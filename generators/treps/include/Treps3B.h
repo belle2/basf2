@@ -39,8 +39,9 @@ namespace Belle2 {
   public:
     // constants, enums and typedefs
     double w;      // invariant mass of two-photon system
-    char filename[132]; // filename for parameter input
-    char filename2[132]; // filename for W List input
+    char parameterFile[132]; // filename for parameter input
+    char wlistFile[132]; // filename for W List input
+    char diffcrosssectionFile[132]; // filename for differential cross section
 
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved
@@ -145,7 +146,14 @@ namespace Belle2 {
     int wtcount;
     int  wthead[5000];
     double  wtcond[5000];
-    std::map<double, double> crossSectionOfW;
+
+    // Table of differential cross section of W.
+    std::map<double, double> diffCrossSectionOfW;
+
+    // They are used for simulate W distribution with importance sampling. NOT CORRECT cross section !!
+    double totalCrossSectionForMC;
+    std::map<double, double> WOfCrossSectionForMC;
+
     //201903E
     int ndecay;  // Num of particles at the first stage
     int pmodel; // Physics model

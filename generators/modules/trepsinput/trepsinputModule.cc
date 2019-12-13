@@ -45,57 +45,69 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
 
-  // setDescription(R"DOC("Input from TREPS generator (No-tag)
-
-  //     Input from TREPS generator for ee->ee hadrons
-  //     )DOC");
-
   // Parameter definitions
-  addParam("W", wf, "W, gamma-gamma cm energy", (float)2.0);
-
-  std::string dfname("treps_par.dat");
-  std::string fname;
-  addParam("InputFileName", fname, "filename for TREPS input", dfname);
-  strncpy(filename, fname.c_str(), 130);
-
-  std::string dfname2("pipidcs.dat");
-  std::string fname2;
-  addParam("InputFileName2", fname2, "filename for W-List input", dfname2);
-  strncpy(filename2, fname2.c_str(), 130);
-
-  std::string nocheck("");
-  addParam("RootFileNameForCheck", rfnfc, "filename for TREPS W-Listbehavior check", nocheck);
-
-  TrepsB::initp();
-  TrepsB::create_hist();
-
-  //Initialize generator;
-  UtrepsB::initg();
-
-  //201903
-  B2DEBUG(10, "wtable started !!!");
-  TrepsB::wtable();
-  //201903E
+  addParam("ParameterFile", m_parameterFile,
+           "parameter file for TREPS input", std::string("treps_par.dat"));
+  addParam("DifferentialCrossSectionFile", m_differentialCrossSectionFile,
+           "file name for differential cross section table input. If UseDiscreteAndSortedW is true, the file is used",
+           std::string("pipidcs.dat"));
+  addParam("WListTableFile", m_wListTableFile,
+           "file name for W-List table input. If UseDiscreteAndSortedW is false (default), the file is used", std::string("wlist_table.dat"));
+  addParam("UseDiscreteAndSortedW", m_useDiscreteAndSortedW,
+           "if true, use WListTable for discrete and sorted W. if false (default), use DifferentialCrossSection", false);
 
 }
 
 void trepsinputModule::initialize()
 {
-  B2DEBUG(10, "TrepsInputModule is initialized !!!");
+  //Initialize generator;
+  strncpy(TrepsB::parameterFile, m_parameterFile.c_str(), 130);
+  strncpy(TrepsB::diffcrosssectionFile, m_differentialCrossSectionFile.c_str(), 130);
+  strncpy(TrepsB::wlistFile, m_wListTableFile.c_str(), 130);
+
+  TrepsB::initp();
+
+  TrepsB::create_hist();
+  UtrepsB::initg();
+
+  if (m_useDiscreteAndSortedW) {
+    // Initialize wtable with WListTable
+    B2INFO("Discrete W-list is used !!!");
+    TrepsB::wtcount = 0;
+    TrepsB::wtable(0);
+
+    TrepsB::w = (double)TrepsB::wf;
+    trepsinputModule::updateW();
+  } else {
+    // Initialize wtable with DifferentialCrossSection
+    TrepsB::wtable();
+  }
 
   m_mcparticles.registerInDataStore();
+
 }
 
 void trepsinputModule::event()
 {
-  B2DEBUG(10, "Event started in TrepsInputModule !!!");
+  if (m_useDiscreteAndSortedW) {
+    if (TrepsB::inmode != 0) return;
 
-  TrepsB::w = simulateW();
-  trepsinputModule::updateW();
+    TrepsB::wtcount++;
+    TrepsB::wf = (float)(wtable(1));
+
+    if (abs((double)TrepsB::wf - TrepsB::w) >= 0.001 && TrepsB::wf > 0.01) {
+      B2INFO(" W value changed. " << TrepsB::w << " to " << TrepsB::wf);
+      TrepsB::w = (double)TrepsB::wf;
+      trepsinputModule::updateW();
+    }
+  } else {
+    TrepsB::w = simulateW();
+    trepsinputModule::updateW();
+  }
 
   int idummy = 0;
   int iret = TrepsB::event_gen(idummy);
-  mpg.clear();
+  m_mpg.clear();
 
   if (iret >= 1) {
 
@@ -103,20 +115,20 @@ void trepsinputModule::event()
 
     // fill data of the final-state particles
     for (int i = 0; i < npart ; i++) {
-      auto& p = mpg.addParticle();
+      auto& p = m_mpg.addParticle();
       p.setPDG(part[i].part_prop.icode);
       p.set4Vector(part[i].p);
       p.setMass(part[i].part_prop.pmass);
       p.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
     }
     // fill data of the recoil electron and positron
-    auto& p1 = mpg.addParticle();
+    auto& p1 = m_mpg.addParticle();
     p1.setPDG(11);
     p1.set4Vector(TrepsB::pe);
     p1.setMass(TrepsB::me);
     p1.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
 
-    auto& p2 = mpg.addParticle();
+    auto& p2 = m_mpg.addParticle();
     p2.setPDG(-11);
     p2.set4Vector(TrepsB::pp);
     p2.setMass(TrepsB::me);
@@ -125,26 +137,27 @@ void trepsinputModule::event()
 
   }
   //Fill MCParticle List
-  mpg.generateList(m_mcparticles.getName(), MCParticleGraph::c_setDecayInfo);
+  m_mpg.generateList(m_mcparticles.getName(), MCParticleGraph::c_setDecayInfo);
 }
+
 void trepsinputModule::terminate()
 {
-  if (boost::filesystem::path(rfnfc).extension().string() == std::string(".root")) {
-    TFile* f = new TFile(rfnfc.c_str(), "recreate");
-    if (f) {
-      B2DEBUG(10, "Write histograms for check into " << rfnfc);
-      f->cd();
-      treh1->Write();
-      treh2->Write();
-      treh3->Write();
-      treh4->Write();
-      treh5->Write();
-      treh6->Write();
-      f->Flush();
-      f->Close();
-    }
-  }
   TrepsB::terminate();
+}
+
+double trepsinputModule::getCrossSection(double W)
+{
+  if (TrepsB::diffCrossSectionOfW.size() == 0) {
+    B2FATAL("Cross Section Table is empty !!!");
+    return 0.;
+  }
+
+  auto it_upper = TrepsB::diffCrossSectionOfW.lower_bound(
+                    W); // This lower_bound returns first iterator which meets >=w condition. --> upper side
+  auto it_lower = it_upper;
+  it_lower--;
+
+  return (it_upper->second - it_lower->second) / (it_upper->first - it_lower->first) * (W - it_lower->first) + it_lower->second;
 }
 
 double trepsinputModule::simulateW()
@@ -152,54 +165,24 @@ double trepsinputModule::simulateW()
   std::random_device rnd;
   std::mt19937 mt(rnd());
 
-  const std::map<double, double> upperLimit_pipi = {
-    {0.5, 4.5},
-    {1.5, 0.2},
-    {2.0, 0.025},
-    {2.5, 0.006},
-    {3.0, 0.0013},
-    {4.0, 0.}
-  };
-
-  std::map<double, double> areaUpToBin;
-  double areaOfRandom = 0.;
-  double lowerEdge = 0.;
-  double upperEdge = 0.;
-  double currentLimit = 0.;
-  for (auto x : upperLimit_pipi) {
-    upperEdge = x.first;
-    areaOfRandom += (upperEdge - lowerEdge) * currentLimit;
-
-    lowerEdge = upperEdge;
-    currentLimit = x.second;
-
-    areaUpToBin[lowerEdge] = areaOfRandom;
-  }
-
-  std::uniform_real_distribution<double> getScaledW(0.0, areaOfRandom);
+  std::uniform_real_distribution<double> getCrossSectionForMC(0.0, TrepsB::totalCrossSectionForMC);
 
   while (1) {
-    double scaledW = getScaledW(mt);
+    double crossSectionForMC = getCrossSectionForMC(mt);
 
-    double W = 0.;
+    auto it_upper = TrepsB::WOfCrossSectionForMC.lower_bound(crossSectionForMC);
+    auto it_lower = it_upper;
+    it_lower--;
 
-    double edge = 0.;
-    double limit = 0.;
-    double area = 0.;
-    for (auto x : areaUpToBin) {
+    double diffCrossSectionAtUpper = TrepsB::diffCrossSectionOfW.at(it_upper->second);
+    double diffCrossSectionAtLower = TrepsB::diffCrossSectionOfW.at(it_lower->second);
+    double limit = (diffCrossSectionAtUpper > diffCrossSectionAtLower) ? diffCrossSectionAtUpper * 1.01 : diffCrossSectionAtLower *
+                   1.01;
 
-      if (scaledW < x.second) {
-        W = (scaledW - area) / limit + edge;
-        break;
-      }
-
-      edge = x.first;
-      area = x.second;
-      limit = upperLimit_pipi.at(edge);
-    }
+    double W = (crossSectionForMC - it_lower->first) / limit + it_lower->second ; /////
 
     if (W < 0.5 or W > 4.0)
-      B2FATAL("W has to be in [0.5, 4.0] !!! W = " << W << ", scaledW = " << scaledW);
+      B2FATAL("W has to be in [0.5, 4.0] !!! W = " << W << ", crossSectionForMC = " << crossSectionForMC);
 
     std::uniform_real_distribution<double> getTrial(0.0, limit);
     double trial = getTrial(mt);
@@ -213,16 +196,3 @@ double trepsinputModule::simulateW()
   return 0;
 }
 
-double trepsinputModule::getCrossSection(double W)
-{
-  if (TrepsB::crossSectionOfW.size() == 0) {
-    B2ERROR("Cross Section Table is empty !!!");
-    return 0.;
-  }
-
-  auto it_upper = crossSectionOfW.lower_bound(W); // This lower_bound returns first iterator which meets >=w condition. --> upper side
-  auto it_lower = it_upper;
-  it_lower--;
-
-  return (it_upper->second - it_lower->second) / (it_upper->first - it_lower->first) * (W - it_lower->first) + it_lower->second;
-}

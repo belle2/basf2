@@ -53,25 +53,6 @@ namespace Belle2 {
 
   TrepsB::TrepsB(void) : sutool()
   {
-    //  char filtmp[132];
-    char* strpoi;
-
-    if ((strpoi = getenv("TREPS_PAR_FILE")) != 0)
-      //  strcpy( filtmp, getenv("TREPS_PAR_FILE") )
-      //  if ( filtmp[0] == '\0' )
-      // file name of parameter-input file
-      //    strcpy( filename, "treps_par.dat" );
-      //  else
-      strcpy(filename, strpoi);
-
-    B2INFO("Treps: Parameters are read from the file, " << filename);
-
-    if ((strpoi = getenv("TREPS_WLIST_FILE")) != 0) strcpy(filename2, strpoi);
-
-    B2INFO("Treps: W list is read from the file, " << filename2);
-
-
-
   }
 
   //
@@ -80,14 +61,21 @@ namespace Belle2 {
   void TrepsB::initp(void)
   // read parameter-input file and load the parameters
   {
+
+    char* strpoi;
+
+    B2INFO("Treps: Parameters are read from the file, " << parameterFile);
+    B2INFO("Treps: W list is read from the file, " << wlistFile);
+    B2INFO("Treps: Differential cross section list is read from the file, " << diffcrosssectionFile);
+
     partgen = new Part_gen [30];
     parti = new Part_cont [10];
     parts = new Part_cont [20];
     pppp = new TLorentzVector [30];
 
-    ifstream infile(filename);
+    ifstream infile(parameterFile);
     if (!infile) {
-      B2FATAL("Can't open input file: " << filename);
+      B2FATAL("Can't open input file: " << parameterFile);
     } else {
       infile >> ebeam ;
       std::cout << "ebeam :" << ebeam << std::endl;
@@ -156,9 +144,6 @@ namespace Belle2 {
       ephi = ppp.Phi();
       etheta = ppp.Theta();
 
-
-      //B2DEBUG(10,"Rot. angle "<< etheta);
-
       tsws = -tsws ;
       tswsb = (1. / tsws4) * tsws;
 
@@ -212,10 +197,6 @@ namespace Belle2 {
 
   void TrepsB::create_hist(void)
   {
-    //    filnam_hist = "trepshist";
-    //  trfile = new HBookFile(filnam_hist, 14 );
-
-
     treh1 = new TH1F("PZSUMCM", "PZSUMCM", 100, -10., 10.);
     treh2 = new TH1F("PTSUMCM", "PTSUMCM", 100, 0., 1.);
     treh3 = new TH1F("EALLCM", "EALLCM", 100, 0., 20.);
@@ -230,22 +211,38 @@ namespace Belle2 {
 
   }
 
-  //201903
-  // W table
   void TrepsB::wtable()
   {
-    // initialization and load table
+    totalCrossSectionForMC = 0.;
 
-    // Load Wlist_table
-    ifstream infile2(filename2);
-    if (!infile2) {
+    // Load Differential Cross Section table
+    ifstream infile(diffcrosssectionFile);
+    if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
       double w; // W [GeV]
-      double crossSection; // Number of events for given W
-      while (infile2 >> w >> crossSection) {
+      double diffCrossSection; // Number of events for given W
+
+      double previousW = 0.;
+      double previousDCS = 0.; // Diff(erential) Cross Section
+      while (infile >> w >> diffCrossSection) {
         if (w > 9000. || w < 0.) continue;
-        crossSectionOfW[w] = crossSection;
+        diffCrossSectionOfW[w] = diffCrossSection;
+
+        // Calculate total cross section up to the bin.
+        // This will be used for importance sampling. NOT CORRECT cross section
+        if (diffCrossSection > previousDCS and previousDCS != 0) {
+          // If current diffCrossSection is higher than previous and not first time, use diffCrossSection
+          totalCrossSectionForMC += (w - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
+        } else {
+          // If previous diffCrossSection is higher than current or first time, use previousDCS
+          totalCrossSectionForMC += (w - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
+        }
+        // Store current cross section with w
+        WOfCrossSectionForMC[totalCrossSectionForMC] = w;
+
+        previousW = w;
+        previousDCS = diffCrossSection;
       }
 
       B2DEBUG(10, " wtable loaded");
@@ -268,8 +265,8 @@ namespace Belle2 {
 
       // Load Wlist_table
 
-      ifstream infile2(filename2);
-      if (!infile2) {
+      ifstream infile(wlistFile);
+      if (!infile) {
         B2FATAL("Can't open W-list input file") ;
       } else {
         double w1;
@@ -280,12 +277,12 @@ namespace Belle2 {
         hpoint = 1;
         nwpoint = 0;
 
-        infile2 >> inmodein;
+        infile >> inmodein;
         inmode = inmodein;
 
-        while (!infile2.eof() && inmode == 0) {
-          sutool.nextline(infile2);
-          infile2 >> w1 >> n1 ;
+        while (!infile.eof() && inmode == 0) {
+          sutool.nextline(infile);
+          infile >> w1 >> n1 ;
           if (w1 > 9000. || w1 < 0.) continue;
 
           if (nwpoint == 0) wthead[0] = 1;
@@ -295,21 +292,18 @@ namespace Belle2 {
           B2DEBUG(10,  w1 << " GeV  " << n1 << " events   " << hpoint - 1 << "events in total");
           wthead[nwpoint] = hpoint;
         }
-        while (!infile2.eof() && (inmode == 1 || inmode == 2)) {
-          sutool.nextline(infile2);
-          infile2 >> w1 >> n1 ;
+        while (!infile.eof() && (inmode == 1 || inmode == 2)) {
+          sutool.nextline(infile);
+          infile >> w1 >> n1 ;
           if (w1 > 9000. || w1 < 0.) continue;
           wf = w1;
           w = (double)wf;
-          //B2DEBUG(10,"Here1");
           updateW();
-          //B2DEBUG(10, "Here");
           if (inmode == 1)
             B2INFO(w << " " << twlumi() << "   //W(GeV) and Two-photon lumi. func.(wide)(1/GeV)");
           else
             B2INFO(w << " " << twlumi_n() << "   //W(GeV) and Two-photon lumi. func.(narrow)(nb/keV/(2J+1))");
 
-          //B2DEBUG(10, "Here" );
         }
 
         B2DEBUG(10, wthead[0] << " " << wtcond[0]);
@@ -330,7 +324,6 @@ namespace Belle2 {
     }
   }
 
-  //201903E
 
 
   void TrepsB::setW(double ww)
@@ -421,7 +414,6 @@ namespace Belle2 {
         if (v > vmax) vmax = v;
       }
     } else {
-      // B2DEBUG(10, "VMAX  "<<vmax);
       do { z = (gRandom->Uniform() - 0.5) * 2. ; }
       while (vmax * gRandom->Uniform() >= tpangd(z, w));
     }
@@ -445,8 +437,6 @@ namespace Belle2 {
       } else {
         r = (2.0 + d * d / rs - sqrt(pow((2.0 + d * d / rs), 2) - 4.0)) * 0.5;
       }
-
-      //  std::cout << " d, rs "<<d<<" "<<rs<<std::endl;
 
       double z = sqrt(rs / r);
       double y = sqrt(rs * r);
@@ -561,7 +551,6 @@ namespace Belle2 {
 
       // particle masses
       tpgetm(parti, ndecay);
-      //   std::cout << parti[0].pmass <<" "<< parti[0].pmassp << std::endl;
 
       // angular distribution
       if (ndecay == 2) {

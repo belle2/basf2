@@ -26,20 +26,8 @@
 using namespace Belle2;
 
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
-
 UtrepsB::UtrepsB(void) : TrepsB()
 {
-
-  //parametrization of pi+pi- partial waves
-
-
 }
 
 void UtrepsB::initg(void)
@@ -75,9 +63,7 @@ void UtrepsB::initg(void)
 
   static double data003[9] = { 2.3, 2.3, 7.26, 7.94, 8.53, 7.38, 3.25, 1.98, 2.30};
   static double data203[9] = { 9.63, 9.63, 10.73, 8.02, 6.18, 3.37, 0.63, 0.10, 0.66};
-  static double data223[9] = { 1.48, 1.48, -4.62, -6.12, -6.78, -5.35, -1.82, -1.02, -1.63}
-                             ;
-
+  static double data223[9] = { 1.48, 1.48, -4.62, -6.12, -6.78, -5.35, -1.82, -1.02, -1.63};
 
 
   if (TrepsB::pmodel == 251) {
@@ -290,8 +276,6 @@ int UtrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
   //HepRandom& rnd8 = sutool.rnd8;
 
   int iret = 1;
-
-  //B2DEBUG(10, " Ndecay"<<TrepsB::ndecay <<" Pmodel"<<TrepsB::pmodel<< " npart "<<_npart);
 
 
   // 3-body physics models

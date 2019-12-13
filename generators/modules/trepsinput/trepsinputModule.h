@@ -39,9 +39,6 @@ namespace Belle2 {
     /** input event from TREPS */
     virtual void event() override;
 
-    float wf;
-    std::string rfnfc;
-
     /** Simulate W distribution according to given input file of cross section table */
     double simulateW();
 
@@ -50,13 +47,24 @@ namespace Belle2 {
 
   private:
 
-    MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
+    /** Parameter file which configures the setting of beam, production particle etc. */
+    std::string m_parameterFile;
+
+    /** W-List table file. It has to have two columns, W [GeV] and Number_of_events_at_W */
+    std::string m_wListTableFile;
+
+    /** Differential cross section table file. It has to have two columns, W [GeV] and differential_cross_section */
+    std::string m_differentialCrossSectionFile;
+
+    MCParticleGraph m_mpg;        /**< An instance of the MCParticle graph. */
 
     DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
 
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */
 
     StoreArray<MCParticle> m_mcparticles; /**< MCParticle collection */
+
+    bool m_useDiscreteAndSortedW; /* if it is true, W-list table is used for discrete and sorted W */
 
   };
 }

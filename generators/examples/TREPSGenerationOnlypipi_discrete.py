@@ -18,7 +18,7 @@ set_log_level(LogLevel.DEBUG)
 main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100000)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=99966)
 
 # beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
@@ -27,17 +27,17 @@ beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
 parameterFilePipi = Belle2.FileSystem.findFile('generators/modules/trepsinput/parameterFiles/treps_par_pipi.dat')
-differentialCrossSectionFilePipi = Belle2.FileSystem.findFile(
-    'generators/modules/trepsinput/differentialCrossSectionFiles/pipidcs.dat')
+wListTableFilePipi = Belle2.FileSystem.findFile('generators/modules/trepsinput/wListFiles/wlist_table_pipi.dat')
 
 trepsinput = basf2.register_module('trepsinput')
 trepsinput.param('ParameterFile', parameterFilePipi)
-trepsinput.param('DifferentialCrossSectionFile', differentialCrossSectionFilePipi)
+trepsinput.param('WListTableFile', wListTableFilePipi)
+trepsinput.param('UseDiscreteAndSortedW', True)
 
 # run
 main.add_module("Progress")
 main.add_module(trepsinput)
-main.add_module("RootOutput", outputFileName="utrepsbpipi_100k.root")
+main.add_module("RootOutput", outputFileName="utrepsbpipi_100k_dicrete.root")
 main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.INFO, onlyPrimaries=False)
 
 # generate events

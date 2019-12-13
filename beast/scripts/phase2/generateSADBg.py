@@ -144,7 +144,8 @@ main.add_module(generator)
 # Geant geometry
 geometry = register_module('Geometry')
 geometry.param('useDB', False)
-geometry.param('additionalComponents', ['BEAMABORT', 'MICROTPC', 'CLAWS', 'HE3TUBE'])
+if phase == 31:
+    geometry.param('additionalComponents', ['BEAMABORT', 'MICROTPC', 'CLAWS', 'HE3TUBE'])
 main.add_module(geometry)
 
 # Geant simulation

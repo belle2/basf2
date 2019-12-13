@@ -14,7 +14,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all simulation examples."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = []
+    broken_tutorials = ['B2A104-SimulateAndReconstruct-withBeamBkg.py']
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
@@ -35,7 +35,7 @@ class TutorialsTest(unittest.TestCase):
                         # on stderr so it's not split from output of unittest
                         # done like this since we don't want to decode/encode utf8
                         sys.stdout.buffer.write(result.stdout)
-#                    self.assertEqual(result.returncode, 0)
+                    self.assertEqual(result.returncode, 0)
 
 
 if __name__ == '__main__':

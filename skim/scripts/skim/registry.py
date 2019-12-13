@@ -26,6 +26,9 @@ skim_registry = [
     # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
     ('14140101', 'BtoD0h_Kpi'),
     ('14140102', 'BtoD0h_Kpipipi'),
+    ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    ('14120700', 'B0toDStarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
+    ('14120800', 'B0toDStarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -69,9 +72,6 @@ skim_registry = [
     ('18520400', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
-    ('14120600', 'B0toDpi_kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
-    ('14120700', 'B0toDStarPi_D0pi_kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
-    ('14120800', 'B0toDStarPi_D0pi_kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
 ]
 
 #: A dict listing which standalone skims are included the combined skim scripts

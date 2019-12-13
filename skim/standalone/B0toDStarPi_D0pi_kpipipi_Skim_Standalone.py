@@ -4,7 +4,7 @@
 #######################################################
 #
 # neutral B to charm mode:
-# B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
+# B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> K- pi+ pi- pi+
 #
 # Chiara La Licata 2019/Oct/18
 #
@@ -22,9 +22,9 @@ gb2_setuprel = 'release-04-00-04'
 
 mypath = Path()
 
-skimCode = encodeSkimName('B0toDStarPi_D0pi_kpipipi')
+skimCode = encodeSkimName('B0toDStarPi_D0pi_Kpipipi')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = get_test_file("MC12_mixedBGx1")
 
 inputMdstList('default', fileList, path=mypath)
 
@@ -39,15 +39,15 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
              path=mypath)
 
 
-# B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+ Skim
-from skim.btocharm import loadB0toDstarh_kpipipi
+# B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> K- pi+ pi- pi+ Skim
+from skim.btocharm import loadB0toDstarh_Kpipipi
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
 loadStdD0_Kpipipi(path=mypath)
 loadStdDstarPlus_D0pi_Kpipipi(path=mypath)
-B0toDstarhList_kpipipi = loadB0toDstarh_kpipipi(path=mypath)
+B0toDstarhList_Kpipipi = loadB0toDstarh_Kpipipi(path=mypath)
 
-skimOutputUdst(skimCode, B0toDstarhList_kpipipi, path=mypath)
-summaryOfLists(B0toDstarhList_kpipipi, path=mypath)
+skimOutputUdst(skimCode, B0toDstarhList_Kpipipi, path=mypath)
+summaryOfLists(B0toDstarhList_Kpipipi, path=mypath)
 
 setSkimLogging(mypath)
 process(mypath)

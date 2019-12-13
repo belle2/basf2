@@ -329,11 +329,11 @@ def BsigToD0hToKpipipiList(path):
     return Lists
 
 
-def loadB0toDpi(path):
+def loadB0toDpi_Kpipi(path):
     """
     **Skim Author**: C. La Licata
 
-    **Skim Name**: B0toDpi_kpipi
+    **Skim Name**: B0toDpi_Kpipi
 
     **Skim Category**: physics, hadronic neutral B to charm
 
@@ -360,21 +360,16 @@ def loadB0toDpi(path):
 
     Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
 
-    BsigList = []
+    ma.reconstructDecay('B0:Dpi_Kpipi -> D-:Kpipi pi+:all', Bcuts, 0, path=path)
 
-    ma.reconstructDecay('B0:Dpi -> D-:Kpipi pi+:all', Bcuts, 0, path=path)
-
-    BsigList.append('B0:Dpi')
-
-    List = BsigList
-    return List
+    return ['B0:Dpi_Kpipi']
 
 
-def loadB0toDstarh_kpi(path):
+def loadB0toDstarh_Kpi(path):
     """
     **Skim Author**: C. La Licata
 
-    **Skim Name**: B0toDStarPi_D0pi_kpi
+    **Skim Name**: B0toDStarPi_D0pi_Kpi
 
     **Skim Category**: physics, hadronic neutral B to charm
 
@@ -401,20 +396,16 @@ def loadB0toDstarh_kpi(path):
 
     Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
 
-    BsigList_kpi = []
+    ma.reconstructDecay('B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:all', Bcuts, 0, path=path)
 
-    ma.reconstructDecay('B0:Dstarpi_kpi -> D*-:D0_Kpi pi+:all', Bcuts, 0, path=path)
-    BsigList_kpi.append('B0:Dstarpi_kpi')
-
-    List = BsigList_kpi
-    return List
+    return ['B0:Dstarpi_Kpi']
 
 
-def loadB0toDstarh_kpipipi(path):
+def loadB0toDstarh_Kpipipi(path):
     """
    **Skim Author**: C. La Licata
 
-   **Skim Name**: B0toDStarPi_D0pi_kpipipi
+   **Skim Name**: B0toDStarPi_D0pi_Kpipipi
 
    **Skim Category**: physics, hadronic neutral B to charm
 
@@ -441,13 +432,9 @@ def loadB0toDstarh_kpipipi(path):
 
     Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
 
-    BsigList_kpipipi = []
+    ma.reconstructDecay('B0:Dstarpi_Kpipipi -> D*-:D0_Kpipipi pi+:all', Bcuts, 0, path=path)
 
-    ma.reconstructDecay('B0:Dstarpi_kpipipi -> D*-:D0_Kpipipi pi+:all', Bcuts, 0, path=path)
-    BsigList_kpipipi.append('B0:Dstarpi_kpipipi')
-
-    Lists = BsigList_kpipipi
-    return Lists
+    return ['B0:Dstarpi_Kpipipi']
 
 
 def DoubleCharmList(path):

@@ -4,7 +4,7 @@
 #######################################################
 #
 # neutral B to charm mode:
-# B0 -> D-(k+ pi- pi-)pi+
+# B0 -> D-(K+ pi- pi-)pi+
 #
 # Chiara La Licata 2019/Oct/18
 #
@@ -22,7 +22,7 @@ gb2_setuprel = 'release-04-00-04'
 
 mypath = Path()
 
-skimCode = encodeSkimName('B0toDpi_kpipi')
+skimCode = encodeSkimName('B0toDpi_Kpipi')
 
 fileList = get_test_file("mixedBGx1", "MC12")
 
@@ -39,11 +39,11 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
              path=mypath)
 
 
-# B0 to D-(k+ pi- pi-)pi+ Skim
-from skim.btocharm import loadB0toDpi
+# B0 to D-(K+ pi- pi-)pi+ Skim
+from skim.btocharm import loadB0toDpi_Kpipi
 from skim.standardlists.charm import loadStdDplus_Kpipi
 loadStdDplus_Kpipi(path=mypath)
-B0toDpiList = loadB0toDpi(path=mypath)
+B0toDpiList = loadB0toDpi_Kpipi(path=mypath)
 
 skimOutputUdst(skimCode, B0toDpiList, path=mypath)
 summaryOfLists(B0toDpiList, path=mypath)

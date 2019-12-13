@@ -76,7 +76,7 @@ void GeneratedVertexDisplacerModule::event()
 
     MCParticle& mcp = *m_mcparticles[mcp_index];
 
-    if (!(mcp.hasStatus(MCParticle::c_PrimaryParticle)) || (mcp.hasStatus(MCParticle::c_Initial))) return;
+    if (!(mcp.hasStatus(MCParticle::c_PrimaryParticle)) || (mcp.hasStatus(MCParticle::c_Initial))) continue;
 
     int mcp_pdg = mcp.getPDG();
 
@@ -151,19 +151,20 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   else if (m_lifetimeOption.compare("flat") == 0) {
     decayTime_mcp = gRandom->Uniform(0, m_maxDecayTime);
   } else {
-    decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Gamma() * fourVector_mcp.Beta();
+    decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Gamma();
 
     if (!particle.getMass()) {
       B2WARNING("Displacing a particle with zero mass. Forcing Gamma=1 for the decay time.");
-      decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Beta();
+      decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime;
     }
   }
 
   float pMag = fourVector_mcp.P();
+  float beta = fourVector_mcp.Beta();
 
-  displacement.SetX(decayTime_mcp * fourVector_mcp.X() / pMag);
-  displacement.SetY(decayTime_mcp * fourVector_mcp.Y() / pMag);
-  displacement.SetZ(decayTime_mcp * fourVector_mcp.Z() / pMag);
+  displacement.SetX(beta * decayTime_mcp * fourVector_mcp.X() / pMag);
+  displacement.SetY(beta * decayTime_mcp * fourVector_mcp.Y() / pMag);
+  displacement.SetZ(beta * decayTime_mcp * fourVector_mcp.Z() / pMag);
   displacement.SetT(decayTime_mcp);
 }
 

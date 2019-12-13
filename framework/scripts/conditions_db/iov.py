@@ -7,6 +7,7 @@ validities, `IoVSet`, which can be used to manipulate iov ranges
 """
 
 import math
+from itertools import product
 
 
 class IntervalOfValidity:
@@ -71,7 +72,7 @@ class IntervalOfValidity:
 
     def __repr__(self):
         """Return a printable representation"""
-        return "IoV{}".format(self.__first + self.__final)
+        return "{}".format(self.__first + self.__final)
 
     def __eq__(self, other):
         """Check for equality"""
@@ -200,7 +201,7 @@ class IoVSet:
     >>> a.iovs
     IovSet{IoV(0, 0, 0, 5), IoV(0, 8, 0, 9)}
     """
-    def __init__(self, *, allow_overlaps=False, allow_startone=False):
+    def __init__(self, iterable=None, *, allow_overlaps=False, allow_startone=False):
         """Create a new set.
 
         Parameters:
@@ -218,6 +219,9 @@ class IoVSet:
         #: Whether or not run 1 will be also considered the first run when
         # combining iovs between experiments
         self.__allow_startone = allow_startone
+        if iterable is not None:
+            for element in iterable:
+                self.add(element)
 
     def add(self, iov):
         """
@@ -234,13 +238,18 @@ class IoVSet:
         >>> a.iovs
         IovSet{IoV(0, 0, 0, 5), IoV(0, 8, 0, 9)}
 
-        Parameters: iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): Iov or
-            iovset to add to this set
+        Parameters:
+            iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
+                set of IoVs to add to this set
+
+        Warning:
+            This method modifies the set in place
         """
         # we can remove a set from a set :D
         if isinstance(iov, IoVSet):
             for element in iov:
                 self.add(element)
+            return
         # make sure it's actually an IoV, this will raise an error on failure
         if not isinstance(iov, IntervalOfValidity):
             iov = IntervalOfValidity(iov)
@@ -278,13 +287,18 @@ class IoVSet:
         >>> a.iovs
         IovSet{IoV(0, 0, 0, inf), IoV(2, 0, 4, inf), IoV(8, 6, 10, inf)}
 
-        Parameters: iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): Iov or
-            IoVSet to remove from this set
+        Parameters:
+            iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
+                set of IoVs to remove from this set
+
+        Warning:
+            This method modifies the set in place
         """
         # we can remove a set from a set :D
         if isinstance(iov, IoVSet):
             for element in iov:
                 self.remove(element)
+            return
         # make sure it's actually an IoV, this will raise an error on failure
         if not isinstance(iov, IntervalOfValidity):
             iov = IntervalOfValidity(iov)
@@ -300,6 +314,54 @@ class IoVSet:
                 elif delta is not None:
                     self.__iovs.add(delta)
 
+    def intersect(self, other):
+        """Intersect this set with another set and return a new set
+        which is valid exactly where both sets have been valid before
+
+        >>> a = IoVSet()
+        >>> a.add((0,0,10,-1))
+        >>> b = IoVSet()
+        >>> b.add((5,0,20,-1))
+        >>> a.intersect(b)
+        IovSet{IoV(5,0,10,-1))}
+        """
+        result = IoVSet()
+        for a, b in product(self.iovs, other.iovs):
+            c = a & b
+            if c:
+                result.add(c)
+        return result
+
+    def contains(self, iov):
+        """
+        Check if an iov is fully covered by the set
+
+        Parameters:
+            iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
+                set of IoVs to be checked
+
+        Returns:
+            True if the full iovs or all the iovs in the given set are fully
+            present in this set
+        """
+        # check if the whole set is in this set: all iovs need to be in here
+        if isinstance(iov, IoVSet):
+            return all(e in self for e in iov)
+        # make sure it's actually an IoV, this will raise an error on failure
+        if not isinstance(iov, IntervalOfValidity):
+            iov = IntervalOfValidity(iov)
+        # and then check all iovs in the set if they cover it
+        for existing in self.__iovs:
+            if iov - existing is None:
+                return True
+        return False
+
+    def copy(self):
+        """Return a copy of this set"""
+        copy = IoVSet(allow_overlaps=self.__allow_overlaps, allow_startone=self.__allow_startone)
+        copy.__iovs = set(self.__iovs)
+        return copy
+
     def clear(self):
         """Clear all iovs from this set"""
         self.__iovs = {}
@@ -308,6 +370,33 @@ class IoVSet:
     def iovs(self):
         """Return the set of valid iovs"""
         return self.__iovs
+
+    def __bool__(self):
+        """Return True if the set is not empty"""
+        return len(self.__iovs) > 0
+
+    def __contains__(self, iov):
+        """Check if an iov is fully covered by the set"""
+        return self.contains(iov)
+
+    def __and__(self, other):
+        """Return a new set that is the intersection between two sets"""
+        return self.intersect(other)
+
+    def __or__(self, other):
+        """
+        Return a new set that is the combination of two sets: The new set will
+        be valid everywhere any of the two sets were valid
+        """
+        copy = self.copy()
+        copy.add(other)
+        return copy
+
+    def __sub__(self, other):
+        """Return a new set which is only valid for where a is valid but not b"""
+        copy = self.copy()
+        copy.remove(other)
+        return copy
 
     def __iter__(self):
         """Loop over the set of iovs"""

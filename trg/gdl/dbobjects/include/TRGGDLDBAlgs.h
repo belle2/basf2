@@ -43,6 +43,12 @@ namespace Belle2 {
       m_algs.push_back(s);
     }
 
+    /** clear vector */
+    void clear(void)
+    {
+      m_algs.clear();
+    }
+
     /** Getter for a GDL logic alghrithm */
     std::string getalg(int i) const
     {

@@ -121,7 +121,7 @@ namespace Belle2 {
 //  m_TRGSummary.isRequired();
     TRGDebug::level(_debugLevel);
 
-    B2DEBUG(100, "TRGGDLModule::initialize ... options");
+    B2INFO("TRGGDLModule::initialize. simulationMode=" << _simulationMode);
     if (_simulationMode != 3) {
       m_TRGGRLInfo.isRequired("TRGGRLObjects");
     }
@@ -153,6 +153,7 @@ namespace Belle2 {
                                _algFromDB,
                                _algFilePath);
     }
+    printf("TRGGDLModule::beginRun() ends.\n");
 
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
@@ -160,22 +161,14 @@ namespace Belle2 {
   void
   TRGGDLModule::event()
   {
-    /*
-    StoreObjPtr<EventMetaData> bevt;
-    unsigned _exp = bevt->getExperiment();
-    unsigned _run = bevt->getRun();
-    unsigned _evt = bevt->getEvent();
-    std::cout << "evt(" << _evt << ") " << std::endl;
-    */
 
+    printf("TRGGDLModule::event() starts.\n");
     newDir->cd();
 
     TRGDebug::enterStage("TRGGDLModule event");
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
-    std::cout << "h_inp->GetName()=" << h_inp->GetName()
-              << ", h_inp->GetNbinsX()=" << h_inp->GetNbinsX() << std::endl;
     _gdl->accumulateInp(h_inp);
     _gdl->accumulateFtd(h_ftd);
     _gdl->accumulatePsn(h_psn);

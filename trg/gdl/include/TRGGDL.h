@@ -30,6 +30,7 @@
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include <TH1I.h>
@@ -263,6 +264,7 @@ namespace Belle2 {
     DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
     DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
     DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
+    DBObjPtr<TRGGDLDBAlgs> db_algs;
 
     ///
     std::vector<bool> _inpBits;

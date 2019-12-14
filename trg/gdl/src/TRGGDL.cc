@@ -151,16 +151,15 @@ namespace Belle2 {
   void
   TRGGDL::initialize(void)
   {
-    for (int i = 0; i < 160; i++) {
-//  for(int i=0; i<m_InputBitsDB->getninbit(); i++){
+//  for (int i = 0; i < 160; i++) {
+    for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
       B2INFO("TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
     }
-    for (int i = 0; i < 160; i++) {
-//  for(int i=0; i<m_FTDLBitsDB->getnoutbit(); i++){
+//  for (int i = 0; i < 160; i++) {
+    for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
       B2INFO("TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
     }
     for (int i = 0; i < db_algs->getnalgs(); i++) {
-//  for(int i=0; i<m_FTDLBitsDB->getnoutbit(); i++){
       B2INFO("TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
     }
     //if it is firmware simulation, do the cofigurnation
@@ -256,12 +255,12 @@ namespace Belle2 {
         B2WARNING("TRGGRLInfo doesn't exist!!!!");
         return;
       } else {
-        printf("TRGGRLInfo found.\n");
+        if (_debugLevel > 89) printf("TRGGDL:TRGGRLInfo found.\n");
       }
 
       int input_summary = 0;
       for (int i = 0; i < N_InputBits; i++) {
-        printf("ABC:i(%d)\n", i);
+        if (_debugLevel > 89) printf("TRGGDL:ABC:i(%d)\n", i);
         if ((i % 32) == 0) {
           if (i > 0) {
             GDLResult->setInputBits(i / 32 - 1, input_summary);
@@ -288,7 +287,7 @@ namespace Belle2 {
       isload.close();
 
       for (int i = 0; i < N_OutputBits; i++) {
-        // printf("ABB:i(%d)\n", i);
+        if (_debugLevel > 89) printf("TRGGDL:ABB:i(%d)\n", i);
         if ((i % 32) == 0) {
           if (i > 0) {
             GDLResult->setFtdlBits(i / 32 - 1, L1Summary);
@@ -298,7 +297,7 @@ namespace Belle2 {
           L1Summary_psnm = 0;
         }
         std::string alg = _algFromDB ? db_algs->getalg(i) : algs[i];
-        // printf("i(%d), alg(%s)\n", i, db_algs->getalg(i).c_str());
+        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, db_algs->getalg(i).c_str());
         if (isFiredFTDL(_inpBits, alg)) {
           L1Summary |= (1 << (i % 32));
           if (doprescale(m_PrescalesDB->getprescales(i))) {
@@ -323,7 +322,7 @@ namespace Belle2 {
     unsigned _exp = bevt->getExperiment();
     unsigned _run = bevt->getRun();
     */
-    printf("dataSimulation Start\n");
+    if (_debugLevel > 9) printf("TRGGDL:dataSimulation Start\n");
     unsigned _evt = bevt->getEvent();
     TRGDebug::enterStage("TRGGDL dataSim");
 
@@ -336,7 +335,8 @@ namespace Belle2 {
     int N_OutputBits = m_FTDLBitsDB->getnoutbit();
     if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
 
-    printf("N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);
+    if (_debugLevel > 19)
+      printf("TRGGDL:N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);
 
     StoreObjPtr<TRGSummary> GDLResult;
     if (! GDLResult) {
@@ -344,7 +344,7 @@ namespace Belle2 {
       return;
     } else {
 
-      printf("TRGSummary Found.\n");
+      if (_debugLevel > 89) printf("TRGGDL:TRGSummary Found.\n");
       _inpBits.clear();
       _ftdBits.clear();
       _psnBits.clear();

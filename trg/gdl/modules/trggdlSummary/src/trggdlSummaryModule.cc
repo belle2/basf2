@@ -33,12 +33,14 @@ TRGGDLSummaryModule::TRGGDLSummaryModule()
 
   setDescription("Fill experiment data to TRGSummary");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("debugLevel", _debugLevel, "Debug Level", 0);
 
 }
 
 void TRGGDLSummaryModule::initialize()
 {
-  printf("TRGGDLSummaryModule::initialize() start\n");
+
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() start\n");
 
   GDLResult.registerInDataStore();
   for (int i = 0; i < 320; i++) {
@@ -89,13 +91,13 @@ void TRGGDLSummaryModule::initialize()
   }
 
 
-  printf("TRGGDLSummaryModule::initialize() end\n");
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() end\n");
 }
 
 void TRGGDLSummaryModule::event()
 {
 
-  printf("TRGGDLSummaryModule::event() start\n");
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::event() start\n");
   StoreObjPtr<EventMetaData> bevt;
   unsigned _exp = bevt->getExperiment();
   unsigned _run = bevt->getRun();
@@ -111,10 +113,9 @@ void TRGGDLSummaryModule::event()
   int nword_input  = m_unpacker->get_nword_input();
   int nword_output = m_unpacker->get_nword_output();
 
-  printf("n_leafs(%d), n_leafsExtra(%d), n_clocks(%d), nconf(%d), nword_input(%d), nword_output(%d)\n",
-         n_leafs, n_leafsExtra, n_clocks, nconf, nword_input, nword_output);
-
-
+  if (_debugLevel > 89)
+    printf("trggdlSummaryModule:n_leafs(%d), n_leafsExtra(%d), n_clocks(%d), nconf(%d), nword_input(%d), nword_output(%d)\n",
+           n_leafs, n_leafsExtra, n_clocks, nconf, nword_input, nword_output);
 
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
@@ -124,7 +125,8 @@ void TRGGDLSummaryModule::event()
   for (int i = 0; i < 320; i++) {
     if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
   }
-  printf("clk_map(%d)\n", clk_map);
+  if (_debugLevel > 89)
+    printf("trggdlSummaryModule:clk_map(%d)\n", clk_map);
 
   std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
   for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
@@ -134,25 +136,28 @@ void TRGGDLSummaryModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    printf("a:ii(%d),", ii);
+    if (_debugLevel > 89)
+      printf("trggdlSummaryModule:a:ii(%d)\n", ii);
     std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {
         Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
-        printf("ab:i(%d), LeafBitMap[i](%d), *Bits[LeafBitMap[i]](%d)\n",
-               i, LeafBitMap[i], *Bits[LeafBitMap[i]]);
+        if (_debugLevel > 89)
+          printf("trggdlSummaryModule:ab:i(%d), LeafBitMap[i](%d), *Bits[LeafBitMap[i]](%d)\n",
+                 i, LeafBitMap[i], *Bits[LeafBitMap[i]]);
       } else {
-        printf("ab:i(%d), LeafBitMap[i](%d)\n",
-               i, LeafBitMap[i]);
+        if (_debugLevel > 89)
+          printf("trggdlSummaryModule:ab:i(%d), LeafBitMap[i](%d)\n",
+                 i, LeafBitMap[i]);
       }
     }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      printf("ad:leaf(%d),ii(%d),clk_map(%d),*Bits[leaf](%d), entAry[ii]->m_unpacker[clk_map](%d)",
-             leaf, ii, clk_map, *Bits[leaf], entAry[ii]->m_unpacker[clk_map]);
+      if (_debugLevel > 89)
+        printf("trggdlSummaryModule:ad:leaf(%d),ii(%d),clk_map(%d),*Bits[leaf](%d), entAry[ii]->m_unpacker[clk_map](%d)\n",
+               leaf, ii, clk_map, *Bits[leaf], entAry[ii]->m_unpacker[clk_map]);
       _data[leaf][entAry[ii]->m_unpacker[clk_map]] =  *Bits[leaf];
     }
-    printf("\n");
   }
 
   GDLResult.create(true);
@@ -160,24 +165,14 @@ void TRGGDLSummaryModule::event()
   unsigned ored = 0;
 
   for (int j = 0; j < (int)nword_input; j++) {
-    printf("b:j(%d),", j);
+    if (_debugLevel > 89) printf("b:j(%d),", j);
     ored = 0;
     for (int clk = 0; clk < n_clocks; clk++) {
-      printf("clk(%d),", clk);
+      if (_debugLevel > 89) printf("clk(%d),", clk);
       ored |= _data[ee_itd[j]][clk];
     }
     GDLResult->setInputBits(j, ored);
-    if (j == 1) {
-      bool aa = (1 << (41 - 32)) & ored;
-      std::cout << "trggdlSummaryModule41=(" << aa
-                << "), event(" << _evt
-                << ")";
-      if (_evt == 405 || _evt == 720) {
-        std::cout << ", ored(" << ored
-                  << ")";
-      }
-      std::cout << std::endl;
-    }
+    if (_debugLevel > 89) printf("\n");
   }
 
   if (nconf == 0) {

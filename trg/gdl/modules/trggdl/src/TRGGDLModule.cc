@@ -54,7 +54,7 @@ namespace Belle2 {
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("DebugLevel", _debugLevel, "TRGGDL debug level", _debugLevel);
+    addParam("debugLevel", _debugLevel, "Debug Level", _debugLevel);
     addParam("Belle2Phase", _Phase, "Phase2 or Phase3", _Phase);
     addParam("ConfigFile",
              _configFilename,
@@ -153,7 +153,7 @@ namespace Belle2 {
                                _algFromDB,
                                _algFilePath);
     }
-    printf("TRGGDLModule::beginRun() ends.\n");
+    if (_debugLevel > 9) printf("TRGGDLModule::beginRun() ends.\n");
 
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
@@ -162,10 +162,10 @@ namespace Belle2 {
   TRGGDLModule::event()
   {
 
-    printf("TRGGDLModule::event() starts.\n");
+    if (_debugLevel > 9) printf("TRGGDLModule::event() starts.\n");
+
     newDir->cd();
 
-    TRGDebug::enterStage("TRGGDLModule event");
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
@@ -181,8 +181,6 @@ namespace Belle2 {
       B2WARNING("TRGGDLModule.cc: TRGSummary not found. Check it!!!!");
     }
     setReturnValue(result_summary);
-
-    TRGDebug::leaveStage("TRGGDLModule event");
 
     oldDir->cd();
   }

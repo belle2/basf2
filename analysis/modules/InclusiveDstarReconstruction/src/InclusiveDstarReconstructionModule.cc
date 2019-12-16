@@ -119,12 +119,11 @@ void InclusiveDstarReconstructionModule::event()
     };
 
     num_slow_pions++;
-    TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
-    Particle dstar = Particle(
-                       dstar_four_vector, m_dstar_pdg_code, Particle::EFlavorType::c_Flavored,
-    {pion->getArrayIndex()}, pion->getArrayPointer());
-    Particle* new_dstar = particles.appendNew(dstar);
 
+    TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
+    Particle dstar = Particle(dstar_four_vector, m_dstar_pdg_code, Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
+                              pion->getArrayPointer());
+    Particle* new_dstar = particles.appendNew(dstar);
     outputDstarList->addParticle(new_dstar);
 
   }
@@ -135,12 +134,12 @@ void InclusiveDstarReconstructionModule::event()
 
 TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
 {
-  float dstar_energy = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
-  TVector3 slow_pion_momentum = pion->getMomentum();
-  float dstar_momentum_mag = sqrt(dstar_energy * dstar_energy - m_dstar_pdg_mass * m_dstar_pdg_mass);
-  TVector3 dstar_momentum = slow_pion_momentum * (dstar_momentum_mag / slow_pion_momentum.Mag());
+  double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
+  TVector3 momentum_vector_pion = pion->getMomentum();
+  float abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
+  TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
 
-  return TLorentzVector(dstar_momentum, dstar_energy);
+  return TLorentzVector(momentum_vec_dstar, energy_dstar);
 }
 
 bool InclusiveDstarReconstructionModule::pionCompatibleWithDstar(int pion_pdg_code)

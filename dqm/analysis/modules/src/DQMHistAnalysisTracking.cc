@@ -28,7 +28,7 @@ DQMHistAnalysisTrackingModule::DQMHistAnalysisTrackingModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("Tracking"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("TracksDQM"));
   B2DEBUG(99, "DQMHistAnalysisTracking: Constructor done.");
 }
 
@@ -62,7 +62,7 @@ void DQMHistAnalysisTrackingModule::event()
     hh1 = findHist(m_histogramDirectoryName, name);
   }
   if (hh1) {
-    hh1->SetStats(false);
+    hh1->SetStats(true); // maybe we want the mean?
 
     double nGood = hh1->GetBinContent(1);
     double nBad = hh1->GetBinContent(2);

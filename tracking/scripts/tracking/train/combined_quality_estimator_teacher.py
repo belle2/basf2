@@ -367,7 +367,13 @@ class GenerateSimTask(Basf2PathTask):
         )
         path.add_module("EvtGenInput")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
-        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True)
+        if self.experiment_number == 1002:
+            # remove KLM because of bug in backround files with release 4
+            components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
+        else:
+            components = None
+        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)
+
         path.add_module(
             "RootOutput",
             outputFileName=self.get_output_file_name(self.output_file_name),
@@ -1686,7 +1692,7 @@ class MasterTask(b2luigi.WrapperTask):
     num_processes = b2luigi.get_setting("basf2_processes_per_worker", default=0)
     #: Dictionary with experiment numbers as keys and background directory paths as values
     bkgfiles_by_exp = b2luigi.get_setting("bkgfiles_by_exp")
-    # transform dictionary keys (exp. numbers) from strings to int
+    #: Transform dictionary keys (exp. numbers) from strings to int
     bkgfiles_by_exp = {int(key): val for (key, val) in bkgfiles_by_exp.items()}
 
     def requires(self):

@@ -16,12 +16,12 @@
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -81,10 +81,11 @@ namespace Belle2 {
     /**
      * Unpack one EKLM digit.
      * @param[in] rawData           Data to be unpacked.
-     * @param[in] lane              Lane.
+     * @param[in] copper            Copper identifier.
+     * @param[in] hslb              HSLB number.
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackEKLMDigit(const int* rawData, EKLMDataConcentratorLane* lane,
+    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
@@ -152,6 +153,9 @@ namespace Belle2 {
 
     /* Common database objects. */
 
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;
 
@@ -163,9 +167,6 @@ namespace Belle2 {
 
     /* EKLM database objects. */
 
-    /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
-
     /** Channels. */
     DBObjPtr<EKLMChannels> m_eklmChannels;
 
@@ -173,9 +174,6 @@ namespace Belle2 {
     StoreArray<EKLMDigit> m_eklmDigits;
 
     /* BKLM database objects. */
-
-    /** Electronics map. */
-    DBObjPtr<KLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
@@ -191,13 +189,16 @@ namespace Belle2 {
 
     /* Other common variables. */
 
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
     /** Trigger ctime of the previous event. */
     unsigned int m_triggerCTimeOfPreviousEvent;
 
     /* Other EKLM variables. */
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
 
     /* Other BKLM variables. */
 

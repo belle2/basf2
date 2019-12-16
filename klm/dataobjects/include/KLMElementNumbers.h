@@ -42,6 +42,18 @@ namespace Belle2 {
     static const KLMElementNumbers& Instance();
 
     /**
+     * Get channel number
+     * @param[in] subdetector Sundetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] plane       Plane.
+     * @param[in] strip       Strip.
+     */
+    uint16_t channelNumber(int subdetector, int section, int sector, int layer,
+                           int plane, int strip) const;
+
+    /**
      * Get channel number for BKLM.
      * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).

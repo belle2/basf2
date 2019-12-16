@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
+/* Own header. */
+#include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
+
+/* Belle 2 headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* ROOT headers. */
 #include <TClass.h>
 #include <TROOT.h>
-
-/* Belle2 headers. */
-#include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
 
@@ -51,10 +53,8 @@ void DQMHistAnalysisKLMModule::terminate()
 
 void DQMHistAnalysisKLMModule::beginRun()
 {
-  if (!m_bklmElectronicsMap.isValid())
-    B2FATAL("No BKLM electronics map.");
-  if (!m_eklmElectronicsMap.isValid())
-    B2FATAL("No EKLM electronics map.");
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("No KLM electronics map.");
 }
 
 void DQMHistAnalysisKLMModule::endRun()
@@ -74,7 +74,6 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int channelSubdetector, channelSection, channelSector;
   int layer, plane, strip;
   std::string str;
-  const EKLMDataConcentratorLane* lane;
   canvas->Clear();
   canvas->cd();
   histogram->Draw();
@@ -108,31 +107,25 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
     m_ElementNumbers->moduleNumberToElementNumbers(
       it->first, &channelSubdetector, &channelSection, &channelSector, &layer);
-    if (m_ElementNumbers->isBKLMChannel(it->first)) {
-      uint16_t channel = BKLMElementNumbers::channelNumber(
-                           channelSection, channelSector, layer, 0, 1);
-      const KLMElectronicsChannel* electronicsChannel =
-        m_bklmElectronicsMap->getElectronicsChannel(channel);
-      if (electronicsChannel == nullptr)
-        B2FATAL("Incomplete BKLM electronics map.");
-      str = "No data from HSLB " +
-            BKLMElementNumbers::getHSLBName(
-              electronicsChannel->getCopper(), electronicsChannel->getSlot()) +
-            ", lane " + std::to_string(electronicsChannel->getLane());
-      latex.DrawLatexNDC(x, y, str.c_str());
-      y -= 0.05;
+    /* Channel with plane = 1, strip = 1 exists for any BKLm or EKLM module. */
+    uint16_t channel = m_ElementNumbers->channelNumber(
+                         channelSubdetector, channelSection, channelSector,
+                         layer, 1, 1);
+    const KLMElectronicsChannel* electronicsChannel =
+      m_ElectronicsMap->getElectronicsChannel(channel);
+    if (electronicsChannel == nullptr)
+      B2FATAL("Incomplete KLM electronics map.");
+    str = "No data from HSLB ";
+    if (channelSubdetector == KLMElementNumbers::c_BKLM) {
+      str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
+                                             electronicsChannel->getSlot());
     } else {
-      int eklmSector = m_ElementNumbers->localChannelNumberEKLM(it->first);
-      lane = m_eklmElectronicsMap->getLaneBySector(eklmSector);
-      if (lane == nullptr)
-        B2FATAL("Incomplete EKLM electronics map.");
-      str = "No data from HSLB " +
-            EKLMElementNumbers::getHSLBName(lane->getCopper(),
-                                            lane->getDataConcentrator()) +
-            ", lane " + std::to_string(lane->getLane());
-      latex.DrawLatexNDC(x, y, str.c_str());
-      y -= 0.05;
+      str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
+                                             electronicsChannel->getSlot());
     }
+    str += ", lane " + std::to_string(electronicsChannel->getLane());
+    latex.DrawLatexNDC(x, y, str.c_str());
+    y -= 0.05;
   }
   if (activeModuleChannels == 0)
     return;
@@ -144,42 +137,24 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
-    uint16_t module = m_ElementNumbers->moduleNumber(
-                        subdetector, section, sector, layer);
     if ((nEvents > average * 10) && (nEvents > 50)) {
-      if (m_ElementNumbers->isBKLMChannel(channelNumber)) {
-        uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
-                                     channelSection, channelSector,
-                                     layer, plane, strip);
-        const KLMElectronicsChannel* electronicsChannel =
-          m_bklmElectronicsMap->getElectronicsChannel(detectorChannel);
-        if (electronicsChannel == nullptr)
-          B2FATAL("Incomplete BKLM electronics map.");
-        str = "Hot channel: HSLB " +
-              BKLMElementNumbers::getHSLBName(
-                electronicsChannel->getCopper(),
-                electronicsChannel->getSlot()) +
-              ", lane " + std::to_string(electronicsChannel->getLane()) +
-              ", axis " + std::to_string(electronicsChannel->getAxis()) +
-              ", channel " + std::to_string(electronicsChannel->getChannel());
-        latex.DrawLatexNDC(x, y, str.c_str());
-        y -= 0.05;
+      const KLMElectronicsChannel* electronicsChannel =
+        m_ElectronicsMap->getElectronicsChannel(channelNumber);
+      if (electronicsChannel == nullptr)
+        B2FATAL("Incomplete BKLM electronics map.");
+      str = "Hot channel: HSLB ";
+      if (channelSubdetector == KLMElementNumbers::c_BKLM) {
+        str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
+                                               electronicsChannel->getSlot());
       } else {
-        int eklmSector = m_ElementNumbers->localChannelNumberEKLM(module);
-        lane = m_eklmElectronicsMap->getLaneBySector(eklmSector);
-        if (lane == nullptr)
-          B2FATAL("Incomplete EKLM electronics map.");
-        int asic, channel;
-        m_ElementNumbersEKLM->getAsicChannel(plane, strip, &asic, &channel);
-        str = "Hot channel: HSLB " +
-              EKLMElementNumbers::getHSLBName(lane->getCopper(),
-                                              lane->getDataConcentrator()) +
-              ", lane " + std::to_string(lane->getLane()) +
-              ", asic " + std::to_string(asic) +
-              ", channel " + std::to_string(channel);
-        latex.DrawLatexNDC(x, y, str.c_str());
-        y -= 0.05;
+        str += EKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
+                                               electronicsChannel->getSlot());
       }
+      str += (", lane " + std::to_string(electronicsChannel->getLane()) +
+              ", axis " + std::to_string(electronicsChannel->getAxis()) +
+              ", channel " + std::to_string(electronicsChannel->getChannel()));
+      latex.DrawLatexNDC(x, y, str.c_str());
+      y -= 0.05;
     }
   }
   canvas->Modified();

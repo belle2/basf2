@@ -13,6 +13,7 @@
 /* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
@@ -89,6 +90,12 @@ namespace Belle2 {
                          const EKLMAlignment* eklmAlignment,
                          const EKLMSegmentAlignment* eklmSegmentAlignment,
                          bool displacement = false);
+
+    /**
+      * Import electronics map.
+      * @param[in] electronicsMap KLM electronics map.
+      */
+    void importElectronicsMap(const KLMElectronicsMap* electronicsMap);
 
   private:
 

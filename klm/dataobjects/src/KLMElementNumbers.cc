@@ -34,6 +34,19 @@ const KLMElementNumbers& KLMElementNumbers::Instance()
   return klmElementNumbers;
 }
 
+uint16_t KLMElementNumbers::channelNumber(
+  int subdetector, int section, int sector, int layer, int plane,
+  int strip) const
+{
+  switch (subdetector) {
+    case c_BKLM:
+      return channelNumberBKLM(section, sector, layer, plane, strip);
+    case c_EKLM:
+      return channelNumberEKLM(section, sector, layer, plane, strip);
+  }
+  B2FATAL("Incorrect subdetector number: " << subdetector);
+}
+
 uint16_t KLMElementNumbers::channelNumberBKLM(
   int section, int sector, int layer, int plane, int strip) const
 {

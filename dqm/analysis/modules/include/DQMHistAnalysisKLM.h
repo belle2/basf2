@@ -20,7 +20,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -98,11 +97,8 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
-    /** BKLM electronics map. */
-    DBObjPtr<KLMElectronicsMap> m_bklmElectronicsMap;
-
-    /** EKLM electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

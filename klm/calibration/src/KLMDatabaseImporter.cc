@@ -180,3 +180,13 @@ void KLMDatabaseImporter::importAlignment(
   importEKLMAlignment(eklmAlignment, displacement);
   importEKLMSegmentAlignment(eklmSegmentAlignment, displacement);
 }
+
+void KLMDatabaseImporter::importElectronicsMap(
+  const KLMElectronicsMap* electronicsMap)
+{
+  DBImportObjPtr<KLMElectronicsMap> electronicsMapImport;
+  electronicsMapImport.construct(*electronicsMap);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  electronicsMapImport.import(iov);
+}

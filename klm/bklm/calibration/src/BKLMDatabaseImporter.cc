@@ -128,9 +128,9 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
       uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
                                    section, sector, layer, plane, iStrip);
       m_ElectronicsChannels.push_back(
-        std::pair<uint16_t, BKLMElectronicsChannel>(
+        std::pair<uint16_t, KLMElectronicsChannel>(
           detectorChannel,
-          BKLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
+          KLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
     }
   }
 }

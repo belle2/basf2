@@ -187,7 +187,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLMDigitRaw* klmDigitRaw;
   KLM::unpackRawData(rawData, &raw, &m_klmDigitRaws, &klmDigitRaw, true);
   const uint16_t* detectorChannel;
-  BKLMElectronicsChannel electronicsChannel(
+  KLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
   detectorChannel =
     m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);

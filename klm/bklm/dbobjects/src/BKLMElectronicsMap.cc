@@ -25,19 +25,19 @@ BKLMElectronicsMap::~BKLMElectronicsMap()
 }
 
 const uint16_t* BKLMElectronicsMap::getDetectorChannel(
-  BKLMElectronicsChannel* electronicsChannel) const
+  KLMElectronicsChannel* electronicsChannel) const
 {
-  std::map<BKLMElectronicsChannel, uint16_t>::const_iterator it;
+  std::map<KLMElectronicsChannel, uint16_t>::const_iterator it;
   it = m_MapElectronicsDetector.find(*electronicsChannel);
   if (it == m_MapElectronicsDetector.end())
     return nullptr;
   return &(it->second);
 }
 
-const BKLMElectronicsChannel* BKLMElectronicsMap::getElectronicsChannel(
+const KLMElectronicsChannel* BKLMElectronicsMap::getElectronicsChannel(
   uint16_t detectorChannel) const
 {
-  std::map<uint16_t, BKLMElectronicsChannel>::const_iterator it;
+  std::map<uint16_t, KLMElectronicsChannel>::const_iterator it;
   it = m_MapDetectorElectronics.find(detectorChannel);
   if (it == m_MapDetectorElectronics.end())
     return nullptr;
@@ -48,7 +48,7 @@ void BKLMElectronicsMap::addChannel(
   uint16_t detectorChannel, int copper, int slot, int lane, int axis,
   int channel)
 {
-  BKLMElectronicsChannel electronicsChannel(copper, slot, lane, axis, channel);
+  KLMElectronicsChannel electronicsChannel(copper, slot, lane, axis, channel);
   if (m_MapDetectorElectronics.find(detectorChannel) != m_MapDetectorElectronics.end()) {
     B2ERROR("Detector channel already exists in the electronics map."
             << LogVar("Detector channel", detectorChannel));
@@ -63,9 +63,9 @@ void BKLMElectronicsMap::addChannel(
             << LogVar("Channel", channel));
     return;
   }
-  m_MapDetectorElectronics.insert(std::pair<uint16_t, BKLMElectronicsChannel>(
+  m_MapDetectorElectronics.insert(std::pair<uint16_t, KLMElectronicsChannel>(
                                     detectorChannel, electronicsChannel));
-  m_MapElectronicsDetector.insert(std::pair<BKLMElectronicsChannel, uint16_t>(
+  m_MapElectronicsDetector.insert(std::pair<KLMElectronicsChannel, uint16_t>(
                                     electronicsChannel, detectorChannel));
 }
 

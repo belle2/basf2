@@ -13,8 +13,8 @@
 
 /* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+#include <klm/dbobjects/KLMElectronicsChannel.h>
 
 namespace Belle2 {
 
@@ -82,7 +82,7 @@ namespace Belle2 {
   private:
 
     /** Electronics mapping. */
-    std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
+    std::vector< std::pair<uint16_t, KLMElectronicsChannel> > m_ElectronicsChannels;
 
     /** Low experiment. */
     int m_ExperimentLow;

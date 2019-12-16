@@ -111,7 +111,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     if (m_ElementNumbers->isBKLMChannel(it->first)) {
       uint16_t channel = BKLMElementNumbers::channelNumber(
                            channelSection, channelSector, layer, 0, 1);
-      const BKLMElectronicsChannel* electronicsChannel =
+      const KLMElectronicsChannel* electronicsChannel =
         m_bklmElectronicsMap->getElectronicsChannel(channel);
       if (electronicsChannel == nullptr)
         B2FATAL("Incomplete BKLM electronics map.");
@@ -151,7 +151,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
         uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
                                      channelSection, channelSector,
                                      layer, plane, strip);
-        const BKLMElectronicsChannel* electronicsChannel =
+        const KLMElectronicsChannel* electronicsChannel =
           m_bklmElectronicsMap->getElectronicsChannel(detectorChannel);
         if (electronicsChannel == nullptr)
           B2FATAL("Incomplete BKLM electronics map.");

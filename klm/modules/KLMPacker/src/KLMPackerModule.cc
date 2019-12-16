@@ -65,7 +65,7 @@ void KLMPackerModule::event()
     uint16_t bword4 = 0;
     int channel = BKLMElementNumbers::channelNumber(bklmDigit.getSection(), bklmDigit.getSector(), bklmDigit.getLayer(),
                                                     bklmDigit.isPhiReadout(), bklmDigit.getStrip());
-    const BKLMElectronicsChannel* electronicsChannel =
+    const KLMElectronicsChannel* electronicsChannel =
       m_BklmElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete BKLM electronics map.");

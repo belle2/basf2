@@ -9,7 +9,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisTracking.h>
 #include <TROOT.h>
-#include <TLatex.h>
 
 using namespace std;
 using namespace Belle2;
@@ -85,11 +84,6 @@ void DQMHistAnalysisTrackingModule::event()
 
     hh1->Draw("hist");
   }
-//   auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
-//   tt->SetTextAngle(90);// Rotated
-//   tt->SetTextAlign(12);// Centered
-//   tt->Draw();
-
   m_cTrackingError->Modified();
   m_cTrackingError->Update();
 }

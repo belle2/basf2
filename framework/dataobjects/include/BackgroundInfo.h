@@ -11,8 +11,7 @@
 #pragma once
 
 #include <framework/pcore/Mergeable.h>
-#include <simulation/dataobjects/SimHitBase.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <string>
 #include <vector>
@@ -44,7 +43,7 @@ namespace Belle2 {
      * Structure for background description
      */
     struct BackgroundDescr {
-      SimHitBase::BG_TAG tag = SimHitBase::bg_none;  /**< background tag denoting type */
+      BackgroundMetaData::BG_TAG tag = BackgroundMetaData::bg_none;  /**< background tag denoting type */
       std::string type; /**< background type */
       BackgroundMetaData::EFileType fileType = BackgroundMetaData::c_Usual; /**< file type */
       std::vector<std::string> fileNames;     /**< file names */

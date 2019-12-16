@@ -24,7 +24,7 @@
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
 
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 
 // ROOT

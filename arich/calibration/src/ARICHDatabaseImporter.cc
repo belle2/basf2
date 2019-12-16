@@ -43,6 +43,7 @@
 #include <arich/dbobjects/ARICHGlobalAlignment.h>
 #include <arich/dbobjects/ARICHMirrorAlignment.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
+#include <arich/dbobjects/ARICHAeroTilesAlignment.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -242,6 +243,34 @@ void ARICHDatabaseImporter::importMirrorAlignment()
   importObj.import(m_iov);
 
 }
+
+void ARICHDatabaseImporter::importAeroTilesAlignment()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "AeroTilesAlignment");
+
+  ARICHAeroTilesAlignment tileAlign;
+
+  for (auto tile : alignPars.getNodes("Slot")) {
+    int id = tile.getInt("@id");
+    double r = tile.getLength("r");
+    double phi = tile.getAngle("phi");
+    double z = tile.getLength("z");
+    double alpha = tile.getLength("alpha");
+    double beta = tile.getLength("beta");
+    double gamma = tile.getLength("gamma");
+    ARICHPositionElement alignEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
+    tileAlign.setAlignmentElement(id, alignEl);
+    alignEl.print();
+  }
+
+  DBImportObjPtr<ARICHAeroTilesAlignment> importObj;
+  importObj.construct(tileAlign);
+  importObj.import(m_iov);
+
+}
+
 
 void ARICHDatabaseImporter::importChannelMask()
 {
@@ -600,6 +629,12 @@ void ARICHDatabaseImporter::printGlobalAlignment()
 void ARICHDatabaseImporter::printMirrorAlignment()
 {
   DBObjPtr<ARICHMirrorAlignment> align;
+  align->print();
+}
+
+void ARICHDatabaseImporter::printAeroTilesAlignment()
+{
+  DBObjPtr<ARICHAeroTilesAlignment> align;
   align->print();
 }
 

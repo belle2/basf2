@@ -152,8 +152,8 @@ double trepsinputModule::getCrossSection(double W)
     return 0.;
   }
 
-  auto it_upper = TrepsB::diffCrossSectionOfW.lower_bound(
-                    W); // This lower_bound returns first iterator which meets >=w condition. --> upper side
+  // lower_bound returns first iterator which meets >=W condition. --> upper side
+  auto it_upper = TrepsB::diffCrossSectionOfW.lower_bound(W);
   auto it_lower = it_upper;
   it_lower--;
 
@@ -178,11 +178,12 @@ double trepsinputModule::simulateW()
     double diffCrossSectionAtLower = TrepsB::diffCrossSectionOfW.at(it_lower->second);
     double limit = (diffCrossSectionAtUpper > diffCrossSectionAtLower) ? diffCrossSectionAtUpper * 1.01 : diffCrossSectionAtLower *
                    1.01;
+    // Higher diffCrossSection * 1.01 is set as limit. Same definition of limit is used in TrepsB::wtable().
 
-    double W = (crossSectionForMC - it_lower->first) / limit + it_lower->second ; /////
-
-    if (W < 0.5 or W > 4.0)
-      B2FATAL("W has to be in [0.5, 4.0] !!! W = " << W << ", crossSectionForMC = " << crossSectionForMC);
+    double W = (crossSectionForMC - it_lower->first) / limit + it_lower->second ;
+    if (W < TrepsB::diffCrossSectionOfW.begin()->first or W > TrepsB::diffCrossSectionOfW.rbegin()->first)
+      B2FATAL("W has to be in [" << TrepsB::diffCrossSectionOfW.begin()->first << ", " << TrepsB::diffCrossSectionOfW.rbegin()->first
+              << "] !!! W = " << W << ", crossSectionForMC = " << crossSectionForMC);
 
     std::uniform_real_distribution<double> getTrial(0.0, limit);
     double trial = getTrial(mt);

@@ -21,19 +21,19 @@ namespace Belle2 {
   /**
    * BKLM electronics map.
    */
-  class BKLMElectronicsMap: public TObject {
+  class KLMElectronicsMap: public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    BKLMElectronicsMap();
+    KLMElectronicsMap();
 
     /**
      * Destructor.
      */
-    ~BKLMElectronicsMap();
+    ~KLMElectronicsMap();
 
     /**
      * Get detector channel by electronics channel.
@@ -72,7 +72,7 @@ namespace Belle2 {
     std::map<KLMElectronicsChannel, uint16_t> m_MapElectronicsDetector;
 
     /** Class version. */
-    ClassDef(Belle2::BKLMElectronicsMap, 1);
+    ClassDef(Belle2::KLMElectronicsMap, 1);
 
   };
 

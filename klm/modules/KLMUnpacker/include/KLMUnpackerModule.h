@@ -14,9 +14,9 @@
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
@@ -175,7 +175,7 @@ namespace Belle2 {
     /* BKLM database objects. */
 
     /** Electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
+    DBObjPtr<KLMElectronicsMap> m_bklmElectronicsMap;
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;

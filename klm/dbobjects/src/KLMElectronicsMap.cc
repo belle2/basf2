@@ -9,22 +9,22 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-BKLMElectronicsMap::BKLMElectronicsMap()
+KLMElectronicsMap::KLMElectronicsMap()
 {
 }
 
-BKLMElectronicsMap::~BKLMElectronicsMap()
+KLMElectronicsMap::~KLMElectronicsMap()
 {
 }
 
-const uint16_t* BKLMElectronicsMap::getDetectorChannel(
+const uint16_t* KLMElectronicsMap::getDetectorChannel(
   KLMElectronicsChannel* electronicsChannel) const
 {
   std::map<KLMElectronicsChannel, uint16_t>::const_iterator it;
@@ -34,7 +34,7 @@ const uint16_t* BKLMElectronicsMap::getDetectorChannel(
   return &(it->second);
 }
 
-const KLMElectronicsChannel* BKLMElectronicsMap::getElectronicsChannel(
+const KLMElectronicsChannel* KLMElectronicsMap::getElectronicsChannel(
   uint16_t detectorChannel) const
 {
   std::map<uint16_t, KLMElectronicsChannel>::const_iterator it;
@@ -44,7 +44,7 @@ const KLMElectronicsChannel* BKLMElectronicsMap::getElectronicsChannel(
   return &(it->second);
 }
 
-void BKLMElectronicsMap::addChannel(
+void KLMElectronicsMap::addChannel(
   uint16_t detectorChannel, int copper, int slot, int lane, int axis,
   int channel)
 {

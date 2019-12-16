@@ -15,11 +15,11 @@
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/database/Database.h>
@@ -153,7 +153,7 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
 
 void BKLMDatabaseImporter::importElectronicMapping()
 {
-  DBImportObjPtr<BKLMElectronicsMap> electronicsMap;
+  DBImportObjPtr<KLMElectronicsMap> electronicsMap;
   electronicsMap.construct();
   unsigned int n = m_ElectronicsChannels.size();
   for (unsigned int i = 0; i < n; ++i) {

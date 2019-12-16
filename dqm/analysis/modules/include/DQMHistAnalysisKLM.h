@@ -19,7 +19,7 @@
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -99,7 +99,7 @@ namespace Belle2 {
     TCanvas* findCanvas(const std::string& canvasName);
 
     /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
+    DBObjPtr<KLMElectronicsMap> m_bklmElectronicsMap;
 
     /** EKLM electronics map. */
     DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;

@@ -12,7 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
@@ -102,7 +102,7 @@ namespace Belle2 {
     /* BKLM objects. */
 
     /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_BklmElectronicsMap;
+    DBObjPtr<KLMElectronicsMap> m_BklmElectronicsMap;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_BklmDigits;

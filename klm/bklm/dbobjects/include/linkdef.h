@@ -6,7 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::BKLMAlignment+;
-#pragma link C++ class Belle2::BKLMElectronicsMap+;
 #pragma link C++ class Belle2::BKLMGeometryPar+;
 #pragma link C++ class Belle2::BKLMSimulationPar+;
 #pragma link C++ class Belle2::BKLMADCThreshold+;

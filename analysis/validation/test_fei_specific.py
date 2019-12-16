@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>william.sutcliffe@kit.edu</contact>
+  <contact>wsut@uni-bonn.de</contact>
 </header>
 """
 

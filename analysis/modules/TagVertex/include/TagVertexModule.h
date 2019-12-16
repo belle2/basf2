@@ -131,6 +131,9 @@ namespace Belle2 {
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFitter) */
     bool m_verbose;               /**< choose if you want to print extra infos */
+    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter */
+    TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
+
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);
@@ -208,11 +211,11 @@ namespace Belle2 {
 
 
     //convert HEP object to ROOT objects, useful for KFitter
-    CLHEP::HepSymMatrix getHepMatrix(TMatrixDSym const& mat1);
-    TMatrixDSym getRootMatrix(CLHEP::HepSymMatrix const& mat1);
-    HepPoint3D getHepPoint(TVector3 const& v1);
-    TVector3 getRootVector(HepPoint3D const& v1);
-    CLHEP::HepLorentzVector getHepLorentzVector(TLorentzVector const& p);
+    //CLHEP::HepSymMatrix getHepMatrix(TMatrixDSym const& mat1);
+    //TMatrixDSym getRootMatrix(CLHEP::HepSymMatrix const& mat1);
+    //HepPoint3D getHepPoint(TVector3 const& v1);
+    //TVector3 getRootVector(HepPoint3D const& v1);
+    //CLHEP::HepLorentzVector getHepLorentzVector(TLorentzVector const& p);
 
     /**
      * Print a TVector3 (useful for debugging)

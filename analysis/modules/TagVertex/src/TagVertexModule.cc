@@ -33,6 +33,9 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/utility/CLHEPToROOT.h>
+#include <analysis/utility/ROOTToCLHEP.h>
+
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
@@ -513,7 +516,6 @@ namespace Belle2 {
 
     TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
-
     //print some stuff if wanted
 
     if (m_verbose) {
@@ -581,8 +583,15 @@ namespace Belle2 {
       B2DEBUG(10, "IPTube covariance: " << printMatrix(m_constraintCov));
     }
 
-    return true;
+    //The following is done to do the BTube constraint with a virtual track
+    //(ie KFitter way)
 
+    m_tagMomentum = v4FinalNew;
+
+    m_pvCov.ResizeTo(pv);
+    m_pvCov = pv;
+
+    return true;
   }
 
 
@@ -1269,45 +1278,45 @@ namespace Belle2 {
     return true;
   }
 
-  CLHEP::HepSymMatrix TagVertexModule::getHepMatrix(TMatrixDSym const& mat1)
-  {
-    int n(mat1.GetNcols());
-    CLHEP::HepSymMatrix mat2(n, 0);
-    for (int i(0); i < n; ++i) {
-      for (int j(0); j < n; ++j)
-        mat2[i][j] = mat1(i, j);
-    }
-    return mat2;
-  }
+  //CLHEP::HepSymMatrix TagVertexModule::getHepMatrix(TMatrixDSym const& mat1)
+  //{
+  //  int n(mat1.GetNcols());
+  //  CLHEP::HepSymMatrix mat2(n, 0);
+  //  for (int i(0); i < n; ++i) {
+  //    for (int j(0); j < n; ++j)
+  //      mat2[i][j] = mat1(i, j);
+  //  }
+  //  return mat2;
+  //}
 
-  TMatrixDSym TagVertexModule::getRootMatrix(CLHEP::HepSymMatrix const& mat1)
-  {
-    int n = mat1.num_row();
-    TMatrixFSym m(n);
-    /*
-     * TMatrixFSym is stored as a full matrix, thus all elements must be set.
-     */
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j)
-        m[i][j] = mat1[i][j];
-    }
-    return m;
-  }
+  //TMatrixDSym TagVertexModule::getRootMatrix(CLHEP::HepSymMatrix const& mat1)
+  //{
+  //  int n = mat1.num_row();
+  //  TMatrixFSym m(n);
+  //  /*
+  //   * TMatrixFSym is stored as a full matrix, thus all elements must be set.
+  //   */
+  //  for (int i = 0; i < n; ++i) {
+  //    for (int j = 0; j < n; ++j)
+  //      m[i][j] = mat1[i][j];
+  //  }
+  //  return m;
+  //}
 
-  HepPoint3D TagVertexModule::getHepPoint(TVector3 const& v1)
-  {
-    return HepPoint3D(v1.X(), v1.Y(), v1.Z());
-  }
+  //HepPoint3D TagVertexModule::getHepPoint(TVector3 const& v1)
+  //{
+  //  return HepPoint3D(v1.X(), v1.Y(), v1.Z());
+  //}
 
-  TVector3 TagVertexModule::getRootVector(HepPoint3D const& v1)
-  {
-    return TVector3(v1.x(), v1.y(), v1.z());
-  }
+  //TVector3 TagVertexModule::getRootVector(HepPoint3D const& v1)
+  //{
+  //  return TVector3(v1.x(), v1.y(), v1.z());
+  //}
 
-  CLHEP::HepLorentzVector TagVertexModule::getHepLorentzVector(TLorentzVector const& p)
-  {
-    return CLHEP::HepLorentzVector(p.X(), p.Y(), p.Z(), p.T());
-  }
+  //CLHEP::HepLorentzVector TagVertexModule::getHepLorentzVector(TLorentzVector const& p)
+  //{
+  //  return CLHEP::HepLorentzVector(p.X(), p.Y(), p.Z(), p.T());
+  //}
 
   bool TagVertexModule::makeGeneralFitKFitter()
   {
@@ -1318,8 +1327,24 @@ namespace Belle2 {
 
     // apply constraint
 
-    if (m_constraintType != "noConstraint")
-      kFit.setIpProfile(getHepPoint(m_constraintCenter), getHepMatrix(m_constraintCov));
+    if (m_constraintType != "noConstraint" && m_constraintType != "tube")
+      kFit.setIpProfile(ROOTToCLHEP::getPoint3D(m_constraintCenter), ROOTToCLHEP::getHepSymMatrix(m_constraintCov));
+
+    if (m_constraintType == "tube") {
+      CLHEP::HepSymMatrix err(7, 0);
+
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          err[i + 4][j + 4] = m_pvCov(i, j);
+        }
+      }
+
+      kFit.setIpTubeProfile(
+        ROOTToCLHEP::getHepLorentzVector(m_tagMomentum),
+        ROOTToCLHEP::getPoint3D(m_constraintCenter),
+        err,
+        0.);
+    }
 
     //feed KFitter with tracks without Kshorts
     //For this, we need to construct a particle from the trackfit result as
@@ -1350,26 +1375,7 @@ namespace Belle2 {
         nTracksAdded++;
         trackAndWeights.at(i).weight = 1.;
       }
-
-      //Particle(const int trackArrayIndex,
-      //             const TrackFitResult* trackFit,
-      //                          const Const::ChargedStable& chargedStable,
-      //                                       const Const::ChargedStable& chargedStableUsedForFit)
-
-      //kFit.addTrack( getHepLorentzVector(trackRes.get4Momentum()),
-      //               getHepPoint(trackRes.getPosition()),
-      //               getHepMatrix(trackRes.)  );
-      //addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
-      //                                                 const double q);
-
-      //try {
-      //  rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
-      //}
-      //catch (const rave::CheckedFloatException&) {
-      //  B2ERROR("Exception caught in TagVertexModule::makeGeneralFit(): Invalid inputs (nan/inf)?");
-      //}
     }
-
 
     //perform fit if there are enough tracks
 
@@ -1401,7 +1407,7 @@ namespace Belle2 {
     if (isGoodFit != 0) return false;
 
 
-    m_tagV = getRootVector(kFit.getVertex());
+    m_tagV = CLHEPToROOT::getTVector3(kFit.getVertex());
 
     if (m_constraintType != "noConstraint") {
       TMatrixDSym tubeInv = m_constraintCov;
@@ -1415,7 +1421,7 @@ namespace Belle2 {
       m_tagVChi2IP = tubeInv.Similarity(dV);
     }
 
-    TMatrixDSym errMat(getRootMatrix(kFit.getVertexError()));
+    TMatrixDSym errMat(CLHEPToROOT::getTMatrixDSym(kFit.getVertexError()));
 
     m_tagVErrMatrix.ResizeTo(errMat);
     m_tagVErrMatrix = errMat;

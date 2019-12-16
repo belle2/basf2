@@ -729,7 +729,7 @@ namespace Belle2 {
     }
 
     /// Set the quality index attached to this RecoTrack. 0 means likely fake.
-    void setQualityIndicator(float qualityIndicator)
+    void setQualityIndicator(const float qualityIndicator)
     {
       m_qualityIndicator = qualityIndicator;
     }

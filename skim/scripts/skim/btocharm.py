@@ -365,7 +365,7 @@ def loadB0toDpi_Kpipi(path):
     return ['B0:Dpi_Kpipi']
 
 
-def loadB0toDstarh_Kpi(path):
+def loadB0toDstarPi_Kpi(path):
     """
     **Skim Author**: C. La Licata
 
@@ -401,7 +401,7 @@ def loadB0toDstarh_Kpi(path):
     return ['B0:Dstarpi_Kpi']
 
 
-def loadB0toDstarh_Kpipipi(path):
+def loadB0toDstarPi_Kpipipi(path):
     """
    **Skim Author**: C. La Licata
 

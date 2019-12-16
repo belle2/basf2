@@ -40,14 +40,14 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
 
 
 # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> K- pi+ pi- pi+ Skim
-from skim.btocharm import loadB0toDstarh_Kpipipi
+from skim.btocharm import loadB0toDstarPi_Kpipipi
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
 loadStdD0_Kpipipi(path=mypath)
 loadStdDstarPlus_D0pi_Kpipipi(path=mypath)
-B0toDstarhList_Kpipipi = loadB0toDstarh_Kpipipi(path=mypath)
+B0toDstarPiList_Kpipipi = loadB0toDstarPi_Kpipipi(path=mypath)
 
-skimOutputUdst(skimCode, B0toDstarhList_Kpipipi, path=mypath)
-summaryOfLists(B0toDstarhList_Kpipipi, path=mypath)
+skimOutputUdst(skimCode, B0toDstarPiList_Kpipipi, path=mypath)
+summaryOfLists(B0toDstarPiList_Kpipipi, path=mypath)
 
 setSkimLogging(mypath)
 process(mypath)

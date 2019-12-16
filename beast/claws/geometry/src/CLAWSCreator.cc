@@ -103,12 +103,13 @@ namespace Belle2 {
         }
       } else {
         int i = 0;
+        std::vector<double> alpha = params.getArray("alpha", {0});
         for (double z : params.getArray("z", {0})) {
           double center = ri[i] / Unit::mm * CLHEP::mm + roffset - height / 2 - top;
           //    center *= CLHEP::mm / Unit::mm;
           z *= CLHEP::mm / Unit::mm;
           for (double phi : params.getArray("phi", {M_PI / 2})) {
-            G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(u, center, z);
+            G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(u, center, z) * G4RotateY3D(alpha[i]);
             new G4PVPlacement(transform, volume, name, parent, false, copyNo++, check);
           }
           i++;

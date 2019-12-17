@@ -12,8 +12,6 @@
 #include <analysis/variables/InclusiveVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>

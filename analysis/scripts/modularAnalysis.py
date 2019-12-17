@@ -952,13 +952,13 @@ def fillParticleListFromMC(
 
     The type of the particles to be loaded is specified via the decayString module parameter.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and
-                         sets mother-daughter relations
+    @param decayString             specifies type of Particles and determines the name of the ParticleList
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
+                                   sets mother-daughter relations
     @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
     """
 
     pload = register_module('ParticleLoader')

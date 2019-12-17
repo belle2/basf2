@@ -12,6 +12,8 @@
 #include <analysis/variables/InclusiveVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
@@ -68,7 +70,7 @@ namespace Belle2 {
             if (abs(daughter->getPDGCode()) == pdgCode) {
               result++;
             }
-          } else if (daughter->getParticleType() == Particle::EParticleType::c_Track) {
+          } else if (abs(daughter->getCharge()) > 0) {
             result++;
           }
         }

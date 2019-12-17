@@ -4,6 +4,10 @@
 ########################################################
 # Run TREPS to generate e+e- -> e+e-pi+pi- events
 #
+# differentialCrossSection file is used to generate events
+# with smooth W distribution. This is useful to produce
+# background samples for study of e+e-l+l- or taupair
+#
 # Example steering file
 ########################################################
 

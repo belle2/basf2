@@ -4,6 +4,10 @@
 ########################################################
 # Run TREPS to generate e+e- -> e+e-pi+pi- events
 #
+# wListTable file is used and UseDiscreteAndSortedW is True.
+# W distribution of generated events will be discrete and sorted.
+# This is useful to hadronic two-photon analysis.
+#
 # Example steering file
 ########################################################
 

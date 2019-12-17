@@ -181,7 +181,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getNFitTracks();
     }
 
@@ -543,25 +543,9 @@ namespace Belle2 {
       return result;
     }
 
-    double getTrackMomentumComponent(const Particle* part, unsigned int trackIndex, unsigned int component)
-    {
-      double result(-1111.0);
-
-      if (component > 2)
-        return result;
-
-      auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getVtxFitTrackPComponent(trackIndex, component);
-
-      return result;
-    }
-
-
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -575,7 +559,7 @@ namespace Belle2 {
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -589,7 +573,7 @@ namespace Belle2 {
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -603,7 +587,7 @@ namespace Belle2 {
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -617,7 +601,7 @@ namespace Belle2 {
 
     double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -631,7 +615,7 @@ namespace Belle2 {
 
     double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -645,7 +629,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -666,7 +650,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -694,7 +678,7 @@ namespace Belle2 {
 
     double tagVDistanceToConstraint(const Particle* part)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -709,7 +693,7 @@ namespace Belle2 {
 
     double tagVDistanceToConstraintErr(const Particle* part)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -732,7 +716,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -754,7 +738,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -786,7 +770,7 @@ namespace Belle2 {
 
     double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(-1111.0);
+      double result(std::numeric_limits<float>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -798,8 +782,8 @@ namespace Belle2 {
 
       TVector3 mcTagV(vert->getMCTagVertex());
 
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return -1111.;
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return -1111.;
+      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return std::numeric_limits<float>::quiet_NaN();
+      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return std::numeric_limits<float>::quiet_NaN();
 
       DistanceTools distanceTools;
       result = distanceTools.vtxToVtxDist(mcParticle -> getProductionVertex(),
@@ -870,9 +854,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("internalTagVMCFlavor", particleInternalTagVMCFlavor,
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
-
-
-    //REGISTER_VARIABLE("tagTrack0MomentumX", tagTrack0MomentumX, "Just a test function for now, don't use");
 
     REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
                       "return the X component of the momentum of the ith track used in the tag vtx fit.");

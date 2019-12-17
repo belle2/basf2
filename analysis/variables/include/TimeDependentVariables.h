@@ -276,12 +276,6 @@ namespace Belle2 {
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * Return one of the three components of the momentum of the tag track indexed by trackIndex
-     *
-     */
-    double getTrackMomentumComponent(const Particle* part, unsigned int trackIndex, unsigned int component);
-
-    /**
      * Returns the d0 parameter of the tag track indexed by trackIndex
      *
      */

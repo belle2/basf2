@@ -4,6 +4,7 @@
 
 
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -135,8 +136,8 @@ void InclusiveDstarReconstructionModule::event()
 TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
 {
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
-  TVector3 momentum_vector_pion = pion->getMomentum();
-  float abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
+  TVector3 momentum_vector_pion =  pion->getMomentum();
+  double abs_momentum_dstar = sqrt((energy_dstar * energy_dstar) - (m_dstar_pdg_mass * m_dstar_pdg_mass));
   TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
 
   return TLorentzVector(momentum_vec_dstar, energy_dstar);

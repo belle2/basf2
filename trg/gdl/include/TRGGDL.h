@@ -63,7 +63,8 @@ namespace Belle2 {
                              unsigned firmwareSimulationMode = 0,
                              const std::string& Phase = "Phase",
                              bool algFromDB = true,
-                             const std::string& algFilePath = "ftd.alg");
+                             const std::string& algFilePath = "ftd.alg",
+                             int debugLevel = 0);
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -78,7 +79,8 @@ namespace Belle2 {
            unsigned firmwareSimulationMode,
            const std::string& Phase,
            bool algFromDB = true,
-           const std::string& algFilePath = "ftd.alg");
+           const std::string& algFilePath = "ftd.alg",
+           int debugLevel = 0);
 
     /// Destructor
     virtual ~TRGGDL();

@@ -8,6 +8,7 @@
 #
 # -----------------------------------------------------------------------------------
 
+import basf2
 from basf2 import *
 ################
 import sys  # get argv
@@ -23,12 +24,25 @@ if argc == 2:
 
 set_log_level(LogLevel.INFO)
 
+# 0
+# use_central_database("online")
+# use_local_database("./localdb/database.txt")
+# use_central_database("staging_online")
+
+# use_central_database("master_2019-09-26")
+# use_central_database("data_reprocessing_prompt_bucket6")
+# use_central_database("TRGGDL_201811")
 # use_central_database("online")
 # use_central_database("staging_online")
-# use_central_database("TRGGDL_201811")
 
-use_central_database("data_reprocessing_prompt_bucket6")
-use_local_database("./localdb/database.txt")
+# 1
+basf2.conditions.disable_globaltag_replay()
+basf2.conditions.prepend_testing_payloads('./localdb/database.txt')
+
+# 2
+# basf2.conditions.disable_globaltag_replay()
+# basf2.conditions.globaltags = ['data_reprocessing_prompt_rel4_patchb', 'online']
+# basf2.conditions.prepend_testing_payloads('./localdb/database.txt')
 
 main = create_path()
 
@@ -50,6 +64,7 @@ main.add_module(input)
 
 # Unpacker
 trggdlUnpacker = register_module("TRGGDLUnpacker")
+# trggdlUnpacker.param('print_dbmap', True)
 main.add_module(trggdlUnpacker)
 
 #
@@ -59,7 +74,8 @@ main.add_module(trggdlsummary)
 datatsim = register_module('TRGGDL')
 datatsim.param('SimulationMode', 3)
 datatsim.param('Belle2Phase', "Belle2Phase")
-datatsim.param('algFromDB', False)
+# datatsim.param('algFromDB', False)
+# datatsim.param('algFilePath', "ftd_0023.alg")
 main.add_module(datatsim)
 
 histo = register_module('HistoManager')
@@ -74,5 +90,6 @@ main.add_module(progress)
 # main.add_module(output, branchNames=["TRGSummary"])
 
 process(main)
+# process(main, max_event=200)
 
 print(statistics)

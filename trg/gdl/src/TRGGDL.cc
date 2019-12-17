@@ -72,7 +72,8 @@ namespace Belle2 {
                     unsigned firmwareSimulationMode,
                     const std::string& Phase,
                     bool algFromDB,
-                    const std::string& algFilePath)
+                    const std::string& algFilePath,
+                    int debugLevel)
   {
     if (_gdl) {
       //delete _gdl;
@@ -86,7 +87,8 @@ namespace Belle2 {
                         firmwareSimulationMode,
                         Phase,
                         algFromDB,
-                        algFilePath);
+                        algFilePath,
+                        debugLevel);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -110,8 +112,9 @@ namespace Belle2 {
                  unsigned firmwareSimulationMode,
                  const std::string& Phase,
                  bool algFromDB,
-                 const std::string& algFilePath)
-    : _debugLevel(0),
+                 const std::string& algFilePath,
+                 int debugLevel)
+    : _debugLevel(debugLevel),
       _configFilename(configFile),
       _simulationMode(simulationMode),
       _fastSimulationMode(fastSimulationMode),
@@ -151,16 +154,16 @@ namespace Belle2 {
   void
   TRGGDL::initialize(void)
   {
-//  for (int i = 0; i < 160; i++) {
-    for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
-      B2INFO("TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
-    }
-//  for (int i = 0; i < 160; i++) {
-    for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
-      B2INFO("TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
-    }
-    for (int i = 0; i < db_algs->getnalgs(); i++) {
-      B2INFO("TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+    if (_debugLevel > 19) {
+      for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
+        B2INFO("TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
+      }
+      for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
+        B2INFO("TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
+      }
+      for (int i = 0; i < db_algs->getnalgs(); i++) {
+        B2INFO("TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+      }
     }
     //if it is firmware simulation, do the cofigurnation
     //fastsimulation doesn't use the configuration currently
@@ -386,30 +389,9 @@ namespace Belle2 {
         }
         isload.close();
 
-        bool event_ok = true;
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, algs[i]);
           bool data = GDLResult->testFtdl(i);
-          if (m_PrescalesDB->getprescales(i) == 1) {
-            if ((ftdl_fired && !data) || (!ftdl_fired && data)) {
-              event_ok = false;
-              bool a = false;
-              for (long unsigned int j = 0; j < _inpBits.size(); j++) {
-                if (_inpBits[j]) {
-                  if (a) {
-                    std::cout << "," << j;
-                  } else {
-                    std::cout << j;
-                    a = true;
-                  }
-                }
-              }
-              if (0)
-                std::cout << " [[" << algs[i].c_str()
-                          << "]], ftdl1(" << GDLResult->getFtdlBits(1)
-                          << ")" << std::endl;
-            }
-          }
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
@@ -700,17 +682,6 @@ namespace Belle2 {
     if (ftd == "ftd_0.01") {
       _ftd = ftd_0_01;
     }
-    /*
-      //get trigger menu file
-      const string fmenu = _configFilename+".menu"
-      ifstream menufile(fmenu.c_str(), ios::in);
-      if(menufile.fail()){
-      cout<<"trigger menufile "<<fmenu<<"  can not open"<<endl;
-      return;
-      }
-      getTriggerMenu(menufile);
-      menufile.close();
-     */
 
     //...Summary...
     if (TRGDebug::level()) {
@@ -748,11 +719,6 @@ namespace Belle2 {
       if (w1.size())
         _input.push_back(w1);
 
-
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << endl;
-      // }
-
       ++lines;
     }
 
@@ -780,10 +746,6 @@ namespace Belle2 {
 
       if (w1.size())
         _output.push_back(w1);
-
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << endl;
-      // }
 
       ++lines;
     }
@@ -817,33 +779,10 @@ namespace Belle2 {
       if (w2.size())
         _algorithm.push_back(w2);
 
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << "," << w2 << endl;
-      // }
-
       ++lines;
     }
 
   }
-
-  /*void
-  TRGGDL::getTriggerMenu(ifstream & menuf){
-
-  std::string sline;
-  std::string scut;
-  int prescaf;
-  int index;
-  if(menf.is_open()){
-  while(!menuf.eof())
-  {
-  std::getline(menuf, sline);
-  //sscanf(sline, " %i %s %i", &index, scut, &prescaf)
-  _trgmenu.push_back(scut);
-  //_prescale.push_back(prescaf);
-  }
-  }
-  }
-  */
 
   TRGState
   TRGGDL::decision(const TRGState& input)

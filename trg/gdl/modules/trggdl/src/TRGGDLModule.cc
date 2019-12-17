@@ -143,7 +143,8 @@ namespace Belle2 {
                                _firmwareSimulationMode,
                                _Phase,
                                _algFromDB,
-                               _algFilePath);
+                               _algFilePath,
+                               _debugLevel);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
@@ -151,7 +152,8 @@ namespace Belle2 {
                                _firmwareSimulationMode,
                                _Phase,
                                _algFromDB,
-                               _algFilePath);
+                               _algFilePath,
+                               _debugLevel);
     }
     if (_debugLevel > 9) printf("TRGGDLModule::beginRun() ends.\n");
 

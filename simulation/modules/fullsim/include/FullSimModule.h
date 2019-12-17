@@ -111,6 +111,7 @@ namespace Belle2 {
     double m_svdProductionCut;             /*!< Secondary production threshold in SVD envelope. */
     double m_cdcProductionCut;             /*!< Secondary production threshold in CDC envelope. */
     double m_arichtopProductionCut;        /*!< Secondary production threshold in ARICH and TOP envelopes. */
+    double m_eclProductionCut;             /*!< Secondary production threshold in ECL envelopes. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */

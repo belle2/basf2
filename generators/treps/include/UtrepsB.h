@@ -10,17 +10,6 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/utilities/InitialParticleGeneration.h>
-#include <string>
-
-#include<TVector3.h>
-#include<TLorentzVector.h>
-
-// user include files
 #include <generators/treps/Particle_array.h>
 #include <generators/treps/Sutool.h>
 #include <generators/treps/Treps3B.h>
@@ -34,28 +23,16 @@ namespace Belle2 {
 
   public:
 
-    /*** Constructor: Sets the description, the properties and the parameters of the module.
-     */
     UtrepsB(void);
     ~UtrepsB() { };
 
-    /** initialization for trepsinput */
-    virtual void initialize() { };
-
-    /** initialization for trepsinput */
-    virtual void terminate() { };
-
-    /** input event from TREPS */
-    virtual void event() { };
-
-    virtual double tpform(double, double) const override ;
-    virtual double tpangd(double, double) override ;
-    virtual int tpuser(TLorentzVector, TLorentzVector,
-                       Part_gen*, int);
-
-    Interps b00, b20, b22;
-
+    /** initialization of Pparametrization of pi+pi- partial waves */
     void initg() ;
+    Interps b00, b20, b22; // Parameter sets
+
+    virtual double tpform(double, double) const override ; // FormFactor effict
+    virtual double tpangd(double, double) override ; // angular distribution for final 2-body case
+    virtual int tpuser(TLorentzVector, TLorentzVector, Part_gen*, int); // user decision routine for extra generation conditions.
 
   private:
     double d2func(double) const;

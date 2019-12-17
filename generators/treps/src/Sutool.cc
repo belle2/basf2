@@ -181,38 +181,6 @@ namespace Belle2 {
 
   int Sutool::poisson(double m)
   {
-    /*
-      int nr;
-
-      if( m <= 10 ){
-      int k = 1;
-      double a = 1.0;
-
-      while(1){
-      double u = rnd8();
-      a = u*a;
-      if( a < exp(-m) ) return k-1 ;
-      else k++;
-      }
-      }
-      else {
-      double v1, v2, r2;
-      do{
-      v1 = 2.*rnd8()-1.;
-      v2 = 2.*rnd8()-1.;
-      r2 = v1*v1 + v2*v2;
-      } while( r2 > 1.0 );
-
-      double z = v1*sqrt( -2.*log(r2)/r2 );
-      //return max( 0, (int)( m + z*sqrt(m) + 0.5 ) );
-      int ret;
-      ret = 0;
-      if( (int)( m + z*sqrt(m) + 0.5 )>0 )
-      ret =  (int)( m + z*sqrt(m) + 0.5 );
-      return ret;
-
-      }
-    */
     return gRandom->Poisson(m);
   }
 

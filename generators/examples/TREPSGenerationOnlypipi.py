@@ -22,8 +22,6 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100000)
 
 # beam parameters
 beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters.param("generateCMS", True)
-# beamparameters.param("smearVertex", False)
 
 # to run the framework the used modules need to be registered
 parameterFilePipi = Belle2.FileSystem.findFile('generators/modules/trepsinput/parameterFiles/treps_par_pipi.dat')

@@ -39,7 +39,4 @@ namespace Belle2 {
     pcharg = pchargx ;
   }
 
-
-
-
 } // namespace Belle

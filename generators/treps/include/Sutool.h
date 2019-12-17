@@ -32,14 +32,6 @@ namespace Belle2 {
     // friend classes and functions
 
   public:
-    // constants, enums and typedefs
-
-    //    double rndd(void) {
-    //    extern BasfranEngine* BASF_Random_Engine;
-    //    double fnum = RandFlat::shoot( BASF_Random_Engine );
-    //    return fnum;
-    //  }
-
     // Constructors and destructor
     Sutool() {};
     virtual ~Sutool() {};
@@ -63,7 +55,6 @@ namespace Belle2 {
   class Interps {
   public:
     Interps(void) {};
-    //  Interps( double, double, int, double* );
     Interps(double x1, double x2, int nd, double* yd)
     {
       xmin = x1; xmax = x2;
@@ -73,7 +64,6 @@ namespace Belle2 {
 
     ~Interps(void) {};
 
-    //  double get_val( double );
     double get_val(double x)
     {
       double rn = (x - xmin) / (xmax - xmin) * (double)ndiv;
@@ -85,7 +75,6 @@ namespace Belle2 {
       return x1 ;
     };
 
-    //  void change( double, double, int, double* ) ;
     void change(double x1, double x2, int nd, double* yd)
     {
       xmin = x1; xmax = x2;
@@ -93,7 +82,6 @@ namespace Belle2 {
       return;
     };
 
-    //int check_xrange( double );
     int check_xrange(double x)
     {
       if (x < xmin) return -1 ;
@@ -103,7 +91,6 @@ namespace Belle2 {
 
 
   private:
-    //  double interp( double*, double );
     double interp(double* y, double x)
     {
 
@@ -196,31 +183,9 @@ namespace Belle2 {
     };
 
 
-
     friend dbcomplex operator /(dbcomplex a , dbcomplex b)
     {
       return a * (1. / b);
-
-      /*  double r = b.re;
-      double i = b.im;
-      double ti, tr;
-
-      tr = r < 0 ? -r:r;
-      ti = i < 0 ? -i:i;
-
-      if( tr<= ti ){
-      ti = r/i;
-      tr = i*(1 + ti*ti );
-      r = a.re;
-      i = a.im;
-      }
-      else {
-      ti = -i/r;
-      tr = r*( 1 + ti*ti );
-      r = -a.im ;
-      i = a.re ;
-      }
-      return dbcomplex( (r*ti*i)/tr, (i*ti-r)/tr ); */
     };
 
     double real(void)

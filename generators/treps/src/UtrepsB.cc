@@ -8,20 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <string.h>
-#include <string>
-#include <TFile.h>
-
-#include <TVector3.h>
 #include <TLorentzVector.h>
-#include <TRandom.h>
-
-
-// user include files
-#include <generators/treps/Particle_array.h>
-#include <generators/treps/Sutool.h>
 #include <generators/treps/UtrepsB.h>
-
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -32,11 +21,9 @@ UtrepsB::UtrepsB(void) : TrepsB()
 
 void UtrepsB::initg(void)
 {
-
   B2DEBUG(10, " UtrepsB initg  Pmodel " << TrepsB::pmodel);
 
   //parametrization of pi+pi- partial waves
-
 
   static double data001[21] = { 20., 15., 9., 8., 8., 7., 5.3, 5.2,
                                 5.2, 5.2, 5.2, 4., 3., 2., 2.,
@@ -100,10 +87,10 @@ double UtrepsB::qfunc(double y, double mm) const
 {
   return sqrt(0.25 * y - mm * mm);
 }
+
 //form factor effect
 double UtrepsB::tpform(double _q2, double _w) const
 {
-  //B2DEBUG(10, " Fmodel "<< TrepsB::fmodel );
   double dis = 1. / pow((1.0 + _q2 / (_w * _w)), 2);
   if (TrepsB::fmodel == 1) {
     // rho form factor
@@ -273,10 +260,7 @@ int UtrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
   // be canceled.
   // CAUTION!: The 4-momenta of particles are in e+e- cms
 
-  //HepRandom& rnd8 = sutool.rnd8;
-
   int iret = 1;
-
 
   // 3-body physics models
 
@@ -378,8 +362,7 @@ int UtrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
     }
     if (weimax * gRandom->Uniform()  > wei) iret = 0;
 
-    //B2DEBUG(10,  " $$ 3B $$ "<< wei <<" "<< iret );
-
+    B2DEBUG(10,  " $$ 3B $$ " << wei << " " << iret);
   }
 
 

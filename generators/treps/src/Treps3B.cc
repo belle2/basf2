@@ -38,8 +38,6 @@ using namespace std;
 #include <stdlib.h>
 
 // user include files
-#include <generators/treps/Particle_array.h>
-#include <generators/treps/Sutool.h>
 #include <generators/treps/Treps3B.h>
 
 #include <framework/logging/Logger.h>
@@ -1116,7 +1114,6 @@ namespace Belle2 {
 
 
     TVector3 pbcm = (-1. / pb.T()) * pb.Vect();
-    //  TVector3 bz = (TVector3)pb*(1./((TVector3)pb).mag());
     p3.Boost(pbcm); p4.Boost(pbcm); p5.Boost(pbcm);
     ps3 = p3.Vect(); ps4 = p4.Vect(); ps5 = p5.Vect();
 

@@ -82,27 +82,6 @@ namespace Belle2 {
     friend dbcomplex operator /(dbcomplex a , dbcomplex b)
     {
       return a * (1. / b);
-
-      /*  double r = b.re;
-      double i = b.im;
-      double ti, tr;
-
-      tr = r < 0 ? -r:r;
-      ti = i < 0 ? -i:i;
-
-      if( tr<= ti ){
-      ti = r/i;
-      tr = i*(1 + ti*ti );
-      r = a.re;
-      i = a.im;
-      }
-      else {
-      ti = -i/r;
-      tr = r*( 1 + ti*ti );
-      r = -a.im ;
-      i = a.re ;
-      }
-      return dbcomplex( (r*ti*i)/tr, (i*ti-r)/tr ); */
     };
 
     double real(void)

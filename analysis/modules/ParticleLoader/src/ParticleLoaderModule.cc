@@ -90,6 +90,10 @@ namespace Belle2 {
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
              false);
 
+    addParam("skipNonPrimaryDaughters", m_skipNonPrimaryDaughters,
+             "If true, the secondary MC daughters will be skipped, default is false",
+             false);
+
     addParam("trackHypothesis", m_trackHypothesis,
              "Track hypothesis to use when loading the particle. By default, use the particle's own hypothesis.",
              0);
@@ -882,6 +886,7 @@ namespace Belle2 {
     vector<MCParticle*> mcdaughters = mcmother->getDaughters();
 
     for (auto& mcdaughter : mcdaughters) {
+      if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle) and m_skipNonPrimaryDaughters) continue;
       Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
       daughter->addRelationTo(mcdaughter);

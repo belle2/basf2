@@ -942,6 +942,7 @@ def fillParticleListFromMC(
     decayString,
     cut,
     addDaughters=False,
+    skipNonPrimaryDaughters=False,
     writeOut=False,
     path=None,
 ):
@@ -953,7 +954,9 @@ def fillParticleListFromMC(
 
     @param decayString   specifies type of Particles and determines the name of the ParticleList
     @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
+    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and
+                         sets mother-daughter relations
+    @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
     @param writeOut      whether RootOutput module should save the created ParticleList
     @param path          modules are added to this path
     """
@@ -962,6 +965,7 @@ def fillParticleListFromMC(
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('addDaughters', addDaughters)
+    pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
@@ -970,6 +974,7 @@ def fillParticleListFromMC(
 def fillParticleListsFromMC(
     decayStringsWithCuts,
     addDaughters=False,
+    skipNonPrimaryDaughters=False,
     writeOut=False,
     path=None,
 ):
@@ -983,17 +988,20 @@ def fillParticleListsFromMC(
     pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    @param decayString             specifies type of Particles and determines the name of the ParticleList
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
+                                   sets mother-daughter relations
+    @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('addDaughters', addDaughters)
+    pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)

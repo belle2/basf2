@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -131,6 +132,13 @@ namespace Belle2 {
      * @param cutParameter
      */
     explicit ParticleGenerator(const std::string& decayString, const std::string& cutParameter = "");
+
+    /**
+     * Initialises the generator to produce the given type of sublist
+     * @param DecayDescriptor
+     * @param cutParameter
+     */
+    explicit ParticleGenerator(const DecayDescriptor decaydescriptor, const std::string& cutParameter = "");
 
     /**
      * Initialises the generator to produce the given type of sublist

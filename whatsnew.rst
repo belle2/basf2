@@ -29,7 +29,7 @@ Changes since release-04
 .. And then for framework as well. If something is more important we can always
    move it directly in here
 
-.. .. include:: framework/doc/whatsnew-since/release-04-00.txt
+.. include:: framework/doc/whatsnew-since/release-04-00.txt
 
 Changes since release-03
 ========================

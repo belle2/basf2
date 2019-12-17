@@ -12,9 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <string>
 #include <map>
 
@@ -99,7 +98,7 @@ namespace Belle2 {
      * structure to hold samples of a particular background type
      */
     struct BkgFiles {
-      SimHitBase::BG_TAG tag;  /**< background tag */
+      BackgroundMetaData::BG_TAG tag;  /**< background tag */
       std::string type;        /**< background type */
       double realTime;         /**< real time of BG samlpe */
       double scaleFactor;      /**< scale factor for the rate */
@@ -115,7 +114,7 @@ namespace Belle2 {
       /**
        * default constructor
        */
-      BkgFiles(): tag(SimHitBase::bg_none), realTime(0.0), scaleFactor(1.0),
+      BkgFiles(): tag(BackgroundMetaData::bg_none), realTime(0.0), scaleFactor(1.0),
         fileType(BackgroundMetaData::c_Usual),
         tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
       {}
@@ -129,7 +128,7 @@ namespace Belle2 {
        * @param fileTyp file type
        * @param indx index of this element in the std::vector
        */
-      BkgFiles(SimHitBase::BG_TAG bkgTag,
+      BkgFiles(BackgroundMetaData::BG_TAG bkgTag,
                const std::string& bkgType,
                const std::string& fileName,
                double time,
@@ -169,7 +168,7 @@ namespace Belle2 {
         SIMHIT* simHit = simHits.appendNew(*bkgSimHit);
         simHit->shiftInTime(timeShift);
         if (simHit->getBackgroundTag() == 0) // should be properly set at bkg simulation
-          simHit->setBackgroundTag(SimHitBase::bg_other);
+          simHit->setBackgroundTag(BackgroundMetaData::bg_other);
         if (m_wrapAround) {
           double time = simHit->getGlobalTime();
           if (time > maxTime) {
@@ -240,7 +239,7 @@ namespace Belle2 {
      * @param realTime real time that corresponds to background sample
      * @param fileTyp file type
      */
-    void appendSample(SimHitBase::BG_TAG bkgTag,
+    void appendSample(BackgroundMetaData::BG_TAG bkgTag,
                       const std::string& bkgType,
                       const std::string& fileName,
                       double realTime,

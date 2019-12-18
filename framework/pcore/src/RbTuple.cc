@@ -104,7 +104,6 @@ int RbTupleManager::begin(int procid)
 
   for (auto& mod : m_histdefs) {
     auto* hmod = (HistoModule*) mod;
-    cout << hmod->getName() << endl;
     hmod->defineHisto();
   }
 

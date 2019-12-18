@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Yo Sato                                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -46,8 +46,17 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    /**
+     * Register particles which have (sub-)decay recursively.
+     * The function is called in initialize().
+     */
     void registerParticleRecursively(DecayDescriptor decaydescriptor);
-    void loadRecursive(DecayDescriptor decaydescriptor);
+
+    /**
+     * Combine particles which have (sub-)decay recursively.
+     * The function is called in event().
+     */
+    void combineRecursively(DecayDescriptor decaydescriptor);
 
 
   private:
@@ -63,8 +72,6 @@ namespace Belle2 {
 
     std::vector<std::string> m_vector_listName;   /**< vector of output particle list name */
 
-    int m_decayModeID; /**< user specified decay mode identifier */
-
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
 
     std::string m_cutParameter;  /**< selection criteria */
@@ -72,10 +79,6 @@ namespace Belle2 {
     std::unique_ptr<Variable::Cut> m_cut;  /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
-
-    int m_maximumNumberOfCandidates; /**< maximum number of reconstructed candidates */
-
-    bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
 
   };
 

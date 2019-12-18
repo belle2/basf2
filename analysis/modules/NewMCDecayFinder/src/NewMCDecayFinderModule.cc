@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc                                *
+ * Contributors: Yo Sato                                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -54,8 +54,6 @@ namespace Belle2 {
              "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
-    addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
-             0);
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
@@ -88,10 +86,8 @@ namespace Belle2 {
 
     m_cut = Variable::Cut::compile(m_cutParameter);
 
-    // Daughters
+    // register particles which have (sub-)decay recursively
     registerParticleRecursively(m_decaydescriptor);
-
-    B2DEBUG(10, "Correctly initialized !!!");
 
   }
 
@@ -99,7 +95,8 @@ namespace Belle2 {
   {
     B2DEBUG(10, "event() started !!!");
 
-    loadRecursive(m_decaydescriptor);
+    // combine particles recursively
+    combineRecursively(m_decaydescriptor);
 
     StoreObjPtr<ParticleList> plist(m_listName);
     bool existingList = plist.isValid();
@@ -131,23 +128,24 @@ namespace Belle2 {
 
     for (int i = 0; i < nProducts; ++i) {
       if (decaydescriptor.getDaughter(i)->getNDaughters() == 0) {
+        // if daughter does not have daughters, it must be already registered
         const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
         StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
       } else {
+        // if daughter has daughters, call the function recursively
         registerParticleRecursively(*(decaydescriptor.getDaughter(i)));
       }
     }
 
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
-
     std::string listName = mother->getFullName();
     StoreObjPtr<ParticleList> particleList(listName);
 
-    // if particleList already exists,
+    // if particleList already exists
     auto existList = std::find(m_vector_listName.begin(), m_vector_listName.end(), listName);
     if (existList != m_vector_listName.end()) {
-      B2ERROR(listName << " already exist ! You may observe event overlap !");
+      B2ERROR(listName << " already exist ! You cannot write same sub-decay twice !!!");
       return;
     }
 
@@ -165,7 +163,7 @@ namespace Belle2 {
 
   }
 
-  void NewMCDecayFinderModule::loadRecursive(DecayDescriptor decaydescriptor)
+  void NewMCDecayFinderModule::combineRecursively(DecayDescriptor decaydescriptor)
   {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
@@ -188,19 +186,21 @@ namespace Belle2 {
       outputList->bindAntiParticleList(*(outputAntiList));
     }
 
-
     unsigned int numberOfLists = decaydescriptor.getNDaughters();
 
     for (unsigned int i = 0; i < numberOfLists; ++i) {
       const DecayDescriptor* dDaughter = decaydescriptor.getDaughter(i);
 
-      if (dDaughter->getNDaughters() == 0) continue;
-      loadRecursive(*dDaughter);
+      if (dDaughter->getNDaughters() == 0)
+        // if daughter does not have daughters, do nothing
+        continue;
+      // if daughter has daughter, call the function recursively
+      combineRecursively(*dDaughter);
     }
 
+    // initialize the generator
     m_generator = std::make_unique<ParticleGenerator>(decaydescriptor, "");
     m_generator->init();
-
 
     while (m_generator->loadNext()) {
       Particle&& particle = m_generator->getCurrentParticle();
@@ -209,11 +209,22 @@ namespace Belle2 {
       int iparticle = particles.getEntries() - 1;
 
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
-
-      // append to the created particle the user specified decay mode ID
-      newParticle->addExtraInfo("decayModeID", m_decayModeID);
     }
 
+    // select only signal particles
+    std::unique_ptr<Variable::Cut> cutIsSignal = Variable::Cut::compile("isSignal");
+
+    std::vector<unsigned int> toRemove;
+    unsigned int n = outputList->getListSize();
+    for (unsigned i = 0; i < n; i++) {
+      const Particle* part = outputList->getParticle(i);
+
+      MCMatching::setMCTruth(part);
+      MCMatching::getMCErrors(part);
+
+      if (!cutIsSignal->check(part)) toRemove.push_back(part->getArrayIndex());
+    }
+    outputList->removeParticles(toRemove);
 
   }
 

@@ -1744,56 +1744,31 @@ def newFindMCDecay(
     path=None,
 ):
     r"""
-    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
-    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
-    possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
-    criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+    Finds and creates a ``ParticleList`` from given decay string.
+    ``ParticleList`` of daughters with sub-decay is are created.
 
-    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
-    decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
-    would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
-    need to be stated correctly so this can be used for "sum of exclusive" decays
+    Only signal particle, which means ``isSignal`` is equal to 1, is stored. One can use the decay string grammar
+    to change the behavior of ``isSignal``. One can find detailed information in :ref:`DecayString`.
 
     .. warning::
-        The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
-        Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
-        distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
+        If one uses same sub-decay twice, same particles are registered to a ``ParticleList``. For example,
+        ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] [pi0:gg =direct=> gamma:MC gamma:MC]``.
+        One can skip the second sub-decay, ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] pi0:gg``.
 
-        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
-        This can be solved by manually randomising the lists before combining.
-
-    See Also:
-
-        * `Particle combiner how does it work? <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
-        * `Identical particles in decay chain <https://questions.belle2.org/question/5724/identical-particles-in-decay-chain/>`_
 
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
-    @param dmID        user specified decay mode identifier
+                       isSignal==1 is always required by default.
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
-    @param candidate_limit Maximum amount of candidates to be reconstructed. If
-                       the number of candidates is exceeded a Warning will be
-                       printed.
-                       By default, all these candidates will be removed and event will be ignored.
-                       This behaviour can be changed by \'ignoreIfTooManyCandidates\' flag.
-                       If no value is given the amount is limited to a sensible
-                       default. A value <=0 will disable this limit and can
-                       cause huge memory amounts so be careful.
-    @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
-                       candidates reaches limit. If event is ignored, no candidates are reconstructed,
-                       otherwise, number of candidates in candidate_limit is reconstructed.
     """
 
     pmake = register_module('NewMCDecayFinder')
     pmake.set_name('NewMCDecayFinder_' + decayString)
     pmake.param('decayString', decayString)
     pmake.param('cut', cut)
-    pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
     path.add_module(pmake)
 

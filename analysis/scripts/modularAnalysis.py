@@ -2581,6 +2581,7 @@ def applyChargedPidMVA(particleLists, path, binaryHypoPDGCodes=(0, 0), payloadNa
     - pi (211) vs. K (321)
     - K (321) vs. pi (211)
     - p (2212) vs. pi (211)
+    - d (1000010020) vs pi (211)
 
     , or 'global' PID, namely "one-vs-others" separation. This makes use of an MVA algorithm trained in multi-class mode.
 
@@ -2605,7 +2606,7 @@ def applyChargedPidMVA(particleLists, path, binaryHypoPDGCodes=(0, 0), payloadNa
     if binaryHypoPDGCodes != (0, 0):
 
         # In binary mode, enforce check on input S, B hypotheses compatibility.
-        binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
+        binaryOpts = [(11, 211), (13, 211), (211, 321), (321, 211), (2212, 211), (1000010020, 211)]
 
         if binaryHypoPDGCodes not in binaryOpts:
             B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],

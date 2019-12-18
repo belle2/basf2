@@ -331,3 +331,26 @@ def get_object_with_name(object_name, root=None):
         return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
 
     return getattr(root, object_name)
+
+
+def is_light_build():
+    """
+    Check if we are running in a light build.
+
+    Returns:
+        bool True/false if we're in a light build.
+    """
+    try:
+        import generators
+    except ModuleNotFoundError:
+        return True
+    return False
+
+
+def skip_test_if_light(py_case=None):
+    """
+    Skips the test if we are running in a light build (maybe this test tests
+    some generation example or whatever)
+    """
+    if is_light_build():
+        skip_test(reason="We're in a light build.", py_case=py_case)

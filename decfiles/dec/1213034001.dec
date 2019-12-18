@@ -9,17 +9,6 @@
 # Cuts: None
 # Date: 20190812
 #
-Alias B+sig B+
-Alias B-sig B-
-ChargeConj B+sig B-sig
-
-Alias D*0sig D*0
-Alias anti-D*0sig anti-D*0
-ChargeConj D*0sig anti-D*0sig
-
-Alias D0sig D0
-Alias anti-D0sig anti-D0
-ChargeConj D0sig anti-D0sig
 
 # Upsilon(4S) decay
 Decay Upsilon(4S)

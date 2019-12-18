@@ -13,6 +13,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
+#include <framework/database/DBObjPtr.h>
+#include <simulation/dbobjects/ROIParameters.h>
 
 namespace Belle2 {
 
@@ -35,9 +37,17 @@ namespace Belle2 {
     /**  */
     void initialize() override final;
 
+    /**  */
+    void beginRun() override final;
 
     /**  */
     void event() override final;
+
+    /**  all the actual work is done here */
+    void filterDigits();
+
+    /**  all the actual work is done here */
+    void copyDigits();
 
 
     bool m_CreateOutside; /**< if set, create list of outside pixels, too */
@@ -45,6 +55,13 @@ namespace Belle2 {
     std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
+    bool m_overwriteDB; /**< if set, overwrites ROI-finding settings in DB */
+    bool m_usePXDDataReduction; /**< enables/disables ROI-finding if overwriteDB=True */
+
+
+    int m_countNthEvent = 0;  /**< Event counter to be able to disable data reduction for every Nth event */
+    DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
+    int m_skipEveryNth = -1;  /**< Parameter from DB for how many events to skip data reduction */
 
     SelectSubset< PXDDigit > m_selectorIN; /**< selector of the subset of PXDDigits contained in the ROIs*/
     SelectSubset< PXDDigit > m_selectorOUT; /**< selector of the subset of PXDDigits NOT contained in the ROIs*/

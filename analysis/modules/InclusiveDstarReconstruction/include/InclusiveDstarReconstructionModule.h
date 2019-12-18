@@ -19,29 +19,59 @@
 
 namespace Belle2 {
   /**
-   * Inclusively reconstructs a D* particle list  from an input pion particle list.
+   * Inclusive D* reconstruction module.
    *
+   * This module creates a D* particle list by estimating the D* four momenta
+   * from slow pions, specified by a given cut. The D* energy is approximated
+   * as  E(D*) = m(D*)/(m(D*) - m(D)) * E(pi). The absolute value of the D*
+   * momentum is calculated using the D* PDG mass and the direction is collinear
+   * to the slow pion direction.
+   *
+   * The charge of the given pion list has to be consistent with the D* charge.
    */
   class InclusiveDstarReconstructionModule : public Module {
 
   public:
 
-    /** Constructor */
+    /**
+     * Constructor.
+     */
     InclusiveDstarReconstructionModule();
-    /** Destructor */
+
+    /**
+     * Destructor.
+     */
     virtual ~InclusiveDstarReconstructionModule();
-    /** initialize the module (setup the data store) */
+
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
     virtual void initialize() override;
-    /** process event */
+
+    /**
+     * Event Processor.
+     */
     virtual void event() override;
 
 
   private:
 
-    /** Exstimates the D* four momentum given a slow pion */
+    /**
+     * Estimates the D* four momentum given a slow pion
+     *
+     * @param pion - a pion particle
+     * @returns estimated D* four momentum
+     * */
     TLorentzVector estimateDstarFourMomentum(const Particle* pion);
 
-    /** Checks if the given pion is list if compatible with the charge of the D* particle */
+    /**
+     * Checks if the given pion is list if compatible with the charge
+     * of the D* particle
+     *
+     * @param pion_pdg_code - PDG code of the processed pion particle
+     * @returns true (false) if pion pdg code is compatible (not compatible) with the current D* list
+     * */
     bool pionCompatibleWithDstar(int pion_pdg_code);
 
 
@@ -52,9 +82,9 @@ namespace Belle2 {
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
-    int m_dstar_pdg_code;
-    float m_dstar_pdg_mass;
-    float m_d_pdg_mass;
+    int m_dstar_pdg_code; /**< PDG code of the given D* particle list */
+    float m_dstar_pdg_mass; /**< PDG mass of the give D* particle list */
+    float m_d_pdg_mass; /**< PDG mass for the D daughter of the D* */
   };
 
 }

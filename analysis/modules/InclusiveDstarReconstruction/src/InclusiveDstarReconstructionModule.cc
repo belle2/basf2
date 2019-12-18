@@ -78,21 +78,22 @@ void InclusiveDstarReconstructionModule::initialize()
   m_cut = Variable::Cut::compile(m_slowPionCut);
 
   m_dstar_pdg_mass = TDatabasePDG::Instance()->GetParticle(m_dstar_pdg_code)->Mass();
-  // if output list is a charged (neutral) D*, assign charged (neutral) D mass
-  m_d_pdg_mass = (abs(m_dstar_pdg_code) == 413) ? TDatabasePDG::Instance()->GetParticle(411)->Mass() :
-                 TDatabasePDG::Instance()->GetParticle(421)->Mass();
+  // if output list is a charged (neutral) D*, assign average of charged and neutral (neutral) D mass
+//  m_d_pdg_mass = (abs(m_dstar_pdg_code) == 413) ? (TDatabasePDG::Instance()->GetParticle(411)->Mass() +
+//                                                   TDatabasePDG::Instance()->GetParticle(421)->Mass()) / 2 :
+//                 TDatabasePDG::Instance()->GetParticle(421)->Mass();
 
+  if (abs(m_dstar_pdg_code) == 413) {
+    m_d_pdg_mass = (pion_pdg_code == 111) ? TDatabasePDG::Instance()->GetParticle(421)->Mass() : TDatabasePDG::Instance()->GetParticle(
+                     411)->Mass();
+  } else {
+    m_d_pdg_mass = TDatabasePDG::Instance()->GetParticle(421)->Mass();
+  }
 
 }
 
 void InclusiveDstarReconstructionModule::event()
 {
-  // loop over all pions in input list
-  // if pion does not pass slow pion cut, continue
-  // check if pion and dstar list fit to each other
-  // estimate dstar four vector
-  // create dstar particle and set slow pion as daughter
-
   StoreArray<Particle> particles;
 
   // create output particle lists and bind anti-particle list
@@ -109,17 +110,12 @@ void InclusiveDstarReconstructionModule::event()
   StoreObjPtr<ParticleList> inputPionList(m_inputPionListName);
   unsigned int num_pions = inputPionList->getListSize();
 
-  // debugging purpose at the moment
-  unsigned int num_slow_pions = 0;
-
   for (unsigned int pion_index = 0; pion_index < num_pions; pion_index++) {
     const Particle* pion = inputPionList->getParticle(pion_index);
 
     if (!m_cut->check(pion)) {
       continue;
     };
-
-    num_slow_pions++;
 
     TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
     Particle dstar = Particle(dstar_four_vector, m_dstar_pdg_code, Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
@@ -128,16 +124,16 @@ void InclusiveDstarReconstructionModule::event()
     outputDstarList->addParticle(new_dstar);
 
   }
-
-  B2DEBUG(9, "Number of slow pions found: " << num_slow_pions);
-  B2DEBUG(9, "Number of pions: " << num_pions);
 }
 
 TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
 {
+  // estimate D* energy and absolute momentum using the slow pion energy
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
+  double abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
+
+  // dstar momentum approximated colinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
-  double abs_momentum_dstar = sqrt((energy_dstar * energy_dstar) - (m_dstar_pdg_mass * m_dstar_pdg_mass));
   TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
 
   return TLorentzVector(momentum_vec_dstar, energy_dstar);

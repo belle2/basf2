@@ -11,10 +11,10 @@ from ROOT import TFile
 from ROOT import TNtuple
 
 
-class TestMbcEff(unittest.TestCase):
+class TestNewMCDecayFinder(unittest.TestCase):
     """The unit test"""
 
-    def testMbcEff(self):
+    def testNewMCDecayFinder(self):
         """Reconstruct stuff with tight Mbc cut."""
 
         testFile = tempfile.NamedTemporaryFile()

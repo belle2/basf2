@@ -278,12 +278,8 @@ class Luminosity:
         ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
-        if period==1:
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
-        if period==2:
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
-            ax1.xaxis.set_minor_locator(ticker.AutoLocator())
+        ax1.xaxis.set_minor_locator(ticker.AutoLocator())
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -291,14 +287,8 @@ class Luminosity:
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.plot(x, yInt, color="red", label="Total",lw=3)
-        if period==1:
-            ax2.xaxis.set_major_locator(ticker.AutoLocator())
-            ax2.xaxis.set_minor_locator(ticker.AutoLocator())
-            #ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
-        if period==2:
-            ax2.xaxis.set_major_locator(ticker.AutoLocator())
-            ax2.xaxis.set_minor_locator(ticker.AutoLocator())
-            #ax2.xaxis.set_minor_locator(ticker.MultipleLocator(7))
+        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        ax2.xaxis.set_minor_locator(ticker.AutoLocator())
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()

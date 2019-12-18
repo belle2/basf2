@@ -8,23 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 #include <string>
+
 namespace TreeFitter {
 
 
   FitParams::FitParams(const int dim)
-    : m_globalState(dim),
-      m_globalCovariance(dim, dim),
-      m_dim(dim),
-      m_chiSquare(1e10),
-      m_nConstraints(0),
-      m_dimensionReduction(0),
-      m_nConstraintsVec(dim, 0)
+    :
+    m_dim(dim),
+    m_chiSquare(1e10),
+    m_nConstraints(0),
+    m_dimensionReduction(0),
+    m_nConstraintsVec(dim, 0),
+    m_globalState(dim),
+    m_globalCovariance(dim, dim)
   {
     resetStateVector();
     resetCovariance();

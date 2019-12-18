@@ -13,7 +13,6 @@
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <TLorentzRotation.h>
-#include <utility>
 
 namespace Belle2 {
 

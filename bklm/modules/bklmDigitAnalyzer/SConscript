@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'bklm', 'bklm_dataobjects', 'klm_dataobjects',
-               '$ROOT_LIBS']
-
-Return('env')

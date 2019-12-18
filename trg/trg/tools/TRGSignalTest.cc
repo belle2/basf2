@@ -70,7 +70,8 @@ main()
   tmp.dump(); tmp = t0;
   cout << "t0.unset(12, 100)" << endl;
   tmp.unset(12, 100);
-  tmp.dump(); tmp = t0;
+  tmp.dump();
+  // tmp = t0; // not used, so commented out
 
   //...Termination...
   cout << NAME << " ... terminated" << endl;

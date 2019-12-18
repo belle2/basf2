@@ -9,8 +9,6 @@
  **************************************************************************/
 // Own include
 #include <arich/modules/arichDigitizer/ARICHDigitizerModule.h>
-#include <framework/core/ModuleManager.h>
-#include <time.h>
 
 // Hit classes
 #include <arich/dataobjects/ARICHSimHit.h>
@@ -21,20 +19,18 @@
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
 
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 
 // ROOT
 #include <TVector2.h>
 #include <TVector3.h>
 #include <TRandom3.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;

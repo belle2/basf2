@@ -1,17 +1,22 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013-2019 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck, Christian Pulvermacher                      *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
+#include <framework/utilities/GeneralCut.h>
 
 #include <boost/algorithm/string.hpp>
 
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <exception>
 #include <string>
 #include <regex>
 

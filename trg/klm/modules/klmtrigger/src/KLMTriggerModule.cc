@@ -20,7 +20,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 // digits
-#include <bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMDigit.h>
 
 #include <trg/klm/dataobjects/KLMTriggerHit.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
@@ -106,11 +106,11 @@ void KLMTriggerModule::fillHits()
       const BKLMDigit* bklmDigit_i = bklmDigits[i];
       const BKLMDigit* bklmDigit_j = bklmDigits[j];
 
-      if (bklmDigit_i->getForward() == bklmDigit_j->getForward() &&
+      if (bklmDigit_i->getSection() == bklmDigit_j->getSection() &&
           bklmDigit_i->getSector() == bklmDigit_j->getSector() &&
           bklmDigit_i->getLayer() == bklmDigit_j->getLayer() &&
           bklmDigit_i->isPhiReadout() != bklmDigit_j->isPhiReadout()) {  // phi-theta match
-        int fwd = bklmDigit_i->getForward();
+        int section = bklmDigit_i->getSection();
         int sector = bklmDigit_i->getSector() - 1; // zero-based
         int layer = bklmDigit_i->getLayer() - 1; // zero-based
         int phiStrip = 0;
@@ -125,13 +125,13 @@ void KLMTriggerModule::fillHits()
 
         int xInt = 0, yInt = 0, zInt = 0;
         double x = 0.0, y = 0.0, z = 0.0;
-        geometryConverter(fwd, sector, layer, phiStrip, zStrip, xInt, yInt, zInt);
+        geometryConverter(section, sector, layer, phiStrip, zStrip, xInt, yInt, zInt);
         // covert 1/8 cm to cm
         x = (double)(xInt >> 3);
         y = (double)(yInt >> 3);
         z = (double)(zInt >> 3);
 
-        KLMTriggerHit* hit = klmTriggerHits.appendNew(fwd, sector, layer, phiStrip, zStrip);
+        KLMTriggerHit* hit = klmTriggerHits.appendNew(section, sector, layer, phiStrip, zStrip);
         hit->setX(x);
         hit->setY(y);
         hit->setZ(z);
@@ -164,13 +164,13 @@ void KLMTriggerModule::fillTracks()
   for (int i = 0; i < nEntries; ++i) {
     const KLMTriggerHit* hit = klmTriggerHits[i];
 
-    int fwd = hit->getForward();
+    int section = hit->getSection();
     int sector = hit->getSector();
 
-    int sectorID = fwd * c_TotalSectors + sector;
+    int sectorID = section * c_TotalSectors + sector;
 
     if (trackMap.find(sectorID) == trackMap.end())
-      trackMap[sectorID] = klmTriggerTracks.appendNew(fwd, sector);
+      trackMap[sectorID] = klmTriggerTracks.appendNew(section, sector);
 
     trackMap[sectorID]->addRelationTo(klmTriggerHits[i]);
   }
@@ -338,7 +338,7 @@ void KLMTriggerModule::calcChisq()
 }
 
 
-//void KLMTriggerModule::geometryConverter(bool fwd, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z)
+//void KLMTriggerModule::geometryConverter(bool section, int sector, int layer, int phiStrip, int zStrip, double& x, double& y, double& z)
 //{
 //  // lengths are in centimeters
 //  const double phi_width[c_TotalLayers] = {4.0, 4.0, 4.90, 5.11, 5.32, 5.53, 4.30, 4.46, 4.62, 4.77, 4.93, 5.09, 5.25, 5.40, 5.56};
@@ -386,7 +386,7 @@ void KLMTriggerModule::calcChisq()
 //  }
 //
 //  // backward part flip
-//  if(!fwd) {
+//  if(!section) {
 //    y = -y;
 //    z = -z;
 //  }
@@ -401,7 +401,7 @@ void KLMTriggerModule::calcChisq()
 //}
 
 
-void KLMTriggerModule::geometryConverter(int fwd, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z)
+void KLMTriggerModule::geometryConverter(int section, int sector, int layer, int phiStrip, int zStrip, int& x, int& y, int& z)
 {
   const int c_LayerXCoord[c_TotalLayers] = {1628, 1700, 1773, 1846, 1919, 1992, 2064, 2137, 2210, 2283, 2356, 2428, 2501, 2574, 2647};
   const int c_LayerY0[c_TotalLayers] = { -2403, -2566, -2744, -2862, -2979, -3097, -3234, -3354, -3474, -3587, -3708, -3828, -3948, -4061, -4181};
@@ -420,71 +420,71 @@ void KLMTriggerModule::geometryConverter(int fwd, int sector, int layer, int phi
   int zWidth = 0;
 
   // define if module is flipped
-  if (layer == 0 && fwd == 0 && sector == 0) // layer 0, backward, sector 0
+  if (layer == 0 && section == 0 && sector == 0) // layer 0, backward, sector 0
     flipped = true;
-  else if (layer == 0 && fwd == 0 && sector == 1)
+  else if (layer == 0 && section == 0 && sector == 1)
     flipped = true;
-  else if (layer == 0 && fwd == 0 && sector == 2)
+  else if (layer == 0 && section == 0 && sector == 2)
     flipped = false;
-  else if (layer == 0 && fwd == 0 && sector == 3)
+  else if (layer == 0 && section == 0 && sector == 3)
     flipped = false;
-  else if (layer == 0 && fwd == 0 && sector == 4)
+  else if (layer == 0 && section == 0 && sector == 4)
     flipped = false;
-  else if (layer == 0 && fwd == 0 && sector == 5)
+  else if (layer == 0 && section == 0 && sector == 5)
     flipped = false;
-  else if (layer == 0 && fwd == 0 && sector == 6)
+  else if (layer == 0 && section == 0 && sector == 6)
     flipped = true;
-  else if (layer == 0 && fwd == 0 && sector == 7)
+  else if (layer == 0 && section == 0 && sector == 7)
     flipped = true;
-  else if (layer == 0 && fwd == 1 && sector == 0) // layer 0, forward, sector 0
+  else if (layer == 0 && section == 1 && sector == 0) // layer 0, forward, sector 0
     flipped = true;
-  else if (layer == 0 && fwd == 1 && sector == 1)
+  else if (layer == 0 && section == 1 && sector == 1)
     flipped = true;
-  else if (layer == 0 && fwd == 1 && sector == 2)
+  else if (layer == 0 && section == 1 && sector == 2)
     flipped = true;
-  else if (layer == 0 && fwd == 1 && sector == 3)
+  else if (layer == 0 && section == 1 && sector == 3)
     flipped = false;
-  else if (layer == 0 && fwd == 1 && sector == 4)
+  else if (layer == 0 && section == 1 && sector == 4)
     flipped = false;
-  else if (layer == 0 && fwd == 1 && sector == 5)
+  else if (layer == 0 && section == 1 && sector == 5)
     flipped = false;
-  else if (layer == 0 && fwd == 1 && sector == 6)
+  else if (layer == 0 && section == 1 && sector == 6)
     flipped = false;
-  else if (layer == 0 && fwd == 1 && sector == 7)
+  else if (layer == 0 && section == 1 && sector == 7)
     flipped = true;
-  else if (layer == 1 && fwd == 0 && sector == 0) // layer 1, backward, sector 0
+  else if (layer == 1 && section == 0 && sector == 0) // layer 1, backward, sector 0
     flipped = false;
-  else if (layer == 1 && fwd == 0 && sector == 1)
+  else if (layer == 1 && section == 0 && sector == 1)
     flipped = false;
-  else if (layer == 1 && fwd == 0 && sector == 2)
+  else if (layer == 1 && section == 0 && sector == 2)
     flipped = false;
-  else if (layer == 1 && fwd == 0 && sector == 3)
+  else if (layer == 1 && section == 0 && sector == 3)
     flipped = true;
-  else if (layer == 1 && fwd == 0 && sector == 4)
+  else if (layer == 1 && section == 0 && sector == 4)
     flipped = true;
-  else if (layer == 1 && fwd == 0 && sector == 5)
+  else if (layer == 1 && section == 0 && sector == 5)
     flipped = true;
-  else if (layer == 1 && fwd == 0 && sector == 6)
+  else if (layer == 1 && section == 0 && sector == 6)
     flipped = true;
-  else if (layer == 1 && fwd == 0 && sector == 7)
+  else if (layer == 1 && section == 0 && sector == 7)
     flipped = false;
-  else if (layer == 1 && fwd == 1 && sector == 0) // layer 1, forward, sector 0
+  else if (layer == 1 && section == 1 && sector == 0) // layer 1, forward, sector 0
     flipped = false;
-  else if (layer == 1 && fwd == 1 && sector == 1)
+  else if (layer == 1 && section == 1 && sector == 1)
     flipped = false;
-  else if (layer == 1 && fwd == 1 && sector == 2)
+  else if (layer == 1 && section == 1 && sector == 2)
     flipped = true;
-  else if (layer == 1 && fwd == 1 && sector == 3)
+  else if (layer == 1 && section == 1 && sector == 3)
     flipped = true;
-  else if (layer == 1 && fwd == 1 && sector == 4)
+  else if (layer == 1 && section == 1 && sector == 4)
     flipped = true;
-  else if (layer == 1 && fwd == 1 && sector == 5)
+  else if (layer == 1 && section == 1 && sector == 5)
     flipped = true;
-  else if (layer == 1 && fwd == 1 && sector == 6)
+  else if (layer == 1 && section == 1 && sector == 6)
     flipped = false;
-  else if (layer == 1 && fwd == 1 && sector == 7)
+  else if (layer == 1 && section == 1 && sector == 7)
     flipped = false;
-  else if (layer > 2 && fwd == 0) // backward RPCs
+  else if (layer > 2 && section == 0) // backward RPCs
     flipped = true;
   else
     flipped = false;
@@ -594,7 +594,7 @@ void KLMTriggerModule::geometryConverter(int fwd, int sector, int layer, int phi
     y = -y;
 
   z  = z0 + dz + zStrip * zWidth;
-  if (fwd == 1)
+  if (section == 1)
     z = z + c_ZOffset;
   else
     z = -z + c_ZOffset;

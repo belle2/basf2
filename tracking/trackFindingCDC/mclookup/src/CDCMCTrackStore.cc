@@ -14,9 +14,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
@@ -25,8 +22,6 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <memory>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

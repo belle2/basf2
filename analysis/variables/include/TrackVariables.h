@@ -179,6 +179,26 @@ namespace Belle2 {
     */
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
 
+    /**
+     * returns the PDG code of the track fit hypothesis actually used for the particle
+     */
+    double trackFitHypothesisPDG(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixD0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixPhi0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixOmegaPull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixZ0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixTanLambdaPull(const Particle* part);
+
   }
 } // Belle2 namespace
 

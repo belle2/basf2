@@ -45,6 +45,12 @@ namespace Belle2 {
     /** function to be executed on initialize() */
     void initialize();
 
+    /** Set allowed flags. */
+    void setAllowedFlags(int allowedFlags)
+    {
+      m_allowedFlags = allowedFlags | MCInitialParticles::c_generateCMS;
+    }
+
   private:
     /** generate the vertex
      * @param initial nominal vertex position

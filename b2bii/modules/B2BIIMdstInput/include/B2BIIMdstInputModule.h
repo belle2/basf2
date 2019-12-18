@@ -6,13 +6,13 @@
 // Date : 16 - Feb - 2015
 //-
 
-#ifndef B2BIIMDST_INPUT_H
-#define B2BIIMDST_INPUT_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
 #include "belle_legacy/panther/panther.h"
@@ -93,8 +93,9 @@ namespace Belle2 {
 
     //! Entries numbers which are valid for the current file
     std::set<int64_t> m_valid_entries_in_current_file;
+
+    //! File metadata to declare if we process real data or simulated data
+    StoreObjPtr<FileMetaData> m_fileMetadata{"", DataStore::c_Persistent};
   };
 
 } // end namespace Belle2
-
-#endif

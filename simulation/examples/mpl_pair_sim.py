@@ -41,7 +41,7 @@ GEARBOX = register_module('Gearbox')
 
 GEOMETRY = register_module('Geometry')
 GEOMETRY_param = {
-    'components': ['BeamPipe', 'MagneticField', 'PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'BKLM'],
+    'components': ['BeamPipe', 'MagneticField', 'PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],
     'geometryType': 0
 }
 GEOMETRY.param(GEOMETRY_param)
@@ -63,8 +63,8 @@ PXDDIGI.param(PXDDIGI_param)
 
 # SVDDIGITIZER = register_module('SVDDigitizer')
 # SVDDIGITIZER_param = {
-# 	'PoissonSmearing': True,
-# 	'ElectronicEffects': True
+#     'PoissonSmearing': True,
+#     'ElectronicEffects': True
 # }
 # SVDDIGITIZER.param(SVDDIGITIZER_param)
 

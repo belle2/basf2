@@ -54,8 +54,9 @@ main.add_module('EvtGenInput', userDECFile=find_file('decfiles/dec/1111440100.de
 
 # detector simulation
 bg = None
-if 'BELLE2_BACKGROUND_DIR' in os.environ:
-    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+# temporarily disable background overlay until new background files are produced
+# if 'BELLE2_BACKGROUND_DIR' in os.environ:
+#    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
 # trigger simulation

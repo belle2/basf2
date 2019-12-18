@@ -167,7 +167,9 @@ namespace Belle2 {
     {
       assertOperatorUsable(m_outputStack.size());
       // so far all a binary operators
+      // cppcheck-suppress unreadVariable; used in lambda below
       OutputToken op2 = m_outputStack.top(); m_outputStack.pop();
+      // cppcheck-suppress unreadVariable; used in lambda below
       OutputToken op1 = m_outputStack.top(); m_outputStack.pop();
       // and apply ...
       m_outputStack.push(std::visit(Utils::VisitOverload{

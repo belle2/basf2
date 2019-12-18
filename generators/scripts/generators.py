@@ -172,13 +172,17 @@ def add_kkmc_generator(path, finalstate=''):
     )
 
 
-def add_evtgen_generator(path, finalstate='', signaldecfile=None):
+def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True):
     """
     Add EvtGen for mixed and charged BB
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): Either "charged" for B+/B- or "mixed" for B0/anti-B0
+        coherentMixing: Either True or False. Switches on or off the coherent decay of the B0-B0bar pair.
+                        It should always be True,  unless you are generating Y(5,6S) -> BBar. In the latter case,
+                        setting it False solves the interla limiation of Evtgen that allows to make a
+                        coherent decay only starting from the Y(4S).
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
 
@@ -197,7 +201,8 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None):
     # use EvtGen
     evtgen = path.add_module(
         'EvtGenInput',
-        userDECFile=evtgen_userdecfile
+        userDECFile=evtgen_userdecfile,
+        CoherentMixing=coherentMixing
     )
 
 
@@ -323,7 +328,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     # fragmentation failure as is this currently not supported by do_while
     add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
     # check for the particles we want
-    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
     path.do_while(loop_path, max_iterations=max_iterations)
 

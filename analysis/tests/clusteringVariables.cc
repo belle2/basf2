@@ -15,9 +15,7 @@
 #include <TRandom3.h>
 
 // VariableManager and particle(list)
-#include <analysis/variables/Variables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -29,7 +27,6 @@
 // framework - set up mock events
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Gearbox.h>
@@ -250,9 +247,9 @@ namespace {
     const Manager::Var* clusterThetaCMS = Manager::Instance().getVariable("useCMSFrame(clusterTheta)");
 
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(1)), 2.0);
-    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.0442522);
+    EXPECT_FLOAT_EQ(clusterPhiCMS->function(gammalist->getParticle(1)), 2.042609);
     EXPECT_FLOAT_EQ(clusterTheta->function(gammalist->getParticle(1)), 1.0);
-    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2625268);
+    EXPECT_FLOAT_EQ(clusterThetaCMS->function(gammalist->getParticle(1)), 1.2599005);
 
     // test cluster quantities directly (lab system only)
     EXPECT_FLOAT_EQ(clusterPhi->function(gammalist->getParticle(0)), eclclusters[0]->getPhi());
@@ -584,7 +581,7 @@ namespace {
     t3->addRelationTo(klm5);
 
     // case 3: 1 track --> 2 clusters
-    // possible case, but not covered
+    // not possible
 
     // make the KLong from clusters (and sum up the total KLM momentum magnitude)
     double klmMomentum = 0.0;
@@ -624,7 +621,7 @@ namespace {
     EXPECT_FLOAT_EQ(totalKLongMomentum + totalMuonMomentum, klmMomentum);
   }
 
-  TEST_F(KLMVariableTest, MoreClustersToOneTrack)
+  TEST_F(KLMVariableTest, TrackToKLMClusterMatchingTest)
   {
     StoreArray<Particle> particles;
     StoreArray<Track> tracks;
@@ -632,18 +629,13 @@ namespace {
     StoreArray<KLMCluster> klmClusters;
 
     // add a TrackFitResult
-    TRandom3 generator;
-
-    const float pValue = 0.5;
-    const float bField = 1.5;
-    const int charge = 1;
-    TMatrixDSym cov6(6);
-
     TVector3 position(1.0, 0, 0);
     TVector3 momentum(0, 1.0, 0);
-
+    TMatrixDSym cov6(6);
+    const int charge = 1;
+    const float pValue = 0.5;
+    const float bField = 1.5;
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-
     trackFits.appendNew(position, momentum, cov6, charge, Const::muon, pValue, bField, CDCValue, 16777215);
 
     // add one Track
@@ -655,19 +647,25 @@ namespace {
     KLMCluster* klm1 = klmClusters.appendNew(KLMCluster());
     klm1->setTime(1.1);
     klm1->setClusterPosition(1.1, 1.1, 1.0);
-    klm1->setLayers(5);
+    klm1->setLayers(1);
     klm1->setInnermostLayer(1);
     klm1->setMomentumMag(1.0);
     KLMCluster* klm2 = klmClusters.appendNew(KLMCluster());
     klm2->setTime(1.2);
     klm2->setClusterPosition(1.2, 1.2, 2.0);
-    klm2->setLayers(10);
+    klm2->setLayers(2);
     klm2->setInnermostLayer(2);
     klm2->setMomentumMag(1.0);
 
-    // and add a relationship between the track and both clusters
-    muonTrack->addRelationTo(klm1);
-    muonTrack->addRelationTo(klm2);
+    // and add a weighted relationship between the track and both clusters
+    // only the relation with klm1 must be returned
+    // in reconstruction we set a relation to only one cluster (if any),
+    // so here we test that getKLMCluster() returns the first cluster
+    // stored in the RelationVector
+    float distance1 = 11.1;
+    muonTrack->addRelationTo(klm1, 1. / distance1);
+    float distance2 = 2.2;
+    muonTrack->addRelationTo(klm2, 1. / distance2);
 
     // add a Particle
     const Particle* muon = particles.appendNew(Particle(muonTrack, Const::muon));
@@ -675,9 +673,11 @@ namespace {
     // grab variables
     const Manager::Var* vTrNClusters = Manager::Instance().getVariable("nMatchedKLMClusters");
     const Manager::Var* vClusterInnermostLayer = Manager::Instance().getVariable("klmClusterInnermostLayer");
+    const Manager::Var* vClusterTrackDistance = Manager::Instance().getVariable("klmClusterTrackDistance");
 
     EXPECT_POSITIVE(vTrNClusters->function(muon));
-    EXPECT_FLOAT_EQ(2.0, vClusterInnermostLayer->function(muon));
+    EXPECT_FLOAT_EQ(1.0, vClusterInnermostLayer->function(muon));
+    EXPECT_FLOAT_EQ(distance1, vClusterTrackDistance->function(muon));
 
     // add a Pion - no clusters matched here
     trackFits.appendNew(position, momentum, cov6, charge, Const::pion, pValue, bField, CDCValue, 16777215);

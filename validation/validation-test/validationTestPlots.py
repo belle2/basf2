@@ -3,7 +3,7 @@
 
 """
 <header>
-<output>validationTestPlots.root</output>
+<output>validationTestPlots.root, validationTestPlotsExpertOnly.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
 </header>
 """
@@ -46,7 +46,7 @@ tntuple.SetAlias('Description', "This is a description test. "
                  "because e.g. \\theta will be interpreted as [tab]heta.")
 tntuple.SetAlias('Check', "This is the check text.")
 tntuple.SetAlias('Contact', "Name of the contact person.")
-tntuple.SetAlias('MetaOptions', "some_meta_options")
+tntuple.SetAlias('MetaOptions', "shifter, some_meta_options")
 
 # Overwrite the former TNtuple if one was there
 tntuple.Write()
@@ -63,7 +63,7 @@ add_properties(
         'Description': "xlog",
         'Check': "Gaus Histogram Check",
         'Contact': "Gaus Histogram Contact",
-        'MetaOptions': "logx, nostats"
+        'MetaOptions': "shifter, logx, nostats"
     }
 )
 
@@ -72,7 +72,11 @@ gaus_h.Write()
 # Warnings
 # ======================================
 
-warnings_h = ROOT.TH1F("warnings_histogram", "Histogram", 100, -3, 3)
+warnings_h = ROOT.TH1F(
+    "warnings_histogram",
+    "Histogram with missing check and description",
+    100, -3, 3
+)
 warnings_h.FillRandom("gaus", 500)
 
 add_properties(
@@ -81,7 +85,7 @@ add_properties(
         'Description': "",
         'Check': "",
         'Contact': "Kilian Lieret, Kilian.Lieret@campus.lmu.de",
-        'MetaOptions': "logx, nostats"
+        'MetaOptions': "shifter, logx, nostats"
     }
 )
 
@@ -90,7 +94,7 @@ warnings_h.Write()
 # Exp histograms
 # ======================================
 
-exp_h = ROOT.TH1F("exp_histogram", " Exp Histogram", 100, 0, 10)
+exp_h = ROOT.TH1F("exp_histogram", " Expert Histogram", 100, 0, 10)
 
 exp_fn = ROOT.TF1("exp_fn", "exp(-x)", 0, 10)
 exp_h.FillRandom("exp_fn", 500)
@@ -99,9 +103,10 @@ add_properties(
     exp_h,
     {
         'Description': "Expert Validation Plot",
-        'Check': "Exp Histogram Check",
-        'Contact': "Exp Histogram Contact",
-        'MetaOptions': "logy, nostats, C, expert"
+        'Check': "Expert Histogram Check. Should only appear if expert button"
+                 "was checked.",
+        'Contact': "Expert Histogram Contact",
+        'MetaOptions': "logy, nostats, C"
     }
 )
 
@@ -132,7 +137,7 @@ add_properties(
         'Description': "xlog ylog with stats. I can haz $\LaTeX$?",
         'Check': "Gaus Changing Histogram Check",
         'Contact': "Gaus Changing Histogram Contact",
-        'MetaOptions': "logx, logy"
+        'MetaOptions': "shifter, logx, logy"
     }
 )
 
@@ -156,7 +161,7 @@ add_properties(
         'Description': "Some 2D Histogram",
         'Check': "Check For Something",
         'Contact': "Contact Someone",
-        'MetaOptions': "contz"
+        'MetaOptions': "shifter, contz"
     }
 )
 
@@ -180,13 +185,15 @@ for i in range(500):
 
 teff = ROOT.TEfficiency(gaus_passed, gaus_total)
 teff.SetName("TEfficiency")
+teff.SetTitle("Tefficiency")
 
 add_properties(
     teff,
     {
         'Description': "Efficiency plot of something",
         'Check': "Check For Something",
-        'Contact': "Contact Someone"
+        'Contact': "Contact Someone",
+        'MetaOptions': "shifter"
     }
 )
 
@@ -206,12 +213,14 @@ for i in range(50):
     graph_err.SetPoint(i, i + 1.0, passed)
 
 graph_err.SetName("TGraphErrors")
+graph_err.SetTitle("TGraphErrors")
 add_properties(
     graph_err,
     {
         'Description': "TGraphErrors plot of something",
         'Check': "Check For Something",
-        'Contact': "Contact Someone"
+        'Contact': "Contact Someone",
+        'MetaOptions': "shifter"
     }
 )
 
@@ -221,8 +230,17 @@ graph_err.Write()
 # ======================================
 
 # generate some user-defined HTML
-html_content = ROOT.TNamed("This is bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
+html_content = ROOT.TNamed("This is a bold HTML tag", "<p><b>THIS IS USER'S HTML</b></p>")
 
 html_content.Write()
 
+tfile.Close()
+
+# Expert only
+# ======================================
+
+tfile = ROOT.TFile("validationTestPlotsExpertOnly.root", "RECREATE")
+gaus_h = ROOT.TH1F("gaus_histogram_exprt", " Gaus Histogram Expert", 100, -3, 3)
+gaus_h.FillRandom("gaus", 500)
+gaus_h.Write()
 tfile.Close()

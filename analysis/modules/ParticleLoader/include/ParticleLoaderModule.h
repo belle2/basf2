@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
  *               Sam Cunliffe, Torben Ferber                              *
+ *               Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,10 +13,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-
+#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Utility.h>
 
@@ -41,7 +40,7 @@ namespace Belle2 {
    * o) neutral final state particles
    *   - gamma                            (input MDST type = ECLCluster with 'n photons' ECLCluster::Hypothesis::c_nPhotons)
    *   - K_S0, Lambda0, converted photons (input MDST type = V0)
-   *   - K_L0                             (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
+   *   - K_L0, n0                         (input MDST type = KLMCluster, or ECLCluster with neutral hadron hypothesis)
    *
    * The following BASF2 relations are set by the ParticleLoader:
    *
@@ -127,6 +126,16 @@ namespace Belle2 {
     void v0sToParticles();
 
     /**
+     * Loads ROE object as Particle of specified type to StoreArray<Particle> and adds it to the ParticleList
+     */
+    void roeToParticles();
+
+    /**
+     * Helper method to load ROE object as Particle
+     */
+    void addROEToParticleList(RestOfEvent* roe, int pdgCode = 0, bool isSelfConjugatedParticle = true);
+
+    /**
      * returns true if the PDG code determined from the decayString is valid
      */
     bool isValidPDGCode(const int pdgCode);
@@ -138,7 +147,9 @@ namespace Belle2 {
 
     bool m_useMCParticles;  /**< Load MCParticle as Particle instead of the corresponding MDST dataobject */
 
-    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
+    bool m_useROEs;  /**< Switch to load ROE as Particle */
+
+    DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specified DecayString */
 
     std::vector<std::tuple<std::string, std::string>>
                                                    m_decayStringsWithCuts; /**< Input DecayString specifying the particle being created/loaded. Particles need as well pass the selection criteria */
@@ -147,18 +158,22 @@ namespace Belle2 {
     std::vector<PList> m_MCParticles2Plists; /**< Collection of PLists that will collect Particles created from MCParticles */
     std::vector<PList> m_Tracks2Plists; /**< Collection of PLists that will collect Particles created from Tracks */
     std::vector<PList> m_V02Plists; /**< Collection of PLists that will collect Particles created from V0 */
+    std::vector<PList> m_ROE2Plists; /**< Collection of PLists that will collect Particles created from V0 */
     std::vector<PList> m_ECLClusters2Plists; /**< Collection of PLists that will collect Particles created from ECLClusters */
     std::vector<PList> m_KLMClusters2Plists; /**< Collection of PLists that will collect Particles created from KLMClusters */
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
-
+    std::string m_roeMaskName; /**< ROE mask name to load */
+    std::string m_sourceParticleListName; /**< Particle list name from which we need to get related ROEs */
+    bool m_useMissing; /**< Use missing momentum to build a particle */
     int m_trackHypothesis; /**< pdg code for track hypothesis that should be used to create the particle */
 
     bool m_enforceFitHypothesis =
       false; /**<If true, a Particle is only created if a track fit with the particle hypothesis passed to the ParticleLoader is available. */
 
     std::vector<int> m_chargeZeroTrackCounts; /**< internally used to count number of tracks with charge zero */
+    std::vector<int> m_sameChargeDaughtersV0Counts; /**< internally used to count the number of V0s with same charge daughters*/
   };
 
 } // Belle2 namespace

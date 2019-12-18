@@ -38,6 +38,18 @@ bool EventMetaData::isEndOfData() const
   return (m_event == UINT_MAX and m_run == INT_MAX and m_experiment == INT_MAX);
 }
 
+void EventMetaData::setEndOfRun(unsigned int experimentNumber, unsigned int runNumber)
+{
+  m_event = UINT_MAX;
+  m_experiment = experimentNumber;
+  m_run = runNumber;
+}
+
+bool EventMetaData::isEndOfRun() const
+{
+  return not isEndOfData() and (m_event == UINT_MAX);
+}
+
 bool EventMetaData::operator== (const EventMetaData& eventMetaData) const
 {
   return ((m_event == eventMetaData.getEvent()) &&

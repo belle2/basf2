@@ -9,8 +9,7 @@ __authors__ = [
     "..."
 ]
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 
 def EtabList(path):
@@ -21,13 +20,28 @@ def EtabList(path):
     selection criteria are listed below
     (1) 2 std photon with E > 3.5 GeV
     (2) 7 < M(eta_b) < 10 GeV/c^2
-    (3) R2 < 0.995
+    (3) foxWolframR2 < 0.995
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
     # create and fill hard photon
-    cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5', path=path)
-    applyCuts('gamma:hard', 'R2EventLevel < 0.995', path=path)
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
+
+    ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                       allMoments=False,
+                       foxWolfram=True,
+                       harmonicMoments=False,
+                       cleoCones=False,
+                       thrust=False,
+                       collisionAxis=False,
+                       jets=False,
+                       sphericity=False,
+                       checkForDuplicates=False,
+                       path=path)
+
+    ma.cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5', path=path)
+    ma.applyCuts('gamma:hard', 'foxWolframR2 < 0.995', path=path)
 
     # the requirement of 7 < M(eta_b) < 10 GeV/c2
     Etabcuts = 'M > 7 and M < 10'
@@ -40,7 +54,7 @@ def EtabList(path):
 
     # reconstruct the decay eta_b -> gamma gamma
     for chID, channel in enumerate(Etab_Channels):
-        reconstructDecay('eta_b:all' + str(chID) + ' -> ' + channel, Etabcuts, chID, path=path)
+        ma.reconstructDecay('eta_b:all' + str(chID) + ' -> ' + channel, Etabcuts, chID, path=path)
         EtabList.append('eta_b:all' + str(chID))
 
     # return the eta_b decaylist
@@ -56,24 +70,39 @@ def UpsilonList(path):
     (1) 2 tracks with momentum ranging between 3.5 < p < 15,
     (2) At least 1 track p < 1.5 or 1 std photon with E > 150 MeV
     (3) M(Y(1S,2S)) > 8 GeV/c^2
-    (4) R2 < 0.995
+    (4) foxWolframR2 < 0.995
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
     Ycuts = ''
     # create and fill e/mu/pi/photon ParticleLists
-    fillParticleList('mu+:loose', 'p<15 and p>3.5', path=path)
-    fillParticleList('e+:loose', 'p<15 and p>3.5', path=path)
-    fillParticleList('pi+:loose', 'p<1.5 and pt>0.05', path=path)
-    cutAndCopyList('gamma:soft', 'gamma:loose', 'E>0.15', path=path)
+    ma.fillParticleList('mu+:loose', 'p<15 and p>3.5', path=path)
+    ma.fillParticleList('e+:loose', 'p<15 and p>3.5', path=path)
+    ma.fillParticleList('pi+:loose', 'p<1.5 and pt>0.05', path=path)
+    ma.cutAndCopyList('gamma:soft', 'gamma:loose', 'E>0.15', path=path)
 
     # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
-    reconstructDecay('Upsilon:ee -> e+:loose e-:loose', 'M > 8', path=path)
-    reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', 'M > 8', path=path)
-    copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
+    ma.reconstructDecay('Upsilon:ee -> e+:loose e-:loose', 'M > 8', path=path)
+    ma.reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', 'M > 8', path=path)
+    ma.copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
 
-    # require R2 < 0.995
-    applyCuts('Upsilon:all', 'R2EventLevel < 0.995', path=path)
+    # require foxWolframR2 < 0.995
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims', cut='E > 0.1', path=path)
+
+    ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                       allMoments=False,
+                       foxWolfram=True,
+                       harmonicMoments=False,
+                       cleoCones=False,
+                       thrust=False,
+                       collisionAxis=False,
+                       jets=False,
+                       sphericity=False,
+                       checkForDuplicates=False,
+                       path=path)
+
+    ma.applyCuts('Upsilon:all', 'foxWolframR2 < 0.995', path=path)
 
     # Y(1S,2S) with pi+ or photon are reconstructed
     Upsilon_Channels = ['Upsilon:all pi+:loose',
@@ -84,7 +113,7 @@ def UpsilonList(path):
 
     # reconstruct the decay channel
     for chID, channel in enumerate(Upsilon_Channels):
-        reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path)
+        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path)
         UpsilonList.append('junction:all' + str(chID))
 
     # reture the list
@@ -108,10 +137,10 @@ def ISRpipiccList(path):
 
     # intermediate state J/psi and psi(2S) are reconstructed
     # add mass window cut for J/psi and psi(2S) candidates
-    reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2', path=path)
-    reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>3.0 and M<3.2', path=path)
-    reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74', path=path)
-    reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74', path=path)
+    ma.reconstructDecay('J/psi:ee -> e+:loose e-:loose', 'M>3.0 and M<3.2', path=path)
+    ma.reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', 'M>3.0 and M<3.2', path=path)
+    ma.reconstructDecay('psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose', 'M>3.64 and M<3.74', path=path)
+    ma.reconstructDecay('psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose', 'M>3.64 and M<3.74', path=path)
 
     # the requirement of recoil mass square of hadrons
     MMScuts = '-4 < m2Recoil < 4'
@@ -133,7 +162,7 @@ def ISRpipiccList(path):
 
     # reconstruct the different ISR channels and append to the virtual photon
     for chID, channel in enumerate(vpho_Channels):
-        reconstructDecay('vpho:myCombination' + str(chID) + ' -> ' + channel, MMScuts, chID, path=path)
+        ma.reconstructDecay('vpho:myCombination' + str(chID) + ' -> ' + channel, MMScuts, chID, path=path)
         vphoList.append('vpho:myCombination' + str(chID))
 
     # return the ISR process list

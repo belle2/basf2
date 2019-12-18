@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TFile.h>
-
-/* Belle2 headers. */
 #include <alignment/calibration/MillepedeTreeConversionAlgorithm.h>
+
 #include <genfit/GblData.h>
+
+#include <TFile.h>
 
 using namespace Belle2;
 
@@ -61,9 +60,7 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
       error = aErr;
       nlab = std::min((int)labGlobal->size(), max_entries);
       for (j = 0; j < nlab; j++) {
-        /* cppcheck-suppress unreadVariable */
         label[j] = (*labGlobal)[j];
-        /* cppcheck-suppress unreadVariable */
         der[j] = (*derGlobal)[j];
       }
       t_out->Fill();

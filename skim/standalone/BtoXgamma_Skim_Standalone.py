@@ -1,64 +1,44 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+######################################################
 #
 # EWP standalone skim steering
-# P. Urquijo, 6/Jan/2015
+#
+# B->Xgamma inclusive skim
+#
+# Trevor Shillington July 2019
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
-from stdPhotons import *
-from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
-import argparse
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
+from stdCharged import stdPi
+import skimExpertFunctions as expert
 
-gb2_setuprel = 'release-03-02-00'
+# basic setup
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('BtoXgamma')
 
+path = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=path)
 
-skimCode = encodeSkimName('BtoXgamma')
-fileList = get_test_file("mixedBGx1", "MC12")
+# import standard lists
+stdPhotons('loose', path=path)
+stdPhotons('all', path=path)
+stdPi('all', path=path)
 
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
-
-path = Path()
-inputMdstList('default', fileList, path=path)
-stdPi0s('loose', path=path)
-stdPhotons('tight', path=path)  # also builds loose list
-loadStdSkimPhoton(path=path)
-loadStdSkimPi0(path=path)
-stdPi('loose', path=path)
-stdK('loose', path=path)
-stdK('95eff', path=path)
-stdPi('95eff', path=path)
-stdKshorts(path=path)
-loadStdLightMesons(path=path)
-
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=path)
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=path)
-# EWP Skim
+# call reconstructed lists from scripts/skim/ewp_incl.py
 from skim.ewp import B2XgammaList
 XgammaList = B2XgammaList(path=path)
-skimOutputUdst(skimCode, XgammaList, path=path)
-summaryOfLists(XgammaList, path=path)
+expert.skimOutputUdst(skimCode, XgammaList, path=path)
+ma.summaryOfLists(XgammaList, path=path)
 
-
-setSkimLogging(path=path)
-process(path=path)
+# process
+expert.setSkimLogging(path=path)
+b2.process(path=path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

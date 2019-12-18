@@ -10,8 +10,6 @@
 #include <framework/logging/Logger.h>
 
 #include <ios>
-#include <cstdlib>
-#include <unistd.h>
 #include <fcntl.h>
 #include <cerrno>
 

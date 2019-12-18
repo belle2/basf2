@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Particle gun muon events for EKLM, only EKLM digitization and reconstruction.
+# Particle gun muon events for KLM, only KLM digitization and reconstruction.
 
-import os
-import random
 import basf2
 import ROOT
 
@@ -30,14 +28,10 @@ paramloader = basf2.register_module('Gearbox')
 
 # Geometry builder
 geobuilder = basf2.register_module('Geometry')
-geobuilder.param('components', ['EKLM', 'BKLM'])
+geobuilder.param('components', ['KLM'])
 
 # Full Geant4 simulation
 g4sim = basf2.register_module('FullSim')
-
-# Root file output
-output = basf2.register_module('RootOutput')
-output.param('outputFileName', 'ParticleGunMuonsKLM.root')
 
 # Digitizers
 klm_digitizer = basf2.register_module('KLMDigitizer')
@@ -54,6 +48,10 @@ klm_unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
 # Reconstructors
 bklm_reconstructor = basf2.register_module('BKLMReconstructor')
 eklm_reconstructor = basf2.register_module('EKLMReconstructor')
+
+# Root file output
+output = basf2.register_module('RootOutput')
+output.param('outputFileName', 'ParticleGunMuonsKLM.root')
 
 # Create main path
 main = basf2.create_path()
@@ -74,7 +72,7 @@ main.add_module(eklm_reconstructor)
 
 main.add_module(output)
 
-# Process 100 events
+# Process the events
 basf2.process(main)
 print(basf2.statistics)
 

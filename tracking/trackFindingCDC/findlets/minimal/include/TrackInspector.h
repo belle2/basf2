@@ -30,6 +30,9 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
+      /// Access parameters
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
+
       /// Print the tracks.
       void apply(std::vector<CDCTrack>& tracks) final;
 

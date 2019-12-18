@@ -25,12 +25,8 @@
 
 // framework
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-
-#include <cmath>
-#include <bitset> // bitwise stuff for L1
 
 namespace Belle2 {
   namespace {

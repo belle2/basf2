@@ -8,65 +8,35 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import stdKshorts
-from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdMu
+import skimExpertFunctions as expert
 
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
-import argparse
-gb2_setuprel = 'release-03-02-00'
-skimCode = encodeSkimName('LeptonicUntagged')
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('LeptonicUntagged')
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+leppath = b2.Path()
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+ma.inputMdstList('default', fileList, path=leppath)
 
-leppath = Path()
-
-inputMdstList('default', fileList, path=leppath)
-
-loadStdSkimPi0(path=leppath)
-loadStdSkimPhoton(path=leppath)
-stdPi('loose', path=leppath)
-stdK('loose', path=leppath)
-stdPi('all', path=leppath)
 stdE('all', path=leppath)
 stdMu('all', path=leppath)
-stdPi0s('loose', path=leppath)  # for stdCharm.py
-stdPhotons('loose', path=leppath)
-stdKshorts(path=leppath)
-
-loadStdD0(path=leppath)
-loadStdDplus(path=leppath)
-loadStdDstar0(path=leppath)
-loadStdDstarPlus(path=leppath)
 
 # SL Skim
 from skim.leptonic import LeptonicList
 
 lepList = LeptonicList(path=leppath)
-skimOutputUdst(skimCode, lepList, path=leppath)
+expert.skimOutputUdst(skimCode, lepList, path=leppath)
 
-summaryOfLists(lepList, path=leppath)
+ma.summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging(path=leppath)
-process(leppath)
+expert.setSkimLogging(path=leppath)
+b2.process(leppath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

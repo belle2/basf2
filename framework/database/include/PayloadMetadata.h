@@ -16,7 +16,7 @@ namespace Belle2::Conditions {
   /** Simple struct to group all information necessary for a single payload */
   struct PayloadMetadata {
     /** Constructor to request a payload with a given name and indicate whether non-existence is ok */
-    PayloadMetadata(const std::string& _name, bool _required = true): name{_name}, required{_required} {}
+    explicit PayloadMetadata(const std::string& _name, bool _required = true): name{_name}, required{_required} {}
     /** Constructor for all the information which is usually obtained from providers. "required" and "filename" are not part of this as they get filled in later steps or from other parties */
     PayloadMetadata(const std::string& _name, const std::string& _globaltag, const std::string& _payloadUrl,
                     const std::string& _baseUrl, const std::string& _checksum, int firstExp, int firstRun, int finalExp, int finalRun,

@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
@@ -160,17 +159,6 @@ namespace Belle2 {
     /** No default constructor */
     SVDOnlineToOfflineMap() = delete;
 
-    /** Return a pointer to a new SVDDigit whose VxdID, isU and cellID is set
-     * @param FADC is FADC number from the SVDRawCopper data.
-     * @param APV25 is the APV25 number from the SVDRawCopper data.
-     * @param channel is the APV25 channel number from the SVDRawCopper data.
-     * @return a pointer to the new SVDDigit owned by the caller whose
-     * Position is 0
-     * FIXME: There should be no such function in this mapping class, no dependence
-     * on SVDDigit and its interface.
-     */
-    SVDDigit* NewDigit(unsigned char FADC, unsigned char APV25,
-                       unsigned char channel, float charge, float time);
 
     /** Return a pointer to a new SVDShpaerDigit whose VxdID, isU and cellID is set
      * @param FADC is FADC number from the SVDRawCopper data.
@@ -210,6 +198,27 @@ namespace Belle2 {
      * @return true if the APV that reads the strip is in the map, false otherwise
      */
     bool isAPVinMap(VxdID sensorID, bool side, unsigned short strip);
+
+    /** prepares the list of the missing APVs
+     *  using the channel mapping
+     */
+    void prepareListOfMissingAPVs();
+    /** struct to hold missing APVs informations */
+    struct missingAPV {
+      VxdID m_sensorID;           /**< Sensor ID */
+      bool m_isUSide;               /**< True if u-side of the sensor */
+      float m_halfStrip;          /**< floating strip in the middle of the APV */
+    };
+
+    /** list of the missing APVs
+     */
+    std::vector< missingAPV > m_missingAPVs;
+
+    /** Get number of missing APVs */
+    int getNumberOfMissingAPVs()
+    {
+      return m_missingAPVs.size();
+    }
 
     /** Get ChipInfo for a given layer/ladder/dssd/side/strip combination.
      * @param layer is the the layer number
@@ -281,7 +290,7 @@ namespace Belle2 {
     unsigned int nBadMappingErrors = 0;
 
     /** The suppression factor of BadMapping ERRORs messages to be shown */
-    int m_errorRate;
+    int m_errorRate{1000};
 
     /** add chipN on FADCn to the map
      */

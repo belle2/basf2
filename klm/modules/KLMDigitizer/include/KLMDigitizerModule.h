@@ -10,22 +10,24 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMChannels.h>
-#include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/bklm/dataobjects/BKLMSimHit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/simulation/ScintillatorFirmware.h>
+
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -72,6 +74,19 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
+
+    /**
+     * Efficiency determination mode.
+     */
+    enum EfficiencyMode {
+
+      /** Strip. */
+      c_Strip,
+
+      /** Plane. */
+      c_Plane,
+
+    };
 
     /**
      * Check channel parameters for channel-specific simulation.
@@ -134,14 +149,26 @@ namespace Belle2 {
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
 
+    /** Efficiency determination mode ("Strip" or "Plane"). */
+    std::string m_Efficiency;
+
+    /** Efficiency determination mode (converted from the string parameter). */
+    EfficiencyMode m_EfficiencyMode;
+
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Simulation hit map for BKLM. */
-    std::multimap<uint16_t, BKLMSimHit*> m_bklmSimHitChannelMap;
+    /** Simulation hit map for BKLM (by channel). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitChannelMap;
 
-    /** Simulation hit map for EKLM. */
-    std::multimap<uint16_t, EKLMSimHit*> m_eklmSimHitChannelMap;
+    /** Simulation hit map for BKLM (by plane). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
+
+    /** Simulation hit map for EKLM (by channel). */
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
+
+    /** Simulation hit map for EKLM (by plane). */
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

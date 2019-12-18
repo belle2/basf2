@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from geometry import check_components
 from analysisDQM import add_analysis_dqm
 
 
@@ -26,15 +27,21 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             events should be added
     """
     assert dqm_mode in ["dont_care", "all_events", "filtered", "before_reco"]
+    # Check components.
+    check_components(components)
 
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         # PXD (not useful on HLT)
         if components is None or 'PXD' in components:
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('SetupGenfitExtrapolation')
+            path.add_module('PXDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            PXDInterceptListName='PXDIntercepts')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
-            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
+            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT
@@ -54,6 +61,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
+
+        # Event time measuring detectors
+        if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
+            eventT0DQMmodule = register_module('EventT0DQM')
+            path.add_module(eventT0DQMmodule)
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT
@@ -107,7 +119,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         topdqm = register_module('TOPDQM')
         path.add_module(topdqm)
     # KLM
-    if (components is None or 'BKLM' or 'EKLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
+    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
         klmdqm = register_module("KLMDQM")
         path.add_module(klmdqm)
 
@@ -118,11 +130,18 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(trgecldqm)
         # TRGGDL
         trggdldqm = register_module('TRGGDLDQM')
+        trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
+        # TRGGRL
+        trggrldqm = register_module('TRGGRLDQM')
+        path.add_module(trggrldqm)
         # TRGCDCTSF
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
             path.add_module('TRGCDCTSFDQM', TSFMOD=mod_tsf)
+        # TRGCDC2D
+        trgcdct2ddqm = register_module('TRGCDCT2DDQM')
+        path.add_module(trgcdct2ddqm)
         # TRGCDC3D
         nmod_t3d = [0, 1, 2, 3]
         for mod_t3d in nmod_t3d:
@@ -139,7 +158,25 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+    # TRG after skim
+    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
+        # TRGGDL
+        trggdldqm_skim = register_module('TRGGDLDQM')
+        trggdldqm_skim.param('skim', 1)
+        path.add_module(trggdldqm_skim)
 
+    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
+                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
+        path.add_module('SetupGenfitExtrapolation')
+        path.add_module('CDCTriggerNeuroDQM',
+                        limitedoutput=True,
+                        showRecoTracks=True,
+                        skipWithoutHWTS=True,
+                        maxRecoZDist=1.0,
+                        maxRecoD0Dist=0.5,
+                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')

@@ -10,17 +10,18 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TNamed.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TNamed.h>
-
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
-#include <klm/dataobjects/BKLMChannelIndex.h>
-#include <klm/dataobjects/EKLMChannelIndex.h>
 
 namespace Belle2 {
 
@@ -82,12 +83,9 @@ namespace Belle2 {
      */
     void setDataAllChannels(const T data)
     {
-      BKLMChannelIndex bklmChannels;
-      for (BKLMChannelIndex& bklmChannel : bklmChannels)
-        setChannelData(bklmChannel.getKLMChannelNumber(), data);
-      EKLMChannelIndex eklmChannels;
-      for (EKLMChannelIndex& eklmChannel : eklmChannels)
-        setChannelData(eklmChannel.getKLMChannelNumber(), data);
+      KLMChannelIndex klmChannels;
+      for (KLMChannelIndex& klmChannel : klmChannels)
+        setChannelData(klmChannel.getKLMChannelNumber(), data);
     }
 
   private:

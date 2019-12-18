@@ -3,7 +3,6 @@ from softwaretrigger import constants
 import modularAnalysis
 
 from rawdata import add_unpackers
-from tracking import add_cdc_monopole_track_finding
 
 
 def add_online_dqm(path, run_type, dqm_environment, components, dqm_mode):
@@ -132,9 +131,6 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     # ECL cluster and track particle lists
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
-
-    # monopoles
-    add_cdc_monopole_track_finding(path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

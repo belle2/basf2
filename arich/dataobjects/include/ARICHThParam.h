@@ -13,7 +13,6 @@
 
 // ROOT
 #include <TObject.h>
-#include <stdint.h>
 
 namespace Belle2 {
 

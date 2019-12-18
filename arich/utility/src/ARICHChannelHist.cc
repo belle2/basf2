@@ -13,6 +13,7 @@
 #include <math.h>
 #include <iostream>
 #include <algorithm>
+#include <TGraph.h>
 #include <TVector2.h>
 #include <TList.h>
 

@@ -11,7 +11,6 @@
 #include <framework/core/SubEventModule.h>
 
 #include <framework/core/ModuleManager.h>
-#include <framework/core/Environment.h>
 #include <framework/core/ProcessStatistics.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/datastore/DataStore.h>
@@ -136,6 +135,7 @@ void SubEventModule::setProperties()
 void restoreContents(const DataStore::StoreEntryMap& orig, DataStore::StoreEntryMap& dest)
 {
   for (const auto& entry : orig) {
+    // cppcheck-suppress variableScope ; accessing a map entry creates it so this is effect free
     auto& destEntry = dest[entry.first];
     auto& srcEntry = entry.second;
     if (srcEntry.ptr == nullptr)

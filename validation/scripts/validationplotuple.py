@@ -211,7 +211,7 @@ class Plotuple:
         """!
         @return Returns true if this plotuple has the expert option
         """
-        return self.mop.has_option("expert")
+        return not self.mop.has_option("shifter")
 
     def perform_comparison(self):
         """!

@@ -11,42 +11,27 @@
 __author__ = " Reem Rasheed"
 
 
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPhotons import *
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
-set_log_level(LogLevel.INFO)
+import skimExpertFunctions as expert
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
 
 
-import sys
-import os
-import glob
-import argparse
-skimCode = encodeSkimName('TCPV')
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+skimCode = expert.encodeSkimName('TCPV')
 
 # create a path
-path = Path()
+path = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
@@ -60,16 +45,16 @@ stdPhotons('loose', path=path)
 stdKshorts(path=path)
 loadStdDiLeptons(True, path=path)
 loadStdLightMesons(path=path)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
+ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
 tcpvList = TCPVList(path=path)
-skimOutputUdst(skimCode, tcpvList, path=path)
-summaryOfLists(tcpvList, path=path)
+expert.skimOutputUdst(skimCode, tcpvList, path=path)
+ma.summaryOfLists(tcpvList, path=path)
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

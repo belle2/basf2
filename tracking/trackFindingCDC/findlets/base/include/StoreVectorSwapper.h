@@ -34,9 +34,9 @@ namespace Belle2 {
 
     public:
       /// Constructor taking the default name of the store vector which is the target of the swap.
-      StoreVectorSwapper(const std::string& storeVectorName,
-                         const std::string& classMnemomicName = "",
-                         const std::string& classMnemomicDescription = "")
+      explicit StoreVectorSwapper(const std::string& storeVectorName,
+                                  const std::string& classMnemomicName = "",
+                                  const std::string& classMnemomicDescription = "")
         : m_param_storeVectorName(storeVectorName),
           m_classMnemomicName(classMnemomicName),
           m_classMnemomicDescription(classMnemomicDescription)

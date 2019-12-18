@@ -20,6 +20,7 @@
 
 // Belle II utilities
 #include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 
 // Belle II dataobjects
@@ -56,9 +57,14 @@
 #include "belle_legacy/nisKsFinder/nisKsFinder.h"
 #endif
 
+#ifdef HAVE_GOODLAMBDA
+#include "belle_legacy/findLambda/findLambda.h"
+#endif
 
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
+#include "belle_legacy/tables/evtcls.h"
+
 
 #include <cmath>
 #include <cfloat>
@@ -164,6 +170,11 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertECLCrystalEnergies", m_convertECLCrystalEnergies, "Flag to switch on conversion of Datecl_mc_ehits into ECLHits",
            false);
   addParam("convertExtHits", m_convertExtHits, "Flag to switch on conversion of Mdst_ecl_trk into ExtHits", false);
+  addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
+           "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
+           -1.1);
+
+  addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
 
   m_realData = false;
 
@@ -204,6 +215,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
+
+  if (m_convertEvtcls) m_evtCls.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -275,31 +288,35 @@ void B2BIIConvertMdstModule::event()
   else
     m_realData = true;  // <- this is real data sample
 
-  // 0. Convert IPProfile
+  // 0. Convert IPProfile to BeamSpot
   convertIPProfile();
 
   // Make sure beam parameters are correct: if they are not found in the
   // database or different from the ones in the database we need to override them
-  if (!m_beamParamsDB || !(m_beamParams == *m_beamParamsDB)) {
-    if (!m_beamParamsDB && !m_realData) {
+  if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
+      !m_collisionBoostVectorDB || !m_collisionInvMDB) {
+    if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
       B2INFO("No database entry for this run yet, create one");
       StoreObjPtr<EventMetaData> event;
       IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
-      Database::Instance().storeData("BeamParameters", &m_beamParams, iov);
-      B2INFO("store");
+      Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
+      Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
+      Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
     }
     if (m_realData) {
       B2ERROR("BeamParameters from condition database are different from converted "
-              "ones, overriding database. Did you call setupB2BIIDatabase()?");
+              "ones, overriding database. Did you make sure the globaltag B2BII is used?");
     } else {
-      B2INFO("BeamParameters from condition database are different from converted "
+      B2INFO("BeamSpot, BoostVector, and InvariantMass from condition database are different from converted "
              "ones, overriding database");
     }
     if (ProcHandler::parallelProcessingUsed()) {
       B2FATAL("Cannot reliably override the Database content in parallel processing "
               "mode, please run the conversion in single processing mode");
     }
-    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(m_beamParams), true);
+    DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
+    DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
+    DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
   }
 
   // 1. Convert MC information
@@ -337,6 +354,10 @@ void B2BIIConvertMdstModule::event()
 
   // 12. Convert ExtHit information and set Track -> ExtHit relations
   if (m_convertExtHits) convertExtHitTable();
+
+  // 13. Convert Evtcls panther table information
+  if (m_convertEvtcls) convertEvtclsTable();
+
 }
 
 
@@ -350,13 +371,25 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   const double crossingAngle = Belle::BeamEnergy::Cross_angle();
   const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
   const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
+  const double mass_e = Const::electronMass;    //mass of electron: 0.0 in basf, 0.000510998902 in basf2;
+  TMatrixDSym covariance(0);    //0 entries = no error
+  HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
-  std::vector<double> covariance; //0 entries = no error
+  // Get four momentum of LER and HER
+  TLorentzVector P_her(0.0, 0.0, TMath::Sqrt(Eher * Eher - mass_e * mass_e), Eher);
+  P_her.RotateY(angleHer);
+  TLorentzVector P_ler(0.0, 0.0, TMath::Sqrt(Eler * Eler - mass_e * mass_e), Eler);
+  P_ler.RotateY(angleLer);
 
-  m_beamParams.setLER(Eler, angleLer, covariance);
-  m_beamParams.setHER(Eher, angleHer, covariance);
+  // Get four momentum of beam
+  TLorentzVector P_beam = P_her + P_ler;
+
+  m_collisionBoostVector.setBoost(P_beam.BoostVector(), covariance);
+  m_collisionInvM.setMass(P_beam.M(), 0.0 , 0.0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
+  B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
+  B2DEBUG(99, "Beam Momentum (post-convert) : P_X = " << P_beam.Px() << "; P_Y = " << P_beam.Py() << "; P_Z = " << P_beam.Pz());
 }
 
 void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
@@ -365,11 +398,11 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
     // No IPProfile for this run ...
     if (beginRun) {
       // no IPProfile, set vertex to NaN without errors for the full run
-      m_beamParams.setVertex(
+      m_beamSpot.setIP(
         TVector3(std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN(),
                  std::numeric_limits<double>::quiet_NaN()
-                ), std::vector<double>()
+                ), TMatrixTSym<double>()
       );
     }
     return;
@@ -398,8 +431,7 @@ void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
       cov(i, j) = ipErr(i + 1, j + 1);
     }
   }
-  m_beamParams.setVertex(TVector3(ip.x(), ip.y(), ip.z()));
-  m_beamParams.setCovVertex(cov);
+  m_beamSpot.setIP(TVector3(ip.x(), ip.y(), ip.z()), cov);
 }
 
 void B2BIIConvertMdstModule::convertMdstChargedTable()
@@ -745,6 +777,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.setVertex(v0Vertex);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
+
+      // GoodLambda flag as extra info
+      Belle::FindLambda lambdaFinder;
+      lambdaFinder.candidates(belleV0, Belle::IpProfile::position(1));
+      newV0->addExtraInfo("goodLambda", lambdaFinder.goodLambda());
     } else if (belleV0.kind() == 3) { // anti-Lambda -> pi+ anti-p
       Particle antiLambda0(v0Momentum, -3122);
       antiLambda0.appendDaughter(newDaugM);
@@ -752,6 +789,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.setVertex(v0Vertex);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
+
+      // GoodLambda flag as extra info
+      Belle::FindLambda lambdaFinder;
+      lambdaFinder.candidates(belleV0, Belle::IpProfile::position(1));
+      newV0->addExtraInfo("goodLambda", lambdaFinder.goodLambda());
     } else if (belleV0.kind() == 4) { // gamma -> e+ e-
       Particle gamma(v0Momentum, 22);
       gamma.appendDaughter(newDaugP);
@@ -1205,6 +1247,51 @@ void B2BIIConvertMdstModule::convertExtHitTable()
       }
     }
   }
+}
+
+void B2BIIConvertMdstModule::convertEvtclsTable()
+{
+  // Create StoreObj if it is not valid
+  if (not m_evtCls.isValid()) {
+    m_evtCls.create();
+  }
+  // Pull Evtcls_flag(2) from manager
+  Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
+  Belle::Evtcls_flag2_Manager& EvtFlag2Mgr = Belle::Evtcls_flag2_Manager::get_manager();
+
+  // Pull Evtcls_hadronic_flag from manager
+  Belle::Evtcls_hadronic_flag_Manager& EvtHadFlagMgr = Belle::Evtcls_hadronic_flag_Manager::get_manager();
+
+  std::string name = "evtcls_flag";
+  std::string name_had = "evtcls_hadronic_flag";
+  // Only one entry in each event
+  std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
+  std::vector<Belle::Evtcls_flag2>::iterator eflag2Iterator = EvtFlag2Mgr.begin();
+  std::vector<Belle::Evtcls_hadronic_flag>::iterator ehadflagIterator = EvtHadFlagMgr.begin();
+
+  // Converting evtcls_flag(2)
+  std::vector<int> flag(20);
+  for (int index = 0; index < 20; ++index) {
+    // flag(14, 16): not filled
+    if (index == 14 || index == 16) continue;
+    std::string iVar = name + std::to_string(index);
+    // 0-9 corresponding to evtcls_flag.flag(0-9)
+    if (index < 10) {
+      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
+    } else {
+      // 10-19 corresponding to evtcls_flag2.flag(0-9)
+      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
+    }
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+  }
+
+  // Converting evtcls_hadronic_flag
+  for (int index = 0; index < 6; ++index) {
+    std::string iVar = name_had + std::to_string(index);
+    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+  }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1722,7 +1809,10 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux,
                                                   ECLCluster* eclCluster)
 {
-  eclCluster->setIsTrack(ecl.match() > 0);
+  if (eclAux.e9oe25() < m_matchType2E9oE25Threshold)
+    eclCluster->setIsTrack(ecl.match() > 0);
+  else
+    eclCluster->setIsTrack(ecl.match() == 1);
 
   eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
   eclCluster->setPhi(ecl.phi());

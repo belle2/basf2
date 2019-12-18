@@ -251,6 +251,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
           DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
         DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
+        B2ASSERT("Can not find a data store entry with the name " << namelist.at(i) << ". Did you maybe forget to register it?", entry);
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {

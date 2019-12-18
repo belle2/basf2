@@ -9,35 +9,20 @@
 #
 #######################################################
 
-from basf2 import *
-from ROOT import Belle2
-from modularAnalysis import *
-from stdPi0s import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdPi0s import loadStdSkimPi0
 
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
+import skimExpertFunctions as expert
+b2.set_log_level(b2.LogLevel.INFO)
 
-gb2_setuprel = "release-03-02-00"
+gb2_setuprel = "release-04-00-00"
 
-import os
-import sys
-import glob
-import argparse
-skimCode = encodeSkimName('BtoPi0Pi0')
+skimCode = expert.encodeSkimName('BtoPi0Pi0')
 
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
-
-path = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=path)
+path = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=path)
 
 # load particle lists
 loadStdSkimPi0(path=path)
@@ -45,13 +30,13 @@ loadStdSkimPi0(path=path)
 # Had Skim
 from skim.btocharmless import BtoPi0Pi0List
 Pi0Pi0List = BtoPi0Pi0List(path=path)
-skimOutputUdst(skimCode, Pi0Pi0List, path=path)
+expert.skimOutputUdst(skimCode, Pi0Pi0List, path=path)
 
-summaryOfLists(Pi0Pi0List, path=path)
+ma.summaryOfLists(Pi0Pi0List, path=path)
 
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

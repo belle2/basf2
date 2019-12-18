@@ -9,36 +9,23 @@
 # Last updated 21 Nov 2018
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from skim.standardlists.lightmesons import *
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
+import basf2 as b2
+import modularAnalysis as ma
+from skim.standardlists.lightmesons import loadStdLightMesons
+from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
-gb2_setuprel = "release-03-02-00"
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+import skimExpertFunctions as expert
+gb2_setuprel = "release-04-00-00"
 
 # Create skim path
-charmless2skimpath = Path()
+charmless2skimpath = b2.Path()
 
 # Retrieve skim code
-skimCode = encodeSkimName("CharmlessHad2Body")
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=charmless2skimpath)
+skimCode = expert.encodeSkimName("CharmlessHad2Body")
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=charmless2skimpath)
 
 # Load particle lists
 stdPhotons('loose', path=charmless2skimpath)
@@ -53,11 +40,11 @@ loadStdLightMesons(path=charmless2skimpath)
 # Import skim decay mode lists and perform skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
 Had2BodyList = CharmlessHad2BodyB0List(path=charmless2skimpath) + CharmlessHad2BodyBmList(path=charmless2skimpath)
-skimOutputUdst(skimCode, Had2BodyList, path=charmless2skimpath)
-summaryOfLists(Had2BodyList, path=charmless2skimpath)
+expert.skimOutputUdst(skimCode, Had2BodyList, path=charmless2skimpath)
+ma.summaryOfLists(Had2BodyList, path=charmless2skimpath)
 
-setSkimLogging(path=charmless2skimpath)
-process(charmless2skimpath)
+expert.setSkimLogging(path=charmless2skimpath)
+b2.process(charmless2skimpath)
 
 # Print summary statistics
-print(statistics)
+print(b2.statistics)

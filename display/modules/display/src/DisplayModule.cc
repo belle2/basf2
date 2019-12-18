@@ -6,6 +6,7 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -196,7 +197,11 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-        m_visualizer->addTrackCandidate(colName, recoTrack);
+        if (colName != "RecoTracksMpl") {
+          m_visualizer->addTrackCandidate(colName, recoTrack);
+        } else {
+          m_visualizer->addTrackCandidateImproved(colName, recoTrack);
+        }
       }
     }
 

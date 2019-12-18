@@ -1,13 +1,19 @@
+// weird bug in intel compiler and or boost::process: If we include boost
+// process intel compile fails. It seems that including sys/wait.h after
+// other c++ std:: headers triggers a weird behavior failing two static
+// asserts. We work around that by including it right away
+#include <sys/wait.h>
+
 #include <framework/utilities/Utils.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+#include <boost/process.hpp>
+
 #include <sys/time.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <iomanip>
 #include <utility>
@@ -72,7 +78,6 @@ namespace Belle2::Utils {
     return getStatmSize().second;
   }
 
-  // cppcheck-suppress passedByValue ; We take a value to move it into a member so no performance penalty
   Timer::Timer(std::string  text):
     m_startTime(getClock()),
     m_text(std::move(text))
@@ -82,5 +87,21 @@ namespace Belle2::Utils {
   {
     double elapsed = (getClock() - m_startTime) / Unit::ms;
     B2INFO(m_text << " " << std::fixed << std::setprecision(3) << elapsed << " ms");
+  }
+
+  std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments,
+                               bool searchPath)
+  {
+    namespace bp = boost::process;
+    auto cmd = searchPath ? bp::search_path(command) : boost::filesystem::path(command);
+    bp::ipstream cmdOut;
+    bp::child child(cmd, bp::args(arguments), bp::std_in.close(), bp::std_out > cmdOut);
+    char buffer[4096];
+    std::string result;
+    while (child.running() && cmdOut.read(buffer, sizeof(buffer))) {
+      result.append(buffer, sizeof(buffer));
+    }
+    if (cmdOut.gcount()) result.append(buffer, cmdOut.gcount());
+    return result;
   }
 }

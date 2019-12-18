@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
-#include <tracking/trackFindingCDC/display/AttributeMap.h>
 
 #include <framework/datastore/StoreArray.h>
 
@@ -23,7 +22,6 @@ namespace Belle2 {
   class CDCSimHit;
 
   namespace TrackFindingCDC {
-    class PrimitivePlotter;
 
     class BoundingBox;
 
@@ -31,15 +29,12 @@ namespace Belle2 {
 
     class CDCWireTopology;
     class CDCWireSuperLayer;
-    class CDCWireLayer;
     class CDCWire;
 
     class CDCTrajectory2D;
-    class CDCTrajectory3D;
 
     class CDCWireHit;
     class CDCTangent;
-    class CDCFacet;
     class CDCRecoHit2D;
     class CDCRecoHit3D;
 
@@ -70,9 +65,9 @@ namespace Belle2 {
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
-                       bool animate = false,
-                       bool forwardFade = false);
+      explicit EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter,
+                                bool animate = false,
+                                bool forwardFade = false);
 
       /// Copy constructor
       EventDataPlotter(const EventDataPlotter& eventDataPlotter);

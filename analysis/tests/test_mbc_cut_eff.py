@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from ROOT import Belle2
 from ROOT import TFile
@@ -20,7 +21,9 @@ class TestMbcEff(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/1000_B_DstD0Kpi_skimmed.root', 'validation'), path=main)
+        inputfile = b2test_utils.require_file(
+            'analysis/1000_B_DstD0Kpi_skimmed.root', 'validation', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('pi+:a', 'pionID > 0.5', path=main)
         fillParticleList('K+:a', 'kaonID > 0.5', path=main)
@@ -50,12 +53,12 @@ class TestMbcEff(unittest.TestCase):
         print("False candidates {0}".format(allBkg))
 
         sig_expected = 136
-        bkg_expected = 1680
+        bkg_expected = 1630
 
         self.assertTrue(
             allSig == sig_expected,
             f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {sig_expected}.")
-        self.assertTrue(allBkg == bkg_expected, f"Mbc cut background hhas changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
+        self.assertTrue(allBkg == bkg_expected, f"Mbc cut background has changed! n_bkg expected: {bkg_expected} found: {allBkg}.")
 
         print("Test passed, cleaning up.")
 

@@ -61,6 +61,9 @@ Variables
    which were aliases created using `matchedMC`, with the dedicated variables
    `mcFlightTime` and `mcFlightDistance`, respectively.
 
+ * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output. The new variable returns 
+   the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do. 
+   Now we can evaluate the output of both taggers in the same way.
 
 Modules
 +++++++
@@ -91,6 +94,8 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
+ * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
+ * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
 Conditions DB
 +++++++++++++
@@ -101,3 +106,5 @@ Full Event Interpretation
 +++++++++++++++++++++++++
 
  * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).
+
+

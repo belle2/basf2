@@ -9,15 +9,10 @@
  **************************************************************************/
 
 #include <framework/database/DBStore.h>
-#include <framework/database/IntraRunDependency.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
 
-#include <TClonesArray.h>
 #include <TClass.h>
-#include <TFile.h>
-
-#include <list>
 
 namespace Belle2 {
 
@@ -79,7 +74,11 @@ namespace Belle2 {
 
   void DBStore::update()
   {
-    if (m_dbEntries.empty()) return;
+    if (m_dbEntries.empty()) {
+      // make sure we at least fix the list of globaltags on the first time
+      Database::Instance().initialize(Database::c_InitGlobaltagList);
+      return;
+    }
 
     // Make sure our EventMetaData pointer is reconnected as it could get
     // disconnected if the DataStore is reset.
@@ -93,7 +92,11 @@ namespace Belle2 {
 
   void DBStore::update(const EventMetaData& event)
   {
-    if (m_dbEntries.empty()) return;
+    if (m_dbEntries.empty()) {
+      // make sure we at least fix the list of globaltags on the first time
+      Database::Instance().initialize(Database::c_InitGlobaltagList);
+      return;
+    }
     m_manualEvent = event;
     performUpdate(*m_manualEvent);
   }
@@ -105,7 +108,8 @@ namespace Belle2 {
     // fine from performance.
     // TODO: once we are sure somehow to not have duplicate iovs we can relax
     // this requirement.
-    std::list<Database::DBQuery> entries;
+    std::vector<Database::DBQuery> entries;
+    entries.reserve(m_dbEntries.size());
     for (auto& entry : m_dbEntries) {
       bool expired = !entry.second.getIoV().contains(event);
       if (expired) {

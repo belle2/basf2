@@ -11,25 +11,20 @@
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/dbobjects/ARICHGeometryConfig.h"
 #include "arich/modules/arichReconstruction/Utility.h"
-#include "arich/geometry/ARICHBtestGeometryPar.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 #include "arich/dataobjects/ARICHPhoton.h"
 
 // DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <TRotation.h>
 #include <TRandom3.h>
-#include <TFile.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -94,6 +89,11 @@ namespace Belle2 {
     for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
       m_mirrorNorms.push_back(getMirrorNorm(i));
       m_mirrorPoints.push_back(getMirrorPoint(i));
+    }
+
+    for (int iTile = 1; iTile < 125; iTile++) {
+      m_tilePars[iTile - 1][0] = m_tileAlign->getAlignmentElement(iTile).getAlpha();
+      m_tilePars[iTile - 1][1] = m_tileAlign->getAlignmentElement(iTile).getBeta();
     }
   }
 
@@ -374,6 +374,10 @@ namespace Belle2 {
 
     double wideGaussFract = (m_recPars->getParameters())[0];
     double wideGaussSigma = (m_recPars->getParameters())[1];
+
+    unsigned tileID = m_arichgp->getAerogelPlane().getAerogelTileID(arichTrack.getPosition().X(), arichTrack.getPosition().Y());
+    double r = arichTrack.getPosition().XYvector().Mod();
+    if (tileID > 0) correctEmissionPoint(tileID, r);
 
     //------------------------------------------------------
     // Calculate number of expected detected photons (emmited x geometrical acceptance).
@@ -726,14 +730,23 @@ namespace Belle2 {
   TVector3 ARICHReconstruction::getMirrorNorm(int mirrorID)
   {
     if (m_alignMirrors && m_mirrAlign.isValid()) {
-      TVector3 mirnorm(1, 0, 0);
-      mirnorm.RotateX(m_mirrAlign->getAlignmentElement(mirrorID).getAlpha());
-      mirnorm.RotateY(m_mirrAlign->getAlignmentElement(mirrorID).getBeta());
-      mirnorm.RotateZ(m_arichgp->getMirrors().getNormVector(mirrorID).Phi() + m_mirrAlign->getAlignmentElement(mirrorID).getGamma());
+
+      TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
+      mirnorm.SetTheta(mirnorm.Theta() + m_mirrAlign->getAlignmentElement(mirrorID).getAlpha());
+      mirnorm.SetPhi(mirnorm.Phi() + m_mirrAlign->getAlignmentElement(mirrorID).getBeta());
       return mirnorm;
+
     }
     return m_arichgp->getMirrors().getNormVector(mirrorID);
   }
 
+  void ARICHReconstruction::correctEmissionPoint(int tileID, double r)
+  {
+
+    double ang = m_tilePars[tileID - 1][0] + m_tilePars[tileID - 1][1] * r;
+    m_zaero[0] = m_arichgp->getAerogelPlane().getAerogelZPosition() + m_thickness[0] - ang * 50.;
+    m_zaero[1] = m_zaero[0] +  m_thickness[1];
+
+  }
 
 }

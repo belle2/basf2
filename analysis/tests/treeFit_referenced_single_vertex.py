@@ -4,6 +4,7 @@ import unittest
 import os
 import tempfile
 from basf2 import *
+import b2test_utils
 from modularAnalysis import *
 from vertex import vertexTree
 from ROOT import Belle2
@@ -21,7 +22,9 @@ class TestTreeFits(unittest.TestCase):
 
         main = create_path()
 
-        inputMdst('default', find_file('analysis/1000_B_Jpsi_ks_pipi.root', 'validation'), path=main)
+        inputfile = b2test_utils.require_file(
+            'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
+        inputMdst('default', inputfile, path=main)
 
         fillParticleList('mu+', 'muonID > 0.5', path=main)
 
@@ -64,9 +67,10 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 1470, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives < 1521, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 736, "Signal rejection too high")
+        self.assertTrue(truePositives > 741, "Signal rejection too high")
+
         self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")

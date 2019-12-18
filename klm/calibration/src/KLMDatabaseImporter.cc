@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-#include <string>
+/* Own header. */
+#include <klm/calibration/KLMDatabaseImporter.h>
 
-/* External headers. */
+/* Belle 2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 
-/* Belle2 headers. */
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <klm/calibration/KLMDatabaseImporter.h>
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -76,11 +76,9 @@ void KLMDatabaseImporter::importTimeConversion(
   timeConversionImport.import(iov);
 }
 
-void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
+void KLMDatabaseImporter::loadStripEfficiency(
+  KLMStripEfficiency* stripEfficiency, std::string fileName)
 {
-  DBImportObjPtr<KLMStripEfficiency> stripEfficiency;
-  stripEfficiency.construct();
-
   TFile* file = TFile::Open(fileName.c_str(), "r");
   if (!file) {
     B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** failed to open");
@@ -92,8 +90,8 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
     } else {
       int isBarrel = 0;
       tree->SetBranchAddress("isBarrel", &isBarrel);
-      int isForward = 0;
-      tree->SetBranchAddress("isForward", &isForward);
+      int section = 0;
+      tree->SetBranchAddress("isForward", &section);
       int sector = 0;
       tree->SetBranchAddress("sector", &sector);
       int layer = 0;
@@ -110,18 +108,75 @@ void KLMDatabaseImporter::importStripEfficiency(std::string fileName)
       for (int i = 0; i < tree->GetEntries(); i++) {
         tree->GetEntry(i);
         if (isBarrel)
-          stripEfficiency->setBarrelEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setBarrelEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
         else
-          stripEfficiency->setEndcapEfficiency(isForward, sector, layer, plane, strip, efficiency, efficiencyError);
+          stripEfficiency->setEndcapEfficiency(section, sector, layer, plane, strip, efficiency, efficiencyError);
       }
     }
     file->Close();
   }
-
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  stripEfficiency.import(iov);
-
-  B2INFO("KLMDatabaseImporter: strip efficiencies imported and calibration file " << fileName << " closed");
 }
 
+void KLMDatabaseImporter::importStripEfficiency(
+  const KLMStripEfficiency* stripEfficiency)
+{
+  DBImportObjPtr<KLMStripEfficiency> stripEfficiencyImport;
+  stripEfficiencyImport.construct(*stripEfficiency);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  stripEfficiencyImport.import(iov);
+}
+
+void KLMDatabaseImporter::importBKLMAlignment(
+  const BKLMAlignment* bklmAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "BKLMDisplacement";
+  else
+    payloadName = "BKLMAlignment";
+  DBImportObjPtr<BKLMAlignment> bklmAlignmentImport(payloadName);
+  bklmAlignmentImport.construct(*bklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  bklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMAlignment(
+  const EKLMAlignment* eklmAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMDisplacement";
+  else
+    payloadName = "EKLMAlignment";
+  DBImportObjPtr<EKLMAlignment> eklmAlignmentImport(payloadName);
+  eklmAlignmentImport.construct(*eklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMSegmentAlignment(
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMSegmentDisplacement";
+  else
+    payloadName = "EKLMSegmentAlignment";
+  DBImportObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentImport(payloadName);
+  eklmSegmentAlignmentImport.construct(*eklmSegmentAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmSegmentAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importAlignment(
+  const BKLMAlignment* bklmAlignment, const EKLMAlignment* eklmAlignment,
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
+{
+  importBKLMAlignment(bklmAlignment, displacement);
+  importEKLMAlignment(eklmAlignment, displacement);
+  importEKLMSegmentAlignment(eklmSegmentAlignment, displacement);
+}

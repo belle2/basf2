@@ -1,7 +1,4 @@
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
-#include <limits>       // std::numeric_limits
 #include <gtest/gtest.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/trackFindingVXD/sectorMapTools/Sector.h>

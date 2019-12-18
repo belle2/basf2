@@ -35,14 +35,14 @@ namespace Belle2 {
             qDivisions>;
 
     public:
+      /// typedef of the templated AHitDecisionAlgorithm; used to reach methods defined in the algorithm e.g. debugLine, centerX, centerY etc.
+      using DecisionAlgorithm = AHitDecisionAlgorithm;
+
       /// Constructor using the given maximal level setting the maximal values.
       QuadraticLegendre()
         : Super(2, 2, 1, 1)
       {
       }
-
-      /// End view: use the quadratic expression for z(s)
-      static const bool m_lookingForQuadraticTracks = true;
     };
   }
 }

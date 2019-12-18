@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -58,7 +59,7 @@ namespace Belle2 {
 
       std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
-
+      std::string m_svdEventInfoName; /**< SVDEventInfo name */
       bool m_simulate3sampleData; /**<if true, simulate 3-sample data taking*/
       bool m_binPrintout;  /**< if true, print data created by the Packer */
 
@@ -181,6 +182,7 @@ namespace Belle2 {
       };
 
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;   /**< Required input for EventMetaData */
+      StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr;  /**< SVDEventInfo from simulation */
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
       StoreArray<SVDShaperDigit> m_svdShaperDigit; /**< Required input for SVDShaperDigit */
       int m_FADCTriggerNumberOffset; /**< FADC trigger numnber offset*/

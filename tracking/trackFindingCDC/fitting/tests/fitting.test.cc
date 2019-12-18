@@ -27,8 +27,6 @@
 #include <tracking/trackFindingCDC/geometry/Circle2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-
 #include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>

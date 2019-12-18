@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <beast/claws/simulation/SensitiveDetector.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/gearbox/Unit.h>
 #include <G4Track.hh>
 #include <G4Step.hh>

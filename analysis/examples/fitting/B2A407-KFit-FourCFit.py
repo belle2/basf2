@@ -35,7 +35,6 @@ from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
 import variables.collections as vc
 import variables.utils as vu
-# b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
 
 # create path
 my_path = b2.create_path()
@@ -59,12 +58,12 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.", path=my_path)
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=my_path)
 
-# Perform four momentum constraint fit using KFit
-# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
+# Perform four momentum constraint fit using KFit.
+# Reject the candidates with failed fit.
 fourCKFit("Upsilon(4S)", 0.0, path=my_path)
 
 # Perform four momentum constraint fit using KFit and update the Daughters
-# keep candidates only passing C.L. value of the fit prob > 0.0 (no cut)
+# Reject the candidates with failed fit.
 # fourCKFitDaughtersUpdate("Upsilon(4S)", 0.0)
 
 # Associates the MC truth to the reconstructed D0

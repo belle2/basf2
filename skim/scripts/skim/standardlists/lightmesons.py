@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 # Call to build all light mesons. Not recommended to use this general function as it creates many candidates
 
@@ -44,7 +43,7 @@ def loadStdLooseRho0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('rho0:loose -> pi-:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho0:loose -> pi-:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho0:loose'
 
 
@@ -55,7 +54,7 @@ def loadStdAllRho0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('rho0:all -> pi-:all pi+:all', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho0:all -> pi-:all pi+:all', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho0:all'
 
 
@@ -66,7 +65,7 @@ def loadStdLooseRhoPlus(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('rho+:loose -> pi0:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho+:loose -> pi0:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:loose'
 
 
@@ -77,8 +76,24 @@ def loadStdAllRhoPlus(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('rho+:all -> pi0:loose pi+:all', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho+:all -> pi0:loose pi+:all', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:all'
+
+
+def loadA_1Plus(persistent=True, path=None):
+    """
+    Creates a 'a_1+:all' list from 'pi+:all pi+:all pi-:all' requiring :math:`0.8 < M < 1.6~{\\rm GeV}/c^2`.
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    reconstructDecay(
+        decayString='a_1+:all -> pi+:all pi+:all pi-:all',
+        cut='0.8 < M < 1.6',
+        dmID=1, writeOut=persistent,
+        path=path)
+
+    return 'a_1+:all'
 
 
 def loadStdLooseKstar0(persistent=True, path=None):
@@ -88,7 +103,7 @@ def loadStdLooseKstar0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*0:loose -> pi-:loose K+:loose', '0.74 < M < 1.04', 1, persistent, path)
+    ma.reconstructDecay('K*0:loose -> pi-:loose K+:loose', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*0:loose'
 
 
@@ -99,29 +114,29 @@ def loadStdAllKstar0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*0:all -> pi-:all K+:all', '0.74 < M < 1.04', 1, persistent, path)
+    ma.reconstructDecay('K*0:all -> pi-:all K+:all', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*0:all'
 
 
 def loadStdLooseKstarPlus(persistent=True, path=None):
     """
-    Create a list of 'K*+:loose' list from 'pi+:loose K_S0:all' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:loose' list from 'pi+:loose K_S0:merged' with :math:`0.74 < M < 1.04~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*+:loose -> pi+:loose K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    ma.reconstructDecay('K*+:loose -> pi+:loose K_S0:merged', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*+:loose'
 
 
 def loadStdAllKstarPlus(persistent=True, path=None):
     """
-    Create a list of 'K*+:all' list from 'pi+:all K_S0:all' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:all' list from 'pi+:all K_S0:merged' with :math:`0.74 < M < 1.04~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('K*+:all -> pi+:all K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    ma.reconstructDecay('K*+:all -> pi+:all K_S0:merged', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*+:all'
 
 
@@ -132,7 +147,7 @@ def loadStdAllPhi(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('phi:all -> K+:all K-:all', '0.97 < M < 1.1', 1, persistent, path)
+    ma.reconstructDecay('phi:all -> K+:all K-:all', '0.97 < M < 1.1', 1, persistent, path)
     return 'phi:all'
 
 
@@ -143,7 +158,7 @@ def loadStdLoosePhi(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('phi:loose -> K+:loose K-:loose', '0.97 < M < 1.1', 1, persistent, path)
+    ma.reconstructDecay('phi:loose -> K+:loose K-:loose', '0.97 < M < 1.1', 1, persistent, path)
     return 'phi:loose'
 
 
@@ -154,7 +169,7 @@ def loadStdAllF_0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('f_0:all -> pi+:all pi-:all', '0.78 < M < 1.18', 1, persistent, path)
+    ma.reconstructDecay('f_0:all -> pi+:all pi-:all', '0.78 < M < 1.18', 1, persistent, path)
     return 'f_0:all'
 
 
@@ -165,7 +180,7 @@ def loadStdLooseF_0(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('f_0:loose -> pi+:loose pi-:loose', '0.78 < M < 1.18', 1, persistent, path)
+    ma.reconstructDecay('f_0:loose -> pi+:loose pi-:loose', '0.78 < M < 1.18', 1, persistent, path)
     return 'f_0:loose'
 
 
@@ -176,7 +191,7 @@ def loadStdAllOmega(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('omega:all -> pi0:loose pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
+    ma.reconstructDecay('omega:all -> pi0:loose pi-:all pi+:all', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:all'
 
 
@@ -187,7 +202,7 @@ def loadStdLooseOmega(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('omega:loose -> pi0:loose pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
+    ma.reconstructDecay('omega:loose -> pi0:loose pi-:loose pi+:loose', '0.73 < M < 0.83', 1, persistent, path)
     return 'omega:loose'
 
 
@@ -199,9 +214,9 @@ def loadStdLooseEta(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, persistent, path)
-    reconstructDecay('eta:loose2 -> pi0:loose pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
-    copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], persistent, path)
+    ma.reconstructDecay('eta:loose1 -> gamma:loose gamma:loose', '0.4 < M < 0.6', 1, persistent, path)
+    ma.reconstructDecay('eta:loose2 -> pi0:loose pi-:loose pi+:loose', '0.4 < M < 0.6', 2, persistent, path)
+    ma.copyLists('eta:loose', ['eta:loose1', 'eta:loose2'], persistent, path)
     return 'eta:loose'
 
 
@@ -213,7 +228,7 @@ def loadStdLooseEtaPrime(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:loose', '0.8 < M < 1.1', 1, persistent, path)
-    reconstructDecay('eta\':loose2 -> pi+:loose pi-:loose eta:loose', '0.8 < M < 1.1', 2, persistent, path)
-    copyLists('eta\':loose', ['eta\':loose1', 'eta\':loose2'], persistent, path)
+    ma.reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:loose', '0.8 < M < 1.1', 1, persistent, path)
+    ma.reconstructDecay('eta\':loose2 -> pi+:loose pi-:loose eta:loose', '0.8 < M < 1.1', 2, persistent, path)
+    ma.copyLists('eta\':loose', ['eta\':loose1', 'eta\':loose2'], persistent, path)
     return 'eta\':loose'

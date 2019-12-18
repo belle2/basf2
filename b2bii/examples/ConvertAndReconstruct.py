@@ -20,6 +20,7 @@ from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
+import variables as va
 
 if len(sys.argv) != 4:
     sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
@@ -30,8 +31,6 @@ mc_or_data = sys.argv[1].lower()
 isMC = {"mc": True, "data": False}.get(mc_or_data, None)
 if isMC is None:
     sys.exit('First parameter must be "mc" or "data" to indicate whether we run on MC or real data')
-
-setupB2BIIDatabase(isMC)
 
 inputBelleMDSTFile = sys.argv[2]
 outputBelle2ROOTFile = sys.argv[3]
@@ -78,7 +77,11 @@ matchMCTruth('K_S0:mdst', path=mypath)
 vertexKFit('K_S0:mdst', -1, path=mypath)
 
 # The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
-printVariableValues('pi+:all', ['mcPDG', 'p', 'atcPIDBelle(3,2)', 'muIDBelle',
+va.variables.addAlias('Lkpi', 'atcPIDBelle(3,2)')
+va.variables.addAlias('Lppi', 'atcPIDBelle(4,2)')
+va.variables.addAlias('Lpk', 'atcPIDBelle(4,3)')
+
+printVariableValues('pi+:all', ['mcPDG', 'p', 'Lkpi', 'muIDBelle',
                                 'muIDBelleQuality', 'eIDBelle', 'nSVDHits'], path=mypath)
 
 printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'], path=mypath)
@@ -113,7 +116,7 @@ variables = create_aliases_for_selected(
 
 belle1pid = [
     'eIDBelle', 'muIDBelleQuality', 'muIDBelle',
-    'atcPIDBelle(3,2)', 'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)']
+    'Lkpi', 'Lppi', 'Lpk']
 variables += create_aliases_for_selected(
     belle1pid, 'K_S0 -> ^pi+ ^pi-')
 

@@ -9,14 +9,11 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
 #include <string>
 #include <TVector3.h>
-#include <TVector2.h>
 #include <TRotation.h>
 
 namespace Belle2 {

@@ -30,18 +30,19 @@ namespace Belle2 {
 
     /** Flags that describe different reconstruction errors. */
     enum MCErrorFlags {
-      c_Correct             = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
-      c_MissFSR             = 1, /**< A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle::c_IsFSRPhoton). */
-      c_MissingResonance    = 2, /**< The associated MCParticle decay contained additional non-final-state particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases*/
-      c_DecayInFlight       = 4, /**< A Particle was reconstructed from the secondary decay product of the actual particle. This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean a pion hypothesis was used for a secondary electron. */
-      c_MissNeutrino        = 8, /**< A neutrino is missing (not reconstructed). */
-      c_MissGamma           = 16, /**< A photon (not FSR) is missing (not reconstructed). */
-      c_MissMassiveParticle = 32, /**< A generated massive FSP is missing (not reconstructed). */
-      c_MissKlong           = 64, /**< A Klong is missing (not reconstructed). */
-      c_MisID               = 128, /**< One of the charged final state particles is mis-identified. */
-      c_AddedWrongParticle  = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
-      c_InternalError       = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
-      c_MissPHOTOS          = 1024, /**< A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton) */
+      c_Correct               = 0,  /**< This Particle and all its daughters are perfectly reconstructed. */
+      c_MissFSR               = 1, /**< A Final State Radiation (FSR) photon is not reconstructed (based on MCParticle::c_IsFSRPhoton). */
+      c_MissingResonance      = 2, /**< The associated MCParticle decay contained additional non-final-state particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases*/
+      c_DecayInFlight         = 4, /**< A Particle was reconstructed from the secondary decay product of the actual particle. This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might mean a pion hypothesis was used for a secondary electron. */
+      c_MissNeutrino          = 8, /**< A neutrino is missing (not reconstructed). */
+      c_MissGamma             = 16, /**< A photon (not FSR) is missing (not reconstructed). */
+      c_MissMassiveParticle   = 32, /**< A generated massive FSP is missing (not reconstructed). */
+      c_MissKlong             = 64, /**< A Klong is missing (not reconstructed). */
+      c_MisID                 = 128, /**< One of the charged final state particles is mis-identified. */
+      c_AddedWrongParticle    = 256, /**< A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters) belongs to another Particle. */
+      c_InternalError         = 512, /**< There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster. */
+      c_MissPHOTOS            = 1024, /**< A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton) */
+      c_AddedRecoBremsPhoton  = 2048, /**< A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has no MC particle assigned, or it doesn't belong to the decay chain */
     };
 
     /** Return string with all human-readable flags, e.g. explainFlags(402) returns "c_MissingResonance | c_MissGamma | c_MisID | c_AddedWrongParticle".
@@ -81,10 +82,12 @@ namespace Belle2 {
      *
      * @param particle pointer to the particle. setMCTruth() must have been called previously (usually via the MCMatching module)!
      * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
+     * @param option to ignore corresponding flags with PropertyFlags of particle which are set by decaystring grammar.
      *
      * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */
-    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr);
+    static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr,
+                           const bool honorProperty = true);
 
     /** Sets error flags in extra-info (also returns it).
      *
@@ -161,6 +164,13 @@ namespace Belle2 {
      */
     static int countMissingParticle(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle,
                                     const std::vector<int>& daughterPDG);
+
+    /**
+     * Returns the flags ignored by PropertyFlags of given particle.
+     * Only c_isIgnored... flags are considered. c_isUnspecified is already considered in setMCErrorsExtraInfo function.
+     * @return ORed combination of corresponding MCErrorFlags with PropertyFlags of given particle
+     */
+    static int getFlagsIgnoredByProperty(const Belle2::Particle* particle);
 
   };
 }

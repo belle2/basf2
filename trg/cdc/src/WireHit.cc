@@ -45,6 +45,7 @@ namespace Belle2 {
                     driftRightError,
                     mcLRflag,
                     fudgeFactor),
+             _mc(), //2019/07/31 by ytlai
              _iCDCSimHit(indexCDCSimHit)
   {
   }

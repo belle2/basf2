@@ -27,15 +27,22 @@ def get_consts_line(layer, wire, parameter, coefficient):
 
 
 class WriteConstraints(Module):
+    """
+    Module to write down contraints for CDC wires in layers
+    (needs geometry to load to read wire positions)
+    """
+
     def __init__(self):
         """ init """
         super(WriteConstraints, self).__init__()
         self.consts = []
 
     def add(self, text):
+        """ Add a line to constraints """
         self.consts.append(text)
 
     def event(self):
+        """ On 1st event, collect all constraints data """
         if self.consts:
             return
 
@@ -78,6 +85,7 @@ class WriteConstraints(Module):
                 self.add(get_consts_line(layer, wire, Belle2.CDCAlignment.wireFwdY, +math.cos(wirePhi)))
 
     def terminate(self):
+        """ Write down the file with constraints """
         with open('cdc-wire-constraints.txt', 'w') as txt:
             for line in self.consts:
                 txt.write(str(line) + '\n')

@@ -1,11 +1,8 @@
 #include <framework/dataobjects/Helix.h>
-#include <framework/logging/Logger.h>
 
 #include <TVector3.h>
 #include <TRandom3.h>
-#include <TMath.h>
 
-#include <boost/math/special_functions/sign.hpp>
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>

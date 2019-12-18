@@ -24,15 +24,11 @@
 #include <vector>
 
 namespace genfit {
-  class AbsFitter;
   class TrackCand;
   class AbsTrackRep;
 }
 
 namespace Belle2 {
-
-  template <class T>
-  class StoreArray;
 
   class RecoTrackGenfitAccess;
 
@@ -312,6 +308,7 @@ namespace Belle2 {
       (m_storeArrayNameOfRecoHitInformation);
 
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
+        // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
           return &recoHitInformation;
         }
@@ -557,7 +554,7 @@ namespace Belle2 {
     }
 
     /** Return an already created track representation of the given reco track for the PDG. You
-     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * are not allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
      * for the given pdgCode.
      *
      * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
@@ -732,7 +729,7 @@ namespace Belle2 {
     }
 
     /// Set the quality index attached to this RecoTrack. 0 means likely fake.
-    void setQualityIndicator(float qualityIndicator)
+    void setQualityIndicator(const float qualityIndicator)
     {
       m_qualityIndicator = qualityIndicator;
     }
@@ -853,6 +850,7 @@ namespace Belle2 {
       std::vector<const RecoHitInformation*> relatedHitInformationAsVector;
       relatedHitInformationAsVector.reserve(relatedHitInformation.size());
       for (const RecoHitInformation& hitInformation : relatedHitInformation) {
+        // cppcheck-suppress useStlAlgorithm
         relatedHitInformationAsVector.push_back(&hitInformation);
       }
       std::sort(relatedHitInformationAsVector.begin(), relatedHitInformationAsVector.end(), [](const RecoHitInformation * a,
@@ -883,6 +881,7 @@ namespace Belle2 {
       std::vector<HitType*> hitList;
       hitList.reserve(relatedHits.size());
       for (HitType& hit : relatedHits) {
+        // cppcheck-suppress useStlAlgorithm
         hitList.push_back(&hit);
       }
 

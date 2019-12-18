@@ -1,0 +1,5 @@
+
+Miscellaneous
++++++++++++++
+
+ * Added support for writing ``udst`` files as output from BGxN N>0 files in light releases (see :issue:`BII-3622`). This means skimming is fully supported with a light release.

@@ -374,6 +374,9 @@ if 'FBDT_qrCombined' in totalBranches:
 if 'FANN_qrCombined' in totalBranches:
     methods.append("FANN")
 
+if 'DNN_qrCombined' in totalBranches:
+    methods.append("DNN")
+
 if 'DeltaT' in totalBranches:
     existsDeltaT = True
 
@@ -395,7 +398,9 @@ for method in methods:
 
     if method == "FBDT":
         label = method
-    else:
+    elif method == "DNN":
+        label = method
+    elif method == "FANN":
         label = "MLP"
 
     with Quiet(ROOT.kError):

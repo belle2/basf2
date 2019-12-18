@@ -85,17 +85,30 @@ namespace Belle2 {
      */
     double eclClusterTiming(const Particle* particle);
 
+    /**
+     * return whether or not ECL cluster's timing fit failed
+     */
+    double eclClusterHasFailedTiming(const Particle* particle);
 
-    /** return  Error on clusters phi position  */
+    /**
+     * return  Error on clusters phi position
+     */
     double eclClusterErrorPhi(const Particle* particle);
 
-    /** return  Error on clusters theta position  */
+    /**
+     * return  Error on clusters theta position
+     */
     double eclClusterErrorTheta(const Particle* particle);
 
     /**
      * return ECL cluster's Error on timing information
      */
     double eclClusterErrorTiming(const Particle* particle);
+
+    /**
+     * return whether or not calculation of ECL cluster's error on the timing failed
+     */
+    double eclClusterHasFailedErrorTiming(const Particle* particle);
 
     /**
      * return the energy of the crystal with highest energy

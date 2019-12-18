@@ -6,24 +6,23 @@
 # Modified by Y. Kato, Mar/2018
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPhotons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+import sys
+import skimExpertFunctions as expert
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
 
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
-set_log_level(LogLevel.INFO)
+skimpath = b2.Path()
 
-skimpath = Path()
-
-skimCode = encodeSkimName('Systematics')
+skimCode = expert.encodeSkimName('Systematics')
 argvs = sys.argv
 argc = len(argvs)
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=skimpath)
+ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('loose', path=skimpath)
 stdMu('loose', path=skimpath)
@@ -34,10 +33,10 @@ stdMu('all', path=skimpath)
 
 from skim.systematics import SystematicsList
 SysList = SystematicsList(skimpath)
-skimOutputUdst(skimCode, SysList, path=skimpath)
-summaryOfLists(SysList, path=skimpath)
+expert.skimOutputUdst(skimCode, SysList, path=skimpath)
+ma.summaryOfLists(SysList, path=skimpath)
 
-setSkimLogging(path=skimpath)
-process(skimpath)
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 
-print(statistics)
+print(b2.statistics)

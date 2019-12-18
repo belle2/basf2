@@ -8,13 +8,10 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <TFile.h>
-#include <TText.h>
 #include <TPaveText.h>
 #include <TCanvas.h>
 

@@ -10,11 +10,10 @@
 
 // Own include
 #include <analysis/variables/TimeDependentVariables.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/VariableManager/Manager.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
@@ -23,17 +22,13 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
-#include <TRandom.h>
-#include <TVectorF.h>
+#include <TMatrixD.h>
 #include <TVector3.h>
 
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -48,7 +43,7 @@ namespace Belle2 {
 
     double particleTagVx(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -60,7 +55,7 @@ namespace Belle2 {
 
     double particleTagVy(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -72,7 +67,7 @@ namespace Belle2 {
 
     double particleTagVz(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -84,7 +79,7 @@ namespace Belle2 {
 
     double particleTruthTagVx(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -96,7 +91,7 @@ namespace Belle2 {
 
     double particleTruthTagVy(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -108,7 +103,7 @@ namespace Belle2 {
 
     double particleTruthTagVz(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -120,7 +115,7 @@ namespace Belle2 {
 
     double particleTagVxErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -134,7 +129,7 @@ namespace Belle2 {
 
     double particleTagVyErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -148,7 +143,7 @@ namespace Belle2 {
 
     double particleTagVzErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -162,7 +157,7 @@ namespace Belle2 {
 
     double particleTagVpVal(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -176,7 +171,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getNTracks();
     }
 
@@ -184,7 +179,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getFitType();
     }
 
@@ -192,7 +187,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getTagVNDF();
     }
 
@@ -200,7 +195,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getTagVChi2();
     }
 
@@ -208,7 +203,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return -1111.0;
+        return std::numeric_limits<float>::quiet_NaN();
       return vert->getTagVChi2IP();
     }
 
@@ -217,7 +212,7 @@ namespace Belle2 {
 
     double particleDeltaT(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -229,7 +224,7 @@ namespace Belle2 {
 
     double particleDeltaTErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -241,7 +236,7 @@ namespace Belle2 {
 
     double particleMCDeltaT(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -253,7 +248,7 @@ namespace Belle2 {
 
     double particleDeltaZ(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -265,7 +260,7 @@ namespace Belle2 {
 
     double particleDeltaZErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -273,20 +268,20 @@ namespace Belle2 {
         double zVariance = particle->getVertexErrorMatrix()(2, 2);
         double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
         result = sqrt(zVariance + TagVZVariance);
-        if (std::isnan(result) or std::isinf(result)) result = -1111.0;
+        if (std::isnan(result) or std::isinf(result)) result = std::numeric_limits<float>::quiet_NaN();
       }
       return result;
     }
 
     double particleDeltaB(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaT() * bg * c;
@@ -296,13 +291,13 @@ namespace Belle2 {
 
     double particleDeltaBErr(const Particle* particle)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
       if (vert) {
         PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector().BoostVector();
+        TVector3 boost = T.getBoostVector();
         double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
         double c = Const::speedOfLight / 1000.; // cm ps-1
         result = vert->getDeltaTErr() * bg * c;
@@ -316,7 +311,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       TVector3 pos = part->getVertex();
@@ -329,10 +324,11 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
+
       TVector3 pos = part->getVertex();
       double l = pos.Dot(orthBoostDir);
 
@@ -343,11 +339,11 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
+      TVector3 boost = T.getBoostVector();
       TVector3 boostDir = boost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return -1111;
+      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
       TVector3 pos = mcPart->getDecayVertex();
       double l = pos.Dot(boostDir);
 
@@ -356,14 +352,15 @@ namespace Belle2 {
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
-      PCmsLabTransform T;
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TLorentzVector trueBeamEnergy = beamParamsDB->getHER() + beamParamsDB->getLER();
+      TVector3 boost = trueBeamEnergy.BoostVector();
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return -1111;
+      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
       TVector3 pos = mcPart->getDecayVertex();
       double l = pos.Dot(orthBoostDir);
 
@@ -375,8 +372,7 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boost = T.getBoostVector();
 
       double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
       double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
@@ -411,9 +407,9 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
 
-      TVector3 boost = T.getBoostVector().BoostVector();
-      TVector3 boostDir = boost.Unit();
-      TVector3 orthBoostDir(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
+      TVector3 boost = T.getBoostVector();
+      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoostDir = orthBoost.Unit();
 
       double cy = orthBoostDir.Z() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
       double sy = orthBoostDir.X() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
@@ -450,7 +446,7 @@ namespace Belle2 {
 
     double tagVBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -463,7 +459,7 @@ namespace Belle2 {
 
     double tagVOrthogonalBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -476,7 +472,7 @@ namespace Belle2 {
 
     double tagVTruthBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -489,7 +485,7 @@ namespace Belle2 {
 
     double tagVTruthOrthogonalBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -501,7 +497,7 @@ namespace Belle2 {
 
     double tagVErrBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -514,7 +510,7 @@ namespace Belle2 {
 
     double tagVErrOrthogonalBoostDirection(const Particle* part)
     {
-      double result = -1111.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -527,7 +523,7 @@ namespace Belle2 {
 
     double particleInternalTagVMCFlavor(const Particle* part)
     {
-      double result = 1000.0;
+      double result = std::numeric_limits<float>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 

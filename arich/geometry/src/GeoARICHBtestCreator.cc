@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <sstream>
-#include <cmath>
 #include <string.h>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -19,13 +18,10 @@
 // Geant4
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
-#include <G4AssemblyVolume.hh>
 #include <G4LogicalSkinSurface.hh>
 #include <G4OpticalSurface.hh>
 // Geant4 Shapes
 #include <G4Box.hh>
-#include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4Material.hh>
 
@@ -42,10 +38,8 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 // Framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <arich/simulation/SensitiveDetector.h>
 #include <arich/simulation/SensitiveAero.h>

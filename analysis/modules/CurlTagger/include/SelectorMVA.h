@@ -17,7 +17,6 @@
 #include <string>
 
 #include <mva/methods/FastBDT.h>
-#include <mva/interface/Interface.h>
 
 //Root Includes
 #include "TFile.h"

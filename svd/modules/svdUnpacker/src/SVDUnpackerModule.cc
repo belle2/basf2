@@ -49,18 +49,16 @@ REG_MODULE(SVDUnpacker)
 std::string Belle2::SVD::SVDUnpackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
-  m_generateOldDigits(false),
   m_mapping(m_xmlFileName),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
 {
   //Set module properties
-  setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
+  setDescription("Produce SVDShaperDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("SVDEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
-  addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
-  addParam("GenerateOldDigits", m_generateOldDigits, "Generate SVDDigits", bool(false));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -84,13 +82,13 @@ void SVDUnpackerModule::initialize()
   m_eventMetaDataPtr.isRequired();
   // Don't panic if no SVD data.
   m_rawSVD.isOptional(m_rawSVDListName);
+
+  // Register default SVDEventInfo for unpacking Raw Data
+  m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
+
   StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
   storeDAQDiagnostics.registerInDataStore();
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
-
-  if (m_generateOldDigits) {
-    m_svdDigit.registerInDataStore(m_svdDigitListName);
-  }
 
   StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
   storeShaperDigits.registerInDataStore();
@@ -106,7 +104,7 @@ void SVDUnpackerModule::beginRun()
 
   if (! m_map) { //give up
     B2ERROR("SVD xml map not loaded." << std::endl <<
-            "No SVDDigit will be produced for this run!");
+            "No SVDShaperDigit will be produced for this run!");
     return;
   }
 
@@ -127,6 +125,7 @@ void SVDUnpackerModule::beginRun()
   nFADCMatchErrors = -1;
   nAPVErrors = -1;
   nFTBFlagsErrors = -1;
+  nEventInfoMatchErrors = -1;
 
   seenHeadersAndTrailers = 0;
 }
@@ -140,15 +139,9 @@ void SVDUnpackerModule::event()
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   if (!rawSVDList || !rawSVDList.getEntries())
     return;
-  StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
-
-  if (!m_silentAppend && m_generateOldDigits && svdDigits && svdDigits.getEntries())
-    B2WARNING("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
-              << "This can lead to undesired behaviour. At least remember to\""
-              << "use SVDDigitSorter in your path and set the \n"
-              << "silentlyAppend parameter of SVDUnpacker to true.");
 
   if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
     B2WARNING("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
@@ -175,6 +168,9 @@ void SVDUnpackerModule::event()
   bool badTrailer = false;
   bool missedHeader = false;
   bool missedTrailer = false;
+
+  // flag to set SVDEventInfo once per event
+  bool isSetEventInfo = false;
 
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
@@ -322,6 +318,22 @@ void SVDUnpackerModule::event()
 
             // create SVDModeByte object from MainHeader vars
             m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+
+            // create SVDEventInfo and fill it with SVDModeByte & SVDTriggerType objects
+            if (!isSetEventInfo) {
+              m_SVDTriggerType = SVDTriggerType(trgType);
+              m_svdEventInfoPtr.create();
+              m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
+              m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
+
+              // set X-talk info online from Raw Data
+              m_svdEventInfoPtr->setCrossTalk(m_MainHeader.xTalk);
+
+              isSetEventInfo = true;
+            } else {  // let's check if the current SVDModeByte and SVDTriggerType are consistent with the one stored in SVDEventInfo
+              if (m_SVDModeByte !=  m_svdEventInfoPtr->getModeByte())  {m_svdEventInfoPtr->setMatchModeByte(false); badHeader = true; nEventInfoMatchErrors++;}
+              if (trgType != (m_svdEventInfoPtr->getTriggerType()).getType()) { m_svdEventInfoPtr->setMatchTriggerType(false);  badHeader = true; nEventInfoMatchErrors++;}
+            }
           } // is FADC header
 
           if (m_APVHeader.check == 2) { // APV header
@@ -371,17 +383,6 @@ void SVDUnpackerModule::event()
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
               sample[5] = m_data_B.sample6;
-            }
-
-            if (m_generateOldDigits) {
-              for (unsigned int idat = 0; idat < 6; idat++) {
-                // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
-                SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
-                if (newDigit) {
-                  svdDigits.appendNew(*newDigit);
-                  delete newDigit;
-                }
-              }
             }
 
             // Generating SVDShaperDigit object
@@ -567,9 +568,14 @@ void SVDUnpackerModule::event()
 
     if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
         || p.second->getFTBFlags()     || p.second->getAPVError() || !(p.second->getAPVMatch()) || !(p.second->getFADCMatch())
+        || p.second->getBadHeader()
         ||  p.second->getBadMapping() || p.second->getUpsetAPV() || p.second->getMissedHeader() || p.second->getMissedTrailer()) continue;
     shaperDigits.appendNew(p.first)->addRelationTo(p.second);
   }
+
+  if (!m_svdEventInfoPtr->getMatchTriggerType()) {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD Trigger Type value for: " << LogVar("Event number", eventNo));}
+  if (!m_svdEventInfoPtr->getMatchModeByte())  {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD ModeByte object for: " << LogVar("Event number", eventNo));}
+
 
 } //end event function
 #ifndef __clang__

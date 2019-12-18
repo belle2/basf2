@@ -4,15 +4,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
 #include <genfit/GFRaveVertex.h>
-#include <genfit/Track.h>
 #include <genfit/FieldManager.h>
 #include "genfit/MaterialEffects.h"
-#include <genfit/Exception.h>
 
 #include <framework/utilities/IOIntercept.h>
 
@@ -220,11 +217,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
   const TVector3& posVert(vert.getPos());
-  TLorentzVector lv0, lv1;
 
-  // Reconstruct invariant mass.
-  lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-  lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
 
   // Apply cuts. We have one set of cuts inside the beam pipe,
   // the other outside.
@@ -260,6 +253,10 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
 
   if (m_validation) {
     B2DEBUG(300, "Create StoreArray and Output for validation.");
+    TLorentzVector lv0, lv1;
+    // Reconstruct invariant mass.
+    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
     m_validationV0s.appendNew(
       std::make_pair(trackPlus, tfrPlusVtx),
       std::make_pair(trackMinus, tfrMinusVtx),

@@ -261,11 +261,11 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
 
   std::ofstream file2DILout;
 
-  int startfrom = 1, endat = 1;
   for (int iIOLayer = 0; iIOLayer <= 1; iIOLayer++) {
 
     file2DILout.open(Form("f2D_Constants_Local_Layer%d_%s.txt", iIOLayer, fSetPrefix.data()));
 
+    int startfrom = 1, endat = 1;
     if (iIOLayer == 0) {
       startfrom = lBinInLayer; endat = hBinInLayer;
     } else  {

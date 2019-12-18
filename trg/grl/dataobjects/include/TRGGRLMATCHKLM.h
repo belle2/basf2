@@ -18,10 +18,13 @@
 
 namespace Belle2 {
 
+  /// a class for CDC2D-KLM Matching in TRGGRL
   class TRGGRLMATCHKLM : public RelationsObject {
   public:
 
+    /// Constructor
     TRGGRLMATCHKLM(): m_dphi(-999.) {}
+    /// Desturctor
     ~TRGGRLMATCHKLM() {}
 
     /**Get dphi*/

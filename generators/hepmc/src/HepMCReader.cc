@@ -8,10 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-# include <generators/hepmc/HepMCReader.h>
+#include <generators/hepmc/HepMCReader.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+
+#include <HepMC/IO_GenEvent.h>
 
 #include <TLorentzVector.h>
 
@@ -43,7 +45,7 @@ int HepMCReader::nextValidEvent(HepMC::GenEvent& evt)
 
 int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 {
-  int eventID = -1;
+  int eventID;
 
   HepMC::GenEvent evt;
   // read event number once
@@ -53,14 +55,11 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
   eventWeight = 1; // why is evt.weights() a std::vector?
   const int nparticles = evt.particles_size();
 
-  B2DEBUG(10, "Found eventID " << eventID << " with " << nparticles << " particles.");
-  //evt.print(); // print pythia event content
+  B2DEBUG(20, "Found eventID " << eventID << " with " << nparticles << " particles.");
 
-  //this tellt the module to stop processing the events
   if (nparticles <= 0) {
     throw (HepMCInvalidEventError());
   }
-  // Fill particle graph with this event
   const int event_offset = graph.size(); //offset
   //Make list of particles; Prepare graph
   for (int i = 0; i < nparticles; i++) {
@@ -75,7 +74,8 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     hash_index_map[hash] = i;
     ++tmp_particle;
   }
-
+  const double len_conv = HepMC::Units::conversion_factor(evt.length_unit(), HepMC::Units::CM); // from, to
+  const double mom_conv = HepMC::Units::conversion_factor(evt.momentum_unit(), HepMC::Units::GEV); // from, to
   auto read_particle = evt.particles_begin();
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
@@ -88,35 +88,29 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     const bool isFinalstate =  !decay_vertex && status == 1;
     const bool isVirtual  = (status == 4) || (status == 21) || (status == 22) || (status == 23); //TODO refine
     const int pdg_code = (*read_particle)->pdg_id() ;
-    const double mass = (*read_particle)->generated_mass();
-    const auto momentum = (*read_particle)->momentum();
+    const double mass = (*read_particle)->generated_mass() * mom_conv;
+    auto const mom_tmp = (*read_particle)->momentum();
+    //whatever genius wrote this vector class did not implement an operator for multiplication with a scalar or even access via []
+    const HepMC::FourVector momentum(
+      mom_tmp.x()*mom_conv * Unit::GeV,
+      mom_tmp.y()*mom_conv * Unit::GeV,
+      mom_tmp.z()*mom_conv * Unit::GeV,
+      mom_tmp.t()*mom_conv * Unit::GeV
+    );
 
-    B2DEBUG(10, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
+    B2DEBUG(20, "Read particle: status " << status << " isFinal " << isFinalstate << " isVirtual " << isVirtual << " pdg " << pdg_code
             << " mass " << mass << " px " << momentum.x() << " py " << momentum.y() << " px " << momentum.z() << " E " << momentum.t());
-
     p.setPDG(pdg_code);
     p.setMomentum(TVector3(momentum.x(), momentum.y(), momentum.z()));
     p.setEnergy(momentum.t());
     p.setMass(mass);
     if (production_vertex) {
       const auto pos = production_vertex->position();
-      p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * Unit::mm);
-      p.setProductionTime(pos.t() * Unit::mm / Const::speedOfLight);
+      p.setProductionVertex(TVector3(pos.x(), pos.y(), pos.z()) * len_conv * Unit::cm);
+      p.setProductionTime(pos.t() * len_conv * Unit::cm / Const::speedOfLight);
       p.setValidVertex(true);
     }
 
-    // number of particles attached to this particles decay vertex
-    //int ndaughters = 0;
-    //if (decay_vertex) {
-    //  ndaughters = decay_vertex->particles_out_size();
-    //  //std::cout << "  Found vertex " << pdg_code << " ----------------------------"   << std::endl;
-    //  int count = 0;
-    //  for (auto daughter = decay_vertex->particles_begin(HepMC::children);
-    //       daughter != decay_vertex->particles_end(HepMC::children); ++daughter) {
-    //    std::cout << "     Daughter nr " << ++count << " pdg " << (*daughter)->pdg_id() <<" hash " << (*daughter)->barcode() <<  std::endl;
-    //    //(*daughter)->print();
-    //  }
-    //}
     if (decay_vertex) {
       int daughter_idx = 0;
       for (auto daughter = decay_vertex->particles_begin(HepMC::children);
@@ -141,7 +135,7 @@ int HepMCReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     ++read_particle;
   }
   eventID += 1;
-  B2DEBUG(10, "Returning event id " << eventID);
+  B2DEBUG(20, "Returning event id " << eventID);
   return eventID;
 }
 
@@ -152,10 +146,10 @@ void HepMCReader::readNextEvent(HepMC::GenEvent& evt)
     evt.read(m_input);
     if (evt.is_valid()) {
       const int nparticles = evt.particles_size();
-      B2DEBUG(10, "Found valid event.i N particles " << nparticles);
+      B2DEBUG(20, "Found valid event.i N particles " << nparticles);
       return; //
     } else {
-      B2DEBUG(10, "The next event was invalid. Will stop reading now.");
+      B2DEBUG(20, "The next event was invalid. Will stop reading now.");
     }
   }
   return;

@@ -12,17 +12,21 @@
 #include <analysis/modules/FSRCorrection/FSRCorrectionModule.h>
 
 // framework aux
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/PCmsLabTransform.h>
+
+// variables
+#include <analysis/variables/ECLVariables.h>
 
 #include <cmath>
 #include <algorithm>
@@ -63,6 +67,11 @@ namespace Belle2 {
 
   void FSRCorrectionModule::initialize()
   {
+    // module is deprecated
+    B2WARNING("The module FSRCorrection is deprecated.\n"
+              "Please switch to one of the new (and better) modules BremsFinder or BelleBremRecovery.\n"
+              "Soon, this module will be removed.");
+
     // check the validity of output ParticleList name
     bool valid = m_decaydescriptor.init(m_outputListName);
     if (!valid)
@@ -95,6 +104,11 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> antiParticleList(m_outputAntiListName);
     antiParticleList.registerInDataStore(flags);
     m_maxAngle = cos(m_angleThres * M_PI / 180.0);
+
+    StoreArray<Particle> particles;
+    StoreArray<PIDLikelihood> pidlikelihoods;
+    particles.registerRelationTo(pidlikelihoods);
+
   }
 
 
@@ -164,10 +178,12 @@ namespace Belle2 {
         B2INFO("[FSRCorrectionModule] Found a radiative gamma and added its 4-vector to the lepton");
       }
 
-      Particle correctedLepton(new4Vec, lepton->getPDGCode());
-      correctedLepton.appendDaughter(lepton);
+      Particle correctedLepton(new4Vec, lepton->getPDGCode(), Particle::EFlavorType::c_Flavored, Particle::c_Track,
+                               lepton->getTrack()->getArrayIndex());
+
+      correctedLepton.appendDaughter(lepton, false);
       if (fsrGammaFound) {
-        correctedLepton.appendDaughter(fsrGamma);
+        correctedLepton.appendDaughter(fsrGamma, false);
         // update error matrix
         const TMatrixFSym& lepErrorMatrix = lepton->getMomentumVertexErrorMatrix();
         const TMatrixFSym& fsrErrorMatrix = fsrGamma->getMomentumVertexErrorMatrix();
@@ -188,16 +204,23 @@ namespace Belle2 {
         correctedLepton.setMomentumVertexErrorMatrix(lepton->getMomentumVertexErrorMatrix());
       }
 
-
       // add the info from original lepton to the new lepton
       correctedLepton.setVertex(lepton->getVertex());
       correctedLepton.setPValue(lepton->getPValue());
 
       correctedLepton.addExtraInfo("fsrCorrected", float(fsrGammaFound));
+      if (fsrGammaFound) correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", Variable::eclClusterE(fsrGamma));
 
       // add the mc relation
       Particle* newLepton = particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
+
+      const PIDLikelihood* pid = lepton->getPIDLikelihood();
+
+      if (pid) {
+        newLepton->addRelationTo(pid);
+      }
+
       if (mcLepton != nullptr) newLepton->addRelationTo(mcLepton);
       outputList->addParticle(newLepton);
 

@@ -4,9 +4,12 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
-
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/DataStore.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-
+#include <string>
 #include <cmath>
 #include <TFile.h>
 
@@ -385,7 +388,41 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "fastestpriority");
+      m_T0 = 9999;
+      // find shortest time of related and relevant axial hits
+      RelationVector<CDCTriggerSegmentHit> axialHits =
+        track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+      for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
+        // skip hits with negative relation weight (not selected in finder)
+        if (axialHits.weight(ihit) < 0) continue;
+        unsigned short iSL = axialHits[ihit]->getISuperLayer();
+        // skip stereo hits (should not be related to track, but check anyway)
+        if (iSL % 2 == 1) continue;
+        // get shortest time of relevant hits
+        double relId = getRelId(*axialHits[ihit]);
+        if (m_MLPs[isector].isRelevant(relId, iSL) &&
+            axialHits[ihit]->priorityTime() < m_T0) {
+          m_T0 = axialHits[ihit]->priorityTime();
+        }
+      }
+      // find shortest time of relevant stereo hits
+      StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+      for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+        unsigned short iSL = hits[ihit]->getISuperLayer();
+        // skip axial hits
+        if (iSL % 2 == 0) continue;
+        // get shortest time of relevant hits
+        double relId = getRelId(*hits[ihit]);
+        if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
+          m_T0 = hits[ihit]->priorityTime();
+        }
+      }
+      if (m_T0 < 9999) {
+        m_hasT0 = true;
+      } else {
+        m_T0 = 0;
+        m_hasT0 = false;
+      }
     }
   } else if (et_option == "fastestpriority") {
     m_T0 = 9999;
@@ -442,8 +479,11 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       m_T0 = m_eventTime->getBinnedEventT0(Const::CDC);
       m_hasT0 = true;
     } else {
-      getEventTime(isector, track, "zero");
+      m_hasT0 = true;
+      m_T0 = 0;
     }
+  } else {
+    B2ERROR("No valid parameter for et_option (" << et_option << " )!");
   }
 
 }
@@ -780,30 +820,43 @@ NeuroTrigger::save(const string& filename, const string& arrayname)
 bool
 NeuroTrigger::load(const string& filename, const string& arrayname)
 {
-  TFile datafile(filename.c_str(), "READ");
-  if (!datafile.IsOpen()) {
-    B2WARNING("Could not open file " << filename);
-    return false;
-  }
-  TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
-  if (!MLPs) {
+  if (filename.size() < 1) {
+    m_MLPs.clear();
+    m_MLPs = m_cdctriggerneuroconfig->getMLPs();
+    if (m_MLPs.size() == 0) {
+      B2ERROR("Could not load Neurotrigger weights from database!");
+      return false;
+    }
+    B2DEBUG(2, "Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+    return true;
+  } else {
+    TFile datafile(filename.c_str(), "READ");
+    if (!datafile.IsOpen()) {
+      B2WARNING("Could not open file " << filename);
+      return false;
+    }
+
+    TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
+    if (!MLPs) {
+      datafile.Close();
+      B2WARNING("File " << filename << " does not contain key " << arrayname);
+      return false;
+    }
+    m_MLPs.clear();
+    for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
+      CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
+      if (expert) m_MLPs.push_back(*expert);
+      else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
+    }
+    MLPs->Clear();
+    delete MLPs;
     datafile.Close();
-    B2WARNING("File " << filename << " does not contain key " << arrayname);
-    return false;
-  }
-  m_MLPs.clear();
-  for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {
-    CDCTriggerMLP* expert = dynamic_cast<CDCTriggerMLP*>(MLPs->At(isector));
-    if (expert) m_MLPs.push_back(*expert);
-    else B2WARNING("Wrong type " << MLPs->At(isector)->ClassName() << ", ignoring this entry.");
-  }
-  MLPs->Clear();
-  delete MLPs;
-  datafile.Close();
-  B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
+    B2DEBUG(100, "loaded " << m_MLPs.size() << " networks");
 
-  // load some values from the geometry that will be needed for the input
-  setConstants();
+    // load some values from the geometry that will be needed for the input
+    setConstants();
 
-  return true;
+    return true;
+  }
 }

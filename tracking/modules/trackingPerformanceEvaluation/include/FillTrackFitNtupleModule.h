@@ -13,26 +13,16 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <TFile.h>
 #include <TNtuple.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 // forward declarations
 namespace Belle2 {
-  class TrackFitResult;
-
-  template< class T >
-  class StoreArray;
-
 
   /** This module takes the Tracks and the RecoTrack
    *  input and produce a root file containing an nutple

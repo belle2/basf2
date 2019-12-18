@@ -11,10 +11,8 @@
 #include <beast/ph1bpipe/simulation/SensitiveDetector.h>
 #include <beast/ph1bpipe/dataobjects/Ph1bpipeSimHit.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>

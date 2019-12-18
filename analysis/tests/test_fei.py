@@ -211,7 +211,7 @@ class TestFSPLoader(unittest.TestCase):
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
@@ -229,7 +229,7 @@ class TestFSPLoader(unittest.TestCase):
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
@@ -254,6 +254,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -275,6 +277,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -1207,7 +1211,7 @@ if __name__ == '__main__':
     basf2_mva.loadRootDictionary()
     tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
-    basf2.use_local_database(tempdir + '/localdb/dbcache.txt', tempdir + '/localdb/', False, basf2.LogLevel.WARNING)
+    basf2.conditions.testing_payloads = ['localdb/database.txt']
     # main() never returns, so install exit handler to do our cleanup
     atexit.register(shutil.rmtree, tempdir)
     unittest.main()

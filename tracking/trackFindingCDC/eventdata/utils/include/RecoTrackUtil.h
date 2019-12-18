@@ -3,7 +3,7 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Oliver Frost, Dmitrii Neverov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,6 @@
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
-  class CDCHit;
   class RecoTrack;
 
   namespace TrackFindingCDC {
@@ -21,6 +20,9 @@ namespace Belle2 {
 
     /// Structure to summarize utility function to output a list of hits into a RecoTrack.
     struct RecoTrackUtil {
+
+      /// For magnetic monopoles; estimates charge sign from all stereo hits, momentum direction from hits in closest superlayer, fixing magnitude with given value. Ignores building CDCTrajectory3D since it is based on a helix.
+      static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks, const double momentumSeedMagnitude);
 
       /// Copies the track information to the RecoTrack
       static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks);

@@ -10,12 +10,10 @@
  **************************************************************************/
 #pragma once
 
-#include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 namespace TreeFitter {
 
@@ -101,7 +99,7 @@ namespace TreeFitter {
     const bool m_isBeamSpot;
 
     /** the parameters are initialize elsewhere this is just a pointer to that */
-    Belle2::DBObjPtr<Belle2::BeamParameters> m_beamParams;
+    Belle2::DBObjPtr<Belle2::BeamSpot> m_beamSpot;
 
     /** inflated the covariance matrix in z by this number */
     const int m_inflationFactorCovZ;

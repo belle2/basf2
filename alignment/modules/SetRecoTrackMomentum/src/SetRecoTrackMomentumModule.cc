@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <alignment/modules/SetRecoTrackMomentum/SetRecoTrackMomentumModule.h>
+
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
@@ -45,12 +46,12 @@ void SetRecoTrackMomentumModule::initialize()
 void SetRecoTrackMomentumModule::event()
 {
   // In automatic mode, do nothing if B-field > 0 at origin
-  if (m_automatic && BFieldManager::getInstance().getField(TVector3(0., 0., 0.)).Mag() > 1.e-14) {
+  if (m_automatic && BFieldManager::getInstance().getField(B2Vector3D(0., 0., 0.)).Mag() > 1.e-14) {
     return;
   }
 
   for (auto& track : m_tracks) {
-    TVector3 mom = track.getMomentumSeed();
+    B2Vector3D mom = track.getMomentumSeed();
     mom = 1. / mom.Mag() * m_momentum * mom;
 
     track.setPositionAndMomentum(track.getPositionSeed(), mom);

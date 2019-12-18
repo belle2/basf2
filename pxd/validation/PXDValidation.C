@@ -261,15 +261,15 @@ void PXDValidation()
   TH1F **hValidDigitSignalToNoise;
   hValidDigitSignalToNoise = new TH1F*[nPixelTypes];
   for (int ipixtype=0; ipixtype<nPixelTypes; ipixtype++) {
-    TString title(Form("Validation: Reconstructed signal to noise in pixel, for pixel size in v: %i microns, layer %i, region %i",
+    TString title2(Form("Validation: Reconstructed signal to noise in pixel, for pixel size in v: %i microns, layer %i, region %i",
                        (int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2) + 1,ipixtype%2 + 1));
-    TString name(Form("hValidDigitSignalToNoise_Layer%i_Region%i_PixSize%i",(int)(ipixtype/2) + 1,ipixtype%2 + 1,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
-    hValidDigitSignalToNoise[ipixtype] = new TH1F(name, title, iplot4, lplot4, hplot4);
+    TString name2(Form("hValidDigitSignalToNoise_Layer%i_Region%i_PixSize%i",(int)(ipixtype/2) + 1,ipixtype%2 + 1,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
+    hValidDigitSignalToNoise[ipixtype] = new TH1F(name2, title2, iplot4, lplot4, hplot4);
     hValidDigitSignalToNoise[ipixtype]->GetXaxis()->SetTitle("S/N");
-    TString expr(Form("digit_charge*%f/%f>>%s", ADUToElectrons, DigitNoise,name.Data()));
+    TString expr2(Form("digit_charge*%f/%f>>%s", ADUToElectrons, DigitNoise,name2.Data()));
     TString cond(Form("pixel_type==%i",ipixtype));
-    treeDigit->Draw(expr,cond);
-    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
+    treeDigit->Draw(expr2,cond);
+    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title2.Data()));
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should have visible maxima in range 18 - 25."));
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidDigitSignalToNoise[ipixtype]->Write();
@@ -361,13 +361,13 @@ void PXDValidation()
 
     for (int iclsize=0; iclsize<nPixSizeGroups; iclsize++) {
       // u direction
-      TString title(Form("Validation: Error distribution in u, for cluster size in u: %s, pixel size in v: %i microns, layer %i, region %i",
+      TString title3(Form("Validation: Error distribution in u, for cluster size in u: %s, pixel size in v: %i microns, layer %i, region %i",
                          textclsize[iclsize].Data(),(int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2) + 1,ipixtype%2 + 1));
-      TString name(Form("hValidErrorDistrU_CS%s_Layer%i_Region%i_PixSize%i",
+      TString name3(Form("hValidErrorDistrU_CS%s_Layer%i_Region%i_PixSize%i",
                         textclsize[iclsize].Data(),(int)(ipixtype/2) + 1,ipixtype%2 + 1,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
-      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize] = new TH1F(name, title, iplot7, lplot7, hplot7);
+      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize] = new TH1F(name3, title3, iplot7, lplot7, hplot7);
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetXaxis()->SetTitle("u pull");
-      TString exprU1(Form("cluster_uPull>>%s",name.Data()));
+      TString exprU1(Form("cluster_uPull>>%s",name3.Data()));
       TString cond;
       if (iclsize < 3) {
         cond.Append(Form("pixel_type==%i&&cluster_uSize==%i",ipixtype,iclsize+1));
@@ -377,7 +377,7 @@ void PXDValidation()
       }
       cValidErrorDistrU->cd(ipixtype*nPixSizeGroups+iclsize+1);
       tree->Draw(exprU1,cond);
-      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
+      hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Description", title3.Data()));
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check RMS, should be less 2.0."));
       hValidErrorDistrU[ipixtype*nPixSizeGroups+iclsize]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
       if (iclsize < 2) {
@@ -434,17 +434,17 @@ void PXDValidation()
   hValidEtaDistV = new TH1F*[nPixelTypes];
   for (int ipixtype=0; ipixtype<nPixelTypes; ipixtype++) {
     // u direction
-    TString title(Form("Validation: Reconstructed in-pixel eta distribution in u, for pixel size in v: %i microns, layer %i, region %i",
+    TString title4(Form("Validation: Reconstructed in-pixel eta distribution in u, for pixel size in v: %i microns, layer %i, region %i",
                        (int)(PixSizeV[ipixtype]*cmToMicron+0.1),(int)(ipixtype/2) + 1,ipixtype%2 + 1));
-    TString name(Form("hValidEtaDistU_Layer%i_Region%i_PixSize%i",(int)(ipixtype/2) + 1,ipixtype%2 + 1,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
-    hValidEtaDistU[ipixtype] = new TH1F(name, title, iplot8, lplot8, hplot8);
+    TString name4(Form("hValidEtaDistU_Layer%i_Region%i_PixSize%i",(int)(ipixtype/2) + 1,ipixtype%2 + 1,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
+    hValidEtaDistU[ipixtype] = new TH1F(name4, title4, iplot8, lplot8, hplot8);
     hValidEtaDistU[ipixtype]->GetXaxis()->SetTitle("Reconstructed u in-pixel position");
-    TString exprU1(Form("cluster_uEtaPosition>>%s",name.Data()));
+    TString exprU1(Form("cluster_uEtaPosition>>%s",name4.Data()));
     TString cond(Form("pixel_type==%i",ipixtype));
     cValidEtaDist->cd(ipixtype*2+0+1);
     tree->Draw(exprU1,cond);
     hValidEtaDistU[ipixtype]->SetLineColor(kRed);
-    hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
+    hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title4.Data()));
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should be peak in middle and rest of bins flat."));
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidEtaDistU[ipixtype]->GetListOfFunctions()->Add(new TNamed('MetaOptions', "nostats"));

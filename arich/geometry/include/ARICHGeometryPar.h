@@ -19,9 +19,6 @@
 #include "TVector3.h"
 #include "TVector2.h"
 #include <G4ThreeVector.hh>
-#include <G4MaterialPropertyVector.hh>
-#include <cmath>
-#include <boost/format.hpp>
 
 #define MAX_N_ALAYERS 5
 #define MAXPTS_QE 100

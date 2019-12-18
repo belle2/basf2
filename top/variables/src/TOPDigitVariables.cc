@@ -24,6 +24,10 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+
+#include <top/dataobjects/TOPBarHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <algorithm> // for sort
 using namespace std;
@@ -62,6 +66,25 @@ namespace Belle2 {
         if (not extHit) return TVector3(0, 0, 0);
         int slotID = extHit->getCopyID();
         const auto& position = extHit->getPosition(); // TVector3
+        const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+        if (not geo or not geo->isModuleIDValid(slotID)) return TVector3(0, 0, 0);
+        const auto& module = geo->getModule(slotID);
+        return module.pointToLocal(position); // TVector3
+      }
+
+      // returns the local coordinate of the MC particle's entry point to the TOP
+      TVector3 getLocalPositionMCMatch(const Particle* particle)
+      {
+        const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+        if (mcparticle == nullptr) {
+          return TVector3(0, 0, 0);
+        }
+        const auto* barHit = mcparticle->getRelated<TOPBarHit>();
+        if (!barHit) {
+          return TVector3(0, 0, 0);
+        }
+        int slotID = barHit->getModuleID();
+        const auto& position = barHit->getPosition(); // TVector3
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if (not geo or not geo->isModuleIDValid(slotID)) return TVector3(0, 0, 0);
         const auto& module = geo->getModule(slotID);
@@ -109,6 +132,30 @@ namespace Belle2 {
         }
         int pdg = static_cast<int>(vars[0]);
         return computeTOF(particle, pdg);
+      }
+
+      // returns the average time of the first 5 (good) digits
+      double getAverageTimeOfFirst5(const Particle* particle)
+      {
+        int slotID = static_cast<int>(getSlotID(particle));
+        StoreArray<TOPDigit> digits;
+        vector<double> digitTimes;
+        for (const auto& digit : digits) {
+          if (digit.getModuleID() != slotID) continue;
+          // skip bad digits only when we want to clean
+          if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+          digitTimes.push_back(digit.getTime());
+        }
+        if (digitTimes.empty()) return 0;
+        sort(digitTimes.begin(), digitTimes.end());
+        double T0 = 0;
+        size_t count = 0;
+        for (auto t : digitTimes) {
+          T0 += t;
+          count += 1;
+          if (count == 5) break;
+        }
+        return T0 / count;
       }
 
       // counts the number of photons in the TOP in a given time frame
@@ -164,7 +211,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (t.getModuleID() != thisModuleID) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -184,7 +231,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
@@ -204,7 +251,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) == abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -223,7 +270,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         int count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue; // catch the case where one of the module IDs is negative
           count += 1;
         }
@@ -243,7 +290,7 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         double maxGap = 0; // the largest time difference between two consecutive hits
         vector<double> digitTimes; // all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -275,7 +322,7 @@ namespace Belle2 {
         if (thisModuleID == 0) return 0;
         StoreArray<TOPDigit> topDigits;
         vector<double> digitTimes; // the times for all digits in the module that the track entered
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           digitTimes.push_back(t.getTime());
@@ -297,6 +344,47 @@ namespace Belle2 {
         return digitTimes.size() - maxGapIndex;
       }
 
+      //! @z coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPz(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.z();
+      }
+
+      //! @theta coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPtheta(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Theta();
+      }
+
+      //! @phi coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPphi(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Phi();
+      }
 
       //! @returns the number of reflected digits in the same module as the particle
       double topReflectedDigitCount(const Particle* particle)
@@ -328,6 +416,24 @@ namespace Belle2 {
       double getTOPLocalZ(const Particle* particle)
       {
         return TOPVariable::getLocalPosition(particle).Z();
+      }
+
+      //! @returns the X coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalXMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).X();
+      }
+
+      //! @returns the Y coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalYMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).Y();
+      }
+
+      //! @returns the Z coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalZMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).Z();
       }
 
       //! @returns the local phi component of the particle's momentum in the TOP
@@ -477,12 +583,13 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           count += 1;
         }
         return count;
       }
+
       //! returns the number of good photons in a given slot
       double TOPGoodPhotonsInSlot([[maybe_unused]] const Particle* particle, const vector<double>& vars)
       {
@@ -490,16 +597,45 @@ namespace Belle2 {
         StoreArray<TOPDigit> topDigits;
         int thisModuleID = static_cast<int>(vars[0]);
         size_t count = 0;
-        for (auto t : topDigits) {
+        for (const auto& t : topDigits) {
           if (abs(t.getModuleID()) != abs(thisModuleID)) continue;
           if (t.getHitQuality() != TOPDigit::c_Good) continue;
           count += 1;
         }
         return count;
       }
+
+      //! returns the number of tracks in the same slot as the particle
+      double TOPTracksInSlot([[maybe_unused]] const Particle* particle)
+      {
+        const auto* trk = particle->getTrack();
+        if (not trk) {
+          return -1.0;
+        }
+        int thisModuleID = static_cast<int>(getSlotID(particle));
+        if (thisModuleID == 0) return 0;
+        StoreArray<Track> tracks;
+        int nTracks = 0;
+        for (const auto& t : tracks) {
+          const auto* tl = t.getRelated<TOPLikelihood>();
+          if (not tl) continue;
+          const auto* te = tl->getRelated<ExtHit>();
+          if (not te) continue;
+          if (te->getCopyID() != thisModuleID) continue;
+          nTracks += 1;
+        }
+        return nTracks;
+      }
+
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactZ", TOPVariable::extrapTrackToTOPz,
+                      "[calibration] z coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactTheta", TOPVariable::extrapTrackToTOPtheta,
+                      "[calibration] theta coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactPhi", TOPVariable::extrapTrackToTOPphi,
+                      "[calibration] phi coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
     REGISTER_VARIABLE("topBackgroundDigitCount", TOPVariable::topBackgroundDigitCount,
@@ -511,7 +647,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("topReflectedDigitCount", TOPVariable::topReflectedDigitCount,
                       "[calibration] The number of reflected photons in the same module");
     REGISTER_VARIABLE("topReflectedDigitCountExpert(minGap, maxGap)", TOPVariable::topReflectedDigitCountExpert,
-                      "[calibration] The number of photons after the largest gap between minGap and maxGap")
+                      "[calibration] The number of photons after the largest gap between minGap and maxGap");
     REGISTER_VARIABLE("topDigitGapSize", TOPVariable::topDigitGapSize,
                       "[calibration] The largest time difference between two consecutive hits in the same module");
     REGISTER_VARIABLE("topLocalX", TOPVariable::getTOPLocalX,
@@ -520,6 +656,12 @@ namespace Belle2 {
                       "[calibration] The local y coordinate of the particle's entry point to the TOP module");
     REGISTER_VARIABLE("topLocalZ", TOPVariable::getTOPLocalZ,
                       "[calibration] The local z coordinate of the particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalXMCMatch", TOPVariable::getTOPLocalXMCMatch,
+                      "[calibration] The local x coordinate of the MC particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalYMCMatch", TOPVariable::getTOPLocalYMCMatch,
+                      "[calibration] The local y coordinate of the MC particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalZMCMatch", TOPVariable::getTOPLocalZMCMatch,
+                      "[calibration] The local z coordinate of the MC particle's entry point to the TOP module");
     REGISTER_VARIABLE("topLocalPhi", TOPVariable::getTOPLocalPhi,
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,
@@ -528,6 +670,8 @@ namespace Belle2 {
                       "[calibration] The time of flight from the origin to the TOP");
     REGISTER_VARIABLE("topTOFExpert(pdg)", TOPVariable::getTOFExpert,
                       "[calibration] The time of flight from the origin to the TOP under the given hypothesis");
+    REGISTER_VARIABLE("topAverageTimeOfFirst5", TOPVariable::getAverageTimeOfFirst5,
+                      "[calibration] The average time of the first (up to) 5 hits in the module with the track");
     REGISTER_VARIABLE("topSlotID", TOPVariable::getSlotID,
                       "[calibration] The ID of the TOP slot that was hit by the particle");
     REGISTER_VARIABLE("topExpectedPhotonCount(pdg)", TOPVariable::getExpectedTOPPhotonCount,
@@ -566,5 +710,7 @@ namespace Belle2 {
                       "[calibration] The number of all photons in the given slot");
     REGISTER_VARIABLE("topGoodPhotonsInSlot(id)", TOPVariable::TOPGoodPhotonsInSlot,
                       "[calibration] The number of good photons in the given slot");
+    REGISTER_VARIABLE("topTracksInSlot", TOPVariable::TOPTracksInSlot,
+                      "[calibration] The number of tracks in the same slot as the particle");
   } // Variable
 } // Belle2

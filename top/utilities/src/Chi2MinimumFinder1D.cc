@@ -34,6 +34,18 @@ namespace Belle2 {
       m_chi2.resize(m_x.size(), 0);
     }
 
+    Chi2MinimumFinder1D::Chi2MinimumFinder1D(const std::shared_ptr<TH1D> h)
+    {
+      m_xmin = h->GetXaxis()->GetXmin();
+      m_xmax = h->GetXaxis()->GetXmax();
+      m_dx = h->GetBinWidth(1);
+      for (int i = 0; i < h->GetNbinsX(); i++) {
+        m_x.push_back(h->GetBinCenter(i + 1));
+        m_chi2.push_back(h->GetBinContent(i + 1));
+      }
+      m_entries = h->GetEntries() / h->GetNbinsX();
+    }
+
     void Chi2MinimumFinder1D::clear()
     {
       for (auto& chi2 : m_chi2) chi2 = 0;

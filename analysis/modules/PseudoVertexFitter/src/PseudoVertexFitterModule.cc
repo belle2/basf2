@@ -10,7 +10,8 @@
 
 #include <analysis/modules/PseudoVertexFitter/PseudoVertexFitterModule.h>
 #include <analysis/dataobjects/Particle.h>
-#include <TMath.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <framework/database/DBObjPtr.h>
 
 using namespace std;
 

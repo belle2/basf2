@@ -16,7 +16,6 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
-#include <genfit/KalmanFitter.h>
 
 namespace Belle2 {
 

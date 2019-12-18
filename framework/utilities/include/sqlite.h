@@ -37,7 +37,7 @@ namespace sqlite {
   class SQLiteError: public std::runtime_error {
   public:
     /** Construct an instance from a prefix string and an sqlite error code */
-    SQLiteError(int code, const std::string& prefix = ""): std::runtime_error(prefix + sqlite3_errstr(code)), m_code(code) {}
+    explicit SQLiteError(int code, const std::string& prefix = ""): std::runtime_error(prefix + sqlite3_errstr(code)), m_code(code) {}
     /** Return the sqlite error code */
     int code() const { return m_code; }
   private:
@@ -64,7 +64,7 @@ namespace sqlite {
     class ColumnFiller {
     public:
       /** Create a new instance for the given statement */
-      ColumnFiller(sqlite3_stmt* statement): m_stmt(statement) {}
+      explicit ColumnFiller(sqlite3_stmt* statement): m_stmt(statement) {}
       /** Fill integer column */
       void operator()(int index, int& col) { col = sqlite3_column_int(m_stmt, index); }
       /** Fill 64bit integer column */
@@ -79,7 +79,7 @@ namespace sqlite {
           col = ptr;
         }
       }
-      /* Fill blob column */
+      /** Fill blob column */
       void operator()(int index, std::vector<std::byte>& col)
       {
         // ptr is owned by sqlite, no need to free but we need to copy
@@ -111,7 +111,7 @@ namespace sqlite {
     class ParameterBinder {
     public:
       /** Create a new object for the given statement*/
-      ParameterBinder(sqlite3_stmt* statement): m_stmt(statement) {}
+      explicit ParameterBinder(sqlite3_stmt* statement): m_stmt(statement) {}
 
       /** Bind the parameter with the given index to the statement */
       template<class T>

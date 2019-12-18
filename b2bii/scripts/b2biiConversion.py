@@ -41,6 +41,9 @@ def setupB2BIIDatabase(isMC=False):
 
     This automatically chooses the correct global tag and sets up a database suitable for B2BII conversion.
 
+    Warning:
+        This function is not up to date and should not be called
+
     Args:
         isMC (bool): should be True for MC data and False for real data
     """
@@ -66,7 +69,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
                                   convertECLCrystalEnergies=False,
-                                  convertExtHits=False):
+                                  convertExtHits=False,
+                                  matchType2E9oE25Threshold=-1.1):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -115,6 +119,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
     convert.param("convertExtHits", convertExtHits)
+    convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

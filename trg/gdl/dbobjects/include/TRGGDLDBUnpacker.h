@@ -196,10 +196,10 @@ namespace Belle2 {
     int m_nClks;
 
     /** num of Bit **/
-    int m_nBits;
+    int m_nBits = 0;
 
     /** conf **/
-    int m_conf;
+    int m_conf = 0;
 
     /** leaf names **/
     char m_LeafNames[320][100];

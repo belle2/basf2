@@ -8,13 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <arich/dbobjects/ARICHModulesInfo.h>
 #include <geometry/Materials.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 

@@ -88,10 +88,10 @@ with TemporaryDirectory() as tmp:
     assert math.isclose(t1.pycms, -t2.pycms, rel_tol=eps), 'Momenta don\'t balance'
     assert math.isclose(t1.pzcms, -t2.pzcms, rel_tol=eps), 'Momenta don\'t balance'
 
-    assert math.isclose(t1.pxcms, -1.4572035746e-03, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pycms, +2.5198484375e-03, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pzcms, -3.8826254795e+00, rel_tol=eps), 'CMS momenta are not as expected'
-    assert math.isclose(t1.pecms, 6.6973734293e+00, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pxcms, -0.023859674786793544, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pycms, 0.0025198485236614943, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pzcms, -3.882552444880825, rel_tol=eps), 'CMS momenta are not as expected'
+    assert math.isclose(t1.pecms, 6.697373505125157, rel_tol=eps), 'CMS momenta are not as expected'
 
     assert t1.px == 0.24189484119415283, 'Boosted momenta are not as expected'
     assert t1.py == 0.0025198485236614943, 'Boosted momenta are not as expected'

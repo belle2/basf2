@@ -30,7 +30,7 @@ namespace Belle2 {
     virtual void finish() override;
   private:
 
-    StoreObjPtr<EventMetaData> m_emd;
+    StoreObjPtr<EventMetaData> m_emdata;
 
     /** Current event id */
     int m_evt = -1;
@@ -56,6 +56,6 @@ namespace Belle2 {
     int m_spread;
     /// Runs during the defineHisto() function
     virtual void inDefineHisto() override;
-    void describeProcess(std::string functionName);
+    void describeProcess(const std::string& functionName);
   };
 }

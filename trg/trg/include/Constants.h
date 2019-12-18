@@ -18,6 +18,7 @@
 
 namespace Belle2 {
 
+  /// Origin 3D point
   extern const HepGeom::Point3D<double> ORIGIN;
 
 }

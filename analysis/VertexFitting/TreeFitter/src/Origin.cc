@@ -55,10 +55,10 @@ namespace TreeFitter {
   ErrCode Origin::initOrigin()
   {
     ErrCode status;
-    if (m_beamParams && m_isBeamSpot && m_constraintDimension == 3) {
+    if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 3) {
       m_covariance = Eigen::Matrix<double, 3, 3>::Zero(3, 3);
-      const TVector3& vertexVector = m_beamParams->getVertex();
-      const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
+      const TVector3& vertexVector = m_beamSpot->getIPPosition();
+      const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
       m_posVec(0) = vertexVector.x();
       m_posVec(1) = vertexVector.y();
       m_posVec(2) = vertexVector.z();
@@ -69,10 +69,10 @@ namespace TreeFitter {
       m_covariance(2, 0) = covVertex(2 , 0);
       m_covariance(2, 1) = covVertex(2 , 1);
 
-    } else if (m_beamParams && m_isBeamSpot && m_constraintDimension == 2) {
+    } else if (m_beamSpot && m_isBeamSpot && m_constraintDimension == 2) {
       m_covariance = Eigen::Matrix<double, 2, 2>::Zero(2, 2);
-      const TVector3& vertexVector = m_beamParams->getVertex();
-      const TMatrixDSym& covVertex = m_beamParams->getCovVertex();
+      const TVector3& vertexVector = m_beamSpot->getIPPosition();
+      const TMatrixDSym& covVertex = m_beamSpot->getCovVertex();
       m_posVec(0) = vertexVector.x();
       m_posVec(1) = vertexVector.y();
       m_covariance(0, 0) = covVertex(0 , 0);

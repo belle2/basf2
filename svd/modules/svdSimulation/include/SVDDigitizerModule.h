@@ -115,6 +115,8 @@ namespace Belle2 {
       std::string m_relShaperDigitMCParticleName;
       /** Name of the relation between SVDShaperDigits and SVDTrueHits */
       std::string m_relShaperDigitTrueHitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       // 2. Physics
       /** Max. Segment length to use for charge drifting */

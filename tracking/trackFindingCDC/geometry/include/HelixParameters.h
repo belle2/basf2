@@ -14,8 +14,6 @@
 
 #include <tracking/trackFindingCDC/geometry/UncertainParameters.h>
 
-#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
-
 namespace Belle2 {
 
   namespace TrackFindingCDC {

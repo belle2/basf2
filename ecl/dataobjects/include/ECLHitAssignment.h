@@ -11,10 +11,7 @@
 #ifndef ECLHITASSIGNMENT_H
 #define ECLHITASSIGNMENT_H
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <TVector3.h>
 
 namespace Belle2 {
 

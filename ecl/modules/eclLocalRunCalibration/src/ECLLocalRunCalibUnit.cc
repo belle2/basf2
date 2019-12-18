@@ -12,13 +12,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <iostream>
-// FRAMEWORK
-#include <framework/database/DBObjPtr.h>
+
 // ECL
 #include <ecl/modules/eclLocalRunCalibration/ECLLocalRunCalibUnit.h>
 #include <ecl/dbobjects/ECLCrystalLocalRunCalib.h>
 #include <ecl/dbobjects/ECLLocalRunCalibRef.h>
+
 using namespace Belle2;
 // Constructor.
 ECLLocalRunCalibUnit::ECLLocalRunCalibUnit(

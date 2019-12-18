@@ -11,7 +11,6 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
-#include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
 #include <TH2F.h>
@@ -104,6 +103,11 @@ namespace Belle2 {
      * Import mirror alignment parameters from ARICH-MirrorAlignment.xml
      */
     void importMirrorAlignment();
+
+    /**
+     * Import aerogel tiles alignment parameters from ARICH-AeroTilesAlignment.xml
+     */
+    void importAeroTilesAlignment();
 
     /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
@@ -241,6 +245,11 @@ namespace Belle2 {
      * Prints mirror alignment constants
      */
     void printMirrorAlignment();
+
+    /**
+     * Prints aerogel tiles alignment constants
+     */
+    void printAeroTilesAlignment();
 
     // DAQ classes
 

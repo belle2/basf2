@@ -322,8 +322,16 @@ function getDefaultRevisions(mode="rbn") {
     // Don't use [referenceRevision, otherList[0]] or similar, because this
     // gives problems if otherList is of length 0!
 
-    if (mode === "all"){
+    // First, we cache the case of running locally: There all of the above
+    // revision lists are empty and our only guess is to return allRevisions, which
+    // in particular will include 'reference' and 'current' etc.
+    if (!nightlyRevisions.length && !buildRevisions.length && !releaseRevisions.length){
         return allRevisions;
+    }
+
+    if (mode === "all"){
+        // todo: remove this limitation if we find way too avoid too lengthy file names
+        return allRevisions.slice(0, 10);
     }
     else if (mode === "r"){
         return [referenceRevision].concat(releaseRevisions.slice(0, 1));
@@ -480,6 +488,13 @@ function updateComparisonData(_comparisonData) {
     }
 }
 
+function packagePaneExpertToggle() {
+    template2ractive["package"].set(
+        "show_expert_plots",
+        $("#check_show_expert_plots")[0].checked
+    )
+}
+
 /**
  * Gets information about the comparisons and plots (generated when
  * we generate the plots), merges it with the information about the revisions
@@ -520,9 +535,12 @@ function setupRactiveFromRevision(revList) {
                         $("content").text("No package could be loaded");
                     }
                 }
+
                 ractive.on({
                     // todo: why does pycharm complain about this being unused? It's used in package.html
                     load_validation_plots: function (evt) {
+                        packagePaneExpertToggle();
+
                         // This gets called if the user clicks on a package in the
                         // package-selection side menu.
 
@@ -870,7 +888,8 @@ function getObjectWithKey(objects, key, value) {
  * this function until it looks like no new elements appear.
  * Note: We wait until we have latex support (via the latexRenderingLoaded
  * global variable) and (via latexRenderingInProgress) also make sure that
- * only one kind of this function is active (including its recursive calls)
+ * only one kind of this function is active (including its recursive calls).
+ * It will not re-render anything that is already typeset.
  * That means that calling this function is super cheap, so please call it
  * whenever your actions might make any DOM that contains LaTeX appear on the
  * page!
@@ -910,7 +929,7 @@ function renderLatex(force=false, irepeat=0) {
         ["Typeset", MathJax.Hub],
         function () {
             let neqn = MathJax.Hub.getAllJax().length;
-            let msg = `LaTeX re-rendering: neqn=${neqn}, irepeat=${irepeat}. `;
+            let msg = `LaTeX reloading: neqn=${neqn}, irepeat=${irepeat}. `;
             if (latexEqnCount !== neqn) {
                 // New LaTeX appeared, restart counting.
                 irepeat = 0;

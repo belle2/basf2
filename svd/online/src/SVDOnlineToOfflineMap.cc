@@ -12,6 +12,8 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <svd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
 using namespace std;
@@ -34,7 +36,7 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
             "resolved to: " << xmlFullPath << endl <<
             "by FileSystem::findFile does not exist." << endl <<
             "SVD online to offline map cannot be initialized." << endl <<
-            "Be aware: no SVDDigit will be produced by this module." << endl
+            "Be aware: no SVDShaperDigit will be produced by this module." << endl
            );
     return;
   }
@@ -44,12 +46,12 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
   } catch (std::exception const& ex) {
     B2ERROR("STD excpetion rised during xml parsing " << ex.what() << endl <<
             "SVD online to offline map cannot be initialized." << endl <<
-            "Be aware: no SVDDigits will be produced by this module." << endl);
+            "Be aware: no SVDShaperDigits will be produced by this module." << endl);
     return;
   } catch (...) {
     B2ERROR("Unknown excpetion rised during xml parsing "
             "SVD online to offline map cannot be initialized." << endl <<
-            "Be aware: no SVDDigits will be produced by this module." << endl);
+            "Be aware: no SVDShaperDigits will be produced by this module." << endl);
     return;
   }
 
@@ -67,9 +69,9 @@ SVDOnlineToOfflineMap::SVDOnlineToOfflineMap(const string& xmlFilename): m_MapUn
   } catch (...) {
     B2ERROR("Unknown excpetion rised during map initialization! "
             "SVD online to offline map corrupted." << endl <<
-            "Be aware: the SVDDigits will be unreliable." << endl);
+            "Be aware: the SVDShaperDigits will be unreliable." << endl);
     // To Do: rise an exception so that the calling module will skip the
-    // SVDDigits filling
+    // SVDShaperDigits filling
     return;
   }
 }
@@ -163,26 +165,6 @@ bool SVDOnlineToOfflineMap::isAPVinMap(VxdID sensorID, bool side, unsigned short
   return isAPVinMap(sensorID.getLayerNumber(), sensorID.getLadderNumber(), sensorID.getSensorNumber(), side, strip);
 }
 
-
-
-SVDDigit* SVDOnlineToOfflineMap::NewDigit(unsigned char FADC,
-                                          unsigned char APV25, unsigned char channel, float charge = 0.0,
-                                          float time = 0.0)
-{
-  // Issue a warning, we'll be sending out a null pointer.
-  if (channel > 127) {
-    B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
-    return NULL;
-  }
-  const SensorInfo& info = getSensorInfo(FADC, APV25);
-  short strip = getStripNumber(channel, info);
-
-  if (info.m_sensorID) {
-    return new SVDDigit(info.m_sensorID, info.m_uSide, strip, 0., charge, time);
-  } else {
-    return NULL;
-  }
-}
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
                                                       unsigned char APV25, unsigned char channel, short samples[6], float time, SVDModeByte mode)
@@ -326,3 +308,37 @@ void SVDOnlineToOfflineMap::prepFADCmaps(FADCmap& map1, FADCmap& map2)
   }
 }
 
+void SVDOnlineToOfflineMap::prepareListOfMissingAPVs()
+{
+
+
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+
+  for (auto layer : geoCache.getLayers(VXD::SensorInfoBase::SVD))
+    for (auto ladder : geoCache.getLadders(layer))
+      for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
+        for (int view = 0; view < 2; view++) {
+
+          int nAPVs = 6;
+          if (layer.getLayerNumber() != 3 && view == 0)
+            nAPVs = 4;
+
+          //loop on all APVs of the side
+          for (int apv = 0; apv < nAPVs; apv++) {
+            B2DEBUG(29, "checking " << sensor.getLayerNumber() << "." << sensor.getLadderNumber() << "." << sensor.getSensorNumber() <<
+                    ", view = " << view << ", apv = " << apv);
+            if (! isAPVinMap(sensor, view, apv * 128 + 63.5)) {
+              missingAPV tmp_missingAPV;
+              tmp_missingAPV.m_sensorID = sensor;
+              tmp_missingAPV.m_isUSide = view;
+              tmp_missingAPV.m_halfStrip = apv * 128 + 63.5;
+
+              m_missingAPVs.push_back(tmp_missingAPV);
+              B2DEBUG(29, "FOUND MISSING APV: " << sensor << ", " << view << ", " << apv);
+            }
+
+          }
+
+        }
+
+}

@@ -113,7 +113,7 @@ namespace Belle2 {
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      void readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar);
+      void readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar);
 
     private:
 

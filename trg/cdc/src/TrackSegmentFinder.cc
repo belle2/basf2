@@ -45,11 +45,13 @@ namespace Belle2 {
   TRGCDCTrackSegmentFinder::TRGCDCTrackSegmentFinder(const TRGCDC& TRGCDC,
                                                      bool makeRootFile,
                                                      bool logicLUTFlag)
-    : TRGBoard("", TRGClock("", 0, 0), TRGClock("", 0, 0), TRGClock("", 0, 0),
-               TRGClock("", 0, 0)),
-      _cdc(TRGCDC),
-      m_logicLUTFlag(logicLUTFlag),
-      m_makeRootFile(makeRootFile)
+    :
+    TRGBoard("", TRGClock("", 0, 0), TRGClock("", 0, 0), TRGClock("", 0, 0),
+            TRGClock("", 0, 0)),
+    _cdc(TRGCDC),
+    m_logicLUTFlag(logicLUTFlag),
+    m_makeRootFile(makeRootFile),
+    _type(), _tosbE(), _tosbT() // 2019/07/31 by ytlai
   {
 
     m_Trg_PI = 3.141592653589793;
@@ -90,6 +92,10 @@ namespace Belle2 {
                                                      std::vector<TCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
+      m_Trg_PI(), // 2019/07/31 by ytlai
+      m_logicLUTFlag(),
+      m_rootTSFFilename(),
+      m_fileTSF(),
       _type(type),
       //     _tisb(0),
       _tosbE(0),
@@ -2823,10 +2829,11 @@ namespace Belle2 {
     vector<int> changeTime = Hitmap->stateChanges();
 
     int* LUTValue = new int[changeTime.size()];
-    int oldLUT = 0;
+    //int oldLUT = 0;
     int lastFastHit = in->clock().min();
     if (changeTime.size()) {
 
+      int oldLUT = 0; // 2019/07/31 by ytlai, moved to here to reduce scope
       const string fn = "TSF::simulateTSF:tsid=" + to_string(tsid);
       TRGDebug::enterStage(fn);
 

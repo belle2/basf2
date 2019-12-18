@@ -3,7 +3,8 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe                   *
+ * Contributors: Thomas Keck, Anze Zupanc, Sam Cunliffe,                  *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -28,10 +29,17 @@ namespace Belle2 {
 
     /**
      * Returns function which returns the value of the given variable for the given particle if its abs(pdgCode) agrees with the given one
-     * First argument in the argument vector must be the name of variable.
-     * Second argument in the argument vector must be an integers corresponding to a PDG code.
+     * First argument in the argument vector must be an integer corresponding to a PDG code.
+     * Second argument in the argument vector must be the name of a variable.
      */
     Manager::FunctionPtr varFor(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the value of the given variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.
+     * If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.
+     * Only one argument is allowed in the argument vector and it must be the name of a variable.
+     */
+    Manager::FunctionPtr varForMCGen(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the number of particles in the given particle List.
@@ -42,6 +50,12 @@ namespace Belle2 {
      * Returns 1 if the particle is contained in the particle list
      */
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns 1 if the same mdst source object was used to create a particle in
+     * the list (0 if not and -1 for non-mdst source based particles
+     */
+    Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
@@ -185,7 +199,7 @@ namespace Belle2 {
      * If two indices given: returns the angle between the momenta of the two given daughters.
      * If three indices given: Variable returns the angle between the momentum of the third particle and a vector
      * which is the sum of the first two daughter momenta.
-     * The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.
+     * The arguments in the argument vector must be generalized daughter indices.
      */
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
 
@@ -228,6 +242,14 @@ namespace Belle2 {
      * First argument in the argument vector must be the name of variable
      */
     Manager::FunctionPtr isInfinity(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns a function which returns the value of one of two variables of a particle,
+     * depending on whether the particle passes the supplied cut. The first argument in the argument
+     * vector must be a cut string, and the second and third arguments must be the name of the
+     * variable to return if the particle does or does not pass the cut, respectively.
+     */
+    Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the combined p-value of the given p-values
@@ -381,5 +403,27 @@ namespace Belle2 {
     * Returns function which returns the median value of the given variable of the particles in the given particle list.
     */
     Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as
+    * generalized indices. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
+    * fifth daugther of a particle.
+    */
+    Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.
+     * The variable should only be applied to an Upsilon(4S) list. E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)``
+     * applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B
+     * meson in the signal B meson rest frame."
+     */
+    Manager::FunctionPtr useTagSideRecoilRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
+    */
+    Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
+
+
   }
 }

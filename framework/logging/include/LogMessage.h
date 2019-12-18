@@ -123,6 +123,8 @@ namespace Belle2 {
      */
     std::string toJSON(bool complete) const;
 
+    /** Return a reference to the log variables associated with this message */
+    const std::vector<LogVar>& getLogVariables() const { return m_message.getVariables(); }
   private:
 
     LogConfig::ELogLevel m_logLevel; /**< The log level of the message. */

@@ -72,10 +72,8 @@ void TrackDQMModule::initialize()
     return;
   }
 
-  if (!m_eventLevelTrackingInfo.isOptional()) {
-    B2WARNING("Missing EventLevelTrackingInfo, Track-DQM is skipped.");
-    return;
-  }
+  // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there
+  m_eventLevelTrackingInfo.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -84,6 +82,7 @@ void TrackDQMModule::initialize()
 
 void TrackDQMModule::defineHisto()
 {
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD.");
@@ -328,6 +327,8 @@ void TrackDQMModule::defineHisto()
     m_TRClusterHitmap[index]->GetYaxis()->SetTitle("Theta angle [deg]");
     m_TRClusterHitmap[index]->GetZaxis()->SetTitle("counts");
   }
+
+
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
@@ -449,26 +450,29 @@ void TrackDQMModule::beginRun()
 
   for (VxdID layer : geo.getLayers()) {
     int i = gTools->getLayerIndex(layer.getLayerNumber());
-    if (m_TRClusterHitmap[i] != nullptr) m_TRClusterHitmap[i]->Reset();
+    if (m_TRClusterHitmap && m_TRClusterHitmap[i] != nullptr) m_TRClusterHitmap[i]->Reset();
   }
 
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
     i = gTools->getLayerIndex(i);
-    if (m_TRClusterCorrelationsPhi[i] != nullptr) m_TRClusterCorrelationsPhi[i]->Reset();
-    if (m_TRClusterCorrelationsTheta[i] != nullptr) m_TRClusterCorrelationsTheta[i]->Reset();
+    if (m_TRClusterCorrelationsPhi && m_TRClusterCorrelationsPhi[i] != nullptr) m_TRClusterCorrelationsPhi[i]->Reset();
+    if (m_TRClusterCorrelationsTheta && m_TRClusterCorrelationsTheta[i] != nullptr) m_TRClusterCorrelationsTheta[i]->Reset();
   }
+
   for (int i = 0; i < gTools->getNumberOfSensors(); i++) {
-    if (m_UBResidualsSensor[i] != nullptr) m_UBResidualsSensor[i]->Reset();
-    if (m_UBResidualsSensorU[i] != nullptr) m_UBResidualsSensorU[i]->Reset();
-    if (m_UBResidualsSensorV[i] != nullptr) m_UBResidualsSensorV[i]->Reset();
+    if (m_UBResidualsSensor && m_UBResidualsSensor[i] != nullptr) m_UBResidualsSensor[i]->Reset();
+    if (m_UBResidualsSensorU && m_UBResidualsSensorU[i] != nullptr) m_UBResidualsSensorU[i]->Reset();
+    if (m_UBResidualsSensorV && m_UBResidualsSensorV[i] != nullptr) m_UBResidualsSensorV[i]->Reset();
   }
+
 }
 
 
 void TrackDQMModule::event()
 {
+
   StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
   if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
   StoreArray<Track> tracks(m_TracksStoreArrayName);
@@ -679,5 +683,8 @@ void TrackDQMModule::event()
   }
 
 
-  m_trackingErrorFlags->Fill((double)m_eventLevelTrackingInfo->hasAnErrorFlag());
+  // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there. If the Object is not there
+  //  the option "no error"  seen is filled to not scare any shifters.
+  if (m_eventLevelTrackingInfo.isValid()) m_trackingErrorFlags->Fill((double)m_eventLevelTrackingInfo->hasAnErrorFlag());
+  else m_trackingErrorFlags->Fill(0.0);
 }

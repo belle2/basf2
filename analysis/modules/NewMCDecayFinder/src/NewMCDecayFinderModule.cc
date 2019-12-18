@@ -205,7 +205,7 @@ namespace Belle2 {
     while (m_generator->loadNext()) {
       Particle&& particle = m_generator->getCurrentParticle();
 
-      Particle* newParticle = particles.appendNew(particle);
+      particles.appendNew(particle);
       int iparticle = particles.getEntries() - 1;
 
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());

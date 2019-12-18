@@ -13,8 +13,6 @@
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 
-#include <genfit/KalmanFitterInfo.h>
-
 #include <map>
 
 using namespace Belle2;

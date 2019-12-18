@@ -15,6 +15,7 @@ Example steering file - 2019 Belle II Collaboration.
 __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 
+
 import argparse
 
 
@@ -58,6 +59,8 @@ if __name__ == '__main__':
     import basf2
     from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple
 
+    print(basf2.conditions.globaltags)
+
     # ------------
     # Create path.
     # ------------
@@ -88,9 +91,10 @@ if __name__ == '__main__':
 
     # Set variable aliases if needed be.
     from variables import variables
-    variables.addAlias("clusterEop", "clusterEoP")
-    variables.addAlias("eclPulseShapeDiscriminationMVA", "clusterPulseShapeDiscriminationMVA")
     variables.addAlias("__event__", "evtNum")
+    for det in ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]:
+        variables.addAlias(f"deltaLogL_e_pi_{det}", f"pidDeltaLogLikelihoodValueExpert(11, 211, {det})")
+        variables.addAlias(f"deltaLogL_mu_pi_{det}", f"pidDeltaLogLikelihoodValueExpert(13, 211, {det})")
 
     # ----------------------
     # Apply charged Pid MVA.

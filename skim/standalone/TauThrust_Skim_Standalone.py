@@ -7,45 +7,34 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
-from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
+import skimExpertFunctions as expert
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
 
-skimCode = encodeSkimName('TauThrust')
+skimCode = expert.encodeSkimName('TauThrust')
 
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+tauthrustskim = b2.Path()
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-tauthrustskim = Path()
-
-fileList = get_test_file("mixedBGx1", "MC12")
-
-inputMdstList('default', fileList, path=tauthrustskim)
+ma.inputMdstList('default', fileList, path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
 
 # Tau Skim
-from skim.taupair import *
+from skim.taupair import TauThrustList
 tauList = TauThrustList(path=tauthrustskim)
 
-skimOutputUdst(skimCode, tauList, path=tauthrustskim)
-summaryOfLists(tauList, path=tauthrustskim)
+expert.skimOutputUdst(skimCode, tauList, path=tauthrustskim)
+ma.summaryOfLists(tauList, path=tauthrustskim)
 
-setSkimLogging(path=tauthrustskim)
-process(tauthrustskim)
+expert.setSkimLogging(path=tauthrustskim)
+b2.process(tauthrustskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

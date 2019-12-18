@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Create EKLM database payloads.
+# Create EKLM electronics mapping payloads.
 
 import sys
 import basf2
 import ROOT
 from ROOT.Belle2 import EKLMDatabaseImporter, EKLMElectronicsMap
-from basf2 import *
 
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 # MC corresponds to the design electronics map
 
@@ -17,20 +16,6 @@ mc = False
 if (len(sys.argv) >= 2):
     if (sys.argv[1] == 'mc'):
         mc = True
-
-eventinfosetter = register_module('EventInfoSetter')
-
-# Gearbox
-gearbox = register_module('Gearbox')
-
-# Create main path
-main = create_path()
-
-# Add modules to main path
-main.add_module(eventinfosetter)
-main.add_module(gearbox)
-
-process(main)
 
 # EKLM electronics map
 #

@@ -8,21 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/geometry/GeometryPar.h>
+
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
-#include <simulation/background/BkgSensitiveDetector.h>
-
-#include <framework/gearbox/Gearbox.h>
+/* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <simulation/background/BkgSensitiveDetector.h>
 
 using namespace std;
 
@@ -97,19 +97,19 @@ namespace Belle2 {
       m_OffsetZ = content.getLength("OffsetZ");
       m_Phi = content.getLength("Phi");
       m_NSector = content.getNumberNodes("Sectors/Forward/Sector");
-      if (m_NSector > NSECTOR) { // array-bounds check
+      if (m_NSector > BKLMElementNumbers::getMaximalSectorNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): sector array size exceeded:"
                 << LogVar("# of sectors", m_NSector)
-                << LogVar("array size", NSECTOR));
+                << LogVar("array size", BKLMElementNumbers::getMaximalSectorNumber()));
       }
       m_SolenoidOuterRadius = content.getLength("SolenoidOuterRadius");
       m_OuterRadius = content.getLength("OuterRadius");
       m_HalfLength = content.getLength("HalfLength");
       m_NLayer = content.getNumberNodes("Layers/Layer");
-      if (m_NLayer > NLAYER) { // array-bounds check
+      if (m_NLayer > BKLMElementNumbers::getMaximalLayerNumber()) { // array-bounds check
         B2FATAL("BKLM GeometryPar::read(): layer array size exceeded:"
                 << LogVar("# of layers", m_NLayer)
-                << LogVar("array size", NLAYER));
+                << LogVar("array size", BKLMElementNumbers::getMaximalLayerNumber()));
       }
 
       m_IronNominalHeight = content.getLength("Layers/IronNominalHeight");
@@ -422,7 +422,7 @@ namespace Belle2 {
       for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
         bool isForward = (section == BKLMElementNumbers::c_ForwardSection);
         for (int sector = 1; sector <= m_NSector; ++sector) {
-          bool hasChimney = (!isForward) && (sector == CHIMNEY_SECTOR);
+          bool hasChimney = (!isForward) && (sector == BKLMElementNumbers::c_ChimneySector);
           int nZStrips = (hasChimney ? m_NZStripsChimney : m_NZStrips);
           int nZScints = (hasChimney ? m_NZScintsChimney : m_NZScints);
           CLHEP::HepRotation rotation;
@@ -725,16 +725,6 @@ namespace Belle2 {
       return (iM == m_Modules.end() ? NULL : iM->second);
     }
 
-    const Module* GeometryPar::findModule(int layer, bool hasChimney) const
-    {
-      int moduleID = ((layer - 1) << BKLM_LAYER_BIT);
-      if (hasChimney) { // Chimney module is in backward sector 3
-        moduleID |= ((3 - 1) << BKLM_SECTOR_BIT);
-      }
-      map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      return (iM == m_Modules.end() ? NULL : iM->second);
-    }
-
     const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const
     {
       int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
@@ -751,69 +741,62 @@ namespace Belle2 {
 
     void GeometryPar::readAlignmentFromDB()
     {
-      DBObjPtr<BKLMAlignment> bklmAlignments;
-      if (!bklmAlignments.isValid()) {
-        B2INFO("No BKLM alignment data.");
-        return;
-      }
-
-      for (int section = 0; section <= BKLMElementNumbers::getMaximalSectionNumber(); ++section) {
-        for (int sector = 1; sector <= m_NSector; ++sector) {
-          for (int layer = 1; layer <= m_NLayer; ++layer) {
-
-            BKLMElementID bklmid(section, sector, layer);
-            int id = bklmid.getID();
-            HepGeom::Transform3D alignment;
-            alignment = getTransformFromRigidBodyParams(
-                          bklmAlignments->getGlobalParam(id, 1),
-                          bklmAlignments->getGlobalParam(id, 2),
-                          bklmAlignments->getGlobalParam(id, 3),
-                          bklmAlignments->getGlobalParam(id, 4),
-                          bklmAlignments->getGlobalParam(id, 5),
-                          bklmAlignments->getGlobalParam(id, 6));
-
-            int moduleID = BKLMElementNumbers::moduleNumber(
-                             section, sector, layer);
-
-            m_Alignments.insert(std::pair<int, HepGeom::Transform3D>(moduleID, alignment));
-          }
-        }
+      DBObjPtr<BKLMAlignment> bklmAlignment;
+      if (!bklmAlignment.isValid())
+        B2FATAL("No BKLM alignment data.");
+      KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
+      for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
+           bklmModule != bklmModules.endBKLM(); ++bklmModule) {
+        uint16_t module = bklmModule.getKLMModuleNumber();
+        const KLMAlignmentData* alignmentData =
+          bklmAlignment->getModuleAlignment(module);
+        if (alignmentData == nullptr)
+          B2FATAL("Incomplete BKLM alignment data.");
+        HepGeom::Transform3D alignment;
+        alignment = getTransformFromRigidBodyParams(
+                      alignmentData->getDeltaU(),
+                      alignmentData->getDeltaV(),
+                      alignmentData->getDeltaW(),
+                      alignmentData->getDeltaAlpha(),
+                      alignmentData->getDeltaBeta(),
+                      alignmentData->getDeltaGamma());
+        int moduleID = BKLMElementNumbers::moduleNumber(
+                         bklmModule.getSection(), bklmModule.getSector(),
+                         bklmModule.getLayer());
+        m_Alignments.insert(std::pair<int, HepGeom::Transform3D>(moduleID, alignment));
       }
       // Add callback to itself.
-      bklmAlignments.addCallback(this, &bklm::GeometryPar::readAlignmentFromDB);
+      bklmAlignment.addCallback(this, &bklm::GeometryPar::readAlignmentFromDB);
     }
 
     void GeometryPar::readDisplacedGeoFromDB()
     {
-      DBObjPtr<BKLMAlignment> bklmDisplacements;
-      if (!bklmDisplacements.isValid()) {
-        B2INFO("No BKLM displaced geometry data in database!");
-        return;
-      }
-
-      DBArray<BKLMDisplacement> displacements;
-
-      for (const auto& disp : displacements) {
-        unsigned short bklmElementID = disp.getElementID();
-        BKLMElementID bklmid(bklmElementID);
-        unsigned short section = bklmid.getSection();
-        unsigned short sector = bklmid.getSectorNumber();
-        unsigned short layer = bklmid.getLayerNumber();
-
-        HepGeom::Transform3D displacement = getTransformFromRigidBodyParams(disp.getUShift(),
-                                            disp.getVShift(),
-                                            disp.getWShift(),
-                                            disp.getAlphaRotation(),
-                                            disp.getBetaRotation(),
-                                            disp.getGammaRotation()
-                                                                           );
-
-        int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer, false);
-
+      DBObjPtr<BKLMAlignment> bklmDisplacement("BKLMDisplacement");
+      if (!bklmDisplacement.isValid())
+        B2FATAL("No BKLM displaced geometry data in database!");
+      KLMChannelIndex bklmModules(KLMChannelIndex::c_IndexLevelLayer);
+      for (KLMChannelIndex bklmModule = bklmModules.beginBKLM();
+           bklmModule != bklmModules.endBKLM(); ++bklmModule) {
+        uint16_t module = bklmModule.getKLMModuleNumber();
+        const KLMAlignmentData* displacementData =
+          bklmDisplacement->getModuleAlignment(module);
+        if (displacementData == nullptr)
+          B2FATAL("Incomplete BKLM displacement data.");
+        HepGeom::Transform3D displacement;
+        displacement = getTransformFromRigidBodyParams(
+                         displacementData->getDeltaU(),
+                         displacementData->getDeltaV(),
+                         displacementData->getDeltaW(),
+                         displacementData->getDeltaAlpha(),
+                         displacementData->getDeltaBeta(),
+                         displacementData->getDeltaGamma());
+        int moduleID = BKLMElementNumbers::moduleNumber(
+                         bklmModule.getSection(), bklmModule.getSector(),
+                         bklmModule.getLayer());
         m_Displacements.insert(std::pair<int, HepGeom::Transform3D>(moduleID, displacement));
       }
       // Add callback to itself.
-      bklmDisplacements.addCallback(this, &bklm::GeometryPar::readDisplacedGeoFromDB);
+      bklmDisplacement.addCallback(this, &bklm::GeometryPar::readDisplacedGeoFromDB);
     }
 
     HepGeom::Transform3D GeometryPar::getTransformFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta,

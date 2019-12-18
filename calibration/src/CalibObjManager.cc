@@ -3,7 +3,6 @@
 #include <string>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <TKey.h>
 #include <TTree.h>
 
 using namespace std;
@@ -136,5 +135,11 @@ namespace Belle2 {
     boost::split(strs, keyName, boost::is_any_of("_"));
     string indexString = strs.back();
     return stoi(indexString);
+  }
+
+  bool CalibObjManager::isRegistered(const std::string& name) const
+  {
+    if (m_templateObjects.count(name)) return true;
+    else return false;
   }
 }

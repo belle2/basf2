@@ -11,12 +11,6 @@
 
 #include <TVector3.h>
 
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
-#include <string>
-#include <sstream>
-
-
 namespace Belle2 {
   /**
    * Class to calculate the Sphericity tensor eigenvalues and eigenvectors starting from an

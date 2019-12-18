@@ -8,8 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <TObject.h>
-#include <TMath.h>
 #include <TH2F.h>
 #include <TAxis.h>
 

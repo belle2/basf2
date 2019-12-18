@@ -8,12 +8,11 @@ wherever the validation-data are visible  (it's also a bit slower).
 """
 
 import b2test_utils
-from basf2 import set_random_seed, create_path, process, conditions
+from basf2 import set_random_seed, create_path, process
 
 inputFile = b2test_utils.require_file('mdst12.root', 'validation')
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
-conditions.disable_globaltag_replay()
 set_random_seed("1337")
 fsps = ['K-', 'pi-', 'gamma', 'K_L0']
 
@@ -27,9 +26,9 @@ testpath.add_module('ParticleStats', particleLists=[fsps[0]])
 
 testpath.add_module('RestOfEventBuilder', particleList=fsps[0],
                     particleListsInput=['pi+', 'gamma', 'K_L0'])
-mask = ('cleanMask', 'E > 0.05', 'E > 0.05', [0, 0, 0, 0, 0, 0])
+mask = ('cleanMask', 'E > 0.05', 'E > 0.05')
 testpath.add_module('RestOfEventInterpreter', particleList=fsps[0],
-                    ROEMasksWithFractions=mask)
+                    ROEMasks=mask)
 
 ###############################################################################
 roe_path = create_path()

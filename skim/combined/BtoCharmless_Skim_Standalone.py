@@ -7,35 +7,22 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from skim.standardlists.lightmesons import loadStdLightMesons
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
+from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-import argparse
+import skimExpertFunctions as expert
 
-gb2_setuprel = "release-03-02-00"
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+gb2_setuprel = "release-04-00-00"
 
 # Create skim path
-btocharmlesspath = Path()
+btocharmlesspath = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=btocharmlesspath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=btocharmlesspath)
 
 # Load particle lists
 stdPhotons('loose', path=btocharmlesspath)
@@ -50,13 +37,13 @@ loadStdLightMesons(path=btocharmlesspath)
 # Import skim decay mode lists and perform skim
 from skim.btocharmless import CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
 Had2BodyList = CharmlessHad2BodyB0List(path=btocharmlesspath) + CharmlessHad2BodyBmList(path=btocharmlesspath)
-add_skim("CharmlessHad2Body", Had2BodyList, path=btocharmlesspath)
+expert.add_skim("CharmlessHad2Body", Had2BodyList, path=btocharmlesspath)
 
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
 Had3BodyList = CharmlessHad3BodyB0List(path=btocharmlesspath) + CharmlessHad3BodyBmList(path=btocharmlesspath)
-add_skim('CharmlessHad3Body', Had3BodyList, path=btocharmlesspath)
-setSkimLogging(path=btocharmlesspath)
-process(btocharmlesspath)
+expert.add_skim('CharmlessHad3Body', Had3BodyList, path=btocharmlesspath)
+expert.setSkimLogging(path=btocharmlesspath)
+b2.process(btocharmlesspath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

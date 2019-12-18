@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;
@@ -27,7 +28,7 @@ uint16_t BKLMElementNumbers::channelNumber(
   int section, int sector, int layer, int plane, int strip)
 {
   checkChannelNumber(section, sector, layer, plane, strip);
-  return (section ? BKLM_END_MASK : 0)
+  return (section << BKLM_END_BIT)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT)
          | ((plane) << BKLM_PLANE_BIT)
@@ -45,12 +46,34 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
+uint16_t BKLMElementNumbers::planeNumber(
+  int section, int sector, int layer, int plane)
+{
+  checkSection(section);
+  checkSector(sector);
+  checkLayer(layer);
+  checkPlane(plane);
+  return (section << BKLM_END_BIT)
+         | ((sector - 1) << BKLM_SECTOR_BIT)
+         | ((layer - 1) << BKLM_LAYER_BIT)
+         | ((plane) << BKLM_PLANE_BIT);
+}
+
+void BKLMElementNumbers::planeNumberToElementNumbers(
+  uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane)
+{
+  *section = ((planeGlobal & BKLM_END_MASK) >> BKLM_END_BIT);
+  *sector = ((planeGlobal & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
+  *layer = ((planeGlobal & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
+  *plane = ((planeGlobal & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT);
+}
+
 uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
 {
   checkSection(section);
   checkSector(sector, fatalError);
   checkLayer(layer, fatalError);
-  return (section ? BKLM_END_MASK : 0)
+  return (section << BKLM_END_BIT)
          | ((sector - 1) << BKLM_SECTOR_BIT)
          | ((layer - 1) << BKLM_LAYER_BIT);
 }
@@ -76,7 +99,7 @@ int BKLMElementNumbers::layerGlobalNumber(int section, int sector, int layer)
   checkSection(section);
   checkSector(sector);
   checkLayer(layer);
-  int layerGlobal = layer - 1;
+  int layerGlobal = layer;
   layerGlobal += (sector - 1) * m_MaximalLayerNumber;
   layerGlobal += section * m_MaximalSectorNumber * m_MaximalLayerNumber;
   return layerGlobal;
@@ -90,7 +113,9 @@ int BKLMElementNumbers::getNStrips(
   checkLayer(layer);
   checkPlane(plane);
   int strips = 0;
-  if (section == BKLMElementNumbers::c_BackwardSection && sector == 3 && plane == 0) {
+  if (section == BKLMElementNumbers::c_BackwardSection &&
+      sector == BKLMElementNumbers::c_ChimneySector &&
+      plane == BKLMElementNumbers::c_ZPlane) {
     /* Chimney sector. */
     if (layer < 3)
       strips = 38;
@@ -98,19 +123,19 @@ int BKLMElementNumbers::getNStrips(
       strips = 34;
   } else {
     /* Other sectors. */
-    if (layer == 1 && plane == 1)
+    if (layer == 1 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 37;
-    if (layer == 2 && plane == 1)
+    if (layer == 2 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 42;
-    if (layer > 2 && layer < 7 && plane == 1)
+    if (layer > 2 && layer < 7 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 36;
-    if (layer > 6 && plane == 1)
+    if (layer > 6 && plane == BKLMElementNumbers::c_PhiPlane)
       strips = 48;
-    if (layer == 1 && plane == 0)
+    if (layer == 1 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 54;
-    if (layer == 2 && plane == 0)
+    if (layer == 2 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 54;
-    if (layer > 2 && plane == 0)
+    if (layer > 2 && plane == BKLMElementNumbers::c_ZPlane)
       strips = 48;
   }
   return strips;

@@ -58,6 +58,9 @@ namespace Belle2 {
     /// Clears the map of templated objects -> causing their destruction
     void deleteHeldObjects();
 
+    /// Checks for the existence of a name in the templated object map to see if we registered the object
+    bool isRegistered(const std::string& name) const;
+
     /** Gets the collector object of this name for the given exprun. If there already exists
       * some objects it gets the highest index one if it is in-memory. If the highest index
       * object is file resident it creates a new in memory object with a higher index.
@@ -67,6 +70,15 @@ namespace Belle2 {
     {
       std::string objectDirName = name + '/' + getObjectExpRunName(name, expRun);
       TDirectory* objectDir = m_dir->GetDirectory(objectDirName.c_str());
+      // Does the object name have a directory available? (framework problem if not)
+      if (not objectDir) {
+        // Is the object name known to us? (user problem if not)
+        if (not isRegistered(name)) {
+          B2ERROR("The requested object name '" << name << "' isn't known to CalibObjManager!");
+          return nullptr;
+        }
+        B2FATAL("TDirectory for registered object " << name << " not found: " << objectDirName);
+      }
       unsigned int highestIndex = getHighestIndexObject(name, objectDir);
       std::string highestIndexName = name + "_" + std::to_string(highestIndex);
       // First check if we currently have an object we're using.

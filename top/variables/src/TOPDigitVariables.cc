@@ -24,6 +24,10 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
+#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+
+#include <top/dataobjects/TOPBarHit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <algorithm> // for sort
 using namespace std;
@@ -62,6 +66,25 @@ namespace Belle2 {
         if (not extHit) return TVector3(0, 0, 0);
         int slotID = extHit->getCopyID();
         const auto& position = extHit->getPosition(); // TVector3
+        const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
+        if (not geo or not geo->isModuleIDValid(slotID)) return TVector3(0, 0, 0);
+        const auto& module = geo->getModule(slotID);
+        return module.pointToLocal(position); // TVector3
+      }
+
+      // returns the local coordinate of the MC particle's entry point to the TOP
+      TVector3 getLocalPositionMCMatch(const Particle* particle)
+      {
+        const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+        if (mcparticle == nullptr) {
+          return TVector3(0, 0, 0);
+        }
+        const auto* barHit = mcparticle->getRelated<TOPBarHit>();
+        if (!barHit) {
+          return TVector3(0, 0, 0);
+        }
+        int slotID = barHit->getModuleID();
+        const auto& position = barHit->getPosition(); // TVector3
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if (not geo or not geo->isModuleIDValid(slotID)) return TVector3(0, 0, 0);
         const auto& module = geo->getModule(slotID);
@@ -321,6 +344,47 @@ namespace Belle2 {
         return digitTimes.size() - maxGapIndex;
       }
 
+      //! @z coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPz(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.z();
+      }
+
+      //! @theta coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPtheta(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Theta();
+      }
+
+      //! @phi coordinate of the track extrapolated to TOP using helix data from TrackFitResult
+      double extrapTrackToTOPphi(const Particle* particle)
+      {
+        auto trk = particle->getTrack();
+        if (not trk) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        auto trkfit = trk->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())));
+        auto top = trkfit->getHelix();
+        double arcLength = top.getArcLength2DAtCylindricalR(120);
+        const auto& result = top.getPositionAtArcLength2D(arcLength);
+        return result.Phi();
+      }
 
       //! @returns the number of reflected digits in the same module as the particle
       double topReflectedDigitCount(const Particle* particle)
@@ -352,6 +416,24 @@ namespace Belle2 {
       double getTOPLocalZ(const Particle* particle)
       {
         return TOPVariable::getLocalPosition(particle).Z();
+      }
+
+      //! @returns the X coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalXMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).X();
+      }
+
+      //! @returns the Y coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalYMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).Y();
+      }
+
+      //! @returns the Z coordinate of the MC particle entry point to the TOP in the local frame
+      double getTOPLocalZMCMatch(const Particle* particle)
+      {
+        return TOPVariable::getLocalPositionMCMatch(particle).Z();
       }
 
       //! @returns the local phi component of the particle's momentum in the TOP
@@ -548,6 +630,12 @@ namespace Belle2 {
     } // TOPVariable
 
     VARIABLE_GROUP("TOP Calibration");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactZ", TOPVariable::extrapTrackToTOPz,
+                      "[calibration] z coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactTheta", TOPVariable::extrapTrackToTOPtheta,
+                      "[calibration] theta coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
+    REGISTER_VARIABLE("extrapTrackToTOPimpactPhi", TOPVariable::extrapTrackToTOPphi,
+                      "[calibration] phi coordinate of the impact point of the track extrapolated to TOP using helix data from TrackFitResult");
     REGISTER_VARIABLE("topDigitCount", TOPVariable::topDigitCount,
                       "[calibration] The number of TOPDigits in the module to which the track was extrapolated");
     REGISTER_VARIABLE("topBackgroundDigitCount", TOPVariable::topBackgroundDigitCount,
@@ -568,6 +656,12 @@ namespace Belle2 {
                       "[calibration] The local y coordinate of the particle's entry point to the TOP module");
     REGISTER_VARIABLE("topLocalZ", TOPVariable::getTOPLocalZ,
                       "[calibration] The local z coordinate of the particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalXMCMatch", TOPVariable::getTOPLocalXMCMatch,
+                      "[calibration] The local x coordinate of the MC particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalYMCMatch", TOPVariable::getTOPLocalYMCMatch,
+                      "[calibration] The local y coordinate of the MC particle's entry point to the TOP module");
+    REGISTER_VARIABLE("topLocalZMCMatch", TOPVariable::getTOPLocalZMCMatch,
+                      "[calibration] The local z coordinate of the MC particle's entry point to the TOP module");
     REGISTER_VARIABLE("topLocalPhi", TOPVariable::getTOPLocalPhi,
                       "[calibration] The local phi coordinate of the particle's momentum in the TOP module");
     REGISTER_VARIABLE("topLocalTheta", TOPVariable::getTOPLocalTheta,

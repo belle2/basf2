@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
-#include <framework/logging/Logger.h>
 
 #include <utility>
 

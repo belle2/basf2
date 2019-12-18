@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/display/ColorMapping.h>
 #include <tracking/trackFindingCDC/display/Mapping.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>

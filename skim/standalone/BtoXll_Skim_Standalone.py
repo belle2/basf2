@@ -7,59 +7,38 @@
 #
 # B->Xll (no LFV modes) inclusive skim
 #
-# Trevor Shillington July 2019
+# Trevor Shillington December 2019
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
 from stdCharged import stdE, stdMu, stdPi
-from skimExpertFunctions import setSkimLogging, encodeSkimName, get_test_file
-import argparse
+import skimExpertFunctions as expert
 
-# Use argparse to allow the optional --data argument, used only when run on data
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('BtoXll')
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
-
-gb2_setuprel = 'release-03-02-03'
-skimCode = encodeSkimName('BtoXll')
-
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
-
-path = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=path)
+path = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=path)
 
 # import standard lists
-stdE('loose', path=path)
-stdMu('loose', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
 stdPi('all', path=path)
 stdPhotons('all', path=path)
 
 # call reconstructed lists from scripts/skim/ewp.py
 from skim.ewp import B2XllList
 XllList = B2XllList(path=path)
-skimOutputUdst(skimCode, XllList, path=path)
-summaryOfLists(XllList, path=path)
+expert.skimOutputUdst(skimCode, XllList, path=path)
+ma.summaryOfLists(XllList, path=path)
 
 # process
-setSkimLogging(path=path)
-process(path=path)
+expert.setSkimLogging(path=path)
+b2.process(path=path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

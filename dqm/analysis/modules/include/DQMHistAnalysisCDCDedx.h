@@ -11,9 +11,7 @@
 #pragma once
 #include <TCanvas.h>
 #include <TH1.h>
-#include <TH2.h>
 #include <TLine.h>
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 namespace Belle2 {

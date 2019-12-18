@@ -9,31 +9,17 @@
 #
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
-skimCode = encodeSkimName('LFVZpVisible')
-import sys
-import os
-import glob
-import argparse
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+import skimExpertFunctions as expert
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('LFVZpVisible')
 
-# Read optional --data argument
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
-
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
-
-lfvzppath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=lfvzppath)
+lfvzppath = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=lfvzppath)
 
 stdPi('loose', path=lfvzppath)
 stdK('loose', path=lfvzppath)
@@ -47,10 +33,10 @@ stdMu('all', path=lfvzppath)
 
 from skim.dark import LFVZpVisibleList
 SysList = LFVZpVisibleList(path=lfvzppath)
-skimOutputUdst(skimCode, SysList, path=lfvzppath)
-summaryOfLists(SysList, path=lfvzppath)
+expert.skimOutputUdst(skimCode, SysList, path=lfvzppath)
+ma.summaryOfLists(SysList, path=lfvzppath)
 
-setSkimLogging(path=lfvzppath)
-process(lfvzppath)
+expert.setSkimLogging(path=lfvzppath)
+b2.process(lfvzppath)
 
-print(statistics)
+print(b2.statistics)

@@ -13,20 +13,13 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
-#include <TH1D.h>
-#include <TH2D.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TDirectory.h>
 #include <TROOT.h>
 #include <TTree.h>
-#include "iostream"
-#include "string"
-#include <framework/utilities/FileSystem.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -81,6 +74,14 @@ void TimeWalkCalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
 
   const int nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
@@ -194,6 +195,16 @@ void TimeWalkCalibrationAlgorithm::storeHist()
   B2INFO("Storing histogram");
   B2DEBUG(21, "Store 1D histogram");
   TFile*  fhist = new TFile(m_histName.c_str(), "RECREATE");
+  auto hNDF =   getObjectPtr<TH1F>("hNDF");
+  auto hPval =   getObjectPtr<TH1F>("hPval");
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  //store NDF, P-val. EventT0 histogram for monitoring during calibration
+  if (hNDF && hPval && hEvtT0) {
+    hEvtT0->Write();
+    hPval->Write();
+    hNDF->Write();
+  }
+
   TDirectory* old = gDirectory;
   TDirectory* h1D = old->mkdir("h1D");
   TDirectory* h2D = old->mkdir("h2D");

@@ -20,7 +20,6 @@
 
 
 #include <framework/core/Module.h>
-#include <string>
 
 namespace Belle2 {
 

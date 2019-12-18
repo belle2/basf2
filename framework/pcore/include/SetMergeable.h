@@ -11,9 +11,6 @@
 
 #include <framework/pcore/Mergeable.h>
 
-#include <set>
-#include <unordered_set>
-
 namespace Belle2 {
 
   /** Wrap an STL set to make it mergeable.

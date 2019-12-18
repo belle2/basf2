@@ -16,7 +16,6 @@
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 #include <tracking/ckf/cdc/findlets/CKFToCDCFromEclFindlet.h>
 
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 
 namespace Belle2 {

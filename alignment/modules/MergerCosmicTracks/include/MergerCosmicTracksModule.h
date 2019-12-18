@@ -8,9 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <framework/core/Module.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/datastore/StoreArray.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /**

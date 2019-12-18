@@ -14,9 +14,6 @@
 
 #include <framework/core/ModuleParamList.h>
 
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>

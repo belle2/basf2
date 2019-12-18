@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDGainMapPar.h>
 #include <framework/database/DBObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>

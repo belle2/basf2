@@ -22,11 +22,12 @@ namespace Belle2 {
     SoftwareTriggerVariableManager::SoftwareTriggerVariable* SoftwareTriggerVariableManager::getVariable(
       const std::string& variableName)
     {
-      if (m_variableNameToVariable.find(variableName) == m_variableNameToVariable.end()) {
-        m_variableNameToVariable.emplace(variableName, std::shared_ptr<SoftwareTriggerVariable>(
-                                           new SoftwareTriggerVariable(variableName)));
+      auto lowerBoundIterator = m_variableNameToVariable.lower_bound(variableName);
+      if (lowerBoundIterator == m_variableNameToVariable.end() or lowerBoundIterator->first != variableName) {
+        lowerBoundIterator = m_variableNameToVariable.insert(lowerBoundIterator,
+        {variableName, std::shared_ptr<SoftwareTriggerVariable>(new SoftwareTriggerVariable(variableName))});
       }
-      return m_variableNameToVariable[variableName].get();
+      return lowerBoundIterator->second.get();
     }
   }
 }

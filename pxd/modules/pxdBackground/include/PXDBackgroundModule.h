@@ -18,7 +18,6 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>
-#include <vector>
 #include <memory>
 #include <map>
 #include <vxd/background/niel_fun.h>

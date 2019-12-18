@@ -18,9 +18,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdexcept>
-#include <cmath>
-
 
 using namespace std;
 using namespace Belle2;

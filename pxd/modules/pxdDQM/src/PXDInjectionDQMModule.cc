@@ -15,7 +15,6 @@ using namespace std;
 using namespace Belle2;
 using namespace Belle2::PXD;
 using namespace Belle2::VXD;
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module

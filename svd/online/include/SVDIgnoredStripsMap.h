@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Constructor
      * @param xml_filename is the name of the xml file containing the map.
      */
-    SVDIgnoredStripsMap(const std::string& xml_filename);
+    explicit SVDIgnoredStripsMap(const std::string& xml_filename);
 
     /** No default constructor */
     SVDIgnoredStripsMap() = delete;

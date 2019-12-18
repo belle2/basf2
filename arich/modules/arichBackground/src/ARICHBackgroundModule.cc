@@ -22,18 +22,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-
-// ROOT
-#include <TVector2.h>
-#include <TClonesArray.h>
 
 using namespace std;
 using namespace boost;

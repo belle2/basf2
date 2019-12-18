@@ -15,7 +15,6 @@
 
 //Framework
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 //ECL
 #include <ecl/dataobjects/ECLSimHit.h>

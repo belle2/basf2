@@ -13,12 +13,10 @@
 #include <framework/core/HistoModule.h>
 
 #include <vector>
-#include <set>
 #include <boost/format.hpp>
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TVector3.h"
 #include "TDirectory.h"
 
 using namespace std;

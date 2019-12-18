@@ -10,30 +10,18 @@
   * This software is provided "as is" without any warranty.                *
   *************************************************************************/
 
-#include <list>
 #include <iostream>
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLSimHit.h>
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
 
 using namespace std;
 using namespace Belle2;

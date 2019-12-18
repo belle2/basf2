@@ -10,13 +10,6 @@
 
 #pragma once
 
-#include <math.h>
-
-#include <framework/geometry/B2Vector3.h>
-#include <boost/math/special_functions/sign.hpp>
-#include <framework/core/FrameworkExceptions.h>
-
-
 namespace Belle2 {
 
   /** contains a collection of functions and related stuff needed for SelectionVariables implementing 2-, 3- and 4-hitfilters.

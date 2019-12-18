@@ -8,35 +8,21 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdV0s import *
-from stdPi0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPi0s import loadStdSkimPi0
+from stdPhotons import loadStdSkimPhoton
+import skimExpertFunctions as expert
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
+skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpHmPi0')
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+c3bh1path = b2.Path()
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
-skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmPi0')
-
-c3bh1path = Path()
-
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c3bh1path)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=c3bh1path)
 
 loadStdSkimPhoton(path=c3bh1path)
 loadStdSkimPi0(path=c3bh1path)
@@ -48,16 +34,15 @@ stdPi('all', path=c3bh1path)
 stdK('all', path=c3bh1path)
 stdE('all', path=c3bh1path)
 stdMu('all', path=c3bh1path)
-stdKshorts(path=c3bh1path)
 
 from skim.charm import DstToD0PiD0ToHpHmPi0
 DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=c3bh1path)
-skimOutputUdst(skimCode, DstToD0PiD0ToHpHmPi0List, path=c3bh1path)
+expert.skimOutputUdst(skimCode, DstToD0PiD0ToHpHmPi0List, path=c3bh1path)
 
-summaryOfLists(DstToD0PiD0ToHpHmPi0List, path=c3bh1path)
+ma.summaryOfLists(DstToD0PiD0ToHpHmPi0List, path=c3bh1path)
 
 
-setSkimLogging(path=c3bh1path)
-process(c3bh1path)
+expert.setSkimLogging(path=c3bh1path)
+b2.process(c3bh1path)
 
-print(statistics)
+print(b2.statistics)

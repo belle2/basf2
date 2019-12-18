@@ -14,21 +14,14 @@
 #include <framework/core/HistoModule.h>
 
 #include <cdc/dataobjects/WireID.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <string>
 
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/DetPlane.h>
-#include <genfit/StateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
 #include "TH1.h"
 #include "TH2.h"
-#include "TFile.h"
 #include "TProfile.h"
 #include "TTree.h"
 

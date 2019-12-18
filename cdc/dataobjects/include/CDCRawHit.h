@@ -12,11 +12,7 @@
 #define CDCRAWHIT_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <TObject.h>
 
 namespace Belle2 {
 

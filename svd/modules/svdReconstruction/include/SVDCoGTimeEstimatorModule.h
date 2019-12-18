@@ -17,6 +17,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
@@ -74,6 +75,8 @@ namespace Belle2 {
 
     StoreArray<SVDTrueHit> m_storeTrueHits; /**<SVDTrueHits store array*/
     StoreArray<MCParticle> m_storeMCParticles; /**<MCParticles Store array*/
+
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo; /**<storage for SVDEventInfo object */
 
     /** The peak time estimation */
     float m_weightedMeanTime;

@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'analysis_KFit', 
-	      'analysis_VertexFitting', 'analysis_DecayDescriptor',
-	      'analysis_utility', '$ROOT_LIBS', 'CLHEP']
-
-Return('env')

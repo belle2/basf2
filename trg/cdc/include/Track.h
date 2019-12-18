@@ -51,7 +51,7 @@ namespace Belle2 {
     TRGCDCTrack();
 
     /// Constructor from a Circle.
-    TRGCDCTrack(const TRGCDCCircle&);
+    explicit TRGCDCTrack(const TRGCDCCircle&);
 
     /// Destructor
     virtual ~TRGCDCTrack();

@@ -19,9 +19,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/core/Module.h>
-#include <string>
-#include <TFile.h>
-#include <TNtuple.h>
 
 namespace Belle2 {
 

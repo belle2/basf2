@@ -5,14 +5,9 @@
 #include <framework/gearbox/Const.h>
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1F.h>
-#include <TGraphErrors.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TTree.h>
-#include "iostream"
-
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/Database.h>

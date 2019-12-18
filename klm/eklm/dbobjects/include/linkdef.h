@@ -6,7 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::EKLMAlignment+;
-#pragma link C++ class Belle2::EKLMAlignmentData+;
 #pragma link C++ class Belle2::EKLMChannelData+;
 #pragma link C++ class Belle2::EKLMChannels+;
 #pragma link C++ class Belle2::EKLMDataConcentratorLane+;
@@ -22,10 +21,8 @@
 #pragma link C++ class Belle2::EKLMGeometry::Point+;
 #pragma link C++ class Belle2::EKLMGeometry::ShieldDetailGeometry+;
 #pragma link C++ class Belle2::EKLMGeometry::ShieldGeometry+;
-#pragma link C++ class Belle2::EKLMGeometry::BoardGeometry+;
-#pragma link C++ class Belle2::EKLMGeometry::BoardPosition+;
-#pragma link C++ class Belle2::EKLMGeometry::StripBoardPosition+;
 #pragma link C++ class Belle2::EKLMReconstructionParameters+;
+#pragma link C++ class Belle2::EKLMSegmentAlignment+;
 #pragma link C++ class Belle2::EKLMSimulationParameters+;
 #pragma link C++ class Belle2::EKLMTimeCalibration+;
 #pragma link C++ class Belle2::EKLMTimeCalibrationData+;

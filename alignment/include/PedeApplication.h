@@ -15,8 +15,6 @@
 #include <alignment/PedeResult.h>
 
 #include <string>
-#include <vector>
-
 
 namespace Belle2 {
   namespace alignment {

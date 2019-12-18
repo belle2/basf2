@@ -131,7 +131,7 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra = 26;
+    static const int n_output_extra = 42;
     static const char* output_extra[n_output_extra];
 
     //condition database for unpacker

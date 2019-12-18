@@ -11,10 +11,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <tracking/dataobjects/ROIid.h>
@@ -22,13 +20,10 @@
 #include <pxd/dataobjects/PXDDigit.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
 #include <TH1F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
 

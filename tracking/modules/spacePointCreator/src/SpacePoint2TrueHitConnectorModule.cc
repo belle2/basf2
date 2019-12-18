@@ -238,7 +238,7 @@ void SpacePoint2TrueHitConnectorModule::event()
         registerAllRelations(spacePoint, trueHitMap, detType);
       } else { // find THE ONE TrueHit (to rule them all, one TrueHit to find them all ...)
         // COULDDO: wrap this up in a function
-        pair<VXDTrueHit*, double> trueHitwWeight = { nullptr, 0.0 };
+        pair<VXDTrueHit*, double> trueHitwWeight;
 
         if (detType == c_PXD) trueHitwWeight = getTHwithWeight<baseMapT, PXDTrueHit>(trueHitMap, m_PXDTrueHits, spacePoint, c_PXD);
         else trueHitwWeight = getTHwithWeight<baseMapT, SVDTrueHit>(trueHitMap, m_SVDTrueHits, spacePoint, c_SVD);
@@ -811,6 +811,7 @@ void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 {
   if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
     string output;
+    // cppcheck-suppress useStlAlgorithm
     for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
     B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
   }

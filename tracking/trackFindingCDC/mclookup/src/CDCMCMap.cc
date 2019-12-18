@@ -9,14 +9,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -263,7 +262,7 @@ MayBePtr<const CDCHit> CDCMCMap::getHit(const CDCSimHit* simHit) const
 
 bool CDCMCMap::isBackground(const CDCSimHit* simHit) const
 {
-  return simHit ? simHit->getBackgroundTag() != CDCSimHit::bg_none : false;
+  return simHit ? simHit->getBackgroundTag() != BackgroundMetaData::bg_none : false;
 }
 
 bool CDCMCMap::isBackground(const CDCHit* hit) const

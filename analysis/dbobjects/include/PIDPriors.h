@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 
-#include <framework/gearbox/Unit.h>
 #include <analysis/dbobjects/PIDPriorsTable.h>
 #include <framework/gearbox/Const.h>
 

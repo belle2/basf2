@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <assert.h>
 #include "EvtGenBase/EvtComplex.hh"
 
 namespace Belle2 {

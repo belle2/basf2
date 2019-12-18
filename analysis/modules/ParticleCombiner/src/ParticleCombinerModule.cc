@@ -12,8 +12,6 @@
 #include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
@@ -26,7 +24,6 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
-#include <algorithm>
 #include <memory>
 
 using namespace std;

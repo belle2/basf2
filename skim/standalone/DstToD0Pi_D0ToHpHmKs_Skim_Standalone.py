@@ -8,35 +8,21 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-import argparse
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdV0s import mergedKshorts, stdKshorts
+import skimExpertFunctions as expert
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpHmKs')
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
+c3bh2path = b2.Path()
 
-import os
-import sys
-import glob
-skimCode = encodeSkimName('DstToD0Pi_D0ToHpHmKs')
-
-c3bh2path = Path()
-
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c3bh2path)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=c3bh2path)
 
 
 stdKshorts(path=c3bh2path)
@@ -52,12 +38,12 @@ stdMu('all', path=c3bh2path)
 
 from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(c3bh2path)
-skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList, path=c3bh2path)
+expert.skimOutputUdst(skimCode, DstToD0PiD0ToHpHmKsList, path=c3bh2path)
 
-summaryOfLists(DstToD0PiD0ToHpHmKsList, path=c3bh2path)
+ma.summaryOfLists(DstToD0PiD0ToHpHmKsList, path=c3bh2path)
 
 
-setSkimLogging(path=c3bh2path)
-process(c3bh2path)
+expert.setSkimLogging(path=c3bh2path)
+b2.process(c3bh2path)
 
-print(statistics)
+print(b2.statistics)

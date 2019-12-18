@@ -8,10 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <framework/logging/Logger.h>
+/* Own header. */
 #include <klm/dataobjects/KLMElementNumbers.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -108,6 +112,27 @@ void KLMElementNumbers::channelNumberToElementNumbers(
   }
 }
 
+uint16_t KLMElementNumbers::planeNumberBKLM(
+  int section, int sector, int layer, int plane) const
+{
+  uint16_t planeGlobal;
+  planeGlobal = BKLMElementNumbers::planeNumber(section, sector, layer, plane);
+  return planeGlobal + m_BKLMOffset;
+}
+
+uint16_t KLMElementNumbers::planeNumberEKLM(
+  int section, int sector, int layer, int plane) const
+{
+  uint16_t planeGlobal;
+  /*
+   * Note that the default order of elements is different
+   * for EKLM-specific code!
+   */
+  planeGlobal = m_ElementNumbersEKLM->planeNumber(
+                  section, layer, sector, plane);
+  return planeGlobal;
+}
+
 uint16_t KLMElementNumbers::moduleNumber(
   int subdetector, int section, int sector, int layer) const
 {
@@ -185,4 +210,12 @@ uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
   uint16_t sect;
   sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(section, sector);
   return sect;
+}
+
+int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
+{
+  if (subdetector == c_BKLM)
+    return layer;
+  else
+    return BKLMElementNumbers::getMaximalLayerNumber() + layer;
 }

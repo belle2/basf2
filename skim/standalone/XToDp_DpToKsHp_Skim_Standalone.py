@@ -7,39 +7,25 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
 from stdV0s import mergedKshorts
-from skimExpertFunctions import *
-import argparse
+import skimExpertFunctions as expert
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--data',
-                    help='Provide this flag if running on data.',
-                    action='store_true', default=False)
-args = parser.parse_args()
+b2.set_log_level(b2.LogLevel.INFO)
 
-if args.data:
-    use_central_database("data_reprocessing_prompt_bucket6")
+gb2_setuprel = 'release-04-00-00'
 
-set_log_level(LogLevel.INFO)
-
-gb2_setuprel = 'release-03-02-02'
-
-import os
-import sys
-import glob
-skimCode = encodeSkimName('XToDp_DpToKsHp')
+skimCode = expert.encodeSkimName('XToDp_DpToKsHp')
 
 # create a new path for each WG
-ckshppath = Path()
+ckshppath = b2.Path()
 
 fileList = ['/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +
             'mdst/sub00/mdst_000141_prod00007392_task10020000141.root']
 
-inputMdstList('default', fileList, path=ckshppath)
+ma.inputMdstList('default', fileList, path=ckshppath)
 
 
 mergedKshorts(path=ckshppath)
@@ -48,11 +34,11 @@ stdK('loose', path=ckshppath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(ckshppath)
-skimOutputUdst(skimCode, DpToKsHpList, path=ckshppath)
-summaryOfLists(DpToKsHpList, path=ckshppath)
+expert.skimOutputUdst(skimCode, DpToKsHpList, path=ckshppath)
+ma.summaryOfLists(DpToKsHpList, path=ckshppath)
 
 
-setSkimLogging(path=ckshppath)
-process(ckshppath)
+expert.setSkimLogging(path=ckshppath)
+b2.process(ckshppath)
 
-print(statistics)
+print(b2.statistics)

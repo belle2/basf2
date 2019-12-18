@@ -802,7 +802,9 @@ def create_plots(revisions=None, force=False, process_queue=None,
     # available revisions and reference. The order should now be [reference,
     # newest_revision, ..., oldest_revision].
     if not revisions:
-        revisions = ['reference'] + available_revisions(work_folder)
+        # todo: remove this limitation if we find way too avoid too lengthy file names
+        revisions = ['reference'] + \
+                    sorted(sorted(available_revisions(work_folder), reverse=True)[:9])
 
     # Now we check whether the plots for the selected revisions have been
     # generated before or not. In the path we use the alphabetical order of the

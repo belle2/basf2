@@ -11,13 +11,13 @@
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerResultPrinterModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <TFile.h>
 #include <TTree.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <memory>
-#include <iomanip>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -77,19 +77,24 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = true;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
-    // cppcheck-suppress unreadVariable // the variable is used in the Fill() method below
     value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
     counter++;
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = true;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
@@ -103,8 +108,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {
@@ -118,8 +126,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = false;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
+  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
   for (auto& cutResult : m_passedEventsPerTrigger) {

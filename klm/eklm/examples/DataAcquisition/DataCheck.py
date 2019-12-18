@@ -3,26 +3,26 @@
 
 # Check collected data.
 
-from basf2 import *
 import sys
+import basf2
 
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-input = register_module('RootInput')
+input = basf2.register_module('RootInput')
 input.param('inputFileName', sys.argv[1])
 
-gearbox = register_module('Gearbox')
+gearbox = basf2.register_module('Gearbox')
 
-eklmdatachecker = register_module('EKLMDataChecker')
+eklmdatachecker = basf2.register_module('EKLMDataChecker')
 
 # Create the main path and add the modules
-main = create_path()
+main = basf2.create_path()
 main.add_module(input)
 main.add_module(gearbox)
 main.add_module(eklmdatachecker)
 
 # Process the data
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

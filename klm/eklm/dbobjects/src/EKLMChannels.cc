@@ -8,11 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+/* Own header. */
 #include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/geometry/GeometryData.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

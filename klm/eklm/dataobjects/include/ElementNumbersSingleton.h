@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {

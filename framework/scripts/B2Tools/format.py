@@ -51,6 +51,8 @@ def decayDescriptor(decay_string):
     substitutes = [
         ('==>', '$\\to$'),
         ('gamma', r'$\gamma$'),
+        ('p+', r'$p$'),
+        ('anti-p-', r'$\bar{p}$'),
         ('pi+', r'$\pi^+$'),
         ('pi-', r'$\pi^-$'),
         ('pi0', r'$\pi^0$'),
@@ -66,10 +68,16 @@ def decayDescriptor(decay_string):
         ('e+', r'$e^+$'),
         ('e-', r'$e^-$'),
         ('J/psi', r'$J/\psi$'),
+        ('anti-Lambda_c-', r'$\Lambda^{-}_{c}$'),
+        ('anti-Sigma+', r'$\overline{\Sigma}^{+}$'),
+        ('anti-Lambda0', r'$\overline{\Lambda}^{0}$'),
         ('anti-D0*', r'$\overline{D^{0*}}$'),
         ('anti-D*0', r'$\overline{D^{0*}}$'),
         ('anti-D0', r'$\overline{D^0}$'),
         ('anti-B0', r'$\overline{B^0}$'),
+        ('Sigma+', r'$\Sigma^{+}$'),
+        ('Lambda_c+', r'$\Lambda^{+}_{c}$'),
+        ('Lambda0', r'$\Lambda^{0}$'),
         ('D+', r'$D^+$'),
         ('D-', r'$D^-$'),
         ('D0', r'$D^0$'),
@@ -82,7 +90,9 @@ def decayDescriptor(decay_string):
         ('D_s*-', r'$D^{-*}_s$'),
         ('B+', r'$B^+$'),
         ('B-', r'$B^-$'),
-        ('B0', r'$B^0$'), ]
+        ('B0', r'$B^0$'),
+        ('B_s0', r'$B^0_s$'),
+        ('K*0', r'$K^{0*}$')]
     tex_string = decay_string
     for (key, value) in substitutes:
         tex_string = tex_string.replace(key, value)
@@ -111,10 +121,10 @@ def duration(seconds):
     if ms != 0 and hours == 0 and minutes == 0 and seconds == 0:
         string += "%dms" % (ms)
     if us != 0 and hours == 0 and minutes == 0 and seconds == 0 and ms == 0:
-        string += "%d$\mu$s" % (us)
+        string += r"%d$\mu$s" % (us)
 
     if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
-        string += '$<1\mu$s'
+        string += r'$<1\mu$s'
     return string
 
 

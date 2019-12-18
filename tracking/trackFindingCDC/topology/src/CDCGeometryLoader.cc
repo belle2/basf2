@@ -11,10 +11,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <framework/utilities/TestHelpers.h>
-
 #include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>

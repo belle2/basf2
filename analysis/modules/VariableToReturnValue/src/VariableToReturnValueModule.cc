@@ -11,7 +11,6 @@
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>

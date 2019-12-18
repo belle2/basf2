@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <boost/math/special_functions/sign.hpp>
-#include <math.h>
 
 #include <vector>
 #include <algorithm>

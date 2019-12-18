@@ -9,6 +9,7 @@
 **************************************************************************/
 
 #include <alignment/modules/SetRecoTrackMomentum/SetRecoTrackMomentumModule.h>
+
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;

@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 

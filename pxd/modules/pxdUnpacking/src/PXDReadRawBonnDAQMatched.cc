@@ -244,16 +244,17 @@ void PXDReadRawBonnDAQMatchedModule::event()
   int stat;
   auto tnr = triggernr;
   do {
-//         B2INFO("Search for " << triggernr);
+    // Search for triggernr
     tnr = triggernr; // set again as it is the return value
     stat = readOneEvent(tnr);
     if (stat <= 0) {
-      /// End of File
+      // End of File
       break;
     };
-//         B2INFO("Found " << tnr);
   } while (tnr != triggernr); // found and filled, else continue
 
+  // set return value to true only if matching event was found
+  setReturnValue(tnr == triggernr);
 
   return;
 }

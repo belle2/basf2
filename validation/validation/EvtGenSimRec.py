@@ -5,7 +5,7 @@
 <header>
   <output>EvtGenSimRec.root</output>
   <cacheable/>
-  <contact>tkuhr</contact>
+  <contact>Software team b2soft@mail.desy.de</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>
 </header>
@@ -22,7 +22,7 @@ from background import get_background_files
 set_random_seed(12345)
 
 # set one parallel process to excercise the basf2 parallel code
-set_nprocesses(1)
+# set_nprocesses(1)
 
 main = create_path()
 
@@ -58,13 +58,13 @@ print(statistics)
 
 statistics_plots(
     'EvtGenSimRec_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation and reconstruction job with generic EvtGen events',
     prefix='EvtGenSimRec'
 )
 event_timing_plot(
     '../EvtGenSimRec.root', 'EvtGenSimRec_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation and reconstruction job with generic EvtGen events',
     prefix='EvtGenSimRec'
 )

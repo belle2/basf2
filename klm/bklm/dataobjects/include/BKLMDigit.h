@@ -44,7 +44,6 @@ namespace Belle2 {
     //! @@param charge the charge (number of photons for the scintillator strips)
     BKLMDigit(int moduleID, int ctime, short tdc, short charge);
 
-
     //! Copy constructor
     BKLMDigit(const BKLMDigit&);
 
@@ -54,18 +53,13 @@ namespace Belle2 {
     //! Destructor
     virtual ~BKLMDigit() {}
 
-
-
     //! Get unique channel identifier.
     //!@return unique channel id
     unsigned int getUniqueChannelID() const override;
 
-
-
     //! The pile-up method.
     //! @return if the bg digit should be appended
     DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
-
 
     //! Determine whether hit is in RPC or scintillator
     //! @return whether hit is in RPC (true) or scintillator (false)
@@ -101,7 +95,7 @@ namespace Belle2 {
 
     //! Get plane number.
     //! @return Plane number (0=z, 1=phi).
-    bool getPlane() const
+    int getPlane() const
     {
       return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
     }

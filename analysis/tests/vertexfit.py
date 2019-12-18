@@ -31,8 +31,6 @@ def check(filename):
 
 testFile = tempfile.NamedTemporaryFile()
 
-basf2.conditions.disable_globaltag_replay()
-
 main = basf2.create_path()
 
 ma.inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)

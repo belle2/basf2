@@ -103,6 +103,7 @@ def testAllSkims(standaloneSkims, combinedSkims):
 
         sys.exit(1)
 
+
 if __name__ == '__main__':
     standaloneSkims = [name for _, name in skim_registry]
     combinedSkims = combined_skims.keys()

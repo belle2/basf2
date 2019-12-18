@@ -40,7 +40,7 @@ Many are defined for convenience and can be recreated logically from :b2:var:`mc
 Some extra variables are provided externally, for example :b2:var:`isCloneTrack` from the tracking-level MC matching.
 
 .. b2-variables::
-        :variables: isSignal,isSignalWithoutProperty,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
 ~~~~~~~~~~~~~~~
@@ -157,11 +157,12 @@ Steering file snippet
   ...
  
 
-~~~~~~
-Status
-~~~~~~
+.. warning:: 
+  `isSignal` of output particle, ``'B+:testB'`` in above case, is not related to given decay string for now.
+  For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
+  So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
-Skipping of intermediate states in decay chain not supported yet, e.g. :math:`B \to \pi \pi K`.
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 
 ---------------
 MC decay string

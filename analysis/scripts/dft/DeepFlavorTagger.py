@@ -14,6 +14,7 @@
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
 import modularAnalysis as ma
+import variables.utils as vu
 from ROOT import Belle2
 import basf2
 from basf2 import B2ERROR, B2FATAL
@@ -67,7 +68,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
 
 
 def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard', variable_list=None,
-                     output_variable='networkOutput', target='qrCombined', overwrite=False,
+                     target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
                      additional_roe_filter=None,
@@ -83,7 +84,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     :param working_dir: string, working directory for the method
     :param uniqueIdentifier: string, database identifier for the method
     :param variable_list: list[string], name of the basf2 variables used for discrimination
-    :param output_variable: string, variable name returned by the expert and added to extra info
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
     :param transform_to_probability: bool, enable a purity transformation to compensate potential over-training,
@@ -237,9 +237,12 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         expert_module.param('listNames', particle_lists)
         expert_module.param('identifier', uniqueIdentifier)
 
-        expert_module.param('extraInfoName', output_variable)
+        expert_module.param('extraInfoName', 'dnn_output')
         expert_module.param('signalFraction', signal_fraction)
 
         roe_path.add_module(expert_module)
+
+        # Create standard alias for the output of the flavor tagger
+        vu._variablemanager.addAlias('DNN_qrCombined', 'formula(2*extraInfo(dnn_output) - 1)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

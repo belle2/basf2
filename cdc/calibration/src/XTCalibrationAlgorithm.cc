@@ -10,6 +10,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <iostream>
+#include <memory>
 
 #include <framework/database/DBObjPtr.h>
 
@@ -135,6 +136,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
   createHisto();
 
   B2INFO("Start Fitting");
+  std::unique_ptr<XTFunction> xt;
   for (int l = 0; l < 56; ++l) {
     for (int lr = 0; lr < 2; ++lr) {
       for (int al = 0; al < m_nAlphaBins; ++al) {
@@ -177,11 +179,11 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
             tmin = 12;
           }
 
-          XTFunction* xt;
+          // B2INFO("layer " << l << ", lr " << lr << ", alpha "  << m_iAlpha[al] << ", theta " <<  m_iTheta[th]);
           if (m_useSliceFit) { // if slice fit results exist.
-            xt = new XTFunction(m_hist2d_1[l][lr][al][th], m_xtMode);
+            xt.reset(new XTFunction(m_hist2d_1[l][lr][al][th], m_xtMode));
           } else { // from TProfile.
-            xt = new XTFunction(m_hProf[l][lr][al][th], m_xtMode);
+            xt.reset(new XTFunction(m_hProf[l][lr][al][th], m_xtMode));
           }
 
           if (m_bField) {
@@ -216,11 +218,19 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
             xt->setXTParams(p0, p1, 0., 0., 0., 0., m_par6[l], 0.0001);
             xt->setFitRange(tmin, m_par6[l] + 100);
           }
-
           xt->setDebug(m_debug);
           xt->setBField(m_bField);
           xt->fitXT();
-
+          if (xt->isValid() == false) {
+            B2WARNING("Empty xt");
+            m_fitStatus[l][lr][al][th] = c_fitFailure;
+            continue;
+          }
+          if (xt->getFitStatus() != 1) {
+            B2WARNING("Fit failed");
+            m_fitStatus[l][lr][al][th] = c_fitFailure;
+            continue;
+          }
           if (xt->validate() == true) {
             m_fitStatus[l][lr][al][th] = xt->getFitStatus();
             m_xtFunc[l][lr][al][th] = (TF1*)xt->getXTFunction();
@@ -237,7 +247,6 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
       }
     }
   }
-
   write();
   storeHisto();
   return checkConvergence();

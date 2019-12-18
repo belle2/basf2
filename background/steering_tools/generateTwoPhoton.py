@@ -148,7 +148,7 @@ main.add_module(geometry)
 fullsim = register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-    fullsim.param('UICommands', ['/process/inactivate nKiller'])
+    fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
     fullsim.param('StoreAllSecondaries', True)
     fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)

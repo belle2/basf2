@@ -165,8 +165,9 @@ namespace Belle2 {
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
 
-    double energyDependentTimeOffsetElectronic(const double amplitude)
-    ;  /**< Function to calculate "energy dependence equation using Alex function" */
+    /**< Function to calculate "energy dependence equation using Alex function" */
+    double energyDependentTimeOffsetElectronic(const double amplitude);
+
     double m_energyDependenceTimeOffsetFitParam_p1 = 0  ;               /**< p1 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p2 = 88449. ;           /**< p2 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06 ;      /**< p3 in "energy dependence equation" */

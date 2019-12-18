@@ -11,9 +11,9 @@ __authors__ = [
 ]
 
 
+import basf2 as b2
 import pdg
-from modularAnalysis import cutAndCopyList, applyEventCuts, fillParticleList, \
-    reconstructDecay, B2WARNING
+import modularAnalysis as ma
 
 
 def SinglePhotonDarkList(path):
@@ -37,13 +37,13 @@ def SinglePhotonDarkList(path):
 
     # no good tracks in the event
     cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
-    applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
+    ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
 
     # no other photon above 100 MeV
     angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
     minimum = 'E > 0.1'  # GeV
-    cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
-    applyEventCuts('0 < nParticlesInList(gamma:100) < 2', path=path)
+    ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
+    ma.applyEventCuts('0 < nParticlesInList(gamma:100) < 2', path=path)
 
     # all remaining single photon events (== candidates) with region
     # dependent minimum energy in GeV
@@ -52,7 +52,7 @@ def SinglePhotonDarkList(path):
     region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
     region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
     region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
-    cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path)
+    ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path)
     return ['gamma:singlePhoton']
 
 
@@ -80,7 +80,7 @@ def _initialALP(path):
     ALPcuts = ''
 
     # applying a lab frame energy cut to the daughter photons
-    fillParticleList(
+    ma.fillParticleList(
         'gamma:cdcAndMinimumEnergy',
         'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
         True, path=path
@@ -94,7 +94,7 @@ def _initialALP(path):
     for chID, channel in enumerate(ALPchannels):
         mode = 'ALP:' + str(chID) + ' -> ' + channel
         print(mode)
-        reconstructDecay(mode, ALPcuts, chID, path=path)
+        ma.reconstructDecay(mode, ALPcuts, chID, path=path)
 
         ALPList.append('ALP:' + str(chID))
 
@@ -126,7 +126,7 @@ def ALP3GammaList(path):
     ALPList = _initialALP(path=path)
 
     # applying a lab frame energy cut to the recoil photon
-    fillParticleList('gamma:minimumEnergy', 'E >= 0.1', True, path=path)
+    ma.fillParticleList('gamma:minimumEnergy', 'E >= 0.1', True, path=path)
     beamList = []
 
     # reconstructing decay using the reconstructed ALP
@@ -134,7 +134,7 @@ def ALP3GammaList(path):
     for chID, channel in enumerate(ALPList):
         mode = 'beam:' + str(chID) + ' -> gamma:minimumEnergy ' + channel
         print(mode)
-        reconstructDecay(mode, beamcuts, chID, path=path)
+        ma.reconstructDecay(mode, beamcuts, chID, path=path)
         beamList.append('beam:' + str(chID))
     return beamList
 
@@ -163,12 +163,12 @@ def LFVZpVisibleList(path):
     track_cuts = 'abs(dz) < 2.0 and abs(dr) < 0.5'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 4'
 
-    cutAndCopyList('e+:lfvzp', 'e+:all', track_cuts, path=path)
+    ma.cutAndCopyList('e+:lfvzp', 'e+:all', track_cuts, path=path)
 
     # Z' to lfv: fully reconstructed
     LFVZpVisChannel = 'e+:lfvzp e+:lfvzp e-:lfvzp e-:lfvzp'
 
-    reconstructDecay('vpho:vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
+    ma.reconstructDecay('vpho:vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
 
     lfvzp_list.append('vpho:vislfvzp')
 
@@ -176,14 +176,14 @@ def LFVZpVisibleList(path):
     LFVZpVisChannel = 'e+:lfvzp e+:lfvzp e-:lfvzp'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 3'
 
-    reconstructDecay('vpho:3tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
+    ma.reconstructDecay('vpho:3tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
 
     lfvzp_list.append('vpho:3tr_vislfvzp')
 
     # Z' to lfv: two same-sign tracks
     LFVZpVisChannel = 'e+:lfvzp e+:lfvzp'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-    reconstructDecay('vpho:2tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
+    ma.reconstructDecay('vpho:2tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
 
     lfvzp_list.append('vpho:2tr_vislfvzp')
 
@@ -220,8 +220,8 @@ def DimuonPlusMissingEnergyList(path):
     dimuon_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dimuon candidate
-    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
-    reconstructDecay(dimuon_name + ' -> mu+:' + skim_label + ' mu-:' + skim_label, dimuon_cut, path=path)
+    ma.cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    ma.reconstructDecay(dimuon_name + ' -> mu+:' + skim_label + ' mu-:' + skim_label, dimuon_cut, path=path)
 
     # And return the dimuon list
     dimuon_list.append(dimuon_name)
@@ -261,9 +261,9 @@ def ElectronMuonPlusMissingEnergyList(path):
     emu_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dimuon candidate
-    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
-    cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
-    reconstructDecay(emu_name + ' -> e+:' + skim_label + ' mu-:' + skim_label, emu_cut, path=path)
+    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    ma.cutAndCopyList('mu+:' + skim_label, 'mu+:all', fromIP_cut + ' and ' + muonID_cut, path=path)
+    ma.reconstructDecay(emu_name + ' -> e+:' + skim_label + ' mu-:' + skim_label, emu_cut, path=path)
 
     # And return the dimuon list
     emu_list.append(emu_name)
@@ -292,7 +292,7 @@ def DielectronPlusMissingEnergyList(path):
 
     # FIXME this skim is currently deactivated: delete the following two lines to activate it
     # and update the Sphinx documentation
-    B2WARNING("The skim 'DielectronPlusMissingEnergy' is currently deactivated.")
+    b2.B2WARNING("The skim 'DielectronPlusMissingEnergy' is currently deactivated.")
     return []
 
     dielectron_list = []
@@ -310,8 +310,8 @@ def DielectronPlusMissingEnergyList(path):
     dielectron_cut += ' and [useCMSFrame(pt) > 0.2]'
 
     # Reconstruct the dielectron candidate
-    cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
-    reconstructDecay(dielectron_name + ' -> e+:' + skim_label + ' e-:' + skim_label, dielectron_cut, path=path)
+    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', fromIP_cut + ' and ' + electronID_cut + ' and ' + theta_cut, path=path)
+    ma.reconstructDecay(dielectron_name + ' -> e+:' + skim_label + ' e-:' + skim_label, dielectron_cut, path=path)
 
     # And return the dielectron list
     dielectron_list.append(dielectron_name)

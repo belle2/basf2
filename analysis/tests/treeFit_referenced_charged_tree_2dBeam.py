@@ -20,8 +20,6 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        basf2.conditions.disable_globaltag_replay()
-
         main = basf2.create_path()
 
         inputfile = b2test_utils.require_file(

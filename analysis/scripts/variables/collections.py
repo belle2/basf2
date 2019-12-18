@@ -148,7 +148,7 @@ flight_info = [
 ]
 
 #: MC true flight info variables
-mc_flight_info = utils.create_mctruth_aliases(flight_info)
+mc_flight_info = ['mcFlightTime', 'mcFlightDistance']
 
 #: Replacement for Vertex tuple tool
 vertex = [

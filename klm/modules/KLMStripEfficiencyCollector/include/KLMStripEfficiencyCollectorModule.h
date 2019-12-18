@@ -27,9 +27,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dataobjects/RecoTrack.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
 /* C++ headers. */
 #include <map>
@@ -102,6 +104,11 @@ namespace Belle2 {
     void prepare() override;
 
     /**
+     * Finish data processing.
+     */
+    void finish() override;
+
+    /**
      * This method is called for each event.
      */
     void collect() override;
@@ -143,6 +150,12 @@ namespace Belle2 {
     /** Muon list name. If empty, use tracks. */
     std::string m_MuonListName;
 
+    /**
+     * Maximal distance in the units of strip number from ExtHit to
+     * matching (B|E)KLMDigit.
+     */
+    double m_AllowedDistance1D;
+
     /** Minimal number of matching digits. */
     int m_MinimalMatchingDigits;
 
@@ -155,6 +168,9 @@ namespace Belle2 {
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;
 
+    /** Debug mode. */
+    bool m_Debug;
+
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
@@ -166,12 +182,6 @@ namespace Belle2 {
 
     /** Tracks. */
     StoreArray<Track> m_tracks;
-
-    /** RecoTracks. */
-    StoreArray<RecoTrack> m_recoTracks;
-
-    /** TrackFitResult. */
-    StoreArray<TrackFitResult> m_trackFitResults;
 
     /** ExtHits. */
     StoreArray<ExtHit> m_extHits;
@@ -191,8 +201,17 @@ namespace Belle2 {
     /** Plane array index. */
     const KLMPlaneArrayIndex* m_PlaneArrayIndex;
 
-    /** Max distance in strips number to 1D hit from extHit to be still matched */
-    double m_AllowedDistance1D;
+    /** Matching data file. */
+    TFile* m_MatchingFile;
+
+    /** Matching data tree. */
+    TTree* m_MatchingTree;
+
+    /** Matching hit data. */
+    struct HitData m_MatchingHitData;
+
+    /** Matched strip. */
+    int m_MatchedStrip;
 
   };
 

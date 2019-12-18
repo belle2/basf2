@@ -1,5 +1,5 @@
-# EventType: 2610030000
-# Descriptor: [ccbar Dstar2D0Pip D02KmPip]
+# EventType: 2610030004
+# Descriptor: [ccbar Dstar2DbPim Db2KpPim]
 # NickName: 
 # Cuts: None
 # Documentation: 
@@ -43,25 +43,18 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-ChargeConj D0sig anti-D0sig
-
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
 1.000 c anti-c PYTHIA 32;
 Enddecay
 
-Decay D*+
-1.0  D0sig  pi+  PHOTOS VSS;
-Enddecay
-
 Decay D*-
 1.0  anti-D0sig  pi- PHOTOS VSS;
 Enddecay
 
-Decay D0sig
-1.0   K-  pi+  PHOTOS  PHSP;
+Decay anti-D0sig
+1.0   K+  pi-  PHOTOS  PHSP;
 Enddecay
-CDecay anti-D0sig
 
 End

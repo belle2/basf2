@@ -27,12 +27,14 @@ fileList = ['../SLUntagged.dst.root']
 
 ma.inputMdstList('default', fileList, path=SLpath)
 
+stdPi('all', path=SLpath)
 stdPi('loose', path=SLpath)
-stdK('loose', path=SLpath)
+stdK('all', path=SLpath)
 stdPi('all', path=SLpath)
 stdE('all', path=SLpath)
 stdMu('all', path=SLpath)
 
+stdPi0s('skim', path=SLpath)  # for skim.standardlists.charm
 stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
 stdPhotons('loose', path=SLpath)
 stdKshorts(path=SLpath)

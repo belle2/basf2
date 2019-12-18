@@ -35,7 +35,6 @@ from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
 import variables.collections as vc
 import variables.utils as vu
-# b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
 
 # create path
 my_path = b2.create_path()

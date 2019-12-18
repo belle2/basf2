@@ -96,6 +96,7 @@ void Belle2PhysicsList::ConstructParticle()
 void Belle2PhysicsList::SetCuts()
 {
   // Belle2 assumes input units are cm
+  G4cout << " Global cut set to " << m_globalCutValue << G4endl;
   SetCutValue(m_globalCutValue * cm, "proton");
   SetCutValue(m_globalCutValue * cm, "e-");
   SetCutValue(m_globalCutValue * cm, "e+");
@@ -105,24 +106,28 @@ void Belle2PhysicsList::SetCuts()
   G4ProductionCuts* regionCuts = 0;
 
   // VXD region cut
+  if (m_pxdCutValue == 0.0) m_pxdCutValue = m_globalCutValue;
   regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(m_pxdCutValue * cm);
   G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
   theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
 
   // SVD region cut
+  if (m_svdCutValue == 0.0) m_svdCutValue = m_globalCutValue;
   regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(m_svdCutValue * cm);
   G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
   theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
 
   // CDC region cut
+  if (m_cdcCutValue == 0.0) m_cdcCutValue = m_globalCutValue;
   regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(m_cdcCutValue * cm);
   G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
   theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
 
   // ARICH region cut
+  if (m_arichtopCutValue == 0.0) m_arichtopCutValue = m_globalCutValue;
   regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(m_arichtopCutValue * cm);
   theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
@@ -131,22 +136,16 @@ void Belle2PhysicsList::SetCuts()
   regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(m_arichtopCutValue * cm);
   G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
-  theRegionStore->GetRegion("TOPModule02")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule03")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule04")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule05")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule06")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule07")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule08")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule09")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule10")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule11")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule12")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule13")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule14")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule15")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule16")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("TOPModule17")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("TOPEnvelope")->SetProductionCuts(regionCuts);
+
+  // ECL region cut
+  if (m_eclCutValue == 0.0) m_eclCutValue = m_globalCutValue;
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_eclCutValue * cm);
+  G4cout << " ECL cut set to " << m_eclCutValue << G4endl;
+  theRegionStore->GetRegion("ECLForwardEnvelope")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("ECLBarrelSector")->SetProductionCuts(regionCuts);
+  theRegionStore->GetRegion("ECLBackwardEnvelope")->SetProductionCuts(regionCuts);
 }
 
 
@@ -183,6 +182,12 @@ void Belle2PhysicsList::SetCDCProductionCutValue(G4double value)
 void Belle2PhysicsList::SetARICHTOPProductionCutValue(G4double value)
 {
   m_arichtopCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetECLProductionCutValue(G4double value)
+{
+  m_eclCutValue = value;
 }
 
 

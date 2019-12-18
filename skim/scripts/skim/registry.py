@@ -19,11 +19,13 @@ skim_registry = [
     ('15420100', 'BottomoniumEtabExclusive'),
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
-    ('14140100', 'BtoDh_hh'),
-    ('14120300', 'BtoDh_Kspi0'),
-    ('14140200', 'BtoDh_Kshh'),
-    ('14120400', 'BtoDh_Kspipipi0'),
-    ('14140500', 'BtoDh_Kspi0pi0'),
+    ('14140100', 'BtoD0h_hh'),
+    ('14120300', 'BtoD0h_Kspi0'),
+    ('14140200', 'BtoD0h_Kshh'),
+    ('14120400', 'BtoD0h_Kspipipi0'),
+    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
+    ('14140101', 'BtoD0h_Kpi'),
+    ('14140102', 'BtoD0h_Kpipipi'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -103,15 +105,12 @@ combined_skims = {
         'feiSLB0', 'feiSLBplus'
     ],
     'MiscCombined': [
-        'TCPV'
+        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
     ],
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
     ],
     'Semileptonic': [
         'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
-    ],
-    'TauCombined': [
-        'TauLFV', 'TauThrust', 'TauGeneric'
     ]
 }

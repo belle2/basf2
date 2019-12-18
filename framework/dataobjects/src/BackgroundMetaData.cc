@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

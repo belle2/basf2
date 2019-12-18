@@ -369,7 +369,7 @@ def loadB0toDstarPi_Kpi(path):
     """
     **Skim Author**: C. La Licata
 
-    **Skim Name**: B0toDStarPi_D0pi_Kpi
+    **Skim Name**: B0toDstarPi_D0pi_Kpi
 
     **Skim Category**: physics, hadronic neutral B to charm
 
@@ -405,7 +405,7 @@ def loadB0toDstarPi_Kpipipi(path):
     """
    **Skim Author**: C. La Licata
 
-   **Skim Name**: B0toDStarPi_D0pi_Kpipipi
+   **Skim Name**: B0toDstarPi_D0pi_Kpipipi
 
    **Skim Category**: physics, hadronic neutral B to charm
 

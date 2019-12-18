@@ -11,27 +11,25 @@
 ######################################################
 
 from ROOT import Belle2
-from basf2 import *
+import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdPi, stdK
-from stdPi0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file, skimOutputUdst
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-04'
 
-mypath = Path()
+mypath = b2.Path()
 
-skimCode = encodeSkimName('B0toDStarPi_D0pi_Kpi')
+skimCode = encodeSkimName('B0toDstarPi_D0pi_Kpi')
 
 fileList = get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=mypath)
+ma.inputMdstList('default', fileList, path=mypath)
 
 # create and fill pion and kaon ParticleLists
 stdPi('all', path=mypath)
 stdK('all', path=mypath)
-stdPi0s('skim', path=mypath)
 
 ma.applyCuts(list_name='pi+:all', cut='abs(dr) < 2 and abs(dz) < 5',
              path=mypath)
@@ -46,10 +44,10 @@ loadStdDstarPlus_D0pi_Kpi(path=mypath)
 B0toDstarPiList_Kpi = loadB0toDstarPi_Kpi(path=mypath)
 
 skimOutputUdst(skimCode, B0toDstarPiList_Kpi, path=mypath)
-summaryOfLists(B0toDstarPiList_Kpi, path=mypath)
+ma.summaryOfLists(B0toDstarPiList_Kpi, path=mypath)
 
 setSkimLogging(mypath)
-process(mypath)
+b2.process(mypath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

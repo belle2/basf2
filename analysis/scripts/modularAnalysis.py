@@ -2344,256 +2344,205 @@ def writePi0EtaVeto(
     particleList,
     decayString,
     workingDirectory='.',
-    pi0vetoname='Pi0_Prob',
-    etavetoname='Eta_Prob',
     downloadFlag=True,
     selection='',
     path=None
 ):
 
-    #    global PI0ETAVETO
+    """
+    Give pi0/eta probability for hard photon.
 
-    #    if PI0ETAVETO == 0:
-    variables.addAlias('lowE', 'daughter(1,E)')
-    variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
-    variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
-    variables.addAlias('minC2Tdist', 'daughter(1,minC2TDist)')
-    variables.addAlias('cluNHits', 'daughter(1,clusterNHits)')
-    variables.addAlias('E9E21', 'daughter(1,clusterE9E21)')
+    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
+    current default weight files are optimised by MC12.
+    The Input Variables are as below.
+    M : pi0/eta candidates Invariant mass
+    daughter(1,E) : soft photon energy in lab frame
+    daughter(1,clusterTheta) : soft photon ECL cluster's polar angle
+    daughter(1,minC2TDist) : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+    daughter(1,clusterZernikeMVA) : soft photon output of MVA using Zernike moments of the cluster
+    daughter(1,clusterNHits) :  soft photon total crystal weights sum(w_i) with w_i<=1
+    daughter(1,clusterE9E21) :
+    cosHelicityAngleMomentum :
 
-#    PI0ETAVETO_COUNTER = PI0ETAVETO_COUNTER + 1
-#    B2WARNING('PI0ETAVETO_COUNTER is ' + str(PI0ETAVETO))
+    If you don't have weight files in your workingDirectory,
+    these files are downloaded from database to your workingDirectory automatically.
+    Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
+    about how to use this function.
+
+    NOTE for debug
+    Please don't use following ParticleList names elsewhere.
+    'gamma:HARDPHOTON', 'pi0:PI0VETO_ORIGIN', eta:ETAVETO,
+    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
+
+    @param particleList     The input ParticleList
+    @param decayString specify Particle to be added to the ParticleList
+    @param workingDirectory The weight file directory
+    @param downloadFlag whether download default weight files or not
+    @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
+    @param path       modules are added to this path
+    """
 
     roe_path = create_path()
-
     deadEndPath = create_path()
-
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-
     fillSignalSideParticleList('gamma:HARDPHOTON', decayString, path=roe_path)
-
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
         B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
 
+    # define the particleList name for soft photon
     pi0soft_origin = 'gamma:PI0SOFT' + '_' + particleList.replace(':', '_')
-
+    # fill the particleList for soft photon with energy cut
     fillParticleList(
-        pi0soft_origin,
-        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-        path=roe_path)
+        pi0soft_origin, '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]', path=roe_path)
+    # apply an additional cut for soft photon
     applyCuts(pi0soft_origin, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-
+    # reconstruct pi0
     reconstructDecay('pi0:PI0VETO_ORIGIN -> gamma:HARDPHOTON ' + pi0soft_origin, '', path=roe_path)
-
+    # if you don't have wight files in your workingDirectory,
+    # these files are downloaded from database to your workingDirectory automatically.
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifierStandard', workingDirectory + '/pi0veto.root')
             B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
-
-    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO_ORIGIN'], extraInfoName='Pi0Veto',
-                        identifier=workingDirectory + '/pi0veto.root')
-
+    # MVA training is conducted.
+    roe_path.add_module(
+        'MVAExpert', listNames=['pi0:PI0VETO_ORIGIN'], extraInfoName='Pi0Veto', identifier=workingDirectory + '/pi0veto.root')
+    # Pick up only one pi0/eta candidate with the highest pi0/eta probability.
     rankByHighest('pi0:PI0VETO_ORIGIN', 'extraInfo(Pi0Veto)', numBest=1, path=roe_path)
-
-    variableToSignalSideExtraInfo('pi0:PI0VETO_ORIGIN', {'extraInfo(Pi0Veto)': pi0vetoname}, path=roe_path)
+    # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
+    variableToSignalSideExtraInfo('pi0:PI0VETO_ORIGIN', {'extraInfo(Pi0Veto)': 'Pi0_Prob'}, path=roe_path)
 
     pi0soft_tight_energy_threshold = 'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD' + '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        pi0soft_tight_energy_threshold,
-        '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
-        path=roe_path)
+    fillParticleList(pi0soft_tight_energy_threshold,
+                     '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]', path=roe_path)
     applyCuts(pi0soft_tight_energy_threshold, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-
     reconstructDecay('pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD -> gamma:HARDPHOTON ' + pi0soft_tight_energy_threshold, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/pi0veto_energy.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifierWithHigherEnergyThreshold', workingDirectory + '/pi0veto_energy.root')
             B2INFO('writePi0EtaVeto: pi0veto_energy.root has been downloaded from database to workingDirectory.')
-
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD'], extraInfoName='Pi0VetoTightEnergyThreshold',
                         identifier=workingDirectory + '/pi0veto_energy.root')
-
     rankByHighest('pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD', 'extraInfo(Pi0VetoTightEnergyThreshold)', numBest=1, path=roe_path)
-
-    variableToSignalSideExtraInfo(
-        'pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD', {
-            'extraInfo(Pi0VetoTightEnergyThreshold)': pi0vetoname + '_Tight_Energy_Threshold'}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD',
+                                  {'extraInfo(Pi0VetoTightEnergyThreshold)': 'Pi0_Prob_Tight_Energy_Threshold'},
+                                  path=roe_path)
 
     pi0soft_large_cluster_size = 'gamma:PI0SOFT_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        pi0soft_large_cluster_size,
-        '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-        path=roe_path)
+    fillParticleList(pi0soft_large_cluster_size,
+                     '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]', path=roe_path)
     applyCuts(pi0soft_large_cluster_size, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
-
     reconstructDecay('pi0:PI0VETO_LARGE_CLUSTER_SIZE -> gamma:HARDPHOTON ' + pi0soft_large_cluster_size, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/pi0veto_cluster.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifierWithLargerClusterSize', workingDirectory + '/pi0veto_cluster.root')
             B2INFO('writePi0EtaVeto: pi0veto_cluster.root has been downloaded from database to workingDirectory.')
-
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO_LARGE_CLUSTER_SIZE'], extraInfoName='Pi0VetoLargeClusterSize',
                         identifier=workingDirectory + '/pi0veto_cluster.root')
-
     rankByHighest('pi0:PI0VETO_LARGE_CLUSTER_SIZE', 'extraInfo(Pi0VetoLargeClusterSize)', numBest=1, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:PI0VETO_LARGE_CLUSTER_SIZE',
+                                  {'extraInfo(Pi0VetoLargeClusterSize)': 'Pi0_Prob_Large_Cluster_Size'}, path=roe_path)
 
-    variableToSignalSideExtraInfo(
-        'pi0:PI0VETO_LARGE_CLUSTER_SIZE', {
-            'extraInfo(Pi0VetoLargeClusterSize)': pi0vetoname + '_Large_Cluster_Size'}, path=roe_path)
-
-    pi0softname_tight_energy_threshold_and_large_cluster_size = 'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + \
-        '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        pi0softname_tight_energy_threshold_and_large_cluster_size,
-        '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
-        path=roe_path)
+    pi0softname_tight_energy_threshold_and_large_cluster_size = \
+        'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
+    fillParticleList(pi0softname_tight_energy_threshold_and_large_cluster_size,
+                     '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]', path=roe_path)
     applyCuts(pi0softname_tight_energy_threshold_and_large_cluster_size,
               'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
-
     reconstructDecay('pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE -> gamma:HARDPHOTON ' +
                      pi0softname_tight_energy_threshold_and_large_cluster_size, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/pi0veto_both.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download(
-                'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
-                workingDirectory + '/pi0veto_both.root')
+                'Pi0VetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize', workingDirectory + '/pi0veto_both.root')
             B2INFO('writePi0EtaVeto: pi0veto_both.root has been downloaded from database to workingDirectory.')
-
-    roe_path.add_module(
-        'MVAExpert',
-        listNames=['pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE'],
-        extraInfoName='Pi0VetoTightEnergyThresholdAndLargeClusterSize',
-        identifier=workingDirectory +
-        '/pi0veto_both.root')
-
+    roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE'],
+                        extraInfoName='Pi0VetoTightEnergyThresholdAndLargeClusterSize',
+                        identifier=workingDirectory + '/pi0veto_both.root')
     rankByHighest('pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE',
                   'extraInfo(Pi0VetoTightEnergyThresholdAndLargeClusterSize)', numBest=1, path=roe_path)
-
     variableToSignalSideExtraInfo(
-        'pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE', {
-            'extraInfo(Pi0VetoTightEnergyThresholdAndLargeClusterSize)':
-            pi0vetoname + '_Tight_Energy_Threshold_And_Large_Cluster_Size'}, path=roe_path)
+        'pi0:PI0VETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE',
+        {'extraInfo(Pi0VetoTightEnergyThresholdAndLargeClusterSize)':
+         'Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size'}, path=roe_path)
 
     etasoftname_origin = 'gamma:ETASOFT_ORIGIN' + '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        etasoftname_origin,
-        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-        path=roe_path)
+    fillParticleList(etasoftname_origin,
+                     '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]', path=roe_path)
     applyCuts(etasoftname_origin, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-
     reconstructDecay('eta:ETAVETO_ORIGIN -> gamma:HARDPHOTON ' + etasoftname_origin, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifierStandard', workingDirectory + '/etaveto.root')
             B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
-
-    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO_ORIGIN'], extraInfoName='EtaVeto',
-                        identifier=workingDirectory + '/etaveto.root')
-
+    roe_path.add_module(
+        'MVAExpert', listNames=['eta:ETAVETO_ORIGIN'], extraInfoName='EtaVeto', identifier=workingDirectory + '/etaveto.root')
     rankByHighest('eta:ETAVETO_ORIGIN', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
-
-    variableToSignalSideExtraInfo('eta:ETAVETO_ORIGIN', {'extraInfo(EtaVeto)': etavetoname}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO_ORIGIN', {'extraInfo(EtaVeto)': 'Eta_Prob'}, path=roe_path)
 
     etasoftname_tight_energy_threshold = 'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD' + '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        etasoftname_tight_energy_threshold,
-        '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
-        path=roe_path)
+    fillParticleList(etasoftname_tight_energy_threshold,
+                     '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]', path=roe_path)
     applyCuts(etasoftname_tight_energy_threshold, 'abs(clusterTiming)<clusterErrorTiming', path=roe_path)
-
     reconstructDecay('eta:ETAVETO_TIGHT_ENERGY_THRESHOLD -> gamma:HARDPHOTON ' +
                      etasoftname_tight_energy_threshold, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifierWithHigherEnergyThreshold', workingDirectory + '/etaveto_energy.root')
             B2INFO('writePi0EtaVeto: etaveto_energy.root has been downloaded from database to workingDirectory.')
-
     roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO_TIGHT_ENERGY_THRESHOLD'], extraInfoName='EtaVetoTightEnergyThreshold',
                         identifier=workingDirectory + '/etaveto_energy.root')
-
     rankByHighest('eta:ETAVETO_TIGHT_ENERGY_THRESHOLD', 'extraInfo(EtaVetoTightEnergyThreshold)', numBest=1, path=roe_path)
-
     variableToSignalSideExtraInfo(
-        'eta:ETAVETO_TIGHT_ENERGY_THRESHOLD', {
-            'extraInfo(EtaVetoTightEnergyThreshold)': etavetoname + '_Tight_Energy_Threshold'}, path=roe_path)
+        'eta:ETAVETO_TIGHT_ENERGY_THRESHOLD',
+        {'extraInfo(EtaVetoTightEnergyThreshold)': 'Eta_Prob_Tight_Energy_Threshold'}, path=roe_path)
 
     etasoftname_large_cluster_size = 'gamma:ETASOFT_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        etasoftname_large_cluster_size,
-        '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
-        path=roe_path)
+    fillParticleList(etasoftname_large_cluster_size,
+                     '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]', path=roe_path)
     applyCuts(etasoftname_large_cluster_size, 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
-
     reconstructDecay('eta:ETAVETO_LARGE_CLUSTER_SIZE -> gamma:HARDPHOTON ' + etasoftname_large_cluster_size, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifierWithLargerClusterSize', workingDirectory + '/etaveto_cluster.root')
             B2INFO('writePi0EtaVeto: etaveto_cluster.root has been downloaded from database to workingDirectory.')
-
     roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO_LARGE_CLUSTER_SIZE'], extraInfoName='EtaVetoLargeClusterSize',
                         identifier=workingDirectory + '/etaveto_cluster.root')
-
     rankByHighest('eta:ETAVETO_LARGE_CLUSTER_SIZE', 'extraInfo(EtaVetoLargeClusterSize)', numBest=1, path=roe_path)
+    variableToSignalSideExtraInfo('eta:ETAVETO_LARGE_CLUSTER_SIZE',
+                                  {'extraInfo(EtaVetoLargeClusterSize)': 'Eta_Prob_Large_Cluster_Size'}, path=roe_path)
 
-    variableToSignalSideExtraInfo(
-        'eta:ETAVETO_LARGE_CLUSTER_SIZE', {
-            'extraInfo(EtaVetoLargeClusterSize)': etavetoname + '_Large_Cluster_Size'}, path=roe_path)
-
-    etasoftname_tight_energy_threshold_and_large_cluster_size = 'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + \
-        '_' + particleList.replace(':', '_')
-
-    fillParticleList(
-        etasoftname_tight_energy_threshold_and_large_cluster_size,
-        '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
-        path=roe_path)
+    etasoftname_tight_energy_threshold_and_large_cluster_size = \
+        'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
+    fillParticleList(etasoftname_tight_energy_threshold_and_large_cluster_size,
+                     '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]', path=roe_path)
     applyCuts(etasoftname_tight_energy_threshold_and_large_cluster_size,
               'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2', path=roe_path)
-
     reconstructDecay('eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE -> gamma:HARDPHOTON ' +
                      etasoftname_tight_energy_threshold_and_large_cluster_size, '', path=roe_path)
-
     if not os.path.isfile(workingDirectory + '/etaveto_both.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download(
-                'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize',
-                workingDirectory + '/etaveto_both.root')
+                'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize', workingDirectory + '/etaveto_both.root')
             B2INFO('writePi0EtaVeto: etaveto_both.root has been downloaded from database to workingDirectory.')
-
-    roe_path.add_module(
-        'MVAExpert',
-        listNames=['eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE'],
-        extraInfoName='EtaVetoTightEnergyThresholdAndLargeClusterSize',
-        identifier=workingDirectory +
-        '/etaveto_both.root')
-
+    roe_path.add_module('MVAExpert', listNames=['eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE'],
+                        extraInfoName='EtaVetoTightEnergyThresholdAndLargeClusterSize',
+                        identifier=workingDirectory + '/etaveto_both.root')
     rankByHighest('eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE',
                   'extraInfo(EtaVetoTightEnergyThresholdAndLargeClusterSize)', numBest=1, path=roe_path)
-
     variableToSignalSideExtraInfo(
-        'eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE', {
-            'extraInfo(EtaVetoTightEnergyThresholdAndLargeClusterSize)':
-            etavetoname + '_Tight_Energy_Threshold_And_Large_Cluster_Size'}, path=roe_path)
+        'eta:ETAVETO_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE',
+        {'extraInfo(EtaVetoTightEnergyThresholdAndLargeClusterSize)':
+         'Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size'}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

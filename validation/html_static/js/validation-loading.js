@@ -821,7 +821,6 @@ function sha1(str) {
     // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
     // slightly tweaked: Kilian Lieret
     //    input by: Brett Zamir (http://brett-zamir.me)
-    //  depends on: utf8_encode
     //   example 1: sha1('Kevin van Zonneveld');
     //   returns 1: '54916d2e62f65b3afa6e192e6a601cdbe5cb5897'
 
@@ -958,7 +957,6 @@ function selectedRevsListToString(selectedRevs) {
         if (i > 0) revString += ",";
         revString += selectedRevs[i];
     }
-    console.log(revString);
     return sha1(revString).slice(0, 10)
 }
 

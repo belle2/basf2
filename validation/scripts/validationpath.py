@@ -32,20 +32,20 @@ class TagFolderRainbowTable(dict):
     that is a simple text file that contains hash <> revisions.
     """
 
-    def update_from_json(self, path):
+    def update_from_json(self, path: str) -> None:
         """ Read a json file which was produced by the ``to_json`` method and
         update this dictionary. If the path does not exist, do nothing. """
         if os.path.exists(path):
             with open(path) as infile:
                 self.update(json.load(infile))
 
-    def to_json(self, path):
+    def to_json(self, path: str) -> None:
         """ Write out this dictionary as a json file. """
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w") as outfile:
             json.dump(self, outfile, indent=4, sort_keys=True)
 
-    def update_to_json(self, path):
+    def update_to_json(self, path: str) -> None:
         """ Read json file (if exists) for anything the dictionary
         doesn't contain yet and write everything back. """
         self.update_from_json(path)

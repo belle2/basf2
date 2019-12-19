@@ -39,8 +39,8 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
   addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD pixel outside the ROIs", false);
 
-  addParam("overwriteDB", m_overwriteDB, "If set, ROI-finding settings in DB are overwritten", false);
-  addParam("usePXDDataReduction", m_usePXDDataReduction, "enables/disables ROI-finding if overwriteDB=True", false);
+  addParam("overrideDB", m_overrideDB, "If set, ROI-finding settings in DB are overwritten", false);
+  addParam("usePXDDataReduction", m_usePXDDataReduction, "enables/disables ROI-finding if overrideDB=True", false);
 }
 
 void PXDdigiFilterModule::initialize()
@@ -93,7 +93,7 @@ void PXDdigiFilterModule::event()
     m_countNthEvent = 0;
   }
 
-  if (m_overwriteDB) {
+  if (m_overrideDB) {
     if (m_usePXDDataReduction) {
       filterDigits();
     } else {
@@ -149,7 +149,8 @@ void PXDdigiFilterModule::filterDigits()
 
 void PXDdigiFilterModule::copyDigits()
 {
-  m_selectorIN.select([](const PXDDigit * thePxdDigit) {return true;});
+  // omitting the variable name; otherwise a warning is produced (un-used variable)
+  m_selectorIN.select([](const PXDDigit* /* thePxdDigit */) {return true;});
 }
 
 

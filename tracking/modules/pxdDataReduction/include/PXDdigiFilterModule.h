@@ -50,13 +50,13 @@ namespace Belle2 {
     void copyDigits();
 
 
-    bool m_CreateOutside; /**< if set, create list of outside pixels, too */
+    bool m_CreateOutside = false; /**< if set, create list of outside pixels, too */
     std::string m_PXDDigitsName;  /**< The name of the StoreArray of PXDDigits to be filtered */
     std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
-    bool m_overwriteDB; /**< if set, overwrites ROI-finding settings in DB */
-    bool m_usePXDDataReduction; /**< enables/disables ROI-finding if overwriteDB=True */
+    bool m_overrideDB = false; /**< if set, overwrites ROI-finding settings in DB */
+    bool m_usePXDDataReduction = false; /**< enables/disables ROI-finding if overwriteDB=True */
 
 
     int m_countNthEvent = 0;  /**< Event counter to be able to disable data reduction for every Nth event */

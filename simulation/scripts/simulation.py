@@ -39,7 +39,14 @@ def check_simulation(path):
 
 
 def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True, overwriteDB=False, usePXDDataReduction=True):
+                         doCleanup=True, overrideDB=False, usePXDDataReduction=True):
+    """
+    This function adds the standard simulation modules to a path.
+    @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
+    @param overrideDB: override settings from the DB with the value set in 'usePXDDataReduction'
+    @param usePXDDataReduction: if 'overrideDB==True', override settings from the DB
+    @param doCleanup: if 'doCleanup=True' temporary datastore objects are emptied
+    """
 
     # SVD reconstruction
     svd_cluster = '__ROIsvdClusters'
@@ -57,8 +64,8 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
     pxd_digifilter.param('ROIidsName', 'ROIs')
     pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
     pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
-    pxd_digifilter.param('overwriteDB', overwriteDB)
-    pxd_digifilter.param('usePXDDataReduction', usePXDDataReduction)  # only used for overwriteDB=True
+    pxd_digifilter.param('overrideDB', overrideDB)
+    pxd_digifilter.param('usePXDDataReduction', usePXDDataReduction)  # only used for overrideDB=True
     path.add_module(pxd_digifilter)
 
     # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
@@ -117,6 +124,8 @@ def add_simulation(
         usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
+    @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
+    @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
@@ -258,7 +267,7 @@ def add_simulation(
         if forceSetPXDDataReduction:
             if usePXDDataReduction:
                 add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction,
-                                     overwriteDB=forceSetPXDDataReduction, usePXDDataReduction=usePXDDataReduction)
+                                     overrideDB=forceSetPXDDataReduction, usePXDDataReduction=usePXDDataReduction)
         else:
             path_enableROI_Red = create_path()
             add_PXDDataReduction(

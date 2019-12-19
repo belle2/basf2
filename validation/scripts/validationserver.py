@@ -191,6 +191,18 @@ class ValidationRoot(object):
         raise cherrypy.HTTPRedirect("/static/validation.html")
 
     @cherrypy.expose
+    def plots(self, *args):
+        # todo: replace os.getcwd with an attribute
+        tag_folder = os.path.relpath(
+            validationpath.get_html_plots_tag_comparison_folder(os.getcwd(), args[:-2]),
+            validationpath.get_html_folder(os.getcwd())
+        )
+        print(tag_folder)
+        path = os.path.join(tag_folder, *args[-2:])
+        print(path)
+        return cherrypy.lib.static.serve_file(path)
+
+    @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
     def check_comparison_status(self):
@@ -325,21 +337,22 @@ class ValidationRoot(object):
         comparison
         """
 
-        # todo: ensure this file is not outside of the webserver
-        full_path = os.path.join(
-            self.comparison_folder,
-            comparison_label,
+        path = os.path.join(
+            os.path.relpath(
+                validationpath.get_html_plots_tag_comparison_folder(os.getcwd(), comparison_label.split(",")),
+                validationpath.get_html_folder(os.getcwd())
+            ),
             "comparison.json"
         )
 
         # check if this comparison actually exists
-        if not os.path.isfile(full_path):
+        if not os.path.isfile(path):
             raise cherrypy.HTTPError(
                 404,
-                f"Json Comparison file {full_path} does not exist"
+                f"Json Comparison file {path} does not exist"
             )
 
-        return deliver_json(full_path)
+        return deliver_json(path)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()

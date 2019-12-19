@@ -2318,13 +2318,13 @@ def oldwritePi0EtaVeto(
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
-            B2INFO('writePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
+            B2INFO('oldwritePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
             conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
-            B2INFO('writePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
+            B2INFO('oldwritePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
     roe_path.add_module('MVAExpert', listNames=['pi0:PI0VETO'], extraInfoName='Pi0Veto',
                         identifier=workingDirectory + '/pi0veto.root')
@@ -2360,19 +2360,19 @@ def writePi0EtaVeto(
     daughter(1,clusterTheta) : soft photon ECL cluster's polar angle
     daughter(1,minC2TDist) : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
     daughter(1,clusterZernikeMVA) : soft photon output of MVA using Zernike moments of the cluster
-    daughter(1,clusterNHits) :  soft photon total crystal weights sum(w_i) with w_i<=1
-    daughter(1,clusterE9E21) :
-    cosHelicityAngleMomentum :
+    daughter(1,clusterNHits) : soft photon total crystal weights sum(w_i) with w_i<=1
+    daughter(1,clusterE9E21) : soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
+    cosHelicityAngleMomentum : pi0/eta candidates cosHelicityAngleMomentum
 
     If you don't have weight files in your workingDirectory,
     these files are downloaded from database to your workingDirectory automatically.
-    Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
-    about how to use this function.
 
     NOTE for debug
     Please don't use following ParticleList names elsewhere.
-    'gamma:HARDPHOTON', 'pi0:PI0VETO_ORIGIN', eta:ETAVETO,
-    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
+    'gamma:HARDPHOTON', 'pi0:PI0VETO_ORIGIN', 'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD', 'gamma:PI0SOFT_LARGE_CLUSTER_SIZE',
+    'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE', 'eta:ETAVETO_ORIGIN', 'gamma:ETASOFT_LARGE_CLUSTER_SIZE',
+    'gamma:ETASOFT_LARGE_CLUSTER_SIZE', 'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE'
+    'gamma:PI0SOFT' + '_' + particleList.replace(':', '_'), 'gamma:ETASOFT' + '_' + particleList.replace(':', '_')
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
@@ -2390,6 +2390,9 @@ def writePi0EtaVeto(
         os.mkdir(workingDirectory)
         B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
 
+    """
+    pi0 veto for standard cut
+    """
     # define the particleList name for soft photon
     pi0soft_origin = 'gamma:PI0SOFT' + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy cut
@@ -2414,6 +2417,9 @@ def writePi0EtaVeto(
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:PI0VETO_ORIGIN', {'extraInfo(Pi0Veto)': 'Pi0_Prob'}, path=roe_path)
 
+    """
+    pi0 veto for tight energy threshold
+    """
     pi0soft_tight_energy_threshold = 'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD' + '_' + particleList.replace(':', '_')
     fillParticleList(pi0soft_tight_energy_threshold,
                      '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]', path=roe_path)
@@ -2431,6 +2437,9 @@ def writePi0EtaVeto(
                                   {'extraInfo(Pi0VetoTightEnergyThreshold)': 'Pi0_Prob_Tight_Energy_Threshold'},
                                   path=roe_path)
 
+    """
+    pi0 veto for large cluster size cut
+    """
     pi0soft_large_cluster_size = 'gamma:PI0SOFT_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
     fillParticleList(pi0soft_large_cluster_size,
                      '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]', path=roe_path)
@@ -2447,6 +2456,9 @@ def writePi0EtaVeto(
     variableToSignalSideExtraInfo('pi0:PI0VETO_LARGE_CLUSTER_SIZE',
                                   {'extraInfo(Pi0VetoLargeClusterSize)': 'Pi0_Prob_Large_Cluster_Size'}, path=roe_path)
 
+    """
+    pi0 veto for tight energy threshold and large cluster size cut
+    """
     pi0softname_tight_energy_threshold_and_large_cluster_size = \
         'gamma:PI0SOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
     fillParticleList(pi0softname_tight_energy_threshold_and_large_cluster_size,
@@ -2471,6 +2483,9 @@ def writePi0EtaVeto(
         {'extraInfo(Pi0VetoTightEnergyThresholdAndLargeClusterSize)':
          'Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size'}, path=roe_path)
 
+    """
+    eta veto for standard cut
+    """
     etasoftname_origin = 'gamma:ETASOFT_ORIGIN' + '_' + particleList.replace(':', '_')
     fillParticleList(etasoftname_origin,
                      '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]', path=roe_path)
@@ -2486,6 +2501,9 @@ def writePi0EtaVeto(
     rankByHighest('eta:ETAVETO_ORIGIN', 'extraInfo(EtaVeto)', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:ETAVETO_ORIGIN', {'extraInfo(EtaVeto)': 'Eta_Prob'}, path=roe_path)
 
+    """
+    eta veto for tight energy threshold
+    """
     etasoftname_tight_energy_threshold = 'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD' + '_' + particleList.replace(':', '_')
     fillParticleList(etasoftname_tight_energy_threshold,
                      '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]', path=roe_path)
@@ -2504,6 +2522,9 @@ def writePi0EtaVeto(
         'eta:ETAVETO_TIGHT_ENERGY_THRESHOLD',
         {'extraInfo(EtaVetoTightEnergyThreshold)': 'Eta_Prob_Tight_Energy_Threshold'}, path=roe_path)
 
+    """
+    eta veto for large cluster size cut
+    """
     etasoftname_large_cluster_size = 'gamma:ETASOFT_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
     fillParticleList(etasoftname_large_cluster_size,
                      '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]', path=roe_path)
@@ -2520,6 +2541,9 @@ def writePi0EtaVeto(
     variableToSignalSideExtraInfo('eta:ETAVETO_LARGE_CLUSTER_SIZE',
                                   {'extraInfo(EtaVetoLargeClusterSize)': 'Eta_Prob_Large_Cluster_Size'}, path=roe_path)
 
+    """
+    eta veto for tight energy threshold and large cluster size cut
+    """
     etasoftname_tight_energy_threshold_and_large_cluster_size = \
         'gamma:ETASOFT_TIGHT_ENERGY_THRESHOLD_AND_LARGE_CLUSTER_SIZE' + '_' + particleList.replace(':', '_')
     fillParticleList(etasoftname_tight_energy_threshold_and_large_cluster_size,

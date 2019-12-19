@@ -36,8 +36,8 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import variableToSignalSideExtraInfo
-from modularAnalysis import vertexRave
-from modularAnalysis import vertexTree
+from vertex import vertexRave
+from vertex import vertexTree
 from stdCharged import stdPi, stdK
 from variables import variables
 import variables.collections as vc

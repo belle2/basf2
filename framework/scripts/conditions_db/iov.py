@@ -11,7 +11,28 @@ from itertools import product
 
 
 class IntervalOfValidity:
-    """Interval of validity class to support set operations like union and intersection"""
+    """
+    Interval of validity class to support set operations like union and
+    intersection.
+
+    An interval of validity is a set of runs for which something is valid. An
+    IntervalOfValidity consists of a `first` valid run and a `final` valid run.
+
+    Warning:
+        The `final` run is inclusive so the the validity is including the final run.
+
+    Each run is identified by a experiment number and a run number. Accessing
+    `first` or `final` will return a tuple ``(experiment, run)`` but the
+    elements can also be accessed separately with `first_exp`, `first_exp`,
+    `final_exp` and `final_run`.
+
+    For `final` there's a special case where either the run or both, the run and
+    the experiment number are infinite. This means the validity extends to all
+    values. If only the run number is infinite then it's valid for all further
+    runs in this experiment. If both are infinite the validity extends to everything.
+
+    For simplicity ``-1`` can be passed in instead of infinity when creating objects.
+    """
     def __init__(self, *iov):
         """Create a new object.
 
@@ -37,7 +58,11 @@ class IntervalOfValidity:
 
     @staticmethod
     def always():
-        """Return an iov that is valid everywhere"""
+        """Return an iov that is valid everywhere
+
+        >>> IntervalOfValidity.always()
+        (0, 0, inf, inf)
+        """
         return IntervalOfValidity(0, 0, -1, -1)
 
     @property
@@ -72,7 +97,7 @@ class IntervalOfValidity:
 
     def __repr__(self):
         """Return a printable representation"""
-        return "{}".format(self.__first + self.__final)
+        return str(self.__first + self.__final)
 
     def __eq__(self, other):
         """Check for equality"""
@@ -89,7 +114,8 @@ class IntervalOfValidity:
         return self.intersect(other)
 
     def __or__(self, other):
-        """Union between iovs. Will return None if the iovs don't overlap or connect to each other"""
+        """Union between iovs. Will return None if the iovs don't overlap or
+        connect to each other"""
         return self.union(other, False)
 
     def __sub__(self, other):
@@ -105,12 +131,13 @@ class IntervalOfValidity:
         Will return None if everything is removed.
 
         Warning:
-            If the other iov is in the middle of the validity we will return a tuple of two new iovs
+            If the other iov is in the middle of the validity we will return a
+            tuple of two new iovs
 
-            >>> iov1 = IntervalOfValidity(0,0,10,-1)
-            >>> iov2 = IntervalOfValidity(5,0,5,-1)
-            >>> iov1 - iov2
-            (Iov(0,0,4,inf), IoV(6,0,10,inf))
+                >>> iov1 = IntervalOfValidity(0,0,10,-1)
+                >>> iov2 = IntervalOfValidity(5,0,5,-1)
+                >>> iov1 - iov2
+                ((0, 0, 4, inf), (6, 0, 10, inf))
         """
         if other.first <= self.first and other.final >= self.final:
             # full overlap
@@ -140,13 +167,38 @@ class IntervalOfValidity:
         return self
 
     def intersect(self, other):
-        """Intersection with another iov. Will return None if the payloads don't overlap"""
+        """Intersection with another iov.
+
+        Will return None if the payloads don't overlap
+
+            >>> iov1 = IntervalOfValidity(1,0,2,5)
+            >>> iov2 = IntervalOfValidity(2,0,2,-1)
+            >>> iov3 = IntervalOfValidity(2,10,5,-1)
+            >>> iov1.intersect(iov2)
+            (2, 0, 2, 5)
+            >>> iov2.intersect(iov3)
+            (2, 10, 2, inf)
+            >>> iov3.intersect(iov1) is None
+            True
+
+        """
         if other.first <= self.final and other.final >= self.first:
             return IntervalOfValidity(*(max(self.first, other.first) + min(self.final, other.final)))
         return None
 
     def union(self, other, allow_startone=False):
-        """Union with another iov.
+        """
+        Return the union with another iov.
+
+            >>> iov1 = IntervalOfValidity(1,0,1,-1)
+            >>> iov2 = IntervalOfValidity(2,0,2,-1)
+            >>> iov3 = IntervalOfValidity(2,10,5,-1)
+            >>> iov1.union(iov2)
+            (1, 0, 2, inf)
+            >>> iov2.union(iov3)
+            (2, 0, 5, inf)
+            >>> iov3.union(iov1) is None
+            True
 
         Warning:
            This method will return None if the iovs don't overlap or connect to
@@ -156,19 +208,19 @@ class IntervalOfValidity:
             other (IntervalOfValidity): IoV to calculate the union with
             allow_startone (bool): If True we will consider run 0 and run 1 the
                 first run in an experiment. This means that if one of the iovs has
-                un unlimited final run it can be joind with the other iov if the
+                un unlimited final run it can be joined with the other iov if the
                 experiment number increases and the iov starts at run 0 and 1. If
                 this is False just run 0 is considered the next run.
 
-                >>> iov1 = IntervalOfValidity(0,0,0,-1)
-                >>> iov2 = IntervalOfValidity(1,1,1,-1)
-                >>> iov1.union(iov2, False)
-                None
-                >>> iov1.union(iov2, True)
-                IoV(0,0,1,inf)
+                    >>> iov1 = IntervalOfValidity(0,0,0,-1)
+                    >>> iov2 = IntervalOfValidity(1,1,1,-1)
+                    >>> iov1.union(iov2, False) is None
+                    True
+                    >>> iov1.union(iov2, True)
+                    (0, 0, 1, inf)
 
         """
-        # check the trival case of overlapping
+        # check the trivial case of overlapping
         if other.first <= self.final and other.final >= self.first:
             return IntervalOfValidity(min(self.first, other.first) + max(self.final, other.final))
         # ok, let's do the less simple case where they don't overlap but join directly
@@ -182,7 +234,17 @@ class IntervalOfValidity:
 
     @property
     def tuple(self):
-        """Return the iov as a tuple with experiment/run numbers replaced with -1"""
+        """Return the iov as a tuple with experiment/run numbers replaced with -1
+
+        This is mostly helpful where infinity is not supported and is how the
+        intervals are represented in the database.
+
+            >>> a = IntervalOfValidity.always()
+            >>> a
+            (0, 0, inf, inf)
+            >>> a.tuple
+            (0, 0, -1, -1)
+        """
         return self.__first + tuple(-1 if math.isinf(x) else x for x in self.__final)
 
 
@@ -194,17 +256,23 @@ class IoVSet:
 
     The final, minimal number of iovs can be obtained with the `iovs` property
 
-    >>> a = IoVSet()
-    >>> a.add((0,0,0,2))
-    >>> a.add((0,3,0,5))
-    >>> a.add((0,8,0,9))
-    >>> a.iovs
-    IovSet{IoV(0, 0, 0, 5), IoV(0, 8, 0, 9)}
+        >>> a = IoVSet()
+        >>> a.add((0,0,0,2))
+        >>> a.add((0,3,0,5))
+        >>> a.add((0,8,0,9))
+        >>> a
+        {(0, 0, 0, 5), (0, 8, 0, 9)}
     """
     def __init__(self, iterable=None, *, allow_overlaps=False, allow_startone=False):
         """Create a new set.
 
+            >>> a = IoVSet([IntervalOfValidity(3,6,3,-1), (0,0,3,5)])
+            >>> a
+            {(0, 0, 3, inf)}
+
         Parameters:
+            iterable: if not None it should be an iterable of IntervalOfValidity
+                objects or anything that can be converted to an IntervalOfValidity.
             allow_overlaps (bool): If False adding which overlaps with any
                 existing iov in the set will raise a ValueError.
             allow_startone (bool): If True also join iovs if one covers the
@@ -223,7 +291,7 @@ class IoVSet:
             for element in iterable:
                 self.add(element)
 
-    def add(self, iov):
+    def add(self, iov, allow_overlaps=None):
         """
         Add a new iov to the set.
 
@@ -231,20 +299,41 @@ class IoVSet:
         operation the set will contain the minimal amount of separate iovs
         possible to represent all added iovs
 
-        >>> a = IoVSet()
-        >>> a.add((0,0,0,2))
-        >>> a.add((0,3,0,5))
-        >>> a.add((0,8,0,9))
-        >>> a.iovs
-        IovSet{IoV(0, 0, 0, 5), IoV(0, 8, 0, 9)}
+            >>> a = IoVSet()
+            >>> a.add((0, 0, 0, 2))
+            >>> a.add((0, 3, 0, 5))
+            >>> a.add((0, 8, 0, 9))
+            >>> a
+            {(0, 0, 0, 5), (0, 8, 0, 9)}
+            >>> a.add(IoVSet([(10, 0, 10, 1), (10, 2, 10, -1)]))
+            >>> a
+            {(0, 0, 0, 5), (0, 8, 0, 9), (10, 0, 10, inf)}
+
+        Be aware, by default it's not possible to add overlapping iovs to the set.
+        This can be changed either on construction or per `add` call using
+        ``allow_overlap``
+
+            >>> a.add((0, 2, 0, 3))
+            Traceback (most recent call last):
+                ...
+            ValueError: Overlap between (0, 0, 0, 5) and (0, 2, 0, 3)
+            >>> a.add((0, 2, 0, 3), allow_overlaps=True)
+            >>> a
+            {(0, 0, 0, 5), (0, 8, 0, 9), (10, 0, 10, inf)}
 
         Parameters:
             iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
                 set of IoVs to add to this set
+            allow_overlaps (bool): Can be used to override global overlap setting
+                of this set to allow/restrict overlaps for a single insertion
+                operation
 
         Warning:
             This method modifies the set in place
         """
+        # check whether we override overlap settings
+        if allow_overlaps is None:
+            allow_overlaps = self.__allow_overlaps
         # we can remove a set from a set :D
         if isinstance(iov, IoVSet):
             for element in iov:
@@ -256,7 +345,7 @@ class IoVSet:
         # and now check for all existing iovs ... (but use a copy since we modify the set)
         for existing in list(self.__iovs):
             # if there's an overlap to the new iov
-            if not self.__allow_overlaps and existing & iov:
+            if not allow_overlaps and existing & iov:
                 raise ValueError(f"Overlap between {existing} and {iov}")
             # and if they can be combined to a bigger iov
             combined = existing.union(iov, self.__allow_startone)
@@ -278,14 +367,18 @@ class IoVSet:
     def remove(self, iov):
         """Remove and iov or a set of iovs from this set
 
-        After this operation the set will not be valid for the given iov
+        After this operation the set will not be valid for the given iov or set
+        of iovs:
 
-        >>> a = IoVSet()
-        >>> a.add((0,0,10,-1))
-        >>> a.remove((1,0,1,-1))
-        >>> a.remove((5,0,8,5))
-        >>> a.iovs
-        IovSet{IoV(0, 0, 0, inf), IoV(2, 0, 4, inf), IoV(8, 6, 10, inf)}
+            >>> a = IoVSet()
+            >>> a.add((0,0,10,-1))
+            >>> a.remove((1,0,1,-1))
+            >>> a.remove((5,0,8,5))
+            >>> a
+            {(0, 0, 0, inf), (2, 0, 4, inf), (8, 6, 10, inf)}
+            >>> a.remove(IoVSet([(3,0,3,10), (3,11,3,-1)]))
+            >>> a
+            {(0, 0, 0, inf), (2, 0, 2, inf), (4, 0, 4, inf), (8, 6, 10, inf)}
 
         Parameters:
             iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
@@ -314,19 +407,30 @@ class IoVSet:
                 elif delta is not None:
                     self.__iovs.add(delta)
 
-    def intersect(self, other):
+    def intersect(self, iov):
         """Intersect this set with another set and return a new set
         which is valid exactly where both sets have been valid before
 
-        >>> a = IoVSet()
-        >>> a.add((0,0,10,-1))
-        >>> b = IoVSet()
-        >>> b.add((5,0,20,-1))
-        >>> a.intersect(b)
-        IovSet{IoV(5,0,10,-1))}
+            >>> a = IoVSet()
+            >>> a.add((0,0,10,-1))
+            >>> a.intersect((5,0,20,-1))
+            {(5, 0, 10, inf)}
+            >>> a.intersect(IoVSet([(0,0,3,-1), (9,0,20,-1)]))
+            {(0, 0, 3, inf), (9, 0, 10, inf)}
+
+        Parameters:
+            iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
+                set of IoVs to intersect with this set
         """
+        if not isinstance(iov, (IoVSet, IntervalOfValidity)):
+            iov = IntervalOfValidity(iov)
+        if isinstance(iov, IntervalOfValidity):
+            iov = IoVSet([iov])
+
+        # ok for all combinations a,b from set1 and set2 check the intersection
+        # and if not empty add to the result
         result = IoVSet()
-        for a, b in product(self.iovs, other.iovs):
+        for a, b in product(self.iovs, iov.iovs):
             c = a & b
             if c:
                 result.add(c)
@@ -336,12 +440,24 @@ class IoVSet:
         """
         Check if an iov is fully covered by the set
 
+            >>> a = IoVSet([(0,0,2,-1), (5,0,5,-1)])
+            >>> a.contains((0,0,1,-1))
+            True
+            >>> a.contains(IntervalOfValidity(0,0,3,2))
+            False
+            >>> a.contains(IoVSet([(0,1,1,23), (5,0,5,23)]))
+            True
+            >>> a.contains(IoVSet([(0,1,1,23), (5,0,6,23)]))
+            False
+            >>> a.contains((3,0,4,-1))
+            False
+
         Parameters:
             iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
                 set of IoVs to be checked
 
         Returns:
-            True if the full iovs or all the iovs in the given set are fully
+            True if the full iov or all the iovs in the given set are fully
             present in this set
         """
         # check if the whole set is in this set: all iovs need to be in here
@@ -353,6 +469,44 @@ class IoVSet:
         # and then check all iovs in the set if they cover it
         for existing in self.__iovs:
             if iov - existing is None:
+                return True
+        return False
+
+    def overlaps(self, iov):
+        """Check if the given iov overlaps with this set.
+
+        In contrast to `contains` this doesn't require the given iov to be fully
+        covered. It's enough if the any run covered by the iov is also covered
+        by this set.
+
+            >>> a = IoVSet([(0,0,2,-1), (5,0,5,-1)])
+            >>> a.overlaps((0,0,1,-1))
+            True
+            >>> a.overlaps(IntervalOfValidity(0,0,3,2))
+            True
+            >>> a.overlaps(IoVSet([(0,1,1,23), (5,0,5,23)]))
+            True
+            >>> a.overlaps(IoVSet([(0,1,1,23), (5,0,6,23)]))
+            True
+            >>> a.overlaps((3,0,4,-1))
+            False
+
+        Parameters:
+            iov (Union[IoVSet, IntervalOfValidity, tuple(int)]): IoV or
+                set of IoVs to be checked
+
+        Returns:
+            True if the iov or any of the iovs in the given set overlap with any
+            iov in this set
+        """
+        if not isinstance(iov, (IoVSet, IntervalOfValidity)):
+            iov = IntervalOfValidity(iov)
+        if isinstance(iov, IntervalOfValidity):
+            iov = IoVSet([iov])
+
+        for a, b in product(self.iovs, iov.iovs):
+            c = a & b
+            if c:
                 return True
         return False
 
@@ -372,7 +526,19 @@ class IoVSet:
         return self.__iovs
 
     def __bool__(self):
-        """Return True if the set is not empty"""
+        """Return True if the set is not empty
+
+
+            >>> a = IoVSet()
+            >>> a.add((0,0,1,-1))
+            >>> bool(a)
+            True
+            >>> a.clear()
+            >>> a
+            {}
+            >>> bool(a)
+            False
+        """
         return len(self.__iovs) > 0
 
     def __contains__(self, iov):
@@ -380,20 +546,46 @@ class IoVSet:
         return self.contains(iov)
 
     def __and__(self, other):
-        """Return a new set that is the intersection between two sets"""
+        """Return a new set that is the intersection between two sets
+
+            >>> a = IoVSet([(0,0,1,-1)])
+            >>> a & (1,0,2,-1)
+            {(1, 0, 1, inf)}
+        """
         return self.intersect(other)
 
     def __or__(self, other):
         """
         Return a new set that is the combination of two sets: The new set will
-        be valid everywhere any of the two sets were valid
+        be valid everywhere any of the two sets were valid.
+
+        No check for overlaps will be performed but the result will inherit the
+        settings for further additions from the first set
+
+            >>> a = IoVSet([(0,0,1,-1)])
+            >>> a | (1,0,2,-1)
+            {(0, 0, 2, inf)}
+            >>> a | (3,0,3,-1)
+            {(0, 0, 1, inf), (3, 0, 3, inf)}
         """
         copy = self.copy()
-        copy.add(other)
+        copy.add(other, allow_overlaps=True)
         return copy
 
     def __sub__(self, other):
-        """Return a new set which is only valid for where a is valid but not b"""
+        """
+        Return a new set which is only valid for where a is valid but not b.
+
+        See `remove` but this will not modify the set in place
+
+            >>> a = IoVSet([(0,0,-1,-1)])
+            >>> a - (1,0,2,-1)
+            {(0, 0, 0, inf), (3, 0, inf, inf)}
+            >>> a - (0,0,3,-1) - (10,0,-1,-1)
+            {(4, 0, 9, inf)}
+            >>> IoVSet([(0,0,1,-1)]) - (2,0,2,-1)
+            {(0, 0, 1, inf)}
+        """
         copy = self.copy()
         copy.remove(other)
         return copy
@@ -404,4 +596,4 @@ class IoVSet:
 
     def __repr__(self):
         """Return a printable representation"""
-        return "IoVSet" + repr(self.__iovs)
+        return '{' + ', '.join(str(e) for e in sorted(self.__iovs)) + '}'

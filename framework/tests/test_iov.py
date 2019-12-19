@@ -6,7 +6,9 @@
 import math
 import random
 import unittest
+import doctest
 from conditions_db.iov import IntervalOfValidity, IoVSet
+from conditions_db import iov
 
 
 class TestIntervalOfValidity(unittest.TestCase):
@@ -82,7 +84,7 @@ class TestIntervalOfValidity(unittest.TestCase):
             self.assertEqual(iov(b) | iov(a), self.iovify(c), f'{a} | {b} = {c}')
 
     def test_union_startone(self):
-        """Test that we can caluclate the union starting at run 1 as well"""
+        """Test that we can calculate the union starting at run 1 as well"""
         iov = IntervalOfValidity
         self.assertEqual(iov(0, 0, 1, -1).union(iov(2, 1, 2, -1)), None)
         self.assertEqual(iov(0, 0, 1, -1).union(iov(2, 1, 2, -1), True), iov(0, 0, 2, -1))
@@ -141,5 +143,26 @@ class TestIoVSet(unittest.TestCase):
                 s.remove(iov)
             self.assertEqual(s.iovs, result)
 
+    def test_intersection(self):
+        """Test intersecting two sets"""
+        iovs = []
+        for i in range(6):
+            iovs.append((i, 0, i+5, -1))
+        result = {IntervalOfValidity(5, 0, 5, -1)}
+        for _ in range(10):
+            a = IoVSet([IntervalOfValidity.always()])
+            for iov in random.sample(iovs, len(iovs)):
+                a = a.intersect(iov)
+            self.assertEqual(a.iovs, result)
+        full = IoVSet(iovs, allow_overlaps=True)
+        self.assertEqual(full.iovs, {IntervalOfValidity(0, 0, 10, -1)})
+
+
+def load_tests(loader, tests, ignore):
+    """Add the doctests to the list of tests"""
+    tests.addTests(doctest.DocTestSuite(iov))
+    return tests
+
 if __name__ == "__main__":
+    # test everything
     unittest.main()

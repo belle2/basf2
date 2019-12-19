@@ -17,7 +17,6 @@
 #include <string>
 
 // DataObjects
-// #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -394,6 +393,11 @@ namespace Belle2 {
      * All elements are set to 0.0
      */
     void resetTagVertexErrorMatrix();
+
+    /**
+     * Resets 3x3 constraint error matrix
+     * All elements are set to 0.0
+     */
     void resetConstraintCov();
 
     ClassDef(TagVertex, 3) /**<

@@ -30,7 +30,6 @@
 
 #include <string>
 #include <vector>
-//#include <pair>
 
 
 namespace Belle2 {
@@ -133,8 +132,8 @@ namespace Belle2 {
     /** calculate the standard constraint for the vertex fit on the tag side*/
     bool findConstraintBoost(double cut, double shiftAlongBoost = -2000.);
 
-    //** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
-    //the expected BTag line of flights
+    /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
+    /the expected BTag line of flights */
     bool findConstraintBTube(Particle* Breco, double cut);
 
     /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */
@@ -180,9 +179,19 @@ namespace Belle2 {
 
 
 
-    //just to help printing things out
+    /**
+     * Print a TVector3 (useful for debugging)
+     */
     std::string printVector(TVector3 const& vec);
+
+    /**
+     * Print a TMatrix (useful for debugging)
+     */
     std::string printMatrix(TMatrix const& mat);
+
+    /**
+     * Print a TMatrixFSym (useful for debugging)
+     */
     std::string printMatrix(TMatrixFSym const& mat);
   };
 

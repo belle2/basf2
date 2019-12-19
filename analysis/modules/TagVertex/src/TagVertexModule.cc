@@ -3,8 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi (most of the stuff)                        *
- *               Thibaud Humair (tube and extra tag track info)           *
+ * Contributors: Luigi Li Gioi, Thibaud Humair                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -144,7 +143,6 @@ namespace Belle2 {
       bool ok = doVertexFit(particle);
       if (ok) deltaT(particle);
 
-      //if (m_fitPval < m_confidenceLevel) {
       if ((m_fitPval < m_confidenceLevel && m_confidenceLevel != 0)
           || (m_fitPval <= m_confidenceLevel && m_confidenceLevel == 0)) {
         toRemove.push_back(particle->getArrayIndex());
@@ -485,20 +483,20 @@ namespace Belle2 {
 
     //Particle* tubecreatorBCopy = ParticleCopy::copyParticle(Breco); //causes problems when deleting pcle
 
-    Particle* tubecreatorBCopy = new Particle(Breco->get4Vector(), Breco->getPDGCode());
-    tubecreatorBCopy->updateMomentum(Breco->get4Vector(), Breco->getVertex(), Breco->getMomentumVertexErrorMatrix(),
-                                     Breco->getPValue());
+    Particle tubecreatorBCopy(Particle(Breco->get4Vector(), Breco->getPDGCode()));
+    tubecreatorBCopy.updateMomentum(Breco->get4Vector(), Breco->getVertex(), Breco->getMomentumVertexErrorMatrix(),
+                                    Breco->getPValue());
 
     //vertex fit will give the intersection between the beam spot and the trajectory of the B
     //(base of the BTube, or primary vtx cov matrix)
 
-    ok0 = doVertexFitForBTube(tubecreatorBCopy);
+    ok0 = doVertexFitForBTube(&tubecreatorBCopy);
 
     if (!ok0) return false;
 
     //get direction of B tag = opposite direction of B rec in CMF
 
-    TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
+    TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
     TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
@@ -508,26 +506,23 @@ namespace Belle2 {
     //To creat the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
 
-    TMatrixFSym pv = tubecreatorBCopy->getVertexErrorMatrix();
+    TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
 
     //print some stuff if wanted
 
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
-      B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
+      B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy.getVertex()));
       B2DEBUG(10, "Brec direction before fit: " << printVector((1. / Breco->getP()) * Breco->getMomentum()));
-      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
+      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy.getP()) * tubecreatorBCopy.getMomentum()));
       B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
       B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
-      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
+      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy.getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
       B2DEBUG(10, "BTag direction: " << printVector((1. / v4FinalNew.P())*v4FinalNew.Vect()));
       B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
       B2DEBUG(10, "Brec direction in CMF: " << printVector((1. / vec.P())*vec.Vect()));
-      //B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[0] << "," << std::fixed <<
-      //    std::setprecision(
-      //      20) << tubecreatorBCopy->getVertex()[1] << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[2] << "}");
     }
 
 
@@ -567,7 +562,7 @@ namespace Belle2 {
 
     //set the constraint
 
-    m_constraintCenter = tubecreatorBCopy->getVertex();
+    m_constraintCenter = tubecreatorBCopy.getVertex();
 
     m_constraintCov.ResizeTo(3, 3);
 
@@ -580,9 +575,6 @@ namespace Belle2 {
     if (m_verbose) {
       B2DEBUG(10, "IPTube covariance: " << printMatrix(m_constraintCov));
     }
-
-    //analysis::RaveSetup::getInstance()->reset();
-    delete tubecreatorBCopy;
 
     return true;
 
@@ -653,7 +645,8 @@ namespace Belle2 {
     bool isBreco = false;
     int nReco = 0;
 
-    TVector3 MCTagVert(-111, -111, -111);
+    TVector3 MCTagVert(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                       std::numeric_limits<float>::quiet_NaN());
     int mcPDG = 0;
 
     // Array of MC particles
@@ -1131,7 +1124,7 @@ namespace Belle2 {
     //prepare container of pointer to tracks
     TrackAndWeight trackAndWeight;
     trackAndWeight.mcParticle = 0;
-    trackAndWeight.weight = -1111.;
+    trackAndWeight.weight = std::numeric_limits<float>::quiet_NaN();
     vector<TrackAndWeight> trackAndWeights;
 
     // apply constraint

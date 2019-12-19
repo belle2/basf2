@@ -2312,7 +2312,7 @@ def oldwritePi0EtaVeto(
 
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
-        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+        B2INFO('oldwritePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:

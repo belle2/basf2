@@ -45,6 +45,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
   addParam("Debug", m_Debug, "Debug mode.", false);
+  addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
@@ -74,7 +75,7 @@ void KLMStripEfficiencyCollectorModule::prepare()
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
   m_GeometryBKLM = bklm::GeometryPar::instance();
   if (m_Debug) {
-    m_MatchingFile = new TFile("matching.root", "recreate");
+    m_MatchingFile = new TFile(m_MatchingFileName.c_str(), "recreate");
     m_MatchingTree = new TTree("t_matching", "");
     m_MatchingTree->Branch("subdetector", &m_MatchingHitData.subdetector,
                            "subdetector/I");

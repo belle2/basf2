@@ -81,7 +81,8 @@ string TagVertex::getConstraintType()
 TVector3 TagVertex::getConstraintCenter()
 {
   if (m_constraintType == "noConstraint")
-    return TVector3(-1111., -1111. , -1111.);
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
   return m_constraintCenter;
 }
 
@@ -148,7 +149,8 @@ float TagVertex::getTagVChi2IP()
 TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex)
 {
   if (m_vtxFitTracks.size() <= trackIndex)
-    return TVector3(-1111., -1111., -1111.);
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
   return m_vtxFitTracks.at(trackIndex) -> getPosition();
 }
 
@@ -156,35 +158,36 @@ TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex)
 TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex)
 {
   if (m_vtxFitTracks.size() <= trackIndex)
-    return TVector3(-1111., -1111., -1111.);
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
   return m_vtxFitTracks.at(trackIndex) -> getMomentum();
 }
 
 double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component)
 {
   if (m_vtxFitTracks.size() <= trackIndex || component > 2)
-    return -1111.;
+    return std::numeric_limits<float>::quiet_NaN();;
   return m_vtxFitTracks.at(trackIndex) -> getMomentum()[component];
 }
 
 double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex)
 {
   if (m_vtxFitTracks.size() <= trackIndex)
-    return -1111.;
+    return std::numeric_limits<float>::quiet_NaN();;
   return m_vtxFitTracks.at(trackIndex) -> getZ0();
 }
 
 double TagVertex::getVtxFitTrackD0(unsigned int trackIndex)
 {
   if (m_vtxFitTracks.size() <= trackIndex)
-    return -1111.;
+    return std::numeric_limits<float>::quiet_NaN();;
   return m_vtxFitTracks.at(trackIndex) -> getD0();
 }
 
 double TagVertex::getRaveWeight(unsigned int trackIndex)
 {
   if (m_raveWeights.size() <= trackIndex)
-    return -1111.;
+    return std::numeric_limits<float>::quiet_NaN();;
   return m_raveWeights.at(trackIndex);
 }
 

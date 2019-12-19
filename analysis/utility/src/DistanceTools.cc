@@ -34,8 +34,6 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(TVector3 const& trackP,
 {
   if (trackPosCovMat.GetNcols() != 3 || vtxPosCovMat.GetNcols() != 3) {
     B2ERROR("in DistanceTools::trackToVtxCovmat, matrices must be of size 3");
-    //trackPosCovMat.Print();
-    //vtxPosCovMat.Print();
     return TMatrixDSym(3);
   }
 

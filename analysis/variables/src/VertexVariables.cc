@@ -466,12 +466,12 @@ namespace Belle2 {
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position
-    REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance, "3D distance from the vertex or POCA to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
-                      "significance of distance relative to interaction point(-1 in case of numerical problems)");
-    REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
-    REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
-    REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
+                      "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
+    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP");
+    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y in respect to IP");
+    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z in respect to IP");
     REGISTER_VARIABLE("x", particleX,
                       "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
     REGISTER_VARIABLE("y", particleY,
@@ -481,9 +481,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)");
     REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)");
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)");
-    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
-    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");

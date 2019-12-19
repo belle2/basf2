@@ -147,7 +147,7 @@ namespace Belle2 {
      */
     bool collectDataTrack(const Particle* muon);
 
-    /** Muon list name. If empty, use tracks. */
+    /** Muon list name. */
     std::string m_MuonListName;
 
     /**
@@ -167,9 +167,6 @@ namespace Belle2 {
 
     /** Whether to remove unused muons. */
     bool m_RemoveUnusedMuons;
-
-    /** Debug mode. */
-    bool m_Debug;
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
@@ -200,6 +197,12 @@ namespace Belle2 {
 
     /** Plane array index. */
     const KLMPlaneArrayIndex* m_PlaneArrayIndex;
+
+    /** Debug mode. */
+    bool m_Debug;
+
+    /** Matching data file name */
+    std::string m_MatchingFileName;
 
     /** Matching data file. */
     TFile* m_MatchingFile;

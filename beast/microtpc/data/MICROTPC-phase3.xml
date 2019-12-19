@@ -59,69 +59,71 @@ whitespace, comma or semi-colon -->
 <v_CG>0.00390826</v_CG>
     <Active>
       <Material>MICROTPC-Material</Material>
+      <!--HUMU-->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
-      <!--AngleZ unit="deg">110.0</AngleZ-->
-      <AngleZ unit="deg">112.5</AngleZ>
-      <TPCpos_x unit="cm">32.4</TPCpos_x>
-      <TPCpos_y unit="cm">11.8</TPCpos_y>
-      <TPCpos_z unit="cm">190.6</TPCpos_z>
-      <SensVol_x unit="cm">32.4</SensVol_x>
-      <SensVol_y unit="cm">11.8</SensVol_y>
-      <SensVol_z unit="cm">191.171</SensVol_z>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">201</TPCpos_x>
+      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_z unit="cm">1600</TPCpos_z>
+      <SensVol_x unit="cm">201</SensVol_x>
+      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_z unit="cm">1601.171</SensVol_z>
     </Active>
     
     <Active>
       <Material>MICROTPC-Material</Material>
+      <!--NENE-->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
-      <TPCpos_x unit="cm">0.0</TPCpos_x>
-      <TPCpos_y unit="cm">34.7</TPCpos_y>
-      <TPCpos_z unit="cm">190.6</TPCpos_z>
-      <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">34.7</SensVol_y>
-      <SensVol_z unit="cm">191.171</SensVol_z>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">201</TPCpos_x>
+      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_z unit="cm">1400</TPCpos_z>
+      <SensVol_x unit="cm">201</SensVol_x>
+      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_z unit="cm">1401.171</SensVol_z>
     </Active>
 
     <Active>
       <Material>MICROTPC-Material</Material>
+      <!--IIWI-->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
-      <!--AngleZ unit="deg">290.0</AngleZ-->
-      <AngleZ unit="deg">292.5</AngleZ>
-      <TPCpos_x unit="cm">-32.3</TPCpos_x>
-      <TPCpos_y unit="cm">-12.1</TPCpos_y>
-      <TPCpos_z unit="cm">190.6</TPCpos_z>
-      <SensVol_x unit="cm">-32.3</SensVol_x>
-      <SensVol_y unit="cm">-12.1</SensVol_y>
-      <SensVol_z unit="cm">191.171</SensVol_z>
+      <AngleX unit="deg">180.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">-182.9</TPCpos_x>
+      <TPCpos_y unit="cm">16</TPCpos_y>
+      <TPCpos_z unit="cm">656.5</TPCpos_z>
+      <SensVol_x unit="cm">-182.9</SensVol_x>
+      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_z unit="cm">655.329</SensVol_z>
     </Active>
 
     <Active>
       <Material>MICROTPC-Material</Material>
+      <!--PALILA-->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">0.0</AngleX>
-      <!--AngleZ unit="deg">0.0</AngleZ-->
-      <AngleZ unit="deg">180.0</AngleZ>
-      <TPCpos_x unit="cm">0</TPCpos_x>
-      <TPCpos_y unit="cm">-34.7</TPCpos_y>
-      <TPCpos_z unit="cm">190.6</TPCpos_z>
-      <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">-34.7</SensVol_y>
-      <SensVol_z unit="cm">191.171</SensVol_z>
+      <AngleX unit="deg">180.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">-181.4</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
+      <TPCpos_z unit="cm">-562.5</TPCpos_z>
+      <SensVol_x unit="cm">-181.4</SensVol_x>
+      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_z unit="cm">-563.671</SensVol_z>
     </Active>
 
     <Active>
       <MaterialVessel>MICROTPC-Material</MaterialVessel>
+      <!--TAKO-->
       <MaterialGas>MICROTPC-Material</MaterialGas>
       <MaterialEndCap>MICROTPC-Material</MaterialEndCap>
       <ScaleGas>MICROTPC-Material</ScaleGas>
@@ -129,59 +131,30 @@ whitespace, comma or semi-colon -->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">180.0</AngleX>
-      <AngleZ unit="deg">108.0</AngleZ>
-      <TPCpos_x unit="cm">34.4</TPCpos_x>
-      <TPCpos_y unit="cm">11.2</TPCpos_y>
-      <TPCpos_z unit="cm">-125.5</TPCpos_z>
-      <SensVol_x unit="cm">34.4</SensVol_x>
-      <SensVol_y unit="cm">11.2</SensVol_y>
-      <SensVol_z unit="cm">-124.929</SensVol_z>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">204</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
+      <TPCpos_z unit="cm">-800</TPCpos_z>
+      <SensVol_x unit="cm">204</SensVol_x>
+      <SensVol_y unit="cm">16</SensVol_y>
+      <SensVol_z unit="cm">-798.829</SensVol_z>
     </Active>
 
     <Active>
       <Material>MICROTPC-Material</Material>
+      <!--ELEPAIO-->
       <dx_Vessel unit="cm">15.0</dx_Vessel>
       <dy_Vessel unit="cm">10.4</dy_Vessel>
       <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">180.0</AngleX>
-      <AngleZ unit="deg">0.0</AngleZ>
-      <TPCpos_x unit="cm">0</TPCpos_x>
-      <TPCpos_y unit="cm">36.2</TPCpos_y>
-      <TPCpos_z unit="cm">-125.5</TPCpos_z>
-      <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">36.2</SensVol_y>
-      <SensVol_z unit="cm">-124.929</SensVol_z>
-    </Active>
-
-    <Active>
-      <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">15.0</dx_Vessel>
-      <dy_Vessel unit="cm">10.4</dy_Vessel>
-      <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">180.0</AngleX>
-      <AngleZ unit="deg">288.0</AngleZ>
-      <TPCpos_x unit="cm">-34.4</TPCpos_x>
-      <TPCpos_y unit="cm">-11.2</TPCpos_y>
-      <TPCpos_z unit="cm">-125.5</TPCpos_z>
-      <SensVol_x unit="cm">-34.4</SensVol_x>
-      <SensVol_y unit="cm">-11.2</SensVol_y>
-      <SensVol_z unit="cm">-124.929</SensVol_z>
-    </Active>
-
-    <Active>
-      <Material>MICROTPC-Material</Material>
-      <dx_Vessel unit="cm">15.0</dx_Vessel>
-      <dy_Vessel unit="cm">10.4</dy_Vessel>
-      <dz_Vessel unit="cm">31.0</dz_Vessel>
-      <AngleX unit="deg">180.0</AngleX>
-      <AngleZ unit="deg">180.0</AngleZ>
-      <TPCpos_x unit="cm">0</TPCpos_x>
-      <TPCpos_y unit="cm">-36.2</TPCpos_y>
-      <TPCpos_z unit="cm">-125.5</TPCpos_z>
-      <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">-36.2</SensVol_y>
-      <SensVol_z unit="cm">-124.929</SensVol_z>
+      <AngleX unit="deg">0.0</AngleX>
+      <AngleZ unit="deg">90.0</AngleZ>
+      <TPCpos_x unit="cm">204</TPCpos_x>
+      <TPCpos_y unit="cm">16.0</TPCpos_y>
+      <TPCpos_z unit="cm">-1400</TPCpos_z>
+      <SensVol_x unit="cm">204</SensVol_x>
+      <SensVol_y unit="cm">16.0</SensVol_y>
+      <SensVol_z unit="cm">-1398.829</SensVol_z>
     </Active>
 
   </Content>

@@ -10,7 +10,7 @@
 </div>
 
 <!-- temporary announcements -->
-<div id="includeBanner"></div>
+<span id="includeBanner"></span>
 
 <!---------------------------------------------------------------------------->
 <!-- PLOTS LOADING OVERLAY -->
@@ -247,6 +247,11 @@
 
 <script>
   $(function(){
-  $("#includeBanner").load("banner.html");
+      $.get("banner.html")
+          .done(function() {
+              $("#includeBanner").load("banner.html");
+          }).fail(function() {
+          // not exists code
+      })
   });
 </script>

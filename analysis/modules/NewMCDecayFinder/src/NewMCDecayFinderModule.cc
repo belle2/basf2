@@ -131,6 +131,22 @@ namespace Belle2 {
         // if daughter does not have daughters, it must be already registered
         const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
         StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+
+        StoreObjPtr<ParticleList> plist(daughter->getFullName());
+        if (!plist.isValid()) {
+          B2ERROR(daughter->getFullName() << " was not created");
+        } else {
+          unsigned int nPart = plist->getListSize();
+          for (unsigned iPart = 0; iPart < nPart; iPart++) {
+            const Particle* part = plist->getParticle(iPart);
+            Particle::EParticleType particleType = part->getParticleType();
+            if (particleType == Particle::c_Track or
+                particleType == Particle::c_ECLCluster or
+                particleType == Particle::c_KLMCluster)
+              B2ERROR(daughter->getFullName() << " is a reconstructed particle! It is not accepted in NewDecayFinderModule!");
+          }
+        }
+
       } else {
         // if daughter has daughters, call the function recursively
         registerParticleRecursively(*(decaydescriptor.getDaughter(i)));

@@ -10,7 +10,7 @@ from basf2 import register_module, create_path
 from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 
 
-def setAnalysisConfigParams(configParametersAndValues, path=None):
+def setAnalysisConfigParams(configParametersAndValues, path):
     """
     Sets analysis configuration parameters.
 
@@ -47,7 +47,7 @@ def setAnalysisConfigParams(configParametersAndValues, path=None):
     path.add_module(conf)
 
 
-def inputMdst(environmentType, filename, path=None, skipNEvents=0, entrySequence=None, *, parentLevel=0):
+def inputMdst(environmentType, filename, path, skipNEvents=0, entrySequence=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) file with the RootInput module.
 
@@ -69,7 +69,7 @@ def inputMdst(environmentType, filename, path=None, skipNEvents=0, entrySequence
     inputMdstList(environmentType, [filename], path, skipNEvents, entrySequence, parentLevel=parentLevel)
 
 
-def inputMdstList(environmentType, filelist, path=None, skipNEvents=0, entrySequences=None, *, parentLevel=0):
+def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences=None, *, parentLevel=0):
     """
     Loads the specified ROOT (DST/mDST/muDST) files with the RootInput module.
 
@@ -156,7 +156,7 @@ def inputMdstList(environmentType, filelist, path=None, skipNEvents=0, entrySequ
         path.add_module(fixECL)
 
 
-def outputMdst(filename, path=None):
+def outputMdst(filename, path):
     """
     Saves mDST (mini-Data Summary Tables) to the output root file.
     """
@@ -255,7 +255,7 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
-def outputIndex(filename, path=None, includeArrays=[], keepParents=False, mc=True):
+def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     """
     Write out all particle lists as an index file to be reprocessed using parentLevel flag.
     Additional branches necessary for file to be read are automatically included.
@@ -299,7 +299,7 @@ def outputIndex(filename, path=None, includeArrays=[], keepParents=False, mc=Tru
     path.add_module(r1)
 
 
-def setupEventInfo(noEvents, path=None):
+def setupEventInfo(noEvents, path):
     """
     Prepare to generate events. This function sets up the EventInfoSetter.
     You should call this before adding a generator from generators.
@@ -317,7 +317,7 @@ def setupEventInfo(noEvents, path=None):
     path.add_module(evtnumbers)
 
 
-def loadGearbox(path=None, silence_warning=False):
+def loadGearbox(path, silence_warning=False):
     """
     Loads Gearbox module to the path.
 
@@ -333,11 +333,11 @@ def loadGearbox(path=None, silence_warning=False):
 
     if not silence_warning:
         B2WARNING("""You are overwriting the geometry from the database with Gearbox.
-                     This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+            This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
 
-                     If you're really sure you know what you're doing you can suppress this message with:
+            If you're really sure you know what you're doing you can suppress this message with:
 
-                     >>> loadGearbox(silence_warning=True)
+            >>> loadGearbox(silence_warning=True)
 
                   """)
 
@@ -345,7 +345,7 @@ def loadGearbox(path=None, silence_warning=False):
     path.add_module(paramloader)
 
 
-def printPrimaryMCParticles(path=None):
+def printPrimaryMCParticles(path):
     """
     Prints all primary MCParticles.
     """
@@ -628,7 +628,7 @@ def mergeListsWithBestDuplicate(outputListName,
     path.add_module(pmanipulate)
 
 
-def fillSignalSideParticleList(outputListName, decayString, path=None):
+def fillSignalSideParticleList(outputListName, decayString, path):
     """
     This function should only be used in the ROE path, that is a path
     that is executed for each ROE object in the DataStore.
@@ -929,7 +929,7 @@ def fillParticleListsFromMC(decayStringsWithCuts, addDaughters=False, writeOut=F
     path.add_module(pload)
 
 
-def applyCuts(list_name, cut, path=None):
+def applyCuts(list_name, cut, path):
     """
     Removes particle candidates from ``list_name`` that do not pass ``cut``
     (given selection criteria).
@@ -955,7 +955,7 @@ def applyCuts(list_name, cut, path=None):
     path.add_module(pselect)
 
 
-def applyEventCuts(cut, path=None):
+def applyEventCuts(cut, path):
     """
     Removes events that do not pass the ``cut`` (given selection criteria).
 
@@ -1327,7 +1327,7 @@ def printDataStore(eventNumber=-1, path=None):
     path.add_module(printDS)
 
 
-def printVariableValues(list_name, var_names, path=None):
+def printVariableValues(list_name, var_names, path):
     """
     Prints out values of specified variables of all Particles included in given ParticleList. For debugging purposes.
 
@@ -1344,7 +1344,7 @@ def printVariableValues(list_name, var_names, path=None):
     path.add_module(prlist)
 
 
-def printList(list_name, full, path=None):
+def printList(list_name, full, path):
     """
     Prints the size and executes Particle->print() (if full=True)
     method for all Particles in given ParticleList. For debugging purposes.
@@ -1491,7 +1491,7 @@ def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     path.add_module(mod)
 
 
-def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path=None):
+def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
     """
     Write the value of specified variables estimated for the single particle in the input list (has to contain exactly 1
     particle) as an extra info to the particle related to current ROE.
@@ -1556,7 +1556,7 @@ def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     path.add_module(mod)
 
 
-def signalSideParticleFilter(particleList, selection, roe_path=None, deadEndPath=None):
+def signalSideParticleFilter(particleList, selection, roe_path, deadEndPath):
     """
     Checks if the current ROE object in the for_each roe path (argument roe_path) is related
     to the particle from the input ParticleList. Additional selection criteria can be applied.
@@ -1578,7 +1578,7 @@ def signalSideParticleFilter(particleList, selection, roe_path=None, deadEndPath
     mod.if_false(deadEndPath)
 
 
-def signalSideParticleListsFilter(particleLists, selection, roe_path=None, deadEndPath=None):
+def signalSideParticleListsFilter(particleLists, selection, roe_path, deadEndPath):
     """
     Checks if the current ROE object in the for_each roe path (argument roe_path) is related
     to the particle from the input ParticleList. Additional selection criteria can be applied.
@@ -1620,7 +1620,7 @@ def findMCDecay(list_name, decay, writeOut=False, path=None):
     path.add_module(decayfinder)
 
 
-def summaryOfLists(particleLists, path=None):
+def summaryOfLists(particleLists, path):
     """
     Prints out Particle statistics at the end of the job: number of events with at
     least one candidate, average number of candidates per event, etc.
@@ -1633,7 +1633,7 @@ def summaryOfLists(particleLists, path=None):
     path.add_module(particleStats)
 
 
-def matchMCTruth(list_name, path=None):
+def matchMCTruth(list_name, path):
     """
     Performs MC matching (sets relation Particle->MCParticle) for
     all particles (and its (grand)^N-daughter particles) in the specified
@@ -1649,7 +1649,7 @@ def matchMCTruth(list_name, path=None):
     path.add_module(mcMatch)
 
 
-def looseMCTruth(list_name, path=None):
+def looseMCTruth(list_name, path):
     """
     Performs loose MC matching for all particles in the specified
     ParticleList.
@@ -1807,7 +1807,7 @@ def updateROEMask(list_name,
     path.add_module(roeMask)
 
 
-def updateROEMasks(list_name, mask_tuples, path=None):
+def updateROEMasks(list_name, mask_tuples, path):
     """
     Update existing ROE masks by applying additional selection cuts for tracks
     and/or clusters.
@@ -1961,7 +1961,7 @@ def printROEInfo(mask_names=[], which_mask='both', full_print=False, path=None):
     path.add_module(printMask)
 
 
-def buildContinuumSuppression(list_name, roe_mask, path=None):
+def buildContinuumSuppression(list_name, roe_mask, path):
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes BASF2 relation between them.
@@ -1977,7 +1977,7 @@ def buildContinuumSuppression(list_name, roe_mask, path=None):
     path.add_module(qqBuilder)
 
 
-def removeParticlesNotInLists(lists_to_keep, path=None):
+def removeParticlesNotInLists(lists_to_keep, path):
     """
     Removes all Particles that are not in a given list of ParticleLists (or daughters of those).
     All relations from/to Particles, daughter indices, and other ParticleLists are fixed.
@@ -1991,7 +1991,7 @@ def removeParticlesNotInLists(lists_to_keep, path=None):
     path.add_module(mod)
 
 
-def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path=None):
+def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_name, input_lists_names, path):
     """
     Reconstructs Btag from particles in given ParticleLists which do not share any final state particles (mdstSource) with Bsig.
 
@@ -2009,7 +2009,7 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     path.add_module(btag)
 
 
-def selectDaughters(particle_list_name, decay_string, path=None):
+def selectDaughters(particle_list_name, decay_string, path):
     """
     Redefine the Daughters of a particle: select from decayString
 
@@ -2023,7 +2023,7 @@ def selectDaughters(particle_list_name, decay_string, path=None):
     path.add_module(seld)
 
 
-def markDuplicate(particleList, prioritiseV0, path=None):
+def markDuplicate(particleList, prioritiseV0, path):
     """
     Call DuplicateVertexMarker to find duplicate particles in a list and
     flag the ones that should be kept
@@ -2037,7 +2037,7 @@ def markDuplicate(particleList, prioritiseV0, path=None):
     path.add_module(markdup)
 
 
-def V0ListMerger(firstList, secondList, prioritiseV0, path=None):
+def V0ListMerger(firstList, secondList, prioritiseV0, path):
     """
     Merge two particle lists, vertex them and trim duplicates
 
@@ -2398,7 +2398,7 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path=None):
+def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
     """
     Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
 

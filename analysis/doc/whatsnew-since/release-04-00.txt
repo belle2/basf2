@@ -1,6 +1,15 @@
 Changes in the analysis package
 -------------------------------
 
+Standard Particle Lists
++++++++++++++++++++++++
+
+ * Added stdHyperons.py, this analysis script reconstructs the standard hyperons Xi-, Xi0, and Omega-.
+   	 
+   * New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`
+   * All documentation for this optimization and usage can be found at `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/1337/files/BELLE2-NOTE-PH-2019-011.pdf>`_
+
+
 Variables
 +++++++++
 
@@ -85,6 +94,8 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
+ * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
+ * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
 Conditions DB
 +++++++++++++

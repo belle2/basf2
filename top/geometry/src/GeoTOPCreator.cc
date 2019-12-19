@@ -148,6 +148,8 @@ namespace Belle2 {
       double backwardLength = geo.getQBB().getPrismEnclosure().getLength();
       double prismPosition = geo.getQBB().getPrismPosition();
 
+      G4Region* aRegion = new G4Region("TOPEnvelope");
+
       for (const auto& geoModule : geo.getModules()) {
         int moduleID = geoModule.getModuleID();
         double barLength = geoModule.getBarLength();
@@ -180,7 +182,6 @@ namespace Belle2 {
         std::string name = geoModule.getName();
 
         // Set up region for production cuts
-        G4Region* aRegion = new G4Region(name);
         module->SetRegion(aRegion);
         aRegion->AddRootLogicalVolume(module);
 
@@ -207,6 +208,8 @@ namespace Belle2 {
 
       const auto& geoQBB = geo.getQBB();
       auto* module = createModuleEnvelope(geoQBB, moduleID);
+
+      // add quartz optics together with PMT array
 
       const auto& geoModule = geo.getModule(moduleID);
       auto* optics = assembleOptics(geoModule);

@@ -172,7 +172,7 @@ namespace Belle2 {
     /** Add quality indicator to object.
     *
     */
-    void setQualityIndicator(double qualityIndicator)
+    void setQualityIndicator(const double qualityIndicator)
     {
       m_qualityIndicator = qualityIndicator;
     }

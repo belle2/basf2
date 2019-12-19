@@ -29,6 +29,9 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   setDescription("Module for EKLM strips efficiency (data collection).");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
            std::string("mu+:all"));
+  addParam("AllowedDistance1D", m_AllowedDistance1D,
+           "Maximal distance in the units of strip number from ExtHit to "
+           "matching (B|E)KLMDigit.", double(8));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -38,9 +41,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
            "Minimal momentum in case there are no hits in outer layers.", 0.0);
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
-  addParam("AllowedDistance1D", m_AllowedDistance1D,
-           "Maximal distance in the units of strip number from ExtHit to "
-           "matching (B|E)KLMDigit.", double(8));
+  addParam("Debug", m_Debug, "Debug mode.", false);
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
@@ -68,6 +69,28 @@ void KLMStripEfficiencyCollectorModule::prepare()
   registerObject<TH1F>("matchedDigitsInPlane", matchedDigitsInPlane);
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
   m_GeometryBKLM = bklm::GeometryPar::instance();
+  if (m_Debug) {
+    m_MatchingFile = new TFile("matching.root", "recreate");
+    m_MatchingTree = new TTree("t_matching", "");
+    m_MatchingTree->Branch("subdetector", &m_MatchingHitData.subdetector,
+                           "subdetector/I");
+    m_MatchingTree->Branch("section", &m_MatchingHitData.section, "section/I");
+    m_MatchingTree->Branch("sector", &m_MatchingHitData.sector, "sector/I");
+    m_MatchingTree->Branch("layer", &m_MatchingHitData.layer, "layer/I");
+    m_MatchingTree->Branch("plane", &m_MatchingHitData.plane, "plane/I");
+    m_MatchingTree->Branch("strip", &m_MatchingHitData.strip, "strip/I");
+    m_MatchingTree->Branch("matchedStrip", &m_MatchedStrip, "matchedStrip/I");
+  }
+}
+
+void KLMStripEfficiencyCollectorModule::finish()
+{
+  if (m_Debug) {
+    m_MatchingFile->cd();
+    m_MatchingTree->Write();
+    delete m_MatchingTree;
+    delete m_MatchingFile;
+  }
 }
 
 void KLMStripEfficiencyCollectorModule::startRun()
@@ -372,7 +395,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
     if (matchingDigits < m_MinimalMatchingDigits)
       continue;
     /*
-     * Check the number of matching digits in outer layersi relatively to
+     * Check the number of matching digits in outer layers relatively to
      * this hit.
      */
     if (matchingDigitsOuterLayers < m_MinimalMatchingDigitsOuterLayers) {
@@ -392,8 +415,17 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
         continue;
     }
     allExtHitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
-    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr)
+    if (it->second.eklmDigit != nullptr || it->second.bklmDigit != nullptr) {
       matchedDigitsInPlane->Fill(m_PlaneArrayIndex->getIndex(it->first));
+      if (m_Debug) {
+        std::memcpy(&m_MatchingHitData, &(it->second), sizeof(struct HitData));
+        if (it->second.eklmDigit != nullptr)
+          m_MatchedStrip = it->second.eklmDigit->getStrip();
+        else
+          m_MatchedStrip = it->second.bklmDigit->getStrip();
+        m_MatchingTree->Fill();
+      }
+    }
   }
   return true;
 }

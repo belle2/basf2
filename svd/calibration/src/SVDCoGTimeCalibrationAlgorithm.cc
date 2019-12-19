@@ -32,10 +32,6 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(const std::string
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
-  int layer_num = 0;
-  int ladder_num = 0;
-  int sensor_num = 0;
-
   int ladderOfLayer[4] = {7, 10, 12, 16};
   int sensorOnLayer[4] = {2, 3, 4, 5};
 
@@ -50,11 +46,11 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TFile* f = new TFile("algorithm_output.root", "RECREATE");
 
   for (int layer = 0; layer < 4; layer++) {
-    layer_num = layer + 3;
+    int layer_num = layer + 3;
     for (int ladder = 0; ladder < (int)ladderOfLayer[layer]; ladder++) {
-      ladder_num = ladder + 1;
+      int ladder_num = ladder + 1;
       for (int sensor = 0; sensor < (int)sensorOnLayer[layer]; sensor++) {
-        sensor_num = sensor + 1;
+        int sensor_num = sensor + 1;
         for (int view  = 1; view > -1; view--) {
           char side = 'U';
           if (view == 0)
@@ -85,8 +81,6 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Fit("pol3", "RQ");
           double par[4];
           pol3->GetParameters(par);
-          double meanT0 = hEventT0->GetMean();
-          double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
@@ -119,14 +113,14 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
            << currentRun.first << "," << currentRun.second << ")");
     m_previousEventT0.emplace(meanEventT0);
     return true;
-  } else if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
+  }
+  if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
     B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
            << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
     m_previousEventT0.emplace(meanEventT0);
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 

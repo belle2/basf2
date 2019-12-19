@@ -330,7 +330,8 @@ function getDefaultRevisions(mode="rbn") {
     }
 
     if (mode === "all"){
-        return allRevisions;
+        // todo: remove this limitation if we find way too avoid too lengthy file names
+        return allRevisions.slice(0, 10);
     }
     else if (mode === "r"){
         return [referenceRevision].concat(releaseRevisions.slice(0, 1));

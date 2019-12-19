@@ -70,7 +70,7 @@ namespace Belle2 {
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns 1 if the given particle appears to be a daugher in the decay chain of given lists.
+     * Returns function which returns 1 if the given particle appears to be a daughter in the decay chain of given lists.
      */
     Manager::FunctionPtr isDescendantOfList(const std::vector<std::string>& arguments);
 

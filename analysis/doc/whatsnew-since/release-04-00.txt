@@ -3,6 +3,9 @@ Changes in the analysis package
 
 Variables
 +++++++++
+ * Added ``isDescendantOfList`` and ``isMCDescendantOfList`` meta variables that allow to check whether the
+   particle is the descendant of the list (or if it is mathced to the descendant of the list) at any generation.
+   The variables have recursive search inside, they extend ``isDaugtherOfList`` and ``isGrandDaughterOfList``.
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.

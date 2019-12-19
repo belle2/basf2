@@ -479,7 +479,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
-      B2INFO("isDaughterOfList is outdated and replaced by isDescendantOfList.");
+      B2WARNING("isDaughterOfList is outdated and replaced by isDescendantOfList.");
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("1"));
       return isDescendantOfList(new_arguments);
@@ -515,7 +515,7 @@ namespace Belle2 {
 
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments)
     {
-      B2INFO("isGrandDaughterOfList is outdated and replaced by isDescendantOfList.");
+      B2WARNING("isGrandDaughterOfList is outdated and replaced by isDescendantOfList.");
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("2"));
       return isDescendantOfList(new_arguments);
@@ -560,21 +560,21 @@ namespace Belle2 {
         auto listNames = arguments;
         auto func = [listNames](const Particle * particle) -> double {
           double output = 0;
-          double generation_flag = -1;
+          int generation_flag = -1;
           try {
-            generation_flag = std::stod(listNames.back());
+            generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
 
           for (auto& iListName : listNames)
           {
             try {
-              std::stod(iListName);
+              Belle2::convertString<int>(iListName);
               continue;
             } catch (std::exception& e) {}
 
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, double flag)-> int {
+            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> int {
               int result = 0;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
@@ -624,9 +624,9 @@ namespace Belle2 {
         auto listNames = arguments;
         auto func = [listNames](const Particle * particle) -> double {
           double output = 0;
-          double generation_flag = -1;
+          int generation_flag = -1;
           try {
-            generation_flag = std::stod(listNames.back());
+            generation_flag = Belle2::convertString<int>(listNames.back());
           } catch (std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
@@ -641,7 +641,7 @@ namespace Belle2 {
               continue;
             } catch (std::exception& e) {}
             // Creating recursive lambda
-            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, double flag)-> int {
+            auto list_comparison  = [](auto && self, const Particle * m, const Particle * p, int flag)-> int {
               int result = 0;
               for (unsigned i = 0; i < m->getNDaughters(); ++i)
               {
@@ -2447,18 +2447,18 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList,
                       R"DOC(Returns 1 if the given particle appears in decay chain of the particles in the given particle Lists.\n"
-                      "Passing a number as the last argument, allows to check if particle belongs to the certain generation:\n"
-                      "`isDescendantOfList(<particle_list>,1)` returns 1 if particle is a daughther of the list,\n"
-                      "`isDescendantOfList(<particle_list>,2)` returns 1 if particle is a granddaughther of the list,\n"
-                      "`isDescendantOfList(<particle_list>,3)` returns 1 if particle is a grandgranddaughther of the list, etc.\n\n"
-                      "Default value is `-1` that is inclusive for all generations.)DOC");
+                      "Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:\n"
+                      "``isDescendantOfList(<particle_list>,1)`` returns 1 if particle is a daughter of the list,\n"
+                      "``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,\n"
+                      "``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.\n\n"
+                      "Default value is ``-1`` that is inclusive for all generations.)DOC");
     REGISTER_VARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList,
                       R"DOC(Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.\n"
-                      "Passing a number as the last argument, allows to check if particle belongs to the certain generation:\n"
-                      "`isMCDescendantOfList(<particle_list>,1)` returns 1 if particle is matched to the same particle as any daughther of the list,\n"
-                      "`isMCDescendantOfList(<particle_list>,2)` returns 1 if particle is matched to the same particle as any granddaughther of the list,\n"
-                      "`isMCDescendantOfList(<particle_list>,3)` returns 1 if particle is matched to the same particle as any grandgranddaughther of the list, etc.\n
-                      "Default value is `-1` that is inclusive for all generations.\n"
+                      "Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:\n"
+                      "``isMCDescendantOfList(<particle_list>,1)`` returns 1 if particle is matched to the same particle as any daughter of the list,\n"
+                      "``isMCDescendantOfList(<particle_list>,2)`` returns 1 if particle is matched to the same particle as any granddaughter of the list,\n"
+                      "``isMCDescendantOfList(<particle_list>,3)`` returns 1 if particle is matched to the same particle as any great-granddaughter of the list, etc.\n
+                      "Default value is ``-1`` that is inclusive for all generations.\n"
                       "It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.)DOC");
 
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(

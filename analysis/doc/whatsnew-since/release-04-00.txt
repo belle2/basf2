@@ -12,7 +12,10 @@ Standard Particle Lists
 
 Variables
 +++++++++
-
+ * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` takes into account the nontrivial
+ transformation of track parameters relative to IP when used for tracks. 
+ `dr` does not center at zero before and now it does. 
+ 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
    For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.

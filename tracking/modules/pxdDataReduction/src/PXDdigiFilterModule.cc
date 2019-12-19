@@ -39,8 +39,8 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
   addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD pixel outside the ROIs", false);
 
-  addParam("overrideDB", m_overrideDB, "If set, ROI-finding settings in DB are overwritten", false);
-  addParam("usePXDDataReduction", m_usePXDDataReduction, "enables/disables ROI-finding if overrideDB=True", false);
+  addParam("overrideDB", m_overrideDB, "If set, ROI-filtering settings in DB are overwritten", false);
+  addParam("usePXDDataReduction", m_usePXDDataReduction, "enables/disables ROI-filtering if overrideDB=True", false);
 }
 
 void PXDdigiFilterModule::initialize()
@@ -70,7 +70,7 @@ void PXDdigiFilterModule::initialize()
 
 void PXDdigiFilterModule::beginRun()
 {
-  // reset variables used to enable/disable ROI-finding
+  // reset variables used to enable/disable ROI-filtering
   m_skipEveryNth = -1;
   if (m_roiParameters) {
     m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();

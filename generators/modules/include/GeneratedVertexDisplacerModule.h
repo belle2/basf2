@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sascha Dreyer                                            *
+ * Contributors: Sascha Dreyer, Savino Longo                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -62,9 +62,10 @@ namespace Belle2 {
   private:
     // Parameters
     std::string m_lifetimeOption;  /**< Set the lifetime option, either fixed, flat exponential */
-    std::vector<float> m_lifetime;  /**< Set the numerical value of the lifetime c*tau [cm]  */
+    std::vector<float> m_lifetime;  /**< Set the numerical value of the lifetime ctau [cm]  */
     std::vector<int> m_pdgVals;  /**< Set the particles whose vertices should be displaced  */
-    float m_maxDecayTime; /**< Set the maximal decayTime for the options 'flat' and 'exponential'. */
+    float m_maxDecayTime;  /**< Set the maximal decayTime for the options 'flat' and 'exponential'. */
+    bool m_ctau;  /**< Input unit option. True (default): module expects lifetime as ctau [cm]. False: lifetime as tau [ns]. */
   };
 
 }

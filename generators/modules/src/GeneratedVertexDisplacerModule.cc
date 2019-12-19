@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Sascha Dreyer                                            *
+ * Contributors: Sascha Dreyer, Savino Longo                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -43,6 +43,9 @@ GeneratedVertexDisplacerModule::GeneratedVertexDisplacerModule() : Module()
   addParam("maxDecayTime", m_maxDecayTime,
            "Set the maximal allowed decay time in c*tau [cm] for the option 'flat'. The 'exponential' option is not bound. Default 300cm.",
            static_cast<float>(300));
+  addParam("ctau", m_ctau,
+           "Input unit option. True (default): module expects lifetime as ctau [cm]. False: lifetime as tau [ns].",
+           true);
 
 }
 
@@ -96,22 +99,19 @@ void GeneratedVertexDisplacerModule::event()
 
 void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifetime)
 {
-  // misusing TLV class to pass X,Y,Z and time of the vertex
   TLorentzVector* displacementVector = new TLorentzVector();
   getDisplacement(particle, lifetime, *displacementVector);
 
-  TVector3 decayVertex = particle.getDecayVertex();
+  TVector3 newDecayVertex = particle.getProductionVertex();
+  newDecayVertex.SetX(newDecayVertex.X() + displacementVector->X());
+  newDecayVertex.SetY(newDecayVertex.Y() + displacementVector->Y());
+  newDecayVertex.SetZ(newDecayVertex.Z() + displacementVector->Z());
 
-  decayVertex.SetX(decayVertex.X() + displacementVector->X());
-  decayVertex.SetY(decayVertex.Y() + displacementVector->Y());
-  decayVertex.SetZ(decayVertex.Z() + displacementVector->Z());
-
-  particle.setDecayVertex(decayVertex);
+  particle.setDecayVertex(newDecayVertex);
   particle.setDecayTime(particle.getProductionTime() + displacementVector->T());
   particle.setValidVertex(true);
 
-
-  // displace first daughters
+  // displace direct daughters
   if (particle.getNDaughters()) {
     displaceDaughter(*displacementVector, particle.getDaughters());
   }
@@ -129,8 +129,6 @@ void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisp
     MCParticle& mcp = *m_mcparticles[daughter_mcpArrayIndex];
     mcp.setProductionVertex(mcp.getProductionVertex() + motherDisplacementVector.Vect());
     mcp.setProductionTime(mcp.getProductionTime() + motherDisplacementVector.T());
-    mcp.setDecayVertex(mcp.getDecayVertex() + motherDisplacementVector.Vect());
-    mcp.setDecayTime(mcp.getDecayTime() + motherDisplacementVector.T());
     mcp.setValidVertex(true);
 
     // Displace subsequent daughters
@@ -144,28 +142,26 @@ void GeneratedVertexDisplacerModule::displaceDaughter(TLorentzVector& motherDisp
 void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float lifetime, TLorentzVector& displacement)
 {
   TLorentzVector fourVector_mcp = particle.get4Vector();
-  float decayTime_mcp = 0;
+  float decayLength_mcp = 0;
+  float c_cm_per_ns = 29.9792458;
+  if (!m_ctau) lifetime *= c_cm_per_ns;
 
-  if (m_lifetimeOption.compare("fixed") == 0)
-    decayTime_mcp = lifetime;
-  else if (m_lifetimeOption.compare("flat") == 0) {
-    decayTime_mcp = gRandom->Uniform(0, m_maxDecayTime);
-  } else {
-    decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Gamma();
+  if (m_lifetimeOption.compare("fixed") == 0) decayLength_mcp = lifetime;
+  else if (m_lifetimeOption.compare("flat") == 0) decayLength_mcp = gRandom->Uniform(0, m_maxDecayTime);
+  else {
+    decayLength_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime * fourVector_mcp.Gamma() * fourVector_mcp.Beta();
 
     if (!particle.getMass()) {
       B2WARNING("Displacing a particle with zero mass. Forcing Gamma=1 for the decay time.");
-      decayTime_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime;
+      decayLength_mcp = -1 * std::log(gRandom->Uniform(0, 1.)) * lifetime;
     }
   }
 
   float pMag = fourVector_mcp.P();
-  float beta = fourVector_mcp.Beta();
-
-  displacement.SetX(beta * decayTime_mcp * fourVector_mcp.X() / pMag);
-  displacement.SetY(beta * decayTime_mcp * fourVector_mcp.Y() / pMag);
-  displacement.SetZ(beta * decayTime_mcp * fourVector_mcp.Z() / pMag);
-  displacement.SetT(decayTime_mcp);
+  displacement.SetX(decayLength_mcp * fourVector_mcp.X() / pMag);
+  displacement.SetY(decayLength_mcp * fourVector_mcp.Y() / pMag);
+  displacement.SetZ(decayLength_mcp * fourVector_mcp.Z() / pMag);
+  displacement.SetT(decayLength_mcp / c_cm_per_ns);
 }
 
 

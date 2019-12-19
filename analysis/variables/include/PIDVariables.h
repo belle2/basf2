@@ -117,6 +117,16 @@ namespace Belle2 {
     Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments);
 
     /**
+     * returns most likely PDG code based on PID information.
+     */
+    double mostLikelyPDG(const Particle* part);
+
+    /**
+     * returns true if a particle is assigned to its most likely type according to PID likelihood
+     */
+    double isMostLikely(const Particle* part);
+
+    /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()
      * Additional arguments are integers for signal and background hypothesis:
      * (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)

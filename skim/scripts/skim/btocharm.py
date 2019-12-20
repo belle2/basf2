@@ -344,7 +344,7 @@ def loadB0toDpi_Kpipi(path):
     **Decay Mode**:
 
 
-    1.  :math:`B^{0}\\to \\D^{-} (\\to K^+ pi^- pi^-) \\pi^+`
+    1.  :math:`B^{0}\\to \\D^{-} (\\D^{0} to K^+ pi^- pi^-) \\pi^+`
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -380,7 +380,7 @@ def loadB0toDstarPi_Kpi(path):
     **Decay Mode**:
 
 
-    1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^-) \\pi^+`
+    1.  :math:`B^{0}\\to \\D^{*-} (\\D^{0} to K^+ pi^-) \\pi^+`
 
     **Particle Lists**: Standard lists for all particles.
 

@@ -890,7 +890,7 @@ namespace Belle2 {
       Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
       daughter->addRelationTo(mcdaughter);
-      mother->appendDaughter(daughter);
+      mother->appendDaughter(daughter, false);
 
       if (mcdaughter->getNDaughters() > 0)
         appendDaughtersRecursive(daughter);

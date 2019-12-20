@@ -364,7 +364,7 @@ class PreReconstruction(object):
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
                     pvfit.param('vertexFitter', 'kfitter')
                     pvfit.param('fitType', 'vertex')
-                    pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
+                    pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)
 
                 if self.config.monitor:

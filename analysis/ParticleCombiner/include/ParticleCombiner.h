@@ -138,7 +138,7 @@ namespace Belle2 {
      * @param DecayDescriptor
      * @param cutParameter
      */
-    explicit ParticleGenerator(const DecayDescriptor decaydescriptor, const std::string& cutParameter = "");
+    explicit ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter = "");
 
     /**
      * Initialises the generator to produce the given type of sublist

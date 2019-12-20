@@ -122,7 +122,7 @@ namespace Belle2 {
   }
 
 
-  void ParticleCombinerFromMCModule::registerParticleRecursively(DecayDescriptor decaydescriptor)
+  void ParticleCombinerFromMCModule::registerParticleRecursively(const DecayDescriptor& decaydescriptor)
   {
     int nProducts = decaydescriptor.getNDaughters();
 
@@ -163,7 +163,7 @@ namespace Belle2 {
 
   }
 
-  void ParticleCombinerFromMCModule::combineRecursively(DecayDescriptor decaydescriptor)
+  void ParticleCombinerFromMCModule::combineRecursively(const DecayDescriptor& decaydescriptor)
   {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();

@@ -50,13 +50,13 @@ namespace Belle2 {
      * Register particles which have (sub-)decay recursively.
      * The function is called in initialize().
      */
-    void registerParticleRecursively(DecayDescriptor decaydescriptor);
+    void registerParticleRecursively(const DecayDescriptor& decaydescriptor);
 
     /**
      * Combine particles which have (sub-)decay recursively.
      * The function is called in event().
      */
-    void combineRecursively(DecayDescriptor decaydescriptor);
+    void combineRecursively(const DecayDescriptor& decaydescriptor);
 
 
   private:

@@ -162,7 +162,7 @@ namespace Belle2 {
   }
 
 
-  ParticleGenerator::ParticleGenerator(const DecayDescriptor decaydescriptor, const std::string& cutParameter) : m_iParticleType(0),
+  ParticleGenerator::ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter) : m_iParticleType(0),
     m_listIndexGenerator(),
     m_particleIndexGenerator()
   {

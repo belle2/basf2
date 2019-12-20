@@ -55,6 +55,7 @@ Variables
  * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output. The new variable returns 
    the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do. 
    Now we can evaluate the output of both taggers in the same way.
+ * Added two new variables :b2:var`pidMostLikely` which is the PDG code of the most likely hypothesis for this track, and :b2:var`pidIsMostLikely` which returns true if the particle *is* under it's most likely hypothesis.
 
 Modules
 +++++++
@@ -87,6 +88,7 @@ Modules
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
+ * :b2:mod:`RestOfEventBuilder`, :b2:mod:`EventKinematics` and :b2:mod:`EventShapeCalculator` modules can use most likely charged particle hypothesis according to PID information.
 
 Conditions DB
 +++++++++++++
@@ -98,4 +100,7 @@ Full Event Interpretation
 
  * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).
 
+Standard particle selection
++++++++++++++++++++++++++++
 
+ * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.

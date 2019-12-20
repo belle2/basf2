@@ -462,7 +462,8 @@ namespace Belle2 {
                       "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
-    REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG, "Returns PDG code of the largest PID likelihood");
+    REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
+                      "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
     REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,
                       "Returns 1 if the PID likelihood for the particle given its PID is the largest one");
     // B2BII PID

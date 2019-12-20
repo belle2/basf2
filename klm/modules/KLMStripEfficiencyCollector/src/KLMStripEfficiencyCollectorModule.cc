@@ -24,7 +24,10 @@ REG_MODULE(KLMStripEfficiencyCollector)
 
 KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule(),
-  m_GeometryBKLM(nullptr)
+  m_GeometryBKLM(nullptr),
+  m_MatchingFile(nullptr),
+  m_MatchingTree(nullptr),
+  m_MatchedStrip(0)
 {
   setDescription("Module for EKLM strips efficiency (data collection).");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
@@ -42,10 +45,12 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("RemoveUnusedMuons", m_RemoveUnusedMuons,
            "Whether to remove unused muons.", false);
   addParam("Debug", m_Debug, "Debug mode.", false);
+  addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
   m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
+  m_MatchingHitData = {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr, nullptr};
 }
 
 KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
@@ -70,7 +75,7 @@ void KLMStripEfficiencyCollectorModule::prepare()
   registerObject<TH1F>("allExtHitsInPlane", allExtHitsInPlane);
   m_GeometryBKLM = bklm::GeometryPar::instance();
   if (m_Debug) {
-    m_MatchingFile = new TFile("matching.root", "recreate");
+    m_MatchingFile = new TFile(m_MatchingFileName.c_str(), "recreate");
     m_MatchingTree = new TTree("t_matching", "");
     m_MatchingTree->Branch("subdetector", &m_MatchingHitData.subdetector,
                            "subdetector/I");

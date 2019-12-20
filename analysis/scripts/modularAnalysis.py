@@ -224,6 +224,7 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
     :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
     """
 
+    from basf2 import AfterConditionPath
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
         outputFile = skimDecayMode

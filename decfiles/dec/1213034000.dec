@@ -21,7 +21,7 @@ Enddecay
 CDecay B+sig
 
 Decay D0sig
-1.000 K- pi+ pi0 D_DALITZ;
+1.000 K- pi+ pi0 PHOTOS D_DALITZ;
 Enddecay
 CDecay anti-D0sig
 

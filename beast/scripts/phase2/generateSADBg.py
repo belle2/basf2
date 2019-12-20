@@ -130,7 +130,7 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//BeamBackgroundStudy", '1', ''),
     ])
 main.add_module(gearbox)
 
@@ -144,6 +144,8 @@ main.add_module(generator)
 # Geant geometry
 geometry = register_module('Geometry')
 geometry.param('useDB', False)
+if phase == 31:
+    geometry.param('additionalComponents', ['BEAMABORT', 'MICROTPC', 'CLAWS', 'HE3TUBE'])
 main.add_module(geometry)
 
 # Geant simulation

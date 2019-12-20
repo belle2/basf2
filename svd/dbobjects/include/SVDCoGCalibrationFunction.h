@@ -133,20 +133,20 @@ namespace Belle2 {
     static const int nTriggerBins = 4;
 
     /** residual = (EventT0 - CoGTime Corrected) mean and sigma from gaussian fit*/
-    double m_residMean[ nTriggerBins ]; /**< trigger-bin dependent residual mean*/
-    double m_residSigma[ nTriggerBins ]; /**< trigger-bin dependent residual sigma*/
-    double m_residMeanError[ nTriggerBins ]; /**< trigger-bin dependent mean error*/
-    double m_residSigmaError[ nTriggerBins ]; /**< trigger-bin dependent sigma error*/
+    double m_residMean[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual mean*/
+    double m_residSigma[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual sigma*/
+    double m_residMeanError[ nTriggerBins ] = {0}; /**< trigger-bin dependent mean error*/
+    double m_residSigmaError[ nTriggerBins ] = {0}; /**< trigger-bin dependent sigma error*/
 
 
     /** function parameters & implementations*/
 
-    /** ID = 0, pol1TBdep VERSION: correctedValue = t * scale[tb] + bias[tb] */
-    double m_bias[ nTriggerBins ]; /**< trigger-bin dependent bias*/
-    double m_scale[ nTriggerBins ]; /**< trigger-bin dependent scale*/
-    double m_biasError[ nTriggerBins ]; /**< trigger-bin dependent bias error*/
-    double m_scaleError[ nTriggerBins ]; /**< trigger-bin dependent scale error*/
-    double m_scaleBiasCovariance[ nTriggerBins ]; /**< trigger-bin dependent covariance between scale and bias errors*/
+    /** ID = {0}, pol1TBdep VERSION: correctedValue = t * scale[tb] + bias[tb] */
+    double m_bias[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias*/
+    double m_scale[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale*/
+    double m_biasError[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias error*/
+    double m_scaleError[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale error*/
+    double m_scaleBiasCovariance[ nTriggerBins ] = {0}; /**< trigger-bin dependent covariance between scale and bias errors*/
     /** pol1 TB dep version implementation*/
     double pol1TBdep(double raw_time, int tb) const
     {

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3cut='E > 0.1', path=path
 # -*- coding: utf-8 -*-
 
 """
@@ -23,6 +23,7 @@ vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
 vm.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
 vm.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
 vm.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
+vm.addAlias('E_ECL', 'formula(totalECLEnergyOfParticlesInList(pi+:sig)+totalECLEnergyOfParticlesInList(gamma:sig))')
 
 
 def B0Hadronic(path):
@@ -233,9 +234,9 @@ def runFEIforB0Hadronic(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -280,9 +281,9 @@ def runFEIforBplusHadronic(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -331,9 +332,9 @@ def runFEIforHadronicCombined(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -536,9 +537,9 @@ def runFEIforB0SL(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -591,9 +592,9 @@ def runFEIforBplusSL(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -650,9 +651,9 @@ def runFEIforSLCombined(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -711,9 +712,9 @@ def runFEIforSkimCombined(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799 and E>0.1', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,

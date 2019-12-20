@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Test backwards compatibility for an mdst file produced with release-03-01-02.
+Test backwards compatibility for an mdst file produced with release-04-00-03.
 
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 

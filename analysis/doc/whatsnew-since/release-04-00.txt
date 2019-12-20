@@ -66,7 +66,7 @@ Variables
  * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output. The new variable returns 
    the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do. 
    Now we can evaluate the output of both taggers in the same way.
- * Added two new variables :b2:var`pidMostLikely` which is the PDG code of the most likely hypothesis for this track, and :b2:var`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
+ * Added two new variables :b2:var:`pidMostLikely` which is the PDG code of the most likely hypothesis for this track, and :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
 
 Modules
 +++++++

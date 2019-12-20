@@ -232,6 +232,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
   int dspMask = 0, triggerTag = 0;
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
+  // Mask of shapers that discarded waveform data due to beam burst suppression
+  int burstSuppressionMask;
 
 
   std::vector <int> eclWaveformSamples;
@@ -278,6 +280,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     try {
 
       ECLTrig* eclTrig = 0;
+      burstSuppressionMask = 0;
+
       // trigger phase of the Collector connected to this FINESSE
       // -1 if there are no triggered shapers
       int triggerPhase0 = -1;
@@ -312,6 +316,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         }
 
         value = readNextCollectorWord();
+        burstSuppressionMask |= ((value >> 29) & 1) << (iShaper - 1); // burst suppression bit
         nActiveChannelsWithADCData = (value >> 24) & 0x1F;//number of channels with ADC data
         nADCSamplesPerChannel = (value >> 16) & 0x7F;    //ADC samples per channel
         nActiveDSPChannels = (value >> 8) & 0x1F;       //number of active channels in DSP
@@ -467,7 +472,9 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
       // fill trigid, trgtime for eclTrig object
       if (eclTrig) {
-        eclTrig->setTrigId(iCrate);
+        int trigId = iCrate & 0x3F;
+        trigId |= (burstSuppressionMask & 0xFFF) << 6;
+        eclTrig->setTrigId(trigId);
         eclTrig->setTimeTrig(triggerPhase0);
         eclTrig->setTrigTag(triggerTag0);
       }

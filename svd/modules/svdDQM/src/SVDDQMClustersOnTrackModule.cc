@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys, Giulia Casarosa, Giuliana Rizzo             *
+ * Contributors:  Giulia Casarosa                                         *
  *                                                                        *
  * Prepared for Belle II geometry                                         *
  *                                                                        *

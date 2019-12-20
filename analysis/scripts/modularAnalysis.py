@@ -334,11 +334,11 @@ def loadGearbox(path, silence_warning=False):
 
     if not silence_warning:
         B2WARNING("""You are overwriting the geometry from the database with Gearbox.
-            This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+          This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
 
-            If you're really sure you know what you're doing you can suppress this message with:
+          If you're really sure you know what you're doing you can suppress this message with:
 
-            >>> loadGearbox(silence_warning=True)
+          >>> loadGearbox(silence_warning=True)
 
                   """)
 

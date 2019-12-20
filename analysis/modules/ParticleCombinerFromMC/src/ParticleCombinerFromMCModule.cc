@@ -196,22 +196,17 @@ namespace Belle2 {
         const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
         StoreObjPtr<ParticleList> plist(daughter->getFullName());
         // if daughter is not created, returns error
-        if (!plist.isValid()) {
+        if (!plist.isValid())
           B2ERROR(daughter->getFullName() << " is not created");
-        } else {
-          unsigned int nPart = plist->getListSize();
-          for (unsigned iPart = 0; iPart < nPart; iPart++) {
-            const Particle* part = plist->getParticle(iPart);
-            Particle::EParticleType particleType = part->getParticleType();
+        // if daughter contains reconstructed particles, returns error.
+        unsigned nRecoParticles = plist->getNParticlesOfOriginType(Particle::c_Track);
+        nRecoParticles += plist->getNParticlesOfOriginType(Particle::c_ECLCluster);
+        nRecoParticles += plist->getNParticlesOfOriginType(Particle::c_KLMCluster);
+        if (nRecoParticles > 0)
+          B2ERROR("ParticleList " << daughter->getFullName() <<
+                  " contains reconstructed particles! It is not accepted in NewDecayFinderModule!");
 
-            // if daughter is reconstructed, returns error because it is not accepted.
-            if (particleType == Particle::c_Track or
-                particleType == Particle::c_ECLCluster or
-                particleType == Particle::c_KLMCluster)
-              B2ERROR(daughter->getFullName() << " is a reconstructed particle! It is not accepted in NewDecayFinderModule!");
-          }
-        }
-        // if particleType is c_MCParticle or c_Combined, do nothing
+        // if not, do nothing.
       } else {
         // if daughter has daughter, call the function recursively
         combineRecursively(*dDaughter);

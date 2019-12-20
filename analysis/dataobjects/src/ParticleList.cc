@@ -63,6 +63,8 @@ void ParticleList::addParticle(const Particle* particle)
   int pdg = particle->getPDGCode();
   Particle::EFlavorType type = particle->getFlavorType();
   addParticle((unsigned) iparticle, pdg, type, true);
+
+  m_originTypeList.push_back(particle->getParticleType());
 }
 
 void ParticleList::bindAntiParticleList(ParticleList& antiList, bool includingAntiList)

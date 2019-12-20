@@ -299,6 +299,17 @@ namespace Belle2 {
     }
 
     /**
+     * Returns the number of particles which have given Particle::EParticleType
+     *
+     * @param type Particle::EParticleType
+     * @return number of particles which is originated from given type
+     */
+    unsigned getNParticlesOfOriginType(Particle::EParticleType type) const
+    {
+      return std::count(m_originTypeList.begin(), m_originTypeList.end(), type);
+    }
+
+    /**
      * Returns true if and only if 'p' is already in this list.
      * Will check flavour-specific and self-conjugated list, and optionally (with includingAntiList=true) also the anti-particle list.
      */
@@ -346,6 +357,8 @@ namespace Belle2 {
 
     /** keep anti-list around for performance. */
     mutable StoreObjPtr<ParticleList>* m_antiList; //! transient
+
+    std::vector<Particle::EParticleType> m_originTypeList; /**< list of Particle::EParticleType of particles */
 
     ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 

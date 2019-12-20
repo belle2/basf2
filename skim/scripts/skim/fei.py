@@ -251,7 +251,11 @@ def runFEIforB0Hadronic(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
-
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
 
@@ -298,6 +302,11 @@ def runFEIforBplusHadronic(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -349,6 +358,11 @@ def runFEIforHadronicCombined(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -554,6 +568,11 @@ def runFEIforB0SL(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -609,6 +628,11 @@ def runFEIforBplusSL(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -668,6 +692,11 @@ def runFEIforSLCombined(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -729,6 +758,11 @@ def runFEIforSkimCombined(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:sig', 'gamma:sig'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL>9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')

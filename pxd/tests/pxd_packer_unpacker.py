@@ -124,7 +124,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
-simulation.add_simulation(main, components=['PXD'], usePXDDataReduction=False)
+simulation.add_simulation(main, components=['PXD'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
 set_module_parameters(main, type="Geometry", useDB=False, components=["PXD"])
 
 main.add_module(progress)

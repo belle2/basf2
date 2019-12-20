@@ -26,14 +26,14 @@ namespace Belle2 {
   /**
    * particle combiner module
    */
-  class NewMCDecayFinderModule : public Module {
+  class ParticleCombinerFromMCModule : public Module {
 
   public:
 
     /**
      * Constructor
      */
-    NewMCDecayFinderModule();
+    ParticleCombinerFromMCModule();
 
     /**
      * Initialize the Module.

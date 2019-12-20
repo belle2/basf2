@@ -29,7 +29,7 @@ class TestNewMCDecayFinder(unittest.TestCase):
         fillParticleListFromMC('K+:MC', 'mcPrimary', path=main)
         fillParticleListFromMC('pi+:MC', 'mcPrimary', path=main)
 
-        newFindMCDecay(
+        reconstructMCDecay(
             'B0:DstD0Kpi =direct=> [D*+ =direct=> [D0 =direct=> K-:MC pi+:MC ] pi+:MC] pi-:MC',
             '',
             path=main)
@@ -57,8 +57,8 @@ class TestNewMCDecayFinder(unittest.TestCase):
 
         self.assertTrue(
             allSig == sig_expected,
-            f"Mbc cut efficency has changed! n_sig expected: {sig_expected} found: {sig_expected}.")
-        self.assertTrue(allBkg == 0, f"Mbc cut background has changed! n_bkg expected 0, found: {allBkg}.")
+            f"n_sig expected: {sig_expected} found: {sig_expected}.")
+        self.assertTrue(allBkg == 0, f"n_bkg expected 0, found: {allBkg}.")
 
         print("Test passed, cleaning up.")
 

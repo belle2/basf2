@@ -1736,7 +1736,7 @@ def signalSideParticleListsFilter(
     mod.if_false(deadEndPath)
 
 
-def newFindMCDecay(
+def reconstructMCDecay(
     decayString,
     cut,
     dmID=0,
@@ -1765,8 +1765,8 @@ def newFindMCDecay(
     @param path        modules are added to this path
     """
 
-    pmake = register_module('NewMCDecayFinder')
-    pmake.set_name('NewMCDecayFinder_' + decayString)
+    pmake = register_module('ParticleCombinerFromMC')
+    pmake.set_name('ParticleCombinerFromMC_' + decayString)
     pmake.param('decayString', decayString)
     pmake.param('cut', cut)
     pmake.param('writeOut', writeOut)
@@ -1780,6 +1780,9 @@ def findMCDecay(
     path=None,
 ):
     """
+    This function is not fully tested and maintained.
+    Please consider to use reconstructMCDecay() instead.
+
     Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
     The decay string is required to describe correctly what you want.
     In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`

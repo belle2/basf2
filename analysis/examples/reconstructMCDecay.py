@@ -11,7 +11,7 @@ __authors__ = "Yo Sato"
 
 import basf2
 from ROOT import Belle2
-from modularAnalysis import inputMdst, fillParticleListFromMC, variablesToNtuple, newFindMCDecay
+from modularAnalysis import inputMdst, fillParticleListFromMC, variablesToNtuple, reconstructMCDecay
 from variables.utils import create_aliases_for_selected
 from variables import variables as vm  # shorthand for the variable manager instance
 
@@ -27,17 +27,18 @@ fillParticleListFromMC('e+:MC', 'mcPrimary', path=mypath)
 fillParticleListFromMC('nu_e:MC', 'mcPrimary', path=mypath)
 fillParticleListFromMC('gamma:MC', 'mcPrimary', path=mypath)
 
-newFindMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', 'isSignal==1', path=mypath)
-newFindMCDecay(
+reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', 'isSignal==1', path=mypath)
+reconstructMCDecay(
     'B+:DstENu =direct=> [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC pi0:gg] pi0:gg ] e+:MC nu_e:MC ',
     'isSignal==1',
     path=mypath)
 
 # One can directly reconstruct pi0:gg in same decay string as following.
-# But it this case, you have to use different label for pi0, pi0:gg and pi0:gg2. Otherwise you will have events overlapping.
-# newFindMCDecay(
+# But it this case, you have to write sub-decay only once. Otherwise same particles are registered twice.
+#
+# reconstructMCDecay(
 #     'B+:DstENu =direct=>\
-# [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] [pi0:gg2 =direct=> gamma:MC gamma:MC] ]\
+# [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] pi0:gg ]\
 # e+:MC nu_e:MC ',
 #     'isSignal==1',
 #     path=mypath)

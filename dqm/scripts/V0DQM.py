@@ -7,7 +7,7 @@ This module defines functions to add the V0 DQM module.
 
 from basf2 import *
 from modularAnalysis import *
-from vertex import vertexKFit
+from vertex import KFit
 
 
 def add_V0_dqm(path):

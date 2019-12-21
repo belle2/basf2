@@ -1,106 +1,78 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(c) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Dennis Wright (SLAC)                                      *
+ * Contributors: Dennis Wright                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/physicslist/Belle2PhysicsList.h>
-#include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
-#include "G4RegionStore.hh"
-#include "G4ProductionCuts.hh"
-
-// EM and decay physics
-#include "G4EmStandardPhysics.hh"
-#include "G4EmStandardPhysics_option1.hh"
-#include "G4OpticalPhysics.hh"
-#include "G4EmParameters.hh"
-#include "G4DecayPhysics.hh"
 #include <simulation/physicslist/Geant4ePhysics.h>
 
-// Hadronic physics
-#include <simulation/physicslist/ProtonPhysics.h>
-#include <simulation/physicslist/NeutronPhysics.h>
-#include <simulation/physicslist/PionPhysics.h>
-#include <simulation/physicslist/KaonPhysics.h>
-#include <simulation/physicslist/HyperonPhysics.h>
-#include <simulation/physicslist/AntiBaryonPhysics.h>
-#include <simulation/physicslist/IonPhysics.h>
-#include <simulation/physicslist/GammaLeptoNuclearPhysics.h>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 
-// Particles
-#include "G4BosonConstructor.hh"
-#include "G4LeptonConstructor.hh"
-#include "G4MesonConstructor.hh"
-#include "G4BaryonConstructor.hh"
-#include "G4IonConstructor.hh"
-#include "G4ShortLivedConstructor.hh"
+#include <G4ParticleTable.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4Ions.hh>
+#include <G4ProcessManager.hh>
+#include <G4ComptonScattering.hh>
+#include <G4GammaConversion.hh>
+#include <G4PhotoElectricEffect.hh>
+#include <simulation/kernel/ExtStepLengthLimitProcess.h>
+#include <simulation/kernel/ExtMagFieldLimitProcess.h>
+#include <simulation/kernel/ExtEnergyLoss.h>
+#include <simulation/kernel/ExtMessenger.h>
+
+#include <framework/logging/Logger.h>
 
 #define g4ePDGcode 0
 
+using namespace std;
 using namespace Belle2;
 using namespace Simulation;
 
-
-Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
-  : G4VModularPhysicsList(), m_globalCutValue(0.07)
+Geant4ePhysics::Geant4ePhysics() :
+// G4VPhysicsConstructor("Geant4ePhysics"),
+  m_StepLengthLimitProcess(NULL), m_MagFieldLimitProcess(NULL),
+  m_ELossProcess(NULL), m_Messenger(NULL)
 {
-  G4cout << " Using " << physicsListName << " physics list " << G4endl;
+  if (false) {
+    ConstructParticle();
+    ConstructProcess();
+  }
+}
 
-  m_pxdCutValue = m_globalCutValue;
-  m_svdCutValue = m_globalCutValue;
-  m_cdcCutValue = m_globalCutValue;
-  m_arichtopCutValue = m_globalCutValue;
-  // Decay
-  RegisterPhysics(new G4DecayPhysics());
-
-  // Hadronic physics
-  RegisterPhysics(new ProtonPhysics());
-  RegisterPhysics(new NeutronPhysics());
-  RegisterPhysics(new PionPhysics());
-  RegisterPhysics(new KaonPhysics());
-  RegisterPhysics(new HyperonPhysics());
-  RegisterPhysics(new AntiBaryonPhysics());
-  RegisterPhysics(new IonPhysics());
-  RegisterPhysics(new GammaLeptoNuclearPhysics());
-  RegisterPhysics(new Geant4ePhysics());
+Geant4ePhysics::~Geant4ePhysics()
+{
+  if (m_StepLengthLimitProcess) delete m_StepLengthLimitProcess;
+  if (m_MagFieldLimitProcess) delete m_MagFieldLimitProcess;
+  if (m_ELossProcess) delete m_ELossProcess;
+  if (m_Messenger) delete m_Messenger;
 }
 
 
-Belle2PhysicsList::~Belle2PhysicsList()
-{}
-
-
-void Belle2PhysicsList::ConstructParticle()
+void Geant4ePhysics::ConstructParticle()
 {
-  G4BosonConstructor pBosonConstructor;
-  pBosonConstructor.ConstructParticle();
+  /*
+  // Create ext-specific copies of useful particles, in case we are
+  // running the geant4e extrapolator.  These particles will have a
+  // limited process list and can coexist with geant4 particles: they
+  // are distinguished by their name having the prefix "g4e_" and their
+  // "PDG code" always being the reserved value of 0 (which means that
+  // the user must use FindParticle(name) rather than FindParticle(#)
+  // to look up these special particles.
+  // Arguments for G4ParticleDefinition() are as follows:
+  //               name             mass          width         charge
+  //             2*spin           parity  C-conjugation
+  //          2*Isospin       2*Isospin3       G-parity
+  //               type    lepton number  baryon number   PDG encoding
+  //             stable         lifetime    decay table
+  //             shortlived      subType    anti_encoding
+  // Values copied verbatim from geant4, except our particles don't decay
+  // and the names/PDGcodes are unique.
 
-  G4LeptonConstructor pLeptonConstructor;
-  pLeptonConstructor.ConstructParticle();
-
-  G4MesonConstructor pMesonConstructor;
-  pMesonConstructor.ConstructParticle();
-
-  G4BaryonConstructor pBaryonConstructor;
-  pBaryonConstructor.ConstructParticle();
-
-  G4IonConstructor pIonConstructor;
-  pIonConstructor.ConstructParticle();
-
-  G4ShortLivedConstructor pShortLivedConstructor;
-  pShortLivedConstructor.ConstructParticle();
-
-  ConstructG4eParticles();
-}
-
-
-void Belle2PhysicsList::ConstructG4eParticles()
-{
   static G4ParticleDefinition* g4eParticle = NULL;
 
   if (g4eParticle == NULL) {
@@ -215,6 +187,7 @@ void Belle2PhysicsList::ConstructG4eParticles()
       "nucleus",        0,          +2,  g4ePDGcode,
       true,          -1.0,        NULL,
       false,     "static",  g4ePDGcode,  0.857438230 *  muNucleon
+
     );
     // copied from G4AntiDeuteron.hh except use G4ParticleDefinition instead of G4Ions
     new G4ParticleDefinition(
@@ -225,127 +198,39 @@ void Belle2PhysicsList::ConstructG4eParticles()
       true,          -1.0,        NULL,
       false,     "static",  g4ePDGcode, -0.857438230 * muNucleon
     );
+
+  }
+  */
+}
+
+
+void Geant4ePhysics::ConstructProcess()
+{
+  // Define the limited set of processes that will be suffered by the
+  // geant4e-specific particles
+  m_StepLengthLimitProcess = new ExtStepLengthLimitProcess;
+  m_MagFieldLimitProcess = new ExtMagFieldLimitProcess;
+  m_ELossProcess = new ExtEnergyLoss;
+  m_Messenger = new ExtMessenger(m_StepLengthLimitProcess, m_MagFieldLimitProcess, m_ELossProcess);
+  G4ParticleTable* myParticleTable = G4ParticleTable::GetParticleTable();
+  // theParticleIterator is a Geant4 macro since version 10.
+  G4ParticleTable::G4PTblDicIterator* myParticleIterator = myParticleTable->GetIterator();
+  myParticleIterator->reset();
+  while ((*myParticleIterator)()) {
+    G4ParticleDefinition* particle = myParticleIterator->value();
+    G4ProcessManager* pmanager = particle->GetProcessManager();
+    G4String particleName = particle->GetParticleName();
+    if (particleName.compare(0, 4, "g4e_") == 0) {
+      if (particleName == "g4e_gamma") {
+        pmanager->AddDiscreteProcess(new G4GammaConversion());
+        pmanager->AddDiscreteProcess(new G4ComptonScattering());
+        pmanager->AddDiscreteProcess(new G4PhotoElectricEffect());
+      } else {
+        pmanager->AddContinuousProcess(m_ELossProcess, 1);
+        pmanager->AddDiscreteProcess(m_StepLengthLimitProcess, 2);
+        pmanager->AddDiscreteProcess(m_MagFieldLimitProcess, 3);
+      }
+    }
   }
 }
-
-
-void Belle2PhysicsList::SetCuts()
-{
-  // Belle2 assumes input units are cm
-  G4cout << " Global cut set to " << m_globalCutValue << G4endl;
-  SetCutValue(m_globalCutValue * cm, "proton");
-  SetCutValue(m_globalCutValue * cm, "e-");
-  SetCutValue(m_globalCutValue * cm, "e+");
-  SetCutValue(m_globalCutValue * cm, "gamma");
-
-  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
-  G4ProductionCuts* regionCuts = 0;
-
-  // VXD region cut
-  if (m_pxdCutValue == 0.0) m_pxdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_pxdCutValue * cm);
-  G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
-  theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
-
-  // SVD region cut
-  if (m_svdCutValue == 0.0) m_svdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_svdCutValue * cm);
-  G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
-  theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
-
-  // CDC region cut
-  if (m_cdcCutValue == 0.0) m_cdcCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_cdcCutValue * cm);
-  G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
-  theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
-
-  // ARICH region cut
-  if (m_arichtopCutValue == 0.0) m_arichtopCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
-
-  // TOP module region cuts
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
-  theRegionStore->GetRegion("TOPEnvelope")->SetProductionCuts(regionCuts);
-
-  // ECL region cut
-  if (m_eclCutValue == 0.0) m_eclCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_eclCutValue * cm);
-  G4cout << " ECL cut set to " << m_eclCutValue << G4endl;
-  theRegionStore->GetRegion("ECLForwardEnvelope")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBarrelSector")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBackwardEnvelope")->SetProductionCuts(regionCuts);
-}
-
-
-void Belle2PhysicsList::SetVerbosity(G4int verb)
-{
-  SetVerboseLevel(verb);
-}
-
-
-void Belle2PhysicsList::SetProductionCutValue(G4double value)
-{
-  m_globalCutValue = value;
-}
-
-
-void Belle2PhysicsList::SetPXDProductionCutValue(G4double value)
-{
-  m_pxdCutValue = value;
-}
-
-
-void Belle2PhysicsList::SetSVDProductionCutValue(G4double value)
-{
-  m_svdCutValue = value;
-}
-
-
-void Belle2PhysicsList::SetCDCProductionCutValue(G4double value)
-{
-  m_cdcCutValue = value;
-}
-
-
-void Belle2PhysicsList::SetARICHTOPProductionCutValue(G4double value)
-{
-  m_arichtopCutValue = value;
-}
-
-
-void Belle2PhysicsList::SetECLProductionCutValue(G4double value)
-{
-  m_eclCutValue = value;
-}
-
-
-void Belle2PhysicsList::UseStandardEMPhysics(G4bool yesno)
-{
-  if (yesno) {
-    RegisterPhysics(new G4EmStandardPhysics());
-  } else {
-    RegisterPhysics(new G4EmStandardPhysics_option1());
-  }
-}
-
-
-void Belle2PhysicsList::UseOpticalPhysics(G4bool yesno)
-{
-  if (yesno) RegisterPhysics(new G4OpticalPhysics());
-}
-
-
-void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
-{
-  if (yesno) G4cout << " High precision neutron option not yet ready " << G4endl;
-}
-
 

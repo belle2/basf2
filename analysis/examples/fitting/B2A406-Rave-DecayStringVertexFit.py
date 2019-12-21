@@ -30,9 +30,9 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import vertexRave
-from modularAnalysis import massVertexRave
-from modularAnalysis import vertexRaveDaughtersUpdate
+from vertex import vertexRave
+from vertex import massVertexRave
+from vertex import vertexRaveDaughtersUpdate
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc

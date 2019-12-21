@@ -29,7 +29,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
-from modularAnalysis import KFit
+from vertex import KFit
 from modularAnalysis import matchMCTruth
 from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons

@@ -165,10 +165,10 @@ namespace Belle2 {
 
           for (int view = VIndex ; view < UIndex + 1; view++) {
             int nAPV = 6;
-            unsigned int viewNumber = 2;
+            unsigned int viewNumber = 3;
 
-            if (m_histograms[layerNumber][ladderNumber][view].size() <= viewNumber)
-              m_histograms[layerNumber][ladderNumber][sensorNumber].resize(viewNumber + 1);
+            if (m_histograms[layerNumber][ladderNumber][view].size() < viewNumber)
+              m_histograms[layerNumber][ladderNumber][sensorNumber].resize(viewNumber);
             m_histograms[layerNumber][ladderNumber][sensorNumber][view].resize(nAPV);
             for (int apv = 0; apv < nAPV; apv ++) {
 

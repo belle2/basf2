@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sergei Gribanov, Mikhail Remnev                          *
@@ -8,7 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#pragma once
+
 #include <vector>
+#include <ecl/utility/ECLDspEmulator.h>
 
 namespace Belle2 {
   class ECLDigit;
@@ -47,7 +50,7 @@ namespace Belle2 {
        * @param[in] adc[31]  Waveform data from ECLDsp dataobject
        * @param[in] ttrig    Trigger time from ECLTrig dataobject
        */
-      static ECLDigit shapeFitter(int cid, std::vector<int> adc, int ttrig);
+      static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig);
 
     private:
       /**

@@ -32,7 +32,7 @@ def BeamSpotCalibration(files, tags):
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
-    vx.vertexKFit('Upsilon(4S):BS', conf_level=0, path=path)
+    vx.KFit('Upsilon(4S):BS', conf_level=0, path=path)
 
     collector = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm = BeamSpotAlgorithm()

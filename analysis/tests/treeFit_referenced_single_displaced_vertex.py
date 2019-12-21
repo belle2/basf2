@@ -6,7 +6,6 @@ import tempfile
 import basf2
 import modularAnalysis as ma
 import b2test_utils
-from vertex import vertexTree
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple

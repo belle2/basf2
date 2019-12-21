@@ -29,7 +29,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
-from vertex import fourCKFit
+from vertex import KFit
 from modularAnalysis import matchMCTruth
 from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
@@ -60,11 +60,11 @@ reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=my_path)
 
 # Perform four momentum constraint fit using KFit.
 # Reject the candidates with failed fit.
-fourCKFit("Upsilon(4S)", 0.0, path=my_path)
+KFit("Upsilon(4S)", 0.0, 'fourC', path=my_path)
 
 # Perform four momentum constraint fit using KFit and update the Daughters
 # Reject the candidates with failed fit.
-# fourCKFitDaughtersUpdate("Upsilon(4S)", 0.0)
+# KFit("Upsilon(4S)", 0.0, 'fourC', daughtersUpdate=True, path=my_path)
 
 # Associates the MC truth to the reconstructed D0
 matchMCTruth('Upsilon(4S)', path=my_path)

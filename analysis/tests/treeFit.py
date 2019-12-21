@@ -5,7 +5,7 @@ import os
 import tempfile
 import basf2
 import modularAnalysis as ma
-from vertex import vertexTree
+from vertex import treeFit
 import b2test_utils
 from ROOT import Belle2
 from ROOT import TFile
@@ -36,7 +36,7 @@ class TestTreeFits(unittest.TestCase):
         ma.reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
         ma.matchMCTruth('B0:rec', path=main)
 
-        vertexTree('B0:rec', conf_level=-1, ipConstraint=True, updateAllDaughters=True, path=main)
+        treeFit('B0:rec', conf_level=-1, ipConstraint=True, updateAllDaughters=True, path=main)
 
         ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)

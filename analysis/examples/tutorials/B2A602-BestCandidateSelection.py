@@ -65,13 +65,12 @@ ma.reconstructDecay(decayString='D0 -> K-:loose pi+:all',
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vx.vertexTree(list_name='D0',
-              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
-              ipConstraint=True,
-              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-              updateAllDaughters=True,  # update momenta off ALL particles
-              path=my_path
-              )
+vx.treeFit(list_name='D0',
+           conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+           ipConstraint=True,
+           # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+           updateAllDaughters=True,  # update momenta off ALL particles
+           path=my_path)
 
 # smaller |M_rec - M| is better, add here a different output variable name, due to parentheses
 ma.rankByLowest(particleList='D0',

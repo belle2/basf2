@@ -328,7 +328,7 @@ def SystematicsLambdaList(path):
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
         ma.reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID, path=path)
-        vertex.vertexKFit('Lambda0:syst' + str(chID), 0.002, path=path)
+        vertex.KFit('Lambda0:syst' + str(chID), 0.002, path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13', path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225', path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0', path=path)

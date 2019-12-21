@@ -27,7 +27,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import massKFit
+from vertex import massKFit
 from modularAnalysis import variablesToNtuple
 from stdPi0s import stdPi0s
 import variables.collections as vc

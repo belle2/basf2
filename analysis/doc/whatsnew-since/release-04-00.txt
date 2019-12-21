@@ -1,6 +1,8 @@
 Changes in the analysis package
 -------------------------------
 
+  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -94,7 +96,6 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
- * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
 Conditions DB

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2ERROR
+from modularAnalysis import fillParticleList
 
 
 # define arrays to interpret cut matrix

@@ -1,5 +1,5 @@
-#!/usr/bin/env python3cut='E > 0.1', path=coding
-# -*- path: utf-8 -*-
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 """
 (Semi-)Leptonic Working Group Skims for missing energy modes that use the `FullEventInterpretation` (FEI) algorithm.

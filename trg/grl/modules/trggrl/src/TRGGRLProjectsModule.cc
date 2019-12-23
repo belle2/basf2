@@ -550,10 +550,10 @@ void TRGGRLProjectsModule::event()
   // bha_type13: 33
   bool bha_type13 = (ECLtoGDL[1] & (1 << (33 - 32 * 1))) != 0;
 
-  bool nclst_0 = (eclTrgClusterArray.getEntries() & (1 << 0)) != 0;
-  bool nclst_1 = (eclTrgClusterArray.getEntries() & (1 << 1)) != 0;
-  bool nclst_2 = (eclTrgClusterArray.getEntries() & (1 << 2)) != 0;
-  bool nclst_3 = (eclTrgClusterArray.getEntries() & (1 << 3)) != 0;
+  bool nclst_0 = (eclTrgClusterArray.getEntries() == 1);
+  bool nclst_1 = (eclTrgClusterArray.getEntries() == 2);
+  bool nclst_2 = (eclTrgClusterArray.getEntries() == 3);
+  bool nclst_3 = (eclTrgClusterArray.getEntries() > 3);
 
   // ecl_bg_0: 57
   bool ecl_bg_0 = (ECLtoGDL[1] & (1 << (57 - 32 * 1))) != 0;
@@ -610,20 +610,19 @@ void TRGGRLProjectsModule::event()
   }
 
   bool klm_hit = klmtracklist.getEntries() > 0;
-  bool klm_0 = (klmtracklist.getEntries() & (1 << 0)) != 0;
-  bool klm_1 = (klmtracklist.getEntries() & (1 << 1)) != 0;
-  bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
-  bool klm_3 = (klmtracklist.getEntries() & (1 << 3)) != 0;
+  bool klm_0 = (klmtracklist.getEntries() == 1);
+  bool klm_1 = (klmtracklist.getEntries() == 2);
+  bool klm_2 = (klmtracklist.getEntries() > 2);
 
-  bool cdcklm_0 = (trackKLMmatch.getEntries() & (1 << 0)) != 0;
-  bool cdcklm_1 = (trackKLMmatch.getEntries() & (1 << 1)) != 1;
-  bool cdcklm_2 = (trackKLMmatch.getEntries() & (1 << 2)) != 2;
-  bool cdcklm_3 = (trackKLMmatch.getEntries() & (1 << 3)) != 3;
+  bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
+  bool cdcklm_1 = (trackKLMmatch.getEntries() == 2);
+  bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
+  bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
 
-  bool cdcecl_0 = (trackphimatch.getEntries() & (1 << 0)) != 0;
-  bool cdcecl_1 = (trackphimatch.getEntries() & (1 << 1)) != 0;
-  bool cdcecl_2 = (trackphimatch.getEntries() & (1 << 2)) != 0;
-  bool cdcecl_3 = (trackphimatch.getEntries() & (1 << 3)) != 0;
+  bool cdcecl_0 = (trackphimatch.getEntries() == 1);
+  bool cdcecl_1 = (trackphimatch.getEntries() == 2);
+  bool cdcecl_2 = (trackphimatch.getEntries() == 3);
+  bool cdcecl_3 = (trackphimatch.getEntries() > 3);
 
   int N_KLMb2b = 0;
   for (int i = 0; i < klmtracklist.getEntries(); i++) {
@@ -635,9 +634,9 @@ void TRGGRLProjectsModule::event()
     }
   }
 
-  bool klmb2b_0 = (N_KLMb2b & (1 << 0)) != 0;
-  bool klmb2b_1 = (N_KLMb2b & (1 << 1)) != 0;
-  bool klmb2b_2 = (N_KLMb2b & (1 << 2)) != 0;
+  bool klmb2b_0 = (N_KLMb2b == 1);
+  bool klmb2b_1 = (N_KLMb2b == 2);
+  bool klmb2b_2 = (N_KLMb2b > 2);
 
   int N_clst1 = 0, N_clst2 = 0;
   for (int i = 0 ; i < grlphoton.getEntries() ; i++) {
@@ -645,15 +644,15 @@ void TRGGRLProjectsModule::event()
     if (grlphoton[i]->get_e() > 2.0) { N_clst2++; }
   }
 
-  bool nclst1_0 = (N_clst1 & (1 << 0)) != 0;
-  bool nclst1_1 = (N_clst1 & (1 << 1)) != 0;
-  bool nclst1_2 = (N_clst1 & (1 << 2)) != 0;
-  bool nclst1_3 = (N_clst1 & (1 << 3)) != 0;
+  bool nclst1_0 = (N_clst1 == 1);
+  bool nclst1_1 = (N_clst1 == 2);
+  bool nclst1_2 = (N_clst1 == 3);
+  bool nclst1_3 = (N_clst1 > 3);
 
-  bool nclst2_0 = (N_clst2 & (1 << 0)) != 0;
-  bool nclst2_1 = (N_clst2 & (1 << 1)) != 0;
-  bool nclst2_2 = (N_clst2 & (1 << 2)) != 0;
-  bool nclst2_3 = (N_clst2 & (1 << 3)) != 0;
+  bool nclst2_0 = (N_clst2 == 1);
+  bool nclst2_1 = (N_clst2 == 2);
+  bool nclst2_2 = (N_clst2 == 3);
+  bool nclst2_3 = (N_clst2 > 3);
 
   //---------------------------------------------------------------------
   //..Filling InputBits
@@ -734,7 +733,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
     else if (bitname == "klm_2") {bit = klm_2;}
-    else if (bitname == "klm_3") {bit = klm_3;}
     else if (bitname == "klmb2b_0") {bit = klmb2b_0;}
     else if (bitname == "klmb2b_1") {bit = klmb2b_1;}
     else if (bitname == "klmb2b_2") {bit = klmb2b_2;}

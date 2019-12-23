@@ -205,7 +205,7 @@ namespace Belle2 {
         nRecoParticles += plist->getNParticlesOfOriginType(Particle::c_KLMCluster);
         if (nRecoParticles > 0)
           B2ERROR("ParticleList " << daughter->getFullName() <<
-                  " contains reconstructed particles! It is not accepted in NewDecayFinderModule!");
+                  " contains reconstructed particles! It is not accepted in ParticleCombinerFromMCModule!");
 
         // if not, do nothing.
       } else {

@@ -233,65 +233,65 @@ add  p Particle  f'_1                           20333  1.4263000e+00  5.4500000e
 * omega(1420). PDG reports possible ranges for the mass and width, their central values are chosen here.
 add  p Particle  omega(2S)                     100223  1.4250000e+00  2.1500000e-01  4.0000000e-01     0     2              0          0
 * a_0(1450)
-add  p Particle  a(0)(1450)+                    10211        1474e-3         265e-3              0     3     0              0          0
-add  p Particle  a(0)(1450)-                   -10211        1474e-3         265e-3              0    -3     0              0          0
-add  p Particle  a(0)(1450)0                    10111        1474e-3         265e-3              0     0     0              0          0
+add  p Particle  a(0)(1450)+                    10211        1474e-3         265e-3         800e-3     3     0              0          0
+add  p Particle  a(0)(1450)-                   -10211        1474e-3         265e-3         800e-3    -3     0              0          0
+add  p Particle  a(0)(1450)0                    10111        1474e-3         265e-3         800e-3     0     0              0          0
 * rho(1450)
 add  p Particle  rho(2S)+                      100213  1.4650000e+00  4.0000000e-01  5.0000000e-01     3     2              0          0
 add  p Particle  rho(2S)-                     -100213  1.4650000e+00  4.0000000e-01  5.0000000e-01    -3     2              0          0
 add  p Particle  rho(2S)0                      100113  1.4650000e+00  4.0000000e-01  5.0000000e-01     0     2              0          0
 * eta(1475)
-add  p Particle  eta(1475)                     100331        1475e-3          90e-3              0     0     0              0          0
+add  p Particle  eta(1475)                     100331        1475e-3          90e-3         400e-3     0     0              0          0
 * f_0(1500)
 add  p Particle  f_0(1500)                    9030221  1.5060000e+00  1.1200000e-01  3.0000000e-01     0     0              0          0
 * f'_2(1525)
 add  p Particle  f'_2                             335  1.5250000e+00  7.3000000e-02  2.0000000e-01     0     4              0        335
 * pi_1(1600)
-add  p Particle  pi(1)(1600)+                 9010213        1660e-3         257e-3              0     3     2              0          0
-add  p Particle  pi(1)(1600)-                -9010213        1660e-3         257e-3              0    -3     2              0          0
-add  p Particle  pi(1)(1600)0                 9010113        1660e-3         257e-3              0     0     2              0          0
+add  p Particle  pi(1)(1600)+                 9010213        1660e-3         257e-3         800e-3     3     2              0          0
+add  p Particle  pi(1)(1600)-                -9010213        1660e-3         257e-3         800e-3    -3     2              0          0
+add  p Particle  pi(1)(1600)0                 9010113        1660e-3         257e-3         800e-3     0     2              0          0
 * eta_2(1645)
-add  p Particle  eta(2)(1645)                   10225        1617e-3         181e-3              0     0     4              0          0
+add  p Particle  eta(2)(1645)                   10225        1617e-3         181e-3         600e-3     0     4              0          0
 * omega(1670)
 add  p Particle  omega(1650)                    30223  1.6700000e+00  3.1500000e-01              0     0     2              0          0
 * omega_3(1670)
-add  p Particle  omega(3)(1670)                   227        1667e-3         168e-3              0     0     6              0          0
+add  p Particle  omega(3)(1670)                   227        1667e-3         168e-3         600e-3  0     6              0          0
 * pi_2(1670) 
-add  p Particle  pi(2)(1670)+                   10215      1670.6e-3         258e-3              0     3     4              0          0
-add  p Particle  pi(2)(1670)-                  -10215      1670.6e-3         258e-3              0    -3     4              0          0
-add  p Particle  pi(2)(1670)0                   10115      1670.6e-3         258e-3              0     0     4              0          0
+add  p Particle  pi(2)(1670)+                   10215      1670.6e-3         258e-3         800e-3     3     4              0          0
+add  p Particle  pi(2)(1670)-                  -10215      1670.6e-3         258e-3         800e-3    -3     4              0          0
+add  p Particle  pi(2)(1670)0                   10115      1670.6e-3         258e-3         800e-3     0     4              0          0
 * phi(1680)
-add  p Particle  phi(1680)                     100333  1.6800000e+00  1.5000000e-01              0     0     2              0          0
+add  p Particle  phi(1680)                     100333        1680e-3         150e-3         600e-3     0     2              0          0
 * rho_3(1690). The width is mode-dependent, "2 pi, 2 K and K K pi" width is used.
-add  p Particle  rho(3)(1690)+                    217      1688.8e-3         161e-3              0     3     6              0          0
-add  p Particle  rho(3)(1690)-                   -217      1688.8e-3         161e-3              0    -3     6              0          0
-add  p Particle  rho(3)(1690)0                    117      1688.8e-3         161e-3              0     0     6              0          0
+add  p Particle  rho(3)(1690)+                    217      1688.8e-3         161e-3         600e-3     3     6              0          0
+add  p Particle  rho(3)(1690)-                   -217      1688.8e-3         161e-3         600e-3    -3     6              0          0
+add  p Particle  rho(3)(1690)0                    117      1688.8e-3         161e-3         600e-3     0     6              0          0
 * rho(1700)
 add  p Particle  rho(3S)+                       30213  1.7200000e+00  2.5000000e-01  5.0000000e-01     3     2              0          0
 add  p Particle  rho(3S)-                      -30213  1.7200000e+00  2.5000000e-01  5.0000000e-01    -3     2              0          0
 add  p Particle  rho(3S)0                       30113  1.7200000e+00  2.5000000e-01  5.0000000e-01     0     2              0          0
 * f_0(1710)
-add  p Particle  f(0)(1710)                     10331        1704e-3         123e-3              0     0     0              0          0
+add  p Particle  f(0)(1710)                     10331        1704e-3         123e-3         500e-3     0     0              0          0
 * pi(1800)
-add  p Particle  pi(1800)+                    9010211        1810e-3         215e-3              0     3     0              0          0
-add  p Particle  pi(1800)-                   -9010211        1810e-3         215e-3              0    -3     0              0          0
-add  p Particle  pi(1800)0                    9010111        1810e-3         215e-3              0     0     0              0          0
+add  p Particle  pi(1800)+                    9010211        1810e-3         215e-3         700e-3     3     0              0          0
+add  p Particle  pi(1800)-                   -9010211        1810e-3         215e-3         700e-3    -3     0              0          0
+add  p Particle  pi(1800)0                    9010111        1810e-3         215e-3         700e-3     0     0              0          0
 * phi_3(1850)
-add  p Particle  phi(3)(1850)                     337        1854e-3          87e-3              0     0     6              0          0
+add  p Particle  phi(3)(1850)                     337        1854e-3          87e-3         400e-3     0     6              0          0
 * f_2(1950)
-add  p Particle  f(2)(1950)                   9050225        1936e-3         464e-3              0     0     4              0          0
+add  p Particle  f(2)(1950)                   9050225        1936e-3         464e-3        1000e-3     0     4              0          0
 * f_2(2010)
-add  p Particle  f(2)(2010)                   9060225        2011e-3         202e-3              0     0     4              0          0
+add  p Particle  f(2)(2010)                   9060225        2011e-3         202e-3         700e-3     0     4              0          0
 * a_4(1970) (was a_4(2040))
-add  p Particle  a_4(1970)+                       219        1967e-3         324e-3              0     3     8              0          0
-add  p Particle  a_4(1970)-                      -219        1967e-3         324e-3              0    -3     8              0          0
-add  p Particle  a_4(1970)0                       119        1967e-3         324e-3              0     0     8              0          0
+add  p Particle  a_4(1970)+                       219        1967e-3         324e-3        1000e-3     3     8              0          0
+add  p Particle  a_4(1970)-                      -219        1967e-3         324e-3        1000e-3    -3     8              0          0
+add  p Particle  a_4(1970)0                       119        1967e-3         324e-3        1000e-3     0     8              0          0
 * f_4(2050)
-add  p Particle  f(4)(2050)                       229        2018e-3         237e-3              0     0     8              0          0
+add  p Particle  f(4)(2050)                       229        2018e-3         237e-3         800e-3     0     8              0          0
 * f_2(2300)
-add  p Particle  f(2)(2300)                   9080225        2297e-3         149e-3              0     0     4              0          0
+add  p Particle  f(2)(2300)                   9080225        2297e-3         149e-3         600e-3     0     4              0          0
 * f_2(2340)
-add  p Particle  f(2)(2340)                   9090225        2345e-3         322e-3              0     0     4              0          0
+add  p Particle  f(2)(2340)                   9090225        2345e-3         322e-3        1000e-3     0     4              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Strange mesons
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
@@ -339,20 +339,20 @@ add  p Particle  anti-K''*0                    -30313  1.7180000e+00  3.2200000e
 add  p Particle  K''*+                          30323  1.7180000e+00  3.2200000e-01  7.0000000e-01     3     2              0          0
 add  p Particle  K''*-                         -30323  1.7180000e+00  3.2200000e-01  7.0000000e-01    -3     2              0          0
 * K_2(1770)
-add  p Particle  K(2)(1770)0                    10315        1773e-3         186e-3              0     0     4              0          0
-add  p Particle  anti-K(2)(1770)0              -10315        1773e-3         186e-3              0     0     4              0          0
-add  p Particle  K(2)(1770)+                    10325        1773e-3         186e-3              0     3     4              0          0
-add  p Particle  K(2)(1770)-                   -10325        1773e-3         186e-3              0    -3     4              0          0
+add  p Particle  K(2)(1770)0                    10315        1773e-3         186e-3         700e-3     0     4              0          0
+add  p Particle  anti-K(2)(1770)0              -10315        1773e-3         186e-3         700e-3     0     4              0          0
+add  p Particle  K(2)(1770)+                    10325        1773e-3         186e-3         700e-3     3     4              0          0
+add  p Particle  K(2)(1770)-                   -10325        1773e-3         186e-3         700e-3    -3     4              0          0
 * K_3*(1780)
 add  p Particle  K_3*0                            317  1.7760000e+00  1.5900000e-01  7.0000000e-01     0     6              0          0
 add  p Particle  anti-K_3*0                      -317  1.7760000e+00  1.5900000e-01  7.0000000e-01     0     6              0          0
 add  p Particle  K_3*+                            327  1.7760000e+00  1.5900000e-01  7.0000000e-01     3     6              0          0
 add  p Particle  K_3*-                           -327  1.7760000e+00  1.5900000e-01  7.0000000e-01    -3     6              0          0
 * K_2(1820)
-add  p Particle  K(2)(1820)0                    20315        1819e-3         264e-3              0     0     4              0          0
-add  p Particle  anti-K(2)(1820)0              -20315        1819e-3         264e-3              0     0     4              0          0
-add  p Particle  K(2)(1820)+                    20325        1819e-3         264e-3              0     3     4              0          0
-add  p Particle  K(2)(1820)-                   -20325        1819e-3         264e-3              0     3     4              0          0
+add  p Particle  K(2)(1820)0                    20315        1819e-3         264e-3         800e-3     0     4              0          0
+add  p Particle  anti-K(2)(1820)0              -20315        1819e-3         264e-3         800e-3     0     4              0          0
+add  p Particle  K(2)(1820)+                    20325        1819e-3         264e-3         800e-3     3     4              0          0
+add  p Particle  K(2)(1820)-                   -20325        1819e-3         264e-3         800e-3     3     4              0          0
 * K_4*(2045)
 add  p Particle  K_4*0                            319  2.0450000e+00  1.9800000e-01  2.0000000e-01     0     8              0          0
 add  p Particle  anti-K_4*0                      -319  2.0450000e+00  1.9800000e-01  2.0000000e-01     0     8              0          0

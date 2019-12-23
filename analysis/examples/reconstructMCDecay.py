@@ -35,7 +35,7 @@ reconstructMCDecay(
 
 
 # One can directly reconstruct pi0:gg in same decay string as following.
-# But it this case, you have to write sub-decay only once. Otherwise same particles are registered twice.
+# But in this case, one have to write sub-decay only once. Otherwise same particles are registered twice.
 #
 # reconstructMCDecay(
 #     'B+:DstENu =direct=>\

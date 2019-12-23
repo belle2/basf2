@@ -221,11 +221,11 @@ add  p Particle  a_20                             115  1.3181000e+00  1.0700000e
 * f_0(1370). The mass and width are given by PDG as "1200 to 1500 MeV" and "200 to 500 MeV", respectively.
 add  p Particle  f'_0                           30221  1.3500000e+00  3.5000000e-01  3.5000000e-01     0     0              0      10331
 * pi_1(1400)
-add  p Particle  pi(1)(1400)+                 9000213        1354e-3         330e-3              0     3     2              0          0
-add  p Particle  pi(1)(1400)-                -9000213        1354e-3         330e-3              0    -3     2              0          0
-add  p Particle  pi(1)(1400)0                 9000113        1354e-3         330e-3              0     0     2              0          0
+add  p Particle  pi(1)(1400)+                 9000213        1354e-3         330e-3        1000e-3     3     2              0          0
+add  p Particle  pi(1)(1400)-                -9000213        1354e-3         330e-3        1000e-3    -3     2              0          0
+add  p Particle  pi(1)(1400)0                 9000113        1354e-3         330e-3        1000e-3     0     2              0          0
 * eta(1405)
-add  p Particle  eta(1405)                    9020221      1408.8e-3        50.1e-3              0     0     0              0          0
+add  p Particle  eta(1405)                    9020221      1408.8e-3        50.1e-3         250e-3     0     0              0          0
 * h_1(1415)
 add  p Particle  h'_1                           10333  1.4140000e+00  9.0000000e-02  3.0000000e-01     0     2              0      10333
 * f_1(1420)

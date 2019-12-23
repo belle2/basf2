@@ -45,7 +45,7 @@ reconstructMCDecay(
 #     path=mypath)
 
 
-interesting_variables = ['isSignal', "Mbc", "deltaE", "isSignal", "mcErrors"]
+interesting_variables = ['isSignal', "Mbc", "deltaE", "mcErrors"]
 
 vm.printAliases()
 

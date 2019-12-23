@@ -302,11 +302,16 @@ namespace Belle2 {
      * Returns the number of particles which have given Particle::EParticleType
      *
      * @param type Particle::EParticleType
+     * @param includingAntiList
      * @return number of particles which is originated from given type
      */
-    unsigned getNParticlesOfOriginType(Particle::EParticleType type) const
+    unsigned getNParticlesOfOriginType(Particle::EParticleType type, bool includingAntiList = true) const
     {
-      return std::count(m_originTypeList.begin(), m_originTypeList.end(), type);
+      unsigned nList = std::count(m_originTypeList.begin(), m_originTypeList.end(), type);
+      if (includingAntiList and !m_antiListName.empty()) {
+        nList += getAntiParticleList().getNParticlesOfOriginType(type, false);
+      }
+      return nList;
     }
 
     /**

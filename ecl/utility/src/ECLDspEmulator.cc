@@ -34,9 +34,10 @@ namespace Belle2 {
 
 namespace Belle2 {
   namespace ECL {
-    ECLShapeFit lftda_(short int* f, short int* f1, short int* fg41,
-                       short int* fg43, short int* fg31, short int* fg32,
-                       short int* fg33, int* y, int& ttrig2, int& la_thr,
+    template <typename INT>
+    ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
+                       INT* fg43, INT* fg31, INT* fg32,
+                       INT* fg33, int* y, int& ttrig2, int& la_thr,
                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
                        int& chi_thres)
@@ -145,6 +146,7 @@ namespace Belle2 {
 
       // Struct with fit results
       ECLShapeFit result;
+      result.fit.resize(31);
 
       /***   FIRST APPROXIMATION   ***/
 
@@ -390,6 +392,19 @@ namespace Belle2 {
 
       return result;
     }
+
+    template ECLShapeFit lftda_<short>(short* f, short* f1, short* fg41,
+                                       short* fg43, short* fg31, short* fg32,
+                                       short* fg33, int* y, int& ttrig2, int& la_thr,
+                                       int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                                       int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                                       int& chi_thres);
+    template ECLShapeFit lftda_<int>(int* f, int* f1, int* fg41,
+                                     int* fg43, int* fg31, int* fg32,
+                                     int* fg33, int* y, int& ttrig2, int& la_thr,
+                                     int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                                     int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                                     int& chi_thres);
   }
 }
 

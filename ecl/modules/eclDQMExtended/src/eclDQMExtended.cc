@@ -429,7 +429,8 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 
   A0 = (int)v_totalthrA0[cellID - 1];
   Ahard = (int)v_totalthrAhard[cellID - 1];
-  Askip = (int)v_totalthrAskip[cellID - 1];
+  // FIXME: Value of this threshold should be read from the database.
+  Askip = 20;
 
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);

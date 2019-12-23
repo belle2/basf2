@@ -79,16 +79,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Define EKLM histograms.
-     */
-    void defineHistoEKLM();
-
-    /**
-     * Define BKLM histograms.
-     */
-    void defineHistoBKLM();
-
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -131,6 +121,15 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
+    /** Plane occupancy: BKLM, phi readout. */
+    TH1F* m_PlaneBKLMPhi;
+
+    /** Plane occupancy: BKLM, z readout. */
+    TH1F* m_PlaneBKLMZ;
+
+    /** Plane occupancy: EKLM. */
+    TH1F* m_PlaneEKLM;
+
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
       EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
@@ -142,20 +141,14 @@ namespace Belle2 {
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
 
-    /** Sector number. */
-    TH1F* m_eklmSector;
-
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;
 
-    /** Sector and layer number occupancy for phi-readout hits */
-    TH1F* m_bklmSectorLayerPhi;
-
-    /** Sector and layer number occupancy for Z-readout hits */
-    TH1F* m_bklmSectorLayerZ;
-
     /** Number of BKLM Digits. */
-    TH1F* m_bklmDigitsN;
+    TH1F* m_BklmDigitsNumber;
+
+    /** Number of KLM Digits. */
+    TH1F* m_KlmDigitsNumber;
 
   };
 

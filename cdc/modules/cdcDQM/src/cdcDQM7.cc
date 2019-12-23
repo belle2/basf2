@@ -10,6 +10,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/HistoModule.h>
 
+// framework aux
+#include <framework/gearbox/Unit.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
 
@@ -54,6 +59,13 @@ TH2D* bmap_2; // board(copper-finess) status map 2D
 // add 20190205
 TH1D* h_occ; // occupancy
 TH1D* h_occ_L[56]; // occupancy layer dependent
+TH1D* h_hit_cell; // hit vs cell id
+
+TH1D* h_EoccAfterInjLER; /*<nhits after LER injection>*/
+TH1D* h_EoccAfterInjHER; /*<nhits after HER injection>*/
+TH1D* h_occAfterInjLER; /*<occupancy after LER injection>*/
+TH1D* h_occAfterInjHER; /*<occupancy after HER injection>*/
+
 
 void cdcDQM7Module::defineHisto()
 {
@@ -121,6 +133,9 @@ void cdcDQM7Module::defineHisto()
   h_occ = new TH1D("occ", "occ. total", 100, 0, 1.);
   h_occ->SetFillColor(95);
 
+  // 20191108
+  h_hit_cell = new TH1D("h_hit_cell", "Hit of each cell", 14336, 0, 14335);
+  h_hit_cell->SetFillColor(20);
   //
   bmap_2 = new TH2D("bmap_2", "", 75, 0, 75, 4, 0, 4);
 
@@ -136,6 +151,22 @@ void cdcDQM7Module::defineHisto()
   bmap_2->SetOption("zcol"); //
   bmap_2->SetStats(0);
 
+  h_EoccAfterInjLER = new TH1D("EoccAfterInjLer", "Eocc after LER injection", 4000, 0, 20000);
+  h_EoccAfterInjLER->SetMinimum(0);
+  h_EoccAfterInjLER->SetFillColor(7);
+
+  h_EoccAfterInjHER = new TH1D("EoccAfterInjHer", "Eocc after HER injection", 4000, 0, 20000);
+  h_EoccAfterInjHER->SetMinimum(0);
+  h_EoccAfterInjHER->SetFillColor(7);
+
+  h_occAfterInjLER = new TH1D("occAfterInjLer", "occupancy after LER injection", 4000, 0, 20000);
+  h_occAfterInjLER->SetMinimum(0);
+  h_occAfterInjLER->SetFillColor(7);
+
+  h_occAfterInjHER = new TH1D("occAfterInjHer", "occupancy after HER injection", 4000, 0, 20000);
+  h_occAfterInjHER->SetMinimum(0);
+  h_occAfterInjHER->SetFillColor(7);
+
   oldDir->cd();//
 
 }
@@ -143,6 +174,8 @@ void cdcDQM7Module::defineHisto()
 void cdcDQM7Module::initialize()
 {
   REG_HISTOGRAM   // required to register histograms to HistoManager
+  // register dataobjects
+  m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
 
 }
 
@@ -151,6 +184,7 @@ void cdcDQM7Module::beginRun()
   for (int i = 0; i < 56; i++) {
     h_nhits_L[i]->Reset();
     h_occ_L[i]->Reset();
+
   }
 
   for (int j = 0; j < 9; j++) {
@@ -162,6 +196,12 @@ void cdcDQM7Module::beginRun()
   h_board_out_tdc->Reset();
   bmap_2->Reset();
   h_occ->Reset();
+  h_hit_cell->Reset();
+
+  h_EoccAfterInjLER->Reset();
+  h_EoccAfterInjHER->Reset();
+  h_occAfterInjLER->Reset();
+  h_occAfterInjHER->Reset();
 
 }
 
@@ -173,11 +213,14 @@ void cdcDQM7Module::event()
   int ftdc = 0;
 
   // occ total
-  h_occ->Fill(nent / 14336.);
+  double occ_total = nent / 14336.;
+  h_occ->Fill(occ_total);
 
   // for layer dependent occupancy
   int whits_L[56] = {}; // wire hits
   double occ_L[56] = {}; // occupancy
+
+  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int i = 0; i < nent; i++) {
     CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
@@ -215,12 +258,25 @@ void cdcDQM7Module::event()
       }// fastest
 
     }// adc
+
+    // add by J.H. Yin
+    if (adcsum > 25) {
+      int cid(0);
+      if (sL == 0) {
+        cid = iL * ndiv[sL] + wid;
+      } else {
+        for (int isl = 0; isl < sL; isl ++) {
+          cid += 6 * ndiv[isl];
+        }
+        cid += 2 * ndiv[0] + iL * ndiv[sL] + wid;
+      }
+      h_hit_cell -> Fill(cid);
+    }
   }// cdchit
 
   h_fast_tdc->Fill(ftdc);
 
   // each layer
-  int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
   for (int b = 0; b < 56; b++) {
     int n_wire = 0;
     if (b < 8) {
@@ -307,6 +363,26 @@ void cdcDQM7Module::event()
 
 
   }// cdcrawhits
+
+  for (auto& it : m_rawFTSW) {
+    B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
+            (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
+            it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+    auto difference = it.GetTimeSinceLastInjection(0);
+    if (difference != 0x7FFFFFFF) {
+      //unsigned int nentries = m_digits.getEntries();
+      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
+      if (it.GetIsHER(0)) {
+        h_occAfterInjHER->Fill(diff2, occ_total);
+        h_EoccAfterInjHER->Fill(diff2);
+      } else {
+        h_occAfterInjLER->Fill(diff2, occ_total);
+        h_EoccAfterInjLER->Fill(diff2);
+      }
+    }
+  }
+
+
 
 
 }

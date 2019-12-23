@@ -5,8 +5,6 @@ Import('env')
 
 env['LIBS'] = [
     'alignment',
-    'analysis',
-    'analysis_dataobjects',
     'tracking_dataobjects',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',
@@ -25,8 +23,7 @@ env['LIBS'] = [
     'CLHEP',
     '$ROOT_LIBS',
     '$GEANT4_LIBS',
-    'FastBDT_shared',
-    'tracking_dbobjects',
+    'FastBDT_shared'
     ]
 
 Return('env')

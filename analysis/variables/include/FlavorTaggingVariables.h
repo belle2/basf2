@@ -129,9 +129,9 @@ namespace Belle2 {
     double isRestOfEventMajorityB0Flavor(const Particle*);
 
     /**
-     * Returns the MC flavor (+-1) of the accompaning tag-side neutral B meson if the given particle is a correctly MC matched neutral B.
+     * Returns the MC flavor (+-1) of the accompaning tag-side B meson if the given particle is a correctly MC-matched B candidate.
      * It returns 0 else. */
-    double mcFlavorOfOtherB0(const Particle* particle);
+    double mcFlavorOfOtherB(const Particle* particle);
 
     /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the semileptonic flavor tagging variables. The Possibilities are:

@@ -807,14 +807,16 @@ function getRevs() {
     return revs;
 }
 
+
 /**
  * Returns a string representation of the array of selected revisions.
  * We need that to create folder names & queries
  */
 function selectedRevsListToString(selectedRevs) {
     let revString = "";
+    selectedRevs.sort();
     for (let i in selectedRevs) {
-        if (i > 0) revString += "_";
+        if (i > 0) revString += ",";
         revString += selectedRevs[i];
     }
     return revString;

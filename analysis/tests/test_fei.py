@@ -13,8 +13,7 @@ import subprocess
 import ROOT
 
 import fei
-from fei.config import *
-from fei import core
+from fei.config import Particle
 
 import numpy as np
 
@@ -49,33 +48,33 @@ def print_path(a, b):
 
 def get_small_unittest_channels():
     pion = Particle('pi+',
-                    MVAConfiguration(variables=['p', 'dr'],
-                                     target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
-                                        bestCandidateMode='highest',
-                                        bestCandidateVariable='piid',
-                                        bestCandidateCut=20),
-                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                    fei.config.MVAConfiguration(variables=['p', 'dr'],
+                                                target='isPrimarySignal'),
+                    fei.config.PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                                                   bestCandidateMode='highest',
+                                                   bestCandidateVariable='piid',
+                                                   bestCandidateCut=20),
+                    fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
 
     kaon = Particle('K+',
-                    MVAConfiguration(variables=['p', 'dr'],
-                                     target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
-                                        bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid',
-                                        bestCandidateCut=20),
-                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                    fei.config.MVAConfiguration(variables=['p', 'dr'],
+                                                target='isPrimarySignal'),
+                    fei.config.PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                                                   bestCandidateMode='highest',
+                                                   bestCandidateVariable='Kid',
+                                                   bestCandidateCut=20),
+                    fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
 
     D0 = Particle('D0',
-                  MVAConfiguration(variables=['M', 'p'],
-                                   target='isSignal'),
-                  PreCutConfiguration(userCut='1.7 < M < 1.95',
-                                      bestCandidateMode='lowest',
-                                      bestCandidateVariable='abs(dM)',
-                                      bestCandidateCut=20),
-                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+                  fei.config.MVAConfiguration(variables=['M', 'p'],
+                                              target='isSignal'),
+                  fei.config.PreCutConfiguration(userCut='1.7 < M < 1.95',
+                                                 bestCandidateMode='lowest',
+                                                 bestCandidateVariable='abs(dM)',
+                                                 bestCandidateCut=20),
+                  fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.001))
     D0.addChannel(['K-', 'pi+'])
     D0.addChannel(['pi-', 'pi+'])
 
@@ -211,7 +210,7 @@ class TestFSPLoader(unittest.TestCase):
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         print_path(path, x.reconstruct())
@@ -229,7 +228,7 @@ class TestFSPLoader(unittest.TestCase):
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('K_S0:V0 -> pi+ pi-', '')],
                         writeOut=True)
-        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:FSP -> p+ pi-', '')],
+        path.add_module('ParticleLoader', decayStringsWithCuts=[('Lambda0:V0 -> p+ pi-', '')],
                         writeOut=True)
         path.add_module('ParticleLoader', decayStringsWithCuts=[('gamma:V0 -> e+ e-', '')], addDaughters=True, writeOut=True)
         hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5)
@@ -254,6 +253,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -275,6 +276,8 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleCopier', inputListNames=['gamma:FSP'])
         path.add_module('ParticleListManipulator', outputListName='K_S0:V0', inputListNames=['K_S0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['K_S0:V0'])
+        path.add_module('ParticleListManipulator', outputListName='Lambda0:V0', inputListNames=['Lambda0:mdst'], writeOut=True)
+        path.add_module('ParticleCopier', inputListNames=['Lambda0:V0'])
         path.add_module('ParticleListManipulator', outputListName='pi0:FSP', inputListNames=['pi0:mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['pi0:FSP'])
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
@@ -529,9 +532,9 @@ class TestPreReconstruction(unittest.TestCase):
 class TestPostReconstruction(unittest.TestCase):
 
     def test_get_missing_channels(self):
-        pion = Particle('pi+:unittest', MVAConfiguration(variables=['p', 'dr'], target='isPrimarySignal'))
+        pion = Particle('pi+:unittest', fei.config.MVAConfiguration(variables=['p', 'dr'], target='isPrimarySignal'))
         pion.addChannel(['pi+:FSP'])
-        D0 = Particle('D0:unittest', MVAConfiguration(variables=['M', 'p'], target='isSignal'))
+        D0 = Particle('D0:unittest', fei.config.MVAConfiguration(variables=['M', 'p'], target='isSignal'))
         D0.addChannel(['K-:unittest', 'pi+:unittest'])
         D0.addChannel(['pi-:unittest', 'pi+:unittest'])
         config = fei.config.FeiConfiguration(monitor=False, prefix="UNITTEST")

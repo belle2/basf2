@@ -63,6 +63,8 @@
 
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
+#include "belle_legacy/tables/evtcls.h"
+
 
 #include <cmath>
 #include <cfloat>
@@ -172,6 +174,8 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
 
+  addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
+
   m_realData = false;
 
   B2DEBUG(1, "B2BIIConvertMdst: Constructor done.");
@@ -211,6 +215,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
+
+  if (m_convertEvtcls) m_evtCls.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -348,6 +354,10 @@ void B2BIIConvertMdstModule::event()
 
   // 12. Convert ExtHit information and set Track -> ExtHit relations
   if (m_convertExtHits) convertExtHitTable();
+
+  // 13. Convert Evtcls panther table information
+  if (m_convertEvtcls) convertEvtclsTable();
+
 }
 
 
@@ -1237,6 +1247,51 @@ void B2BIIConvertMdstModule::convertExtHitTable()
       }
     }
   }
+}
+
+void B2BIIConvertMdstModule::convertEvtclsTable()
+{
+  // Create StoreObj if it is not valid
+  if (not m_evtCls.isValid()) {
+    m_evtCls.create();
+  }
+  // Pull Evtcls_flag(2) from manager
+  Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
+  Belle::Evtcls_flag2_Manager& EvtFlag2Mgr = Belle::Evtcls_flag2_Manager::get_manager();
+
+  // Pull Evtcls_hadronic_flag from manager
+  Belle::Evtcls_hadronic_flag_Manager& EvtHadFlagMgr = Belle::Evtcls_hadronic_flag_Manager::get_manager();
+
+  std::string name = "evtcls_flag";
+  std::string name_had = "evtcls_hadronic_flag";
+  // Only one entry in each event
+  std::vector<Belle::Evtcls_flag>::iterator eflagIterator = EvtFlagMgr.begin();
+  std::vector<Belle::Evtcls_flag2>::iterator eflag2Iterator = EvtFlag2Mgr.begin();
+  std::vector<Belle::Evtcls_hadronic_flag>::iterator ehadflagIterator = EvtHadFlagMgr.begin();
+
+  // Converting evtcls_flag(2)
+  std::vector<int> flag(20);
+  for (int index = 0; index < 20; ++index) {
+    // flag(14, 16): not filled
+    if (index == 14 || index == 16) continue;
+    std::string iVar = name + std::to_string(index);
+    // 0-9 corresponding to evtcls_flag.flag(0-9)
+    if (index < 10) {
+      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
+    } else {
+      // 10-19 corresponding to evtcls_flag2.flag(0-9)
+      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
+    }
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+  }
+
+  // Converting evtcls_hadronic_flag
+  for (int index = 0; index < 6; ++index) {
+    std::string iVar = name_had + std::to_string(index);
+    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+  }
+
 }
 
 //-----------------------------------------------------------------------------

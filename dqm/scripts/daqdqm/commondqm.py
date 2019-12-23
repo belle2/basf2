@@ -35,9 +35,13 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'PXD' in components:
             path.add_module('PXDDAQDQM', histogramDirectoryName='PXDDAQ')
             path.add_module('PXDDQMExpressReco', histogramDirectoryName='PXDER')
+            path.add_module('SetupGenfitExtrapolation')
+            path.add_module('PXDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            PXDInterceptListName='PXDIntercepts')
             path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
-            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
+            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT
@@ -57,6 +61,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         if components is None or 'PXD' in components or 'SVD' in components:
             vxddqm = register_module('VXDDQMExpressReco')
             path.add_module(vxddqm)
+
+        # Event time measuring detectors
+        if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
+            eventT0DQMmodule = register_module('EventT0DQM')
+            path.add_module(eventT0DQMmodule)
 
     if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
         # HLT

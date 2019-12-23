@@ -332,7 +332,7 @@ void SVDDigitizerModule::event()
       }
     } else {
       // Don't bother with warnings for background SimHits
-      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+      if (m_currentHit->getBackgroundTag() == BackgroundMetaData::bg_none)
         B2WARNING(
           "Could not find MCParticle which produced SVDSimhit " << i);
       m_currentParticle = -1;

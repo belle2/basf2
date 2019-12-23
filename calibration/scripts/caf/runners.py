@@ -8,9 +8,6 @@ import ROOT
 from .utils import decode_json_string
 from .utils import IoV_Result
 from .utils import AlgResult
-from .state_machines import MachineError, ConditionError, TransitionError
-from .state_machines import AlgorithmMachine
-from .strategies import AlgorithmStrategy
 from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
 import multiprocessing
 
@@ -63,6 +60,9 @@ class AlgorithmsRunner(Runner):
     But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
+
     def __init__(self, name):
         """
         """
@@ -78,6 +78,8 @@ class AlgorithmsRunner(Runner):
         self.output_database_dir = ""
         #: Algorithm results from each algorithm we execute
         self.results = {}
+        #: Final state of runner
+        self.final_state = None
         #: The list of algorithms that this runner executes
         self.algorithms = None
         #: Output directory of these algorithms, for logging mostly
@@ -96,6 +98,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     def run(self, iov, iteration):
         """
         """
+        from .strategies import AlgorithmStrategy
         B2INFO("SequentialAlgorithmsRunner begun for Calibration {}".format(self.name))
         # First we do the setup of algorithm strategies
         strategies = []
@@ -121,28 +124,34 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                                 args=(strategy, iov, iteration, queue))
 
             self.results[strategy.algorithm.name] = []
-            B2DEBUG(29, "Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO("Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO("Logging will be diverted into algorithm output.")
             child.start()
-            update_interval = 60
-            previous_update_time = time.time()
-            while True:
-                if (time.time() - previous_update_time) > update_interval:
-                    B2INFO("Still waiting for AlgorithStrategy to finish for {}".format(strategy.algorithm.name))
-                    previous_update_time = time.time()
-                else:
-                    result = queue.get()
-                    if result == strategy.FINISHED_RESULTS:
-                        break
-                    else:
-                        self.results[strategy.algorithm.name].append(result)
+            final_state = None
             child.join()
             # Check the exitcode for failed Process()
             if child.exitcode == 0:
-                B2INFO("AlgorithStrategy subprocess for {} exited correctly.".format(strategy.algorithm.name))
+                B2INFO("AlgorithStrategy subprocess for {} exited".format(strategy.algorithm.name))
             else:
                 raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
             B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
-        B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
+            B2INFO("Collecting results for {}.".format(strategy.algorithm.name))
+            while True:
+                output = queue.get()
+                if output["type"] == "result":
+                    self.results[strategy.algorithm.name].append(output["value"])
+                elif output["type"] == "final_state":
+                    final_state = output["value"]
+                    break
+
+            if final_state == AlgorithmStrategy.FAILED:
+                B2ERROR(f"AlgorithmStrategy for {strategy.algorithm.name} failed. We wil not proceed with any more algorithms")
+                self.final_state = self.FAILED
+                break
+
+        if self.final_state != self.FAILED:
+            B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
+            self.final_state = self.COMPLETED
 
     @staticmethod
     def _run_strategy(strategy, iov, iteration, queue):

@@ -1,6 +1,0 @@
-Import('env')
-
-env['SUBLIB'] = True
-env['LIBS'] = ['analysis_dataobjects', 'CLHEP', 'framework']
-
-Return('env')

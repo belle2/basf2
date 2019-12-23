@@ -798,8 +798,6 @@ void SVDClusterEvaluationTrueInfoModule::createArbitraryGraphError_Red(const cha
 bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 {
 
-  float charge = 0;
-  bool primary = false;
 
   bool isGood = false;
 
@@ -809,8 +807,8 @@ bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 
     m_histoControl_THToMCsize->Fill(relatVectorTHToMC.size());
 
-    charge = relatVectorTHToMC[0]->getCharge();
-    primary = relatVectorTHToMC[0]->isPrimaryParticle();
+    float charge = relatVectorTHToMC[0]->getCharge();
+    bool primary = relatVectorTHToMC[0]->isPrimaryParticle();
 
     m_histoControl_MCcharge->Fill(charge);
     m_histoControl_MCisPrimary->Fill(primary);

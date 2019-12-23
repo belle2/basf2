@@ -172,8 +172,16 @@ namespace Belle2 {
     Manager::FunctionPtr CleoConesCS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1 || arguments.size() == 2) {
+
+        int coneNumber = 0;
+        try {
+          coneNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The first argument of the CleoCones meta function must be an integer!");
+          return nullptr;
+        }
+
         bool useROE = false;
-        auto coneNumber = arguments[0];
         if (arguments.size() == 2) {
           if (arguments[1] == "ROE") {
             useROE = true;
@@ -189,7 +197,7 @@ namespace Belle2 {
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
             cleoCones = qq->getCleoConesROE();
-          return cleoCones.at(stoi(coneNumber) - 1);
+          return cleoCones.at(coneNumber - 1);
         };
         return func;
       } else {

@@ -6,15 +6,8 @@ This module defines wrapper functions around the analysis modules. An overview c
 be found at https://confluence.desy.de/display/BI/Physics+AnalysisSteering
 """
 
-from basf2 import *
-import os
-import sys
-import inspect
-from vertex import *
-from kinfit import *
-from variables import variables
-import basf2_mva
-import pdg
+from basf2 import register_module, create_path
+from basf2 import B2INFO, B2WARNING, B2ERROR, B2FATAL
 
 
 def setAnalysisConfigParams(configParametersAndValues, path):
@@ -29,7 +22,7 @@ def setAnalysisConfigParams(configParametersAndValues, path):
     - 'mcMatchingVersion': Specifies what version of mc matching algorithm is going to be used:
 
           - 'MC5' - analysis of BelleII MC5
-          - 'Belle' - analaysis of Belle MC
+          - 'Belle' - analysis of Belle MC
           - 'BelleII' (default) - all other cases
 
     @param configParametersAndValues dictionary of parameters and their values of the form {param1: value, param2: value, ...)
@@ -143,6 +136,7 @@ def inputMdstList(environmentType, filelist, path, skipNEvents=0, entrySequences
             Belle2.DBStore.Instance().addConstantOverride("MagneticField", field, False)
     elif environmentType in ["MC8", "MC9", "MC10"]:
         # make sure the last database setup is the magnetic field for MC8-10
+        from basf2 import conditions
         conditions.globaltags += ["Legacy_MagneticField_MC8_MC9_MC10"]
     elif environmentType is 'None':
         B2INFO('No magnetic field is loaded. This is OK, if generator level information only is studied.')
@@ -230,6 +224,7 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
     :param dict dataDescription: Additional data descriptions to add to the output file. For example {"mcEventType":"mixed"}
     """
 
+    from basf2 import AfterConditionPath
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
         outputFile = skimDecayMode
@@ -271,7 +266,7 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
     @param str filename the name of the output index file
     @param str path modules are added to this path
     @param list(str) includeArrays: datastore arrays/objects to write to the output
-        file in addition to particl lists and related information
+        file in addition to particle lists and related information
     @param bool keepParents whether the parents of the input event will be saved as the parents of the same event
         in the output index file. Useful if you are only adding more information to another index file
     @param bool mc whether the input data is MC or not
@@ -339,11 +334,11 @@ def loadGearbox(path, silence_warning=False):
 
     if not silence_warning:
         B2WARNING("""You are overwriting the geometry from the database with Gearbox.
-This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
+          This is fine if you're generating cosmic events. But in most other cases you probably don't want this.
 
-If you're really sure you know what you're doing you can suppress this message with:
+          If you're really sure you know what you're doing you can suppress this message with:
 
->>> loadGearbox(silence_warning=True)
+          >>> loadGearbox(silence_warning=True)
 
                   """)
 
@@ -371,16 +366,14 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
     path.add_module(mcparticleprinter)
 
 
-def correctBrems(
-    outputList,
-    inputList,
-    gammaList,
-    maximumAcceptance=3.0,
-    multiplePhotons=False,
-    usePhotonOnlyOnce=False,
-    writeOut=False,
-    path=None,
-):
+def correctBrems(outputList,
+                 inputList,
+                 gammaList,
+                 maximumAcceptance=3.0,
+                 multiplePhotons=False,
+                 usePhotonOnlyOnce=True,
+                 writeOut=False,
+                 path=None):
     """
     For each particle in the given ``inputList``, copies it to the ``outputList`` and adds the
     4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
@@ -420,12 +413,7 @@ def correctBrems(
     path.add_module(bremscorrector)
 
 
-def copyList(
-    outputListName,
-    inputListName,
-    writeOut=False,
-    path=None,
-):
+def copyList(outputListName, inputListName, writeOut=False, path=None):
     """
     Copy all Particle indices from input ParticleList to the output ParticleList.
     Note that the Particles themselves are not copied. The original and copied
@@ -440,53 +428,34 @@ def copyList(
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
-def correctFSR(
-    outputListName,
-    inputListName,
-    gammaListName,
-    angleThreshold=5.0,
-    energyThreshold=1.0,
-    writeOut=False,
-    path=None,
-):
+def correctFSR(outputListName,
+               inputListName,
+               gammaListName,
+               angleThreshold=5.0,
+               energyThreshold=1.0,
+               writeOut=False,
+               path=None):
     """
-    Takes the particles from the given lepton list copies them to the output list and adds the
-    4-vector of the closest photon (considered as radiative) to the lepton, if the given
-    criteria for maximal angle and energy are fulfilled.
-    Please note, a new lepton is generated, with the old electron and -if found- a gamma as daughters.
-    Information attached to the track is only available for the old lepton, accessable via the daughter
-    metavariable, e.g. <daughter(0, eid)>.
-
-    @param outputListName The output lepton list containing the corrected leptons.
-    @param inputListName The initial lepton list containing the leptons to correct, should already exists.
-    @param gammaListName The gammas list containing possibly radiative gammas, should already exist..
-    @param angleThreshold The maximum angle (in degrees) between the lepton and the (radiative) gamma to be accepted.
-    @param energyThreshold The maximum energy of the (radiative) gamma to be accepted.
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    WARNING:
+      The :b2:mod:`FSRCorrection` module is now deprecated.
+      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
+      The latter resembles the previous principle of FSRCorrection but does no
+      longer contain the faulty first-come, first-served approach. For Belle II
+      data it is recommended to use correctBrems(), which should perform better.
     """
 
-    fsrcorrector = register_module('FSRCorrection')
-    fsrcorrector.set_name('FSRCorrection_' + outputListName)
-    fsrcorrector.param('inputListName', inputListName)
-    fsrcorrector.param('outputListName', outputListName)
-    fsrcorrector.param('gammaListName', gammaListName)
-    fsrcorrector.param('angleThreshold', angleThreshold)
-    fsrcorrector.param('energyThreshold', energyThreshold)
-    fsrcorrector.param('writeOut', writeOut)
-    path.add_module(fsrcorrector)
+    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
+              "When analysing Belle II data, it is recommended to use correctBrems().")
 
 
-def correctBremsBelle(
-    outputListName,
-    inputListName,
-    gammaListName,
-    multiplePhotons=True,
-    minimumEnergy=0.05,
-    angleThreshold=0.05,
-    writeOut=False,
-    path=None
-):
+def correctBremsBelle(outputListName,
+                      inputListName,
+                      gammaListName,
+                      multiplePhotons=True,
+                      minimumEnergy=0.05,
+                      angleThreshold=0.05,
+                      writeOut=False,
+                      path=None):
     """
     Run the Belle - like brems finding on the ``inputListName`` of charged particles.
     Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
@@ -517,16 +486,15 @@ def correctBremsBelle(
     path.add_module(fsrcorrector)
 
 
-def copyLists(
-    outputListName,
-    inputListNames,
-    writeOut=False,
-    path=None,
-):
+def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
     Copy all Particle indices from all input ParticleLists to the single output ParticleList.
-    Note that the Particles themselves are not copied.The original and copied
-    ParticleLists will point to the same Particles.
+    Note that the Particles themselves are not copied.
+    The original and copied ParticleLists will point to the same Particles.
+    Duplicates are removed based on the first-come, first-served principle.
+    Therefore, the order of the input ParticleLists matters.
+    If you want to select the best duplicate based on another criterion, have
+    a look at the function `mergeListsWithBestDuplicate`.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -542,12 +510,7 @@ def copyLists(
     path.add_module(pmanipulate)
 
 
-def copyParticles(
-    outputListName,
-    inputListName,
-    writeOut=False,
-    path=None,
-):
+def copyParticles(outputListName, inputListName, writeOut=False, path=None):
     """
     Create copies of Particles given in the input ParticleList and add them to the output ParticleList.
 
@@ -576,13 +539,7 @@ def copyParticles(
     path.add_module(pcopy)
 
 
-def cutAndCopyLists(
-    outputListName,
-    inputListNames,
-    cut,
-    writeOut=False,
-    path=None,
-):
+def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=None):
     """
     Copy candidates from all lists in ``inputListNames`` to
     ``outputListName`` if they pass ``cut`` (given selection criteria).
@@ -615,13 +572,7 @@ def cutAndCopyLists(
     path.add_module(pmanipulate)
 
 
-def cutAndCopyList(
-    outputListName,
-    inputListName,
-    cut,
-    writeOut=False,
-    path=None,
-):
+def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None):
     """
     Copy candidates from ``inputListName`` to ``outputListName`` if they pass
     ``cut`` (given selection criteria).
@@ -648,6 +599,36 @@ def cutAndCopyList(
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
+def mergeListsWithBestDuplicate(outputListName,
+                                inputListNames,
+                                variable,
+                                preferLowest=True,
+                                writeOut=False,
+                                path=None):
+    """
+    Merge input ParticleLists into one output ParticleList. Only the best
+    among duplicates is kept. The lowest or highest value (configurable via
+    preferLowest) of the provided variable determines which duplicate is the
+    best.
+
+    @param ouputListName name of merged ParticleList
+    @param inputListName vector of original ParticleLists to be merged
+    @param variable      variable to determine best duplicate
+    @param preferLowest  whether lowest or highest value of variable should be preferred
+    @param writeOut      whether RootOutput module should save the created ParticleList
+    @param path          modules are added to this path
+    """
+
+    pmanipulate = register_module('ParticleListManipulator')
+    pmanipulate.set_name('PListMerger_' + outputListName)
+    pmanipulate.param('outputListName', outputListName)
+    pmanipulate.param('inputListNames', inputListNames)
+    pmanipulate.param('variable', variable)
+    pmanipulate.param('preferLowest', preferLowest)
+    pmanipulate.param('writeOut', writeOut)
+    path.add_module(pmanipulate)
+
+
 def fillSignalSideParticleList(outputListName, decayString, path):
     """
     This function should only be used in the ROE path, that is a path
@@ -670,9 +651,7 @@ def fillSignalSideParticleList(outputListName, decayString, path):
     path.add_module(pload)
 
 
-def fillParticleLists(decayStringsWithCuts, writeOut=False,
-                      path=None,
-                      enforceFitHypothesis=False):
+def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFitHypothesis=False):
     """
     Creates Particles of the desired types from the corresponding ``mdst`` dataobjects,
     loads them to the ``StoreArray<Particle>`` and fills the ParticleLists.
@@ -748,13 +727,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     path.add_module(pload)
 
 
-def fillParticleList(
-    decayString,
-    cut,
-    writeOut=False,
-    path=None,
-    enforceFitHypothesis=False
-):
+def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypothesis=False):
     """
     Creates Particles of the desired type from the corresponding ``mdst`` dataobjects,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -813,14 +786,12 @@ def fillParticleList(
     path.add_module(pload)
 
 
-def fillParticleListWithTrackHypothesis(
-    decayString,
-    cut,
-    hypothesis,
-    writeOut=False,
-    enforceFitHypothesis=False,
-    path=None,
-):
+def fillParticleListWithTrackHypothesis(decayString,
+                                        cut,
+                                        hypothesis,
+                                        writeOut=False,
+                                        enforceFitHypothesis=False,
+                                        path=None):
     """
     As fillParticleList, but if used for a charged FSP, loads the particle with the requested hypothesis if available
 
@@ -845,12 +816,7 @@ def fillParticleListWithTrackHypothesis(
     path.add_module(pload)
 
 
-def fillConvertedPhotonsList(
-    decayString,
-    cut,
-    writeOut=False,
-    path=None,
-):
+def fillConvertedPhotonsList(decayString, cut, writeOut=False, path=None):
     """
     Creates photon Particle object for each e+e- combination in the V0 StoreArray.
 
@@ -877,15 +843,13 @@ def fillConvertedPhotonsList(
     path.add_module(pload)
 
 
-def fillParticleListFromROE(
-    decayString,
-    cut,
-    maskName='',
-    sourceParticleListName='',
-    useMissing=False,
-    writeOut=False,
-    path=None,
-):
+def fillParticleListFromROE(decayString,
+                            cut,
+                            maskName='',
+                            sourceParticleListName='',
+                            useMissing=False,
+                            writeOut=False,
+                            path=None):
     """
     Creates Particle object for each ROE of the desired type found in the
     StoreArray<RestOfEvent>, loads them to the StoreArray<Particle>
@@ -916,13 +880,7 @@ def fillParticleListFromROE(
     path.add_module(pload)
 
 
-def fillParticleListFromMC(
-    decayString,
-    cut,
-    addDaughters=False,
-    writeOut=False,
-    path=None,
-):
+def fillParticleListFromMC(decayString, cut, addDaughters=False, writeOut=False, path=None):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
@@ -945,12 +903,7 @@ def fillParticleListFromMC(
     path.add_module(pload)
 
 
-def fillParticleListsFromMC(
-    decayStringsWithCuts,
-    addDaughters=False,
-    writeOut=False,
-    path=None,
-):
+def fillParticleListsFromMC(decayStringsWithCuts, addDaughters=False, writeOut=False, path=None):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -1027,15 +980,13 @@ def applyEventCuts(cut, path):
     eselect.if_value('<1', empty_path)
 
 
-def reconstructDecay(
-    decayString,
-    cut,
-    dmID=0,
-    writeOut=False,
-    path=None,
-    candidate_limit=None,
-    ignoreIfTooManyCandidates=True,
-):
+def reconstructDecay(decayString,
+                     cut,
+                     dmID=0,
+                     writeOut=False,
+                     path=None,
+                     candidate_limit=None,
+                     ignoreIfTooManyCandidates=True):
     r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
@@ -1094,13 +1045,7 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
-def combineAllParticles(
-    inputParticleLists,
-    outputList,
-    cut='',
-    writeOut=False,
-    path=None
-):
+def combineAllParticles(inputParticleLists, outputList, cut='', writeOut=False, path=None):
     """
     Creates a new Particle as the combination of all Particles from all
     provided inputParticleLists. However, each particle is used only once
@@ -1125,14 +1070,12 @@ def combineAllParticles(
     path.add_module(pmake)
 
 
-def reconstructMissingKlongDecayExpert(
-    decayString,
-    cut,
-    dmID=0,
-    writeOut=False,
-    path=None,
-    recoList="_reco",
-):
+def reconstructMissingKlongDecayExpert(decayString,
+                                       cut,
+                                       dmID=0,
+                                       writeOut=False,
+                                       path=None,
+                                       recoList="_reco"):
     """
     Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
 
@@ -1165,12 +1108,7 @@ def reconstructMissingKlongDecayExpert(
     path.add_module(rmake)
 
 
-def replaceMass(
-    replacerName,
-    particleLists=[],
-    pdgCode=22,
-    path=None,
-):
+def replaceMass(replacerName, particleLists=[], pdgCode=22, path=None):
     """
     replaces the mass of the particles inside the given particleLists
     with the invariant mass of the particle corresponding to the given pdgCode.
@@ -1188,14 +1126,12 @@ def replaceMass(
     path.add_module(pmassupdater)
 
 
-def reconstructRecoil(
-    decayString,
-    cut,
-    dmID=0,
-    writeOut=False,
-    path=None,
-    candidate_limit=None,
-):
+def reconstructRecoil(decayString,
+                      cut,
+                      dmID=0,
+                      writeOut=False,
+                      path=None,
+                      candidate_limit=None):
     """
     Creates new Particles that recoil against the input particles.
 
@@ -1233,14 +1169,12 @@ def reconstructRecoil(
     path.add_module(pmake)
 
 
-def reconstructRecoilDaughter(
-    decayString,
-    cut,
-    dmID=0,
-    writeOut=False,
-    path=None,
-    candidate_limit=None,
-):
+def reconstructRecoilDaughter(decayString,
+                              cut,
+                              dmID=0,
+                              writeOut=False,
+                              path=None,
+                              candidate_limit=None):
     """
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
@@ -1278,15 +1212,13 @@ def reconstructRecoilDaughter(
     path.add_module(pmake)
 
 
-def rankByHighest(
-    particleList,
-    variable,
-    numBest=0,
-    outputVariable='',
-    allowMultiRank=False,
-    cut='',
-    path=None,
-):
+def rankByHighest(particleList,
+                  variable,
+                  numBest=0,
+                  outputVariable='',
+                  allowMultiRank=False,
+                  cut='',
+                  path=None):
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
     in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
@@ -1326,15 +1258,13 @@ def rankByHighest(
     path.add_module(bcs)
 
 
-def rankByLowest(
-    particleList,
-    variable,
-    numBest=0,
-    outputVariable='',
-    allowMultiRank=False,
-    cut='',
-    path=None,
-):
+def rankByLowest(particleList,
+                 variable,
+                 numBest=0,
+                 outputVariable='',
+                 allowMultiRank=False,
+                 cut='',
+                 path=None):
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
     in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
@@ -1432,13 +1362,7 @@ def printList(list_name, full, path):
     path.add_module(prlist)
 
 
-def variablesToNtuple(
-    decayString,
-    variables,
-    treename='variables',
-    filename='ntuple.root',
-    path=None,
-):
+def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -1461,15 +1385,13 @@ def variablesToNtuple(
     path.add_module(output)
 
 
-def variablesToHistogram(
-    decayString,
-    variables,
-    variables_2d=[],
-    filename='ntuple.root',
-    path=None, *,
-    directory=None,
-    prefixDecayString=False,
-):
+def variablesToHistogram(decayString,
+                         variables,
+                         variables_2d=[],
+                         filename='ntuple.root',
+                         path=None, *,
+                         directory=None,
+                         prefixDecayString=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -1500,12 +1422,7 @@ def variablesToHistogram(
     path.add_module(output)
 
 
-def variablesToExtraInfo(
-    particleList,
-    variables,
-    option=0,
-    path=None,
-):
+def variablesToExtraInfo(particleList, variables, option=0, path=None):
     """
     For each particle in the input list the selected variables are saved in an extra-info field with the given name.
     Can be used when wanting to save variables before modifying them, e.g. when performing vertex fits.
@@ -1527,13 +1444,7 @@ def variablesToExtraInfo(
     path.add_module(mod)
 
 
-def variablesToDaughterExtraInfo(
-    particleList,
-    decayString,
-    variables,
-    option=0,
-    path=None,
-):
+def variablesToDaughterExtraInfo(particleList, decayString, variables, option=0, path=None):
     """
     For each daughter particle specified via decay string the selected variables (estimated for the mother particle)
     are saved in an extra-info field with the given name. In other words, the property of mother is saved as extra-info
@@ -1559,12 +1470,7 @@ def variablesToDaughterExtraInfo(
     path.add_module(mod)
 
 
-def variablesToEventExtraInfo(
-    particleList,
-    variables,
-    option=0,
-    path=None,
-):
+def variablesToEventExtraInfo(particleList, variables, option=0, path=None):
     """
     For each particle in the input list the selected variables are saved in an event-extra-info field with the given name,
     Can be used to save MC truth information, for example, in a ntuple of reconstructed particles.
@@ -1586,11 +1492,7 @@ def variablesToEventExtraInfo(
     path.add_module(mod)
 
 
-def variableToSignalSideExtraInfo(
-    particleList,
-    varToExtraInfo,
-    path,
-):
+def variableToSignalSideExtraInfo(particleList, varToExtraInfo, path):
     """
     Write the value of specified variables estimated for the single particle in the input list (has to contain exactly 1
     particle) as an extra info to the particle related to current ROE.
@@ -1607,13 +1509,7 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
-def signalRegion(
-        particleList,
-        cut,
-        path=None,
-        name="isSignalRegion",
-        blind_data=True,
-):
+def signalRegion(particleList, cut, path=None, name="isSignalRegion", blind_data=True):
     """
     Define and blind a signal region.
     Per default, the defined signal region is cut out if ran on data.
@@ -1637,6 +1533,7 @@ def signalRegion(
 
     """
 
+    from variables import variables
     mod = register_module('VariablesToExtraInfo')
     mod.set_name(f'{name}_' + particleList)
     mod.param('particleList', particleList)
@@ -1660,18 +1557,13 @@ def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
     path.add_module(mod)
 
 
-def signalSideParticleFilter(
-    particleList,
-    selection,
-    roe_path,
-    deadEndPath
-):
+def signalSideParticleFilter(particleList, selection, roe_path, deadEndPath):
     """
     Checks if the current ROE object in the for_each roe path (argument roe_path) is related
     to the particle from the input ParticleList. Additional selection criteria can be applied.
     If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
     meet the selection criteria the execution of deadEndPath is started. This path, as the name
-    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    suggests should be empty and its purpose is to end the execution of for_each roe path for
     the current ROE object.
 
     @param particleList  The input ParticleList
@@ -1687,18 +1579,13 @@ def signalSideParticleFilter(
     mod.if_false(deadEndPath)
 
 
-def signalSideParticleListsFilter(
-    particleLists,
-    selection,
-    roe_path,
-    deadEndPath
-):
+def signalSideParticleListsFilter(particleLists, selection, roe_path, deadEndPath):
     """
     Checks if the current ROE object in the for_each roe path (argument roe_path) is related
     to the particle from the input ParticleList. Additional selection criteria can be applied.
     If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
     meet the selection criteria the execution of deadEndPath is started. This path, as the name
-    sugest should be empty and its purpose is to end the execution of for_each roe path for
+    suggests should be empty and its purpose is to end the execution of for_each roe path for
     the current ROE object.
 
     @param particleLists  The input ParticleLists
@@ -1714,14 +1601,16 @@ def signalSideParticleListsFilter(
     mod.if_false(deadEndPath)
 
 
-def findMCDecay(
-    list_name,
-    decay,
-    writeOut=False,
-    path=None,
-):
+def findMCDecay(list_name, decay, writeOut=False, path=None):
     """
-    The MCDecayFinder module is buggy at the moment. Not to be used.
+    Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
+    The decay string is required to describe correctly what you want.
+    In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
+
+    @param list_name The output particle list name
+    @param decay     The decay string which you want
+    @param writeOut  Whether `RootOutput` module should save the created ``outputList``
+    @param path      modules are added to this path
     """
 
     decayfinder = register_module('MCDecayFinder')
@@ -1766,7 +1655,7 @@ def looseMCTruth(list_name, path):
     Performs loose MC matching for all particles in the specified
     ParticleList.
     The difference between loose and normal mc matching algorithm is that
-    the loose agorithm will find the common mother of the majority of daughter
+    the loose algorithm will find the common mother of the majority of daughter
     particles while the normal algorithm finds the common mother of all daughters.
     The results of loose mc matching algorithm are stored to the following extraInfo
     items:
@@ -1775,7 +1664,7 @@ def looseMCTruth(list_name, path):
       - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother
       - looseMCWrongDaughterN: number of daughters that don't originate from the most
                                common mother
-      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't orginate from
+      - looseMCWrongDaughterPDG: PDG code of the daughter that doesn't originate from
                                  the most common mother
                                  (only if looseMCWrongDaughterN = 1)
       - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background
@@ -1832,13 +1721,11 @@ def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     path.add_module(roeBuilder)
 
 
-def appendROEMask(
-    list_name,
-    mask_name,
-    trackSelection,
-    eclClusterSelection,
-    path=None
-):
+def appendROEMask(list_name,
+                  mask_name,
+                  trackSelection,
+                  eclClusterSelection,
+                  path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
     selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
@@ -1895,13 +1782,11 @@ def appendROEMasks(list_name, mask_tuples, path=None):
     path.add_module(roeMask)
 
 
-def updateROEMask(
-    list_name,
-    mask_name,
-    trackSelection,
-    eclClusterSelection='',
-    path=None
-):
+def updateROEMask(list_name,
+                  mask_name,
+                  trackSelection,
+                  eclClusterSelection='',
+                  path=None):
     """
     Update an existing ROE mask by applying additional selection cuts for
     tracks and/or clusters.
@@ -1923,11 +1808,7 @@ def updateROEMask(
     path.add_module(roeMask)
 
 
-def updateROEMasks(
-    list_name,
-    mask_tuples,
-    path
-):
+def updateROEMasks(list_name, mask_tuples, path):
     """
     Update existing ROE masks by applying additional selection cuts for tracks
     and/or clusters.
@@ -1950,15 +1831,10 @@ def updateROEMasks(
     path.add_module(roeMask)
 
 
-def keepInROEMasks(
-    list_name,
-    mask_names,
-    cut_string,
-    path=None
-):
+def keepInROEMasks(list_name, mask_names, cut_string, path=None):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
-    With this funciton one can KEEP the tracks/eclclusters used in particles from provided particle list.
+    With this function one can KEEP the tracks/eclclusters used in particles from provided particle list.
     This function should be executed only in the for_each roe path for the current ROE object.
 
     To avoid unnecessary computation, the input particle list should only contain particles from ROE
@@ -1992,15 +1868,10 @@ def keepInROEMasks(
     path.add_module(updateMask)
 
 
-def discardFromROEMasks(
-    list_name,
-    mask_names,
-    cut_string,
-    path=None
-):
+def discardFromROEMasks(list_name, mask_names, cut_string, path=None):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks (track or eclCluster).
-    With this funciton one can DISCARD the tracks/eclclusters used in particles from provided particle list.
+    With this function one can DISCARD the tracks/eclclusters used in particles from provided particle list.
     This function should be executed only in the for_each roe path for the current ROE object.
 
     To avoid unnecessary computation, the input particle list should only contain particles from ROE
@@ -2034,12 +1905,7 @@ def discardFromROEMasks(
     path.add_module(updateMask)
 
 
-def optimizeROEWithV0(
-    list_name,
-    mask_names,
-    cut_string,
-    path=None
-):
+def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     """
     This function is used to apply particle list specific cuts on one or more ROE masks for Tracks.
     It is possible to optimize the ROE selection by treating tracks from V0's separately, meaning,
@@ -2069,12 +1935,7 @@ def optimizeROEWithV0(
     path.add_module(updateMask)
 
 
-def printROEInfo(
-    mask_names=[],
-    which_mask='both',
-    full_print=False,
-    path=None
-):
+def printROEInfo(mask_names=[], which_mask='both', full_print=False, path=None):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
     It prints out basic ROE object info.
@@ -2185,11 +2046,13 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path):
     @param secondList second particle list to merge
     @param prioritiseV0 if true, give V0s a higher priority
     """
+
+    from vertex import vertexKFit
     listName = firstList.split(':')[0]
     if (listName == secondList.split(':')[0]):
         outList = listName + ':merged'
         copyLists(outList, [firstList, secondList], False, path)
-        vertexKFit(outList, 0.0, '', '', path)
+        KFit(outList, 0.0, path=path)
         markDuplicate(outList, prioritiseV0, path)
         applyCuts(outList, 'extraInfo(highQualityVertex)', path)
     else:
@@ -2199,16 +2062,14 @@ def V0ListMerger(firstList, secondList, prioritiseV0, path):
 PI0ETAVETO_COUNTER = 0
 
 
-def writePi0EtaVeto(
-    particleList,
-    decayString,
-    workingDirectory='.',
-    pi0vetoname='Pi0_Prob',
-    etavetoname='Eta_Prob',
-    downloadFlag=True,
-    selection='',
-    path=None
-):
+def writePi0EtaVeto(particleList,
+                    decayString,
+                    workingDirectory='.',
+                    pi0vetoname='Pi0_Prob',
+                    etavetoname='Eta_Prob',
+                    downloadFlag=True,
+                    selection='',
+                    path=None):
     """
     Give pi0/eta probability for hard photon.
 
@@ -2242,6 +2103,9 @@ def writePi0EtaVeto(
     @param path       modules are added to this path
     """
 
+    import basf2_mva
+    import os
+    from variables import variables
     if not os.path.isfile(workingDirectory + '/pi0veto.root') and downloadFlag:
         pi0veto_error_message = (
             "The necessary weight file pi0veto.root is not present in the provided working directory.\n"
@@ -2566,6 +2430,7 @@ def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
 
     """
 
+    import pdg
     # Enforce check on input S, B hypotheses compatibility.
     binaryOpts = [(11, 211), (13, 211)]
 

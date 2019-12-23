@@ -34,8 +34,6 @@ import variables.utils as vu
 import vertex as vx
 from stdPi0s import stdPi0s
 
-b2.conditions.disable_globaltag_replay()
-
 # create path
 my_path = b2.create_path()
 
@@ -64,14 +62,13 @@ ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
-vx.vertexTree(list_name='B0:all',
-              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
-              ipConstraint=True,
-              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-              updateAllDaughters=True,  # update momenta off ALL particles
-              massConstraint=['pi0'],  # mass constrain ALL pi0
-              path=my_path
-              )
+vx.treeFit(list_name='B0:all',
+           conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+           ipConstraint=True,
+           # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+           updateAllDaughters=True,  # update momenta off ALL particles
+           massConstraint=['pi0'],  # mass constrain ALL pi0
+           path=my_path)
 
 # perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0:all',

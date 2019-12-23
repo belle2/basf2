@@ -19,11 +19,16 @@ skim_registry = [
     ('15420100', 'BottomoniumEtabExclusive'),
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
-    ('14140100', 'BtoDh_hh'),
-    ('14120300', 'BtoDh_Kspi0'),
-    ('14140200', 'BtoDh_Kshh'),
-    ('14120400', 'BtoDh_Kspipipi0'),
-    ('14140500', 'BtoDh_Kspi0pi0'),
+    ('14140100', 'BtoD0h_hh'),
+    ('14120300', 'BtoD0h_Kspi0'),
+    ('14140200', 'BtoD0h_Kshh'),
+    ('14120400', 'BtoD0h_Kspipipi0'),
+    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
+    ('14140101', 'BtoD0h_Kpi'),
+    ('14140102', 'BtoD0h_Kpipipi'),
+    ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
+    ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -68,3 +73,47 @@ skim_registry = [
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
 ]
+
+#: A dict listing which standalone skims are included the combined skim scripts
+combined_skims = {
+    'BtoCharm': [
+        'BtoDh_Kshh', 'BtoDh_hh', 'BtoDh_Kspi0', 'BtoDh_Kspipipi0'
+    ],
+    'BtoCharmless': [
+        'CharmlessHad2Body', 'CharmlessHad3Body'
+    ],
+    'CharmHigh': [
+
+    ],
+    'CharmLow': [
+
+    ],
+    'CombinedSystematics': [
+        'Systematics', 'SystematicsLambda', 'SystematicsTracking', 'Resonance',
+        'SystematicsRadMuMu', 'SystematicsRadEE'
+    ],
+    'Dark': [
+        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
+    ],
+    'EWP': [
+        'BtoXll', 'BtoXll_LFV', 'BtoXgamma'
+    ],
+    'feiCombined': [
+        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
+    ],
+    'feiHadronicCombined': [
+        'feiHadronicB0', 'feiHadronicBplus'
+    ],
+    'feiSLCombined': [
+        'feiSLB0', 'feiSLBplus'
+    ],
+    'MiscCombined': [
+        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+    ],
+    'Quarkonium': [
+        'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
+    ],
+    'Semileptonic': [
+        'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    ]
+}

@@ -19,7 +19,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <rawdata/dataobjects/RawSVD.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDTransparentDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
@@ -39,7 +38,7 @@ namespace Belle2 {
 
     /** SVDUnpackerModule: The SVD Raw Hits Decoder.
      *
-     * This module produces SVDDigits from the Copper
+     * This module produces SVDShaperDigits from the Copper
      */
     class SVDUnpackerModule : public Module {
 
@@ -63,9 +62,6 @@ namespace Belle2 {
       virtual void endRun() override; /**<end run*/
 
       std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
-      std::string m_svdDigitListName; /**<SVDDigit StoreArray name*/
-
-      bool m_generateOldDigits;  /**< whether to produce old SVDDigit format*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
       std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
       std::string m_svdEventInfoName; /**< SVDEventInfo name */
@@ -168,7 +164,6 @@ namespace Belle2 {
       SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
 
       StoreArray<RawSVD> m_rawSVD;   /**< output for RawSVD */
-      StoreArray<SVDDigit> m_svdDigit; /**< Required input for SVDDigit */
 
       int m_shutUpFTBError;
       int m_FADCTriggerNumberOffset;
@@ -185,8 +180,8 @@ namespace Belle2 {
        */
       bool m_killUpsetDigits = false;
 
-      /** Silently append new SVDDigits to a pre-existing non-empty
-       * SVDDigits/SVDShaperDigits storeArray.
+      /** Silently append new SVDShaperDigits to a pre-existing non-empty
+       * SVDShaperDigits storeArray.
        * If false, a pre-exsiting non-empty output StoreArray will cause
        * a FATAL error to remind the users that they may be mixing data
        * inadvertently, and that they need to plug in a digit sorter in

@@ -111,6 +111,8 @@ Modules
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
+ * Added the :b2:mod:`ParticleCombinerFromMC` and the ``reconstructMCDecay`` to find and create ``ParticleList`` from a given decaystring. They can be used instead of the :b2:mod:`MCDecayFinder` and ``findMCDecay`` which are not fully tested and maintained.
+
 Conditions DB
 +++++++++++++
 

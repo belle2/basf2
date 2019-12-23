@@ -122,9 +122,83 @@ assuming you have reconstructed :code:`X -> Y Z` :
         from modularAnalysis import applyCuts
         applyCuts('X:myCandidates', 'isSignal==1')
 
+-------------------------------------------------------
+MC decay finder module :b2:mod:`ParticleCombinerFromMC`
+-------------------------------------------------------
+
+Analysis module to reconstruct for a given decay in the list of generated particles ``MCParticle``. Only signal particles whose `isSignal` is equal to 1 are stored.
+
+The module can be used for:
+
+* Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
+* Matched MC decays as input for a truth matching module.
+
+~~~~~~~~~~~~~~~~~~~~~
+Steering file snippet
+~~~~~~~~~~~~~~~~~~~~~
+ 
+.. code-block:: python
+
+  import basf2
+  
+  # Create main path
+  main = basf2.create_path()
+  
+  # Modules to generate events, etc.
+  ...
+
+  import modularAnalysis as ma
+
+  # Load particles from MCParticle at first
+  ma.fillParticleListFromMC('K+:MC',    '', path=main)
+  ma.fillParticleListFromMC('pi+:MC',   '', path=main)
+  ma.fillParticleListFromMC('e+:MC',    '', path=main)
+  ma.fillParticleListFromMC('nu_e:MC',  '', path=main)
+  ma.fillParticleListFromMC('gamma:MC', '', path=main)
+
+  """
+  Example 1
+  Search for B+ decaying to anti-D0* e+ nu_e, where anti-D0* decays to [anti-D0 -> K+ pi- pi0] and pi0.
+  Additional photons emitted are ignored. Charge conjugated decays are matched, too.
+  """
+  # Reconstruct pi0 from gamma gamma at fist for convenience. Then reconstruct B+ with pi0:gg.
+  ma.reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', '', path=main)
+  ma.reconstructMCDecay(
+    'B+:DstENu =direct=> [anti-D*0:D0pi0 =direct=> [anti-D0:Kpipi0 =direct=> K+:MC pi-:MC pi0:gg] pi0:gg ] e+:MC nu_e:MC ',
+    '',
+    path=main)
+
+  # One can directly reconstruct pi0:gg in same decay string. 
+  # But in this case, one have to write sub-decay of pi0:gg only once. Otherwise same particles are registered twice.
+  # ma.reconstructMCDecay(
+  #     'B+:DstENu =direct=>\
+  #      [anti-D*0:D0pi0 =direct=> [anti-D0:Kpipi0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] pi0:gg ]\
+  #      e+:MC nu_e:MC ',
+  #     '',
+  #     path=main)
+
+
+  """
+  Example 2
+  Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
+  Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
+  are matched, too. If there is a match found, save to ParticleList 'B+:testB'
+  """
+  # Reconstruct B+ from [anti-D0 =direct=> K+ pi-] accepting missing daughters
+  ma.reconstructMCDecay('B+:D0Kpi =direct=> [anti-D0:Kpi =direct=> K+:MC pi-:MC] ... ?gamma ?nu', '', path=main)  
+  
+
+  ...
+ 
+
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
+
+
 ----------------------------------------------
 MC decay finder module :b2:mod:`MCDecayFinder`
 ----------------------------------------------
+.. warning:: 
+  This module is not fully tested and maintained. Please consider to use :b2:mod:`ParticleCombinerFromMC`
 
 Analysis module to search for a given decay in the list of generated particles ``MCParticle``.
 

@@ -32,7 +32,6 @@ from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 import pdg
-from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
 

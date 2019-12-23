@@ -29,15 +29,12 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from modularAnalysis import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
 from stdPhotons import stdPhotons
 
 # create path
 mypath = b2.create_path()
-
-beamparameters = add_beamparameters(mypath, "Y4S")
 
 # load input ROOT file
 inputMdst(environmentType='default',

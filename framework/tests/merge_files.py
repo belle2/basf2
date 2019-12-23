@@ -11,7 +11,7 @@ import ROOT
 from ROOT.Belle2 import FileMetaData, EventMetaData
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, skip_test_if_light
 
 
 def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):
@@ -369,6 +369,7 @@ def check_XX_filemetaversion():
 
 
 if __name__ == "__main__":
+    skip_test_if_light()  # light builds don't have particle gun
     failures = 0
     existing = [e for e in sorted(globals().items()) if e[0].startswith("check_")]
     for name, fcn in existing:

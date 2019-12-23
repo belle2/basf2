@@ -1657,6 +1657,8 @@ def findMCDecay(
     @param writeOut  Whether `RootOutput` module should save the created ``outputList``
     @param path      modules are added to this path
     """
+    B2WARNING("This function is not fully tested and maintained."
+              "Please consider to use reconstructMCDecay() instead.")
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)

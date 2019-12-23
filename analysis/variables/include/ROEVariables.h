@@ -330,44 +330,27 @@ namespace Belle2 {
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments);
 
     /**
-     * Returns pi0 probability
+     * Returns pi0 probability, where mode is used to specify the selection criteria for soft phoron.
+     * The following strings are available.
+     * standard: loose energy cut and no clusterNHits cut are applied to soft photon
+     * tight: tight energy cut and no clusterNHits cut are applied to soft photon
+     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
+     * both: tight energy cut and clusterNHits cut are applied to soft photon
+     * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
-    double particlePi0VetoOrigin(const Particle* particle);
+    Manager::FunctionPtr pi0Veto(const std::vector<std::string>& arguments);
 
     /**
-     * Returns pi0 probability
+     * Returns eta probability, where mode is used to specify the selection criteria for soft phoron.
+     * The following strings are available.
+     * standard: loose energy cut and no clusterNHits cut are applied to soft photon
+     * tight: tight energy cut and no clusterNHits cut are applied to soft photon
+     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
+     * both: tight energy cut and clusterNHits cut are applied to soft photon
+     * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
-    double particlePi0VetoTightEnergyThreshold(const Particle* particle);
+    Manager::FunctionPtr etaVeto(const std::vector<std::string>& arguments);
 
-    /**
-     * Returns pi0 probability
-     */
-    double particlePi0VetoLargeClusterSize(const Particle* particle);
-
-    /**
-     * Returns pi0 probability
-     */
-    double particlePi0VetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle);
-
-    /**
-     * Returns eta probability
-     */
-    double particleEtaVetoOrigin(const Particle* particle);
-
-    /**
-     * Returns eta probability
-     */
-    double particleEtaVetoTightEnergyThreshold(const Particle* particle);
-
-    /**
-     * Returns eta probability
-     */
-    double particleEtaVetoLargeClusterSize(const Particle* particle);
-
-    /**
-     * Returns eta probability
-     */
-    double particleEtaVetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle);
 
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables

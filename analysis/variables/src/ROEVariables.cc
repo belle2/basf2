@@ -1779,85 +1779,129 @@ namespace Belle2 {
       return 0.0;
     }
 
-    double particlePi0VetoOrigin(const Particle* particle)
+
+    Manager::FunctionPtr pi0Veto(const std::vector<std::string>& arguments)
     {
-      if (particle->hasExtraInfo("Pi0_Prob")) {
-        return particle->getExtraInfo("Pi0_Prob");
-      } else {
-        B2WARNING("Pi0_Prob is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for pi0Veto");
+
+      std::string mode;
+      mode = arguments[0];
+
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+        B2FATAL("the given argument is not supported!pi01");
+
+      auto func = [mode](const Particle * particle) -> double {
+        if (mode == "standard")
+        {
+          if (particle->hasExtraInfo("Pi0ProbOrigin")) {
+            return particle->getExtraInfo("Pi0ProbOrigin");
+          } else {
+            B2WARNING("Pi0ProbOrigin is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "tight")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThreshold")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThreshold");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThreshold is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "cluster")
+        {
+          if (particle->hasExtraInfo("Pi0ProbLargeClusterSize")) {
+            return particle->getExtraInfo("Pi0ProbLargeClusterSize");
+          } else {
+            B2WARNING("Pi0ProbLargeClusterSize is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "both")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else
+        {
+          B2FATAL("the given argument is not supported!pi02");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      };
+      return func;
     }
 
-    double particlePi0VetoTightEnergyThreshold(const Particle* particle)
+    Manager::FunctionPtr etaVeto(const std::vector<std::string>& arguments)
     {
-      if (particle->hasExtraInfo("Pi0_Prob_Tight_Energy_Threshold")) {
-        return particle->getExtraInfo("Pi0_Prob_Tight_Energy_Threshold");
-      } else {
-        B2WARNING("Pi0_Prob_Tight_Energy_Thereshold is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments (1 required) for etaVeto");
+
+      std::string mode;
+      mode = arguments[0];
+
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+        B2FATAL("the given argument is not supported!eta1");
+
+      auto func = [mode](const Particle * particle) -> double {
+        if (mode == "standard")
+        {
+          if (particle->hasExtraInfo("EtaProbOrigin")) {
+            return particle->getExtraInfo("EtaProbOrigin");
+          } else {
+            B2WARNING("EtaProbOrigin is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "tight")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThreshold")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThreshold");
+          } else {
+            B2WARNING("EtaProbTightEnergyThreshold is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "cluster")
+        {
+          if (particle->hasExtraInfo("EtaProbLargeClusterSize")) {
+            return particle->getExtraInfo("EtaProbLargeClusterSize");
+          } else {
+            B2WARNING("EtaProbLargeClusterSize is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "both")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
+          } else {
+            B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else
+        {
+          B2FATAL("the given argument is not supported!eta2");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      };
+      return func;
     }
 
-    double particlePi0VetoLargeClusterSize(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Pi0_Prob_Large_Cluster_Size")) {
-        return particle->getExtraInfo("Pi0_Prob_Large_Cluster_Size");
-      } else {
-        B2WARNING("Pi0_Prob_Large_Cluster_Size is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
-
-    double particlePi0VetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size")) {
-        return particle->getExtraInfo("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size");
-      } else {
-        B2WARNING("Pi0_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
-
-    double particleEtaVetoOrigin(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Eta_Prob")) {
-        return particle->getExtraInfo("Eta_Prob");
-      } else {
-        B2WARNING("Eta_Prob is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
-
-    double particleEtaVetoTightEnergyThreshold(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Eta_Prob_Tight_Energy_Threshold")) {
-        return particle->getExtraInfo("Eta_Prob_Tight_Energy_Threshold");
-      } else {
-        B2WARNING("Eta_Prob_Tight_Energy_Threshold is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
-
-    double particleEtaVetoLargeClusterSize(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Eta_Prob_Large_Cluster_Size")) {
-        return particle->getExtraInfo("Eta_Prob_Large_Cluster_Size");
-      } else {
-        B2WARNING("Eta_Prob_Large_Cluster_Size is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
-
-    double particleEtaVetoTightEnergyThresholdAndLargeClusterSize(const Particle* particle)
-    {
-      if (particle->hasExtraInfo("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size")) {
-        return particle->getExtraInfo("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size");
-      } else {
-        B2WARNING("Eta_Prob_Tight_Energy_Threshold_And_Large_Cluster_Size is not registerted in extraInfo!");
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-    }
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -2264,29 +2308,23 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
-    REGISTER_VARIABLE("pi0_prob_origin", particlePi0VetoOrigin,
-                      "Returns pi0 probability");
+    REGISTER_VARIABLE("pi0Prob(mode)", pi0Veto,
+                      "Returns pi0 probability, where mode is used to specify the selection criteria for soft phoron. \n"
+                      "The following strings are available. \n"
+                      "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "You can find more details in writePi0EtaVeto function in modularAnalysis.py.");
 
-    REGISTER_VARIABLE("pi0_prob_tight_energy_threshold", particlePi0VetoTightEnergyThreshold,
-                      "Returns pi0 probability");
-
-    REGISTER_VARIABLE("pi0_prob_large_cluster_size", particlePi0VetoLargeClusterSize,
-                      "Returns pi0 probability");
-
-    REGISTER_VARIABLE("pi0_prob_tight_energy_threshold_and_large_cluster_size", particlePi0VetoTightEnergyThresholdAndLargeClusterSize,
-                      "Returns pi0 probability");
-
-    REGISTER_VARIABLE("eta_prob_origin", particleEtaVetoOrigin,
-                      "Returns eta probability");
-
-    REGISTER_VARIABLE("eta_prob_tight_energy_threshold", particleEtaVetoTightEnergyThreshold,
-                      "Returns eta probability");
-
-    REGISTER_VARIABLE("eta_prob_large_cluster_size", particleEtaVetoLargeClusterSize,
-                      "Returns eta probability");
-
-    REGISTER_VARIABLE("eta_prob_tight_energy_threshold_and_large_cluster_size", particleEtaVetoTightEnergyThresholdAndLargeClusterSize,
-                      "Returns eta probability");
+    REGISTER_VARIABLE("etaProb(mode)", etaVeto,
+                      "Returns eta probability, where mode is used to specify the selection criteria for soft phoron. \n"
+                      "The following strings are available. \n"
+                      "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "You can find more details in writePi0EtaVeto function in modularAnalysis.py.");
 
   }
 }

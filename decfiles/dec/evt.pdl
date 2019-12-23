@@ -253,9 +253,9 @@ add  p Particle  pi(1)(1600)0                 9010113        1660e-3         257
 * eta_2(1645)
 add  p Particle  eta(2)(1645)                   10225        1617e-3         181e-3         600e-3     0     4              0          0
 * omega(1670)
-add  p Particle  omega(1650)                    30223  1.6700000e+00  3.1500000e-01              0     0     2              0          0
+add  p Particle  omega(1650)                    30223        1670e-3         315e-3        1000e-3     0     2              0          0
 * omega_3(1670)
-add  p Particle  omega(3)(1670)                   227        1667e-3         168e-3         600e-3  0     6              0          0
+add  p Particle  omega(3)(1670)                   227        1667e-3         168e-3         600e-3     0     6              0          0
 * pi_2(1670) 
 add  p Particle  pi(2)(1670)+                   10215      1670.6e-3         258e-3         800e-3     3     4              0          0
 add  p Particle  pi(2)(1670)-                  -10215      1670.6e-3         258e-3         800e-3    -3     4              0          0

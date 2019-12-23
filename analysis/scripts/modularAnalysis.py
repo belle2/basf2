@@ -2368,6 +2368,14 @@ def writePi0EtaVeto(
     If you don't have weight files in your workingDirectory,
     these files are downloaded from database to your workingDirectory automatically.
 
+    The following strings are available for mode.
+    standard: loose energy cut and no clusterNHits cut are applied to soft photon
+    tight: tight energy cut and no clusterNHits cut are applied to soft photon
+    cluster: loose energy cut and clusterNHits cut are applied to soft photon
+    both: tight energy cut and clusterNHits cut are applied to soft photon
+
+    One can obtain the result of pi0/eta veto from `pi0Prob(mode)`/`etaProb(mode)`
+
     NOTE for debug
     Please don't use following ParticleList names elsewhere.
     'gamma:HardPhoton',

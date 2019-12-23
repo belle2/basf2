@@ -71,9 +71,9 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
- * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
- * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
- * Modified ``writePi0EtaVeto`` function and added ``oldwritePi0EtaVeto`` function. The weight files used in release-03 were not available in release-04. They are moved to the new global tag for release-04. They are now available through ``oldwritePi0EtaVeto``, which were optimized for MC9. The ``writePi0EtaVeto`` uses the new weight files, which are optimized for MC12.
+ * Modified ``writePi0EtaVeto`` function and added ``oldwritePi0EtaVeto`` function. The weight files used in release-03 were not available in release-04.
+   They are moved to the new global tag for release-04. They are now available through ``oldwritePi0EtaVeto``, which were optimized for MC9.
+   The ``writePi0EtaVeto`` uses the new weight files, which are optimized for MC12.
 
 Conditions DB
 +++++++++++++

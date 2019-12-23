@@ -1309,13 +1309,24 @@ Decay B0
 0.0001965000 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #CPV included, Oberhof 09/11/2017
 0.0001965000 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   #CPV included, Oberhof 09/11/2017
 
-#0.000222000 chi_c1  K*0  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.000040 K*S chi_c1       SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
-0.000040 K*L chi_c1       SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
-0.000159 chi_c1 K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
+# B0 -> chi_c1 pi- K+ (PDG2019 data)
+# Branching fraction: 0.000497
+# Partial branching fractions:
+# chi_c1 K*(892)0 0.000238 * (2/3) = 0.00015867
+# chi_c1 K+ pi-   0.000497 - 0.00015867 = 0.00033833
+# Br(B0 -> chi_c1 K*(892)0 = 0.000238
+0.00015867   chi_c1  K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
+0.00033833   chi_c1  K+  pi-   PHSP;
 
-0.000497   chi_c1  K+  pi-         PHSP;
-0.0002     chi_c1  K0  pi0         PHSP;
+# B0 -> chi_c1 pi0 K0 (PDG2019 data)
+# Branching fraction (estimated from chi_c1 pi- K+): 4.97e-4 / 2 = 0.0002485
+# Partial branching fractions:
+# chi_c1 K*(892)0 0.000238 * (1/3) = 0.00007933
+# chi_c1 K0 pi0   0.0002485 - 0.00007933 = 0.00016917
+0.000039665  K*S chi_c1        SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.000039665  K*L chi_c1        SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.00016917   chi_c1  K0  pi0   PHSP;
+
 0.00032    chi_c1  K0  pi-  pi+    PHSP;
 0.0002     chi_c1  K0  pi0  pi0    PHSP;
 0.00035    chi_c1  K+  pi-  pi0    PHSP;
@@ -1570,8 +1581,6 @@ Decay B0
 0.000170000 K0      D0      anti-D0 pi0                     PHSP;
 0.000620000 psi(2S) K0                                      PHSP;
 0.000140000 chi_c0  K0                                      PHSP;
-0.000390000 chi_c1  K0                                      PHSP;
-0.000158000 chi_c1  K-      pi+                             PHSP;
 0.000004700 K0 rho0                                         PHSP;
 0.000011000 eta     K_0*0                                   PHSP;
 0.000009600 eta     K_2*0                                   PHSP;
@@ -2630,13 +2639,24 @@ Decay anti-B0
 0.000196500 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 09/11/2017
 0.000196500 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #CPV included, Oberhof 09/11/2017
 
-#0.000222000 chi_c1  anti-K*0  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.000040 K*S chi_c1            SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
-0.000040 K*L chi_c1            SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
-0.000159 chi_c1 anti-K*0T      SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
+# B0 -> chi_c1 pi- K+ (PDG2019 data)
+# Branching fraction: 0.000497
+# Partial branching fractions:
+# chi_c1 K*(892)0 0.000238 * (2/3) = 0.00015867
+# chi_c1 K+ pi-   0.000497 - 0.00015867 = 0.00033833
+# Br(B0 -> chi_c1 K*(892)0 = 0.000238
+0.00015867   chi_c1  anti-K*0T  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
+0.00033833   chi_c1  K-  pi+    PHSP;
 
-0.000497   chi_c1  K-  pi+               PHSP;
-0.0002     chi_c1  anti-K0   pi0         PHSP;
+# B0 -> chi_c1 pi0 K0 (PDG2019 data)
+# Branching fraction (estimated from chi_c1 pi- K+): 4.97e-4 / 2 = 0.0002485
+# Partial branching fractions:
+# chi_c1 K*(892)0 0.000238 * (1/3) = 0.00007933
+# chi_c1 K0 pi0   0.0002485 - 0.00007933 = 0.00016917
+0.000039665  K*S chi_c1             SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.000039665  K*L chi_c1             SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.00016917   chi_c1  anti-K0  pi0   PHSP;
+
 0.00032    chi_c1  anti-K0   pi+  pi-    PHSP;
 0.0002     chi_c1  anti-K0   pi0  pi0    PHSP;
 0.00035    chi_c1  K-  pi+  pi0          PHSP;
@@ -2891,8 +2911,6 @@ Decay anti-B0
 0.000170000 anti-K0 anti-D0 D0      pi0                     PHSP;
 0.000620000 psi(2S) anti-K0                                 PHSP;
 0.000140000 chi_c0  anti-K0                                 PHSP;
-0.000390000 chi_c1  anti-K0                                 PHSP;
-0.000158000 chi_c1  K+      pi-                             PHSP;
 0.000004700 anti-K0 rho0                                    PHSP;
 0.000011000 eta     anti-K_0*0                              PHSP;
 0.000009600 eta     anti-K_2*0                              PHSP;
@@ -3745,8 +3763,23 @@ Decay B+
 
 0.000497 chi_c1  K+                     SVS; #[Reconstructed PDG2018]
 0.000300 chi_c1  K*+                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.00058  chi_c1  K0   pi+               PHSP;
-0.000329 chi_c1  K+   pi0               PHSP;
+
+# B+ -> chi_c1 K+ pi0 (PDG2019 data)
+# Branching fraction: 0.00058
+# Partial branching fractions:
+# chi_c1 K*(892)+  Br(B+ -> chi_c1 K*(892)+) * Br(K*(892)+ -> K0 pi+) =
+#                  0.0003 * 0.99901 * (2/3) = 0.0001998
+# chi_c1 K0 pi+: 0.00058 - 0.0001998 = 0.0003802
+0.0003802 chi_c1  K0   pi+              PHSP;
+
+# B+ -> chi_c1 K+ pi0 (PDG2019 data)
+# Branching fraction: 0.000329
+# Partial branching fractions:
+# chi_c1 K*(892)+  Br(B+ -> chi_c1 K*(892)+) * Br(K*(892)+ -> K+ pi0) =
+#                  0.0003 * 0.99901 * (1/3) = 0.0000999
+# chi_c1 K+ pi0: 0.000329 - 0.0000999 = 0.0002291
+0.0002291 chi_c1  K+   pi0              PHSP;
+
 0.000374 chi_c1  K+   pi+  pi-          PHSP;
 0.0002   chi_c1  K+  pi0  pi0           PHSP;
 0.0002   chi_c1  K0  pi+  pi0           PHSP;
@@ -4782,8 +4815,23 @@ Decay B-
 
 0.000497 chi_c1  K-                         SVS; #[Reconstructed PDG2018]
 0.000300 chi_c1  K*-                        SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.00058  chi_c1  anti-K0   pi-              PHSP;
-0.000329 chi_c1  K-  pi0                    PHSP;
+
+# B+ -> chi_c1 K+ pi0 (PDG2019 data)
+# Branching fraction: 0.00058
+# Partial branching fractions:
+# chi_c1 K*(892)+  Br(B+ -> chi_c1 K*(892)+) * Br(K*(892)+ -> K0 pi+) =
+#                  0.0003 * 0.99901 * (2/3) = 0.0001998
+# chi_c1 K0 pi+: 0.00058 - 0.0001998 = 0.0003802
+0.0003802 chi_c1  anti-K0   pi-             PHSP;
+
+# B+ -> chi_c1 K+ pi0 (PDG2019 data)
+# Branching fraction: 0.000329
+# Partial branching fractions:
+# chi_c1 K*(892)+  Br(B+ -> chi_c1 K*(892)+) * Br(K*(892)+ -> K+ pi0) =
+#                  0.0003 * 0.99901 * (1/3) = 0.0000999
+# chi_c1 K+ pi0: 0.000329 - 0.0000999 = 0.0002291
+0.0002291 chi_c1  K-   pi0                  PHSP;
+
 0.000374 chi_c1  K-  pi+  pi-               PHSP;
 0.0002   chi_c1  K-  pi0  pi0               PHSP;
 0.0002   chi_c1  anti-K0   pi-  pi0         PHSP;

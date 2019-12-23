@@ -27,10 +27,10 @@ fillParticleListFromMC('e+:MC', 'mcPrimary', path=mypath)
 fillParticleListFromMC('nu_e:MC', 'mcPrimary', path=mypath)
 fillParticleListFromMC('gamma:MC', 'mcPrimary', path=mypath)
 
-reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', 'isSignal==1', path=mypath)
+reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', '', path=mypath)
 reconstructMCDecay(
     'B+:DstENu =direct=> [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC pi0:gg] pi0:gg ] e+:MC nu_e:MC ',
-    'isSignal==1',
+    '',
     path=mypath)
 
 
@@ -41,7 +41,7 @@ reconstructMCDecay(
 #     'B+:DstENu =direct=>\
 # [anti-D*0 =direct=> [anti-D0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] pi0:gg ]\
 # e+:MC nu_e:MC ',
-#     'isSignal==1',
+#     '',
 #     path=mypath)
 
 

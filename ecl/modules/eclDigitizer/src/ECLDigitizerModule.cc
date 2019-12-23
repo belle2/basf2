@@ -35,6 +35,7 @@
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/utility/ECLDspEmulator.h>
 
 using namespace std;
 using namespace Belle2;
@@ -149,10 +150,33 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
   const int n16 = 16; // number of points before signal n16 = 16
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
   const fitparams_t& r = m_fitparams[t.ifunc];
-  shapeFitter((short int*)m_idn[t.idn].id, (int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-              (int*)r.fg31, (int*)r.fg32, (int*)r.fg33,
-              (int*)FitA, (int*)&ttrig, (int*)&n16,
-              &m_lar, &m_ltr, &m_lq , &m_chi);
+
+  short int* id = (short int*)m_idn[t.idn].id;
+
+  int A0  = (int) * (id + 0) - 128;
+  int Askip  = (int) * (id + 1) - 128;
+
+  int Ahard  = (int) * (id + 2);
+  int k_a = (int) * ((unsigned char*)id + 26);
+  int k_b = (int) * ((unsigned char*)id + 27);
+  int k_c = (int) * ((unsigned char*)id + 28);
+  int k_16 = (int) * ((unsigned char*)id + 29);
+  int k1_chi = (int) * ((unsigned char*)id + 24);
+  int k2_chi = (int) * ((unsigned char*)id + 25);
+
+  int chi_thres = (int) * (id + 15);
+
+  int trg_time = ttrig;
+
+  auto result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
+                       (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
+                       trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k_16, k1_chi,
+                       k2_chi, chi_thres);
+
+  m_lar = result.amp;
+  m_ltr = result.time;
+  m_lq  = trg_time;
+  m_chi = result.chi2;
 }
 
 int ECLDigitizerModule::shapeSignals()

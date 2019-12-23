@@ -1,0 +1,31 @@
+# EventType: 1213052000
+# Descriptor: [B- -> [D0 -> K- pi+ pi- pi+]rho-]
+# NickName: Bu_Drho-_DtoK-pi+pi-pi+
+# Documentation: B to Charm(less) phase3 study
+# Tested:yes
+# PhysicsWG: Hadronic BtoCharm(less) WG
+# Responsible: Niharika Rout
+# Email: niharikarout@physics.iitm.ac.in
+# Cuts: None
+# Date: 20190812
+#
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.500 B-sig B+   PHOTOS VSS;
+0.500 B- B+sig   PHOTOS VSS;
+Enddecay
+
+Decay B-sig
+1.000 rho- D0sig PHOTOS SVS;
+Enddecay
+CDecay B+sig
+
+Decay D0sig
+1.000 K- pi+ pi- pi+ PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+End
+
+

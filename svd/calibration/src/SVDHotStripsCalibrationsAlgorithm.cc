@@ -38,7 +38,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 
   for (int i = 0; i < 768; i++) { vecHS[i] = 0; stripOccAfterAbsCut[i] = 0;}
 
-  float occCal = 1.;
+  //  float occCal = 1.;
   float occThr = 0.2; //first absolute cut for strips with occupancy >20%
 
   //  auto HSBitmap = new Belle2::SVDCalibrationsBitmap();
@@ -72,7 +72,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     if (!side && layer != 3) nstrips = 512;
 
     for (int iterStrip = 0; iterStrip < nstrips; iterStrip++) {
-      occCal = hocc->GetBinContent(iterStrip + 1);
+      float occCal = hocc->GetBinContent(iterStrip + 1);
       if (occCal > occThr) {
         vecHS[i] = 1;
         stripOccAfterAbsCut[i] = 0;

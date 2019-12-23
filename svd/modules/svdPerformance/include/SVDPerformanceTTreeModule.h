@@ -54,10 +54,16 @@ namespace Belle2 {
     float m_svdTruePos = -99;      /**< true position */
     float m_svdClPhi = 0;   /**< cluster global phi */
     float m_svdClZ = 0;     /**< cluster global Z */
+    int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/
+    int m_svdTrkSVDHits = 0; /**< number of SVD hits on the track*/
+    int m_svdTrkCDCHits = 0; /**< number of CDC hits on the track*/
     float m_svdTrkPos = 0; /**< track position*/
+    float m_svdTrkPosOS = 0; /**< track position on the other side*/
     float m_svdTrkPosErr = 0; /**< track position error*/
+    float m_svdTrkPosErrOS = 0; /**< track position error on the other side*/
     float m_svdTrkQoP = 0; /**< track q/p*/
-    float m_svdTrkPrime = 0;     /**< tan of incident angle projected on u,w*/
+    float m_svdTrkPrime = 0;     /**< tan of incident angle projected on u/v,w*/
+    float m_svdTrkPrimeOS = 0;     /**< tan of incident angle projected on v/u,w (other side)*/
     float m_svdTrkPosUnbiased = 0; /**< unbiased track position */
     float m_svdTrkPosErrUnbiased = 0; /**< unbiased track position error*/
     float m_svdTrkQoPUnbiased = 0; /**< unbiased track q/p*/

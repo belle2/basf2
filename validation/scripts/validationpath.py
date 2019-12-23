@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+import hashlib
+import json
 
 folder_name_results = "results"
 folder_name_html_static = "html_static"
@@ -19,6 +21,41 @@ file_name_runtimes_dat = "runtimes.dat"
 def get_basepath():
     return {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
             'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
+
+
+class TagFolderRainbowTable(dict):
+    """ Because of issues of too long filenames if the number of revision
+    is growing, the simple recipe of creating folder names by concatenating
+    the names of the revisions does not work.
+    Therefore, we use a hashing algorithm. At the same time we want to be
+    able to look up the folder content easily, so we create a rainbow table,
+    that is a simple text file that contains hash <> revisions.
+    """
+
+    def update_from_json(self, path: str) -> None:
+        """ Read a json file which was produced by the ``to_json`` method and
+        update this dictionary. If the path does not exist, do nothing. """
+        if os.path.exists(path):
+            with open(path) as infile:
+                self.update(json.load(infile))
+
+    def to_json(self, path: str) -> None:
+        """ Write out this dictionary as a json file. """
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as outfile:
+            json.dump(self, outfile, indent=4, sort_keys=True)
+
+    def update_to_json(self, path: str) -> None:
+        """ Read json file (if exists) for anything the dictionary
+        doesn't contain yet and write everything back. """
+        self.update_from_json(path)
+        self.to_json(path)
+
+
+# Note that it is enough to have one object, even in the (unexpected) case that
+# there is more than one output_base_dir (at the cost of having some unneeded
+# entries there, perhaps)
+RAINBOW_TABLE = TagFolderRainbowTable()
 
 
 def get_results_runtime_file(output_base_dir):
@@ -51,23 +88,20 @@ def get_html_plots_folder(output_base_dir):
     return os.path.join(get_html_folder(output_base_dir), folder_name_plots)
 
 
-def get_tag_comparison_folder(tags):
-    """!
-    Creates a unique folder name from a list of tags
-    """
-    if not isinstance(tags, list):
-        raise Exception("Provided input must be a list of tags")
-
-    return '_'.join(tags)
-
-
 def get_html_plots_tag_comparison_folder(output_base_dir, tags):
     """!
     Return the absolute path to the results folder
     """
+    string = ",".join(sorted(tags))
+    tag_folder = hashlib.sha1(string.encode("utf8")).hexdigest()[:10]
+    if tag_folder not in RAINBOW_TABLE:
+        RAINBOW_TABLE[tag_folder] = sorted(tags)
+        RAINBOW_TABLE.update_to_json(
+            os.path.join(get_html_plots_folder(output_base_dir), "rainbow.json")
+        )
     return os.path.join(
         get_html_plots_folder(output_base_dir),
-        get_tag_comparison_folder(tags)
+        tag_folder
     )
 
 

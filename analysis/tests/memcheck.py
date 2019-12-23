@@ -12,7 +12,7 @@ from ROOT import Belle2
 from modularAnalysis import reconstructDecay, rankByHighest, buildRestOfEvent, buildContinuumSuppression, matchMCTruth, \
     variablesToNtuple
 from stdCharged import stdPi, stdMu
-from vertex import vertexTree, TagV
+from vertex import treeFit, TagV
 from flavorTagger import flavorTagger
 from rawdata import add_packers, add_unpackers
 import glob
@@ -86,7 +86,7 @@ reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', cut='3.0 < M < 3.2', path=
 reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', cut='5.2 < M < 5.4', path=main)
 
 # perform B0 kinematic vertex fit and keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexTree('B0:jpsiks', 0.0, path=main)
+treeFit('B0:jpsiks', 0.0, path=main)
 
 # order candidates by chi2 probability
 rankByHighest('B0:jpsiks', 'chiProb', path=main)

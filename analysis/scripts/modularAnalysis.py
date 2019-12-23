@@ -1833,7 +1833,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood. Replaces inputParticlelists.
+                              according to PID likelihood and the inputParticlelists
+                              option will be ignored.
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
@@ -2370,7 +2371,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
                               If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood. Replaces inputListNames and default_cleanup.
+                              according to PID likelihood and the options inputListNames and default_cleanup
+                              will be ignored.
     @param default_cleanup    if True, apply default clean up cuts to default
                               ParticleLists pi+:evtkin and gamma:evtkin.
     @param path               modules are added to this path
@@ -2451,7 +2453,8 @@ def buildEventShape(inputListNames=[],
                               event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood. Replaces inputListNames and default_cleanup.
+                              according to PID likelihood and the options inputListNames
+                              and default_cleanup will be ignored.
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.

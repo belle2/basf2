@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <vector>
+
 namespace Belle2 {
   namespace ECL {
     typedef struct ECLShapeFit {
@@ -28,7 +30,7 @@ namespace Belle2 {
       /** (Peak < LA_THR) => true */
       bool low_amp;
       /** Shape of the fitted function. */
-      long long fit[31];
+      std::vector<long long> fit;
       /** Chi^2 from the fit */
       int chi2;
     } ECLShapeFit;
@@ -63,11 +65,13 @@ namespace Belle2 {
      * @param[in] k2_chi    Bit shift for chi2 threshold calculation
      * @param[in] chi_thres Base value for chi2 threshold
      */
-    ECLShapeFit lftda_(short int* f, short int* f1, short int* fg41,
-                       short int* fg43, short int* fg31, short int* fg32,
-                       short int* fg33, int* y, int& ttrig2, int& la_thr,
+    template <typename INT>
+    ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
+                       INT* fg43, INT* fg31, INT* fg32,
+                       INT* fg33, int* y, int& ttrig2, int& la_thr,
                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
                        int& chi_thres);
+
   }
 }

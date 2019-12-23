@@ -166,11 +166,9 @@ namespace Belle2 {
     m_listIndexGenerator(),
     m_particleIndexGenerator()
   {
-    // !!! CAUTION !!!
-    // decaydescriptor must be valid. Please check if it is valid at first, for example,
-    //
-    // bool valid = decaydescriptor.init(decayString);
-    // if (valid) ParticleGenerator generator(decaydescriptor, cut);
+    bool valid = decaydescriptor.isInitOK();
+    if (!valid)
+      B2ERROR("Given decaydescriptor failed to initialized");
 
     m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
     m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();

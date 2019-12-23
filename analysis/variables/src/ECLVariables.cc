@@ -1281,7 +1281,7 @@ point (IP) should have a Photon timing that corresponds to the Event t0, :math:`
 time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL 
 cluster produced at the interation point in time with the event, the cluster time should be consistent with zero 
 within the uncertainties. Special values are returned if the fit for the Photon timing fails (see 
-documentation for clusterHasFailedTiming). (For MC, the calibrations and corrections are not fully simulated).
+documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
 
 .. note::
     | Please read `this <importantNoteECL>` first.

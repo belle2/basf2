@@ -147,7 +147,6 @@ void ECLDigitizerModule::beginRun()
 void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
                                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
 {
-  const int n16 = 16; // number of points before signal n16 = 16
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
   const fitparams_t& r = m_fitparams[t.ifunc];
 
@@ -175,8 +174,32 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
 
   m_lar = result.amp;
   m_ltr = result.time;
-  m_lq  = trg_time;
+  m_lq  = result.quality;
   m_chi = result.chi2;
+
+  //== Set precision of chi^2 to be the same as in the raw data.
+  int discarded_bits = 0;
+  if ((m_chi & 0x7800000) != 0) {
+    m_chi = 0x7800000;
+  } else if ((m_chi & 0x0600000) != 0) {
+    discarded_bits = 14;
+  } else if ((m_chi & 0x0180000) != 0) {
+    discarded_bits = 12;
+  } else if ((m_chi & 0x0060000) != 0) {
+    discarded_bits = 10;
+  } else if ((m_chi & 0x0018000) != 0) {
+    discarded_bits = 8;
+  } else if ((m_chi & 0x0006000) != 0) {
+    discarded_bits = 6;
+  } else if ((m_chi & 0x0001800) != 0) {
+    discarded_bits = 4;
+  } else if ((m_chi & 0x0000600) != 0) {
+    discarded_bits = 2;
+  }
+  if (discarded_bits > 0) {
+    m_chi >>= discarded_bits;
+    m_chi <<= discarded_bits;
+  }
 }
 
 int ECLDigitizerModule::shapeSignals()

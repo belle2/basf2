@@ -1,6 +1,21 @@
 Changes in the analysis package
 -------------------------------
 
+Vertex Fitting
+++++++++++++++
+
+ .. warning:: The convenience function for the :b2:mod:`TreeFitter` module has
+    been renamed from ``vertexTree`` to :func:`vertex.treeFit`.
+
+ .. warning:: The KFit convenience functions have been merged to the new
+    function :func:`vertex.KFit`. One of its input arguments is ``fit_type``,
+    which specifies whether you want to perform a mass fit
+    (``fit_type=mass``), a vertex fit (``fit_type=vertex``), a
+    mass-constrained vertex fit (``fit_type=massvertex``), or a vertex fit
+    with the mother constrained to the beam four-momentum
+    (``fit_type=fourC``).
+  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -97,7 +112,6 @@ Modules
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
- * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
 Conditions DB

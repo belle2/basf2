@@ -3,9 +3,9 @@
 import unittest
 import os
 import tempfile
-from basf2 import *
+from basf2 import create_path, register_module
 import b2test_utils
-from modularAnalysis import *
+from modularAnalysis import fillParticleListFromMC, reconstructMCDecay, inputMdst
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -15,7 +15,7 @@ class TestNewMCDecayFinder(unittest.TestCase):
     """The unit test"""
 
     def testNewMCDecayFinder(self):
-        """Reconstruct stuff with tight Mbc cut."""
+        """Reconstruct/search for an MC decay chain using the reconstructMCDecay tool."""
 
         testFile = tempfile.NamedTemporaryFile()
 
@@ -40,7 +40,8 @@ class TestNewMCDecayFinder(unittest.TestCase):
         ntupler.param('particleList', 'B0:DstD0Kpi')
         main.add_module(ntupler)
 
-        process(main)
+        b2test_utils.safe_process(main)
+        # process(main)
 
         ntuplefile = TFile(testFile.name)
         ntuple = ntuplefile.Get('ntuple')

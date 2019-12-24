@@ -31,11 +31,11 @@ def get_calibrations(input_data, **kwargs):
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, 2)
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, 1)
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of physics files actually used as input = {len(input_files_physics)}")
 
-    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 2)
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 3)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
@@ -50,6 +50,8 @@ def get_calibrations(input_data, **kwargs):
     from ROOT import Belle2
     import millepede_calibration as mp2
     import alignment
+    import modularAnalysis as ana
+    import basf2
 
     cfg = mp2.create_configuration(
         db_components=['VXDAlignment', 'CDCAlignment'],
@@ -69,7 +71,7 @@ def get_calibrations(input_data, **kwargs):
     with cfg.reprocess_cosmics(collection_name='Bcosmics'):
         path = basf2.create_path()
         ana.fillParticleList('mu+:bad', 'z0 > 57. and abs(d0) < 26.5', path=path)
-        path.add_module('SkimFilter', particleLists=['mu+:bad']).if_true(create_path())
+        path.add_module('SkimFilter', particleLists=['mu+:bad']).if_true(basf2.create_path())
 
         cfg.collect_tracks('RecoTracks', path=path)
 
@@ -89,7 +91,7 @@ def get_calibrations(input_data, **kwargs):
             0,
             1003))  # init_event used to setup geometry at particular (event, run, exp) - only needed for constraint generation
 
-    basf2.set_module_parameters(cal.collections['physics'].pre_collector_path, 'RootInput', entrySequences=['0:4000'])
+    basf2.set_module_parameters(cal.collections['physics'].pre_collector_path, 'RootInput', entrySequences=['0:2000'])
     basf2.set_module_parameters(cal.collections['Bcosmics'].pre_collector_path, 'RootInput', entrySequences=['0:8000'])
 
     # Most values like database chain and backend args are overwritten by b2caf-prompt-run. But some can be set.

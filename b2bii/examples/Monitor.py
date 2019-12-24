@@ -13,8 +13,6 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
-from modularAnalysis import vertexKFit
-from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
 from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
 from b2biiMonitors import addBeamParamsConversionMonitors

@@ -2,6 +2,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/variables/BasicParticleInformation.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -1200,6 +1201,47 @@ namespace {
     }
 
   }
+
+  /** B0 -> K*0 (-> K+ pi- ) J/psi (-> e+ e- gamma) */
+  TEST_F(MCMatchingTest, IsSignalBehavior)
+  {
+    {
+      /** B0 -> K*0 (-> K+ pi- ) J/psi (-> e+ e- gamma) */
+      Decay d(511, { {313, {321, -211}}, {443, { -11, 11, 22}}});
+      Decay* ep = &(d[1][0]);
+      Decay* em = &(d[1][1]);
+
+      /** Reconstructed as B0 -> K*0 (-> K+ pi- ) e+ e- */
+      d.reconstruct({511, {{313, {321, -211}}, { -11, {}, Decay::c_ReconstructFrom, ep}, {11, {}, Decay::c_ReconstructFrom, em}}});
+
+      MCParticle* photon = d.getMCParticle(22);
+      photon->setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_IsPHOTOSPhoton);
+
+      Particle* B = d.m_particle;
+      ASSERT_TRUE(MCMatching::setMCTruth(B)) << d.getString();
+
+      // '=exact=>' c_Ordinary
+      B->setProperty(Particle::PropertyFlags::c_Ordinary);
+      EXPECT_EQ(MCMatching::c_MissingResonance | MCMatching::c_MissPHOTOS, MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
+
+      // '=norad=>' c_isIgnoreIntermediate
+      B->setProperty(Particle::PropertyFlags::c_isIgnoreIntermediate);
+      EXPECT_EQ(MCMatching::c_MissPHOTOS, MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
+
+      // '=direct=>' c_isIgnoreRadiatedPhotons
+      B->setProperty(Particle::PropertyFlags::c_isIgnoreRadiatedPhotons);
+      EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
+
+      // '->' c_isIgnoreRadiatedPhotons and c_isIgnoreIntermediate
+      B->setProperty(Particle::PropertyFlags::c_isIgnoreRadiatedPhotons | Particle::PropertyFlags::c_isIgnoreIntermediate);
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 1.0) << d.getString();
+    }
+  }
+
 
 }  // namespace
 #endif

@@ -12,7 +12,6 @@
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
 /* Belle 2 headers. */
@@ -34,23 +33,21 @@ BKLMHit1d::BKLMHit1d() :
 }
 
 // Constructor with a cluster of contiguous parallel BKLMDigits
-BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
+BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
   RelationsObject()
 {
   m_Time = 0.0;
   m_EDep = 0.0;
   m_ModuleID = 0;
-
   if (digits.size() == 0) {
-    B2WARNING("Attempt to create a 1D hit with no BKLMDigits");
+    B2WARNING("Attempt to create a BKLMHit1d with no BKLMDigits");
     return;
   }
-
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
   m_ModuleID = digits.front()->getModuleID();
-  for (std::vector<BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    BKLMDigit* digit = *iDigit;
+  for (std::vector<const BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
+    const BKLMDigit* digit = *iDigit;
     if (!BKLMElementNumbers::hitsFromSamePlane(m_ModuleID, digit->getModuleID())) {
       B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
       continue;

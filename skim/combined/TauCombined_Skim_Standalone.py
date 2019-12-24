@@ -6,15 +6,15 @@ Run TauGeneric, TauLFV, and TauThrust skims together
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdPi, stdK, stdPr, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
-from skim.standardlists.charm import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
+import skimExpertFunctions as expert
 
 skimpath = b2.Path()
-fileList = get_test_file('mixedBGx1', 'MC12')
+fileList = expert.get_test_file('MC12_mixedBGx1')
 ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('loose', path=skimpath)
@@ -31,11 +31,11 @@ loadStdLightMesons(path=skimpath)
 loadStdSkimPi0(path=skimpath)
 
 from skim.taupair import TauLFVList, TauList, TauThrustList
-add_skim('TauLFV', TauLFVList(path=skimpath), path=skimpath)
-add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
-add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
+expert.add_skim('TauLFV', TauLFVList(path=skimpath), path=skimpath)
+expert.add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
+expert.add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
 
-setSkimLogging(path=skimpath)
+expert.setSkimLogging(path=skimpath)
 b2.process(path=skimpath)
 
 # print out the summary

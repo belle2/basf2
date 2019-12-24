@@ -104,7 +104,7 @@ namespace Belle2 {
     /** BKLM electronics map. */
     DBObjPtr<BKLMElectronicsMap> m_BklmElectronicsMap;
 
-    /* BKLM digits. */
+    /** BKLM digits. */
     StoreArray<BKLMDigit> m_BklmDigits;
 
     /* EKLM objects. */

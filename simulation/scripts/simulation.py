@@ -8,7 +8,6 @@ from pxd import add_pxd_simulation
 from svd import add_svd_simulation
 from svd import add_svd_reconstruction
 from tracking import add_tracking_for_PXDDataReduction_simulation
-from iov_conditional import make_conditional_at
 
 
 def check_simulation(path):
@@ -39,9 +38,15 @@ def check_simulation(path):
                 % (", ".join(required), ", ".join(found)))
 
 
-def add_PXDDataReduction(path, components,
-                         pxd_unfiltered_digits='pxd_unfiltered_digits',
-                         doCleanup=True):
+def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered_digits',
+                         doCleanup=True, overrideDB=False, usePXDDataReduction=True):
+    """
+    This function adds the standard simulation modules to a path.
+    @param pxd_unfiltered_digits: the name of the StoreArray containing the input PXDDigits
+    @param overrideDB: override settings from the DB with the value set in 'usePXDDataReduction'
+    @param usePXDDataReduction: if 'overrideDB==True', override settings from the DB
+    @param doCleanup: if 'doCleanup=True' temporary datastore objects are emptied
+    """
 
     # SVD reconstruction
     svd_cluster = '__ROIsvdClusters'
@@ -59,6 +64,8 @@ def add_PXDDataReduction(path, components,
     pxd_digifilter.param('ROIidsName', 'ROIs')
     pxd_digifilter.param('PXDDigitsName', pxd_unfiltered_digits)
     pxd_digifilter.param('PXDDigitsInsideROIName', 'PXDDigits')
+    pxd_digifilter.param('overrideDB', overrideDB)
+    pxd_digifilter.param('usePXDDataReduction', usePXDDataReduction)  # only used for overrideDB=True
     path.add_module(pxd_digifilter)
 
     # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
@@ -109,6 +116,7 @@ def add_simulation(
         components=None,
         bkgfiles=None,
         bkgOverlay=True,
+        forceSetPXDDataReduction=False,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
         generate_2nd_cdc_hits=False,
@@ -116,6 +124,8 @@ def add_simulation(
         usePXDGatedMode=False):
     """
     This function adds the standard simulation modules to a path.
+    @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
+    @param usePXDDataReduction: if 'forceSetPXDDataReduction==True', override settings from the DB
     @param cleanupPXDDataReduction: if True the datastore objects used by PXDDataReduction are emptied
     """
 
@@ -183,17 +193,21 @@ def add_simulation(
     # PXD digitization
     pxd_digits_name = ''
     if components is None or 'PXD' in components:
-        if usePXDDataReduction:
-            pxd_digits_name = 'pxd_unfiltered_digits'
-        # use 'make_conditional_at' to force deactivation of ROI finding for early phase 3 (experiment 1003)
-        path_earlyPhase3_pxdDigi = create_path()
-        path_standard_pxdDigi = create_path()
+        if forceSetPXDDataReduction:
+            if usePXDDataReduction:
+                pxd_digits_name = 'pxd_unfiltered_digits'
+            add_pxd_simulation(path, digitsName=pxd_digits_name)
+        else:
+            # use DB conditional module to decide whether ROI finding should be activated
+            path_disableROI_Sim = create_path()
+            path_enableROI_Sim = create_path()
 
-        add_pxd_simulation(path_earlyPhase3_pxdDigi)
-        add_pxd_simulation(path_standard_pxdDigi, digitsName=pxd_digits_name)
+            add_pxd_simulation(path_disableROI_Sim, digitsName='PXDDigits')
+            add_pxd_simulation(path_enableROI_Sim, digitsName='pxd_unfiltered_digits')
 
-        make_conditional_at(path, iov_list=[(1003, 0, 1003, -1)],
-                            path_when_in_iov=path_earlyPhase3_pxdDigi, path_when_not_in_iov=path_standard_pxdDigi)
+            roi_condition_module_Sim = path.add_module("ROIfindingConditionFromDB")
+            roi_condition_module_Sim.if_true(path_enableROI_Sim, AfterConditionPath.CONTINUE)
+            roi_condition_module_Sim.if_false(path_disableROI_Sim, AfterConditionPath.CONTINUE)
 
     # TOP digitization
     if components is None or 'TOP' in components:
@@ -217,32 +231,53 @@ def add_simulation(
         klm_digitizer = register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
-    # use 'make_conditional_at' to force deactivation of ROI finding for early phase 3 (experiment 1003)
-    path_earlyPhase3 = create_path()
-    path_standard = create_path()
-
     # background overlay executor - after all digitizers
     if bkgfiles is not None and bkgOverlay:
-        path_earlyPhase3.add_module('BGOverlayExecutor')
-        path_standard.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
+        if forceSetPXDDataReduction:
+            path.add_module('BGOverlayExecutor', PXDDigitsName=pxd_digits_name)
 
-        if components is None or 'PXD' in components:
-            path_earlyPhase3.add_module("PXDDigitSorter")
-            path_standard.add_module("PXDDigitSorter", digits=pxd_digits_name)
+            if components is None or 'PXD' in components:
+                path.add_module("PXDDigitSorter", digits=pxd_digits_name)
 
-        # sort SVDShaperDigits before PXD data reduction
-        if components is None or 'SVD' in components:
-            path_earlyPhase3.add_module("SVDShaperDigitSorter")
-            path_standard.add_module("SVDShaperDigitSorter")
+            # sort SVDShaperDigits before PXD data reduction
+            if components is None or 'SVD' in components:
+                path.add_module("SVDShaperDigitSorter")
+        else:
+            path_disableROI_Bkg = create_path()
+            path_enableROI_Bkg = create_path()
+
+            path_disableROI_Bkg.add_module('BGOverlayExecutor', PXDDigitsName='PXDDigits')
+            if components is None or 'PXD' in components:
+                path_disableROI_Bkg.add_module("PXDDigitSorter", digits='PXDDigits')
+            if components is None or 'SVD' in components:
+                path_disableROI_Bkg.add_module("SVDShaperDigitSorter")
+
+            path_enableROI_Bkg.add_module('BGOverlayExecutor', PXDDigitsName='pxd_unfiltered_digits')
+            if components is None or 'PXD' in components:
+                path_enableROI_Bkg.add_module("PXDDigitSorter", digits='pxd_unfiltered_digits')
+            if components is None or 'SVD' in components:
+                path_enableROI_Bkg.add_module("SVDShaperDigitSorter")
+
+            roi_condition_module_Bkg = path.add_module("ROIfindingConditionFromDB")
+            roi_condition_module_Bkg.if_true(path_enableROI_Bkg, AfterConditionPath.CONTINUE)
+            roi_condition_module_Bkg.if_false(path_disableROI_Bkg, AfterConditionPath.CONTINUE)
 
     # PXD data reduction - after background overlay executor
-    if (components is None or 'PXD' in components) and usePXDDataReduction:
-        # don't add this module for early phase 3
-        add_PXDDataReduction(path_standard, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction)
+    if components is None or 'PXD' in components:
+        if forceSetPXDDataReduction:
+            if usePXDDataReduction:
+                add_PXDDataReduction(path, components, pxd_digits_name, doCleanup=cleanupPXDDataReduction,
+                                     overrideDB=forceSetPXDDataReduction, usePXDDataReduction=usePXDDataReduction)
+        else:
+            path_enableROI_Red = create_path()
+            add_PXDDataReduction(
+                path_enableROI_Red,
+                components,
+                pxd_unfiltered_digits='pxd_unfiltered_digits',
+                doCleanup=cleanupPXDDataReduction)
 
-    # pick the valid path
-    make_conditional_at(path, iov_list=[(1003, 0, 1003, -1)],
-                        path_when_in_iov=path_earlyPhase3, path_when_not_in_iov=path_standard)
+            roi_condition_module_Red = path.add_module("ROIfindingConditionFromDB")
+            roi_condition_module_Red.if_true(path_enableROI_Red, AfterConditionPath.CONTINUE)
 
     # statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Simulation')

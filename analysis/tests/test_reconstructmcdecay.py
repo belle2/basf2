@@ -41,7 +41,6 @@ class TestNewMCDecayFinder(unittest.TestCase):
         main.add_module(ntupler)
 
         b2test_utils.safe_process(main)
-        # process(main)
 
         ntuplefile = TFile(testFile.name)
         ntuple = ntuplefile.Get('ntuple')

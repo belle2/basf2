@@ -2388,7 +2388,7 @@ namespace Belle2 {
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * [v3 - v4] / v5^v6)", formula, R"DOCSTRING(
 Returns the result of the given formula, where v1 to vN are variables or floating
-point numbers. Currently the only supported operations are addtion (``+``),
+point numbers. Currently the only supported operations are addition (``+``),
 subtraction (``-``), multiplication (``*``), division (``/``) and power (``^``
 or ``**``). Parenthesis can be in the form of square brackets ``[v1 * v2]``
 or normal brackets ``(v1 * v2)``. It will work also with variables taking
@@ -2445,21 +2445,28 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList,
-                      R"DOC(Returns 1 if the given particle appears in decay chain of the particles in the given particle Lists."
-                      "Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:"
-                      "``isDescendantOfList(<particle_list>,1)`` returns 1 if particle is a daughter of the list,"
-                      "``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,"
-                      "``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc."
-                      "Default value is ``-1`` that is inclusive for all generations.)DOC");
-    REGISTER_VARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList,
-                      R"DOC(Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists."
-                      "Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:"
-                      "``isMCDescendantOfList(<particle_list>,1)`` returns 1 if particle is matched to the same particle as any daughter of the list,"
-                      "``isMCDescendantOfList(<particle_list>,2)`` returns 1 if particle is matched to the same particle as any granddaughter of the list,"
-                      "``isMCDescendantOfList(<particle_list>,3)`` returns 1 if particle is matched to the same particle as any great-granddaughter of the list, etc."
-                      "Default value is ``-1`` that is inclusive for all generations."
-                      "It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.)DOC");
+    REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
+                      Returns 1 if the given particle appears in the decay chain of the particles in the given ParticleLists.
+
+                      Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
+
+                      * ``isDescendantOfList(<particle_list>,1)`` returns 1 if particle is a daughter of the list,
+                      * ``isDescendantOfList(<particle_list>,2)`` returns 1 if particle is a granddaughter of the list,
+                      * ``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.
+                      * Default value is ``-1`` that is inclusive for all generations.
+                      )DOC");
+    REGISTER_VARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
+                      Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
+
+                      Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
+
+                      * ``isMCDescendantOfList(<particle_list>,1)`` returns 1 if particle is matched to the same particle as any daughter of the list,
+                      * ``isMCDescendantOfList(<particle_list>,2)`` returns 1 if particle is matched to the same particle as any granddaughter of the list,
+                      * ``isMCDescendantOfList(<particle_list>,3)`` returns 1 if particle is matched to the same particle as any great-granddaughter of the list, etc.
+                      * Default value is ``-1`` that is inclusive for all generations.
+
+                      It makes only sense for lists created with `fillParticleListFromMC` function with ``addDaughters=True`` argument.
+                      )DOC");
 
     REGISTER_VARIABLE("sourceObjectIsInList(particleListName)", sourceObjectIsInList, R"DOC(
 Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to create a particle in ``particleListName``, 0.0 if not. 

@@ -19,7 +19,7 @@ import basf2
 from modularAnalysis import outputUdst
 
 main = basf2.create_path()
-input = basf.register_module('RootInput')
+input = basf2.register_module('RootInput')
 input.param('inputFileName', '../DSTtoMDST.mdst.root')
 main.add_module(input)
 outputUdst('../MDSTtoUDST.udst.root', path=main)

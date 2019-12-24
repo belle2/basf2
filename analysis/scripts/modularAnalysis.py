@@ -1612,10 +1612,10 @@ def reconstructMCDecay(
     Finds and creates a ``ParticleList`` from given decay string.
     ``ParticleList`` of daughters with sub-decay is are created.
 
-    Only signal particle, which means ``isSignal`` is equal to 1, is stored. One can use the decay string grammar
-    to change the behavior of ``isSignal``. One can find detailed information in :ref:`DecayString`.
+    Only signal particle, which means :b2:var:`isSignal` is equal to 1, is stored. One can use the decay string grammar
+    to change the behavior of :b2:var:`isSignal`. One can find detailed information in :ref:`DecayString`.
 
-    .. warning::
+    .. tip::
         If one uses same sub-decay twice, same particles are registered to a ``ParticleList``. For example,
         ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] [pi0:gg =direct=> gamma:MC gamma:MC]``.
         One can skip the second sub-decay, ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] pi0:gg``.
@@ -1645,8 +1645,9 @@ def findMCDecay(
     path=None,
 ):
     """
-    This function is not fully tested and maintained.
-    Please consider to use reconstructMCDecay() instead.
+    .. warning::
+        This function is not fully tested and maintained.
+        Please consider to use reconstructMCDecay() instead.
 
     Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
     The decay string is required to describe correctly what you want.

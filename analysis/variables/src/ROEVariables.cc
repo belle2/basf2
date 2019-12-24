@@ -1780,16 +1780,16 @@ namespace Belle2 {
     }
 
 
-    Manager::FunctionPtr pi0Veto(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1)
-        B2FATAL("Wrong number of arguments (1 required) for pi0Veto");
+        B2ERROR("Wrong number of arguments (1 required) for pi0Prob");
 
       std::string mode;
       mode = arguments[0];
 
       if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
-        B2FATAL("the given argument is not supported!pi01");
+        B2ERROR("the given argument is not supported in pi0Prob!");
 
       auto func = [mode](const Particle * particle) -> double {
         if (mode == "standard")
@@ -1834,23 +1834,22 @@ namespace Belle2 {
 
         else
         {
-          B2FATAL("the given argument is not supported!pi02");
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
       return func;
     }
 
-    Manager::FunctionPtr etaVeto(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr etaProb(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1)
-        B2FATAL("Wrong number of arguments (1 required) for etaVeto");
+        B2ERROR("Wrong number of arguments (1 required) for etaProb");
 
       std::string mode;
       mode = arguments[0];
 
       if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
-        B2FATAL("the given argument is not supported!eta1");
+        B2ERROR("the given argument is not supported in etaProb!");
 
       auto func = [mode](const Particle * particle) -> double {
         if (mode == "standard")
@@ -1895,7 +1894,6 @@ namespace Belle2 {
 
         else
         {
-          B2FATAL("the given argument is not supported!eta2");
           return std::numeric_limits<float>::quiet_NaN();
         }
       };
@@ -2308,23 +2306,23 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
 
-    REGISTER_VARIABLE("pi0Prob(mode)", pi0Veto,
-                      "Returns pi0 probability, where mode is used to specify the selection criteria for soft phoron. \n"
+    REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
+                      "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
                       "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
-                      "You can find more details in writePi0EtaVeto function in modularAnalysis.py.");
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
-    REGISTER_VARIABLE("etaProb(mode)", etaVeto,
-                      "Returns eta probability, where mode is used to specify the selection criteria for soft phoron. \n"
+    REGISTER_VARIABLE("etaProb(mode)", etaProb,
+                      "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
                       "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
                       "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
                       "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
                       "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
-                      "You can find more details in writePi0EtaVeto function in modularAnalysis.py.");
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
   }
 }

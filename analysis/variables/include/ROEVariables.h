@@ -330,7 +330,7 @@ namespace Belle2 {
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments);
 
     /**
-     * Returns pi0 probability, where mode is used to specify the selection criteria for soft phoron.
+     * Returns pi0 probability, where mode is used to specify the selection criteria for soft photon.
      * The following strings are available.
      * standard: loose energy cut and no clusterNHits cut are applied to soft photon
      * tight: tight energy cut and no clusterNHits cut are applied to soft photon
@@ -338,10 +338,10 @@ namespace Belle2 {
      * both: tight energy cut and clusterNHits cut are applied to soft photon
      * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
-    Manager::FunctionPtr pi0Veto(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments);
 
     /**
-     * Returns eta probability, where mode is used to specify the selection criteria for soft phoron.
+     * Returns eta probability, where mode is used to specify the selection criteria for soft photon.
      * The following strings are available.
      * standard: loose energy cut and no clusterNHits cut are applied to soft photon
      * tight: tight energy cut and no clusterNHits cut are applied to soft photon
@@ -349,7 +349,7 @@ namespace Belle2 {
      * both: tight energy cut and clusterNHits cut are applied to soft photon
      * You can find more details in writePi0EtaVeto function in modularAnalysis.py.
      */
-    Manager::FunctionPtr etaVeto(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr etaProb(const std::vector<std::string>& arguments);
 
 
     // ------------------------------------------------------------------------------

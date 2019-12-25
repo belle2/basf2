@@ -1610,7 +1610,7 @@ def reconstructMCDecay(
 ):
     r"""
     Finds and creates a ``ParticleList`` from given decay string.
-    ``ParticleList`` of daughters with sub-decay is are created.
+    ``ParticleList`` of daughters with sub-decay is created.
 
     Only signal particle, which means :b2:var:`isSignal` is equal to 1, is stored. One can use the decay string grammar
     to change the behavior of :b2:var:`isSignal`. One can find detailed information in :ref:`DecayString`.
@@ -1624,7 +1624,7 @@ def reconstructMCDecay(
     @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
-                       pass give cuts (in VariableManager style) and rejected otherwise
+                       pass given cuts (in VariableManager style) and rejected otherwise
                        isSignal==1 is always required by default.
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path

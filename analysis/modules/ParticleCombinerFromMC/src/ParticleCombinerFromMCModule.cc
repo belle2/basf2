@@ -57,7 +57,7 @@ namespace Belle2 {
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
     m_isSelfConjugatedParticle = false;
     m_generator = nullptr;

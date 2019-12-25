@@ -126,7 +126,7 @@ assuming you have reconstructed :code:`X -> Y Z` :
 MC decay finder module :b2:mod:`ParticleCombinerFromMC`
 -------------------------------------------------------
 
-Analysis module to reconstruct for a given decay in the list of generated particles ``MCParticle``. Only signal particles whose `isSignal` is equal to 1 are stored.
+Analysis module to reconstruct a given decay using the list of generated particles ``MCParticle``. Only signal particles with `isSignal` equal to 1 are stored.
 
 The module can be used for:
 

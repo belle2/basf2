@@ -101,8 +101,6 @@ Modules
  * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
  * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
- * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
-   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
 
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
@@ -111,7 +109,11 @@ Modules
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
 
- * Added the :b2:mod:`ParticleCombinerFromMC` and the ``reconstructMCDecay`` to find and create ``ParticleList`` from a given decaystring. They can be used instead of the :b2:mod:`MCDecayFinder` and ``findMCDecay`` which are not fully tested and maintained.
+ * Added the :b2:mod:`ParticleCombinerFromMC` module and the `reconstructMCDecay` to find and create ``ParticleList`` from a given :ref:`DecayString`.
+   They can be used instead of the :b2:mod:`MCDecayFinder` and `findMCDecay` which are not fully tested and maintained.
+   Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. 
+   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
+   But still the module has some bugs if one uses K_S0. So please consider to use `reconstructMCDecay` instead.
 
 Conditions DB
 +++++++++++++

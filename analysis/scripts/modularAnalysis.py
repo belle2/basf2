@@ -2075,25 +2075,29 @@ def oldwritePi0EtaVeto(
     """
     Give pi0/eta probability for hard photon.
 
-    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
-    current default weight files are optimised by MC9.
-    The Input Variables are as below. Aliases are set to some variables when training.
-    M : pi0/eta candidates Invariant mass
-    lowE : soft photon energy in lab frame
-    cTheta : soft photon ECL cluster's polar angle
-    Zmva : soft photon output of MVA using Zernike moments of the cluster
-    minC2Hdist : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+    In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
+
+    The current default weight files are optimised using MC9.
+    The input variables are as below. Aliases are set to some variables during training.
+
+    * M: pi0/eta candidates Invariant mass
+    * lowE: soft photon energy in lab frame
+    * cTheta: soft photon ECL cluster's polar angle
+    * Zmva: soft photon output of MVA using Zernike moments of the cluster
+    * minC2Hdist: soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
 
     If you don't have weight files in your workingDirectory,
     these files are downloaded from database to your workingDirectory automatically.
     Please refer to analysis/examples/tutorials/B2A306-B02RhoGamma-withPi0EtaVeto.py
     about how to use this function.
 
-    NOTE for debug
-    Please don't use following ParticleList names elsewhere.
-    'gamma:HARDPHOTON', pi0:PI0VETO, eta:ETAVETO,
-    'gamma:PI0SOFT' + str(PI0ETAVETO_COUNTER), 'gamma:ETASOFT' + str(PI0ETAVETO_COUNTER)
-    Please don't use "lowE", "cTheta", "Zmva", "minC2Hdist" as alias elsewhere.
+    NOTE:
+      Please don't use following ParticleList names elsewhere:
+
+      ``gamma:HARDPHOTON``, ``pi0:PI0VETO``, ``eta:ETAVETO``,
+      ``gamma:PI0SOFT + str(PI0ETAVETO_COUNTER)``, ``gamma:ETASOFT + str(PI0ETAVETO_COUNTER)``
+
+      Please don't use ``lowE``, ``cTheta``, ``Zmva``, ``minC2Hdist`` as alias elsewhere.
 
     @param particleList     The input ParticleList
     @param decayString specify Particle to be added to the ParticleList
@@ -2104,6 +2108,9 @@ def oldwritePi0EtaVeto(
     @param selection Selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       modules are added to this path
     """
+
+    import os
+    import basf2_mva
 
     global PI0ETAVETO_COUNTER
 
@@ -2150,13 +2157,11 @@ def oldwritePi0EtaVeto(
 
     if not os.path.isfile(workingDirectory + '/pi0veto.root'):
         if downloadFlag:
-            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('Pi0VetoIdentifier', workingDirectory + '/pi0veto.root')
             B2INFO('oldwritePi0EtaVeto: pi0veto.root has been downloaded from database to workingDirectory.')
 
     if not os.path.isfile(workingDirectory + '/etaveto.root'):
         if downloadFlag:
-            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download('EtaVetoIdentifier', workingDirectory + '/etaveto.root')
             B2INFO('oldwritePi0EtaVeto: etaveto.root has been downloaded from database to workingDirectory.')
 
@@ -2186,36 +2191,41 @@ def writePi0EtaVeto(
     """
     Give pi0/eta probability for hard photon.
 
-    default weight files are set 1.4 GeV as the lower limit of hard photon energy in CMS Frame when mva training for pi0etaveto.
-    current default weight files are optimised by MC12.
-    The Input Variables are as below.
-    M : pi0/eta candidates Invariant mass
-    daughter(1,E) : soft photon energy in lab frame
-    daughter(1,clusterTheta) : soft photon ECL cluster's polar angle
-    daughter(1,minC2TDist) : soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
-    daughter(1,clusterZernikeMVA) : soft photon output of MVA using Zernike moments of the cluster
-    daughter(1,clusterNHits) : soft photon total crystal weights sum(w_i) with w_i<=1
-    daughter(1,clusterE9E21) : soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
-    cosHelicityAngleMomentum : pi0/eta candidates cosHelicityAngleMomentum
+    In the default weight files a value of 1.4 GeV is set as the lower limit for the hard photon energy in the CMS frame.
+
+    The current default weight files are optimised using MC12.
+
+    The input variables of the mva training are:
+
+    * M: pi0/eta candidates Invariant mass
+    * daughter(1,E): soft photon energy in lab frame
+    * daughter(1,clusterTheta): soft photon ECL cluster's polar angle
+    * daughter(1,minC2TDist): soft photon distance from eclCluster to nearest point on nearest Helix at the ECL cylindrical radius
+    * daughter(1,clusterZernikeMVA): soft photon output of MVA using Zernike moments of the cluster
+    * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
+    * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
+    * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
 
     If you don't have weight files in your workingDirectory,
-    these files are downloaded from database to your workingDirectory automatically.
+    these files are downloaded from the database to your workingDirectory automatically.
 
-    The following strings are available for mode.
-    standard: loose energy cut and no clusterNHits cut are applied to soft photon
-    tight: tight energy cut and no clusterNHits cut are applied to soft photon
-    cluster: loose energy cut and clusterNHits cut are applied to soft photon
-    both: tight energy cut and clusterNHits cut are applied to soft photon
+    The following strings are available for mode:
 
-    One can obtain the result of pi0/eta veto from `pi0Prob(mode)`/`etaProb(mode)`
+    * standard: loose energy cut and no clusterNHits cut are applied to soft photon
+    * tight: tight energy cut and no clusterNHits cut are applied to soft photon
+    * cluster: loose energy cut and clusterNHits cut are applied to soft photon
+    * both: tight energy cut and clusterNHits cut are applied to soft photon
 
-    NOTE for debug
-    Please don't use following ParticleList names elsewhere.
-    'gamma:HardPhoton',
-    'gamma:Pi0Soft' + ListName + '_' + particleList.replace(':', '_'),
-    'gamma:EtaSoft' + ListName + '_' + particleList.replace(':', '_'),
-    'pi0:EtaVeto' + ListName,
-    'eta:EtaVeto' + ListName,
+    One can obtain the result of pi0/eta veto from `pi0Prob`/`etaProb`
+
+    NOTE:
+      Please don't use following ParticleList names elsewhere:
+
+      ``gamma:HardPhoton``,
+      ``gamma:Pi0Soft + ListName + '_' + particleList.replace(':', '_')``,
+      ``gamma:EtaSoft + ListName + '_' + particleList.replace(':', '_')``,
+      ``pi0:EtaVeto + ListName``,
+      ``eta:EtaVeto + ListName``
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
@@ -2225,6 +2235,9 @@ def writePi0EtaVeto(
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     """
+
+    import os
+    import basf2_mva
 
     roe_path = create_path()
     deadEndPath = create_path()
@@ -2322,7 +2335,6 @@ def writePi0EtaVeto(
     # these files are downloaded from database to your workingDirectory automatically.
     if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
         if downloadFlag:
-            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download(Pi0PayloadName, workingDirectory + '/' + Pi0WeightFileName)
             B2INFO('writePi0EtaVeto: ' + Pi0WeightFileName + ' has been downloaded from database to workingDirectory.')
     # MVA training is conducted.
@@ -2343,7 +2355,6 @@ def writePi0EtaVeto(
     reconstructDecay('eta:EtaVeto' + ListName + ' -> gamma:HardPhoton ' + etasoft, '', path=roe_path)
     if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
         if downloadFlag:
-            conditions.prepend_globaltag('analysis_tools_release-04_rev0')
             basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
             B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + 'has been downloaded from database to workingDirectory.')
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],

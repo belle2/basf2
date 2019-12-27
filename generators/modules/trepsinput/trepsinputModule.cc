@@ -30,7 +30,7 @@ REG_MODULE(trepsinput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-trepsinputModule::trepsinputModule() : Module(), UtrepsB()
+trepsinputModule::trepsinputModule() : Module()
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -51,26 +51,28 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
 void trepsinputModule::initialize()
 {
   //Initialize generator;
-  TrepsB::parameterFile = m_parameterFile;
-  TrepsB::diffcrosssectionFile = m_differentialCrossSectionFile;
-  TrepsB::wlistFile = m_wListTableFile;
+  m_generator.setParameterFile(m_parameterFile);
+  m_generator.setDiffcrosssectionFile(m_differentialCrossSectionFile);
+  m_generator.setWlistFile(m_wListTableFile);
 
-  TrepsB::initp();
+  m_generator.initp();
 
-  TrepsB::create_hist();
-  UtrepsB::initg();
+  m_generator.create_hist();
+  m_generator.initg();
 
   if (m_useDiscreteAndSortedW) {
     // Initialize wtable with WListTable
     B2INFO("Discrete W-list is used !!!");
-    TrepsB::wtcount = 0;
-    TrepsB::wtable(0);
 
-    TrepsB::w = (double)TrepsB::wf;
-    trepsinputModule::updateW();
+    m_generator.wtcount = 0;
+    m_generator.wtable(0);
+
+    m_generator.w = (double)m_generator.wf;
+
+    m_generator.updateW();
   } else {
     // Initialize wtable with DifferentialCrossSection
-    TrepsB::wtable();
+    m_generator.wtable();
   }
 
   m_mcparticles.registerInDataStore();
@@ -80,31 +82,31 @@ void trepsinputModule::initialize()
 void trepsinputModule::event()
 {
   if (m_useDiscreteAndSortedW) {
-    if (TrepsB::inmode != 0) return;
+    if (m_generator.inmode != 0) return;
 
-    TrepsB::wtcount++;
-    TrepsB::wf = (float)(wtable(1));
+    m_generator.wtcount++;
+    m_generator.wf = (float)(m_generator.wtable(1));
 
-    if (abs((double)TrepsB::wf - TrepsB::w) >= 0.001 && TrepsB::wf > 0.01) {
-      B2INFO(" W value changed. " << TrepsB::w << " to " << TrepsB::wf);
-      TrepsB::w = (double)TrepsB::wf;
-      trepsinputModule::updateW();
+    if (abs((double)m_generator.wf - m_generator.w) >= 0.001 && m_generator.wf > 0.01) {
+      B2INFO(" W value changed. " << m_generator.w << " to " << m_generator.wf);
+      m_generator.w = (double)m_generator.wf;
+      m_generator.updateW();
     }
   } else {
-    TrepsB::w = simulateW();
-    trepsinputModule::updateW();
+    m_generator.w = simulateW();
+    m_generator.updateW();
   }
 
   int idummy = 0;
-  int iret = TrepsB::event_gen(idummy);
+  int iret = m_generator.event_gen(idummy);
   m_mpg.clear();
 
   if (iret >= 1) {
 
-    const Part_gen* part = TrepsB::partgen;
+    const Part_gen* part = m_generator.partgen;
 
     // fill data of the final-state particles
-    for (int i = 0; i < npart ; i++) {
+    for (int i = 0; i < m_generator.npart ; i++) {
       auto& p = m_mpg.addParticle();
       p.setPDG(part[i].part_prop.icode);
       p.set4Vector(part[i].p);
@@ -114,14 +116,14 @@ void trepsinputModule::event()
     // fill data of the recoil electron and positron
     auto& p1 = m_mpg.addParticle();
     p1.setPDG(11);
-    p1.set4Vector(TrepsB::pe);
-    p1.setMass(TrepsB::me);
+    p1.set4Vector(m_generator.pe);
+    p1.setMass(m_generator.me);
     p1.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
 
     auto& p2 = m_mpg.addParticle();
     p2.setPDG(-11);
-    p2.set4Vector(TrepsB::pp);
-    p2.setMass(TrepsB::me);
+    p2.set4Vector(m_generator.pp);
+    p2.setMass(m_generator.me);
     p2.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
 
 
@@ -132,18 +134,18 @@ void trepsinputModule::event()
 
 void trepsinputModule::terminate()
 {
-  TrepsB::terminate();
+  m_generator.terminate();
 }
 
 double trepsinputModule::getCrossSection(double W)
 {
-  if (TrepsB::diffCrossSectionOfW.size() == 0) {
+  if (m_generator.diffCrossSectionOfW.size() == 0) {
     B2FATAL("Cross Section Table is empty !!!");
     return 0.;
   }
 
   // lower_bound returns first iterator which meets >=W condition. --> upper side
-  auto it_upper = TrepsB::diffCrossSectionOfW.lower_bound(W);
+  auto it_upper = m_generator.diffCrossSectionOfW.lower_bound(W);
   auto it_lower = it_upper;
   it_lower--;
 
@@ -154,21 +156,22 @@ double trepsinputModule::simulateW()
 {
 
   while (1) {
-    double crossSectionForMC = gRandom->Uniform(0.0, TrepsB::totalCrossSectionForMC);
+    double crossSectionForMC = gRandom->Uniform(0.0, m_generator.totalCrossSectionForMC);
 
-    auto it_upper = TrepsB::WOfCrossSectionForMC.lower_bound(crossSectionForMC);
+    auto it_upper = m_generator.WOfCrossSectionForMC.lower_bound(crossSectionForMC);
     auto it_lower = it_upper;
     it_lower--;
 
-    double diffCrossSectionAtUpper = TrepsB::diffCrossSectionOfW.at(it_upper->second);
-    double diffCrossSectionAtLower = TrepsB::diffCrossSectionOfW.at(it_lower->second);
+    double diffCrossSectionAtUpper = m_generator.diffCrossSectionOfW.at(it_upper->second);
+    double diffCrossSectionAtLower = m_generator.diffCrossSectionOfW.at(it_lower->second);
     double limit = (diffCrossSectionAtUpper > diffCrossSectionAtLower) ? diffCrossSectionAtUpper * 1.01 : diffCrossSectionAtLower *
                    1.01;
     // Higher diffCrossSection * 1.01 is set as limit. Same definition of limit is used in TrepsB::wtable().
 
     double W = (crossSectionForMC - it_lower->first) / limit + it_lower->second ;
-    if (W < TrepsB::diffCrossSectionOfW.begin()->first or W > TrepsB::diffCrossSectionOfW.rbegin()->first)
-      B2FATAL("W has to be in [" << TrepsB::diffCrossSectionOfW.begin()->first << ", " << TrepsB::diffCrossSectionOfW.rbegin()->first
+    if (W < m_generator.diffCrossSectionOfW.begin()->first or W > m_generator.diffCrossSectionOfW.rbegin()->first)
+      B2FATAL("W has to be in [" << m_generator.diffCrossSectionOfW.begin()->first << ", "
+              << m_generator.diffCrossSectionOfW.rbegin()->first
               << "] !!! W = " << W << ", crossSectionForMC = " << crossSectionForMC);
 
     double trial = gRandom->Uniform(0.0, limit);

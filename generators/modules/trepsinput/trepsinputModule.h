@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * Input from TREPS generator for ee->eeff
    */
-  class trepsinputModule : public Module, public UtrepsB {
+  class trepsinputModule : public Module {
 
   public:
     /**
@@ -46,6 +46,9 @@ namespace Belle2 {
     double getCrossSection(double W);
 
   private:
+
+    /** Treps generator **/
+    UtrepsB m_generator;
 
     /** Parameter file which configures the setting of beam, production particle etc. */
     std::string m_parameterFile;

@@ -40,9 +40,6 @@ namespace Belle2 {
   public:
     // constants, enums and typedefs
     double w;      // invariant mass of two-photon system
-    std::string parameterFile; // filename for parameter input
-    std::string wlistFile; // filename for W List input
-    std::string diffcrosssectionFile; // filename for differential cross section
 
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved
@@ -53,6 +50,19 @@ namespace Belle2 {
     ~TrepsB(void) {};
 
     // member functions
+    void setParameterFile(std::string file)
+    {
+      parameterFile = file;
+    }
+    void setWlistFile(std::string file)
+    {
+      wlistFile = file;
+    }
+    void setDiffcrosssectionFile(std::string file)
+    {
+      diffcrosssectionFile = file;
+    }
+
     void initp(void); // initialize the generator. read parameterFile and load the parameters
     void wtable(); // read diffcrosssectionFile and load W-DifferentialCrossSection table.
     double wtable(int); // read wlistFile and load W-NumberOfEvents table.
@@ -106,6 +116,10 @@ namespace Belle2 {
     double tpdfz(double, double) const;
 
     // data members
+    std::string parameterFile; // filename for parameter input
+    std::string wlistFile; // filename for W List input
+    std::string diffcrosssectionFile; // filename for differential cross section
+
     double ebeam;  // beam energy in cm system = sqrt(s)/2
     constexpr const static  double q2zero = 1.0e-6;
     double q2max; // q^2 max
@@ -153,12 +167,13 @@ namespace Belle2 {
     TH1F* treh1, * treh2, * treh3, * treh4, * treh5, * treh6 ; // Histograms for debug
 
 
-  protected:
+    // protected:
     int npart; // Number of particles to be generated
     Part_gen* partgen;  // final-state particle data in lab.
     TLorentzVector pe, pp ;  // final-state e+ e- 4-momenta in lab.
     constexpr const static double me = 0.000510999;     // electron mass
     TH1F* zdis, *zpdis, *zsdis;
+
   };
 
 

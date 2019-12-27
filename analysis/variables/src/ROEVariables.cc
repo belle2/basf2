@@ -1797,7 +1797,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("Pi0ProbOrigin")) {
             return particle->getExtraInfo("Pi0ProbOrigin");
           } else {
-            B2WARNING("Pi0ProbOrigin is not registerted in extraInfo!");
+            B2WARNING("Pi0ProbOrigin is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1807,7 +1808,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThreshold")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThreshold");
           } else {
-            B2WARNING("Pi0ProbTightEnergyThreshold is not registerted in extraInfo!");
+            B2WARNING("Pi0ProbTightEnergyThreshold is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1817,7 +1819,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("Pi0ProbLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbLargeClusterSize");
           } else {
-            B2WARNING("Pi0ProbLargeClusterSize is not registerted in extraInfo!");
+            B2WARNING("Pi0ProbLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1827,7 +1830,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize");
           } else {
-            B2WARNING("Pi0ProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo!");
+            B2WARNING("Pi0ProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1857,7 +1861,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("EtaProbOrigin")) {
             return particle->getExtraInfo("EtaProbOrigin");
           } else {
-            B2WARNING("EtaProbOrigin is not registerted in extraInfo!");
+            B2WARNING("EtaProbOrigin is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1867,7 +1872,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("EtaProbTightEnergyThreshold")) {
             return particle->getExtraInfo("EtaProbTightEnergyThreshold");
           } else {
-            B2WARNING("EtaProbTightEnergyThreshold is not registerted in extraInfo!");
+            B2WARNING("EtaProbTightEnergyThreshold is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1877,7 +1883,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("EtaProbLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbLargeClusterSize");
           } else {
-            B2WARNING("EtaProbLargeClusterSize is not registerted in extraInfo!");
+            B2WARNING("EtaProbLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }
@@ -1887,7 +1894,8 @@ namespace Belle2 {
           if (particle->hasExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize")) {
             return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
           } else {
-            B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo!");
+            B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
             return std::numeric_limits<float>::quiet_NaN();
           }
         }

@@ -30,6 +30,8 @@
 #include <generators/treps/Sutool.h>
 #include <generators/treps/Particle_array.h>
 
+#include <string>
+
 namespace Belle2 {
 
 
@@ -38,9 +40,9 @@ namespace Belle2 {
   public:
     // constants, enums and typedefs
     double w;      // invariant mass of two-photon system
-    char parameterFile[132]; // filename for parameter input
-    char wlistFile[132]; // filename for W List input
-    char diffcrosssectionFile[132]; // filename for differential cross section
+    std::string parameterFile; // filename for parameter input
+    std::string wlistFile; // filename for W List input
+    std::string diffcrosssectionFile; // filename for differential cross section
 
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved

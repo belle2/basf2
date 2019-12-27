@@ -51,9 +51,9 @@ trepsinputModule::trepsinputModule() : Module(), UtrepsB()
 void trepsinputModule::initialize()
 {
   //Initialize generator;
-  strncpy(TrepsB::parameterFile, m_parameterFile.c_str(), 130);
-  strncpy(TrepsB::diffcrosssectionFile, m_differentialCrossSectionFile.c_str(), 130);
-  strncpy(TrepsB::wlistFile, m_wListTableFile.c_str(), 130);
+  TrepsB::parameterFile = m_parameterFile;
+  TrepsB::diffcrosssectionFile = m_differentialCrossSectionFile;
+  TrepsB::wlistFile = m_wListTableFile;
 
   TrepsB::initp();
 

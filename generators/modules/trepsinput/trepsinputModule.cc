@@ -15,8 +15,8 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <TFile.h>
+#include <TRandom.h>
 
-#include <random>
 #include <map>
 
 using namespace Belle2;
@@ -152,13 +152,9 @@ double trepsinputModule::getCrossSection(double W)
 
 double trepsinputModule::simulateW()
 {
-  std::random_device rnd;
-  std::mt19937 mt(rnd());
-
-  std::uniform_real_distribution<double> getCrossSectionForMC(0.0, TrepsB::totalCrossSectionForMC);
 
   while (1) {
-    double crossSectionForMC = getCrossSectionForMC(mt);
+    double crossSectionForMC = gRandom->Uniform(0.0, TrepsB::totalCrossSectionForMC);
 
     auto it_upper = TrepsB::WOfCrossSectionForMC.lower_bound(crossSectionForMC);
     auto it_lower = it_upper;
@@ -175,8 +171,7 @@ double trepsinputModule::simulateW()
       B2FATAL("W has to be in [" << TrepsB::diffCrossSectionOfW.begin()->first << ", " << TrepsB::diffCrossSectionOfW.rbegin()->first
               << "] !!! W = " << W << ", crossSectionForMC = " << crossSectionForMC);
 
-    std::uniform_real_distribution<double> getTrial(0.0, limit);
-    double trial = getTrial(mt);
+    double trial = gRandom->Uniform(0.0, limit);
     double crossSection = getCrossSection(W);
 
     if (trial < crossSection)

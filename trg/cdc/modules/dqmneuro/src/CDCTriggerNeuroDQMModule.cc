@@ -2933,7 +2933,7 @@ void CDCTriggerNeuroDQMModule::event()
       trs += padto(strpt.str(), 6) + ", " + padto(stromega.str(), 6) + ", " + padto(strphi.str(), 6) + ", " + padto(strtheta.str(),
              6) + ", " + padto(strz.str(), 6) + ")";
       B2DEBUG(15, padright(trs, 100));
-      std::string infostr = "        Found old track: ( ";
+      std::string infostr = "      Found old track: ( ";
       for (bool x : ltrack.getFoundOldTrack()) {
         infostr += std::to_string(x) + " ";
       }
@@ -2946,7 +2946,53 @@ void CDCTriggerNeuroDQMModule::event()
       infostr += ")";
       infostr += (ltrack.getValidStereoBit()) ? " valid" : " NOT valid";
       B2DEBUG(15, padright(infostr, 100));
+      CDCTriggerTrack* ftrack = ltrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
+      CDCTriggerTrack* strack = ftrack->getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
+      if (strack) {
+        vector<float> unpackedInput =
+          ltrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
+        // vector<float> simInput = ltrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
+        vector<float> simInput =
+          strack->getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorName)->getInput();
+        B2DEBUG(20, padright("      Input Vector unpacked (id, t, alpha), sim (id, t, alpha), delta (id, t, alpha):", 100));
+        for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
+          std::string lla = "      " + std::to_string(ii / 3) + ")";
+          std::string llb = "      " + std::to_string(ii / 3) + ")";
+          lla += "(" + padright(std::to_string(unpackedInput[ii]), 8) + " " + padright(std::to_string(unpackedInput[ii + 1]),
+                 8) + " " + padright(std::to_string(unpackedInput[ii + 2]), 8) + "),(" + padright(std::to_string(simInput[ii]),
+                     8) + " " + padright(std::to_string(simInput[ii + 1]), 8) + " " + padright(std::to_string(simInput[ii + 2]),
+                         8) + "),(" + padright(std::to_string(unpackedInput[ii] - simInput[ii]),
+                                               8) + " " + padright(std::to_string(unpackedInput[ii + 1] - simInput[ii + 1]),
+                                                                   8) + " " + padright(std::to_string(unpackedInput[ii + 2] - simInput[ii + 2]), 8) + ")";
+          llb += "  (" + padright(std::to_string(int(unpackedInput[ii] * 4096)),
+                                  8) + " " + padright(std::to_string(int(unpackedInput[ii + 1] * 4096)),
+                                                      8) + " " + padright(std::to_string(int(unpackedInput[ii + 2] * 4096)),
+                                                          8) + "),(" + padright(std::to_string(int(simInput[ii] * 4096)), 8) + " " + padright(std::to_string(int(simInput[ii + 1] * 4096)),
+                                                              8) + " " + padright(std::to_string(int(simInput[ii + 2] * 4096)),
+                                                                  8) + "),(" + padright(std::to_string(int(unpackedInput[ii] * 4096 - simInput[ii] * 4096)),
+                                                                      8) + " " + padright(std::to_string(int(unpackedInput[ii + 1] * 4096 - simInput[ii + 1] * 4096)),
+                                                                          8) + " " + padright(std::to_string(int(unpackedInput[ii + 2] * 4096 - simInput[ii + 2] * 4096)), 8) + ")";
+
+          //  cout << hex;
+          //  cout.setf(ios::showbase);
+          //  cout << "   (" << setw(11) << (int)(unpackedInput[ii]  * 4096) << ", "                       << setw(11) << (int)(
+          //         unpackedInput[ii + 1] * 4096) << ", "                            << setw(11) << (int)(unpackedInput[ii + 2] * 4096) << "), ";
+          //  cout << "(" << setw(11) << (int)(simInput[ii]       * 4096) << ", "                       << setw(11) << (int)(
+          //         simInput[ii + 1]      * 4096) << ", "                            << setw(11) << (int)(simInput[ii + 2]      * 4096) << "), ";
+          //  cout << "(" << setw(11) << (int)(unpackedInput[ii] * 4096 - simInput[ii] * 4096)  << ", " << setw(11) << (int)(
+          //         unpackedInput[ii + 1] * 4096 - simInput[ii + 1] * 4096) << ", "  << setw(11) << (int)(unpackedInput[ii + 2] * 4096 - simInput[ii +
+          //             2] * 4096) << "), " << endl;
+          //  cout.unsetf(ios::showbase);
+          //  cout << dec;
+          //std::cout << " (" << simInput[ii] / unpackedInput[ii] << std::endl << ", " << simInput[ii + 1] /  unpackedInput[ii + 1] << ", " <<
+          //          simInput[ii + 2] / unpackedInput[ii + 2] << ")" << std::endl;
+          B2DEBUG(30, padright(lla, 100));
+          B2DEBUG(20, padright(llb, 100));
+        }
+      }
     }
+
+
   }
   if (!m_limitedoutput && m_simNeuroTracksName != "") {
     B2DEBUG(10,  padright("Number of SW NeuroTracks: ", 40)             << padright(std::to_string(m_simNeuroTracks.getEntries()), 60));

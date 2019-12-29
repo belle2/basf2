@@ -41,12 +41,12 @@ namespace Belle2 {
     std::unique_ptr<TH2F> m_grid;
 
     /**
-     * The clusterTheta bin edges.
+     * The clusterTheta bin edges in [rad].
      */
     std::vector<float> m_thetabins = {0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057};
 
     /**
-     * The p bin edges.
+     * The p bin edges in [GeV/c].
      */
     std::vector<float> m_pbins = {0.0, 0.5, 0.75, 1.0, 3.0, 100.0};
 
@@ -87,8 +87,12 @@ namespace Belle2 {
       m_dbrep.setAngularUnit(Unit::rad);
       m_dbrep.setEnergyUnit(Unit::GeV);
 
+      std::vector<std::pair<float, float>> gridBinCentres;
+
       for (unsigned int ip(0); ip < m_pbins.size() - 1; ip++) {
+        auto p_bin_centre = (m_pbins.at(ip) + m_pbins.at(ip + 1)) / 2.0;
         for (unsigned int jth(0); jth < m_thetabins.size() - 1; jth++) {
+          auto th_bin_centre = (m_thetabins.at(jth) + m_thetabins.at(jth + 1)) / 2.0;
           auto fname = m_basename
                        + "__p__" + std::to_string(m_pbins.at(ip)) + "_" + std::to_string(m_pbins.at(ip + 1))
                        + "__clusterTheta__" + std::to_string(m_thetabins.at(jth)) + "_" + std::to_string(m_thetabins.at(jth + 1));
@@ -97,9 +101,12 @@ namespace Belle2 {
           std::ofstream dummyfile(fname);
           dummyfile.close();
           m_dummyfiles.push_back(fname);
+
+          auto centre = std::make_pair(th_bin_centre, p_bin_centre);
+          gridBinCentres.push_back(centre);
         }
       }
-      m_dbrep.storeMVAWeights(m_testHypo.getPDGCode(), m_dummyfiles);
+      m_dbrep.storeMVAWeights(m_testHypo.getPDGCode(), m_dummyfiles, gridBinCentres);
 
     }
 

@@ -516,12 +516,6 @@ namespace Belle2 {
         B2INFO("Registered new TMVA Plugin named " << pluginName);
       }
 
-      // std::ifstream file(custom_weightfile);
-      // std::string str;
-      // while (std::getline(file, str)) {
-      //    std::cout << str << "\n";
-      // }
-
       if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {
         B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");
       }

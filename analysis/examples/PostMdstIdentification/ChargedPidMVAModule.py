@@ -2,8 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
+This steering file fills an NTuple with the ChargedPidMVA score
+for charged particle identification. By default, global PID info is stored,
+meaning one signal hypothesis is tested against all others.
+Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mass hypotheses.
 
-cd $BELLE2_LOCAL_DIR
+Usage:
+
 basf2 -i /PATH/TO/MDST/FILE.root analysis/examples/PostMdstIdentification/ChargedPidMVAModule.py -- [OPTIONS]
 
 Input: *_mdst_*.root
@@ -20,17 +25,11 @@ import os
 import sys
 import argparse
 
-g_binaryOpts = [(0, 0), (11, 211), (13, 211), (211, 321), (321, 211), (2212, 211)]
-
 
 def argparser():
 
-    description = """This steering file fills an NTuple with the ChargedPidMVA score
-for charged particle identification. By default, global PID info is stored,
-meaning one signal hypothesis is tested against all others.
-Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mass hypotheses."""
-
-    parser = argparse.ArgumentParser(description=description, usage=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
 
     def sb_pair(arg):
         try:
@@ -43,18 +42,14 @@ Optionally, binary PID can be stored, by testing one (or more) pair of (S,B) mas
                         action="store_true",
                         default=False,
                         help="Apply truth-matching on particles.")
-    parser.add_argument(
-        "--testHyposPDGCodePair",
-        required=(
-            "binary" in sys.argv),
-        type=sb_pair,
-        nargs='+',
-        default=(
-            0,
-            0),
-        choices=g_binaryOpts,
-        help="""Use in binary mode. A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test.
-        Pass a space-separated list of (>= 1) S,B pdgIds, e.g. '--testHyposPDGCodePair 11,211 13,211'""")
+    parser.add_argument("--testHyposPDGCodePair",
+                        type=sb_pair,
+                        nargs='+',
+                        default=(0, 0),
+                        help="""Option required in binary mode.
+                        A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test.
+                        Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:
+                        '--testHyposPDGCodePair 11,211 13,211'""")
     parser.add_argument("-d", "--debug",
                         dest="debug",
                         action="store",
@@ -71,13 +66,11 @@ if __name__ == '__main__':
     args = argparser().parse_args()
 
     import basf2
-    from modularAnalysis import fillParticleLists, applyChargedPidMVA, variablesToNtuple, matchMCTruth, applyCuts
+    from modularAnalysis import fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts
+    from modularAnalysis import ChargedPidMVATrainingMode, applyChargedPidMVA
     from variables import variables
     from ROOT import Belle2
 
-    # TEMP
-    # basf2.conditions.append_testing_payloads(os.path.join(os.getenv("BELLE2_LOCAL_DIR"), "localdb/database.txt"))
-    basf2.conditions.append_globaltag("test_chargedpidmva_Dec2019_v0")
     print(basf2.conditions.globaltags)
 
     # ------------
@@ -99,14 +92,15 @@ if __name__ == '__main__':
     # ---------------------------------------
 
     std_charged = {
-        Belle2.Const.electron.getPDGCode(): {"EVTGEN_ID": "e",  "NAME": "electron", "CUT": ""},
-        Belle2.Const.muon.getPDGCode(): {"EVTGEN_ID": "mu", "NAME": "muon",     "CUT": ""},
-        Belle2.Const.pion.getPDGCode(): {"EVTGEN_ID": "pi", "NAME": "pion",     "CUT": ""},
-        Belle2.Const.kaon.getPDGCode(): {"EVTGEN_ID": "K",  "NAME": "kaon",     "CUT": ""},
-        Belle2.Const.proton.getPDGCode(): {"EVTGEN_ID": "p",  "NAME": "proton",   "CUT": ""},
+        Belle2.Const.electron.getPDGCode(): {"EVTGEN_ID": "e+",        "NAME": "e",  "FULLNAME": "electron", "CUT": ""},
+        Belle2.Const.muon.getPDGCode(): {"EVTGEN_ID": "mu+",       "NAME": "mu", "FULLNAME": "muon",     "CUT": ""},
+        Belle2.Const.pion.getPDGCode(): {"EVTGEN_ID": "pi+",       "NAME": "pi", "FULLNAME": "pion",     "CUT": ""},
+        Belle2.Const.kaon.getPDGCode(): {"EVTGEN_ID": "K+",        "NAME": "K",  "FULLNAME": "kaon",     "CUT": ""},
+        Belle2.Const.proton.getPDGCode(): {"EVTGEN_ID": "p+",        "NAME": "p",  "FULLNAME": "proton",   "CUT": ""},
+        Belle2.Const.deuteron.getPDGCode(): {"EVTGEN_ID": "deuteron",  "NAME": "d",  "FULLNAME": "deuteron", "CUT": ""},
     }
 
-    plists = [(f"{d.get('EVTGEN_ID')}+:{d.get('NAME')}s", d.get("CUT")) for d in std_charged.values()]
+    plists = [(f"{d.get('EVTGEN_ID')}:{d.get('FULLNAME')}s", d.get("CUT")) for d in std_charged.values()]
 
     fillParticleLists(plists, path=path)
 
@@ -134,12 +128,12 @@ if __name__ == '__main__':
     for det in ["SVD", "CDC", "TOP", "ARICH", "ECL", "KLM"]:
         if global_pid:
             for pdgId, d in std_charged.items():
-                variables.addAlias(f"{d.get('NAME')}LogL_{det}", f"pidLogLikelihoodValueExpert({pdgId}, {det})")
+                variables.addAlias(f"{d.get('FULLNAME')}LogL_{det}", f"pidLogLikelihoodValueExpert({pdgId}, {det})")
         elif binary_pid:
             for s, b in args.testHyposPDGCodePair:
-                s_id = std_charged.get(s).get("EVTGEN_ID")
-                b_id = std_charged.get(b).get("EVTGEN_ID")
-                variables.addAlias(f"deltaLogL_{s_id}_{b_id}_{det}", f"pidDeltaLogLikelihoodValueExpert({s}, {b}, {det})")
+                s_name = std_charged.get(s).get("NAME")
+                b_name = std_charged.get(b).get("NAME")
+                variables.addAlias(f"deltaLogL_{s_name}_{b_name}_{det}", f"pidDeltaLogLikelihoodValueExpert({s}, {b}, {det})")
 
     # ----------------------
     # Apply charged Pid MVA.
@@ -148,13 +142,13 @@ if __name__ == '__main__':
     if global_pid:
         applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                            path=path,
-                           payloadName="ChargedPidMVAWeights_Multiclass")
+                           trainingMode=ChargedPidMVATrainingMode.Multiclass)
     elif binary_pid:
         for s, b in args.testHyposPDGCodePair:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
-                               binaryHypoPDGCodes=(s, b),
-                               payloadName="ChargedPidMVAWeights_Classification")
+                               trainingMode=ChargedPidMVATrainingMode.Classification,
+                               binaryHypoPDGCodes=(s, b))
 
     if args.debug:
         for m in path.modules():

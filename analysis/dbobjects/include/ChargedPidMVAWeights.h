@@ -79,20 +79,30 @@ namespace Belle2 {
      * Given a particle mass hypothesis' pdgId,
      * store the list of MVA weight files (one for each category) into the payload.
      *
-     * NB: the caller MUST ensure that the order in the list of file paths corresponds to the
-     * one of the linearised TH2F grid object, set in the payload via setWeightCategories()
-     *
      * @param pdg the particle mass hypothesis' pdgId.
      * @param filepaths a list of xml (root) file paths for several (clusterTheta,p) categories.
+     * @param categoryBinCentres a list of pair<float, float> representing the (clusterTheta,p) bin centres.
+     *        Used to check consistency of the xml vector indexing w/ the linearised TH2 category map.
      */
-    void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths)
+    void storeMVAWeights(const int pdg, const std::vector<std::string>& filepaths,
+                         const std::vector<std::pair<float, float>>& categoryBinCentres)
     {
 
       if (!isValidPdg(pdg)) {
         B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
       }
 
+      unsigned int idx(0);
       for (const auto& path : filepaths) {
+
+        // Index consistency check.
+        auto theta_p = categoryBinCentres.at(idx);
+        auto h_idx = getMVAWeightIdx(theta_p.first, theta_p.second);
+        if (idx != h_idx) {
+          B2FATAL("xml file:\n" << path << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
+                  "\n, i.e. the linearised index of the 2D bin centered in (clusterTheta, p) = (" << theta_p.first << ", " << theta_p.second <<
+                  ")\nPlease check how the input xml file list is being filled.");
+        }
 
         Belle2::MVA::Weightfile weightfile;
         if (boost::ends_with(path, ".root")) {
@@ -110,6 +120,7 @@ namespace Belle2 {
         Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
         m_weightfiles[pdg].push_back(ss.str());
 
+        ++idx;
       }
 
     }
@@ -119,14 +130,14 @@ namespace Belle2 {
      * For the multi-class mode,
      * store the list of MVA weight files (one for each category) into the payload.
      *
-     * NB: the caller MUST ensure that the order in the list of file paths corresponds to the
-     * one of the linearised TH2F grid object, set in the payload via setWeightCategories()
-     *
      * @param filepaths a list of xml (root) file paths for several (clusterTheta,p) categories.
+     * @param categoryBinCentres a list of pair<float, float> representing the (clusterTheta,p) bin centres.
+     *        Used to check consistency of the xml vector indexing w/ the linearised TH2 category map.
      */
-    void storeMVAWeightsMultiClass(const std::vector<std::string>& filepaths)
+    void storeMVAWeightsMultiClass(const std::vector<std::string>& filepaths,
+                                   const std::vector<std::pair<float, float>>& categoryBinCentres)
     {
-      storeMVAWeights(0, filepaths);
+      storeMVAWeights(0, filepaths, categoryBinCentres);
     }
 
 
@@ -134,21 +145,31 @@ namespace Belle2 {
      * Given a particle mass hypothesis' pdgId,
      * store the list of selection cuts (one for each category) into the payload.
      *
-     * NB: the caller MUST ensure that the order in the list of file paths corresponds to the
-     * one of the linearised TH2F grid object, set in the payload via setWeightCategories()
-     *
      * @param pdg the particle mass hypothesis' pdgId.
      * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
+     * @param categoryBinCentres a list of pair<float, float> representing the (clusterTheta,p) bin centres.
+     *        Used to check consistency of the xml vector indexing w/ the linearised TH2 category map.
      */
-    void storeCuts(const int pdg, const std::vector<std::string>& cutfiles)
+    void storeCuts(const int pdg, const std::vector<std::string>& cutfiles,
+                   const std::vector<std::pair<float, float>>& categoryBinCentres)
     {
 
       if (!isValidPdg(pdg)) {
         B2FATAL("PDG: " << pdg << " is not that of a valid charged particle! Aborting...");
       }
 
+      unsigned int idx(0);
       for (const auto& cutfile : cutfiles) {
+
+        // Index consistency check.
+        auto theta_p = categoryBinCentres.at(idx);
+        auto h_idx = getMVAWeightIdx(theta_p.first, theta_p.second);
+        if (idx != h_idx) {
+          B2FATAL("Cut file:\n" << cutfile << "\nindex in input vector:\n" << idx << "\ndoes not correspond to:\n" << h_idx <<
+                  "\n, i.e. the linearised index of the 2D bin centered in (clusterTheta, p) = (" << theta_p.first << ", " << theta_p.second <<
+                  ")\nPlease check how the input cut file list is being filled.");
+        }
 
         std::ifstream ifs(cutfile);
         std::string cut((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
@@ -161,6 +182,8 @@ namespace Belle2 {
         std::replace(cut.begin(), cut.end(), ')', ']');
 
         m_cuts[pdg].push_back(cut);
+
+        ++idx;
       }
 
     }
@@ -169,15 +192,14 @@ namespace Belle2 {
      * For the multi-class mode,
      * store the list of selection cuts (one for each category) into the payload.
      *
-     * NB: the caller MUST ensure that the order in the list of file paths corresponds to the
-     * one of the linearised TH2F grid object, set in the payload via setWeightCategories()
-     *
      * @param cutfiles a list of text files w/ cut strings, for each (clusterTheta, p) category.
      *        The format of the cut must comply with the `GeneralCut` syntax.
+     * @param categoryBinCentres a list of pair<float, float> representing the (clusterTheta,p) bin centres.
+     *        Used to check consistency of the xml vector indexing w/ the linearised TH2 category map.
      */
-    void storeCutsMultiClass(const std::vector<std::string>& cutfiles)
+    void storeCutsMultiClass(const std::vector<std::string>& cutfiles, const std::vector<std::pair<float, float>>& categoryBinCentres)
     {
-      storeCuts(0, cutfiles);
+      storeCuts(0, cutfiles, categoryBinCentres);
     }
 
 
@@ -388,7 +410,7 @@ namespace Belle2 {
 
     /**
      * For each charged particle mass hypothesis' pdgId,
-     * this map containsa list of (serialized) Weightfile objects to be stored in the payload.
+     * this map contains a list of (serialized) Weightfile objects to be stored in the payload.
      * Each weightfile in the list corresponds to a (clusterTheta, p) category.
      * The indexing in each vector must reflect the one of the corresponding 'linearised' TH2F histogram contained in the m_grids map.
      *
@@ -424,9 +446,8 @@ namespace Belle2 {
     };
 
 
-    ClassDef(ChargedPidMVAWeights, 6);
-    /**< 6. add multi-class support. */
-    /**< 5. remove 2D grid dependence on pdgId. */
+    ClassDef(ChargedPidMVAWeights, 5);
+    /**< 5. remove 2D grid dependence on pdgId, add multi-class support. */
     /**< 4. add cuts map. */
     /**< 3. add overloaded getMVAWeightIdx. */
     /**< 2: add energy/angular units. */

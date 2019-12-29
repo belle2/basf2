@@ -192,7 +192,7 @@ void ChargedPidMVAMulticlassModule::event()
 void ChargedPidMVAMulticlassModule::initializeMVA()
 {
 
-  B2INFO("Load supported MVA interfaces for mult-class charged particle identification...");
+  B2INFO("Load supported MVA interfaces for multi-class charged particle identification...");
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();

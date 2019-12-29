@@ -117,9 +117,9 @@ namespace Belle2 {
     /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
      *
-     * The signal hypothesis pdgId and the test pdgId are passed a vector of strings of size = 2.
+     * The signal hypothesis pdgId and the test pdgId are passed as a vector of strings of size = 2.
      * Examples:
-     * Response of BDT trained for "e vs pi" separation = pidPairChargedBDTScore(11, 211)
+     * Response of BDT trained for binary "e vs pi" separation = pidPairChargedBDTScore(11, 211)
      *
      * If the response for the given set of hypotheses is not available for the particle under test, return NaN.
      */

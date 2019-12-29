@@ -743,13 +743,21 @@ def parse_raw_data_iov(file_path):
     # We'll try and extract the exp and run from both the directory and filename
     # That wil let us check that everything is as we expect
 
-    reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
-    path_exp = int(reduced_path.parts[0][1:])
-    path_run = int(reduced_path.parts[1][1:])
+    try:
+        reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
+    # Second try for the calibration data path
+    except ValueError:
+        reduced_path = file_path.relative_to("/group/belle2/dataprod/Data/Raw")
 
-    split_filename = reduced_path.name.split(".")
-    filename_exp = int(split_filename[1])
-    filename_run = int(split_filename[2])
+    try:
+        path_exp = int(reduced_path.parts[0][1:])
+        path_run = int(reduced_path.parts[1][1:])
+
+        split_filename = reduced_path.name.split(".")
+        filename_exp = int(split_filename[1])
+        filename_run = int(split_filename[2])
+    except ValueError as e:
+        raise ValueError("Wrong file path: {}".format(file_path)) from e
 
     if path_exp == filename_exp and path_run == filename_run:
         return IoV(path_exp, path_run, path_exp, path_run)

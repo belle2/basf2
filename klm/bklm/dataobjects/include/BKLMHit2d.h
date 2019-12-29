@@ -12,6 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
 
 /* Belle 2 headers. */
@@ -20,13 +21,10 @@
 /* ROOT headers. */
 #include <TVector3.h>
 
-namespace CLHEP {
-  class Hep3Vector;
-}
+/* CLHEP headers. */
+#include <CLHEP/Vector/ThreeVector.h>
 
 namespace Belle2 {
-
-  class BKLMHit1d;
 
   //! Store one BKLM strip hit as a ROOT object
   class BKLMHit2d : public RelationsObject {

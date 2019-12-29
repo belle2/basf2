@@ -11,8 +11,7 @@ __authors__ = [
     "Phil Grace"
 ]
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 
 def LeptonicList(path):
@@ -59,11 +58,11 @@ def LeptonicList(path):
         "Phillip Urquijo"
     ]
 
-    cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True, path=path)
-    cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True, path=path)
-    reconstructDecay('B-:L0 -> e-:highP', '', 1, path=path)
-    reconstructDecay('B-:L1 -> mu-:highP', '', 2, path=path)
-    applyCuts('B-:L0', 'nTracks>=3', path=path)
-    applyCuts('B-:L1', 'nTracks>=3', path=path)
+    ma.cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True, path=path)
+    ma.cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True, path=path)
+    ma.reconstructDecay('B-:L0 -> e-:highP', '', 1, path=path)
+    ma.reconstructDecay('B-:L1 -> mu-:highP', '', 2, path=path)
+    ma.applyCuts('B-:L0', 'nTracks>=3', path=path)
+    ma.applyCuts('B-:L1', 'nTracks>=3', path=path)
     lepList = ['B-:L0', 'B-:L1']
     return lepList

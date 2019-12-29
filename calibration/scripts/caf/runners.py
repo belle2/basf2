@@ -128,29 +128,54 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
             B2INFO("Logging will be diverted into algorithm output.")
             child.start()
             final_state = None
-            child.join()
-            # Check the exitcode for failed Process()
-            if child.exitcode == 0:
-                B2INFO("AlgorithStrategy subprocess for {} exited".format(strategy.algorithm.name))
-            else:
-                raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
-            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            final_loop = False
+
             B2INFO("Collecting results for {}.".format(strategy.algorithm.name))
             while True:
-                output = queue.get()
-                if output["type"] == "result":
-                    self.results[strategy.algorithm.name].append(output["value"])
-                elif output["type"] == "final_state":
-                    final_state = output["value"]
-                    break
+                # Do we have results?
+                while not queue.empty():
+                    output = queue.get()
+                    B2DEBUG(29, f"Result from queue was {output}")
+                    if output["type"] == "result":
+                        self.results[strategy.algorithm.name].append(output["value"])
+                    elif output["type"] == "final_state":
+                        final_state = output["value"]
+                    else:
+                        raise RunnerError(f"Unknown result output: {output}")
 
+                # Still alive but not results at the moment? Wait a few seconds before checking.
+                if child.is_alive():
+                    time.sleep(5)
+                    continue
+                else:
+                    # Reached a good ending of strategy
+                    if final_state:
+                        # Check the exitcode for failed Process()
+                        if child.exitcode == 0:
+                            B2INFO(f"AlgorithStrategy subprocess for {strategy.algorithm.name} exited")
+                            break
+                        else:
+                            raise RunnerError(f"Error during subprocess of AlgorithmStrategy for {strategy.algorithm.name}")
+                    # It might be possible that the subprocess has finished but all results weren't gathered yet.
+                    else:
+                        # Go around once more since all results should be in the queue waiting
+                        if not final_loop:
+                            final_loop = True
+                            continue
+                        else:
+                            raise RunnerError((f"Strategy for {strategy.algorithm.name} "
+                                               "exited subprocess but without a final state!"))
+
+            # Exit early and don't continue strategies as this one failed
             if final_state == AlgorithmStrategy.FAILED:
                 B2ERROR(f"AlgorithmStrategy for {strategy.algorithm.name} failed. We wil not proceed with any more algorithms")
                 self.final_state = self.FAILED
                 break
 
+            B2DEBUG(29, f"Finished subprocess of AlgorithmStrategy for {strategy.algorithm.name}")
+
         if self.final_state != self.FAILED:
-            B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
+            B2INFO(f"SequentialAlgorithmsRunner finished for Calibration {self.name}")
             self.final_state = self.COMPLETED
 
     @staticmethod

@@ -446,8 +446,8 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
 
   // Loads the tree with the hits
   auto hitTree = getObjectPtr<TTree>("hitTree");
-  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 20000, -60, 40.); // 10 ps bins
-  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
+  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
+  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "amplitude > 80 && refTimeValid");
   //hitTree->Draw("hitTime:(channel)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
 
   m_histFile->cd();
@@ -461,8 +461,8 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
       if (m_fitterMode == "MC")
         h_profile->GetXaxis()->SetRangeUser(-10, -10);
       else
-        h_profile->GetXaxis()->SetRangeUser(-100, -5);
-
+        h_profile->GetXaxis()->SetRangeUser(-65,
+                                            -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
       fitChannel(iSlot, iChannel, h_profile);
       determineFitStatus();
 

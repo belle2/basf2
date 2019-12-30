@@ -98,12 +98,18 @@ namespace Belle2 {
       /** Fits the two pulsers */
       void fitPulser(TH1*, TH1*);
 
-      /**..Run algorithm on events */
+      /** Calculates the commonT0 calibration after the fits have been done.
+       *  It also saves the constants in a localDB and in the output tree
+       */
+      void calculateChennelT0();
+
+      /** Runs the algorithm on events. Currently, it always returns c_OK despite of the actual result of the fitting procedure.
+       *  This is not an issue since this moduleis not intended to be used in the automatic calibration. */
       virtual EResult calibrate() override;
 
     private:
 
-      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit*/
+      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit. Currently not used*/
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
       std::string m_fitConstraints =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the TTS parametrization*/

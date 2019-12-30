@@ -21,8 +21,11 @@
 #include "math.h"
 #include <limits>
 #include <framework/logging/Logger.h>
+#include <top/dbobjects/TOPCalChannelT0.h>
 
-using namespace std;
+
+
+//using namespace std;
 using namespace Belle2;
 using namespace TOP;
 
@@ -184,8 +187,6 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
   m_fitTree->Branch<float>("firstPulserSigma", &m_firstPulserSigma);
   m_fitTree->Branch<float>("secondPulserTime", &m_secondPulserTime);
   m_fitTree->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
-  m_fitTree->Branch<float>("channelT0", &m_channelT0);
-  m_fitTree->Branch<float>("channelT0Err", &m_channelT0Err);
   m_fitTree->Branch<short>("fitStatus", &m_fitStatus);
 
   m_fitTree->Branch<float>("chi2", &m_chi2);
@@ -370,8 +371,6 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   m_timeBackground = laser.GetParameter(11);
   m_sigmaBackground = laser.GetParameter(12);
   m_yieldLaserBackground = laser.GetParameter(13) / 0.005;
-  m_channelT0 = m_peakTime - m_peakTimeMC;
-  m_channelT0Err = m_peakTimeErr;
   m_chi2 = laser.GetChisquare() / laser.GetNDF();
 
   // copy some MC information to the output tree
@@ -432,6 +431,61 @@ void  TOPLocalCalFitter::determineFitStatus()
 }
 
 
+void TOPLocalCalFitter::calculateChennelT0()
+{
+  int nEntries = m_fitTree->GetEntries();
+  if (nEntries != 8192) {
+    B2ERROR("fitTree does not contain an entry wit a fit result for each channel. Found " << nEntries <<
+            " instead of 8192. Perhaps you tried to run the commonT0 calculation before finishing the fitting?");
+    return;
+  }
+
+  // Create and fill the TOPCalChannelT0 object.
+  // This part is mostly copy-pasted from the DB importer used up to Jan 2020
+  auto* channelT0 = new TOPCalChannelT0();
+  short nCal[16] = {0};
+  for (int i = 0; i < nEntries; i++) {
+    m_fitTree->GetEntry(i);
+    channelT0->setT0(m_slot, m_channel, m_peakTime - m_peakTimeMC, m_peakTimeErr);
+    if (m_fitStatus == 0) {
+      nCal[m_slot - 1]++;
+    } else {
+      channelT0->setUnusable(m_slot, m_channel);
+    }
+  }
+
+  // Normalize the constants
+  channelT0->suppressAverage();
+
+  // create the localDB
+  saveCalibration(channelT0);
+
+  short nCalTot = 0;
+  B2INFO("Summary: ");
+  for (int iSlot = 1; iSlot < 17; iSlot++) {
+    B2INFO("--> Number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
+    B2INFO("--> Cal on ch 1, 256 and 511:    " << channelT0->getT0(iSlot, 0) << ", " << channelT0->getT0(iSlot,
+           257) << ", " << channelT0->getT0(iSlot, 511));
+    nCalTot += nCal[iSlot - 1];
+  }
+
+  B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: " << nCalTot << "/ 8192");
+
+
+  // Loop again on the output tree to save the constants there too, adding two more branches.
+  TBranch* channelT0Branch = m_fitTree->Branch<float>("channelT0", &m_channelT0);
+  TBranch* channelT0ErrBranch = m_fitTree->Branch<float>("channelT0Err", &m_channelT0Err);
+
+  for (int i = 0; i < nEntries; i++) {
+    m_fitTree->GetEntry(i);
+    m_channelT0 = channelT0->getT0(m_slot, m_channel);
+    m_channelT0Err = channelT0->getT0Error(m_slot, m_channel);
+    channelT0Branch->Fill();
+    channelT0ErrBranch->Fill();
+  }
+  return ;
+
+}
 
 
 
@@ -448,7 +502,6 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
   auto hitTree = getObjectPtr<TTree>("hitTree");
   TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
   hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "amplitude > 80 && refTimeValid");
-  //hitTree->Draw("hitTime:(channel)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
 
   m_histFile->cd();
   h_hitTime->Write();
@@ -464,6 +517,7 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
         h_profile->GetXaxis()->SetRangeUser(-65,
                                             -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
       fitChannel(iSlot, iChannel, h_profile);
+
       determineFitStatus();
 
       // Now let's fit the pulser
@@ -486,7 +540,11 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
     h_hitTime->Write();
   }
 
+  calculateChennelT0();
+
   m_fitTree->Write();
   m_histFile->Close();
+
+
   return c_OK;
 }

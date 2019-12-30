@@ -1,6 +1,21 @@
 Changes in the analysis package
 -------------------------------
 
+Vertex Fitting
+++++++++++++++
+
+ .. warning:: The convenience function for the :b2:mod:`TreeFitter` module has
+    been renamed from ``vertexTree`` to :func:`vertex.treeFit`.
+
+ .. warning:: The KFit convenience functions have been merged to the new
+    function :func:`vertex.KFit`. One of its input arguments is ``fit_type``,
+    which specifies whether you want to perform a mass fit
+    (``fit_type=mass``), a vertex fit (``fit_type=vertex``), a
+    mass-constrained vertex fit (``fit_type=massvertex``), or a vertex fit
+    with the mother constrained to the beam four-momentum
+    (``fit_type=fourC``).
+  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -14,6 +29,13 @@ Standard Particle Lists
 
 Variables
 +++++++++
+ * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
+   transformation of track parameters relative to IP when used for tracks. 
+   `dr` did not center at zero before and now it does. 
+ 
+ * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
+   particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
+   The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
@@ -89,17 +111,20 @@ Modules
  * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
  * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
- * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
-   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
 
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
- * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
  * :b2:mod:`RestOfEventBuilder`, :b2:mod:`EventKinematics` and :b2:mod:`EventShapeCalculator` modules can use most likely charged particle hypothesis according to PID information.
+
+ * Added the :b2:mod:`ParticleCombinerFromMC` module and the `reconstructMCDecay` to find and create ``ParticleList`` from a given :ref:`DecayString`.
+   They can be used instead of the :b2:mod:`MCDecayFinder` and `findMCDecay` which are not fully tested and maintained.
+   Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. 
+   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
+   But still the module has some bugs if one uses K_S0. So please consider to use `reconstructMCDecay` instead.
 
 Conditions DB
 +++++++++++++

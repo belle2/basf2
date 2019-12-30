@@ -30,7 +30,7 @@ stdMu('95eff', path=cslpath)
 loadStdSkimPi0(path=cslpath)
 
 ma.reconstructDecay('K_S0:all -> pi-:95eff pi+:95eff', '0.4 < M < 0.6', 1, True, path=cslpath)
-vertex.vertexKFit('K_S0:all', 0.0, path=cslpath)
+vertex.KFit('K_S0:all', 0.0, path=cslpath)
 ma.applyCuts('K_S0:all', '0.477614 < M < 0.517614', path=cslpath)
 
 

@@ -18,6 +18,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -29,26 +30,6 @@
 
 namespace Belle2 {
   namespace Variable {
-
-    // Convenience function to obtain track d0 with respect to IP
-    // Based on v0DaughterD0 function in ParameterVariables.cc
-    double trackD0FromIP(const Particle* particle)
-    {
-      const Track* track = particle->getTrack();
-      if (!track) return std::numeric_limits<float>::quiet_NaN();
-
-      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(particle->getPDGCode())));
-      if (!trackFit) return std::numeric_limits<float>::quiet_NaN();
-
-      static DBObjPtr<BeamSpot> beamSpotDB;
-
-      UncertainHelix helix = trackFit->getUncertainHelix();
-      helix.passiveMoveBy(beamSpotDB->getIPPosition());
-
-      return helix.getD0();
-    }
-
-
     double goodBelleKshort(const Particle* KS)
     {
       // check input
@@ -75,7 +56,8 @@ namespace Belle2 {
       double fl = particleDRho(KS);
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
                            KS) + particlePy(KS) * particlePy(KS))));
-      double dr = std::min(abs(trackD0FromIP(d0)), abs(trackD0FromIP(d1)));
+      // particleDRho returns track d0 relative to IP for tracks
+      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(KS);
 
       bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
@@ -109,7 +91,7 @@ namespace Belle2 {
         return Lambda->getExtraInfo("goodLambda");
 
       double p = particleP(Lambda);
-      double dr = std::min(abs(trackD0FromIP(d0)), abs(trackD0FromIP(d1)));
+      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane

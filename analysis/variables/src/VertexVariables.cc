@@ -9,17 +9,24 @@
 **************************************************************************/
 
 #include <analysis/variables/VertexVariables.h>
-#include <framework/database/DBObjPtr.h>
-#include <mdst/dbobjects/BeamSpot.h>
-#include <mdst/dataobjects/MCParticle.h>
+#include <analysis/variables/TrackVariables.h>
 #include <analysis/utility/ReferenceFrame.h>
+
+#include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
 #include <TMatrixFSym.h>
 #include <TVector3.h>
-#include <boost/format.hpp>
+
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 namespace Belle2 {
   class Particle;
@@ -231,49 +238,98 @@ namespace Belle2 {
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).X();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).X();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).X();
+      }
     }
 
     double particleDY(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Y();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Y();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).Y();
+      }
     }
 
     double particleDZ(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Z();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Z();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).Z();
+      }
     }
 
     double particleDRho(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Perp();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Perp();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).Perp();
+      }
     }
 
     double particleDPhi(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Phi();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Phi();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).Phi();
+      }
     }
 
     double particleDCosTheta(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).CosTheta();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).CosTheta();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).CosTheta();
+      }
     }
 
     double particleDistance(const Particle* part)
     {
       static DBObjPtr<BeamSpot> beamSpotDB;
       const auto& frame = ReferenceFrame::GetCurrent();
-      return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Mag();
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return frame.getVertex(part->getVertex() - beamSpotDB->getIPPosition()).Mag();
+      } else {
+        UncertainHelix helix = trackFit->getUncertainHelix();
+        helix.passiveMoveBy(beamSpotDB->getIPPosition());
+        return frame.getVertex(helix.getPerigee()).Mag();
+      }
     }
 
     double particleDistanceSignificance(const Particle* part)
@@ -410,12 +466,12 @@ namespace Belle2 {
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position
-    REGISTER_VARIABLE("distance", particleDistance, "3D distance relative to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance, "3D distance from the vertex or POCA to interaction point");
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
-                      "significance of distance relative to interaction point(-1 in case of numerical problems)");
-    REGISTER_VARIABLE("dx", particleDX, "x in respect to IP");
-    REGISTER_VARIABLE("dy", particleDY, "y in respect to IP");
-    REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
+                      "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
+    REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP");
+    REGISTER_VARIABLE("dy", particleDY, "vertex or POCA in case of tracks y in respect to IP");
+    REGISTER_VARIABLE("dz", particleDZ, "vertex or POCA in case of tracks z in respect to IP");
     REGISTER_VARIABLE("x", particleX,
                       "x coordinate of vertex in case of composite particle, or point of closest approach (POCA) in case of a track");
     REGISTER_VARIABLE("y", particleY,
@@ -425,9 +481,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("x_uncertainty", particleDXUncertainty, "uncertainty on x (measured with respect to the origin)");
     REGISTER_VARIABLE("y_uncertainty", particleDYUncertainty, "uncertainty on y (measured with respect to the origin)");
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)");
-    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
-    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle in degrees in respect to IP");
-    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex polar angle in respect to IP");
+    REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.");
+    REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP");
+    REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
                       "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");

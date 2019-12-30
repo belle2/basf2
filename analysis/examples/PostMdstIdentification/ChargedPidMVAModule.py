@@ -66,8 +66,7 @@ if __name__ == '__main__':
     args = argparser().parse_args()
 
     import basf2
-    from modularAnalysis import fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts
-    from modularAnalysis import ChargedPidMVATrainingMode, applyChargedPidMVA
+    from modularAnalysis import fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts, applyChargedPidMVA
     from variables import variables
     from ROOT import Belle2
 
@@ -142,12 +141,12 @@ if __name__ == '__main__':
     if global_pid:
         applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                            path=path,
-                           trainingMode=ChargedPidMVATrainingMode.Multiclass)
+                           trainingMode=Belle2.ChargedPidMVAWeights.c_Multiclass)
     elif binary_pid:
         for s, b in args.testHyposPDGCodePair:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
-                               trainingMode=ChargedPidMVATrainingMode.Classification,
+                               trainingMode=Belle2.ChargedPidMVAWeights.c_Classification,
                                binaryHypoPDGCodes=(s, b))
 
     if args.debug:

@@ -53,6 +53,28 @@ namespace Belle2 {
      */
     ~ChargedPidMVAWeights() {};
 
+    /**
+     * A (strongly-typed) enumerator identifier for each valid MVA training mode.
+     */
+    enum class ChargedPidMVATrainingMode : unsigned int {
+      /** Binary classification */
+      c_Classification = 0,
+      /** Multi-class classification */
+      c_Multiclass = 1,
+      /** Binary classification, ECL only */
+      c_ECL_Classification = 2,
+      /** Multi-class classification, ECL only */
+      c_ECL_Multiclass = 3,
+      /** Binary classification, including PSD */
+      c_PSD_Classification = 4,
+      /** Multi-class classification, including PSD */
+      c_PSD_Multiclass = 5,
+      /** Binary classification, ECL only, including PSD */
+      c_ECL_PSD_Classification = 6,
+      /** Multi-class classification, ECL only, including PSD */
+      c_ECL_PSD_Multiclass = 7
+    };
+
 
     /**
      * Set the energy unit to ensure consistency w/ the one used to define the bins grid.
@@ -447,7 +469,7 @@ namespace Belle2 {
 
 
     ClassDef(ChargedPidMVAWeights, 5);
-    /**< 5. remove 2D grid dependence on pdgId, add multi-class support. */
+    /**< 5. remove 2D grid dependence on pdgId, add multi-class support, define enum for valid training modes */
     /**< 4. add cuts map. */
     /**< 3. add overloaded getMVAWeightIdx. */
     /**< 2: add energy/angular units. */

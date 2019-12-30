@@ -180,7 +180,7 @@ The mask tuples should contain a mask name and cuts for charged particles, for p
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
 Most of ROE variables accept mask name as an argument, which allows user to compare 
 variable distributions from different ROE masks. 
-For example, the :b2:var:`roeE(cleanMask)` variable will be computed only using only ROE particles from a corresponding mask. 
+For example, the :b2:var:`roeE` variable will be computed using only ROE particles from a corresponding mask.
 
 .. note::
   Hard cuts on track impact parameters :math:`d_0` and :math:`z_0` are not recommended since one can throw away tracks from long lived decaying

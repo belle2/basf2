@@ -67,6 +67,10 @@ namespace Belle2 {
       void UseHighPrecisionNeutrons(G4bool);
 
     private:
+
+      /** Construct parallel particle types needed for reco */
+      void ConstructG4eParticles();
+
       /** Secondary production thresholds */
       G4double m_globalCutValue;
 

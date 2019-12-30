@@ -149,17 +149,14 @@ class ValidationRoot(object):
 
     """
 
-    def __init__(self, results_folder, comparison_folder):
+    def __init__(self, working_folder):
         """
         class initializer, which takes the path to the folders containing the
         validation run results and plots (aka comparison)
         """
 
-        #: folder where the results of one revision run are located
-        self.results_folder = results_folder
-
-        #: folder where the comparison plots and json result files are located
-        self.comparison_folder = comparison_folder
+        #: html folder that contains plots etc.
+        self.working_folder = working_folder
 
         #: Date when this object was instantiated
         self.last_restart = datetime.datetime.now()
@@ -179,7 +176,10 @@ class ValidationRoot(object):
         """
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug('Creating plots for revisions: ' + str(rev_list))
-        progress_key = start_plotting_request(rev_list, self.results_folder)
+        progress_key = start_plotting_request(
+            rev_list,
+            validationpath.get_results_folder(self.working_folder),
+        )
         return {"progress_key": progress_key}
 
     @cherrypy.expose
@@ -189,6 +189,20 @@ class ValidationRoot(object):
         the default url is used (like http://localhost:8080/)
         """
         raise cherrypy.HTTPRedirect("/static/validation.html")
+
+    @cherrypy.expose
+    def plots(self, *args):
+        # todo: replace os.getcwd with an attribute
+        tag_folder = os.path.relpath(
+            validationpath.get_html_plots_tag_comparison_folder(
+                self.working_folder, args[:-2]
+            ),
+            validationpath.get_html_folder(self.working_folder)
+        )
+        print(tag_folder)
+        path = os.path.join(tag_folder, *args[-2:])
+        print(path)
+        return cherrypy.lib.static.serve_file(path)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -213,7 +227,7 @@ class ValidationRoot(object):
 
         # get list of available revision
         rev_list = get_json_object_list(
-            self.results_folder,
+            validationpath.get_results_folder(self.working_folder),
             validationpath.file_name_results_json
         )
 
@@ -228,7 +242,7 @@ class ValidationRoot(object):
         # load and combine
         for r in rev_list:
             full_path = os.path.join(
-                self.results_folder,
+                validationpath.get_results_folder(self.working_folder),
                 r,
                 validationpath.file_name_results_json
             )
@@ -325,21 +339,24 @@ class ValidationRoot(object):
         comparison
         """
 
-        # todo: ensure this file is not outside of the webserver
-        full_path = os.path.join(
-            self.comparison_folder,
-            comparison_label,
+        path = os.path.join(
+            os.path.relpath(
+                validationpath.get_html_plots_tag_comparison_folder(
+                    self.working_folder, comparison_label.split(",")
+                ),
+                validationpath.get_html_folder(self.working_folder)
+            ),
             "comparison.json"
         )
 
         # check if this comparison actually exists
-        if not os.path.isfile(full_path):
+        if not os.path.isfile(path):
             raise cherrypy.HTTPError(
                 404,
-                f"Json Comparison file {full_path} does not exist"
+                f"Json Comparison file {path} does not exist"
             )
 
-        return deliver_json(full_path)
+        return deliver_json(path)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -550,8 +567,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     if not dry_run:
         cherrypy.quickstart(
             ValidationRoot(
-                results_folder=results_folder,
-                comparison_folder=comparison_folder
+                working_folder=cwd_folder
             ),
             '/',
             cherry_config

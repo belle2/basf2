@@ -53,7 +53,7 @@ pxdROIFinder.param(param_pxdROIFinder)
 PXDDIGI = register_module('PXDDigitizer')
 
 pxdDigitFilter = register_module('PXDdigiFilter')
-pxdDigitFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True})
+pxdDigitFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True, 'overrideDB': True, 'usePXDDataReduction': True})
 
 # Create paths
 main = create_path()
@@ -62,7 +62,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
-add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC'], usePXDDataReduction=False)
+add_simulation(main, components=['PXD', 'SVD', 'CDC'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
 add_tracking_reconstruction(main, ['SVD', 'CDC'])
 main.add_module(pxdROIFinder)
 main.add_module(PXDDIGI)

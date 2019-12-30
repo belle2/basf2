@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<DetectorComponent name="MICROTPC"  xmlns:xi="http://www.w3.org/2001/XInclude">
+<DetectorComponent name="MICROTPC">
 <Creator library="beast">MICROTPCCreator</Creator>
 <Content>
-<xi:include href="MICROTPC-recoilProb.xml"/>
 <!-- normally, parameters should be defined with a unit attribute. This
 enables automatic conversion to the default framework unit --> 
 <stepSize unit="um">200</stepSize>
@@ -65,7 +64,7 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <!--AngleZ unit="deg">110.0</AngleZ-->
-      <AngleZ unit="deg">67.5</AngleZ>
+      <AngleZ unit="deg">112.5</AngleZ>
       <TPCpos_x unit="cm">32.4</TPCpos_x>
       <TPCpos_y unit="cm">11.8</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
@@ -85,7 +84,7 @@ whitespace, comma or semi-colon -->
       <TPCpos_y unit="cm">34.7</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
       <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">33.7</SensVol_y>
+      <SensVol_y unit="cm">34.7</SensVol_y>
       <SensVol_z unit="cm">191.171</SensVol_z>
     </Active>
 
@@ -96,7 +95,7 @@ whitespace, comma or semi-colon -->
       <dz_Vessel unit="cm">31.0</dz_Vessel>
       <AngleX unit="deg">0.0</AngleX>
       <!--AngleZ unit="deg">290.0</AngleZ-->
-      <AngleZ unit="deg">67.5</AngleZ>
+      <AngleZ unit="deg">292.5</AngleZ>
       <TPCpos_x unit="cm">-32.3</TPCpos_x>
       <TPCpos_y unit="cm">-12.1</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
@@ -117,7 +116,7 @@ whitespace, comma or semi-colon -->
       <TPCpos_y unit="cm">-34.7</TPCpos_y>
       <TPCpos_z unit="cm">190.6</TPCpos_z>
       <SensVol_x unit="cm">0</SensVol_x>
-      <SensVol_y unit="cm">-33.7</SensVol_y>
+      <SensVol_y unit="cm">-34.7</SensVol_y>
       <SensVol_z unit="cm">191.171</SensVol_z>
     </Active>
 

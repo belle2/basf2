@@ -63,9 +63,9 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
         'Xi-:std',
         'Xi-:reco',
         '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-       [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 0. and \
-       formula( [ x^2 + y^2 + z^2 ]^[0.5] ) < formula( [ daughter(0,x)^2 + daughter(0,y)^2 + daughter(0,z)^2 ]^[0.5] ) ] and \
-       [ chiProb > 0.0 ]',
+        [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 0. and \
+        formula( [ x^2 + y^2 + z^2 ]^[0.5] ) < formula( [ daughter(0,x)^2 + daughter(0,y)^2 + daughter(0,z)^2 ]^[0.5] ) ] and \
+        [ chiProb > 0.0 ]',
         True,
         path=path)
 

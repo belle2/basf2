@@ -9,7 +9,6 @@
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
 
 using namespace Belle2;
 
@@ -125,14 +124,7 @@ void ChargedPidMVAModule::event()
       const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      // Get track charge sign.
-      const Track* track = particle->getTrack();
-      if (!track) {
-        B2ERROR("\tParticle has no associated track. This shouldn't happen for charged stable particles...");
-      }
-      auto charge = track->getTrackFitResultWithClosestMass(Const::chargedStableSet.find(pdg))->getChargeSign();
-
-      B2DEBUG(11, "\t\tcharge          = " << charge);
+      B2DEBUG(11, "\t\tcharge          = " << particle->getCharge());
       B2DEBUG(11, "\t\tclusterTheta    = " << theta << " [rad]");
       B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
       B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));

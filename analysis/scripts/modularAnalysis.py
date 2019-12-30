@@ -1744,7 +1744,8 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
+def buildRestOfEvent(target_list_name, inputParticlelists=[],
+                     belle_sources=False, fillWithMostLikely=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1754,11 +1755,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=Fals
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the inputParticlelists
+                              option will be ignored.
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
-    # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
@@ -2249,7 +2256,8 @@ def writePi0EtaVeto(particleList,
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
+def buildEventKinematics(inputListNames=[], default_cleanup=True,
+                         fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
@@ -2258,12 +2266,21 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
     The visible energy missing values are
     stored in a EventKinematics dataobject.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True, apply default clean up cuts to default
-                            ParticleLists pi+:evtkin and gamma:evtkin.
-    @param path             modules are added to this path
+    @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
+                              If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the options inputListNames and default_cleanup
+                              will be ignored.
+    @param default_cleanup    if True, apply default clean up cuts to default
+                              ParticleLists pi+:evtkin and gamma:evtkin.
+    @param path               modules are added to this path
     """
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        fillParticleList('gamma:evtkin', '', path=path)
+        inputListNames += ['gamma:evtkin']
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
@@ -2294,6 +2311,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
+                    fillWithMostLikely=False,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2332,6 +2350,9 @@ def buildEventShape(inputListNames=[],
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the options inputListNames
+                              and default_cleanup will be ignored.
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
@@ -2354,6 +2375,13 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        fillParticleList('gamma:evtshape', '', path=path)
+        inputListNames += ['gamma:evtshape']
+
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)

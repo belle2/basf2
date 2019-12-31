@@ -26,6 +26,7 @@
 #include <G4PVPlacement.hh>
 #include <G4String.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Transform3D.hh>
 #include <G4Tubs.hh>
 #include <G4UnionSolid.hh>
@@ -121,6 +122,12 @@ namespace Belle2 {
                            );
       envelopeLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
       putEndsInEnvelope(envelopeLogical);
+
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("BKLMEnvelope");
+      envelopeLogical->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(envelopeLogical);
+
       new G4PVPlacement(G4TranslateZ3D(m_GeoPar->getOffsetZ() * CLHEP::cm) * G4RotateZ3D(m_GeoPar->getRotation() * CLHEP::rad),
                         envelopeLogical,
                         "BKLM.EnvelopePhysical",

@@ -66,7 +66,7 @@ namespace Belle2 {
        *  Use MC to fit the MC sample and calculate a new set of prism corrections. No parameter is fixed, but the
        *  tail components are removed form the fit.
        */
-      void setFitMode(std::string fitterMode)
+      void setFitMode(const std::string& fitterMode)
       {
         if (fitterMode == "calibration")
           B2INFO("Fitter set to calibration mode");
@@ -115,8 +115,6 @@ namespace Belle2 {
         "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the TTS parametrization*/
       std::string m_TTSData =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the Fit constraints and MC info */
-      bool m_isMonitoringFit =
-        false; /**< Set to True if you are analyzing runs with low statistics and you want to fix the fit parameters from a high-stat run*/
       std::string m_fitterMode = "calibration";/**< Fit mode. Can be 'calibration', 'monitoring' or 'MC' */
 
       TFile* m_inputTTS = nullptr; /**< File containing m_treeTTS */

@@ -880,30 +880,42 @@ def fillParticleListFromROE(decayString,
     path.add_module(pload)
 
 
-def fillParticleListFromMC(decayString, cut, addDaughters=False, writeOut=False, path=None):
+def fillParticleListFromMC(decayString,
+                           cut,
+                           addDaughters=False,
+                           skipNonPrimaryDaughters=False,
+                           writeOut=False,
+                           path=None):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleList.
 
     The type of the particles to be loaded is specified via the decayString module parameter.
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    @param decayString             specifies type of Particles and determines the name of the ParticleList
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
+                                   sets mother-daughter relations
+    @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + decayString)
     pload.param('decayStringsWithCuts', [(decayString, cut)])
     pload.param('addDaughters', addDaughters)
+    pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
 
 
-def fillParticleListsFromMC(decayStringsWithCuts, addDaughters=False, writeOut=False, path=None):
+def fillParticleListsFromMC(decayStringsWithCuts,
+                            addDaughters=False,
+                            skipNonPrimaryDaughters=False,
+                            writeOut=False,
+                            path=None):
     """
     Creates Particle object for each MCParticle of the desired type found in the StoreArray<MCParticle>,
     loads them to the StoreArray<Particle> and fills the ParticleLists.
@@ -914,17 +926,20 @@ def fillParticleListsFromMC(decayStringsWithCuts, addDaughters=False, writeOut=F
     pions = ('pi+:gen', 'pionID>0.1')
     fillParticleListsFromMC([kaons, pions])
 
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param cut           Particles need to pass these selection criteria to be added to the ParticleList
-    @param addDaughters  adds the bottom part of the decay chain of the particle to the datastore and sets mother-daughter relations
-    @param writeOut      whether RootOutput module should save the created ParticleList
-    @param path          modules are added to this path
+    @param decayString             specifies type of Particles and determines the name of the ParticleList
+    @param cut                     Particles need to pass these selection criteria to be added to the ParticleList
+    @param addDaughters            adds the bottom part of the decay chain of the particle to the datastore and
+                                   sets mother-daughter relations
+    @param skipNonPrimaryDaughters if true, skip non primary daughters, useful to study final state daughter particles
+    @param writeOut                whether RootOutput module should save the created ParticleList
+    @param path                    modules are added to this path
     """
 
     pload = register_module('ParticleLoader')
     pload.set_name('ParticleLoader_' + 'PLists')
     pload.param('decayStringsWithCuts', decayStringsWithCuts)
     pload.param('addDaughters', addDaughters)
+    pload.param('skipNonPrimaryDaughters', skipNonPrimaryDaughters)
     pload.param('writeOut', writeOut)
     pload.param('useMCParticles', True)
     path.add_module(pload)
@@ -1601,8 +1616,54 @@ def signalSideParticleListsFilter(particleLists, selection, roe_path, deadEndPat
     mod.if_false(deadEndPath)
 
 
-def findMCDecay(list_name, decay, writeOut=False, path=None):
+def reconstructMCDecay(
+    decayString,
+    cut,
+    dmID=0,
+    writeOut=False,
+    path=None,
+):
+    r"""
+    Finds and creates a ``ParticleList`` from given decay string.
+    ``ParticleList`` of daughters with sub-decay is created.
+
+    Only signal particle, which means :b2:var:`isSignal` is equal to 1, is stored. One can use the decay string grammar
+    to change the behavior of :b2:var:`isSignal`. One can find detailed information in :ref:`DecayString`.
+
+    .. tip::
+        If one uses same sub-decay twice, same particles are registered to a ``ParticleList``. For example,
+        ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] [pi0:gg =direct=> gamma:MC gamma:MC]``.
+        One can skip the second sub-decay, ``K_S0:pi0pi0 =direct=> [pi0:gg =direct=> gamma:MC gamma:MC] pi0:gg``.
+
+
+    @param decayString :ref:`DecayString` specifying what kind of the decay should be reconstructed
+                       (from the DecayString the mother and daughter ParticleLists are determined)
+    @param cut         created (mother) Particles are added to the mother ParticleList if they
+                       pass given cuts (in VariableManager style) and rejected otherwise
+                       isSignal==1 is always required by default.
+    @param writeOut    whether RootOutput module should save the created ParticleList
+    @param path        modules are added to this path
     """
+
+    pmake = register_module('ParticleCombinerFromMC')
+    pmake.set_name('ParticleCombinerFromMC_' + decayString)
+    pmake.param('decayString', decayString)
+    pmake.param('cut', cut)
+    pmake.param('writeOut', writeOut)
+    path.add_module(pmake)
+
+
+def findMCDecay(
+    list_name,
+    decay,
+    writeOut=False,
+    path=None,
+):
+    """
+    .. warning::
+        This function is not fully tested and maintained.
+        Please consider to use reconstructMCDecay() instead.
+
     Finds and creates a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
     The decay string is required to describe correctly what you want.
     In the case of inclusive decays, you can use :ref:`Grammar_for_custom_MCMatching`
@@ -1612,6 +1673,8 @@ def findMCDecay(list_name, decay, writeOut=False, path=None):
     @param writeOut  Whether `RootOutput` module should save the created ``outputList``
     @param path      modules are added to this path
     """
+    B2WARNING("This function is not fully tested and maintained."
+              "Please consider to use reconstructMCDecay() instead.")
 
     decayfinder = register_module('MCDecayFinder')
     decayfinder.set_name('MCDecayFinder_' + list_name)
@@ -1681,7 +1744,8 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=False, path=None):
+def buildRestOfEvent(target_list_name, inputParticlelists=[],
+                     belle_sources=False, fillWithMostLikely=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1691,11 +1755,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[], belle_sources=Fals
     @param inputParticlelists list of input particle list names, which serve
                               as a source of particles to build ROE, the FSP particles from
                               target_list_name are excluded from ROE object
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the inputParticlelists
+                              option will be ignored.
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
-    # if (len(inputParticlelists) < 3):
     fillParticleList('pi+:roe_default', '', path=path)
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
@@ -2375,12 +2445,21 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
     The visible energy missing values are
     stored in a EventKinematics dataobject.
 
-    @param inputListNames   list of ParticleLists used to calculate the global event kinematics.
-                            If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param default_cleanup  if True, apply default clean up cuts to default
-                            ParticleLists pi+:evtkin and gamma:evtkin.
-    @param path             modules are added to this path
+    @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
+                              If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the options inputListNames and default_cleanup
+                              will be ignored.
+    @param default_cleanup    if True, apply default clean up cuts to default
+                              ParticleLists pi+:evtkin and gamma:evtkin.
+    @param path               modules are added to this path
     """
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        fillParticleList('gamma:evtkin', '', path=path)
+        inputListNames += ['gamma:evtkin']
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
@@ -2411,6 +2490,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
+                    fillWithMostLikely=False,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2449,6 +2529,9 @@ def buildEventShape(inputListNames=[],
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
+    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
+                              according to PID likelihood and the options inputListNames
+                              and default_cleanup will be ignored.
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
@@ -2471,6 +2554,13 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+    if fillWithMostLikely:
+        from stdCharged import stdMostLikely
+        stdMostLikely(path=path)
+        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        fillParticleList('gamma:evtshape', '', path=path)
+        inputListNames += ['gamma:evtshape']
+
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)

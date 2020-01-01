@@ -4,7 +4,7 @@ from basf2 import *
 from modularAnalysis import *
 from variables import variables
 
-from vertex import treeFit, vertexKFit
+from vertex import treeFit, vertexKFit, massVertexKFit
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
 from stdPhotons import stdPhotons

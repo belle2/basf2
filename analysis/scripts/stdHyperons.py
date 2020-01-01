@@ -58,7 +58,7 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
         treeFit('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
-        print("WARNING: fitter == kfitter or fitter == treefitter")
+        BERROR(f"stdXi: invalid fitter ({fitter}). Choose from kfitter or treefitter")
 
     cutAndCopyList(
         'Xi-:std',
@@ -194,7 +194,7 @@ def stdOmega(fitter='kfitter', b2bii=False, path=None):
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
         treeFit('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
-        print("WARNING: fitter == kfitter or fitter == treefitter")
+        BERROR(f"stdOmega: invalid fitter ({fitter}). Choose from kfitter or treefitter")
 
     if not b2bii:
         cutAndCopyList(

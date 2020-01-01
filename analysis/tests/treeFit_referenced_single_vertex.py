@@ -3,10 +3,9 @@
 import unittest
 import os
 import tempfile
-from basf2 import *
+import basf2
 import b2test_utils
-from modularAnalysis import *
-from vertex import vertexTree
+import modularAnalysis as ma
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -20,16 +19,16 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        main = create_path()
+        main = basf2.create_path()
 
         inputfile = b2test_utils.require_file(
             'analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
-        inputMdst('default', inputfile, path=main)
+        ma.inputMdst('default', inputfile, path=main)
 
-        fillParticleList('mu+', 'muonID > 0.5', path=main)
+        ma.fillParticleList('mu+', 'muonID > 0.5', path=main)
 
-        reconstructDecay('J/psi:all -> mu+ mu-', '', 0, path=main)
-        matchMCTruth('J/psi:all', path=main)
+        ma.reconstructDecay('J/psi:all -> mu+ mu-', '', 0, path=main)
+        ma.matchMCTruth('J/psi:all', path=main)
 
         conf = 0
         main.add_module('TreeFitter',
@@ -41,13 +40,13 @@ class TestTreeFits(unittest.TestCase):
                         ipConstraint=False,
                         updateAllDaughters=False)
 
-        ntupler = register_module('VariablesToNtuple')
+        ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
         ntupler.param('particleList', 'J/psi:all')
         main.add_module(ntupler)
 
-        process(main)
+        basf2.process(main)
 
         ntuplefile = TFile(testFile.name)
         ntuple = ntuplefile.Get('ntuple')

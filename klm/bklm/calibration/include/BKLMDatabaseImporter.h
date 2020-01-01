@@ -70,16 +70,6 @@ namespace Belle2 {
     void importSimulationPar();
 
     /**
-     * Import BKLM Alignment parameters into the database
-     */
-    void importAlignment();
-
-    /**
-     * Import BKLM displaced-geometry parameters into the database
-     */
-    void importDisplacement();
-
-    /**
      * Import BKLM scintillator ADC parameters into the database
      */
     void importADCThreshold(BKLMADCThreshold* inputThreshold);

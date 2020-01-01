@@ -83,6 +83,10 @@ void DQMHistAnalysisTOPModule::initialize()
   m_text1 = new TPaveText(1, 435, 10, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
+
+  m_text2 = new TPaveText(0.2, 0.70, 0.50, 0.9, "NB");
+  m_text2->SetFillColorAlpha(kWhite, 0);
+  m_text2->SetBorderSize(0);
 }
 
 
@@ -202,6 +206,27 @@ void DQMHistAnalysisTOPModule::event()
     m_line1->Draw();
     m_line2->Draw();
     m_text1->Draw();
+  }
+
+  TH1F* hBoolEvtMonitor = (TH1F*)findHist("TOP/BoolEvtMonitor");
+  double badRatio(0.0);
+  int totalBadEvts(0);
+  int totalEvts(0);
+  if (hBoolEvtMonitor != NULL) {
+    totalEvts = hBoolEvtMonitor->GetEntries();
+    totalBadEvts = hBoolEvtMonitor->GetBinContent(2);
+  }
+  if (totalEvts > 0) badRatio = totalBadEvts * 1.0 / totalEvts;
+
+  m_text2->Clear();
+  m_text2->AddText(Form("fraction of deviating hits: %.4f %%", badRatio * 100.0));
+
+  TCanvas* c3 = find_canvas("TOP/c_BoolEvtMonitor");
+  if (c3 != NULL) {
+    c3->cd();
+    if (badRatio > 0.0001) c3->Pad()->SetFillColor(kRed);
+    else c3->Pad()->SetFillColor(kWhite);
+    m_text2->Draw();
   }
 
   m_c_goodHitsMean->Clear();

@@ -224,6 +224,14 @@ void DQMHistAnalysisPXDEffModule::event()
 
   auto gr = m_hEffAll->GetPaintedGraph();
   if (gr) {
+    for (int i = 0; i < gr->GetN(); i++) {
+      gr->SetPointEXhigh(i, 0.);
+      gr->SetPointEXlow(i, 0.);
+      // this has to be done first, as it will recalc Min/Max and destroy axis
+      Double_t x, y;
+      gr->GetPoint(i, x, y);
+      gr->SetPoint(i, x - 0.01, y);
+    }
     gr->SetMinimum(0);
     gr->SetMaximum(m_PXDModules.size());
     auto ay = gr->GetYaxis();
@@ -236,10 +244,6 @@ void DQMHistAnalysisPXDEffModule::event()
         ax->SetBinLabel(i + 1, ModuleName);
         B2RESULT(ModuleName);
       }
-    }
-    for (int i = 0; i < gr->GetN(); i++) {
-      gr->SetPointEXhigh(i, 0.);
-      gr->SetPointEXlow(i, 0.);
     }
 
     gr->SetLineColor(4);

@@ -16,32 +16,18 @@
 #include <framework/utilities/Utils.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
+#include <framework/core/PyObjROOTUtils.h>
 #include <boost/algorithm/string.hpp>
 
 #include <set>
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-09-26"
+#define CURRENT_DEFAULT_TAG "master_2019-11-29"
 
 namespace py = boost::python;
 
 namespace {
-  /** Create a python wrapped copy from a class instance which has a ROOT dictionary.
-   * This piece of dark magic creates a python object referencing a ROOT object
-   * the same way as you would see it in the ROOT python module.
-   *
-   * It will create a copy of the object using the copy constructor which is then
-   * owned by python.
-   */
-  template<class T>
-  py::object createPyCopy(const T& instance)
-  {
-    const char* classname = instance.IsA()->GetName();
-    void* addr = new T(instance);
-    PyObject* obj = TPython::ObjectProxy_FromVoidPtr(addr, classname, true);
-    return py::object(py::handle<>(obj));
-  }
   /** extract a list of strings from any iterable python object
    * This function is much more lenient than what we usually do: It will use `str()`
    * on each object in the list and use the string representation. So it should
@@ -232,7 +218,7 @@ namespace Belle2::Conditions {
       // otherwise it's a list of file metadata instances
       if (m_inputGlobaltags) {
         py::list metaDataList;
-        for (const auto& m : m_inputMetadata) metaDataList.append(createPyCopy(m));
+        for (const auto& m : m_inputMetadata) metaDataList.append(createROOTObjectPyCopy(m));
         arguments["metadata"] = metaDataList;
       }
       // arguments ready, call callback function, python will handle the exceptions

@@ -164,8 +164,11 @@ namespace Belle2 {
     /** Simulation hit map for BKLM (by plane). */
     std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
 
-    /** Simulation hit map for EKLM. */
+    /** Simulation hit map for EKLM (by channel). */
     std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
+
+    /** Simulation hit map for EKLM (by plane). */
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

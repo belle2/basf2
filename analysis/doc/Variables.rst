@@ -375,6 +375,15 @@ Here is a list of production and decay vertex variables:
 .. b2-variables::
    :group: Vertex Information   
 
+For fully-inclusive particles
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a list of useful variables to work with fully-inclusive particles, which are produced via :doc:`RestOfEvent`, `AllParticleCombiner` or other inclusive reconstruction modules:
+
+.. b2-variables::
+   :group: For fully-inclusive particles   
+
+
 Belle and ``b2bii`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 from basf2 import B2ERROR
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
-from variables import variables
-
 from vertex import treeFit, vertexKFit, massVertexKFit
+
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
 from stdPhotons import stdPhotons

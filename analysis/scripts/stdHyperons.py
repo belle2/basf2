@@ -4,6 +4,7 @@ from basf2 import *
 from modularAnalysis import *
 from variables import variables
 
+from vertex import treeFit, vertexKFit
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
@@ -55,7 +56,7 @@ def stdXi(fitter='kfitter', b2bii=False, path=None):
         vertexKFit('Xi-:reco', conf_level=0.0, path=path)
     elif fitter == 'treefitter':
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
-        vertexTree('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+        treeFit('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
         print("WARNING: fitter == kfitter or fitter == treefitter")
 
@@ -127,11 +128,11 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         'Xi0:prelim -> Lambda0:reco pi0:reco',
         '1.225 < M < 1.405',
         path=path)
-    vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[3122], ipConstraint=True, updateAllDaughters=True, path=path)
+    treeFit('Xi0:prelim', conf_level=0.0, massConstraint=[3122], ipConstraint=True, updateAllDaughters=True, path=path)
     # Reconstructed core resolution pi0~7.8 MeV selecting 3*sigma_core around the nominal mass
     # pi0 mass range is invariant for b2bii=True, tighter selection is required by user
     applyCuts('Xi0:prelim', '[ daughter(1,M) > 0.111577 and daughter(1,M) < 0.158377 ]', path=path)
-    vertexTree('Xi0:prelim', conf_level=0.0, massConstraint=[111, 3122], ipConstraint=True, updateAllDaughters=False, path=path)
+    treeFit('Xi0:prelim', conf_level=0.0, massConstraint=[111, 3122], ipConstraint=True, updateAllDaughters=False, path=path)
 
     cutAndCopyList(
         'Xi0:std',
@@ -191,7 +192,7 @@ def stdOmega(fitter='kfitter', b2bii=False, path=None):
         vertexKFit('Omega-:reco', conf_level=0.0, path=path)
     elif fitter == 'treefitter':
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
-        vertexTree('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
+        treeFit('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
         print("WARNING: fitter == kfitter or fitter == treefitter")
 

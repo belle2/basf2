@@ -2436,7 +2436,8 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True, path=None):
+def buildEventKinematics(inputListNames=[], default_cleanup=True,
+                         fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used

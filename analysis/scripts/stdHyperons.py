@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2ERROR
+from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from variables import variables
 
 from vertex import treeFit, vertexKFit, massVertexKFit

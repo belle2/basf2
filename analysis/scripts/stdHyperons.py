@@ -299,7 +299,7 @@ def goodXi0(xitype='loose', path=None):
             'Xi0:std',
             '[ daughter(1,p) > 0.150 ] and \
             [ formula( [ x^2 + y^2 + z^2 ]^[0.5] ) > 1.5 ] and \
-            [ daughter(1, abs(M)) < 0.0156 ]',
+            [ daughter(1, abs(dM)) < 0.0156 ]',
             True,
             path=path)
 

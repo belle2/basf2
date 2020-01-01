@@ -41,6 +41,8 @@ import stdCharged as stdc
 # create path
 my_path = b2.create_path()
 
+b2.conditions.prepend_globaltag('analysis_tools_release-04')
+
 # load input ROOT file
 ma.inputMdst(environmentType='default',
              filename=b2.find_file('B2rhogamma_rho2pipi.root', 'examples', False),

@@ -59,13 +59,13 @@ reconstructDecay("beam:sel -> A:sel gamma:sel", "", path=my_path)
 reconstructDecay("beam:selv -> A:selvertex gamma:sel", "", path=my_path)
 reconstructDecay("beam:selv4c -> A:selvertex gamma:sel", "", path=my_path)
 
-# Perform four momentum constraint fit using OrcaKinFit and update the Daughters
-fitKinematic4C("beam:selv4c", path=my_path)
-
 # Associates the MC truth
 matchMCTruth('beam:sel', path=my_path)
 matchMCTruth('beam:selv', path=my_path)
 matchMCTruth('beam:selv4c', path=my_path)
+
+# Perform four momentum constraint fit using OrcaKinFit and update the Daughters
+fitKinematic4C("beam:selv4c", path=my_path)
 
 # Select variables that we want to store to ntuple
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_uncertainty

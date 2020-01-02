@@ -59,7 +59,7 @@ KFit('D0:pi0pi0', 0.0, 'mass', path=my_path)
 # and -1 < Delta E < 1 GeV
 reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0', path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 matchMCTruth('B0:all', path=my_path)
 
 # Select variables that we want to store to ntuple

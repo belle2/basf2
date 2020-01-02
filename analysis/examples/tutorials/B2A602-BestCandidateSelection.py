@@ -63,10 +63,13 @@ ma.reconstructDecay(decayString='D0 -> K-:loose pi+:all',
                     cut='1.8 < M < 1.9',
                     path=my_path)
 
+# perform MC matching (MC truth association)
+ma.matchMCTruth(list_name='D0', path=my_path)
+
 # perform D0 vertex fit
-# keep only candidates passing C.L. value of the fit > conf_level (here: no cut)
+# keep only candidates passing C.L. value of the fit > conf_level
 vx.treeFit(list_name='D0',
-           conf_level=-1,  # keep all candidates, 0: keep only fit survivors, optimise this cut for your need
+           conf_level=0,  # 0: keep only fit survivors, -1: keep all candidates; optimise this cut for your need
            ipConstraint=True,
            # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
            updateAllDaughters=True,  # update momenta of ALL particles
@@ -117,14 +120,9 @@ ma.rankByHighest(particleList="D0",
                  path=my_path)
 va.variables.addAlias('second_D_rank', 'extraInfo(second_D_rank)')
 
-
 # add rank variable aliases for easier use
 va.variables.addAlias('dM_rank', 'extraInfo(abs_dM_rank)')
 va.variables.addAlias('chiProb_rank', 'extraInfo(chiProb_rank)')
-
-# perform MC matching (MC truth association)
-ma.matchMCTruth(list_name='D0', path=my_path)
-
 
 # Select variables that we want to store to ntuple
 fs_hadron_vars = vu.create_aliases_for_selected(list_of_variables=vc.mc_truth, decay_string='D0 -> ^K- ^pi+')

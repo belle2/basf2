@@ -20,7 +20,7 @@ ma.inputMdst(environmentType='default',
 particles = fei.get_default_channels()
 
 # Set up FEI configuration specifying the FEI prefix
-configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True)
+configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True, cache=-1)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

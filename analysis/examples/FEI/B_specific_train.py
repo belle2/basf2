@@ -99,12 +99,12 @@ feistate = fei.get_path(belle_particles, configuration)
 if feistate.stage == 0:
     # Write out the rest of event, we train only on the rest of event of our signal side.
     # This is the main difference compared to the generic FEI.
-    rO = ma.register_module('RootOutput')
+    rO = b2.register_module('RootOutput')
     rO.set_name('ROE_RootOutput')
     rO.param('additionalBranchNames', ['RestOfEvent'])
     feistate.path.add_module(rO)
     roe_path = b2.create_path()
-    cond_module = ma.register_module('SignalSideParticleFilter')
+    cond_module = b2.register_module('SignalSideParticleFilter')
     cond_module.param('particleLists', ['B+:sig'])
     cond_module.if_true(feistate.path, b2.AfterConditionPath.END)
     roe_path.add_module(cond_module)
@@ -112,9 +112,9 @@ if feistate.stage == 0:
 else:
     # After stage 0, the training is done only on the written out rest of event.
     path = b2.create_path()
-    inputMdstList('default', [], path)
+    ma.inputMdstList('default', [], path)
     path.add_path(feistate.path)
-    r1 = ma.register_module('RootOutput')
+    r1 = b2.register_module('RootOutput')
     r1.set_name('ROE_RootOutput')
     r1.param('additionalBranchNames', ['RestOfEvent'])
     path.add_module(r1)

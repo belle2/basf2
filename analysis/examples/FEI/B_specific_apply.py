@@ -11,7 +11,6 @@
 # This example is for hadronic tagging.
 
 
-import os
 import fei
 import basf2 as b2
 import modularAnalysis as ma
@@ -80,7 +79,7 @@ fei_tag = 'FEIv4_2019_MC12_release_03_01_01'
 # b2.conditions.globaltags = ['name of database containing the specific training']
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
-b2.conditions.globaltags = ['GT_gen_ana_004.40_AAT-parameters']
+b2.conditions.globaltags = ['analysis_tools_release-04']
 
 belle_particles = fei.get_default_channels(KLong=False,
                                            chargedB=True,
@@ -89,7 +88,7 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            B_extra_cut='nRemainingTracksInEvent <= 3',
                                            specific=True)
 
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False, cache=0)
 feistate = fei.get_path(belle_particles, configuration)
 
 

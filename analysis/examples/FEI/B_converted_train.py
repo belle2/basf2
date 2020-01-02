@@ -5,6 +5,10 @@
 
 # William Sutcliffe 2019
 
+# To properly read the Belle database the user name is set to g0db
+import os
+os.environ['PGUSER'] = 'g0db'
+
 import basf2 as b2
 import modularAnalysis as ma
 
@@ -37,7 +41,7 @@ if feistate.stage <= 0:
         applyHadronBJSkim=True,
         path=path)
 else:
-    b2.inputMdstList('Belle', [], path)
+    ma.inputMdstList('Belle', [], path)
 
 # Add FEI path to the path to be processed
 path.add_path(feistate.path)

@@ -3,6 +3,10 @@
 
 # William Sutcliffe 2019
 
+# To properly read the Belle database the user name is set to g0db
+import os
+os.environ['PGUSER'] = 'g0db'
+
 import fei
 import basf2 as b2
 import modularAnalysis as ma
@@ -35,7 +39,8 @@ ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 particles = fei.get_default_channels(convertedFromBelle=True)
 
 # Set up FEI configuration specifying the FEI prefix of the Belle legacy training
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MCConverted_Track14_2', b2bii=True, training=False, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MCConverted_Track14_2',
+                                            b2bii=True, training=False, monitor=False, cache=0)
 
 # Get FEI path
 feistate = fei.get_path(particles, configuration)

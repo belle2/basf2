@@ -88,6 +88,9 @@ __author__ = " Reem Rasheed"
 import modularAnalysis as ma
 from variables import variables as vm
 vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
 
 def TCPVList(path):
@@ -136,9 +139,9 @@ def TCPVList(path):
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1', path=path)
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -153,6 +156,11 @@ def TCPVList(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL<9', path=path)
 
     bPlustoJPsiK_List = []
     bMinustoJPsiK_List = []

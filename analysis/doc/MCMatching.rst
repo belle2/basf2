@@ -132,10 +132,6 @@ The module can be used for:
 
 * Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
 * Matched MC decays as input for a truth matching module.
-
-~~~~~~~~~~~~~~~~~~~~~
-Steering file snippet
-~~~~~~~~~~~~~~~~~~~~~
  
 .. code-block:: python
 
@@ -206,10 +202,6 @@ The module can be used for:
 
 * Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
 * Matched MC decays as input for a truth matching module.
-
-~~~~~~~~~~~~~~~~~~~~~
-Steering file snippet
-~~~~~~~~~~~~~~~~~~~~~
  
 .. code-block:: python
 

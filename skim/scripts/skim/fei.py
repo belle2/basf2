@@ -23,9 +23,6 @@ vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
 vm.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
 vm.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
 vm.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
-vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
-vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
-vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
 
 def B0Hadronic(path):
@@ -264,16 +261,19 @@ def runFEIforB0Hadronic(path):
     """
     # Pre-selection cuts
 
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims',
+                        cut='d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims',
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
     ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
     ma.applyEventCuts('E_ECL<9', path=path)
-
-    ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
-    ma.fillParticleList(decayString='gamma:eventShapeForSkims',
-                        cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -320,6 +320,11 @@ def runFEIforBplusHadronic(path):
                         cut=' d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
@@ -374,15 +379,19 @@ def runFEIforHadronicCombined(path):
 
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
-    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('E_ECL<9', path=path)
 
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
+                        cut=' d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
+    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL<9', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -611,11 +620,20 @@ def runFEIforB0SL(path):
         reconstructed tag modes, and pre-cuts applied.
     """
     # Pre-selection cuts
+
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
                         cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL<9', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -629,11 +647,6 @@ def runFEIforB0SL(path):
                        path=path)
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
-    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('E_ECL<9', path=path)
 
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
@@ -678,6 +691,10 @@ def runFEIforBplusSL(path):
 
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
     ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
     ma.applyEventCuts('E_ECL<9', path=path)
@@ -742,6 +759,11 @@ def runFEIforSLCombined(path):
 
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
     ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
     ma.applyEventCuts('E_ECL<9', path=path)
@@ -808,6 +830,11 @@ def runFEIforSkimCombined(path):
 
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
     ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
     ma.applyEventCuts('E_ECL<9', path=path)

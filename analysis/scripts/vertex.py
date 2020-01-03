@@ -715,16 +715,16 @@ def TagV(
         MCassociation (str):     use standard MC association or the internal one
         confidenceLevel (float): minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
         constraintType (str):    choose the constraint used in the fit:
-            * noConstraint
-            * IP (= default, tag B constrained to be on the IP),
-            * tube (= tube along the tag B line of flight, only for fully reconstructed signal B)
-            * boost (= long tube along the boost direction)
-            * (breco) (deprecated, but similar to tube)
+            noConstraint
+            IP (= default, tag B constrained to be on the IP),
+            tube (= tube along the tag B line of flight, only for fully reconstructed signal B)
+            boost (= long tube along the boost direction)
+            (breco) (deprecated, but similar to tube)
         trackFindingType (str):  choose how to look for tag tracks
-            * standard (all tracks except from Kshorts)
-            * standard_PXD (default, same as above but consider only tracks with at least 1 PXD hit)
-            * singleTrack (only choose the best track, DOES NOT WORK with no constraint)
-            * singleTrack_PXD (same as above but consider only tracks with at least 1 PXD hit)
+            standard (all tracks except from Kshorts)
+            standard_PXD (default, same as above but consider only tracks with at least 1 PXD hit)
+            singleTrack (only choose the best track, DOES NOT WORK with no constraint)
+            singleTrack_PXD (same as above but consider only tracks with at least 1 PXD hit)
         askMCInfo (bool):        True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int):        minimum N PXD hits for a track
         maskName (str):          get particles from a specified ROE mask

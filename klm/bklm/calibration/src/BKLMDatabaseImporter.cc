@@ -50,8 +50,11 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
 
 void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 {
+  // Clear the vector: needed if we want to load two different maps
+  // in the same steering file.
   if (m_ElectronicsChannels.size() > 0)
     m_ElectronicsChannels.clear();
+
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -113,7 +116,7 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
         channelId = MaxiChannel - iStrip + 1;
 
       if (plane == BKLMElementNumbers::c_PhiPlane) {
-        /** Start settings for exp. 10. */
+        // Start settings for exp. 10.
         if (isExperiment10) {
           if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
             if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
@@ -130,7 +133,7 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
               // }
             }
           }
-        } /** End settings for exp. 10. */
+        } // End settings for exp. 10.
         if (layer == 1)
           channelId += 4;
         if (layer == 2)

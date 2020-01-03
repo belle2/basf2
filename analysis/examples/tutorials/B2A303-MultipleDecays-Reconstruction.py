@@ -85,7 +85,7 @@ ma.reconstructDecay(decayString='B+:D0pi -> anti-D0:all pi+',
                     dmID=1,
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B+:D0pi',
                 path=my_path)
 

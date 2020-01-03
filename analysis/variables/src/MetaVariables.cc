@@ -1677,7 +1677,7 @@ namespace Belle2 {
         try {
           rank = Belle2::convertString<int>(arguments[3]);
         } catch (boost::bad_lexical_cast&)  {
-          B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be integer!");
+          B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be an integer!");
           return nullptr;
         }
 
@@ -2790,9 +2790,22 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. countInList(e+, isSignal == 1) returns the number of correctly reconstructed electrons in the event.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.");
-    REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank,
-                      "Returns a specific variable according to its rank in a particle list.\n"
-                      "The rank is determined via BestCandidateSelection. BestCandidateSelection has to be used before.");
+    REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
+                      Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
+
+                      .. note::
+                        The `BestCandidateSelection` module available via `rankByHighest` / `rankByLowest` has to be used before.
+
+                      .. warning::
+                        The first candidate matching the given rank is used.
+                        Thus, it is not recommended to use this variable in conjunction with ``allowMultiRank`` in the `BestCandidateSelection` module.
+
+                      The suffix ``_rank`` is automatically added to the argument ``rankedVariableName``,
+                      which either has to be the name of the variable used to order the candidates or the selected outputVariable name without the ending ``_rank``.
+                      This means that your selected name for the rank variable has to end with ``_rank``.
+
+                      An example of this variable's usage is given in the tutorial `B2A602-BestCandidateSelection <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A602-BestCandidateSelection.py>`_
+                      )DOC");
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
                       "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
                       "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");

@@ -50,7 +50,7 @@ ma.reconstructDecay(decayString='D0:kpi -> K-:loose pi+:loose', cut='1.8 < M < 1
 # and D* CMS momentum > 2.5 GeV
 ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.2', path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='D*+', path=my_path)
 
 # Select variables that we want to store to ntuple

@@ -29,6 +29,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 
@@ -48,7 +50,7 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
-void BKLMDatabaseImporter::loadDefaultElectronicMapping()
+void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 {
   int copperId = 0;
   int slotId = 0;
@@ -73,17 +75,25 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
       if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
         copperId = 4 + BKLM_ID;
     }
-    if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
-    if (sector == 1 || sector == 2) slotId = sector + 2;
-    if (sector == 7 || sector == 8) slotId = sector - 6;
+    if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+      slotId = sector - 2;
+    if (sector == 1 || sector == 2)
+      slotId = sector + 2;
+    if (sector == 7 || sector == 8)
+      slotId = sector - 6;
 
-    if (layer > 2)  laneId = layer + 5;
-    else laneId = layer;
+    if (layer > 2)
+      laneId = layer + 5;
+    else
+      laneId = layer;
 
     if (layer < 3) {
-      if (plane == 0) axisId = 1;
-      else if (plane == 1) axisId = 0;
-    } else axisId = plane;
+      if (plane == 0)
+        axisId = 1;
+      else
+        axisId = 0;
+    } else
+      axisId = plane;
 
     int MaxiChannel = BKLMElementNumbers::getNStrips(
                         section, sector, layer, plane);
@@ -98,20 +108,47 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
-      if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
-
+      if (!(dontFlip && layer > 2 && plane == 1))
+        channelId = MaxiChannel - iStrip + 1;
       if (plane == 1) { //phi strips
-        if (layer == 1)  channelId = channelId + 4;
-        if (layer == 2)  channelId = channelId + 2;
+        /** Start settings for exp. 10. */
+        if (isExperiment10) {
+          if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+            if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
+              channelId = MaxiChannel - channelId + 1;
+              // if (layer == 1)
+              // channelId += -2;
+              // if (layer == 2) {
+              // if (section == BKLMElementNumbers::c_ForwardSection &&
+              // (sector == 1 ||  sector == 2 || sector == 8))
+              // channelId += 1;
+              // if (section == BKLMElementNumbers::c_BackwardSection &&
+              // (sector == 4 ||  sector == 5 || sector == 6))
+              // channelId += 1;
+              // }
+            }
+          }
+        } /** End settings for exp. 10. */
+        if (layer == 1)
+          channelId += 4;
+        if (layer == 2)
+          channelId += 2;
       } else if (plane == 0) { //z strips
         if (layer < 3) { //scintillator
           if (section == BKLMElementNumbers::c_BackwardSection
               && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
             if (layer == 1) {
-              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
-              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
-            } else {
+              if (!isExperiment10) {
+                if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
+                else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
+                else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
+              } else {
+                if (channelId > 0 && channelId < 9) channelId = 9 - channelId;         // 8 : 1
+                else if (channelId > 8 && channelId < 24) channelId = 39 - channelId;  // 30 : 16
+                else if (channelId > 23 && channelId < 39) channelId = 69 - channelId; // 45 : 31
+              }
+            }
+            if (layer == 2) {
               if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
               else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
               else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;

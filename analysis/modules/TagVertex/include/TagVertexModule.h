@@ -3,8 +3,7 @@
  * Copyright(C) 2014 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi (most of the stuff)                        *
- *               Thibaud Humair (tube and extra tag track info)           *
+ * Contributors: Luigi Li Gioi, Thibaud Humair                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -133,7 +132,7 @@ namespace Belle2 {
     bool findConstraintBoost(double cut, double shiftAlongBoost = -2000.);
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
-    /the expected BTag line of flights */
+    the expected BTag line of flights */
     bool findConstraintBTube(Particle* Breco, double cut);
 
     /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */
@@ -144,7 +143,7 @@ namespace Belle2 {
 
     /** asks for the MC information of the tracks performing the vertex fit *
      *  returns a list of pointers to the MC particles and their kinds, ie
-     *  1 for good pcle coming direclty from the tag B and 2 otherwise
+     *  1 for good particle coming directly from the tag B and 2 otherwise
      */
     std::vector< std::pair<const MCParticle*, int> > FlavorTaggerInfoMCMatch(Particle* Breco);
 

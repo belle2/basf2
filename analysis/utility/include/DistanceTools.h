@@ -21,19 +21,12 @@
 namespace Belle2 {
 
   /**
-   * This class contains a collection of function that are useful to compute distances
+   * This namespace contains a collection of function that are useful to compute distances
    * between tracks and vertices.
    *
    * All tracks are assumed to be straight in the current implementation.
    */
-  class DistanceTools {
-
-  public:
-
-    /**
-     * Default constructor
-     */
-    DistanceTools();
+  namespace DistanceTools {
 
     /**
      * Returns the 3D vector between a vertex and a track's point of closest approach to that vertex
@@ -80,5 +73,5 @@ namespace Belle2 {
      */
     double vtxToVtxDistErr(TVector3 const& vtx1Pos, TVector3 const& vtx2Pos,
                            TMatrixDSym const& vtx1CovMat, TMatrixDSym const& vtx2CovMat);
-  };
+  }
 }

@@ -698,7 +698,6 @@ def TagV(
     list_name,
     MCassociation='',
     confidenceLevel=0.,
-    # useFitAlgorithm='standard_PXD',
     trackFindingType="standard",
     constraintType="IP",
     askMCInfo=False,
@@ -715,25 +714,25 @@ def TagV(
         list_name (str):         name of the input Breco ParticleList
         MCassociation (str):     use standard MC association or the internal one
         confidenceLevel (float): minimum value of the ConfidenceLevel to accept the fit. 0 selects CL > 0
-        constraintType (str):   choose the constraint used in the fit:
-                                noConstraint
-                                IP (= default, BTag constrainedto be on the IP),
-                                tube (= tube along the BTag line of flight, only for fully reconstructed BCP)
-                                boost (= long tube along the boost direction)
-                                (breco) (deprecated, but similar to tube)
-        trackFindingType (str): choose how to look for tag tracks
-                                standard (all tracks except from Kshorts)
-                                standard_PXD (default, same as above but consider only tracks with at least 1 PXD hit)
-                                singleTrack (only choose the best track, DOES NOT WORK with no constraint)
-                                singleTrack_PXD (same as above but consider only tracks with at least 1 PXD hit)
-        askMCInfo (bool):       True when requesting MC Information from the tracks performing the vertex fit
-        reqPXDHits (int):       minimum N PXD hits for a track
-        maskName (str):         get particles from a specified ROE mask
-        path (basf2.Path):      modules are added to this path
-    """
+        constraintType (str):    choose the constraint used in the fit:
+            * noConstraint
+            * IP (= default, tag B constrained to be on the IP),
+            * tube (= tube along the tag B line of flight, only for fully reconstructed signal B)
+            * boost (= long tube along the boost direction)
+            * (breco) (deprecated, but similar to tube)
+        trackFindingType (str):  choose how to look for tag tracks
+            * standard (all tracks except from Kshorts)
+            * standard_PXD (default, same as above but consider only tracks with at least 1 PXD hit)
+            * singleTrack (only choose the best track, DOES NOT WORK with no constraint)
+            * singleTrack_PXD (same as above but consider only tracks with at least 1 PXD hit)
+        askMCInfo (bool):        True when requesting MC Information from the tracks performing the vertex fit
+        reqPXDHits (int):        minimum N PXD hits for a track
+        maskName (str):          get particles from a specified ROE mask
+        path (basf2.Path):       modules are added to this path
 
-    # useFitAlgorithm (str):   choose the fit algorithm: boost, breco, standard, standard_pxd, singleTrack,
-    #    singleTrack_pxd, noConstraint
+    Note that the useFitAlgorithm (str) parameter is deprecated and replaced by constraintType (str)
+    and trackFindingType (str)
+    """
 
     tvfit = register_module('TagVertex')
     tvfit.set_name('TagVertex_' + list_name)
@@ -743,7 +742,6 @@ def TagV(
     tvfit.param('MCAssociation', MCassociation)
     tvfit.param('trackFindingType', trackFindingType)
     tvfit.param('constraintType', constraintType)
-    # tvfit.param('useFitAlgorithm', useFitAlgorithm)
     tvfit.param('askMCInformation', askMCInfo)
     tvfit.param('reqPXDHits', reqPXDHits)
     path.add_module(tvfit)

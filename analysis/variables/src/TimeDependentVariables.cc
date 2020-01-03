@@ -640,10 +640,9 @@ namespace Belle2 {
       const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
       if (!tagTrack) return result;
 
-      DistanceTools distanceTools;
-      result =  distanceTools.trackToVtxDist(tagTrack -> getPosition(),
-                                             tagTrack -> getMomentum(),
-                                             vert -> getConstraintCenter());
+      result =  DistanceTools::trackToVtxDist(tagTrack -> getPosition(),
+                                              tagTrack -> getMomentum(),
+                                              vert -> getConstraintCenter());
 
       return result;
     }
@@ -665,12 +664,11 @@ namespace Belle2 {
 
       TMatrixDSym trackPosCovMat(tagTrack->getCovariance6().GetSub(0, 2, 0, 2));
 
-      DistanceTools distanceTools;
-      result = distanceTools.trackToVtxDistErr(tagTrack -> getPosition(),
-                                               tagTrack -> getMomentum(),
-                                               vert -> getConstraintCenter(),
-                                               trackPosCovMat,
-                                               vert -> getConstraintCov());
+      result = DistanceTools::trackToVtxDistErr(tagTrack -> getPosition(),
+                                                tagTrack -> getMomentum(),
+                                                vert -> getConstraintCenter(),
+                                                trackPosCovMat,
+                                                vert -> getConstraintCov());
 
       return result;
 
@@ -685,9 +683,8 @@ namespace Belle2 {
       if (!vert) return result;
       if (vert->getConstraintType() == "noConstraint") return result;
 
-      DistanceTools distanceTools;
-      result =  distanceTools.vtxToVtxDist(vert -> getConstraintCenter(),
-                                           vert -> getTagVertex());
+      result =  DistanceTools::vtxToVtxDist(vert -> getConstraintCenter(),
+                                            vert -> getTagVertex());
       return result;
     }
 
@@ -705,11 +702,10 @@ namespace Belle2 {
       //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
       TMatrixDSym emptyMat(3);
 
-      DistanceTools distanceTools;
-      result = distanceTools.vtxToVtxDistErr(vert -> getConstraintCenter(),
-                                             vert -> getTagVertex(),
-                                             vert -> getConstraintCov(),
-                                             emptyMat);
+      result = DistanceTools::vtxToVtxDistErr(vert -> getConstraintCenter(),
+                                              vert -> getTagVertex(),
+                                              vert -> getConstraintCov(),
+                                              emptyMat);
 
       return result;
     }
@@ -727,10 +723,9 @@ namespace Belle2 {
       const TrackFitResult* tagTrack(vert->getVtxFitTrackResultPtr(trackIndexInt));
       if (!tagTrack) return result;
 
-      DistanceTools distanceTools;
-      result = distanceTools.trackToVtxDist(tagTrack -> getPosition(),
-                                            tagTrack -> getMomentum(),
-                                            vert -> getTagVertex());
+      result = DistanceTools::trackToVtxDist(tagTrack -> getPosition(),
+                                             tagTrack -> getMomentum(),
+                                             vert -> getTagVertex());
 
 
       return result;
@@ -758,12 +753,11 @@ namespace Belle2 {
 
       TMatrixDSym emptyMat(3);
 
-      DistanceTools distanceTools;
-      result = distanceTools.trackToVtxDistErr(tagTrack -> getPosition(),
-                                               tagTrack -> getMomentum(),
-                                               vert -> getTagVertex(),
-                                               trackPosCovMat,
-                                               emptyMat);
+      result = DistanceTools::trackToVtxDistErr(tagTrack -> getPosition(),
+                                                tagTrack -> getMomentum(),
+                                                vert -> getTagVertex(),
+                                                trackPosCovMat,
+                                                emptyMat);
 
       return result;
     }
@@ -783,11 +777,11 @@ namespace Belle2 {
       TVector3 mcTagV(vert->getMCTagVertex());
 
       if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return std::numeric_limits<float>::quiet_NaN();
+      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN()) return std::numeric_limits<float>::quiet_NaN();
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return std::numeric_limits<float>::quiet_NaN();
 
-      DistanceTools distanceTools;
-      result = distanceTools.vtxToVtxDist(mcParticle -> getProductionVertex(),
-                                          mcTagV);
+      result = DistanceTools::vtxToVtxDist(mcParticle -> getProductionVertex(),
+                                           mcTagV);
 
       return result;
     }
@@ -869,7 +863,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagTrackRaveWeight(i)", tagTrackRaveWeight, "returns the weight assigned by Rave to track i");
 
     REGISTER_VARIABLE("TagVNFitTracks", particleTagVNFitTracks,
-                      "returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts");
+                      "returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)");
 
     REGISTER_VARIABLE("TagTrackDistanceToConstraint(i)", tagTrackDistanceToConstraint,
                       "returns the measured distance between the ith tag track and the centre of the constraint.");

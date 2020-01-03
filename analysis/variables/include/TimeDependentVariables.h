@@ -288,7 +288,7 @@ namespace Belle2 {
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts
+     * returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)
      *
      */
     double particleTagVNFitTracks(const Particle* particle);
@@ -341,7 +341,7 @@ namespace Belle2 {
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
-     * returns the true distance between the true B Tag decay vertex and the p'cle
+     * returns the true distance between the true B Tag decay vertex and the particle
      * corresponding to the tag vtx track indexed by trackIndex.
      *
      */

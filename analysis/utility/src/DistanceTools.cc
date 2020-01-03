@@ -21,7 +21,7 @@ TVector3 DistanceTools::trackToVtxVec(TVector3 const& trackPos, TVector3 const& 
 {
   TVector3 trackDir((1. / trackP.Mag()) * trackP);
   TVector3 r(vtxPos - trackPos);
-  return (r.Dot(trackDir)) * trackDir - r;
+  return r - (r.Dot(trackDir)) * trackDir;
 }
 
 double DistanceTools::trackToVtxDist(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
@@ -111,4 +111,3 @@ double DistanceTools::vtxToVtxDistErr(TVector3 const& vtx1Pos, TVector3 const& v
   return TMath::Sqrt(ret);
 }
 
-DistanceTools::DistanceTools() = default;

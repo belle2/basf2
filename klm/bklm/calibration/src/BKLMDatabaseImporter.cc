@@ -50,6 +50,8 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
 
 void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 {
+  if (m_ElectronicsChannels.size() > 0)
+    m_ElectronicsChannels.clear();
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -137,41 +139,42 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 
       if (plane == BKLMElementNumbers::c_ZPlane) {
         if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+          int channelCheck = channelId;
           if (section == BKLMElementNumbers::c_BackwardSection
               && sector == BKLMElementNumbers::c_ChimneySector) {
             if (layer == 1) {
               if (!isExperiment10) {
-                if (channelId > 0 && channelId < 9)
+                if (channelCheck > 0 && channelCheck < 9)
                   channelId = 9 - channelId;
-                if (channelId > 8 && channelId < 24)
+                if (channelCheck > 8 && channelCheck < 24)
                   channelId = 54 - channelId;
-                if (channelId > 23 && channelId < 39)
+                if (channelCheck > 23 && channelCheck < 39)
                   channelId = 54 - channelId;
               } else {
-                if (channelId > 0 && channelId < 9)
+                if (channelCheck > 0 && channelCheck < 9)
                   channelId = 9 - channelId; // 8 : 1
-                if (channelId > 8 && channelId < 24)
+                if (channelCheck > 8 && channelCheck < 24)
                   channelId = 39 - channelId; // 30 : 16
-                if (channelId > 23 && channelId < 39)
+                if (channelCheck > 23 && channelCheck < 39)
                   channelId = 69 - channelId; // 45 : 31
               }
             }
             if (layer == 2) {
-              if (channelId > 0 && channelId < 10)
+              if (channelCheck > 0 && channelCheck < 10)
                 channelId = 10 - channelId;
-              if (channelId > 9 && channelId < 24)
+              if (channelCheck > 9 && channelCheck < 24)
                 channelId = 40 - channelId;
-              if (channelId > 23 && channelId < 39)
+              if (channelCheck > 23 && channelCheck < 39)
                 channelId = 69 - channelId;
             }
           } else { // All the sectors except the chimney one
-            if (channelId > 0 && channelId < 10)
+            if (channelCheck > 0 && channelCheck < 10)
               channelId = 10 - channelId;
-            if (channelId > 9 && channelId < 25)
+            if (channelCheck > 9 && channelCheck < 25)
               channelId = 40 - channelId;
-            if (channelId > 24 && channelId < 40)
+            if (channelCheck > 24 && channelCheck < 40)
               channelId = 70 - channelId;
-            if (channelId > 39 && channelId < 55)
+            if (channelCheck > 39 && channelCheck < 55)
               channelId = 100 - channelId;
           }
         }

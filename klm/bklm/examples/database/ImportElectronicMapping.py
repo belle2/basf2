@@ -45,5 +45,5 @@ else:
     dbImporter.setElectronicMappingLane(0, 7, 1, 2)
     dbImporter.setElectronicMappingLane(0, 7, 2, 1)
 
-    dbImporter.setIOV(10, 0, 11, -1)
+    dbImporter.setIOV(10, 0, -1, -1)
     dbImporter.importElectronicMapping()

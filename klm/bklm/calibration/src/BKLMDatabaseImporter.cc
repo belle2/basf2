@@ -63,6 +63,7 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
+
     if (section == BKLMElementNumbers::c_ForwardSection) {
       if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
         copperId = 1 + BKLM_ID;
@@ -75,6 +76,7 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
       if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
         copperId = 4 + BKLM_ID;
     }
+
     if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
       slotId = sector - 2;
     if (sector == 1 || sector == 2)
@@ -82,18 +84,16 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
     if (sector == 7 || sector == 8)
       slotId = sector - 6;
 
-    if (layer > 2)
+    if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
       laneId = layer + 5;
-    else
-      laneId = layer;
-
-    if (layer < 3) {
-      if (plane == 0)
-        axisId = 1;
-      else
-        axisId = 0;
-    } else
       axisId = plane;
+    } else {
+      laneId = layer;
+      if (plane == BKLMElementNumbers::c_ZPlane)
+        axisId = 1;
+      if (plane == BKLMElementNumbers::c_PhiPlane)
+        axisId = 0;
+    }
 
     int MaxiChannel = BKLMElementNumbers::getNStrips(
                         section, sector, layer, plane);
@@ -108,9 +108,11 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
-      if (!(dontFlip && layer > 2 && plane == 1))
+
+      if (!(dontFlip && layer >= BKLMElementNumbers::c_FirstRPCLayer && plane == BKLMElementNumbers::c_PhiPlane))
         channelId = MaxiChannel - iStrip + 1;
-      if (plane == 1) { //phi strips
+
+      if (plane == BKLMElementNumbers::c_PhiPlane) {
         /** Start settings for exp. 10. */
         if (isExperiment10) {
           if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
@@ -133,31 +135,46 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
           channelId += 4;
         if (layer == 2)
           channelId += 2;
-      } else if (plane == 0) { //z strips
-        if (layer < 3) { //scintillator
+      }
+
+      if (plane == BKLMElementNumbers::c_ZPlane) {
+        if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
           if (section == BKLMElementNumbers::c_BackwardSection
-              && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
+              && sector == BKLMElementNumbers::c_ChimneySector) {
             if (layer == 1) {
               if (!isExperiment10) {
-                if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
-                else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
-                else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
+                if (channelId > 0 && channelId < 9)
+                  channelId = 9 - channelId;
+                if (channelId > 8 && channelId < 24)
+                  channelId = 54 - channelId;
+                if (channelId > 23 && channelId < 39)
+                  channelId = 54 - channelId;
               } else {
-                if (channelId > 0 && channelId < 9) channelId = 9 - channelId;         // 8 : 1
-                else if (channelId > 8 && channelId < 24) channelId = 39 - channelId;  // 30 : 16
-                else if (channelId > 23 && channelId < 39) channelId = 69 - channelId; // 45 : 31
+                if (channelId > 0 && channelId < 9)
+                  channelId = 9 - channelId; // 8 : 1
+                if (channelId > 8 && channelId < 24)
+                  channelId = 39 - channelId; // 30 : 16
+                if (channelId > 23 && channelId < 39)
+                  channelId = 69 - channelId; // 45 : 31
               }
             }
             if (layer == 2) {
-              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
+              if (channelId > 0 && channelId < 10)
+                channelId = 10 - channelId;
+              if (channelId > 9 && channelId < 24)
+                channelId = 40 - channelId;
+              if (channelId > 23 && channelId < 39)
+                channelId = 69 - channelId;
             }
-          } else { //all sectors except backward sector #3
-            if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-            else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
-            else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
-            else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
+          } else { // All the sectors except the chimney one
+            if (channelId > 0 && channelId < 10)
+              channelId = 10 - channelId;
+            if (channelId > 9 && channelId < 25)
+              channelId = 40 - channelId;
+            if (channelId > 24 && channelId < 40)
+              channelId = 70 - channelId;
+            if (channelId > 39 && channelId < 55)
+              channelId = 100 - channelId;
           }
         }
       }

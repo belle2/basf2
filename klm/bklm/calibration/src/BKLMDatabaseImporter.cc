@@ -29,8 +29,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-#include <iostream>
-
 using namespace std;
 using namespace Belle2;
 

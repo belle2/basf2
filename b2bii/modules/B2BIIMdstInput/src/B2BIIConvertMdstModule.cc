@@ -178,6 +178,17 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
 
   m_realData = false;
 
+#if Light_relase == True
+  if (m_convertECLCrystalEnergies) {
+    B2WARNING("You are using a light release. The conversion of ECL crystal energies is not possible.");
+    m_convertECLCrystalEnergies = false;
+  }
+  if (m_convertExtHits) {
+    B2WARNING("You are using a light release. The conversion of ExtHits is not possible.");
+    m_convertExtHits = false;
+  }
+#endif
+
   B2DEBUG(1, "B2BIIConvertMdst: Constructor done.");
 }
 
@@ -210,8 +221,14 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_trackFitResults.registerInDataStore();
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
+
+#if Light_relase != True
   if (m_convertECLCrystalEnergies) m_eclHits.registerInDataStore();
-  if (m_convertExtHits) m_extHits.registerInDataStore();
+  if (m_convertExtHits) {
+    m_extHits.registerInDataStore();
+    m_tracks.registerRelationTo(m_extHits);
+  }
+#endif
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -241,7 +258,6 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
-  if (m_convertExtHits) m_tracks.registerRelationTo(m_extHits);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -1190,6 +1206,7 @@ void B2BIIConvertMdstModule::convertECLHitTable()
     return;
   }
 
+#if Light_relase != True
   // Loop over all Belle Datecl_mc_ehits
   for (Belle::Datecl_mc_ehits_Manager::iterator ehitIterator = ehitsMgr.begin(); ehitIterator != ehitsMgr.end(); ++ehitIterator) {
 
@@ -1202,6 +1219,7 @@ void B2BIIConvertMdstModule::convertECLHitTable()
     // Convert Datecl_mc_ehit -> ECLHit
     convertECLHitObject(datECLMCEHit, B2EclHit);
   }
+#endif
 }
 
 void B2BIIConvertMdstModule::convertExtHitTable()
@@ -1212,6 +1230,7 @@ void B2BIIConvertMdstModule::convertExtHitTable()
     return;
   }
 
+#if Light_relase != True
   Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
 
   // Relations
@@ -1247,6 +1266,7 @@ void B2BIIConvertMdstModule::convertExtHitTable()
       }
     }
   }
+#endif
 }
 
 void B2BIIConvertMdstModule::convertEvtclsTable()
@@ -1844,6 +1864,7 @@ void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster&
   klmCluster->setInnermostLayer(klm_cluster.first_layer());
 }
 
+#if Light_relase != True
 void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit)
 {
   // note: average time was not available in Belle
@@ -1865,7 +1886,7 @@ void B2BIIConvertMdstModule::convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_
   }
   extHit->setCovariance(covarianceMatrix);
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // RELATIONS

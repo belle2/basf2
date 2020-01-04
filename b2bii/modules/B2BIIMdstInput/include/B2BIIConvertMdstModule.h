@@ -41,8 +41,10 @@
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
+#if Light_release != True
 #include <ecl/dataobjects/ECLHit.h>
 #include <tracking/dataobjects/ExtHit.h>
+#endif
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -254,6 +256,7 @@ namespace Belle2 {
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
 
+#if Light_release != True
     /**
      * Converts Datecl_mc_ehits record to ECLHit object.
      */
@@ -263,6 +266,7 @@ namespace Belle2 {
      * Converts Mdst_ecl_trk record to ExtHit object.
      */
     void convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit);
+#endif
 
     /**
      * Creates TrackFitResult and fills it.
@@ -411,11 +415,13 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
+#if Light_release != True
     /** ECL hits */
     StoreArray<ECLHit> m_eclHits;
 
     /** Ext hits */
     StoreArray<ExtHit> m_extHits;
+#endif
 
     /** Event classification flags */
     StoreObjPtr<EventExtraInfo> m_evtCls;

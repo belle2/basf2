@@ -124,6 +124,7 @@ global_env = Environment(
         # in an dependency to boost_python so let's keep it for now.
         "-Wl,--copy-dt-needed-entries"
     ],
+    LIGHT_RELEASE=False,
 )
 
 # add this early because we want to be sure it's enabled before we create any
@@ -300,6 +301,8 @@ else:
         light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
         sphinx_exclude_pattern |= available_packages.difference(light_packages)
         available_packages = available_packages.intersection(light_packages)
+        global_env['LIGHT_RELEASE'] = True
+        global_env.Append(CCFLAGS=['-DLight_release=True'])
 
     # we looped over all of them and know what's available so let's compile
     # whatever was selected

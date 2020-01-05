@@ -85,9 +85,11 @@ combined_skims = {
         'CharmlessHad2Body', 'CharmlessHad3Body'
     ],
     'CharmHigh': [
-
+        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJmPi0',
+        'DstToD0Pi_D0ToHpHmPi0', 'XToDp_DpToKsHp'
     ],
     'CharmLow': [
+        'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs',
 
     ],
     'CombinedSystematics': [

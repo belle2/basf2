@@ -24,6 +24,8 @@ Changes since release-04
 .. Detailed changes for the analysis package first, that's
    what user will want to see
 
+.. include:: analysis/doc/whatsnew-since/release-04-01.txt
+
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 
 .. And then for framework as well. If something is more important we can always

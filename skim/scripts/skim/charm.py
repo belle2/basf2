@@ -237,8 +237,8 @@ def DstToD0PiD0ToHpHmKs(path):
 
     fillCharmSkimKs(path)
 
-    D0cuts = '1.80 < M < 1.93'
-    Dstcuts = '0 < Q < 0.015 and useCMSFrame(p)>2.3'
+    D0cuts = '1.75 < M < 1.95'
+    Dstcuts = '0 < Q < 0.022 and useCMSFrame(p)>2.3'
 
     D0_Channels = ['pi-:hphmks pi+:hphmks K_S0:charmskim',
                    'K-:hphmks K+:hphmks K_S0:charmskim'

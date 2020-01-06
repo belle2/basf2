@@ -13,6 +13,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/RandomGenerator.h>
+#include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>

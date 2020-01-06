@@ -115,6 +115,8 @@ void GeneratedVertexDisplacerModule::displace(MCParticle& particle, float lifeti
   if (particle.getNDaughters()) {
     displaceDaughter(*displacementVector, particle.getDaughters());
   }
+
+  delete displacementVector;
 }
 
 
@@ -143,8 +145,7 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
 {
   TLorentzVector fourVector_mcp = particle.get4Vector();
   float decayLength_mcp = 0;
-  float c_cm_per_ns = 29.9792458;
-  if (!m_ctau) lifetime *= c_cm_per_ns;
+  if (!m_ctau) lifetime *= Const::speedOfLight;
 
   if (m_lifetimeOption.compare("fixed") == 0) decayLength_mcp = lifetime;
   else if (m_lifetimeOption.compare("flat") == 0) decayLength_mcp = gRandom->Uniform(0, m_maxDecayTime);
@@ -161,13 +162,13 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   displacement.SetX(decayLength_mcp * fourVector_mcp.X() / pMag);
   displacement.SetY(decayLength_mcp * fourVector_mcp.Y() / pMag);
   displacement.SetZ(decayLength_mcp * fourVector_mcp.Z() / pMag);
-  displacement.SetT(decayLength_mcp / c_cm_per_ns);
+  displacement.SetT(decayLength_mcp / Const::speedOfLight);
 }
 
 
 void GeneratedVertexDisplacerModule::terminate()
 {
-  B2DEBUG(0, "Terminate GeneratedVertexDisplacerModule");
+
 }
 
 

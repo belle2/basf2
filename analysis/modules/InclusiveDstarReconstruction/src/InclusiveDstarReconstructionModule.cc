@@ -117,7 +117,12 @@ void InclusiveDstarReconstructionModule::event()
       continue;
     };
 
+//    if ( pion->getEnergy() / (m_dstar_pdg_mass - m_d_pdg_mass) < 0 ) continue;
+
     TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
+
+    if (isnan(dstar_four_vector.P())) continue;
+
     Particle dstar = Particle(dstar_four_vector, m_dstar_pdg_code, Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
                               pion->getArrayPointer());
     Particle* new_dstar = particles.appendNew(dstar);
@@ -128,13 +133,23 @@ void InclusiveDstarReconstructionModule::event()
 
 TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(const Particle* pion)
 {
-  // estimate D* energy and absolute momentum using the slow pion energy
+//  // estimate D* energy and absolute momentum using the slow pion energy
   double energy_dstar = pion->getEnergy() * m_dstar_pdg_mass / (m_dstar_pdg_mass - m_d_pdg_mass);
   double abs_momentum_dstar = sqrt(energy_dstar * energy_dstar - m_dstar_pdg_mass * m_dstar_pdg_mass);
 
   // dstar momentum approximated colinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
   TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
+
+//  double mass_pion = pion->getMass();
+//  double mass_pion = TDatabasePDG::Instance()->GetParticle(pion->getPDGCode())->Mass();
+//  double energy_pion_dstarcms = (m_dstar_pdg_mass* m_dstar_pdg_mass + mass_pion*mass_pion - m_d_pdg_mass*m_d_pdg_mass) / (2*m_dstar_pdg_mass);
+//  double abs_momentum_dstar = m_dstar_pdg_mass/(mass_pion * mass_pion) * energy_pion_dstarcms * pion->getMomentum().Mag();
+//
+//  TVector3 momentum_vector_pion =  pion->getMomentum();
+//  TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
+//
+//  double energy_dstar = sqrt( m_dstar_pdg_mass*m_dstar_pdg_mass + abs_momentum_dstar *abs_momentum_dstar);
 
   return TLorentzVector(momentum_vec_dstar, energy_dstar);
 }

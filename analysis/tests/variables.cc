@@ -2453,6 +2453,73 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
   }
 
+  TEST_F(MetaVariableTest, mcParticleIsInList)
+  {
+    // datastore things
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
+    // needed to mock up
+    StoreArray<MCParticle> mcparticles;
+    StoreArray<Particle> particles;
+    StoreObjPtr<ParticleList> list("testList");
+
+    mcparticles.registerInDataStore();
+    particles.registerInDataStore();
+    particles.registerRelationTo(mcparticles);
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+    list.registerInDataStore(flags);
+
+    DataStore::Instance().setInitializeActive(false);
+    // end datastore setup
+    list.create();
+    list->initialize(22, "testList");
+
+    // MCParticles
+    auto* mcphoton = mcparticles.appendNew();
+    mcphoton->setPDG(22);
+    mcphoton->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcelectron = mcparticles.appendNew();
+    mcelectron->setPDG(11);
+    mcelectron->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcother = mcparticles.appendNew();
+    mcother->setPDG(22);
+    mcother->setStatus(MCParticle::c_PrimaryParticle);
+
+    // particles
+    auto* photon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    photon->addRelationTo(mcphoton);
+    list->addParticle(photon);
+
+    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    electron->addRelationTo(mcelectron);
+    list->addParticle(electron);
+
+    auto* other = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    other->addRelationTo(mcother);
+    // not in the list
+
+    // get the variable
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("mcParticleIsInList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("mcParticleIsInList(testList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(photon));
+    EXPECT_FLOAT_EQ(vsensible->function(photon), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(electron), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(other), 0.0);
+
+    // now mock up some other type particles
+    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* composite_ = particles.appendNew(undefined);
+    auto* undefined_ = particles.appendNew(composite);
+    EXPECT_FLOAT_EQ(vsensible->function(composite_), 0.0);
+    EXPECT_FLOAT_EQ(vsensible->function(undefined_), 0.0);
+  }
+
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
   {
     /* Mock up an event with a "photon" and an "electron" which are nearly back to

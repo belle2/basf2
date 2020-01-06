@@ -479,6 +479,37 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr mcParticleIsInList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for mcParticleIsInList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+          B2FATAL("Invalid Listname " << listName << " given to mcParticleIsInList");
+
+        // this can only be true for mc-matched particles or particles are created from MCParticles
+        const MCParticle* mcp = particle->getMCParticle();
+        if (mcp == nullptr) return 0.0;
+
+        // check every particle in the input list is not matched to (or created from) the same MCParticle
+        for (unsigned i = 0; i < list->getListSize(); ++i)
+        {
+          const MCParticle* imcp = list->getParticle(i)->getMCParticle();
+          if ((imcp != nullptr) and (mcp->getArrayIndex() == imcp->getArrayIndex()))
+            return 1.0;
+        }
+        return 0.0;
+      };
+      return func;
+    }
+
     Manager::FunctionPtr isDaughterOfList(const std::vector<std::string>& arguments)
     {
       B2WARNING("isDaughterOfList is outdated and replaced by isDescendantOfList.");
@@ -2603,6 +2634,14 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
 )DOC");
+
+    REGISTER_VARIABLE("mcParticleIsInList(particleListName)", mcParticleIsInList, R"DOC(
+Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
+(or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
+
+.. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
+)DOC");
+
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,

@@ -71,6 +71,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
     const std::string& baseIdentifier = cutIdentifier.first;
 
+    // TODO: ROOT does not like Histograms with 0 bins, so this thing produces several runtime warnings by root. Someone knowing the code should have a look
     m_cutResultHistograms.emplace(baseIdentifier,
                                   new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 0, 0, 0));
     m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());

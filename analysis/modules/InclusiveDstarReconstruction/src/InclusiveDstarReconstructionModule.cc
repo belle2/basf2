@@ -78,10 +78,6 @@ void InclusiveDstarReconstructionModule::initialize()
   m_cut = Variable::Cut::compile(m_slowPionCut);
 
   m_dstar_pdg_mass = TDatabasePDG::Instance()->GetParticle(m_dstar_pdg_code)->Mass();
-  // if output list is a charged (neutral) D*, assign average of charged and neutral (neutral) D mass
-//  m_d_pdg_mass = (abs(m_dstar_pdg_code) == 413) ? (TDatabasePDG::Instance()->GetParticle(411)->Mass() +
-//                                                   TDatabasePDG::Instance()->GetParticle(421)->Mass()) / 2 :
-//                 TDatabasePDG::Instance()->GetParticle(421)->Mass();
 
   if (abs(m_dstar_pdg_code) == 413) {
     m_d_pdg_mass = (pion_pdg_code == 111) ? TDatabasePDG::Instance()->GetParticle(421)->Mass() : TDatabasePDG::Instance()->GetParticle(
@@ -117,8 +113,6 @@ void InclusiveDstarReconstructionModule::event()
       continue;
     };
 
-//    if ( pion->getEnergy() / (m_dstar_pdg_mass - m_d_pdg_mass) < 0 ) continue;
-
     TLorentzVector dstar_four_vector = estimateDstarFourMomentum(pion);
 
     if (isnan(dstar_four_vector.P())) continue;
@@ -140,16 +134,6 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
   // dstar momentum approximated colinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
   TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
-
-//  double mass_pion = pion->getMass();
-//  double mass_pion = TDatabasePDG::Instance()->GetParticle(pion->getPDGCode())->Mass();
-//  double energy_pion_dstarcms = (m_dstar_pdg_mass* m_dstar_pdg_mass + mass_pion*mass_pion - m_d_pdg_mass*m_d_pdg_mass) / (2*m_dstar_pdg_mass);
-//  double abs_momentum_dstar = m_dstar_pdg_mass/(mass_pion * mass_pion) * energy_pion_dstarcms * pion->getMomentum().Mag();
-//
-//  TVector3 momentum_vector_pion =  pion->getMomentum();
-//  TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
-//
-//  double energy_dstar = sqrt( m_dstar_pdg_mass*m_dstar_pdg_mass + abs_momentum_dstar *abs_momentum_dstar);
 
   return TLorentzVector(momentum_vec_dstar, energy_dstar);
 }

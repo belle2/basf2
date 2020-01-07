@@ -35,16 +35,6 @@ def SinglePhotonDarkList(path):
     """
     __author__ = "Sam Cunliffe"
 
-    # no good tracks in the event
-    cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
-    ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
-
-    # no other photon above 100 MeV
-    angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
-    minimum = 'E > 0.1'  # GeV
-    ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
-    ma.applyEventCuts('0 < nParticlesInList(gamma:100) < 2', path=path)
-
     # all remaining single photon events (== candidates) with region
     # dependent minimum energy in GeV
     region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel

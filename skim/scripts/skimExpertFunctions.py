@@ -112,6 +112,14 @@ def add_skim(label, lists, path):
     summaryOfLists(lists, path=path)
 
 
+def outputIfPassesEventCut(cut, conditionalPath, skimName, lists, mainSkimPath):
+    eselect = mainSkimPath.add_module("VariableToReturnValue",
+                                      variable=f"passesEventCut({cut})")
+    eselect.if_value('>=1', conditionalPath, b2.AfterConditionPath.CONTINUE)
+    skimOutputUdst(encodeSkimName(skimName), skimParticleLists=lists, path=conditionalPath)
+    summaryOfLists(particleLists=lists, path=conditionalPath)
+
+
 def setSkimLogging(path, additional_modules=[]):
     """
     Turns the log level to ERROR for  several modules to decrease

@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Load default electronics mapping.
      */
-    void loadDefaultElectronicMapping();
+    void loadDefaultElectronicMapping(bool isExperiment10 = false);
 
     /**
      * Set non-default lane.

@@ -25,9 +25,9 @@
 #include <G4Box.hh>
 #include <G4Polyhedra.hh>
 #include <G4PVPlacement.hh>
+#include <G4Region.hh>
 #include <G4Tubs.hh>
 #include <G4UnionSolid.hh>
-#include <G4Region.hh>
 
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -1892,15 +1892,13 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     createStripSegment(i);
   }
   /* Create other volumes. */
-
-  // Set up region for production cuts
+  /* Set up region for production cuts */
   G4Region* aRegion = new G4Region("EKLMEnvelope");
 
   for (m_CurVol.section = 1; m_CurVol.section <= m_GeoDat->getNSections();
        m_CurVol.section++) {
     section = createSection(&topVolume);
-
-    // Assign same region to each sector
+    /* Assign same region to each sector */
     section->SetRegion(aRegion);
     aRegion->AddRootLogicalVolume(section);
 

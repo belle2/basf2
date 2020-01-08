@@ -122,7 +122,7 @@ namespace Belle2 {
                            );
       envelopeLogical->SetVisAttributes(m_VisAttributes.front()); // invisible
       putEndsInEnvelope(envelopeLogical);
-      /* Set up region for production cuts */
+      /* Set up region for production cuts. */
       G4Region* aRegion = new G4Region("BKLMEnvelope");
       envelopeLogical->SetRegion(aRegion);
       aRegion->AddRootLogicalVolume(envelopeLogical);

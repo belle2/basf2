@@ -60,8 +60,6 @@ namespace Belle2 {
   // read parameter-input file and load the parameters
   {
 
-    char* strpoi;
-
     B2INFO("Treps: Parameters are read from the file, " << parameterFile);
     B2INFO("Treps: W list is read from the file, " << wlistFile);
     B2INFO("Treps: Differential cross section list is read from the file, " << diffcrosssectionFile);
@@ -205,7 +203,6 @@ namespace Belle2 {
     zdis = new TH1F("kin3_z", "kin3_z", 40, -1., 1.);
     zpdis = new TH1F("kin3_zp", "kin3_zp", 40, -1., 1.);
     zsdis = new TH1F("kin3_zs", "kin3_zs", 40, -1., 1.);
-
 
   }
 

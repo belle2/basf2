@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     UtrepsB(void);
-    ~UtrepsB() { };
+    ~UtrepsB() {};
 
     /** initialization of Pparametrization of pi+pi- partial waves */
     void initg() ;

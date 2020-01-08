@@ -12,7 +12,10 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+#include <generators/treps/Treps3B.h>
 #include <generators/treps/UtrepsB.h>
+
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/InitialParticleGeneration.h>

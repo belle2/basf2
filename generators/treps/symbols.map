@@ -1,0 +1,16 @@
+# Tell the linker that only the C++ interface symbols should be public, all the
+# rest we want to be private to not interfere with anything else (aka Pythia)
+{
+global:
+    extern "C++" {
+        Belle2::UtrepsB::*;
+        Belle2::TrepsB::*;
+        Belle2::Sutool::*;
+        Belle2::Intreps::*;
+        Belle2::Part_cont::*;
+        Belle2::Part_gen::*;
+	Belle2::dbcomplex::*;
+    };
+local:
+    *;
+};

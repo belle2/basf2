@@ -19,7 +19,7 @@
 // $Log$
 
 
-#if !defined(PACKAGE_TREPS3B_H_INCLUDED)
+#ifndef PACKAGE_TREPS3B_H_INCLUDED
 #define PACKAGE_TREPS3B_H_INCLUDED
 
 #include<TVector3.h>
@@ -38,16 +38,16 @@ namespace Belle2 {
   class TrepsB {
 
   public:
+    // Constructors and destructor
+    TrepsB(void);
+    ~TrepsB() {};
+
     // constants, enums and typedefs
     double w;      // invariant mass of two-photon system
-
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved
     Sutool sutool; //calculation tool kit by S.U
 
-    // Constructors and destructor
-    TrepsB(void);
-    ~TrepsB(void) {};
 
     // member functions
     void setParameterFile(std::string file)
@@ -177,6 +177,6 @@ namespace Belle2 {
   };
 
 
-#endif /* PACKAGE_TREPS3B_H_INCLUDED */
-
 } // namespace Belle2
+
+#endif /* PACKAGE_TREPS3B_H_INCLUDED */

@@ -23,7 +23,7 @@
 #include <fstream>
 using namespace std;
 
-#if !defined(PACKAGE_SUTOOL_H_INCLUDED)
+#ifndef PACKAGE_SUTOOL_H_INCLUDED
 #define PACKAGE_SUTOOL_H_INCLUDED
 
 namespace Belle2 {
@@ -34,7 +34,7 @@ namespace Belle2 {
   public:
     // Constructors and destructor
     Sutool() {};
-    virtual ~Sutool() {};
+    ~Sutool() {};
 
     // member functions
     void nextline(ifstream& infile)

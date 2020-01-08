@@ -134,7 +134,7 @@ void trepsinputModule::event()
 
 void trepsinputModule::terminate()
 {
-  m_generator.terminate();
+  // m_generator.terminate();
 }
 
 double trepsinputModule::getCrossSection(double W)

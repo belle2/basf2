@@ -8,7 +8,7 @@
 
 
 
-#if !defined(PACKAGE_DBCOMPLEX_H_INCLUDED)
+#ifndef PACKAGE_DBCOMPLEX_H_INCLUDED
 #define PACKAGE_DBCOMPLEX_H_INCLUDED
 
 namespace Belle2 {
@@ -104,7 +104,7 @@ namespace Belle2 {
       return dbcomplex(re, -im) ;
     }
   };
-
+}
 #endif /* PACKAGE_DBCOMPLEX_H_INCLUDED */
 
 

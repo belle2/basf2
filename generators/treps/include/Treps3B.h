@@ -83,16 +83,40 @@ namespace Belle2 {
                 int, int, int, int, int, double&, double&, double&,
                 double&, double&, double&, TVector3&,
                 TVector3&, TVector3&, double&) ;
-    virtual int tpuser(TLorentzVector, TLorentzVector,
-                       Part_gen*, int);
+    // This will be overwritten in UtrepsB.h
+    virtual int tpuser(TLorentzVector _pe, TLorentzVector _pp,
+                       Part_gen* part, int _npart)
+    {
+      // user decision routine for extra generation conditions.
+      // Return positive integer for the generation, otherwise, this event will
+      // be canceled.
+      // CAUTION!: The 4-momenta of particles are represented in the e+e- c.m. system
+      //
+      return 1 ;
+    }
+
 
     // const member functions
     void terminate(void) const ;
-    virtual double tpform(double, double) const  ; // returns form factor effect, actually always returns 1
-    virtual double tpangd(double, double)  ; // always returns 1
-    virtual void trkpsh(int, TLorentzVector, TLorentzVector,
-                        Part_gen*, int) const ; // do nothing..
-    virtual void print_event(void) const ; // print event information at B2DEBUG(10)
+    void print_event(void) const ; // print event information at B2DEBUG(10)
+
+    // returns form factor effect, actually always returns 1. This will be overwritten in UtrepsB.h
+    virtual double tpform(double _q2, double _w) const
+    {
+      //form factor effect
+      double dis = 1.0 ;
+      return dis ;
+    }
+    // always returns 1. This will be overwritten in UtrepsB.h
+    virtual double tpangd(double _z, double _w)
+    {
+      double c = 1.0 ;
+      return c;
+    }
+
+    // do nothing
+    void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
+
 
 
   private:

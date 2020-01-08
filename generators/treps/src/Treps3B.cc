@@ -846,31 +846,6 @@ namespace Belle2 {
     return tpform(q2, w) ;
   }
 
-
-  double TrepsB::tpform(double _q2, double _w) const
-  {
-    //form factor effect
-    double dis = 1.0 ;
-    return dis ;
-  }
-
-  double TrepsB::tpangd(double _z, double _w)
-  {
-    double c = 1.0 ;
-    return c;
-  }
-
-  int TrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
-                     Part_gen* part, int _npart)
-  {
-    // user decision routine for extra generation conditions.
-    // Return positive integer for the generation, otherwise, this event will
-    // be canceled.
-    // CAUTION!: The 4-momenta of particles are represented in the e+e- c.m. system
-    //
-    return 1 ;
-  }
-
   void TrepsB::trkpsh(int iev,
                       TLorentzVector _pe, TLorentzVector _pp,
                       Part_gen* part, int n) const

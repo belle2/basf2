@@ -25,13 +25,13 @@ namespace Belle2 {
   /**
    * Input from TREPS generator for ee->eeff
    */
-  class trepsinputModule : public Module {
+  class TrepsInputModule : public Module {
 
   public:
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    trepsinputModule();
+    TrepsInputModule();
 
     /** initialization for trepsinput */
     virtual void initialize() override;

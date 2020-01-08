@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <generators/modules/trepsinput/trepsinputModule.h>
+#include <generators/modules/trepsinput/TrepsInputModule.h>
 #include <generators/treps/Sutool.h>
 #include <generators/treps/UtrepsB.h>
 #include <string.h>
@@ -24,13 +24,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(trepsinput)
+REG_MODULE(TrepsInput)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-trepsinputModule::trepsinputModule() : Module()
+TrepsInputModule::TrepsInputModule() : Module()
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -48,7 +48,7 @@ trepsinputModule::trepsinputModule() : Module()
 
 }
 
-void trepsinputModule::initialize()
+void TrepsInputModule::initialize()
 {
   //Initialize generator;
   m_generator.setParameterFile(m_parameterFile);
@@ -79,7 +79,7 @@ void trepsinputModule::initialize()
 
 }
 
-void trepsinputModule::event()
+void TrepsInputModule::event()
 {
   if (m_useDiscreteAndSortedW) {
     if (m_generator.inmode != 0) return;
@@ -132,12 +132,12 @@ void trepsinputModule::event()
   m_mpg.generateList(m_mcparticles.getName(), MCParticleGraph::c_setDecayInfo);
 }
 
-void trepsinputModule::terminate()
+void TrepsInputModule::terminate()
 {
   // m_generator.terminate();
 }
 
-double trepsinputModule::getCrossSection(double W)
+double TrepsInputModule::getCrossSection(double W)
 {
   if (m_generator.diffCrossSectionOfW.size() == 0) {
     B2FATAL("Cross Section Table is empty !!!");
@@ -152,7 +152,7 @@ double trepsinputModule::getCrossSection(double W)
   return (it_upper->second - it_lower->second) / (it_upper->first - it_lower->first) * (W - it_lower->first) + it_lower->second;
 }
 
-double trepsinputModule::simulateW()
+double TrepsInputModule::simulateW()
 {
 
   while (1) {

@@ -31,10 +31,6 @@ namespace Belle2 {
     void initg() ;
     Interps b00, b20, b22; // Parameter sets
 
-    /* virtual double tpform(double, double) const override ;
-    /* virtual double tpangd(double, double) override ;
-    /* virtual int tpuser(TLorentzVector, TLorentzVector, Part_gen*, int); // user decision routine for extra generation conditions. */
-
     // FormFactor effect */
     virtual double tpform(double _q2, double _w) const
     {

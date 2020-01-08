@@ -57,6 +57,9 @@ namespace Belle2 {
       /** Set cut value for ECL barrel, forward and backward envelopes */
       void SetECLProductionCutValue(G4double);
 
+      /** Set cut value for BKLM and EKLM envelopes */
+      void SetKLMProductionCutValue(G4double);
+
       /** Use standard EM physics instead of EM option1 */
       void UseStandardEMPhysics(G4bool);
 
@@ -79,6 +82,7 @@ namespace Belle2 {
       G4double m_cdcCutValue;
       G4double m_arichtopCutValue;
       G4double m_eclCutValue;
+      G4double m_klmCutValue;
     };
 
   } // end of namespace Simulation

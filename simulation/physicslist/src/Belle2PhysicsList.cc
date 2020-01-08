@@ -55,6 +55,9 @@ Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   m_svdCutValue = m_globalCutValue;
   m_cdcCutValue = m_globalCutValue;
   m_arichtopCutValue = m_globalCutValue;
+  m_eclCutValue = m_globalCutValue;
+  m_klmCutValue = m_globalCutValue;
+
   // Decay
   RegisterPhysics(new G4DecayPhysics());
 
@@ -282,6 +285,18 @@ void Belle2PhysicsList::SetCuts()
   theRegionStore->GetRegion("ECLForwardEnvelope")->SetProductionCuts(regionCuts);
   theRegionStore->GetRegion("ECLBarrelSector")->SetProductionCuts(regionCuts);
   theRegionStore->GetRegion("ECLBackwardEnvelope")->SetProductionCuts(regionCuts);
+
+  // BKLM region cut
+  if (m_klmCutValue == 0.0) m_klmCutValue = m_globalCutValue;
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_klmCutValue * cm);
+  theRegionStore->GetRegion("BKLMEnvelope")->SetProductionCuts(regionCuts);
+
+  // EKLM region cut
+  regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(m_klmCutValue * cm);
+  G4cout << " BKLM and EKLM cuts set to " << m_klmCutValue << G4endl;
+  theRegionStore->GetRegion("EKLMEnvelope")->SetProductionCuts(regionCuts);
 }
 
 
@@ -324,6 +339,12 @@ void Belle2PhysicsList::SetARICHTOPProductionCutValue(G4double value)
 void Belle2PhysicsList::SetECLProductionCutValue(G4double value)
 {
   m_eclCutValue = value;
+}
+
+
+void Belle2PhysicsList::SetKLMProductionCutValue(G4double value)
+{
+  m_klmCutValue = value;
 }
 
 

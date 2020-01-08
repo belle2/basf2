@@ -37,6 +37,10 @@ InclusiveDstarReconstructionModule::InclusiveDstarReconstructionModule() : Modul
   addParam("DstarListName", m_outputDstarListName, "Name of the output D* ParticleList", std::string(""));
   addParam("slowPionCut", m_slowPionCut, "Cut for selecting slow pions", std::string("useCMSFrame(p) < 0.2"));
 
+  m_dstar_pdg_code = 0;
+  m_dstar_pdg_mass = 0;
+  m_d_pdg_mass = 0;
+
 }
 
 InclusiveDstarReconstructionModule::~InclusiveDstarReconstructionModule() = default;

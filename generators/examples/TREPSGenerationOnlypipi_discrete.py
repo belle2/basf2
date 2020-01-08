@@ -28,8 +28,8 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=99966)
 beamparameters = add_beamparameters(main, "Y4S")
 
 # to run the framework the used modules need to be registered
-parameterFilePipi = Belle2.FileSystem.findFile('generators/modules/trepsinput/parameterFiles/treps_par_pipi.dat')
-wListTableFilePipi = Belle2.FileSystem.findFile('generators/modules/trepsinput/wListFiles/wlist_table_pipi.dat')
+parameterFilePipi = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_pipi.dat')
+wListTableFilePipi = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_pipi.dat')
 
 trepsinput = basf2.register_module('trepsinput')
 trepsinput.param('ParameterFile', parameterFilePipi)

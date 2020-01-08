@@ -39,6 +39,11 @@ Variables
  * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
    particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
    The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
+ * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit: 
+   :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
+   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`, 
+   :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
+   :b2:var:`TagTrackTrueDistanceToTagV`
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
@@ -96,6 +101,9 @@ Variables
 Modules
 +++++++
 
+ * In :b2:mod:`TagV` added Btube as a possible constraint for the tag B vertex fit. The ``useFitAlgorithm`` parameter in the module is replaced 
+   by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the module are now using double precision.
+   The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
    (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
    on a first-come, first-served basis, i.e. the order of the input particles
@@ -141,3 +149,7 @@ Full Event Interpretation
 
  * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).
 
+Utilities
++++++++++
+
+ * A set of functions `DistanceTool` has been added to compute distances between (straight) tracks and vertices. 

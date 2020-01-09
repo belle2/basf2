@@ -12,6 +12,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
+ *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,6 +27,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
+
+#include <ecl/utility/ECLTimingUtilities.h>
 
 class TH1F;
 class TFile;
@@ -116,8 +119,8 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
     std::vector < float > v_calibrationCrateTimeOffset;  /**< single crate time calibration offset as vector (per crystal) */
-    std::vector < float >
-    v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as vector uncertainty (per crystal) */
+    std::vector < float > v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as
+                                                                 vector uncertainty (per crystal) */
     DBObjPtr<ECLCrystalCalib> m_calibrationCrateTimeOffset;  /**< single crate time calibration offset (per crystal) */
 
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
@@ -162,11 +165,12 @@ namespace Belle2 {
 
     bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
 
+
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
+      std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
+
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
-
-    /**< Function to calculate "energy dependence equation using Alex function" */
-    double energyDependentTimeOffsetElectronic(const double amplitude);
 
     double m_energyDependenceTimeOffsetFitParam_p1 = 0  ;               /**< p1 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p2 = 88449. ;           /**< p2 in "energy dependence equation" */
@@ -195,7 +199,6 @@ namespace Belle2 {
     /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
     virtual const char* eventLevelClusteringInfoName() const override
     { return "EventLevelClusteringInfoPureCsI" ; }
-
 
   };
 

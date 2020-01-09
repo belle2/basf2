@@ -32,6 +32,7 @@ namespace Belle2 {
        * i.e. the energy dependence correction to the time
        * t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
        * or "energy dependence equation using Alex function"
+       * In units of clock ticks: 1/(4fRF) = 0.4913 ns/clock tick
        */
       double energyDependentTimeOffsetElectronic(const double amplitude);
 
@@ -39,7 +40,7 @@ namespace Belle2 {
       /**
        * Sets the time walk function parameters to the values given by the user
        */
-      int setTimeWalkFuncParams(double p1, double p2, double p3, double p4, double p5, double p6)
+      void setTimeWalkFuncParams(double p1, double p2, double p3, double p4, double p5, double p6)
       {
         energyDependenceTimeOffsetFitParam_p1 = p1 ;
         energyDependenceTimeOffsetFitParam_p2 = p2 ;

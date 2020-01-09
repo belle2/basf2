@@ -173,6 +173,12 @@ void ECLDigitCalibratorModule::initialize()
     m_pol2Max = 0.;
   }
 
+  ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
+                                     m_energyDependenceTimeOffsetFitParam_p2,
+                                     m_energyDependenceTimeOffsetFitParam_p3,
+                                     m_energyDependenceTimeOffsetFitParam_p4,
+                                     m_energyDependenceTimeOffsetFitParam_p5,
+                                     m_energyDependenceTimeOffsetFitParam_p6) ;
 }
 
 // begin run
@@ -280,7 +286,8 @@ void ECLDigitCalibratorModule::event()
       bool m_IsMCFlag = Environment::Instance().isMC();
       B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag) ;
       if (!m_IsMCFlag) {
-        double energyTimeShift = energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) ;
+        double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
+                                 m_timeInverseSlope ;
         B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude *
                 v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
                 energyTimeShift << " ns") ;
@@ -450,17 +457,6 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
 
   return m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
 
-}
-
-
-double ECLDigitCalibratorModule::energyDependentTimeOffsetElectronic(const double amp)
-{
-  double ticks_offset = m_energyDependenceTimeOffsetFitParam_p1 + pow((m_energyDependenceTimeOffsetFitParam_p3 /
-                        (amp + m_energyDependenceTimeOffsetFitParam_p2)),
-                        m_energyDependenceTimeOffsetFitParam_p4) + m_energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
-                            m_energyDependenceTimeOffsetFitParam_p6) ;
-
-  return ticks_offset * m_timeInverseSlope ;
 }
 
 

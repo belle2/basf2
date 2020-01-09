@@ -10,6 +10,7 @@
  **************************************************************************/
 
 #include <ecl/utility/ECLTimingUtilities.h>
+#include <math.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -17,14 +18,11 @@ using namespace ECL;
 ECLTimingUtilities::ECLTimingUtilities()
 { }
 
+// Time
 double ECLTimingUtilities::energyDependentTimeOffsetElectronic(const double amp)
 {
-  double ticks_offset = energyDependenceTimeOffsetFitParam_p1 + pow((energyDependenceTimeOffsetFitParam_p3 /
-                        (amp + energyDependenceTimeOffsetFitParam_p2)),
-                        energyDependenceTimeOffsetFitParam_p4) + energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
-                            energyDependenceTimeOffsetFitParam_p6) ;
-
-  return ticks_offset * m_timeInverseSlope ;
+  return  energyDependenceTimeOffsetFitParam_p1 + pow((energyDependenceTimeOffsetFitParam_p3 /
+                                                       (amp + energyDependenceTimeOffsetFitParam_p2)),
+                                                      energyDependenceTimeOffsetFitParam_p4) + energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
+                                                          energyDependenceTimeOffsetFitParam_p6) ;
 }
-
-

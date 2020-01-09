@@ -2670,56 +2670,103 @@ def tagCurlTracks(particleLists,
     path.add_module(curlTagger)
 
 
-def applyChargedPidMVA(sigHypoPDGCode, bkgHypoPDGCode, particleLists, path):
+def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0, 0)):
     """
-    Apply an MVA (BDT) to perform particle identification for charged stable particles using `ChargedPidMVA` module.
+    Use an MVA to perform particle identification for charged stable particles, using the `ChargedPidMVA` module.
+
+    The module decorates Particle objects in the input ParticleList(s) with variables
+    containing the appropriate MVA score, which can be used to select candidates by placing a cut on it.
 
     Note:
-        At the moment, the MVA is trained for **lepton identification** only.
+        The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
 
-    The module decorates Particle objects in the input ParticleList(s) w/ variables
-    containing the appropriate MVA score, which can be used to select candidates.
+    The module can perform either 'binary' PID between input S, B particle mass hypotheses according to the following scheme:
+
+    - e (11) vs. pi (211)
+    - mu (13) vs. pi (211)
+    - pi (211) vs. K (321)
+    - K (321) vs. pi (211)
+    - p (2212) vs. pi (211)
+    - d (1000010020) vs pi (211)
+
+    , or 'global' PID, namely "one-vs-others" separation. The latter makes use of an MVA algorithm trained in multi-class mode,
+    and it's the default behaviour.
 
     Note:
-        Currently, particle identification works as 'binary' separation between
-        input S, B particle mass hypotheses according to the following scheme:
-
-        - e (11) vs. pi (211)
-
-        - mu (13) vs. pi (211)
-
-        The MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
-
-    The MVA algorithm used is a gradient boosted decision tree (**TMVA 4.2.1**, **ROOT 6.14/06**).
+        Currently the MVA is charge-agnostic, i.e. the training is not done independently for +/- charged particles.
 
     Parameters:
-        sigHypoPDGCode (int): the pdgId of the signal mass hypothesis.
-        bkgHypoPDGCode (int): the pdgId of the background mass hypothesis.
-        particleLists (list): list of names of ParticleList objects for charged stable particles.
-                                 The charge-conjugate ParticleLists will be also stored automatically.
+        particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
+                                   The charge-conjugate ParticleLists will be also processed automatically.
         path (basf2.Path): the module is added to this path.
-
+        trainingMode (Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode): enum identifier of the training mode.
+                                                                              Needed to pick up the correct payload from the DB.
+                                                                              Available choices:
+                                                                              {c_Classification=0,
+                                                                               c_Multiclass=1,
+                                                                               c_ECL_Classification=2,
+                                                                               c_ECL_Multiclass=3,
+                                                                               c_PSD_Classification=4,
+                                                                               c_PSD_Multiclass=5,
+                                                                               c_ECL_PSD_Classification=6,
+                                                                               c_ECL_PSD_Multiclass=7}
+        binaryHypoPDGCodes (Optional[tuple(int, int)]): the pdgIds of the signal, background mass hypothesis.
+                                                        Required only for binary PID mode.
     """
 
-    import pdg
-    # Enforce check on input S, B hypotheses compatibility.
-    binaryOpts = [(11, 211), (13, 211)]
-
-    if (sigHypoPDGCode, bkgHypoPDGCode) not in binaryOpts:
-        B2FATAL("No charged pid MVA was trained to separate ", sigHypoPDGCode, " vs. ", bkgHypoPDGCode,
-                ". Please choose among the following pairs:\n",
-                "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+    from ROOT import Belle2
 
     plSet = set(particleLists)
-    for pList in particleLists:
-        name, label = pList.split(':')
-        plSet.add(f"{pdg.conjugate(name)}:{label}")
 
-    chargedpid = register_module("ChargedPidMVA")
-    chargedpid.set_name(f"ChargedPidMVA_{sigHypoPDGCode}_vs_{bkgHypoPDGCode}")
-    chargedpid.param("sigHypoPDGCode", sigHypoPDGCode)
-    chargedpid.param("bkgHypoPDGCode", bkgHypoPDGCode)
+    if binaryHypoPDGCodes == (0, 0):
+        # MULTI-CLASS training mode.
+
+        chargedpid = register_module("ChargedPidMVAMulticlass")
+
+    else:
+        # BINARY training mode.
+
+        # In binary mode, enforce check on input S, B hypotheses compatibility.
+        binaryOpts = [
+            (Belle2.Const.electron.getPDGCode(), Belle2.Const.pion.getPDGCode()),
+            (Belle2.Const.muon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
+            (Belle2.Const.pion.getPDGCode(), Belle2.Const.kaon.getPDGCode()),
+            (Belle2.Const.kaon.getPDGCode(), Belle2.Const.pion.getPDGCode()),
+            (Belle2.Const.proton.getPDGCode(), Belle2.Const.pion.getPDGCode()),
+            (Belle2.Const.deuteron.getPDGCode(), Belle2.Const.pion.getPDGCode())
+        ]
+
+        if binaryHypoPDGCodes not in binaryOpts:
+            B2FATAL("No charged pid MVA was trained to separate ", binaryHypoPDGCodes[0], " vs. ", binaryHypoPDGCodes[1],
+                    ". Please choose among the following pairs:\n",
+                    "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
+
+        chargedpid = register_module("ChargedPidMVA")
+        chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}")
+        chargedpid.param("sigHypoPDGCode", binaryHypoPDGCodes[0])
+        chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
+
     chargedpid.param("particleLists", list(plSet))
+
+    # Map the training mode enum value to the actual name of the payload in the GT.
+    payloadNames = {
+        Belle2.ChargedPidMVAWeights.c_Classification: "Classification",
+        Belle2.ChargedPidMVAWeights.c_Multiclass: "Multiclass",
+        Belle2.ChargedPidMVAWeights.c_ECL_Classification: "ECL_Classification",
+        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: "ECL_Multiclass",
+        Belle2.ChargedPidMVAWeights.c_PSD_Classification: "PSD_Classification",
+        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: "PSD_Multiclass",
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: "ECL_PSD_Classification",
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: "ECL_PSD_Multiclass"
+    }
+
+    if payloadNames.get(trainingMode) is None:
+        B2FATAL("The chosen training mode integer identifier:\n", trainingMode,
+                "\nis not supported. Please choose among the following:\n",
+                "\n".join(f"{key}:{val}" for key, val in sorted(payloadNames.items())))
+
+    payloadName = f"ChargedPidMVAWeights_{payloadNames.get(trainingMode)}"
+    chargedpid.param("payloadName", payloadName)
 
     path.add_module(chargedpid)
 

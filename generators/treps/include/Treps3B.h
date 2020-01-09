@@ -63,6 +63,19 @@ namespace Belle2 {
       diffcrosssectionFile = file;
     }
 
+    void setBeamEnergy(double energy)
+    {
+      ebeam = energy;
+    }
+    void setElectronMomentum(TVector3 p)
+    {
+      pfeb = p;
+    }
+    void setPositronMomentum(TVector3 p)
+    {
+      pfpb = p;
+    }
+
     void initp(void); // initialize the generator. read parameterFile and load the parameters
     void wtable(); // read diffcrosssectionFile and load W-DifferentialCrossSection table.
     double wtable(int); // read wlistFile and load W-NumberOfEvents table.
@@ -144,14 +157,14 @@ namespace Belle2 {
     std::string wlistFile; // filename for W List input
     std::string diffcrosssectionFile; // filename for differential cross section
 
-    double ebeam;  // beam energy in cm system = sqrt(s)/2
+    double ebeam;  // cms beam energy in cm system = sqrt(s)/2
     constexpr const static  double q2zero = 1.0e-6;
     double q2max; // q^2 max
     double cost_cut, pt_cut ;  // cut for save
     int cost_flag, pt_flag ; // flag watching neutral particles
     constexpr const static double pi = 3.14159265358979;     // pi
     constexpr const static double twopi = 2.0 * 3.14159265358979; // 2pi
-    TVector3 pfeb, pfpb; // Momentum of e(lectron) and p(ositron) at lab frame. Scaled to 1/ebeam.
+    TVector3 pfeb, pfpb; // Momentum of e(lectron) and p(ositron) at lab frame.
     TVector3 tswsb ; // Normalized boost factor
     double qzmin, qptmin; // Minimum of qz and qpt
     Part_cont* parti, *parts ; // Particles to be generated. parti is primary, parts is secondary particles.

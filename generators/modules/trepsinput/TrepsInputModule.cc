@@ -30,7 +30,7 @@ REG_MODULE(TrepsInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrepsInputModule::TrepsInputModule() : Module()
+TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -50,37 +50,30 @@ TrepsInputModule::TrepsInputModule() : Module()
 
 void TrepsInputModule::initialize()
 {
-  //Initialize generator;
-  m_generator.setParameterFile(m_parameterFile);
-  m_generator.setDiffcrosssectionFile(m_differentialCrossSectionFile);
-  m_generator.setWlistFile(m_wListTableFile);
-
-  m_generator.initp();
-
-  m_generator.create_hist();
-  m_generator.initg();
-
-  if (m_useDiscreteAndSortedW) {
-    // Initialize wtable with WListTable
-    B2INFO("Discrete W-list is used !!!");
-
-    m_generator.wtcount = 0;
-    m_generator.wtable(0);
-
-    m_generator.w = (double)m_generator.wf;
-
-    m_generator.updateW();
-  } else {
-    // Initialize wtable with DifferentialCrossSection
-    m_generator.wtable();
-  }
-
+  m_initial.initialize();
   m_mcparticles.registerInDataStore();
-
 }
 
 void TrepsInputModule::event()
 {
+  /*
+   * Check if the BeamParameters have changed (if they do, abort the job;
+   * otherwise cross section calculation will be a nightmare).
+   */
+  if (m_beamParams.hasChanged()) {
+    if (!m_initialized) {
+      initializeGenerator();
+      B2WARNING("Beam parameters are initialized !!!");
+    } else {
+      B2FATAL("TrepsInputModule::event(): BeamParameters have changed within "
+              "a job, this is not supported for TREPS!");
+    }
+  }
+
+  /* Generation of the initial particle from beam parameters. */
+  MCInitialParticles& initial = m_initial.generate();
+  TVector3 vertex = initial.getVertex();
+
   if (m_useDiscreteAndSortedW) {
     if (m_generator.inmode != 0) return;
 
@@ -112,6 +105,8 @@ void TrepsInputModule::event()
       p.set4Vector(part[i].p);
       p.setMass(part[i].part_prop.pmass);
       p.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
+      p.setProductionVertex(vertex);
+      p.setValidVertex(true);
     }
     // fill data of the recoil electron and positron
     auto& p1 = m_mpg.addParticle();
@@ -119,22 +114,25 @@ void TrepsInputModule::event()
     p1.set4Vector(m_generator.pe);
     p1.setMass(m_generator.me);
     p1.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
+    p1.setProductionVertex(vertex);
+    p1.setValidVertex(true);
 
     auto& p2 = m_mpg.addParticle();
     p2.setPDG(-11);
     p2.set4Vector(m_generator.pp);
     p2.setMass(m_generator.me);
     p2.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
-
+    p2.setProductionVertex(vertex);
+    p2.setValidVertex(true);
 
   }
   //Fill MCParticle List
   m_mpg.generateList(m_mcparticles.getName(), MCParticleGraph::c_setDecayInfo);
+
 }
 
 void TrepsInputModule::terminate()
 {
-  // m_generator.terminate();
 }
 
 double TrepsInputModule::getCrossSection(double W)
@@ -185,3 +183,43 @@ double TrepsInputModule::simulateW()
   return 0;
 }
 
+
+void TrepsInputModule::initializeGenerator()
+{
+  // Set parameter files
+  m_generator.setParameterFile(m_parameterFile);
+  m_generator.setDiffcrosssectionFile(m_differentialCrossSectionFile);
+  m_generator.setWlistFile(m_wListTableFile);
+
+  // Initialize the initial particle information
+  TVector3 p3;
+  const BeamParameters& nominalBeam = m_initial.getBeamParameters();
+  m_generator.setBeamEnergy(nominalBeam.getMass() / 2.);
+  p3 = nominalBeam.getHER().Vect();
+  m_generator.setElectronMomentum(p3);
+  p3 = nominalBeam.getLER().Vect();
+  m_generator.setPositronMomentum(p3);
+
+  // Initialize generator;
+  m_generator.initp();
+
+  m_generator.create_hist();
+  m_generator.initg();
+
+  if (m_useDiscreteAndSortedW) {
+    // Initialize wtable with WListTable
+    B2INFO("Discrete W-list is used !!!");
+
+    m_generator.wtcount = 0;
+    m_generator.wtable(0);
+
+    m_generator.w = (double)m_generator.wf;
+
+    m_generator.updateW();
+  } else {
+    // Initialize wtable with DifferentialCrossSection
+    m_generator.wtable();
+  }
+
+  m_initialized = true;
+}

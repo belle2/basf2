@@ -48,6 +48,9 @@ namespace Belle2 {
     /** Returns the differential cross section for given W [GeV] */
     double getCrossSection(double W);
 
+    /** Initialize the TREPS generator  */
+    void initializeGenerator();
+
   private:
 
     /** Treps generator **/
@@ -71,6 +74,8 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcparticles; /**< MCParticle collection */
 
     bool m_useDiscreteAndSortedW; /* if it is true, W-list table is used for discrete and sorted W */
+
+    bool m_initialized{false}; /**< True if generator has been initialized. */
 
   };
 }

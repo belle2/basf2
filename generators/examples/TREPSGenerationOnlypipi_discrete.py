@@ -31,7 +31,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 parameterFilePipi = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_pipi.dat')
 wListTableFilePipi = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_pipi.dat')
 
-trepsinput = basf2.register_module('trepsinput')
+trepsinput = basf2.register_module('TrepsInput')
 trepsinput.param('ParameterFile', parameterFilePipi)
 trepsinput.param('WListTableFile', wListTableFilePipi)
 trepsinput.param('UseDiscreteAndSortedW', True)

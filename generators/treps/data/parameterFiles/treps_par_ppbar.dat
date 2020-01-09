@@ -1,6 +1,3 @@
-   5.29                   :BEAM ENERGY
-0.05493    0.0       1.3229
-0.03139    0.0       -0.7559
   1.0           :Q2MAX( NOTAG IF NEGATIVE, KINEMATICAL MAX ASSUMED)
   1.01     1              :ABS(COS(THETA)) CUT VALUE ( MAX VALUE )
   0.00     1              :PT CUT VALUE ( MIN VALUE )

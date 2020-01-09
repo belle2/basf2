@@ -73,16 +73,20 @@ namespace Belle2 {
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
-      infile >> ebeam ;
-      std::cout << "ebeam :" << ebeam << std::endl;
-      sutool.nextline(infile);
-      double px, py, pz ;
-      infile >> px >> py >> pz ;
-      pfeb = TVector3(px, py,  pz);
-      sutool.nextline(infile);
-      infile >> px >> py >> pz ;
-      pfpb = TVector3(px, py,  pz);
-      sutool.nextline(infile);
+
+      // infile >> ebeam ;
+      // std::cout << "ebeam :" << ebeam << std::endl;
+      // sutool.nextline(infile);
+
+      // double px, py, pz ;
+      // infile >> px >> py >> pz ;
+      // pfeb = TVector3(px, py,  pz);
+      // sutool.nextline(infile);
+
+      // infile >> px >> py >> pz ;
+      // pfpb = TVector3(px, py,  pz);
+      // sutool.nextline(infile);
+
       infile >> q2max ;
       sutool.nextline(infile);
       infile >> cost_cut >> cost_flag ;
@@ -130,12 +134,17 @@ namespace Belle2 {
       double tsws4 = pfeb.Mag() + pfpb.Mag() ;
       TVector3 tsws = TVector3(-(pfeb + pfpb));
       double emsys = tsws4 * tsws4 - tsws.Mag2() ;
-      TVector3 ppp3(ebeam * pfeb);
-      TLorentzVector ppp(ppp3, ppp3.Mag());
-      peb = ppp;
-      ppp3 = TVector3(ebeam * pfpb);
-      ppb = TLorentzVector(ppp3, ppp3.Mag());
 
+      // TVector3 ppp3(ebeam * pfeb);
+      // TLorentzVector ppp(ppp3, ppp3.Mag());
+      // peb = ppp;
+      peb = TLorentzVector(pfeb, pfeb.Mag());
+
+      // ppp3 = TVector3(ebeam * pfpb);
+      // ppb = TLorentzVector(ppp3, ppp3.Mag());
+      ppb = TLorentzVector(pfpb, pfpb.Mag());
+
+      TLorentzVector ppp = peb;
       ppp.Boost(tsws.x() / tsws4, tsws.y() / tsws4, tsws.z() / tsws4);
       ephi = ppp.Phi();
       etheta = ppp.Theta();
@@ -148,8 +157,10 @@ namespace Belle2 {
       B2INFO("") ;
       B2INFO("****** Treps3 Input Parameters in Initialization ******");
       B2INFO("  Beam energy in e+e- cm system (GeV): " << ebeam);
-      B2INFO("  e- lab. momentum (in unit of cm energy): " << pfeb.x() << " " << pfeb.y() << " " << pfeb.z());
-      B2INFO("  e+ lab. momentum (in unit of cm energy): " << pfpb.x() << " " << pfpb.y() << " " << pfpb.z());
+      B2INFO("  e- lab. momentum: " << pfeb.x() << " " << pfeb.y() << " " << pfeb.z());
+      B2INFO("  e+ lab. momentum: " << pfpb.x() << " " << pfpb.y() << " " << pfpb.z());
+      // B2INFO("  e- lab. momentum (in unit of cm energy): " << pfeb.x() << " " << pfeb.y() << " " << pfeb.z());
+      // B2INFO("  e+ lab. momentum (in unit of cm energy): " << pfpb.x() << " " << pfpb.y() << " " << pfpb.z());
       B2INFO("  Q2 max (GeV2): " << q2max);
       B2INFO("  Save-condition (|cos(theta_cm)|): " << cost_cut << ", "
              << cost_flag);
@@ -178,7 +189,7 @@ namespace Belle2 {
       B2INFO("*******************************************************");
       //*********************************
 
-      if (abs(emsys - 4.) > 0.001) {
+      if (abs(emsys - 4 * ebeam * ebeam) > 0.001) {
         B2FATAL(" Wrong beam fractional momenta ");
         exit(1) ;
       }

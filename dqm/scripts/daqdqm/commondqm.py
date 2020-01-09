@@ -56,6 +56,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                 FADCmode=True)
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
+            path.add_module('SVDDQMHitTime')
 
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -181,11 +182,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
-        path.add_module('SetupGenfitExtrapolation')
-        path.add_module('SVDROIFinder',
-                        recoTrackListName='RecoTracks',
-                        SVDInterceptListName='SVDIntercepts')
-        path.add_module('SVDDQMEfficiency')
+        if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
+            path.add_module('SetupGenfitExtrapolation')
+            path.add_module('SVDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            SVDInterceptListName='SVDIntercepts')
+            path.add_module('SVDDQMEfficiency')
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')

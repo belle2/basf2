@@ -13,6 +13,12 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
+#include <tracking/ckf/svd/entities/CKFToSVDState.h>
+
 #include <framework/logging/Logger.h>
 
 #include <vector>
@@ -68,6 +74,14 @@ namespace Belle2 {
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
               B2WARNING("Relations Creator reached maximal number of items. Aborting");
+              StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+              if (std::is_base_of<AObject, CKFToPXDState>::value) {
+                m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
+              } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
+                m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
+              } else {
+                B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
+              }
               weightedRelations.clear();
               return;
             }

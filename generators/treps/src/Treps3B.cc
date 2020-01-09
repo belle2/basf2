@@ -73,20 +73,6 @@ namespace Belle2 {
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
-
-      // infile >> ebeam ;
-      // std::cout << "ebeam :" << ebeam << std::endl;
-      // sutool.nextline(infile);
-
-      // double px, py, pz ;
-      // infile >> px >> py >> pz ;
-      // pfeb = TVector3(px, py,  pz);
-      // sutool.nextline(infile);
-
-      // infile >> px >> py >> pz ;
-      // pfpb = TVector3(px, py,  pz);
-      // sutool.nextline(infile);
-
       infile >> q2max ;
       sutool.nextline(infile);
       infile >> cost_cut >> cost_flag ;
@@ -159,8 +145,6 @@ namespace Belle2 {
       B2INFO("  Beam energy in e+e- cm system (GeV): " << ebeam);
       B2INFO("  e- lab. momentum: " << pfeb.x() << " " << pfeb.y() << " " << pfeb.z());
       B2INFO("  e+ lab. momentum: " << pfpb.x() << " " << pfpb.y() << " " << pfpb.z());
-      // B2INFO("  e- lab. momentum (in unit of cm energy): " << pfeb.x() << " " << pfeb.y() << " " << pfeb.z());
-      // B2INFO("  e+ lab. momentum (in unit of cm energy): " << pfpb.x() << " " << pfpb.y() << " " << pfpb.z());
       B2INFO("  Q2 max (GeV2): " << q2max);
       B2INFO("  Save-condition (|cos(theta_cm)|): " << cost_cut << ", "
              << cost_flag);

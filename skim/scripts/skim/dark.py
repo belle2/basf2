@@ -38,11 +38,11 @@ def SinglePhotonDarkList(path):
 
     # no good tracks in the event
     cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
-    ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
 
     # no other photon above 100 MeV
     angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
     minimum = 'E > 0.1'  # GeV
+    ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
     path2 = b2.Path()
     ifEventPasses('0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks(' + cleaned + ') < 1', conditional_path=path2, path=path)
 

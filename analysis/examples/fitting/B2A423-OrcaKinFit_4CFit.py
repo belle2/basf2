@@ -57,14 +57,12 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.", path=mypath)
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=mypath)
 reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "", path=mypath)
 
-
-# Perform four momentum constraint fit using OrcaKinFit
-fitKinematic4C("Upsilon(4S):4c", path=mypath)
-
 # Associates the MC truth to the reconstructed Upsilon(4S)
 matchMCTruth('Upsilon(4S)', path=mypath)
 matchMCTruth('Upsilon(4S):4c', path=mypath)
 
+# Perform four momentum constraint fit using OrcaKinFit
+fitKinematic4C("Upsilon(4S):4c", path=mypath)
 
 # Select variables that we want to store to ntuple
 muvars = vc.mc_truth + vc.pid + vc.kinematics

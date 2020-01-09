@@ -192,16 +192,18 @@ class ValidationRoot(object):
 
     @cherrypy.expose
     def plots(self, *args):
-        # todo: replace os.getcwd with an attribute
+        """
+        Serve file from the html/plot directory.
+        :param args: For the request /plots/a/b/c, these will be the strings
+            "a", "b", "c"
+        """
         tag_folder = os.path.relpath(
             validationpath.get_html_plots_tag_comparison_folder(
                 self.working_folder, args[:-2]
             ),
             validationpath.get_html_folder(self.working_folder)
         )
-        print(tag_folder)
         path = os.path.join(tag_folder, *args[-2:])
-        print(path)
         return cherrypy.lib.static.serve_file(path)
 
     @cherrypy.expose

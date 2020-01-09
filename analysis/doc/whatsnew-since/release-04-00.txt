@@ -14,7 +14,8 @@ Vertex Fitting
     mass-constrained vertex fit (``fit_type=massvertex``), or a vertex fit
     with the mother constrained to the beam four-momentum
     (``fit_type=fourC``).
-  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
+
+ .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
 
 Standard Particle Lists
 +++++++++++++++++++++++
@@ -23,6 +24,10 @@ Standard Particle Lists
 
    * New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`
    * All documentation for this optimization and usage can be found at `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/1337/files/BELLE2-NOTE-PH-2019-011.pdf>`_
+
+ * The default vertex fitter for the V0 lists `stdKshorts` and `stdLambdas` has been changed from `vertexRave` to `treeFit`.
+   However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `vertexRave` or to `KFit`.
+ * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.
 
 
 Variables
@@ -34,6 +39,11 @@ Variables
  * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
    particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
    The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
+ * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit: 
+   :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
+   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`, 
+   :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
+   :b2:var:`TagTrackTrueDistanceToTagV`
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
@@ -86,6 +96,7 @@ Variables
  * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output. The new variable returns
    the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do.
    Now we can evaluate the output of both taggers in the same way.
+ * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
 
  * Added :b2:var:`pidChargedBDTScore(pdgCodeHyp)` and :b2:var:`pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
 
@@ -93,6 +104,9 @@ Variables
 Modules
 +++++++
 
+ * In :b2:mod:`TagV` added Btube as a possible constraint for the tag B vertex fit. The ``useFitAlgorithm`` parameter in the module is replaced 
+   by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the module are now using double precision.
+   The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
    (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
    on a first-come, first-served basis, i.e. the order of the input particles
@@ -117,8 +131,12 @@ Modules
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
 
+ * Modified `writePi0EtaVeto` function and added `oldwritePi0EtaVeto` function. The weight files used in release-03 were not available in release-04.
+   The latter uses old weight files optimized with MC9, while new weight files, which are optimized with MC12, are used in `writePi0EtaVeto`
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
  * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value.
+ * The KFitter can be used to fit vertices of fully-inclusive particles, for which it ignores the daughters without defined p-value. 
+ * :b2:mod:`RestOfEventBuilder`, :b2:mod:`EventKinematics` and :b2:mod:`EventShapeCalculator` modules can use most likely charged particle hypothesis according to PID information.
 
  * Added the :b2:mod:`ParticleCombinerFromMC` module and the `reconstructMCDecay` to find and create ``ParticleList`` from a given :ref:`DecayString`.
    They can be used instead of the :b2:mod:`MCDecayFinder` and `findMCDecay` which are not fully tested and maintained.
@@ -135,3 +153,8 @@ Full Event Interpretation
 +++++++++++++++++++++++++
 
  * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).
+
+Utilities
++++++++++
+
+ * A set of functions `DistanceTool` has been added to compute distances between (straight) tracks and vertices. 

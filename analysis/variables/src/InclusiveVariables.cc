@@ -68,7 +68,7 @@ namespace Belle2 {
             if (abs(daughter->getPDGCode()) == pdgCode) {
               result++;
             }
-          } else if (daughter->getParticleType() == Particle::EParticleType::c_Track) {
+          } else if (abs(daughter->getCharge()) > 0) {
             result++;
           }
         }

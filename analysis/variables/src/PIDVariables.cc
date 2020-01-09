@@ -319,6 +319,18 @@ namespace Belle2 {
       return func;
     }
 
+    double mostLikelyPDG(const Particle* part)
+    {
+      auto* pid = part->getPIDLikelihood();
+      if (!pid) return std::numeric_limits<double>::quiet_NaN();
+      return pid->getMostLikely().getPDGCode();
+    }
+
+    double isMostLikely(const Particle* part)
+    {
+      return mostLikelyPDG(part) == abs(part->getPDGCode());
+    }
+
     //*************
     // B2BII
     //*************
@@ -468,6 +480,10 @@ namespace Belle2 {
                       "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.");
     REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)", pidPairChargedBDTScore,
                       "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.");
+    REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
+                      "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
+    REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,
+                      "Returns 1 if the PID likelihood for the particle given its PID is the largest one");
 
     // B2BII PID
     VARIABLE_GROUP("PID_belle");

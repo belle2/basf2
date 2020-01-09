@@ -21,7 +21,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
                             (filtered and dismissed) should be added
-                     For dqm_mode == "before_reco" only thw DQM modules which should run before
+                     For dqm_mode == "before_reco" only the DQM modules which should run before
                             all reconstruction
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
@@ -44,19 +44,27 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD
         if components is None or 'SVD' in components:
-            # SVD DATA FORMAT
-            svdunpackerdqm = register_module('SVDUnpackerDQM')
-            path.add_module(svdunpackerdqm)
-            # SVDDQMExpressReco General
             path.add_module(
                 'SVDZeroSuppressionEmulator',
                 SNthreshold=5,
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
+            # SVD DATA FORMAT
+            path.add_module('SVDUnpackerDQM')
+            # SVD GENERAL
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
+            # SVD HIT TIME
             path.add_module('SVDDQMHitTime')
+            # SVD EFFICIENCY
+            path.add_module('SetupGenfitExtrapolation')
+            path.add_module('SVDROIFinder',
+                            recoTrackListName='RecoTracks',
+                            SVDInterceptListName='SVDIntercepts')
+            path.add_module('SVDDQMEfficiency')
+            # SVD CLUSTERS ON TRACK
+            path.add_module('SVDDQMClustersOnTrack')
 
         # VXD (PXD/SVD common)
         if components is None or 'PXD' in components or 'SVD' in components:
@@ -182,12 +190,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')
         path.add_module(trackDqm)
-        if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
-            path.add_module('SetupGenfitExtrapolation')
-            path.add_module('SVDROIFinder',
-                            recoTrackListName='RecoTracks',
-                            SVDInterceptListName='SVDIntercepts')
-            path.add_module('SVDDQMEfficiency')
+
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')

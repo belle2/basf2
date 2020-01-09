@@ -204,6 +204,11 @@ namespace Belle2::Conditions {
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYSTATUS, 0L);
+    // Don't cache DNS entries, ask the system every time we need to connect ...
+    curl_easy_setopt(m_session->curl, CURLOPT_DNS_CACHE_TIMEOUT, 0L);
+    // and shuffle the addresses so we try a different node, otherwise we might
+    // always get the same address due to system caching and RFC 3484
+    curl_easy_setopt(m_session->curl, CURLOPT_DNS_SHUFFLE_ADDRESSES, 1L);
     auto version = getUserAgent();
     curl_easy_setopt(m_session->curl, CURLOPT_USERAGENT, version.c_str());
     return true;

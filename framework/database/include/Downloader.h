@@ -102,8 +102,8 @@ namespace Belle2::Conditions {
     unsigned int m_connectionTimeout{60};
     /** Timeout to wait for stalled connections (<10KB/s) */
     unsigned int m_stalledTimeout{60};
-    /** Number of retries to perform when downloading failes with HTTP response code >=500 */
-    unsigned int m_maxRetries{3};
+    /** Number of retries to perform when downloading fails with HTTP response code >=500 */
+    unsigned int m_maxRetries{5};
     /** Backoff factor for retries in seconds */
     unsigned int m_backoffFactor{5};
   };

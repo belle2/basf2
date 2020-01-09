@@ -14,6 +14,7 @@ __authors__ = [
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
+from skimExpertFunctions import ifEventPasses
 
 
 def SinglePhotonDarkList(path):
@@ -35,6 +36,16 @@ def SinglePhotonDarkList(path):
     """
     __author__ = "Sam Cunliffe"
 
+    # no good tracks in the event
+    cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+    ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
+
+    # no other photon above 100 MeV
+    angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
+    minimum = 'E > 0.1'  # GeV
+    path2 = b2.Path()
+    ifEventPasses('0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks(' + cleaned + ') < 1', conditional_path=path2, path=path)
+
     # all remaining single photon events (== candidates) with region
     # dependent minimum energy in GeV
     region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel
@@ -42,7 +53,7 @@ def SinglePhotonDarkList(path):
     region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
     region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
     region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
-    ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path)
+    ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
     return ['gamma:singlePhoton']
 
 

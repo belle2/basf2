@@ -2185,7 +2185,7 @@ def oldwritePi0EtaVeto(
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
-        import variables from variables
+        from variables import variables
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')

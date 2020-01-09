@@ -524,3 +524,39 @@ def add_cosmics_generator(path, components=None,
 
         empty_path = create_path()
         cosmics_selector.if_false(empty_path)
+
+
+def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
+    """
+    Add TREPS generator to produce hadronic two-photon processes.
+
+    Parameters:
+        path (basf2.Path):           path where the generator should be added
+        finalstate(str):             "e+e-pi+pi-", "e+e-K+K-" or "e+e-ppbar"
+        useDiscreteAndSortedW(bool): if True, wListTableFile is used for discrete and sorted W. evtNumList must be set proper value.
+    """
+
+    if finalstate == 'e+e-pi+pi-':
+        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_pipi.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('data/generators/treps/differentialCrossSectionFiles/pipidcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_pipi.dat')
+    elif finalstate == 'e+e-K+K-':
+        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_kk.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('data/generators/treps/differentialCrossSectionFiles/kkdcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_kk.dat')
+    elif finalstate == 'e+e-ppbar':
+        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_ppbar.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile(
+            'data/generators/treps/differentialCrossSectionFiles/ppbardcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_ppbar.dat')
+    else:
+        B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
+
+    # use TREPS to generate two-photon events.
+    trepsinput = path.add_module(
+        'TrepsInput',
+        ParameterFile=parameterFile,
+        DifferentialCrossSectionFile=differentialCrossSectionFile,
+        WListTableFile=wListTableFile,
+        UseDiscreteAndSortedW=useDiscreteAndSortedW,
+    )

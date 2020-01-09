@@ -214,7 +214,8 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
-    /** Return the found by track finder flag for the given hit (every type) */
+    /** Return the TrackFinder which added the given hit to track */
+    /** Int value corresponds to values of enum Belle2::RecoHitInformation::OriginTrackFinder */
     int getFoundByTrackFinder(int i) const { return m_hFoundByTrackFinder[i]; }
 
     /** Return the max weights from KalmanFitterInfo */

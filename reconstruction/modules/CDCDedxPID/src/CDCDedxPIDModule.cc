@@ -308,11 +308,9 @@ void CDCDedxPIDModule::event()
       int superlayer = cdcHit->getISuperLayer();
 
       // check which algorithm found this hit
-      int foundByTrackFinder = -1;
+      int foundByTrackFinder = 0;
       const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
-      //if (hitInfo->getFoundByTrackFinder() == RecoHitInformation::c_ReattachCDCWireHitsToRecoTracks) {
       foundByTrackFinder = hitInfo->getFoundByTrackFinder();
-      //}
 
       // add weights for hypotheses
       double weightPionHypo = 0;

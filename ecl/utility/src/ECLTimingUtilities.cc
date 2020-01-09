@@ -18,7 +18,7 @@ using namespace ECL;
 ECLTimingUtilities::ECLTimingUtilities()
 { }
 
-// Time
+// Time offset as a function of the signal amplitude measured in units of ticks
 double ECLTimingUtilities::energyDependentTimeOffsetElectronic(const double amp)
 {
   return  energyDependenceTimeOffsetFitParam_p1 + pow((energyDependenceTimeOffsetFitParam_p3 /

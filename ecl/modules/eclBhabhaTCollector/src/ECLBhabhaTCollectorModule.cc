@@ -44,6 +44,7 @@ REG_MODULE(ECLBhabhaTCollector)
 //-----------------------------------------------------------------
 
 ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorModule(),
+  m_ElectronicsDB("ECLCrystalElectronics"),
   m_ElectronicsTimeDB("ECLCrystalElectronicsTime"),
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
@@ -343,6 +344,9 @@ void ECLBhabhaTCollectorModule::collect()
   //== Get expected energies and calibration constants from DB. Need to call
   //   hasChanged() for later comparison
 
+  if (m_ElectronicsDB.hasChanged()) {
+    m_Electronics = m_ElectronicsDB->getCalibVector();
+  }
   if (m_ElectronicsTimeDB.hasChanged()) {
     m_ElectronicsTime = m_ElectronicsTimeDB->getCalibVector();
   }
@@ -731,11 +735,11 @@ void ECLBhabhaTCollectorModule::collect()
 
 
             // Code to determine the phi and theta of the crystal.
-            TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
-            phi_ECLCaldigits_bothClusters.push_back(crystal3Vec.Phi());
-            theta_ECLCaldigits_bothClusters.push_back(crystal3Vec.Theta());
-            B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
-                    << ", phi = " << crystal3Vec.Phi());
+            //TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
+            phi_ECLCaldigits_bothClusters.push_back(0);
+            theta_ECLCaldigits_bothClusters.push_back(0);
+            /* B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
+                    << ", phi = " << crystal3Vec.Phi()); */
 
             E_ECLCaldigits_bothClusters.push_back(tempE);
             amp_ECLDigits_bothClusters.push_back(ecl_dig->getAmp());
@@ -800,8 +804,10 @@ void ECLBhabhaTCollectorModule::collect()
     time -= m_FlightTime[cid - 1];
 
 
-    // Apply the time walk correction: time shift as a function of energy
-    double energyTimeShift = energyDependentTimeOffsetElectronic(amplitude) * TICKS_TO_NS;
+    // Apply the time walk correction: time shift as a function of the amplitude corrected by the electronics calibration.
+    //    The electronics calibration also accounts for crystals that have a dead pre-amp and thus half the normal amplitude.
+    double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
+
     B2DEBUG(35, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
             ", t(E) shift = " << energyTimeShift << " ns");
     time -= energyTimeShift;
@@ -1100,25 +1106,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   B2DEBUG(30, "This was for event number = " << m_tree_evtNum);
 
-}
-
-
-
-/*  Time walk function : time shift as a function of crystal amplitude.
-    This function is copy-pasted from ecl/modules/eclDigitCalibration/src/ECLDigitCalibratorModule.cc
-    Ideally this code would just execute the function from ECLDigitCalibratorModule; however,
-    it is non-trivial to make an instance of ECLDigitCalibratorModule so that a
-    copy of the function is available.  In the future, the function should be moved to a
-    different location to make it more easily accessible to outside modules.
-*/
-double ECLBhabhaTCollectorModule::energyDependentTimeOffsetElectronic(const double amp)
-{
-  double ticks_offset = m_energyDependenceTimeOffsetFitParam_p1 + pow((m_energyDependenceTimeOffsetFitParam_p3 /
-                        (amp + m_energyDependenceTimeOffsetFitParam_p2)),
-                        m_energyDependenceTimeOffsetFitParam_p4) + m_energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
-                            m_energyDependenceTimeOffsetFitParam_p6);
-
-  return ticks_offset;
 }
 
 

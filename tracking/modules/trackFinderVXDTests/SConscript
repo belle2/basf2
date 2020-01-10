@@ -3,16 +3,13 @@ Import('env')
 env['LIBS'] = [
     'boost_chrono',
     'framework',
-#    'geometry',
     'mdst_dataobjects',
-#    'pxd',
     'pxd_dataobjects',
-#    'svd',
     'svd_dataobjects',
-    'vxd', 
+    'vxd',
     'genfit2',
-    'tracking', 'tracking_dataobjects',
-#    'testbeam_vxd_dataobjects'
-    ]
+    'tracking',
+    'tracking_dataobjects',
+]
 
 Return('env')

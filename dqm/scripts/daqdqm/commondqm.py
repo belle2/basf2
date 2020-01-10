@@ -186,6 +186,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                         recoTrackListName='RecoTracks',
                         SVDInterceptListName='SVDIntercepts')
         path.add_module('SVDDQMEfficiency')
+        path.add_module('SVDDQMClustersOnTrack')
     # ARICH
     if (components is None or 'ARICH' in components) and (dqm_mode in ["dont_care", "filtered"]):
         path.add_module('ARICHDQM')

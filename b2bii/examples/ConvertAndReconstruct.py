@@ -12,7 +12,7 @@ from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
-from modularAnalysis import vertexKFit
+from modularAnalysis import KFit
 from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
 from variables.utils import create_aliases_for_selected
@@ -74,7 +74,7 @@ fillParticleList('e+:all', '', path=mypath)
 # needs to be executed
 matchMCTruth('pi0:mdst', path=mypath)
 matchMCTruth('K_S0:mdst', path=mypath)
-vertexKFit('K_S0:mdst', -1, path=mypath)
+KFit('K_S0:mdst', -1, path=mypath)
 
 # The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
 va.variables.addAlias('Lkpi', 'atcPIDBelle(3,2)')

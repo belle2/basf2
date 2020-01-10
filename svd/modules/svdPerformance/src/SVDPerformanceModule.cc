@@ -78,9 +78,6 @@ void SVDPerformanceModule::initialize()
 
   m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
 
-  TString NameOfHisto = "";
-  TString TitleOfHisto = "";
-
   for (int s = 0; s < m_nLayers; s++)
     if (m_is2017TBanalysis)
       sensorsOnLayer[s] = 2;
@@ -115,8 +112,8 @@ void SVDPerformanceModule::initialize()
           nameSide = "V";
 
         //SHAPER DIGITS
-        NameOfHisto = "shaper_N_L" + nameLayer + "S" + nameSensor + "" + nameSide;
-        TitleOfHisto = "number of ShaperDigits (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
+        TString NameOfHisto = "shaper_N_L" + nameLayer + "S" + nameSensor + "" + nameSide;
+        TString TitleOfHisto = "number of ShaperDigits (L" + nameLayer + ", sensor" + nameSensor + "," + nameSide + " side)";
         h_nShaper[i][j][k] = createHistogram1D(NameOfHisto, TitleOfHisto, 100, 0, 100, "n ShaperDigits", m_histoList_shaper[i]);
 
 
@@ -367,8 +364,8 @@ void SVDPerformanceModule::initialize()
         }
 
       }
-      NameOfHisto = "clNOtrk_nUVSnV_L" + nameLayer + "S" + nameSensor;
-      TitleOfHisto = "Number of U clusters VS number of V cluster, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
+      TString NameOfHisto = "clNOtrk_nUVSnV_L" + nameLayer + "S" + nameSensor;
+      TString TitleOfHisto = "Number of U clusters VS number of V cluster, TB=3,4,5 (L" + nameLayer + ", sensor" + nameSensor + ")";
       h_clNuVSNv[i][j] = createHistogram2D(NameOfHisto, TitleOfHisto, 50, 0, 50, "# V cluster", 50, 0, 50, "# U clusters",
                                            m_histoList_cluster[i]);
 
@@ -943,76 +940,6 @@ TH2F*  SVDPerformanceModule::createHistogram2D(const char* name, const char* tit
   return h;
 }
 
-TH3F*  SVDPerformanceModule::createHistogram3D(const char* name, const char* title,
-                                               Int_t nbinsX, Double_t minX, Double_t maxX,
-                                               const char* titleX,
-                                               Int_t nbinsY, Double_t minY, Double_t maxY,
-                                               const char* titleY,
-                                               Int_t nbinsZ, Double_t minZ, Double_t maxZ,
-                                               const char* titleZ,
-                                               TList* histoList)
-{
-
-  TH3F* h = new TH3F(name, title, nbinsX, minX, maxX, nbinsY, minY, maxY, nbinsZ, minZ, maxZ);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-  h->GetZaxis()->SetTitle(titleZ);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH3F*  SVDPerformanceModule::createHistogram3D(const char* name, const char* title,
-                                               Int_t nbinsX, Double_t* binsX,
-                                               const char* titleX,
-                                               Int_t nbinsY, Double_t* binsY,
-                                               const char* titleY,
-                                               Int_t nbinsZ, Double_t* binsZ,
-                                               const char* titleZ,
-                                               TList* histoList)
-{
-
-  TH3F* h = new TH3F(name, title, nbinsX, binsX, nbinsY, binsY, nbinsZ, binsZ);
-
-  h->GetXaxis()->SetTitle(titleX);
-  h->GetYaxis()->SetTitle(titleY);
-  h->GetZaxis()->SetTitle(titleZ);
-
-  if (histoList)
-    histoList->Add(h);
-
-  return h;
-}
-
-TH1*  SVDPerformanceModule::duplicateHistogram(const char* newname, const char* newtitle,
-                                               TH1* h, TList* histoList)
-{
-
-  TH1F* h1 =  dynamic_cast<TH1F*>(h);
-  TH2F* h2 =  dynamic_cast<TH2F*>(h);
-  TH3F* h3 =  dynamic_cast<TH3F*>(h);
-
-  TH1* newh = 0;
-
-  if (h1)
-    newh = new TH1F(*h1);
-  if (h2)
-    newh = new TH2F(*h2);
-  if (h3)
-    newh = new TH3F(*h3);
-
-  newh->SetName(newname);
-  newh->SetTitle(newtitle);
-
-  if (histoList)
-    histoList->Add(newh);
-
-
-  return newh;
-}
 
 TH1F*  SVDPerformanceModule::createHistogramsRatio(const char* name, const char* title,
                                                    TH1* hNum, TH1* hDen, bool isEffPlot,
@@ -1122,68 +1049,6 @@ TH1F*  SVDPerformanceModule::createHistogramsRatio(const char* name, const char*
   return h;
 
 }
-
-
-void  SVDPerformanceModule::addInefficiencyPlots(TList* histoList, TH3F* h3_xPerMCParticle, TH3F* h3_MCParticle)
-{
-
-  if ((h3_xPerMCParticle == NULL) || (h3_MCParticle == NULL))
-    return;
-
-  //normalized to MCParticles
-  TH1F* h_ineff_pt = createHistogramsRatio("hineffpt", "inefficiency VS pt, normalized to MCParticles", h3_xPerMCParticle,
-                                           h3_MCParticle, false, 0);
-  histoList->Add(h_ineff_pt);
-
-  TH1F* h_ineff_theta = createHistogramsRatio("hinefftheta", "inefficiency VS #theta, normalized to MCParticles",
-                                              h3_xPerMCParticle, h3_MCParticle, false, 1);
-  histoList->Add(h_ineff_theta);
-
-  TH1F* h_ineff_phi = createHistogramsRatio("hineffphi", "inefficiency VS #phi, normalized to MCParticles", h3_xPerMCParticle,
-                                            h3_MCParticle, false, 2);
-  histoList->Add(h_ineff_phi);
-
-}
-
-void  SVDPerformanceModule::addEfficiencyPlots(TList* histoList, TH3F* h3_xPerMCParticle, TH3F* h3_MCParticle)
-{
-  if ((h3_xPerMCParticle == NULL) || (h3_MCParticle == NULL))
-    return;
-
-  //normalized to MCParticles
-  TH1F* h_eff_pt = createHistogramsRatio("heffpt", "efficiency VS pt, normalized to MCParticles", h3_xPerMCParticle,
-                                         h3_MCParticle, true, 0);
-  histoList->Add(h_eff_pt);
-
-  TH1F* h_eff_theta = createHistogramsRatio("hefftheta", "efficiency VS #theta, normalized to MCParticles", h3_xPerMCParticle,
-                                            h3_MCParticle, true, 1);
-  histoList->Add(h_eff_theta);
-
-  TH1F* h_eff_phi = createHistogramsRatio("heffphi", "efficiency VS #phi, normalized to MCParticles", h3_xPerMCParticle,
-                                          h3_MCParticle, true, 2);
-  histoList->Add(h_eff_phi);
-
-}
-
-
-
-void  SVDPerformanceModule::addPurityPlots(TList* histoList, TH3F* h3_MCParticlesPerX, TH3F* h3_X)
-{
-  if ((h3_X == NULL) || (h3_MCParticlesPerX == NULL))
-    return;
-
-//purity histograms
-  TH1F* h_pur_pt = createHistogramsRatio("hpurpt", "purity VS pt", h3_MCParticlesPerX, h3_X, true, 0);
-  histoList->Add(h_pur_pt);
-
-  TH1F* h_pur_theta = createHistogramsRatio("hpurtheta", "purity VS #theta", h3_MCParticlesPerX, h3_X, true, 1);
-  histoList->Add(h_pur_theta);
-
-  TH1F* h_pur_phi = createHistogramsRatio("hpurphi", "purity VS #phi", h3_MCParticlesPerX, h3_X, true, 2);
-  histoList->Add(h_pur_phi);
-
-}
-
 
 
 

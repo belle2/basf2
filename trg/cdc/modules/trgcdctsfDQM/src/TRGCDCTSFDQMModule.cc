@@ -101,8 +101,9 @@ void TRGCDCTSFDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   char c_name[100];
   sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);

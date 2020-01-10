@@ -383,16 +383,16 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
 
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
-            B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
-                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            B2WARNING("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
+                      << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
             return false;
           }
           if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
-            B2ERROR("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
-                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            B2WARNING("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
+                      << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
@@ -508,8 +508,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         }
 
         if (nLinked > m_PARAMmaxSegmentConnections) {
-          B2ERROR("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -517,8 +517,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           return;
         }
         if (nAdded > m_PARAMmaxSegmentAddedConnections) {
-          B2ERROR("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -526,9 +526,9 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           return;
         }
         if (segments.size() > m_PARAMmaxNetworkSize) {
-          B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
-                  << ". Network size is " << segmentNetwork.size()
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
+                    << ". Network size is " << segmentNetwork.size()
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);

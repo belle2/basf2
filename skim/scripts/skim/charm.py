@@ -149,11 +149,11 @@ def DstToD0PiD0ToHpJmEta(path):
 
     DstList = []
     ma.reconstructDecay('D0:HpJmEta -> K-:loose pi+:loose eta:myskim', charmcuts, path=path)
-    vertex.vertexTree('D0:HpJmEta', 0.001, path=path)
+    vertex.treeFit('D0:HpJmEta', 0.001, path=path)
     ma.reconstructDecay('D*+:HpJmEtaRS -> D0:HpJmEta pi+:all', Dstcuts, path=path)
     ma.reconstructDecay('D*-:HpJmEtaWS -> D0:HpJmEta pi-:all', Dstcuts, path=path)
-    vertex.vertexKFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
-    vertex.vertexKFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
+    vertex.KFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
+    vertex.KFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
     DstList.append('D*+:HpJmEtaRS')
     DstList.append('D*+:HpJmEtaWS')
 
@@ -167,14 +167,14 @@ def DstToD0PiD0ToKsOmega(path):
 
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
     ma.reconstructDecay('D0:Eta -> K_S0:merged eta:3pi', charmcuts, path=path)
-    vertex.vertexTree('D0:Eta', conf_level=0.001, path=path)
+    vertex.treeFit('D0:Eta', conf_level=0.001, path=path)
     ma.reconstructDecay('D0:Omega -> K_S0:merged omega:3pi', charmcuts, path=path)
-    vertex.vertexTree('D0:Omega', conf_level=0.001, path=path)
+    vertex.treeFit('D0:Omega', conf_level=0.001, path=path)
     ma.copyLists('D0:KsOmega', ['D0:Eta', 'D0:Omega'], path=path)
 
     DstList = []
     ma.reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)
-    vertex.vertexKFit('D*+:KsOmega', conf_level=0.001, path=path)
+    vertex.KFit('D*+:KsOmega', conf_level=0.001, path=path)
     DstList.append('D*+:KsOmega')
 
     return DstList

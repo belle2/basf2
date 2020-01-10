@@ -20,7 +20,7 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import fitKinematic4C
+from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 from beamparameters import add_beamparameters
 import variables.collections as vc

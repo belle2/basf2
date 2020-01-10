@@ -1,0 +1,30 @@
+# EventType: 1113040100
+# Descriptor: [B0 -> (D- -> (KS0 pi-) pi+]
+# NickName: Bd_Dpi_kspi
+# Documentation: One of the neutral B decays needed for phase3 data validation
+#
+# Tested: Yes
+# Physics WG: BtoCharm(less)
+# Responsible: Eldar Ganiev
+# Email: eldar.ganiev@ts.infn.it
+# Cuts: none
+# Data: 20190806
+
+
+Decay Upsilon(4S)
+0.500 B0sig anti-B0 VSS_BMIX dm;
+0.500 B0 anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 D-sig pi+ PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D-sig
+1.000 K_S0 pi- PHOTOS PHSP;
+Enddecay
+CDecay D+sig
+
+End
+

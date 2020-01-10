@@ -329,6 +329,114 @@ def BsigToD0hToKpipipiList(path):
     return Lists
 
 
+def loadB0toDpi_Kpipi(path):
+    """
+    **Skim Author**: C. La Licata
+
+    **Skim Name**: B0toDpi_Kpipi
+
+    **Skim Category**: physics, hadronic neutral B to charm
+
+    **Skim Code**: 14120600
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Mode**:
+
+
+    1.  :math:`B^{0}\\to \\D^{-} (\\D^{0} to K^+ pi^- pi^-) \\pi^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    2. Mbc > 5.2
+    3. abs(deltaE) < 0.3
+
+    Note:
+    This skim uses loadStdDplus_Kpipi from the ``charm.py`` script
+    where D- channel is defined.
+
+    """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:Dpi_Kpipi -> D-:Kpipi pi+:all', Bcuts, 0, path=path)
+
+    return ['B0:Dpi_Kpipi']
+
+
+def loadB0toDstarPi_Kpi(path):
+    """
+    **Skim Author**: C. La Licata
+
+    **Skim Name**: B0toDstarPi_D0pi_Kpi
+
+    **Skim Category**: physics, hadronic neutral B to charm
+
+    **Skim Code**: 14120700
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Mode**:
+
+
+    1.  :math:`B^{0}\\to \\D^{*-} (\\D^{0} to K^+ pi^-) \\pi^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    2. Mbc > 5.2
+    3. abs(deltaE) < 0.3
+
+    Note:
+    This skim uses loadStdDstarPlus_D0pi_Kpi from the ``charm.py`` script
+    where D*- channel is defined.
+
+    """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:all', Bcuts, 0, path=path)
+
+    return ['B0:Dstarpi_Kpi']
+
+
+def loadB0toDstarPi_Kpipipi(path):
+    """
+   **Skim Author**: C. La Licata
+
+   **Skim Name**: B0toDstarPi_D0pi_Kpipipi
+
+   **Skim Category**: physics, hadronic neutral B to charm
+
+   **Skim Code**: 14120700
+
+   **Working Group**: BtoCharm (WG4)
+
+   **Decay Mode**:
+
+
+   1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^- pi^- pi^+) \\pi^+`
+
+   **Particle Lists**: Standard lists for all particles.
+
+   **Additional Cuts**:
+   2. Mbc > 5.2
+   3. abs(deltaE) < 0.3
+
+   Note:
+   This skim uses  from the ``charm.py`` script
+   where D*- channel is defined.
+
+   """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:Dstarpi_Kpipipi -> D*-:D0_Kpipipi pi+:all', Bcuts, 0, path=path)
+
+    return ['B0:Dstarpi_Kpipipi']
+
+
 def DoubleCharmList(path):
     """
     **Skim Author**: Phillip Urquijo

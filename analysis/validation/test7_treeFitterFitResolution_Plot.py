@@ -15,7 +15,6 @@
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
 
 import glob
 

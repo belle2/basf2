@@ -92,10 +92,38 @@ namespace Belle2 {
                          bool displacement = false);
 
     /**
+     * Load BKLM electronics map.
+     * @param[in] isExperiment10 Experiment 10 or earlier data.
+     */
+    void loadBKLMElectronicsMap(bool isExperiment10 = false);
+
+    /**
+     * Set non-default lane for all channels in a module.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] lane        Lane.
+     */
+    void setElectronicsMapLane(
+      int subdetector, int section, int sector, int layer, int lane);
+
+    /**
+     * Set non-default lane for all channels in a plane.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] plane       Plane.
+     * @param[in] lane        Lane.
+     */
+    void setElectronicsMapLane(
+      int subdetector, int section, int sector, int layer, int plane, int lane);
+
+    /**
       * Import electronics map.
-      * @param[in] electronicsMap KLM electronics map.
       */
-    void importElectronicsMap(const KLMElectronicsMap* electronicsMap);
+    void importElectronicsMap();
 
   private:
 
@@ -123,6 +151,12 @@ namespace Belle2 {
     void importEKLMSegmentAlignment(
       const EKLMSegmentAlignment* eklmSegmentAlignment,
       bool displacement = false);
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** Data for creation of the electronics map. */
+    std::vector< std::pair<uint16_t, KLMElectronicsChannel> > m_ElectronicsChannels;
 
     /** Low experiment. */
     int m_ExperimentLow;

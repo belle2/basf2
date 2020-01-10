@@ -203,6 +203,24 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   }
 }
 
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int section, int sector, int layer, int plane, int lane)
+{
+  int channelSection, channelSector, channelLayer, channelPlane, strip;
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &channelPlane,
+      &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer) &&
+        (channelPlane == plane))
+      m_ElectronicsChannels[i].second.setLane(lane);
+  }
+}
+
 void BKLMDatabaseImporter::importElectronicMapping()
 {
   DBImportObjPtr<BKLMElectronicsMap> electronicsMap;

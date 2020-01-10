@@ -315,7 +315,7 @@ void KLMDatabaseImporter::loadBKLMElectronicsMap(bool isExperiment10)
         }
       }
 
-      uint16_t detectorChannel = BKLMElementNumbers::channelNumber(
+      uint16_t detectorChannel = m_ElementNumbers->channelNumberBKLM(
                                    section, sector, layer, plane, iStrip);
       m_ElectronicsChannels.push_back(
         std::pair<uint16_t, KLMElectronicsChannel>(

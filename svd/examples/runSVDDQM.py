@@ -26,7 +26,7 @@ b2conditions.globaltags = ['klm_alignment_testing', 'online']
 main = create_path()
 
 # RAW
-files = [' /group/belle2/dataprod/Data/Raw/e0010/r04925/sub00/beam.0010.04925.HLT*.root']
+files = [' /group/belle2/dataprod/Data/Raw/e0010/r04295/sub00/physics.0010.04295.HLT*.root']
 
 # old-format cDST
 # files=["/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_hadron/cdst/sub00/cdst.physics.0010.04295.HLT1*.root","/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_bhabha/cdst/sub00/cdst.physics.0010.04295.HLT1.*.root","/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_mumu_2trk/cdst/sub00/cdst.physics.0010.04295.HLT1.*.root"]
@@ -36,7 +36,7 @@ files = [' /group/belle2/dataprod/Data/Raw/e0010/r04925/sub00/beam.0010.04925.HL
 main.add_module("RootInput", inputFileNames=files)
 
 # register the HistoManager and specify output file
-main.add_module("HistoManager", histoFileName="SVDDQM.root")
+main.add_module("HistoManager", histoFileName="SVDDQMOutput.root")
 
 # nee to know SVD geometry to create histograms
 main.add_module('Gearbox')
@@ -61,33 +61,31 @@ main.add_module(
     FADCmode=True)
 
 
-# SVD DATA FORMAT - available only with unpacking
+# ** SVD DATA FORMAT - available only with unpacking
 # -> it needs SVDDAQDiagnostic
-unpacker = main.add_module('SVDUnpackerDQM')
+# unpacker = main.add_module('SVDUnpackerDQM')
 # unpacker.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
 # unpacker.set_debug_level(100)
 
-# SVD ExpressReco General
+# ** SVD ExpressReco General
 # main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
-# SVD Efficiency - available only with full reconstruction
+# ** SVD Efficiency - available only with full reconstruction
 # -> it neeeds Tracks and relations
-''' main.add_module('SetupGenfitExtrapolation')
-main.add_module('SVDROIFinder',
-                recoTrackListName='RecoTracks',
-                SVDInterceptListName='SVDIntercepts')
-main.add_module('SVDDQMEfficiency')
+# main.add_module('SetupGenfitExtrapolation')
+# main.add_module('SVDROIFinder', recoTrackListName='RecoTracks', SVDInterceptListName='SVDIntercepts')
+# main.add_module('SVDDQMEfficiency')
 
-# SVD Clusters On Track - available only with full reconstruction
+# ** SVD Clusters On Track - available only with full reconstruction
 # -> it neeeds Tracks and relations
-main.add_module('SVDDQMClustersOnTrack')
-'''
-# SVD Occupancy after Injection - need RawFTSW
+# main.add_module('SVDDQMClustersOnTrack')
+
+# ** SVD Occupancy after Injection - need RawFTSW & Offline ZS
 injection = main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
-injection.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
-injection.set_debug_level(28)
+# injection.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
+# injection.set_debug_level(30)
 
-# SVD Hit Time - in preparation
+# ** SVD Hit Time - in preparation
 # SVDHitTimeDQMmodule = main.add_module("SVDDQMHitTime")
 # SVDHitTimeDQMmodule.set_log_level(LogLevel.INFO)  # LogLevel.DEBUG / LogLevel.INFO
 # SVDHitTimeDQMmodule.set_debug_level(21)

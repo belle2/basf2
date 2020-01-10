@@ -1,6 +1,12 @@
-//
-// Created by mwelsch on 12/6/19.
-//
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Maximilian Welsch                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 
 #include <analysis/modules/InclusiveDstarReconstruction/InclusiveDstarReconstructionModule.h>
@@ -9,11 +15,9 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
-#include <TLorentzVector.h>
 #include <TVector3.h>
 #include <TDatabasePDG.h>
 
@@ -61,11 +65,11 @@ void InclusiveDstarReconstructionModule::initialize()
   if (!valid)
     B2ERROR("InclusiveDstarReconstructionModule::initialize Invalid Input ParticleList Name: " << m_outputDstarListName);
 
-  // get output particle pdg code
+  // get input particle pdg code
   mother = m_decaydescriptor.getMother();
   int pion_pdg_code  = mother->getPDGCode();
 
-  // check compatibility of particle lists like (D*+ needs either pi+ or pi-, D*0 only compatible with pi0)??
+  // check compatibility of particle lists like (D*+ needs either pi+ or pi0, D*0 only compatible with pi0)
   if (!pionCompatibleWithDstar(pion_pdg_code))
     B2ERROR("Pion PDG code " << pion_pdg_code << " not compatible with D* PDG code " << m_dstar_pdg_code);
 
@@ -137,7 +141,7 @@ TLorentzVector InclusiveDstarReconstructionModule::estimateDstarFourMomentum(con
 
   // dstar momentum approximated colinear to pion direction
   TVector3 momentum_vector_pion =  pion->getMomentum();
-  TVector3 momentum_vec_dstar = momentum_vector_pion * (abs_momentum_dstar / momentum_vector_pion.Mag());
+  TVector3 momentum_vec_dstar = abs_momentum_dstar * momentum_vector_pion.Unit();
 
   return TLorentzVector(momentum_vec_dstar, energy_dstar);
 }

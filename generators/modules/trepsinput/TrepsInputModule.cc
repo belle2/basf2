@@ -63,7 +63,7 @@ void TrepsInputModule::event()
   if (m_beamParams.hasChanged()) {
     if (!m_initialized) {
       initializeGenerator();
-      B2WARNING("Beam parameters are initialized !!!");
+      B2INFO("Initialized the TREPS generator!");
     } else {
       B2FATAL("TrepsInputModule::event(): BeamParameters have changed within "
               "a job, this is not supported for TREPS!");

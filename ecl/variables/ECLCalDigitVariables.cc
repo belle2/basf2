@@ -304,7 +304,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double getExtCellExpert(const Particle* particle, int varid)
+    double getExtCellExpert(const Particle* particle, int varid, bool front)
     {
       ECL::ECLGeometryPar* geometry = ECL::ECLGeometryPar::Instance();
       if (!geometry) {
@@ -313,35 +313,52 @@ namespace Belle2 {
       }
       const Track* track = particle->getTrack();
       if (track) {
-        for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
-          if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
-          if (extHit.getStatus() != EXT_ENTER) continue;
-          int crystalID = extHit.getCopyID() - 1;
-          if (crystalID == -1) continue;
-
-          const TVector3& extHitPosition = extHit.getPosition();
-          const TVector3& trackPointing = extHit.getMomentum();
-
-          geometry->Mapping(crystalID);
-          const int thetaID = geometry->GetThetaID();
-          const int phiID = geometry->GetPhiID();
-
-          const TVector3& crystalCenterPosition = geometry->GetCrystalPos(geometry->GetCellID(thetaID, phiID));
-          const TVector3& crystalOrientation = geometry->GetCrystalVec(geometry->GetCellID(thetaID, phiID));
-          const TVector3& crystalPositionOnSurface = crystalCenterPosition - (crystalCenterPosition - extHitPosition).Dot(
-                                                       crystalOrientation.Unit()) * crystalOrientation.Unit();
-
-          if (varid == varType::phiOffset) {
-            return extHitPosition.DeltaPhi(crystalPositionOnSurface);
-          } else if (varid == varType::thetaOffset) {
-            return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
-          } else if (varid == varType::phiPointing) {
-            return trackPointing.DeltaPhi(crystalOrientation);
-          } else if (varid == varType::thetaPointing) {
-            return trackPointing.Theta() - crystalOrientation.Theta();
+        ExtHit* edgeExtHit;
+        if (front) {
+          for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
+            if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
+            if (extHit.getStatus() != EXT_ENTER) continue;
+            int crystalID = extHit.getCopyID() - 1;
+            if (crystalID == -1) continue;
+            edgeExtHit = new ExtHit(extHit);
+            break;
+          }
+        } else {
+          auto extHits = track->getRelationsTo<ExtHit>();
+          for (unsigned int iextHit(extHits.size() - 1); iextHit > 0; --iextHit) {
+            const auto extHit = extHits[iextHit];
+            if (extHit->getDetectorID() != Const::EDetector::ECL) continue;
+            if (extHit->getStatus() != EXT_EXIT) continue;
+            int crystalID = extHit->getCopyID() - 1;
+            if (crystalID == -1) break;
+            edgeExtHit = new ExtHit(*extHit);
+            break;
           }
         }
+
+        const TVector3& extHitPosition = edgeExtHit->getPosition();
+        const TVector3& trackPointing = edgeExtHit->getMomentum();
+
+        geometry->Mapping(edgeExtHit->getCopyID() - 1);
+        const int thetaID = geometry->GetThetaID();
+        const int phiID = geometry->GetPhiID();
+
+        const TVector3& crystalCenterPosition = geometry->GetCrystalPos(geometry->GetCellID(thetaID, phiID));
+        const TVector3& crystalOrientation = geometry->GetCrystalVec(geometry->GetCellID(thetaID, phiID));
+        const TVector3& crystalPositionOnSurface = crystalCenterPosition - (crystalCenterPosition - extHitPosition).Dot(
+                                                     crystalOrientation.Unit()) * crystalOrientation.Unit();
+
+        if (varid == varType::phiOffset) {
+          return extHitPosition.DeltaPhi(crystalPositionOnSurface);
+        } else if (varid == varType::thetaOffset) {
+          return extHitPosition.Theta() - crystalPositionOnSurface.Theta();
+        } else if (varid == varType::phiPointing) {
+          return trackPointing.DeltaPhi(crystalOrientation);
+        } else if (varid == varType::thetaPointing) {
+          return trackPointing.Theta() - crystalOrientation.Theta();
+        }
       }
+
       return std::numeric_limits<double>::quiet_NaN();
     }
   }
@@ -1010,22 +1027,42 @@ namespace Belle2 {
 
     double getExtFrontPositionPhiOffset(const Particle* particle)
     {
-      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiOffset);
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiOffset, true);
     }
 
     double getExtFrontPositionThetaOffset(const Particle* particle)
     {
-      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaOffset);
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaOffset, true);
     }
 
     double getExtFrontPositionPhiPointing(const Particle* particle)
     {
-      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiPointing);
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiPointing, true);
     }
 
     double getExtFrontPositionThetaPointing(const Particle* particle)
     {
-      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing);
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing, true);
+    }
+
+    double getExtBackPositionPhiOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiOffset, false);
+    }
+
+    double getExtBackPositionThetaOffset(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaOffset, false);
+    }
+
+    double getExtBackPositionPhiPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::phiPointing, false);
+    }
+
+    double getExtBackPositionThetaPointing(const Particle* particle)
+    {
+      return ECLCalDigitVariable::getExtCellExpert(particle, ECLCalDigitVariable::varType::thetaPointing, false);
     }
 
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)

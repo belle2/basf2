@@ -83,6 +83,8 @@ Modules
 
  * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector ``^`` to select daughters.
 
+ * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
+
 Conditions DB
 +++++++++++++
 

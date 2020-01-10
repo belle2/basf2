@@ -47,13 +47,16 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # SVD DATA FORMAT
             svdunpackerdqm = register_module('SVDUnpackerDQM')
             path.add_module(svdunpackerdqm)
-            # SVDDQMExpressReco General
+            # offline ZS emulator
             path.add_module(
                 'SVDZeroSuppressionEmulator',
                 SNthreshold=5,
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
+            # SVD Occupancy after Injection
+            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+            # SVDDQMExpressReco General
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
 

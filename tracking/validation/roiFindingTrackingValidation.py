@@ -265,8 +265,6 @@ path.add_module(ROIValidationPlots)
 path.add_module('Progress')
 
 if ACTIVE:
-    basf2.print_path(path)
-
     basf2.process(path)
 
     print(path)

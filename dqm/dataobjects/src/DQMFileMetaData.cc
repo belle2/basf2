@@ -14,7 +14,7 @@
 #include <framework/utilities/HTML.h>
 #include <framework/utilities/KeyValuePrinter.h>
 
-#include <nlohmann/json.hpp>
+//#include <nlohmann/json.hpp>
 
 #include <iostream>
 
@@ -22,7 +22,7 @@ using namespace std;
 using namespace Belle2;
 
 DQMFileMetaData::DQMFileMetaData() :
-  m_nEvents(0), m_experiment(0), m_run(0), m_date(""), m_release(""),
+  m_nEvents(0), m_experiment(0), m_run(0), m_date(""), m_release(""), m_databaseGlobalTag(""), m_procID(""),
   m_isMC(true), m_mcEvents(0)
 {
 }
@@ -51,7 +51,7 @@ void DQMFileMetaData::Print(Option_t* option) const
 
 std::string DQMFileMetaData::getJsonStr() const
 {
-  nlohmann::json metadata = {
+  /*nlohmann::json metadata = {
     {"nEvents", m_nEvents},
     {"experiment", m_experiment},
     {"run", m_run},
@@ -61,5 +61,5 @@ std::string DQMFileMetaData::getJsonStr() const
     {"mcEvents", m_mcEvents},
     {"globalTag", m_databaseGlobalTag},
   };
-  return metadata.dump(2);
+  return metadata.dump(2);*/
 }

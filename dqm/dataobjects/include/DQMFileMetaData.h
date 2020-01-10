@@ -45,9 +45,11 @@ namespace Belle2 {
     /** Run date getter (UTC) */
     const std::string& getRunDate() const {return m_date;}
 
-    /** Software release version getter.
-     */
+    /** Software release version getter */
     const std::string& getRelease() const {return m_release;}
+
+    /** Processing ID */
+    const std::string& getProcessingID() const {return m_procID;}
 
     /** Is it generated data?.
      */
@@ -87,6 +89,11 @@ namespace Belle2 {
       m_date = date;
     }
 
+    void setProcessingID(const std::string& procID)
+    {
+      m_procID = procID;
+    }
+
     /** Number of generated events setter.
      *
      *  @param nEvents The number of generated events.
@@ -123,6 +130,8 @@ namespace Belle2 {
     std::string m_date; /**< run date and time (UTC).  */
 
     std::string m_release; /**< Software release version.  */
+
+    std::string m_procID; /**< processing ID */
 
     bool m_isMC; /**< Is it generated or real data?.  */
 

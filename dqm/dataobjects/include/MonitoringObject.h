@@ -11,6 +11,7 @@
 #pragma once
 
 #include <TObject.h>
+#include <TNamed.h>
 #include <TCanvas.h>
 
 #include <vector>
@@ -24,7 +25,7 @@ namespace Belle2 {
    *  See BELLE2-NOTE-TE-2015-028: Event, File, and Dataset Metadata for a
    *  detailed definition. Available at: https://docs.belle2.org/record/287?ln=en
    */
-  class MonitoringObject : public TObject {
+  class MonitoringObject : public TNamed {
 
   public:
     /** Constructor.
@@ -33,19 +34,14 @@ namespace Belle2 {
 
     MonitoringObject(const std::string& name)
     {
-      m_name = name;
+      fName = name;
     }
 
 
-    const std::string& getName() const {return m_name;}
+    const std::string& getName() const {return std::string(fName);}
 
     //    void setCreationData(const std::string& date, const std::string& release)
     //{m_date = date; m_release = release;}
-
-    void setName(const std::string& name)
-    {
-      m_name = name;
-    }
 
     void addCanvas(TCanvas* canv)
     {
@@ -57,10 +53,26 @@ namespace Belle2 {
       m_vars.insert({var, val});
     }
 
+    void addVariable(const std::string& var, const std::string& val)
+    {
+      m_strVars.insert({var, val});
+    }
+
+    const std::map<std::string, float>& getVariables()
+    {
+      return m_vars;
+    }
+
+    const std::map<std::string, std::string>& getStringVariables()
+    {
+      return m_strVars;
+    }
+
+
 
   private:
 
-    std::string m_name;
+    //TString fName;
 
     std::vector<TCanvas*> m_Canvases;
 

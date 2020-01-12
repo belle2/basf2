@@ -52,10 +52,17 @@ total_input_files = [
 
 # Average number of events in test files
 nEventsPerFile = {
+
+
+    'proc10_exp7': 20152,  # this is the number of events in the data test file and not the average per file.
+    'proc10_exp8': 17974,
+
     'proc9_exp3': 3456,
     'proc9_exp7': 3691,
     'proc9_exp8': 7846,
     'bucket7_exp8': 11242,
+
+
 
     'MC13_mixedBGx1': 200000,
     'MC13_chargedBGx1': 200000,
@@ -88,9 +95,8 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0007.01232.HLT1.f00000.root'),
     ('proc10_exp8', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0008/4S/r01026/all/' +
      'mdst/sub00/mdst.physics.0008.01026.HLT1.f00001.root'),
-
     ('MC13_mixedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009434/s00/e1003/4S/r00000/mixed/' +
-     'mdst/sub00/mdst_000001_prod00009434_task10020000001.root')
+     'mdst/sub00/mdst_000001_prod00009434_task10020000001.root'),
     ('MC13_chargedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009435/s00/e1003/4S/r00000/charged/' +
      'mdst/sub00/mdst_000001_prod00009435_task10020000001.root'),
     ('MC13_uubarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/' +

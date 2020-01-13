@@ -135,15 +135,15 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         self.outputFileName = "CoGCorrectionMonitor_" + self.localdb + ".root"
 
         #: lists used to create the histograms for each TB :
-        #:  residuals
+        #: residuals
         self.resList = []
-        #:  scatterplot
+        #: scatterplot
         self.spList = []
         #: cog
         self.cogList = []
         #: t0
         self.cdcList = []
-        #: SNR
+        #: Cluster SNR
         self.snrList = []
         #: number of clusters
         self.nList = []

@@ -20,7 +20,6 @@
 // Belle objects (Panther tables)
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
-#include "belle_legacy/tables/ecl.h"
 
 #include "belle_legacy/helix/Helix.h"
 

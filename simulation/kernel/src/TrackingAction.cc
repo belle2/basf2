@@ -70,11 +70,14 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
   const G4DynamicParticle* dynamicParticle = track->GetDynamicParticle();
 
+  bool primPartFlag = false;
+
   try {
     //Check if the dynamic particle has a primary particle attached.
     //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
     if (dynamicParticle->GetPrimaryParticle() != NULL) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
+      primPartFlag = true;
       if (primaryParticle->GetUserInformation() != NULL) {
         const_cast<G4Track*>(track)->SetUserInformation(new TrackInfo(ParticleInfo::getInfo(*primaryParticle)));
       } else {
@@ -92,8 +95,11 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
     currParticle.setMass(dynamicParticle->GetMass() / CLHEP::MeV * Unit::MeV);
     currParticle.setEnergy(dynamicParticle->GetTotalEnergy() / CLHEP::MeV * Unit::MeV);
     currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
-    currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
-    currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+
+    if (!primPartFlag) {
+      currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
+      currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+    }
 
     //Primary or secondary particle?
     if (dynamicParticle->GetPrimaryParticle() != NULL) {

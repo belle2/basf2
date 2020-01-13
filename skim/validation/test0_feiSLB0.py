@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>feiSLB0.dst.root</output>
+  <output>../feiSLB0.dst.root</output>
   <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """

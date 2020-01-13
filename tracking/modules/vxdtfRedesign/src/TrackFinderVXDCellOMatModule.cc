@@ -137,7 +137,7 @@ void TrackFinderVXDCellOMatModule::event()
   if (m_PARAMsetFamilies) {
     unsigned short nFamilies = m_familyDefiner.defineFamilies(segmentNetwork);
     if (nFamilies > m_PARAMmaxFamilies)  {
-      B2ERROR("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
+      B2WARNING("Maximal number of track canidates per event was exceeded: Number of Families = " << nFamilies);
       m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
       return;
     }
@@ -147,7 +147,7 @@ void TrackFinderVXDCellOMatModule::event()
   /// collect all Paths starting from a Seed:
   m_collectedPaths.clear();
   if (not m_pathCollector.findPaths(segmentNetwork, m_collectedPaths, m_PARAMmaxPaths, m_PARAMstoreSubsets)) {
-    B2ERROR("VXDCellOMat got signal to abort the event.");
+    B2WARNING("VXDCellOMat got signal to abort the event.");
     m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
     m_network->set_collectedPaths(m_collectedPaths.size());
     return;

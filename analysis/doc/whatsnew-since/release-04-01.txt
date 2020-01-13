@@ -29,7 +29,6 @@ Standard Particle Lists
    However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `vertexRave` or to `KFit`.
  * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.
 
-
 Variables
 +++++++++
 
@@ -59,6 +58,12 @@ Variables
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
+ * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
+   :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
+   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
+   :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
+   :b2:var:`TagTrackTrueDistanceToTagV`
+ * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
 
 Modules
 +++++++
@@ -79,6 +84,7 @@ Modules
  * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
  * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
+ * Added `ChargedPidMVAMulticlass` module to allow performing global PID (one-vs-rest), using an MVA trained in multi-class mode.
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
 
   .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
@@ -90,3 +96,12 @@ Modules
  * :b2:mod:`RestOfEventBuilder`, :b2:mod:`EventKinematics` and :b2:mod:`EventShapeCalculator` modules can use most likely charged particle hypothesis according to PID information.
  * Added the :b2:mod:`ParticleCombinerFromMC` module and the `reconstructMCDecay` to find and create ``ParticleList`` from a given :ref:`DecayString`.
    They can be used instead of the :b2:mod:`MCDecayFinder` and `findMCDecay` which are not fully tested and maintained.
+ * In :b2:mod:`TagVertex` added Btube as a possible constraint for the tag B vertex fit. The ``useFitAlgorithm`` parameter in the module is replaced
+   by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the module are now using double precision.
+   The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
+ * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
+
+Utilities
++++++++++
+
+ * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.

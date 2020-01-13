@@ -95,6 +95,13 @@ run = int(run)
 
 
 class dbImporterModule(Module):
+    """
+    :author: Laura Zani
+    Module to call the importer methods for the payloads creation from XML file
+    :param calibfile: path to the xml file containing the local calibrations
+    :type calibfile: string
+    """
+
     def beginRun(self):
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
@@ -102,25 +109,24 @@ class dbImporterModule(Module):
             # import the noises
             dbImporter.importSVDNoiseCalibrationsFromXML(calibfile)
             print(colored("V) Noise Imported", 'green'))
-            # import the pedestals
+        # import the pedestals
             dbImporter.importSVDPedestalCalibrationsFromXML(calibfile)
             print(colored("V) Pedestal Imported", 'green'))
-            # import pulse shape calibrations
+        # import pulse shape calibrations
             dbImporter.importSVDCalAmpCalibrationsFromXML(calibfile)
             print(colored("V) Pulse Shape Calibrations Imported", 'green'))
-            # import FADCMasked strips only if NOT --nomask
+        # import FADCMasked strips only if NOT --nomask
             if not args.mask:
                 dbImporter.importSVDFADCMaskedStripsFromXML(calibfile)
                 print(colored("V) FADC Masked Strips Imported", 'green'))
             else:
                 print(colored("X) FADC Masked Strips are NOT imported.", 'red'))
-            if not args.localXml:
-                # import XML file only if NOT --isLocalXML
-                dbImporter.importSVDGlobalXMLFile(calibfile)
-                print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
-            else:
-                print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
-
+                if not args.localXml:
+                    # import XML file only if NOT --isLocalXML
+                    dbImporter.importSVDGlobalXMLFile(calibfile)
+                    print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
+                else:
+                    print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
 
 main.add_module(dbImporterModule())
 

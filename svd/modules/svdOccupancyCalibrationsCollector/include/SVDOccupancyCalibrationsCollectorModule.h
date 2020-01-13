@@ -89,14 +89,14 @@ namespace Belle2 {
 
     /** Tree */
     std::string m_tree = "tree";
-    TTree* m_histogramTree = nullptr;
+    TTree* m_histogramTree = nullptr; /**<tree containing as events the histograms per layer, ladder, sensor, side*/
 
-    TH1F* m_hnevents = nullptr;
-    TH1F* m_hist = nullptr;
-    int m_layer = 0;
-    int m_ladder = 0;
-    int m_sensor = 0;
-    int m_side = 0;
+    TH1F* m_hnevents = nullptr; /**<first bin of the histogram is counting the processed events*/
+    TH1F* m_hist = nullptr; /**<pointer to occupancy histogram*/
+    int m_layer = 0;  /**<SVD layer identifier*/
+    int m_ladder = 0;/**<SVD ladder identifier*/
+    int m_sensor = 0;/**<SVD sensor identifier*/
+    int m_side = 0;/**<SVD side identifier*/
 
   private:
 

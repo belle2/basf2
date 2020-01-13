@@ -75,6 +75,13 @@ class ExamplesTest(unittest.TestCase):
 
         self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
 
+    def test_reconstruction_examples(self):
+        """
+        Test supported reconstruction examples.
+        """
+
+        self._test_examples_dir('analysis/examples/reconstruction/')
+
     def test_simulation_examples(self):
         """
         Test supported simulation examples.

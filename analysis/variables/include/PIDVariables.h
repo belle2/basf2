@@ -104,17 +104,36 @@ namespace Belle2 {
     double deuteronID(const Particle* part);
 
     /**
-     * @return the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
+     * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
      *
-     * Currently uses ECL-only inputs.
-     *
-     * The signal hypothesis pdg and the test pdg are passed a vector of strings of size = 2.
+     * The signal hypothesis pdgId is passed as a string (a vector of strings of size = 1).
      * Examples:
-     * Response of BDT trained for "e vs pi" separation = pidPairChargedBDTScore(11, 211)
+     * Response of BDT trained for multi-class separation, "e vs. others" = pidChargedBDTScore(11)
      *
-     * If the BDT score for the given set of hypotheses is not available for the particle under test, return NaN.
+     * If the response for the given hypothesis is not available for the particle under test, return NaN.
+     */
+    Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& pdgCodeHyp);
+
+    /**
+     * @return the charged PID BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
+     *
+     * The signal hypothesis pdgId and the test pdgId are passed as a vector of strings of size = 2.
+     * Examples:
+     * Response of BDT trained for binary "e vs pi" separation = pidPairChargedBDTScore(11, 211)
+     *
+     * If the response for the given set of hypotheses is not available for the particle under test, return NaN.
      */
     Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments);
+
+    /**
+     * returns most likely PDG code based on PID information.
+     */
+    double mostLikelyPDG(const Particle* part);
+
+    /**
+     * returns true if a particle is assigned to its most likely type according to PID likelihood
+     */
+    double isMostLikely(const Particle* part);
 
     /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()
@@ -148,4 +167,3 @@ namespace Belle2 {
 
   }
 } // Belle2 namespace
-

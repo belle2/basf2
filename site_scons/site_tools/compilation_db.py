@@ -1,5 +1,5 @@
-# Taken from https://github.com/mongodb/mongo/blob/8dd6d4755734ed37c1b98dfdefce3ca6bc65f1f6/site_scons/site_tools/compilation_db.py
-# without further modification
+# Adapted from
+# https://github.com/mongodb/mongo/blob/8dd6d4755734ed37c1b98dfdefce3ca6bc65f1f6/site_scons/site_tools/compilation_db.py
 
 # Copyright 2015 MongoDB Inc.
 #
@@ -52,7 +52,7 @@ class __CompilationDbNode(SCons.Node.Python.Value):
         self.Decider(changed_since_last_build_node)
 
 
-def changed_since_last_build_node(node, target, prev_ni):
+def changed_since_last_build_node(node, target, prev_ni, repo_node=None):
     """ Dummy decider to force alwasy building"""
     return True
 

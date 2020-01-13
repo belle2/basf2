@@ -108,13 +108,8 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   const double dalpha = 0;
   const double dxs = 0;
   const double dys = 0;
-  //const double dy = 0;
   const double sinda = sin(dalpha);
   const double cosda = cos(dalpha);
-  /* Local position in segment coordinates. */
-  TVector2 pos = sop->getPlane()->LabToPlane(sop->getPos());
-  //double u = pos.X();
-  //double v = pos.Y();
   /* Local position in sector coordinates. */
   HepGeom::Point3D<double> globalPos;
   HepGeom::Transform3D t;
@@ -142,9 +137,6 @@ std::pair<std::vector<int>, TMatrixD> AlignableEKLMRecoHit::globalDerivatives(co
   derGlobal(1, 2) =
     -((x - dxs) * (-sinda * m_StripV.X() - cosda * m_StripV.Y()) +
       (y - dys) * (cosda * m_StripV.X() - sinda * m_StripV.Y()));
-  //derGlobal(1, 3) = -cosda;
-  //derGlobal(1, 4) = -u * cosda - (v - dy) * sinda;
-
   return alignment::GlobalDerivatives(labGlobal, derGlobal);
 
 }

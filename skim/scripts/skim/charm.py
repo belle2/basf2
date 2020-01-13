@@ -13,6 +13,7 @@ import vertex
 
 haveRunD0ToHpJm = 0
 haveRunD0ToNeutrals = 0
+haveFilledCharmSkimKs = 0
 
 
 def D0ToHpJm(path):
@@ -149,11 +150,11 @@ def DstToD0PiD0ToHpJmEta(path):
 
     DstList = []
     ma.reconstructDecay('D0:HpJmEta -> K-:loose pi+:loose eta:myskim', charmcuts, path=path)
-    vertex.vertexTree('D0:HpJmEta', 0.001, path=path)
+    vertex.treeFit('D0:HpJmEta', 0.001, path=path)
     ma.reconstructDecay('D*+:HpJmEtaRS -> D0:HpJmEta pi+:all', Dstcuts, path=path)
     ma.reconstructDecay('D*-:HpJmEtaWS -> D0:HpJmEta pi-:all', Dstcuts, path=path)
-    vertex.vertexKFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
-    vertex.vertexKFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
+    vertex.KFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
+    vertex.KFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
     DstList.append('D*+:HpJmEtaRS')
     DstList.append('D*+:HpJmEtaWS')
 
@@ -167,14 +168,14 @@ def DstToD0PiD0ToKsOmega(path):
 
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
     ma.reconstructDecay('D0:Eta -> K_S0:merged eta:3pi', charmcuts, path=path)
-    vertex.vertexTree('D0:Eta', conf_level=0.001, path=path)
+    vertex.treeFit('D0:Eta', conf_level=0.001, path=path)
     ma.reconstructDecay('D0:Omega -> K_S0:merged omega:3pi', charmcuts, path=path)
-    vertex.vertexTree('D0:Omega', conf_level=0.001, path=path)
+    vertex.treeFit('D0:Omega', conf_level=0.001, path=path)
     ma.copyLists('D0:KsOmega', ['D0:Eta', 'D0:Omega'], path=path)
 
     DstList = []
     ma.reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)
-    vertex.vertexKFit('D*+:KsOmega', conf_level=0.001, path=path)
+    vertex.KFit('D*+:KsOmega', conf_level=0.001, path=path)
     DstList.append('D*+:KsOmega')
 
     return DstList
@@ -217,20 +218,37 @@ def DstToD0Neutrals(path):
     return DstList
 
 
+def fillCharmSkimKs(path):
+    global haveFilledCharmSkimKs
+    if haveFilledCharmSkimKs == 0:
+        haveFilledCharmSkimKs = 1
+        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.4 < M < 0.6', True, path=path)
+        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.4 < M < 0.6', 1, True, path=path)
+        ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
+    else:
+        pass
+
+
 def DstToD0PiD0ToHpHmKs(path):
+    mySel = 'abs(d0) < 1 and abs(z0) < 3'
+    mySel += ' and 0.296706 < theta < 2.61799'
+    ma.fillParticleList('pi+:hphmks', mySel, path=path)
+    ma.fillParticleList('K+:hphmks', mySel, path=path)
 
-    D0cuts = '1.80 < M < 1.93'
-    Dstcuts = '0 < Q < 0.015 and useCMSFrame(p)>2.3'
+    fillCharmSkimKs(path)
 
-    D0_Channels = ['pi-:loose pi+:loose K_S0:merged',
-                   'K-:loose K+:loose K_S0:merged'
+    D0cuts = '1.75 < M < 1.95'
+    Dstcuts = '0 < Q < 0.022 and useCMSFrame(p)>2.3'
+
+    D0_Channels = ['pi-:hphmks pi+:hphmks K_S0:charmskim',
+                   'K-:hphmks K+:hphmks K_S0:charmskim'
                    ]
     DstList = []
 
     for chID, channel in enumerate(D0_Channels):
         ma.reconstructDecay('D0:HpHmKs' + str(chID) + ' -> ' + channel, D0cuts, chID, path=path)
 
-        ma.reconstructDecay('D*+:HpHmKs' + str(chID) + ' -> pi+:all D0:HpHmKs' + str(chID), Dstcuts, chID, path=path)
+        ma.reconstructDecay('D*+:HpHmKs' + str(chID) + ' -> pi+:hphmks D0:HpHmKs' + str(chID), Dstcuts, chID, path=path)
         DstList.append('D*+:HpHmKs' + str(chID))
 
     return DstList
@@ -316,9 +334,16 @@ def CharmSemileptonic(path):
 
 
 def DpToKsHp(path):
+    mySel = 'abs(d0) < 1 and abs(z0) < 3'
+    mySel += ' and 0.296706 < theta < 2.61799'
+    ma.fillParticleList('pi+:kshp', mySel, path=path)
+    ma.fillParticleList('K+:kshp', mySel, path=path)
+
+    fillCharmSkimKs(path)
+
     Dpcuts = '1.72 < M < 1.98 and useCMSFrame(p)>2'
-    Dp_Channels = ['K_S0:merged pi+:loose',
-                   'K_S0:merged K+:loose',
+    Dp_Channels = ['K_S0:charmskim pi+:kshp',
+                   'K_S0:charmskim K+:kshp',
                    ]
 
     DpList = []

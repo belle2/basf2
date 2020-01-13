@@ -27,7 +27,7 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 using namespace std;
 

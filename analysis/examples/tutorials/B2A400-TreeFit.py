@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 #######################################################
-# run 'pydoc3 vertex' for general documentation of vertexxing stuff
+# run 'pydoc3 vertex' for general documentation of vertexing stuff
 #
 # It is recommended to use the TreeFitter for everything as it is the fastest tool
 #
 # If you want to fit precise vertices with nTracks>2 attached and you are
-# interested in the vertex postion, TagV COULD BE the better tool as it
+# interested in the vertex position, TagV COULD BE the better tool as it
 # reweights the tracks. However, you have to check yourself.
 #
 # This tutorial demonstrates how to perform a fit with
@@ -62,18 +62,16 @@ ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
-vx.vertexTree(list_name='B0:all',
-              conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
-              ipConstraint=True,
-              # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-              updateAllDaughters=True,  # update momenta off ALL particles
-              massConstraint=['pi0'],  # mass constrain ALL pi0
-              path=my_path
-              )
-
 # perform MC matching (MC truth association)
-ma.matchMCTruth(list_name='B0:all',
-                path=my_path)
+ma.matchMCTruth(list_name='B0:all', path=my_path)
+
+vx.treeFit(list_name='B0:all',
+           conf_level=0,  # 0:keep only fit survivors, -1: keep all candidates; optimise this cut for your need
+           ipConstraint=True,
+           # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
+           updateAllDaughters=True,  # update momenta of ALL particles
+           massConstraint=['pi0'],  # mass constrain ALL pi0
+           path=my_path)
 
 # whatever you are interested in
 #

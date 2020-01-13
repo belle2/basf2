@@ -116,7 +116,25 @@ package below 20 MeV.  This option is useful if background or beamline issues ar
 studied, but would not be used in the standard simulation due to the large amount of CPU
 time required.
 
-Using this physics list
+Secondary production thresholds
+-------------------------------
+
+This physics list allows the Geant4 secondary production thresholds to be set either
+globally or separately for each detector envelope (cuts per region).  The current global
+default value is 0.07 cm.  Using the steering script, a different threshold may be set 
+for each of the following detectors:
+
+#. PXD   0.01 cm
+#. SVD   0.02 cm
+#. CDC   0.10 cm
+#. TOP + ARICH  0.05 cm  (currently one value for both TOP and ARICH envelopes
+#. ECL   0.10 cm
+#. KLM   0.10 cm
+
+The values shown here are suggestions and may be changed in order to optimize the simulation.
+See below for how to set these for a run.
+
+Using this physics list 
 -----------------------
 
 Belle2PhysicsList is currently invoked in FullSimModule.  It can be chosen by setting
@@ -130,6 +148,14 @@ to G4EmStandardPhysics.
 The already existing options RunEventVerbosity, RegisterOptics and ProductionCut retain
 their original meaning and usage.   
 
+Secondary production thresholds may also be set in main.add_module.
+If no cut values are specified in this file, the default value of 0.07 cm is
+used everywhere in the Belle2 geometry.  This global default can be changed by setting 
+the parameter ProductionCut.  Each detector envelope can have a cut value distinct from 
+the global value by setting the parameters PXDProductionCut, SVDProductionCut, etc.
+Cut values which are not explicitly set for a given detetcor envelope assume the value 
+set by the ProductionCut parameter. 
+
 A test script, simulation/example/Belle2PhyslistTestBrems.py, is identical to 
 BremsstralungPhotons.py, except that it invokes Belle2PhysicsList as follows:: 
 
@@ -137,7 +163,13 @@ BremsstralungPhotons.py, except that it invokes Belle2PhysicsList as follows::
                   RegisterOptics=False,
                   #                StandardEM=True,
                   #                UseHighPrecisionNeutrons=True,
-                  #                ProductionCut=0.07,
+                  ProductionCut=0.07,
+                  PXDProductionCut=0.01,
+                  SVDProductionCut=0.02,
+                  CDCProductionCut=0.10,
+                  ARICHTOPProductionCut=0.05,
+                  ECLProductionCut=0.1,
+                  KLMProductionCut=0.1,
                   StoreBremsstrahlungPhotons=True, BremsstrahlungPhotonsEnergyCut=10.0)
 
 Here the physics list is invoked with its default EM and neutron options since these

@@ -16,7 +16,7 @@ REG_MODULE(ChargedPidMVA)
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
-  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -32,6 +32,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            m_particle_lists,
            "The input list of ParticleList names.",
            std::vector<std::string>());
+  addParam("payloadName",
+           m_payload_name,
+           "The name of the database payload object with the MVA weights.",
+           std::string("ChargedPidMVAWeights"));
 }
 
 
@@ -40,7 +44,11 @@ ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 void ChargedPidMVAModule::initialize()
 {
+
   m_event_metadata.isRequired();
+
+  m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
+
 }
 
 
@@ -48,14 +56,14 @@ void ChargedPidMVAModule::beginRun()
 {
 
   // Retrieve the payload from the DB.
-  m_weightfiles_representation.addCallback([this]() { initializeMVA(); });
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
 
-  if (!m_weightfiles_representation->isValidPdg(m_sig_pdg)) {
+  if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
     B2FATAL("PDG: " << m_sig_pdg <<
             " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
-  if (!m_weightfiles_representation->isValidPdg(m_bkg_pdg)) {
+  if (!(*m_weightfiles_representation.get())->isValidPdg(m_bkg_pdg)) {
     B2FATAL("PDG: " << m_bkg_pdg <<
             " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
@@ -68,8 +76,6 @@ void ChargedPidMVAModule::beginRun()
 void ChargedPidMVAModule::event()
 {
 
-  auto sigPart = Const::ChargedStable(m_sig_pdg);
-
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
 
   for (const auto& name : m_particle_lists) {
@@ -81,7 +87,7 @@ void ChargedPidMVAModule::event()
     int pdg = abs(pList->getPDGCode());
 
     // Check if this ParticleList is made up of legit Const::ChargedStable particles.
-    if (!m_weightfiles_representation->isValidPdg(pdg)) {
+    if (!(*m_weightfiles_representation.get())->isValidPdg(pdg)) {
       B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
               " is not that of a valid particle in Const::chargedStableSet! Aborting...");
     }
@@ -108,30 +114,33 @@ void ChargedPidMVAModule::event()
       }
 
       // Retrieve the index for the correct MVA expert and dataset,
-      // given (signal hypo, clusterTheta, p)
+      // given reconstructed (clusterTheta, p)
       auto theta   = eclCluster->getTheta();
       auto p       = particle->getP();
       int jth, ip;
-      auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
+      auto index   = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, jth, ip);
 
       // Get the cut defining the MVA category under exam (this reflects the one used in the training).
-      const auto cuts   = m_weightfiles_representation->getCuts(m_sig_pdg);
+      const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
       const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
 
-      B2DEBUG(11, "\tclusterTheta = " << theta << " [rad]");
-      B2DEBUG(11, "\tp = " << p << " [GeV/c]");
-      B2DEBUG(11, "\tBrems corrected? " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
-      B2DEBUG(11, "\tWeightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      B2DEBUG(11, "\t\tcharge          = " << particle->getCharge());
+      B2DEBUG(11, "\t\tclusterTheta    = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
+      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
       if (!cutstr.empty()) {
         B2DEBUG(11, "\tCategory cut: " << cutstr);
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
 
-      auto nvars  = m_variables.at(index).size();
+      B2DEBUG(11, "\tMVA variables:");
+
+      auto nvars = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
 
-        auto varobj =  m_variables.at(index).at(ivar);
+        auto varobj = m_variables.at(index).at(ivar);
 
         auto var = varobj->function(particle);
 
@@ -144,14 +153,16 @@ void ChargedPidMVAModule::event()
 
       }
 
-      auto nspecs  = m_spectators.at(index).size();
+      B2DEBUG(12, "\tMVA spectators:");
+
+      auto nspecs = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
 
-        auto specobj =  m_spectators.at(index).at(ispec);
+        auto specobj = m_spectators.at(index).at(ispec);
 
         auto spec = specobj->function(particle);
 
-        B2DEBUG(11, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+        B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
 
         m_datasets.at(index)->m_spectators[ispec] = spec;
 
@@ -193,7 +204,7 @@ void ChargedPidMVAModule::initializeMVA()
 
   B2INFO("\tLoading weightfiles from the payload class for SIGNAL particle hypothesis: " << m_sig_pdg);
 
-  auto serialized_weightfiles = m_weightfiles_representation->getMVAWeights(m_sig_pdg);
+  auto serialized_weightfiles = (*m_weightfiles_representation.get())->getMVAWeights(m_sig_pdg);
   auto nfiles = serialized_weightfiles->size();
 
   B2INFO("\tConstruct the MVA experts and datasets from N = " << nfiles << " weightfiles...");

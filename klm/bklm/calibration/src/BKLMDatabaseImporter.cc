@@ -48,8 +48,13 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
-void BKLMDatabaseImporter::loadDefaultElectronicMapping()
+void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
 {
+  // Clear the vector: needed if we want to load two different maps
+  // in the same steering file.
+  if (m_ElectronicsChannels.size() > 0)
+    m_ElectronicsChannels.clear();
+
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -61,6 +66,7 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
+
     if (section == BKLMElementNumbers::c_ForwardSection) {
       if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
         copperId = 1 + BKLM_ID;
@@ -73,17 +79,24 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
       if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
         copperId = 4 + BKLM_ID;
     }
-    if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
-    if (sector == 1 || sector == 2) slotId = sector + 2;
-    if (sector == 7 || sector == 8) slotId = sector - 6;
 
-    if (layer > 2)  laneId = layer + 5;
-    else laneId = layer;
+    if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+      slotId = sector - 2;
+    if (sector == 1 || sector == 2)
+      slotId = sector + 2;
+    if (sector == 7 || sector == 8)
+      slotId = sector - 6;
 
-    if (layer < 3) {
-      if (plane == 0) axisId = 1;
-      else if (plane == 1) axisId = 0;
-    } else axisId = plane;
+    if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
+      laneId = layer + 5;
+      axisId = plane;
+    } else {
+      laneId = layer;
+      if (plane == BKLMElementNumbers::c_ZPlane)
+        axisId = 1;
+      if (plane == BKLMElementNumbers::c_PhiPlane)
+        axisId = 0;
+    }
 
     int MaxiChannel = BKLMElementNumbers::getNStrips(
                         section, sector, layer, plane);
@@ -98,29 +111,68 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping()
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
-      if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 
-      if (plane == 1) { //phi strips
-        if (layer == 1)  channelId = channelId + 4;
-        if (layer == 2)  channelId = channelId + 2;
-      } else if (plane == 0) { //z strips
-        if (layer < 3) { //scintillator
-          if (section == BKLMElementNumbers::c_BackwardSection
-              && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
-            if (layer == 1) {
-              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
-              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
-            } else {
-              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
+      if (!(dontFlip && layer >= BKLMElementNumbers::c_FirstRPCLayer && plane == BKLMElementNumbers::c_PhiPlane))
+        channelId = MaxiChannel - iStrip + 1;
+
+      if (plane == BKLMElementNumbers::c_PhiPlane) {
+        // Start settings for exp. 10.
+        if (isExperiment10) {
+          if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+            if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
+              channelId = MaxiChannel - channelId + 1;
+              if (layer == 1)
+                channelId += -2;
+              if (layer == 2)
+                channelId += 1;
             }
-          } else { //all sectors except backward sector #3
-            if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-            else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
-            else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
-            else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
+          }
+        } // End settings for exp. 10.
+        if (layer == 1)
+          channelId += 4;
+        if (layer == 2)
+          channelId += 2;
+      }
+
+      if (plane == BKLMElementNumbers::c_ZPlane) {
+        if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+          int channelCheck = channelId;
+          if (section == BKLMElementNumbers::c_BackwardSection
+              && sector == BKLMElementNumbers::c_ChimneySector) {
+            if (layer == 1) {
+              if (!isExperiment10) {
+                if (channelCheck > 0 && channelCheck < 9)
+                  channelId = 9 - channelId;
+                if (channelCheck > 8 && channelCheck < 24)
+                  channelId = 54 - channelId;
+                if (channelCheck > 23 && channelCheck < 39)
+                  channelId = 54 - channelId;
+              } else {
+                if (channelCheck > 0 && channelCheck < 9)
+                  channelId = 9 - channelId; // 8 : 1
+                if (channelCheck > 8 && channelCheck < 24)
+                  channelId = 39 - channelId; // 30 : 16
+                if (channelCheck > 23 && channelCheck < 39)
+                  channelId = 69 - channelId; // 45 : 31
+              }
+            }
+            if (layer == 2) {
+              if (channelCheck > 0 && channelCheck < 10)
+                channelId = 10 - channelId;
+              if (channelCheck > 9 && channelCheck < 24)
+                channelId = 40 - channelId;
+              if (channelCheck > 23 && channelCheck < 39)
+                channelId = 69 - channelId;
+            }
+          } else { // All the sectors except the chimney one
+            if (channelCheck > 0 && channelCheck < 10)
+              channelId = 10 - channelId;
+            if (channelCheck > 9 && channelCheck < 25)
+              channelId = 40 - channelId;
+            if (channelCheck > 24 && channelCheck < 40)
+              channelId = 70 - channelId;
+            if (channelCheck > 39 && channelCheck < 55)
+              channelId = 100 - channelId;
           }
         }
       }
@@ -147,6 +199,24 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
     if ((channelSection == section) &&
         (channelSector == sector) &&
         (channelLayer == layer))
+      m_ElectronicsChannels[i].second.setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int section, int sector, int layer, int plane, int lane)
+{
+  int channelSection, channelSector, channelLayer, channelPlane, strip;
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &channelPlane,
+      &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer) &&
+        (channelPlane == plane))
       m_ElectronicsChannels[i].second.setLane(lane);
   }
 }

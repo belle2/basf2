@@ -2,7 +2,4 @@ Import('env')
 
 env['LIBS'] = ['CLHEP', 'framework', 'belle_legacy', 'mdst_dataobjects', 'b2bii', 'analysis_dataobjects', 'analysis_VertexFitting']
 
-if not env['LIGHT_RELEASE']:
-	env['LIBS'] += ['ecl_dataobjects', 'tracking_dataobjects']
-
 Return('env')

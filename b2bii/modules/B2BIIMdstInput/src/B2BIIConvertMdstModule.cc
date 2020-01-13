@@ -167,9 +167,6 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("mcMatchingMode", m_mcMatchingModeString,
            "MC matching mode: 'Direct', or 'GeneratorLevel'",
            std::string("Direct"));
-  addParam("convertECLCrystalEnergies", m_convertECLCrystalEnergies, "Flag to switch on conversion of Datecl_mc_ehits into ECLHits",
-           false);
-  addParam("convertExtHits", m_convertExtHits, "Flag to switch on conversion of Mdst_ecl_trk into ExtHits", false);
   addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
@@ -177,17 +174,6 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
 
   m_realData = false;
-
-#if Light_relase == True
-  if (m_convertECLCrystalEnergies) {
-    B2WARNING("You are using a light release. The conversion of ECL crystal energies is not possible.");
-    m_convertECLCrystalEnergies = false;
-  }
-  if (m_convertExtHits) {
-    B2WARNING("You are using a light release. The conversion of ExtHits is not possible.");
-    m_convertExtHits = false;
-  }
-#endif
 
   B2DEBUG(1, "B2BIIConvertMdst: Constructor done.");
 }
@@ -221,14 +207,6 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_trackFitResults.registerInDataStore();
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
-
-#if Light_relase != True
-  if (m_convertECLCrystalEnergies) m_eclHits.registerInDataStore();
-  if (m_convertExtHits) {
-    m_extHits.registerInDataStore();
-    m_tracks.registerRelationTo(m_extHits);
-  }
-#endif
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
@@ -365,13 +343,7 @@ void B2BIIConvertMdstModule::event()
   // 10. Convert KLong information
   convertMdstKLongTable();
 
-  // 11. Convert ECL crystal energy
-  if (m_convertECLCrystalEnergies) convertECLHitTable();
-
-  // 12. Convert ExtHit information and set Track -> ExtHit relations
-  if (m_convertExtHits) convertExtHitTable();
-
-  // 13. Convert Evtcls panther table information
+  // 11. Convert Evtcls panther table information
   if (m_convertEvtcls) convertEvtclsTable();
 
 }
@@ -1195,80 +1167,6 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   }
 }
 
-void B2BIIConvertMdstModule::convertECLHitTable()
-{
-  if (m_realData)
-    return;
-
-  // check if the Datecl_mc_hits table has any entries
-  Belle::Datecl_mc_ehits_Manager& ehitsMgr = Belle::Datecl_mc_ehits_Manager::get_manager();
-  if (ehitsMgr.count() == 0) {
-    return;
-  }
-
-#if Light_relase != True
-  // Loop over all Belle Datecl_mc_ehits
-  for (Belle::Datecl_mc_ehits_Manager::iterator ehitIterator = ehitsMgr.begin(); ehitIterator != ehitsMgr.end(); ++ehitIterator) {
-
-    // Pull Datecl_mc_ehits from manager
-    Belle::Datecl_mc_ehits datECLMCEHit = *ehitIterator;
-
-    // Create Belle II ECLHit
-    auto B2EclHit = m_eclHits.appendNew();
-
-    // Convert Datecl_mc_ehit -> ECLHit
-    convertECLHitObject(datECLMCEHit, B2EclHit);
-  }
-#endif
-}
-
-void B2BIIConvertMdstModule::convertExtHitTable()
-{
-  Belle::Mdst_ecl_trk_Manager& eclTrkMgr = Belle::Mdst_ecl_trk_Manager::get_manager();
-  // check if the Mdst_ecl_trk table has any entries
-  if (eclTrkMgr.count() == 0) {
-    return;
-  }
-
-#if Light_relase != True
-  Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
-
-  // Relations
-  RelationArray tracksToExtHits(m_tracks, m_extHits);
-
-  // Loop over all Belle Mdst_ecl_trk
-  for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = eclTrkMgr.begin(); ecltrkIterator != eclTrkMgr.end();
-       ++ecltrkIterator) {
-
-    // Pull Mdst_ecl_trk from manager
-    Belle::Mdst_ecl_trk mdstECLTrk = *ecltrkIterator;
-
-    // Create Belle II ExtHit
-    auto B2ExtHit = m_extHits.appendNew();
-
-    // Convert Mdst_ecl_trk -> ExtHit
-    convertExtHitObject(mdstECLTrk, B2ExtHit);
-
-    // Set relation between track and ExtHit
-    Belle::Mdst_trk mTRK = mdstECLTrk.trk();
-
-    // the numbering in mdst_charged is
-    // not necessarily the same as in mdst_trk
-    // therefore we have to find the corresponding mdst_charged
-    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
-      Belle::Mdst_charged mChar = *chgIterator;
-      Belle::Mdst_trk mTRK_in_charged = mChar.trk();
-
-      if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
-        // found the correct  mdst_charged
-        tracksToExtHits.add(mChar.get_ID() - 1, m_extHits.getEntries() - 1, 1.0);
-        break;
-      }
-    }
-  }
-#endif
-}
-
 void B2BIIConvertMdstModule::convertEvtclsTable()
 {
   // Create StoreObj if it is not valid
@@ -1864,29 +1762,6 @@ void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster&
   klmCluster->setInnermostLayer(klm_cluster.first_layer());
 }
 
-#if Light_relase != True
-void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit)
-{
-  // note: average time was not available in Belle
-  eclHit->setCellId(ecl_mc_ehit.cId());
-  eclHit->setEnergyDep(ecl_mc_ehit.energy());
-}
-
-void B2BIIConvertMdstModule::convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit)
-{
-  extHit->setPDGCode(Const::pion.getPDGCode()); // always set Pion
-  extHit->setDetectorID(Const::EDetector::ECL);
-  extHit->setCopyID(ecl_trk_hit.cId());
-  extHit->setStatus(EXT_ENTER);
-  extHit->setPosition(TVector3(ecl_trk_hit.x(0), ecl_trk_hit.x(1), ecl_trk_hit.x(2)));
-  extHit->setMomentum(TVector3(ecl_trk_hit.p(0), ecl_trk_hit.p(1), ecl_trk_hit.p(2)));
-  double covarianceMatrix[21];
-  for (int i = 0; i < 21; ++i) {
-    covarianceMatrix[i] = ecl_trk_hit.error(i);
-  }
-  extHit->setCovariance(covarianceMatrix);
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // RELATIONS

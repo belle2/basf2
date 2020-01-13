@@ -41,11 +41,6 @@
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
-#if Light_release != True
-#include <ecl/dataobjects/ECLHit.h>
-#include <tracking/dataobjects/ExtHit.h>
-#endif
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Const.h>
@@ -147,10 +142,6 @@ namespace Belle2 {
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
 
-    bool m_convertECLCrystalEnergies; /**< Flag to switch on conversion of Datecl_mc_ehits objects into ECLHits */
-
-    bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
-
     bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
     /**
@@ -213,16 +204,6 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
-    /**
-     * Reads and converts all entries of Datecl_mc_ehits Panther table to ECLHit dataobjects and adds them to StoreArray<ECLHit>.
-     */
-    void convertECLHitTable();
-
-    /**
-     * Reads and converts all entries of Mdst_ecl_trk Panther table to ExtHit dataobjects and adds them to StoreArray<ExtHit>.
-     */
-    void convertExtHitTable();
-
     /** Stores beam parameters (energy, angles) in CollisionInvariantMass and CollisionBoostVector (currently in the DataStore). */
     void convertBeamEnergy();
 
@@ -255,18 +236,6 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
-
-#if Light_release != True
-    /**
-     * Converts Datecl_mc_ehits record to ECLHit object.
-     */
-    void convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit);
-
-    /**
-     * Converts Mdst_ecl_trk record to ExtHit object.
-     */
-    void convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit);
-#endif
 
     /**
      * Creates TrackFitResult and fills it.
@@ -414,14 +383,6 @@ namespace Belle2 {
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
-
-#if Light_release != True
-    /** ECL hits */
-    StoreArray<ECLHit> m_eclHits;
-
-    /** Ext hits */
-    StoreArray<ExtHit> m_extHits;
-#endif
 
     /** Event classification flags */
     StoreObjPtr<EventExtraInfo> m_evtCls;

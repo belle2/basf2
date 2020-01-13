@@ -98,6 +98,20 @@ namespace Belle2 {
     void loadBKLMElectronicsMap(bool isExperiment10 = false);
 
     /**
+     * Load EKLM electronics map.
+     *
+     * @param[in] version
+     * Map version:
+     * 1 = phase 2, experiment 3
+     * 2 = phase 3, starting from experiment 4.
+     *
+     * @param[in] mc
+     * MC or data (MC does not have occasional cable switches that exist
+     * in the data).
+     */
+    void loadEKLMElectronicsMap(int version, bool mc);
+
+    /**
      * Set non-default lane for all channels in a module.
      * @param[in] subdetector Subdetector.
      * @param[in] section     Section.
@@ -151,6 +165,35 @@ namespace Belle2 {
     void importEKLMSegmentAlignment(
       const EKLMSegmentAlignment* eklmSegmentAlignment,
       bool displacement = false);
+
+    /**
+     * Get EKLM firmware strip number by software strip number.
+     * @param[in] stripFirmware Firmware strip number.
+     */
+    int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
+
+    /**
+     * Get EKLM ASIC and channel numbers (both are 0-based)
+     * by plane and strip numbers.
+     * @param[in]  plane   Plane.
+     * @param[in]  strip   Strip,
+     * @param[out] asic    ASIC.
+     * @param[out] channel Channel.
+     */
+    void getEKLMAsicChannel(int plane, int strip,
+                            int* asic, int* channel) const;
+
+    /**
+     * Add EKLM electronics map lane.
+     * @param[in] section Section.
+     * @param[in] sector  Sector.
+     * @param[in] layer   Layer.
+     * @param[in] copper  Copper.
+     * @param[in] slot    Slot.
+     * @param[in] lane    Lane.
+     */
+    void addEKLMElectronicsMapLane(
+      int section, int sector, int layer, int copper, int slot, int axis);
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

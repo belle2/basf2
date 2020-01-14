@@ -89,28 +89,28 @@ namespace Belle2 {
       return m_word4;
     }
 
-    /** Get the channel number from the first raw word. */
+    /** Get the channel number. */
     uint16_t getChannel() const
     {
       return m_word1 & 0x7F;
     }
 
-    /** Get the view (= axis = plane) number from the second raw word. */
+    /** Get the view (= axis = plane) number. */
     uint16_t getAxis() const
     {
-      return (m_word2 >> 7) & 1;
+      return (m_word1 >> 7) & 1;
     }
 
-    /** Get the lane number from the third raw word. */
+    /** Get the lane number. */
     uint16_t getLane() const
     {
-      return (m_word3 >> 8) & 0x1F;
+      return (m_word1 >> 8) & 0x1F;
     }
 
-    /** Get the status flag from the fourth raw word. */
+    /** Get the status flag. */
     uint16_t getFlag() const
     {
-      return m_word4 >> 13;
+      return m_word1 >> 13;
     }
 
   private:

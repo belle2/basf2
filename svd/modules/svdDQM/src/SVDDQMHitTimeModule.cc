@@ -40,14 +40,14 @@ void SVDDQMHitTimeModule::defineHisto()
   m_l3v_bhabha_L1_ECLTRG = new TH1F("SVDTime_L3V_bhabha_ECLTRG",
                                     "SVD L3 V-Side Cluster Time : bhabhas, ECLTRG time",
                                     nBins, minT0, maxT0);
-  m_l3vEvtT0_bhabha_L1_ECLTRG = new TH1F("SVDTimeEvtT0_bhabha_ECLTRG",
+  m_l3vEvtT0_bhabha_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_ECLTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, ECLTRG time",
                                          nBins, minT0, maxT0);
 
   m_l3v_hadron_L1_ECLTRG = new TH1F("SVDTime_L3V_hadron_ECLTRG",
                                     "SVD L3 V-Side Cluster Time : hadrons, ECLTRG time",
                                     nBins, minT0, maxT0);
-  m_l3vEvtT0_hadron_L1_ECLTRG = new TH1F("SVDTimeEvtT0_hadron_ECLTRG",
+  m_l3vEvtT0_hadron_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_ECLTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : hadrons, ECLTRG time",
                                          nBins, minT0, maxT0);
 
@@ -55,21 +55,21 @@ void SVDDQMHitTimeModule::defineHisto()
   m_l3v_mumu_L1_ECLTRG = new TH1F("SVDTime_L3V_mumu_ECLTRG",
                                   "SVD L3 V-Side Cluster Time : mumus, ECLTRG time",
                                   nBins, minT0, maxT0);
-  m_l3vEvtT0_mumu_L1_ECLTRG = new TH1F("SVDTimeEvtT0_mumu_ECLTRG",
+  m_l3vEvtT0_mumu_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_ECLTRG",
                                        "SVD L3 V-Side Cluster Time - EventT0 : mumus, ECLTRG time",
                                        nBins, minT0, maxT0);
 
   m_l3v_bhabha_L1_CDCTRG = new TH1F("SVDTime_L3V_bhabha_CDCTRG",
                                     "SVD L3 V-Side Cluster Time : bhabhas, CDCTRG time",
                                     nBins, minT0, maxT0);
-  m_l3vEvtT0_bhabha_L1_CDCTRG = new TH1F("SVDTimeEvtT0_bhabha_CDCTRG",
+  m_l3vEvtT0_bhabha_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_CDCTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, CDCTRG time",
                                          nBins, minT0, maxT0);
 
   m_l3v_hadron_L1_CDCTRG = new TH1F("SVDTime_L3V_hadron_CDCTRG",
                                     "SVD L3 V-Side Cluster Time : hadrons, CDCTRG time",
                                     nBins, minT0, maxT0);
-  m_l3vEvtT0_hadron_L1_CDCTRG = new TH1F("SVDTimeEvtT0_hadron_CDCTRG",
+  m_l3vEvtT0_hadron_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_CDCTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : hadrons, CDCTRG time",
                                          nBins, minT0, maxT0);
 
@@ -77,7 +77,7 @@ void SVDDQMHitTimeModule::defineHisto()
   m_l3v_mumu_L1_CDCTRG = new TH1F("SVDTime_L3V_mumu_CDCTRG",
                                   "SVD L3 V-Side Cluster Time : mumus, CDCTRG time",
                                   nBins, minT0, maxT0);
-  m_l3vEvtT0_mumu_L1_CDCTRG = new TH1F("SVDTimeEvtT0_mumu_CDCTRG",
+  m_l3vEvtT0_mumu_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_CDCTRG",
                                        "SVD L3 V-Side Cluster Time - EventT0 : mumus, CDCTRG time",
                                        nBins, minT0, maxT0);
 

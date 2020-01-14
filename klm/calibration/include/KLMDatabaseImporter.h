@@ -92,6 +92,11 @@ namespace Belle2 {
                          bool displacement = false);
 
     /**
+     * Clear electronics map (to be able to import its multiple versions).
+     */
+    void clearElectronicsMap();
+
+    /**
      * Load BKLM electronics map.
      * @param[in] isExperiment10 Experiment 10 or earlier data.
      */
@@ -135,8 +140,8 @@ namespace Belle2 {
       int subdetector, int section, int sector, int layer, int plane, int lane);
 
     /**
-      * Import electronics map.
-      */
+     * Import electronics map.
+     */
     void importElectronicsMap();
 
   private:
@@ -171,17 +176,6 @@ namespace Belle2 {
      * @param[in] stripFirmware Firmware strip number.
      */
     int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
-
-    /**
-     * Get EKLM ASIC and channel numbers (both are 0-based)
-     * by plane and strip numbers.
-     * @param[in]  plane   Plane.
-     * @param[in]  strip   Strip,
-     * @param[out] asic    ASIC.
-     * @param[out] channel Channel.
-     */
-    void getEKLMAsicChannel(int plane, int strip,
-                            int* asic, int* channel) const;
 
     /**
      * Add EKLM electronics map lane.

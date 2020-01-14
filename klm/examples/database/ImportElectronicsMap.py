@@ -17,9 +17,54 @@ if (len(sys.argv) >= 2):
 
 # Database importer.
 dbImporter = KLMDatabaseImporter()
-dbImporter.loadBKLMElectronicsMap()
+
+
+def clear_electronics_map():
+    """
+    Clear electronics map (to load another version).
+    """
+    dbImporter.clearElectronicsMap()
+
+
+def load_bklm_electronics_map(version, mc):
+    """
+    Load BKLM electronics map.
+    Versions:
+    1 = before experiment 10.
+    2 = experiment 10 and later (scintillator phi strips issue).
+    """
+    if mc:
+        dbImporter.loadBKLMElectronicsMap()
+    else:
+        if version == 1:
+            dbImporter.loadBKLMElectronicsMap()
+        elif version == 2:
+            dbImporter.loadBKLMElectronicsMap(True)
+        # Switch lanes for real-data map.
+        # The fibers of layer 1 and 2 are switched in BB6.
+        dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
+                                         BKLMElementNumbers.c_BackwardSection,
+                                         7, 1, 2)
+        dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
+                                         BKLMElementNumbers.c_BackwardSection,
+                                         7, 2, 1)
+
+
+def load_eklm_electronics_map(version, mc):
+    """
+    Load EKLM electronics map.
+    Versions:
+    1 = phase 2 (wrong connection of cables for backward sectors 2 and 3).
+    2 = phase 3
+    """
+    dbImporter.loadEKLMElectronicsMap(version, mc)
 
 if mc:
+    # MC map: a single version of map is used for all periods.
+
+    load_bklm_electronics_map(1, True)
+    load_eklm_electronics_map(1, True)
+
     dbImporter.setIOV(0, 0, 0, -1)
     dbImporter.importElectronicsMap()
 
@@ -30,28 +75,24 @@ if mc:
     dbImporter.importElectronicsMap()
 
 else:
-    # Switch lanes for real-data map.
-    # The fibers of layer 1 and 2 are switched in BB6.
-    dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
-                                     BKLMElementNumbers.c_BackwardSection,
-                                     7, 1, 2)
-    dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
-                                     BKLMElementNumbers.c_BackwardSection,
-                                     7, 2, 1)
+    # Data map.
 
-    dbImporter.setIOV(1, 0, 9, -1)
+    # Experiments 0 - 3.
+    load_bklm_electronics_map(1, False)
+    load_eklm_electronics_map(1, False)
+    dbImporter.setIOV(1, 0, 4, -1)
     dbImporter.importElectronicsMap()
 
-    # Import mapping for experiment 10 and 11.
-    dbImporter.loadBKLMElectronicsMap(True)
+    # Experiments 4 - 9.
+    clear_electronics_map()
+    load_bklm_electronics_map(1, False)
+    load_eklm_electronics_map(2, False)
+    dbImporter.setIOV(1, 0, 4, -1)
+    dbImporter.importElectronicsMap()
 
-    # Still switch the lanes.
-    dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
-                                     BKLMElementNumbers.c_BackwardSection,
-                                     7, 1, 2)
-    dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,
-                                     BKLMElementNumbers.c_BackwardSection,
-                                     7, 2, 1)
-
-    dbImporter.setIOV(10, 0, -1, -1)
+    # Experiments 0 - 3.
+    clear_electronics_map()
+    load_bklm_electronics_map(2, False)
+    load_eklm_electronics_map(2, False)
+    dbImporter.setIOV(1, 0, 4, -1)
     dbImporter.importElectronicsMap()

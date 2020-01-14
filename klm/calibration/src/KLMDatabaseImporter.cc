@@ -186,13 +186,13 @@ void KLMDatabaseImporter::importAlignment(
   importEKLMSegmentAlignment(eklmSegmentAlignment, displacement);
 }
 
+void KLMDatabaseImporter::clearElectronicsMap()
+{
+  m_ElectronicsChannels.clear();
+}
+
 void KLMDatabaseImporter::loadBKLMElectronicsMap(bool isExperiment10)
 {
-  // Clear the vector: needed if we want to load two different maps
-  // in the same steering file.
-  if (m_ElectronicsChannels.size() > 0)
-    m_ElectronicsChannels.clear();
-
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -336,19 +336,21 @@ int KLMDatabaseImporter::getEKLMStripFirmwareBySoftware(int stripSoftware) const
   return strip;
 }
 
-void KLMDatabaseImporter::getEKLMAsicChannel(
-  int plane, int strip, int* asic, int* channel) const
-{
-  int stripFirmware = getEKLMStripFirmwareBySoftware(strip);
-  int asicMod5 = (stripFirmware - 1) / EKLMElementNumbers::getNStripsSegment();
-  *channel = (stripFirmware - 1) % EKLMElementNumbers::getNStripsSegment();
-  *asic = asicMod5 +
-          EKLMElementNumbers::getMaximalSegmentNumber() * (plane - 1);
-}
-
 void KLMDatabaseImporter::addEKLMElectronicsMapLane(
-  int section, int sector, int layer, int copper, int slot, int axis)
+  int section, int sector, int layer, int copper, int slot, int lane)
 {
+  for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); ++plane) {
+    for (int strip = 1; strip <= EKLMElementNumbers::getMaximalStripNumber(); ++strip) {
+      int axis = plane - 1;
+      int channel = getEKLMStripFirmwareBySoftware(strip);
+      uint16_t detectorChannel = m_ElementNumbers->channelNumberEKLM(
+                                   section, sector, layer, plane, strip);
+      m_ElectronicsChannels.push_back(
+        std::pair<uint16_t, KLMElectronicsChannel>(
+          detectorChannel,
+          KLMElectronicsChannel(copper, slot, lane, axis, channel)));
+    }
+  }
 }
 
 void KLMDatabaseImporter::loadEKLMElectronicsMap(int version, bool mc)

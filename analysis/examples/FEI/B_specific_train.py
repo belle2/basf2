@@ -89,7 +89,7 @@ belle_particles = fei.get_default_channels(KLong=False,
                                            specific=True)
 
 # Get FEI path
-configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=True, monitor=False)
+configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=True, monitor=False, cache=-1)
 
 
 # Add FEI path to the path to be processed

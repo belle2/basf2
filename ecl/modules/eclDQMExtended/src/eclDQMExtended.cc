@@ -450,6 +450,9 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   m_AmpFit = result.amp;
   m_TimeFit = result.time;
   m_QualityFit = result.quality;
+
+  if (result.skip_thr || result.hit_thr) m_QualityFit += 4;
+
 }
 
 void ECLDQMEXTENDEDModule::beginRun()

@@ -100,14 +100,14 @@ namespace Belle2 {
     /** Upper threshold of energy deposition in event, [GeV]. */
     double m_EnergyUpperThr;
 
-    /** Parameters for hit map histograms. */
-    std::vector<double> m_HitMapThresholds = {};
+    /** Parameters for hit occ. histograms. */
+    std::vector<double> m_HitThresholds = {};
     /** Parameters for histograms w/ total energy. */
     std::vector<double> m_TotalEnergyThresholds = {};
     /** Parameters for timing histograms. */
     std::vector<double> m_TimingThresholds = {};
     /** Parameters for number of hits histograms. */
-    std::vector<std::pair<double, double>> m_HitNumberThresholdsUpperLimits = {};
+    std::vector<double> m_HitNumberUpperLimits = {};
     /** Parameters for waveform histograms. */
     std::vector<std::string> m_WaveformOption;
     /** Container for energy. */
@@ -125,13 +125,21 @@ namespace Belle2 {
     /** Pedestal rms error values.    */
     double m_PedestalRms[8736] = {};
 
-    /** Histogram: Total event no (auxiliary) to normalize hit map && waveform flow. */
+    /** Histogram: Total event no (auxiliary) to normalize hit map . */
     TH1F* h_evtot{nullptr};
+    /** Histogram: Event no for logic (auxiliary) to normalize logic waveform flow. */
+    TH1F* h_evtot_logic{nullptr};
+    /** Histogram: Event no for rand (auxiliary) to normalize rand waveform flow. */
+    TH1F* h_evtot_rand{nullptr};
+    /** Histogram: Event no for dphy (auxiliary) to normalize dphy waveform flow. */
+    TH1F* h_evtot_dphy{nullptr};
     /** Histogram: Fit quality flag (0 - good, 1 - large amplitude, 3 - bad chi2). */
     TH1F* h_quality{nullptr};
+    /** Histogram: Fit quality flag for waveform type 'other'. */
+    TH1F* h_quality_other{nullptr};
     /** Histogram: Trigger tag flag #1. */
     TH1F* h_trigtag1{nullptr};
-    /** Histogram: Fraction of waveforms vs digits. */
+    /** Histogram: Fraction of digits above ADC threshold. */
     TH1F* h_adc_hits{nullptr};
 
     /** Histogram vector: Hit map. */
@@ -146,10 +154,8 @@ namespace Belle2 {
     std::vector<TH1F*> h_ncevs = {};
     /** Histogram vector: Waveforms vs CellID. */
     std::vector<TH1F*> h_cells = {};
-    /** Histogram vector: Waveforms vs ShaperID. */
-    std::vector<TH1F*> h_shs = {};
-    /** Histogram vector: Waveforms vs CrateID. */
-    std::vector<TH1F*> h_crs = {};
+    /** Histogram: Normalize to psd hits for CellID. */
+    TH1F* h_cell_psd_norm{nullptr};
     /** Histogram vector: Reconstructed signal time for all ECL crates above the threshold = 1 GeV. */
     std::vector<TH1F*> h_time_crate_Thr1GeV = {};
     /** Histogram: Trigger time vs. Trig Cell ID.  */
@@ -162,9 +168,5 @@ namespace Belle2 {
     TProfile* h_pedrms_cellid{nullptr};
     /** Histogram: Pedestal rms error vs. Theta ID.   */
     TProfile* h_pedrms_thetaid{nullptr};
-
-    /** Convert a CellID number to the global Shaper number. */
-    unsigned short conversion(int);
-
   };
 }; // end Belle2 namespace

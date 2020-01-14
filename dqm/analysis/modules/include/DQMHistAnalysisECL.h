@@ -54,9 +54,9 @@ namespace Belle2 {
   private:
 
     /** Parameters for hit map histograms. */
-    std::vector<double> m_HitMapThresholds;
-    /** Parameters for waveform histograms. */
-    std::vector<std::string> m_WaveformOption;
+    std::vector<double> m_HitMapThresholds{};
+    /** Options for waveform histograms. */
+    std::vector<std::string> m_WaveformOption{};
 
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_lower_boundary_trigtag2 = nullptr;

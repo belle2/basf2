@@ -23,7 +23,6 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TColor.h>
-#include<iostream>
 
 using namespace Belle2;
 
@@ -98,7 +97,6 @@ TCanvas* DQMHistAnalysisECLModule::findCanv(TString canvas_name)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = NULL;
-
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       if (obj->GetName() == canvas_name) return (TCanvas*)obj;
@@ -110,15 +108,19 @@ TCanvas* DQMHistAnalysisECLModule::findCanv(TString canvas_name)
 void DQMHistAnalysisECLModule::normalize(std::string c_name, std::string h_name, Double_t weight)
 {
   TCanvas* c = findCanv(c_name);
-  c->cd();
-  TH1* h = findHist(h_name);
-  for (unsigned short i = 0; i < h->GetNbinsX(); i++) {
-    Double_t entries = h->GetBinContent(i + 1);
-    h->SetBinContent(i + 1, entries / weight);
+  if (c != NULL) {
+    c->cd();
+    TH1* h = findHist(h_name);
+    if (h != NULL) {
+      for (unsigned short i = 0; i < h->GetNbinsX(); i++) {
+        Double_t entries = h->GetBinContent(i + 1);
+        if (weight) h->SetBinContent(i + 1, entries / weight);
+      }
+      h->Draw();
+    }
+    c->Modified();
+    c->Update();
   }
-  h->Draw();
-  c->Modified();
-  c->Update();
 }
 
 void DQMHistAnalysisECLModule::event()
@@ -139,6 +141,16 @@ void DQMHistAnalysisECLModule::event()
   c_quality->Modified();
   c_quality->Update();
 
+  //quality_other
+  TCanvas* c_quality_other = findCanv("ECL/c_quality_other");
+  c_quality_other->cd();
+  c_quality_other->SetLogy();
+  TH1* h_quality_other = findHist("ECL/quality_other");
+  if (h_quality_other != NULL) h_quality_other->SetMinimum(0.1);
+  c_quality_other->Draw();
+  c_quality_other->Modified();
+  c_quality_other->Update();
+
   //cid_Thr%1%MeV, wf_cid_%1%, wf_sh_%1%, wf_cr_%1%
   TH1* h_evtot = findHist("ECL/event");
   if (h_evtot != NULL) {
@@ -146,15 +158,30 @@ void DQMHistAnalysisECLModule::event()
     for (const auto& id : m_HitMapThresholds)
       normalize(str(boost::format("ECL/c_cid_Thr%1%MeV") % id),
                 str(boost::format("ECL/cid_Thr%1%MeV") % id), events);
-    for (const auto& id : m_WaveformOption) {
-      normalize(str(boost::format("ECL/c_wf_cid_%1%") % id),
-                str(boost::format("ECL/wf_cid_%1%") % id), events);
-      normalize(str(boost::format("ECL/c_wf_sh_%1%") % id),
-                str(boost::format("ECL/wf_sh_%1%") % id), events);
-      normalize(str(boost::format("ECL/c_wf_cr_%1%") % id),
-                str(boost::format("ECL/wf_cr_%1%") % id), events);
-    }
   }
+  for (const auto& id : m_WaveformOption) {
+    if (id != "psd" && id != "other") {
+      TH1* h_evtot_norm = findHist(str(boost::format("ECL/event_%1%") % id));
+      if (h_evtot_norm != NULL) {
+        Double_t events = h_evtot_norm->GetBinContent(1);
+        normalize(str(boost::format("ECL/c_wf_cid_%1%") % id),
+                  str(boost::format("ECL/wf_cid_%1%") % id), events);
+      }
+    } else if (id == "psd") {
+      TCanvas* c_psd = findCanv(str(boost::format("ECL/c_wf_cid_%1%") % id));
+      if (c_psd != NULL) {
+        c_psd->cd();
+        TH1* h_psd = findHist(str(boost::format("ECL/wf_cid_%1%") % id));
+        TH1* h_psd_norm = findHist(str(boost::format("ECL/%1%_cid") % id));
+        if (h_psd != NULL && h_psd_norm != NULL) {
+          h_psd->Divide(h_psd, h_psd_norm);
+          h_psd->Draw();
+        }
+        c_psd->Modified();
+        c_psd->Update();
+      }
+    }
+  } //m_WaveformOption
 
   //trigtag1
   TCanvas* c_trigtag1 = findCanv("ECL/c_trigtag1");
@@ -174,23 +201,12 @@ void DQMHistAnalysisECLModule::event()
   //adc_hits
   TCanvas* c_adc_hits = findCanv("ECL/c_adc_hits");
   c_adc_hits->cd();
-  c_adc_hits->Pad()->SetFrameFillColor(10);
-  c_adc_hits->Pad()->SetFillColor(kWhite);
   c_adc_hits->SetLogy();
   TH1* h_adc_hits = findHist("ECL/adc_hits");
-  if (h_adc_hits != NULL) {
-    h_adc_hits->SetMinimum(0.1);
-    for (unsigned short i = 50; i < 250; i++) {
-      if (h_adc_hits->GetBinContent(i + 1)) {
-        c_adc_hits->Pad()->SetFillColor(kRed);
-        break;
-      }
-    }
-  }
+  if (h_adc_hits != NULL) h_adc_hits->SetMinimum(0.1);
   c_adc_hits->Draw();
   c_adc_hits->Modified();
   c_adc_hits->Update();
-
 
   //ampfail_quality
   TCanvas* c_ampfail_quality = findCanv("ECL/c_ampfail_quality");

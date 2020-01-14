@@ -29,6 +29,8 @@ namespace Belle2 {
      * Default constructor.
      */
     KLMDigitRaw():
+      m_Copper(0),
+      m_Slot(0),
       m_word1(0),
       m_word2(0),
       m_word3(0),
@@ -37,13 +39,31 @@ namespace Belle2 {
     }
 
     /** Explicit constructor. */
-    KLMDigitRaw(uint16_t word1, uint16_t word2, uint16_t word3,
-                uint16_t word4):
+    KLMDigitRaw(int copper, int slot, uint16_t word1, uint16_t word2,
+                uint16_t word3, uint16_t word4):
+      m_Copper(copper),
+      m_Slot(slot),
       m_word1(word1),
       m_word2(word2),
       m_word3(word3),
       m_word4(word4)
     {}
+
+    /**
+     * Get copper identifier.
+     */
+    int getCopper() const
+    {
+      return m_Copper;
+    }
+
+    /**
+     * Get slot number.
+     */
+    int getSlot() const
+    {
+      return m_Slot;
+    }
 
     /** Get the first (of four) raw words. */
     uint16_t getWord1() const
@@ -69,31 +89,37 @@ namespace Belle2 {
       return m_word4;
     }
 
-    /** Get the channel number from the first raw word. */
+    /** Get the channel number. */
     uint16_t getChannel() const
     {
       return m_word1 & 0x7F;
     }
 
-    /** Get the view (= axis = plane) number from the second raw word. */
+    /** Get the view (= axis = plane) number. */
     uint16_t getAxis() const
     {
-      return (m_word2 >> 7) & 1;
+      return (m_word1 >> 7) & 1;
     }
 
-    /** Get the lane number from the third raw word. */
+    /** Get the lane number. */
     uint16_t getLane() const
     {
-      return (m_word3 >> 8) & 0x1F;
+      return (m_word1 >> 8) & 0x1F;
     }
 
-    /** Get the status flag from the fourth raw word. */
+    /** Get the status flag. */
     uint16_t getFlag() const
     {
-      return m_word4 >> 13;
+      return m_word1 >> 13;
     }
 
   private:
+
+    /** Copper identifier. */
+    int m_Copper;
+
+    /** Slot number. */
+    int m_Slot;
 
     /** First (of four) raw-data words (contains channel number). */
     uint16_t m_word1;
@@ -108,7 +134,7 @@ namespace Belle2 {
     uint16_t m_word4;
 
     /** Class version. */
-    ClassDef(KLMDigitRaw, 1);
+    ClassDef(KLMDigitRaw, 2);
 
   };
 

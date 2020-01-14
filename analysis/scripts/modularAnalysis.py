@@ -2185,6 +2185,7 @@ def oldwritePi0EtaVeto(
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
+        from variables import variables
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
@@ -2804,6 +2805,28 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     dist_mod.param('decayString', decay_string)
     dist_mod.param('mode', mode)
     path.add_module(dist_mod)
+
+
+def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut, path):
+    """
+    Adds the InclusiveDstarReconstruction module to the given path.
+    This module creates a D* particle list by estimating the D* four momenta
+    from slow pions, specified by a given cut. The D* energy is approximated
+    as  E(D*) = m(D*)/(m(D*) - m(D)) * E(pi). The absolute value of the D*
+    momentum is calculated using the D* PDG mass and the direction is collinear
+    to the slow pion direction. The charge of the given pion list has to be consistent
+    with the D* charge
+
+    @param inputPionList Name of the input pion particle list
+    @param outputDstarList Name of the output D* particle list
+    @param slowPionCut Cut applied to the pion list to identify slow pions
+    @param path the module is added to this path
+    """
+    incl_dstar = register_module("InclusiveDstarReconstruction")
+    incl_dstar.param("pionListName", inputPionList)
+    incl_dstar.param("DstarListName", outputDstarList)
+    incl_dstar.param("slowPionCut", slowPionCut)
+    path.add_module(incl_dstar)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

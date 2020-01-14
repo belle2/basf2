@@ -4,6 +4,8 @@ Full event interpretation
 Sphinx documentation
 ####################
 
+.. seealso:: The FEI is formally described in the publication `Comp.Sci.HEP.2019.3.6 <https://link.springer.com/article/10.1007/s41781-019-0021-8>`_
+
 .. automodule:: fei
    :members:
    :undoc-members:
@@ -206,7 +208,7 @@ If you want to use the FEI in your analysis these are the steps you have to do (
 #.    Copy an example steering file from ``analysis/examples/FEI/`` to your directory and modify it (especially choose a different prefix(!))
 #.    Use ``python3 analysis/scripts/fei/distributed.py`` to perform the training
 #.    Take a look at the summary.pdf which is created at the end of the training
-#.    Upload the weightfiles to the condition database: ``conditionsdb upload production localdb/database.txt``
+#.    Upload the weightfiles to the condition database: ``b2conditionsdb-request localdb/database.txt``
 #.    Load the path in your analyis-steering file by choosing the option ``training=False`` in the ``FEIConfiguration``
 #.    Use the ParticleLists created by the FEI ``B+:generic``, ``B+:semileptonic``, ``B0:generic``, ``B0:semileptonic`` and the signal-probabilities stored in the extra Info ``(extraInfo(SignalProbability))`` in your analysis.
 
@@ -221,7 +223,7 @@ This script can be used to train the FEI on a cluster like available at KEKCC.  
 
 The script will automatically create some directories collection containing weightfiles, monitoring files and other stuff jobs containing temporary files during the training (can be deleted afterwards)
 
-The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI at each stage.  At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate.  If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know howto fix the occured problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somehwere and use it directly.
+The distributed script automatically spawns jobs on the cluster (or local machine), and runs the steering file on the provided MC. Since a FEI training requires multiple runs over the same MC, it does so multiple times. The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput). In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI at each stage.  At the end it produces summary outputs using printReporting.py and latexReporting.py (this will only work of you use the monitoring mode). And a summary file for each mva training using basf2_mva_evaluate.  If your training fails for some reason (e.g. a job fails on the cluster), the FEI will stop, you can fix the problem and resume the training using the `-x` option. This requires some expert knowledge, because you have to know howto fix the occured problem and at which step you have to resume the training. After the training the weightfiles will be stored in the localdb in the collection directory. You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere. Alternatively you can just copy the localdb to somehwere and use it directly, however, this is recommended only for testing as it is not reproducible.
 
 You have to adjust the following parameters:
 
@@ -264,144 +266,7 @@ In general a FEI training steering file consists of
 The user is responsible for writing the input and output part of the steering file. Depending on the training mode (generic / specific) this part is different for each training (see below for examples).
 The FEI algorithm itself just assumes that the DataStore already contains a valid reconstructed event, and starts to reconstruct B mesons. During the training the steering file is executed multiple times. The first time it is called with the Monte Carlo files you provided, and the complete DataStore is written out at the end. The following calls must receive the previous output as input.
 
-Generic FEI Training
-********************
-
-Your steering file should look like this::
-
-    from basf2 import *
-    from modularAnalysis import *
-    import fei
-    
-    path = create_path()
-    inputMdstList('MC7', [], path)
-    
-    particles = fei.get_default_channels()
-    configuration = fei.config.FeiConfiguration(prefix='FEI_TEST', training=True, monitor=True)
-    feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
-    
-    path.add_module('RootOutput')
-      
-    process(path)
-
-Specific FEI Training
-*********************
-
-::
-
-    from basf2 import *
-    from modularAnalysis import *
-    import fei
-     
-    path = create_path()
-     
-    # Input
-    inputMdstList('MC7', [], path)
-    
-    # Max 12 tracks per event - this avoids much computing time.
-    empty_path = create_path()
-    skimfilter = register_module('VariableToReturnValue')
-    skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-    skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
-    path.add_module(skimfilter)
-     
-    # Signal side reconstruction
-    fillParticleList('mu+', 'muonID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-    fillParticleList('e+', 'electronID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-    fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
-    reconstructDecay('B+:sig_e -> gamma e+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=1, writeOut=True, path=path)
-    reconstructDecay('B+:sig_mu -> gamma mu+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=2, writeOut=True, path=path)
-    copyLists('B+:sig', ['B+:sig_e', 'B+:sig_mu'], writeOut=True, path=path)
-    looseMCTruth('B+:sig', path=path)
-    rankByHighest('B+:sig', 'daughter(0,E)', outputVariable='PhotonCandidateRank', path=path)
-    buildRestOfEvent('B+:sig', path=path)
-    clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4', 'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
-    appendROEMasks('B+:sig', [clean_roe_mask], path=path)
-    applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
-     
-    skimfilter = register_module('SkimFilter')
-    skimfilter.param('particleLists', ['B+:sig'])
-    empty_path = create_path()
-    skimfilter.if_value('=0', empty_path, AfterConditionPath.END)
-    path.add_module(skimfilter)
-     
-    # Prepare list for the training.
-    path.add_module('MCDecayFinder', decayString='B+ ==> e+ nu_e gamma', listName='B+:FEIMC_e', writeOut=True)
-    path.add_module('MCDecayFinder', decayString='B+ ==> mu+ nu_mu gamma', listName='B+:FEIMC_mu', writeOut=True)
-    copyLists('B+:FEIMC', ['B+:FEIMC_e', 'B+:FEIMC_mu'], writeOut=True, path=path)
-     
-    
-    # We want the FEI to be only trained on a correctly reconstruced signal side and on wrongly reconstructed background.
-    isSignal = 'isSignalAcceptMissingNeutrino'
-    signalMC = 'eventCached(countInList(B+:FEIMC))'
-    cut = '[[{mc} > 0 and {sig} == 1] or [{mc} == 0 and {sig} != 1]]'.format(mc=signalMC, sig=isSignal)
-    applyCuts('B+:sig', cut, path=path)
-     
-    # FEI config
-    fei_tag = 'my_specFEI'
-    belle_particles = fei.get_default_channels(KLong=False,
-                                           chargedB=True,
-                                           neutralB=True,
-                                           semileptonic=False,
-                                           B_extra_cut='nRemainingTracksInEvent <= 3',
-                                           specific=True)
-     
-    configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=True, monitor=False)
-    feistate = fei.get_path(belle_particles, configuration)
-         
-    # FEI training
-    if feistate.stage == 0:
-       # Write out the rest of event, we train only on the rest of event of our signal side.
-       # This is the main difference compared to the generic FEI.
-       rO = register_module('RootOutput')
-       rO.set_name('ROE_RootOutput')
-       rO.param('additionalBranchNames', ['RestOfEvent'])
-       feistate.path.add_module(rO)
-       roe_path = create_path()
-       cond_module = register_module('SignalSideParticleFilter')
-       cond_module.param('particleLists', ['B+:sig'])
-       cond_module.if_true(feistate.path, AfterConditionPath.END)
-       roe_path.add_module(cond_module)
-       path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-    else:
-       # After stage 0, the training is done only on the written out rest of event.
-       path = create_path()
-       inputMdstList('MC7', [], path)
-       path.add_path(feistate.path)
-       r1 = register_module('RootOutput')
-       r1.set_name('ROE_RootOutput')
-       r1.param('additionalBranchNames', ['RestOfEvent'])
-       path.add_module(r1)
-    
-    process(path)
-
-Converted FEI Training
-**********************
-::
-
-   from basf2 import *
-   from modularAnalysis import *
-   import b2biiConversion
-    
-   # You have to use the decay-channel configuration for Belle (e.g. PID variables are different)
-   # AND you have to set b2bii in the FeiConfiguration, because the loading of the FSP particles is different
-   import fei
-   particles = fei.get_default_channels(convertedFromBelle=True)
-   configuration = fei.config.FeiConfiguration(prefix='FEI_Belle1_Generic_2017_1', b2bii=True, training=True, monitor=True)
-   feistate = fei.get_path(particles, configuration)
-    
-   path = create_path()
-   if feistate.stage <= 0:
-       b2biiConversion.convertBelleMdstToBelleIIMdst(None, applyHadronBJSkim=True, path=path)
-   else:
-       inputMdstList('Belle', [], path)
-    
-   path.add_path(feistate.path)
-   path.add_module('RootOutput')
-    
-   print(path)
-   process(path)
+You can find up to date examples for training the specific or generic FEI, for the cases of Belle II of Belle converted data / MC in ``analysis/examples/FEI``.
 
 Applying the FEI
 ################
@@ -428,244 +293,36 @@ Each candidate has three extra infos which are interesting:
 You can use a different decay channel configuration during the application. In particular you can omit decay-channels (e.g. the semileptonic if your are only interested in the hadronic tag).
 However, it is not possible to add new channels without training them first (obviously).
 
-You can find up to date examples in ``analysis/examples/FEI``.
-
-Generic FEI 
-***********
-
-::
-
-   from basf2 import *
-   from modularAnalysis import *
-   import fei
-    
-   # Uses the conditions database for containing analysis payloads
-   use_central_database('GT_gen_ana_004.40_AAT-parameters', LogLevel.DEBUG, 'fei_database')
-
-   # In case you have problems with the conditions database you can use the localdb of the FEI directly
-   # use_local_database('/gpfs/group/belle2/users/sutclw/fei4/feiv4_2018_MC9_release_02_00_00/localdb/database.txt',
-   #                     '/gpfs/group/belle2/users/sutclw/fei4/feiv4_2018_MC9_release_02_00_00/localdb/', True, LogLevel.WARNING)
-    
-   path = create_path()
-   inputMdstList('MC9', [], path)
-    
-   import fei
-   particles = fei.get_default_channels()
-   configuration = fei.config.FeiConfiguration(prefix='FEIv4_2018_MC9_release_02_00_00', training=False, monitor=False)
-   feistate = fei.get_path(particles, configuration)
-   path.add_path(feistate.path)
-    
-   path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
-    
-   variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_charged_hadronic.root', path=path)
-   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
-    
-   variablesToNTuple('B0:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_mixed_hadronic.root', path=path)
-   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
-    
-   print(path)
-   process(path)
-   print(statistics)
-
-
-Specific FEI
-************
-
-::
-
-   from basf2 import *
-   from modularAnalysis import *
-   import fei
-    
-    
-   path = create_path()
-    
-   # Input
-   inputMdstList('MC9', [], path)
-    
-   # Max 12 tracks per event - this avoids much computing time.
-   empty_path = create_path()
-   skimfilter = register_module('VariableToReturnValue')
-   skimfilter.param('variable', 'nCleanedTracks(dr < 2 and abs(dz) < 4)')
-   skimfilter.if_value('>12', empty_path, AfterConditionPath.END)
-   path.add_module(skimfilter)
-    
-   # Signal side reconstruction
-   fillParticleList('mu+', 'muonID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-   fillParticleList('e+', 'electronID > 0.8 and dr < 2 and abs(dz) < 4', writeOut=True, path=path)
-   fillParticleList('gamma', 'goodGamma == 1 and E >= 1.0', writeOut=True, path=path)
-   reconstructDecay('B+:sig_e -> gamma e+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=1, writeOut=True, path=path)
-   reconstructDecay('B+:sig_mu -> gamma mu+', '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6', dmID=2, writeOut=True, path=path)
-   copyLists('B+:sig', ['B+:sig_e', 'B+:sig_mu'], writeOut=True, path=path)
-   looseMCTruth('B+:sig', path=path)
-   rankByHighest('B+:sig', 'daughter(0,E)', outputVariable='PhotonCandidateRank', path=path)
-   buildRestOfEvent('B+:sig', path=path)
-   clean_roe_mask = ('CleanROE', 'dr < 2 and abs(dz) < 4', 'clusterE9E25 > 0.9 and clusterTiming < 50 and goodGamma == 1 and trackMatchType==0')
-   appendROEMasks('B+:sig', [clean_roe_mask], path=path)
-   applyCuts('B+:sig', 'roeDeltae(CleanROE) < 2.0 and roeMbc(CleanROE) > 4.8', path=path)
-    
-   skimfilter = register_module('SkimFilter')
-   skimfilter.param('particleLists', ['B+:sig'])
-   empty_path = create_path()
-   skimfilter.if_value('=0', empty_path, AfterConditionPath.END)
-   path.add_module(skimfilter)
-    
-    
-   # FEI config
-   fei_tag = 'my_specFEI'
-   fei_dir = os.path.join('/path/to/fei', fei_tag)
-   use_local_database(os.path.join(fei_dir, 'localdb/database.txt'), os.path.join(fei_dir, 'localdb'), True, LogLevel.WARNING)
-   belle_particles = fei.get_default_channels(KLong=False,
-					      chargedB=True,
-					      neutralB=False,
-					      semileptonic=False,
-					      B_extra_cut='nRemainingTracksInEvent <= 3',
-					      specific=True)
-    
-   configuration = fei.config.FeiConfiguration(prefix=fei_tag, training=False, monitor=False)
-   feistate = fei.get_path(belle_particles, configuration)
-    
-    
-   # Run the tagging and copy the lists
-   roe_path = feistate.path
-   empty_path = create_path()
-   copyLists('B-:generic_final', [], writeOut=True, path=path)
-   copyLists('B-:generic_final', ['B-:generic'], writeOut=True, path=roe_path)
-   signalSideParticleFilter('B+:sig', '', roe_path, empty_path)
-   path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
-    
-   # Reconstruct the Upsilon
-   upsilon_cut = '7.5 <= M <= 10.5 and -2.0 <= missingMass <= 4.0 and -0.15 <= daughter(0,deltaE) <= 0.1'
-   reconstructDecay('Upsilon(4S):hadronic -> B-:generic_final B+:sig', upsilon_cut, dmID=1, path=path)
-   copyLists('Upsilon(4S):all', ['Upsilon(4S):hadronic'], path=path)
-   looseMCTruth('Upsilon(4S):all', path=path)
-    
-   buildRestOfEvent('Upsilon(4S):all', path=path)
-   upsilon_roe = ('UpsilonROE', 'dr < 2 and abs(dz) < 4', 'goodBelleGamma == 1')
-   appendROEMasks('Upsilon(4S):all', [upsilon_roe], path=path)
-   applyCuts('Upsilon(4S):all', '-2.0 < missingMass < 4.0', path=path)
-   applyCuts('Upsilon(4S):all', 'roeEextra(UpsilonROE) <= 0.9', path=path)
-   applyCuts('Upsilon(4S):all', 'nROETracks(UpsilonROE) <= 4', path=path)
-    
-   # Best candidate selection - only one candidate per event
-   rankByHighest('Upsilon(4S):all', 'daughter(0, extraInfo(SignalProbability))', numBest=1,
-		 outputVariable='FEIProbabilityRank', path=path)
-    
-   # Write Ntuples
-   variablesToNTuple('Upsilon(4S):all', ['M', 'missingMass', 'E'], filename="Upsilon.root", path=path)
-    
-   process(path)
-
-
-Converted FEI
-*************
-
-::
-
-   from basf2 import *
-   from modularAnalysis import *
-    
-   import b2biiConversion
-   import ROOT
-   from ROOT import Belle2
-    
-   # In case you have problems with the conditions database you can use the localdb of the FEI directly
-   # use_local_database('/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/database.txt',
-   #                     '/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/', True, LogLevel.WARNING)
-    
-   path = create_path()
-   b2biiConversion.convertBelleMdstToBelleIIMdst([], applyHadronBJSkim=True, path=path)
-   setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-    
-   import fei
-   particles = fei.get_default_channels(convertedFromBelle=True)
-   configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MCConverted_Track14_2', b2bii=True, training=False, monitor=False)
-   feistate = fei.get_path(particles, configuration)
-    
-   path.add_path(feistate.path)
-    
-   path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
-    
-   variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_charged_hadronic.root', path=path)
-   variablesToNTuple('B+:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_charged_semileptonic.root', path=path)
-    
-   variablesToNTuple('B0:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_mixed_hadronic.root', path=path)
-   variablesToNTuple('B0:semileptonic', ['uniqueEventID', 'cosThetaBetweenParticleAndNominalB', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignalAcceptMissingNeutrino'], filename='B_mixed_semileptonic.root', path=path)
-    
-   process(path)
-
-Converted FEI like the old FR
-*****************************
-
-::
-
-   from basf2 import *
-   from modularAnalysis import *
-    
-   import b2biiConversion
-   import ROOT
-   from ROOT import Belle2
-   ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
-    
-   # In case you have problems with the conditions database you can use the localdb of the FEI directly
-   # use_local_database('/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/database.txt',
-   #                     '/home/belle2/tkeck/feiv4/Belle1_2017_convertedMC_Track14_2/localdb/', True, LogLevel.WARNING)
-    
-   path = create_path()
-   b2biiConversion.convertBelleMdstToBelleIIMdst([], applyHadronBJSkim=True, path=path)
-   setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
-    
-   import fei
-   particles = fei.default_channels.get_fr_channels(convertedFromBelle=True)
-   configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MCConverted_Track14_2', b2bii=True, training=False, monitor=False)
-   feistate = fei.get_path(particles, configuration)
-    
-   path.add_path(feistate.path)
-    
-   path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
-   path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
-    
-   variablesToNTuple('B+:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_charged_hadronic.root', path=path)
-   variablesToNTuple('B0:generic', ['uniqueEventID', 'Mbc', 'deltaE', 'mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)', 'isSignal'], filename='B_mixed_hadronic.root', path=path)
-    
-   process(path)
-
+You can find up to date examples in ``analysis/examples/FEI``. 
 If you encounter problems which require debugging in the FEI algorithm, the best starting point is to enable the monitoring, by choosing ``monitor=True`` in the FEIConfiguration. This will create a lot of root files containing histograms of interesting variables throughout the process (e.g. MC truth before and after all the cuts). You can also create a pdf using the root files produced by the monitoring and the "Summary.pickle" file produced by the original training by executing:
 
 ``basf2 fei/latexReporting.py > summary.tex``
 
-Pre-Trained FEI
-###############
+FEI and the condition datasbase
+###############################
 
+The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located. 
+FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <link to something helpful explaining this>`.
+In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
 
-From time to time I retrain the generic FEI using the current MC campaign and basf2 software. Currently you can find these trainings on KEKCC in my home-directory: /home/belle2/tkeck/feiv4
+``b2conditionsdb-recommend input_file.mdst.root``
 
-There are different trainings available here. Be sure to read the README file in the corresponding directories, it will contain information about the skim-cuts which were used for the training, and the data which was used.
+This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
+Analysis tags are named `analysis_tools_XXXX`.
+You will need to prepend this tag to your global tags list.
+This is done inside the FEI steering script.
 
-One important remark:
-Be careful if you schedule many jobs on the cluster, make sure that the jobs can share the database-cache e.g.
-``use_central_database('production', LogLevel.WARNING, '/home/belle2/$your_username/database_cache_directory')``
-Otherwise all the jobs will download the weightfiles separately.
+.. code-block:: python3
 
-#.    this is slow
-#.    this is effectively a ddos against the database 
+        import basf2
+        import fei
 
-Current performance
+        basf2.conditions.prepend_globaltag("findme")
+        fei.configure("foo", bar)
+        
+Note that when running on Belle converted data or MC you will need to use the `B2BII` and `B2BII_MC` database tags, respectively. 
 
-The training was done with 100M MC9 :math:`B\bar{B}` events with beam-background
-
-The tag-side efficiencies are (on the events which survive the skim-cut)
-
-* 0.2 % for hadronic neutral :math:`B`
-* 0.4 % for hadronic charged :math:`B`
-* 1.3 % for semileptonic neutral :math:`B`
-* 1.1 % for semileptonic charged :math:`B`
+If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>` and/or send a mail to XXX@belle2org,
 
 Troubleshooting
 ###############

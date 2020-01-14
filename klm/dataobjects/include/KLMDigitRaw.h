@@ -49,6 +49,22 @@ namespace Belle2 {
       m_word4(word4)
     {}
 
+    /**
+     * Get copper identifier.
+     */
+    int getCopper() const
+    {
+      return m_Copper;
+    }
+
+    /**
+     * Get slot number.
+     */
+    int getSlot() const
+    {
+      return m_Slot;
+    }
+
     /** Get the first (of four) raw words. */
     uint16_t getWord1() const
     {

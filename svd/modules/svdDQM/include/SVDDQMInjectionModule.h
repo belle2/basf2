@@ -16,9 +16,7 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <TH1.h>
-#include <TH2.h>
 #include <string>
-#include <map>
 
 namespace Belle2 {
 

@@ -63,6 +63,11 @@ namespace Belle2 {
                               unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
+          StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+          if (!m_eventLevelTrackingInfo.isValid()) {
+            B2ERROR("EventLevelTrackingInfo not valid. Cannot set flags.");
+          }
+
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
           for (AObject* to : possibleTos) {
@@ -74,7 +79,6 @@ namespace Belle2 {
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
               B2WARNING("Relations Creator reached maximal number of items. Aborting");
-              StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
               if (std::is_base_of<AObject, CKFToPXDState>::value) {
                 m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
               } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
@@ -82,6 +86,7 @@ namespace Belle2 {
               } else {
                 B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
               }
+
               weightedRelations.clear();
               return;
             }

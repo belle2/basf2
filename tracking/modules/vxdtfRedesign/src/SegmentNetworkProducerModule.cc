@@ -132,7 +132,7 @@ void SegmentNetworkProducerModule::initialize()
 
   m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
-  m_eventLevelTrackingInfo.registerInDataStore();
+  m_eventLevelTrackingInfo.isRequired();
 }
 
 
@@ -142,11 +142,6 @@ void SegmentNetworkProducerModule::event()
 
   if (m_vxdtfFilters == nullptr) {
     B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
-  }
-
-  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
-  if (!m_eventLevelTrackingInfo.isValid()) {
-    m_eventLevelTrackingInfo.create();
   }
 
   // make sure that network exists:

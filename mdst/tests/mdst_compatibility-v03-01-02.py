@@ -10,7 +10,8 @@ CHANGES since release-03-01-02:
 
 - EventMetaData:
   + isEndOfRun
-
+  + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
+  + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 - ECLCluster:
   + hasFailedFitTime
   + hasFailedTimeResolution

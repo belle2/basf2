@@ -9,6 +9,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 CHANGES since release-00-09-03:
 - EventMetaData:
   + isEndOfRun
+  + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
+  + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   * getTrackFitResult behavior changed for non-pion tracks

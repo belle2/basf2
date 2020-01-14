@@ -37,6 +37,8 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "Name of BKLMDigit store array.", string(""));
   addParam("outputEKLMDigitsName", m_outputEKLMDigitsName,
            "Name of EKLMDigit store array.", string(""));
+  addParam("WriteDigitRaws", m_WriteDigitRaws,
+           "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
@@ -61,23 +63,23 @@ KLMUnpackerModule::~KLMUnpackerModule()
 
 void KLMUnpackerModule::initialize()
 {
-  /* Common. */
   m_RawKLMs.isRequired();
-  /* BKLM. */
+  /* Digits. */
   m_bklmDigits.registerInDataStore(m_outputBKLMDigitsName);
-  m_klmDigitRaws.registerInDataStore();
   m_bklmDigitOutOfRanges.registerInDataStore();
-  m_DigitEventInfos.registerInDataStore();
-
-  m_bklmDigits.registerRelationTo(m_klmDigitRaws);
-  m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
-  m_DigitEventInfos.registerRelationTo(m_bklmDigits);
-  m_DigitEventInfos.registerRelationTo(m_bklmDigitOutOfRanges);
-
-  /* EKLM. */
   m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
+  /* Event information. */
   m_DigitEventInfos.registerInDataStore();
+  m_bklmDigits.registerRelationTo(m_DigitEventInfos);
+  m_bklmDigitOutOfRanges.registerRelationTo(m_DigitEventInfos);
   m_eklmDigits.registerRelationTo(m_DigitEventInfos);
+  /* Raw data in dataobject format. */
+  if (m_WriteDigitRaws) {
+    m_klmDigitRaws.registerInDataStore();
+    m_bklmDigits.registerRelationTo(m_klmDigitRaws);
+    m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
+    m_eklmDigits.registerRelationTo(m_klmDigitRaws);
+  }
 }
 
 void KLMUnpackerModule::beginRun()
@@ -99,12 +101,14 @@ void KLMUnpackerModule::beginRun()
 }
 
 void KLMUnpackerModule::unpackEKLMDigit(
-  const int* rawData, EKLMDataConcentratorLane* lane,
+  const int* rawData, int copper, int hslb, EKLMDataConcentratorLane* lane,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
   int section, layer, sector, strip = 0;
   KLM::RawData raw;
-  KLM::unpackRawData(rawData, &raw, nullptr, nullptr, false);
+  KLMDigitRaw* klmDigitRaw;
+  KLM::unpackRawData(copper, hslb + 1, rawData, &raw, &m_klmDigitRaws,
+                     &klmDigitRaw, m_WriteDigitRaws);
   if ((raw.triggerBits & 0x10) != 0)
     return;
   /**
@@ -155,6 +159,8 @@ void KLMUnpackerModule::unpackEKLMDigit(
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
+  if (m_WriteDigitRaws)
+    eklmDigit->addRelationTo(klmDigitRaw);
   eklmDigit->setCTime(raw.ctime);
   eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
@@ -185,7 +191,8 @@ void KLMUnpackerModule::unpackBKLMDigit(
 {
   KLM::RawData raw;
   KLMDigitRaw* klmDigitRaw;
-  KLM::unpackRawData(rawData, &raw, &m_klmDigitRaws, &klmDigitRaw, true);
+  KLM::unpackRawData(copper, hslb + 1, rawData, &raw,
+                     &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
   BKLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
@@ -213,8 +220,9 @@ void KLMUnpackerModule::unpackBKLMDigit(
       BKLMDigitOutOfRange* bklmDigitOutOfRange =
         m_bklmDigitOutOfRanges.appendNew(
           moduleId, raw.ctime, raw.tdc, raw.charge);
-      bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-      klmDigitEventInfo->addRelationTo(bklmDigitOutOfRange);
+      if (m_WriteDigitRaws)
+        bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
 
       std::string message = "channel number is out of range";
       m_rejected[message] += 1;
@@ -256,8 +264,9 @@ void KLMUnpackerModule::unpackBKLMDigit(
     if (raw.charge < m_scintThreshold)
       bklmDigit->isAboveThreshold(true);
   }
-  bklmDigit->addRelationTo(klmDigitRaw);
-  klmDigitEventInfo->addRelationTo(bklmDigit);
+  bklmDigit->addRelationTo(klmDigitEventInfo);
+  if (m_WriteDigitRaws)
+    bklmDigit->addRelationTo(klmDigitRaw);
 }
 
 void KLMUnpackerModule::event()
@@ -320,8 +329,8 @@ void KLMUnpackerModule::event()
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
           if (eklmHit) {
-            unpackEKLMDigit(&buf_slot[iHit * hitLength], &lane,
-                            klmDigitEventInfo);
+            unpackEKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
+                            &lane, klmDigitEventInfo);
           } else {
             unpackBKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
                             klmDigitEventInfo);

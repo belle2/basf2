@@ -14,7 +14,6 @@
 /* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <klm/dbobjects/KLMElectronicsChannel.h>
 
 namespace Belle2 {
 

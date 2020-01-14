@@ -94,15 +94,17 @@ main.add_module("Gearbox")
 run = int(run)
 
 
-class dbImporterModule(Module):
+class dbImporterModule(basf2.Module):
     """
     :author: Laura Zani
     Module to call the importer methods for the payloads creation from XML file
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string
     """
-
     def beginRun(self):
+        """
+        Function to call the dbImporter methods to upload the different local payloads
+        """
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.calib is not None:

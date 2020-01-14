@@ -39,9 +39,18 @@ gROOT.SetBatch(True)
 
 
 class SVDCoGTimeCalibrationCheckModule(basf2.Module):
+    """
+    Python class used for checking SVD CoG Calibration stored in a localDB
+    """
 
     def fillLists(self, svdRecoDigitsFromTracks, svdClustersFromTracks):
+        """
+        Function that fill the lists needed for the check of the calibration
 
+        parameters:
+             svdRecoDigitsFromTracks (SVDRecoDigit): RecoDigits related to tracks
+             svdClustersFromTracks (SVDCluster): Clusters related to tracks
+        """
         timeCluster = svdClustersFromTracks.getClsTime()
         snrCluster = svdClustersFromTracks.getSNR()
         sizeCluster = svdClustersFromTracks.getSize()
@@ -85,30 +94,67 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             cdcHistNoSync = self.cdcNoSyncList[layerIndex][ladderIndex][sensorIndex][sideIndex]
             cdcHistNoSync.Fill(tZero)
 
+            #: counts the number of clusters
             self.NTOT = self.NTOT + 1
 
     def set_localdb(self, localDB):
+        """
+        Function that allows to set the localDB
+
+        parameters:
+             localDB (str): Name of the localDB used
+        """
+        #: set the name of the localDB used
         self.localdb = localDB
 
     def set_run_number(self, run):
+        """
+        Function that allows to save the run number
+
+        parameters:
+             run (int): run number
+        """
+        #: set the run number
         self.runnumber = run
 
     def set_exp_number(self, exp):
+        """
+        Function that allows to save the experiment number
+
+        parameters:
+             exp (int): experiment number
+        """
+        #: set the experiment number
         self.expnumber = exp
 
     def initialize(self):
+        """
+        Initialize object (histograms, lists, ...) used by the class
+        """
+
+        #: name of the output file
         self.outputFileName = "../caf/tree/SVDCoGCalibrationCheck_" + str(self.runnumber) + ".root"
+        #: lists used to create the histograms for each TB :
+        #: residuals
         self.resList = []
+        #: scatterplot
         self.spList = []
+        #: cog
         self.cogList = []
+        #: t0
         self.cdcList = []
+        #: Cluster SNR
         self.snrList = []
+        #: Cluster Size
         self.sizeList = []
+        #: Cluster charge
         self.chargeList = []
+        #: t0 no synchronized
         self.cdcNoSyncList = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
+        #: counts the number of events
         self.Evt = 0
         for layer in geoCache.getLayers(Belle2.VXD.SensorInfoBase.SVD):
             layerList0 = []
@@ -200,18 +246,27 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
                                                                     str(ladderN) + "." + str(sensorN) + "." + str(s),
                                                                     " ", 200, -100, 100))
 
+        #: distribution of EventT0
         self.EventT0Hist = TH1F("EventT0", " ", 160, -40, 40)
+        #: first order coefficient alpha, U side
         self.alphaU = TH1F("alphaU", "first order coefficient ~ U side", 100, 0, 2)
+        #: first order coefficient alpha, V side
         self.alphaV = TH1F("alphaV", "first order coefficient ~ V side", 100, 0, 2)
+        #: zero order coefficient beta, U side
         self.betaU = TH1F("betaU", "beta - EventT0Sync average ~ U side", 100, -5, 5)
+        #: zero order coefficient beta, V side
         self.betaV = TH1F("betaV", "beta - EventT0Sync average ~ V side", 100, -5, 5)
 
+        #: gaus function used for fitting distributions
         self.gaus = TF1("gaus", 'gaus(0)', -150, 150)
+        #: order 1 polynomium used for the calibration
         self.pol1 = TF1("pol1", "[0] + [1]*x", -30, 30)
+        #: order 3 polynomium used for the calibration
         self.pol3 = TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 50)
         self.NTOT = 0
 
     def event(self):
+        """ Function that allows to cicle on the events """
 
         timeClusterU = 0
         timeClusterV = 0
@@ -221,6 +276,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.Evt = self.Evt + 1
 
         # fill EventT0 histogram
+        #: registers PyStoreObj EventT0
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
         if self.cdcEventT0.hasEventT0():
             et0 = self.EventT0Hist
@@ -235,6 +291,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             self.fillLists(svdRecoDigit, svdCluster)
 
     def terminate(self):
+        """ Terminates te class and produces the output rootfile """
 
         layerNumberTree = np.zeros(1, dtype=int)
         ladderNumberTree = np.zeros(1, dtype=int)

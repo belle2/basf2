@@ -537,18 +537,18 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
     """
 
     if finalstate == 'e+e-pi+pi-':
-        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_pipi.dat')
-        differentialCrossSectionFile = Belle2.FileSystem.findFile('data/generators/treps/differentialCrossSectionFiles/pipidcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_pipi.dat')
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_pipi.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_pipi.dat')
     elif finalstate == 'e+e-K+K-':
-        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_kk.dat')
-        differentialCrossSectionFile = Belle2.FileSystem.findFile('data/generators/treps/differentialCrossSectionFiles/kkdcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_kk.dat')
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_kk.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_kk.dat')
     elif finalstate == 'e+e-ppbar':
-        parameterFile = Belle2.FileSystem.findFile('data/generators/treps/parameterFiles/treps_par_ppbar.dat')
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
         differentialCrossSectionFile = Belle2.FileSystem.findFile(
-            'data/generators/treps/differentialCrossSectionFiles/ppbardcs.dat')
-        wListTableFile = Belle2.FileSystem.findFile('data/generators/treps/wListFiles/wlist_table_ppbar.dat')
+            'generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
     else:
         B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
 

@@ -50,6 +50,8 @@ namespace Belle2 {
 
     /**
      * Unpack KLM raw data.
+     * @param[in]     copper        Copper identifier.
+      @param[in]      slot          Slot number (1-based).
      * @param[in]     buffer        Data buffer (to be unpacked).
      * @param[out]    data          Unpacked data.
      * @param[in,out] klmDigitRaws  KLMDigitRaw array.
@@ -57,8 +59,9 @@ namespace Belle2 {
      * @param[in]     fillDigitRaws Whether to fill klmDigitRaws.
      */
     void unpackRawData(
-      const int* buffer, RawData* data, StoreArray<KLMDigitRaw>* klmDigitRaws,
-      KLMDigitRaw** newDigitRaw, bool fillDigitRaws);
+      int copper, int slot, const int* buffer, RawData* data,
+      StoreArray<KLMDigitRaw>* klmDigitRaws, KLMDigitRaw** newDigitRaw,
+      bool fillDigitRaws);
 
   }
 

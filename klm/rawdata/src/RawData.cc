@@ -17,7 +17,8 @@
 using namespace Belle2;
 
 void KLM::unpackRawData(
-  const int* buffer, KLM::RawData* data, StoreArray<KLMDigitRaw>* klmDigitRaws,
+  int copper, int slot, const int* buffer, KLM::RawData* data,
+  StoreArray<KLMDigitRaw>* klmDigitRaws,
   KLMDigitRaw** newDigitRaw, bool fillDigitRaws)
 {
   uint16_t dataWords[4];
@@ -33,7 +34,8 @@ void KLM::unpackRawData(
   data->tdc = dataWords[2] & 0x7FF;
   data->charge = dataWords[3] & 0xFFF;
   if (fillDigitRaws) {
-    *newDigitRaw = klmDigitRaws->appendNew(dataWords[0], dataWords[1],
+    *newDigitRaw = klmDigitRaws->appendNew(copper, slot,
+                                           dataWords[0], dataWords[1],
                                            dataWords[2], dataWords[3]);
   }
 }

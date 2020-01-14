@@ -29,6 +29,8 @@ namespace Belle2 {
      * Default constructor.
      */
     KLMDigitRaw():
+      m_Copper(0),
+      m_Slot(0),
       m_word1(0),
       m_word2(0),
       m_word3(0),
@@ -37,8 +39,10 @@ namespace Belle2 {
     }
 
     /** Explicit constructor. */
-    KLMDigitRaw(uint16_t word1, uint16_t word2, uint16_t word3,
-                uint16_t word4):
+    KLMDigitRaw(int copper, int slot, uint16_t word1, uint16_t word2,
+                uint16_t word3, uint16_t word4):
+      m_Copper(copper),
+      m_Slot(slot),
       m_word1(word1),
       m_word2(word2),
       m_word3(word3),
@@ -95,6 +99,12 @@ namespace Belle2 {
 
   private:
 
+    /** Copper identifier. */
+    int m_Copper;
+
+    /** Slot number. */
+    int m_Slot;
+
     /** First (of four) raw-data words (contains channel number). */
     uint16_t m_word1;
 
@@ -108,7 +118,7 @@ namespace Belle2 {
     uint16_t m_word4;
 
     /** Class version. */
-    ClassDef(KLMDigitRaw, 1);
+    ClassDef(KLMDigitRaw, 2);
 
   };
 

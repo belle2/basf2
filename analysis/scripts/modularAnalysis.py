@@ -2700,19 +2700,20 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
                                    The charge-conjugate ParticleLists will be also processed automatically.
         path (basf2.Path): the module is added to this path.
-        trainingMode (Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode): enum identifier of the training mode.
-                                                                              Needed to pick up the correct payload from the DB.
-                                                                              Available choices:
-                                                                              {c_Classification=0,
-                                                                               c_Multiclass=1,
-                                                                               c_ECL_Classification=2,
-                                                                               c_ECL_Multiclass=3,
-                                                                               c_PSD_Classification=4,
-                                                                               c_PSD_Multiclass=5,
-                                                                               c_ECL_PSD_Classification=6,
-                                                                               c_ECL_PSD_Multiclass=7}
-        binaryHypoPDGCodes (Optional[tuple(int, int)]): the pdgIds of the signal, background mass hypothesis.
-                                                        Required only for binary PID mode.
+        trainingMode (``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``): enum identifier of the training mode.
+          Needed to pick up the correct payload from the DB. Available choices:
+
+          * c_Classification=0
+          * c_Multiclass=1
+          * c_ECL_Classification=2
+          * c_ECL_Multiclass=3
+          * c_PSD_Classification=4
+          * c_PSD_Multiclass=5
+          * c_ECL_PSD_Classification=6
+          * c_ECL_PSD_Multiclass=7
+
+        binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
+          Required only for binary PID mode.
     """
 
     from ROOT import Belle2

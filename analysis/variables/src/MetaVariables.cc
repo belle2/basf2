@@ -2365,6 +2365,64 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
 
+    Manager::FunctionPtr genParticleIndexOfAncestor(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        int pdg_code = -1;
+        std::string arg = arguments[0];
+        TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+
+        if (part != nullptr) {
+          pdg_code = std::abs(part->PdgCode());
+        }
+
+        if (pdg_code == -1) {
+          try {
+            pdg_code = Belle2::convertString<int>(arg);
+          } catch (std::exception& e) {}
+        }
+
+        if (pdg_code == -1) {
+          B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code from or particle name.");
+        }
+
+        auto func = [pdg_code](const Particle * particle) -> double {
+          const Particle* p = particle;
+          const MCParticle* i_p;
+          try{
+            i_p = p->getMCParticle();
+          } catch (std::exception& e) {}
+
+          if (i_p == nullptr)
+          {
+            return -2;
+          }
+
+          while (true)
+          {
+            const MCParticle* mother;
+            try {
+              mother = i_p->getMother();
+            } catch (std::exception& e) {}
+
+            if (mother == nullptr) {
+              return -1;
+            }
+
+            if (std::abs(mother->getPDG()) == std::abs(pdg_code)) {
+              return mother->getIndex();
+            }
+            i_p = mother;
+          }
+          return -1;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function genParticleIndexOfAncestor (expected 1)");
+      }
+    }
+
+
 
 
 
@@ -2696,7 +2754,7 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
 )DOC");
-
+    REGISTER_VARIABLE("genParticleIndexOfAncestor(type)",genParticleIndexOfAncestor,R"DOC(Returns :b2:var:`genParticleIndex` of the first ancestor of the given type.)DOC")
 
   }
 }

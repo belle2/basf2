@@ -3312,6 +3312,143 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, genParticleIndexOfAncestor)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    StoreObjPtr<ParticleList> DList("D0:vartest");
+    DList.registerInDataStore();
+    DList.create();
+    DList->initialize(421, "D0:vartest");
+    DataStore::Instance().setInitializeActive(false);
+    TLorentzVector momentum;
+    TLorentzVector momentum_0;
+    TLorentzVector momentum_1;
+    std::vector<int> daughterIndices;
+    std::vector<int> grandDaughterIndices;
+    std::vector<int> grandGrandDaughterIndices;
+    std::vector<int> D_daughterIndices;
+    std::vector<int> D_grandDaughterIndices_0;
+    std::vector<int> D_grandDaughterIndices_1;
+
+
+    // Create MC graph for D -> (K0s -> pi+ + pi-) (K0s -> pi+ + pi-)
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& mcg_m = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_d_0 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_d_1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_gd_0_0 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_gd_0_1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_gd_1_0 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_gd_1_1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& mcg_not_child = mcGraph.addParticle();
+
+    mcg_m.setPDG(421);
+    mcg_d_0.setPDG(-310);
+    mcg_d_1.setPDG(310);
+    mcg_gd_0_0.setPDG(211);
+    mcg_gd_0_1.setPDG(-211);
+    mcg_gd_1_0.setPDG(211);
+    mcg_gd_1_1.setPDG(-211);
+    mcg_not_child.setPDG(211);
+
+    mcg_d_0.comesFrom(mcg_m);
+    mcg_d_1.comesFrom(mcg_m);
+    mcg_gd_0_0.comesFrom(mcg_d_0);
+    mcg_gd_0_1.comesFrom(mcg_d_0);
+    mcg_gd_1_0.comesFrom(mcg_d_1);
+    mcg_gd_1_1.comesFrom(mcg_d_1);
+
+    mcGraph.generateList();
+
+    // Get MC Particles from StoreArray
+    auto* mc_not_child = mcParticles[0];
+    auto* mc_m = mcParticles[1];
+    auto* mc_d_0 = mcParticles[2];
+    auto* mc_d_1 = mcParticles[3];
+    auto* mc_gd_0_0 = mcParticles[4];
+    auto* mc_gd_0_1 = mcParticles[5];
+    auto* mc_gd_1_0 = mcParticles[6];
+    auto* mc_gd_1_1 = mcParticles[7];
+
+
+    mc_m->setStatus(MCParticle::c_PrimaryParticle);
+    mc_d_0->setStatus(MCParticle::c_PrimaryParticle);
+    mc_d_1->setStatus(MCParticle::c_PrimaryParticle);
+    mc_gd_0_0->setStatus(MCParticle::c_PrimaryParticle);
+    mc_gd_0_1->setStatus(MCParticle::c_PrimaryParticle);
+    mc_gd_1_0->setStatus(MCParticle::c_PrimaryParticle);
+    mc_gd_1_1->setStatus(MCParticle::c_PrimaryParticle);
+    mc_not_child->setStatus(MCParticle::c_PrimaryParticle);
+
+    // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
+
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+
+    D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
+    D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_0->getArrayIndex());
+    D_grandDaughterIndices_1.push_back(D_gd_1_1->getArrayIndex());
+    momentum_0 = D_gd_0_0->get4Vector() + D_gd_0_1->get4Vector();
+    momentum_1 = D_gd_1_0->get4Vector() + D_gd_1_1->get4Vector();
+
+
+    const Particle* D_d_0 = particles.appendNew(momentum_0, 310, Particle::c_Unflavored, D_grandDaughterIndices_0);
+    const Particle* D_d_1 = particles.appendNew(momentum_1, 310, Particle::c_Unflavored, D_grandDaughterIndices_1);
+
+
+    momentum = D_d_0->get4Vector() + D_d_1->get4Vector();
+    D_daughterIndices.push_back(D_d_0->getArrayIndex());
+    D_daughterIndices.push_back(D_d_1->getArrayIndex());
+
+    const Particle* D_m = particles.appendNew(momentum, 421, Particle::c_Unflavored, D_daughterIndices);
+    DList->addParticle(D_m);
+
+    // Particle that is not an child
+    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
+
+    // Particle that is not an child and doesn't have MC particle
+    const Particle* not_child_2 = particles.appendNew(TLorentzVector(6.0, 1, 1, 1), 211);
+
+    // MC matching
+    D_gd_0_0->addRelationTo(mc_gd_0_0);
+    D_gd_0_1->addRelationTo(mc_gd_0_1);
+    D_gd_1_0->addRelationTo(mc_gd_1_0);
+    D_gd_1_1->addRelationTo(mc_gd_1_1);
+    D_d_0->addRelationTo(mc_d_0);
+    D_d_1->addRelationTo(mc_d_1);
+    D_m->addRelationTo(mc_m);
+    not_child->addRelationTo(mc_not_child);
+
+    // All pions should have common D mother
+    const Manager::Var* var_d = Manager::Instance().getVariable("genParticleIndexOfAncestor(D0)");
+    ASSERT_NE(var_d, nullptr);
+    EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
+    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
+    EXPECT_FLOAT_EQ(var_d->function(D_gd_1_0), var_d->function(D_gd_1_1));
+    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_1_0));
+    EXPECT_FLOAT_EQ(var_d->function(D_gd_0_1), var_d->function(D_gd_1_1));
+    EXPECT_FLOAT_EQ(var_d->function(not_child), -1);
+    EXPECT_FLOAT_EQ(var_d->function(not_child_2), -2);
+
+    // // All but they have differnt K0s mothers
+    const Manager::Var* var_310 = Manager::Instance().getVariable("genParticleIndexOfAncestor(310)");
+    ASSERT_NE(var_310, nullptr);
+    EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
+    EXPECT_FLOAT_EQ(var_310->function(D_gd_1_0), var_310->function(D_gd_1_1));
+    EXPECT_NE(var_310->function(D_gd_0_0), var_310->function(D_gd_1_0));
+    EXPECT_NE(var_310->function(D_gd_0_1), var_310->function(D_gd_1_1));
+    EXPECT_FLOAT_EQ(var_310->function(not_child), -1);
+    EXPECT_FLOAT_EQ(var_310->function(not_child_2), -2);
+  }
 
 
 

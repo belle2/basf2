@@ -27,6 +27,7 @@ Standard Particle Lists
 
 Variables
 +++++++++
+ * Added :b2:var:`genParticleIndexOfAncestor` variable that returns :b2:var:`genParticleIndex` of the first ancestor of the given type.
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.

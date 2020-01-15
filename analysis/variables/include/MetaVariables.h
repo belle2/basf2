@@ -424,6 +424,10 @@ namespace Belle2 {
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
 
+    /**
+     * check the array index of a MCParticle related to particle's ancestor with given name
+     */
+    Manager::FunctionPtr genParticleIndexOfAncestor(const std::vector<std::string>& arguments);
 
   }
 }

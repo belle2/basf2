@@ -51,6 +51,9 @@ namespace Belle2 {
     /** Processing ID */
     const std::string& getProcessingID() const {return m_procID;}
 
+    /** Run type */
+    const std::string& getRunType() const {return m_rtype;}
+
     /** Is it generated data?.
      */
     bool isMC() const {return m_isMC;}
@@ -94,6 +97,11 @@ namespace Belle2 {
       m_procID = procID;
     }
 
+    void setRunType(const std::string& rtype)
+    {
+      m_rtype = rtype;
+    }
+
     /** Number of generated events setter.
      *
      *  @param nEvents The number of generated events.
@@ -132,6 +140,8 @@ namespace Belle2 {
     std::string m_release; /**< Software release version.  */
 
     std::string m_procID; /**< processing ID */
+
+    std::string m_rtype; /**< run type (physics, cosmics, etc.) */
 
     bool m_isMC; /**< Is it generated or real data?.  */
 

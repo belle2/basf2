@@ -137,7 +137,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         #: lists used to create the histograms for each TB :
         #: residuals
         self.resList = []
-        #: scatterplot
+        #: scatterplot t0 vs cog
         self.spList = []
         #: cog
         self.cogList = []
@@ -266,7 +266,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         self.NTOT = 0
 
     def event(self):
-        """ Function that allows to cicle on the events """
+        """
+        Function that allows to cicle on the events
+        """
 
         timeClusterU = 0
         timeClusterV = 0
@@ -291,7 +293,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             self.fillLists(svdRecoDigit, svdCluster)
 
     def terminate(self):
-        """ Terminates te class and produces the output rootfile """
+        """
+        Terminates te class and produces the output rootfile
+        """
 
         layerNumberTree = np.zeros(1, dtype=int)
         ladderNumberTree = np.zeros(1, dtype=int)

@@ -10,6 +10,7 @@
 
 #include <svd/calibration/SVDCrossTalkCalibrationsAlgorithm.h>
 #include <svd/calibration/SVDCrossTalkStripsCalibrations.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -24,7 +25,7 @@ SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(const std::
 CalibrationAlgorithm::EResult SVDCrossTalkCalibrationsAlgorithm::calibrate()
 {
   int isCrossTalkCal = 0;
-  auto payload = new Belle2::SVDCrossTalkStripsCalibrations::t_payload();
+  auto payload = new Belle2::SVDCrossTalkStripsCalibrations::t_payload(isCrossTalkCal, m_id);
 
   auto tree = getObjectPtr<TTree>("HTreeCrossTalkCalib");
 
@@ -56,7 +57,14 @@ CalibrationAlgorithm::EResult SVDCrossTalkCalibrationsAlgorithm::calibrate()
     if (side == 0 && layer != 3) nstrips = 512;
 
     for (int strip = 0; strip < nstrips; strip++) {
+
       isCrossTalkCal = hist->GetBinContent(strip + 1);
+
+      if (layer == 4 && ladder == 1 && sensor == 2 && side == 1
+          && hist->GetEntries() < m_minEntries) { //Check that we have enough events populating the calibration
+        cout << "Not enough Data: " << hist->GetEntries() << " entries found" << endl;
+        return c_NotEnoughData;
+      }
 
       payload->set(layer, ladder, sensor, side, strip, isCrossTalkCal);
     }

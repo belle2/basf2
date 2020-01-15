@@ -165,19 +165,18 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
         std::string sensorName;
         occupancyPDFName(svdShaperDigit.getSensorID(), svdShaperDigit.isUStrip(), sensorName);
         auto xTalkStrip = m_sensorHistograms.at(sensorName);
-        xTalkStrip->Fill(svdShaperDigit.getCellID(), true);
+        xTalkStrip->Fill(svdShaperDigit.getCellID(), 1);
       }
       if (std::find(clusterStrips_vSide.begin(), clusterStrips_vSide.end(), stripID) != clusterStrips_vSide.end()) {
         std::string sensorName;
         occupancyPDFName(svdShaperDigit.getSensorID(), svdShaperDigit.isUStrip(), sensorName);
         auto xTalkStrip = m_sensorHistograms.at(sensorName);
-        xTalkStrip->Fill(svdShaperDigit.getCellID(), true);
+        xTalkStrip->Fill(svdShaperDigit.getCellID(), 1);
       }
 
 
     }//shaper digit loop
   }
-
 } //Collector loop
 
 
@@ -186,7 +185,6 @@ void SVDCrossTalkCalibrationsCollectorModule::finish()
 
 void SVDCrossTalkCalibrationsCollectorModule::closeRun()
 {
-
   std::string sensorName;
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {

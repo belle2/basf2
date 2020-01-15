@@ -58,7 +58,7 @@ namespace Belle2 {
 
 
   private:
-
+    /**Values for defining size of TTree object */
     TTree* m_histogramTree;
     TH1F* m_hist;
     int m_layer = 4;

@@ -1,3 +1,10 @@
+############################################################
+# Python script to test the collector and
+# algorithm function to port SVDCrossTalkCalibrations to CAF
+#
+# James Webb (Nov. 2019)
+############################################################
+
 from basf2 import *
 
 set_log_level(LogLevel.INFO)
@@ -9,7 +16,6 @@ import multiprocessing
 import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCrossTalkCalibrationsAlgorithm
-from ROOT.Belle2 import SVDOccupancyCalibrationsAlgorithm
 
 from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
 from caf import backends
@@ -33,7 +39,7 @@ def SVDCrossTalkCalibrations(files, tags):
     path.add_module('RootInput', branchNames=input_branches)
 
     path.add_module("Gearbox")
-    path.add_module("Geometry")  # , useDB=True)
+    path.add_module("Geometry")
 
     raw.add_unpackers(path, components=['SVD'])
 
@@ -50,7 +56,8 @@ def SVDCrossTalkCalibrations(files, tags):
                               max_files_per_collector_job=-1,
                               backend_args=None
                               )
-    # Local database containing occupancy payload required for CrossTalk
+    # Local database containing occupancy payload required for runs that do not have SVDOccupancy payload
+    # attached to svd_basic global tag
     calibration.use_local_database('/gpfs/fs02/belle2/group/detector/SVD/earlyPhase3/localDB_Occupancy/database.txt')
 
     calibration.strategies = strategies.SequentialRunByRun
@@ -59,8 +66,16 @@ def SVDCrossTalkCalibrations(files, tags):
 
 
 if __name__ == "__main__":
-    input_files = [os.path.abspath(file) for file in [
-            "/group/belle2/dataprod/Data/Raw/e0009/r00385/sub00/*root"]]
+    #    input_files = [os.path.abspath(file) for file in [
+    #            "/group/belle2/dataprod/Data/Raw/e0008/r01309/sub00/physics.0008.01309.HLT5.f00098.root"]]
+    input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance()
+                   .getInputFilesOverride()]
+
+    print(" ")
+    print("INPUT FILES")
+    print(" ")
+    print(input_files)
+    print(" ")
 
     svdCrossTalkCAF = SVDCrossTalkCalibrations(input_files,
                                                ['data_reprocessing_prompt_rel4_patchb',

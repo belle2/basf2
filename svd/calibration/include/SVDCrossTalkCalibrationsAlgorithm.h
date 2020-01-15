@@ -26,13 +26,19 @@ namespace Belle2 {
     /** Destructor */
     virtual ~SVDCrossTalkCalibrationsAlgorithm() {}
 
+    /** Set the minimum number of entries required in hist from collector for L4.2.1 u-side */
+    void setMinEntries(int minEntries) {m_minEntries = minEntries;}
+
   protected:
 
     virtual EResult calibrate() override;
 
   private:
-
+    /**Identifier string */
     std::string m_id;
+
+    /**Minimum number of required entries for collector histogram L4.2.1 u-side */
+    int m_minEntries = 10000;
 
   };
 

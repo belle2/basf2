@@ -3312,7 +3312,7 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, genParticleIndexOfAncestor)
+  TEST_F(MetaVariableTest, firstMCAncestorOfType)
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
@@ -3328,9 +3328,6 @@ namespace {
     TLorentzVector momentum;
     TLorentzVector momentum_0;
     TLorentzVector momentum_1;
-    std::vector<int> daughterIndices;
-    std::vector<int> grandDaughterIndices;
-    std::vector<int> grandGrandDaughterIndices;
     std::vector<int> D_daughterIndices;
     std::vector<int> D_grandDaughterIndices_0;
     std::vector<int> D_grandDaughterIndices_1;
@@ -3378,6 +3375,7 @@ namespace {
 
 
     mc_m->setStatus(MCParticle::c_PrimaryParticle);
+    mc_m->setEnergy(5.);
     mc_d_0->setStatus(MCParticle::c_PrimaryParticle);
     mc_d_1->setStatus(MCParticle::c_PrimaryParticle);
     mc_gd_0_0->setStatus(MCParticle::c_PrimaryParticle);
@@ -3429,7 +3427,7 @@ namespace {
     not_child->addRelationTo(mc_not_child);
 
     // All pions should have common D mother
-    const Manager::Var* var_d = Manager::Instance().getVariable("genParticleIndexOfAncestor(D0)");
+    const Manager::Var* var_d = Manager::Instance().getVariable("firstMCAncestorOfType(D0, mdstIndex)");
     ASSERT_NE(var_d, nullptr);
     EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
@@ -3438,9 +3436,11 @@ namespace {
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_1), var_d->function(D_gd_1_1));
     EXPECT_FLOAT_EQ(var_d->function(not_child), -1);
     EXPECT_FLOAT_EQ(var_d->function(not_child_2), -2);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("firstMCAncestorOfType(D0, E)")->function(D_gd_0_0), 5.);
+
 
     // // All but they have differnt K0s mothers
-    const Manager::Var* var_310 = Manager::Instance().getVariable("genParticleIndexOfAncestor(310)");
+    const Manager::Var* var_310 = Manager::Instance().getVariable("firstMCAncestorOfType(310, mdstIndex)");
     ASSERT_NE(var_310, nullptr);
     EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
     EXPECT_FLOAT_EQ(var_310->function(D_gd_1_0), var_310->function(D_gd_1_1));

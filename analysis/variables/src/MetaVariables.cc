@@ -2365,11 +2365,12 @@ endloop:
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
 
-    Manager::FunctionPtr genParticleIndexOfAncestor(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr firstMCAncestorOfType(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 1) {
+      if (arguments.size() == 2) {
         int pdg_code = -1;
         std::string arg = arguments[0];
+        std::string variable_of_interest = arguments[1];
         TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
 
         if (part != nullptr) {
@@ -2386,7 +2387,7 @@ endloop:
           B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code from or particle name.");
         }
 
-        auto func = [pdg_code](const Particle * particle) -> double {
+        auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
           const Particle* p = particle;
           const MCParticle* i_p;
           try{
@@ -2410,7 +2411,8 @@ endloop:
             }
 
             if (std::abs(mother->getPDG()) == std::abs(pdg_code)) {
-              return mother->getIndex();
+              const Particle* m_p = new Particle(mother);
+              return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
             }
             i_p = mother;
           }
@@ -2418,7 +2420,7 @@ endloop:
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function genParticleIndexOfAncestor (expected 1)");
+        B2FATAL("Wrong number of arguments for meta function firstMCAncestorOfType (expected 2: type and variable of interest)");
       }
     }
 
@@ -2754,7 +2756,7 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
 )DOC");
-    REGISTER_VARIABLE("genParticleIndexOfAncestor(type)",genParticleIndexOfAncestor,R"DOC(Returns :b2:var:`genParticleIndex` of the first ancestor of the given type.)DOC")
+    REGISTER_VARIABLE("firstMCAncestorOfType(type, variable)",firstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.)DOC")
 
   }
 }

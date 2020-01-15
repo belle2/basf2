@@ -39,6 +39,11 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "Unique name for the DirectedNodeNetworkContainer Store Object Pointer created and filled by this module.",
            string(""));
 
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
+
   addParam("addVirtualIP",
            m_PARAMAddVirtualIP,
            "Whether to add a SpacePoint for a virtual interaction point to be considered by the network creation.",
@@ -132,7 +137,7 @@ void SegmentNetworkProducerModule::initialize()
 
   m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
-  m_eventLevelTrackingInfo.isRequired();
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 

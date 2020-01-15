@@ -37,6 +37,11 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed.",
            string(""));
 
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
+
   addParam("SpacePointTrackCandArrayName",
            m_PARAMSpacePointTrackCandArrayName,
            "name for StoreArray< SpacePointTrackCand> to be filled.",
@@ -92,7 +97,7 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
   }
 
-  m_eventLevelTrackingInfo.isRequired();
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 

@@ -31,13 +31,11 @@ Untested method EventLevelTrackingInfo::setNCDCHitsNotAssigned
 Untested method EventLevelTrackingInfo::setNCDCHitsNotAssignedPostCleaning
 Untested method EventLevelTrackingInfo::setNCDCSegments
 Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
+Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
+Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
-Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
-Untested method EventLevelTrackingInfo::hasSVDCKFAbortionFlag
-Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
-Untested method EventLevelTrackingInfo::hasPXDCKFAbortionFlag
 Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
 Untested method PIDLikelihood::printArray

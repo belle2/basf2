@@ -41,6 +41,11 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
+
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
@@ -91,7 +96,7 @@ void TrackFinderVXDCellOMatModule::initialize()
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
   }
 
-  m_eventLevelTrackingInfo.isRequired();
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 

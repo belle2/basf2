@@ -64,9 +64,6 @@ namespace Belle2 {
       {
         for (AObject* from : froms) {
           StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-          if (!m_eventLevelTrackingInfo.isValid()) {
-            B2ERROR("EventLevelTrackingInfo not valid. Cannot set flags.");
-          }
 
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
@@ -79,12 +76,14 @@ namespace Belle2 {
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
               B2WARNING("Relations Creator reached maximal number of items. Aborting");
-              if (std::is_base_of<AObject, CKFToPXDState>::value) {
-                m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
-              } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
-                m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
-              } else {
-                B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
+              if (m_eventLevelTrackingInfo.isValid()) {
+                if (std::is_base_of<AObject, CKFToPXDState>::value) {
+                  m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
+                } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
+                  m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
+                } else {
+                  B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
+                }
               }
 
               weightedRelations.clear();

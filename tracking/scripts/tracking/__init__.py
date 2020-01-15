@@ -4,7 +4,7 @@
 from basf2 import *
 from tracking.path_utils import *
 
-from tracking.modules import registerEventTrackingInfo
+from tracking.modules import RegisterEventLevelTrackingInfo
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
@@ -207,7 +207,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         use_ecl_to_cdc_ckf = False
 
     # register EventTrackingInfo
-    path.add_module(registerEventTrackingInfo())
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module(RegisterEventLevelTrackingInfo())
 
     # output tracks
     cdc_reco_tracks = "CDCRecoTracks"
@@ -282,7 +283,8 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
     import cdc.cr as cosmics_setup
 
     # register EventTrackingInfo
-    path.add_module(registerEventTrackingInfo())
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module(RegisterEventLevelTrackingInfo())
 
     if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
@@ -364,8 +366,10 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
         return
 
     # register EventTrackingInfo
-    # Should we define a second EventTrackingInfo StoreArray for the ROI-finding?
-    path.add_module(registerEventTrackingInfo())
+    if 'RegisterEventLevelTrackingInfoForPXDDataReduction' not in path:
+        registerEventlevelTrackingInfo = register_module(RegisterEventLevelTrackingInfo("EventLevelTrackingInfo__ROI"))
+        registerEventlevelTrackingInfo.set_name('RegisterEventLevelTrackingInfoForPXDDataReduction')
+        path.add_module(registerEventlevelTrackingInfo)
 
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
@@ -419,7 +423,8 @@ def add_vxd_standalone_cosmics_finder(
     """
 
     # register EventTrackingInfo
-    path.add_module(registerEventTrackingInfo())
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module(RegisterEventLevelTrackingInfo())
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)

@@ -11,12 +11,13 @@ class registerEventTrackingInfo(basf2.Module):
 
     def __init__(self):
         super(registerEventTrackingInfo, self).__init__()
+        self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
 
     def initialize(self):
-        """ Register the StoreArray on the DataStore"""
+        """ Register the StoreObj on the DataStore"""
         self.m_eventLevelTrackingInfo = Belle2.PyStoreObj(Belle2.EventLevelTrackingInfo.Class())
         self.m_eventLevelTrackingInfo.registerInDataStore()
 
     def event(self):
-        """ ... and create the StoreArray """
+        """ ... and create the StoreObj """
         self.m_eventLevelTrackingInfo.create()

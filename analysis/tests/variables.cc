@@ -3346,13 +3346,21 @@ namespace {
     MCParticleGraph::GraphParticle& mcg_not_child = mcGraph.addParticle();
 
     mcg_m.setPDG(421);
+    mcg_m.set4Vector(TLorentzVector(7, 7, 7, 7));
     mcg_d_0.setPDG(-310);
+    mcg_d_0.set4Vector(TLorentzVector(6, 6, 6, 6));
     mcg_d_1.setPDG(310);
+    mcg_d_1.set4Vector(TLorentzVector(5, 5, 5, 5));
     mcg_gd_0_0.setPDG(211);
+    mcg_gd_0_0.set4Vector(TLorentzVector(4, 4, 4, 4));
     mcg_gd_0_1.setPDG(-211);
+    mcg_gd_0_1.set4Vector(TLorentzVector(3, 3, 3, 3));
     mcg_gd_1_0.setPDG(211);
+    mcg_gd_1_0.set4Vector(TLorentzVector(2, 1, 2, 2));
     mcg_gd_1_1.setPDG(-211);
+    mcg_gd_1_1.set4Vector(TLorentzVector(1, 1, 1, 1));
     mcg_not_child.setPDG(211);
+    mcg_not_child.set4Vector(TLorentzVector(10, 10, 10, 10));
 
     mcg_d_0.comesFrom(mcg_m);
     mcg_d_1.comesFrom(mcg_m);
@@ -3375,7 +3383,6 @@ namespace {
 
 
     mc_m->setStatus(MCParticle::c_PrimaryParticle);
-    mc_m->setEnergy(5.);
     mc_d_0->setStatus(MCParticle::c_PrimaryParticle);
     mc_d_1->setStatus(MCParticle::c_PrimaryParticle);
     mc_gd_0_0->setStatus(MCParticle::c_PrimaryParticle);
@@ -3428,6 +3435,11 @@ namespace {
 
     // All pions should have common D mother
     const Manager::Var* var_d = Manager::Instance().getVariable("firstMCAncestorOfType(D0, mdstIndex)");
+    // std::cout<<"mdstIndex"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, mdstIndex)")->function(D_gd_0_0)<<std::endl;
+    // std::cout<<"matchedMC(E)"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, matchedMC(E))")->function(D_gd_0_0)<<std::endl;
+    // std::cout<<"E"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0)<<std::endl;
+    // std::cout<<"matchedMC(PDG)"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, matchedMC(PDG))")->function(D_gd_0_0)<<std::endl;
+    // std::cout<<"PDG"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, PDG)")->function(D_gd_0_0)<<std::endl;
     ASSERT_NE(var_d, nullptr);
     EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
@@ -3436,7 +3448,6 @@ namespace {
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_1), var_d->function(D_gd_1_1));
     EXPECT_FLOAT_EQ(var_d->function(not_child), -1);
     EXPECT_FLOAT_EQ(var_d->function(not_child_2), -2);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("firstMCAncestorOfType(D0, E)")->function(D_gd_0_0), 5.);
 
 
     // // All but they have differnt K0s mothers
@@ -3448,6 +3459,7 @@ namespace {
     EXPECT_NE(var_310->function(D_gd_0_1), var_310->function(D_gd_1_1));
     EXPECT_FLOAT_EQ(var_310->function(not_child), -1);
     EXPECT_FLOAT_EQ(var_310->function(not_child_2), -2);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0), 10.392304);
   }
 
   TEST_F(MetaVariableTest, isDescendantOfList)

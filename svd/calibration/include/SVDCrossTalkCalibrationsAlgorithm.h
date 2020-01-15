@@ -37,7 +37,7 @@ namespace Belle2 {
     /**Identifier string */
     std::string m_id;
 
-    /**Minimum number of required entries for collector histogram L4.2.1 u-side */
+    /**Minimum number of required entries for collector histogram L4.1.2 u-side */
     int m_minEntries = 10000;
 
   };

@@ -58,7 +58,7 @@ def SVDCrossTalkCalibrations(files, tags):
                               )
     # Local database containing occupancy payload required for runs that do not have SVDOccupancy payload
     # attached to svd_basic global tag
-    calibration.use_local_database('/gpfs/fs02/belle2/group/detector/SVD/earlyPhase3/localDB_Occupancy/database.txt')
+    # calibration.use_local_database('/gpfs/fs02/belle2/group/detector/SVD/earlyPhase3/localDB_Occupancy/database.txt')
 
     calibration.strategies = strategies.SequentialRunByRun
 

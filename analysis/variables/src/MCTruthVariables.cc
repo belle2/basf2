@@ -100,7 +100,7 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
         return std::numeric_limits<double>::quiet_NaN();
       // get mcparticle weight (mcmatch weight)
       auto mcpww = particle->getRelatedToWithWeight<MCParticle>();

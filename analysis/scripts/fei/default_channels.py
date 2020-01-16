@@ -61,6 +61,9 @@ def get_default_channels(
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
+        # HOTFIX
+        from variables import variables
+        variables.addAlias('Kid_belle', 'atcPIDBelle(3,2)')
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)', 'kIDBelle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',

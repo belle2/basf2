@@ -81,10 +81,13 @@ namespace Belle2 {
     /**
      * Unpack one EKLM digit.
      * @param[in] rawData           Data to be unpacked.
+     * @param[in] copper            Copper identifier.
+     * @param[in] hslb              HSLB number.
      * @param[in] lane              Lane.
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackEKLMDigit(const int* rawData, EKLMDataConcentratorLane* lane,
+    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
+                         EKLMDataConcentratorLane* lane,
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
@@ -122,10 +125,13 @@ namespace Belle2 {
     /** Name of EKLMDigit store array. */
     std::string m_outputEKLMDigitsName;
 
-    /* EKLM parameters. */
+    /** Record raw data in dataobject format (for debugging). */
+    bool m_WriteDigitRaws;
 
-    /** Record wrong hits (e.g. for debugging). */
+    /** Record wrong hits (for debugging). */
     bool m_WriteWrongHits;
+
+    /* EKLM parameters. */
 
     /**
      * Do not issue B2ERROR on wrong hits, with certain firmware versions

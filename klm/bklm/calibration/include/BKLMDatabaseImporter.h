@@ -45,7 +45,7 @@ namespace Belle2 {
     void loadDefaultElectronicMapping(bool isExperiment10 = false);
 
     /**
-     * Set non-default lane.
+     * Set non-default lane for all channels in a module.
      * @param[in] section Section.
      * @param[in] sector  Sector.
      * @param[in] layer   Layer.
@@ -53,6 +53,17 @@ namespace Belle2 {
      */
     void setElectronicMappingLane(
       int section, int sector, int layer, int lane);
+
+    /**
+     * Set non-default lane for all channels in a plane.
+     * @param[in] section Section.
+     * @param[in] sector  Sector.
+     * @param[in] layer   Layer.
+     * @param[in] plane   Plane.
+     * @param[in] lane    Lane.
+     */
+    void setElectronicMappingLane(
+      int section, int sector, int layer, int plane, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.

@@ -8,6 +8,9 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-04-00-03:
 
+- EventLevelTrackingInfo:
+  + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
+  + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging

@@ -809,10 +809,13 @@ def add_vxd_track_finding_vxdtf2(
         spacePointArrayNames += ["PXD" + nameSPs]
 
     nameSegNet = 'SegmentNetwork' + suffix
+    nameEvtInfo = "EventLevelTrackingInfo" + suffix
+
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
+    segNetProducer.param('EventLevelTrackingInfoName', nameEvtInfo)
     path.add_module(segNetProducer)
 
     #################
@@ -822,6 +825,7 @@ def add_vxd_track_finding_vxdtf2(
 
     # append a suffix to the storearray name
     nameSPTCs = 'SPTrackCands' + suffix
+    nameEvtInfo = "EventLevelTrackingInfo" + suffix
 
     trackFinder = register_module('TrackFinderVXDCellOMat')
     trackFinder.param('NetworkName', nameSegNet)
@@ -830,6 +834,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
+    trackFinder.param('EventLevelTrackingInfoName', nameEvtInfo)
     path.add_module(trackFinder)
 
     if useTwoStepSelection:

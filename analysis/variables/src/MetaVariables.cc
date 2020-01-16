@@ -2536,7 +2536,7 @@ namespace Belle2 {
 
           if (i_p == nullptr)
           {
-            return -2;
+            return std::numeric_limits<float>::quiet_NaN();
           }
 
           while (true)
@@ -2547,7 +2547,7 @@ namespace Belle2 {
             } catch (std::exception& e) {}
 
             if (mother == nullptr) {
-              return -1;
+              return std::numeric_limits<float>::quiet_NaN();
             }
 
             if (std::abs(mother->getPDG()) == std::abs(pdg_code)) {
@@ -2556,7 +2556,7 @@ namespace Belle2 {
             }
             i_p = mother;
           }
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         };
         return func;
       } else {

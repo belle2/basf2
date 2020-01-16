@@ -102,6 +102,7 @@ void SVDDQMHitTimeModule::initialize()
   }
   m_TrgResult.isRequired();
   m_eventT0.isOptional();
+  m_svdEventInfo.isOptional();
   m_clusters.isRequired();
 
   REG_HISTOGRAM
@@ -198,6 +199,10 @@ void SVDDQMHitTimeModule::event()
     if (m_eventT0.isValid())
       if (m_eventT0->hasEventT0())
         eventT0 = m_eventT0->getEventT0();
+
+
+  // eventT0 is synchronized with SVD reference frame
+  eventT0 = eventT0 - 7.8625 * (3 - m_svdEventInfo->getModeByte().getTriggerBin());
 
   //loop on clusters
   for (const SVDCluster& cluster : m_clusters) {

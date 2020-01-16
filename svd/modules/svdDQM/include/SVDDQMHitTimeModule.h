@@ -22,6 +22,7 @@
 using std::vector;
 using std::string;
 
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <framework/dataobjects/EventT0.h>
 
@@ -67,6 +68,7 @@ namespace Belle2 {
 
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Trigger selection data object */
     StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     StoreArray<SVDCluster> m_clusters ;  /**< Store array for clusters*/
 
     TH1F* m_l3v_bhabha_L1_ECLTRG{nullptr}; /**< svd time histogram for bhabha events wrt the ECL trigger time*/

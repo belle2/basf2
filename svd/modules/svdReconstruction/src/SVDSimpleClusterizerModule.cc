@@ -180,6 +180,7 @@ void SVDSimpleClusterizerModule::event()
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
     aStrip.time = m_storeDigits[i]->getTime();
+    aStrip.timeError = m_storeDigits[i]->getTimeError();
 
     //try to add the strip to the existing cluster
     if (! clusterCandidate.add(thisSensorID, thisSide, aStrip)) {
@@ -235,7 +236,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float position = cluster.getPosition();
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
   float time = cluster.getTime();
-  float timeError = cluster.getTimeError(); //not implemented yet
+  float timeError = cluster.getTimeError();
 
 
   //  Store Cluster into Datastore

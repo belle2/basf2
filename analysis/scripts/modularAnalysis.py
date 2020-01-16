@@ -2185,6 +2185,7 @@ def oldwritePi0EtaVeto(
     global PI0ETAVETO_COUNTER
 
     if PI0ETAVETO_COUNTER == 0:
+        from variables import variables
         variables.addAlias('lowE', 'daughter(1,E)')
         variables.addAlias('cTheta', 'daughter(1,clusterTheta)')
         variables.addAlias('Zmva', 'daughter(1,clusterZernikeMVA)')
@@ -2699,19 +2700,20 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
         particleLists (list(str)): list of names of ParticleList objects for charged stable particles.
                                    The charge-conjugate ParticleLists will be also processed automatically.
         path (basf2.Path): the module is added to this path.
-        trainingMode (Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode): enum identifier of the training mode.
-                                                                              Needed to pick up the correct payload from the DB.
-                                                                              Available choices:
-                                                                              {c_Classification=0,
-                                                                               c_Multiclass=1,
-                                                                               c_ECL_Classification=2,
-                                                                               c_ECL_Multiclass=3,
-                                                                               c_PSD_Classification=4,
-                                                                               c_PSD_Multiclass=5,
-                                                                               c_ECL_PSD_Classification=6,
-                                                                               c_ECL_PSD_Multiclass=7}
-        binaryHypoPDGCodes (Optional[tuple(int, int)]): the pdgIds of the signal, background mass hypothesis.
-                                                        Required only for binary PID mode.
+        trainingMode (``Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode``): enum identifier of the training mode.
+          Needed to pick up the correct payload from the DB. Available choices:
+
+          * c_Classification=0
+          * c_Multiclass=1
+          * c_ECL_Classification=2
+          * c_ECL_Multiclass=3
+          * c_PSD_Classification=4
+          * c_PSD_Multiclass=5
+          * c_ECL_PSD_Classification=6
+          * c_ECL_PSD_Multiclass=7
+
+        binaryHypoPDGCodes (tuple(int, int), ``optional``): the pdgIds of the signal, background mass hypothesis.
+          Required only for binary PID mode.
     """
 
     from ROOT import Belle2
@@ -2804,6 +2806,28 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     dist_mod.param('decayString', decay_string)
     dist_mod.param('mode', mode)
     path.add_module(dist_mod)
+
+
+def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut, path):
+    """
+    Adds the InclusiveDstarReconstruction module to the given path.
+    This module creates a D* particle list by estimating the D* four momenta
+    from slow pions, specified by a given cut. The D* energy is approximated
+    as  E(D*) = m(D*)/(m(D*) - m(D)) * E(pi). The absolute value of the D*
+    momentum is calculated using the D* PDG mass and the direction is collinear
+    to the slow pion direction. The charge of the given pion list has to be consistent
+    with the D* charge
+
+    @param inputPionList Name of the input pion particle list
+    @param outputDstarList Name of the output D* particle list
+    @param slowPionCut Cut applied to the pion list to identify slow pions
+    @param path the module is added to this path
+    """
+    incl_dstar = register_module("InclusiveDstarReconstruction")
+    incl_dstar.param("pionListName", inputPionList)
+    incl_dstar.param("DstarListName", outputDstarList)
+    incl_dstar.param("slowPionCut", slowPionCut)
+    path.add_module(incl_dstar)
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

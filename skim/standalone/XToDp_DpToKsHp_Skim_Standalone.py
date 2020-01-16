@@ -28,9 +28,8 @@ fileList = ['/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod000
 ma.inputMdstList('default', fileList, path=ckshppath)
 
 
-mergedKshorts(path=ckshppath)
-stdPi('loose', path=ckshppath)
-stdK('loose', path=ckshppath)
+stdPi('all', path=ckshppath)
+stdK('all', path=ckshppath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(ckshppath)

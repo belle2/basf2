@@ -53,7 +53,11 @@ class ExamplesTest(unittest.TestCase):
         Test supported FEI examples.
         """
 
-        self._test_examples_dir('analysis/examples/FEI/')
+        if '/sw/belle/local/neurobayes-4.3.1/lib/' in os.getenv('LD_LIBRARY_PATH'):
+            self._test_examples_dir('analysis/examples/FEI/')
+        else:
+            skip_b2bii_examples = ['B_converted_apply.py', 'B_converted_train.py']
+            self._test_examples_dir('analysis/examples/FEI/', skip_b2bii_examples)
 
     def test_fitting_examples(self):
         """
@@ -74,6 +78,13 @@ class ExamplesTest(unittest.TestCase):
                           ]
 
         self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
+
+    def test_reconstruction_examples(self):
+        """
+        Test supported reconstruction examples.
+        """
+
+        self._test_examples_dir('analysis/examples/reconstruction/')
 
     def test_simulation_examples(self):
         """

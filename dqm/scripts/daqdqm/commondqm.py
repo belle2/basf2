@@ -44,15 +44,19 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD
         if components is None or 'SVD' in components:
+            # SVD DATA FORMAT
+            svdunpackerdqm = register_module('SVDUnpackerDQM')
+            path.add_module(svdunpackerdqm)
+            # offline ZS emulator
             path.add_module(
                 'SVDZeroSuppressionEmulator',
                 SNthreshold=5,
                 ShaperDigits='SVDShaperDigits',
                 ShaperDigitsIN='SVDShaperDigitsZS5',
                 FADCmode=True)
-            # SVD DATA FORMAT
-            path.add_module('SVDUnpackerDQM')
-            # SVD GENERAL
+            # SVD Occupancy after Injection
+            path.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+            # SVDDQMExpressReco General
             path.add_module('SVDDQMExpressReco',
                             offlineZSShaperDigits='SVDShaperDigitsZS5')
             # SVD HIT TIME

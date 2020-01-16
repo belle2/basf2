@@ -58,14 +58,15 @@ namespace Belle2 {
 
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
-    // L1 timing source from getTimeType() in TRGSummary
-    // See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
-    // (2019/11/11) release-04-00-02, return values from getTimType() are
-    // 0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet)
+
+    /** L1 timing source from getTimeType() in TRGSummary
+     * See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
+     * (2019/11/11) release-04-00-02, return values from getTimType() are
+     * 0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet) */
     int m_L1TimingSrc;
 
-    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
-    StoreObjPtr<EventT0> m_eventT0 ;  /**< Store array for clusters*/
+    StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Trigger selection data object */
+    StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
     StoreArray<SVDCluster> m_clusters ;  /**< Store array for clusters*/
 
     TH1F* m_l3v_bhabha_L1_ECLTRG{nullptr}; /**< svd time histogram for bhabha events wrt the ECL trigger time*/

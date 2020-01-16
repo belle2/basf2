@@ -68,10 +68,11 @@ namespace Belle2 {
     addParam("vertexFitter", m_vertexFitter, "kfitter or rave", string("kfitter"));
     addParam("fitType", m_fitType, "type of the kinematic fit (vertex, massvertex, mass)", string("vertex"));
     addParam("withConstraint", m_withConstraint,
-             "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing, btube, iptube_20um",
+             "additional constraint on vertex: ipprofile, iptube, mother, iptubecut, pointing, btube",
              string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
+    addParam("smearing", m_smearing, "smear IP tube width by given length", 0.002);
   }
 
   void ParticleVertexFitterModule::initialize()
@@ -120,12 +121,19 @@ namespace Belle2 {
     m_beamSpotCov.ResizeTo(3, 3);
     TMatrixDSym beamSpotCov(3);
     if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
-    if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
+    if (m_withConstraint == "iptube") {
+      if (m_smearing > 0 && m_vertexFitter == "kfitter") {
+        ParticleVertexFitterModule::smearBeamSpot(m_smearing);
+      } else {
+        ParticleVertexFitterModule::findConstraintBoost(2.);
+        if (m_vertexFitter == "rave")
+          B2WARNING("ParticleVertexFitterModule: Rave does not support smeared IP tube constraint. smearing parameter is ignored.");
+      }
+    }
     if (m_withConstraint == "iptubecut") {  // for development purpose only
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
       findConstraintBoost(0.03);
     }
-    if (m_withConstraint == "iptube_20um") ParticleVertexFitterModule::smearBeamSpot(0.002);
     if ((m_vertexFitter == "rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
@@ -194,7 +202,6 @@ namespace Belle2 {
         m_withConstraint != "iptubecut" &&
         m_withConstraint != "pointing" &&
         m_withConstraint != "btube" &&
-        m_withConstraint != "iptube_20um" &&
         m_withConstraint != "")
       B2FATAL("ParticleVertexFitter: " << m_withConstraint << " ***invalid Constraint ");
 
@@ -206,7 +213,7 @@ namespace Belle2 {
       if (m_fitType == "vertex") {
         if (m_withConstraint == "ipprofile") {
           ok = doKVertexFit(mother, true, false);
-        } else if (m_withConstraint == "iptube" || m_withConstraint == "iptube_20um") {
+        } else if (m_withConstraint == "iptube") {
           ok = doKVertexFit(mother, false, true);
         } else {
           ok = doKVertexFit(mother, false, false);
@@ -215,9 +222,8 @@ namespace Belle2 {
 
       // mass-constrained vertex fit
       if (m_fitType == "massvertex") {
-        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut"
-            || m_withConstraint == "iptube_20um") {
-          B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube, ipprofile or iptube_20um constraint.");
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - mass-constrained fit using kfitter does not work with iptube or ipprofile constraint.");
         } else if (m_withConstraint == "pointing") {
           ok = doKMassPointingVertexFit(mother);
         } else {
@@ -227,9 +233,8 @@ namespace Belle2 {
 
       // mass fit
       if (m_fitType == "mass") {
-        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut"
-            || m_withConstraint == "iptube_20um") {
-          B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube, ipprofile or iptube_20um constraint.");
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - mass fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKMassFit(mother);
         }
@@ -237,9 +242,8 @@ namespace Belle2 {
 
       // four C fit
       if (m_fitType == "fourC") {
-        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut"
-            || m_withConstraint == "iptube_20um") {
-          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using kfitter does not work with iptube, ipprofile or iptube_20um constraint.");
+        if (m_withConstraint == "ipprofile" || m_withConstraint == "iptube" || m_withConstraint == "iptubecut") {
+          B2FATAL("ParticleVertexFitter: Invalid options - four C fit using kfitter does not work with iptube or ipprofile constraint.");
         } else {
           ok = doKFourCFit(mother);
         }
@@ -255,15 +259,11 @@ namespace Belle2 {
 
     // fits using Rave
     if (m_vertexFitter == "rave") {
-      if (m_withConstraint == "iptube_20um") {
-        B2FATAL("ParticleVertexFitter: Invalid option - vertex fit using rave does not work with iptube_20um constraint.");
-      } else {
-        try {
-          ok = doRaveFit(mother);
-        } catch (const rave::CheckedFloatException&) {
-          B2ERROR("Invalid inputs (nan/inf)?");
-          ok = false;
-        }
+      try {
+        ok = doRaveFit(mother);
+      } catch (const rave::CheckedFloatException&) {
+        B2ERROR("Invalid inputs (nan/inf)?");
+        ok = false;
       }
     }
 

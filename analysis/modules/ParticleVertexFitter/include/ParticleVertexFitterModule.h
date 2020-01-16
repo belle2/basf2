@@ -81,6 +81,7 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
+    double m_smearing;            /**< smearing width applied to IP tube */
 
     /**
      * Main steering routine

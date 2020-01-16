@@ -701,7 +701,7 @@ def TagV(
     list_name,
     MCassociation='',
     confidenceLevel=0.,
-    trackFindingType="standard",
+    trackFindingType="standard_PXD",
     constraintType="IP",
     askMCInfo=False,
     reqPXDHits=0,

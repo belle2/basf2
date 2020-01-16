@@ -3435,19 +3435,14 @@ namespace {
 
     // All pions should have common D mother
     const Manager::Var* var_d = Manager::Instance().getVariable("firstMCAncestorOfType(D0, mdstIndex)");
-    // std::cout<<"mdstIndex"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, mdstIndex)")->function(D_gd_0_0)<<std::endl;
-    // std::cout<<"matchedMC(E)"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, matchedMC(E))")->function(D_gd_0_0)<<std::endl;
-    // std::cout<<"E"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0)<<std::endl;
-    // std::cout<<"matchedMC(PDG)"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, matchedMC(PDG))")->function(D_gd_0_0)<<std::endl;
-    // std::cout<<"PDG"<<Manager::Instance().getVariable("firstMCAncestorOfType(310, PDG)")->function(D_gd_0_0)<<std::endl;
     ASSERT_NE(var_d, nullptr);
     EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
     EXPECT_FLOAT_EQ(var_d->function(D_gd_1_0), var_d->function(D_gd_1_1));
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_1_0));
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_1), var_d->function(D_gd_1_1));
-    EXPECT_FLOAT_EQ(var_d->function(not_child), -1);
-    EXPECT_FLOAT_EQ(var_d->function(not_child_2), -2);
+    EXPECT_TRUE(std::isnan(var_d->function(not_child)));
+    EXPECT_TRUE(std::isnan(var_d->function(not_child_2)));
 
 
     // // All but they have differnt K0s mothers
@@ -3457,9 +3452,9 @@ namespace {
     EXPECT_FLOAT_EQ(var_310->function(D_gd_1_0), var_310->function(D_gd_1_1));
     EXPECT_NE(var_310->function(D_gd_0_0), var_310->function(D_gd_1_0));
     EXPECT_NE(var_310->function(D_gd_0_1), var_310->function(D_gd_1_1));
-    EXPECT_FLOAT_EQ(var_310->function(not_child), -1);
-    EXPECT_FLOAT_EQ(var_310->function(not_child_2), -2);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0), 10.392304);
+    EXPECT_TRUE(std::isnan(var_310->function(not_child)));
+    EXPECT_TRUE(std::isnan(var_310->function(not_child_2)));
+    EXPECT_FLOAT_EQ(int(Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0)), 10);
   }
 
 

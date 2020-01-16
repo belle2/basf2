@@ -161,9 +161,12 @@ void SVDCoGTimeEstimatorModule::event()
     m_weightedMeanTime = CalculateWeightedMeanPeakTime(samples_vec);
     if (m_StopCreationReco)
       continue;
-    m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError();
     m_amplitude = CalculateAmplitude(samples_vec);
     m_amplitudeError = CalculateAmplitudeError(thisSensorID, thisSide, thisCellID);
+
+    //need the amplitudeError in ADC as the noise of the strip to computer the error on time
+    m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError(samples_vec);
+
     m_chi2 = CalculateChi2();
 
     //check too high ADC
@@ -261,7 +264,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
   }
   if (sumAmplitudes != 0) {
     averagetime /= (sumAmplitudes);
-    averagetime *= DeltaT;
+    averagetime *= m_DeltaT;
   } else {
     averagetime = -1;
     m_StopCreationReco = true;
@@ -283,9 +286,26 @@ float SVDCoGTimeEstimatorModule::CalculateAmplitude(Belle2::SVDShaperDigit::APVF
   return amplitude;
 }
 
-float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError()
+float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {
-  return m_FixedTimeError;
+
+  //assuming that noise of the samples are totally UNcorrelated
+  //in MC this hypothesis is correct
+
+  //sum of samples amplitudes
+  float Atot = 0;
+  //sum of time residuals squared
+  float tmpResSq = 0;
+
+  for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
+    Atot  += samples[k];
+    tmpResSq += TMath::Power(k * m_DeltaT - m_weightedMeanTime, 2);
+  }
+
+  return m_amplitudeError / Atot * TMath::Sqrt(tmpResSq);
+
+  //  return m_FixedTimeError;
+
 }
 
 float SVDCoGTimeEstimatorModule::CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID)

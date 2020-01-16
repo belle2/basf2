@@ -9,9 +9,7 @@
  **************************************************************************/
 
 
-#ifndef SVDCOGTIMEESTIMATOR_H
-#define SVDCOGTIMEESTIMATOR_H
-
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
@@ -92,7 +90,7 @@ namespace Belle2 {
     float m_chi2 = 0;
 
     /** Time width of a sampling */
-    float DeltaT = 31.44; //ns
+    float m_DeltaT = 31.44; //ns
 
     /** To stop creation of the SVDShaperDigit if something is wrong */
     bool m_StopCreationReco = false;
@@ -163,11 +161,11 @@ namespace Belle2 {
 
     /** Function to calculate the peak time, obtained as the weighted mean of the time of the samples, weighted with the amplitude of each sample */
     float CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples);
-    /** Function to calculate the peak time error, obtained as 1/10 of the time itself */
+    /** Function to calculate the amplitude of the shaper, obtained as the largest of the 6 samples */
     float CalculateAmplitude(Belle2::SVDShaperDigit::APVFloatSamples samples);
-    /** Function to calculate the amplitude of the shaper, obtained as the mean of the 6 samples */
-    float CalculateWeightedMeanPeakTimeError();
-    /** Function to calculate the amplitude error, obtained as 1/10 of the amplitude itself */
+    /** Function to calculate the peak time error */
+    float CalculateWeightedMeanPeakTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples);
+    /** Function to calculate the amplitude error as the noise of the strip */
     float CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID);
     /** Function to calculate chi2, that is not used here, so just set at 0.01 */
     float CalculateChi2();
@@ -184,7 +182,7 @@ namespace Belle2 {
 
   };
 }
-#endif
+
 
 
 

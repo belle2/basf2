@@ -143,7 +143,7 @@ namespace Belle2 {
 
     bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
-    bool m_nisEnable; /**< Flag to switch on conversion of Evtcls table */
+    bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
     /**
      * E9/E25 threshold value

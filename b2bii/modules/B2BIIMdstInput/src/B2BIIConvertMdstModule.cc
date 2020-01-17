@@ -172,7 +172,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
            -1.1);
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
-  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of Mdst_evtcls", false);
+  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", false);
 
   m_realData = false;
 

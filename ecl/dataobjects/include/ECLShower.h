@@ -97,6 +97,7 @@ namespace Belle2 {
       m_PulseShapeDiscriminationMVA = 0.5;        /**< Digit level MVA classifier that uses pulse shape discrimination.*/
       m_NumberOfHadronDigits = 0.0;         /**< Shower Number of hadron digits*/
       m_numberOfCrystalsForEnergy = 0.0;         /**< number of crystals used for energy calculation*/
+      m_nominalNumberOfCrystalsForEnergy = 0.0;         /**< nominal number of crystals used for energy calculation*/
       m_listOfCrystalsForEnergy = {}; /**< list of cell ids used for energy calculation*/
     }
 
@@ -227,6 +228,10 @@ namespace Belle2 {
     /*! Set number of crystals used for energy calculation
      */
     void setNumberOfCrystalsForEnergy(double numberOfCrystalsForEnergy) { m_numberOfCrystalsForEnergy = numberOfCrystalsForEnergy; }
+
+    /*! Set nominal number of crystals used for energy calculation
+     */
+    void setNominalNumberOfCrystalsForEnergy(double nominalNumberOfCrystalsForEnergy) { m_nominalNumberOfCrystalsForEnergy = nominalNumberOfCrystalsForEnergy; }
 
     /*! Set list of cell ids used for energy calculation
      */
@@ -403,6 +408,11 @@ namespace Belle2 {
      */
     double getNumberOfCrystalsForEnergy() const { return m_numberOfCrystalsForEnergy; }
 
+    /*! Get nominal number of crystals used for energy calculation
+     * @return m_nominalNumberOfCrystalsForEnergy
+     */
+    double getNominalNumberOfCrystalsForEnergy() const { return m_nominalNumberOfCrystalsForEnergy; }
+
     /*! Get list of cellids used for energy calculation
      * @return m_listOfCrystalsForEnergy
      */
@@ -524,6 +534,7 @@ namespace Belle2 {
     Double32_t
     m_NumberOfHadronDigits;         /**< Number of hadron digits in shower (pulse shape discrimination variable).  Weighted sum of digits in shower with significant scintillation emission (> 3 MeV) in the hadronic scintillation component. (SL)*/
     Double32_t m_numberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
+    Double32_t m_nominalNumberOfCrystalsForEnergy; /**< number of crystals used for energy calculation (TF)*/
     std::vector<unsigned int> m_listOfCrystalsForEnergy; /**< list of cell ids used for energy calculation (TF)*/
 
     // 2: added uniqueID and highestE (TF)
@@ -539,7 +550,7 @@ namespace Belle2 {
     // 12: added m_PulseShapeDiscriminationMVA.  Noted m_ShowerHadronIntensity will be removed in release-04 (SL)
     // 13: made enums strongly typed
     // 14: added m_numberOfCrystalsForEnergy of crystals for energy determination
-    // 15: added m_listOfCrystalsForEnergy
+    // 15: added m_listOfCrystalsForEnergy, m_nominalNumberOfCrystalsForEnergy
     ClassDef(ECLShower, 15);/**< ClassDef */
 
   };

@@ -325,7 +325,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       // Get the optimal number of neighbours as function of raw energy and background level
       const unsigned int nOptimal = getOptimalNumberOfDigits(highestEnergyID, energyEstimation, backgroundLevel);
-      aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+      aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
 
       // Get the list of crystals used for the energy calculation
       std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
@@ -336,7 +336,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       for (unsigned int i = 0; i < digits.size(); ++i) {
         weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
         listCrystalPairs.at(i) = std::make_pair((digits.at(i)).getCellId(), weights.at(i) * (digits.at(i)).getEnergy());
-
       }
 
       // sort the listCrystals and keep the n highest in descending order
@@ -351,6 +350,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         }
       }
 
+      aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(listCrystals.size()));
       aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
       showerEnergy = getEnergySum(weighteddigits, nOptimal);
@@ -737,7 +737,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
         // Get the optimal number of neighbours as function of raw energy and background level
         const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
-        aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+        aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
 
         // Get the list of crystals used for the energy calculation
         std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
@@ -763,6 +763,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
           }
         }
 
+        aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(listCrystals.size()));
         aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);

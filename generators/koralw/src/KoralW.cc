@@ -13,6 +13,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
+#include <TRandom.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -47,12 +49,11 @@ extern"C" {
     float vhep[2000][4]; /**< vertex [mm]. */
   } hepevt_;
 
-
   void kw_setdatapath_(const char* filename, size_t* length);
   void kw_readatax_(const char* filename, size_t* length, int* reset, int* max, double* xpar);
   void kw_initialize_(double* ecm, double* xpar);
-  void marini_(int* mar1, int* mar2, int* mar3);
-  void rmarin_(int* mar1, int* mar2, int* mar3);
+  void marini_(unsigned int* mar1, int* mar2, int* mar3);
+  void rmarin_(unsigned int* mar1, int* mar2, int* mar3);
   void kw_make_();
   void kw_finalize_();
   void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
@@ -67,14 +68,13 @@ extern"C" {
 }
 
 
-void KoralW::init(const std::string& dataPath, const std::string& userDataFile, int randomSeed)
+void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
 {
   if (dataPath.empty()) B2FATAL("KoralW: The specified data path is empty !");
-    if (userDataFile.empty()) B2FATAL("KoralW: The specified user data file is empty !");
-      if ((randomSeed < 0) || (randomSeed > 900000000)) B2FATAL("The random seed has to be in the range 0 .. 900 OOO OOO !");
+  if (userDataFile.empty()) B2FATAL("KoralW: The specified user data file is empty !");
 
-        //Make sure the dataPath ends with an "/"
-        string dataPathNew = dataPath;
+  //Make sure the dataPath ends with an "/"
+  string dataPathNew = dataPath;
   if (dataPath[dataPath.length() - 1] != '/') dataPathNew += "/";
 
   //Set the path to the data files
@@ -97,7 +97,7 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile, 
   kw_initialize_(&m_cmsEnergy, m_xpar);
 
   //Initialize random number generator
-  int mar1 = randomSeed;
+  unsigned int mar1 = gRandom->Integer(m_seed);
   int mar2 = 7345;
   int mar3 = 239;
   marini_(&mar1, &mar2, &mar3);
@@ -128,8 +128,6 @@ void KoralW::term()
   kw_getxsecmc_(&m_crossSection, &m_crossSectionError);
 }
 
-
-
 //=========================================================================
 //                       Protected methods
 //=========================================================================
@@ -155,7 +153,6 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
 
   //every particle from a generator is primary, TF
   part.addStatus(MCParticle::c_PrimaryParticle);
-
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
@@ -163,7 +160,6 @@ void KoralW::storeParticle(MCParticleGraph& mcGraph, const float* mom, const flo
   part.setEnergy(mom[3]);
   part.setMass(mom[4]);
   part.setProductionVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
-//   part.setDecayVertex(vtx[0]*Unit::mm, vtx[1]*Unit::mm, vtx[2]*Unit::mm);
 
   //boost, TF
   TLorentzVector p4 = part.get4Vector();

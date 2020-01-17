@@ -36,7 +36,6 @@ KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_s
            FileSystem::findFile("/data/generators/koralw"));
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
            FileSystem::findFile("/data/generators/koralw/KoralW_ee.data"));
-  addParam("RandomSeed", m_seed, "The random seed of the generator.", 1227);
 }
 
 
@@ -97,7 +96,7 @@ void KoralWInputModule::initializeGenerator()
   double ecm = nominal.getMass();
   m_generator.setCMSEnergy(ecm);
 
-  m_generator.init(m_dataPath, m_userDataFile, m_seed);
+  m_generator.init(m_dataPath, m_userDataFile);
 
   m_initialized = true;
 

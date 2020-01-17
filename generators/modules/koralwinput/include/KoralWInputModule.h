@@ -54,7 +54,6 @@ namespace Belle2 {
     /** Module parameters */
     std::string m_dataPath;      /**< The path to the KoralW input data files. */
     std::string m_userDataFile;  /**< The filename of the user KoralW input data file. */
-    int m_seed;                  /**< The random seed of the generator. */
 
     /** Variables */
     KoralW m_generator;        /**< The KoralW generator. */

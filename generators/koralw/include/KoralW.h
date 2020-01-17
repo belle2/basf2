@@ -28,7 +28,11 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    KoralW() : m_crossSection(0.0), m_crossSectionError(0.0), m_cmsEnergy(0.0)
+    KoralW() :
+      m_crossSection(0.0),
+      m_crossSectionError(0.0),
+      m_cmsEnergy(0.0),
+      m_seed(900000000)
     {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
 
 
@@ -45,7 +49,7 @@ namespace Belle2 {
      * @param userDataFile The path and filename of the user input data file, which defines the user settings for the generator.
      * @param randomSeed The random seed for the generator.
      */
-    void init(const std::string& dataPath, const std::string& userDataFile, int randomSeed);
+    void init(const std::string& dataPath, const std::string& userDataFile);
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
@@ -74,7 +78,9 @@ namespace Belle2 {
   protected:
 
     double m_crossSection;      /**< The cross section of the generated KoralW events. */
+
     double m_crossSectionError; /**< The error on the cross section of the generated KoralW events. */
+
     double m_cmsEnergy; /**< CMS Energy = 2*Ebeam [GeV]. */
 
     /** Store a single generated particle into the MonteCarlo graph.
@@ -86,7 +92,6 @@ namespace Belle2 {
      *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-
     void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex, TLorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
@@ -94,9 +99,9 @@ namespace Belle2 {
 
     double m_xpar[NUM_XPAR];  /**< Double parameters for KoralW. */
 
+    unsigned int m_seed; /**< Seed for the random number generator. */
+
   };
 }
-
-
 
 #endif /* KORALW_H */

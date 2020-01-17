@@ -32,7 +32,9 @@ namespace Belle2 {
       m_crossSection(0.0),
       m_crossSectionError(0.0),
       m_cmsEnergy(0.0),
-      m_seed(900000000)
+      m_seed1(900000000),
+      m_seed2(10000),
+      m_seed3(1000)
     {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
 
 
@@ -99,7 +101,11 @@ namespace Belle2 {
 
     double m_xpar[NUM_XPAR];  /**< Double parameters for KoralW. */
 
-    unsigned int m_seed; /**< Seed for the random number generator. */
+    unsigned int m_seed1; /**< First seed for the random number generator. */
+
+    unsigned int m_seed2; /**< Second seed for the random number generator. */
+
+    unsigned int m_seed3; /**< Third seed for the random number generator. */
 
   };
 }

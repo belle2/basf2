@@ -52,8 +52,8 @@ extern"C" {
   void kw_setdatapath_(const char* filename, size_t* length);
   void kw_readatax_(const char* filename, size_t* length, int* reset, int* max, double* xpar);
   void kw_initialize_(double* ecm, double* xpar);
-  void marini_(unsigned int* mar1, int* mar2, int* mar3);
-  void rmarin_(unsigned int* mar1, int* mar2, int* mar3);
+  void marini_(unsigned int* mar1, unsigned int* mar2, unsigned int* mar3);
+  void rmarin_(unsigned int* mar1, unsigned int* mar2, unsigned int* mar3);
   void kw_make_();
   void kw_finalize_();
   void kw_getmomdec_(double* p1, double* p2, double* p3, double* p4);
@@ -66,7 +66,6 @@ extern"C" {
   }
 
 }
-
 
 void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
 {
@@ -97,9 +96,9 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
   kw_initialize_(&m_cmsEnergy, m_xpar);
 
   //Initialize random number generator
-  unsigned int mar1 = gRandom->Integer(m_seed); //The range for this seed seems to be [0, 900000000]
-  int mar2 = 7345;
-  int mar3 = 239;
+  unsigned int mar1 = gRandom->Integer(m_seed1); //The range for this seed seems to be [0, 900000000]
+  unsigned int mar2 = gRandom->Integer(m_seed2);
+  unsigned int mar3 = gRandom->Integer(m_seed3);
   marini_(&mar1, &mar2, &mar3);
   rmarin_(&mar1, &mar2, &mar3);
 }

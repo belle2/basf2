@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KORALWINPUTMODULE_H
-#define KORALWINPUTMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
+/* KoralW header. */
 #include <generators/koralw/KoralW.h>
 
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/utilities/InitialParticleGeneration.h>
-
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -72,6 +73,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-
-#endif /* KORALWINPUTMODULE_H */

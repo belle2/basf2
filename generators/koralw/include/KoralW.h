@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KORALW_H
-#define KORALW_H
+#pragma once
 
+/* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
+
+/* ROOT headers. */
 #include <TLorentzRotation.h>
 
+/* C++ headers. */
 #include <string>
 
 #define NUM_XPAR 10000
@@ -109,5 +112,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* KORALW_H */

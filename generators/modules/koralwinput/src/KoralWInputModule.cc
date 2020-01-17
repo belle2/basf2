@@ -8,23 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/logging/Logger.h>
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
+
 REG_MODULE(KoralWInput)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
@@ -38,12 +35,9 @@ KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_s
            FileSystem::findFile("/data/generators/koralw/KoralW_ee.data"));
 }
 
-
 KoralWInputModule::~KoralWInputModule()
 {
-
 }
-
 
 void KoralWInputModule::initialize()
 {
@@ -52,9 +46,7 @@ void KoralWInputModule::initialize()
 
   //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
   m_initial.initialize();
-
 }
-
 
 void KoralWInputModule::event()
 {
@@ -81,7 +73,6 @@ void KoralWInputModule::event()
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 }
 
-
 void KoralWInputModule::terminate()
 {
   m_generator.term();
@@ -91,7 +82,6 @@ void KoralWInputModule::terminate()
 
 void KoralWInputModule::initializeGenerator()
 {
-
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double ecm = nominal.getMass();
   m_generator.setCMSEnergy(ecm);
@@ -99,5 +89,4 @@ void KoralWInputModule::initializeGenerator()
   m_generator.init(m_dataPath, m_userDataFile);
 
   m_initialized = true;
-
 }

@@ -17,6 +17,7 @@ from basf2 import *
 from basf2 import conditions as b2conditions
 from svd import add_svd_reconstruction
 from tracking import add_tracking_reconstruction
+from rawdata import add_unpackers
 
 # needed for some temporary issues with BKLMDisplacement payload
 b2conditions.override_globaltags()
@@ -26,7 +27,7 @@ b2conditions.globaltags = ['klm_alignment_testing', 'online']
 main = create_path()
 
 # RAW
-files = [' /group/belle2/dataprod/Data/Raw/e0010/r04295/sub00/physics.0010.04295.HLT*.root']
+files = [' /group/belle2/dataprod/Data/Raw/e0010/r04295/sub00/physics.0010.04295.HLT1*.root']
 
 # old-format cDST
 # files=["/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_hadron/cdst/sub00/cdst.physics.0010.04295.HLT1*.root","/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_bhabha/cdst/sub00/cdst.physics.0010.04295.HLT1.*.root","/group/belle2/dataprod/Data/release-04-00-02/DB00000523/Unofficial/e0010/4S/r04295/skim/hlt_mumu_2trk/cdst/sub00/cdst.physics.0010.04295.HLT1.*.root"]
@@ -43,11 +44,11 @@ main.add_module('Gearbox')
 main.add_module('Geometry')
 
 # if using RAW data you need to unpack them
-main.add_module('SVDUnpacker')
+add_unpackers(main, components=['SVD', 'CDC'])
 # you may also want to do SVD reconstruction
 # add_svd_reconstruction(main)
 # or TRACKING reconstruction
-# add_tracking_reconstruction(main)
+add_tracking_reconstruction(main, components=['SVD', 'CDC'])
 
 # if using cDST with new format you have to do svd reconstruction
 # add_svd_reconstruction(main)
@@ -81,12 +82,12 @@ main.add_module(
 # main.add_module('SVDDQMClustersOnTrack')
 
 # ** SVD Occupancy after Injection - need RawFTSW & Offline ZS
-injection = main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
+# injection = main.add_module('SVDDQMInjection', ShaperDigits='SVDShaperDigitsZS5')
 # injection.set_log_level(LogLevel.DEBUG)  # LogLevel.DEBUG / LogLevel.INFO
 # injection.set_debug_level(30)
 
-# ** SVD Hit Time - in preparation
-# SVDHitTimeDQMmodule = main.add_module("SVDDQMHitTime")
+# ** SVD Hit Time
+SVDHitTimeDQMmodule = main.add_module("SVDDQMHitTime")
 # SVDHitTimeDQMmodule.set_log_level(LogLevel.INFO)  # LogLevel.DEBUG / LogLevel.INFO
 # SVDHitTimeDQMmodule.set_debug_level(21)
 

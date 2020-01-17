@@ -18,6 +18,15 @@ from b2biiMonitors import addNeutralsConversionMonitors
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 os.environ['PGUSER'] = 'g0db'
 
+# If you want to create the monitoring histograms (recommended in the beginning of your analysis), just provide any argument
+monitoring = False
+if len(sys.argv) == 1:
+    basf2.B2WARNING("In the beginning of an analysis it is recommended to study the monitoring histograms.\n"
+                    "These tell you if the conversion works as expected.\n"
+                    "If you want to create them, just provide any argument to this skript.")
+else:
+    monitoring = True
+
 print('BELLE2_EXTERNALS_DIR     = ' + str(os.getenv('BELLE2_EXTERNALS_DIR')))
 print('BELLE2_EXTERNALS_SUBDIR  = ' + str(os.getenv('BELLE2_EXTERNALS_SUBDIR')))
 print('BELLE2_EXTERNALS_OPTION  = ' + str(os.getenv('BELLE2_EXTERNALS_OPTION')))
@@ -36,8 +45,7 @@ inputfile = basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.md
 convertBelleMdstToBelleIIMdst(inputfile, path=mypath)
 
 # Reconstruct
-# If you want to create the monitoring histograms (recommended in the beginning of your analysis), just provide any argument
-if len(sys.argv) == 2:
+if monitoring:
     # Create monitoring histograms if requested
     addBeamParamsConversionMonitors(path=mypath)
     addTrackConversionMonitors(path=mypath)

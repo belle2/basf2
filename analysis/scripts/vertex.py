@@ -13,6 +13,7 @@ def fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
+    smearing=0.002,
     path=None,
 ):
     """
@@ -33,6 +34,7 @@ def fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
@@ -44,7 +46,7 @@ def fitVertex(
 
     B2WARNING(warning)
 
-    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, daughtersUpdate, path)
+    _fitVertex(list_name, conf_level, decay_string, fitter, fit_type, constraint, daughtersUpdate, smearing, path)
 
 
 def _fitVertex(
@@ -55,6 +57,7 @@ def _fitVertex(
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
+    smearing=0.002,
     path=None,
 ):
     """
@@ -73,6 +76,7 @@ def _fitVertex(
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
@@ -85,6 +89,7 @@ def _fitVertex(
     pvfit.param('withConstraint', constraint)
     pvfit.param('updateDaughters', daughtersUpdate)
     pvfit.param('decayString', decay_string)
+    pvfit.param('smearing', smearing)
     path.add_module(pvfit)
 
 
@@ -93,6 +98,7 @@ def vertexKFit(
     conf_level,
     decay_string='',
     constraint='',
+    smearing=0.002,
     path=None,
 ):
     """
@@ -105,16 +111,18 @@ def vertexKFit(
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str): select particles used for the vertex fit
         constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
+        smearing (float) :  IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'vertex', constraint, False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'vertex', constraint, False, smearing, path)
 
 
 def vertexKFitDaughtersUpdate(
     list_name,
     conf_level,
     constraint='',
+    smearing=0.002,
     path=None,
 ):
     """
@@ -126,10 +134,11 @@ def vertexKFitDaughtersUpdate(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         constraint (str):   add aditional constraint to the fit (valid options are ipprofile or iptube)
+        smearing (float) :  IP tube width is smeared by this value (cm). meaningful only with 'iptube' constraint.
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, '', 'kfitter', 'vertex', constraint, True, path)
+    _fitVertex(list_name, conf_level, '', 'kfitter', 'vertex', constraint, True, smearing, path)
 
 
 def massVertexKFit(
@@ -150,7 +159,7 @@ def massVertexKFit(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', False, 0, path)
 
 
 def massVertexKFitDaughtersUpdate(
@@ -171,7 +180,7 @@ def massVertexKFitDaughtersUpdate(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', True, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'massvertex', '', True, 0, path)
 
 
 def massKFit(
@@ -192,7 +201,7 @@ def massKFit(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', False, 0, path)
 
 
 def massKFitDaughtersUpdate(
@@ -213,7 +222,7 @@ def massKFitDaughtersUpdate(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', True, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'mass', '', True, 0, path)
 
 
 def fourCKFit(
@@ -234,7 +243,7 @@ def fourCKFit(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', False, 0, path)
 
 
 def fourCKFitDaughtersUpdate(
@@ -255,7 +264,7 @@ def fourCKFitDaughtersUpdate(
         path (basf2.Path):  modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', True, path)
+    _fitVertex(list_name, conf_level, decay_string, 'kfitter', 'fourC', '', True, 0, path)
 
 
 def vertexRave(
@@ -309,7 +318,7 @@ def vertexRave(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'vertex', constraint, False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'rave', 'vertex', constraint, False, 0, path)
 
 
 def vertexRaveDaughtersUpdate(
@@ -429,7 +438,7 @@ def massVertexRave(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', False, 0, path)
 
 
 def massVertexRaveDaughtersUpdate(
@@ -479,7 +488,7 @@ def massVertexRaveDaughtersUpdate(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', True, path)
+    _fitVertex(list_name, conf_level, decay_string, 'rave', 'massvertex', '', True, 0, path)
 
 
 def massRave(
@@ -530,7 +539,7 @@ def massRave(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', 'mass', '', False, path)
+    _fitVertex(list_name, conf_level, decay_string, 'rave', 'mass', '', False, 0, path)
 
 
 def vertexTree(

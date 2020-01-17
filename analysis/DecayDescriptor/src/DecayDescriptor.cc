@@ -34,7 +34,8 @@ DecayDescriptor::DecayDescriptor() :
   m_isIgnoreMassive(false),
   m_isIgnoreNeutrino(false),
   m_isIgnoreGamma(false),
-  m_isNULL(false)
+  m_isNULL(false),
+  m_isInitOK(false)
 {
 }
 
@@ -57,16 +58,16 @@ bool DecayDescriptor::init(const DecayString& s)
   // b) DecayStringDecay
 
   if (const DecayStringParticle* p = boost::get< DecayStringParticle >(&s)) {
-    bool isInitOK = m_mother.init(*p);
-    if (!isInitOK) {
+    m_isInitOK = m_mother.init(*p);
+    if (!m_isInitOK) {
       B2WARNING("Could not initialise mother particle " << p->m_strName);
       return false;
     }
     return true;
   } else if (const DecayStringDecay* d = boost::get< DecayStringDecay > (&s)) {
     // Initialise list of mother particles
-    bool isInitOK = m_mother.init(d->m_mother);
-    if (!isInitOK) {
+    m_isInitOK = m_mother.init(d->m_mother);
+    if (!m_isInitOK) {
       B2WARNING("Could not initialise mother particle " << d->m_mother.m_strName);
       return false;
     }
@@ -89,16 +90,20 @@ bool DecayDescriptor::init(const DecayString& s)
       m_isIgnoreIntermediate = false;
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
+      m_isInitOK = false;
       return false;
     }
 
     // Initialise list of daughters
-    if (d->m_daughters.empty()) return false;
+    if (d->m_daughters.empty()) {
+      m_isInitOK = false;
+      return false;
+    }
     int nDaughters = d->m_daughters.size();
     for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
       DecayDescriptor daughter;
-      isInitOK = daughter.init(d->m_daughters[iDaughter]);
-      if (!isInitOK) {
+      m_isInitOK = daughter.init(d->m_daughters[iDaughter]);
+      if (!m_isInitOK) {
         B2WARNING("Could not initialise daughter!");
         return false;
       }
@@ -121,6 +126,7 @@ bool DecayDescriptor::init(const DecayString& s)
 
     return true;
   }
+  m_isInitOK = false;
   return false;
 }
 

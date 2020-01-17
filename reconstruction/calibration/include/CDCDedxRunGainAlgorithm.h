@@ -95,10 +95,19 @@ namespace Belle2 {
     }
 
     /**
+    * function to decide merge vs relative gains
+    */
+    void setMergePayload(bool value = true) {isMergePayload = value;}
+
+    /**
+    * function to  store new payload after full calibration
+    */
+    void generateNewPayloads(double RunGainConst);
+
+    /**
     * function to make flag active for plotting
     */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
-
 
   protected:
 
@@ -114,9 +123,10 @@ namespace Belle2 {
     std::string m_badRunFName; /**< name of bad run file */
     bool isRmBadruns; /**< if bad runs consideration */
     bool isMakePlots; /**< produce plots for status */
-
+    bool isMergePayload; /**< merge payload at the of calibration */
     std::vector<int> listofbadruns; /**< vector of bad ru list */
     std::vector<double> rmeanOfbadrun; /**< vector of runing avg mean*/
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
 
   };

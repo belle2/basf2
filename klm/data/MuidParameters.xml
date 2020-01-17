@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This is the index file for the muon-identification PDFs by experiment number -->
+<!--DIVOT:  Only experiment #0 is present and used for all experiments -->
+<MuidParameters xmlns:xi="http://www.w3.org/2001/XInclude">
+  <!--xi:include href="../klm/MuidParameters_e000000.xml"/> -->
+</MuidParameters>

@@ -192,7 +192,7 @@ int ECLDigitizerModule::shapeSignals()
 
   // add only background hits
   for (const auto& hit : m_eclHits) {
-    if (hit.getBackgroundTag() == ECLHit::bg_none) continue;
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) continue;
     int j = hit.getCellId() - 1; //0~8735
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
@@ -286,7 +286,7 @@ void ECLDigitizerModule::event()
   vector<ch_t> hitmap;
   for (const auto& hit : m_eclHits) {
     int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 

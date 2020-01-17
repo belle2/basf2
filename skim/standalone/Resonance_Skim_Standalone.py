@@ -7,20 +7,19 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdMu, stdPr
-from stdPi0s import *
-from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-
-set_log_level(LogLevel.INFO)
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdMu, stdPi, stdPr
+from stdPi0s import stdPi0s
+import skimExpertFunctions as expert
+import sys
+b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-syspath = Path()
-fileList = get_test_file("mixedBGx1", "MC12")
+syspath = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=syspath)
+ma.inputMdstList('default', fileList, path=syspath)
 
 argvs = sys.argv
 argc = len(argvs)
@@ -32,15 +31,15 @@ stdPr('loose', path=syspath)
 stdPi0s('looseFit', path=syspath)
 
 
-skimCode = encodeSkimName('Resonance')
+skimCode = expert.encodeSkimName('Resonance')
 
-from skim.systematics import *
+from skim.systematics import ResonanceList
 ResonanceList = ResonanceList(path=syspath)
 
-skimOutputUdst(skimCode, ResonanceList, path=syspath)
-summaryOfLists(ResonanceList, path=syspath)
+expert.skimOutputUdst(skimCode, ResonanceList, path=syspath)
+ma.summaryOfLists(ResonanceList, path=syspath)
 
-setSkimLogging(path=syspath)
-process(syspath)
+expert.setSkimLogging(path=syspath)
+b2.process(syspath)
 
-print(statistics)
+print(b2.statistics)

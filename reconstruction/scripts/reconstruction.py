@@ -321,6 +321,7 @@ def add_cdst_output(
     calibrationBranches = [
         'RecoTracks',
         'EventT0',
+        'SVDEventInfo',
         'SVDShaperDigits',
         'SVDRecoDigits',
         'SVDClusters',
@@ -354,8 +355,8 @@ def add_cdst_output(
         'EKLMHit2ds',
         'EKLMDigits',
         'EKLMHit2dsToEKLMDigits',
-        'Muids',
-        'TracksToMuids',
+        'KLMMuidLikelihoods',
+        'TracksToKLMMuidLikelihoods',
         'TracksToARICHLikelihoods',
         'TracksToExtHits',
         'ARICHDigits',

@@ -64,6 +64,7 @@ namespace Belle2 {
 
     std::string    m_fileName;  /**< The name of the json file. */
     nlohmann::json m_json;      /**< The json object */
+    double m_basf2StartTime;    /**< the start time of basf2 */
 
     /**
      *  Constructor

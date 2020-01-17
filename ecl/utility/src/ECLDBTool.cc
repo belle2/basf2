@@ -13,8 +13,7 @@
  **************************************************************************/
 // FRAMEWORK
 #include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
+#include <framework/database/Configuration.h>
 // ECL
 #include <ecl/utility/ECLDBTool.h>
 using namespace Belle2;
@@ -34,12 +33,11 @@ ECLDBTool::~ECLDBTool()
 // Connect to a database.
 void ECLDBTool::connect() const
 {
+  auto& conf = Conditions::Configuration::getInstance();
   if (m_isLocal) {
-    LocalDatabase::reset();
-    LocalDatabase::createInstance(m_dbName.c_str());
+    conf.prependTestingPayloadLocation(m_dbName.c_str());
   } else {
-    ConditionsDatabase::reset();
-    ConditionsDatabase::createDefaultInstance(m_dbName.c_str());
+    conf.prependGlobalTag(m_dbName.c_str());
   }
 }
 // Write object and validity interval to a database.

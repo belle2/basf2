@@ -15,37 +15,43 @@ from geometry import check_components
 from rawdata import add_unpackers
 
 
-def setup_basf2_and_db():
+def setup_basf2_and_db(zmq=False):
     """
     Setup local database usage for HLT
     """
     parser = argparse.ArgumentParser(description='basf2 for online')
 
-    parser.add_argument('input_buffer_name', type=str,
-                        help='Input Ring Buffer names')
-    parser.add_argument('output_buffer_name', type=str,
-                        help='Output Ring Buffer name')
-    parser.add_argument('histo_port', type=int,
-                        help='Port of the HistoManager to connect to')
+    if zmq:
+        parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
+        parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
+        parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
+    else:
+        parser.add_argument('input_buffer_name', type=str,
+                            help='Input Ring Buffer names')
+        parser.add_argument('output_buffer_name', type=str,
+                            help='Output Ring Buffer name')
+        parser.add_argument('histo_port', type=int,
+                            help='Port of the HistoManager to connect to')
+        parser.add_argument('--input-file', type=str,
+                            help="Input sroot file, if set no RingBuffer input will be used",
+                            default=None)
+        parser.add_argument('--output-file', type=str,
+                            help="Filename for SeqRoot output, if set no RingBuffer output will be used",
+                            default=None)
+        parser.add_argument('--histo-output-file', type=str,
+                            help="Filename for histogram output",
+                            default=None)
+        parser.add_argument('--no-output',
+                            help="Don't write any output files",
+                            action="store_true", default=False)
+
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local database.txt to use for the ConditionDB",
                         default=constants.DEFAULT_DB_FILE_LOCATION)
-    parser.add_argument('--input-file', type=str,
-                        help="Input sroot file, if set no RingBuffer input will be used",
-                        default=None)
-    parser.add_argument('--output-file', type=str,
-                        help="Filename for SeqRoot output, if set no RingBuffer output will be used",
-                        default=None)
-    parser.add_argument('--histo-output-file', type=str,
-                        help="Filename for histogram output",
-                        default=None)
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
-    parser.add_argument('--no-output',
-                        help="Don't write any output files",
-                        action="store_true", default=False)
 
     args = parser.parse_args()
 
@@ -101,6 +107,23 @@ def start_path(args, location):
         path.add_module('HistoManager', histoFileName=args.histo_output_file)
 
     return path
+
+
+def start_zmq_path(args, location):
+    path = basf2.Path()
+    reco_path = basf2.Path()
+
+    if location == constants.Location.expressreco:
+        input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
+    elif location == constants.Location.hlt:
+        input_module = path.add_module("HLTZMQ2Ds", input=args.input)
+    else:
+        basf2.B2FATAL(f"Does not know location {location}")
+
+    input_module.if_value("==0", reco_path, basf2.AfterConditionPath.CONTINUE)
+    reco_path.add_module("HLTDQM2ZMQ", output=args.dqm, sendOutInterval=30)
+
+    return path, reco_path
 
 
 def add_hlt_processing(path,
@@ -276,3 +299,22 @@ def finalize_path(path, args, location, show_progress_bar=True):
         else:
             # We are storing everything on purpose!
             path.add_module("RootOutput", outputFileName=args.output_file)
+
+
+def finalize_zmq_path(path, args, location):
+    """
+    Add the required output modules for expressreco/HLT
+    """
+    save_objects = constants.ALWAYS_SAVE_OBJECTS + constants.RAWDATA_OBJECTS
+    if location == constants.Location.expressreco:
+        save_objects += constants.PROCESSED_OBJECTS
+
+    # Limit streaming objects for parallel processing
+    basf2.set_streamobjs(save_objects)
+
+    if location == constants.Location.expressreco:
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=False)
+    elif location == constants.Location.hlt:
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
+    else:
+        basf2.B2FATAL(f"Does not know location {location}")

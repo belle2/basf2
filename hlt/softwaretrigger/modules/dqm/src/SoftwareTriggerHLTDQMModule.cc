@@ -71,8 +71,9 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
     const std::string& baseIdentifier = cutIdentifier.first;
 
+    // TODO: ROOT does not like Histograms with 0 bins, so this thing produces several runtime warnings by root. Someone knowing the code should have a look
     m_cutResultHistograms.emplace(baseIdentifier,
-                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 0, 0, 0));
+                                  new TH1F(baseIdentifier.c_str(), ("Events triggered in HLT baseIdentifier " + baseIdentifier).c_str(), 1, 0, 0));
     m_cutResultHistograms[baseIdentifier]->SetXTitle(("Prescaled Cut Result for " + baseIdentifier).c_str());
     m_cutResultHistograms[baseIdentifier]->SetOption("bar");
     m_cutResultHistograms[baseIdentifier]->SetFillStyle(0);
@@ -81,14 +82,14 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   // We add one for the total result
   m_cutResultHistograms.emplace("total_result",
-                                new TH1F("total_result", "Total Result of HLT (absolute numbers)", 0, 0, 0));
+                                new TH1F("total_result", "Total Result of HLT (absolute numbers)", 1, 0, 0));
   m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
   m_cutResultHistograms["total_result"]->SetOption("bar");
   m_cutResultHistograms["total_result"]->SetFillStyle(0);
   m_cutResultHistograms["total_result"]->SetStats(false);
 
   for (const std::string& trigger : m_param_l1Identifiers) {
-    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 0, 0, 0));
+    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
     m_l1Histograms[trigger]->SetXTitle(("HLT Result for L1: " + trigger).c_str());
     m_l1Histograms[trigger]->SetOption("bar");
     m_l1Histograms[trigger]->SetFillStyle(0);
@@ -97,7 +98,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
 
   // And also one for the total numbers
   m_l1Histograms.emplace("l1_total_result",
-                         new TH1F("l1_total_result", "Events triggered in L1 (total results)", 0, 0, 0));
+                         new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
   m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
   m_l1Histograms["l1_total_result"]->SetOption("bar");
   m_l1Histograms["l1_total_result"]->SetFillStyle(0);

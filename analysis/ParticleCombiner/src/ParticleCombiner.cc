@@ -161,6 +161,63 @@ namespace Belle2 {
 
   }
 
+
+  ParticleGenerator::ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter) : m_iParticleType(0),
+    m_listIndexGenerator(),
+    m_particleIndexGenerator()
+  {
+    bool valid = decaydescriptor.isInitOK();
+    if (!valid)
+      B2ERROR("Given decaydescriptor failed to initialized");
+
+    m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
+    m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();
+    m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
+    m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
+    m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
+
+
+    // Mother particle
+    const DecayDescriptorParticle* mother = decaydescriptor.getMother();
+    m_pdgCode = mother->getPDGCode();
+    m_isUnspecified = mother->isUnspecified();
+
+    // Daughters
+    m_numberOfLists = decaydescriptor.getNDaughters();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      // Get the mother of the subdecaystring of the ith daughter
+      // eg. "B -> [D -> K pi] [tau -> pi pi pi]". The 0th daughter is the
+      // *decaystring* D -> K pi whose mother is the D.
+      const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
+      StoreObjPtr<ParticleList> list(daughter->getFullName());
+      m_plists.push_back(list);
+    }
+
+    m_cut = Variable::Cut::compile(cutParameter);
+
+    m_isSelfConjugated = decaydescriptor.isSelfConjugated();
+
+    // check if input lists can contain copies
+    // remember (list_i, list_j) pairs, where list_i and list_j can contain copies
+    m_inputListsCollide = false;
+    m_collidingLists.clear();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      const DecayDescriptorParticle* daughter_i = decaydescriptor.getDaughter(i)->getMother();
+      for (unsigned int j = i + 1; j < m_numberOfLists; ++j) {
+        const DecayDescriptorParticle* daughter_j = decaydescriptor.getDaughter(j)->getMother();
+
+        if (abs(daughter_i->getPDGCode()) != abs(daughter_j->getPDGCode()))
+          continue;
+
+        if (daughter_i->getLabel() != daughter_j->getLabel()) {
+          m_inputListsCollide = true;
+          m_collidingLists.emplace_back(i, j);
+        }
+      }
+    }
+
+  }
+
   void ParticleGenerator::init()
   {
     m_iParticleType = 0;

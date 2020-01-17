@@ -11,6 +11,5 @@
 #pragma link C++ class Belle2::NoKickRTSel+;
 #pragma link C++ class Belle2::NoKickCuts+;
 
-// #pragma link C++ class <std::pair<std::string, RootMergeable<TTree> >+;
-// #pragma link C++ class Belle2::KeyValBox<std::string, RootMergeable<TTree> >+;
-// #pragma link C++ class Belle2::MapMergeable<TreeContainer >+;
+#pragma link C++ class Belle2::SectorMapComparer+;
+

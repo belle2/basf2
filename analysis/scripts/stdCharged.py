@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2ERROR
+from modularAnalysis import fillParticleList
 
 
 # define arrays to interpret cut matrix
@@ -11,6 +11,7 @@ _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
+_mostLikelyList = 'mostlikely'
 
 
 def _stdChargedEffCuts(particletype, listtype):
@@ -41,6 +42,7 @@ def stdCharged(particletype, listtype, path):
       - 'good' high purity lists for data studies
       - 'loose' loose selections for skimming
       - 'higheff' high efficiency list with loose global ID cut for data studies
+      - 'mostlikely' list with the highest PID likelihood
     Also the following lists, which may or may not be available depending on the release
       - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
       - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
@@ -62,6 +64,12 @@ def stdCharged(particletype, listtype, path):
 
     if listtype == 'all':
         fillParticleList(particletype + '+:all', '', True, path=path)
+    elif listtype == _mostLikelyList:
+        # Here we need basic track quality cuts to be applied,
+        # otherwise, we get a lot of badly reconstructed particles,
+        # which will end up filled as a random type
+        fillParticleList(particletype + '+:'+_mostLikelyList,
+                         'pidIsMostLikely > 0 and ' + trackQuality, True, path=path)
     elif listtype == 'good':
         fillParticleList(
             particletype + '+:good',
@@ -151,3 +159,16 @@ def stdMu(listtype=_defaultlist, path=None):
     @param path         modules are added to this path
     """
     stdCharged('mu', listtype, path)
+
+
+def stdMostLikely(path=None):
+    """
+    Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
+
+    @param path         modules are added to this path
+    """
+    stdCharged('e',  _mostLikelyList, path)
+    stdCharged('mu', _mostLikelyList, path)
+    stdCharged('pi', _mostLikelyList, path)
+    stdCharged('K',  _mostLikelyList, path)
+    stdCharged('p',  _mostLikelyList, path)

@@ -105,6 +105,11 @@ namespace Belle2 {
     void importMirrorAlignment();
 
     /**
+     * Import aerogel tiles alignment parameters from ARICH-AeroTilesAlignment.xml
+     */
+    void importAeroTilesAlignment();
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight
@@ -240,6 +245,11 @@ namespace Belle2 {
      * Prints mirror alignment constants
      */
     void printMirrorAlignment();
+
+    /**
+     * Prints aerogel tiles alignment constants
+     */
+    void printAeroTilesAlignment();
 
     // DAQ classes
 

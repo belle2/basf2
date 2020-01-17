@@ -24,12 +24,14 @@ Changes since release-04
 .. Detailed changes for the analysis package first, that's
    what user will want to see
 
+.. include:: analysis/doc/whatsnew-since/release-04-01.txt
+
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 
 .. And then for framework as well. If something is more important we can always
    move it directly in here
 
-.. .. include:: framework/doc/whatsnew-since/release-04-00.txt
+.. include:: framework/doc/whatsnew-since/release-04-00.txt
 
 Changes since release-03
 ========================
@@ -134,7 +136,7 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.vertexKFit`, and similar functions) for fast/simple fits, or TreeFitter (`vertex.vertexTree`) for more complex fits and fitting the full decay chain.
+Instead we recommend you use either KFitter (`vertex.KFit`) for fast/simple fits, or TreeFitter (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 

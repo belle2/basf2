@@ -43,6 +43,7 @@
 #include <G4Sphere.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Colour.hh>
 #include <G4TwoVector.hh>
 #include <G4ThreeVector.hh>
@@ -147,6 +148,8 @@ namespace Belle2 {
       double backwardLength = geo.getQBB().getPrismEnclosure().getLength();
       double prismPosition = geo.getQBB().getPrismPosition();
 
+      G4Region* aRegion = new G4Region("TOPEnvelope");
+
       for (const auto& geoModule : geo.getModules()) {
         int moduleID = geoModule.getModuleID();
         double barLength = geoModule.getBarLength();
@@ -177,6 +180,11 @@ namespace Belle2 {
         G4Transform3D T = Rz * tr * D * T1;
         auto* module = createModule(geo, moduleID);
         std::string name = geoModule.getName();
+
+        // Set up region for production cuts
+        module->SetRegion(aRegion);
+        aRegion->AddRootLogicalVolume(module);
+
         new G4PVPlacement(T, module, name, &topVolume, false, moduleID);
       }
 

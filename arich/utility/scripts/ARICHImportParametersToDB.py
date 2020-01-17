@@ -114,3 +114,8 @@ if argc == 5:
 # Parameters are read from arich/data/ARICH-MirrorAlignment.xml
 
 # dbImporter.importMirrorAlignment()
+
+# Import aerogel tile alignment parameters
+# Parameters are read from arich/data/ARICH-AeroTilesAlignment.xml
+
+# dbImporter.importAeroTilesAlignment()

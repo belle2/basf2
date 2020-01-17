@@ -97,7 +97,7 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
   kw_initialize_(&m_cmsEnergy, m_xpar);
 
   //Initialize random number generator
-  unsigned int mar1 = gRandom->Integer(m_seed);
+  unsigned int mar1 = gRandom->Integer(m_seed); //The range for this seed seems to be [0, 900000000]
   int mar2 = 7345;
   int mar3 = 239;
   marini_(&mar1, &mar2, &mar3);

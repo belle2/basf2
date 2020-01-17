@@ -172,6 +172,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
            -1.1);
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
+  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of Mdst_evtcls", false);
 
   m_realData = false;
 
@@ -791,17 +792,19 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       convGammaPList->addParticle(newV0);
     }
     // append extra info: nisKsFinder quality indicators
-    if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
-      Belle::nisKsFinder ksnb;
-      double protIDP = atcPID(pidP, 2, 4);
-      double protIDM = atcPID(pidM, 2, 4);
-      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
-      // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
-      newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
-      newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
-      // K_S0 only
-      if (belleV0.kind() == 1)
-        newV0->addExtraInfo("ksnbStandard", ksnb.standard());
+    if (m_nisEnable) {
+      if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+        Belle::nisKsFinder ksnb;
+        double protIDP = atcPID(pidP, 2, 4);
+        double protIDM = atcPID(pidM, 2, 4);
+        ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
+        // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
+        newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
+        newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
+        // K_S0 only
+        if (belleV0.kind() == 1)
+          newV0->addExtraInfo("ksnbStandard", ksnb.standard());
+      }
     }
   }
 }

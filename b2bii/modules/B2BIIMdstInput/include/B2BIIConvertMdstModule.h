@@ -143,6 +143,8 @@ namespace Belle2 {
 
     bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
+    bool m_nisEnable; /**< Flag to switch on conversion of Evtcls table */
+
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral

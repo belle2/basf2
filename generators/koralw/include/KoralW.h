@@ -19,8 +19,6 @@
 /* C++ headers. */
 #include <string>
 
-#define NUM_XPAR 10000
-
 namespace Belle2 {
 
   /**
@@ -38,7 +36,7 @@ namespace Belle2 {
       m_seed1(900000000),
       m_seed2(10000),
       m_seed3(1000)
-    {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
+    {for (int i = 0; i < m_numXPar; i++) m_XPar[i] = 0.0;}
 
 
     /** Destructor. */
@@ -102,7 +100,9 @@ namespace Belle2 {
 
   private:
 
-    double m_xpar[NUM_XPAR];  /**< Double parameters for KoralW. */
+    static constexpr int m_numXPar = 10000; /**< Number of parameters for KoralW. */
+
+    double m_XPar[m_numXPar];  /**< Values of parameters for KoralW. */
 
     unsigned int m_seed1; /**< First seed for the random number generator. */
 

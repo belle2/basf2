@@ -53,7 +53,7 @@ extern"C" {
   } hepevt_;
 
   void kw_setdatapath_(const char* filename, size_t* length);
-  void kw_readatax_(const char* filename, size_t* length, int* reset, int* max, double* xpar);
+  void kw_readatax_(const char* filename, size_t* length, int* reset, const int* max, double* xpar);
   void kw_initialize_(double* ecm, double* xpar);
   void marini_(unsigned int* mar1, unsigned int* mar2, unsigned int* mar3);
   void rmarin_(unsigned int* mar1, unsigned int* mar2, unsigned int* mar3);
@@ -84,19 +84,18 @@ void KoralW::init(const std::string& dataPath, const std::string& userDataFile)
   kw_setdatapath_(dataPathNew.c_str(), &pathLength);
 
   //Load the default KoralW input data
-  int numXPar = NUM_XPAR;
   int reset = 1;
   const string defaultDataFile = dataPathNew + "KoralW_Default.data";
   pathLength = defaultDataFile.size();
-  kw_readatax_(defaultDataFile.c_str(), &pathLength, &reset, &numXPar, m_xpar);
+  kw_readatax_(defaultDataFile.c_str(), &pathLength, &reset, &m_numXPar, m_XPar);
 
   //Load the user KoralW input data
   reset = 0;
   pathLength = userDataFile.size();
-  kw_readatax_(userDataFile.c_str(), &pathLength, &reset, &numXPar, m_xpar);
+  kw_readatax_(userDataFile.c_str(), &pathLength, &reset, &m_numXPar, m_XPar);
 
   //Initialize KoralW
-  kw_initialize_(&m_cmsEnergy, m_xpar);
+  kw_initialize_(&m_cmsEnergy, m_XPar);
 
   //Initialize random number generator
   unsigned int mar1 = gRandom->Integer(m_seed1); //The range for this seed seems to be [0, 900000000]

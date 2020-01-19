@@ -54,6 +54,12 @@ namespace Belle2 {
       /** Set cut value for ARICH and TOP envelopes */
       void SetARICHTOPProductionCutValue(G4double);
 
+      /** Set cut value for ECL barrel, forward and backward envelopes */
+      void SetECLProductionCutValue(G4double);
+
+      /** Set cut value for BKLM and EKLM envelopes */
+      void SetKLMProductionCutValue(G4double);
+
       /** Use standard EM physics instead of EM option1 */
       void UseStandardEMPhysics(G4bool);
 
@@ -64,6 +70,10 @@ namespace Belle2 {
       void UseHighPrecisionNeutrons(G4bool);
 
     private:
+
+      /** Construct parallel particle types needed for reco */
+      void ConstructG4eParticles();
+
       /** Secondary production thresholds */
       G4double m_globalCutValue;
 
@@ -71,6 +81,8 @@ namespace Belle2 {
       G4double m_svdCutValue;
       G4double m_cdcCutValue;
       G4double m_arichtopCutValue;
+      G4double m_eclCutValue;
+      G4double m_klmCutValue;
     };
 
   } // end of namespace Simulation

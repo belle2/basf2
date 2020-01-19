@@ -19,7 +19,7 @@ import variables.utils as vu
 import stdCharged as stdc
 import variables as va
 import os
-from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 
 # Usual b2bii magic
 os.environ['PGUSER'] = 'g0db'
@@ -27,15 +27,13 @@ os.environ['BELLE_POSTGRES_SERVER'] = 'can01'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 my_path = b2.create_path()
-setupB2BIIDatabase(True)
 
 # Adding database with weight tables
 b2.use_central_database("BellePID")
 
-# More b2bii magic
-input_file = "/home/belle/zupanc/public/B2BII/mdst/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst"
-convertBelleMdstToBelleIIMdst(input_file, path=my_path)
-ma.loadGearbox(path=my_path)
+# Read in and convert Belle mdst
+inputfile = b2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
+convertBelleMdstToBelleIIMdst(inputfile, path=my_path)
 
 """
 In this example, we add information from three types of weight tables to the track.

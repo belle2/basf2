@@ -130,7 +130,7 @@ ma.reconstructDecay(decayString='B+:tag -> anti-D0:all pi+:loose',
                     dmID=1,
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B+:tag',
                 path=my_path)
 
@@ -140,7 +140,7 @@ ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
                     cut="",
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='Upsilon(4S)', path=my_path)
 
 # 5. build rest of the event

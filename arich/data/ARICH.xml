@@ -20,6 +20,7 @@
     <xi:include href="ARICH-MirrorDisplacement.xml"/>
     <xi:include href="ARICH-GlobalAlignment.xml"/>
     <xi:include href="ARICH-MirrorAlignment.xml"/>
+    <xi:include href="ARICH-AeroTilesAlignment.xml"/>
     
     <Envelope>
       <length desc="z length of ARICH envelope" unit="mm">280</length>

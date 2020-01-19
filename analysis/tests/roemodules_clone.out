@@ -2,7 +2,6 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K- (K+)
 [INFO]    -> MDST source: Tracks
@@ -29,7 +28,7 @@
 [INFO] RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: K_S0 and cut: 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: -321
 [INFO]  - ROE related to MC particle with PDG: -211

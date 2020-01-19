@@ -8,15 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KORALW_H
-#define KORALW_H
+#pragma once
 
+/* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticleGraph.h>
+
+/* ROOT headers. */
 #include <TLorentzRotation.h>
 
+/* C++ headers. */
 #include <string>
-
-#define NUM_XPAR 10000
 
 namespace Belle2 {
 
@@ -28,8 +29,14 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    KoralW() : m_crossSection(0.0), m_crossSectionError(0.0), m_cmsEnergy(0.0)
-    {for (int i = 0; i < 10000; i++) m_xpar[i] = 0.0;}
+    KoralW() :
+      m_crossSection(0.0),
+      m_crossSectionError(0.0),
+      m_cmsEnergy(0.0),
+      m_seed1(900000000),
+      m_seed2(10000),
+      m_seed3(1000)
+    {for (int i = 0; i < m_numXPar; i++) m_XPar[i] = 0.0;}
 
 
     /** Destructor. */
@@ -45,7 +52,7 @@ namespace Belle2 {
      * @param userDataFile The path and filename of the user input data file, which defines the user settings for the generator.
      * @param randomSeed The random seed for the generator.
      */
-    void init(const std::string& dataPath, const std::string& userDataFile, int randomSeed);
+    void init(const std::string& dataPath, const std::string& userDataFile);
 
     /** Generates one single event.
      * @param mcGraph Reference to the MonteCarlo graph into which the generated particles will be stored.
@@ -74,7 +81,9 @@ namespace Belle2 {
   protected:
 
     double m_crossSection;      /**< The cross section of the generated KoralW events. */
+
     double m_crossSectionError; /**< The error on the cross section of the generated KoralW events. */
+
     double m_cmsEnergy; /**< CMS Energy = 2*Ebeam [GeV]. */
 
     /** Store a single generated particle into the MonteCarlo graph.
@@ -86,17 +95,20 @@ namespace Belle2 {
      *
      * @param isInitial If the particle is a initial particle for ISR, set this to true.
      */
-
     void storeParticle(MCParticleGraph& mcGraph, const float* mom, const float* vtx, int pdg, TVector3 vertex, TLorentzRotation boost,
                        bool isVirtual = false, bool isInitial = false);
 
   private:
 
-    double m_xpar[NUM_XPAR];  /**< Double parameters for KoralW. */
+    static constexpr int m_numXPar = 10000; /**< Number of parameters for KoralW. */
+
+    double m_XPar[m_numXPar];  /**< Values of parameters for KoralW. */
+
+    unsigned int m_seed1; /**< First seed for the random number generator. */
+
+    unsigned int m_seed2; /**< Second seed for the random number generator. */
+
+    unsigned int m_seed3; /**< Third seed for the random number generator. */
 
   };
 }
-
-
-
-#endif /* KORALW_H */

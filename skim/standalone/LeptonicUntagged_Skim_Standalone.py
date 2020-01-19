@@ -10,11 +10,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdK, stdMu, stdPi
-from stdPhotons import stdPhotons, loadStdSkimPhoton
-from stdPi0s import stdPi0s, loadStdSkimPi0
-from stdV0s import stdKshorts
-from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
+from stdCharged import stdE, stdMu
 import skimExpertFunctions as expert
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -27,21 +23,8 @@ leppath = b2.Path()
 
 ma.inputMdstList('default', fileList, path=leppath)
 
-loadStdSkimPi0(path=leppath)
-loadStdSkimPhoton(path=leppath)
-stdPi('loose', path=leppath)
-stdK('loose', path=leppath)
-stdPi('all', path=leppath)
 stdE('all', path=leppath)
 stdMu('all', path=leppath)
-stdPi0s('loose', path=leppath)  # for stdCharm.py
-stdPhotons('loose', path=leppath)
-stdKshorts(path=leppath)
-
-loadStdD0(path=leppath)
-loadStdDplus(path=leppath)
-loadStdDstar0(path=leppath)
-loadStdDstarPlus(path=leppath)
 
 # SL Skim
 from skim.leptonic import LeptonicList

@@ -7,7 +7,7 @@
 #
 # B->Xll (no LFV modes) inclusive skim
 #
-# Trevor Shillington July 2019
+# Trevor Shillington December 2019
 #
 ######################################################
 
@@ -25,8 +25,8 @@ fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=path)
 
 # import standard lists
-stdE('loose', path=path)
-stdMu('loose', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
 stdPi('all', path=path)
 stdPhotons('all', path=path)
 

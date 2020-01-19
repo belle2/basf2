@@ -9,7 +9,6 @@ import os
 import uproot
 import root_pandas
 import pandas as pd
-import progressbar
 
 __author__ = "Sam Cunliffe"
 __email__ = "sam.cunliffe@desy.de"
@@ -41,8 +40,7 @@ if __name__ == "__main__":
 
     # loop over SWTRs
     sum_out = pd.DataFrame()
-    bar = progressbar.ProgressBar()
-    for fi in bar(args.input):
+    for fi in args.input:
 
         # might have swtr files with no events selected: skip these
         swtr = uproot.open(fi)["software_trigger_results"].pandas.df()

@@ -17,6 +17,11 @@ Vertex Fitting
     with the mother constrained to the beam four-momentum
     (``fit_type=fourC``).
 
+ * Added ``smearing`` parameter to `vertex.KFit`. 
+   When you perform vertex fit with IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), IP profile is smeared by the given value. 
+   The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile. 
+   Setting ``smearing=0`` gives the original `iptube` option, which is an elongated ellipsoid in boost direction.  
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

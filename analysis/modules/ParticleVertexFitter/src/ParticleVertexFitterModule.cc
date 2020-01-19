@@ -126,8 +126,6 @@ namespace Belle2 {
         ParticleVertexFitterModule::smearBeamSpot(m_smearing);
       } else {
         ParticleVertexFitterModule::findConstraintBoost(2.);
-        if (m_vertexFitter == "rave")
-          B2WARNING("ParticleVertexFitterModule: Rave does not support smeared IP tube constraint. smearing parameter is ignored.");
       }
     }
     if (m_withConstraint == "iptubecut") {  // for development purpose only

@@ -14,11 +14,11 @@ class TestStdV0(unittest.TestCase):
             std_function=stdV0s.stdKshorts,
             expected_modules=[
                 "ParticleLoader",
-                "ParticleVertexFitter",
+                "TreeFitter",
                 "ParticleSelector",
                 "ParticleLoader",
                 "ParticleCombiner",
-                "ParticleVertexFitter",
+                "TreeFitter",
                 "ParticleSelector",
                 "ParticleListManipulator"],
             expected_lists=['V0', 'all', 'RD', 'merged']):
@@ -73,14 +73,14 @@ class TestStdV0(unittest.TestCase):
     def test_stdlambdas_list(self):
         """check that the builder function works with the stdLambdas list"""
         expected_modules = ["ParticleLoader",
-                            "ParticleVertexFitter",
+                            "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleLoader",
                             "ParticleLoader",
                             "ParticleCombiner",
-                            "ParticleVertexFitter",
+                            "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
                             "ParticleSelector",
@@ -91,14 +91,14 @@ class TestStdV0(unittest.TestCase):
     def test_mergedlambdas_list(self):
         """check that the builder function works with the merged Lambdas list"""
         expected_modules = ["ParticleLoader",
-                            "ParticleVertexFitter",
+                            "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
                             "ParticleSelector",
                             "ParticleLoader",
                             "ParticleLoader",
                             "ParticleCombiner",
-                            "ParticleVertexFitter",
+                            "TreeFitter",
                             "ParticleSelector",
                             "DuplicateVertexMarker",
                             "ParticleSelector",

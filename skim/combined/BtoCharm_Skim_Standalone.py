@@ -36,30 +36,38 @@ loadStdSkimPi0(path=btocharmpath)
 loadStdSkimPhoton(path=btocharmpath)
 
 
-# B- to D(->hh)h- Skim
-from skim.btocharm import BsigToDhTohhList, loadD0bar
-loadD0bar(path=btocharmpath)
-BtoDhhhList = BsigToDhTohhList(path=btocharmpath)
-expert.add_skim('BtoDh_hh', BtoDhhhList, path=btocharmpath)
+# B+ to anti-D0(->h+h-)h+ Skim
+from skim.btocharm import BsigToD0hTohhList
+from skim.standardlists.charm import loadD0_hh_loose
 
+loadD0_hh_loose(path=btocharmpath)
+BtoD0h_hh_List = BsigToD0hTohhList(path=btocharmpath)
+expert.add_skim('BtoD0h_hh', BtoD0h_hh_List, path=btocharmpath)
 
-# B- to D(->Kshh)h- Skim
-from skim.btocharm import BsigToDhToKshhList, loadDkshh
-loadDkshh(path=btocharmpath)
-BtoDhKshhList = BsigToDhToKshhList(path=btocharmpath)
-expert.add_skim('BtoDh_Kshh', BtoDhKshhList, path=btocharmpath)
+# B+ to anti-D0(->Kshh)h+ Skim
+from skim.btocharm import BsigToD0hToKshhList
+from skim.standardlists.charm import loadD0_Kshh_loose
 
-# B- to D(->Kspi0)h- Skim
-from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
-loadDkspi0(path=btocharmpath)
-BtoDhKspi0List = BsigToDhToKspi0List(path=btocharmpath)
-expert.add_skim('BtoDh_Kspi0', BtoDhKspi0List, path=btocharmpath)
+loadD0_Kshh_loose(path=btocharmpath)
+BtoD0h_Kshh_List = BsigToD0hToKshhList(path=btocharmpath)
+expert.add_skim('BtoD0h_Kshh', BtoD0h_Kshh_List, path=btocharmpath)
 
-# B- to D(->Kspipipi0)h- Skim
-from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
-loadDkspipipi0(path=btocharmpath)
-BtoDhKspipipi0List = BsigToDhToKspipipi0List(path=btocharmpath)
-expert.add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List, path=btocharmpath)
+# B+ to anti-D0(->Kspi0)h+ Skim
+from skim.btocharm import BsigToD0hToKspi0List
+from skim.standardlists.charm import loadD0_Kspi0_loose
+
+loadD0_Kspi0_loose(path=btocharmpath)
+BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=btocharmpath)
+expert.add_skim('BtoD0h_Kspi0', BtoD0h_Kspi0_List, path=btocharmpath)
+
+# B+ to anti-D0(->Kspipipi0)h+ Skim
+from skim.btocharm import BsigToD0hToKspipipi0List
+from skim.standardlists.charm import loadD0_Kspipipi0
+
+loadD0_Kspipipi0(path=btocharmpath)
+BtoD0h_Kspipipi0_List = BsigToD0hToKspipipi0List(path=btocharmpath)
+expert.add_skim('BtoD0h_Kspipipi0', BtoD0h_Kspipipi0_List, path=btocharmpath)
+
 
 expert.setSkimLogging(path=btocharmpath)
 b2.process(path=btocharmpath)

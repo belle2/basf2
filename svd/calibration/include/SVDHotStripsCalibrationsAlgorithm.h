@@ -32,10 +32,10 @@ namespace Belle2 {
 
   private:
 
-    std::string m_id;
-    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips);
-    int m_base;
-    float m_relOccPrec;
+    std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
+    bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips); /**< returns true if the strip is hot*/
+    int m_base; /**< parameter to tune finder angorithm*/
+    float m_relOccPrec; /**< parameter to tue the finder algorithm*/
   };
 } // namespace Belle2
 

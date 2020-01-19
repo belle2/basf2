@@ -285,6 +285,11 @@ namespace Belle2 {
       // if decayString is empty, just use all primary daughters
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         const Particle* child = mother->getDaughter(ichild);
+        // This if allows to skip the daughters, which cannot be used in the fits, particularly K_L0 from KLM.
+        // Useful for fully-inclusive particles.
+        if (mother->getProperty() == Particle::PropertyFlags::c_IsUnspecified and child->getPValue() < 0) {
+          continue;
+        }
         fitChildren.push_back(child);
       }
     } else {
@@ -363,7 +368,11 @@ namespace Belle2 {
       return false;
     }
 
+    // The update of the daughters is disabled for the pi0 mass fit.
+    bool updateDaughters = m_updateDaughters;
+    m_updateDaughters = false;
     bool ok = makeKMassMother(km, pi0Temp);
+    m_updateDaughters = updateDaughters;
 
     return ok;
   }

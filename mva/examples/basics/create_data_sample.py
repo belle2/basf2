@@ -34,9 +34,9 @@ def reconstruction_path(inputfiles):
                         ' and minC2HDist > 35')],
                       path=path)
     reconstructDecay('pi0 -> gamma gamma', '0.1 < M < 1.6', path=path)
-    massVertexKFit('pi0', 0.1, path=path)
+    KFit('pi0', 0.1, fit_type='massvertex', path=path)
     reconstructDecay('D0 -> K- pi+ pi0', '1.8 < M < 1.9', path=path)
-    vertexKFit('D0', 0.1, path=path)
+    KFit('D0', 0.1, path=path)
     applyCuts('D0', '1.7 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
     return path

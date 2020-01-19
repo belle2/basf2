@@ -8,6 +8,7 @@
 #include <G4Box.hh>
 #include <G4AssemblyVolume.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4UnionSolid.hh>
 #include <G4TwoVector.hh>
 #include <G4PVReplica.hh>
@@ -109,6 +110,12 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
+
+  // Set up region for production cuts
+  G4Region* aRegion = new G4Region("ECLForwardEnvelope");
+  innervolume_logical->SetRegion(aRegion);
+  aRegion->AddRootLogicalVolume(innervolume_logical);
+
   new G4PVPlacement(gTrans, innervolume_logical, "ECLForwardPhysical", top, false, 0, overlap);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("fwd_innervolumesector_solid", -M_PI / 8, M_PI / 4, contour_in);

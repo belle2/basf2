@@ -738,7 +738,7 @@ namespace Belle2 {
       }
       CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
                                                           trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
-                                                          track2D->getValidStereoBit(), foundTime, iTracker);
+                                                          track2D->getValidStereoBit(), trkNN.sector, foundTime, iTracker);
       std::vector<float> inputVector(27, 0.);
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         inputVector[3 * iSL] = trkNN.inputID[iSL];

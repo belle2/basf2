@@ -5,6 +5,7 @@ from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, a
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
+from tracking.modules import RegisterEventLevelTrackingInfo
 
 from iov_conditional import phase_2_conditional
 
@@ -439,6 +440,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
                           to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
+    # add EventLevelTrackinginfo for logging errors
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module(RegisterEventLevelTrackingInfo())
+
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
@@ -779,6 +784,15 @@ def add_vxd_track_finding_vxdtf2(
     # Preparation
     #################
 
+    # setup the event level tracking info to log errors and stuff
+    nameTrackingInfoModule = "RegisterEventLevelTrackingInfo" + suffix
+    nameEvtInfo = "EventLevelTrackingInfo" + suffix
+    if nameTrackingInfoModule not in path:
+        # default name of the
+        registerEventlevelTrackingInfo = register_module(RegisterEventLevelTrackingInfo(nameEvtInfo))
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        path.add_module(registerEventlevelTrackingInfo)
+
     nameSPs = 'SpacePoints' + suffix
 
     pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
@@ -809,7 +823,6 @@ def add_vxd_track_finding_vxdtf2(
         spacePointArrayNames += ["PXD" + nameSPs]
 
     nameSegNet = 'SegmentNetwork' + suffix
-    nameEvtInfo = "EventLevelTrackingInfo" + suffix
 
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('NetworkOutputName', nameSegNet)
@@ -825,7 +838,6 @@ def add_vxd_track_finding_vxdtf2(
 
     # append a suffix to the storearray name
     nameSPTCs = 'SPTrackCands' + suffix
-    nameEvtInfo = "EventLevelTrackingInfo" + suffix
 
     trackFinder = register_module('TrackFinderVXDCellOMat')
     trackFinder.param('NetworkName', nameSegNet)

@@ -13,12 +13,12 @@ class RegisterEventLevelTrackingInfo(basf2.Module):
         """Contructor"""
         super(RegisterEventLevelTrackingInfo, self).__init__()
         self.set_property_flags(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
-        # name for the StoreObject to access the event level tracking information
+        #: name for the StoreObject to access the event level tracking information
         self.m_eventLevelTrackingInfoName = m_eventLevelTrackingInfoName
 
     def initialize(self):
         """ Register the StoreObj on the DataStore"""
-        # StoreObject to access the event level tracking information
+        #: StoreObject to access the event level tracking information
         self.m_eventLevelTrackingInfo = Belle2.PyStoreObj(Belle2.EventLevelTrackingInfo.Class(), self.m_eventLevelTrackingInfoName)
         self.m_eventLevelTrackingInfo.registerInDataStore()
 

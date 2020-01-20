@@ -365,12 +365,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     if not is_svd_used(components):
         return
 
-    # register EventTrackingInfo
-    if 'RegisterEventLevelTrackingInfoForPXDDataReduction' not in path:
-        registerEventlevelTrackingInfo = register_module(RegisterEventLevelTrackingInfo("EventLevelTrackingInfo__ROI"))
-        registerEventlevelTrackingInfo.set_name('RegisterEventLevelTrackingInfoForPXDDataReduction')
-        path.add_module(registerEventlevelTrackingInfo)
-
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
         material_effects = register_module('SetupGenfitExtrapolation')
@@ -379,7 +373,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
         path.add_module(material_effects)
 
     # SET StoreArray names
-
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
@@ -387,8 +380,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-
-    # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)

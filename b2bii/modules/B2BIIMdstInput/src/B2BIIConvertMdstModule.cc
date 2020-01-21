@@ -195,6 +195,8 @@ void B2BIIConvertMdstModule::initialize()
   else
     B2FATAL("Unknown MC matching mode: " << m_mcMatchingModeString);
   B2INFO("B2BIIConvertMdst: initialized.");
+  if (!m_nisEnable)
+    B2WARNING("nisKsFinder output has been disabled. ksnbVLike, ksnbNoLam, ksnbStandard will not be converted.");
 }
 
 void B2BIIConvertMdstModule::initializeDataStore()
@@ -805,8 +807,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         if (belleV0.kind() == 1)
           newV0->addExtraInfo("ksnbStandard", ksnb.standard());
       }
-    } else {
-      B2WARNING("nisKsFinder output has been disabled. ksnbVLike, ksnbNoLam, ksnbStandard will not be converted.");
     }
   }
 }

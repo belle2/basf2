@@ -172,7 +172,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
            -1.1);
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
-  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", false);
+  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
 
   m_realData = false;
 
@@ -805,6 +805,8 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         if (belleV0.kind() == 1)
           newV0->addExtraInfo("ksnbStandard", ksnb.standard());
       }
+    } else {
+      B2WARNING("nisKsFinder output has been disabled. ksnbVLike, ksnbNoLam, ksnbStandard will not be converted.");
     }
   }
 }

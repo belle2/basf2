@@ -196,12 +196,11 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLM::unpackRawData(copper, hslb + 1, rawData, &raw,
                      &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
+  int moduleId, layer;
   BKLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
   detectorChannel =
     m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
-  int moduleId = *detectorChannel;
-  int layer = BKLMElementNumbers::getLayerByModule(moduleId);
   if (detectorChannel == nullptr) {
     B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
             << LogVar("Copper", copper)
@@ -218,30 +217,37 @@ void KLMUnpackerModule::unpackBKLMDigit(
     detectorChannel = m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
     if (detectorChannel == nullptr)
       return;
-    // increase by 1 the event-counter of outOfRange-flagged hits
-    klmDigitEventInfo->increaseOutOfRangeHits();
-
-    // store the digit in the appropriate dataobject
     moduleId = *detectorChannel;
-    BKLMDigitOutOfRange* bklmDigitOutOfRange =
-      m_bklmDigitOutOfRanges.appendNew(
-        moduleId, raw.ctime, raw.tdc, raw.charge);
-    if (m_WriteDigitRaws)
-      bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-    bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
+    if (m_WriteWrongHits) {
+      // increase by 1 the event-counter of outOfRange-flagged hits
+      klmDigitEventInfo->increaseOutOfRangeHits();
 
-    std::string message = "channel number is out of range";
-    m_rejected[message] += 1;
-    m_rejectedCount++;
-    B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
-            << LogVar("Channel", raw.channel));
+      // store the digit in the appropriate dataobject
+      BKLMDigitOutOfRange* bklmDigitOutOfRange =
+        m_bklmDigitOutOfRanges.appendNew(
+          moduleId, raw.ctime, raw.tdc, raw.charge);
+      if (m_WriteDigitRaws)
+        bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
 
-    if (!m_DebugBKLMScintillators)
+      std::string message = "channel number is out of range";
+      m_rejected[message] += 1;
+      m_rejectedCount++;
+      B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
+              << LogVar("Channel", raw.channel));
       return;
+    }
     layer = BKLMElementNumbers::getLayerByModule(moduleId);
     if (layer >= BKLMElementNumbers::c_FirstRPCLayer)
       return;
     BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+  } else {
+    moduleId = *detectorChannel;
+    layer = BKLMElementNumbers::getLayerByModule(moduleId);
+    if (m_DebugBKLMScintillators) {
+      if (layer < BKLMElementNumbers::c_FirstRPCLayer)
+        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+    }
   }
 
   if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))

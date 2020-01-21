@@ -40,6 +40,9 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
+// Long lived
+#include "simulation/longlivedneutral/G4LongLivedNeutralPhysics.h"
+
 #define g4ePDGcode 0
 
 using namespace Belle2;
@@ -370,3 +373,9 @@ void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
 }
 
 
+void Belle2PhysicsList::UseLongLivedNeutralParticles(G4int pdg, G4double mass)
+{
+  G4LongLivedNeutralPhysics* pLongLivedNeutral = new G4LongLivedNeutralPhysics(pdg, mass);
+  RegisterPhysics(pLongLivedNeutral);
+  pLongLivedNeutral->ConstructParticle();
+}

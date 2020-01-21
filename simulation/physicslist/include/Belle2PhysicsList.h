@@ -69,6 +69,9 @@ namespace Belle2 {
       /** Use high precision neutron models below 20 MeV */
       void UseHighPrecisionNeutrons(G4bool);
 
+      /** Simulate neutral long-lived particles with given pdg and mass value */
+      void UseLongLivedNeutralParticles(G4int, G4double);
+
     private:
 
       /** Construct parallel particle types needed for reco */
@@ -83,6 +86,8 @@ namespace Belle2 {
       G4double m_arichtopCutValue;
       G4double m_eclCutValue;
       G4double m_klmCutValue;
+
+      G4bool m_longLivedNeutrals;
     };
 
   } // end of namespace Simulation

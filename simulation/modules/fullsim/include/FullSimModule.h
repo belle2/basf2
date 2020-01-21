@@ -136,7 +136,9 @@ namespace Belle2 {
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
-
+    bool m_LongLivedNeutral;               /**< If set to true, simulate long-lived neutral particles. Set mass and pdg values for each new particle. */
+    std::vector<int> m_LongLivedPdg;       /**< PDG values of added long-lived neutral particles to be simulated.  */
+    std::vector<double> m_LongLivedMass;     /**< Mass values of added long-lived neutral particles to be simulated in GeV.  */
 
   private:
 

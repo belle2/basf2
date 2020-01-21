@@ -32,6 +32,7 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
+#include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
@@ -137,7 +138,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0.0);
   addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
-
   vector<string> defaultCommandsAtPreInit;
   addParam("UICommandsAtPreInit", m_uiCommandsAtPreInit,
            "A list of Geant4 UI commands that should be applied at PreInit state, before the simulation starts.",
@@ -146,13 +146,20 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("UICommandsAtIdle", m_uiCommandsAtIdle,
            "A list of Geant4 UI commands that should be applied at Idle state, before the simulation starts.",
            defaultCommandsAtIdle);
-
-
   addParam("trajectoryStore", m_trajectoryStore,
            "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
+  addParam("LongLivedNeutral", m_LongLivedNeutral,
+           "If set to true, simulate long-lived neutral particles. Set mass and pdg values for each new particle.",
+           false);
+  addParam("LongLivedPdg", m_LongLivedPdg,
+           "PDG values of added long-lived neutral particles to be simulated.",
+           vector<int> {0});
+  addParam("LongLivedMass", m_LongLivedMass,
+           "Mass values of added long-lived neutral particles to be simulated in GeV.",
+           vector<double> {0});
 
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
@@ -219,6 +226,14 @@ void FullSimModule::initialize()
     physicsList->SetECLProductionCutValue(m_eclProductionCut);
     physicsList->SetKLMProductionCutValue(m_klmProductionCut);
 
+    if (m_LongLivedNeutral) {
+      if (m_LongLivedPdg.size() != m_LongLivedMass.size()) B2FATAL("PDG values and masses for long-lived neutrals not equal in size.");
+      B2DEBUG(0, "registered long-lived neutral physics.");
+      for (unsigned int llp = 0; llp < m_LongLivedPdg.size(); llp++) {
+        physicsList->UseLongLivedNeutralParticles(m_LongLivedPdg.at(llp), m_LongLivedMass.at(llp));
+      }
+    }
+
     //Apply the Geant4 UI commands in PreInit State - before initialization
     if (m_uiCommandsAtPreInit.size() > 0) {
       G4UImanager* uiManager = G4UImanager::GetUIpointer();
@@ -240,6 +255,15 @@ void FullSimModule::initialize()
     if (m_monopoles) {
       physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
+
+    if (m_LongLivedNeutral) {
+      if (m_LongLivedPdg.size() != m_LongLivedMass.size()) B2FATAL("PDG values and masses for long-lived neutrals not equal in size.");
+      B2DEBUG(0, "registered long-lived neutral physics.");
+      for (unsigned int llp = 0; llp < m_LongLivedPdg.size(); llp++) {
+        physicsList->RegisterPhysics(new G4LongLivedNeutralPhysics(m_LongLivedPdg.at(llp), m_LongLivedMass.at(llp)));
+      }
+    }
+
     physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 
     //Apply the Geant4 UI commands in PreInit State - before initialization

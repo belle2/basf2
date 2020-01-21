@@ -47,7 +47,7 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "Ignore hits with strip = 0 (normally expected for certain firmware "
            "versions).", true);
   addParam("DebugBKLMScintillators", m_DebugBKLMScintillators,
-           "Debug BKLM scintillators.", true);
+           "Debug BKLM scintillators.", false);
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);

@@ -83,9 +83,9 @@ void TimeWalkCalibrationAlgorithm::createHisto()
     tree->SetBranchStatus(brname, 1);
   }
 
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     const double xmax = halfCSize[lay] - 0.12;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)

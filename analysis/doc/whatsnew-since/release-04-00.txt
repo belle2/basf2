@@ -16,6 +16,7 @@ Variables
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`
  * Added :b2:var:`genParticleIndexOfAncestor` variable that returns :b2:var:`genParticleIndex` of the first ancestor of the given type.
+ * Added :b2:var:`firstMCAncestorOfType` variable that returns requested variable of the first gen-level ancestor of the given type.
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.

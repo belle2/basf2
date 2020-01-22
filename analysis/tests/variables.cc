@@ -3312,6 +3312,7 @@ namespace {
 
   }
 
+
   TEST_F(MetaVariableTest, varForFirstMCAncestorOfType)
   {
     DataStore::Instance().setInitializeActive(true);

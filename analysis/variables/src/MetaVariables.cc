@@ -2505,6 +2505,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
 
+
     Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -2515,6 +2516,7 @@ namespace Belle2 {
 
         if (part != nullptr) {
           pdg_code = std::abs(part->PdgCode());
+
         } else {
           try {
             pdg_code = Belle2::convertString<int>(arg);
@@ -2527,6 +2529,7 @@ namespace Belle2 {
 
         auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
           const Particle* p = particle;
+
           int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
           if ((ancestor_level <= 0) or (isnan(ancestor_level)))
           {

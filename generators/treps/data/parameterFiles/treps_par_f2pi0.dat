@@ -1,6 +1,3 @@
-  1.0           :Q2MAX( NOTAG IF NEGATIVE, KINEMATICAL MAX ASSUMED)
-  1.01     1              :ABS(COS(THETA)) CUT VALUE ( MAX VALUE )
-  0.00     1              :PT CUT VALUE ( MIN VALUE )
          2     306     1   :NUMBER OF DECAY PRODUCTS, PHYSICS AND FF MODEL  NUMBERS
        225   1.275     0.       2      0.187
        111   0.1350    0.       0        0.

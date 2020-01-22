@@ -127,8 +127,10 @@ def B0Hadronic(path):
         hadronic :math:`B^0` skim candidates.
     """
 
-    ma.applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
-
+    ma.applyCuts(
+        'B0:generic',
+        '[[Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001] or [extraInfo(decayModeID)==23 and Mbc>5.24 and abs(deltaE)<0.200]]',
+        path=path)
     B0HadronicList = ['B0:generic']
     return B0HadronicList
 
@@ -235,7 +237,10 @@ def BplusHadronic(path):
 
     # B+:generic list from FEI must already exist in path
     # Apply cuts
-    ma.applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
+    ma.applyCuts(
+        'B+:generic',
+        '(Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001) or (extraInfo(decayModeID)==25 and Mbc>5.24 and abs(deltaE)<0.200)',
+        path=path)
 
     BplusHadronicList = ['B+:generic']
     return BplusHadronicList

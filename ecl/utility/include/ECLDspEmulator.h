@@ -14,6 +14,7 @@
 
 namespace Belle2 {
   namespace ECL {
+    /** ShaperDSP fit results from _lftda function */
     typedef struct ECLShapeFit {
       /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
       int amp;

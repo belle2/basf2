@@ -283,15 +283,14 @@ void KLMDigitizerModule::event()
           m_bklmSimHitPlaneMap.insert(
             std::pair<uint16_t, const BKLMSimHit*>(plane, hit));
         } else {
-          if (hit->getBackgroundTag() != BackgroundMetaData::bg_none) {
-            channel = m_ElementNumbers->channelNumberBKLM(
-                        hit->getSection(), hit->getSector(), hit->getLayer(),
-                        hit->getPlane(), hit->getStrip());
-            if (checkActive(channel))
-              m_bklmSimHitChannelMap.insert(
-                std::pair<uint16_t, const BKLMSimHit*>(channel, hit));
-          } else
-            B2FATAL("No MCParticle is related to BKLMSimHit.");
+          B2ASSERT("The BKLMSimHit is not related to any MCParticle and it is also not a beam background hit.",
+                   hit->getBackgroundTag() != BackgroundMetaData::bg_none);
+          channel = m_ElementNumbers->channelNumberBKLM(
+                      hit->getSection(), hit->getSector(), hit->getLayer(),
+                      hit->getPlane(), hit->getStrip());
+          if (checkActive(channel))
+            m_bklmSimHitChannelMap.insert(
+              std::pair<uint16_t, const BKLMSimHit*>(channel, hit));
         }
       }
       std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2;
@@ -361,15 +360,14 @@ void KLMDigitizerModule::event()
           m_eklmSimHitPlaneMap.insert(
             std::pair<uint16_t, const EKLMSimHit*>(plane, hit));
         } else {
-          if (hit->getBackgroundTag() != BackgroundMetaData::bg_none) {
-            channel = m_ElementNumbers->channelNumberEKLM(
-                        hit->getSection(), hit->getSector(), hit->getLayer(),
-                        hit->getPlane(), hit->getStrip());
-            if (checkActive(channel))
-              m_eklmSimHitChannelMap.insert(
-                std::pair<uint16_t, const EKLMSimHit*>(channel, hit));
-          } else
-            B2FATAL("No MCParticle is related to EKLMSimHit.");
+          B2ASSERT("The EKLMSimHit is not related to any MCParticle and it is also not a beam background hit.",
+                   hit->getBackgroundTag() != BackgroundMetaData::bg_none);
+          channel = m_ElementNumbers->channelNumberEKLM(
+                      hit->getSection(), hit->getSector(), hit->getLayer(),
+                      hit->getPlane(), hit->getStrip());
+          if (checkActive(channel))
+            m_eklmSimHitChannelMap.insert(
+              std::pair<uint16_t, const EKLMSimHit*>(channel, hit));
         }
       }
       std::multimap<uint16_t, const EKLMSimHit*>::iterator it, it2;

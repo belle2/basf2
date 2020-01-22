@@ -111,6 +111,21 @@ void TrepsInputModule::event()
   int iret = m_generator.event_gen(idummy);
   m_mpg.clear();
 
+  // fill data of the initial electron and positron
+  MCParticleGraph::GraphParticle& electron = m_mpg.addParticle();
+  electron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
+  electron.setPDG(11);
+  electron.setMomentum(m_generator.getElectronMomentum());
+  electron.setMass(m_generator.me);
+  electron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getElectronMomentum().Mag2()));
+
+  MCParticleGraph::GraphParticle& positron = m_mpg.addParticle();
+  positron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
+  positron.setPDG(-11);
+  positron.setMomentum(m_generator.getPositronMomentum());
+  positron.setMass(m_generator.me);
+  positron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getPositronMomentum().Mag2()));
+
   if (iret >= 1) {
 
     const Part_gen* part = m_generator.partgen;

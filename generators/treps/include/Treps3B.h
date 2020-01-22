@@ -75,6 +75,14 @@ namespace Belle2 {
     {
       pfpb = p;
     }
+    TVector3 getElectronMomentum()
+    {
+      return pfeb;
+    }
+    TVector3 getPositronMomentum()
+    {
+      return pfpb;
+    }
 
     void setMaximalQ2(double q2)
     {

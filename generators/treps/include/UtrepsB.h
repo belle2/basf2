@@ -99,14 +99,15 @@ namespace Belle2 {
         if (ww < 2.3) {
           double gf = pow(qfunc(ww * ww, mm) / qfunc(mr * mr, mm), 5) *
                       d2func(qfunc(ww * ww, mm) * sr) / d2func(qfunc(mr * mr, mm) * sr);
-          dbcomplex  imagu = dbcomplex(0.0, 1.0);
-          dbcomplex  rbr = sqrt(40.*3.14159 * mr / ww * ggg * gtot * br) * gf /
-                           ((-ww * ww + mr * mr) - imagu * mr * gtot * gf) *
-                           sqrt(389000.);
+
+          std::complex<double> imagu(0.0, 1.0);
+          std::complex<double> rbr = sqrt(40.*3.14159 * mr / ww * ggg * gtot * br) * gf /
+                                     ((-ww * ww + mr * mr) - imagu * mr * gtot * gf) *
+                                     sqrt(389000.);
           rbr = (cos(phas) + imagu * sin(phas)) * rbr;
 
           dcs2 = pow(v00 + v20 * sqrt(5.) * 0.5 * (3.*zz * zz - 1.), 2) +
-                 (v22 * v22 + 2.*v22 * rbr.real() + pow(rbr.abs(), 2)) *
+                 (v22 * v22 + 2.*v22 * rbr.real() + pow(std::abs(rbr), 2)) *
                  15. / 8.*pow(1. - zz * zz, 2)
                  + speak * 0.25 * gtot0 * gtot0 / (pow(ww - mr0, 2) + 0.25 * gtot0 * gtot0);
         } else {
@@ -143,13 +144,14 @@ namespace Belle2 {
         if (ww < 2.4) {
           double gf = pow(qfunc(ww * ww, mm) / qfunc(mr * mr, mm), 5) *
                       d2func(qfunc(ww * ww, mm) * sr) / d2func(qfunc(mr * mr, mm) * sr);
-          dbcomplex  imagu = dbcomplex(0.0, 1.0);
-          dbcomplex  rbr = sqrt(40.*3.14159 * mr / ww * ggg * gtot * br) * gf /
-                           ((-ww * ww + mr * mr) - imagu * mr * gtot * gf) *
-                           sqrt(389000.);
+
+          std::complex<double> imagu(0.0, 1.0);
+          std::complex<double> rbr = sqrt(40.*3.14159 * mr / ww * ggg * gtot * br) * gf /
+                                     ((-ww * ww + mr * mr) - imagu * mr * gtot * gf) *
+                                     sqrt(389000.);
 
           dcs2 = s00 + s20 * pow(sqrt(5.) * 0.5 * (3.*zz * zz - 1.), 2) +
-                 (s22 + pow(rbr.abs(), 2)
+                 (s22 + pow(std::abs(rbr), 2)
                   + speak * 0.25 * gtotfa * gtotfa / (pow(ww - mrfa, 2) + 0.25 * gtotfa * gtotfa)) *
                  15. / 8.*pow(1. - zz * zz, 2) ;
         } else {

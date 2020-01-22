@@ -3312,7 +3312,7 @@ namespace {
 
   }
 
-  TEST_F(MetaVariableTest, firstMCAncestorOfType)
+  TEST_F(MetaVariableTest, varForFirstMCAncestorOfType)
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<MCParticle> mcParticles;
@@ -3434,7 +3434,7 @@ namespace {
     not_child->addRelationTo(mc_not_child);
 
     // All pions should have common D mother
-    const Manager::Var* var_d = Manager::Instance().getVariable("firstMCAncestorOfType(D0, mdstIndex)");
+    const Manager::Var* var_d = Manager::Instance().getVariable("varForFirstMCAncestorOfType(D0, mdstIndex)");
     ASSERT_NE(var_d, nullptr);
     EXPECT_TRUE(var_d->function(D_gd_0_0) >= 0);
     EXPECT_FLOAT_EQ(var_d->function(D_gd_0_0), var_d->function(D_gd_0_1));
@@ -3446,7 +3446,7 @@ namespace {
 
 
     // // All but they have differnt K0s mothers
-    const Manager::Var* var_310 = Manager::Instance().getVariable("firstMCAncestorOfType(310, mdstIndex)");
+    const Manager::Var* var_310 = Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, mdstIndex)");
     ASSERT_NE(var_310, nullptr);
     EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
     EXPECT_FLOAT_EQ(var_310->function(D_gd_1_0), var_310->function(D_gd_1_1));
@@ -3454,7 +3454,7 @@ namespace {
     EXPECT_NE(var_310->function(D_gd_0_1), var_310->function(D_gd_1_1));
     EXPECT_TRUE(std::isnan(var_310->function(not_child)));
     EXPECT_TRUE(std::isnan(var_310->function(not_child_2)));
-    EXPECT_FLOAT_EQ(int(Manager::Instance().getVariable("firstMCAncestorOfType(310, E)")->function(D_gd_0_0)), 10);
+    EXPECT_FLOAT_EQ(int(Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, E)")->function(D_gd_0_0)), 10);
   }
 
   TEST_F(MetaVariableTest, isDescendantOfList)

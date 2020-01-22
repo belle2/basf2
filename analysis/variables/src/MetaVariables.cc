@@ -2505,7 +2505,7 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
 
-    Manager::FunctionPtr firstMCAncestorOfType(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
         int pdg_code = -1;
@@ -2515,24 +2515,20 @@ namespace Belle2 {
 
         if (part != nullptr) {
           pdg_code = std::abs(part->PdgCode());
-        }
-
-        if (pdg_code == -1) {
+        } else {
           try {
             pdg_code = Belle2::convertString<int>(arg);
           } catch (std::exception& e) {}
         }
 
         if (pdg_code == -1) {
-          B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code from or particle name.");
+          B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
         }
 
         auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
           const Particle* p = particle;
           const MCParticle* i_p;
-          try{
-            i_p = p->getMCParticle();
-          } catch (std::exception& e) {}
+          i_p = p->getMCParticle();
 
           if (i_p == nullptr)
           {
@@ -2542,10 +2538,7 @@ namespace Belle2 {
           while (true)
           {
             const MCParticle* mother;
-            try {
-              mother = i_p->getMother();
-            } catch (std::exception& e) {}
-
+            mother = i_p->getMother();
             if (mother == nullptr) {
               return std::numeric_limits<float>::quiet_NaN();
             }
@@ -2560,7 +2553,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function firstMCAncestorOfType (expected 2: type and variable of interest)");
+        B2FATAL("Wrong number of arguments for meta function varForFirstMCAncestorOfType (expected 2: type and variable of interest)");
       }
     }
 
@@ -2932,7 +2925,8 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
 )DOC");
-    REGISTER_VARIABLE("firstMCAncestorOfType(type, variable)",firstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.)DOC")
+    REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC")
 
   }
 }

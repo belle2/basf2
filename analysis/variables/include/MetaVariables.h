@@ -438,7 +438,7 @@ namespace Belle2 {
     /**
      * Returns variable of particle's gen-level ancestor of given type
      */
-    Manager::FunctionPtr firstMCAncestorOfType(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments);
 
   }
 }

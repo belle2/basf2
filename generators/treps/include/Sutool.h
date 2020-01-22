@@ -21,7 +21,6 @@
 #include<TLorentzVector.h>
 #include<TVector3.h>
 #include <fstream>
-using namespace std;
 
 #ifndef PACKAGE_SUTOOL_H_INCLUDED
 #define PACKAGE_SUTOOL_H_INCLUDED
@@ -37,7 +36,7 @@ namespace Belle2 {
     ~Sutool() {};
 
     // member functions
-    void nextline(ifstream& infile)
+    void nextline(std::ifstream& infile)
     // skip to end of line
     {
       char s ;

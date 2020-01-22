@@ -274,6 +274,8 @@ void KLMDigitizerModule::event()
         if (hit->getStripMin() <= 0)
           continue;
         const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
+        /* We do not simulate the plane efficiency for BKLMSimHits from beam background
+         * because there are no MCParticles associated to them. */
         if (particle != nullptr) {
           uint16_t plane = m_ElementNumbers->planeNumberBKLM(
                              hit->getSection(), hit->getSector(), hit->getLayer(),
@@ -350,6 +352,8 @@ void KLMDigitizerModule::event()
       for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
         const EKLMSimHit* hit = m_eklmSimHits[i];
         const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
+        /* We do not simulate the plane efficiency for EKLMSimHits from beam background
+         * because there are no MCParticles associated to them. */
         if (particle != nullptr) {
           uint16_t plane = m_ElementNumbers->planeNumberEKLM(
                              hit->getSection(), hit->getSector(), hit->getLayer(),

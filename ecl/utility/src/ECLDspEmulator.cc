@@ -252,7 +252,11 @@ namespace Belle2 {
 
           //== Estimate t_new as t_0 - B/A
 
-          B2 = B1 >> (k_b - 13);
+          if (k_b >= 13) {
+            B2 = B1 >> (k_b - 13);
+          } else {
+            B2 = B1 << (13 - k_b);
+          }
           B2 += (A1 << 13);
           B3 = (B2 / A1);
 

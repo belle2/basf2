@@ -2527,29 +2527,21 @@ namespace Belle2 {
 
         auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
           const Particle* p = particle;
-          const MCParticle* i_p;
-          i_p = p->getMCParticle();
-
-          if (i_p == nullptr)
+          int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
+          if ((ancestor_level <= 0) or (isnan(ancestor_level)))
           {
             return std::numeric_limits<float>::quiet_NaN();
           }
 
-          while (true)
-          {
-            const MCParticle* mother;
-            mother = i_p->getMother();
-            if (mother == nullptr) {
-              return std::numeric_limits<float>::quiet_NaN();
-            }
+          const MCParticle* i_p;
+          i_p = p->getMCParticle();
 
-            if (std::abs(mother->getPDG()) == std::abs(pdg_code)) {
-              const Particle* m_p = new Particle(mother);
-              return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
-            }
-            i_p = mother;
+          for (int a = 0; a < ancestor_level ; a = a + 1)
+          {
+            i_p = i_p->getMother();
           }
-          return std::numeric_limits<float>::quiet_NaN();
+          const Particle* m_p = new Particle(i_p);
+          return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
         };
         return func;
       } else {

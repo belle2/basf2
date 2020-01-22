@@ -125,6 +125,18 @@ namespace Belle2 {
 
     /** Return a reference to the log variables associated with this message */
     const std::vector<LogVar>& getLogVariables() const { return m_message.getVariables(); }
+
+    struct TextHasher {
+      std::size_t operator()(const LogMessage& msg) const
+      {
+        return msg.m_logLevel ^ std::hash<std::string>()(msg.m_message.getMessage());
+      }
+      bool operator()(const LogMessage& lhs, const LogMessage& rhs) const
+      {
+        return (lhs.m_logLevel == rhs.m_logLevel) &&
+               (lhs.m_message.getMessage() == rhs.m_message.getMessage());
+      }
+    };
   private:
 
     LogConfig::ELogLevel m_logLevel; /**< The log level of the message. */
@@ -137,13 +149,7 @@ namespace Belle2 {
     int m_debugLevel;         /**< The debug level for messages with level=c_Debug */
 
     unsigned int m_logInfo;   /**< kind of information to show (ORed combination of LogConfig::ELogInfo flags). */
-
-
-    friend size_t hash(const LogMessage& msg);
   };
-  /** Calculate hash of this message, for unordered_map etc. */
-  size_t hash(const LogMessage& msg);
-
 } // end namespace Belle2
 
 /**

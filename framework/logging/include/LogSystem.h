@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2020 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 
 namespace Belle2 {
@@ -150,6 +151,20 @@ namespace Belle2 {
     inline int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getDebugLevel(); }
 
     /**
+     * Get maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    unsigned getMaxMessageRepetitions() const { return m_maxErrorRepetition; }
+
+    /**
+     * Set maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    void setMaxMessageRepetitions(unsigned repetitions) { m_maxErrorRepetition = repetitions; }
+
+    /**
      * Print error/warning summary at end of execution.
      *
      * Does nothing if m_printErrorSummary is false.
@@ -174,15 +189,26 @@ namespace Belle2 {
     void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; }
 
   private:
-    std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. (owned by us) */
-    LogConfig m_logConfig; /**< The global log system configuration. */
-    const LogConfig* m_moduleLogConfig; /**< log config of current module */
-    std::string m_moduleName;                             /**< The current module name. */
-    std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log configuration objects for packages. */
-    bool m_printErrorSummary;                             /**< Wether to re-print errors-warnings encountered during execution at the end. */
-    std::vector<LogMessage> m_errorLog;                   /**< Save errors/warnings for summary. */
-
-    int m_messageCounter[LogConfig::c_Default]; /**< Counts the number of messages sent per message level. */
+    /** Stores the pointers to the log connection objects. (owned by us) */
+    std::vector<LogConnectionBase*> m_logConnections;
+    /** The global log system configuration. */
+    LogConfig m_logConfig;
+    /** log config of current module */
+    const LogConfig* m_moduleLogConfig;
+    /** The current module name. */
+    std::string m_moduleName;
+    /** Stores the log configuration objects for packages. */
+    std::map<std::string, LogConfig> m_packageLogConfigs;
+    /** Wether to re-print errors-warnings encountered during execution at the end. */
+    bool m_printErrorSummary;
+    /** Count of previous log messages for the summary and to suppress repetitive messages */
+    std::unordered_map<LogMessage, int, LogMessage::TextHasher, LogMessage::TextHasher> m_messageLog{100};
+    /** Maximum number to show the same message. If zero we don't suppress repeated messages */
+    unsigned int m_maxErrorRepetition{0};
+    /** The amount of messages we have suppressed so far just to get an indication we print this from time to time */
+    unsigned int m_suppressedMessages{0};
+    /** Counts the number of messages sent per message level. */
+    int m_messageCounter[LogConfig::c_Default];
 
     /** The constructor is hidden to avoid that someone creates an instance of this class. */
     LogSystem();
@@ -202,6 +228,17 @@ namespace Belle2 {
      * @param logLevel The logging level which should be increased by one.
      */
     void incMessageCounter(LogConfig::ELogLevel logLevel);
+
+    /** Do nothing else than to send the message to all connected connections. No bookkeeping, just and and be done */
+    bool deliverMessageToConnections(const LogMessage& msg);
+
+    /** Send a custom message which looks like a log message but should not be
+     * counted as such.
+     *
+     * This is used in a few places to emit descriptive messages related to
+     * other messages without danger of being suppressed
+     */
+    void showText(LogConfig::ELogLevel level, const std::string& txt, int info = LogConfig::c_Message);
   };
 
 } //end of namespace Belle2

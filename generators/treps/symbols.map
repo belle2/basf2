@@ -5,11 +5,6 @@ global:
     extern "C++" {
         Belle2::UtrepsB::*;
         Belle2::TrepsB::*;
-        Belle2::Sutool::*;
-        Belle2::Intreps::*;
-        Belle2::Part_cont::*;
-        Belle2::Part_gen::*;
-	Belle2::dbcomplex::*;
     };
 local:
     *;

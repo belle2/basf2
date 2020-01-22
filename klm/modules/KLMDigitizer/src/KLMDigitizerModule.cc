@@ -18,6 +18,7 @@
 
 /* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
@@ -272,11 +273,24 @@ void KLMDigitizerModule::event()
         const BKLMSimHit* hit = m_bklmSimHits[i];
         if (hit->getStripMin() <= 0)
           continue;
-        uint16_t plane = m_ElementNumbers->planeNumberBKLM(
-                           hit->getSection(), hit->getSector(), hit->getLayer(),
-                           hit->getPlane());
-        m_bklmSimHitPlaneMap.insert(
-          std::pair<uint16_t, const BKLMSimHit*>(plane, hit));
+        const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
+        if (particle != nullptr) {
+          uint16_t plane = m_ElementNumbers->planeNumberBKLM(
+                             hit->getSection(), hit->getSector(), hit->getLayer(),
+                             hit->getPlane());
+          m_bklmSimHitPlaneMap.insert(
+            std::pair<uint16_t, const BKLMSimHit*>(plane, hit));
+        } else {
+          if (hit->getBackgroundTag() != BackgroundMetaData::bg_none) {
+            channel = m_ElementNumbers->channelNumberBKLM(
+                        hit->getSection(), hit->getSector(), hit->getLayer(),
+                        hit->getPlane(), hit->getStrip());
+            if (checkActive(channel))
+              m_bklmSimHitChannelMap.insert(
+                std::pair<uint16_t, const BKLMSimHit*>(channel, hit));
+          } else
+            B2FATAL("No MCParticle is related to BKLMSimHit.");
+        }
       }
       std::multimap<uint16_t, const BKLMSimHit*>::iterator it, it2;
       std::multimap<const MCParticle*, const BKLMSimHit*> particleHitMap;
@@ -289,8 +303,6 @@ void KLMDigitizerModule::event()
         while (true) {
           const BKLMSimHit* hit = it2->second;
           const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-          if (particle == nullptr)
-            B2FATAL("No MCParticle is related to BKLMSimHit.");
           particleHitMap.insert(
             std::pair<const MCParticle*, const BKLMSimHit*>(particle, hit));
           ++it2;
@@ -337,11 +349,24 @@ void KLMDigitizerModule::event()
       m_eklmSimHitPlaneMap.clear();
       for (i = 0; i < m_eklmSimHits.getEntries(); i++) {
         const EKLMSimHit* hit = m_eklmSimHits[i];
-        uint16_t plane = m_ElementNumbers->planeNumberEKLM(
-                           hit->getSection(), hit->getSector(), hit->getLayer(),
-                           hit->getPlane());
-        m_eklmSimHitPlaneMap.insert(
-          std::pair<uint16_t, const EKLMSimHit*>(plane, hit));
+        const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
+        if (particle != nullptr) {
+          uint16_t plane = m_ElementNumbers->planeNumberEKLM(
+                             hit->getSection(), hit->getSector(), hit->getLayer(),
+                             hit->getPlane());
+          m_eklmSimHitPlaneMap.insert(
+            std::pair<uint16_t, const EKLMSimHit*>(plane, hit));
+        } else {
+          if (hit->getBackgroundTag() != BackgroundMetaData::bg_none) {
+            channel = m_ElementNumbers->channelNumberEKLM(
+                        hit->getSection(), hit->getSector(), hit->getLayer(),
+                        hit->getPlane(), hit->getStrip());
+            if (checkActive(channel))
+              m_eklmSimHitChannelMap.insert(
+                std::pair<uint16_t, const EKLMSimHit*>(channel, hit));
+          } else
+            B2FATAL("No MCParticle is related to EKLMSimHit.");
+        }
       }
       std::multimap<uint16_t, const EKLMSimHit*>::iterator it, it2;
       std::multimap<const MCParticle*, const EKLMSimHit*> particleHitMap;
@@ -354,8 +379,6 @@ void KLMDigitizerModule::event()
         while (true) {
           const EKLMSimHit* hit = it2->second;
           const MCParticle* particle = hit->getRelatedFrom<MCParticle>();
-          if (particle == nullptr)
-            B2FATAL("No MCParticle is related to EKLMSimHit.");
           particleHitMap.insert(
             std::pair<const MCParticle*, const EKLMSimHit*>(particle, hit));
           ++it2;

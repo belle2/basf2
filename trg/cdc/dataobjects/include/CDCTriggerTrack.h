@@ -108,7 +108,7 @@ namespace Belle2 {
     /** store value for used expert network */
     int m_expert;
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 6);
+    ClassDef(CDCTriggerTrack, 7);
   };
 }
 #endif

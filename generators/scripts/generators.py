@@ -559,4 +559,9 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         DifferentialCrossSectionFile=differentialCrossSectionFile,
         WListTableFile=wListTableFile,
         UseDiscreteAndSortedW=useDiscreteAndSortedW,
-    )
+        MaximalQ2=1.0,
+        MaximalAbsCosTheta=1.01,
+        ApplyCosThetaCutCharged=True,
+        MinimalTransverseMomentum=0,
+        ApplyTransverseMomentumCutCharged=True,
+        )

@@ -76,6 +76,41 @@ namespace Belle2 {
       pfpb = p;
     }
 
+    void setMaximalQ2(double q2)
+    {
+      q2max = q2;
+    }
+    void setMaximalAbsCosTheta(double cost)
+    {
+      cost_cut = cost;
+    }
+    void applyCosThetaCutCharged(bool apply)
+    {
+      if (apply) {
+        cost_flag = 1;
+        qzmin = 0.1;
+      } else {
+        cost_flag = 0;
+        qzmin = -0.1;
+      }
+    }
+    void setMinimalTransverseMomentum(double pt)
+    {
+      pt_cut = pt;
+    }
+    void applyTransverseMomentumCutCharged(bool apply)
+    {
+      if (apply) {
+        pt_flag = 1;
+        qptmin = 0.1;
+      } else {
+        pt_flag = 0;
+        qptmin = -0.1;
+      }
+    }
+
+
+
     void initp(void); // initialize the generator. read parameterFile and load the parameters
     void wtable(); // read diffcrosssectionFile and load W-DifferentialCrossSection table.
     double wtable(int); // read wlistFile and load W-NumberOfEvents table.

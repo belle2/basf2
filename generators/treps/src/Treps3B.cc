@@ -73,19 +73,7 @@ namespace Belle2 {
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
-      infile >> q2max ;
-      sutool.nextline(infile);
-      infile >> cost_cut >> cost_flag ;
-      sutool.nextline(infile);
-      infile >> pt_cut >> pt_flag ;
-      std::cout << "pt_cut :" << pt_cut << std::endl;
-      qzmin = -0.1 ;
-      if (cost_flag == 1) qzmin = 0.1 ;
-      qptmin = -0.1 ;
-      if (pt_flag == 1) qptmin = 0.1 ;
-
       // read particle properties
-      sutool.nextline(infile);
       infile >> ndecay >> pmodel >> fmodel ;   //Physics model pmodel, Form factor model  added
 
       if (ndecay < 2) {
@@ -121,13 +109,8 @@ namespace Belle2 {
       TVector3 tsws = TVector3(-(pfeb + pfpb));
       double emsys = tsws4 * tsws4 - tsws.Mag2() ;
 
-      // TVector3 ppp3(ebeam * pfeb);
-      // TLorentzVector ppp(ppp3, ppp3.Mag());
-      // peb = ppp;
       peb = TLorentzVector(pfeb, pfeb.Mag());
 
-      // ppp3 = TVector3(ebeam * pfpb);
-      // ppb = TLorentzVector(ppp3, ppp3.Mag());
       ppb = TLorentzVector(pfpb, pfpb.Mag());
 
       TLorentzVector ppp = peb;

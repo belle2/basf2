@@ -75,6 +75,30 @@ namespace Belle2 {
 
     bool m_useDiscreteAndSortedW; /* if it is true, W-list table is used for discrete and sorted W */
 
+    /**
+     * Maximal Q^2 = -q^2, where q is the difference between the initial
+     * and final electron or positron momenta.
+     */
+    double m_maximalQ2;
+
+    /**
+     * Maximal |cos(theta)|, where theta is the final-state particle polar
+     * angle.
+     */
+    double m_maximalAbsCosTheta;
+
+    /** Whether to apply cut on |cos(theta)| for charged particles only. */
+    bool m_applyCosThetaCutCharged;
+
+    /** Minimal transverse momentum of the final-state particles. */
+    double m_minimalTransverseMomentum;
+
+    /**
+     * Whether to apply cut on the minimal transverse momentum for
+     * charged particles only.
+     */
+    bool m_applyTransverseMomentumCutCharged;
+
     bool m_initialized{false}; /**< True if generator has been initialized. */
 
   };

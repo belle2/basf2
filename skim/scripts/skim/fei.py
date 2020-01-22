@@ -31,7 +31,7 @@ def B0Hadronic(path):
         * **Skim description**: Hadronic :math:`B^0` tag FEI skim for
           generic analysis.
         * **Skim LFN code**: 11180100
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: feiv4_14012020_MC13_release_04_01_01_phase3
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -141,7 +141,7 @@ def BplusHadronic(path):
         * **Skim description**: Hadronic :math:`B^+` tag FEI skim for
           generic analysis.
         * **Skim LFN code**: 11180200
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: feiv4_14012020_MC13_release_04_01_01_phase3
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -296,8 +296,14 @@ def runFEIforB0Hadronic(path):
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
 
-    particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=False,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -352,8 +358,14 @@ def runFEIforBplusHadronic(path):
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
 
-    particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=False,
+        chargedB=True,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -414,8 +426,14 @@ def runFEIforHadronicCombined(path):
     # Run FEI
     b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
 
-    particles = fei.get_default_channels(neutralB=True, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=True,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -426,7 +444,7 @@ def B0SL(path):
         * **Skim description**: Semileptonic :math:`B^0` tag FEI skim
           for generic analysis.
         * **Skim LFN code**: 11180300
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: feiv4_14012020_MC13_release_04_01_01_phase3
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -518,7 +536,7 @@ def BplusSL(path):
         * **Skim description**: Semileptonic :math:`B^+` tag FEI skim
           for generic analysis.
         * **Skim LFN code**: 11180400
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: feiv4_14012020_MC13_release_04_01_01_phase3
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -662,8 +680,9 @@ def runFEIforB0SL(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -726,8 +745,9 @@ def runFEIforBplusSL(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -795,8 +815,9 @@ def runFEIforSLCombined(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -866,7 +887,8 @@ def runFEIforSkimCombined(path):
         hadronic=True,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='feiv4_14012020_MC13_release_04_01_01_phase3', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)

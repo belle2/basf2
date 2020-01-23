@@ -17,9 +17,11 @@
 #include <klm/simulation/ScintillatorSimulator.h>
 
 /* Belle 2 headers. */
-#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+/* ROOT headers. */
+#include <TRandom.h>
 
 using namespace Belle2;
 

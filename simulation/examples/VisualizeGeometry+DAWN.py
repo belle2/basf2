@@ -17,7 +17,7 @@ particlegun = main.add_module('ParticleGun')
 simulation = main.add_module('FullSim')
 
 simulation.param('EnableVisualization', True)
-simulation.param('UICommands', [
+simulation.param('UICommandsAtIdle', [
     # Use VRML2 backend
     '/vis/open DAWNFILE',
     # Draw the geometry

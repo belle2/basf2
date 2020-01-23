@@ -68,8 +68,6 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
-                                  convertECLCrystalEnergies=False,
-                                  convertExtHits=False,
                                   matchType2E9oE25Threshold=-1.1,
                                   HadronA=True, HadronB=True):
     """
@@ -142,8 +140,6 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
-    convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
-    convert.param("convertExtHits", convertExtHits)
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)

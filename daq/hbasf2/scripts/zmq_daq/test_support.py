@@ -42,6 +42,8 @@ class HLTZMQTestCase(TestCase):
         """
         #: use a temporary folder for testing
         self.test_dir = tempfile.mkdtemp()
+        #: remember current working directory
+        self.previous_dir = os.getcwd()
         os.chdir(self.test_dir)
 
         #: dict for all started programs
@@ -62,7 +64,7 @@ class HLTZMQTestCase(TestCase):
             if self._is_running(name):
                 os.killpg(process.pid, signal.SIGKILL)
             process.wait()
-
+        os.chdir(self.previous_dir)
         shutil.rmtree(self.test_dir)
 
         atexit._clear()
@@ -104,13 +106,20 @@ class HLTZMQTestCase(TestCase):
         bind or connect it to localhost and the given port.
         """
         socket = HLTZMQTestCase.ctx.socket(socket_type)
-        socket.rcvtimeo = 5000
+        socket.rcvtimeo = 10000
         socket.linger = 0
         if identity:
             socket.setsockopt_string(zmq.IDENTITY, identity)
         if bind:
-            socket.bind(f"tcp://*:{port}")
+            if port is None:
+                port = socket.bind_to_random_port("tcp://*")
+                return socket, port
+            else:
+                socket.bind(f"tcp://*:{port}")
         else:
+            if port is None:
+                raise RuntimeError("Cannot connect to unknown port")
+
             socket.connect(f"tcp://localhost:{port}")
 
         return socket
@@ -234,14 +243,30 @@ class BaseCollectorTestCase(HLTZMQTestCase):
     """
     As the collectors are mostly equal, use a common base test case class
     """
-    #: input_port
-    input_port = HLTZMQTestCase.get_free_port()
-    #: output_port
-    output_port = HLTZMQTestCase.get_free_port()
-    #: monitoring_port
-    monitoring_port = HLTZMQTestCase.get_free_port()
     #: final_collector
     final_collector = False
+
+    def setUp(self):
+        """Setup port numbers and necessary programs"""
+        #: input_port
+        self.input_port = HLTZMQTestCase.get_free_port()
+        #: output_port
+        self.output_port = HLTZMQTestCase.get_free_port()
+        #: monitoring_port
+        self.monitoring_port = HLTZMQTestCase.get_free_port()
+
+        command = "b2hlt_finalcollector" if self.final_collector else "b2hlt_collector"
+        output = "localhost" if self.final_collector else "*"
+        self.needed_programs = {
+            "collector": [
+                command,
+                "--input", f"tcp://*:{self.input_port}",
+                "--output", f"tcp://{output}:{self.output_port}",
+                "--monitor", f"tcp://*:{self.monitoring_port}"
+            ]
+        }
+        # programs are setup, call parent setup function now
+        super().setUp()
 
     def create_output_socket(self):
         """create the output socket depending if final collector or not"""

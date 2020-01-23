@@ -85,12 +85,13 @@ void TRGECLDQMModule::defineHisto()
 void TRGECLDQMModule::initialize()
 {
 
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
+
   trgeclHitArray.registerInDataStore();
   trgeclEvtArray.registerInDataStore();
   trgeclCluster.registerInDataStore();
   trgeclSumArray.registerInDataStore();
-  defineHisto();
 
 }
 

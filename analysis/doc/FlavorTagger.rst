@@ -1,3 +1,5 @@
+.. _FlavorTagger:
+
 Flavor Tagger
 ==============
 
@@ -236,9 +238,9 @@ The variable has several output values. The meaning  are the following:
     not work well at all and one could think for an instant that the flavor tagger
     is under or overestimating the dilution.
 
-The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
-accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
-neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the 
+accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched 
+:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional informations about individual categories are saved using the aliases
@@ -293,6 +295,8 @@ An example tutorial for normal use can be found under:
 
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
+Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_ 
+at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
@@ -319,6 +323,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
+If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
 
 
 Functions

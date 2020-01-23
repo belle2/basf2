@@ -362,8 +362,10 @@ namespace {
     ASSERT_EQ(output1, 1.0);
 
     /** We consider also as correctly matched those particles with the mc error flags
-    * MissFSR, MissingResonance and MissPHOTOS. 1 + 2 + 1024 = 1027. */
+    * MissFSR, MissingResonance and MissPHOTOS. 1 + 2 + 1024 = 1027,
+    * if c_isIgnoreRadiatedPhotons and c_isIgnoreIntermediate are set to the properties, 2 + 4 = 6  */
     savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, 1027);
+    savedB0->setProperty(6);
     double output2 = var -> function(savedB0);
     ASSERT_EQ(output2, 1.0);
 

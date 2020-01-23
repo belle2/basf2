@@ -29,7 +29,7 @@ def mc_gen_topo(n=200):
     Parameters:
         n (int): number of MCGenPDG_i/MCGenMothIndex_i variables.
     """
-    list_of_indexes = range(n)
+    list_of_indexes = [str(i) for i in range(n)]
     wrapper = 'genParticle({variable}, varForMCGen(PDG))'
     prefix = 'MCGenPDG'
     MCGenPDG = create_aliases(list_of_indexes, wrapper, prefix)

@@ -5,6 +5,7 @@ import ROOT
 
 import os.path
 import validationcomparison
+import validationpath
 import metaoptions
 import math
 import json
@@ -169,13 +170,19 @@ class Plotuple:
             self.contact = 'n/a'
             self.warnings.append('No Contact Person')
 
-        self.plot_folder = os.path.join(
-            "plots",
-            "_".join(self.revisions),
-            self.package
+        #: The folder in which the plots will be found. Note that this should
+        #: be relative to the ``html`` directory, because this is the string
+        #: that will be used for the JavaScript queries to get the files
+        self.plot_folder = os.path.relpath(
+            os.path.join(
+                validationpath.get_html_plots_tag_comparison_folder(
+                    work_folder, tags=revisions
+                ),
+                self.package
+            ),
+            validationpath.get_html_folder(work_folder),
         )
-        if not os.path.isdir(self.plot_folder):
-            os.makedirs(self.plot_folder)
+        os.makedirs(self.plot_folder, exist_ok=True)
 
     def has_reference(self):
         """!

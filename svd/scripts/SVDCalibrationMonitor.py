@@ -17,8 +17,9 @@ cog -> cog calibration parameters
 
 from basf2 import *
 import ROOT
-
 import argparse
+from basf2 import conditions
+
 
 parser = argparse.ArgumentParser(description="SVD Calibration Monitor")
 parser.add_argument('--exp', metavar='expNumber', dest='exp', type=int, nargs=1, help='Experiment Number')
@@ -32,18 +33,34 @@ parser.add_argument('--cluster', dest='doCluster', action='store_const', const=T
 parser.print_help()
 print('')
 args = parser.parse_args()
+RunList = args.run
+ExpList = args.exp
 
 # check the global tag first:
 # GLOBAL_TAG = "svd_Belle2_20181221"
-GLOBAL_TAG = "data_reprocessing_proc7"
 
-reset_database()
-use_database_chain()
+
+conditions.override_globaltags()
+conditions.globaltags = [
+    "svd_basic", "svd_loadedOnFADC",
+    "data_reprocessing_prompt_rel4_patchb",
+    "giulia_CDCEDepToADCConversions_rel4_patch"]
+
+myLocalDB = "run"+str(RunList[0]) + "/calibration_results/SVDOccupancyAndHotStrips/outputdb/database.txt"
+print('Your are plotting occupancy from payloads belongin to the local DB:')
+print('')
+print(myLocalDB)
+
+conditions.testing_payloads = [str(myLocalDB)]
+
+
+# TO BE USED before release 04, with previous database version:
+# reset_database()
+# use_database_chain()
 # uncomment if using a local database:
-use_local_database("localDB/database.txt", "localDB", invertLogging=True)
-use_central_database(GLOBAL_TAG)
-RunList = args.run
-ExpList = args.exp
+# use_local_database(str(myLocalDB)+"database.txt", str(myLocalDB), invertLogging=True)
+# use_local_database("localDB/database.txt", "localDB", invertLogging=True)
+# use_central_database(GLOBAL_TAG)
 
 filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"

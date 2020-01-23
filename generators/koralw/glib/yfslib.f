@@ -1773,7 +1773,7 @@ C            (NTOT2*MODCNS + NTOT) random numbers
       NOW = MODCNS
       IF (LOOP2 .EQ. NTOT2+1)  NOW=NTOT
       IF (NOW .GT. 0)  THEN
-        WRITE(6,'(A,I15)') ' MARINI SKIPPING OVER ',NOW
+CC        WRITE(6,'(A,I15)') ' MARINI SKIPPING OVER ',NOW
        DO 40 IDUM = 1, NTOT
        UNI = U(I97)-U(J97)
        IF (UNI .LT. 0.)  UNI=UNI+1.

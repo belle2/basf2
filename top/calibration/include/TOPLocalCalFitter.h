@@ -66,7 +66,7 @@ namespace Belle2 {
        *  Use MC to fit the MC sample and calculate a new set of prism corrections. No parameter is fixed, but the
        *  tail components are removed form the fit.
        */
-      void setFitMode(std::string fitterMode)
+      void setFitMode(const std::string& fitterMode)
       {
         if (fitterMode == "calibration")
           B2INFO("Fitter set to calibration mode");
@@ -98,19 +98,23 @@ namespace Belle2 {
       /** Fits the two pulsers */
       void fitPulser(TH1*, TH1*);
 
-      /**..Run algorithm on events */
+      /** Calculates the commonT0 calibration after the fits have been done.
+       *  It also saves the constants in a localDB and in the output tree
+       */
+      void calculateChennelT0();
+
+      /** Runs the algorithm on events. Currently, it always returns c_OK despite of the actual result of the fitting procedure.
+       *  This is not an issue since this moduleis not intended to be used in the automatic calibration. */
       virtual EResult calibrate() override;
 
     private:
 
-      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit*/
+      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit. Currently not used*/
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
       std::string m_fitConstraints =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the TTS parametrization*/
       std::string m_TTSData =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the Fit constraints and MC info */
-      bool m_isMonitoringFit =
-        false; /**< Set to True if you are analyzing runs with low statistics and you want to fix the fit parameters from a high-stat run*/
       std::string m_fitterMode = "calibration";/**< Fit mode. Can be 'calibration', 'monitoring' or 'MC' */
 
       TFile* m_inputTTS = nullptr; /**< File containing m_treeTTS */

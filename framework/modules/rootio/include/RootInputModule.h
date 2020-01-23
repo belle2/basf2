@@ -216,6 +216,9 @@ namespace Belle2 {
     /** Input ROOT File Cache size in MB, <0 means default */
     int m_cacheSize{0};
 
+    /** Discard events that have an error flag != 0 */
+    bool m_discardErrorEvents{true};
+
     /** Set to true if we process the input files completely: No skip events or sequences or -n parameters */
     bool m_processingAllEvents{true};
   };

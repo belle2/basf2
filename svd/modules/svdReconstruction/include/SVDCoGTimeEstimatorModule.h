@@ -79,17 +79,17 @@ namespace Belle2 {
     StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo; /**<storage for SVDEventInfo object */
 
     /** The peak time estimation */
-    float m_weightedMeanTime;
+    float m_weightedMeanTime = 0;
     /** The peak time estimation error */
-    float m_weightedMeanTimeError;
+    float m_weightedMeanTimeError = 0;
 
     /** The shaper amplitude estimation */
-    float m_amplitude;
+    float m_amplitude = 0;
     /** The shaper amplitude estimation error */
-    float m_amplitudeError;
+    float m_amplitudeError = 0;
 
     /** Chi2, to be defined here */
-    float m_chi2;
+    float m_chi2 = 0;
 
     /** Time width of a sampling */
     float DeltaT = 31.44; //ns
@@ -131,35 +131,35 @@ namespace Belle2 {
     RelationLookup m_trueRelation;
 
     /** Name of the SVDEventInfo object */
-    std::string m_svdEventInfoName;
+    std::string m_svdEventInfoName = "SVDEventInfo";
     /** Name of the collection to use for the MCParticles */
-    std::string m_storeMCParticlesName;
+    std::string m_storeMCParticlesName = "MCParticles";
     /** Name of the collection to use for the SVDTrueHits */
-    std::string m_storeTrueHitsName;
+    std::string m_storeTrueHitsName = "SVDTrueHits";
     /** Name of the collection to use for the SVDShaperDigits */
-    std::string m_storeShaperDigitsName;
+    std::string m_storeShaperDigitsName = "SVDShaperDigits";
     /** Name of the collection to use for the SVDRecoDigits */
-    std::string m_storeRecoDigitsName;
+    std::string m_storeRecoDigitsName = "SVDRecoDigits";
     /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
-    std::string m_relRecoDigitShaperDigitName;
+    std::string m_relRecoDigitShaperDigitName = "";
 
     /** Parameters for the corrections */
-    bool m_calEventT0; /**< calibration with EventT0*/
-    bool m_corrPeakTime; /**< correction of peakTime per strip from local calibrations*/
+    bool m_calEventT0 = true; /**< calibration with EventT0*/
+    bool m_corrPeakTime = true; /**< correction of peakTime per strip from local calibrations*/
 
     /** Name of the relation between SVDShaperDigits and MCParticles */
-    std::string m_relShaperDigitMCParticleName;
+    std::string m_relShaperDigitMCParticleName = "";
     /** Name of the relation between SVDShaperDigits and SVDTrueHits */
-    std::string m_relShaperDigitTrueHitName;
+    std::string m_relShaperDigitTrueHitName = "";
     /** Name of the relation between SVDRecoDigits and MCParticles */
-    std::string m_relRecoDigitMCParticleName;
+    std::string m_relRecoDigitMCParticleName = "";
     /** Name of the relation between SVDRecoDigits and SVDTrueHits */
-    std::string m_relRecoDigitTrueHitName;
+    std::string m_relRecoDigitTrueHitName = "";
 
     /** Width of the distribution of the times after having substracted the TriggerBin and the CalibrationPeakTime */
-    float m_FixedTimeError;
+    float m_FixedTimeError = 6;
     /** Approximate ADC error on each sample */
-    float m_AmplitudeArbitraryError;
+    float m_AmplitudeArbitraryError = 10;
 
     /** Function to calculate the peak time, obtained as the weighted mean of the time of the samples, weighted with the amplitude of each sample */
     float CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples);

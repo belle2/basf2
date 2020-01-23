@@ -223,12 +223,44 @@ void EKLMElementNumbers::stripNumberToElementNumbers(
   planeNumberToElementNumbers(planeGlobal, section, layer, sector, plane);
 }
 
-int EKLMElementNumbers::stripLocalNumber(int strip) const
+int EKLMElementNumbers::getSectionByGlobalStrip(int stripGlobal)
+{
+  int section, layer, sector, plane, strip;
+  stripNumberToElementNumbers(stripGlobal,
+                              &section, &layer, &sector, &plane, &strip);
+  return section;
+}
+
+int EKLMElementNumbers::getLayerByGlobalStrip(int stripGlobal)
+{
+  int section, layer, sector, plane, strip;
+  stripNumberToElementNumbers(stripGlobal,
+                              &section, &layer, &sector, &plane, &strip);
+  return layer;
+}
+
+int EKLMElementNumbers::getSectorByGlobalStrip(int stripGlobal)
+{
+  int section, layer, sector, plane, strip;
+  stripNumberToElementNumbers(stripGlobal,
+                              &section, &layer, &sector, &plane, &strip);
+  return sector;
+}
+
+int EKLMElementNumbers::getPlaneByGlobalStrip(int stripGlobal)
+{
+  int section, layer, sector, plane, strip;
+  stripNumberToElementNumbers(stripGlobal,
+                              &section, &layer, &sector, &plane, &strip);
+  return plane;
+}
+
+int EKLMElementNumbers::getStripByGlobalStrip(int stripGlobal)
 {
   static int maxStrip = getMaximalStripGlobalNumber();
-  if (strip <= 0 || strip > maxStrip)
+  if (stripGlobal <= 0 || stripGlobal > maxStrip)
     B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
-  return (strip - 1) % m_MaximalStripNumber + 1;
+  return (stripGlobal - 1) % m_MaximalStripNumber + 1;
 }
 
 int EKLMElementNumbers::getStripSoftwareByFirmware(int stripFirmware) const

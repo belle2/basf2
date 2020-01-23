@@ -1274,11 +1274,14 @@ as function of true photon energy, true photon direction and beam background lev
     | Precision: :math:`16` bit
 )DOC");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
-Returns ECL cluster's timing. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster.
-After all corrections (including Time-Of-Flight) and calibrations, photons from the interaction point (IP)
-should have a time that corresponds to the event trigger time :math:`t_{0}`
-(For MC, this is currently not simulated and such photons are designed to have a time of :math:`t = 0\,` nano second).
+Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
+Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
+cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction 
+point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the 
+time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL 
+cluster produced at the interation point in time with the event, the cluster time should be consistent with zero 
+within the uncertainties. Special values are returned if the fit for the Photon timing fails (see 
+documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
 
 .. note::
     | Please read `this <importantNoteECL>` first.

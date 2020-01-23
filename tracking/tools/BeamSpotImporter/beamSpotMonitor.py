@@ -11,6 +11,7 @@ usage:
 import basf2
 import ROOT
 import sys
+from basf2 import conditions as b2conditions
 
 if __name__ == '__main__':
 
@@ -27,10 +28,7 @@ if __name__ == '__main__':
             runList.append(int(run[1]))
             evtList.append(int(1))
 
-    basf2.reset_database()
-    basf2.use_database_chain()
-    basf2.use_central_database("data_reprocessing_prompt")
-    basf2.use_local_database(current_localDB + "/database.txt", current_localDB, invertLogging=True)
+    b2conditions.testing_payloads = [str(current_localDB) + "/database.txt"]
 
     main = basf2.create_path()
 

@@ -85,8 +85,12 @@
 
 __author__ = " Reem Rasheed"
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
+from variables import variables as vm
+vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
 
 def TCPVList(path):
@@ -115,17 +119,62 @@ def TCPVList(path):
                        'J/psi:eeLoose K*0:loose',
                        'J/psi:mumuLoose K*0:loose']
 
+    bPlustoJPsiK_Channel = ['J/psi:mumu K+:1%',
+                            'J/psi:ee K+:1%']
+
+    btoD_Channels = ['D0:Kpipipi pi+:all',
+                     'D0:Kpi pi+:all',
+                     ]
+
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):
-        reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-        applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B0:TCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        ma.applyCuts('B0:TCPV_qqs' + str(chID), 'nTracks>4', path=path)
         bd_qqs_List.append('B0:TCPV_qqs' + str(chID))
 
     bd_ccs_List = []
     for chID, channel in enumerate(bd_ccs_Channels):
-        reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
-        applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B0:TCPV_ccs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        ma.applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
         bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
-    tcpvLists = bd_qqs_List + bd_ccs_List
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims',
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims',
+                        cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+
+    ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                       allMoments=False,
+                       foxWolfram=True,
+                       harmonicMoments=False,
+                       cleoCones=False,
+                       thrust=False,
+                       collisionAxis=False,
+                       jets=False,
+                       sphericity=False,
+                       checkForDuplicates=False,
+                       path=path)
+
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
+    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
+    ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
+    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
+    ma.applyEventCuts('E_ECL<9', path=path)
+
+    bPlustoJPsiK_List = []
+    bMinustoJPsiK_List = []
+    for chID, channel in enumerate(bPlustoJPsiK_Channel):
+        ma.reconstructDecay('B+:TCPV_JPsiK' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        bPlustoJPsiK_List.append('B+:TCPV_JPsiK' + str(chID))
+        bMinustoJPsiK_List.append('B-:TCPV_JPsiK' + str(chID))
+
+    bPlustoD_List = []
+    bMinustoD_List = []
+    for chID, channel in enumerate(btoD_Channels):
+        ma.reconstructDecay('B+:TCPV_bToD' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
+        bPlustoD_List.append('B+:TCPV_bToD' + str(chID))
+        bMinustoD_List.append('B-:TCPV_bToD' + str(chID))
+
+    tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + bMinustoJPsiK_List + bMinustoD_List
     return tcpvLists

@@ -171,7 +171,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         }
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.5, m_fLandau->GetParameter(1));
+        m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
       }
 

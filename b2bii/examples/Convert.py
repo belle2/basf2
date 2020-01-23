@@ -2,34 +2,26 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sys
+import basf2
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 
-from basf2 import *
-from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
+os.environ['PGUSER'] = 'g0db'
 
-if len(sys.argv) != 3:
-    sys.exit('Must provide two input parameters: [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
-             'A small example Belle MDST file can be downloaded from '
-             'http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
-
-inputBelleMDSTFile = sys.argv[1]
-outputBelle2ROOTFile = sys.argv[2]
-
-main = create_path()
+main = basf2.create_path()
 
 # add all modules necessary to read and convert the mdst file
-convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, path=main)
+inputfile = basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
+convertBelleMdstToBelleIIMdst(inputfile, applyHadronBJSkim=True, path=main)
 
 # Store the converted Belle II dataobjects in ROOT
-output = register_module('RootOutput')
-output.param('outputFileName', outputBelle2ROOTFile)
+output = basf2.register_module('RootOutput')
+output.param('outputFileName', 'B2BII_Convert_Example.mdst.root')
 main.add_module(output)
 
 # progress
-progress = register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
-process(main)
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

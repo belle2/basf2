@@ -91,7 +91,7 @@ def getArgumentParser():
                         help='Number of events to run per sample. This input can '
                         'be any positive number, but the actual number events '
                         'run is limited to the size of the test files '
-                        '(~200,000 for MC files and ~40,000 for data files).')
+                        '(~200,000 for MC files and ~20,000 for data files).')
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')

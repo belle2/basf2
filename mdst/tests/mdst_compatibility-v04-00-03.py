@@ -12,7 +12,7 @@ CHANGES since release-04-00-03:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 - Global tags:
-  * The compatibiility tag "Legacy_IP_Information" is no longer added for
+  * The compatibility tag "Legacy_IP_Information" is no longer added for
     release 4 input files.
 """
 

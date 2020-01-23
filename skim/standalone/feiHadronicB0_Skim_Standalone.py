@@ -35,7 +35,7 @@ expert.skimOutputUdst(skimCode, B0HadronicList, path=path)
 ma.summaryOfLists(B0HadronicList, path=path)
 
 # Suppress noisy modules, and then process
-expert.setSkimLogging(path)
+expert.setSkimLogging(path, ['ParticleCombiner'])
 b2.process(path)
 
 # print out the summary

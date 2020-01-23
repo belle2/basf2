@@ -11,6 +11,9 @@ CHANGES since release-04-00-03:
 - EventLevelTrackingInfo:
   + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
   + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
+- Global tags:
+  * The compatibiility tag "Legacy_IP_Information" is no longer added for
+    release 4 input files.
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging

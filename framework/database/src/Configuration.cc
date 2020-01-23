@@ -173,20 +173,18 @@ namespace Belle2::Conditions {
     //
     // TODO: Once we're sure all files being used contain all payloads remove this.
     std::optional<std::string> youngest;
-    bool release4OrLater = false;
     for (const auto& metadata : inputMetadata) {
+      // Skip release 4 or later files.
+      const std::string& release = metadata.getRelease();
+      if (release.substr(0, 8) == "release-" and
+          release.compare(8, 2, "04", 2) >= 0)
+        continue;
+      // Otherwise, get the date of the youngest file.
       if (!youngest or * youngest > metadata.getDate()) {
         youngest = metadata.getDate();
       }
-      const char* release = metadata.getRelease().c_str();
-      if ((strncmp(release, "release-", 8) == 0) && (strlen(release) == 16)) {
-        char* end;
-        int releaseNumber = strtol(release + 8, &end, 10);
-        if ((end - release == 10) && (*end == '-'))
-          release4OrLater = (releaseNumber >= 4);
-      }
     }
-    if (youngest->compare("2019-12-31") < 0 && !release4OrLater) {
+    if (youngest and youngest->compare("2019-12-31") < 0) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }

@@ -90,6 +90,10 @@ def getArgumentParser():
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')
+    parser.add_argument('--average-over', nargs='+', default=[],
+                        choices=['skims', 'samples'],
+                        help='If this argument is given, this tool will produce stat averages over '
+                        'all given skims or all given samples. These are printed in JSON format.')
 
     sampleGroup = parser.add_mutually_exclusive_group()
     sampleGroup.add_argument('--mconly', action='store_true',
@@ -874,7 +878,7 @@ def printToJson(allSkimStats, statSpecifier):
     outputJsonName = 'skimStats.json'
     with open(outputJsonName, 'w') as outputJson:
         json.dump(allSkimStats, outputJson, indent=4)
-    print(f'\nWrote stats to JSON file {outputJsonName}.')
+    print(f'\nWrote stats to JSON file {outputJsonName}')
 
 
 def printToScreen(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLabels,
@@ -1016,6 +1020,45 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
           '(accessible via ctrl-shift-D or cmd-shift-D).')
 
 
+def printAverages(allSkimStats, skims, samples, statSpecifier, averageRequest):
+    """Produce averages for statistics over all given skims or all given samples.
+
+    Args:
+        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        skims (list): List of skims to run.
+        samples (list): List of sample labels to test on.
+        statSpecifier (dict): A nested dict specifying how each statistic should
+            be calculated and printed, as returned by ``getStatSpecifier``.
+        averageRequest (list): A list containing 'skims' or 'samples' (or both).
+            This indicates what the user wants to average over.
+    """
+    # Construct a multi-index dataframe to simplify averaging.
+    # Also replace NaN values with 0, to avoid breaking later calculations.
+    DataFrames = {key: pd.DataFrame.from_dict(value) for key, value in allSkimStats.items()}
+    df = pd.concat(DataFrames, axis=0)
+    df.fillna(value=0, inplace=True)
+
+    if "skims" in averageRequest:
+        averagedDataFrame = df.mean(level=1)
+        averagedDataFrame.replace({0: None}, inplace=True)
+        averagedDict = averagedDataFrame.T.to_dict(orient="index")
+
+        outputJsonName = "averagePerSample.json"
+        with open(outputJsonName, "w") as outputJSON:
+            json.dump(averagedDict, outputJSON, indent=4)
+        print(f"Calculated stats for each sample, averaged over all given skims. Results saved to JSON file {outputJsonName}")
+
+    if "samples" in averageRequest:
+        averagedDataFrame = df.mean(level=0)
+        averagedDataFrame.replace({0: None}, inplace=True)
+        averagedDict = averagedDataFrame.T.to_dict(orient="index")
+
+        outputJsonName = "averagePerSkim.json"
+        with open(outputJsonName, "w") as outputJSON:
+            json.dump(averagedDict, outputJSON, indent=4)
+        print(f"Calculated stats for each skim, averaged over all given samples. Results saved to JSON file {outputJsonName}")
+
+
 if __name__ == '__main__':
     parser = getArgumentParser()
     args = parser.parse_args()
@@ -1054,3 +1097,5 @@ if __name__ == '__main__':
 
     if args.json:
         printToJson(allSkimStats, statSpecifier)
+
+    printAverages(allSkimStats, skims, samples, statSpecifier, args.average_over)

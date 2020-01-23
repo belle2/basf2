@@ -241,12 +241,12 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
         if any(returnCodes):
             B2ERROR(f'An error occurred while submitting jobs for {skim} skim with script {script}.')
         else:
-            B2INFO(f'Running {script} on {nEventsPerSample} events from test samples of {", ".join(samples)}. Job IDs:\n  '
-                  '\n  '.join(jobIDs))
+            B2INFO(f'Running {script} on {nEventsPerSample} events from test samples of {", ".join(samples)}. Job IDs:\n  ' + \
+                   '\n  '.join(jobIDs))
 
     B2INFO(f'Log files will be written to {str(logDirectory)}. '
-          'Once these jobs have finished, please run `b2skim-stats-print` '
-          f'from the directory {str(logDirectory.parent)}.')
+           'Once these jobs have finished, please run `b2skim-stats-print` '
+           f'from the directory {str(logDirectory.parent)}.')
 
 
 if __name__ == '__main__':

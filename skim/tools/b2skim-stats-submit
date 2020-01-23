@@ -6,6 +6,7 @@ read by ``b2skim-stats-print``.
 """
 
 import argparse
+from functools import lru_cache
 from pathlib import Path
 import re
 import subprocess
@@ -16,9 +17,9 @@ from ROOT import PyConfig
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
 from b2test_utils import working_directory
-from basf2 import find_file, B2ERROR
+from basf2 import find_file, B2ERROR, B2INFO
 from skim.registry import skim_registry, combined_skims
-from skimExpertFunctions import get_test_file
+from skimExpertFunctions import get_test_file, get_eventN
 
 
 def getAllSamples(mcCampaign):
@@ -76,8 +77,8 @@ def getArgumentParser():
     allStandaloneSkims = [skim for _, skim in sorted(skim_registry)]
     allCombinedSkims = sorted(combined_skims.keys())
 
-    parser = argparse.ArgumentParser(description='Submits test jobs for a given set of skims, and ' +
-                                     'saves the output in a format to be read by ``b2skim-stats-print``. ' +
+    parser = argparse.ArgumentParser(description='Submits test jobs for a given set of skims, and '
+                                     'saves the output in a format to be read by ``b2skim-stats-print``. '
                                      'One or more standalone or combined skim names must be provided.',
                                      formatter_class=CustomHelpFormatter)
     parser.add_argument('-s', '--standalone', nargs='+', default=[],
@@ -86,6 +87,11 @@ def getArgumentParser():
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run.')
+    parser.add_argument('-n', type=int, default=10000, dest='nEventsPerSample',
+                        help='Number of events to run per sample. This input can '
+                        'be any positive number, but the actual number events '
+                        'run is limited to the size of the test files '
+                        '(~200,000 for MC files and ~40,000 for data files).')
     parser.add_argument('--mccampaign', default='MC12',
                         choices=['MC9', 'MC10', 'MC11', 'MC12'],
                         help='The MC campaign to test on.')
@@ -176,7 +182,7 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
         return mcSamples + dataSamples
 
 
-def submitJobs(skims, scripts, samples, nTestEvents):
+def submitJobs(skims, scripts, samples, nEventsPerSample):
     """Submit ``bsub`` jobs for each skim and for each test sample.
 
     Warns if any of the ``bsub`` submissions returned a non-zero exit code.
@@ -188,10 +194,13 @@ def submitJobs(skims, scripts, samples, nTestEvents):
             Must match with the ``skims`` argument.
         samples (list): A list of internal labels for samples to be tested.
             These are read by `skimExpertFunctions.get_test_file`.
-        nTestEvents (int): The number of events per file to run on.
+        nEventsPerSample (int): The number of events per file to run on.
     """
     logDirectory = Path('log').resolve()
     logDirectory.mkdir(parents=True, exist_ok=True)
+
+    # Set up a cache for the metadata query, to reduce number of calls
+    get_cached_eventN = lru_cache()(get_eventN)
 
     for skim, script in zip(skims, scripts):
         if not script:
@@ -215,6 +224,10 @@ def submitJobs(skims, scripts, samples, nTestEvents):
             workingDirectory = Path(logDirectory, f'{skim}_{sample}')
             workingDirectory.mkdir(exist_ok=True)
 
+            # Check that the number of events asked for doesn't exceed the number of events in the test file.
+            # Removing this may confuse the stats printer.
+            nTestEvents = min(nEventsPerSample, get_cached_eventN(sampleFile))
+
             with working_directory(workingDirectory):
                 process = subprocess.run(['bsub', '-q', 'l', '-oo', logFile, '-e', errFile,
                                           '-J', f'{skim} {sample}',
@@ -228,12 +241,13 @@ def submitJobs(skims, scripts, samples, nTestEvents):
         if any(returnCodes):
             B2ERROR(f'An error occurred while submitting jobs for {skim} skim with script {script}.')
         else:
-            print(f'Running {script} on {nTestEvents} events from test samples of {", ".join(samples)}. Job IDs:\n  ' +
+            B2INFO(f'Running {script} on {nEventsPerSample} events from test samples of {", ".join(samples)}. Job IDs:\n  '
                   '\n  '.join(jobIDs))
 
-    print(f'Log files will be written to {str(logDirectory)}. '
+    B2INFO(f'Log files will be written to {str(logDirectory)}. '
           'Once these jobs have finished, please run `b2skim-stats-print` '
           f'from the directory {str(logDirectory.parent)}.')
+
 
 if __name__ == '__main__':
     parser = getArgumentParser()
@@ -243,5 +257,4 @@ if __name__ == '__main__':
     skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
     samples = getSamplesToRun(mcSamples, dataSamples, args.mconly, args.dataonly)
 
-    nTestEvents = 10000
-    submitJobs(skims, scripts, samples, nTestEvents)
+    submitJobs(skims, scripts, samples, args.nEventsPerSample)

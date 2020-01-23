@@ -482,6 +482,8 @@ def getAllSamples(mcCampaign):
         'proc9_exp7': 'Data: proc9 exp. 7',
         'proc9_exp8': 'Data: proc9 exp. 8',
         'bucket7_exp8': 'Data: bucket7 exp. 8'
+        'proc10_exp7': 'Data: proc10 exp. 7'
+        'proc10_exp8': 'Data: proc10 exp. 8'
     }
 
     return mcSampleLabels, dataSampleLabels
@@ -1020,7 +1022,7 @@ if __name__ == '__main__':
     statSpecifier = getStatSpecifier()
     allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier, args.VERBOSE)
 
-    beamBackgrounds = ['BGx1']#,'BGx0'
+    beamBackgrounds = ['BGx1','BGx0']
     if not args.dataonly:
         allSkimStats = addWeightedMC(allSkimStats, statSpecifier, args.mccampaign, beamBackgrounds, args.VERBOSE)
 

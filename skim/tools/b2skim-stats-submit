@@ -50,7 +50,7 @@ def getAllSamples(mcCampaign):
         f'{mcCampaign}_taupairBGx0',
     ]
 
-    dataSamples = ['proc10_exp7','proc10_exp8','proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
+    dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8', 'proc10_exp7', 'proc10_exp8']
 
     return mcSamples, dataSamples
 

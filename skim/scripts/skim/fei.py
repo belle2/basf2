@@ -239,7 +239,7 @@ def BplusHadronic(path):
     # Apply cuts
     ma.applyCuts(
         'B+:generic',
-        '[[Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001] or [(extraInfo(decayModeID)==25 and Mbc>5.24 and abs(deltaE)<0.200]]',
+        '[[Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001] or [extraInfo(decayModeID)==25 and Mbc>5.24 and abs(deltaE)<0.200]]',
         path=path)
 
     BplusHadronicList = ['B+:generic']

@@ -48,14 +48,31 @@ total_input_files = [
     ('MC12_ccbarBGx0', 665),
     ('MC12_taupairBGx0', 460),
 
+
+    ('MC13_mixedBGx1', 2550),
+    ('MC13_chargedBGx1', 2700),
+    ('MC13_uubarBGx1', 8030),
+    ('MC13_ddbarBGx1', 2010),
+    ('MC13_ssbarBGx1', 1920),
+    ('MC13_ccbarBGx1', 6650),
+    ('MC13_taupairBGx1', 4600),
+    ('MC13_mixedBGx0', 510),
+    ('MC13_chargedBGx0', 540),
+    ('MC13_uubarBGx0', 1606),
+    ('MC13_ddbarBGx0', 402),
+    ('MC13_ssbarBGx0', 384),
+    ('MC13_ccbarBGx0', 1330),
+    ('MC13_taupairBGx0', 920),
+
 ]
 
 # Average number of events in test files
 nEventsPerFile = {
 
 
-    'proc10_exp7': 20152,  # this is the number of events in the data test file and not the average per file.
-    'proc10_exp8': 17974,
+    # TODO: get estimates for these
+    # 'proc10_exp7': ,
+    # 'proc10_exp8': ,
 
     'proc9_exp3': 3456,
     'proc9_exp7': 3691,

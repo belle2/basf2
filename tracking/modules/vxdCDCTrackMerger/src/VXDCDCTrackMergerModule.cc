@@ -11,8 +11,6 @@
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-
 using namespace Belle2;
 
 REG_MODULE(VXDCDCTrackMerger)

@@ -7,23 +7,23 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
-from stdPhotons import *
-from skim.standardlists.lightmesons import *
-from stdPi0s import *
-from stdV0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from skim.standardlists.lightmesons import loadStdLightMesons
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+import skimExpertFunctions as expert
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
 
-skimCode = encodeSkimName('TauLFV')
+skimCode = expert.encodeSkimName('TauLFV')
 
-taulfvskim = Path()
+taulfvskim = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=taulfvskim)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=taulfvskim)
 
 stdPi('loose', path=taulfvskim)
 stdK('loose', path=taulfvskim)
@@ -37,14 +37,14 @@ stdKshorts(path=taulfvskim)
 loadStdLightMesons(path=taulfvskim)
 
 # Tau Skim
-from skim.taupair import *
+from skim.taupair import TauLFVList
 tauList = TauLFVList(1, path=taulfvskim)
 
-skimOutputUdst(skimCode, tauList, path=taulfvskim)
-summaryOfLists(tauList, path=taulfvskim)
+expert.skimOutputUdst(skimCode, tauList, path=taulfvskim)
+ma.summaryOfLists(tauList, path=taulfvskim)
 
-setSkimLogging(path=taulfvskim)
-process(taulfvskim)
+expert.setSkimLogging(path=taulfvskim)
+b2.process(taulfvskim)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

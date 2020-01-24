@@ -10,10 +10,6 @@
 
 #include <analysis/utility/DecayForest.h>
 
-#include <framework/logging/Logger.h>
-
-#include <iostream>
-#include <sstream>
 #include <cassert>
 
 using namespace Belle2;

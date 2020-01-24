@@ -182,6 +182,7 @@ restrictions apply:
     :nodefaultconst:
     :nogroupsections:
 
+.. _b2file-remove-branches:
 
 ``b2file-remove-branches``: Create a copy of a basf2 output file removing a list of given branches in the process
 -----------------------------------------------------------------------------------------------------------------
@@ -204,6 +205,8 @@ restrictions apply:
     :prog: b2file-size
     :nodefault:
     :nogroupsections:
+
+.. _b2file-normalize:
 
 ``b2file-normalize``: Reset non-reproducible root file metadata and optionally the file name in the metadata
 ------------------------------------------------------------------------------------------------------------

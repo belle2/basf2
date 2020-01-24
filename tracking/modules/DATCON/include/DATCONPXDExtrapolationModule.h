@@ -18,11 +18,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <root/TVector2.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
-
 namespace Belle2 {
 
   /** The DATCONPXDExtrapolationModule does an extrapolation to the

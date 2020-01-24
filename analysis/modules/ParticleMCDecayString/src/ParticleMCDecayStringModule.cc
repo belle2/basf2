@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/StringWrapper.h>
-#include <analysis/utility/MCMatching.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>

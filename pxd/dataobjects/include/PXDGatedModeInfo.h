@@ -14,8 +14,6 @@
 #include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/logging/Logger.h>
-#include <memory>
-
 
 namespace Belle2 {
 

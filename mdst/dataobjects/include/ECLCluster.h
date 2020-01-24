@@ -14,7 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>

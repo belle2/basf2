@@ -10,14 +10,15 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Transform3D.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+/* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMGeometry.h>
+
+/* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Transform3D.h>
 
 /**
  * @file

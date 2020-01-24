@@ -15,13 +15,21 @@
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/TrackVariables.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <analysis/variables/ParameterVariables.h>
+#include <analysis/variables/VertexVariables.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
+
+#include <limits>
 
 namespace Belle2 {
   namespace Variable {
-
     double goodBelleKshort(const Particle* KS)
     {
       // check input
@@ -35,15 +43,21 @@ namespace Belle2 {
         B2WARNING("goodBelleKshort is only defined for a particle with charged daughters");
         return 0.0;
       }
-      if (abs(KS->getPDGCode()) != 310)
+      if (abs(KS->getPDGCode()) != Const::Kshort.getPDGCode())
         B2WARNING("goodBelleKshort is being applied to a candidate with PDG " << KS->getPDGCode());
+
+      // If goodKs exists, return the value
+      if (KS->hasExtraInfo("goodKs")) {
+        return KS->getExtraInfo("goodKs");
+      }
 
       // Belle selection
       double p = particleP(KS);
       double fl = particleDRho(KS);
       double dphi = acos(((particleDX(KS) * particlePx(KS)) + (particleDY(KS) * particlePy(KS))) / (fl * sqrt(particlePx(KS) * particlePx(
                            KS) + particlePy(KS) * particlePy(KS))));
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      // particleDRho returns track d0 relative to IP for tracks
+      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(KS);
 
       bool low = p < 0.5 && abs(zdist) < 0.8 && dr > 0.05 && dphi < 0.3;
@@ -55,6 +69,7 @@ namespace Belle2 {
       } else
         return 0.0;
     }
+
 
     double goodBelleLambda(const Particle* Lambda)
     {
@@ -68,12 +83,15 @@ namespace Belle2 {
         B2WARNING("goodBelleLambda is only defined for a particle with charged daughters");
         return 0.;
       }
-      if (abs(Lambda->getPDGCode()) != 3122) {
+      if (abs(Lambda->getPDGCode()) != Const::Lambda.getPDGCode()) {
         B2WARNING("goodBelleLambda is being applied to a candidate with PDG " << Lambda->getPDGCode());
       }
 
+      if (Lambda->hasExtraInfo("goodLambda"))
+        return Lambda->getExtraInfo("goodLambda");
+
       double p = particleP(Lambda);
-      double dr = std::min(abs(trackD0(d0)), abs(trackD0(d1)));
+      double dr = std::min(abs(particleDRho(d0)), abs(particleDRho(d1)));
       double zdist = v0DaughterZ0Diff(Lambda);
       double dphi = acos(cosAngleBetweenMomentumAndVertexVectorInXYPlane(Lambda));
       // Flight distance of Lambda0 in xy plane
@@ -139,9 +157,13 @@ It reproduces the ``goodLambda()`` function in Belle.
 
 ``goodBelleLambda`` selection 1 (selected with: ``goodBelleLambda>0``) should be used with ``atcPIDBelle(4,2) > 0.6``,
 and ``goodBelleLambda`` selecton 2 (``goodBelleLambda>1``) can be used without a proton PID cut. 
-The former cut is looser than the latter."
+The former cut is looser than the latter.". 
 
-See `BN-684`_ Lambda selection at Belle. K F Chen et al.
+.. warning:: ``goodBelleLambda`` is not optimized or tested on Belle II data.
+
+See Also:
+  * `BN-684`_ Lambda selection at Belle. K F Chen et al.
+  * The ``FindLambda`` class can be found at ``/belle_legacy/findLambda/findLambda.h``
 
 .. _BN-684: https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz
 

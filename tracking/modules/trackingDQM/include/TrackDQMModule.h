@@ -13,10 +13,12 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <TH1F.h>
 #include <TH2F.h>
+
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 namespace Belle2 {
 
@@ -133,6 +135,17 @@ namespace Belle2 {
     TH1F* m_TracksVXDCDC = nullptr;
     /** Number of all finding tracks */
     TH1F* m_Tracks = nullptr;
+
+    /** Monitors the Error flags set by the tracking code. As of the time of implementation there only were two flags:
+      VXDTF2AbortionFlag, i.e. how often the VXDTF2 did abort the event and did not produce tracks,
+      and UnspecifiedTrackFindingFailure
+      The histogram records if any flag was set.
+    */
+    TH1F* m_trackingErrorFlags = nullptr;
+
+    /// Acccess to the EventLevelTrackingInfo object in the datastore.
+    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
 
   };  //end class declaration
 

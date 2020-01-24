@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
  *               Sam Cunliffe, Torben Ferber                              *
+ *               Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -30,6 +31,7 @@
 #include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
@@ -86,6 +88,10 @@ namespace Belle2 {
 
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
+             false);
+
+    addParam("skipNonPrimaryDaughters", m_skipNonPrimaryDaughters,
+             "If true, the secondary MC daughters will be skipped, default is false",
              false);
 
     addParam("trackHypothesis", m_trackHypothesis,
@@ -226,7 +232,7 @@ namespace Belle2 {
             m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
-          if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
+          if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
             B2INFO("   -> MDST source: KLMClusters");
             m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
             B2INFO("   -> MDST source: ECLClusters");
@@ -314,7 +320,7 @@ namespace Belle2 {
       if (!pList.isValid())
         B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
       for (unsigned int i = 0; i < pList->getListSize(); i++) {
-        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>();
+        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>("ALL");
         if (!roe) {
           B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
         } else {
@@ -612,15 +618,15 @@ namespace Belle2 {
       if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      // create anti-particle list if necessary
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        // create anti-particle list if necessary
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 
@@ -679,6 +685,12 @@ namespace Belle2 {
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
+        // don't fill a neutron list with clusters that don't have the neutral
+        // hadron hypothesis set (ECL people call this N2)
+        if (listPdgCode == Const::neutron.getPDGCode()
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          continue;
+
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
         if (particle.getParticleType() != Particle::c_ECLCluster) {
@@ -692,9 +704,9 @@ namespace Belle2 {
           const MCParticle* relMCParticle = mcParticles[weightsAndIndex.first];
           double weight = weightsAndIndex.second;
 
-          // TODO: study this further and avoid hardcoded values
+          // TODO: study this further and avoid hard-coded values
           // set the relation only if the MCParticle(reconstructed Particle)'s
-          // energy contribution to this cluster ammounts to at least 30(20)%
+          // energy contribution to this cluster amounts to at least 30(20)%
           if (relMCParticle)
             if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
@@ -728,21 +740,21 @@ namespace Belle2 {
       if (!plist) { // create the list only if the eclClustersToParticle has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 
     StoreArray<KLMCluster> KLMClusters;
     StoreArray<Particle> particles;
 
-    // load reconstructed neutral KLM cluster's as Klongs
+    // load reconstructed neutral KLM cluster's as Klongs or neutrons
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
@@ -757,26 +769,28 @@ namespace Belle2 {
         continue;
       }
 
-
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
-      Particle particle(cluster);
+      for (auto klmCluster2Plist : m_KLMClusters2Plists) {
+        string listName = get<c_PListName>(klmCluster2Plist);
+        int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
 
-      if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
+        // create particle and check its type before adding it to list
+        Particle particle(cluster, pdgCode);
+        if (particle.getParticleType() != Particle::c_KLMCluster) {
+          B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
+        }
         Particle* newPart = particles.appendNew(particle);
 
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
-        for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-          string listName = get<c_PListName>(klmCluster2Plist);
-          auto&  cut = get<c_CutPointer>(klmCluster2Plist);
-          StoreObjPtr<ParticleList> plist(listName);
+        auto&  cut = get<c_CutPointer>(klmCluster2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
-        }
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
       }
     }
   }
@@ -855,6 +869,9 @@ namespace Belle2 {
     if (abs(pdgCode) == abs(Const::Lambda.getPDGCode()))
       return true;
 
+    if (abs(pdgCode) == abs(Const::neutron.getPDGCode()))
+      return true;
+
     return result;
   }
 
@@ -869,10 +886,11 @@ namespace Belle2 {
     vector<MCParticle*> mcdaughters = mcmother->getDaughters();
 
     for (auto& mcdaughter : mcdaughters) {
+      if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle) and m_skipNonPrimaryDaughters) continue;
       Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
       daughter->addRelationTo(mcdaughter);
-      mother->appendDaughter(daughter);
+      mother->appendDaughter(daughter, false);
 
       if (mcdaughter->getNDaughters() > 0)
         appendDaughtersRecursive(daughter);

@@ -10,7 +10,6 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCT0CalibrationCollector.h"
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -19,9 +18,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
-#include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <Math/ProbFuncMathCore.h>
 #include "TH1F.h"

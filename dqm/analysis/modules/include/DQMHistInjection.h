@@ -13,7 +13,6 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TH1.h>
@@ -66,10 +65,22 @@ namespace Belle2 {
     TH1F* m_hInjectionLERPXDOcc = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERPXDOcc = nullptr;
+    //! SVD Hits
+    TH1F* m_hInjectionLERSVD = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionLERSVD = nullptr;
+    //! SVD Occ norm
+    TH1F* m_hInjectionLERSVDOcc = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionLERSVDOcc = nullptr;
     //! ECL Hits
     TH1F* m_hInjectionLERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERECL = nullptr;
+    //! TOP Occ
+    TH1F* m_hInjectionLERTOP = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionLERTOP = nullptr;
     //! PXD Hits
     TH1F* m_hInjectionHERPXD = nullptr;
     //! Final Canvas
@@ -78,10 +89,22 @@ namespace Belle2 {
     TH1F* m_hInjectionHERPXDOcc = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERPXDOcc = nullptr;
+    //! SVD Hits
+    TH1F* m_hInjectionHERSVD = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionHERSVD = nullptr;
+    //! SVD Occ norm
+    TH1F* m_hInjectionHERSVDOcc = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionHERSVDOcc = nullptr;
     //! ECL Hits
     TH1F* m_hInjectionHERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERECL = nullptr;
+    //! TOP Occ
+    TH1F* m_hInjectionHERTOP = nullptr;
+    //! Final Canvas
+    TCanvas* m_cInjectionHERTOP = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! EPICS PVs

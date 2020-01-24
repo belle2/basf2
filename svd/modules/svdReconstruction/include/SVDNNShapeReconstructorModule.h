@@ -18,6 +18,7 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <svd/reconstruction/NNWaveFitter.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <map>
 #include <vector>
 #include <memory>
@@ -76,6 +77,9 @@ namespace Belle2 {
                            relation, unsigned int index);
 
       // Data members
+      /** Storage for SVDEventInfo object */
+      StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
+
       //1. Collections
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
@@ -95,6 +99,8 @@ namespace Belle2 {
       std::string m_relRecoDigitTrueHitName;
       /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
       std::string m_relRecoDigitShaperDigitName;
+      /** Name of the SVDEventInfo object */
+      std::string m_svdEventInfoName;
 
       //2. Strip and time fitter data
       /** Name of the time fitter data xml */

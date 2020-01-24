@@ -76,7 +76,7 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
            string(""));
   addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
-  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string("SVDEventInfoSim"));
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
@@ -300,8 +300,8 @@ void SVDDigitizerModule::event()
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
-  m_currentSensor = 0;
-  m_currentSensorInfo = 0;
+  //  m_currentSensor = 0;
+  //m_currentSensorInfo = 0;
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
@@ -332,7 +332,7 @@ void SVDDigitizerModule::event()
       }
     } else {
       // Don't bother with warnings for background SimHits
-      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+      if (m_currentHit->getBackgroundTag() == BackgroundMetaData::bg_none)
         B2WARNING(
           "Could not find MCParticle which produced SVDSimhit " << i);
       m_currentParticle = -1;

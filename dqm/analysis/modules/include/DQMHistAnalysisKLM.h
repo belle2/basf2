@@ -11,8 +11,6 @@
 #pragma once
 
 /* External headers. */
-#include <TROOT.h>
-#include <TClass.h>
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TText.h>
@@ -23,7 +21,6 @@
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -89,10 +86,10 @@ namespace Belle2 {
       TH1* histogram, TCanvas* canvas, TLatex& latex);
 
     /**
-     * Process one BKLM sector+layer histogram.
+     * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
      */
-    void processBKLMSectorLayerHistogram(const std::string& histName);
+    void processPlaneHistogram(const std::string& histName);
 
     /**
      * Find TCanvas that matches a given name.
@@ -123,11 +120,11 @@ namespace Belle2 {
     TCanvas* m_eklmStripLayer[
       EKLMElementNumbers::getMaximalLayerGlobalNumber()];
 
-    /** TLine for BKLM sector boundary in histogram. */
-    TLine* m_sectorLine[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
+    /** TLine for boundary in plane histograms. */
+    TLine m_PlaneLine;
 
-    /** TText for BKLM sector name in histogram. */
-    TText* m_sectorText[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
+    /** TText for names in plane histograms. */
+    TText m_PlaneText;
 
   };
 

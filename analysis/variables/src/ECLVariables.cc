@@ -26,13 +26,9 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 //MDST
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
-
-//ROOT
-#include <TVector3.h>
 
 #include <cmath>
 #include <stack>
@@ -757,7 +753,10 @@ namespace Belle2 {
 
     double eclClusterEoP(const Particle* part)
     {
-      const double E = eclClusterE(part);
+      double E = eclClusterE(part);
+      if (part->hasExtraInfo("bremsCorrectedPhotonEnergy")) {
+        E += part->getExtraInfo("bremsCorrectedPhotonEnergy");
+      }
       const double p =  part->getMomentumMagnitude();
       if (0 == p) { return std::numeric_limits<float>::quiet_NaN();}
       return E / p;
@@ -1275,11 +1274,14 @@ as function of true photon energy, true photon direction and beam background lev
     | Precision: :math:`16` bit
 )DOC");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
-Returns ECL cluster's timing. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster.
-After all corrections (including Time-Of-Flight) and calibrations, photons from the interaction point (IP)
-should have a time that corresponds to the event trigger time :math:`t_{0}`
-(For MC, this is currently not simulated and such photons are designed to have a time of :math:`t = 0\,` nano second).
+Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
+Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
+cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction 
+point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the 
+time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL 
+cluster produced at the interation point in time with the event, the cluster time should be consistent with zero 
+within the uncertainties. Special values are returned if the fit for the Photon timing fails (see 
+documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1475,10 +1477,6 @@ Returns number of charged tracks matched to this cluster.
         - For charged particles, this should return at least 1 (but sometimes 2 or more).
         - For neutrals, this should always return 0.
         - Returns NaN if there is no cluster.
-)DOC");
-    REGISTER_VARIABLE("clusterCRID", eclClusterConnectedRegionId, R"DOC(
-| Returns ECL cluster's connected region ID.
-| This can be used to find potentially overlapping ECL clusters.
 )DOC");
     REGISTER_VARIABLE("clusterHasPulseShapeDiscrimination", eclClusterHasPulseShapeDiscrimination, R"DOC(
 Status bit to indicate if cluster has digits with waveforms that passed energy and :math:`\chi^2`

@@ -10,22 +10,9 @@
 
 #pragma once
 
-#include <cstdlib>
-#include <ctime>
-#include <algorithm>
-
 #include <TVector3.h>
 
 #include <framework/core/Module.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventKinematics.h>
-
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <analysis/utility/PCmsLabTransform.h>
-
 
 namespace Belle2 {
   /**

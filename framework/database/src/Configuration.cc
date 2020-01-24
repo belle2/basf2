@@ -12,35 +12,22 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Downloader.h>
+#include <framework/database/Database.h>
+#include <framework/utilities/Utils.h>
 #include <boost/python.hpp>
 #include <framework/core/PyObjConvUtils.h>
+#include <framework/core/PyObjROOTUtils.h>
 #include <boost/algorithm/string.hpp>
 
 #include <set>
 #include <TPython.h>
-#include <TClass.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-08-14"
+#define CURRENT_DEFAULT_TAG "master_2019-11-29"
 
 namespace py = boost::python;
 
 namespace {
-  /** Create a python wrapped copy from a class instance which has a ROOT dictionary.
-   * This piece of dark magic creates a python object referencing a ROOT object
-   * the same way as you would see it in the ROOT python module.
-   *
-   * It will create a copy of the object using the copy constructor which is then
-   * owned by python.
-   */
-  template<class T>
-  py::object createPyCopy(const T& instance)
-  {
-    const char* classname = instance.IsA()->GetName();
-    void* addr = new T(instance);
-    PyObject* obj = TPython::ObjectProxy_FromVoidPtr(addr, classname, true);
-    return py::object(py::handle<>(obj));
-  }
   /** extract a list of strings from any iterable python object
    * This function is much more lenient than what we usually do: It will use `str()`
    * on each object in the list and use the string representation. So it should
@@ -118,8 +105,16 @@ namespace Belle2::Conditions {
       overrideGlobalTags();
     }
     std::string serverList = EnvironmentVariables::get("BELLE2_CONDB_SERVERLIST", "http://belle2db.sdcc.bnl.gov/b2s/rest/");
-    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvms/belle.cern.ch/conditions/database.sqlite");
+    fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", serverList + " /cvmfs/belle.cern.ch/conditions/database.sqlite");
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", "/cvmfs/belle.cern.ch/conditions");
+  }
+
+  void Configuration::reset()
+  {
+    if (m_databaseInitialized) {
+      Database::Instance().reset(true);
+    }
+    *this = Configuration();
   }
 
   std::vector<std::string> Configuration::getDefaultGlobalTags() const
@@ -139,11 +134,14 @@ namespace Belle2::Conditions {
 
   void Configuration::setInputMetadata(const std::vector<FileMetaData>& inputMetadata)
   {
+    ensureEditable();
     m_inputMetadata = inputMetadata;
     // make sure the list of globaltags to be used is created but empty
     m_inputGlobaltags.emplace();
     // now check for compatibility: make sure all metadata have the same globaltag
-    // setting
+    // setting. Unless we don't have metadata ...
+    if (inputMetadata.empty()) return;
+
     std::optional<std::string> inputGlobaltags;
     for (const auto& metadata : inputMetadata) {
       if (!inputGlobaltags) {
@@ -152,7 +150,6 @@ namespace Belle2::Conditions {
         if (inputGlobaltags != metadata.getDatabaseGlobalTag()) {
           B2WARNING("Input files metadata contain incompatible globaltag settings, globaltag replay not possible");
           // no need to set anything
-          inputGlobaltags.reset();
           return;
         }
       }
@@ -164,6 +161,28 @@ namespace Belle2::Conditions {
     }
     // set the list of globaltags from the string containing the globaltags
     boost::split(*m_inputGlobaltags, *inputGlobaltags, boost::is_any_of(","));
+
+    // HACK: So, we successfully set the input globaltags from the input file,
+    // however we also decided that we want to add new payloads for
+    // boost/invariant mass/beam spot. So if any of the files was created
+    // before the first of October 2019 we assume their globaltag might be
+    // missing these new payloads and we append an extra globaltag containing
+    // just this information with lowest priority. If the files actually had
+    // all payloads these legacy payloads will never be used as they have
+    // lowest priority. Otherwise this should enable running over old files.
+    //
+    // TODO: Once we're sure all files being used contain all payloads remove this.
+    std::optional<std::string> youngest;
+    for (const auto& metadata : inputMetadata) {
+      if (!youngest or * youngest > metadata.getDate()) {
+        youngest = metadata.getDate();
+      }
+    }
+    if (youngest->compare("2019-12-31") < 0) {
+      B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
+      m_inputGlobaltags->emplace_back("Legacy_IP_Information");
+    }
+    // END TODO/HACK
   }
 
   std::vector<std::string> Configuration::getBaseTags() const
@@ -199,7 +218,7 @@ namespace Belle2::Conditions {
       // otherwise it's a list of file metadata instances
       if (m_inputGlobaltags) {
         py::list metaDataList;
-        for (const auto& m : m_inputMetadata) metaDataList.append(createPyCopy(m));
+        for (const auto& m : m_inputMetadata) metaDataList.append(createROOTObjectPyCopy(m));
         arguments["metadata"] = metaDataList;
       }
       // arguments ready, call callback function, python will handle the exceptions
@@ -229,9 +248,9 @@ namespace Belle2::Conditions {
     There is no default globaltag available for processing. This usually means
     you set the environment variable BELLE2_CONDB_GLOBALTAG to an empty value.
 
-    As this is unlikely to work for even the most basic funtionality this is not
+    As this is unlikely to work for even the most basic functionality this is not
     directly supported anymore. If you really want to disable any access to the
-    conditions database please configure this explictly
+    conditions database please configure this explicitly
 
     >>> basf2.conditions.metadata_providers = []
     >>> basf2.conditions.override_globaltags([])
@@ -353,7 +372,6 @@ globaltags present in input files  will be ignored and only the ones given in
 `globaltags` will be considered.
 )DOC")
     .def("reset", &Configuration::reset, R"DOC(reset()
---
 
 Reset the conditions database configuration to its original state.
 )DOC")
@@ -376,13 +394,11 @@ Warning:
     any addition or modification of this list.
 )DOC")
     .def("append_globaltag", &Configuration::appendGlobalTag, py::args("name"), R"DOC(append_globaltag(name)
---
 
 Append a globaltag to the end of the `globaltags` list. That means it will be
 the lowest priority of all tags in the list.
 )DOC")
     .def("prepend_globaltag", &Configuration::prependGlobalTag, py::args("name"), R"DOC(prepend_globaltag(name)
---
 
 Add a globaltag to the beginning of the `globaltags` list. That means it will be
 the highest priority of all tags in the list.
@@ -428,12 +444,11 @@ Warning:
     leads to results which cannot be reproduced by anyone else and thus cannot
     be published.
 )DOC")
-    .def("prepend_testing_payloads", &Configuration::prependTestingPayloadLocation, py::args("filename"), R"DOC(
---
+    .def("prepend_testing_payloads", &Configuration::prependTestingPayloadLocation, py::args("filename"), R"DOC(prepend_testing_payloads(filename)
 
 Insert a text file containing local test payloads in the beginning of the list
-of `testing_payloads`. This will mean they will have lower priority than payloads in
-previously defined text files but still higher priority than globaltags.
+of `testing_payloads`. This will mean they will have higher priority than payloads in
+previously defined text files as well as higher priority than globaltags.
 
 Parameters:
     filename (str): file containing a local definition of payloads and their
@@ -490,7 +505,7 @@ flat
     All payloads are in the same directory without any substructure with the name
     ``dbstore_{name}_rev_{revision}.root``
 hashed
-    All payloads are stored in subdirectories in the form``AB/{name}_r{revision}.root``
+    All payloads are stored in subdirectories in the form ``AB/{name}_r{revision}.root``
     where ``A`` and ``B`` are the first two characters of the md5 checksum of the
     payload file.
 
@@ -549,7 +564,7 @@ Parameters:
   usable_globaltag_states (set(str)): Names of globaltag states accepted for
       processing. This can be changed to make sure that only fully published
       globaltags are used or to enable running on an open tag. It is not possible
-      to allow usage of 'INVALID' tags, those will always be recjeted.
+      to allow usage of 'INVALID' tags, those will always be rejected.
   connection_timeout (int): timeout in seconds before connection should be
       aborted. 0 sets the timeout to the default (300s)
   stalled_timeout (int): timeout in seconds before a download should be
@@ -570,14 +585,14 @@ This callback can be used to further customize the globaltags to be used during
 processing. It will be called after the input files have been opened and checked
 with three keyword arguments:
 
-``base_tags``
+base_tags
     The globaltags determined from either the input files or, if no input files
     are present, the default globaltags
 
-``user_tags``
+user_tags
     The globaltags provided by the user
 
-``metadata``
+metadata
     If there are not input files (e.g. generating events) this argument is None.
     Otherwise it is a list of all the ``FileMetaData`` instances from all input files.
     This list can be empty if there is no metadata associated with the input files.

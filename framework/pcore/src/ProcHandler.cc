@@ -11,7 +11,6 @@
 
 #include <vector>
 
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <cstdio>
@@ -20,7 +19,6 @@
 #include <cstring>
 #include <unistd.h>
 #include <Python.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -243,6 +241,8 @@ std::set<int> ProcHandler::processList() const
 }
 
 int ProcHandler::EvtProcID() { return s_processID; }
+
+void ProcHandler::setProcessID(int processID) { s_processID = processID; }
 
 std::string ProcHandler::getProcessName()
 {

@@ -23,8 +23,6 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/utilities/EnvironmentVariables.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/ConditionsDatabase.h>
 #include <framework/database/DatabaseChain.h>
@@ -37,10 +35,7 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
-#include <TFile.h>
-
 #include <cstdlib>
-#include <iomanip>
 
 namespace Belle2 {
 
@@ -54,11 +49,14 @@ namespace Belle2 {
 
   void Database::reset(bool keepConfig)
   {
+    auto& conf = Conditions::Configuration::getInstance();
+    conf.setInitialized(false);
     DBStore::Instance().reset(true);
+    Instance().m_configState = c_PreInit;
     Instance().m_metadataProvider.reset();
     Instance().m_payloadCreation.reset();
     if (not keepConfig)
-      Conditions::Configuration::getInstance().reset();
+      conf.reset();
   }
 
   ScopeGuard Database::createScopedUpdateSession()
@@ -195,49 +193,71 @@ namespace Belle2 {
     }
   }
 
-  void Database::initialize()
+  void Database::initialize(const EDatabaseState target)
   {
+    if (m_configState >= target) return;
     auto conf = Conditions::Configuration::getInstance();
-    m_globalTags = conf.getFinalListOfTags();
-    m_usableTagStates = conf.getUsableTagStates();
-    m_metadataConfigurations = conf.getMetadataProviders();
-    // reverse because we want to pop out elements when used
-    std::reverse(m_metadataConfigurations.begin(), m_metadataConfigurations.end());
-    // and setup the first working provider;
-    if (m_metadataConfigurations.empty()) {
-      m_metadataProvider = std::make_unique<Conditions::NullMetadataProvider>();
-    } else {
-      nextMetadataProvider();
-    }
-    if (!m_globalTags.empty()) {
-      // Globaltags are useable so print out the final list we're gonna use
-      if (m_globalTags.size() == 1) {
-        B2INFO("Conditions data: configured globaltag is " << m_globalTags[0]);
-      } else {
-        B2INFO("Conditions data: configured globaltags (highest priority first) are " << boost::algorithm::join(m_globalTags, ", "));
-      }
-    }
-    // Configure payload location/download
-    m_payloadProvider = std::make_unique<Conditions::PayloadProvider>(
-                          conf.getPayloadLocations(),
-                          conf.getDownloadCacheDirectory(),
-                          conf.getDownloadLockTimeout()
-                        );
-    // Also we need to be able to create payloads ...
-    m_payloadCreation = std::make_unique<Conditions::TestingPayloadStorage>(conf.getNewPayloadLocation());
-    // And maaaybe we want to use testing payloads
-    m_testingPayloads.clear();
-    for (const auto& path : conf.getTestingPayloadLocations()) {
-      B2INFO("Conditions data: configured to use testing payloads" << LogVar("location", path));
-      m_testingPayloads.emplace_back(path);
-    }
-    // If so, warn again ... because
-    if (not m_testingPayloads.empty()) {
-      B2WARNING(R"(Conditions data: configured to look for temporary tesing payloads from one or more local folders.
 
-  This will lead to non-reproducible results and is strictly only for testing purposes.
-  It is NOT ALLOWED for official productions or data analysis and any results obtained like this WILL NOT BE PUBLISHED.
-)";);
+    if (m_configState == c_PreInit) {
+      // first step: freeze the configuration object and determine the list of globaltags
+      // this calculates if tag replay is possible and will create an error otherwise but
+      // it will not do anything else than setting the final list of globaltags
+      conf.setInitialized(true);
+      m_globalTags = conf.getFinalListOfTags();
+      // and remove duplicates, there's no need to look in the same gt multiple times
+      std::set<std::string> seen;
+      m_globalTags.erase(std::remove_if(m_globalTags.begin(), m_globalTags.end(),
+      [&seen](const auto & tag) {
+        return not seen.insert(tag).second;
+      }), m_globalTags.end());
+      // and also obtain usable tag states and metadata providers
+      m_usableTagStates = conf.getUsableTagStates();
+      m_metadataConfigurations = conf.getMetadataProviders();
+      // reverse because we want to pop out elements when used
+      std::reverse(m_metadataConfigurations.begin(), m_metadataConfigurations.end());
+      m_configState = c_InitGlobaltagList;
+    }
+    // do we want to stop early?
+    if (m_configState >= target) return;
+    if (m_configState == c_InitGlobaltagList) {
+      // setup the first working provider;
+      if (m_metadataConfigurations.empty()) {
+        m_metadataProvider = std::make_unique<Conditions::NullMetadataProvider>();
+      } else {
+        nextMetadataProvider();
+      }
+      // we will actually use the globaltags so print them now
+      if (!m_globalTags.empty()) {
+        // Globaltags are useable so print out the final list we're gonna use
+        if (m_globalTags.size() == 1) {
+          B2INFO("Conditions data: configured globaltag is " << m_globalTags[0]);
+        } else {
+          B2INFO("Conditions data: configured globaltags (highest priority first) are " << boost::algorithm::join(m_globalTags, ", "));
+        }
+      }
+      // Configure payload location/download
+      m_payloadProvider = std::make_unique<Conditions::PayloadProvider>(
+                            conf.getPayloadLocations(),
+                            conf.getDownloadCacheDirectory(),
+                            conf.getDownloadLockTimeout()
+                          );
+      // Also we need to be able to create payloads ...
+      m_payloadCreation = std::make_unique<Conditions::TestingPayloadStorage>(conf.getNewPayloadLocation());
+      // And maaaybe we want to use testing payloads
+      m_testingPayloads.clear();
+      for (const auto& path : conf.getTestingPayloadLocations()) {
+        B2INFO("Conditions data: configured to use testing payloads" << LogVar("location", path));
+        m_testingPayloads.emplace_back(path);
+      }
+      // If so, warn again ... because
+      if (not m_testingPayloads.empty()) {
+        B2WARNING(R"(Conditions data: configured to look for temporary tesing payloads from one or more local folders.
+
+    This will lead to non-reproducible results and is strictly only for testing purposes.
+    It is NOT ALLOWED for official productions or data analysis and any results obtained like this WILL NOT BE PUBLISHED.
+  )";);
+      }
+      m_configState = c_Ready;
     }
   }
 
@@ -260,13 +280,13 @@ namespace Belle2 {
     py::docstring_options options(true, true, false);
 
     py::def("reset_database", &Database::reset, (py::arg("keep_config") = false),
-        R"DOC(Reset the database setup to have no database sources
+            R"DOC(Reset the database setup to have no database sources
 
 .. deprecated:: release-04-00-00
    Please use `basf2.conditions` for all configuration of the conditions database)DOC");
     py::def("use_database_chain", &DatabaseChain::createInstance,
-        (py::arg("resetIoVs") = true, py::arg("loglevel") = LogConfig::c_Warning, py::arg("invertLogging") = false),
-        R"DOCSTRING(
+            (py::arg("resetIoVs") = true, py::arg("loglevel") = LogConfig::c_Warning, py::arg("invertLogging") = false),
+            R"DOCSTRING(
 Use a database chain. This function used to be necessary to enable usage of
 multiple globaltags but has been deprecated.
 
@@ -313,24 +333,6 @@ Parameters:
 Use the central database to obtain conditions data. Usually users should only
 need to call this with one parameter which is the global tag to identify the
 payloads.
-
->>> use_central_database("my_global_tag")
-
-It might be useful to also specify the log level and invert the log messages
-when adding an additional global tag for lookups
-
->>> use_central_database("my_additional_tag", loglevel=LogLevel.WARNING, invertLogging=True)
-
-The ``payloaddir`` specifies a directory where payloads which needed to be
-downloaded will be placed. This could be set to a common absolute directory for
-all jobs to make sure the payloads only need to be downloaded once. The default
-is to place payloads into a directory called :file:`centraldb` in the local
-working directory.
-
-Warning:
-    For debugging purposes this function also allows to set the base URL for
-    the REST api and the file server but these should generally not be
-    modified.
 
 Parameters:
   globalTag (str): name of the global tag to use for payload lookup

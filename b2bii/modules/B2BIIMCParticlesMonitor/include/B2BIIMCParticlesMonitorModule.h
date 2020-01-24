@@ -9,7 +9,6 @@
 #define B2BIIMCPARTICLESMONITORMODULE_H
 
 #include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
-#include <vector>
 #include "TH1F.h"
 
 namespace Belle2 {

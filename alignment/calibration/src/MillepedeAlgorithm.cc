@@ -1,19 +1,18 @@
+
 #include <alignment/calibration/MillepedeAlgorithm.h>
+
+#include <alignment/dataobjects/MilleData.h>
+#include <alignment/dataobjects/PedeSteering.h>
+#include <alignment/GlobalLabel.h>
+#include <alignment/GlobalParam.h>
+#include <alignment/GlobalTimeLine.h>
+#include <alignment/Manager.h>
+#include <alignment/PedeApplication.h>
+#include <alignment/PedeResult.h>
+#include <framework/database/EventDependency.h>
 
 #include <TH1F.h>
 #include <TTree.h>
-
-#include <alignment/dataobjects/MilleData.h>
-#include <alignment/PedeApplication.h>
-#include <alignment/PedeResult.h>
-#include <alignment/dataobjects/PedeSteering.h>
-
-#include <alignment/GlobalLabel.h>
-#include <alignment/GlobalParam.h>
-
-#include <alignment/Manager.h>
-
-#include <alignment/GlobalTimeLine.h>
 
 using namespace std;
 using namespace Belle2;
@@ -152,7 +151,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     GlobalLabel label_system;
 
     alignment::timeline::GlobalParamTimeLine timeline(m_events, label_system, gpv);
+    alignment::timeline::GlobalParamTimeLine timeline_errors(m_events, label_system, gpv);
+    alignment::timeline::GlobalParamTimeLine timeline_corrections(m_events, label_system, gpv);
     timeline.loadFromDB();
+    timeline_corrections.loadFromDB();
+    timeline_errors.loadFromDB();
 
     // Loop over all determined parameters:
     for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
@@ -179,13 +182,54 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       if (m_invertSign) correction = - correction;
 
       timeline.updateGlobalParam(label, correction);
+      timeline_errors.updateGlobalParam(label, error, true);
+      timeline_corrections.updateGlobalParam(label, correction, true);
     }
 
-
+    //TODO: if data do not cover all parts of timeline, this will lead to memory leak for
+    // objects not being saved in DB -> delete them here
     auto objects = timeline.releaseObjects();
     for (auto iov_obj : objects) {
-      if (iov_obj.second)
-        saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+      if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), ""),
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.first.overlap(getIovFromAllData()));
+        }
+      } else {
+        if (iov_obj.second) delete iov_obj.second;
+      }
+    }
+
+    auto objects_errors = timeline_errors.releaseObjects();
+    for (auto iov_obj : objects_errors) {
+      if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), "") + "_ERRORS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_ERRORS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        }
+      } else {
+        if (iov_obj.second) delete iov_obj.second;
+      }
+    }
+
+    auto objects_corrections = timeline_corrections.releaseObjects();
+    for (auto iov_obj : objects_corrections) {
+      if (iov_obj.second && !iov_obj.first.overlap(getIovFromAllData()).empty()) {
+        if (auto evdep = dynamic_cast<EventDependency*>(iov_obj.second)) {
+          saveCalibration(iov_obj.second, DataStore::objectName(evdep->getAnyObject()->IsA(), "") + "_CORRECTIONS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        } else {
+          saveCalibration(iov_obj.second, DataStore::objectName(iov_obj.second->IsA(), "") + "_CORRECTIONS",
+                          iov_obj.first.overlap(getIovFromAllData()));
+        }
+      } else {
+        if (iov_obj.second) delete iov_obj.second;
+      }
     }
 
   }

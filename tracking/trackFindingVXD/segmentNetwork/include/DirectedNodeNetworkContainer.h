@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
 #include <deque>
 
 #include <framework/datastore/RelationsObject.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/Segment.h>

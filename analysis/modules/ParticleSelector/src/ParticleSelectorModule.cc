@@ -86,13 +86,15 @@ namespace Belle2 {
     }
 
     // loop over list only if cuts should be applied
-    std::vector<unsigned int> toRemove;
-    unsigned int n = plist->getListSize();
-    for (unsigned i = 0; i < n; i++) {
-      const Particle* part = plist->getParticle(i);
-      if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());
+    if (!m_cutParameter.empty()) {
+      std::vector<unsigned int> toRemove;
+      unsigned int n = plist->getListSize();
+      for (unsigned i = 0; i < n; i++) {
+        const Particle* part = plist->getParticle(i);
+        if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());
+      }
+      plist->removeParticles(toRemove);
     }
-    plist->removeParticles(toRemove);
   }
 } // end Belle2 namespace
 

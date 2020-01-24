@@ -13,15 +13,9 @@
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 
 // dataonjects
 #include <mdst/dataobjects/MCParticle.h>
-
-#include "TH1F.h"
-
-#include <stdio.h>
 
 using namespace std;
 using namespace Belle2;

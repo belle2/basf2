@@ -10,7 +10,6 @@
 
 #include <framework/utilities/MultivariateNormalGenerator.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 

@@ -1,77 +1,53 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+######################################################
 #
-# EWP standalone skim steering
-# P. Urquijo, 6/Jan/2015
+# EWP combined skim standalone steering script
+#
+# Trevor Shillington December 2019
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
-from stdPhotons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-03-02-00'
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdMu, stdPi
+from stdPhotons import stdPhotons
+import skimExpertFunctions as expert
+
+gb2_setuprel = 'release-04-00-00'
+fileList = expert.get_test_file("MC12_mixedBGx1")
+path = b2.Path()
+
+ma.inputMdstList('default', fileList, path=path)
+
+# import standard lists
+stdPhotons('loose', path=path)
+stdPhotons('all', path=path)
+stdPi('all', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
 
 
-fileList = get_test_file("mixedBGx1", "MC12")
-
-xggpath = Path()
-
-
-inputMdstList('default', fileList, path=xggpath)
-stdPi0s('loose', path=xggpath)
-stdPhotons('tight', path=xggpath)  # also builds loose list
-loadStdSkimPhoton(path=xggpath)
-loadStdSkimPi0(path=xggpath)
-stdPi('loose', path=xggpath)
-stdK('loose', path=xggpath)
-stdK('95eff', path=xggpath)
-stdPi('95eff', path=xggpath)
-stdKshorts(path=xggpath)
-loadStdLightMesons(path=xggpath)
-
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=xggpath)
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=xggpath)
-# EWP Skim
+# BtoXgamma
 from skim.ewp import B2XgammaList
-add_skim('BtoXgamma', B2XgammaList(path=xggpath), xggpath)
+XgammaList = B2XgammaList(path=path)
+expert.add_skim("BtoXgamma", XgammaList, path=path)
 
-
-setSkimLogging(xggpath)
-process(xggpath)
-
-
-xllpath = Path()
-inputMdstList('default', fileList, path=xllpath)
-loadStdSkimPi0(path=xllpath)
-loadStdSkimPhoton(path=xllpath)
-stdPi0s('loose', path=xllpath)
-stdPhotons('loose', path=xllpath)
-stdK('95eff', path=xllpath)
-stdPi('95eff', path=xllpath)
-stdE('95eff', path=xllpath)
-stdMu('95eff', path=xllpath)
-stdK('loose', path=xllpath)
-stdPi('loose', path=xllpath)
-stdKshorts(path=xllpath)
-loadStdLightMesons(path=xllpath)
-
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=xllpath)
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=xllpath)
-# EWP Skim
+# BtoXll
 from skim.ewp import B2XllList
-add_skim('BtoXll', B2XllList(path=xllpath), path=xllpath)
+XllList = B2XllList(path=path)
+expert.add_skim("BtoXll", XllList, path=path)
 
-setSkimLogging(xllpath)
-process(xllpath)
+# BtoXll_LFV
+from skim.ewp import B2XllListLFV
+XllListLFV = B2XllListLFV(path=path)
+expert.add_skim("BtoXll_LFV", XllListLFV, path=path)
 
+
+# process
+expert.setSkimLogging(path=path)
+b2.process(path=path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

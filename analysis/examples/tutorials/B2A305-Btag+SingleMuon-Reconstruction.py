@@ -50,8 +50,6 @@ from stdPhotons import stdPhotons
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
-b2.conditions.disable_globaltag_replay()
-
 # create path
 my_path = b2.create_path()
 
@@ -114,7 +112,7 @@ ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
                     cut="",
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='Upsilon(4S)',
                 path=my_path)
 

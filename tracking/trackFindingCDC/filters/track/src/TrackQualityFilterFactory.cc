@@ -40,6 +40,12 @@ namespace {
 
 template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
 
+std::string TrackQualityFilterFactory::getFilterPurpose() const
+{
+  return "Track filter for getting the quality indicator for CDC tracks. It should "
+         "distinguish correct PR tracks from fake and if wanted also clone tracks. ";
+}
+
 std::unique_ptr<BaseTrackFilter> TrackQualityFilterFactory::create(
   const std::string& filterName) const
 {

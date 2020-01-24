@@ -283,6 +283,7 @@ namespace Belle2 {
     friend class RootInputModule;
     friend class RootOutputModule;
     friend class B2BIIMdstInputModule;
+    friend class BeamBkgHitRateMonitorModule;
 
     ClassDefOverride(FileMetaData, 10); /**< Metadata information about a file. */
 

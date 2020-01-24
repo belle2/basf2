@@ -15,7 +15,6 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -27,7 +26,6 @@
 #include <cmath>
 
 #include <TRandom.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -277,7 +275,7 @@ void PXDDigitizerModule::event()
       }
     } else {
       // Don't warn if this is a background SimHit
-      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+      if (m_currentHit->getBackgroundTag() == BackgroundMetaData::bg_none)
         B2WARNING(
           "Could not find MCParticle which produced PXDSimhit " << i);
       m_currentParticle = -1;

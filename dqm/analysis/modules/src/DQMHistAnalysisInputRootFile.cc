@@ -10,7 +10,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisInputRootFile.h>
 
-#include <daq/slc/base/StringUtil.h>
+#include <TKey.h>
 #include <TROOT.h>
 
 #include <boost/regex.hpp>

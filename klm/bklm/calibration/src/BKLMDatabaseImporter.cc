@@ -9,44 +9,52 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
+
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
-#include <klm/bklm/dbobjects/BKLMDisplacement.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
-#include <alignment/dbobjects/BKLMAlignment.h>
-#include <klm/bklm/dataobjects/BKLMElementID.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
-#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-
-#include <framework/database/IntervalOfValidity.h>
+/* Belle 2 headers. */
 #include <framework/database/Database.h>
-#include <framework/database/DBArray.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-
-#include <string>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <iostream>
-
-#include <TFile.h>
-#include <TTree.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/gearbox/GearDir.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace std;
 using namespace Belle2;
 
-BKLMDatabaseImporter::BKLMDatabaseImporter()
+BKLMDatabaseImporter::BKLMDatabaseImporter() :
+  m_ExperimentLow(0),
+  m_RunLow(0),
+  m_ExperimentHigh(-1),
+  m_RunHigh(-1)
 {}
 
-void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
+void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
+                                  int experimentHigh, int runHigh)
 {
+  m_ExperimentLow = experimentLow;
+  m_RunLow = runLow;
+  m_ExperimentHigh = experimentHigh;
+  m_RunHigh = runHigh;
+}
+
+void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
+{
+  // Clear the vector: needed if we want to load two different maps
+  // in the same steering file.
+  if (m_ElectronicsChannels.size() > 0)
+    m_ElectronicsChannels.clear();
+
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -58,6 +66,7 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
     int sector = bklmPlane.getSector();
     int layer = bklmPlane.getLayer();
     int plane = bklmPlane.getPlane();
+
     if (section == BKLMElementNumbers::c_ForwardSection) {
       if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
         copperId = 1 + BKLM_ID;
@@ -70,17 +79,24 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
       if (sector == 1 || sector == 2 || sector == 7 || sector == 8)
         copperId = 4 + BKLM_ID;
     }
-    if (sector == 3 || sector == 4 || sector == 5 || sector == 6) slotId = sector - 2;
-    if (sector == 1 || sector == 2) slotId = sector + 2;
-    if (sector == 7 || sector == 8) slotId = sector - 6;
 
-    if (layer > 2)  laneId = layer + 5;
-    else laneId = layer;
+    if (sector == 3 || sector == 4 || sector == 5 || sector == 6)
+      slotId = sector - 2;
+    if (sector == 1 || sector == 2)
+      slotId = sector + 2;
+    if (sector == 7 || sector == 8)
+      slotId = sector - 6;
 
-    if (layer < 3) {
-      if (plane == 0) axisId = 1;
-      else if (plane == 1) axisId = 0;
-    } else axisId = plane;
+    if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
+      laneId = layer + 5;
+      axisId = plane;
+    } else {
+      laneId = layer;
+      if (plane == BKLMElementNumbers::c_ZPlane)
+        axisId = 1;
+      if (plane == BKLMElementNumbers::c_PhiPlane)
+        axisId = 0;
+    }
 
     int MaxiChannel = BKLMElementNumbers::getNStrips(
                         section, sector, layer, plane);
@@ -95,29 +111,68 @@ void BKLMDatabaseImporter::loadDefaultBklmElectronicMapping()
 
     for (int iStrip = 1; iStrip <= MaxiChannel; iStrip++) {
       int channelId = iStrip;
-      if (!(dontFlip && layer > 2 && plane == 1)) channelId = MaxiChannel - iStrip + 1;
 
-      if (plane == 1) { //phi strips
-        if (layer == 1)  channelId = channelId + 4;
-        if (layer == 2)  channelId = channelId + 2;
-      } else if (plane == 0) { //z strips
-        if (layer < 3) { //scintillator
-          if (section == BKLMElementNumbers::c_BackwardSection
-              && sector == 3) { //sector #3 is the top sector, backward sector#3 is the chimney sector.
-            if (layer == 1) {
-              if (channelId > 0 && channelId < 9) channelId = 9 - channelId;
-              else if (channelId > 8 && channelId < 24) channelId = 54 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 54 - channelId;
-            } else {
-              if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-              else if (channelId > 9 && channelId < 24) channelId = 40 - channelId;
-              else if (channelId > 23 && channelId < 39) channelId = 69 - channelId;
+      if (!(dontFlip && layer >= BKLMElementNumbers::c_FirstRPCLayer && plane == BKLMElementNumbers::c_PhiPlane))
+        channelId = MaxiChannel - iStrip + 1;
+
+      if (plane == BKLMElementNumbers::c_PhiPlane) {
+        // Start settings for exp. 10.
+        if (isExperiment10) {
+          if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+            if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
+              channelId = MaxiChannel - channelId + 1;
+              if (layer == 1)
+                channelId += -2;
+              if (layer == 2)
+                channelId += 1;
             }
-          } else { //all sectors except backward sector #3
-            if (channelId > 0 && channelId < 10) channelId = 10 - channelId;
-            else if (channelId > 9 && channelId < 25) channelId = 40 - channelId;
-            else if (channelId > 24 && channelId < 40) channelId = 70 - channelId;
-            else if (channelId > 39 && channelId < 55) channelId = 100 - channelId;
+          }
+        } // End settings for exp. 10.
+        if (layer == 1)
+          channelId += 4;
+        if (layer == 2)
+          channelId += 2;
+      }
+
+      if (plane == BKLMElementNumbers::c_ZPlane) {
+        if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
+          int channelCheck = channelId;
+          if (section == BKLMElementNumbers::c_BackwardSection
+              && sector == BKLMElementNumbers::c_ChimneySector) {
+            if (layer == 1) {
+              if (!isExperiment10) {
+                if (channelCheck > 0 && channelCheck < 9)
+                  channelId = 9 - channelId;
+                if (channelCheck > 8 && channelCheck < 24)
+                  channelId = 54 - channelId;
+                if (channelCheck > 23 && channelCheck < 39)
+                  channelId = 54 - channelId;
+              } else {
+                if (channelCheck > 0 && channelCheck < 9)
+                  channelId = 9 - channelId; // 8 : 1
+                if (channelCheck > 8 && channelCheck < 24)
+                  channelId = 39 - channelId; // 30 : 16
+                if (channelCheck > 23 && channelCheck < 39)
+                  channelId = 69 - channelId; // 45 : 31
+              }
+            }
+            if (layer == 2) {
+              if (channelCheck > 0 && channelCheck < 10)
+                channelId = 10 - channelId;
+              if (channelCheck > 9 && channelCheck < 24)
+                channelId = 40 - channelId;
+              if (channelCheck > 23 && channelCheck < 39)
+                channelId = 69 - channelId;
+            }
+          } else { // All the sectors except the chimney one
+            if (channelCheck > 0 && channelCheck < 10)
+              channelId = 10 - channelId;
+            if (channelCheck > 9 && channelCheck < 25)
+              channelId = 40 - channelId;
+            if (channelCheck > 24 && channelCheck < 40)
+              channelId = 70 - channelId;
+            if (channelCheck > 39 && channelCheck < 55)
+              channelId = 100 - channelId;
           }
         }
       }
@@ -148,14 +203,31 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
   }
 }
 
-void BKLMDatabaseImporter::importBklmElectronicMapping()
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int section, int sector, int layer, int plane, int lane)
 {
-  IntervalOfValidity iov(0, 0, -1, -1);
-  DBImportObjPtr<BKLMElectronicsMap> m_ElectronicsMap;
-  m_ElectronicsMap.construct();
+  int channelSection, channelSector, channelLayer, channelPlane, strip;
   unsigned int n = m_ElectronicsChannels.size();
   for (unsigned int i = 0; i < n; ++i) {
-    m_ElectronicsMap->addChannel(
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &channelPlane,
+      &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer) &&
+        (channelPlane == plane))
+      m_ElectronicsChannels[i].second.setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::importElectronicMapping()
+{
+  DBImportObjPtr<BKLMElectronicsMap> electronicsMap;
+  electronicsMap.construct();
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    electronicsMap->addChannel(
       m_ElectronicsChannels[i].first,
       m_ElectronicsChannels[i].second.getCopper(),
       m_ElectronicsChannels[i].second.getSlot(),
@@ -163,97 +235,44 @@ void BKLMDatabaseImporter::importBklmElectronicMapping()
       m_ElectronicsChannels[i].second.getAxis(),
       m_ElectronicsChannels[i].second.getChannel());
   }
-  m_ElectronicsMap.import(iov);
-  return;
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  electronicsMap.import(iov);
 }
 
-void BKLMDatabaseImporter::importBklmGeometryPar()
+void BKLMDatabaseImporter::importGeometryPar()
 {
-  GearDir content("/Detector/DetectorComponent[@name=\"BKLM\"]/Content");
-
-  // define the data
-  BKLMGeometryPar bklmGeometryPar;
-
-  // Get Gearbox parameters for BKLM
-  bklmGeometryPar.setVersion(0);
-  bklmGeometryPar.read(content);
-
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
+  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"));
+  BKLMGeometryPar bklmGeometryPar(content);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
 
 }
 
-void BKLMDatabaseImporter::importBklmSimulationPar(int expStart, int runStart, int expStop, int runStop)
+void BKLMDatabaseImporter::importSimulationPar()
 {
-  BKLMSimulationPar bklmSimulationPar;
   GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"), "BKLM/SimulationParameters");
-
-  // Get Gearbox simulation parameters for BKLM
-  bklmSimulationPar.read(content);
-
-  // Define the IOV and store data to the DB
-  IntervalOfValidity iov(expStart, runStart, expStop, runStop);
+  BKLMSimulationPar bklmSimulationPar(content);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
   Database::Instance().storeData("BKLMSimulationPar", &bklmSimulationPar, iov);
 }
 
-void BKLMDatabaseImporter::importBklmAlignment()
+void BKLMDatabaseImporter::importADCThreshold(BKLMADCThreshold* inputThreshold)
 {
-
-  DBImportObjPtr<BKLMAlignment> al;
-  al.construct();
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        al->set(bklmid, 1, 0.);
-        al->set(bklmid, 2, 0.);
-        al->set(bklmid, 3, 0.);
-        al->set(bklmid, 4, 0.);
-        al->set(bklmid, 5, 0.);
-        al->set(bklmid, 6, 0.);
-      }
-    }
-  }
-
-  IntervalOfValidity Iov(0, 0, -1, -1);
-  al.import(Iov);
+  DBImportObjPtr<BKLMADCThreshold> adcThreshold;
+  adcThreshold.construct(*inputThreshold);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  adcThreshold.import(iov);
 }
 
-void BKLMDatabaseImporter::importBklmDisplacement()
+void BKLMDatabaseImporter::importTimeWindow(BKLMTimeWindow* inputWindow)
 {
-
-  DBImportArray<BKLMDisplacement> m_displacement;
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 8; j++) {
-      for (int k = 0; k < 15; k++) {
-        BKLMElementID bklmid(i, j, k);
-        m_displacement.appendNew(bklmid, 0, 0, 0, 0, 0, 0);
-      }
-    }
-  }
-
-  IntervalOfValidity Iov(0, 0, -1, -1);
-  m_displacement.import(Iov);
-}
-
-void BKLMDatabaseImporter::importBklmADCThreshold(BKLMADCThreshold* threshold)
-{
-  DBImportObjPtr<BKLMADCThreshold> adcParam;
-  adcParam.construct(*threshold);
-  IntervalOfValidity iov(0, 0, -1, -1);
-  adcParam.import(iov);
-}
-
-void BKLMDatabaseImporter::importBklmTimeWindow()
-{
-
-  DBImportObjPtr<BKLMTimeWindow> m_timing;
-  m_timing.construct();
-  m_timing->setCoincidenceWindow(50);
-  m_timing->setPromptTime(0);
-  m_timing->setPromptWindow(2000);
-
-  IntervalOfValidity iov(0, 0, -1, -1);
-  m_timing.import(iov);
+  DBImportObjPtr<BKLMTimeWindow> timeWindow;
+  timeWindow.construct(*inputWindow);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeWindow.import(iov);
 }

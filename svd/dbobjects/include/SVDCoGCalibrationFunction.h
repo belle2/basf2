@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 namespace Belle2 {
 
+  /** class to contain the CoG Time calibrations*/
   class SVDCoGCalibrationFunction : public TObject {
 
   public:
@@ -43,6 +44,7 @@ namespace Belle2 {
       if (m_implementations.size() == 0) {
         m_implementations.push_back(&SVDCoGCalibrationFunction::pol1TBdep);
         m_implementations.push_back(&SVDCoGCalibrationFunction::pol3TBindep);
+        m_implementations.push_back(&SVDCoGCalibrationFunction::pol5TBindep);
         //m_implementations.push_back(
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
@@ -110,6 +112,18 @@ namespace Belle2 {
       m_par[ 3 ] = d;
     }
 
+    //SETTERS FOR function ID = 2 (pol5TBindep)
+    /** set the */
+    void set_pol5parameters(double a, double b, double c, double d, double e, double f)
+    {
+      m_par[ 0 ] = a;
+      m_par[ 1 ] = b;
+      m_par[ 2 ] = c;
+      m_par[ 3 ] = d;
+      m_par[ 4 ] = e;
+      m_par[ 5 ] = f;
+    }
+
     /** copy constructor */
     SVDCoGCalibrationFunction(const Belle2::SVDCoGCalibrationFunction& a);
 
@@ -120,20 +134,20 @@ namespace Belle2 {
     static const int nTriggerBins = 4;
 
     /** residual = (EventT0 - CoGTime Corrected) mean and sigma from gaussian fit*/
-    double m_residMean[ nTriggerBins ]; /**< trigger-bin dependent residual mean*/
-    double m_residSigma[ nTriggerBins ]; /**< trigger-bin dependent residual sigma*/
-    double m_residMeanError[ nTriggerBins ]; /**< trigger-bin dependent mean error*/
-    double m_residSigmaError[ nTriggerBins ]; /**< trigger-bin dependent sigma error*/
+    double m_residMean[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual mean*/
+    double m_residSigma[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual sigma*/
+    double m_residMeanError[ nTriggerBins ] = {0}; /**< trigger-bin dependent mean error*/
+    double m_residSigmaError[ nTriggerBins ] = {0}; /**< trigger-bin dependent sigma error*/
 
 
     /** function parameters & implementations*/
 
-    /** ID = 0, pol1TBdep VERSION: correctedValue = t * scale[tb] + bias[tb] */
-    double m_bias[ nTriggerBins ]; /**< trigger-bin dependent bias*/
-    double m_scale[ nTriggerBins ]; /**< trigger-bin dependent scale*/
-    double m_biasError[ nTriggerBins ]; /**< trigger-bin dependent bias error*/
-    double m_scaleError[ nTriggerBins ]; /**< trigger-bin dependent scale error*/
-    double m_scaleBiasCovariance[ nTriggerBins ]; /**< trigger-bin dependent covariance between scale and bias errors*/
+    /** ID = {0}, pol1TBdep VERSION: correctedValue = t * scale[tb] + bias[tb] */
+    double m_bias[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias*/
+    double m_scale[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale*/
+    double m_biasError[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias error*/
+    double m_scaleError[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale error*/
+    double m_scaleBiasCovariance[ nTriggerBins ] = {0}; /**< trigger-bin dependent covariance between scale and bias errors*/
     /** pol1 TB dep version implementation*/
     double pol1TBdep(double raw_time, int tb) const
     {
@@ -141,13 +155,24 @@ namespace Belle2 {
              m_bias[ tb % nTriggerBins ];
     };
 
+    //data member usefule for polinomials
+    static const int m_nPar = 6; /**< number of parameters of highest-order implemented pol (5)*/
+    double m_par[ m_nPar ] = {0}; /**< vector of parameters*/
+
     /** ID = 1, pol3TBindep VERSION: (TB independent) correctedValue = par[0] + t * par[1] + t^2 * par[2] + t^3 * par[3] */
-    static const int m_nPar = 4; /**< number of parameters of 3rd order pol*/
-    double m_par[ m_nPar ]; /**< vector of parameters of 3rd order plot*/
     /** pol3 TB indep version implementation*/
     double pol3TBindep(double raw_time, int) const
     {
       return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3);
+    };
+
+
+    /** ID = 2, pol5TBindep VERSION: (TB independent) correctedValue = par[0] + t * par[1] + t^2 * par[2] + t^3 * par[3] + t^4 * par[4] + t^5*par[5]*/
+    /** pol5 TB indep version implementation*/
+    double pol5TBindep(double raw_time, int) const
+    {
+      return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3) + m_par[4] * pow(raw_time,
+             4) + m_par[5] * pow(raw_time, 5);
     };
 
     /** current function ID */
@@ -157,7 +182,7 @@ namespace Belle2 {
     static std::vector < cogFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDCoGCalibrationFunction, 2)
+    ClassDef(SVDCoGCalibrationFunction, 3)
   };
 
 }

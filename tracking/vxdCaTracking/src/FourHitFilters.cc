@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include "tracking/vxdCaTracking/FourHitFilters.h"
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <TMathBase.h>
 #include <math.h>
 
 using namespace std;

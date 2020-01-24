@@ -8,14 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMStatus.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
-#include <cmath>
-#include <climits>
+/* C++ headers. */
 #include <algorithm>
+#include <climits>
 
 using namespace Belle2;
 
@@ -29,25 +33,22 @@ BKLMHit1d::BKLMHit1d() :
 }
 
 // Constructor with a cluster of contiguous parallel BKLMDigits
-BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
+BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
   RelationsObject()
 {
   m_Time = 0.0;
   m_EDep = 0.0;
   m_ModuleID = 0;
-
   if (digits.size() == 0) {
-    B2WARNING("Attempt to create a 1D hit with no BKLMDigits");
+    B2WARNING("Attempt to create a BKLMHit1d with no BKLMDigits");
     return;
   }
-
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
-  int mask = BKLM_MODULEID_MASK | BKLM_PLANE_MASK;
   m_ModuleID = digits.front()->getModuleID();
-  for (std::vector<BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    BKLMDigit* digit = *iDigit;
-    if (((digit->getModuleID() ^ m_ModuleID) & mask) != 0) {
+  for (std::vector<const BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
+    const BKLMDigit* digit = *iDigit;
+    if (!BKLMElementNumbers::hitsFromSamePlane(m_ModuleID, digit->getModuleID())) {
       B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
       continue;
     }
@@ -61,9 +62,8 @@ BKLMHit1d::BKLMHit1d(const std::vector<BKLMDigit*>& digits) :
 
   if (stripMax >= stripMin) {
     m_Time /= ((stripMax - stripMin) + 1.0);
-    m_ModuleID = (m_ModuleID & ~(BKLM_STRIP_MASK | BKLM_MAXSTRIP_MASK))
-                 | ((stripMin - 1) << BKLM_STRIP_BIT)
-                 | ((stripMax - 1) << BKLM_MAXSTRIP_BIT);
+    BKLMElementNumbers::setStripInModule(m_ModuleID, stripMin);
+    BKLMStatus::setMaximalStrip(m_ModuleID, stripMax);
   }
 }
 

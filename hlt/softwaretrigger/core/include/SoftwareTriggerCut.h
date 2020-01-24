@@ -14,10 +14,7 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
-  class SoftwareTriggerResult;
 
   namespace SoftwareTrigger {
     /**

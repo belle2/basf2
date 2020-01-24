@@ -11,7 +11,6 @@
 #include <tracking/ckf/general/entities/CKFState.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <genfit/SharedPlanePtr.h>
-#include <memory>
 
 namespace genfit {
   class MeasuredStateOnPlane;

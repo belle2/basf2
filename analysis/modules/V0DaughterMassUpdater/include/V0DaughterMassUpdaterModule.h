@@ -10,8 +10,6 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 
 namespace Belle2 {
 

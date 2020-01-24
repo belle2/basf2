@@ -11,10 +11,10 @@
 // Own include
 #include <background/modules/BeamBkgHitRateMonitor/ECLHitRateCounter.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/geometry/B2Vector3.h>
+
 #include <numeric>
 
 using namespace std;

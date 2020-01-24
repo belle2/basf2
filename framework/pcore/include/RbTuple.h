@@ -12,9 +12,7 @@
 #include <vector>
 #include <string>
 
-class TDirectory;
 class TFile;
-class TList;
 
 namespace Belle2 {
   class Module;

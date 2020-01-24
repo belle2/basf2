@@ -8,32 +8,31 @@ Physics channel: ee → aγ; a → γγ; Skim LFN code:   18020300
 
 __author__ = "Michael De Nuccio"
 
-from basf2 import *
-from modularAnalysis import *  # Standard Analysis Tools
-from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
-skimCode = encodeSkimName('ALP3Gamma')
-gb2_setuprel = 'release-03-02-00'
+import basf2 as b2
+import modularAnalysis as ma  # Standard Analysis Tools
+import skimExpertFunctions as expert
+skimCode = expert.encodeSkimName('ALP3Gamma')
+gb2_setuprel = 'release-04-00-00'
 
 # create a new path
-darkskimpath = Path()
+darkskimpath = b2.Path()
 
 # fileList contains the input file which the skim will run on
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=darkskimpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=darkskimpath)
 
 from skim.dark import ALP3GammaList
 BeamList = ALP3GammaList(path=darkskimpath)
 
 # output to Udst file
-skimOutputUdst(skimCode, BeamList, path=darkskimpath)
+expert.skimOutputUdst(skimCode, BeamList, path=darkskimpath)
 
 # print out Particle List statistics
-summaryOfLists(BeamList, path=darkskimpath)
+ma.summaryOfLists(BeamList, path=darkskimpath)
 
 # process the path
-process(darkskimpath)
+b2.process(darkskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

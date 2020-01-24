@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <gtest/gtest.h>
 

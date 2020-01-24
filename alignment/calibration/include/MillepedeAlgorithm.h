@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include <calibration/CalibrationAlgorithm.h>
+#include <alignment/dataobjects/PedeSteering.h>
+#include <alignment/GlobalTimeLine.h>
 #include <alignment/PedeResult.h>
 #include <alignment/PedeApplication.h>
-#include <alignment/dataobjects/PedeSteering.h>
-
-#include <alignment/GlobalTimeLine.h>
+#include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
   /**

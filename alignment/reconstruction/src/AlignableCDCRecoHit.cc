@@ -10,16 +10,12 @@
 
 #include <alignment/reconstruction/AlignableCDCRecoHit.h>
 
-#include <cdc/dataobjects/WireID.h>
-#include <cdc/geometry/CDCGeometryPar.h>
-
-#include <cdc/dbobjects/CDCTimeZeros.h>
-#include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
-
 #include <alignment/GlobalLabel.h>
 #include <alignment/GlobalDerivatives.h>
-#include <alignment/Hierarchy.h>
+#include <cdc/dataobjects/WireID.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 using namespace std;
 using namespace Belle2;

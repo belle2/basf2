@@ -19,16 +19,13 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
-
 #include <cdc/simulation/CDCSensitiveDetector.h>
 #include <cdc/dbobjects/CDCGeometry.h>
-#include <iostream>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VisAttributes;
 class G4UserLimits;
-
 
 namespace Belle2 {
 

@@ -17,7 +17,6 @@
 #include <tracking/ckf/cdc/findlets/CDCCKFResultFinalizer.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
 
-#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>

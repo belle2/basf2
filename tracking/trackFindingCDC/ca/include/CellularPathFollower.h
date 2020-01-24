@@ -14,8 +14,9 @@
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
-#include <vector>
 #include <cassert>
+#include <cmath>
+#include <vector>
 
 namespace Belle2 {
 

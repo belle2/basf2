@@ -13,7 +13,13 @@
 #include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <framework/logging/LogMethod.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
+#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
+#include <tracking/ckf/svd/entities/CKFToSVDState.h>
+
+#include <framework/logging/Logger.h>
 
 #include <vector>
 #include <limits>
@@ -57,6 +63,8 @@ namespace Belle2 {
                               unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
+          StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
           for (AObject* to : possibleTos) {
@@ -68,6 +76,16 @@ namespace Belle2 {
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
               B2WARNING("Relations Creator reached maximal number of items. Aborting");
+              if (m_eventLevelTrackingInfo.isValid()) {
+                if (std::is_base_of<AObject, CKFToPXDState>::value) {
+                  m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
+                } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
+                  m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
+                } else {
+                  B2WARNING("Undefined class used for CKFStates. Could not set AbortionFlag.");
+                }
+              }
+
               weightedRelations.clear();
               return;
             }

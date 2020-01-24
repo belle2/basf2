@@ -36,6 +36,7 @@ Where ``<Your selections for ROE>`` is a set of cuts on tracks and clusters of R
 which are in general analysis dependet. Some examples will be given below.
 
 .. autofunction:: modularAnalysis.buildContinuumSuppression
+   :noindex:
 
 Clean Mask
 """"""""""

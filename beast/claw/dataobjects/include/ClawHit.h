@@ -12,12 +12,6 @@
 #define CLAWHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
-//#include <framework/datastore/RelationsObject.h>
-
-// ROOT
-#include <TObject.h>
-#include <TVector3.h>
-#include <vector>
 
 namespace Belle2 {
   /**

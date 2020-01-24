@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-
 namespace Belle2 {
   namespace SoftwareTrigger {
     /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.

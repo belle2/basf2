@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <framework/dataobjects/EventT0.h>
 
+#include <framework/logging/Logger.h>
+
 #include <algorithm>
 #include <iterator>
 

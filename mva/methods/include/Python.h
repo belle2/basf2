@@ -41,8 +41,6 @@
 #pragma GCC diagnostic pop
 #endif
 
-#include <memory>
-
 namespace Belle2 {
   namespace MVA {
 

@@ -184,6 +184,23 @@ namespace Belle2 {
      */
     double trackFitHypothesisPDG(const Particle* part);
 
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixD0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixPhi0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixOmegaPull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixZ0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixTanLambdaPull(const Particle* part);
+
+    /** helper function to get track fit result from particle */
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
   }
 } // Belle2 namespace
 

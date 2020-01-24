@@ -147,8 +147,7 @@ namespace Belle2 {
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
-    double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
-    double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
+    //no need to define highest and lowest truncated value as we laways remove highest 2 dE/dx values from 8 dE/dx value.
 
     //parameters: technical stuff
     double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */

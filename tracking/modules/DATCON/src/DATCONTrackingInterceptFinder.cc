@@ -54,12 +54,12 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
   int hitID;
   unsigned int countLayer;
   double unitX, unitY;
-  double y1 = 0., y2 = 0.;
+  double y1, y2;
   double m, a;
   houghPair hp;
   VxdID sensor;
   vector<unsigned int> candidateIDList;
-  double xdiff = -10.0, ydiff = -10.0;  /**< differences used to fill the ArrayOfActiveSectors */
+  double xdiff, ydiff;  /**< differences used to fill the ArrayOfActiveSectors */
   int sectorX, sectorY;
   double baseX, baseY;
   int maxSectorX, maxSectorY;
@@ -92,7 +92,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      for (auto& hit : hits) {
+      for (const auto& hit : hits) {
         hitID = hit.first;
         hp = hit.second;
         sensor = hp.first;
@@ -181,9 +181,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
                 }
                 ArrayOfActiveSectorsPhiHS[sectorY][sectorX] = -1;
                 uHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(sectorX, sectorY)));
-              }
 
-              if (m_useHoughSpaceClustering) {
                 activeSectorVectorPhi.push_back(true);
               }
             }
@@ -223,7 +221,7 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
   int hitID;
   unsigned int countLayer;
   double unitX, unitY;
-  double y1 = 0, y2 = 0;
+  double y1, y2;
   double m, a;
   houghPair hp;
   VxdID sensor;
@@ -272,7 +270,7 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      for (auto& hit : hits) {
+      for (const auto& hit : hits) {
         hitID = hit.first;
         hp = hit.second;
         sensor = hp.first;

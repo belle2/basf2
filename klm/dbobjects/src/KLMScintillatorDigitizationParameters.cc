@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.            *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 
 using namespace Belle2;

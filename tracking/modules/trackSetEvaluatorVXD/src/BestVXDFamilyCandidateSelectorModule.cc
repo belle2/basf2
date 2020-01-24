@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/BestVXDFamilyCandidateSelectorModule.h"
-#include <framework/logging/Logger.h>
-#include <vector>
-#include <numeric>
 #include <unordered_map>
 
 using namespace Belle2;

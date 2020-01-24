@@ -10,24 +10,22 @@
 
 #pragma once
 
-#include <map>
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 
-#include "CLHEP/Vector/ThreeVector.h"
-
+/* ROOT headers. */
 #include <TObject.h>
+
+/* C++ headers. */
 #include <string>
-#include <cmath>
 #include <vector>
 
-static const int NLAYER = 15;
 static const int NSCINTLAYER = 2;
-static const int NSECTOR = 8;
 static const int NPHISCINT = 48;
 static const int NZSCINT = 54;
 static const int NSTATION = 7;
 static const int BKLM_INNER = 1;
 static const int BKLM_OUTER = 2;
-static const int CHIMNEY_SECTOR = 3;
 
 namespace Belle2 {
 
@@ -52,12 +50,6 @@ namespace Belle2 {
 
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
-
-    //! Get BKLM-geometry version
-    int getVersion() const { return m_version; }
-
-    //! Set BKLM geometry version
-    void setVersion(int version) { m_version = version; }
 
     //! Get the beam background study flag
     bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
@@ -606,9 +598,6 @@ namespace Belle2 {
 
   private:
 
-    //! Geometry version
-    int m_version;
-
     //! Flag for enabling beam background study (=alternate sensitive-detector function)
     bool m_DoBeamBackgroundStudy;
 
@@ -616,7 +605,7 @@ namespace Belle2 {
     double m_Rotation;
 
     //! Global rotation angle of a sector
-    double m_SectorRotation[2][NSECTOR];
+    double m_SectorRotation[2][BKLMElementNumbers::getMaximalSectorNumber()];
 
     //! Global offset along z of the BKLM
     double m_OffsetZ;
@@ -676,16 +665,16 @@ namespace Belle2 {
     int m_NZScintsChimney;
 
     //! Flag to indicate whether layer contains RPCs (true) or scintillators (false)
-    bool m_HasRPCs[NLAYER];
+    bool m_HasRPCs[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Number of phi-readout RPC strips in each layer
-    int m_NPhiStrips[NLAYER];
+    int m_NPhiStrips[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Width of the phi strips on each layer
-    double m_PhiStripWidth[NLAYER];
+    double m_PhiStripWidth[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Width of the z strips on each layer
-    double m_ZStripWidth[NLAYER];
+    double m_ZStripWidth[BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
     //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
@@ -899,21 +888,22 @@ namespace Belle2 {
     double m_MPPCHeight;
 
     //! Reconstruction dx in local system. displacement, not alignment
-    double m_LocalReconstructionShiftX[2][NSECTOR][NLAYER];
+    double m_LocalReconstructionShiftX[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Reconstruction dy in local system. displacement, not alignment
-    double m_LocalReconstructionShiftY[2][NSECTOR][NLAYER];
+    double m_LocalReconstructionShiftY[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Reconstruction dz in local system. displacement, not alignment
-    double m_LocalReconstructionShiftZ[2][NSECTOR][NLAYER];
+    double m_LocalReconstructionShiftZ[2][BKLMElementNumbers::getMaximalSectorNumber()][BKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Flag of z-phi planes flip *for scintillator layers only*
-    bool m_IsFlipped[2][NSECTOR][NSCINTLAYER];
+    bool m_IsFlipped[2][BKLMElementNumbers::getMaximalSectorNumber()][NSCINTLAYER];
 
     //! Optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    /** Class version. */
+    ClassDef(BKLMGeometryPar, 6);
 
   };
 } // end of namespace Belle2

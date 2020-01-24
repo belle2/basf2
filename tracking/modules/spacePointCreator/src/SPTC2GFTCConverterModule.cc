@@ -13,6 +13,7 @@
 #include <genfit/TrackCand.h>
 
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/gearbox/Const.h>

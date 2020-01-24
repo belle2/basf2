@@ -204,10 +204,11 @@ namespace Belle2 {
                       const Const::ParticleType& type = Const::photon);
 
     /**
-     * Constructor of a KLong from a reconstructed KLM cluster.
+     * Constructor from a reconstructed KLM cluster.
      * @param klmCluster pointer to KLMCluster object
+     * @param pdgCode PDG code (Klong by default)
      */
-    explicit Particle(const KLMCluster* klmCluster);
+    explicit Particle(const KLMCluster* klmCluster, const int pdgCode = Const::Klong.getPDGCode());
 
     /**
      * Constructor from MC particle (mdst object MCParticle)
@@ -593,7 +594,7 @@ namespace Belle2 {
 
     /** Apply a function to all daughters of this particle
      *
-     * @param function function object to run on each daugther. If this
+     * @param function function object to run on each daughter. If this
      *    function returns true the processing will be stopped immeddiately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
@@ -803,12 +804,23 @@ namespace Belle2 {
           or (pdg == Const::proton.getPDGCode())
           or (pdg == Const::deuteron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_nPhotons;
-      } else if (pdg == Const::Klong.getPDGCode()) {
+      } else if ((pdg == Const::Klong.getPDGCode())
+                 or (pdg == Const::neutron.getPDGCode())) {
         return ECLCluster::EHypothesisBit::c_neutralHadron;
       } else {
         return ECLCluster::EHypothesisBit::c_none;
       }
     }
+
+    /**
+    * Explores the decay tree of the particle and returns the (grand^n)daughter identified by a generalized index.
+    * The generalized index consists of a colon-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
+    * @param generalizedIndex the generalized index of the particle to be returned
+    * @return a particle in the decay tree of the root particle.
+    */
+    const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
+
 
   private:
 

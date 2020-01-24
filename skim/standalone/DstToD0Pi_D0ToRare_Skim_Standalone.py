@@ -8,27 +8,24 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
+import modularAnalysis as ma
 from stdCharged import stdE, stdMu, stdPi
-from stdPi0s import *
-from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+from stdPi0s import loadStdSkimPi0
+from stdPhotons import loadStdSkimPhoton
+import skimExpertFunctions as expert
 
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
-import os
-import sys
-import glob
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
 
-# skimCode = encodeSkimName('DstToD0Pi_D0ToRare')
+# skimCode = expert.encodeSkimName('DstToD0Pi_D0ToRare')
 skimCode = "DstToD0Pi_D0ToRare"
 
-crpath = Path()
+crpath = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=crpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=crpath)
 
 
 loadStdSkimPi0(path=crpath)
@@ -39,10 +36,10 @@ stdPi('loose', path=crpath)
 
 from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(crpath)
-skimOutputUdst(skimCode, DstToD0Pi_D0ToRareList, path=crpath)
-summaryOfLists(DstToD0Pi_D0ToRareList, path=crpath)
+expert.skimOutputUdst(skimCode, DstToD0Pi_D0ToRareList, path=crpath)
+ma.summaryOfLists(DstToD0Pi_D0ToRareList, path=crpath)
 
-setSkimLogging(path=crpath)
-process(crpath)
+expert.setSkimLogging(path=crpath)
+b2.process(crpath)
 
-print(statistics)
+print(b2.statistics)

@@ -3,7 +3,7 @@
 
 import unittest
 from skim.registry import skim_registry
-import skimExpertFunctions
+import skimExpertFunctions as expert
 
 
 class TestSkimCodes(unittest.TestCase):
@@ -29,12 +29,12 @@ class TestSkimCodes(unittest.TestCase):
     def test_encode(self):
         """check that we raise a LookupError if the skim name doesn't exist"""
         with self.assertRaises(LookupError):
-            skimExpertFunctions.encodeSkimName('SomeNonExistentSkimName')
+            expert.encodeSkimName('SomeNonExistentSkimName')
 
     def test_decode(self):
         """check that we raise a LookupError if the skim code doesn't exist"""
         with self.assertRaises(LookupError):
-            skimExpertFunctions.decodeSkimName('1337')
+            expert.decodeSkimName('1337')
 
 
 if __name__ == '__main__':

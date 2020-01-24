@@ -10,26 +10,21 @@
 #include <tracking/eventTimeExtraction/findlets/HitBasedT0Extractor.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 
-#include <tracking/trackFindingCDC/findlets/combined/ClusterPreparer.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParam.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ScopeGuard.h>
 
-#include <TFile.h>
 #include <TH1D.h>
 #include <TF1.h>
 #include <TFitResult.h>
 #include <TCanvas.h>
-#include <TROOT.h>
 
 #include <boost/lexical_cast.hpp>
 
 #include <memory>
-#include <sstream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

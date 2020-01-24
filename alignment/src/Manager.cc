@@ -1,6 +1,14 @@
+
 #include <alignment/Manager.h>
-#include <cdc/dbobjects/CDCLayerAlignment.h>
+
+#include <alignment/dbobjects/VXDAlignment.h>
 #include <alignment/GlobalTimeLine.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
 
 namespace Belle2 {
   namespace alignment {
@@ -27,6 +35,7 @@ namespace Belle2 {
       vector.addDBObj<CDCXtRelations>(cdcInterface);
       vector.addDBObj<BKLMAlignment>();
       vector.addDBObj<EKLMAlignment>();
+      vector.addDBObj<EKLMSegmentAlignment>();
     }
 
     void GlobalCalibrationManager::initialize(const std::vector< std::string >& components,

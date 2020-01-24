@@ -14,22 +14,21 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdPr, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
-from skim.standardlists.dileptons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-02-00'
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s
+import skimExpertFunctions as expert
+from skim.systematics import ResonanceList, SystematicsLambdaList, SystematicsList, SystematicsRadEEList, \
+    SystematicsRadMuMuList, SystematicsTrackingList
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
 
-fileList = get_test_file("mixedBGx1", "MC12")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-syspath = Path()
-inputMdstList('default', fileList, path=syspath)
+syspath = b2.Path()
+ma.inputMdstList('default', fileList, path=syspath)
 stdPi('loose', path=syspath)
 stdK('loose', path=syspath)
 stdE('loose', path=syspath)
@@ -44,31 +43,25 @@ stdPhotons('loose', path=syspath)
 
 
 # Systematics skim
-from skim.systematics import *
-add_skim('Systematics', SystematicsList(path=syspath), path=syspath)
+expert.add_skim('Systematics', SystematicsList(path=syspath), path=syspath)
 
 # Systematics Lambda Skim
-from skim.systematics import *
-add_skim('SystematicsLambda', SystematicsLambdaList(path=syspath), path=syspath)
+expert.add_skim('SystematicsLambda', SystematicsLambdaList(path=syspath), path=syspath)
 
 # Systematics Tracking
-from skim.systematics import *
-add_skim('SystematicsTracking', SystematicsTrackingList(path=syspath), path=syspath)
+expert.add_skim('SystematicsTracking', SystematicsTrackingList(path=syspath), path=syspath)
 
 # Resonan ce
-from skim.systematics import *
-add_skim('Resonance', ResonanceList(path=syspath), path=syspath)
+expert.add_skim('Resonance', ResonanceList(path=syspath), path=syspath)
 
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadMuMu', SystematicsRadMuMuList(path=syspath), path=syspath)
+expert.add_skim('SystematicsRadMuMu', SystematicsRadMuMuList(path=syspath), path=syspath)
 
 # Systematics Rad mu mu
-from skim.systematics import *
-add_skim('SystematicsRadEE', SystematicsRadEEList(path=syspath), path=syspath)
+expert.add_skim('SystematicsRadEE', SystematicsRadEEList(path=syspath), path=syspath)
 
-process(path=syspath)
+b2.process(path=syspath)
 
-setSkimLogging(path=syspath)
+expert.setSkimLogging(path=syspath)
 # print out the summary
-print(statistics)
+print(b2.statistics)

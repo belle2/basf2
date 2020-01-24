@@ -26,7 +26,7 @@ are in **tagged** and **untagged** analyses of :math:`Y(4S)` decays:
     else in the event is considered to come from the companion *B* meson. In
     addition to tracks and clusters from the companion *B* meson, the ROE contains
     also the extra tracks and clusters, as in the case of the tagged analysis.
-    Cleaning up the ROE in this case can help improve variables such as :math:`M_{BC}` or
+    Cleaning up the ROE in this case can help improve variables such as :math:`M_{bc}` or
     :math:`\Delta E`.
 
 It is therefore a generally bad idea to take everything into account when dealing with the ROE.
@@ -48,20 +48,42 @@ The ROE is formed by calling :func:`modularAnalysis.buildRestOfEvent` command:
    
 This code simply adds ``RestOfEvent`` objects, which are related to each ``B0:rec`` candidate.
 Now, it is possible to calculate simple ROE-based variables using target particle candidate,
-like the ROE momentum ``ROE_P``, the ROE mass ``ROE_M`` or others. The full list of the ROE variables can be found
+like the ROE momentum :b2:var:`roeP`, the ROE mass :b2:var:`roeM` or others. The full list of the ROE variables can be found
 by using command ``basf2 variables.py`` under the **Rest of Event** section.
 
 .. warning :: 
   Names or behavior of the ROE variables may vary from release to release. 
   Please recheck list of variables ``basf2 variables.py`` when switching between the releases.
 
-After reconstructing the ROE, one can use ROE-dependent modules, like `FlavorTagger`, `ContinuumSuppression`, `FullEventInterpretation` and other algorithms.
+After reconstructing the ROE, one can use ROE-dependent modules, like :doc:`FlavorTagger`, `ContinuumSuppression`, `FullEventInterpretation` and other algorithms.
 
 ROE particle type hypothesis
 ----------------------------
 
+
 By default, the ROE object is filled by pions, photons and :math:`K_L^0`'s.
-This can be changed by passing additional particle lists to the builder method:
+This can be changed by passing an additional argument to the builder method:
+
+
+::
+
+  import basf2 as b2
+  import modularAnalysis as ma
+  # Build the ROE object:
+  ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, path = mainPath)
+
+This will automatically provide to the ROE the charged particles, which have the most probable mass hypothesis, according to their PID information.
+Also, the neutral particles, photons and :math:`K_L^0`'s will be supplied to the ROE.
+
+.. hint ::
+  This option is also available for the Event Shape and the Event Kinematics computation.
+  If the option ``fillWithMostLikely=True`` appears more than once in the steering script,
+  a warning about multiple ``X+:mostlikely`` particle lists fill attempts may appear, which is totally fine.
+
+Selection cut based method
+==========================
+
+Nevertheless, there is an option to add particle lists manually:
 
 ::
 
@@ -85,7 +107,7 @@ The order of provided particle lists matters, so preferably, the particle lists 
 
 Changing charged particle hypothesis is important, as the charged particles have different mass, and it will 
 affect the computation of the ROE mass or energy.
-Also, this method allows to study the ROE particle composition by using ``nROE_Charged(...)`` metavariable, as well as ``nROE_Photons(...)`` and ``nROE_NeutralHadrons(...)`` metavariables, see ``basf2 variables.py``.
+Also, this method allows to study the ROE particle composition by using :b2:var:`nROE_Charged` metavariable, as well as :b2:var:`nROE_Photons` and :b2:var:`nROE_NeutralHadrons` metavariables, see ``basf2 variables.py``.
 
 
 Accessing ROE particles
@@ -158,7 +180,7 @@ The mask tuples should contain a mask name and cuts for charged particles, for p
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
 Most of ROE variables accept mask name as an argument, which allows user to compare 
 variable distributions from different ROE masks. 
-For example, the ``ROE_E(cleanMask)`` variable will be computed only using only ROE particles from a corresponding mask. 
+For example, the :b2:var:`roeE` variable will be computed using only ROE particles from a corresponding mask.
 
 .. note::
   Hard cuts on track impact parameters :math:`d_0` and :math:`z_0` are not recommended since one can throw away tracks from long lived decaying
@@ -200,7 +222,7 @@ These methods should be executed inside the ROE loop:
   # Reconstruct a K_S0 candidate using ROE pions:
   ma.reconstructDecay('K_S0:roe -> pi+:roe pi-:roe', '0.45 < M < 0.55', path = roe_path)
   # Perform vertex fitting:
-  vtx.vertexKFit('K_S0:roe',0.001, path=roe_path)
+  vtx.KFit('K_S0:roe',0.001, path=roe_path)
   # Insert a K_S0 candidate into the ROE mask:
   ma.optimizeROEWithV0('K_S0:roe',['cleanMask'],'', path=roe_path)
   # Execute loop for each ROE:
@@ -298,9 +320,10 @@ These reconstructed neutrino particles have no daughters, and they can be
 useful in combination with the visible signal side, for example in semileptonic
 :math:`B`-meson decays, where tag side has been reconstructed using :doc:`FullEventInterpretation`.
 
-.. warning::
-  The resulting particles described here cannot be used for vertexing nor MC matching.
-  This functionality is under development.
+.. hint::
+  The decay vertex of the resulting particles can be fitted by `KFit`.
+  Also MC truth-matching works, but after removing all neutral hadrons matched to tracks. 
+  More improvements will come soon.
 
 
 MVA based cleaning

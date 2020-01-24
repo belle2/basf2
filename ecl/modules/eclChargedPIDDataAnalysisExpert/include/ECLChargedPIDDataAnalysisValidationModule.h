@@ -15,23 +15,10 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TTree.h>
-#include <TEfficiency.h>
-
-// ECL
-#include <ecl/dataobjects/ECLPidLikelihood.h>
-
-// MDST
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 

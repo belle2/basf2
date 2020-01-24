@@ -14,13 +14,8 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <boost/format.hpp>
-#include <stdio.h>
-
-#include <TDatabasePDG.h>
 #include <TRandom3.h>
 
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -29,11 +24,6 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <queue>
-
-#include <EvtGenExternal/EvtExternalGenList.hh>
-#include <EvtGenBase/EvtAbsRadCorr.hh>
-#include <EvtGenBase/EvtDecayBase.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -60,6 +50,7 @@ FragmentationModule::FragmentationModule() : Module()
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
+  addParam("CoherentMixing", m_coherentMixing, "Decay the B0-B0bar coherently (should always be true)", true);
   addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
   //initialize member variables
@@ -149,7 +140,7 @@ void FragmentationModule::initialize()
     } else if (defaultDecFile != m_DecFile) {
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
-    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile));
+    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile, m_coherentMixing));
     evtgen->readDecayFile(m_UserDecFile);
 
     // Update pythia particle tables from evtgen

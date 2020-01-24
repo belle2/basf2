@@ -11,16 +11,15 @@
 #ifndef MILLEPEDECOLLECTORMODULE_H
 #define MILLEPEDECOLLECTORMODULE_H
 
-#include <calibration/CalibrationCollectorModule.h>
-#include <genfit/Track.h>
-#include <genfit/StateOnPlane.h>
-#include <genfit/MeasuredStateOnPlane.h>
 #include <analysis/dataobjects/Particle.h>
-#include <genfit/GblTrajectory.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <framework/geometry/B2Vector3.h>
+#include <genfit/GblTrajectory.h>
+#include <genfit/Track.h>
+#include <genfit/MeasuredStateOnPlane.h>
 
 namespace Belle2 {
   /**
@@ -154,7 +153,7 @@ namespace Belle2 {
     /** Minimum CDC used hit fraction **/
     double m_minUsedCDCHitFraction;
     /** Type of alignment hierarchy (for VXD only for now): 0 = None, 1 = Flat (only constraints,
-         no new global parameters/derivatives), 2 = Full **/
+         no new global parameters/derivatives), 2 = Half-Shells + sensors (no ladders), 3 = Full **/
     int m_hierarchyType;
     /** enable PXD hierarchy **/
     bool m_enablePXDHierarchy;

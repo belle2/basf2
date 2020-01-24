@@ -10,18 +10,23 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/bklm/dataobjects/BKLMHit1d.h>
+#include <klm/bklm/dataobjects/BKLMHit2d.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include "TFile.h"
-#include "TH1D.h"
-#include "TH1I.h"
-#include "TH2D.h"
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH1I.h>
+#include <TH2D.h>
+
+/* C++ headers. */
 #include <string>
-#include <map>
-#include <iostream>
 
 namespace Belle2 {
 

@@ -11,15 +11,11 @@
 #include <analysis/modules/ParticleStats/ParticleStatsModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Environment.h>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <cmath>
-#include <algorithm>
-#include <TParameter.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 using namespace Belle2;
-using namespace boost::algorithm;
 
 // Register module in the framework
 REG_MODULE(ParticleStats)
@@ -186,4 +182,7 @@ void ParticleStatsModule::terminate()
   stream << "Total Number of Particles created in the DataStore: " << m_nParticles;
   stream << "\n=======================================================\n";
   B2INFO(stream.str());
+
+  delete m_PassMatrix;
+  delete m_MultiplicityMatrix;
 }

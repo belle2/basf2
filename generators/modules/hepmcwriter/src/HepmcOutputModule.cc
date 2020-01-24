@@ -9,12 +9,11 @@
 
 #include <generators/modules/hepmcwriter/HepmcOutputModule.h>
 
-#include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace std;
 using namespace Belle2;

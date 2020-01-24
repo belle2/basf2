@@ -283,7 +283,7 @@ def draw_likelihoods(file_chain):
     for entry in file_chain:
         mcps = entry.MCParticles
         momentum = mcps[0].getMomentum()
-        muids = entry.Muids
+        muids = entry.KLMMuidLikelihoods
         for i in range(muids.GetEntriesFast()):
             outcome.Fill(muids[i].getOutcome())
             if muids[i].getOutcome() > 0:

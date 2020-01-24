@@ -14,7 +14,6 @@
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <arich/simulation/SensitiveDetector.h>
@@ -33,22 +32,17 @@
 #include <G4AssemblyVolume.hh>
 #include <G4LogicalSkinSurface.hh>
 #include <G4OpticalSurface.hh>
-#include <G4LogicalVolumeStore.hh>
 
 // Geant4 Shapes
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Trap.hh>
-#include <G4TwoVector.hh>
-#include <G4ExtrudedSolid.hh>
 #include <G4Torus.hh>
 
-#include <G4Polyhedra.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Material.hh>
-#include <TVector2.h>
 #include <TVector3.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -108,6 +102,11 @@ namespace Belle2 {
       // create and place
       G4LogicalVolume* masterLV = new G4LogicalVolume(envelopeTube, material, "ARICH.masterVolume");
       setVisibility(*masterLV, false);
+
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("ARICHEnvelope");
+      masterLV->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(masterLV);
 
       G4RotationMatrix rotMaster;
       double rot_x = m_config.getMasterVolume().getRotationX();

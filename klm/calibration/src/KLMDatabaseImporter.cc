@@ -8,20 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-#include <string>
+/* Own header. */
+#include <klm/calibration/KLMDatabaseImporter.h>
 
-/* External headers. */
+/* Belle 2 headers. */
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 
-/* Belle2 headers. */
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <klm/calibration/KLMDatabaseImporter.h>
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -127,3 +127,56 @@ void KLMDatabaseImporter::importStripEfficiency(
   stripEfficiencyImport.import(iov);
 }
 
+void KLMDatabaseImporter::importBKLMAlignment(
+  const BKLMAlignment* bklmAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "BKLMDisplacement";
+  else
+    payloadName = "BKLMAlignment";
+  DBImportObjPtr<BKLMAlignment> bklmAlignmentImport(payloadName);
+  bklmAlignmentImport.construct(*bklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  bklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMAlignment(
+  const EKLMAlignment* eklmAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMDisplacement";
+  else
+    payloadName = "EKLMAlignment";
+  DBImportObjPtr<EKLMAlignment> eklmAlignmentImport(payloadName);
+  eklmAlignmentImport.construct(*eklmAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importEKLMSegmentAlignment(
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
+{
+  std::string payloadName;
+  if (displacement)
+    payloadName = "EKLMSegmentDisplacement";
+  else
+    payloadName = "EKLMSegmentAlignment";
+  DBImportObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentImport(payloadName);
+  eklmSegmentAlignmentImport.construct(*eklmSegmentAlignment);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  eklmSegmentAlignmentImport.import(iov);
+}
+
+void KLMDatabaseImporter::importAlignment(
+  const BKLMAlignment* bklmAlignment, const EKLMAlignment* eklmAlignment,
+  const EKLMSegmentAlignment* eklmSegmentAlignment, bool displacement)
+{
+  importBKLMAlignment(bklmAlignment, displacement);
+  importEKLMAlignment(eklmAlignment, displacement);
+  importEKLMSegmentAlignment(eklmSegmentAlignment, displacement);
+}

@@ -12,8 +12,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -24,14 +22,6 @@ class TTree;
 class TFile;
 
 namespace Belle2 {
-  class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class ECLCluster;
-
-  template< class T >
-  class StoreArray;
-
 
   /** This module takes the MCParticle collection as input and checks if the
    * related reconstructed track is matched to an ECLCluster. This information

@@ -14,21 +14,14 @@
 
 #include <genfit/MeasurementOnPlane.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/GeoTools.h>
 
-//#include <framework/database/DBObjPtr.h>
-
-#include <algorithm>
 #include <TDirectory.h>
 #include <TVectorD.h>
 
@@ -79,6 +72,9 @@ void TrackDQMModule::initialize()
     return;
   }
 
+  // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there
+  m_eventLevelTrackingInfo.isOptional();
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 
@@ -86,6 +82,7 @@ void TrackDQMModule::initialize()
 
 void TrackDQMModule::defineHisto()
 {
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD.");
@@ -178,18 +175,20 @@ void TrackDQMModule::defineHisto()
   m_UBResidualsSVDV->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDV->GetYaxis()->SetTitle("counts");
 
-  m_MomX = NULL;
-  m_MomY = NULL;
-  m_MomZ = NULL;
-  m_Mom = NULL;
-  m_HitsPXD = NULL;
-  m_HitsSVD = NULL;
-  m_HitsCDC = NULL;
-  m_Hits = NULL;
-  m_TracksVXD = NULL;
-  m_TracksCDC = NULL;
-  m_TracksVXDCDC = NULL;
-  m_Tracks = NULL;
+
+
+  m_MomX = nullptr;
+  m_MomY = nullptr;
+  m_MomZ = nullptr;
+  m_Mom = nullptr;
+  m_HitsPXD = nullptr;
+  m_HitsSVD = nullptr;
+  m_HitsCDC = nullptr;
+  m_Hits = nullptr;
+  m_TracksVXD = nullptr;
+  m_TracksCDC = nullptr;
+  m_TracksVXDCDC = nullptr;
+  m_Tracks = nullptr;
 
   int iHitsInPXD = 10;
   int iHitsInSVD = 20;
@@ -328,6 +327,8 @@ void TrackDQMModule::defineHisto()
     m_TRClusterHitmap[index]->GetYaxis()->SetTitle("Theta angle [deg]");
     m_TRClusterHitmap[index]->GetZaxis()->SetTitle("counts");
   }
+
+
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
@@ -351,6 +352,12 @@ void TrackDQMModule::defineHisto()
     m_TRClusterCorrelationsTheta[index]->GetYaxis()->SetTitle(title.c_str());
     m_TRClusterCorrelationsTheta[index]->GetZaxis()->SetTitle("counts");
   }
+
+  // only monitor if any flag was set so only 2 bins needed
+  m_trackingErrorFlags = new TH1F("NumberTrackingErrorFlags", "Tracking error summary."
+                                  " Mean = errors/event (should be 0 or very close to 0); Error occured yes or no; Number of events", 2, -0.5, 1.5);
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
+  m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
 
   oldDir->cd();
   oldDir->mkdir("TracksDQMAlignment");// dont use returned ptr, it might be zero
@@ -387,6 +394,8 @@ void TrackDQMModule::defineHisto()
     m_UBResidualsSensor[i]->GetZaxis()->SetTitle("counts");
   }
 
+
+
   oldDir->cd();
 }
 
@@ -400,64 +409,70 @@ void TrackDQMModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-  if (m_MomPhi != NULL) m_MomPhi->Reset();
-  if (m_MomCosTheta != NULL) m_MomCosTheta->Reset();
-  if (m_PValue != NULL) m_PValue->Reset();
-  if (m_Chi2 != NULL) m_Chi2->Reset();
-  if (m_NDF != NULL) m_NDF->Reset();
-  if (m_Chi2NDF != NULL) m_Chi2NDF->Reset();
-  if (m_UBResidualsPXD != NULL) m_UBResidualsPXD->Reset();
-  if (m_UBResidualsSVD != NULL) m_UBResidualsSVD->Reset();
-  if (m_UBResidualsPXDU != NULL) m_UBResidualsPXDU->Reset();
-  if (m_UBResidualsSVDU != NULL) m_UBResidualsSVDU->Reset();
-  if (m_UBResidualsPXDV != NULL) m_UBResidualsPXDV->Reset();
-  if (m_UBResidualsSVDV != NULL) m_UBResidualsSVDV->Reset();
+  if (m_MomPhi != nullptr) m_MomPhi->Reset();
+  if (m_MomCosTheta != nullptr) m_MomCosTheta->Reset();
+  if (m_PValue != nullptr) m_PValue->Reset();
+  if (m_Chi2 != nullptr) m_Chi2->Reset();
+  if (m_NDF != nullptr) m_NDF->Reset();
+  if (m_Chi2NDF != nullptr) m_Chi2NDF->Reset();
+  if (m_UBResidualsPXD != nullptr) m_UBResidualsPXD->Reset();
+  if (m_UBResidualsSVD != nullptr) m_UBResidualsSVD->Reset();
+  if (m_UBResidualsPXDU != nullptr) m_UBResidualsPXDU->Reset();
+  if (m_UBResidualsSVDU != nullptr) m_UBResidualsSVDU->Reset();
+  if (m_UBResidualsPXDV != nullptr) m_UBResidualsPXDV->Reset();
+  if (m_UBResidualsSVDV != nullptr) m_UBResidualsSVDV->Reset();
 
-  if (m_MomX != NULL) m_MomX->Reset();
-  if (m_MomY != NULL) m_MomY->Reset();
-  if (m_MomZ != NULL) m_MomZ->Reset();
-  if (m_Mom != NULL) m_Mom->Reset();
-  if (m_D0 != NULL) m_D0->Reset();
-  if (m_D0Phi != NULL) m_D0Phi->Reset();
-  if (m_D0Z0 != NULL) m_D0Z0->Reset();
+  if (m_MomX != nullptr) m_MomX->Reset();
+  if (m_MomY != nullptr) m_MomY->Reset();
+  if (m_MomZ != nullptr) m_MomZ->Reset();
+  if (m_Mom != nullptr) m_Mom->Reset();
+  if (m_D0 != nullptr) m_D0->Reset();
+  if (m_D0Phi != nullptr) m_D0Phi->Reset();
+  if (m_D0Z0 != nullptr) m_D0Z0->Reset();
 
-  if (m_Z0 != NULL) m_Z0->Reset();
-  if (m_Phi != NULL) m_Phi->Reset();
-  if (m_TanLambda != NULL) m_TanLambda->Reset();
-  if (m_Omega != NULL) m_Omega->Reset();
-  if (m_HitsPXD != NULL) m_HitsPXD->Reset();
-  if (m_HitsSVD != NULL) m_HitsSVD->Reset();
-  if (m_HitsCDC != NULL) m_HitsCDC->Reset();
-  if (m_Hits != NULL) m_Hits->Reset();
-  if (m_TracksVXD != NULL) m_TracksVXD->Reset();
-  if (m_TracksCDC != NULL) m_TracksCDC->Reset();
-  if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Reset();
-  if (m_Tracks != NULL) m_Tracks->Reset();
+  if (m_Z0 != nullptr) m_Z0->Reset();
+  if (m_Phi != nullptr) m_Phi->Reset();
+  if (m_TanLambda != nullptr) m_TanLambda->Reset();
+  if (m_Omega != nullptr) m_Omega->Reset();
+  if (m_HitsPXD != nullptr) m_HitsPXD->Reset();
+  if (m_HitsSVD != nullptr) m_HitsSVD->Reset();
+  if (m_HitsCDC != nullptr) m_HitsCDC->Reset();
+  if (m_Hits != nullptr) m_Hits->Reset();
+  if (m_TracksVXD != nullptr) m_TracksVXD->Reset();
+  if (m_TracksCDC != nullptr) m_TracksCDC->Reset();
+  if (m_TracksVXDCDC != nullptr) m_TracksVXDCDC->Reset();
+  if (m_Tracks != nullptr) m_Tracks->Reset();
+
+  if (m_trackingErrorFlags != nullptr) m_trackingErrorFlags->Reset();
+
 
   if (gTools->getNumberOfLayers() == 0) return;
 
   for (VxdID layer : geo.getLayers()) {
     int i = gTools->getLayerIndex(layer.getLayerNumber());
-    if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
+    if (m_TRClusterHitmap && m_TRClusterHitmap[i] != nullptr) m_TRClusterHitmap[i]->Reset();
   }
 
   for (VxdID layer : geo.getLayers()) {
     int i = layer.getLayerNumber();
     if (i == gTools->getLastLayer()) continue;
     i = gTools->getLayerIndex(i);
-    if (m_TRClusterCorrelationsPhi[i] != NULL) m_TRClusterCorrelationsPhi[i]->Reset();
-    if (m_TRClusterCorrelationsTheta[i] != NULL) m_TRClusterCorrelationsTheta[i]->Reset();
+    if (m_TRClusterCorrelationsPhi && m_TRClusterCorrelationsPhi[i] != nullptr) m_TRClusterCorrelationsPhi[i]->Reset();
+    if (m_TRClusterCorrelationsTheta && m_TRClusterCorrelationsTheta[i] != nullptr) m_TRClusterCorrelationsTheta[i]->Reset();
   }
+
   for (int i = 0; i < gTools->getNumberOfSensors(); i++) {
-    if (m_UBResidualsSensor[i] != NULL) m_UBResidualsSensor[i]->Reset();
-    if (m_UBResidualsSensorU[i] != NULL) m_UBResidualsSensorU[i]->Reset();
-    if (m_UBResidualsSensorV[i] != NULL) m_UBResidualsSensorV[i]->Reset();
+    if (m_UBResidualsSensor && m_UBResidualsSensor[i] != nullptr) m_UBResidualsSensor[i]->Reset();
+    if (m_UBResidualsSensorU && m_UBResidualsSensorU[i] != nullptr) m_UBResidualsSensorU[i]->Reset();
+    if (m_UBResidualsSensorV && m_UBResidualsSensorV[i] != nullptr) m_UBResidualsSensorV[i]->Reset();
   }
+
 }
 
 
 void TrackDQMModule::event()
 {
+
   StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
   if (!recoTracks.isOptional() || !recoTracks.getEntries())  return;
   StoreArray<Track> tracks(m_TracksStoreArrayName);
@@ -640,30 +655,36 @@ void TrackDQMModule::event()
       if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;
       if (((nPXD > 0) || (nSVD > 0)) && (nCDC == 0)) iTrackVXD++;
       if (((nPXD == 0) && (nSVD == 0)) && (nCDC > 0)) iTrackCDC++;
-      if (m_MomX != NULL) m_MomX->Fill(tfr->getMomentum().Px());
-      if (m_MomY != NULL) m_MomY->Fill(tfr->getMomentum().Py());
-      if (m_MomZ != NULL) m_MomZ->Fill(tfr->getMomentum().Pz());
-      if (m_MomPt != NULL) m_MomPt->Fill(tfr->getMomentum().Pt());
-      if (m_Mom != NULL) m_Mom->Fill(tfr->getMomentum().Mag());
-      if (m_D0 != NULL) m_D0->Fill(tfr->getD0());
-      if (m_D0Phi != NULL) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
-      if (m_Z0 != NULL) m_Z0->Fill(tfr->getZ0());
-      if (m_D0Z0 != NULL) m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
+      if (m_MomX != nullptr) m_MomX->Fill(tfr->getMomentum().Px());
+      if (m_MomY != nullptr) m_MomY->Fill(tfr->getMomentum().Py());
+      if (m_MomZ != nullptr) m_MomZ->Fill(tfr->getMomentum().Pz());
+      if (m_MomPt != nullptr) m_MomPt->Fill(tfr->getMomentum().Pt());
+      if (m_Mom != nullptr) m_Mom->Fill(tfr->getMomentum().Mag());
+      if (m_D0 != nullptr) m_D0->Fill(tfr->getD0());
+      if (m_D0Phi != nullptr) m_D0Phi->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+      if (m_Z0 != nullptr) m_Z0->Fill(tfr->getZ0());
+      if (m_D0Z0 != nullptr) m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
 
-      if (m_Phi != NULL) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
-      if (m_TanLambda != NULL) m_TanLambda->Fill(tfr->getTanLambda());
-      if (m_Omega != NULL) m_Omega->Fill(tfr->getOmega());
+      if (m_Phi != nullptr) m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+      if (m_TanLambda != nullptr) m_TanLambda->Fill(tfr->getTanLambda());
+      if (m_Omega != nullptr) m_Omega->Fill(tfr->getOmega());
 
-      if (m_HitsPXD != NULL) m_HitsPXD->Fill(nPXD);
-      if (m_HitsSVD != NULL) m_HitsSVD->Fill(nSVD);
-      if (m_HitsCDC != NULL) m_HitsCDC->Fill(nCDC);
-      if (m_Hits != NULL) m_Hits->Fill(nPXD + nSVD + nCDC);
+      if (m_HitsPXD != nullptr) m_HitsPXD->Fill(nPXD);
+      if (m_HitsSVD != nullptr) m_HitsSVD->Fill(nSVD);
+      if (m_HitsCDC != nullptr) m_HitsCDC->Fill(nCDC);
+      if (m_Hits != nullptr) m_Hits->Fill(nPXD + nSVD + nCDC);
     }
-    if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
-    if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);
-    if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
-    if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
+    if (m_TracksVXD != nullptr) m_TracksVXD->Fill(iTrackVXD);
+    if (m_TracksCDC != nullptr) m_TracksCDC->Fill(iTrackCDC);
+    if (m_TracksVXDCDC != nullptr) m_TracksVXDCDC->Fill(iTrackVXDCDC);
+    if (m_Tracks != nullptr) m_Tracks->Fill(iTrack);
   } catch (...) {
     B2DEBUG(20, "Some problem in Track DQM module!");
   }
+
+
+  // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there. If the Object is not there
+  //  the option "no error"  seen is filled to not scare any shifters.
+  if (m_eventLevelTrackingInfo.isValid()) m_trackingErrorFlags->Fill((double)m_eventLevelTrackingInfo->hasAnErrorFlag());
+  else m_trackingErrorFlags->Fill(0.0);
 }

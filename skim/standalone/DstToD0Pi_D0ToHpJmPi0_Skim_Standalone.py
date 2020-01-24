@@ -8,25 +8,21 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdMu, stdE
-from stdV0s import *
-from stdPi0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPi0s import loadStdSkimPi0
+from stdPhotons import loadStdSkimPhoton
+import skimExpertFunctions as expert
 
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
-skimCode = encodeSkimName('DstToD0Pi_D0ToHpJmPi0')
+gb2_setuprel = 'release-04-00-00'
+b2.set_log_level(b2.LogLevel.INFO)
+skimCode = expert.encodeSkimName('DstToD0Pi_D0ToHpJmPi0')
 
-c3bhpath = Path()
-fileList = get_test_file("ddbarBGx0", "MC12")
-inputMdstList('default', fileList, path=c3bhpath)
+c3bhpath = b2.Path()
+fileList = expert.get_test_file("MC12_ddbarBGx0")
+ma.inputMdstList('default', fileList, path=c3bhpath)
 
 
 loadStdSkimPhoton(path=c3bhpath)
@@ -39,16 +35,15 @@ stdPi('all', path=c3bhpath)
 stdK('all', path=c3bhpath)
 stdE('all', path=c3bhpath)
 stdMu('all', path=c3bhpath)
-stdKshorts(path=c3bhpath)
 
 from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(c3bhpath)
-skimOutputUdst(skimCode, DstToD0PiD0ToHpJmPi0List, path=c3bhpath)
+expert.skimOutputUdst(skimCode, DstToD0PiD0ToHpJmPi0List, path=c3bhpath)
 
-summaryOfLists(DstToD0PiD0ToHpJmPi0List, path=c3bhpath)
+ma.summaryOfLists(DstToD0PiD0ToHpJmPi0List, path=c3bhpath)
 
 
-setSkimLogging(path=c3bhpath)
-process(c3bhpath)
+expert.setSkimLogging(path=c3bhpath)
+b2.process(c3bhpath)
 
-print(statistics)
+print(b2.statistics)

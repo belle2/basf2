@@ -10,26 +10,27 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <string>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
 #include <klm/bklm/dbobjects/BKLMADCThreshold.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dataobjects/KLMDigitEventInfo.h>
+#include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dbobjects/KLMTimeConversion.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <klm/dataobjects/KLMDigitEventInfo.h>
-#include <klm/dataobjects/KLMDigitRaw.h>
-#include <klm/dbobjects/KLMTimeConversion.h>
 #include <rawdata/dataobjects/RawKLM.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -80,10 +81,13 @@ namespace Belle2 {
     /**
      * Unpack one EKLM digit.
      * @param[in] rawData           Data to be unpacked.
+     * @param[in] copper            Copper identifier.
+     * @param[in] hslb              HSLB number.
      * @param[in] lane              Lane.
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackEKLMDigit(const int* rawData, EKLMDataConcentratorLane* lane,
+    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
+                         EKLMDataConcentratorLane* lane,
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
@@ -121,10 +125,13 @@ namespace Belle2 {
     /** Name of EKLMDigit store array. */
     std::string m_outputEKLMDigitsName;
 
-    /* EKLM parameters. */
+    /** Record raw data in dataobject format (for debugging). */
+    bool m_WriteDigitRaws;
 
-    /** Record wrong hits (e.g. for debugging). */
+    /** Record wrong hits (for debugging). */
     bool m_WriteWrongHits;
+
+    /* EKLM parameters. */
 
     /**
      * Do not issue B2ERROR on wrong hits, with certain firmware versions
@@ -139,6 +146,9 @@ namespace Belle2 {
     bool m_IgnoreStrip0;
 
     /* BKLM parameters. */
+
+    /** Debug BKLM scintillators. */
+    bool m_DebugBKLMScintillators;
 
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;

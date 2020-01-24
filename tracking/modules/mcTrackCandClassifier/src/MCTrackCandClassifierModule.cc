@@ -8,22 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <boost/foreach.hpp>
-
-#include <framework/datastore/RelationArray.h>
-
 #include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
-
-#include <genfit/FieldManager.h>
-#include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
-#include <genfit/Track.h>
-
-#include <geometry/GeometryManager.h>
-#include <mdst/dataobjects/Track.h>
-#include <TGeoManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -31,8 +16,15 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/BFieldManager.h>
 
+#include <genfit/TrackCand.h>
 
+#include <boost/foreach.hpp>
+
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

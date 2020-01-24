@@ -15,7 +15,6 @@
 #include <deque>
 #include <string>
 #include <utility> // std::pair, std::move
-#include <limits>       // std::numeric_limits
 
 #include <math.h>       /* ceil */
 

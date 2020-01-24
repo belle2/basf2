@@ -37,6 +37,9 @@ PXDclusterFilterModule::PXDclusterFilterModule() : Module()
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
   addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD clusters outside the ROIs", false);
 
+  addParam("overrideDB", m_overrideDB, "If set, ROI-finding settings in DB are overwritten", false);
+  addParam("enableFiltering", m_enableFiltering, "enables/disables ROI-finding if overrideDB=True", false);
+
 }
 
 void PXDclusterFilterModule::initialize()
@@ -56,6 +59,18 @@ void PXDclusterFilterModule::initialize()
     m_selectorOUT.registerSubset(PXDClusters, m_PXDClustersOutsideROIName);
     m_selectorOUT.inheritAllRelations();
   }
+}
+
+void PXDclusterFilterModule::beginRun()
+{
+  // reset variables used to enable/disable ROI-finding
+  m_skipEveryNth = -1;
+  if (m_roiParameters) {
+    m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+  } else {
+    B2ERROR("No configuration for the current run found");
+  }
+  m_countNthEvent = 0;
 }
 
 bool PXDclusterFilterModule::Overlaps(const ROIid& theROI, const PXDCluster& thePXDCluster)
@@ -79,6 +94,42 @@ bool PXDclusterFilterModule::Overlaps(const ROIid& theROI, const PXDCluster& the
 }
 
 void PXDclusterFilterModule::event()
+{
+  // parameters might also change on a per-event basis
+  if (m_roiParameters.hasChanged()) {
+    if (m_roiParameters) {
+      m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+    } else {
+      B2ERROR("No configuration for the current run found");
+    }
+    // and reset counter
+    m_countNthEvent = 0;
+  }
+
+  if (m_overrideDB) {
+    if (m_enableFiltering) {
+      filterClusters();
+    } else {
+      copyClusters();
+    }
+    return;
+  }
+
+  m_countNthEvent++;
+
+  // Data reduction disabled -> simply copy everything
+  if (m_skipEveryNth > 0 and m_countNthEvent % m_skipEveryNth == 0) {
+    copyClusters();
+    m_countNthEvent = 0;
+
+    return;
+  }
+
+  // Perform data reduction
+  filterClusters();
+}
+
+void PXDclusterFilterModule::filterClusters()
 {
   // We have to change it once the hardware type clusters are well defined
   StoreArray<PXDCluster> PXDClusters(m_PXDClustersName);   /**< The PXDClusters to be filtered */
@@ -108,5 +159,12 @@ void PXDclusterFilterModule::event()
       return true;
     });
   }
-
 }
+
+void PXDclusterFilterModule::copyClusters()
+{
+  // omitting the variable name; otherwise a warning is produced (un-used variable)
+  m_selectorIN.select([](const PXDCluster* /* thePxdCluster */) {return true;});
+}
+
+

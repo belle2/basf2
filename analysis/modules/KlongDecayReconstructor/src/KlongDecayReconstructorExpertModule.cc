@@ -22,7 +22,6 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/ParticleCopy.h>
 
 #include <memory>
 

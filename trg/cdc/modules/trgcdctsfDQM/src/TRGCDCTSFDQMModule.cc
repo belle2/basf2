@@ -101,8 +101,9 @@ void TRGCDCTSFDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   char c_name[100];
   sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
@@ -234,6 +235,52 @@ void TRGCDCTSFDQMModule::event()
       h_valid->Fill(v);
       h_timing->Fill(rt);
     }
+
+    // to fill 5 more TS for 15 TS version, only for TSF 1,3,5
+    if (entAry[ii]->m_N2DTS == 10) continue;
+
+    id = entAry[ii]->m_trackerhit10id;
+    v  = entAry[ii]->m_trackerhit10v;
+    rt = entAry[ii]->m_trackerhit10rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit11id;
+    v  = entAry[ii]->m_trackerhit11v;
+    rt = entAry[ii]->m_trackerhit11rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit12id;
+    v  = entAry[ii]->m_trackerhit12v;
+    rt = entAry[ii]->m_trackerhit12rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit13id;
+    v  = entAry[ii]->m_trackerhit13v;
+    rt = entAry[ii]->m_trackerhit13rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit14id;
+    v  = entAry[ii]->m_trackerhit14v;
+    rt = entAry[ii]->m_trackerhit14rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+
+
   }
 
   oldDir->cd();

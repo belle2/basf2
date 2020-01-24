@@ -10,18 +10,9 @@
 
 #include <generators/modules/cryinput/CRYInputModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/GearDir.h>
 
-#include <TDatabasePDG.h>
-#include <TLorentzVector.h>
-#include <TRandom3.h>
-
-#include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>

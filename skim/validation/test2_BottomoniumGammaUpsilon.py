@@ -9,20 +9,20 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdMu
-from stdPhotons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdMu, stdPi
+from stdPhotons import stdPhotons
 from beamparameters import add_beamparameters
 
 # create a new path
-BottomoniumGammaUpsilonskimpath = Path()
+BottomoniumGammaUpsilonskimpath = b2.Path()
 
 # set up for running at Y(3S)
 beamparameters = add_beamparameters(BottomoniumGammaUpsilonskimpath, "Y3S")
 
 filelist = ['../BottomoniumGammaUpsilon.udst.root']
-inputMdstList('default', filelist, path=BottomoniumGammaUpsilonskimpath)
+ma.inputMdstList('default', filelist, path=BottomoniumGammaUpsilonskimpath)
 
 # use standard final state particle lists
 stdMu('loose', path=BottomoniumGammaUpsilonskimpath)
@@ -31,14 +31,13 @@ stdPi('loose', path=BottomoniumGammaUpsilonskimpath)
 stdPhotons('loose', path=BottomoniumGammaUpsilonskimpath)
 
 # Upsilon3S -> gam chib -> gam Y(1S,2S)(ll) decay
-reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumGammaUpsilonskimpath)
-reconstructDecay('chi_b1(2P):mychibJ -> gamma:loose Upsilon:mumu', '', path=BottomoniumGammaUpsilonskimpath)
-reconstructDecay('Upsilon(3S) -> gamma:loose chi_b1(2P):mychibJ', '', path=BottomoniumGammaUpsilonskimpath)
+ma.reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumGammaUpsilonskimpath)
+ma.reconstructDecay('chi_b1(2P):mychibJ -> gamma:loose Upsilon:mumu', '', path=BottomoniumGammaUpsilonskimpath)
+ma.reconstructDecay('Upsilon(3S) -> gamma:loose chi_b1(2P):mychibJ', '', path=BottomoniumGammaUpsilonskimpath)
 
 # the variables that are printed out are: the invariant mass of chib, the invariant mass
 # of Y(1S,2S), and the invariant mass of Y(3S)
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='BottomoniumGammaUpsilon_Validation.root',
     decayString='Upsilon(3S)',
     variables=[
@@ -56,5 +55,5 @@ variablesToHistogram(
          10.7)
     ], path=BottomoniumGammaUpsilonskimpath)
 
-process(BottomoniumGammaUpsilonskimpath)
-print(statistics)
+b2.process(BottomoniumGammaUpsilonskimpath)
+print(b2.statistics)

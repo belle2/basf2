@@ -17,8 +17,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // detector Digits, Clusters or waveforms
@@ -29,7 +27,7 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 using namespace std;
 

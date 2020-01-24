@@ -240,12 +240,15 @@ void KLMUnpackerModule::unpackBKLMDigit(
     layer = BKLMElementNumbers::getLayerByModule(moduleId);
     if (layer >= BKLMElementNumbers::c_FirstRPCLayer)
       return;
-    BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+    /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
+    if (raw.channel > 0)
+      BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
   } else {
     moduleId = *detectorChannel;
     layer = BKLMElementNumbers::getLayerByModule(moduleId);
     if (m_DebugBKLMScintillators) {
-      if (layer < BKLMElementNumbers::c_FirstRPCLayer)
+      /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
+      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
         BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
     }
   }

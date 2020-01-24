@@ -221,7 +221,8 @@ def dbprocess(host, path, lastChangeCallback=lambda: None, *, globaltag="localte
 
 
 # keep timeouts short for testing
-basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5, stalled_timeout=5)
+basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5,
+                                 stalled_timeout=5, max_retries=3)
 
 # set the random seed to something fixed
 basf2.set_random_seed("something important")

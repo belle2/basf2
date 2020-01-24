@@ -67,6 +67,9 @@ namespace Belle2 {
     */
     std::vector<std::vector<std::pair<int, std::string>>> m_hierarchy;
 
+    /** Is this object initialized correctly? **/
+    bool m_isInitOK;
+
   public:
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
@@ -167,6 +170,12 @@ namespace Belle2 {
 
     /** Is the decay or the particle self conjugated */
     bool isSelfConjugated() const;
+
+    /** Check if the object initialized correctly. */
+    bool isInitOK() const
+    {
+      return m_isInitOK;
+    }
 
     /** Takes as input argument a (reconstructed) Particle, tries to match with
     this DecayDescriptorElement and returns true when matched. */

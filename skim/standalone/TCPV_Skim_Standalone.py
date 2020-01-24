@@ -11,36 +11,37 @@
 __author__ = " Reem Rasheed"
 
 
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPhotons import *
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
-from skim.standardlists.dileptons import loadStdDiLeptons
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.dileptons import loadStdDiLeptons, loadStdJpsiToee, loadStdJpsiTomumu
+from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 
-import sys
-import os
-import glob
-skimCode = encodeSkimName('TCPV')
+skimCode = expert.encodeSkimName('TCPV')
 
 # create a path
-path = Path()
+path = b2.Path()
 
-fileList = get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=path)
+ma.inputMdstList('default', fileList, path=path)
 
+ma.fillParticleList('K+:1%',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01", path=path)
+ma.fillParticleList('e+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+ma.fillParticleList('mu+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
 stdPi0s('loose', path=path)
 stdPi('loose', path=path)
+stdK('all', path=path)
 stdK('loose', path=path)
 stdE('loose', path=path)
 stdMu('loose', path=path)
@@ -49,16 +50,20 @@ stdPhotons('loose', path=path)
 stdKshorts(path=path)
 loadStdDiLeptons(True, path=path)
 loadStdLightMesons(path=path)
-cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
+ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=path)
+loadStdJpsiToee(path=path)
+loadStdJpsiTomumu(path=path)
+loadStdD0_Kpi(path=path)
+loadStdD0_Kpipipi(path=path)
 
 # TCPV Skim
 from skim.tcpv import TCPVList
 tcpvList = TCPVList(path=path)
-skimOutputUdst(skimCode, tcpvList, path=path)
-summaryOfLists(tcpvList, path=path)
+expert.skimOutputUdst(skimCode, tcpvList, path=path)
+ma.summaryOfLists(tcpvList, path=path)
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

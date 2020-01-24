@@ -81,13 +81,6 @@ namespace {
     // We should have 6 constraints - one per each top level parameter
     EXPECT_EQ(constraints.size(), 6);
 
-    int id = 100000101;
-
-    // Constraints are named by mother (here top) level parameters
-    //EXPECT_TRUE(constraints.find(id) != constraints.end());
-    // WARNING: not the case anymore, constraints are key-indexed using their CRC checksum.
-    //TODO: extend the Constraints structure to hold this additional info to add it text files
-
     // Here each child parameter exactly corresponds to mother parameter
     // we have two childs, so there should be two entries in constraint coefficients
     for (auto checksum_constraint : constraints) {

@@ -23,7 +23,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-11-11"
+#define CURRENT_DEFAULT_TAG "master_2019-11-29"
 
 namespace py = boost::python;
 
@@ -248,9 +248,9 @@ namespace Belle2::Conditions {
     There is no default globaltag available for processing. This usually means
     you set the environment variable BELLE2_CONDB_GLOBALTAG to an empty value.
 
-    As this is unlikely to work for even the most basic funtionality this is not
+    As this is unlikely to work for even the most basic functionality this is not
     directly supported anymore. If you really want to disable any access to the
-    conditions database please configure this explictly
+    conditions database please configure this explicitly
 
     >>> basf2.conditions.metadata_providers = []
     >>> basf2.conditions.override_globaltags([])
@@ -564,7 +564,7 @@ Parameters:
   usable_globaltag_states (set(str)): Names of globaltag states accepted for
       processing. This can be changed to make sure that only fully published
       globaltags are used or to enable running on an open tag. It is not possible
-      to allow usage of 'INVALID' tags, those will always be recjeted.
+      to allow usage of 'INVALID' tags, those will always be rejected.
   connection_timeout (int): timeout in seconds before connection should be
       aborted. 0 sets the timeout to the default (300s)
   stalled_timeout (int): timeout in seconds before a download should be

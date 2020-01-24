@@ -10,8 +10,11 @@ from ROOT import Belle2
 import gzip
 import glob
 import struct
-from b2test_utils import clean_working_directory, safe_process
+from b2test_utils import clean_working_directory, safe_process, skip_test_if_light
 
+skip_test_if_light()  # cannot simulate events in a light release
+
+basf2.conditions.disable_globaltag_replay()
 basf2.set_random_seed("something important")
 # simplify logging output to just the type and the message
 basf2.logging.enable_summary(False)

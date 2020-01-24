@@ -440,6 +440,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         if localDBs:
             for localDB in reversed(localDBs):
                 collection.use_local_database(localDB)
+        collection.backend_args = {"queue": "l"}
 
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)

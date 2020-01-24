@@ -7,22 +7,21 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skim.standardlists.lightmesons import *
-from skim.standardlists.dileptons import *
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
+from stdPhotons import stdPhotons, loadStdSkimPhoton
+from stdPi0s import stdPi0s, loadStdSkimPi0
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdLightMesons
+import skimExpertFunctions as expert
 
 gb2_setuprel = 'release-04-00-00'
 
-btocharmpath = Path()
+btocharmpath = b2.Path()
 
-fileList = get_test_file("MC12_mixedBGx1")
-inputMdstList('default', fileList, path=btocharmpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=btocharmpath)
 
 
 stdPi('all', path=btocharmpath)
@@ -37,33 +36,41 @@ loadStdSkimPi0(path=btocharmpath)
 loadStdSkimPhoton(path=btocharmpath)
 
 
-# B- to D(->hh)h- Skim
-from skim.btocharm import BsigToDhTohhList, loadD0bar
-loadD0bar(path=btocharmpath)
-BtoDhhhList = BsigToDhTohhList(path=btocharmpath)
-add_skim('BtoDh_hh', BtoDhhhList, path=btocharmpath)
+# B+ to anti-D0(->h+h-)h+ Skim
+from skim.btocharm import BsigToD0hTohhList
+from skim.standardlists.charm import loadD0_hh_loose
+
+loadD0_hh_loose(path=btocharmpath)
+BtoD0h_hh_List = BsigToD0hTohhList(path=btocharmpath)
+expert.add_skim('BtoD0h_hh', BtoD0h_hh_List, path=btocharmpath)
+
+# B+ to anti-D0(->Kshh)h+ Skim
+from skim.btocharm import BsigToD0hToKshhList
+from skim.standardlists.charm import loadD0_Kshh_loose
+
+loadD0_Kshh_loose(path=btocharmpath)
+BtoD0h_Kshh_List = BsigToD0hToKshhList(path=btocharmpath)
+expert.add_skim('BtoD0h_Kshh', BtoD0h_Kshh_List, path=btocharmpath)
+
+# B+ to anti-D0(->Kspi0)h+ Skim
+from skim.btocharm import BsigToD0hToKspi0List
+from skim.standardlists.charm import loadD0_Kspi0_loose
+
+loadD0_Kspi0_loose(path=btocharmpath)
+BtoD0h_Kspi0_List = BsigToD0hToKspi0List(path=btocharmpath)
+expert.add_skim('BtoD0h_Kspi0', BtoD0h_Kspi0_List, path=btocharmpath)
+
+# B+ to anti-D0(->Kspipipi0)h+ Skim
+from skim.btocharm import BsigToD0hToKspipipi0List
+from skim.standardlists.charm import loadD0_Kspipipi0
+
+loadD0_Kspipipi0(path=btocharmpath)
+BtoD0h_Kspipipi0_List = BsigToD0hToKspipipi0List(path=btocharmpath)
+expert.add_skim('BtoD0h_Kspipipi0', BtoD0h_Kspipipi0_List, path=btocharmpath)
 
 
-# B- to D(->Kshh)h- Skim
-from skim.btocharm import BsigToDhToKshhList, loadDkshh
-loadDkshh(path=btocharmpath)
-BtoDhKshhList = BsigToDhToKshhList(path=btocharmpath)
-add_skim('BtoDh_Kshh', BtoDhKshhList, path=btocharmpath)
-
-# B- to D(->Kspi0)h- Skim
-from skim.btocharm import BsigToDhToKspi0List, loadDkspi0
-loadDkspi0(path=btocharmpath)
-BtoDhKspi0List = BsigToDhToKspi0List(path=btocharmpath)
-add_skim('BtoDh_Kspi0', BtoDhKspi0List, path=btocharmpath)
-
-# B- to D(->Kspipipi0)h- Skim
-from skim.btocharm import BsigToDhToKspipipi0List, loadDkspipipi0
-loadDkspipipi0(path=btocharmpath)
-BtoDhKspipipi0List = BsigToDhToKspipipi0List(path=btocharmpath)
-add_skim('BtoDh_Kspipipi0', BtoDhKspipipi0List, path=btocharmpath)
-
-setSkimLogging(path=btocharmpath)
-process(path=btocharmpath)
+expert.setSkimLogging(path=btocharmpath)
+b2.process(path=btocharmpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

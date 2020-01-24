@@ -55,8 +55,8 @@ namespace Belle2 {
     std::string m_outputRootFileName; /**< root output file name. */
 
     // Module parameters.
-    bool m_useTrackInfo; /**< True if using clusters related to tracks. */
-    bool m_is2017TBanalysis; /**< True if analyzing 2017 testbeam data. */
+    bool m_useTrackInfo = true; /**< True if using clusters related to tracks. */
+    bool m_is2017TBanalysis = false; /**< True if analyzing 2017 testbeam data. */
 
     // Store arrays.
     StoreArray<SVDCluster> m_svdClusters; /**< SVD clusters store array. */

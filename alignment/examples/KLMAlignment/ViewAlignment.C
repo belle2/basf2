@@ -4,7 +4,7 @@ void ViewAlignment(const char *fname)
   const int nEndcaps = 2;
   const int nSectors = 4;
   const int nBKLMSectors = 8;
-  int section, layer, sector, plane, segment, param;
+  int section, layer, sector, param;
   float value0, value, error;
   int i, j, n;
   char str[128];

@@ -10,19 +10,19 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdMu, stdE, stdMu
-from stdV0s import *
-from stdPi0s import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPi0s import loadStdSkimPi0
+from stdPhotons import loadStdSkimPhoton
+from stdV0s import mergedKshorts, stdKshorts
+import skimExpertFunctions as expert
 
 
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-charmpath = Path()
+charmpath = b2.Path()
 fileList = [
 
     '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +
@@ -30,7 +30,7 @@ fileList = [
 
 ]
 
-inputMdstList('default', fileList, path=charmpath)
+ma.inputMdstList('default', fileList, path=charmpath)
 
 
 loadStdSkimPhoton(path=charmpath)
@@ -53,32 +53,32 @@ mergedKshorts(path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(charmpath)
-add_skim("DstToD0Pi_D0ToHpJm", DstToD0PiD0ToHpJmList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToHpJm", DstToD0PiD0ToHpJmList, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(charmpath)
-add_skim("DstToD0Pi_D0ToHpHmKs", DstToD0PiD0ToHpHmKsList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToHpHmKs", DstToD0PiD0ToHpHmKsList, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpJmEta
 DstToD0PiD0ToHpJmEtaList = DstToD0PiD0ToHpJmEta(charmpath)
-add_skim("DstToD0Pi_D0ToHpJmEta", DstToD0PiD0ToHpJmEtaList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToHpJmEta", DstToD0PiD0ToHpJmEtaList, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToKsOmega
 DstList = DstToD0PiD0ToKsOmega(charmpath)
-add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
 
 from skim.charm import DstToD0Neutrals
-add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
 
 from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(charmpath)
-add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
 
 from skim.charm import CharmSemileptonic
 CSLList = CharmSemileptonic(charmpath)
-add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
 
-setSkimLogging(path=charmpath)
-process(charmpath)
+expert.setSkimLogging(path=charmpath)
+b2.process(charmpath)
 
-print(statistics)
+print(b2.statistics)

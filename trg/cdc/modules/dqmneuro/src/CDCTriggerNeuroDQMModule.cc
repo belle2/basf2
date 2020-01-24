@@ -2947,6 +2947,11 @@ void CDCTriggerNeuroDQMModule::event()
       infostr += (ltrack.getValidStereoBit()) ? " valid" : " NOT valid";
       B2DEBUG(15, padright(infostr, 100));
       std::string info2str = "      Expert Network Number: " + std::to_string(ltrack.getExpert());
+      info2str += ", TSVector: (";
+      for (bool x : ltrack.getTSVector()) {
+        info2str += std::to_string(x) + " ";
+      }
+      info2str += ")";
       B2DEBUG(15, padright(info2str, 100));
       CDCTriggerTrack* ftrack = ltrack.getRelatedFrom<CDCTriggerTrack>(m_unpackedNeuroInput2DTracksName);
       CDCTriggerTrack* strack = ftrack->getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);

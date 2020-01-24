@@ -21,7 +21,7 @@ import skimExpertFunctions as expert
 
 path = b2.Path()
 
-skimCode = expert.encodeSkimName('BtoDh_Kspi0')
+skimCode = expert.encodeSkimName('BtoD0h_Kspi0')
 
 fileList = ['../BtoDh_Kspi0.dst.root']
 

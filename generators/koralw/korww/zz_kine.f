@@ -2222,15 +2222,15 @@ c
       Ym3=sqrt(-dmas2(qq3))
       Ym4=sqrt(-dmas2(qq4))
       i6=6
-      write(i6,*) '====OVERVEIGHTED EVT. NR: NEVTRU=',NEVTRU,'====='
-      write(i6,*) '===generated with channel: ikan=',ikan,'========'
+CC      write(i6,*) '====OVERVEIGHTED EVT. NR: NEVTRU=',NEVTRU,'====='
+CC      write(i6,*) '===generated with channel: ikan=',ikan,'========'
       write(i6,*) 'Note: this event should be outside your detector'
       write(i6,*) 'if not, increase wtmax (?) and/or check manual ?'
       write(i6,*) 'final state: ',IFLAV
-      write(i6,*) 'wtu= wtmod*wtmod4f/wtmax=',wtovr/wtmax,
-     $                ' wtmod4f=',wtmod4f
-      write(i6,*) 'wtu_max=                 ',wtu,'    ... so far'
-      write(i6,*) '-----------'
+CC      write(i6,*) 'wtu= wtmod*wtmod4f/wtmax=',wtovr/wtmax,
+CC     $                ' wtmod4f=',wtmod4f
+CC      write(i6,*) 'wtu_max=                 ',wtu,'    ... so far'
+CC      write(i6,*) '-----------'
       write(i6,*) 'e-prim=',xmtot,'  wtmod4f=',wtmod4f
       write(i6,*) 'active entries from',mrchan,'to',nrchan,';fak=',fak
       do k=1,nrchan/5+1

@@ -7,6 +7,8 @@
 import os
 import basf2
 from ROOT import TFile, Belle2
+from b2test_utils import skip_test_if_light
+skip_test_if_light()  # cannot simulate events in a light release
 
 
 class CheckEventNumbers(basf2.Module):

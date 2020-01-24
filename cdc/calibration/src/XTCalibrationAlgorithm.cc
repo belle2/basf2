@@ -80,9 +80,9 @@ void XTCalibrationAlgorithm::createHisto()
 
   int al = 0;
   int th = 0;
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     /* protect in case |alpha|>90 */
     if (fabs(alpha > 90)) {

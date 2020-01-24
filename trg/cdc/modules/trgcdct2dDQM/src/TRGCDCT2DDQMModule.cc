@@ -108,8 +108,9 @@ void TRGCDCT2DDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   char c_name_tsf[100];
   sprintf(c_name_tsf, "CDCTriggerSegmentHits");

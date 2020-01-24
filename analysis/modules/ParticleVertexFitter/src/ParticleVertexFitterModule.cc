@@ -362,7 +362,11 @@ namespace Belle2 {
       return false;
     }
 
+    // The update of the daughters is disabled for the pi0 mass fit.
+    bool updateDaughters = m_updateDaughters;
+    m_updateDaughters = false;
     bool ok = makeKMassMother(km, pi0Temp);
+    m_updateDaughters = updateDaughters;
 
     return ok;
   }

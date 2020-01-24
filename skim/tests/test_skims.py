@@ -14,6 +14,9 @@ from stdV0s import stdKshorts, mergedKshorts
 from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons
+from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.dileptons import loadStdDiLeptons, loadStdJpsiToee, loadStdJpsiTomumu
+from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
 b2.set_log_level(b2.LogLevel.INFO)
 
 skimpath = b2.Path()
@@ -22,6 +25,8 @@ ma.inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), 
 
 stdPi0s('loose', path=skimpath)
 stdPhotons('loose', path=skimpath)
+stdPhotons('all', path=skimpath)
+stdPhotons('tight', path=skimpath)  # also builds loose list
 stdKshorts(path=skimpath)
 mergedKshorts(path=skimpath)  # add due to charm skims need it
 stdPi('loose', path=skimpath)
@@ -33,27 +38,33 @@ stdPi('all', path=skimpath)
 stdK('all', path=skimpath)
 stdE('all', path=skimpath)
 stdMu('all', path=skimpath)
-
-loadStdLightMesons(path=skimpath)
-loadStdSkimPi0(path=skimpath)
-loadStdSkimPhoton(path=skimpath)
-stdPhotons('all', path=skimpath)
-stdPhotons('tight', path=skimpath)  # also builds loose list
 stdK('95eff', path=skimpath)
 stdPi('95eff', path=skimpath)
 stdE('95eff', path=skimpath)
 stdMu('95eff', path=skimpath)
 stdPr('90eff', path=skimpath)
-
+# loading partcile liss
+loadStdLightMesons(path=skimpath)
+loadStdSkimPi0(path=skimpath)
+loadStdSkimPhoton(path=skimpath)
 loadStdD0(path=skimpath)
 loadStdDplus(path=skimpath)
 loadStdDstar0(path=skimpath)
 loadStdDstarPlus(path=skimpath)
 loadStdDiLeptons(True, path=skimpath)
+loadStdJpsiToee(path=skimpath)
+loadStdJpsiTomumu(path=skimpath)
+loadStdD0_Kpi(path=skimpath)
+loadStdD0_Kpipipi(path=skimpath)
+
+
 ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
 
 ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=skimpath)
 ma.reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=skimpath)
+ma.fillParticleList('K+:1%',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01", path=skimpath)
+ma.fillParticleList('e+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=skimpath)
+ma.fillParticleList('mu+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=skimpath)
 
 # ISR cc skim
 from skim import quarkonium

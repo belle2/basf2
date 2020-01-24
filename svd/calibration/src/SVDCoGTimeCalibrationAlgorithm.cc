@@ -98,10 +98,11 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 
+  delete f;
+
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
-  delete f;
 }
 
 bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)

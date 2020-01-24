@@ -71,7 +71,7 @@ def B2XllList(path):
 
     # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
     # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
-    fairTrack = 'dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance'
+    fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
     ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
     ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
@@ -119,7 +119,7 @@ def B2XllListLFV(path):
 
     # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
     # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
-    fairTrack = 'dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance'
+    fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
     ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
     ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)

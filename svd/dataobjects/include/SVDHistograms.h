@@ -23,6 +23,7 @@
 
 namespace Belle2 {
 
+  /** template class for SVd histograms*/
   template < class H > // H is an histogram
   class SVDHistograms: public TObject {
 

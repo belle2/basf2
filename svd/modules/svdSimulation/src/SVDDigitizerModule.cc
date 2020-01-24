@@ -300,8 +300,8 @@ void SVDDigitizerModule::event()
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
-  m_currentSensor = 0;
-  m_currentSensorInfo = 0;
+  //  m_currentSensor = 0;
+  //m_currentSensorInfo = 0;
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);

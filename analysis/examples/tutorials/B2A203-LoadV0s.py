@@ -14,8 +14,8 @@
 # The recommended way to do this is to use the standard
 # lists provided in the script: analysis/scripts/stdV0s.py:
 #
-#    stdKshorts(prioritiseV0, path)
-#    stdLambdas(prioritiseV0, path)
+#    stdKshorts(prioritiseV0, fitter, path)
+#    stdLambdas(prioritiseV0, fitter, path)
 #
 # Contributors: B. Scavino (August 2018)
 #               I. Komarov (September 2018)

@@ -99,7 +99,7 @@ Tau-pair skims
 For skim liaisons and developers
 --------------------------------
 
-Some functions and tools are for the use of skim liaisons and developers.
+Some functions and tools are for the use of skim liaisons and developers. A Jupyter notebook skimming tutorial can be found within the basf2 ./skim/tutorial directory.
 
 .. tip:: If you are only interested in the selection criteria this section is probably not relevant for you.
 

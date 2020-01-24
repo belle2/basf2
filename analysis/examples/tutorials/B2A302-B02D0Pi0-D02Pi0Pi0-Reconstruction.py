@@ -55,7 +55,7 @@ ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0:all',
                 path=my_path)
 

@@ -46,17 +46,21 @@ void DQMHistInjectionModule::initialize()
   m_cInjectionLERPXD = new TCanvas("PXDINJ/c_InjectionLERPXD");
   m_cInjectionLERPXDOcc = new TCanvas("PXDINJ/c_InjectionLERPXDOcc");
   m_cInjectionLERECL = new TCanvas("ECLINJ/c_InjectionLERECL");
+  m_cBurstLERECL = new TCanvas("ECLINJ/c_BurstInjectionLERECL");
   m_cInjectionLERTOP = new TCanvas("TOP/c_InjectionLERTOP");
 
   m_cInjectionHERPXD = new TCanvas("PXDINJ/c_InjectionHERPXD");
   m_cInjectionHERPXDOcc = new TCanvas("PXDINJ/c_InjectionHERPXDOcc");
   m_cInjectionHERECL = new TCanvas("ECLINJ/c_InjectionHERECL");
+  m_cBurstHERECL = new TCanvas("ECLINJ/c_BurstInjectionHERECL");
   m_cInjectionHERTOP = new TCanvas("TOP/c_InjectionHERTOP");
 
   m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionLERPXDOcc = new TH1F("HitInjectionPXDLEROcc", "PXD Occ after LER Injection;Time in #mus;Mean Occ in % per module", 4000,
                                    0 , 20000);
   m_hInjectionLERECL = new TH1F("HitInjectionLERECL", "ECL Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hBurstLERECL = new TH1F("BurstInjectionLERECL", "ECL Bursts after LER Injection;Time in #mus;Suppressions/event (1 #mus bins)",
+                            20000, 0 , 20000);
   m_hInjectionLERTOP = new TH1F("HitInjectionLERTOP", "TOP Occ after LER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
 
@@ -64,6 +68,8 @@ void DQMHistInjectionModule::initialize()
   m_hInjectionHERPXDOcc = new TH1F("HitInjectionPXDHEROcc", "PXD Occ after HER Injection;Time in #mus;Mean Occ in % per modul", 4000,
                                    0 , 20000);
   m_hInjectionHERECL = new TH1F("HitInjectionHERECL", "ECL Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
+  m_hBurstHERECL = new TH1F("BurstInjectionHERECL", "ECL Bursts after HER Injection;Time in #mus;Suppressions/event (1 #mus bins)",
+                            20000, 0 , 20000);
   m_hInjectionHERTOP = new TH1F("HitInjectionHERTOP", "TOP Occ after HER Injection;Time in #mus;Mean Occ in % /event", 4000, 0 ,
                                 20000);
 
@@ -112,7 +118,9 @@ void DQMHistInjectionModule::beginRun()
 void DQMHistInjectionModule::event()
 {
   TH1* Hits = nullptr, *Triggers = nullptr;
+  TH1* Bursts = nullptr;
   TString locationHits = "";
+  TString locationBursts = "";
   TString locationTriggers = "";
   m_histogramDirectoryName = "PXDINJ";
 
@@ -215,6 +223,46 @@ void DQMHistInjectionModule::event()
   m_cInjectionHERECL->Clear();
   m_cInjectionHERECL->cd(0);
   m_hInjectionHERECL->Draw("hist");
+// =====
+  locationBursts = "ECLBurstsInjLER";
+  if (m_histogramDirectoryName != "") {
+    locationBursts = m_histogramDirectoryName + "/" + locationBursts;
+  }
+  Bursts = (TH1*)findHist(locationBursts.Data());
+  locationTriggers = "ECLEBurstsInjLER";
+  if (m_histogramDirectoryName != "") {
+    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  }
+  Triggers = (TH1*)findHist(locationTriggers.Data());
+
+  if (Bursts && Triggers) {
+    m_hBurstLERECL->Divide(Bursts, Triggers);
+  }
+
+  m_cBurstLERECL->Clear();
+  m_cBurstLERECL->cd(0);
+  m_hBurstLERECL->Draw("hist");
+// =====
+
+  locationBursts = "ECLBurstsInjHER";
+  if (m_histogramDirectoryName != "") {
+    locationBursts = m_histogramDirectoryName + "/" + locationBursts;
+  }
+  Bursts = (TH1*)findHist(locationBursts.Data());
+  locationTriggers = "ECLEBurstsInjHER";
+  if (m_histogramDirectoryName != "") {
+    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  }
+  Triggers = (TH1*)findHist(locationTriggers.Data());
+
+  if (Bursts && Triggers) {
+    m_hBurstHERECL->Divide(Bursts, Triggers);
+  }
+
+  m_cBurstHERECL->Clear();
+  m_cBurstHERECL->cd(0);
+  m_hBurstHERECL->Draw("hist");
+// =====
 
   m_histogramDirectoryName = "TOP";
 

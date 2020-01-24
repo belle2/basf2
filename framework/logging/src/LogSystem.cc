@@ -147,7 +147,8 @@ bool LogSystem::sendMessage(LogMessage&& message)
   // And if it is the last time we show it let's add a trailer for good measure
   if (messageSent and lastTime) {
     showText(max(message.getLogLevel(), LogConfig::c_Warning),
-             "The previous message has occurred too many times and will be suppressed in future",
+             "The previous message has occurred " + std::to_string(m_maxErrorRepetition) +
+             " times and will be suppressed in future",
              LogConfig::c_Level | LogConfig::c_Message);
   }
 

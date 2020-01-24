@@ -3,8 +3,8 @@
 {
 global:
     extern "C++" {
-        Belle2::UtrepsB::*;
-        Belle2::TrepsB::*;
+        *Belle2::UtrepsB*;
+        *Belle2::TrepsB*;
     };
 local:
     *;

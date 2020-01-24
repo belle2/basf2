@@ -49,15 +49,6 @@ void LogSystem::resetLogConnections()
 }
 
 
-bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const char* package) const
-{
-  const LogConfig& config = getCurrentLogConfig(package);
-  LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
-  int debugLevelLimit = config.getDebugLevel();
-
-  return logLevelLimit <= level && (level != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
-}
-
 bool LogSystem::deliverMessageToConnections(const LogMessage& message)
 {
   bool messageSent = false;
@@ -170,28 +161,6 @@ void LogSystem::resetMessageCounter()
 int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 {
   return m_messageCounter[logLevel];
-}
-
-
-const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
-{
-  //module specific config?
-  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-    return *m_moduleLogConfig;
-  }
-
-  //package specific config?
-  if (package) {
-    const map<string, LogConfig>::const_iterator& packageLogConfig = m_packageLogConfigs.find(package);
-    if (packageLogConfig != m_packageLogConfigs.end()) {
-      const LogConfig& logConfig = packageLogConfig->second;
-      if (logConfig.getLogLevel() != LogConfig::c_Default)
-        return logConfig;
-    }
-  }
-
-  //global config
-  return m_logConfig;
 }
 
 

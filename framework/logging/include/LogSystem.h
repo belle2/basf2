@@ -141,14 +141,14 @@ namespace Belle2 {
      *
      * \sa getCurrentLogConfig()
      */
-    inline LogConfig::ELogLevel getCurrentLogLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getLogLevel(); }
+    LogConfig::ELogLevel getCurrentLogLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getLogLevel(); }
 
     /**
      * Returns the current debug level used by the logging system.
      *
      * \sa getCurrentLogConfig()
      */
-    inline int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getDebugLevel(); }
+    int getCurrentDebugLevel(const char* package = nullptr) const { return getCurrentLogConfig(package).getDebugLevel(); }
 
     /**
      * Get maximum number of repetitions before silencing "identical" log messages
@@ -240,5 +240,32 @@ namespace Belle2 {
      */
     void showText(LogConfig::ELogLevel level, const std::string& txt, int info = LogConfig::c_Message);
   };
+
+  inline const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
+  {
+    //module specific config?
+    if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+      return *m_moduleLogConfig;
+    }
+    //package specific config?
+    if (package && !m_packageLogConfigs.empty()) {
+      // cppcheck-suppress stlIfFind ; cppcheck doesn't like scoped variables in if statements
+      if (auto it = m_packageLogConfigs.find(package); it != m_packageLogConfigs.end()) {
+        const LogConfig& logConfig = it->second;
+        if (logConfig.getLogLevel() != LogConfig::c_Default)
+          return logConfig;
+      }
+    }
+    //global config
+    return m_logConfig;
+  }
+
+  inline bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const char* package) const
+  {
+    const LogConfig& config = getCurrentLogConfig(package);
+    const LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
+    const int debugLevelLimit = config.getDebugLevel();
+    return logLevelLimit <= level && (level != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
+  }
 
 } //end of namespace Belle2

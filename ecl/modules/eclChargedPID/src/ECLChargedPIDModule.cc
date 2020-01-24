@@ -9,61 +9,77 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
+#include <math.h>
+#include <algorithm>
+#include "TMath.h"
 
-#include <ecl/dataobjects/ECLShower.h>
+#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 
 using namespace Belle2;
 
 REG_MODULE(ECLChargedPID)
 
+
 ECLChargedPIDModule::ECLChargedPIDModule() : Module()
 {
-  setDescription("ECL charged particle PID module. Likelihood values for each signed particle hypothesis (sign chosen will depend on the reco track charge) are stored in an ECLPidLikelihood object.");
+  setDescription("The module implements charged particle identification using ECL-related observables.The baseline method include several shower shape variables along with cluster energy and E/p. For each Track matched with a suitable ECLShower, likelihoods for each particle hypothesis are obtained from pdfs stored in a conditions database payload, and get stored in an ECLPidLikelihood object.");
+
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("applyClusterTimingSel", m_applyClusterTimingSel,
+
+  addParam("applyClusterTimingSel",
+           m_applyClusterTimingSel,
            "Set true if you want to apply a abs(clusterTiming)/clusterTimingError<1 cut on clusters. This cut is optimised to achieve 99% timing efficiency for true photons from the IP.",
            bool(false));
 }
 
+
 ECLChargedPIDModule::~ECLChargedPIDModule() {}
 
-void ECLChargedPIDModule::checkDB()
-{
-  if (!m_pdfs) { B2FATAL("No ECL charged PID PDFs found in database!"); }
-}
 
 void ECLChargedPIDModule::initialize()
 {
+  m_eventMetaData.isRequired();
+
   m_eclPidLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_eclPidLikelihoods);
-
-  m_pdfs.addCallback([this]() { checkDB(); });
-  checkDB();
 }
 
-void ECLChargedPIDModule::beginRun() {}
+
+void ECLChargedPIDModule::checkPdfsDB()
+{
+  if (!m_pdfs) { B2FATAL("No ECL charged PID PDFs payload found in database!"); }
+}
+
+
+void ECLChargedPIDModule::beginRun()
+{
+  m_pdfs.addCallback([this]() { checkPdfsDB(); });
+  checkPdfsDB();
+}
+
 
 void ECLChargedPIDModule::event()
 {
 
   for (const auto& track : m_tracks) {
 
+    // Don't forget to clear variable map before a track gets processed!
+    m_variables.clear();
+
     // Load the pion fit hypothesis or the hypothesis which is the closest in mass to a pion
     // (the tracking will not always successfully fit with a pion hypothesis).
     const TrackFitResult* fitRes = track.getTrackFitResultWithClosestMass(Const::pion);
     if (fitRes == nullptr) continue;
-
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
     const double p     = fitRes->getMomentum().Mag();
     const double theta = fitRes->getMomentum().Theta();
+    const auto charge  = fitRes->getChargeSign();
 
-    double maxEnergy(0), e9e21(0);
-    double lat(0), dist(0), trkdepth(0), shdepth(0);
-    double nCrystals = 0;
-    int nClusters = relShowers.size();
+    double shEnergy(0.0), maxEnergy(0.0);
+
+    const ECLShower* mostEnergeticShower = nullptr;
 
     for (const auto& eclShower : relShowers) {
 
@@ -72,31 +88,59 @@ void ECLChargedPIDModule::event()
         if (abs(eclShower.getTime()) > eclShower.getDeltaTime99()) continue;
       }
 
-      const double shEnergy = eclShower.getEnergy();
+      shEnergy = eclShower.getEnergy();
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
-        e9e21 = eclShower.getE9oE21();
-        lat = eclShower.getLateralEnergy();
-        dist = eclShower.getMinTrkDistance();
-        trkdepth = eclShower.getTrkDepth();
-        shdepth = eclShower.getShowerDepth();
+        mostEnergeticShower = &eclShower;
       }
-      nCrystals += int(eclShower.getNumberOfCrystals());
+
     }
 
-    float likelihoods[Const::ChargedStable::c_SetSize];
+    double showerTheta = (mostEnergeticShower) ? mostEnergeticShower->getTheta() : -999.0;
+    int showerReg = (mostEnergeticShower) ? mostEnergeticShower->getDetectorRegion() : -1;
 
-    double eop = maxEnergy / p;
-    const auto charge = fitRes->getChargeSign();
+    // These are the variables that can be used to extract PDF templates for the likelihood / for the MVA training.
+    m_variables[ECLChargedPidPDFs::InputVar::c_E1E9] = (mostEnergeticShower) ? mostEnergeticShower->getE1oE9() : -1.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_E9E21] = (mostEnergeticShower) ? mostEnergeticShower->getE9oE21() : -1.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_E] = (mostEnergeticShower) ? maxEnergy : -1.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_EoP] = (mostEnergeticShower) ? maxEnergy / p : -1.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z40] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike40() : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_Z51] = (mostEnergeticShower) ? mostEnergeticShower->getAbsZernike51() : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_ZMVA] = (mostEnergeticShower) ? mostEnergeticShower->getZernikeMVA() : -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_PSDMVA] = (mostEnergeticShower) ? mostEnergeticShower->getPulseShapeDiscriminationMVA() :
+                                                         -999.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_DeltaL] = (mostEnergeticShower) ? mostEnergeticShower->getTrkDepth() : -1.0;
+    m_variables[ECLChargedPidPDFs::InputVar::c_LAT] = (mostEnergeticShower) ? mostEnergeticShower->getLateralEnergy() : -999.0;
 
-    B2DEBUG(20, "P = " << p << " [GeV]");
-    B2DEBUG(20, "Theta = " << theta << " [rad]");
-    B2DEBUG(20, "E/P = " << eop);
+    B2DEBUG(20, "EVENT: " << m_eventMetaData->getEvent());
+    B2DEBUG(20,  "-------------------------------");
+    B2DEBUG(20, "TRACK properties:");
+    B2DEBUG(20, "p = " << p << " [GeV/c]");
+    B2DEBUG(30, "theta = " << theta << " [rad]");
     B2DEBUG(20, "charge = " << charge);
+    B2DEBUG(20,  "-------------------------------");
+    B2DEBUG(20, "SHOWER properties:");
+    B2DEBUG(20, "showerTheta = " << showerTheta << " [rad], showerReg = " << showerReg);
+    for (const auto& [varid, var] : m_variables) {
+      B2DEBUG(30, "varid: " << static_cast<unsigned int>(varid) << " = " << var);
+    }
+    B2DEBUG(20,  "-------------------------------");
 
-    // Store the right PDF depending on the charge of the particle's track.
-    double pdfval = -1;
+    float likelihoods[Const::ChargedStable::c_SetSize];
+    // Initialise PDF value.
+    double pdfval(0.0);
+
+    // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
+    unsigned int hypo_idx(-1);
     for (const auto& hypo : Const::chargedStableSet) {
+
+      hypo_idx = hypo.getIndex();
+
+      // For now, skip deuteron...
+      if (hypo.getPDGCode() == 1000010020) {
+        likelihoods[hypo_idx] = c_minLogLike;
+        continue;
+      }
 
       auto signedhypo = hypo.getPDGCode() * charge;
 
@@ -118,7 +162,8 @@ void ECLChargedPIDModule::event()
         auto variables_transfo = transfoGaussDecorr(signedhypo, p, showerTheta);
 
         // Get the PDF templates for the various observables, and multiply the PDF values for this candidate.
-        // This assumes observables aren't independent, or at least linear correlations have been removed by suitably transforming the inputs....
+        // This assumes observables aren't correlated
+        // (or at least linear correlations have been removed by suitably transforming the inputs...).
         double prod(1.0);
         double ipdfval;
         for (unsigned int idx(0); idx < variables_transfo.size(); idx++) {
@@ -148,22 +193,13 @@ void ECLChargedPIDModule::event()
 
       }
 
-      B2DEBUG(20, "hypo = " << hypo.getPDGCode() << ", signedhypo = " << signedhypo << ", pdf(E/P=" << eop << ") = " << pdfval);
+      likelihoods[hypo_idx] = (std::isnormal(pdfval)) ? log(pdfval) : c_minLogLike;
 
-      likelihoods[hypo.getIndex()] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : m_minLogLike;
-
+      B2DEBUG(20, "\tlog(L(" << hypo.getPDGCode() << ")) = " << likelihoods[hypo_idx]);
     }
 
-    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods,
-                                                                maxEnergy,
-                                                                eop,
-                                                                e9e21,
-                                                                lat,
-                                                                dist,
-                                                                trkdepth,
-                                                                shdepth,
-                                                                (int) nCrystals,
-                                                                nClusters);
+    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods);
+
     track.addRelationTo(eclPidLikelihood);
 
   } // end loop on tracks
@@ -196,7 +232,7 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
 
   unsigned int nvars = varids->size();
 
-  // Get the variable transformation settings for this (hypo, p, theta).
+  // Get the variable transformation settings for this hypo pdg, p, theta.
   auto vts = m_pdfs->getVTS(pdg, p, theta);
 
   // Transform the input variables only if necessary.

@@ -102,17 +102,17 @@ namespace Belle2 {
     TF1 pdf_p("pdf_p", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.6);
     TF1 pdf_panti("pdf_panti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
 
-    std::map<int, TF1> pdfs = {
-      {11, pdf_el},
-      { -11, pdf_elanti},
-      {13, pdf_mu},
-      { -13, pdf_muanti},
-      {211, pdf_pi},
-      { -211, pdf_pianti},
-      {321, pdf_k},
-      { -321, pdf_kanti},
-      {2212, pdf_p},
-      { -2212, pdf_panti}
+    std::map<int, TF1*> pdfs = {
+      {11, &pdf_el},
+      { -11, &pdf_elanti},
+      {13, &pdf_mu},
+      { -13, &pdf_muanti},
+      {211, &pdf_pi},
+      { -211, &pdf_pianti},
+      {321, &pdf_k},
+      { -321, &pdf_kanti},
+      {2212, &pdf_p},
+      { -2212, &pdf_panti}
     };
 
     // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
@@ -120,23 +120,26 @@ namespace Belle2 {
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
     // Choose an arbitrary set of (clusterTheta, p), and of E/p.
-    double theta = 1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
-    double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
+    double theta =  60.0; //1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
+    double p     = 850.0; //0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
     double eop   = 0.87;
+
+    std::vector<ECLChargedPidPDFs::InputVar> varids = {ECLChargedPidPDFs::InputVar::c_EoP};
 
     // Fill the DB PDF map.
     for (const auto& pdf : pdfs) {
       for (int ip(1); ip <= histgrid.GetNbinsY(); ++ip) {
         for (int jth(1); jth <= histgrid.GetNbinsX(); ++jth) {
-          eclPdfs.setPDFsInternalMap(pdf.first, ip, jth, pdf.second);
+          for (const auto& varid : varids) {
+            eclPdfs.add(pdf.first, ip, jth, varid, pdf.second);
+          }
         }
       }
-      eclPdfs.setPDFsMap(pdf.first);
     }
 
     for (const auto& pdf : pdfs) {
-      float pdfval = eclPdfs.getPdf(pdf.first, p, theta)->Eval(eop);
-      EXPECT_NEAR(pdf.second.Eval(eop), pdfval, 0.001);
+      float pdfval = eclPdfs.getPdf(pdf.first, p, theta, varids.at(0))->Eval(eop);
+      EXPECT_NEAR(pdf.second->Eval(eop), pdfval, 0.001);
       int abspdgId = abs(pdf.first);
       if (pdf.first < 0) {
         likelihoods_minus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
@@ -153,7 +156,7 @@ namespace Belle2 {
 
     for (const auto& pdf : pdfs) {
       float logl(-700);
-      float logl_expect = log(pdf.second.Eval(eop));
+      float logl_expect = log(pdf.second->Eval(eop));
       if (pdf.first < 0) {
         logl = lk_minus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
       } else {

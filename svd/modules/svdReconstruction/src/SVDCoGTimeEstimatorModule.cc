@@ -33,9 +33,6 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
            "RecoDigits collection name", string(""));
-  addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
-           float(6.0));
-
   addParam("StripPeakTimeCorrection", m_corrPeakTime,
            "Correct for the different peaking times of the strips, obtained from local run calibration", true);
   addParam("CalibrationWithEventT0", m_calEventT0,
@@ -182,8 +179,11 @@ void SVDCoGTimeEstimatorModule::event()
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
     SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
 
-    if (m_calEventT0)
+    if (m_calEventT0) {
       m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
+      m_weightedMeanTimeError = m_TimeCal.getCorrectedTimeError(thisSensorID, thisSide, thisCellID, m_weightedMeanTime,
+                                                                m_weightedMeanTimeError, triggerBin);
+    }
 
     //check high charges and too high ADC
     if (m_amplitude > 100000) {
@@ -303,8 +303,6 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError(Belle2::SVDS
   }
 
   return m_amplitudeError / Atot * TMath::Sqrt(tmpResSq);
-
-  //  return m_FixedTimeError;
 
 }
 

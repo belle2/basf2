@@ -154,8 +154,6 @@ namespace Belle2 {
     /** Name of the relation between SVDRecoDigits and SVDTrueHits */
     std::string m_relRecoDigitTrueHitName = "";
 
-    /** Width of the distribution of the times after having substracted the TriggerBin and the CalibrationPeakTime */
-    float m_FixedTimeError = 6;
     /** Approximate ADC error on each sample */
     float m_AmplitudeArbitraryError = 10;
 

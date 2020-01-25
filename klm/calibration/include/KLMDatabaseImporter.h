@@ -99,8 +99,15 @@ namespace Belle2 {
     /**
      * Load BKLM electronics map.
      * @param[in] isExperiment10 Experiment 10 or earlier data.
+     *
+     * @param[in] isExperiment10
+     * Whether the map is created for experiment 10 or later.
+     *
+     * @param[in] channelShift
+     * Whether there is an additional channel shift for experiment 10 map.
      */
-    void loadBKLMElectronicsMap(bool isExperiment10 = false);
+    void loadBKLMElectronicsMap(bool isExperiment10 = false,
+                                bool channelShift = true);
 
     /**
      * Load EKLM electronics map.

@@ -121,7 +121,7 @@ combined_skims = {
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
     ],
-    'Semileptonic': [
-        'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    'Leptonic': [
+        'LeptonicUntagged'
     ]
 }

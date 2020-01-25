@@ -48,7 +48,8 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunHigh = runHigh;
 }
 
-void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
+void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10,
+                                                        bool channelShift)
 {
   // Clear the vector: needed if we want to load two different maps
   // in the same steering file.
@@ -121,10 +122,12 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
           if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
             if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
               channelId = MaxiChannel - channelId + 1;
-              if (layer == 1)
-                channelId += -2;
-              if (layer == 2)
-                channelId += 1;
+              if (channelShift) {
+                if (layer == 1)
+                  channelId += -2;
+                if (layer == 2)
+                  channelId += 1;
+              }
             }
           }
         } // End settings for exp. 10.

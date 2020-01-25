@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 namespace Belle2 {
 
+  /** class to contain the CoG Time calibrations*/
   class SVDCoGCalibrationFunction : public TObject {
 
   public:

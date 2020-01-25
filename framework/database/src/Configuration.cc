@@ -174,11 +174,17 @@ namespace Belle2::Conditions {
     // TODO: Once we're sure all files being used contain all payloads remove this.
     std::optional<std::string> youngest;
     for (const auto& metadata : inputMetadata) {
+      // Skip release 4 or later files.
+      const std::string& release = metadata.getRelease();
+      if (release.substr(0, 8) == "release-" and
+          release.compare(8, 2, "04", 2) >= 0)
+        continue;
+      // Otherwise, get the date of the youngest file.
       if (!youngest or * youngest > metadata.getDate()) {
         youngest = metadata.getDate();
       }
     }
-    if (youngest->compare("2019-12-31") < 0) {
+    if (youngest and youngest->compare("2019-12-31") < 0) {
       B2DEBUG(30, "Enabling legacy IP information globaltag in tag replay");
       m_inputGlobaltags->emplace_back("Legacy_IP_Information");
     }
@@ -248,9 +254,9 @@ namespace Belle2::Conditions {
     There is no default globaltag available for processing. This usually means
     you set the environment variable BELLE2_CONDB_GLOBALTAG to an empty value.
 
-    As this is unlikely to work for even the most basic funtionality this is not
+    As this is unlikely to work for even the most basic functionality this is not
     directly supported anymore. If you really want to disable any access to the
-    conditions database please configure this explictly
+    conditions database please configure this explicitly
 
     >>> basf2.conditions.metadata_providers = []
     >>> basf2.conditions.override_globaltags([])
@@ -564,7 +570,7 @@ Parameters:
   usable_globaltag_states (set(str)): Names of globaltag states accepted for
       processing. This can be changed to make sure that only fully published
       globaltags are used or to enable running on an open tag. It is not possible
-      to allow usage of 'INVALID' tags, those will always be recjeted.
+      to allow usage of 'INVALID' tags, those will always be rejected.
   connection_timeout (int): timeout in seconds before connection should be
       aborted. 0 sets the timeout to the default (300s)
   stalled_timeout (int): timeout in seconds before a download should be

@@ -48,14 +48,46 @@ total_input_files = [
     ('MC12_ccbarBGx0', 665),
     ('MC12_taupairBGx0', 460),
 
+
+    ('MC13_mixedBGx1', 2550),
+    ('MC13_chargedBGx1', 2700),
+    ('MC13_uubarBGx1', 8030),
+    ('MC13_ddbarBGx1', 2010),
+    ('MC13_ssbarBGx1', 1920),
+    ('MC13_ccbarBGx1', 6650),
+    ('MC13_taupairBGx1', 4600),
+    ('MC13_mixedBGx0', 510),
+    ('MC13_chargedBGx0', 540),
+    ('MC13_uubarBGx0', 1606),
+    ('MC13_ddbarBGx0', 402),
+    ('MC13_ssbarBGx0', 384),
+    ('MC13_ccbarBGx0', 1330),
+    ('MC13_taupairBGx0', 920),
+
 ]
 
 # Average number of events in test files
 nEventsPerFile = {
+
+
+    # TODO: get estimates for these
+    # 'proc10_exp7': ,
+    # 'proc10_exp8': ,
+
     'proc9_exp3': 3456,
     'proc9_exp7': 3691,
     'proc9_exp8': 7846,
     'bucket7_exp8': 11242,
+
+
+
+    'MC13_mixedBGx1': 200000,
+    'MC13_chargedBGx1': 200000,
+    'MC13_uubarBGx1': 197609,
+    'MC13_ddbarBGx1':  197673,
+    'MC13_ssbarBGx1': 189320,
+    'MC13_ccbarBGx1': 195621,
+    'MC13_taupairBGx1': 200000,
 
     'MC12_mixedBGx1': 200000,
     'MC12_chargedBGx1': 200000,
@@ -75,6 +107,12 @@ nEventsPerFile = {
 
 #: location of test files on kekcc
 kekcc_locations = [
+
+
+    ('proc10_exp7', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0007/4S/GoodRuns/r03491/all/' +
+     'mdst/sub00/mdst.physics.0007.03491.HLT1.f00001.root'),
+    ('proc10_exp8', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0008/4S/GoodRuns/r01291/all/' +
+     'mdst/sub00/mdst.physics.0008.01291.HLT2.f00010.root'),
     ('proc9_exp3', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0003/4S/r05241/skim/hlt_hadron/' +
      'mdst/sub00/mdst.physics.0003.05241.HLT0.hlt_hadron.f00000.root'),
     ('proc9_exp7', '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0007/4S/GoodRuns/r03822/skim/hlt_hadron/' +
@@ -83,6 +121,37 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0008.01527.HLT4.hlt_hadron.f00000.root'),
     ('bucket7_exp8', '/group/belle2/dataprod/Data/release-03-02-04/DB00000677/bucket7/e0008/4S/GoodRuns/r03123/skim/hlt_hadron/' +
      'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
+    ('MC13_mixedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009434/s00/e1003/4S/r00000/mixed/' +
+     'mdst/sub00/mdst_000001_prod00009434_task10020000001.root'),
+    ('MC13_chargedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009435/s00/e1003/4S/r00000/charged/' +
+     'mdst/sub00/mdst_000001_prod00009435_task10020000001.root'),
+    ('MC13_uubarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/' +
+     'mdst/sub00/mdst_000001_prod00009436_task10020000001.root'),
+    ('MC13_ccbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009437/s00/e1003/4S/r00000/ccbar/' +
+     'mdst/sub00/mdst_000001_prod00009437_task10020000001.root'),
+    ('MC13_ddbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009438/s00/e1003/4S/r00000/ddbar/' +
+     'mdst/sub00/mdst_000001_prod00009438_task10020000001.root'),
+    ('MC13_ssbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009439/s00/e1003/4S/r00000/ssbar/' +
+     'mdst/sub00/mdst_000001_prod00009439_task10020000001.root'),
+    ('MC13_taupairBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009441/s00/e1003/4S/r00000/taupair/' +
+     'mdst/sub00/mdst_000001_prod00009441_task10020000001.root'),
+
+    ('MC13_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009545/s00/e1003/4S/r00000/mixed/' +
+     'mdst/sub00/mdst_000001_prod00009545_task10020000001.root'),
+    ('MC13_chargedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/' +
+     'mdst/sub00/mdst_000001_prod00009551_task10020000001.root'),
+    ('MC13_uubarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009553/s00/e1003/4S/r00000/uubar/' +
+     'mdst/sub00/mdst_000001_prod00009553_task10020000001.root'),
+    ('MC13_ccbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009559/s00/e1003/4S/r00000/ccbar/' +
+     'mdst/sub00/mdst_000001_prod00009559_task10020000001.root'),
+    ('MC13_ddbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009555/s00/e1003/4S/r00000/ddbar/' +
+     'mdst/sub00/mdst_000001_prod00009555_task10020000001.root'),
+    ('MC13_ssbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009557/s00/e1003/4S/r00000/ssbar/' +
+     'mdst/sub00/mdst_000001_prod00009557_task10020000001.root'),
+    ('MC13_taupairBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009561/s00/e1003/4S/r00000/taupair/' +
+     'mdst/sub00/mdst_000001_prod00009561_task10020000001.root'),
+
+
 
 
     ('MC12_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +

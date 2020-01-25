@@ -10,13 +10,13 @@
 
 #pragma once
 
-/* KLM headers. */
-#include <klm/dataobjects/KLMDigitRaw.h>
-
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
+
+  /* KLM forward declarations. */
+  class KLMDigitRaw;
 
   namespace KLM {
 
@@ -45,6 +45,68 @@ namespace Belle2 {
 
       /** Charge (12 bits). */
       uint16_t charge;
+
+      /**
+       * Unpack lane.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackLane(uint16_t raw)
+      {
+        return (raw >> 8) & 0x1F;
+      }
+
+      /**
+       * Unpack axis.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackAxis(uint16_t raw)
+      {
+        return (raw >> 7) & 0x1;
+      };
+
+      /**
+       * Unpack channel.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackChannel(uint16_t raw)
+      {
+        return raw & 0x7F;
+      }
+
+      /**
+       * Unpack CTIME.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackCtime(uint16_t raw)
+      {
+        return raw;
+      }
+
+      /**
+       * Unpack trigger bits.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackTriggerBits(uint16_t raw)
+      {
+        return (raw >> 11) & 0x1F;
+      }
+
+      /**
+       * Unpack TDC.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackTdc(uint16_t raw)
+      {
+        return raw & 0x7FF;
+      }
+
+      /**
+       * Unpack charge.
+       */
+      static uint16_t unpackCharge(uint16_t raw)
+      {
+        return raw & 0xFFF;
+      }
 
     };
 

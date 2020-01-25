@@ -102,10 +102,13 @@ def KFit(list_name,
         conf_level (float):     minimum value of the confidence level to accept the fit
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects particle candidates with a failed fit.
-        fit_type (str):         type of the kinematic fit
-            Valid options are ``mass`` for a mass-constrained fit, ``vertex`` for a vertex fit,
-            ``massvertex`` for a vertex fit with a mass constraint on the mother particle,
-            and ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum.
+        fit_type (str):         type of the kinematic fit. Valid options are
+
+          * ``mass`` for a mass-constrained fit
+          * ``vertex`` for a vertex fit
+          * ``massvertex`` for a vertex fit with a mass constraint on the mother particle
+          * ``fourC`` for a vertex fit in which the mother particle's four-momentum is constrained to the beam four-momentum
+
         constraint (str):       add an additional constraint to the fit (valid options are ipprofile or iptube)
         daughtersUpdate( bool): make copy of the daughters and update them after the KFit
         decay_string (str):     select particles used for the KFit
@@ -698,7 +701,7 @@ def TagV(
     list_name,
     MCassociation='',
     confidenceLevel=0.,
-    trackFindingType="standard",
+    trackFindingType="standard_PXD",
     constraintType="IP",
     askMCInfo=False,
     reqPXDHits=0,

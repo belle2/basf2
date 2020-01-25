@@ -23,4 +23,6 @@
 #pragma link C++ class Belle2::SVDOccupancyCalibrationsAlgorithm;
 #pragma link C++ class Belle2::SVDHotStripsCalibrationsAlgorithm;
 
+
+#pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm;
 #endif

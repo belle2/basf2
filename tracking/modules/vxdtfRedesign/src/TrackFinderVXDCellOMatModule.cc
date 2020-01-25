@@ -41,6 +41,11 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
+
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
@@ -86,11 +91,12 @@ void TrackFinderVXDCellOMatModule::initialize()
 {
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
-  m_eventLevelTrackingInfo.registerInDataStore();
 
   if (m_PARAMselectBestPerFamily) {
     m_sptcSelector = std::make_unique<SPTCSelectorXBestPerFamily>(m_PARAMxBestPerFamily);
   }
+
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 
@@ -107,11 +113,6 @@ void TrackFinderVXDCellOMatModule::beginRun()
 void TrackFinderVXDCellOMatModule::event()
 {
   m_eventCounter++;
-
-  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
-  if (!m_eventLevelTrackingInfo.isValid()) {
-    m_eventLevelTrackingInfo.create();
-  }
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
 

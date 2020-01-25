@@ -65,7 +65,7 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
 
   private:
-    /**< Required input for EventMetaData */
+    /** Required input for EventMetaData */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
     /** SVDShaperDigits StoreArray name */
@@ -96,15 +96,15 @@ namespace Belle2 {
 
     uint16_t ftbError = 0; /**<FTB error container*/
     uint16_t ftbFlags = 0; /**<FTB flags container*/
-    uint16_t apvError = 0; /**< APV error container*/
-    bool apvMatch = true; /**< apv match error*/
+    uint16_t apvError = 0; /**<APV error container*/
+    bool apvMatch = true; /**<apv match error*/
     bool fadcMatch = true; /**<fadcc match error*/
     bool upsetAPV = false; /**<upset APV error*/
     bool badMapping = false; /**<bad mapping error*/
     bool badHeader = false; /**<bad header error*/
     bool badTrailer = false; /**<bad trailer error*/
-    bool missedHeader = false; /** missed Header error*/
-    bool missedTrailer = false; /** missed Trailer error*/
+    bool missedHeader = false; /**<missed Header error*/
+    bool missedTrailer = false; /**<missed Trailer error*/
 
     unsigned short fadcNo = 0; /**<fadc number*/
     //unsigned short apvNo;

@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/rawdata/RawData.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMDigitRaw.h>
+
 /* C++ headers. */
 #include <cstdint>
 
@@ -26,13 +29,13 @@ void KLM::unpackRawData(
   dataWords[1] =  buffer[0] & 0xFFFF;
   dataWords[2] = (buffer[1] >> 16) & 0xFFFF;
   dataWords[3] =  buffer[1] & 0xFFFF;
-  data->lane = (dataWords[0] >> 8) & 0x1F;
-  data->axis = (dataWords[0] >> 7) & 0x1;
-  data->channel = dataWords[0] & 0x7F;
-  data->ctime = dataWords[1];
-  data->triggerBits = (dataWords[2] >> 11) & 0x1F;
-  data->tdc = dataWords[2] & 0x7FF;
-  data->charge = dataWords[3] & 0xFFF;
+  data->lane = RawData::unpackLane(dataWords[0]);
+  data->axis = RawData::unpackAxis(dataWords[0]);
+  data->channel = RawData::unpackChannel(dataWords[0]);
+  data->ctime = RawData::unpackCtime(dataWords[1]);
+  data->triggerBits = RawData::unpackTriggerBits(dataWords[2]);
+  data->tdc = RawData::unpackTdc(dataWords[2]);
+  data->charge =  RawData::unpackCharge(dataWords[3]);
   if (fillDigitRaws) {
     *newDigitRaw = klmDigitRaws->appendNew(copper, slot,
                                            dataWords[0], dataWords[1],

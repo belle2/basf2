@@ -38,6 +38,8 @@ stdPi('all', path=skimpath)
 stdPi0s('loose', path=skimpath)
 stdPhotons('loose', path=skimpath)
 stdKshorts(path=skimpath)
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 
 ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
@@ -58,6 +60,9 @@ loadStdD0_Kpipipi(path=skimpath)
 from skim.tcpv import TCPVList
 expert.add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 
+# SL Skim
+from skim.leptonic import LeptonicList
+expert.add_skim('LeptonicUntagged', LeptonicList(path=skimpath), path=skimpath)
 expert.setSkimLogging(path=skimpath)
 b2.process(path=skimpath)
 

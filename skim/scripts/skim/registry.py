@@ -78,8 +78,12 @@ skim_registry = [
 
 #: A dict listing which standalone skims are included the combined skim scripts
 combined_skims = {
-    'BtoCharm': [
-        'BtoDh_Kshh', 'BtoDh_hh', 'BtoDh_Kspi0', 'BtoDh_Kspipipi0'
+    'BtoCharm1': [
+        'BtoD0h_Kshh', 'BtoD0h_hh', 'BtoD0h_Kspi0', 'BtoD0h_Kspipipi0'
+    ],
+
+    'BtoCharm2': [
+        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
     ],
     'BtoCharmless': [
         'CharmlessHad2Body', 'CharmlessHad3Body'
@@ -89,7 +93,7 @@ combined_skims = {
         'DstToD0Pi_D0ToHpHmPi0', 'XToDp_DpToKsHp'
     ],
     'CharmLow': [
-        'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs',
+        'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare', 'XToD0_D0ToHpJm'
 
     ],
     'CombinedSystematics': [
@@ -112,7 +116,7 @@ combined_skims = {
         'feiSLB0', 'feiSLBplus'
     ],
     'MiscCombined': [
-        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+        'TCPV', 'LeptonicUntagged'
     ],
     'Quarkonium': [
         'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'

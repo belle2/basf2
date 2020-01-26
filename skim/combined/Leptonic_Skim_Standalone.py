@@ -25,8 +25,7 @@ stdMu('all', path=SLskimpath)
 from skim.leptonic import LeptonicList
 leptonicList = LeptonicList(SLskimpath)
 skimCode = expert.encodeSkimName('LeptonicUntagged')
-print(skimCode)
-expert.skimOutputUdst(skimCode2, leptonicList, path=SLskimpath)
+expert.skimOutputUdst(skimCode, leptonicList, path=SLskimpath)
 ma.summaryOfLists(leptonicList, path=SLskimpath)
 
 

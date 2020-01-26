@@ -110,4 +110,7 @@ combined_skims = {
     'Leptonic': [
         'LeptonicUntagged'
     ],
+    'TauCombined': [
+        'TauLFV', 'TauGeneric', 'TauThrust'
+    ]
 }

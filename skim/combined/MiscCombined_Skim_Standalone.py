@@ -18,7 +18,7 @@ from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
 
 
 import skimExpertFunctions as expert
-gb2_setuprel = 'release-04-00-00'
+
 
 skimpath = b2.Path()
 fileList = expert.get_test_file("MC12_mixedBGx1")

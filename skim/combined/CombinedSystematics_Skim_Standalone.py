@@ -23,7 +23,7 @@ import skimExpertFunctions as expert
 from skim.systematics import ResonanceList, SystematicsLambdaList, SystematicsList, SystematicsRadEEList, \
     SystematicsRadMuMuList, SystematicsTrackingList
 b2.set_log_level(b2.LogLevel.INFO)
-gb2_setuprel = 'release-04-00-00'
+
 
 fileList = expert.get_test_file("MC12_mixedBGx1")
 

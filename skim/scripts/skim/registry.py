@@ -104,7 +104,10 @@ combined_skims = {
     'feiSLCombined': [
         'feiSLB0', 'feiSLBplus'
     ],
-    'MiscCombined': [
-        'TCPV', 'LeptonicUntagged'
+    'TCPV': [
+        'TCPV',
+    ],
+    'Leptonic': [
+        'LeptonicUntagged'
     ],
 }

@@ -85,29 +85,18 @@ combined_skims = {
     'BtoCharm2': [
         'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
     ],
-    'BtoCharmless': [
-        'CharmlessHad2Body', 'CharmlessHad3Body'
-    ],
     'CharmHigh': [
         'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJmPi0',
         'DstToD0Pi_D0ToHpHmPi0', 'XToDp_DpToKsHp'
     ],
     'CharmLow': [
         'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare', 'XToD0_D0ToHpJm'
-
-    ],
-    'CombinedSystematics': [
-        'Systematics', 'SystematicsLambda', 'SystematicsTracking', 'Resonance',
-        'SystematicsRadMuMu', 'SystematicsRadEE'
     ],
     'Dark': [
         'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'
-    ],
-    'feiCombined': [
-        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
     ],
     'feiHadronicCombined': [
         'feiHadronicB0', 'feiHadronicBplus'
@@ -118,10 +107,4 @@ combined_skims = {
     'MiscCombined': [
         'TCPV', 'LeptonicUntagged'
     ],
-    'Quarkonium': [
-        'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
-    ],
-    'Leptonic': [
-        'LeptonicUntagged'
-    ]
 }

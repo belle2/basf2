@@ -9,7 +9,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="uchida",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_mumu", "hlt_hadron"],
+                               input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
                                depends_on=[])
 
 
@@ -22,6 +22,8 @@ def get_calibrations(input_data, **kwargs):
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
+    file_to_iov_Bcosmics = input_data["Bcosmics"]
+
     # print(file_to_iov_mumu)
     # print(file_to_iov_hadron)
 
@@ -47,7 +49,14 @@ def get_calibrations(input_data, **kwargs):
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
-    input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron}
+    max_files_per_run_bcr = 10
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics,
+                                                               max_files_per_run_bcr, min_events_per_file)
+    input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
+    basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
+
+    input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron,
+                       "Bcosmics": input_files_Bcosmics}
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
@@ -158,6 +167,46 @@ def pre_collector(max_events=None):
     return reco_path
 
 
+def pre_collector_cr(max_events=None):
+    """
+    Define pre collection (reconstruction in our purpose).
+    Probably, we need only CDC and ECL data.
+    Parameters:
+        max_events [int] : number of events to be processed.
+                           All events by Default.
+    Returns:
+        path : path for pre collection
+    """
+    from basf2 import create_path, register_module
+    reco_path = create_path()
+    if max_events is None:
+        root_input = register_module('RootInput')
+    else:
+        root_input = register_module('RootInput',
+                                     entrySequences=['0:{}'.format(max_events)]
+                                     )
+    reco_path.add_module(root_input)
+
+    gearbox = register_module('Gearbox')
+    reco_path.add_module(gearbox)
+    reco_path.add_module('Geometry', useDB=True)
+
+    from rawdata import add_unpackers
+    # unpack raw data
+    add_unpackers(reco_path)
+
+    from reconstruction import add_cosmics_reconstruction
+    add_cosmics_reconstruction(reco_path,
+                               components=['CDC', 'ECL'],
+                               merge_tracks=False,
+                               pruneTracks=False,
+                               data_taking_period='normal'
+                               )
+    return reco_path
+
++
+
+
 def collector(bField=True, is_cosmic=False):
     """
     Create a cdc calibration collector
@@ -266,10 +315,16 @@ class CDCCalibration(Calibration):
         from caf.framework import Collection
 
         for skim_type, file_list in input_file_dict.items():
-            collection = Collection(collector=collector(),
-                                    input_files=file_list,
-                                    pre_collector_path=pre_collector(max_events=max_events),
-                                    )
+            if skim_type is "Bcosmics":
+                collection = Collection(collector=collector(),
+                                        input_files=file_list,
+                                        pre_collector_path=pre_collector_cr(max_events=max_events),
+                                        )
+            else:
+                collection = Collection(collector=collector(),
+                                        input_files=file_list,
+                                        pre_collector_path=pre_collector(max_events=max_events),
+                                        )
             self.add_collection(name=skim_type, collection=collection)
 
         self.max_iterations = max_iterations

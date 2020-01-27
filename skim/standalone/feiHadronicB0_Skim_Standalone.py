@@ -10,7 +10,6 @@
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
-
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert

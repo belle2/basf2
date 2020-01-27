@@ -25,14 +25,16 @@ public:
   EvtBGLFF(double bglap_0, double bglap_1, double bglap_2, double bglap_3, double bgla0_0, double bgla0_1, double bgla0_2,
            double bgla0_3);
 
+  /** Default constructor */
+  EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, double bglc_1, double bglc_2);
 
   /** Returns scalar ffs */
   void getscalarff(EvtId parent, EvtId daught,
                    double t, double mass, double* fp, double* f0);
 
   /** Returns vector ffs */
-  void getvectorff(EvtId, EvtId, double, double, double*,
-                   double*, double*, double*);
+  void getvectorff(EvtId parent, EvtId daught, double t, double mass, double* a1f,
+                   double* a2f, double* vf, double* a0f);
 
   /** Returns tensor ffs */
   void gettensorff(EvtId, EvtId, double, double, double*,
@@ -90,6 +92,26 @@ private:
 
   /** 3rd-order z expansion coeffieient for scalar form factor f_0   */
   double a0_3{0};
+
+
+
+  /** 0th-order z expansion coeffieient for form factor g   */
+  double a_0{0};
+
+  /** 1st-order z expansion coeffieient for form factor g   */
+  double a_1{0};
+
+  /** 0th-order z expansion coeffieient for form factor f   */
+  double b_0{0};
+
+  /** 1st-order z expansion coeffieient for form factor f   */
+  double b_1{0};
+
+  /** 1st-order z expansion coeffieient for form factor F1   */
+  double c_1{0};
+
+  /** 2nd-order z expansion coeffieient for form factor F1   */
+  double c_2{0};
 
 };
 #endif

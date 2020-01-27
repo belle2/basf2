@@ -102,12 +102,8 @@ namespace Belle2 {
      *
      * @param[in] isExperiment10
      * Whether the map is created for experiment 10 or later.
-     *
-     * @param[in] channelShift
-     * Whether there is an additional channel shift for experiment 10 map.
      */
-    void loadBKLMElectronicsMap(bool isExperiment10 = false,
-                                bool channelShift = true);
+    void loadBKLMElectronicsMap(bool isExperiment10 = false);
 
     /**
      * Load EKLM electronics map.

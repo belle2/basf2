@@ -29,7 +29,6 @@ expert.skimOutputUdst(skimCode, leptonicList, path=SLskimpath)
 ma.summaryOfLists(leptonicList, path=SLskimpath)
 
 
-ma.summaryOfLists(PRList, path=SLskimpath)
 expert.setSkimLogging(path=SLskimpath)
 b2.process(SLskimpath)
 

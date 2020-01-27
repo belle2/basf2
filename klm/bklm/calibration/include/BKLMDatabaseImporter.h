@@ -44,12 +44,8 @@ namespace Belle2 {
      *
      * @param[in] isExperiment10
      * Whether the map is created for experiment 10 or later.
-     *
-     * @param[in] channelShift
-     * Whether there is an additional channel shift for experiment 10 map.
      */
-    void loadDefaultElectronicMapping(bool isExperiment10 = false,
-                                      bool channelShift = true);
+    void loadDefaultElectronicMapping(bool isExperiment10 = false);
 
     /**
      * Set non-default lane for all channels in a module.

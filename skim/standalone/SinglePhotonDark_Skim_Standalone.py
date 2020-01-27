@@ -27,13 +27,6 @@ stdE('all', path=darkskimpath)
 stdMu('all', path=darkskimpath)
 
 
-cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
-minimum = 'E > 0.1'  # GeV
-angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
-ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=darkskimpath)
-
-ma.applyEventCuts('0 < nParticlesInList(gamma:100) < 2', path=darkskimpath)
-ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=darkskimpath)
 # dark photon skim
 from skim.dark import SinglePhotonDarkList
 darklist = SinglePhotonDarkList(path=darkskimpath)

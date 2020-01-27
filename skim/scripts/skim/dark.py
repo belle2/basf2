@@ -18,13 +18,15 @@ import modularAnalysis as ma
 
 def SinglePhotonDarkList(path):
     """
-    Note:
-        * Single photon skim list for the dark photon analysis
-        * Skim code: 18020100
-        * Physics channel: ee → A'γ; A' → invisible
-        * Skim category: physics, dark sector
+    Single photon skim list for the dark photon analysis
 
-    Build the list  of single photon candidates for the dark photon to
+    **Skim code**: 18020100
+
+    **Physics channel**: ee → A'γ; A' → invisible
+
+    **Skim category**: physics, dark sector
+
+    Build the list of single photon candidates for the dark photon to
     invisible final state analysis.
 
     Parameters:
@@ -104,11 +106,13 @@ def _initialALP(path):
 
 def ALP3GammaList(path):
     """
-    Note:
-        * Neutral dark sector skim list for the ALP 3-photon analysis,
-        * Skim code:   18020300
-        * Physics channel: ee → aγ; a → γγ
-        * Skim category: physics, dark sector
+    Neutral dark sector skim list for the ALP 3-photon analysis.
+
+    **Skim code**: 18020300
+
+    **Physics channel**: ee → aγ; a → γγ
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim list builders
@@ -141,11 +145,13 @@ def ALP3GammaList(path):
 
 def LFVZpVisibleList(path):
     """
-    Note:
-        * Lepton flavour violating Z' skim, Z' to visible FS
-        * Skim code:  18520400
-        * Physics channel: ee --> e mu Z'; Z' --> e mu
-        * Skim category: physics, dark sector
+    Lepton flavour violating Z' skim, Z' to visible FS
+
+    **Skim code**: 18520400
+
+    **Physics channel**: ee --> e mu Z'; Z' --> e mu
+
+    **Skim category**: physics, dark sector
 
     The skim list for the LFV Z' to visible final state search
 
@@ -192,12 +198,14 @@ def LFVZpVisibleList(path):
 
 def DimuonPlusMissingEnergyList(path):
     """
-    Note:
-        * Dimuon + missing energy skim,
-          needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520100
-        * Physics channel: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
-        * Skim category: physics, dark sector
+    Dimuon + missing energy skim,
+    needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520100
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim
@@ -230,12 +238,14 @@ def DimuonPlusMissingEnergyList(path):
 
 def ElectronMuonPlusMissingEnergyList(path):
     """
-    Note:
-        * Electron-muon pair + missing energy skim,
-          needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520200
-        * Physics channel: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
-        * Skim category: physics, dark sector
+    Electron-muon pair + missing energy skim,
+    needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520200
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim
@@ -275,12 +285,14 @@ def DielectronPlusMissingEnergyList(path):
     Warning:
         This skim is currently deactivated, since the retention rate is too high
 
-    Note:
-        * Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
-          :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520300
-        * Physics channel: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
-        * Skim category: physics, dark sector
+    Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
+    :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520300
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim

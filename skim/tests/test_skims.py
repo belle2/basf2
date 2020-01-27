@@ -219,19 +219,12 @@ ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=skim
 sp = b2.Path()
 from skim import dark
 
-expert.outputIfPassesEventCut(
-    'nCleanedTracks(' + cleaned + ') < 1 and 0 < nParticlesInList(gamma:100) < 2',
-    conditionalPath=sp,
-    skimName='SinglePhotonDark',
-    lists=dark.SinglePhotonDarkList(
-        path=skimpath),
-    mainSkimPath=skimpath)
 expert.add_skim('ALP3Gamma', dark.ALP3GammaList(path=skimpath), path=skimpath)
 expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=skimpath), path=skimpath)
-
+expert.add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
 expert.setSkimLogging(path=skimpath)
 
 # process the basf2 path in a temporary directory (so all of the skimmed udst

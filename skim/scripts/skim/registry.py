@@ -91,6 +91,9 @@ combined_skims = {
     'CharmLow': [
         'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare', 'XToD0_D0ToHpJm'
     ],
+    'CharmEarlyData': [
+        'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
+    ],
     'Dark': [
         'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
     ],

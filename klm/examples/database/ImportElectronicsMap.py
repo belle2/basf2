@@ -80,19 +80,19 @@ else:
     # Experiments 0 - 3.
     load_bklm_electronics_map(1, False)
     load_eklm_electronics_map(1, False)
-    dbImporter.setIOV(1, 0, 4, -1)
+    dbImporter.setIOV(1, 0, 3, -1)
     dbImporter.importElectronicsMap()
 
     # Experiments 4 - 9.
     clear_electronics_map()
     load_bklm_electronics_map(1, False)
     load_eklm_electronics_map(2, False)
-    dbImporter.setIOV(1, 0, 4, -1)
+    dbImporter.setIOV(4, 0, 9, -1)
     dbImporter.importElectronicsMap()
 
-    # Experiments 0 - 3.
+    # Experiment 10 and later.
     clear_electronics_map()
     load_bklm_electronics_map(2, False)
     load_eklm_electronics_map(2, False)
-    dbImporter.setIOV(1, 0, 4, -1)
+    dbImporter.setIOV(10, 0, -1, -1)
     dbImporter.importElectronicsMap()

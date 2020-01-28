@@ -342,7 +342,7 @@ void KLMDatabaseImporter::addEKLMElectronicsMapLane(
       m_ElectronicsChannels.push_back(
         std::pair<uint16_t, KLMElectronicsChannel>(
           detectorChannel,
-          KLMElectronicsChannel(copper, slot, lane, axis, channel)));
+          KLMElectronicsChannel(EKLM_ID + copper, slot, lane, axis, channel)));
     }
   }
 }
@@ -357,154 +357,154 @@ void KLMDatabaseImporter::loadEKLMElectronicsMap(int version, bool mc)
   }
   /* Backward section. */
   /* Sector 1. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 1, 3, 0, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 2, 3, 0, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 3, 3, 0, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 4, 3, 0, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 5, 3, 0, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 6, 3, 0, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 7, 3, 1, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 8, 3, 1, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 9, 3, 1, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 1, 3, 1, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 2, 3, 1, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 3, 3, 1, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 4, 3, 1, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 5, 3, 1, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 6, 3, 1, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 7, 3, 2, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 8, 3, 2, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 9, 3, 2, 3);
   /* Wrong connection was fixed between phase 2 and phase 3. */
   if (mc || (version >= 2)) {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 10, 3, 1, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 11, 3, 1, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 10, 3, 2, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 11, 3, 2, 5);
   } else {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 10, 3, 1, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 11, 3, 1, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 10, 3, 2, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 11, 3, 2, 4);
   }
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 12, 3, 1, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 1, 12, 3, 2, 6);
   /* Sector 2. */
   if (version == 1) {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 1, 3, 2, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 2, 3, 2, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 3, 3, 2, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 4, 3, 2, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 5, 3, 2, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 6, 3, 2, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 7, 3, 3, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 8, 3, 3, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 9, 3, 3, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 10, 3, 3, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 11, 3, 3, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 12, 3, 3, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 1, 3, 3, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 2, 3, 3, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 3, 3, 3, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 4, 3, 3, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 5, 3, 3, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 6, 3, 3, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 7, 3, 4, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 8, 3, 4, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 9, 3, 4, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 10, 3, 4, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 11, 3, 4, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 12, 3, 4, 6);
   } else {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 1, 3, 3, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 2, 3, 3, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 3, 3, 3, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 4, 3, 3, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 5, 3, 3, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 6, 3, 3, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 7, 3, 2, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 8, 3, 2, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 9, 3, 2, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 10, 3, 2, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 11, 3, 2, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 12, 3, 2, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 1, 3, 4, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 2, 3, 4, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 3, 3, 4, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 4, 3, 4, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 5, 3, 4, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 6, 3, 4, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 7, 3, 3, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 8, 3, 3, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 9, 3, 3, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 10, 3, 3, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 11, 3, 3, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 2, 12, 3, 3, 1);
   }
   /* Sector 3. */
   if (version == 1) {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 1, 4, 0, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 2, 4, 0, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 3, 4, 0, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 4, 4, 0, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 5, 4, 0, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 6, 4, 0, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 7, 4, 1, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 8, 4, 1, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 9, 4, 1, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 10, 4, 1, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 11, 4, 1, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 12, 4, 1, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 1, 4, 1, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 2, 4, 1, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 3, 4, 1, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 4, 4, 1, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 5, 4, 1, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 6, 4, 1, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 7, 4, 2, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 8, 4, 2, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 9, 4, 2, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 10, 4, 2, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 11, 4, 2, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 12, 4, 2, 6);
   } else {
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 1, 4, 1, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 2, 4, 1, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 3, 4, 1, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 4, 4, 1, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 5, 4, 1, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 6, 4, 1, 1);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 7, 4, 0, 6);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 8, 4, 0, 5);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 9, 4, 0, 4);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 10, 4, 0, 3);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 11, 4, 0, 2);
-    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 12, 4, 0, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 1, 4, 2, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 2, 4, 2, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 3, 4, 2, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 4, 4, 2, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 5, 4, 2, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 6, 4, 2, 1);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 7, 4, 1, 6);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 8, 4, 1, 5);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 9, 4, 1, 4);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 10, 4, 1, 3);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 11, 4, 1, 2);
+    addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 3, 12, 4, 1, 1);
   }
   /* Sector 4. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 1, 4, 2, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 2, 4, 2, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 3, 4, 2, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 4, 4, 2, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 5, 4, 2, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 6, 4, 2, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 7, 4, 3, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 8, 4, 3, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 9, 4, 3, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 10, 4, 3, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 11, 4, 3, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 12, 4, 3, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 1, 4, 3, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 2, 4, 3, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 3, 4, 3, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 4, 4, 3, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 5, 4, 3, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 6, 4, 3, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 7, 4, 4, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 8, 4, 4, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 9, 4, 4, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 10, 4, 4, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 11, 4, 4, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_BackwardSection, 4, 12, 4, 4, 6);
   /* Forward section. */
   /* Sector 1. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 1, 1, 2, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 2, 1, 2, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 3, 1, 2, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 4, 1, 2, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 5, 1, 2, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 6, 1, 2, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 7, 1, 2, 7);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 8, 1, 3, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 9, 1, 3, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 10, 1, 3, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 11, 1, 3, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 12, 1, 3, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 13, 1, 3, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 14, 1, 3, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 1, 1, 3, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 2, 1, 3, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 3, 1, 3, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 4, 1, 3, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 5, 1, 3, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 6, 1, 3, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 7, 1, 3, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 8, 1, 4, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 9, 1, 4, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 10, 1, 4, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 11, 1, 4, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 12, 1, 4, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 13, 1, 4, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 1, 14, 1, 4, 7);
   /* Sector 2. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 1, 1, 0, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 2, 1, 0, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 3, 1, 0, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 4, 1, 0, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 5, 1, 0, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 6, 1, 0, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 7, 1, 0, 7);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 8, 1, 1, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 9, 1, 1, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 10, 1, 1, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 11, 1, 1, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 12, 1, 1, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 13, 1, 1, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 14, 1, 1, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 1, 1, 1, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 2, 1, 1, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 3, 1, 1, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 4, 1, 1, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 5, 1, 1, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 6, 1, 1, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 7, 1, 1, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 8, 1, 2, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 9, 1, 2, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 10, 1, 2, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 11, 1, 2, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 12, 1, 2, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 13, 1, 2, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 2, 14, 1, 2, 7);
   /* Sector 3. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 1, 2, 2, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 2, 2, 2, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 3, 2, 2, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 4, 2, 2, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 5, 2, 2, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 6, 2, 2, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 7, 2, 2, 7);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 8, 2, 3, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 9, 2, 3, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 10, 2, 3, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 11, 2, 3, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 12, 2, 3, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 13, 2, 3, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 14, 2, 3, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 1, 2, 3, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 2, 2, 3, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 3, 2, 3, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 4, 2, 3, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 5, 2, 3, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 6, 2, 3, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 7, 2, 3, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 8, 2, 4, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 9, 2, 4, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 10, 2, 4, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 11, 2, 4, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 12, 2, 4, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 13, 2, 4, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 3, 14, 2, 4, 7);
   /* Sector 4. */
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 1, 2, 0, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 2, 2, 0, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 3, 2, 0, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 4, 2, 0, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 5, 2, 0, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 6, 2, 0, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 7, 2, 0, 7);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 8, 2, 1, 1);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 9, 2, 1, 2);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 10, 2, 1, 3);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 11, 2, 1, 4);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 12, 2, 1, 5);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 13, 2, 1, 6);
-  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 14, 2, 1, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 1, 2, 1, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 2, 2, 1, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 3, 2, 1, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 4, 2, 1, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 5, 2, 1, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 6, 2, 1, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 7, 2, 1, 7);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 8, 2, 2, 1);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 9, 2, 2, 2);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 10, 2, 2, 3);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 11, 2, 2, 4);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 12, 2, 2, 5);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 13, 2, 2, 6);
+  addEKLMElectronicsMapLane(EKLMElementNumbers::c_ForwardSection, 4, 14, 2, 2, 7);
 
 }
 

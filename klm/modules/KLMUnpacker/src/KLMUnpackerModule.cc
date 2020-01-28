@@ -122,10 +122,10 @@ void KLMUnpackerModule::unpackEKLMDigit(
     if (!m_IgnoreWrongHits) {
       B2ERROR("Channel does not exist in the KLM electronics map."
               << LogVar("Copper", electronicsChannel.getCopper())
-              << LogVar("Data concentrator", electronicsChannel.getSlot())
+              << LogVar("Slot", electronicsChannel.getSlot())
               << LogVar("Lane", electronicsChannel.getLane())
               << LogVar("Axis", electronicsChannel.getAxis())
-              << LogVar("Channel", electronicsChannel.getLane()));
+              << LogVar("Channel", electronicsChannel.getChannel()));
     }
     if (!m_WriteWrongHits)
       return;
@@ -183,11 +183,12 @@ void KLMUnpackerModule::unpackBKLMDigit(
   detectorChannel =
     m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
   if (detectorChannel == nullptr) {
-    B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
-            << LogVar("Copper", copper)
-            << LogVar("Finesse", hslb + 1)
-            << LogVar("Lane", raw.lane)
-            << LogVar("Axis", raw.axis));
+    B2DEBUG(20, "Channel does not exist in the KLM electronics map."
+            << LogVar("Copper", electronicsChannel.getCopper())
+            << LogVar("Slot", electronicsChannel.getSlot())
+            << LogVar("Lane", electronicsChannel.getLane())
+            << LogVar("Axis", electronicsChannel.getAxis())
+            << LogVar("Channel", electronicsChannel.getChannel()));
     if (!(m_WriteWrongHits || m_DebugBKLMScintillators))
       return;
     /*

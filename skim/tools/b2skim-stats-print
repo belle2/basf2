@@ -601,9 +601,16 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * 20,
-            'CalculationDescription': ('CPU time of test job divided by number of input events, '
-                                       'and multiplied by 20 to convert from KEKCC CPU time to HEP-Spec06 '
-                                       '(the units used for resource estimates in grid production).'),
+            'CalculationDescription': 'CPU time of test job divided by number of input events.',
+            'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
+        },
+        'HS06TimePerFile': {
+            'LongName': 'Estimated CPU time per file (HS06)',
+            'FloatFormat': '.3f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * get_events_per_file(sample) * 20,
+            'CalculationDescription': ('CPU time of test job, divided by number of input events, multiplied by average number of events in a file of this sample type.'),
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
         'udstSize': {
@@ -628,10 +635,10 @@ def getStatSpecifier():
             'LongName': 'Estimated average uDST size per file (MB)',
             'FloatFormat': '.2f',
             'PrintToScreen': False,
-            'PrintToConfluence': False,
+            'PrintToConfluence': True,
             'Calculate': lambda skim, sample: (udstSize(skim, sample) / nInputEvents(skim, sample)
                                                * get_events_per_file(sample) / 1024),
-            'CalculationDescription': 'uDST size per event multiplied by average number of events per file for this sample.',
+            'CalculationDescription': 'uDST size per event multiplied by average number of events in a file of this sample type.',
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
         'logSize': {
@@ -983,11 +990,14 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
 
     confluenceStrings = ['h1. How each statistic is calculated']
     for stat in selectedStats:
-        confluenceStrings.append(f' - {statSpecifier[stat]["LongName"]}: {statSpecifier[stat]["CalculationDescription"]}')
+        confluenceStrings.append(f'|| {statSpecifier[stat]["LongName"]} | {statSpecifier[stat]["CalculationDescription"]} |')
+    confluenceStrings.append("\n*Note*: The units used for resource usage estimates in grid production are "
+                             "HEP-Spec06 (HS06). To obtain estimates in units of HS06, we multiply CPU time on "
+                             "KEKCC by a factor of 20.")
 
     confluenceStrings += ['', 'h1. List of test files for each sample']
     for sample in samples:
-        confluenceStrings += [' - ' + f'{sample}: {{{{{get_test_file(sample)}}}}}']
+        confluenceStrings += [f'|| {sample} | {{{{{get_test_file(sample)}}}}} |']
 
     confluenceStrings += ['', 'h1. Performance statistics per skim']
     for skimName, skimStats in allSkimStats.items():

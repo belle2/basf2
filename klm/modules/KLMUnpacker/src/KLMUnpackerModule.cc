@@ -198,7 +198,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     detectorChannel = m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
     if (detectorChannel == nullptr)
       return;
-    moduleId = *detectorChannel;
+    moduleId = m_ElementNumbers->localChannelNumberBKLM(*detectorChannel);
     if (m_WriteWrongHits) {
       // increase by 1 the event-counter of outOfRange-flagged hits
       klmDigitEventInfo->increaseOutOfRangeHits();
@@ -225,7 +225,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     if (raw.channel > 0)
       BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
   } else {
-    moduleId = *detectorChannel;
+    moduleId = m_ElementNumbers->localChannelNumberBKLM(*detectorChannel);
     layer = BKLMElementNumbers::getLayerByModule(moduleId);
     if (m_DebugBKLMScintillators) {
       /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */

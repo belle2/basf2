@@ -785,12 +785,12 @@ def add_vxd_track_finding_vxdtf2(
 
     # setup the event level tracking info to log errors and stuff
     nameTrackingInfoModule = "RegisterEventLevelTrackingInfo" + suffix
-    nameEvtInfo = "EventLevelTrackingInfo" + suffix
+    nameEventTrackingInfo = "EventLevelTrackingInfo" + suffix
     if nameTrackingInfoModule not in path:
         # Use modified name of module and created StoreObj as module might be added twice (PXDDataReduction)
         registerEventlevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
         registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
-        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', 'EventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
     nameSPs = 'SpacePoints' + suffix

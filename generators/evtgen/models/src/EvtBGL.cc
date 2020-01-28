@@ -5,6 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Lu Cao                                                   *
  *                                                                        *
+ * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -125,11 +127,11 @@ void EvtBGL::init()
       bglffmodel = new EvtBGLFF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5));
       calcamp = new EvtSemiLeptonicVectorAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL (N=3) model handles only scalar meson daughters at this moment. Sorry." << endl;
+      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL (N=3) model for vector meson daughters needs 6 arguments. Sorry." << endl;
       ::abort();
     }
   } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HQET3 model handles only scalar and vector meson daughters. Sorry." << endl;
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL model handles only scalar and vector meson daughters. Sorry." << endl;
     ::abort();
   }
 

@@ -5,6 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Lu Cao                                                   *
  *                                                                        *
+ * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 

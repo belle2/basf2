@@ -5,6 +5,8 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Lu Cao                                                   *
  *                                                                        *
+ * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -35,7 +37,7 @@ EvtBGLFF::EvtBGLFF(double bglap_0, double bglap_1, double bglap_2, double bglap_
 }
 
 
-// BGL (N=3) for vector meson i.e. B->D*lv  (l=e,mu)
+// BGL for vector meson i.e. B->D*lv  (l=e,mu)
 EvtBGLFF::EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, double bglc_1, double bglc_2)
 {
 
@@ -47,7 +49,7 @@ EvtBGLFF::EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, d
   a_1 = bgla_1 / eta_ew_Vcb;
   b_0 = bglb_0 / eta_ew_Vcb;
   b_1 = bglb_1 / eta_ew_Vcb;
-  // c_0 must be defined later
+  // c_0 will be defined later
   c_1 = bglc_1 / eta_ew_Vcb;
   c_2 = bglc_2 / eta_ew_Vcb;
 
@@ -85,6 +87,11 @@ void EvtBGLFF::getscalarff(EvtId parent, EvtId,
 
   return;
 }
+
+// Use z expansion parametrization from
+// C.G.Boyd, B.Grinstein and R.F.Lebed, Phys. Rev. D 56,6895(1997)
+// and
+// B.Grinstein, A.Kobach, Phys. Lett. B 771(2017)359-364
 
 void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a1f,
                            double* a2f, double* vf, double* a0f)
@@ -134,7 +141,7 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
   double r1 = (w + 1.) * mb * mass * g / f;
   double r2 = (w - r) / (w - 1) - F1 / mb / (w - 1) / f;
 
-  double r0 = 1.15; // pay attention!
+  double r0 = 1.15;
 
   *a1f = (w + 1.) / 2. * rstar * ha1;
   *a2f = (r2 / rstar) * ha1;

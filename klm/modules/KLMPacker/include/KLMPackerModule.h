@@ -15,7 +15,6 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -111,9 +110,6 @@ namespace Belle2 {
     StoreArray<BKLMDigit> m_BklmDigits;
 
     /* EKLM objects. */
-
-    /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_EklmElementNumbers;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_EklmDigits;

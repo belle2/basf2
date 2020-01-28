@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/modules/KLMPacker/KLMPackerModule.h>
 
-/* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
@@ -26,7 +23,6 @@ KLMPackerModule::KLMPackerModule() : Module()
   setDescription("KLM raw data packer (creates RawKLM from BKLMDigits and EKLMDigits).");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_EklmElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMPackerModule::~KLMPackerModule()

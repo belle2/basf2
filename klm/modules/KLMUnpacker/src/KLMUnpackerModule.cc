@@ -137,7 +137,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
     correctHit = false;
   } else {
     m_ElementNumbers->channelNumberToElementNumbers(
-      *detectorChannel, &subdetector, &section, &layer, &sector, &plane,
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
       &strip);
   }
   EKLMDigit* eklmDigit = m_eklmDigits.appendNew();

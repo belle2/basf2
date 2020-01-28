@@ -14,13 +14,20 @@ import modularAnalysis as ma
 
 def EtabList(path):
     """
-    Skim code: 15420200
-    Skim selection of the following channel:
-    - eta_b -> gamma gamma
-    selection criteria are listed below
-    (1) 2 std photon with E > 3.5 GeV
-    (2) 7 < M(eta_b) < 10 GeV/c^2
-    (3) foxWolframR2 < 0.995
+    **Skim code**: 15420200
+
+    **Skim Author**: Stefano Spataro, Sen Jia
+
+    **Decay Modes**:
+
+    * ``eta_b -> gamma gamma``
+
+    **Selection Criteria**:
+
+    1. ``2 std photon with E > 3.5 GeV``
+    2. ``7 < M(eta_b) < 10 GeV/c^2``
+    3. ``foxWolframR2 < 0.995``
+
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
@@ -63,14 +70,21 @@ def EtabList(path):
 
 def UpsilonList(path):
     """
-    Skim code: 15440100
-    Skim selection of the following channel:
-    - Y(1S,2S) -> l^+ l^{-} (l = e or mu)
-    selection criteria are listed below
-    (1) 2 tracks with momentum ranging between 3.5 < p < 15,
-    (2) At least 1 track p < 1.5 or 1 std photon with E > 150 MeV
-    (3) M(Y(1S,2S)) > 8 GeV/c^2
-    (4) foxWolframR2 < 0.995
+    **Skim Code**: 15440100
+
+    **Skim Author**: Stefano Spataro, Sen Jia
+
+    **Skim Selection**:
+
+    * Y(1S,2S) -> l^+ l^{-} (l = e or mu)
+
+    **Selection Criteria**
+
+    1. 2 tracks with momentum ranging between ``3.5 < p < 15``
+    2. At least 1 track ``p < 1.5`` or 1 std photon with ``E > 150 MeV``
+    3. ``M(Y(1S,2S)) > 8 GeV/c^2``
+    4. ``foxWolframR2 < 0.995``
+
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
@@ -122,16 +136,23 @@ def UpsilonList(path):
 
 def ISRpipiccList(path):
     """
-    Skim code: 16460100
-    Skim selection of the following channels:
-    - e+e- -> pi+ pi- J/psi -> e+e-
-    - e+e- -> pi+ pi- J/psi -> mu+mu-
-    - e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-
-    - e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-
-    selection criteria are listed below
-    (1) standard e/mu/pi ParticleLists
-    (2) mass window cut for J/psi and psi(2S) candidates
-    (3) Apply -4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4} to extract ISR signal events
+    **Skim Code**: 16460100
+
+    **Skim Author**: Sen Jia
+
+    **Skim Selection**:
+
+    * ``e+e- -> pi+ pi- J/psi -> e+e-``
+    * ``e+e- -> pi+ pi- J/psi -> mu+mu-``
+    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-``
+    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-``
+
+    **Selection Criteria**:
+
+    (1) Standard `e/mu/pi ParticleLists`
+    (2) Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
+    (3) Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
+
     """
     __author__ = "Sen Jia"
 

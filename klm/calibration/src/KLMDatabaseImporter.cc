@@ -191,8 +191,14 @@ void KLMDatabaseImporter::clearElectronicsMap()
   m_ElectronicsChannels.clear();
 }
 
-void KLMDatabaseImporter::loadBKLMElectronicsMap(bool isExperiment10)
+void KLMDatabaseImporter::loadBKLMElectronicsMap(int version)
 {
+  const int minimalVersion = 1;
+  const int maximalVersion = 2;
+  if (version < minimalVersion || version > maximalVersion) {
+    B2FATAL("Incorrect version (" << version << ") of BKLM electronics map. "
+            "It must be from " << minimalVersion << " to " << maximalVersion);
+  }
   int copperId = 0;
   int slotId = 0;
   int laneId;
@@ -266,7 +272,7 @@ void KLMDatabaseImporter::loadBKLMElectronicsMap(bool isExperiment10)
           if (section == BKLMElementNumbers::c_BackwardSection
               && sector == BKLMElementNumbers::c_ChimneySector) {
             if (layer == 1) {
-              if (!isExperiment10) {
+              if (version == 1) {
                 if (channelCheck > 0 && channelCheck < 9)
                   channelId = 9 - channelId;
                 if (channelCheck > 8 && channelCheck < 24)

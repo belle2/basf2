@@ -98,20 +98,22 @@ namespace Belle2 {
 
     /**
      * Load BKLM electronics map.
-     * @param[in] isExperiment10 Experiment 10 or earlier data.
      *
-     * @param[in] isExperiment10
-     * Whether the map is created for experiment 10 or later.
+     * @param[in] version
+     * map version:
+     * 1) Before experiment 10.
+     * 2) Experiment 10 and later (mapping in chimney sector has changed)
      */
-    void loadBKLMElectronicsMap(bool isExperiment10 = false);
+    void loadBKLMElectronicsMap(int version);
 
     /**
      * Load EKLM electronics map.
      *
      * @param[in] version
      * Map version:
-     * 1 = phase 2, experiment 3
-     * 2 = phase 3, starting from experiment 4.
+     * 1) Phase 2, experiment 3. Connection of cables was wrong
+     *    for backward sectors 2 and 3.
+     * 2) Phase 3, starting from experiment 4.
      *
      * @param[in] mc
      * MC or data (MC does not have occasional cable switches that exist

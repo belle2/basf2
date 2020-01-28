@@ -31,15 +31,12 @@ def load_bklm_electronics_map(version, mc):
     Load BKLM electronics map.
     Versions:
     1 = before experiment 10.
-    2 = experiment 10 and later (scintillator phi strips issue).
+    2 = experiment 10 and later (mapping in chimney sector has changed).
     """
     if mc:
-        dbImporter.loadBKLMElectronicsMap()
+        dbImporter.loadBKLMElectronicsMap(1)
     else:
-        if version == 1:
-            dbImporter.loadBKLMElectronicsMap()
-        elif version == 2:
-            dbImporter.loadBKLMElectronicsMap(True)
+        dbImporter.loadBKLMElectronicsMap(version)
         # Switch lanes for real-data map.
         # The fibers of layer 1 and 2 are switched in BB6.
         dbImporter.setElectronicsMapLane(KLMElementNumbers.c_BKLM,

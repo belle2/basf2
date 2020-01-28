@@ -4,7 +4,7 @@
 """FEI Semi-leptonic B0 tag skim standalone for generic analysis in th
     (Semi-)Leptonic and Missing Energy Working Group
     Skim LFN code: 11180400
-    fei training: MC13 based, release-04-01-01 'feiv4_14012020_MC13_release_04_01_01_phase3'
+    fei training: MC13 based, release-04-01-01 'FEIv4_2020_MC13_release_04_01_01'
  """
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]

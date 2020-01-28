@@ -65,7 +65,7 @@ void KLMPackerModule::event()
     const KLMElectronicsChannel* electronicsChannel =
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
-      B2FATAL("Incomplete BKLM electronics map.");
+      B2FATAL("Incomplete KLM electronics map.");
     int flag = 2; // RPC
     if (!bklmDigit.inRPC())
       flag = 4; // Scintillator

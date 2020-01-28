@@ -38,15 +38,14 @@ skim_registry = [
     ('12160300', 'BtoXll_LFV'),
     ('14120500', 'BtoPi0Pi0'),
     ('17240100', 'DstToD0Pi_D0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
-    # ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
     ('17240200', 'DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
-    # ('17240200', 'EarlyData_DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
     ('17240300', 'DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
-    # ('17240300', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
     ('17240400', 'DstToD0Pi_D0ToKsOmega'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
     ('17240500', 'DstToD0Pi_D0ToHpJmEta'),  # D* -> D0 -> K- pi+ eta (RS+WS)
     ('17240600', 'DstToD0Pi_D0ToNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
     ('17240700', 'DstToD0Pi_D0ToHpHmKs'),  # D* -> D0 -> h h Ks
+    ('17240800', 'EarlyData_DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
+    ('17240900', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
     ('17230100', 'XToD0_D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     # ('17230100', 'D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     ('17230200', 'XToD0_D0ToNeutrals'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks

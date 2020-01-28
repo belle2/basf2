@@ -83,32 +83,41 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): either "e+e-e+e-" or "e+e-mu+mu-"
+        finalstate (str): either "e+e-e+e-", "e+e-mu+mu-" or "mu+mu-mu+mu-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
     """
 
     aafh = register_module('AafhInput')
-    aafh_mode = 5
-    if not subweights:  # default subweights are for minmass=0.5
-        aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
-    else:
-        aafh_subgeneratorWeights = subweights
-    aafh_maxSubgeneratorWeight = maxsubweight
-    aafh_maxFinalWeight = maxfinalweight
-
-    if abs(minmass - 0.5) > 0.01 and not subweights:
-        B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
 
     if finalstate == 'e+e-e+e-':
-        pass
+        aafh_mode = 5
+        if not subweights:  # default subweights are for minmass=0.5
+            aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
         if not subweights:
             aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
         else:
             aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+    elif finalstate == 'mu+mu-mu+mu-':
+        aafh_mode = 2
+        minmass = 0
+        maxsubweight = 3
+        if not subweights:
+            aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 3.726e+00, 1.000e+00, 1.778e+00, 1.000e+00, 1.094e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
     else:
         B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
+
+    aafh_maxSubgeneratorWeight = maxsubweight
+    aafh_maxFinalWeight = maxfinalweight
 
     aafh = path.add_module(
         'AafhInput',

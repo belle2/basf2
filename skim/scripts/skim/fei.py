@@ -31,7 +31,7 @@ def B0Hadronic(path):
         * **Skim description**: Hadronic :math:`B^0` tag FEI skim for
           generic analysis.
         * **Skim LFN code**: 11180100
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: FEIv4_2020_MC13_release_04_01_01
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -127,8 +127,10 @@ def B0Hadronic(path):
         hadronic :math:`B^0` skim candidates.
     """
 
-    ma.applyCuts('B0:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
-
+    ma.applyCuts(
+        'B0:generic',
+        '[[Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001] or [extraInfo(decayModeID)==23 and Mbc>5.24 and abs(deltaE)<0.200]]',
+        path=path)
     B0HadronicList = ['B0:generic']
     return B0HadronicList
 
@@ -139,7 +141,7 @@ def BplusHadronic(path):
         * **Skim description**: Hadronic :math:`B^+` tag FEI skim for
           generic analysis.
         * **Skim LFN code**: 11180200
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: FEIv4_2020_MC13_release_04_01_01
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -235,7 +237,10 @@ def BplusHadronic(path):
 
     # B+:generic list from FEI must already exist in path
     # Apply cuts
-    ma.applyCuts('B+:generic', 'Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001', path=path)
+    ma.applyCuts(
+        'B+:generic',
+        '[[Mbc>5.24 and abs(deltaE)<0.200 and sigProb>0.001] or [extraInfo(decayModeID)==25 and Mbc>5.24 and abs(deltaE)<0.200]]',
+        path=path)
 
     BplusHadronicList = ['B+:generic']
     return BplusHadronicList
@@ -289,10 +294,16 @@ def runFEIforB0Hadronic(path):
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
-    particles = fei.get_default_channels(neutralB=True, chargedB=False, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=False,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -345,10 +356,16 @@ def runFEIforBplusHadronic(path):
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
-    particles = fei.get_default_channels(neutralB=False, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=False,
+        chargedB=True,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -407,10 +424,16 @@ def runFEIforHadronicCombined(path):
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
-    particles = fei.get_default_channels(neutralB=True, chargedB=True, hadronic=True, semileptonic=False, KLong=False)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    particles = fei.get_default_channels(
+        neutralB=True,
+        chargedB=True,
+        hadronic=True,
+        semileptonic=False,
+        KLong=False,
+        baryonic=True)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -421,7 +444,7 @@ def B0SL(path):
         * **Skim description**: Semileptonic :math:`B^0` tag FEI skim
           for generic analysis.
         * **Skim LFN code**: 11180300
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: FEIv4_2020_MC13_release_04_01_01
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -513,7 +536,7 @@ def BplusSL(path):
         * **Skim description**: Semileptonic :math:`B^+` tag FEI skim
           for generic analysis.
         * **Skim LFN code**: 11180400
-        * **FEI training**: FEIv4_2019_MC12_release_03_01_01
+        * **FEI training**: FEIv4_2020_MC13_release_04_01_01
         * **Working Group**: (Semi-)Leptonic and Missing Energy
           Working Group (WG1)
         * **Skim liaisons**: Hannah Wakeling & Phil Grace
@@ -649,7 +672,7 @@ def runFEIforB0SL(path):
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
     particles = fei.get_default_channels(
         neutralB=True,
@@ -657,8 +680,9 @@ def runFEIforB0SL(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -713,7 +737,7 @@ def runFEIforBplusSL(path):
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
     particles = fei.get_default_channels(
         neutralB=False,
@@ -721,8 +745,9 @@ def runFEIforBplusSL(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -782,7 +807,7 @@ def runFEIforSLCombined(path):
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
     particles = fei.get_default_channels(
         neutralB=True,
@@ -790,8 +815,9 @@ def runFEIforSLCombined(path):
         hadronic=False,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
 
@@ -853,7 +879,7 @@ def runFEIforSkimCombined(path):
 
     ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
     # Run FEI
-    b2.use_central_database('GT_gen_ana_004.40_AAT-parameters', b2.LogLevel.DEBUG, 'fei_database')
+    b2.conditions.globaltags = ['analysis_tools_release-04']
 
     particles = fei.get_default_channels(
         neutralB=True,
@@ -861,7 +887,8 @@ def runFEIforSkimCombined(path):
         hadronic=True,
         semileptonic=True,
         KLong=False,
+        baryonic=True,
         removeSLD=True)
-    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2019_MC12_release_03_01_01', training=False, monitor=False)
+    configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)

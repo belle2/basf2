@@ -58,6 +58,8 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            "Cluster size at which to switch to Analog head tail algorithm", m_sizeHeadTail);
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
+  addParam("timeAlgorithm", m_timeAlgorithm,
+           " int to choose time algorithm:  0 = 6-sample CoG (default), 1 = 3-sample CoG,  2 = 3-sample ELS", m_timeAlgorithm);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
 
@@ -146,7 +148,7 @@ void SVDSimpleClusterizerModule::event()
   }
   //create a dummy cluster just to start
   SimpleClusterCandidate clusterCandidate(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(),
-                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster, m_timeAlgorithm);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -179,6 +181,7 @@ void SVDSimpleClusterizerModule::event()
     aStrip.charge = thisCharge;
     aStrip.cellID = thisCellID;
     aStrip.noise = thisNoise;
+    //this is the 6-sample CoG time and will be used to compute the 6-sample CoG cluster time, it will not be used for in 3-sample time algorithms:
     aStrip.time = m_storeDigits[i]->getTime();
 
     //try to add the strip to the existing cluster
@@ -193,7 +196,8 @@ void SVDSimpleClusterizerModule::event()
       }
 
       //prepare for the next cluster:
-      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster);
+      clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster,
+                                                m_timeAlgorithm);
 
       //start another cluster:
       if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))

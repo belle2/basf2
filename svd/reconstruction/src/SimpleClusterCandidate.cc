@@ -21,18 +21,19 @@ namespace Belle2 {
   namespace SVD {
 
     SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
-                                                   double cutCluster)
+                                                   double cutCluster, int timeAlgorithm)
       : m_vxdID(vxdID)
       , m_isUside(isUside)
       , m_sizeHeadTail(sizeHeadTail)
       , m_cutSeed(cutSeed)
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
+      , m_timeAlgorithm(timeAlgorithm)
       , m_charge(0)
       , m_chargeError(0)
       , m_seedCharge(0)
-      , m_time(0)
-      , m_timeError(0)
+      , m_6SampleTime(0)
+      , m_6SampleTimeError(0)
       , m_position(0)
       , m_positionError(0)
       , m_SNR(0)
@@ -94,7 +95,7 @@ namespace Belle2 {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
         m_charge += aStrip.charge;
-        m_time += aStrip.time * aStrip.charge;
+        m_6SampleTime += aStrip.time * aStrip.charge;
         noise += aStrip.noise * aStrip.noise;
       }
 
@@ -104,7 +105,7 @@ namespace Belle2 {
       }
 
       noise = sqrt(noise);
-      m_time /= m_charge;
+      m_6SampleTime /= m_charge;
       m_SNR = m_charge / noise;
 
 
@@ -161,7 +162,7 @@ namespace Belle2 {
       else
         m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
 
-      m_timeError = 6; //order of magnitude
+      m_6SampleTimeError = 6; //order of magnitude
     };
 
     bool SimpleClusterCandidate::isGoodCluster()
@@ -179,6 +180,100 @@ namespace Belle2 {
 
       return isGood;
     };
+
+
+    float SimpleClusterCandidate::getTime() const
+    {
+
+      if (m_timeAlgorithm == 0)
+        return get6SampleCoGTime();
+      else if (m_timeAlgorithm == 1)
+        return get3SampleCoGTime();
+      else if (m_timeAlgorithm == 2)
+        return get3SampleELSTime();
+      else {
+        B2FATAL("unrecognized timeAlgorithm, please check the input parameter and select a value among {0 (6-sample CoG), 1 (3-sample CoG), 2 (3-sample ELS)} to select the algorithm that you want to reconstruct the cluster time");
+        return 0;
+      }
+    }
+
+    float SimpleClusterCandidate::getTimeError() const
+    {
+
+      if (m_timeAlgorithm == 0)
+        return get6SampleCoGTimeError();
+      else if (m_timeAlgorithm == 1)
+        return get3SampleCoGTimeError();
+      else if (m_timeAlgorithm == 2)
+        return get3SampleELSTimeError();
+      else {
+        B2FATAL("unrecognized timeAlgorithm, please check the input parameter and select a value among {0 (6-sample CoG), 1 (3-sample CoG), 2 (3-sample ELS)} to select the algorithm that you want to reconstruct the cluster time");
+        return 0;
+      }
+    }
+
+    float SimpleClusterCandidate::get3SampleCoGTime() const
+    {
+
+      //take the cluster samples
+      Belle2::SVDShaperDigit::APVFloatSamples clSamples = getClsSamples();
+
+      /**
+       *
+       * actual algorithm implementation, Yuma
+       *
+       *
+       */
+
+      return 0;
+    }
+    float SimpleClusterCandidate::get3SampleELSTime() const
+    {
+
+      //take the cluster samples
+      Belle2::SVDShaperDigit::APVFloatSamples clSamples = getClsSamples();
+
+      /**
+       *
+       * actual algorithm implementation, Yuma
+       *
+       *
+       */
+      return 0;
+    }
+    float SimpleClusterCandidate::get3SampleCoGTimeError() const
+    {
+
+      //no obvious way to compute the error yet
+      return 0;
+    }
+
+    float SimpleClusterCandidate::get3SampleELSTimeError() const
+    {
+
+      //no obvious way to compute the error yet
+      return 0;
+    }
+
+
+    Belle2::SVDShaperDigit::APVFloatSamples SimpleClusterCandidate::getClsSamples() const
+    {
+
+      if (m_strips.size() == 0)
+        B2ERROR(" you are asking fo the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
+
+      //steps:
+      //1.loop on m_strips
+      //2. access the index of the recodigit from the element of m_strip
+      //3. get the shaperdigit related to the recodigit of index recoDigitIndex
+      //4. sum each sample for each strip accessed in the loop
+      //5. you are done
+
+      Belle2::SVDShaperDigit::APVFloatSamples returnSamples;
+
+      return returnSamples;
+    }
+
 
   }  //SVD namespace
 } //Belle2 namespace

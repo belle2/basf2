@@ -828,7 +828,7 @@ def add_vxd_track_finding_vxdtf2(
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
-    segNetProducer.param('EventLevelTrackingInfoName', nameEvtInfo)
+    segNetProducer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(segNetProducer)
 
     #################
@@ -846,7 +846,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
-    trackFinder.param('EventLevelTrackingInfoName', nameEvtInfo)
+    trackFinder.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(trackFinder)
 
     if useTwoStepSelection:

@@ -218,7 +218,7 @@ namespace Belle2 {
         previousDCS = diffCrossSection;
       }
 
-      B2DEBUG(10, " wtable loaded");
+      B2DEBUG(20, " wtable loaded");
     }
   }
 
@@ -234,7 +234,7 @@ namespace Belle2 {
         wtcond[i] = 0.0;
       }
 
-      B2DEBUG(10, " wtable mode=0  initialized");
+      B2DEBUG(20, " wtable mode=0  initialized");
 
       // Load Wlist_table
 
@@ -262,7 +262,7 @@ namespace Belle2 {
           wtcond[nwpoint] =  w1;
           nwpoint++ ;
           hpoint += n1;
-          B2DEBUG(10,  w1 << " GeV  " << n1 << " events   " << hpoint - 1 << "events in total");
+          B2DEBUG(20,  w1 << " GeV  " << n1 << " events   " << hpoint - 1 << "events in total");
           wthead[nwpoint] = hpoint;
         }
         while (!infile.eof() && (inmode == 1 || inmode == 2)) {
@@ -279,8 +279,8 @@ namespace Belle2 {
 
         }
 
-        B2DEBUG(10, wthead[0] << " " << wtcond[0]);
-        B2DEBUG(10, " wtable mode=0  loaded");
+        B2DEBUG(20, wthead[0] << " " << wtcond[0]);
+        B2DEBUG(20, " wtable mode=0  loaded");
       }
       return 0.0 ;
     } else if (mode == 1) {
@@ -321,7 +321,7 @@ namespace Belle2 {
     double xxx = tpgetd(0, rs, dmin, dmax, q2max);
     tpgetz(0);
 
-    B2DEBUG(150, "In Treps, W has been set to be " << std::setprecision(5) <<
+    B2DEBUG(20, "In Treps, W has been set to be " << std::setprecision(5) <<
             w << " GeV");
   }
 
@@ -397,7 +397,7 @@ namespace Belle2 {
   int TrepsB::event_gen(int iev)
   {
     // generates one event
-    B2INFO("W = " << w);
+    B2DEBUG(20, "W = " << w);
     imode = 0 ;
     int comp = 0 ;
     int npoint;
@@ -688,7 +688,7 @@ namespace Belle2 {
   void TrepsB::terminate() const
   {
 
-    B2DEBUG(10, nsave << " events saved.");
+    B2DEBUG(20, nsave << " events saved.");
     //  trfile->write();
     //std::cout << "Histograms are written in "<< filnam_hist << std::endl;
   }
@@ -870,10 +870,10 @@ namespace Belle2 {
     double q2p = -((pp - ppb).Mag2());
     double www = pf.Mag();
 
-    B2DEBUG(10, "");
-    B2DEBUG(10, "**************** Event# = " << iev << " ******************");
+    B2DEBUG(20, "");
+    B2DEBUG(20, "**************** Event# = " << iev << " ******************");
     for (int i = 0; i < n; i++) {
-      B2DEBUG(10, std::setw(2) << i + 1 << std::setw(11) << std::setprecision(4) << part[i].p.X() <<
+      B2DEBUG(20, std::setw(2) << i + 1 << std::setw(11) << std::setprecision(4) << part[i].p.X() <<
               std::setw(11) << std::setprecision(4) << part[i].p.Y() <<
               std::setw(11) << std::setprecision(4) << part[i].p.Z() <<
               std::setw(11) << std::setprecision(4) << part[i].p.T() <<
@@ -881,7 +881,7 @@ namespace Belle2 {
               std::setw(11) << std::setprecision(4) << part[i].part_prop.pmass <<
               std::setw(6) << std::setprecision(2) << part[i].part_prop.pcharg);
     }
-    B2DEBUG(10, std::setw(2) << "e-" << std::setw(11) << std::setprecision(4) << pe.X() <<
+    B2DEBUG(20, std::setw(2) << "e-" << std::setw(11) << std::setprecision(4) << pe.X() <<
             std::setw(11) << std::setprecision(4) << pe.Y() <<
             std::setw(11) << std::setprecision(4) << pe.Z() <<
             std::setw(11) << std::setprecision(4) << pe.T() <<
@@ -889,7 +889,7 @@ namespace Belle2 {
             std::setw(11) << std::setprecision(4) << me <<
             std::setw(6) << std::setprecision(2) << -1.0);
 
-    B2DEBUG(10, std::setw(2) << "e+" << std::setw(11) << std::setprecision(4) << pp.X() <<
+    B2DEBUG(20, std::setw(2) << "e+" << std::setw(11) << std::setprecision(4) << pp.X() <<
             std::setw(11) << std::setprecision(4) << pp.Y() <<
             std::setw(11) << std::setprecision(4) << pp.Z() <<
             std::setw(11) << std::setprecision(4) << pp.T() <<
@@ -897,12 +897,12 @@ namespace Belle2 {
             std::setw(11) << std::setprecision(4) << me <<
             std::setw(6) << std::setprecision(2) << 1.0);
 
-    B2DEBUG(10, "-----------------------------------------------");
-    B2DEBUG(10, std::setw(2) << "S:" << std::setw(11) << std::setprecision(4) << psum.X() <<
+    B2DEBUG(20, "-----------------------------------------------");
+    B2DEBUG(20, std::setw(2) << "S:" << std::setw(11) << std::setprecision(4) << psum.X() <<
             std::setw(11) << std::setprecision(4) << psum.Y() <<
             std::setw(11) << std::setprecision(4) << psum.Z() <<
             std::setw(11) << std::setprecision(4) << psum.T());
-    B2DEBUG(10, " Q2:(" << q2e << ", " << q2p << ")" <<
+    B2DEBUG(20, " Q2:(" << q2e << ", " << q2p << ")" <<
             "   W: " << www <<
             "   ptlab: " << sqrt(pf.X()*pf.X() + pf.Y()*pf.Y()) <<
             "   pzlab: " << pf.Z());

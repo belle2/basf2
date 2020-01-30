@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka                                         *
+ * Contributors: Kiyoshi Hayasaka, Yo Sato                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

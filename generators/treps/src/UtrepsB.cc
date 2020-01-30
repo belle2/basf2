@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kiyoshi Hayasaka                                         *
+ * Contributors: Kiyoshi Hayasaka, Yo Sato                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,7 +20,7 @@ UtrepsB::UtrepsB(void) : TrepsB()
 
 void UtrepsB::initg(void)
 {
-  B2DEBUG(10, " UtrepsB initg  Pmodel " << TrepsB::pmodel);
+  B2DEBUG(20, " UtrepsB initg  Pmodel " << TrepsB::pmodel);
 
   //parametrization of pi+pi- partial waves
 
@@ -361,7 +361,7 @@ int UtrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
     }
     if (weimax * gRandom->Uniform()  > wei) iret = 0;
 
-    B2DEBUG(10,  " $$ 3B $$ " << wei << " " << iret);
+    B2DEBUG(20,  " $$ 3B $$ " << wei << " " << iret);
   }
 
 

@@ -13,7 +13,6 @@
 /* KLM headers. */
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
-#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
@@ -91,64 +90,6 @@ namespace Belle2 {
                          const EKLMSegmentAlignment* eklmSegmentAlignment,
                          bool displacement = false);
 
-    /**
-     * Clear electronics map (to be able to import its multiple versions).
-     */
-    void clearElectronicsMap();
-
-    /**
-     * Load BKLM electronics map.
-     *
-     * @param[in] version
-     * map version:
-     * 1) Before experiment 10.
-     * 2) Experiment 10 and later (mapping in chimney sector has changed)
-     */
-    void loadBKLMElectronicsMap(int version);
-
-    /**
-     * Load EKLM electronics map.
-     *
-     * @param[in] version
-     * Map version:
-     * 1) Phase 2, experiment 3. Connection of cables was wrong
-     *    for backward sectors 2 and 3.
-     * 2) Phase 3, starting from experiment 4.
-     *
-     * @param[in] mc
-     * MC or data (MC does not have occasional cable switches that exist
-     * in the data).
-     */
-    void loadEKLMElectronicsMap(int version, bool mc);
-
-    /**
-     * Set non-default lane for all channels in a module.
-     * @param[in] subdetector Subdetector.
-     * @param[in] section     Section.
-     * @param[in] sector      Sector.
-     * @param[in] layer       Layer.
-     * @param[in] lane        Lane.
-     */
-    void setElectronicsMapLane(
-      int subdetector, int section, int sector, int layer, int lane);
-
-    /**
-     * Set non-default lane for all channels in a plane.
-     * @param[in] subdetector Subdetector.
-     * @param[in] section     Section.
-     * @param[in] sector      Sector.
-     * @param[in] layer       Layer.
-     * @param[in] plane       Plane.
-     * @param[in] lane        Lane.
-     */
-    void setElectronicsMapLane(
-      int subdetector, int section, int sector, int layer, int plane, int lane);
-
-    /**
-     * Import electronics map.
-     */
-    void importElectronicsMap();
-
   private:
 
     /**
@@ -175,30 +116,6 @@ namespace Belle2 {
     void importEKLMSegmentAlignment(
       const EKLMSegmentAlignment* eklmSegmentAlignment,
       bool displacement = false);
-
-    /**
-     * Get EKLM firmware strip number by software strip number.
-     * @param[in] stripFirmware Firmware strip number.
-     */
-    int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
-
-    /**
-     * Add EKLM electronics map lane.
-     * @param[in] section Section.
-     * @param[in] sector  Sector.
-     * @param[in] layer   Layer.
-     * @param[in] copper  Copper.
-     * @param[in] slot    Slot.
-     * @param[in] lane    Lane.
-     */
-    void addEKLMElectronicsMapLane(
-      int section, int sector, int layer, int copper, int slot, int axis);
-
-    /** Element numbers. */
-    const KLMElementNumbers* m_ElementNumbers;
-
-    /** Data for creation of the electronics map. */
-    std::vector< std::pair<uint16_t, KLMElectronicsChannel> > m_ElectronicsChannels;
 
     /** Low experiment. */
     int m_ExperimentLow;

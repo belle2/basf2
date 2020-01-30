@@ -53,7 +53,11 @@ namespace Belle2 {
       }
       const std::string type = params.getString("@type");
       const std::string material = params.getString("material", "");
-      const double r = params.getLength("r", 0) / Unit::mm * CLHEP::mm;
+      std::vector<double> ri = params.getArray("r", {0});
+      int phase = 0;
+      if (ri.size() > 1) phase = 1;
+
+      //const double r = params.getLength("r", 0) / Unit::mm * CLHEP::mm;
       const double top = params.getLength("top", 0) / Unit::mm * CLHEP::mm;
       const double u = params.getLength("u", 0) / Unit::mm * CLHEP::mm;
       const bool active = params.getBool("active", false);
@@ -86,15 +90,35 @@ namespace Belle2 {
       }
 
       int copyNo = 1;
-      const double center = r + roffset - height / 2 - top;
-      for (double phi : params.getArray("phi", {M_PI / 2})) {
-        for (double z : params.getArray("z", {0})) {
-          z *= CLHEP::mm / Unit::mm;
-          G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(u, center, z);
-          new G4PVPlacement(transform, volume, name, parent, false, copyNo++, check);
+
+      if (!phase) {
+        double center = ri[0] / Unit::mm * CLHEP::mm  + roffset - height / 2 - top;
+        //center *=CLHEP::mm / Unit::mm;
+        for (double phi : params.getArray("phi", {M_PI / 2})) {
+          for (double z : params.getArray("z", {0})) {
+            z *= CLHEP::mm / Unit::mm;
+            G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(u, center, z);
+            new G4PVPlacement(transform, volume, name, parent, false, copyNo++, check);
+          }
         }
+      } else {
+        int i = 0;
+        std::vector<double> alpha = params.getArray("alpha", {0});
+        for (double z : params.getArray("z", {0})) {
+          double center = ri[i] / Unit::mm * CLHEP::mm + roffset - height / 2 - top;
+          //    center *= CLHEP::mm / Unit::mm;
+          z *= CLHEP::mm / Unit::mm;
+          for (double phi : params.getArray("phi", {M_PI / 2})) {
+            G4Transform3D transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(u, center, z) * G4RotateY3D(alpha[i]);
+            new G4PVPlacement(transform, volume, name, parent, false, copyNo++, check);
+          }
+          i++;
+        }
+
       }
     }
+
+
 
     void CLAWSCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {

@@ -39,6 +39,16 @@ namespace Belle2 {
    */
   class Database {
   public:
+    /** State of the database */
+    enum EDatabaseState {
+      /** Before any initialization */
+      c_PreInit = 0,
+      /** Globaltag list has been finalized metadata providers not and globaltags are not checked for usability */
+      c_InitGlobaltagList = 1,
+      /** Everything is ready */
+      c_Ready = 2,
+    };
+
     /**
      * Instance of a singleton Database.
      */
@@ -182,6 +192,8 @@ namespace Belle2 {
      */
     ScopeGuard createScopedUpdateSession();
 
+    /** Initialize the database connection settings on first use */
+    void initialize(const EDatabaseState target = c_Ready);
 
   protected:
     /** Hidden constructor, as it is a singleton. */
@@ -190,8 +202,6 @@ namespace Belle2 {
     Database(const Database&) = delete;
     /** Hidden destructor, as it is a singleton. */
     ~Database();
-    /** Initialize the database connection settings on first use */
-    void initialize();
     /** Enable the next metadataprovider in the list */
     void nextMetadataProvider();
     /** List of available metadata providers (which haven't been tried yet) */
@@ -208,5 +218,7 @@ namespace Belle2 {
     std::unique_ptr<Conditions::TestingPayloadStorage> m_payloadCreation;
     /** optional list of testing payload storages to look for existing payloads */
     std::vector<Conditions::TestingPayloadStorage> m_testingPayloads;
+    /** Current configuration state of the database */
+    EDatabaseState m_configState{c_PreInit};
   };
 } // namespace Belle2

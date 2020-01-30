@@ -76,6 +76,19 @@ namespace Belle2 {
   private:
 
     /**
+     * Efficiency determination mode.
+     */
+    enum EfficiencyMode {
+
+      /** Strip. */
+      c_Strip,
+
+      /** Plane. */
+      c_Plane,
+
+    };
+
+    /**
      * Check channel parameters for channel-specific simulation.
      */
     void checkChannelParameters();
@@ -136,14 +149,26 @@ namespace Belle2 {
     /** Save FPGA fit data (KLMScintillatorFirmwareFitResult). */
     bool m_SaveFPGAFit;
 
+    /** Efficiency determination mode ("Strip" or "Plane"). */
+    std::string m_Efficiency;
+
+    /** Efficiency determination mode (converted from the string parameter). */
+    EfficiencyMode m_EfficiencyMode;
+
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
 
-    /** Simulation hit map for BKLM. */
-    std::multimap<uint16_t, BKLMSimHit*> m_bklmSimHitChannelMap;
+    /** Simulation hit map for BKLM (by channel). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitChannelMap;
 
-    /** Simulation hit map for EKLM. */
-    std::multimap<uint16_t, EKLMSimHit*> m_eklmSimHitChannelMap;
+    /** Simulation hit map for BKLM (by plane). */
+    std::multimap<uint16_t, const BKLMSimHit*> m_bklmSimHitPlaneMap;
+
+    /** Simulation hit map for EKLM (by channel). */
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitChannelMap;
+
+    /** Simulation hit map for EKLM (by plane). */
+    std::multimap<uint16_t, const EKLMSimHit*> m_eklmSimHitPlaneMap;
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

@@ -41,11 +41,14 @@ namespace Belle2 {
 
     /**
      * Load default electronics mapping.
+     *
+     * @param[in] isExperiment10
+     * Whether the map is created for experiment 10 or later.
      */
-    void loadDefaultElectronicMapping();
+    void loadDefaultElectronicMapping(bool isExperiment10 = false);
 
     /**
-     * Set non-default lane.
+     * Set non-default lane for all channels in a module.
      * @param[in] section Section.
      * @param[in] sector  Sector.
      * @param[in] layer   Layer.
@@ -53,6 +56,17 @@ namespace Belle2 {
      */
     void setElectronicMappingLane(
       int section, int sector, int layer, int lane);
+
+    /**
+     * Set non-default lane for all channels in a plane.
+     * @param[in] section Section.
+     * @param[in] sector  Sector.
+     * @param[in] layer   Layer.
+     * @param[in] plane   Plane.
+     * @param[in] lane    Lane.
+     */
+    void setElectronicMappingLane(
+      int section, int sector, int layer, int plane, int lane);
 
     /**
      * Import BKLM electronics mapping in the database.
@@ -68,16 +82,6 @@ namespace Belle2 {
      * Import BKLM simulation parameters into the database
      */
     void importSimulationPar();
-
-    /**
-     * Import BKLM Alignment parameters into the database
-     */
-    void importAlignment();
-
-    /**
-     * Import BKLM displaced-geometry parameters into the database
-     */
-    void importDisplacement();
 
     /**
      * Import BKLM scintillator ADC parameters into the database

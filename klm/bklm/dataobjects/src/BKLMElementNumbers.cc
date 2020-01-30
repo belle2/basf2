@@ -46,6 +46,28 @@ void BKLMElementNumbers::channelNumberToElementNumbers(
   *strip = ((channel & BKLM_STRIP_MASK) >> BKLM_STRIP_BIT) + 1;
 }
 
+uint16_t BKLMElementNumbers::planeNumber(
+  int section, int sector, int layer, int plane)
+{
+  checkSection(section);
+  checkSector(sector);
+  checkLayer(layer);
+  checkPlane(plane);
+  return (section << BKLM_END_BIT)
+         | ((sector - 1) << BKLM_SECTOR_BIT)
+         | ((layer - 1) << BKLM_LAYER_BIT)
+         | ((plane) << BKLM_PLANE_BIT);
+}
+
+void BKLMElementNumbers::planeNumberToElementNumbers(
+  uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane)
+{
+  *section = ((planeGlobal & BKLM_END_MASK) >> BKLM_END_BIT);
+  *sector = ((planeGlobal & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
+  *layer = ((planeGlobal & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
+  *plane = ((planeGlobal & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT);
+}
+
 uint16_t BKLMElementNumbers::moduleNumber(int section, int sector, int layer, bool fatalError)
 {
   checkSection(section);
@@ -77,7 +99,7 @@ int BKLMElementNumbers::layerGlobalNumber(int section, int sector, int layer)
   checkSection(section);
   checkSector(sector);
   checkLayer(layer);
-  int layerGlobal = layer - 1;
+  int layerGlobal = layer;
   layerGlobal += (sector - 1) * m_MaximalLayerNumber;
   layerGlobal += section * m_MaximalSectorNumber * m_MaximalLayerNumber;
   return layerGlobal;
@@ -91,7 +113,8 @@ int BKLMElementNumbers::getNStrips(
   checkLayer(layer);
   checkPlane(plane);
   int strips = 0;
-  if (section == BKLMElementNumbers::c_BackwardSection && sector == BKLMElementNumbers::c_ChimneySector &&
+  if (section == BKLMElementNumbers::c_BackwardSection &&
+      sector == BKLMElementNumbers::c_ChimneySector &&
       plane == BKLMElementNumbers::c_ZPlane) {
     /* Chimney sector. */
     if (layer < 3)

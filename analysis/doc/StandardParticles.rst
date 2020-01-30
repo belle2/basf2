@@ -70,3 +70,6 @@ If you improve these lists, please report in a performance meeting and make a pu
    :members:
    :undoc-members:
 
+.. automodule:: stdHyperons
+   :members:
+   :undoc-members:

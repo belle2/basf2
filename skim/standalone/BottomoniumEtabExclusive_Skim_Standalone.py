@@ -7,33 +7,30 @@
 # S. Spataro, 25/Jul/2016
 #
 ######################################################
-from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-import sys
-import os
-import glob
 
 # create a new path
-BottomoniumEtabskimpath = Path()
+BottomoniumEtabskimpath = b2.Path()
 
-skimCode = encodeSkimName('BottomoniumEtabExclusive')
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=BottomoniumEtabskimpath)
+skimCode = expert.encodeSkimName('BottomoniumEtabExclusive')
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=BottomoniumEtabskimpath)
 
 
 stdPhotons('loose', path=BottomoniumEtabskimpath)
 # Bottomonium Skim
-from skim.quarkonium import *
+from skim.quarkonium import EtabList
 EtabList = EtabList(path=BottomoniumEtabskimpath)
-skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
-summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
+expert.skimOutputUdst(skimCode, EtabList, path=BottomoniumEtabskimpath)
+ma.summaryOfLists(EtabList, path=BottomoniumEtabskimpath)
 
 
-setSkimLogging(path=BottomoniumEtabskimpath)
-process(BottomoniumEtabskimpath)
+expert.setSkimLogging(path=BottomoniumEtabskimpath)
+b2.process(BottomoniumEtabskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

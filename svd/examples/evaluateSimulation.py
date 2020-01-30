@@ -41,6 +41,7 @@ main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel
 digitizer = register_module('SVDDigitizer')
 digitizer.param('statisticsFilename', "digitizer.root")
 digitizer.param('storeWaveforms', True)
+digitizer.param('signalsList', "digitizer.txt")
 main.add_module(digitizer)
 
 main.add_module('RootOutput')

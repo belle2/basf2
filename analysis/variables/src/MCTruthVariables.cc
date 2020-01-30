@@ -38,42 +38,20 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-    double isSignalWithoutProperty(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return std::numeric_limits<double>::quiet_NaN();
-
-      int status = MCMatching::getMCErrors(part, mcparticle, false);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
     double isExtendedSignal(const Particle* part)
     {
+      B2WARNING("isExtendedSignal is deprecated and will be removed. Please use isSignalAcceptWrongFSPs which is exact same variable");
+
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_MisID);
       status &= (~MCMatching::c_AddedWrongParticle);
 
@@ -87,10 +65,7 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_MisID);
       status &= (~MCMatching::c_AddedWrongParticle);
 
@@ -125,7 +100,7 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
         return std::numeric_limits<double>::quiet_NaN();
       // get mcparticle weight (mcmatch weight)
       auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
@@ -238,11 +213,7 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
+      //remove the following bits
       status &= (~MCMatching::c_MissNeutrino);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
@@ -255,10 +226,7 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
 
@@ -272,11 +240,8 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
+      //remove the following bits
       status &= (~MCMatching::c_MissGamma);
-      status &= (~MCMatching::c_MissingResonance);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -288,11 +253,8 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
+      //remove the following bits
       status &= (~MCMatching::c_MissGamma);
-      status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
       status &= (~MCMatching::c_MissNeutrino);
@@ -307,12 +269,8 @@ namespace Belle2 {
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_AddedRecoBremsPhoton);
-      //status &= (~MCMatching::c_DecayInFlight);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -329,11 +287,6 @@ namespace Belle2 {
     double particleMCErrors(const Particle* part)
     {
       return MCMatching::getMCErrors(part);
-    }
-
-    double particleMCErrorsWithoutProperty(const Particle* part)
-    {
-      return MCMatching::getMCErrors(part, nullptr, false);
     }
 
     double particleNumberOfMCMatch(const Particle* particle)
@@ -874,9 +827,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
                       "It behaves according to DecayStringGrammar.");
-    REGISTER_VARIABLE("isSignalWithoutProperty", isSignalWithoutProperty,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
-                      "It does not consider the missing particle flags of PropertyFlags of the particle.");
     REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed. \n"
@@ -931,9 +881,6 @@ namespace Belle2 {
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
-    REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
-                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
-                      "The ignore particle flags of Particle::PropertyFlags which is set by decayString grammar are not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,

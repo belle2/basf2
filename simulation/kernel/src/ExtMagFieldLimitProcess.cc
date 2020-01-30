@@ -23,18 +23,19 @@ using namespace Belle2;
 using namespace Belle2::Simulation;
 
 ExtMagFieldLimitProcess::ExtMagFieldLimitProcess(const G4String& processName) :
-  G4VDiscreteProcess(processName)
+  G4VDiscreteProcess(processName),
+  m_stepLimit(kInfinity)   // user may change this with a geant4 UI command
 {
-  m_stepLimit = kInfinity; // user may change this with a geant4 UI command
   m_field = G4TransportationManager::GetTransportationManager()->GetFieldManager()->GetDetectorField();
   if (false) {
     G4Track aTrack;
     G4Step aStep;
-    G4ForceCondition* condition;
+    G4ForceCondition* condition = nullptr;
     GetMeanFreePath(aTrack, 0.0, condition);
     PostStepDoIt(aTrack, aStep);
     PostStepGetPhysicalInteractionLength(aTrack, 0.0, condition);
   }
+
 }
 
 ExtMagFieldLimitProcess::~ExtMagFieldLimitProcess()

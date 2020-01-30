@@ -117,6 +117,7 @@ namespace Belle2 {
     bool m_TriggerTypeMatch; /**< flag telling if the SVDTriggerType object is the same for each FADCs in the event */
     bool m_Xtalk = false;    /**< information on the x-talk */
 
+    /**class def needed by root*/
     ClassDef(SVDEventInfo, 1);
 
   }; //class

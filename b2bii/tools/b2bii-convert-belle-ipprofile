@@ -31,10 +31,41 @@ import argparse
 import sys
 import os
 import shutil
+import time
+import subprocess
 import numpy as np
 import multiprocessing
 from conditions_db.testing_payloads import parse_testing_payloads_file
 from collections import defaultdict
+
+
+class TCPWaiter(b2.Module):
+    """
+    Apparently the belle one software doesn't believe in reusing TCP connections
+    so if we convert too fast we will run out of available ports until the
+    database gets around to send the final FIN which seems to be much slower
+    than we can convert. So let's monitor the number of open ports and wait if
+    the number gets too high
+    """
+    def __init__(self, delay=10, max_open=30000):
+        super().__init__()
+        self._last = time.time() - delay
+        self._delay = delay
+        self._max_open = max_open
+
+    def event(self):
+        now = time.time()
+        if now - self._last < self._delay:
+            return
+
+        while True:
+            open_ports = int(subprocess.check_output("wc -l < /proc/net/tcp", shell=True))
+            if open_ports < self._max_open:
+                break
+            b2.B2WARNING(f"Waiting for ports to free up, currently {open_ports}>{self._max_open}")
+            time.sleep(self._delay)
+
+        self._last = time.time()
 
 
 def get_argument_parser():
@@ -87,11 +118,16 @@ def run_conversion(rundata):
 
     # get rid of some annoying messages about random seed and globaltags
     b2.logging.log_level = b2.LogLevel.WARNING
+
     # and create and run the conversion path
     main = b2.Path()
     main.add_module("EventInfoSetter", expList=experiments, runList=runs, evtNumList=events)
+    main.add_module(TCPWaiter())
     main.add_module("B2BIIConvertBeamParams", mcFlag=1, missingBenergy=missing_benergy, missingIp=missing_ip, logLevel=b2.LogLevel.INFO)
     b2.process(main)
+    # and revert to normal logging
+    b2.logging.log_level = b2.LogLevel.INFO
+    return len(runs)
 
 
 if __name__ == "__main__":
@@ -147,20 +183,20 @@ if __name__ == "__main__":
             b2.B2INFO(f"{len(rundata)} runs after removing {message}")
 
     # check if there's anything left to do
-    if len(rundata) == 0:
-        b2.B2INFO("Nothing to do, exiting")
-        sys.exit(0)
+    if len(rundata) > 0:
+        converted = 0
+        # if so run conversion on all runs
+        rundata = list(sorted(rundata))
+        if args.jobs > 1:
+            rundata = [rundata[i::args.jobs] for i in range(args.jobs)]
+            with multiprocessing.Pool(args.jobs, maxtasksperchild=1) as pool:
+               converted = sum(pool.map(run_conversion, rundata))
+        else:
+            converted = run_conversion(rundata)
 
-    # if so run conversion on all runs
-    rundata = list(sorted(rundata))
-    if args.jobs > 1:
-        rundata = [rundata[i::args.jobs] for i in range(args.jobs)]
-        with multiprocessing.Pool(args.jobs, maxtasksperchild=1) as pool:
-            pool.map(run_conversion, rundata)
-    else:
-        run_conversion(rundata)
+        b2.B2INFO(f"Conversion finished, converted {converted} runs")
 
-    b2.B2INFO("Conversion finished, optimizing database file")
+    b2.B2INFO("Optimizing database file")
     # ok, data is converted, let's write an optimized database file:
     payloads = parse_testing_payloads_file(db_file)
     # we want a set of all iovs per unique payload (same name and checksum)
@@ -169,21 +205,18 @@ if __name__ == "__main__":
     checksums = defaultdict(set)
 
     for p in sorted(payloads):
-        # remember all revisions for each payload/checksum combination
-        checksums[p.module, p.checksum].add(p.revision)
-        # and remember all iovs for all checksums
-        all_iovs[p.module, p.checksum].add(p.iov_tuple)
+        # and remember all iovs for all revisions
+        all_iovs[p.module, p.revision].add(p.iov_tuple)
 
     # ok, now let's write normalized file by concatenating all
     # iovs if they are consecutive
     final_iovs = []
-    for (name, checksum), iovs in all_iovs.items():
+    for (name, revision), iovs in all_iovs.items():
         # with sorted iovs we can check pairwise if the next one can be merged.
         # Also add one useless iov so we don't have to add the last one after the
         # loop since we extend prev until we find something incompatible so the last
         # thing we find after all iovs is something guaranteed incompatible
         iovs = sorted(iovs) + [(None, None, None, None)]
-        revision = min(checksums[name, checksum])
         prev = iovs.pop(0)
         for iov in iovs:
             if (prev[2], prev[3]+1) == iov[:2]:
@@ -194,8 +227,9 @@ if __name__ == "__main__":
                 # match
                 final_iovs.append((name, revision, prev))
                 prev = iov
-
-    final_iovs.sort()
+    # sort by payload name, iov
+    final_iovs.sort(key=lambda x: (x[0], x[2]))
+    # and write payload file
     with open(os.path.join(args.output, "database-optimized.txt"), "w") as f:
         for name, revision, iov in final_iovs:
             iov = ",".join(map(str, iov))

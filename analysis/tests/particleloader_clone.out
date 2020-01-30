@@ -99,10 +99,9 @@
 [INFO] Number of ParticleLists studied 10 
 [INFO] Number of ParticleLists studied 12 
 [INFO] Number of ParticleLists studied 1 
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
  ... message repeated 19 times
 [INFO] ParticleStats Summary: 
@@ -309,10 +308,9 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO] Number of ParticleLists studied 10 
 [INFO] Number of ParticleLists studied 12 
 [INFO] Number of ParticleLists studied 1 
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles

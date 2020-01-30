@@ -251,8 +251,9 @@ void TRGGDLDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   for (int i = 0; i < 320; i++) {
     LeafBitMap[i] = m_unpacker->getLeafMap(i);

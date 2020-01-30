@@ -10,7 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 
 #include <TFile.h>
 #include <TTree.h>

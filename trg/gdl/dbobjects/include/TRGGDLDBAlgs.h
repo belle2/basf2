@@ -21,7 +21,6 @@ namespace Belle2 {
     TRGGDLDBAlgs(const TRGGDLDBAlgs& b)
     {
       m_algs.clear();
-      m_algs.reserve(b.m_algs.size());
       for (long unsigned int i = 0; i < b.m_algs.size(); i++) {
         m_algs[i] = b.m_algs[i];
       }
@@ -30,7 +29,6 @@ namespace Belle2 {
     TRGGDLDBAlgs& operator=(const TRGGDLDBAlgs& b)
     {
       m_algs.clear();
-      m_algs.reserve(b.m_algs.size());
       for (long unsigned int i = 0; i < b.m_algs.size(); i++) {
         m_algs[i] = b.m_algs[i];
       }

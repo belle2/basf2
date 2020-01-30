@@ -12,7 +12,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/KLMElectronicsMap.h>
+#include <klm/dbobjects/KLMElectronicsChannel.h>
 
 namespace Belle2 {
 

@@ -13,6 +13,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>

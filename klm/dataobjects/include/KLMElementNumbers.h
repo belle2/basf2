@@ -224,6 +224,12 @@ namespace Belle2 {
              BKLMElementNumbers::getMaximalLayerNumber();
     }
 
+    /**
+     * Get minimal plane number.
+     * @param[in] subdetector Subdetector.
+     */
+    int getMinimalPlaneNumber(int subdetector) const;
+
   private:
 
     /**

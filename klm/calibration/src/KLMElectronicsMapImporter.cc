@@ -47,7 +47,7 @@ void KLMElectronicsMapImporter::setIOV(int experimentLow, int runLow,
 
 void KLMElectronicsMapImporter::clearElectronicsMap()
 {
-  m_ElectronicsChannels.clear();
+  m_ChannelMap.clear();
 }
 
 void KLMElectronicsMapImporter::loadBKLMElectronicsMap(int version)
@@ -170,7 +170,7 @@ void KLMElectronicsMapImporter::loadBKLMElectronicsMap(int version)
 
       uint16_t detectorChannel = m_ElementNumbers->channelNumberBKLM(
                                    section, sector, layer, plane, iStrip);
-      m_ElectronicsChannels.push_back(
+      m_ChannelMap.insert(
         std::pair<uint16_t, KLMElectronicsChannel>(
           detectorChannel,
           KLMElectronicsChannel(copperId, slotId, laneId, axisId, channelId)));
@@ -198,7 +198,7 @@ void KLMElectronicsMapImporter::addEKLMLane(
       int channel = getEKLMStripFirmwareBySoftware(strip);
       uint16_t detectorChannel = m_ElementNumbers->channelNumberEKLM(
                                    section, sector, layer, plane, strip);
-      m_ElectronicsChannels.push_back(
+      m_ChannelMap.insert(
         std::pair<uint16_t, KLMElectronicsChannel>(
           detectorChannel,
           KLMElectronicsChannel(EKLM_ID + copper, slot, lane, axis, channel)));
@@ -370,39 +370,37 @@ void KLMElectronicsMapImporter::loadEKLMElectronicsMap(int version, bool mc)
 void KLMElectronicsMapImporter::setLane(
   int subdetector, int section, int sector, int layer, int lane)
 {
-  int channelSubdetector, channelSection, channelSector, channelLayer;
-  int plane, strip;
-  unsigned int n = m_ElectronicsChannels.size();
-  for (unsigned int i = 0; i < n; ++i) {
-    uint16_t channel = m_ElectronicsChannels[i].first;
-    m_ElementNumbers->channelNumberToElementNumbers(
-      channel, &channelSubdetector, &channelSection, &channelSector,
-      &channelLayer, &plane, &strip);
-    if ((channelSubdetector == subdetector) &&
-        (channelSection == section) &&
-        (channelSector == sector) &&
-        (channelLayer == layer))
-      m_ElectronicsChannels[i].second.setLane(lane);
+  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  int minimalPlane = m_ElementNumbers->getMinimalPlaneNumber(subdetector);
+  KLMChannelIndex klmChannel(subdetector, section, sector, layer, minimalPlane, 1);
+  KLMChannelIndex klmModule(klmChannel);
+  klmModule.setIndexLevel(KLMChannelIndex::c_IndexLevelLayer);
+  KLMChannelIndex klmNextModule(klmModule);
+  ++klmNextModule;
+  for (; klmChannel != klmNextModule; ++klmChannel) {
+    uint16_t channel = klmChannel.getKLMChannelNumber();
+    it = m_ChannelMap.find(channel);
+    if (it == m_ChannelMap.end())
+      B2FATAL("The KLM electronics map is not loaded or incomplete.");
+    it->second.setLane(lane);
   }
 }
 
 void KLMElectronicsMapImporter::setLane(
   int subdetector, int section, int sector, int layer, int plane, int lane)
 {
-  int channelSubdetector, channelSection, channelSector, channelLayer;
-  int channelPlane, strip;
-  unsigned int n = m_ElectronicsChannels.size();
-  for (unsigned int i = 0; i < n; ++i) {
-    uint16_t channel = m_ElectronicsChannels[i].first;
-    m_ElementNumbers->channelNumberToElementNumbers(
-      channel, &channelSubdetector, &channelSection, &channelSector,
-      &channelLayer, &channelPlane, &strip);
-    if ((channelSubdetector == subdetector) &&
-        (channelSection == section) &&
-        (channelSector == sector) &&
-        (channelLayer == layer) &&
-        (channelPlane == plane))
-      m_ElectronicsChannels[i].second.setLane(lane);
+  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  KLMChannelIndex klmChannel(subdetector, section, sector, layer, plane, 1);
+  KLMChannelIndex klmPlane(klmChannel);
+  klmPlane.setIndexLevel(KLMChannelIndex::c_IndexLevelPlane);
+  KLMChannelIndex klmNextPlane(klmPlane);
+  ++klmNextPlane;
+  for (; klmChannel != klmNextPlane; ++klmChannel) {
+    uint16_t channel = klmChannel.getKLMChannelNumber();
+    it = m_ChannelMap.find(channel);
+    if (it == m_ChannelMap.end())
+      B2FATAL("The KLM electronics map is not loaded or incomplete.");
+    it->second.setLane(lane);
   }
 }
 
@@ -410,15 +408,15 @@ void KLMElectronicsMapImporter::importElectronicsMap()
 {
   DBImportObjPtr<KLMElectronicsMap> electronicsMap;
   electronicsMap.construct();
-  unsigned int n = m_ElectronicsChannels.size();
-  for (unsigned int i = 0; i < n; ++i) {
+  std::map<uint16_t, KLMElectronicsChannel>::iterator it;
+  for (it = m_ChannelMap.begin(); it != m_ChannelMap.end(); ++it) {
     electronicsMap->addChannel(
-      m_ElectronicsChannels[i].first,
-      m_ElectronicsChannels[i].second.getCopper(),
-      m_ElectronicsChannels[i].second.getSlot(),
-      m_ElectronicsChannels[i].second.getLane(),
-      m_ElectronicsChannels[i].second.getAxis(),
-      m_ElectronicsChannels[i].second.getChannel());
+      it->first,
+      it->second.getCopper(),
+      it->second.getSlot(),
+      it->second.getLane(),
+      it->second.getAxis(),
+      it->second.getChannel());
   }
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);

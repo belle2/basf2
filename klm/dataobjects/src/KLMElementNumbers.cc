@@ -232,3 +232,11 @@ int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
   else
     return BKLMElementNumbers::getMaximalLayerNumber() + layer;
 }
+
+int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
+{
+  if (subdetector == c_BKLM)
+    return 0;
+  else
+    return 1;
+}

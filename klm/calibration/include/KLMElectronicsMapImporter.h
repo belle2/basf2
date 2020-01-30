@@ -14,6 +14,9 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsChannel.h>
 
+/* C++ headers. */
+#include <map>
+
 namespace Belle2 {
 
   /**
@@ -120,7 +123,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** Data for creation of the electronics map. */
-    std::vector< std::pair<uint16_t, KLMElectronicsChannel> > m_ElectronicsChannels;
+    std::map<uint16_t, KLMElectronicsChannel> m_ChannelMap;
 
     /** Low experiment. */
     int m_ExperimentLow;

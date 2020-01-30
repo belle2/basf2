@@ -181,6 +181,7 @@ void KLMElectronicsMapImporter::loadBKLMElectronicsMap(int version)
 int KLMElectronicsMapImporter::getEKLMStripFirmwareBySoftware(int stripSoftware) const
 {
   int segment, strip;
+  /* Segment is 0-based here. */
   segment = (stripSoftware - 1) / EKLMElementNumbers::getNStripsSegment();
   /* Order of segment readout boards in the firmware is opposite. */
   segment = 4 - segment;
@@ -203,6 +204,24 @@ void KLMElectronicsMapImporter::addEKLMLane(
           detectorChannel,
           KLMElectronicsChannel(EKLM_ID + copper, slot, lane, axis, channel)));
     }
+  }
+}
+
+void KLMElectronicsMapImporter::setChannelsEKLMSegment(
+  int section, int sector, int layer, int plane, int segment,
+  int firmwareSegment)
+{
+  std::map<uint16_t, KLMElectronicsChannel>:: iterator it;
+  for (int strip = 1; strip <= EKLMElementNumbers::getNStripsSegment(); ++strip) {
+    int stripPlane = strip + EKLMElementNumbers::getNStripsSegment() * (segment - 1);
+    uint16_t detectorChannel = m_ElementNumbers->channelNumberEKLM(
+                                 section, sector, layer, plane, stripPlane);
+    it = m_ChannelMap.find(detectorChannel);
+    if (it == m_ChannelMap.end())
+      B2FATAL("The KLM electronics map is not loaded or incomplete.");
+    int channel = (firmwareSegment - 1) * EKLMElementNumbers::getNStripsSegment() +
+                  strip;
+    it->second.setChannel(channel);
   }
 }
 
@@ -364,7 +383,15 @@ void KLMElectronicsMapImporter::loadEKLMElectronicsMap(int version, bool mc)
   addEKLMLane(EKLMElementNumbers::c_ForwardSection, 4, 12, 2, 2, 5);
   addEKLMLane(EKLMElementNumbers::c_ForwardSection, 4, 13, 2, 2, 6);
   addEKLMLane(EKLMElementNumbers::c_ForwardSection, 4, 14, 2, 2, 7);
-
+  /* Switch of internal cables. */
+  if (!mc) {
+    setChannelsEKLMSegment(1, 1, 5, 1, 1, 4);
+    setChannelsEKLMSegment(1, 1, 5, 1, 2, 5);
+    setChannelsEKLMSegment(1, 1, 5, 2, 1, 4);
+    setChannelsEKLMSegment(1, 1, 5, 2, 2, 5);
+    setChannelsEKLMSegment(2, 1, 10, 2, 3, 2);
+    setChannelsEKLMSegment(2, 1, 10, 2, 4, 3);
+  }
 }
 
 void KLMElectronicsMapImporter::setLane(

@@ -108,6 +108,19 @@ namespace Belle2 {
     int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
 
     /**
+     * Set channels for EKLM segment.
+     * @param[in] section         Section.
+     * @param[in] sector          Sector.
+     * @param[in] layer           Layer.
+     * @param[in] plane           Plane.
+     * @param[in] segment         Segment.
+     * @param[in] firmwareSegment Segment number in firmware.
+     */
+    void setChannelsEKLMSegment(
+      int section, int sector, int layer, int plane, int segment,
+      int firmwareSegment);
+
+    /**
      * Add EKLM electronics map lane.
      * @param[in] section Section.
      * @param[in] sector  Sector.

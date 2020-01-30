@@ -36,7 +36,7 @@ namespace Belle2 {
     }
 
     /** Setter for a GDL logic alghrithm */
-    void setalg(std::string s)
+    void setalg(const std::string& s)
     {
       m_algs.push_back(s);
     }

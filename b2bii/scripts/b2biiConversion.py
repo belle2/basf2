@@ -69,6 +69,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
                                   matchType2E9oE25Threshold=-1.1,
+                                  enableNisKsFinder=True,
                                   HadronA=True, HadronB=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
@@ -87,6 +88,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convertExtHits (bool): Enables to convert Mdst_ecl_trk into ExtHits.
         matchType2E9oE25Threshold (float): Clusters with a E9/E25 value above this threshold are classified as neutral
             even if tracks are matched to their connected region (matchType == 2 in basf).
+        enableNisKsFinder (bool): Enables to convert nisKsFinder information.
         HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
     """
@@ -141,6 +143,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
+    convert.param("nisKsInfo", enableNisKsFinder)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

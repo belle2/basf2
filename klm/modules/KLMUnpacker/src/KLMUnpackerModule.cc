@@ -46,6 +46,8 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   addParam("IgnoreStrip0", m_IgnoreStrip0,
            "Ignore hits with strip = 0 (normally expected for certain firmware "
            "versions).", true);
+  addParam("DebugBKLMScintillators", m_DebugBKLMScintillators,
+           "Debug BKLM scintillators.", false);
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
@@ -194,6 +196,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLM::unpackRawData(copper, hslb + 1, rawData, &raw,
                      &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
+  int moduleId, layer;
   BKLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
   detectorChannel =
@@ -204,19 +207,22 @@ void KLMUnpackerModule::unpackBKLMDigit(
             << LogVar("Finesse", hslb + 1)
             << LogVar("Lane", raw.lane)
             << LogVar("Axis", raw.axis));
-    if (!m_WriteWrongHits)
+    if (!(m_WriteWrongHits || m_DebugBKLMScintillators))
       return;
-    /* Find channel from the same module. */
-    electronicsChannel.setAxis(0);
-    /* Phi-plane channels may start from 3 or 5. */
+    /*
+     * Try to find channel from the same plane.
+     * Phi-plane channels may start from 3 or 5.
+     */
     electronicsChannel.setChannel(5);
     detectorChannel = m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
-    if (detectorChannel != nullptr) {
+    if (detectorChannel == nullptr)
+      return;
+    moduleId = *detectorChannel;
+    if (m_WriteWrongHits) {
       // increase by 1 the event-counter of outOfRange-flagged hits
       klmDigitEventInfo->increaseOutOfRangeHits();
 
       // store the digit in the appropriate dataobject
-      int moduleId = *detectorChannel;
       BKLMDigitOutOfRange* bklmDigitOutOfRange =
         m_bklmDigitOutOfRanges.appendNew(
           moduleId, raw.ctime, raw.tdc, raw.charge);
@@ -229,13 +235,21 @@ void KLMUnpackerModule::unpackBKLMDigit(
       m_rejectedCount++;
       B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
               << LogVar("Channel", raw.channel));
-
+      return;
     }
-    return;
+    layer = BKLMElementNumbers::getLayerByModule(moduleId);
+    if (layer >= BKLMElementNumbers::c_FirstRPCLayer)
+      return;
+    BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+  } else {
+    moduleId = *detectorChannel;
+    layer = BKLMElementNumbers::getLayerByModule(moduleId);
+    if (m_DebugBKLMScintillators) {
+      if (layer < BKLMElementNumbers::c_FirstRPCLayer)
+        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+    }
   }
 
-  int moduleId = *detectorChannel;
-  int layer = BKLMElementNumbers::getLayerByModule(moduleId);
   if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))
     return;
   if (layer > BKLMElementNumbers::getMaximalLayerNumber()) {

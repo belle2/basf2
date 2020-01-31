@@ -107,7 +107,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
     m_ElementNumbers->moduleNumberToElementNumbers(
       it->first, &channelSubdetector, &channelSection, &channelSector, &layer);
-    /* Channel with plane = 1, strip = 1 exists for any BKLm or EKLM module. */
+    /* Channel with plane = 1, strip = 1 exists for any BKLM or EKLM module. */
     uint16_t channel = m_ElementNumbers->channelNumber(
                          channelSubdetector, channelSection, channelSector,
                          layer, 1, 1);

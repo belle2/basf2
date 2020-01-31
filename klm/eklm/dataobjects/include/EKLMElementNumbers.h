@@ -265,14 +265,10 @@ namespace Belle2 {
 
     /**
      * Get HSLB name.
-     * @param[in] copper           Copper.
-     * @param[in[ dataConcentrator Data concentrator.
+     * @param[in] copper Copper.
+     * @param[in] slot   Slot.
      */
-    static std::string getHSLBName(int copper, int dataConcentrator)
-    {
-      char hslb = 'a' + dataConcentrator;
-      return "800" + std::to_string(copper) + hslb;
-    }
+    static std::string getHSLBName(int copper, int slot);
 
     /**
      * Get maximal section number.

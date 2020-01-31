@@ -13,6 +13,7 @@
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;
 
@@ -261,6 +262,12 @@ int EKLMElementNumbers::getStripByGlobalStrip(int stripGlobal)
   if (stripGlobal <= 0 || stripGlobal > maxStrip)
     B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
   return (stripGlobal - 1) % m_MaximalStripNumber + 1;
+}
+
+std::string EKLMElementNumbers::getHSLBName(int copper, int slot)
+{
+  char hslb = 'a' + slot - 1;
+  return "800" + std::to_string(copper - EKLM_ID) + hslb;
 }
 
 int EKLMElementNumbers::getMaximalDetectorLayerNumber(int section) const

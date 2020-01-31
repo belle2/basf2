@@ -407,7 +407,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int iChannelPosition = mapper.getShaperChannel(cellID);
   short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
   int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
-  int A0, Ahard;
+  int A0, Ahard, Askip;
 
   map_vec = map_container_vec[iShaper];
   f    = vectorsplit(map_vec["F"], iChannelPosition);
@@ -429,15 +429,19 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 
   A0 = (int)v_totalthrA0[cellID - 1];
   Ahard = (int)v_totalthrAhard[cellID - 1];
+  // FIXME: Value of this threshold should be read from the database.
+  Askip = 20;
 
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
 
 
-  lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0, Ahard, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres, m_AmpFit, m_TimeFit,
-         m_QualityFit);
+  auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
+                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres);
 
-  if (m_QualityFit == 2) m_TimeFit = 0;
+  m_AmpFit = result.amp;
+  m_TimeFit = result.time;
+  m_QualityFit = result.quality;
 }
 
 void ECLDQMEXTENDEDModule::beginRun()

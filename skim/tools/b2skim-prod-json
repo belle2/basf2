@@ -33,7 +33,7 @@ entries for data and MC.
         LPNPrefix: /belle/Data
         inputReleaseNumber: release-03-02-02
         prodNumber: 8530  # prodNumber, inputDBGlobalTag, experimentNumber, and runNumbers can be integers
-        inputDBGlobalTag: 654  # Can pass the number without DB00000 at start
+        inputDBGlobalTag: 654
         procNumber: proc9
         experimentNumber: 3
         beamEnergy: 4S

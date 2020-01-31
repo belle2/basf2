@@ -32,10 +32,10 @@ entries for data and MC.
         sampleLabel: proc9_exp3
         LPNPrefix: /belle/Data
         inputReleaseNumber: release-03-02-02
-        prodNumber: 8530  # Can pass prod ID without prod0000 at start
+        prodNumber: 8530  # prodNumber, inputDBGlobalTag, experimentNumber, and runNumbers can be integers
         inputDBGlobalTag: 654  # Can pass the number without DB00000 at start
         procNumber: proc9
-        experimentNumber: e0003
+        experimentNumber: 3
         beamEnergy: 4S
         inputDataLevel: mdst
         runNumbers:
@@ -59,22 +59,21 @@ entries for data and MC.
         inputDataLevel: mdst
         runNumber: r00000
 
-
     MC12b_charged:
         sampleLabel: MC12_chargedBGx1
         LPNPrefix: /belle/MC
         inputReleaseNumber: release-03-01-00
-        inputDBGlobalTag: 547  # Can pass the number without DB00000 at start
+        inputDBGlobalTag: 547  # inputDBGlobalTag, prodNumber, and runNumber can be integers
         mcCampaign: MC12b
         prodNumber:
-            - 7799  # Can pass list of prod numbers without prod0000 at start
+            - 7799  # prodNumber can be a list
             - 7802
         experimentNumber: s00/e1003
         beamEnergy: 4S
         mcType: charged
         mcBackground: BGx1
         inputDataLevel: mdst
-        runNumber: r000000
+        runNumber: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the names of
 the skims. The combined skims must be defined in `skim.registry.combined_skims`. The other required
@@ -302,13 +301,20 @@ def get_lpn_list(sampleInfo, mc):
         else:
             prodNumbers = [sampleInfo["prodNumber"]]
 
-        # Allow prod and run numbers to just be numbers in YAML file (without prod00.. at start)
-        # This will pad a number with the correct number of zeros, and add the correct letters at the front
-        prodNumbers = [str(n) if str(n).startswith("prod00") else "prod" + str(n).zfill(8) for n in prodNumbers]
+        # Allow prod numbers, run number and database global tag ID to just be
+        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each number with the
+        # correct number of zeros, and add the correct letters at the front.
 
-        # Similar for database global tag ID
-        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB00"):
+        # Allow prod numbers, run numbers and database global tag ID to just be numbers in YAML file
+        # (without *e.g.* prod00.. at start). This will pad a number with the correct number of
+        # zeros, and add the correct letters at the front.
+        prodNumbers = [str(n) if str(n).startswith("prod") else "prod" + str(n).zfill(8) for n in prodNumbers]
+
+        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
             sampleInfo["inputDBGlobalTag"] = "DB" + str(sampleInfo["inputDBGlobalTag"]).zfill(8)
+
+        if not str(sampleInfo["runNumber"]).startswith("r"):
+            sampleInfo["runNumber"] = "r" + str(sampleInfo["runNumber"]).zfill(5)
 
         LPNList = [str(Path(sampleInfo["LPNPrefix"],
                             sampleInfo["inputReleaseNumber"],
@@ -322,11 +328,19 @@ def get_lpn_list(sampleInfo, mc):
                             sampleInfo["inputDataLevel"]))
                    for prodNumber in prodNumbers]
     else:
-        if not str(sampleInfo["prodNumber"]).startswith("prod00"):
+        # Allow prod number, experiment number, run numbers and database global tag ID to just be
+        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each number with the
+        # correct number of zeros, and add the correct letters at the front.
+        if not str(sampleInfo["prodNumber"]).startswith("prod"):
             sampleInfo["prodNumber"] = "prod" + str(sampleInfo["prodNumber"]).zfill(8)
 
-        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB00"):
+        if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
             sampleInfo["inputDBGlobalTag"] = "DB" + str(sampleInfo["inputDBGlobalTag"]).zfill(8)
+
+        if not str(sampleInfo["experimentNumber"]).startswith("e"):
+            sampleInfo["experimentNumber"] = "e" + str(sampleInfo["experimentNumber"]).zfill(4)
+
+        sampleInfo["runNumbers"] = [str(n) if str(n).startswith("r") else "r" + str(n).zfill(5) for n in sampleInfo["runNumbers"]]
 
         LPNList = [str(Path(sampleInfo["LPNPrefix"],
                             sampleInfo["inputReleaseNumber"],

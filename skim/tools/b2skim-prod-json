@@ -39,9 +39,9 @@ entries for data and MC.
         beamEnergy: 4S
         inputDataLevel: mdst
         runNumbers:
-            - r03237
-            - r03238
-            - r03239
+            - 3237
+            - 3238
+            - 3239
 
 
     ## Example of a YAML file for MC:

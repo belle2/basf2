@@ -41,13 +41,18 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
+  addParam("DebugElectronicsMap", m_DebugElectronicsMap,
+           "Debug electronics map (record DAQ channel instead of strip).",
+           false);
+  addParam("DAQChannelBKLMScintillators", m_DAQChannelBKLMScintillators,
+           "Record DAQ channel for BKLM scintillators.", false);
+  addParam("DAQChannelModule", m_DAQChannelModule,
+           "Record DAQ channel for specific module.", -1);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
            "Ignore wrong hits (i.e. no B2ERROR).", false);
   addParam("IgnoreStrip0", m_IgnoreStrip0,
            "Ignore hits with strip = 0 (normally expected for certain firmware "
            "versions).", true);
-  addParam("DebugBKLMScintillators", m_DebugBKLMScintillators,
-           "Debug BKLM scintillators.", false);
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
@@ -189,7 +194,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
             << LogVar("Lane", electronicsChannel.getLane())
             << LogVar("Axis", electronicsChannel.getAxis())
             << LogVar("Channel", electronicsChannel.getChannel()));
-    if (!(m_WriteWrongHits || m_DebugBKLMScintillators))
+    if (!(m_WriteWrongHits || m_DebugElectronicsMap))
       return;
     /*
      * Try to find channel from the same plane.
@@ -219,19 +224,37 @@ void KLMUnpackerModule::unpackBKLMDigit(
               << LogVar("Channel", raw.channel));
       return;
     }
-    layer = BKLMElementNumbers::getLayerByModule(moduleId);
-    if (layer >= BKLMElementNumbers::c_FirstRPCLayer)
+    bool recordDebugHit = false;
+    if (m_DAQChannelBKLMScintillators) {
+      layer = BKLMElementNumbers::getLayerByModule(moduleId);
+      /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
+      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0) {
+        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+        recordDebugHit = true;
+      }
+    }
+    if (m_DAQChannelModule) {
+      uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+      if (klmModule == m_DAQChannelModule && raw.channel > 0) {
+        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+        recordDebugHit = true;
+      }
+    }
+    if (!recordDebugHit)
       return;
-    /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
-    if (raw.channel > 0)
-      BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
   } else {
     moduleId = m_ElementNumbers->localChannelNumberBKLM(*detectorChannel);
     layer = BKLMElementNumbers::getLayerByModule(moduleId);
-    if (m_DebugBKLMScintillators) {
-      /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
-      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
-        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+    if (m_DebugElectronicsMap) {
+      if (m_DAQChannelBKLMScintillators) {
+        if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
+          BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+      }
+      if (m_DAQChannelModule) {
+        uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+        if (klmModule == m_DAQChannelModule && raw.channel > 0)
+          BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+      }
     }
   }
 

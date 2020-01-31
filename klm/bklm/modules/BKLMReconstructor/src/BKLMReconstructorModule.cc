@@ -56,6 +56,9 @@ BKLMReconstructorModule::BKLMReconstructorModule() :
   addParam("IgnoreScintillators", m_IgnoreScintillators,
            "Ignore scintillators (to debug their electronics mapping).",
            false);
+  addParam("IgnoreModule", m_IgnoreModule,
+           "Ignore this module (to debug its electronics mapping).", -1);
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -92,6 +95,12 @@ void BKLMReconstructorModule::event()
     const BKLMDigit* digit = m_Digits[index];
     if (m_IgnoreScintillators && !digit->inRPC())
       continue;
+    if (m_IgnoreModule) {
+      uint16_t module = m_ElementNumbers->moduleNumberBKLM(
+                          digit->getSection(), digit->getSector(), digit->getLayer());
+      if (module == m_IgnoreModule)
+        continue;
+    }
     if (digit->inRPC() || digit->isAboveThreshold()) {
       int module = digit->getModuleID();
       uint16_t channel = BKLMElementNumbers::getChannelByModule(module);

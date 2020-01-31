@@ -175,6 +175,14 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
   return module;
 }
 
+uint16_t KLMElementNumbers::moduleNumberByChannel(uint16_t channel) const
+{
+  int subdetector, section, sector, layer, plane, strip;
+  channelNumberToElementNumbers(channel, &subdetector, &section, &sector,
+                                &layer, &plane, &strip);
+  return moduleNumber(subdetector, section, sector, layer);
+}
+
 void KLMElementNumbers::moduleNumberToElementNumbers(
   uint16_t module, int* subdetector, int* section, int* sector,
   int* layer) const

@@ -129,6 +129,15 @@ namespace Belle2 {
     /** Record wrong hits (for debugging). */
     bool m_WriteWrongHits;
 
+    /** Debug electronics map (record DAQ channel instead of strip). */
+    bool m_DebugElectronicsMap;
+
+    /** Record DAQ channel for BKLM scintillators. */
+    bool m_DAQChannelBKLMScintillators;
+
+    /** Record DAQ channel for specific module. */
+    int m_DAQChannelModule;
+
     /* EKLM parameters. */
 
     /**
@@ -144,9 +153,6 @@ namespace Belle2 {
     bool m_IgnoreStrip0;
 
     /* BKLM parameters. */
-
-    /** Debug BKLM scintillators. */
-    bool m_DebugBKLMScintillators;
 
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;

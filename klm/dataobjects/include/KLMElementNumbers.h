@@ -176,6 +176,12 @@ namespace Belle2 {
     uint16_t moduleNumberEKLM(int section, int sector, int layer) const;
 
     /**
+     * Get module number by channel number.
+     * @param[in] channel Channel.
+     */
+    uint16_t moduleNumberByChannel(uint16_t channel) const;
+
+    /**
      * Get element numbers by module number.
      * @param[in]  module      KLM module number.
      * @param[out] subdetector Subdetector.

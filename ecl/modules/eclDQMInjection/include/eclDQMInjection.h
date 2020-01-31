@@ -26,6 +26,7 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 
 #include <TH1.h>
+#include <TH2.h>
 #include <string>
 
 namespace Belle2 {
@@ -45,6 +46,8 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_ECLDigitsName;  /**< The name of the StoreArray of ECLRawHits to be generated */
+      double m_revolutionTime;  /**< The beam revolution cycle time in #mus */
+      double m_ECLThresholdforVetoTuning; /**< ECL threshold for injection veto tuning, ADC channels */
 
 
       /** StoreObjPtr EventMetaData */
@@ -74,14 +77,17 @@ namespace Belle2 {
       TH1F* hOccAfterInjLER{};          /**< Histogram Occupancy after LER injection */
       TH1F* hOccAfterInjHER{};          /**< Histogram Occupancy after HER injection */
 
-      TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+      TH1F* hEOccAfterInjLER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1F* hEOccAfterInjHER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
-      TH1F* hBurstsAfterInjLER{};          /**< Histogram Bursts suppression after LER injection */
-      TH1F* hBurstsAfterInjHER{};          /**< Histogram Bursts suppression after HER injection */
+      TH1F* hBurstsAfterInjLER{};       /**< Histogram Bursts suppression after LER injection */
+      TH1F* hBurstsAfterInjHER{};       /**< Histogram Bursts suppression after HER injection */
 
-      TH1F* hEBurstsAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      TH1F* hEBurstsAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+      TH1F* hEBurstsAfterInjLER{};      /**< Histogram Bursts suppression for normalization after LER injection */
+      TH1F* hEBurstsAfterInjHER{};      /**< Histogram Bursts suppression for normalization after HER injection */
+
+      TH2F* hVetoAfterInjLER{};         /**< Histogram Veto tuning w/ ECL occupancy after LER injection */
+      TH2F* hVetoAfterInjHER{};         /**< Histogram Veto tuning w/ ECL occupancy after HER injection */
 
       void initialize() override final; /**< initialize function */
 

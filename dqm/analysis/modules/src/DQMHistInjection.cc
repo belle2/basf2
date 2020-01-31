@@ -118,9 +118,7 @@ void DQMHistInjectionModule::beginRun()
 void DQMHistInjectionModule::event()
 {
   TH1* Hits = nullptr, *Triggers = nullptr;
-  TH1* Bursts = nullptr;
   TString locationHits = "";
-  TString locationBursts = "";
   TString locationTriggers = "";
   m_histogramDirectoryName = "PXDINJ";
 
@@ -224,19 +222,19 @@ void DQMHistInjectionModule::event()
   m_cInjectionHERECL->cd(0);
   m_hInjectionHERECL->Draw("hist");
 // =====
-  locationBursts = "ECLBurstsInjLER";
+  locationHits = "ECLBurstsInjLER";
   if (m_histogramDirectoryName != "") {
-    locationBursts = m_histogramDirectoryName + "/" + locationBursts;
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Bursts = (TH1*)findHist(locationBursts.Data());
+  Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "ECLEBurstsInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
-  if (Bursts && Triggers) {
-    m_hBurstLERECL->Divide(Bursts, Triggers);
+  if (Hits && Triggers) {
+    m_hBurstLERECL->Divide(Hits, Triggers);
   }
 
   m_cBurstLERECL->Clear();
@@ -244,19 +242,19 @@ void DQMHistInjectionModule::event()
   m_hBurstLERECL->Draw("hist");
 // =====
 
-  locationBursts = "ECLBurstsInjHER";
+  locationHits = "ECLBurstsInjHER";
   if (m_histogramDirectoryName != "") {
-    locationBursts = m_histogramDirectoryName + "/" + locationBursts;
+    locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Bursts = (TH1*)findHist(locationBursts.Data());
+  Hits = (TH1*)findHist(locationHits.Data());
   locationTriggers = "ECLEBurstsInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
   Triggers = (TH1*)findHist(locationTriggers.Data());
 
-  if (Bursts && Triggers) {
-    m_hBurstHERECL->Divide(Bursts, Triggers);
+  if (Hits && Triggers) {
+    m_hBurstHERECL->Divide(Hits, Triggers);
   }
 
   m_cBurstHERECL->Clear();

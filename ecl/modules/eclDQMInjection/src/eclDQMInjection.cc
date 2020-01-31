@@ -34,6 +34,8 @@ ECLDQMInjectionModule::ECLDQMInjectionModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("ECLINJ"));
   addParam("ECLDigitsName", m_ECLDigitsName, "Name of ECL hits", std::string(""));
+  addParam("BeamRevolutionCycle", m_revolutionTime, "Beam revolution cycle in musec", 10.07874);
+  addParam("ECLThresholdforVetoTuning", m_ECLThresholdforVetoTuning, "ECL Threshold for injection veto tuning, ADC channels", 400.);
 }
 
 void ECLDQMInjectionModule::defineHisto()
@@ -50,8 +52,14 @@ void ECLDQMInjectionModule::defineHisto()
   hBurstsAfterInjHER = new TH1F("ECLBurstsInjHER", "ECLBurstsInjHER/Time;Time in #mus;Count/Time (1 #mus bins)", 20000, 0, 20000);
   hEBurstsAfterInjLER = new TH1F("ECLEBurstsInjLER", "ECLEBurstsInjLER/Time;Time in #mus;Triggers/Time (1 #mus bins)", 20000, 0,
                                  20000);
-  hEBurstsAfterInjHER = new TH1F("ECLEBurstsInjHER", "ECLEBurstsInjHER/Time;Time in #mus;TRiggers/Time (1 #mus bins)", 20000, 0,
+  hEBurstsAfterInjHER = new TH1F("ECLEBurstsInjHER", "ECLEBurstsInjHER/Time;Time in #mus;Triggers/Time (1 #mus bins)", 20000, 0,
                                  20000);
+  hVetoAfterInjLER = new TH2F("ECLVetoAfterInjLER",
+                              "ECL Hits for LER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+                              m_revolutionTime);
+  hVetoAfterInjHER = new TH2F("ECLVetoAfterInjHER",
+                              "ECL Hits for HER veto tuning;Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
+                              m_revolutionTime);
 
   // cd back to root directory
   oldDir->cd();
@@ -80,6 +88,10 @@ void ECLDQMInjectionModule::beginRun()
   hEOccAfterInjHER->Reset();
   hBurstsAfterInjLER->Reset();
   hBurstsAfterInjHER->Reset();
+  hEBurstsAfterInjLER->Reset();
+  hEBurstsAfterInjHER->Reset();
+  hVetoAfterInjLER->Reset();
+  hVetoAfterInjHER->Reset();
 }
 
 void ECLDQMInjectionModule::event()
@@ -112,6 +124,11 @@ void ECLDQMInjectionModule::event()
     }
   }
 
+  unsigned int ECLDigitsAboveThr = 0; // Threshold is set to 20 MeV
+  for (auto& aECLDigit : m_storeHits) {
+    if (aECLDigit.getAmp() > m_ECLThresholdforVetoTuning) ECLDigitsAboveThr += 1;
+  }
+
   for (auto& it : m_rawTTD) {
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
             (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
@@ -128,11 +145,13 @@ void ECLDQMInjectionModule::event()
         hEOccAfterInjHER->Fill(diff2);
         hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjHER->Fill(diff2);
+        hVetoAfterInjHER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
       } else {
         hOccAfterInjLER->Fill(diff2, all);
         hEOccAfterInjLER->Fill(diff2);
         hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
         hEBurstsAfterInjLER->Fill(diff2);
+        hVetoAfterInjLER->Fill(diff2, diff2 - int(diff2 / m_revolutionTime)*m_revolutionTime, ECLDigitsAboveThr);
       }
     }
 

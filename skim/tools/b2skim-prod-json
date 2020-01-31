@@ -1,28 +1,106 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Prepares the JSON request files for grid production of skims. See
-`Confluence <https://confluence.desy.de/display/BI/Production+Definition>`_
-for an explanation of the production system.
+"""\
+.. Note::
+   This tool is intended for use by skim production managers, not by skim liaisons.
 
-Important! This tool requires that you have done the following:
- * Run `b2setup` so that the skim expert functions can be used, and
- * Source the file `setup.sh` in the main directory of this repository, so that
-   the combined skim info in the data prod repository can be accessed.
+``%(prog)s`` is a tool for producing grid production requests in the format required by the
+`production system <https://confluence.desy.de/display/BI/Production+Definition>`_.
 
-To run this script, first produce the skim stats for the combined skims using
-`b2skim-stats-submit` and `b2skim-stats-print` (the latter with the flag ``-J``
-to produce a JSON file). Put the output JSON file ``skimStats.json`` in the
-current directory.
+YAML files are used by this tool to define the LPNs of datasets. Below are examples of valid YAML
+entries for data and MC.
 
-The input LPN lists are constructed from the YAML files. Examples for MC and data
-are given in the docstring of `read_registry_yaml` below.
+.. code-block:: yaml
 
-Example usage:
-    b2skim-prod-json RunRegistry_proc9.yaml --data -s LeptonicUntagged -n 9001 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    ## Example of a YAML file for data:
+    proc9_exp3r1:
+        sampleLabel: proc9_exp3
+        LPNPrefix: /belle/Data
+        inputReleaseNumber: release-03-02-02
+        prodNumber: prod00008530
+        inputDBGlobalTag: DB00000654
+        procNumber: proc9
+        experimentNumber: e0003
+        beamEnergy: 4S
+        inputDataLevel: mdst
+        runNumbers:
+            - r02724
+            - r02801
+            - r02802
 
-Example usage for local skim script:
-    b2skim-prod-json RunRegistry_proc9.yaml --data -s LeptonicUntagged -n 9001 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/ -l leptonic.py
+    proc9_exp3r2:
+        sampleLabel: proc9_exp3
+        LPNPrefix: /belle/Data
+        inputReleaseNumber: release-03-02-02
+        prodNumber: 8530  # Can pass prod ID without prod0000 at start
+        inputDBGlobalTag: 654  # Can pass the number without DB00000 at start
+        procNumber: proc9
+        experimentNumber: e0003
+        beamEnergy: 4S
+        inputDataLevel: mdst
+        runNumbers:
+            - r03237
+            - r03238
+            - r03239
+
+
+    ## Example of a YAML file for MC:
+    MC12b_mixed:
+        sampleLabel: MC12_mixedBGx1
+        LPNPrefix: /belle/MC
+        inputReleaseNumber: release-03-01-00
+        inputDBGlobalTag: DB00000547
+        mcCampaign: MC12b
+        prodNumber: prod00007392
+        experimentNumber: s00/e1003
+        beamEnergy: 4S
+        mcType: mixed
+        mcBackground: BGx1
+        inputDataLevel: mdst
+        runNumber: r00000
+
+
+    MC12b_charged:
+        sampleLabel: MC12_chargedBGx1
+        LPNPrefix: /belle/MC
+        inputReleaseNumber: release-03-01-00
+        inputDBGlobalTag: 547  # Can pass the number without DB00000 at start
+        mcCampaign: MC12b
+        prodNumber:
+            - 7799  # Can pass list of prod numbers without prod0000 at start
+            - 7802
+        experimentNumber: s00/e1003
+        beamEnergy: 4S
+        mcType: charged
+        mcBackground: BGx1
+        inputDataLevel: mdst
+        runNumber: r000000
+
+To produce JSON files for a list of combined skims, pass this tool the YAML file and the names of
+the skims. The combined skims must be defined in `skim.registry.combined_skims`. The other required
+arguments include the starting prod ID, skim campaign, intended release to be used, and base
+directory of the repository to output the JSON files in.
+
+This tool is designed to work with the ``skimStats.json`` output of ``b2skim-stats-print`` (see
+:ref:`testing-skims`). The YAML files can be used to specify which sample statistics are to be used
+for each dataset, with the keyword ``sampleLabel``---this must match one of the sample labels used by
+the skim statistics tools. ``skimStats.json`` must be present in the current directory when this
+tool is run.
+
+--epilog--
+.. rubric:: Example usage
+
+* Produce requests for EWP and feiSLCombined skims on proc9::
+
+    $ %(prog)s Registry_proc9.yaml -s EWP feiSLCombined --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+
+* Produce requests for EWP on MC13, with one LPN per JSON file::
+
+    $ %(prog)s Registry_MC13.yaml -1 -s EWP --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+
+* Produce requests for EWP on MC13, using local skim module script::
+
+    $ %(prog)s Registry_MC13.yaml -l ewp_local.py -s EWP --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 """
 
 __author__ = "Phil Grace, Racha Cheaib"
@@ -43,12 +121,7 @@ from ROOT import PyConfig
 # Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
 PyConfig.IgnoreCommandLineOptions = True
 from skimExpertFunctions import encodeSkimName
-
-try:
-    from skimprod.skiminfo import combinedSkimsInfo
-except ModuleNotFoundError:
-    B2ERROR("Please source `setup.sh` in the data prod repository and try again.")
-    sys.exit(1)
+from skim.registry import combined_skims as combinedSkimsInfo
 
 
 def read_registry_yaml(sampleRegistryYaml, mc):
@@ -70,75 +143,6 @@ def read_registry_yaml(sampleRegistryYaml, mc):
         in `b2skim-stats-print`, so that the performance statistics can be
         retrieved from ``skimStats.json``. The remaining keys are used to
         construct the LPNs of the input datasets.
-
-        Example of a data YAML file:
-
-        .. highlight:: yaml
-
-            proc9_exp3r1:
-                sampleLabel: proc9_exp3
-                LPNPrefix: /belle/Data
-                inputReleaseNumber: release-03-02-02
-                prodNumber: prod00008530
-                inputDBGlobalTag: DB00000654
-                procNumber: proc9
-                experimentNumber: e0003
-                beamEnergy: 4S
-                inputDataLevel: mdst
-                runNumbers:
-                    - r02724
-                    - r02801
-                    - r02802
-
-            proc9_exp3r2:
-                sampleLabel: proc9_exp3
-                LPNPrefix: /belle/Data
-                inputReleaseNumber: release-03-02-02
-                prodNumber: prod00008530
-                inputDBGlobalTag: 654
-                procNumber: proc9
-                experimentNumber: e0003
-                beamEnergy: 4S
-                inputDataLevel: mdst
-                runNumbers:
-                    - r03237
-                    - r03238
-                    - r03239
-
-        Example of an MC YAML file:
-
-        .. highlight:: yaml
-
-            MC12b_mixed:
-                sampleLabel: MC12_mixedBGx1
-                LPNPrefix: /belle/MC
-                inputReleaseNumber: release-03-01-00
-                inputDBGlobalTag: 547
-                mcCampaign: MC12b
-                prodNumber: prod00007392
-                experimentNumber: s00/e1003
-                beamEnergy: 4S
-                mcType: mixed
-                mcBackground: BGx1
-                inputDataLevel: mdst
-                runNumber: r00000
-
-            # Can also contain list of prod numbers without prod0000 at start
-            MC12b_charged:
-                sampleLabel: MC12_chargedBGx1
-                LPNPrefix: /belle/MC
-                inputReleaseNumber: release-03-01-00
-                inputDBGlobalTag: DB00000547
-                mcCampaign: MC12b
-                prodNumber:
-                    - 7799
-                    - 7802
-                experimentNumber: s00/e1003
-                beamEnergy: 4S
-                mcType: charged
-                mcBackground: BGx1
-                inputDataLevel: mdst
-                runNumber: r000000
     """
     with open(sampleRegistryYaml) as sampleRegistryFile:
         sampleRegistry = yaml.safe_load(sampleRegistryFile)
@@ -155,8 +159,14 @@ def get_skim_stats_dict():
         skimStatsDict (dict): A dict containing the tested skim statistics.
     """
     # Assumes that skimStats.json is in the current directory
-    with open("skimStats.json") as skimStatsFile:
-        skimStatsDict = json.load(skimStatsFile)
+    try:
+        with open("skimStats.json") as skimStatsFile:
+            skimStatsDict = json.load(skimStatsFile)
+    except FileNotFoundError:
+        B2ERROR("Could not find required file `skimStats.json` in current directory.\n"
+                "          Please run `b2skim-stats-print` with the `-J` flag, and put\n"
+                "          the output `skimStats.json` in the current directory.")
+        sys.exit(1)
 
     return skimStatsDict
 
@@ -215,9 +225,9 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
                     if skim not in skimStatsDict.keys()]
     if missingSkims:
         for missingSkim in missingSkims:
-            B2ERROR(f"Cannot find stats for {missingSkim} skim in skimStats.json."
-                    "Perhaps you misspelled it or forgot to produce the stats "
-                    "with `b2skim-stats-print`.")
+            B2ERROR(f"Cannot find stats for {missingSkim} skim in skimStats.json.\n"
+                    "          Perhaps you misspelled it or forgot to produce the\n"
+                    "          stats with `b2skim-stats-print`?")
         sys.exit(1)
 
     # Verify that all the requested samples were tested, and returned non-None values
@@ -226,7 +236,7 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
             statValue = skimStatsDict[skim][statistic][sampleLabel]
             if statValue is None:
                 B2ERROR(f"The value for {statistic} for {skim} skim on {sampleLabel} sample"
-                        "is `None`! This is no good.")
+                        "is `None`! This value is required for the produced JSON files.")
                 sys.exit(1)
         except KeyError:
             B2ERROR(f"Missing value for {statistic} for {skim} skim on {sampleLabel} sample."
@@ -292,8 +302,8 @@ def get_lpn_list(sampleInfo, mc):
         else:
             prodNumbers = [sampleInfo["prodNumber"]]
 
-        # Allow prod numbers to just be numbers in YAML file (without prod00.. at start)
-        # This will pad a number with the correct number of zeros, and
+        # Allow prod and run numbers to just be numbers in YAML file (without prod00.. at start)
+        # This will pad a number with the correct number of zeros, and add the correct letters at the front
         prodNumbers = [str(n) if str(n).startswith("prod00") else "prod" + str(n).zfill(8) for n in prodNumbers]
 
         # Similar for database global tag ID
@@ -631,11 +641,11 @@ def get_argument_parser():
         parser (argparse.ArgumentParser): A parser which defines the skim
             campaign, release number, and starting prod number.
     """
+    description, epilog = __doc__.split('--epilog--')
     parser = argparse.ArgumentParser(
-        description="Produces JSON request files for grid production of skims.",
+        description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="example usage:\n    "
-        "b2skim-prod-json RunRegistry_proc9.yaml --data -s LeptonicUntagged -n 9001 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/"
+        epilog=epilog
     )
 
     parser.add_argument("sampleRegistryYaml",
@@ -643,18 +653,18 @@ def get_argument_parser():
     parser.add_argument("-s", "--skims", required=True, nargs="+",
                         metavar="SKIM", choices=combinedSkimsInfo.keys(),
                         help="List of skims to produce request files for. "
-                        "Must be listed in `skiminfo.py`.")
+                        "Only accepts combined skims listed in `skim.registry.combined_skims`.")
     parser.add_argument("-n", "--starting-prod-number", required=True, type=int,
                         help="Starting prod number of the JSON files.")
     parser.add_argument("-o", "--output-base-directory", required=True,
                         help="Base directory for output. "
-                        "This should be the base directory of the B2P/MC or B2P/data repo.")
+                        "This should be the base directory of the ``B2P/MC`` or ``B2P/data`` repo.")
     parser.add_argument("-c", "--campaign", required=True,
                         help="Name of the campaign, *e.g.* SKIMDATAx1.")
     parser.add_argument("-r", "--release", required=True,
-                        help="The basf2 to release to be used, *e.g.* release-04-00-03")
+                        help="The basf2 to release to be used, *e.g.* release-04-00-03.")
     parser.add_argument("-l", "--local-skim-script",
-                        help="File name of the local skim script to use, if any. *e.g.* ewp.py."
+                        help="File name of the local skim script to use, if any. *e.g.* ``ewp_local.py``. "
                         "Should not include any path before the file name.")
     parser.add_argument("-1", "--one-lpn-per-json", action="store_true",
                         help="Only include one LPN in each JSON file.")

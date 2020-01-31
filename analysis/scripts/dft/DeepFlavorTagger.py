@@ -13,9 +13,11 @@
 
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
-from modularAnalysis import *
+import modularAnalysis as ma
+import variables.utils as vu
 from ROOT import Belle2
-
+import basf2
+from basf2 import B2ERROR, B2FATAL
 import basf2_mva
 
 # make ROOT compatible available
@@ -66,7 +68,7 @@ def construct_default_variable_names(particle_lists=None, ranked_variable='p', v
 
 
 def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdentifier='standard', variable_list=None,
-                     output_variable='networkOutput', target='qrCombined', overwrite=False,
+                     target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
                      additional_roe_filter=None,
@@ -82,7 +84,6 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     :param working_dir: string, working directory for the method
     :param uniqueIdentifier: string, database identifier for the method
     :param variable_list: list[string], name of the basf2 variables used for discrimination
-    :param output_variable: string, variable name returned by the expert and added to extra info
     :param target: string, target variable
     :param overwrite: bool, overwrite already (locally!) existing training
     :param transform_to_probability: bool, enable a purity transformation to compensate potential over-training,
@@ -134,8 +135,8 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     output_file_name = os.path.join(working_dir, uniqueIdentifier + '_training_data.root')
 
     # create roe specific paths
-    roe_path = create_path()
-    dead_end_path = create_path()
+    roe_path = basf2.create_path()
+    dead_end_path = basf2.create_path()
 
     # define dft specific lists to enable multiple calls, if someone really wants to do that
     extension = particle_lists[0].replace(':', '_to_')
@@ -145,12 +146,12 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
     tree_name = 'dft_variables'
 
     # filter rest of events only for specific particle list
-    signalSideParticleListsFilter(particle_lists, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
+    ma.signalSideParticleListsFilter(particle_lists, 'hasRestOfEventTracks > 0', roe_path, dead_end_path)
 
     # TODO: particles with empty rest of events seems not to show up in efficiency statistics anymore
 
     # create final state particle lists
-    fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
+    ma.fillParticleList(roe_particle_list, roe_particle_list_cut, path=roe_path)
 
     dft_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
@@ -161,8 +162,8 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         pos_cut = pos_cut + ' and ' + additional_roe_filter
         neg_cut = neg_cut + ' and ' + additional_roe_filter
 
-    cutAndCopyList(dft_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
-    cutAndCopyList(dft_particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
+    ma.cutAndCopyList(dft_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
+    ma.cutAndCopyList(dft_particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)
 
     # sort pattern for tagging specific variables
     rank_variable = 'p'
@@ -174,7 +175,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         features += get_variables(dft_particle_lists[1], rank_variable, variable_list, particleNumber=5)
 
     for particles in dft_particle_lists:
-        rankByHighest(particles, rank_variable, path=roe_path)
+        ma.rankByHighest(particles, rank_variable, path=roe_path)
 
     if mode is 'sampler':
         if os.path.isfile(output_file_name) and not overwrite:
@@ -184,7 +185,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         all_variables = features + [target]
 
         # write to ntuples
-        variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
+        ma.variablesToNtuple('', all_variables, tree_name, output_file_name, roe_path)
 
         # write the command line output for the extern teacher to a file
         extern_command = 'basf2_mva_teacher --datafile {output_file_name} --treename {tree_name}' \
@@ -232,13 +233,16 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
         # fill the flavor tagger info
         # mod_ft_info_filler = register_module('FlavorTaggerInfoFiller')
 
-        expert_module = register_module('MVAExpert')
+        expert_module = basf2.register_module('MVAExpert')
         expert_module.param('listNames', particle_lists)
         expert_module.param('identifier', uniqueIdentifier)
 
-        expert_module.param('extraInfoName', output_variable)
+        expert_module.param('extraInfoName', 'dnn_output')
         expert_module.param('signalFraction', signal_fraction)
 
         roe_path.add_module(expert_module)
+
+        # Create standard alias for the output of the flavor tagger
+        vu._variablemanager.addAlias('DNN_qrCombined', 'formula(2*extraInfo(dnn_output) - 1)')
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -754,7 +754,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   // Bhabha veto
   //--------------
   //
-  cout << m_nEvent << endl;
   obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
   obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
   obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);

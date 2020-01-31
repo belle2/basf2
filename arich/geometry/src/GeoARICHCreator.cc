@@ -40,6 +40,7 @@
 #include <G4Torus.hh>
 
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Material.hh>
 #include <TVector3.h>
 
@@ -101,6 +102,11 @@ namespace Belle2 {
       // create and place
       G4LogicalVolume* masterLV = new G4LogicalVolume(envelopeTube, material, "ARICH.masterVolume");
       setVisibility(*masterLV, false);
+
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("ARICHEnvelope");
+      masterLV->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(masterLV);
 
       G4RotationMatrix rotMaster;
       double rot_x = m_config.getMasterVolume().getRotationX();

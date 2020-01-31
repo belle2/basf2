@@ -21,7 +21,7 @@
 #include <framework/logging/Logger.h>
 
 // MetaData
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 // root
 #include <framework/io/RootIOUtilities.h>
@@ -113,7 +113,7 @@ namespace Belle2 {
     bkgInfo.create();
     bkgInfo->setMethod(BackgroundInfo::c_Overlay);
     BackgroundInfo::BackgroundDescr descr;
-    descr.tag = SimHitBase::bg_other;
+    descr.tag = BackgroundMetaData::bg_other;
     descr.type = string("RandomTrigger");
     descr.fileNames = m_inputFileNames;
     descr.numEvents = m_numEvents;

@@ -3,10 +3,12 @@
 
 # Test whether we can create and read a sequential root file with 5 events
 
-from basf2 import create_path, process, set_random_seed, statistics, LogLevel
+from basf2 import create_path, process, set_random_seed, statistics, LogLevel, conditions
 import os
 import multiprocessing
+from b2test_utils import skip_test_if_light
 
+skip_test_if_light()  # light builds don't contain particle gun
 set_random_seed(42)
 
 # create a path
@@ -23,7 +25,7 @@ main.add_module('ParticleGun', pdgCodes=[211, -211, 321, -321],
 # Add everything we need to simulate just ARICH
 main.add_module('Progress')
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['MagneticField', 'ARICH'], logLevel=LogLevel.ERROR)
+main.add_module('Geometry', useDB=False, components=['MagneticField', 'ARICH'], logLevel=LogLevel.ERROR)
 main.add_module('FullSim', logLevel=LogLevel.ERROR)
 # Add seqoutput but ignore write rate
 main.add_module('SeqRootOutput', outputFileName='seqout_test.sroot', logLevel=LogLevel.WARNING)
@@ -34,6 +36,7 @@ sub.start()
 sub.join()
 
 # Read file again
+conditions.disable_globaltag_replay()
 readpath = create_path()
 readpath.add_module('SeqRootInput', inputFileName='seqout_test.sroot')
 readpath.add_module('Progress')

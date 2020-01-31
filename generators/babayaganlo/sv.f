@@ -489,7 +489,7 @@ c     do while(ifinish.ge.istart)
          enddo
 
          vpre = vpre + iswvperrteub(1)*scal_err_dhad*evpre
-         vpim = vpre + iswvperrteub(2)*scal_err_dhad*evpim
+         vpim = vpim + iswvperrteub(2)*scal_err_dhad*evpim
          
       else
          vpre = prest(k) +

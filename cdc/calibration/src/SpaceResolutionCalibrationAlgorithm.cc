@@ -104,11 +104,11 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   }
 
 
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
   int ith = -99;
   int ial = -99;
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     if (std::fabs(x_b) < 0.02 || std::fabs(x_u) < 0.02) continue;
     if (Pval < m_minPval || ndf < m_minNdf) continue;

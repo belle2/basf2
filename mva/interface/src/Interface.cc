@@ -48,6 +48,7 @@ namespace Belle2 {
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;
       static Interface<TMVAOptionsRegression, TMVATeacherRegression, TMVAExpertRegression> interface_TMVARegression;
+      static Interface<TMVAOptionsMulticlass, TMVATeacherMulticlass, TMVAExpertMulticlass> interface_TMVAMulticlass;
       static Interface<PythonOptions, PythonTeacher, PythonExpert> interface_Python;
       static Interface<PDFOptions, PDFTeacher, PDFExpert> interface_PDF;
       static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination;

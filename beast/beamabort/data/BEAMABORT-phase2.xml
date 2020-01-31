@@ -21,9 +21,11 @@
       <Material>BEAMABORT-Material</Material>
       <phase >2</phase>
       <z unit="cm">-9.8,-9.8,-9.8,-9.8,13.6,13.6,13.6,13.6</z>
-      <r_dia unit="cm">2.04,2.04,2.04,2.04,2.04,2.04,2.04,2.04</r_dia>
+      <r_dia unit="cm">1.9,1.9,1.9,1.9,1.9,1.9,1.9,1.9</r_dia>
       <ThetaZ unit="deg">180.0,180.0,180.0,180.0,0,0,0,0</ThetaZ>
-      <Phi unit="deg">55.0,125.0,235.0,305.0,55.0,125.0,235.0,305.0</Phi>
+      <Phi unit="deg">35.0,145.0,215.0,325.0,35.0,145.0,215.0,325.0</Phi>
+      <deltaX unit="cm">0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</deltaX>
+      <addAngle unit="deg">0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0</addAngle>
     </Active>
 
   </Content>

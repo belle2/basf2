@@ -48,9 +48,10 @@ ExtMessenger::ExtMessenger(ExtStepLengthLimitProcess* lAct, ExtMagFieldLimitProc
   m_energyLossCmd->AvailableForStates(G4State_PreInit, G4State_Idle, G4State_GeomClosed, G4State_EventProc);
 
   if (false) {
-    G4UIcommand* command;
+    G4UIcommand* command = nullptr;
     SetNewValue(command, G4String(""));
   }
+
 }
 
 ExtMessenger::~ExtMessenger()

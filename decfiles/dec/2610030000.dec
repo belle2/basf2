@@ -4,10 +4,10 @@
 # Cuts: None
 # Documentation: 
 # PhysicsWG: Charm
-# Tested: No
-# Responsible: Giulia Casarosa
-# Email: giulia.casarosa@pi.infn.it
-# Date: 20170420
+# Tested: Yes
+# Responsible: Yeqi Chen
+# Email: chenyq15@mail.ustc.edu.cn
+# Date: 20191210
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -43,9 +43,7 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias MyD D0
-Alias MyAntiD anti-D0
-ChargeConj MyD MyAntiD
+ChargeConj D0sig anti-D0sig
 
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
@@ -54,16 +52,16 @@ Decay vpho
 Enddecay
 
 Decay D*+
-1.0 MyD  pi+  VSS;
+1.0  D0sig  pi+  PHOTOS VSS;
 Enddecay
 
 Decay D*-
-1.0 MyAntiD pi- VSS;
+1.0  anti-D0sig  pi- PHOTOS VSS;
 Enddecay
 
-Decay MyD
-1.0 K- pi+  PHSP;
+Decay D0sig
+1.0   K-  pi+  PHOTOS  PHSP;
 Enddecay
-CDecay MyAntiD
+CDecay anti-D0sig
 
 End

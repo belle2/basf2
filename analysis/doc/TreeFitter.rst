@@ -38,14 +38,14 @@ Usage:
 ######
 
 The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)\pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. 
-The vertex fitter has a convenience function: `vertex.vertexTree`.
+The vertex fitter has a convenience function: `vertex.treeFit`.
 
 
 Parameters of the convenience function
 ######################################
 Import and use the convenience function:
 
-.. autofunction:: vertex.vertexTree
+.. autofunction:: vertex.treeFit
    :noindex:
 
 All other parameters are the same as for the module, see below.

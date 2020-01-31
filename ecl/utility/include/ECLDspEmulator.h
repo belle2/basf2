@@ -14,6 +14,7 @@
 
 namespace Belle2 {
   namespace ECL {
+    /** ShaperDSP fit results from _lftda function */
     typedef struct ECLShapeFit {
       /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
       int amp;
@@ -64,6 +65,12 @@ namespace Belle2 {
      * @param[in] k1_chi    Bit shift for chi2 calculation
      * @param[in] k2_chi    Bit shift for chi2 threshold calculation
      * @param[in] chi_thres Base value for chi2 threshold
+     *
+     * @param[in] adjusted_timing Optional. Use adjusted formula to determine fit time.
+     *              Not implemented into firmware yet, thus false by default.
+     *              If true, algorithm will determine time near 0 with higher
+     *              precision, time of low-energy hits will be one of {-4,0,4}
+     *              If false, time will be one of {-32, -16, 0}
      */
     template <typename INT>
     ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
@@ -71,7 +78,7 @@ namespace Belle2 {
                        INT* fg33, int* y, int& ttrig2, int& la_thr,
                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                       int& chi_thres);
+                       int& chi_thres, bool adjusted_timing = false);
 
   }
 }

@@ -40,7 +40,7 @@ namespace Belle2 {
                        INT* fg33, int* y, int& ttrig2, int& la_thr,
                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                       int& chi_thres)
+                       int& chi_thres, bool adjusted_timing)
     {
       //                Typical plot of y_i (i=0..31)
       // +-------------------------------------------------------+
@@ -113,7 +113,12 @@ namespace Belle2 {
       }
 
       // Initial time index
-      int it0 = 48 + ((23 - ttrig) << 2);
+      int it0;
+      if (!adjusted_timing) {
+        it0 = 48 + ((23 - ttrig) << 2);
+      } else {
+        it0 = 48 + ((143 - ttrig2) << 2) / 6;
+      }
       // Min time index, max time index
       int it_l = 0, it_h = 191;
       // Time index, must be within [it_l, it_h]
@@ -252,7 +257,11 @@ namespace Belle2 {
 
           //== Estimate t_new as t_0 - B/A
 
-          B2 = B1 >> (k_b - 13);
+          if (k_b >= 13) {
+            B2 = B1 >> (k_b - 13);
+          } else {
+            B2 = B1 << (13 - k_b);
+          }
           B2 += (A1 << 13);
           B3 = (B2 / A1);
 
@@ -279,7 +288,12 @@ namespace Belle2 {
             t_uncut = setInRange(t_uncut, -4096, 4095);
 
             T = -t_uncut;
-            T += ((210 - ttrig2) << 3);
+            if (!adjusted_timing) {
+              T += ((210 - ttrig2) << 3);
+            } else {
+              T += ((215 - ttrig2) << 3) - 4;
+            }
+
             T = setInRange(T, -2048, 2047);
 
             //== Estimate pedestal
@@ -398,13 +412,13 @@ namespace Belle2 {
                                        short* fg33, int* y, int& ttrig2, int& la_thr,
                                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                                       int& chi_thres);
+                                       int& chi_thres, bool adjusted_timing);
     template ECLShapeFit lftda_<int>(int* f, int* f1, int* fg41,
                                      int* fg43, int* fg31, int* fg32,
                                      int* fg33, int* y, int& ttrig2, int& la_thr,
                                      int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                                      int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                                     int& chi_thres);
+                                     int& chi_thres, bool adjusted_timing);
   }
 }
 

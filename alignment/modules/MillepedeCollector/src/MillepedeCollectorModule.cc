@@ -21,7 +21,7 @@
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
-#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -1132,8 +1132,8 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   }
 
   if (bklmHits.isOptional()) {
-    genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (bklmHits.getPtr());
+    genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 

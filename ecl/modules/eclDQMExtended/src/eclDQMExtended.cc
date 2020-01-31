@@ -446,13 +446,11 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
                        Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres);
-
   m_AmpFit = result.amp;
   m_TimeFit = result.time;
   m_QualityFit = result.quality;
 
   if (result.skip_thr || result.hit_thr) m_QualityFit += 4;
-
 }
 
 void ECLDQMEXTENDEDModule::beginRun()

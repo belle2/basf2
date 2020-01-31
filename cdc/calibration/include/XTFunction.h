@@ -168,6 +168,18 @@ namespace Belle2 {
       }
 
       /**
+       * Is valid.
+       */
+      bool isValid()
+      {
+        if (m_fitFunc->IsValid() == true) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      /**
        * Set XT mode.
        * 1 is 5th order Chebshev polynomial.
        * 0 is 5th order polynomial.
@@ -187,7 +199,7 @@ namespace Belle2 {
       void  setXTParams(double p[8])
       {
         for (int i = 0; i < 8; ++i) {m_XTParam[i] = p[i];}
-        m_tmax = p[6] + 250;
+        m_tmax = p[6] + 50;
       }
       /**
        * Set Initial parameters for fitting
@@ -198,7 +210,7 @@ namespace Belle2 {
         m_XTParam[0] = p0;     m_XTParam[1] = p1;     m_XTParam[2] = p2;
         m_XTParam[3] = p3;     m_XTParam[4] = p4;     m_XTParam[5] = p5;
         m_XTParam[6] = p6;     m_XTParam[7] = p7;
-        m_tmax = p6 + 250;
+        m_tmax = p6 + 50;
       }
 
       /**
@@ -311,7 +323,7 @@ namespace Belle2 {
       int m_fitflag = 0;
       double m_Prob = 0; /**< Chi2 prob of fitting*/
       double m_tmin = 20; /**< lower boundary of fit range*/
-      double m_tmax = m_XTParam[6] + 250; /**< upper boundary of fit range*/
+      double m_tmax = m_XTParam[6] + 50; /**< upper boundary of fit range*/
     };
 
     void XTFunction::FitPol5()
@@ -411,7 +423,6 @@ namespace Belle2 {
 
     void XTFunction::FitChebyshev()
     {
-
       if (m_mode != c_Chebyshev) {
         B2ERROR("Fitting function is wrong");
       }
@@ -422,30 +433,25 @@ namespace Belle2 {
       }
       //  m_tmax = m_XTParam[6] + 100;
       //xtCheb5->SetParameters(0.0, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
-      double p[6];
       double par[8];
       m_fitFunc->SetParLimits(7, 0., 0.001);
-      m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
-      m_h1->GetFunction("chebyshev5")->GetParameters(p);
-      m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6], 0.000);
-
+      int fitresult = m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
+      if (fitresult >= 0) {
+        m_h1->GetFunction("chebyshev5")->GetParameters(par);
+        m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], m_XTParam[6], 0.000);
+      }
       double stat;
       for (int i = 0; i < 10; ++i) {
         stat = m_h1->Fit(m_fitFunc, "MQ", "0", m_tmin, m_tmax);
         if (stat == 0) {
-          m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6] - 20, 0.000);
+          m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], m_XTParam[6] - 20, 0.000);
           m_tmax -= 10;
           continue;
         }
         m_fitFunc->GetParameters(par);
-        if (p[1] < 0) { // negative c1
-          std::cout << " neg c1 converted" << std::endl;
-          p[0] = 0;
-          p[1] *= -1.0;
-          p[2] = 0;
-          p[3] = 0;
-          p[4] = 0;
-          p[5] = 0;
+        if (par[1] < 0) { // negative c1
+          // std::cout << " neg c1 converted" << std::endl;
+          par[1] *= -1.0;
           m_fitFunc->SetParLimits(1, 0., 0.01);
           m_tmin += 10.0;
           continue;
@@ -457,7 +463,7 @@ namespace Belle2 {
         if (fp6 < fbehindp6 || fp6 > 1) { /*may be change to good value*/
           m_fitflag = 2;
           //      out += 1;
-          m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], par[6] - 20, 0.000);
+          m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], par[6] - 20, 0.000);
           m_fitFunc->SetParLimits(6, par[6] - 50,  par[6] - 10);
           m_tmax -= 10;
           //      if (m_tmax < p6default + 30) {
@@ -469,8 +475,10 @@ namespace Belle2 {
         //    m_tmax +=10;
         //if (stat != 0) break;
       }
-      m_fitFunc->GetParameters(m_FittedXTParams);
-      m_Prob = m_fitFunc->GetProb();
+      if (par[1] > 0) {
+        m_fitFunc->GetParameters(m_FittedXTParams);
+        m_Prob = m_fitFunc->GetProb();
+      }
       if (stat == 0)
         m_fitflag = 0;
       else

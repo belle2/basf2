@@ -21,7 +21,7 @@ particlegun = main.add_module('ParticleGun')
 simulation = main.add_module('FullSim')
 
 simulation.param('EnableVisualization', True)
-simulation.param('UICommands', [
+simulation.param('UICommandsAtIdle', [
     # Use VRML2 backend
     '/vis/open VRML2FILE',
     # Draw the geometry

@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import basf2
-from b2test_utils import configure_logging_for_tests
+from b2test_utils import configure_logging_for_tests, skip_test_if_light
 from ROOT import Belle2
 
+skip_test_if_light()  # light builds don't know about PXD hits
 configure_logging_for_tests()
 basf2.set_random_seed("something important")
 
@@ -45,6 +46,7 @@ inputfiles = [
     basf2.find_file('framework/tests/chaintest_2.root')
 ]
 
+basf2.conditions.disable_globaltag_replay()
 main = basf2.Path()
 
 # not used for anything, just checking wether the master module

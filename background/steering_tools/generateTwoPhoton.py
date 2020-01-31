@@ -119,7 +119,7 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//BeamBackgroundStudy", '1', ''),
     ])
 main.add_module(gearbox)
 
@@ -140,15 +140,20 @@ main.add_module(aafh)
 # Geant geometry
 geometry = register_module('Geometry')
 geometry.param('useDB', False)
+addComp = ["MagneticField3dQuadBeamline"]
+# add beast detectors for early phase3
+if phase == 31 and sampleType == 'study':
+    addComp.extend(["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
+
 geometry.param({"excludedComponents": ["MagneticField"],
-                "additionalComponents": ["MagneticField3dQuadBeamline"], })
+                "additionalComponents": addComp})
 main.add_module(geometry)
 
 # Geant simulation
 fullsim = register_module('FullSim')
 if sampleType == 'study':
     fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-    fullsim.param('UICommands', ['/process/inactivate nKiller'])
+    fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
     fullsim.param('StoreAllSecondaries', True)
     fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)

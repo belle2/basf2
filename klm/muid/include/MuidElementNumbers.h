@@ -35,7 +35,7 @@ namespace Belle2 {
       c_StopInBackwardEndcap = 5,
       c_ExitBackwardEndcap = 6,
       c_CrossBarrelStopInForwardMin = 7,
-      c_CrossBarrelStopInForwardMax = 14,
+      c_CrossBarrelStopInForwardMax = 21,
       c_CrossBarrelStopInBackwardMin = 22,
       c_CrossBarrelStopInBackwardMax = 36,
       c_CrossBarrelExitForwardMin = 37,

@@ -4,6 +4,7 @@
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
+#include <set>
 
 using namespace std;
 using namespace Belle2;

@@ -19,6 +19,7 @@
 
 #include <string>
 #include <regex>
+#include <set>
 
 using namespace Belle2;
 

@@ -21,7 +21,7 @@ MuidElementNumbers::~MuidElementNumbers()
 {
 }
 
-static bool checkExtrapolationOutcome(int outcome, int lastLayer)
+bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
 {
   /* Barrel stop: never in layer 14. */
   if ((outcome == MuidElementNumbers::c_StopInBarrel)

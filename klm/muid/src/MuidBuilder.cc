@@ -71,30 +71,8 @@ namespace Belle2 {
 
     for (int outcome = 1; outcome <= MuidElementNumbers::getMaximalOutcome(); ++outcome) {
       for (int lastLayer = 0; lastLayer <= MuidElementNumbers::getMaximalBarrelLayer(); ++lastLayer) {
-        if ((outcome == MuidElementNumbers::c_StopInBarrel)
-            && (lastLayer > MuidElementNumbers::getMaximalBarrelLayer() - 1)) break; // barrel stop: never in layer 14
-        if ((outcome == MuidElementNumbers::c_StopInForwardEndcap)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapForwardLayer() - 1)) break; // forward endcap stop: never in layer 13
-        if ((outcome == MuidElementNumbers::c_ExitBarrel)
-            && (lastLayer > MuidElementNumbers::getMaximalBarrelLayer())) break; // barrel exit: no layers 15+
-        if ((outcome == MuidElementNumbers::c_ExitForwardEndcap)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapForwardLayer())) break; // forward endcap exit: no layers 14+
-        if ((outcome == MuidElementNumbers::c_StopInBackwardEndcap)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapBackwardLayer() - 1)) break; // backward endcap stop: never in layer 11
-        if ((outcome == MuidElementNumbers::c_ExitBackwardEndcap)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapBackwardLayer())) break; // backward endcap exit: no layers 12+
-        if ((outcome >= MuidElementNumbers::c_CrossBarrelStopInForwardMin)
-            && (outcome <= MuidElementNumbers::c_CrossBarrelStopInForwardMax)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapForwardLayer() - 1)) break; // like outcome == 2
-        if ((outcome >= MuidElementNumbers::c_CrossBarrelStopInBackwardMin)
-            && (outcome <= MuidElementNumbers::c_CrossBarrelStopInBackwardMax)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapBackwardLayer() - 1)) break; // like outcome == 5
-        if ((outcome >= MuidElementNumbers::c_CrossBarrelExitForwardMin)
-            && (outcome <= MuidElementNumbers::c_CrossBarrelExitForwardMax)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapForwardLayer())) break; // like outcome == 4
-        if ((outcome >= MuidElementNumbers::c_CrossBarrelExitBackwardMin)
-            && (outcome <= MuidElementNumbers::c_CrossBarrelExitBackwardMax)
-            && (lastLayer > MuidElementNumbers::getMaximalEndcapBackwardLayer())) break; // like outcome == 6
+        if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
+          break;
         std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
         for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
           m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];

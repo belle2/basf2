@@ -55,6 +55,13 @@ namespace Belle2 {
     ~MuidElementNumbers();
 
     /**
+     * Check the track extrapolation outcome.
+     * @param[in] outcome   Track extrapolation outcome.
+     * @param[in] lastLayer Last layer crossed during the extrapolation.
+     */
+    static bool checkExtrapolationOutcome(int outcome, int lastLayer);
+
+    /**
      * Get maximal barrel layer number (0-based).
      */
     static constexpr int getMaximalBarrelLayer()

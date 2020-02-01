@@ -103,7 +103,7 @@ namespace Belle2 {
     }
 
     m_ReducedChiSquaredDx = MuidElementNumbers::getMaximalReducedChiSquared() /
-                            (double) MuidElementNumbers::getSizeReducedChiSquared(); // bin size
+                            static_cast<double>(MuidElementNumbers::getSizeReducedChiSquared()); // bin size
     for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
 
       for (int halfNdof = 1; halfNdof <= MuidElementNumbers::getMaximalHalfNdof(); ++halfNdof) {

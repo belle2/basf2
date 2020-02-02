@@ -118,9 +118,9 @@ namespace Belle2 {
     }
 
     /**
-     * Get maximal value of reduced chi-squared (for transverse scattering)..
+     * Get maximal value of reduced chi-squared (for transverse scattering).
      */
-    static constexpr int getMaximalReducedChiSquared()
+    static constexpr double getMaximalReducedChiSquared()
     {
       return m_MaximalReducedChiSquared;
     }

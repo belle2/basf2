@@ -363,7 +363,7 @@ namespace Belle2 {
       string listName = get<c_PListName>(roe2Plist);
       auto& cut = get<c_CutPointer>(roe2Plist);
       StoreObjPtr<ParticleList> plist(listName);
-      if (cut->check(newPart))
+      if (cut->check(newPart) && !plist->contains(newPart))
         plist->addParticle(newPart);
     }
 

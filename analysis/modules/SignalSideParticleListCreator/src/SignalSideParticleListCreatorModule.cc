@@ -111,7 +111,7 @@ void SignalSideParticleListCreatorModule::event()
     if (particle) {
       std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(particle);
 
-      if (selparticles[0])
+      if (selparticles[0] && !plist->contains(selparticles[0]))
         plist->addParticle(selparticles[0]);
     }
   }

@@ -89,3 +89,15 @@ unsigned int RawFTSWFormat::GetFrameCount(int n)
   B2FATAL(err_buf);
   return -1;
 }
+
+void RawFTSWFormat::GetPCTimeVal(int n, struct timeval* tv)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of RawFTSW format that you're using. n=%d tvsec=%d : %s %s %d: Exiting...\n",
+          n, tv->tv_sec, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
+  return;
+
+}

@@ -427,6 +427,42 @@ def add_phokhara_generator(path, finalstate=''):
         B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
 
 
+def add_koralw_generator(path, finalstate='', enableTauDecays=True):
+    """
+    Add KoralW generator for radiative four fermion final states (only four leptons final states are currently supported).
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): either 'e+e-e+e-', 'e+e-mu+mu-', 'e+e-tau+tau-', 'mu+mu-mu+mu-', 'mu+mu-tau+tau-' or 'tau+tau-tau+tau-'
+        enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+    """
+
+    decayFile = ''
+    if finalstate == 'e+e-e+e-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeee.data')
+    elif finalstate == 'e+e-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeMuMu.data')
+    elif finalstate == 'e+e-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeTauTau.data')
+    elif finalstate == 'mu+mu-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuMuMu.data')
+    elif finalstate == 'mu+mu-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuTauTau.data')
+    elif finalstate == 'tau+tau-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_TauTauTauTau.data')
+    else:
+        B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
+
+    path.add_module('KoralWInput',
+                    UserDataFile=decayFile)
+
+    if 'tau+tau-' in finalstate:
+        if enableTauDecays:
+            path.add_module('EvtGenDecay')
+        else:
+            B2WARNING('The tau decays will not be generated.')
+
+
 def add_cosmics_generator(path, components=None,
                           global_box_size=None, accept_box=None, keep_box=None,
                           geometry_xml_file='geometry/Beast2_phase2.xml',

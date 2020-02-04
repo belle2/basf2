@@ -87,7 +87,15 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
   if (type == Particle::c_Unflavored) {
     // this is self-conjugated particle
     // add it to the self-conjugated list of this (and anti-particle list if exists)
-    m_scList.push_back(iparticle);
+
+    // check if the particle is already in this list
+    if (std::find(m_scList.begin(), m_scList.end(), iparticle) == m_scList.end()) {
+      m_scList.push_back(iparticle);
+    } else {
+      B2WARNING("ParticleList::addParticle Trying to add Particle with index=" << iparticle
+                << " to the ParticleList=" << m_thisListName << " that is already included!");
+      return;
+    }
 
     // add it to the self-conjugated list
     if (includingAntiList and !m_antiListName.empty())
@@ -98,7 +106,12 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     if (antiParticle)
       getAntiParticleList().addParticle(iparticle, pdg, type, false);
     else {
-      m_fsList.push_back(iparticle);
+      if (std::find(m_fsList.begin(), m_fsList.end(), iparticle) == m_fsList.end()) {
+        m_fsList.push_back(iparticle);
+      } else {
+        B2WARNING("ParticleList::addParticle Trying to add Particle with index=" << iparticle
+                  << " to the ParticleList=" << m_thisListName << "that is already included! Particle not added");
+      }
     }
   } else {
     B2ERROR("ParticleList::addParticle invalid flavor type, not added");

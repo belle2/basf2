@@ -198,8 +198,12 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
 
-    if parentParticle != 'Upsilon(4S)' and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
+    if parentParticle != 'Upsilon(3S)' and parentParticle != 'Upsilon(4S)'\
+            and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
         B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
+
+    if parentParticle == 'Upsilon(3S)' and finalstate != 'signal':
+        B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
 
     if parentParticle == 'Upsilon(5S)' and finalstate != 'signal':
         B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
@@ -220,6 +224,10 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
+    if parentParticle == 'Upsilon(3S)':
+        beamparameters = bp.add_beamparameters(path, "Y3S")
+        basf2.print_params(beamparameters)
+
     if parentParticle == 'Upsilon(5S)':
         beamparameters = bp.add_beamparameters(path, "Y5S")
         basf2.print_params(beamparameters)

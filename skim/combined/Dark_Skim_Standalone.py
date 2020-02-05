@@ -31,7 +31,7 @@ expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 
-expert.setSkimLogging(path=darkskimpath)
+expert.setSkimLogging(darkskimpath, ['ParticleCombiner'])
 b2.process(darkskimpath)
 
 # print out the summary

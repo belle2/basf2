@@ -5,7 +5,6 @@ from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, a
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
-from tracking.modules import RegisterEventLevelTrackingInfo
 
 from iov_conditional import phase_2_conditional
 
@@ -442,7 +441,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module(RegisterEventLevelTrackingInfo())
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
@@ -786,11 +785,12 @@ def add_vxd_track_finding_vxdtf2(
 
     # setup the event level tracking info to log errors and stuff
     nameTrackingInfoModule = "RegisterEventLevelTrackingInfo" + suffix
-    nameEvtInfo = "EventLevelTrackingInfo" + suffix
+    nameEventTrackingInfo = "EventLevelTrackingInfo" + suffix
     if nameTrackingInfoModule not in path:
-        # default name of the
-        registerEventlevelTrackingInfo = register_module(RegisterEventLevelTrackingInfo(nameEvtInfo))
+        # Use modified name of module and created StoreObj as module might be added twice (PXDDataReduction)
+        registerEventlevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
         registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         path.add_module(registerEventlevelTrackingInfo)
 
     nameSPs = 'SpacePoints' + suffix
@@ -828,7 +828,7 @@ def add_vxd_track_finding_vxdtf2(
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
-    segNetProducer.param('EventLevelTrackingInfoName', nameEvtInfo)
+    segNetProducer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(segNetProducer)
 
     #################
@@ -846,7 +846,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
-    trackFinder.param('EventLevelTrackingInfoName', nameEvtInfo)
+    trackFinder.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(trackFinder)
 
     if useTwoStepSelection:

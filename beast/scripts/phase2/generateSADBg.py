@@ -167,10 +167,7 @@ if phase == 31:
 
 # to not store MCParticles use this, if you want MCParticles comment these two lines and uncomment the line after
 excludeBranch = ['MCParticles']
-main.add_module('RootOutput', outputFileName=outputFile, excludeBranchNames=excludeBranch,
-                buildIndex=False, autoFlushSize=-500000)
-
-# add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
+add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile, excludeBranches=excludeBranch)
 
 
 # Process events

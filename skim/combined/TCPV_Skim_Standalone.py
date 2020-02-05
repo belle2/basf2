@@ -60,5 +60,7 @@ loadStdD0_Kpipipi(path=skimpath)
 from skim.tcpv import TCPVList
 expert.add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 # print out the summary
 print(b2.statistics)

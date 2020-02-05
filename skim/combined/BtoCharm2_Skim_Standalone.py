@@ -55,7 +55,7 @@ expert.add_skim('B0toDpi_Kpipi', B0toDpiList, path=btocharmpath)
 from skim.btocharm import loadB0toDstarPi_Kpi
 from skim.standardlists.charm import loadStdD0_Kpi, loadStdDstarPlus_D0pi_Kpi
 
-loadStdD0_Kpi(path=btocharmpath)
+# loadStdD0_Kpi(path=btocharmpath)
 loadStdDstarPlus_D0pi_Kpi(path=btocharmpath)
 B0toDstarPiList_Kpi = loadB0toDstarPi_Kpi(path=btocharmpath)
 expert.add_skim('B0toDstarPi_D0pi_Kpi', B0toDstarPiList_Kpi, path=btocharmpath)
@@ -64,7 +64,7 @@ expert.add_skim('B0toDstarPi_D0pi_Kpi', B0toDstarPiList_Kpi, path=btocharmpath)
 from skim.btocharm import loadB0toDstarPi_Kpipipi
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
 
-loadStdD0_Kpipipi(path=btocharmpath)
+# loadStdD0_Kpipipi(path=btocharmpath)
 loadStdDstarPlus_D0pi_Kpipipi(path=btocharmpath)
 B0toDstarPiList_Kpipipi = loadB0toDstarPi_Kpipipi(path=btocharmpath)
 expert.add_skim('B0toDstarPi_D0pi_Kpipipi', B0toDstarPiList_Kpipipi, path=btocharmpath)

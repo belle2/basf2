@@ -37,6 +37,8 @@ Modules
  * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`.
    Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
    But still the module has some bugs if one uses K_S0.
+   But still the module has some bugs if one uses K_S0. So please consider to use `reconstructMCDecay` instead.
+ * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
 
 Conditions DB
 +++++++++++++

@@ -8,7 +8,7 @@ Contact: Torben Ferber (ferber@physics.ubc.ca)
 .. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
 """
 
-from basf2 import *
+import basf2
 from ROOT import Belle2
 import beamparameters as bp
 import os
@@ -198,8 +198,11 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
 
-    if parentParticle != 'Upsilon(4S)' and parentParticle != 'Upsilon(6S)':
+    if parentParticle != 'Upsilon(4S)' and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
         B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
+
+    if parentParticle == 'Upsilon(5S)' and finalstate != 'signal':
+        B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
 
     if parentParticle == 'Upsilon(6S)' and finalstate != 'signal':
         B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
@@ -217,9 +220,14 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
+    if parentParticle == 'Upsilon(5S)':
+        beamparameters = bp.add_beamparameters(path, "Y5S")
+        basf2.print_params(beamparameters)
+        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
+
     if parentParticle == 'Upsilon(6S)':
-        bp.add_beamparameters(path, "Y6S")
-        # print_params(beamparameters)
+        beamparameters = bp.add_beamparameters(path, "Y6S")
+        basf2.print_params(beamparameters)
         pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
 
     evtgen = path.add_module(

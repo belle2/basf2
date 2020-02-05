@@ -4603,5 +4603,18 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
   }
+  TEST_F(MetaVariableTest, KSFWVariables)
+  {
+    // simple tests that do not require the ROE builder nor the CS builder
 
+    // check that garbage input throws helpful B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("KSFWVariables(NONSENSE)"));
+
+    // check for NaN if we don't have a CS object for this particle
+    StoreArray<Particle> myParticles;
+    const Particle* particle_with_no_cs = myParticles.appendNew();
+    const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
+    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+
+  }
 }

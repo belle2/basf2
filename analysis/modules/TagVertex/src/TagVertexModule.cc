@@ -338,8 +338,6 @@ namespace Belle2 {
       }
     }
 
-    //if(m_MCInfo) doRaveTracksMatching(roeTracksAndMatch);
-
     return ok;
 
   }
@@ -481,15 +479,12 @@ namespace Belle2 {
     bool ok0(true);
 
     if ((Breco->getVertexErrorMatrix()(2, 2)) == 0.0) {
-      //B2FATAL("In TagVertexModule::findConstraintBTube: Please perform a vertex fit of the selected B before calling this module");
       B2WARNING("In TagVertexModule::findConstraintBTube: cannot get a proper vertex for BReco. BTube constraint replaced by Boost.");
       ok0 = findConstraintBoost(cut);
       return ok0;
     }
 
     //make a copy of tubecreatorB so as not to modify the original object
-
-    //Particle* tubecreatorBCopy = ParticleCopy::copyParticle(Breco); //causes problems when deleting pcle
 
     Particle tubecreatorBCopy(Particle(Breco->get4Vector(), Breco->getPDGCode()));
     tubecreatorBCopy.updateMomentum(Breco->get4Vector(), Breco->getVertex(), Breco->getMomentumVertexErrorMatrix(),
@@ -1278,46 +1273,6 @@ namespace Belle2 {
     return true;
   }
 
-  //CLHEP::HepSymMatrix TagVertexModule::getHepMatrix(TMatrixDSym const& mat1)
-  //{
-  //  int n(mat1.GetNcols());
-  //  CLHEP::HepSymMatrix mat2(n, 0);
-  //  for (int i(0); i < n; ++i) {
-  //    for (int j(0); j < n; ++j)
-  //      mat2[i][j] = mat1(i, j);
-  //  }
-  //  return mat2;
-  //}
-
-  //TMatrixDSym TagVertexModule::getRootMatrix(CLHEP::HepSymMatrix const& mat1)
-  //{
-  //  int n = mat1.num_row();
-  //  TMatrixFSym m(n);
-  //  /*
-  //   * TMatrixFSym is stored as a full matrix, thus all elements must be set.
-  //   */
-  //  for (int i = 0; i < n; ++i) {
-  //    for (int j = 0; j < n; ++j)
-  //      m[i][j] = mat1[i][j];
-  //  }
-  //  return m;
-  //}
-
-  //HepPoint3D TagVertexModule::getHepPoint(TVector3 const& v1)
-  //{
-  //  return HepPoint3D(v1.X(), v1.Y(), v1.Z());
-  //}
-
-  //TVector3 TagVertexModule::getRootVector(HepPoint3D const& v1)
-  //{
-  //  return TVector3(v1.x(), v1.y(), v1.z());
-  //}
-
-  //CLHEP::HepLorentzVector TagVertexModule::getHepLorentzVector(TLorentzVector const& p)
-  //{
-  //  return CLHEP::HepLorentzVector(p.X(), p.Y(), p.Z(), p.T());
-  //}
-
   bool TagVertexModule::makeGeneralFitKFitter()
   {
     //initialize KFitter
@@ -1352,18 +1307,17 @@ namespace Belle2 {
 
     vector<TrackAndWeight> trackAndWeights;
     getTracksWithoutKS(m_tagTracks, trackAndWeights);
-
-    const TrackFitResult* trackRes;
     vector<Particle> particles;
     const int dummyIndex(0);
-    int addedOK;
     int nTracksAdded(0);
 
     for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
+      const TrackFitResult* trackRes(NULL);
       trackRes = trackAndWeights.at(i).track;
 
       particles.push_back(Particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211)));
 
+      int addedOK;
       addedOK = kFit.addParticle(&particles.at(i));
 
       if (addedOK != 0) {
@@ -1538,8 +1492,6 @@ namespace Belle2 {
     } else {return false;}
     return true;
   }
-
-
 
   //The following functions are just here to help printing stuff
 

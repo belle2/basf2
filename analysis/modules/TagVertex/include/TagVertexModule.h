@@ -209,14 +209,6 @@ namespace Belle2 {
      */
     void deltaT(Particle* Breco);
 
-
-    //convert HEP object to ROOT objects, useful for KFitter
-    //CLHEP::HepSymMatrix getHepMatrix(TMatrixDSym const& mat1);
-    //TMatrixDSym getRootMatrix(CLHEP::HepSymMatrix const& mat1);
-    //HepPoint3D getHepPoint(TVector3 const& v1);
-    //TVector3 getRootVector(HepPoint3D const& v1);
-    //CLHEP::HepLorentzVector getHepLorentzVector(TLorentzVector const& p);
-
     /**
      * Print a TVector3 (useful for debugging)
      */

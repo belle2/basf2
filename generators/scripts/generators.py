@@ -8,7 +8,7 @@ Contact: Torben Ferber (ferber@physics.ubc.ca)
 .. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
 """
 
-import basf2
+from basf2 import *
 from ROOT import Belle2
 import beamparameters as bp
 import os
@@ -226,16 +226,16 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     # use EvtGen
     if parentParticle == 'Upsilon(3S)':
         beamparameters = bp.add_beamparameters(path, "Y3S")
-        basf2.print_params(beamparameters)
+        print_params(beamparameters)
 
     if parentParticle == 'Upsilon(5S)':
         beamparameters = bp.add_beamparameters(path, "Y5S")
-        basf2.print_params(beamparameters)
+        print_params(beamparameters)
         pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
 
     if parentParticle == 'Upsilon(6S)':
         beamparameters = bp.add_beamparameters(path, "Y6S")
-        basf2.print_params(beamparameters)
+        print_params(beamparameters)
         pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
 
     evtgen = path.add_module(

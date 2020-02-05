@@ -9,7 +9,10 @@
     <interval>nightly</interval>
 </header>
 """
-__author__ = "N. Rout"
+__author__ = [
+    "N Dash",
+    "N. Rout"
+]
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -35,9 +38,9 @@ stdKshorts(path=path)
 
 
 # Kspi0 skim
-from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
-loadDkspi0(path=path)
-BtoDhList = BsigToDhToKspi0List(path=path)
+from skim.btocharm import loadD0_Kspi0_loose, BsigToD0hToKspi0List
+loadD0_Kspi0_loose(path=path)
+BtoDhList = BsigToD0hToKspi0List(path=path)
 expert.skimOutputUdst(skimCode, BtoDhList, path=path)
 ma.summaryOfLists(BtoDhList, path=path)
 

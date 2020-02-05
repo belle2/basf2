@@ -3,13 +3,16 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <analysis/ContinuumSuppression/ContinuumSuppression.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/TestHelpers.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -34,15 +37,18 @@ namespace {
       StoreArray<Particle> myParticles;
       StoreArray<RestOfEvent> myROEs;
       StoreArray<PIDLikelihood> myPIDLikelihoods;
+      StoreArray<ContinuumSuppression> myContinuumSuppressions;
       myECLClusters.registerInDataStore();
       myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();
       myROEs.registerInDataStore();
+      myContinuumSuppressions.registerInDataStore();
       myPIDLikelihoods.registerInDataStore();
       myParticles.registerRelationTo(myROEs);
       myTracks.registerRelationTo(myPIDLikelihoods);
+      myParticles.registerRelationTo(myContinuumSuppressions);
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;

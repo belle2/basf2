@@ -1177,7 +1177,6 @@ namespace Belle2 {
       }
       if (!isKsDau) {
         trackAndWeight.track = trak1Res;
-        //rFit.addTrack(trak1Res); // Temporal fix: some mom go to Inf
 
         if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
           trackAndWeight.mcParticle = trak1->getRelatedTo<MCParticle>();

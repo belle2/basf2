@@ -1042,13 +1042,13 @@ namespace Belle2 {
                       "return the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.")
 
     REGISTER_VARIABLE("TagTrackTrueOriginX(i)", tagTrackTrueOriginX,
-                      "return the X component of the true origin of the MC particle corresonding to the ith tag vtx track.")
+                      "return the X component of the true origin of the MC particle corresponding to the ith tag vtx track.")
 
     REGISTER_VARIABLE("TagTrackTrueOriginY(i)", tagTrackTrueOriginY,
-                      "return the Y component of the true origin of the MC particle corresonding to the ith tag vtx track.")
+                      "return the Y component of the true origin of the MC particle corresponding to the ith tag vtx track.")
 
     REGISTER_VARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
-                      "return the Z component of the true origin of the MC particle corresonding to the ith tag vtx track.")
+                      "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.")
 
   }
 }

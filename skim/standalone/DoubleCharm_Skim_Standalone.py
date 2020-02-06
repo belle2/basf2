@@ -14,6 +14,7 @@ from stdCharged import stdK, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 import skimExpertFunctions as expert
 b2.set_log_level(b2.LogLevel.INFO)
@@ -31,6 +32,7 @@ stdK('all', path=path)
 stdKshorts(path=path)
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
+loadStdPi0ForBToHadrons(path=path)
 stdPi0s('skim', path=path)
 stdPi0s('loose', path=path)
 stdPhotons('loose', path=path)

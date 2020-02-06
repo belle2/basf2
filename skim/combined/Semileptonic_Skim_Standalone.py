@@ -12,6 +12,7 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from stdV0s import stdKshorts
 from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 import skimExpertFunctions as expert
@@ -29,6 +30,7 @@ stdK('all', path=SLskimpath)
 stdPi('all', path=SLskimpath)
 stdE('all', path=SLskimpath)
 stdMu('all', path=SLskimpath)
+loadStdPi0ForBToHadrons(path=SLskimpath)
 loadStdSkimPi0(path=SLskimpath)
 loadStdSkimPhoton(path=SLskimpath)
 stdKshorts(path=SLskimpath)

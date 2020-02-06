@@ -129,7 +129,7 @@ namespace Belle2 {
     double m_tagVNDF;             /**< Number of degrees of freedom in the tag vertex fit */
     double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
-    std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFitter) */
+    std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
     bool m_verbose;               /**< choose if you want to print extra infos */
     TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter */
     TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
@@ -197,11 +197,11 @@ namespace Belle2 {
 
     /**
      * make the vertex fit on the tag side:
-     * KFitter
+     * KFit
      * tracks coming from Ks removed
      * all other tracks used
      */
-    bool makeGeneralFitKFitter();
+    bool makeGeneralFitKFit();
 
     /**
      * calculate DeltaT and MC-DeltaT (rec - tag) in ps from Breco and Btag vertices

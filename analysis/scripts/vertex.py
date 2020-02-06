@@ -745,9 +745,9 @@ def TagV(
           * singleTrack: only choose the best track, DOES NOT WORK with no constraint;
           * singleTrack_PXD: same as above but consider only tracks with at least 1 PXD hit;
 
-        fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFitter
+        fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFit
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
-        reqPXDHits (int): minimum N PXD hits for a track
+        reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
         path (basf2.Path): modules are added to this path
 

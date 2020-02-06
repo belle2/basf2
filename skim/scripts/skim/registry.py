@@ -20,12 +20,12 @@ skim_registry = [
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
     ('14140100', 'BtoD0h_hh'),
-    ('14120300', 'BtoD0h_Kspi0'),
-    ('14140200', 'BtoD0h_Kshh'),
-    ('14120400', 'BtoD0h_Kspipipi0'),
-    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
     ('14140101', 'BtoD0h_Kpi'),
     ('14140102', 'BtoD0h_Kpipipi'),
+    ('14140200', 'BtoD0h_Kshh'),
+    ('14120300', 'BtoD0h_Kspi0'),
+    ('14120400', 'BtoD0h_Kspipipi0'),
+    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
     ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
     ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
     ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+

@@ -201,15 +201,6 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
             and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
         B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
 
-    if parentParticle == 'Upsilon(3S)' and finalstate != 'signal':
-        B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
-
-    if parentParticle == 'Upsilon(5S)' and finalstate != 'signal':
-        B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
-
-    if parentParticle == 'Upsilon(6S)' and finalstate != 'signal':
-        B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
-
     if finalstate == 'charged':
         pass
     elif finalstate == 'mixed':
@@ -223,10 +214,32 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
+    if parentParticle == 'Upsilon(3S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING("add_evtgen_generator initial state {} has no BB mixing, now switching coherentMixing OFF"
+                      .format(parentParticle))
+
     if parentParticle == 'Upsilon(5S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
         pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
 
     if parentParticle == 'Upsilon(6S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
         pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
 
     evtgen = path.add_module(

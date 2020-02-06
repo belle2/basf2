@@ -91,7 +91,7 @@ namespace Belle2 {
     addParam("reqPXDHits", m_reqPXDHits,
              "Minium number of PXD hits for a track to be used in the vertex fit", 0);
     addParam("fitAlgorithm", m_fitAlgo,
-             "Fitter used for the tag vertex fit: Rave or KFitter", string("Rave"));
+             "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
 
 
   }
@@ -112,10 +112,12 @@ namespace Belle2 {
     StoreArray<TagVertex> verArray;
     verArray.registerInDataStore();
     particles.registerRelationTo(verArray);
+    //check if the fitting algorithm name  is set correctly
+    if (m_fitAlgo != "Rave" && m_fitAlgo != "KFit")
+      B2ERROR("TagVertexModule::makeGeneralFit: invalid fitting algorithm (must be set to either Rave or KFit).");
     //temporary while the one track fit is broken
-    if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") {
+    if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD")
       B2ERROR("TagVertexModule : the singleTrack option is temporarily broken.");
-    }
   }
 
   void TagVertexModule::beginRun()
@@ -290,7 +292,7 @@ namespace Belle2 {
     m_FitType = 0;
 
     double minPVal(0.001);
-    if (m_fitAlgo == "KFitter") minPVal = 0.;
+    if (m_fitAlgo == "KFit") minPVal = 0.;
 
     if (m_trackFindingType == "singleTrack_PXD") {
       ok = getTagTracks_singleTrackAlgorithm(Breco, 1);
@@ -579,7 +581,7 @@ namespace Belle2 {
     }
 
     //The following is done to do the BTube constraint with a virtual track
-    //(ie KFitter way)
+    //(ie KFit way)
 
     m_tagMomentum = v4FinalNew;
 
@@ -1190,9 +1192,8 @@ namespace Belle2 {
   bool TagVertexModule::makeGeneralFit()
   {
     if (m_fitAlgo == "Rave") return  makeGeneralFitRave();
-    if (m_fitAlgo == "KFitter") return makeGeneralFitKFitter();
+    if (m_fitAlgo == "KFit") return makeGeneralFitKFit();
 
-    B2WARNING("TagVertexModule::makeGeneralFit: invalid fitting algorithm.");
     return false;
   }
 
@@ -1273,9 +1274,9 @@ namespace Belle2 {
     return true;
   }
 
-  bool TagVertexModule::makeGeneralFitKFitter()
+  bool TagVertexModule::makeGeneralFitKFit()
   {
-    //initialize KFitter
+    //initialize KFit
 
     analysis::VertexFitKFit kFit;
     kFit.setMagneticField(m_Bfield);
@@ -1301,9 +1302,9 @@ namespace Belle2 {
         0.);
     }
 
-    //feed KFitter with tracks without Kshorts
+    //feed KFit with tracks without Kshorts
     //For this, we need to construct a particle from the trackfit result as
-    //KFitter needs the complete 7X7 cov matrix (maybe there is a nicer solution)
+    //KFit needs the complete 7X7 cov matrix (maybe there is a nicer solution)
 
     vector<TrackAndWeight> trackAndWeights;
     getTracksWithoutKS(m_tagTracks, trackAndWeights);
@@ -1321,7 +1322,7 @@ namespace Belle2 {
       addedOK = kFit.addParticle(&particles.at(i));
 
       if (addedOK != 0) {
-        B2WARNING("TagVertexModule::makeGeneralFitKFitter: failed to add a track");
+        B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
         trackAndWeights.at(i).weight = 0.;
       }
 

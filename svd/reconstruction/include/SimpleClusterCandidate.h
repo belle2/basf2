@@ -94,13 +94,13 @@ namespace Belle2 {
        */
       float get6SampleCoGTime() const { return m_6SampleTime; }
       /**
-       * return the time of the cluster for the 3-sample CoG
+       * return the raw time of the cluster for the 3-sample CoG
        */
-      float get3SampleCoGTime() const;
+      float get3SampleCoGRawTime() const;
       /**
-       * return the time of the cluster for the 3-sample ELS
+       * return the raw time of the cluster for the 3-sample ELS
        */
-      float get3SampleELSTime() const;
+      float get3SampleELSRawTime() const;
 
       /**
        * return the error on the time of the cluster depending on the m_timeAlgorithm, not implemented yet
@@ -124,17 +124,23 @@ namespace Belle2 {
        * sample-by-sample all the strips on the cluster
        */
       Belle2::SVDShaperDigit::APVFloatSamples getClsSamples() const;
+
       /**
        * returns the float vector of clustered 3-samples
        * selected by the MaxSum method
        * with First Frame of the selection
        */
       std::pair<int, std::vector<float>> getMaxSum3Samples() const;
+
+
       /**
-       * returns the Trigger Bin
-       * taken from SVDEventInfo
+       * set max frame computed with the MaxSum algorithm
        */
-      int getTriggerBin() const;
+      void setFirstFrame() {m_firstFrame = getMaxSum3Samples().first;}
+      /**
+       * return the first frame
+       */
+      int getFirstFrame() {return m_firstFrame;}
 
       /**
        * return the position of the cluster
@@ -218,6 +224,9 @@ namespace Belle2 {
 
       /** SVDRecoDigit index of the seed strip of the cluster */
       int m_seedIndex;
+
+      /** first frame selected with the max-sum algorithm */
+      int m_firstFrame = 0;
 
       /** vector containing the strips in the cluster */
       std::vector<stripInCluster> m_strips;

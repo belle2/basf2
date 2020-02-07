@@ -25,6 +25,8 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
+#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 
 namespace Belle2 {
 
@@ -104,6 +106,11 @@ namespace Belle2 {
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClusterCalibrations m_ClusterCal; /**SVDCluser calibratins db object*/
+
+      SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
+      SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/
+
+      int getTriggerBin() const; /**<get the TriggerBin from SVDEventInfo */
 
       void writeClusters(SimpleClusterCandidate clusterCand); /**<write the cluster candidate to clusters*/
     };//end class declaration

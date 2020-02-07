@@ -8,6 +8,8 @@
 // The following two are needed for the python interface
 #pragma link C++ class Belle2::SVDDatabaseImporter+;
 #pragma link C++ class Belle2::SVDCoGTimeCalibrations+;
+#pragma link C++ class Belle2::SVD3SampleCoGTimeCalibrations+;
+#pragma link C++ class Belle2::SVD3SampleELSTimeCalibrations+;
 #pragma link C++ class Belle2::SVDClusterCalibrations+;
 #pragma link C++ class Belle2::SVDNoiseCalibrations;
 #pragma link C++ class Belle2::SVDPulseShapeCalibrations;

@@ -192,9 +192,9 @@ namespace Belle2 {
       if (m_timeAlgorithm == 0)
         return get6SampleCoGTime();
       else if (m_timeAlgorithm == 1)
-        return get3SampleCoGTime();
+        return get3SampleCoGRawTime();
       else if (m_timeAlgorithm == 2)
-        return get3SampleELSTime();
+        return get3SampleELSRawTime();
       else {
         B2FATAL("unrecognized timeAlgorithm, please check the input parameter and select a value among {0 (6-sample CoG), 1 (3-sample CoG), 2 (3-sample ELS)} to select the algorithm that you want to reconstruct the cluster time");
         return 0;
@@ -216,7 +216,7 @@ namespace Belle2 {
       }
     }
 
-    float SimpleClusterCandidate::get3SampleCoGTime() const
+    float SimpleClusterCandidate::get3SampleCoGRawTime() const
     {
 
       //take the MaxSum 3 samples
@@ -232,15 +232,11 @@ namespace Belle2 {
         retval += static_cast<double>(*begin) * step;
       }
       float rawtime = retval / norm;
-      float caltime = rawtime;//we need caiibration here
-      int triggerbin = getTriggerBin();
-      float clstime = caltime + stepSize * (getMaxSum3Samples().first - triggerbin /
-                                            4); //apply First Frame correction and Trigger Bin correction
-      return clstime;
 
+      return rawtime;
     }
 
-    float SimpleClusterCandidate::get3SampleELSTime() const
+    float SimpleClusterCandidate::get3SampleELSRawTime() const
     {
 
       //take the MaxSum 3 samples
@@ -255,11 +251,8 @@ namespace Belle2 {
       auto denom = 1 - std::exp(-4 * stepSize / tau) - (1 + std::exp(-2 * stepSize / tau) / 2) * (*begin - std::exp(
                      -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
       float rawtime = - num / denom;
-      float caltime = rawtime;//we need caiibration here
-      int triggerbin = getTriggerBin();
-      float clstime = caltime + stepSize * (getMaxSum3Samples().first - triggerbin /
-                                            4); //apply First Frame correction and Trigger Bin correction
-      return clstime;
+
+      return rawtime;
 
     }
     float SimpleClusterCandidate::get3SampleCoGTimeError() const
@@ -320,22 +313,8 @@ namespace Belle2 {
       int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
       if (ctrFrame == 0) ctrFrame = 1;
       std::vector<float> clustered3s = {clsSamples.at(ctrFrame - 1), clsSamples.at(ctrFrame), clsSamples.at(ctrFrame + 1)};
+
       return std::make_pair(ctrFrame - 1, clustered3s);
-
-    }
-
-    int SimpleClusterCandidate::getTriggerBin() const
-    {
-
-      //get Tigger Bin from SVDEventInfo
-      StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-      std::string m_svdEventInfoName = "SVDEventInfo";
-      if (!temp_eventinfo.isOptional("SVDEventInfo"))
-        m_svdEventInfoName = "SVDEventInfoSim";
-      StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
-      if (!eventinfo) B2ERROR("No SVDEventInfo!");
-      int triggerbin = eventinfo->getModeByte().getTriggerBin();
-      return triggerbin;
 
     }
 

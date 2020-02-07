@@ -17,6 +17,7 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 using namespace Belle2;
@@ -240,11 +241,24 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
   float time = cluster.getTime();
   float timeError = cluster.getTimeError(); //not implemented yet
+  int firstFrame = cluster.getFirstFrame();
 
+  //depending on the algorithm time contains different information:
+  //6-sample CoG (0): this is the final time you do not do anything else
+  //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate and correct for FirstFrame and TriggerBin:
+  float caltime = time;
+  if (m_timeAlgorithm == 1)
+    caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
+  if (m_timeAlgorithm == 2)
+    caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
+
+  constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
+  if (m_timeAlgorithm == 1 || m_timeAlgorithm == 2)
+    time = caltime + stepSize * (firstFrame - getTriggerBin() / 4);
 
   //  Store Cluster into Datastore
   m_storeClusters.appendNew(SVDCluster(
-                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
+                              sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1, firstFrame
                             ));
 
   //register relation between RecoDigit and Cluster
@@ -294,4 +308,23 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   }
 
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
+}
+
+int SVDSimpleClusterizerModule::getTriggerBin() const
+{
+
+
+  //first check SVDEventTInfo name
+  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  if (!temp_eventinfo.isOptional("SVDEventInfo"))
+    m_svdEventInfoName = "SVDEventInfoSim";
+
+  //then get Tigger Bin from SVDEventInfo
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  int triggerbin = eventinfo->getModeByte().getTriggerBin();
+
+  return triggerbin;
+
 }

@@ -137,6 +137,8 @@ namespace Belle2 {
     TH1F* h_quality{nullptr};
     /** Histogram: Fit quality flag for waveform type 'other'. */
     TH1F* h_quality_other{nullptr};
+    /** Histogram: Cell IDs w/ bad fit quality flag. */
+    TH1F* h_bad_quality{nullptr};
     /** Histogram: Trigger tag flag #1. */
     TH1F* h_trigtag1{nullptr};
     /** Histogram: Fraction of digits above ADC threshold. */

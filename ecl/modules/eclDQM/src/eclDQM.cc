@@ -103,6 +103,10 @@ void ECLDQMModule::defineHisto()
   h_quality_other->SetFillColor(kPink - 4);
   h_quality_other->SetOption("LIVE");
 
+  h_bad_quality = new TH1F("bad_quality", "Fraction of Cell IDs w/ bad quality flag (=3) above Thr. = 1 GeV", 8736, 1, 8737);
+  h_bad_quality->GetXaxis()->SetTitle("Cell IDs");
+  h_bad_quality->SetOption("LIVE");
+
   h_trigtag1 = new TH1F("trigtag1", "Trigger tag flag # 1", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Trigger tag flag #1");
   h_trigtag1->SetOption("LIVE");
@@ -264,6 +268,7 @@ void ECLDQMModule::beginRun()
   h_evtot_dphy->Reset();
   h_quality->Reset();
   h_quality_other->Reset();
+  h_bad_quality->Reset();
   h_trigtag1->Reset();
   h_adc_hits->Reset();
   h_cell_psd_norm->Reset();
@@ -304,6 +309,7 @@ void ECLDQMModule::event()
   for (auto& aECLDigit : m_ECLDigits) {
     int i = aECLDigit.getCellId() - 1;
     h_quality->Fill(aECLDigit.getQuality());  //Fit quality histogram filling.
+    if (aECLDigit.getAmp() > 2.e04 && aECLDigit.getQuality() == 3) h_bad_quality->Fill(aECLDigit.getCellId());
     if (aECLDigit.getAmp() >= (v_totalthrApsd[i] / 4 * 4)) NDigits ++;
     for (const auto& id : m_WaveformOption) {
       if (id != "psd") continue;

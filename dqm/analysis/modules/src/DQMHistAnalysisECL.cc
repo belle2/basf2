@@ -151,10 +151,11 @@ void DQMHistAnalysisECLModule::event()
   c_quality_other->Modified();
   c_quality_other->Update();
 
-  //cid_Thr%1%MeV, wf_cid_%1%, wf_sh_%1%, wf_cr_%1%
+  //bad_quality ,cid_Thr%1%MeV, wf_cid_%1%, wf_sh_%1%, wf_cr_%1%
   TH1* h_evtot = findHist("ECL/event");
   if (h_evtot != NULL) {
     Double_t events = h_evtot->GetBinContent(1);
+    normalize("ECL/c_bad_quality", "ECL/bad_quality", events);
     for (const auto& id : m_HitMapThresholds)
       normalize(str(boost::format("ECL/c_cid_Thr%1%MeV") % id),
                 str(boost::format("ECL/cid_Thr%1%MeV") % id), events);

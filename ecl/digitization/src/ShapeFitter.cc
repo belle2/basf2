@@ -234,8 +234,10 @@ lam:
     C1 += (1 << (k_c - 1));
     C1 >>= k_c;
   }
-  ch2 = (A1** (f + it * 16) + B1** (f1 + it * 16)) >> k1_chi;
-  ch2 += C1;
+  // [redundantAssignment]
+  // ch2 = (A1** (f + it * 16) + B1** (f1 + it * 16)) >> k1_chi;
+  // ch2 += C1;
+
   //  ch2 = z0 - *n16 * ch2;
   ch2 = z00 - *n16 * C1;
   ch1 = ((ch2) * (ch2));

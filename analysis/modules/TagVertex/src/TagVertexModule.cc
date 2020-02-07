@@ -36,6 +36,8 @@
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
 
+// vertex fitting
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 // msdt dataobject
 #include <mdst/dataobjects/MCParticle.h>
@@ -114,7 +116,7 @@ namespace Belle2 {
     particles.registerRelationTo(verArray);
     //check if the fitting algorithm name  is set correctly
     if (m_fitAlgo != "Rave" && m_fitAlgo != "KFit")
-      B2ERROR("TagVertexModule::makeGeneralFit: invalid fitting algorithm (must be set to either Rave or KFit).");
+      B2ERROR("TagVertexModule: invalid fitting algorithm (must be set to either Rave or KFit).");
     //temporary while the one track fit is broken
     if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD")
       B2ERROR("TagVertexModule : the singleTrack option is temporarily broken.");

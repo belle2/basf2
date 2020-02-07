@@ -24,12 +24,6 @@
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <analysis/VertexFitting/KFit/MassFitKFit.h>
-#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
-#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
-#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 
 // DataObjects
 #include <mdst/dataobjects/Track.h>
@@ -131,7 +125,7 @@ namespace Belle2 {
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
     bool m_verbose;               /**< choose if you want to print extra infos */
-    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter */
+    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter) */
     TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
 
 

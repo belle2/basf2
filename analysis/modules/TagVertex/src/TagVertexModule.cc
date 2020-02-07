@@ -1145,7 +1145,7 @@ namespace Belle2 {
     const double mpi = Const::pionMass;
     const double mks = Const::K0Mass;
     double Mass = 0.0;
-    // remove traks from KS
+    // remove tracks from KS
     for (unsigned int i = 0; i < tagTracks.size(); i++) {
       const Track* trak1 = tagTracks[i];
       const TrackFitResult* trak1Res = nullptr;
@@ -1156,7 +1156,7 @@ namespace Belle2 {
       if (!trak1Res) continue;
 
       bool isKsDau = false;
-      for (unsigned int j = 0; j < tagTracks.size(); j++) {
+      for (unsigned int j = 0; j < tagTracks.size() && !isKsDau; j++) {
         if (i != j) {
           const Track* trak2 = tagTracks[j];
           const TrackFitResult* trak2Res = nullptr;
@@ -1307,7 +1307,6 @@ namespace Belle2 {
 
     vector<TrackAndWeight> trackAndWeights;
     getTracksWithoutKS(m_tagTracks, trackAndWeights);
-    vector<Particle> particles;
     const int dummyIndex(0);
     int nTracksAdded(0);
 
@@ -1315,10 +1314,9 @@ namespace Belle2 {
       const TrackFitResult* trackRes(NULL);
       trackRes = trackAndWeights.at(i).track;
 
-      particles.push_back(Particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211)));
-
       int addedOK;
-      addedOK = kFit.addParticle(&particles.at(i));
+      Particle particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
+      addedOK = kFit.addParticle(&particle);
 
       if (addedOK != 0) {
         B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
@@ -1341,7 +1339,7 @@ namespace Belle2 {
     isGoodFit = kFit.doFit();
 
     //save the track info for later use
-    //Tracks are sorted from highest rave weight to lowest
+    //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list
 
     unsigned int n(trackAndWeights.size());
     sort(trackAndWeights.begin(), trackAndWeights.end(), compare);

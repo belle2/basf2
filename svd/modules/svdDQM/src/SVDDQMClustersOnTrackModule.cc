@@ -19,6 +19,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -55,6 +56,7 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
   addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
+  addParam("TB", m_tb, "trigger bin", int(-1));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDClsTrk"));
 
@@ -89,11 +91,11 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   }
 
   int ChargeBins = 80;
-  float ChargeMax = 80;
+  float ChargeMax = 160;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 50;
-  float TimeMin = -100;
+  int TimeBins = 100; //120;
+  float TimeMin = -100; // -20;
   float TimeMax = 100;
 
   int MaxBinBins = 6;
@@ -246,6 +248,10 @@ void SVDDQMClustersOnTrackModule::beginRun()
 
 void SVDDQMClustersOnTrackModule::event()
 {
+  StoreObjPtr<SVDEventInfo> evt;
+  if (m_tb != -1)
+    if (evt->getModeByte().getTriggerBin() != m_tb)
+      return;
 
   //check HLT decision and increase number of events only if the event has been accepted
 

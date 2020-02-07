@@ -11,33 +11,36 @@
 
 
 import os
-from basf2 import *
+import random
+import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_tracking_reconstruction, add_ecl_modules
+from reconstruction import add_tracking_reconstruction
+from reconstruction import add_ecl_modules
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
-eventinfoprinter = register_module('EventInfoPrinter')
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfoprinter = b2.register_module('EventInfoPrinter')
 
 # Create geometry
 # Geometry parameter loader
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 
 # Geometry builder
-geometry = register_module('Geometry')
+geometry = b2.register_module('Geometry')
 
 # Simulation
-g4sim = register_module('FullSim')
+g4sim = b2.register_module('FullSim')
 
 # one event
-eventinfosetter.param({'evtNumList': [3], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [3],
+                       'runList': [1],
+                       'expList': [0]})
 
-import random
 intseed = random.randint(1, 10000000)
 
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22, 111],
     'nTracks': 6,
@@ -55,13 +58,13 @@ param_pGun = {
 
 pGun.param(param_pGun)
 
-eclDigi = register_module('ECLDigitizer')
-eclHit = register_module('ECLHitDebug')
+eclDigi = b2.register_module('ECLDigitizer')
+eclHit = b2.register_module('ECLHitDebug')
 
-makeMatch = register_module('MCMatcherECLClusters')
+makeMatch = b2.register_module('MCMatcherECLClusters')
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 add_simulation(main)
@@ -72,9 +75,9 @@ main.add_module(eclHit)
 
 add_ecl_modules(main)
 
-simpleoutput = register_module('RootOutput')
+simpleoutput = b2.register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

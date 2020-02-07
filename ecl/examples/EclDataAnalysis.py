@@ -12,29 +12,29 @@
 ########################################################
 
 # import os
-# import random
-from basf2 import *
-import glob
-from ROOT import Belle2
-from modularAnalysis import *
+# import glob
+import random
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Event setting and info
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [100],
+                       'runList': [1],
+                       'expList': [0]})
+
 main.add_module(eventinfosetter)
 
 # random number for generation
-import random
 intseed = random.randint(1, 1)
 
 # generator settings
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [13],
     'nTracks': 1,
@@ -57,15 +57,15 @@ main.add_module(pGun)
 add_simulation(main)
 add_reconstruction(main)
 
-# display = register_module('Display')
+# display = b2.register_module('Display')
 # main.add_module(display)
 
 # eclDataAnalysis module
-ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis = b2.register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', 'EclDataAnalysis_Test.root')
 ecldataanalysis.param('doTracking', 1)
 ecldataanalysis.param('doPureCsIStudy', 0)
 main.add_module(ecldataanalysis)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

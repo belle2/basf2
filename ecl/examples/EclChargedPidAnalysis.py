@@ -12,31 +12,29 @@
 #
 ###############################################################
 
-from basf2 import *
-from ROOT import Belle2
-from modularAnalysis import *
-import os.path
 import sys
+import basf2 as b2
 
 particle_type = sys.argv[1]
 file_num = sys.argv[2]
 
 # Input File
-inputFile = register_module('RootInput')
-inputFile.param('inputFileName', './MDST_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
+inputFile = b2.register_module('RootInput')
+inputFile.param('inputFileName',
+                './MDST_pdg{}_BGx1_{}.root'.format(particle_type, file_num))
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 main.add_module(inputFile)
 
 # ECLChargedPIDDataAnalysis module
-eclchargedpid = register_module('ECLChargedPIDDataAnalysis')
+eclchargedpid = b2.register_module('ECLChargedPIDDataAnalysis')
 eclchargedpid.param(
     'rootFileName',
-    './RootOut_pdg' + str(particle_type) + '_BGx1_' + str(file_num) + '.root')
+    './RootOut_pdg{}_BGx1_{}.root'.format(particle_type, file_num))
 
 main.add_module(eclchargedpid)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

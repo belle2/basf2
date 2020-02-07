@@ -12,13 +12,11 @@
 #
 ########################################################
 
-from basf2 import *
+import sys
 import glob
-from ROOT import Belle2
-from modularAnalysis import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
-from beamparameters import add_beamparameters
 
 particle_type = sys.argv[1]  # particle mc pdg code
 p_min = sys.argv[2]  # input in MeV
@@ -28,18 +26,21 @@ theta_max = sys.argv[5]  # input in deg
 file_num = sys.argv[6]  # file numbering scheme
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Event setting and info
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100], 'runList': [1]})
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [100],
+                       'runList': [1],
+                       'expList': [0]})
+
 main.add_module(eventinfosetter)
 
-set_random_seed(123456)
-set_log_level(LogLevel.ERROR)
+b2.set_random_seed(123456)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # generator settings
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [int(particle_type)],
     'nTracks': 1,
@@ -57,16 +58,17 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-
 # include beam background
 bg = glob.glob('/group/belle2/BGFile/OfficialBKG/15thCampaign/bgoverlay_phase3/bgoverlay*.root')
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
 
 # output file
-output = register_module('RootOutput')
-output.param('outputFileName', './MDST_pdg'+str(particle_type)+'_BGx1_'+str(file_num)+'.root')
+output = b2.register_module('RootOutput')
+output.param('outputFileName',
+             './MDST_pdg{}_BGx1_{}.root'.format(particle_type, file_num))
+
 main.add_module(output)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

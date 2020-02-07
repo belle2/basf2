@@ -10,14 +10,13 @@
 # Guglielmo De Nardo - 2015 Belle II Collaboration
 ########################################################
 
-import os
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
-from beamparameters import add_beamparameters
-
 import sys
 import glob
+import basf2 as b2
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
+from beamparameters import add_beamparameters
 
 par = sys.argv
 argc = len(par)
@@ -41,14 +40,14 @@ generator = 0
 if (pdg == 0):
     generator = 1
 
-main = create_path()
+main = b2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 main.add_module(eventinfosetter)
 
 if (generator == 0):
     # single particle generator settings
-    pGun = register_module('ParticleGun')
+    pGun = b2.register_module('ParticleGun')
     param_pGun = {
         'pdgCodes': [pdg],
         'nTracks': 1,
@@ -69,7 +68,7 @@ if (generator == 0):
 else:
     # beam parameters
     beamparameters = add_beamparameters(main, "Y4S")
-    evtgeninput = register_module('EvtGenInput')
+    evtgeninput = b2.register_module('EvtGenInput')
     main.add_module(evtgeninput)
 
 
@@ -81,7 +80,7 @@ else:
 
 add_reconstruction(main, components='ECL')
 
-ecl_digitizerPureCsI = register_module('ECLDigitizerPureCsI')
+ecl_digitizerPureCsI = b2.register_module('ECLDigitizerPureCsI')
 ecl_digitizerPureCsI.param('adcTickFactor', 8)
 ecl_digitizerPureCsI.param('sigmaTrigger', 0.)
 ecl_digitizerPureCsI.param('elecNoise', elenoise)
@@ -95,16 +94,17 @@ if (withbg == 1):
 
 main.add_module(ecl_digitizerPureCsI)
 
-ecl_calibrator_PureCsI = register_module('ECLDigitCalibratorPureCsI')
+ecl_calibrator_PureCsI = b2.register_module('ECLDigitCalibratorPureCsI')
 main.add_module(ecl_calibrator_PureCsI)
-ecl_shower_rec_PureCsI = register_module('ECLReconstructorPureCsI')
+
+ecl_shower_rec_PureCsI = b2.register_module('ECLReconstructorPureCsI')
 main.add_module(ecl_shower_rec_PureCsI)
 
-ecl_digistudy = register_module('ECLDigiStudy')
+ecl_digistudy = b2.register_module('ECLDigiStudy')
 ecl_digistudy.param('outputFileName', digistudyfile)
 main.add_module(ecl_digistudy)
 
-# display = register_module('Display')
+# display = b2.register_module('Display')
 # main.add_module(display)
 
 add_mdst_output(
@@ -124,8 +124,8 @@ add_mdst_output(
         'ECLDigitsPureCsIToECLHits'])
 
 # Show progress of processing
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

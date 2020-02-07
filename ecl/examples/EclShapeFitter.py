@@ -6,9 +6,9 @@
 # received from ShaperDSP module.
 # --------------------------------------------------------------------------
 
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2, gSystem, gInterpreter
-from glob import glob
+import glob
 
 from ROOT import TFile, TTree
 from array import array
@@ -22,7 +22,7 @@ env = Belle2.Environment.Instance()
 
 # Name of input files (accepts glob expressions)
 FILE_LIST = []
-FILE_LIST = sorted(glob('/group/belle2/dataprod/Data/Raw/e0008/r03480/sub00/*.root'))
+FILE_LIST = sorted(glob.glob('/group/belle2/dataprod/Data/Raw/e0008/r03480/sub00/*.root'))
 
 # Override if "-i file.root" argument was sent to basf2.
 input_arg = env.getInputFilesOverride()
@@ -53,6 +53,7 @@ Uses ECLDigits, ECLDsps, ECLTrigs dataobjects
 
 
 class ShapeFitterModule(Module):
+
     def initialize(self):
         '''
         '''
@@ -106,10 +107,10 @@ class ShapeFitterModule(Module):
                     self.evtn += 1
 
 
-set_log_level(LogLevel.ERROR)
+b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path
-main = create_path()
+main = b2.create_path()
 
 # (Seq)Root input
 if FILE_LIST[0].endswith('sroot'):
@@ -125,16 +126,16 @@ main.add_module(ShapeFitterModule())
 
 main.add_module('Progress')
 
-reset_database()
-use_database_chain()
-use_central_database('data_reprocessing_prompt', LogLevel.WARNING)
-use_central_database('online', LogLevel.WARNING)
-use_local_database("localdb/database.txt")
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database('data_reprocessing_prompt', b2.LogLevel.WARNING)
+b2.use_central_database('online', b2.LogLevel.WARNING)
+b2.use_local_database("localdb/database.txt")
 
 # For exp9 data
-conditions.override_globaltags()
+b2.conditions.override_globaltags()
 
 # Process events
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

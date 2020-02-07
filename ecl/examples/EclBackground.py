@@ -12,8 +12,7 @@
 import os
 import sys
 import subprocess
-from basf2 import *
-from subprocess import call
+import basf2 as b2
 from reconstruction import add_ecl_modules
 
 print('\033[1m')  # makes console text bold
@@ -59,35 +58,35 @@ print('\033[0m')  # turns off bold text
 ARICH = False
 
 # Register necessary modules
-main = create_path()
+main = b2.create_path()
 
 # RootInput takes the Monte Carlo events and fills the datastore, so they can be accessed by other modules
-simpleinput = register_module('RootInput')
+simpleinput = b2.register_module('RootInput')
 simpleinput.param('inputFileNames', inputs)
 main.add_module(simpleinput)
 
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 main.add_module(gearbox)
 
 # If you want the ARICH plots, you need to load the geometry.
 if ARICH:
-    geometry = register_module('Geometry')
-    geometry.logging.log_level = LogLevel.WARNING
+    geometry = b2.register_module('Geometry')
+    geometry.logging.log_level = b2.LogLevel.WARNING
     main.add_module(geometry)
 
 # The ecl background module is a HistoModule. Any histogram registered in it will be written to file by the HistoManager module
-histo = register_module('HistoManager')  # Histogram Manager
+histo = b2.register_module('HistoManager')  # Histogram Manager
 histo.param('histoFileName', outfile)
 main.add_module(histo)
 
 # ecl Background study module
-eclBg = register_module('ECLBackground')
+eclBg = b2.register_module('ECLBackground')
 eclBg.param('sampleTime', sampletime)
 eclBg.param('doARICH', ARICH)
 eclBg.param('crystalsOfInterest', [318, 625, 107])  # If you want the dose for specific crystals, put the cell ID here
 
 # Digitization
-eclDigi = register_module('ECLDigitizer')
+eclDigi = b2.register_module('ECLDigitizer')
 main.add_module(eclDigi)
 
 # ECL reconstruction
@@ -97,6 +96,6 @@ add_ecl_modules
 main.add_module(eclBg)
 
 # run it
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

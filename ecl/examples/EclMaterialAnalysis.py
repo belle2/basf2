@@ -14,30 +14,33 @@
 #
 ########################################################
 
-import os
-from basf2 import *
+import random
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Event setting and info
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [100000], 'runList': [1]})
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param({'evtNumList': [100000],
+                       'runList': [1],
+                       'expList': [0]})
+
 main.add_module(eventinfosetter)
 
 # random number for generation
-import random
+
 # intseed = random.randint(1, 10000000)
-set_random_seed(123456)
+b2.set_random_seed(123456)
 
 # Create geometry
 # Geometry parameter loader
-# gearbox = register_module('Gearbox')
+# gearbox = b2.register_module('Gearbox')
 
 # Geometry builder
-# geometry = register_module('Geometry')
+# geometry = b2.register_module('Geometry')
 # geometry.param('components', ['ECL'])
 
 components = [  # 'MagneticField',
@@ -53,10 +56,10 @@ components = [  # 'MagneticField',
 ]
 
 # Simulation
-# g4sim = register_module('FullSim')
+# g4sim = b2.register_module('FullSim')
 
 # single particle generator settings
-pGun = register_module('ParticleGun')
+pGun = b2.register_module('ParticleGun')
 param_pGun = {
     'pdgCodes': [22],
     'nTracks': 1,
@@ -101,14 +104,14 @@ bkgFiles = [
 add_simulation(main)
 add_reconstruction(main)
 
-# display = register_module('Display')
+# display = b2.register_module('Display')
 # main.add_module(display)
 
 # eclDataAnalysis module
-ecldataanalysis = register_module('ECLDataAnalysis')
+ecldataanalysis = b2.register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', 'EclDataAnalysis_500MeV_100000_Full_FWD.root')
 ecldataanalysis.param('doTracking', 0)
 main.add_module(ecldataanalysis)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

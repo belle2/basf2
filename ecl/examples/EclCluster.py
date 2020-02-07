@@ -12,25 +12,23 @@
 # Example steering file - 2014 Belle II Collaboration
 ########################################################
 
-import os
-import glob
-from basf2 import *
+import basf2 as b2
 
 # Create paths
-main = create_path()
+main = b2.create_path()
 
 # Input file
 inputs = 'mdst_000544_prod00000001_task00000544.root'
 
-simpleinput = register_module('RootInput')
+simpleinput = b2.register_module('RootInput')
 simpleinput.param('inputFileNames', inputs)
 main.add_module(simpleinput)
 
 # eclDataAnalysis module
-eclanalysis = register_module('ECLClusterAnalysis')
+eclanalysis = b2.register_module('ECLClusterAnalysis')
 eclanalysis.param('rootFileName', 'EclClusterAnalysis.root')
 eclanalysis.param('doTracking', 1)
 main.add_module(eclanalysis)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

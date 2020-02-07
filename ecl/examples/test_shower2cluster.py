@@ -5,41 +5,43 @@
 # input file is /home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root
 # Output file is shower2cluster.root
 
-from basf2 import *
-from modularAnalysis import *
+import basf2 as b2
 
-import sys
-
-main = create_path()
+main = b2.create_path()
 
 # This is the module for ECLShower to ECLCluster
-showertocluster = register_module('ECLShowertoCluster')
+showertocluster = b2.register_module('ECLShowertoCluster')
 
-rootinput = register_module('RootInput')
 # now both files below work
-inFileROOT = \
-    '/home/belle2/harat/MCsample/charged_e0001r0001_s00_BGx1.mdst.root'
+inFileROOT = '/home/belle2/harat/MCsample/charged_e0001r0001_s00_BGx1.mdst.root'
 # inFileROOT = '/home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root'
 
+rootinput = b2.register_module('RootInput')
 rootinput.param('inputFileName', inFileROOT)
 main.add_module(rootinput)
 main.add_module(showertocluster)
 
-particleLoader = register_module('ParticleLoader')
+particleLoader = b2.register_module('ParticleLoader')
 main.add_module(particleLoader)
 
 # Save ECLCluster in rootfile
-output = register_module('RootOutput')
+output = b2.register_module('RootOutput')
 outFileROOT = 'shower2cluster.root'
 output.param('outputFileName', outFileROOT)
-branches = ['ECLShowers', 'ECLClusters', 'ECLClustersToTracks',
+
+branches = ['ECLShowers',
+            'ECLClusters',
+            'ECLClustersToTracks',
             'ECLClustersToMCParticles']
-branches += ['MCParticles', 'Tracks']
+
+branches += ['MCParticles',
+             'Tracks']
+
 output.param('branchNames', branches)
 main.add_module(output)
 
-# ----> start processing of modules
-process(main)
+# Start processing of modules
+b2.process(main)
 
-# ----> Print call statistics
-print(statistics)
+# Print call statistics
+print(b2.statistics)

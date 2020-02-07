@@ -30,28 +30,28 @@ basf2 -n N -i /path/to/input/DST/file.root EclChargedPidModuleTest.py
 
 """
 
-import basf2
+import basf2 as b2
 
 # Register necessary modules to this path.
-main_path = basf2.create_path()
+main_path = b2.create_path()
 
 # Add module to read input *DST file.
-simpleinput = basf2.register_module('RootInput')
+simpleinput = b2.register_module('RootInput')
 main_path.add_module(simpleinput)
 
 # Add the module to the path.
-eclid = basf2.register_module('ECLChargedPID')
+eclid = b2.register_module('ECLChargedPID')
 main_path.add_module(eclid)
 # Set debug options for this module.
-eclid.logging.log_level = basf2.LogLevel.DEBUG
+eclid.logging.log_level = b2.LogLevel.DEBUG
 eclid.logging.debug_level = 20
 
 # Print the data model objects in the store.
-printcolls = basf2.register_module('PrintCollections')
+printcolls = b2.register_module('PrintCollections')
 main_path.add_module(printcolls)
 
 # Start processing events.
-basf2.process(main_path)
+b2.process(main_path)
 
 # Get some statistics about the booked modules.
-print(basf2.statistics)
+print(b2.statistics)

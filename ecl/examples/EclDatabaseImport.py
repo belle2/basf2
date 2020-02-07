@@ -16,21 +16,21 @@
 #
 ########################################################
 
-from basf2 import *
+import sys
+import glob
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ECLDatabaseImporter
-import glob
-import sys
 
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
 # register event info setter
-eventinfo = register_module('EventInfoSetter')
+eventinfo = b2.register_module('EventInfoSetter')
 eventinfo.initialize()
 
 # register gearbox
-gearbox = register_module('Gearbox')
+gearbox = b2.register_module('Gearbox')
 gearbox.initialize()
 
 rootFiles = ROOT.vector('string')()

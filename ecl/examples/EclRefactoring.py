@@ -11,13 +11,11 @@
 #
 ########################################################
 
-import os
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import *
-
-import sys
 import glob
+import basf2 as b2
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
 
 # user input
 withbg = 0  # add beam background yes/no
@@ -26,20 +24,20 @@ seed = 10000  # seed for random numbers
 mdstfile = 'eclrefactoring.root'  # output file
 
 # set log level
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # fix random seed
-set_random_seed(seed)
+b2.set_random_seed(seed)
 
 # create main path
-main = create_path()
+main = b2.create_path()
 
 # add event infosetter
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 main.add_module(eventinfosetter)
 
 # add generator
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # add default full simulation and digitization
@@ -68,8 +66,8 @@ add_mdst_output(
         'ECLLocalMaximums'])
 
 # Show progress of processing
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

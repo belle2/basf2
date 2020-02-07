@@ -34,7 +34,10 @@ ECLDQMInjectionModule::ECLDQMInjectionModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("ECLINJ"));
   addParam("ECLDigitsName", m_ECLDigitsName, "Name of ECL hits", std::string(""));
-  addParam("BeamRevolutionCycle", m_revolutionTime, "Beam revolution cycle in musec", 10.07874);
+  // BeamRevolutionCycle is set based on 'Timing distribution for the Belle II
+  // data acquistion system'. RF clock of 508 MHz is synchronized to
+  // beam-revolution cycle (5120 RF bunches in one cycle).
+  addParam("BeamRevolutionCycle", m_revolutionTime, "Beam revolution cycle in musec", 5120 / 508.);
   addParam("ECLThresholdforVetoTuning", m_ECLThresholdforVetoTuning, "ECL Threshold for injection veto tuning, ADC channels", 400.);
 }
 

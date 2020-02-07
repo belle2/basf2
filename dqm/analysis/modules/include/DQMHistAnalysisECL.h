@@ -83,7 +83,7 @@ namespace Belle2 {
 
     /** Find TCanvas by name. */
     TCanvas* findCanv(TString);
-    /** Normalize hitsograms. */
+    /** Normalize histograms. */
     void normalize(std::string, std::string, Double_t);
   };
 } // end namespace Belle2

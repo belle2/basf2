@@ -219,7 +219,7 @@ namespace Belle2 {
     {
 
       //take the MaxSum 3 samples
-      std::vector<float> clustered3s = getMaxSum3Samples();
+      std::vector<float> clustered3s = getMaxSum3Samples().second;
       auto begin = clustered3s.begin();
       const auto end = clustered3s.end();
 
@@ -230,7 +230,10 @@ namespace Belle2 {
         norm += static_cast<double>(*begin);
         retval += static_cast<double>(*begin) * step;
       }
-      return retval / norm;
+      float rawtime = retval / norm;
+      float caltime = rawtime;
+      float clstime = caltime + stepSize * getMaxSum3Samples().first;//apply First Frame correction
+      return clstime;
 
     }
 
@@ -238,7 +241,7 @@ namespace Belle2 {
     {
 
       //take the MaxSum 3 samples
-      std::vector<float> clustered3s = getMaxSum3Samples();
+      std::vector<float> clustered3s = getMaxSum3Samples().second;
       const auto begin = clustered3s.begin();
 
       //calculate 'raw' ELS hit-time
@@ -248,7 +251,10 @@ namespace Belle2 {
                    -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
       auto denom = 1 - std::exp(-4 * stepSize / tau) - (1 + std::exp(-2 * stepSize / tau) / 2) * (*begin - std::exp(
                      -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
-      return - num / denom;
+      float rawtime = - num / denom;
+      float caltime = rawtime;
+      float clstime = caltime + stepSize * getMaxSum3Samples().first;//apply First Frame correction
+      return clstime;
 
     }
     float SimpleClusterCandidate::get3SampleCoGTimeError() const
@@ -287,14 +293,14 @@ namespace Belle2 {
         const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>("SVDShaperDigits");
         if (!shaperdigit) B2ERROR("No shaperdigit for strip!?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
-        for (int iSample = 0; iSample < APVsamples.size(); ++iSample)
+        for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
           returnSamples.at(iSample) += APVsamples.at(iSample);
       }
 
       return returnSamples;
     }
 
-    std::vector<float> SimpleClusterCandidate::getMaxSum3Samples() const
+    std::pair<int, std::vector<float>> SimpleClusterCandidate::getMaxSum3Samples() const
     {
 
       //take the cluster samples
@@ -303,13 +309,13 @@ namespace Belle2 {
       //Max Sum selection
       if (clsSamples.size() < 3) B2ERROR("APV25 samples less than 3!?");
       std::vector<float> Sum2bin(clsSamples.size() - 1, 0);
-      for (int iBin = 0; iBin < clsSamples.size() - 1; ++iBin)
+      for (int iBin = 0; iBin < static_cast<int>(clsSamples.size()) - 1; ++iBin)
         Sum2bin.at(iBin) = clsSamples.at(iBin) + clsSamples.at(iBin + 1);
       auto itSum = std::max_element(std::begin(Sum2bin), std::end(Sum2bin));
       int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
       if (ctrFrame == 0) ctrFrame = 1;
       std::vector<float> clustered3s = {clsSamples.at(ctrFrame - 1), clsSamples.at(ctrFrame), clsSamples.at(ctrFrame + 1)};
-      return clustered3s;
+      return std::make_pair(ctrFrame - 1, clustered3s);
 
     }
 

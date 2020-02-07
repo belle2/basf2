@@ -124,7 +124,12 @@ namespace Belle2 {
        * sample-by-sample all the strips on the cluster
        */
       Belle2::SVDShaperDigit::APVFloatSamples getClsSamples() const;
-      std::vector<float> getMaxSum3Samples() const;
+      /**
+       * returns the float vector of clustered 3-samples
+       * selected by the MaxSum method
+       * with First Frame of the selection
+       */
+      std::pair<int, std::vector<float>> getMaxSum3Samples() const;
 
       /**
        * return the position of the cluster

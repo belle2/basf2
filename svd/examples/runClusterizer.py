@@ -83,6 +83,10 @@ if not data:
 
 add_svd_reconstruction(main)
 
+for m in main.modules():
+    if "SVDSimpleClusterizer" == m.name():
+        m.param("timeAlgorithm", 1)
+
 main.add_module('RootOutput', outputFileName=fileout)
 # Show progress
 main.add_module('Progress')

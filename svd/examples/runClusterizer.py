@@ -14,6 +14,7 @@
 
 import os
 import glob
+import sys
 
 from basf2 import *
 from basf2 import conditions as b2conditions
@@ -21,6 +22,7 @@ from rawdata import add_unpackers
 from simulation import add_simulation
 from svd import add_svd_reconstruction
 
+alg = int(sys.argv[1])
 data = False  # True
 unpack = True
 if not data:
@@ -46,11 +48,16 @@ bkg = glob.glob('/group/belle2/BGFile/OfficialBKG/early_phase3/prerelease-04-00-
 # needed for some temporary issues with BKLMDisplacement payload
 if data:
     b2conditions.override_globaltags()
-    b2conditions.globaltags = ['klm_alignment_testing', 'online']
+    b2conditions.globaltags = ['svd_timeCalibration_test', 'klm_alignment_testing', 'online']
+else:
+    b2conditions.globaltags = ['svd_timeCalibration_test']
+
+# svd_timeCalibration_test CONTENT:
+# exp 0, run 0: no calibration applied: returned time from the database = raw time
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [1003])
-eventinfosetter.param('runList', [1])
+eventinfosetter.param('expList', [0])
+eventinfosetter.param('runList', [0])
 
 evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
@@ -76,18 +83,19 @@ if data and unpack:
 
 if not data:
     main.add_module('FullSim')
-    add_simulation(main, bkgfiles=bkg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+    add_simulation(main, bkgfiles=None, usePXDDataReduction=False, forceSetPXDDataReduction=True)
+#    add_simulation(main, bkgfiles=bkg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
 if not data:
-    fileout = 'SVD3SampleClusterizer_MC.root'
+    fileout = 'SVD3SampleClusterizer_MCnoBKG_timeAlg'+str(alg)+'.root'
 
 add_svd_reconstruction(main)
 
 for m in main.modules():
     if "SVDSimpleClusterizer" == m.name():
-        m.param("timeAlgorithm", 1)
+        m.param("timeAlgorithm", alg)
 
-main.add_module('RootOutput', outputFileName=fileout)
+main.add_module('RootOutput', outputFileName=fileout, branchNames=['SVDClusters'])
 # Show progress
 main.add_module('Progress')
 

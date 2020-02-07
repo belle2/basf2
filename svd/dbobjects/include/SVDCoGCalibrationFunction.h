@@ -42,7 +42,7 @@ namespace Belle2 {
     /** constructor */
     SVDCoGCalibrationFunction()
     {
-      B2INFO("SVDCOGCalibrationFunction constructor");
+      //      B2INFO("SVDCOGCalibrationFunction constructor");
 
       // The m_implementations vector is static.
       // We have to initialize it just once.
@@ -54,7 +54,7 @@ namespace Belle2 {
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
 
-      B2INFO("SVDCOGCalibrationFunction filled m_implementations");
+      //      B2INFO("SVDCOGCalibrationFunction filled m_implementations");
 
       // The m_implementationsErr vector is static.
       // We have to initialize it just once.
@@ -66,7 +66,7 @@ namespace Belle2 {
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
 
-      B2INFO("SVDCOGCalibrationFunction filled m_implementationsErr");
+      //      B2INFO("SVDCOGCalibrationFunction filled m_implementationsErr");
 
       m_current = m_implementations.size() - 1;
 

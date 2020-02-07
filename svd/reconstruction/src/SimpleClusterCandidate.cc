@@ -95,8 +95,13 @@ namespace Belle2 {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
         m_charge += aStrip.charge;
-        m_time += aStrip.time /  aStrip.timeError / aStrip.timeError;
-        weightSum +=  aStrip.timeError / aStrip.timeError;
+        m_time += aStrip.time * aStrip.charge;
+        //FIXME: use error to weight the time of each strip in the cluster
+        // it seems to yield a worst resolution vs EventT0 and an additional 1 ns bias
+        //  float tmp_sigmaSquared = aStrip.timeError / aStrip.timeError;
+        //  m_time += aStrip.time / tmp_sigmaSquared;
+        //  weightSum +=  tmp_sigmaSquared;
+        // additional change also below: m_time /= weightSum instead of m_time/=m_charge
         noise += aStrip.noise * aStrip.noise;
       }
 
@@ -106,7 +111,8 @@ namespace Belle2 {
       }
 
       noise = sqrt(noise);
-      m_time /= weightSum;
+      m_time /= m_charge;
+      //      m_time /= weightSum;
       m_timeError = 1. / TMath::Sqrt(weightSum);
       m_SNR = m_charge / noise;
 

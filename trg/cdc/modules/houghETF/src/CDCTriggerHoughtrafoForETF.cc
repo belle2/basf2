@@ -817,33 +817,27 @@ CDCTriggerHoughETFModule::calcEventTiming()
   std::vector<int> ftlists;
   for (long unsigned int iTrack = 0; iTrack < associatedTSHitsList.size(); iTrack++) {
     for (long unsigned int iHit = 0; iHit < associatedTSHitsList[iTrack].size(); iHit++) {
-      short fts = (!m_usePriority) ? associatedTSHitsList[iTrack][iHit]->fastestTime()
+      short fts = (!m_usePriorityTiming) ? associatedTSHitsList[iTrack][iHit]->fastestTime()
                   : associatedTSHitsList[iTrack][iHit]->priorityTime();
       ftlists.push_back(fts);
     }
   }
-  if (m_t0CalcMethod == 1) {
+  if (m_t0CalcMethod == 0) {
     return ftlists[m_arrivalOrder];
+  } else if (m_t0CalcMethod == 1) {
+    return median(ftlists) & -2;
   } else {
-    return medianMean(ftlists, m_nHitsAverage);
+    return medianInTimeWindow(ftlists) & -2;
   }
 }
 
-int CDCTriggerHoughETFModule::median(std::vector<int> v)
+int
+CDCTriggerHoughETFModule::median(std::vector<int> v)
 {
   int size = v.size();
   std::vector<int> _v;
   copy(v.begin(), v.end(), back_inserter(_v));
-  float tmp;
-  for (int i = 0; i < size - 1; i++) {
-    for (int j = i + 1; j < size; j++) {
-      if (_v[i] > _v[j]) {
-        tmp = _v[i];
-        _v[i] = _v[j];
-        _v[j] = tmp;
-      }
-    }
-  }
+  std::sort(_v.begin(), _v.end());
   if (size % 2 == 1) {
     return _v[(size - 1) / 2];
   } else {
@@ -851,11 +845,19 @@ int CDCTriggerHoughETFModule::median(std::vector<int> v)
   }
 }
 
-float
-CDCTriggerHoughETFModule::medianMean(std::vector<int> v, int order)
+int
+CDCTriggerHoughETFModule::medianInTimeWindow(std::vector<int> v)
 {
-  int med = (int)median(v);
-  for (int& i : v) i = abs(i - med);
-  std::sort(v.begin(), v.end());
-  return std::accumulate(v.begin(), v.begin() + order - 1, 0) / order + med;
+  int med = median(v) & -2; // digitization
+  int tstart = med - m_timeWindowStart;
+  int tend   = med - m_timeWindowEnd;
+
+  std::vector<int> _inWindow;
+
+  for (auto& t : v)  if (t > tstart && t <= tend) _inWindow.push_back(t);
+  if (_inWindow.size() == 0) {
+    return med & -2;
+  } else {
+    return median(_inWindow) & -2;
+  }
 }

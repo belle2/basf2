@@ -13,6 +13,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
+from basf2 import conditions as b2conditions
 import datetime
 import os
 
@@ -30,8 +31,9 @@ class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
         timeCal.set_scale(1., 1., 1., 1.)
         timeCal.set_current(0)
 
+        # take the base class payload because it is the same for all calibrations
         payload = Belle2.SVDCoGTimeCalibrations.t_payload(
-            timeCal, "CoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_1stOrderPol__alpha=1_beta=0")
+            timeCal, "6SampleCoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_1stOrderPol__alpha=1_beta=0")
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
@@ -46,14 +48,14 @@ class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
         timeCal.set_pol3parameters(0., 1., 0., 0.)
         timeCal.set_current(1)
 
+        # take the base class payload because it is the same for all calibrations
         payload = Belle2.SVDCoGTimeCalibrations.t_payload(
-            timeCal, "CoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_a=0_b=1_c=0_d=0")
+            timeCal, "6SampleCoGTimeCalibrations_default_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_a=0_b=1_c=0_d=0")
 
         Belle2.Database.Instance().storeData(Belle2.SVDCoGTimeCalibrations.name, payload, iov)
 
 
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultCoGcalibration/database.txt", "localDB_defaultCoGcalibration")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 

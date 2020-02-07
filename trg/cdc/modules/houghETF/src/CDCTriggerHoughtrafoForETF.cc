@@ -832,7 +832,7 @@ CDCTriggerHoughETFModule::calcEventTiming()
 int CDCTriggerHoughETFModule::median(std::vector<int> v)
 {
   int size = v.size();
-  std::vector<int> _v(v.size());
+  std::vector<int> _v;
   copy(v.begin(), v.end(), back_inserter(_v));
   float tmp;
   for (int i = 0; i < size - 1; i++) {

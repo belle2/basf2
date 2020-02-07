@@ -14,6 +14,9 @@
 #include <svd/geometry/SensorInfo.h>
 #include <framework/core/Environment.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -215,31 +218,38 @@ namespace Belle2 {
     float SimpleClusterCandidate::get3SampleCoGTime() const
     {
 
-      //take the cluster samples
-      Belle2::SVDShaperDigit::APVFloatSamples clSamples = getClsSamples();
+      //take the MaxSum 3 samples
+      std::vector<float> clustered3s = getMaxSum3Samples();
+      auto begin = clustered3s.begin();
+      const auto end = clustered3s.end();
 
-      /**
-       *
-       * actual algorithm implementation, Yuma
-       *
-       *
-       */
+      //calculate 'raw' CoG3 hit-time
+      constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
+      auto retval = 0., norm = 0.;
+      for (auto step = 0.; begin != end; ++begin, step += stepSize) {
+        norm += static_cast<double>(*begin);
+        retval += static_cast<double>(*begin) * step;
+      }
+      return retval / norm;
 
-      return 0;
     }
+
     float SimpleClusterCandidate::get3SampleELSTime() const
     {
 
-      //take the cluster samples
-      Belle2::SVDShaperDigit::APVFloatSamples clSamples = getClsSamples();
+      //take the MaxSum 3 samples
+      std::vector<float> clustered3s = getMaxSum3Samples();
+      const auto begin = clustered3s.begin();
 
-      /**
-       *
-       * actual algorithm implementation, Yuma
-       *
-       *
-       */
-      return 0;
+      //calculate 'raw' ELS hit-time
+      constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
+      constexpr auto tau = 55;//ELS time constant, default55
+      auto num = 2 * stepSize * std::exp(-4 * stepSize / tau) + std::exp(-2 * stepSize / tau) * stepSize / 2 * (*begin - std::exp(
+                   -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
+      auto denom = 1 - std::exp(-4 * stepSize / tau) - (1 + std::exp(-2 * stepSize / tau) / 2) * (*begin - std::exp(
+                     -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
+      return - num / denom;
+
     }
     float SimpleClusterCandidate::get3SampleCoGTimeError() const
     {
@@ -269,10 +279,40 @@ namespace Belle2 {
       //4. sum each sample for each strip accessed in the loop
       //5. you are done
 
-      Belle2::SVDShaperDigit::APVFloatSamples returnSamples;
+      Belle2::SVDShaperDigit::APVFloatSamples returnSamples = {0, 0, 0, 0, 0, 0};
+      //FIXME: the name of the StoreArray of RecoDigits and ShaperDigits
+      // must taken from the SimpleClusterizer.
+      const StoreArray<SVDRecoDigit> m_storeRecoDigits("SVDRecoDigits");
+      for (auto istrip : m_strips) {
+        const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>("SVDShaperDigits");
+        if (!shaperdigit) B2ERROR("No shaperdigit for strip!?");
+        Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
+        for (int iSample = 0; iSample < APVsamples.size(); ++iSample)
+          returnSamples.at(iSample) += APVsamples.at(iSample);
+      }
 
       return returnSamples;
     }
+
+    std::vector<float> SimpleClusterCandidate::getMaxSum3Samples() const
+    {
+
+      //take the cluster samples
+      Belle2::SVDShaperDigit::APVFloatSamples clsSamples = getClsSamples();
+
+      //Max Sum selection
+      if (clsSamples.size() < 3) B2ERROR("APV25 samples less than 3!?");
+      std::vector<float> Sum2bin(clsSamples.size() - 1, 0);
+      for (int iBin = 0; iBin < clsSamples.size() - 1; ++iBin)
+        Sum2bin.at(iBin) = clsSamples.at(iBin) + clsSamples.at(iBin + 1);
+      auto itSum = std::max_element(std::begin(Sum2bin), std::end(Sum2bin));
+      int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
+      if (ctrFrame == 0) ctrFrame = 1;
+      std::vector<float> clustered3s = {clsSamples.at(ctrFrame - 1), clsSamples.at(ctrFrame), clsSamples.at(ctrFrame + 1)};
+      return clustered3s;
+
+    }
+
 
 
   }  //SVD namespace

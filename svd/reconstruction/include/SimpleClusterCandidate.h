@@ -98,7 +98,7 @@ namespace Belle2 {
        */
       float get3SampleCoGTime() const;
       /**
-       * return the time of the cluster for the 2-sample ELS
+       * return the time of the cluster for the 3-sample ELS
        */
       float get3SampleELSTime() const;
 
@@ -124,6 +124,7 @@ namespace Belle2 {
        * sample-by-sample all the strips on the cluster
        */
       Belle2::SVDShaperDigit::APVFloatSamples getClsSamples() const;
+      std::vector<float> getMaxSum3Samples() const;
 
       /**
        * return the position of the cluster

@@ -4,8 +4,6 @@
 from basf2 import *
 from tracking.path_utils import *
 
-from tracking.modules import RegisterEventLevelTrackingInfo
-
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trackFitHypotheses=None,
@@ -208,7 +206,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module(RegisterEventLevelTrackingInfo())
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     # output tracks
     cdc_reco_tracks = "CDCRecoTracks"
@@ -284,7 +282,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module(RegisterEventLevelTrackingInfo())
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
@@ -365,12 +363,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     if not is_svd_used(components):
         return
 
-    # register EventTrackingInfo
-    if 'RegisterEventLevelTrackingInfoForPXDDataReduction' not in path:
-        registerEventlevelTrackingInfo = register_module(RegisterEventLevelTrackingInfo("EventLevelTrackingInfo__ROI"))
-        registerEventlevelTrackingInfo.set_name('RegisterEventLevelTrackingInfoForPXDDataReduction')
-        path.add_module(registerEventlevelTrackingInfo)
-
     # Material effects
     if 'SetupGenfitExtrapolation' not in path:
         material_effects = register_module('SetupGenfitExtrapolation')
@@ -379,7 +371,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
         path.add_module(material_effects)
 
     # SET StoreArray names
-
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
@@ -387,8 +378,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-
-    # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
@@ -424,7 +413,7 @@ def add_vxd_standalone_cosmics_finder(
 
     # register EventTrackingInfo
     if 'RegisterEventLevelTrackingInfo' not in path:
-        path.add_module(RegisterEventLevelTrackingInfo())
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)

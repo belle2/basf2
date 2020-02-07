@@ -147,6 +147,9 @@ namespace Belle2 {
 
     /* BKLM parameters. */
 
+    /** Debug BKLM scintillators. */
+    bool m_DebugBKLMScintillators;
+
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;
 

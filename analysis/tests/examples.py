@@ -7,7 +7,7 @@ import subprocess
 import unittest
 import glob
 from basf2 import find_file
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, skip_test_if_light
 
 
 class ExamplesTest(unittest.TestCase):
@@ -42,6 +42,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported calibration examples.
         """
+        skip_test_if_light(self)  # calibration dataobjects not supported in light releases
+
         # list of the broken examples (to be removed when they are individually fixed)
         broken_cal_egs = ['B2CAL901-cDSTECLTRG.py'  # BII-4276
                           ]
@@ -90,6 +92,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported simulation examples.
         """
+        skip_test_if_light(self)  # simulation doesn't work in light releaes
+
         # list of the broken examples (to be removed when they are individually fixed)
         broken_sim_egs = ['B2A104-SimulateAndReconstruct-withBeamBkg.py'
                           ]

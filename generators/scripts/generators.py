@@ -11,6 +11,7 @@ Contact: Torben Ferber (ferber@physics.ubc.ca)
 from basf2 import *
 from ROOT import Belle2
 import os
+import pdg
 
 
 def get_default_decayfile():
@@ -83,32 +84,41 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): either "e+e-e+e-" or "e+e-mu+mu-"
+        finalstate (str): either "e+e-e+e-", "e+e-mu+mu-" or "mu+mu-mu+mu-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
     """
 
     aafh = register_module('AafhInput')
-    aafh_mode = 5
-    if not subweights:  # default subweights are for minmass=0.5
-        aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
-    else:
-        aafh_subgeneratorWeights = subweights
-    aafh_maxSubgeneratorWeight = maxsubweight
-    aafh_maxFinalWeight = maxfinalweight
-
-    if abs(minmass - 0.5) > 0.01 and not subweights:
-        B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
 
     if finalstate == 'e+e-e+e-':
-        pass
+        aafh_mode = 5
+        if not subweights:  # default subweights are for minmass=0.5
+            aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
         if not subweights:
             aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
         else:
             aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+    elif finalstate == 'mu+mu-mu+mu-':
+        aafh_mode = 2
+        minmass = 0
+        maxsubweight = 3
+        if not subweights:
+            aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 3.726e+00, 1.000e+00, 1.778e+00, 1.000e+00, 1.094e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
     else:
         B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
+
+    aafh_maxSubgeneratorWeight = maxsubweight
+    aafh_maxFinalWeight = maxfinalweight
 
     aafh = path.add_module(
         'AafhInput',
@@ -172,7 +182,7 @@ def add_kkmc_generator(path, finalstate=''):
     )
 
 
-def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True):
+def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True, parentParticle='Upsilon(4S)'):
     """
     Add EvtGen for mixed and charged BB
 
@@ -183,8 +193,13 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
                         It should always be True,  unless you are generating Y(5,6S) -> BBar. In the latter case,
                         setting it False solves the interla limiation of Evtgen that allows to make a
                         coherent decay only starting from the Y(4S).
+        parentParticle (str): initial state (used only if it is not Upsilon(4S).
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
+
+    if parentParticle != 'Upsilon(3S)' and parentParticle != 'Upsilon(4S)'\
+            and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
+        B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
 
     if finalstate == 'charged':
         pass
@@ -199,10 +214,39 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
+    if parentParticle == 'Upsilon(3S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING("add_evtgen_generator initial state {} has no BB mixing, now switching coherentMixing OFF"
+                      .format(parentParticle))
+
+    if parentParticle == 'Upsilon(5S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
+        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
+
+    if parentParticle == 'Upsilon(6S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
+        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
+
     evtgen = path.add_module(
         'EvtGenInput',
         userDECFile=evtgen_userdecfile,
-        CoherentMixing=coherentMixing
+        CoherentMixing=coherentMixing,
+        ParentParticle=parentParticle
     )
 
 
@@ -416,6 +460,42 @@ def add_phokhara_generator(path, finalstate=''):
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
     else:
         B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
+
+
+def add_koralw_generator(path, finalstate='', enableTauDecays=True):
+    """
+    Add KoralW generator for radiative four fermion final states (only four leptons final states are currently supported).
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): either 'e+e-e+e-', 'e+e-mu+mu-', 'e+e-tau+tau-', 'mu+mu-mu+mu-', 'mu+mu-tau+tau-' or 'tau+tau-tau+tau-'
+        enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+    """
+
+    decayFile = ''
+    if finalstate == 'e+e-e+e-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeee.data')
+    elif finalstate == 'e+e-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeMuMu.data')
+    elif finalstate == 'e+e-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeTauTau.data')
+    elif finalstate == 'mu+mu-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuMuMu.data')
+    elif finalstate == 'mu+mu-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuTauTau.data')
+    elif finalstate == 'tau+tau-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_TauTauTauTau.data')
+    else:
+        B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
+
+    path.add_module('KoralWInput',
+                    UserDataFile=decayFile)
+
+    if 'tau+tau-' in finalstate:
+        if enableTauDecays:
+            path.add_module('EvtGenDecay')
+        else:
+            B2WARNING('The tau decays will not be generated.')
 
 
 def add_cosmics_generator(path, components=None,

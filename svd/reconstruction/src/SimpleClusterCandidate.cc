@@ -16,6 +16,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 
@@ -231,8 +232,10 @@ namespace Belle2 {
         retval += static_cast<double>(*begin) * step;
       }
       float rawtime = retval / norm;
-      float caltime = rawtime;
-      float clstime = caltime + stepSize * getMaxSum3Samples().first;//apply First Frame correction
+      float caltime = rawtime;//we need caiibration here
+      int triggerbin = getTriggerBin();
+      float clstime = caltime + stepSize * (getMaxSum3Samples().first - triggerbin /
+                                            4); //apply First Frame correction and Trigger Bin correction
       return clstime;
 
     }
@@ -252,8 +255,10 @@ namespace Belle2 {
       auto denom = 1 - std::exp(-4 * stepSize / tau) - (1 + std::exp(-2 * stepSize / tau) / 2) * (*begin - std::exp(
                      -2 * stepSize / tau) * (*(begin + 2))) / (*begin + std::exp(-stepSize / tau) * (*(begin + 1)) / 2);
       float rawtime = - num / denom;
-      float caltime = rawtime;
-      float clstime = caltime + stepSize * getMaxSum3Samples().first;//apply First Frame correction
+      float caltime = rawtime;//we need caiibration here
+      int triggerbin = getTriggerBin();
+      float clstime = caltime + stepSize * (getMaxSum3Samples().first - triggerbin /
+                                            4); //apply First Frame correction and Trigger Bin correction
       return clstime;
 
     }
@@ -319,6 +324,20 @@ namespace Belle2 {
 
     }
 
+    int SimpleClusterCandidate::getTriggerBin() const
+    {
+
+      //get Tigger Bin from SVDEventInfo
+      StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+      std::string m_svdEventInfoName = "SVDEventInfo";
+      if (!temp_eventinfo.isOptional("SVDEventInfo"))
+        m_svdEventInfoName = "SVDEventInfoSim";
+      StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+      if (!eventinfo) B2ERROR("No SVDEventInfo!");
+      int triggerbin = eventinfo->getModeByte().getTriggerBin();
+      return triggerbin;
+
+    }
 
 
   }  //SVD namespace

@@ -130,6 +130,11 @@ namespace Belle2 {
        * with First Frame of the selection
        */
       std::pair<int, std::vector<float>> getMaxSum3Samples() const;
+      /**
+       * returns the Trigger Bin
+       * taken from SVDEventInfo
+       */
+      int getTriggerBin() const;
 
       /**
        * return the position of the cluster

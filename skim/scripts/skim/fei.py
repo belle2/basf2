@@ -1,4 +1,4 @@
-#!/usr/bin/env pyfthon3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -107,7 +107,7 @@ def B0Hadronic(path):
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
+        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
         * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
         * :math:`\\text{visibleEnergyOfEventCMS}>4`
         * :math:`2<E_{\\text{ECL}}<7`
@@ -215,7 +215,7 @@ def BplusHadronic(path):
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
+        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
         * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
         * :math:`\\text{visibleEnergyOfEventCMS}>4`
         * :math:`2<E_{\\text{ECL}}<7`
@@ -496,10 +496,10 @@ def B0SL(path):
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3`
-        * :math:`nCleanedECLClusters(0.296706 < \\theta < 2.61799 and E>0.2)>1`
-        * :math:`visibleEnergyOfEventCMS>4`
-        * :math:`E_{\\text{ECL}}<9`
+        * :math:`\\text{nCleanedTracks(abs}(z0) < 2.0 \\text{ and } abs(d0) < 0.5 \\text{ and } pt>0.1)>=3`
+        * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{ and } E>0.2)>=3`
+        * :math:`\\text{visibleEnergyOfEventCMS}>4`
+        * :math:`2<E_{\\text{ECL}}<7`
 
         Tag side :math:`B` cuts:
 
@@ -588,7 +588,7 @@ def BplusSL(path):
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
        * :math:`n_{\\text{tracks}} \\geq 4`
-       * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
+       * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
        * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
        * :math:`\\text{visibleEnergyOfEventCMS}>4`
        * :math:`2<E_{\\text{ECL}}<7`

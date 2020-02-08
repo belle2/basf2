@@ -50,7 +50,7 @@ void KLMCalibrationChecker::setExperimentRun(int experiment, int run)
   m_run = run;
 }
 
-void KLMCalibrationChecker::setTestingPayload(std::string testingPayloadName)
+void KLMCalibrationChecker::setTestingPayload(const std::string& testingPayloadName)
 {
   m_testingPayloadName = testingPayloadName;
 }

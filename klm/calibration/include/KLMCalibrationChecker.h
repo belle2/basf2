@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Set testing payload name.
      */
-    void setTestingPayload(std::string testingPayloadName);
+    void setTestingPayload(const std::string& testingPayloadName);
 
     /**
      * Prepare local database.

@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: giacomo                                                  *
+ * Contributors: Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

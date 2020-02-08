@@ -79,77 +79,63 @@ void KLMCalibrationChecker::checkStripEfficiency()
   DBObjPtr<KLMStripEfficiency> stripEfficiency;
   if (not stripEfficiency.isValid())
     B2FATAL("Strip efficiency data are not valid.");
-  TCanvas* canvas = new TCanvas();
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {
     int subdetector = klmSector.getSubdetector();
     int section = klmSector.getSection();
     int sector = klmSector.getSector();
+    /* Setup the canvas and the histogram. */
+    TCanvas* canvas = new TCanvas();
+    TH1F* hist = new TH1F("plane_histogram", "", 30, 0.5, 30.5);
+    hist->GetYaxis()->SetTitle("Efficiency");
+    hist->SetMinimum(0.4);
+    hist->SetMaximum(1.);
+    hist->SetMarkerStyle(20);
+    hist->SetMarkerSize(0.5);
+    TString title;
+    float efficiency, efficiencyError, bin;
     if (subdetector == KLMElementNumbers::c_BKLM) {
-      TH1F* hist = new TH1F("bklm_planes_0", "", 30, 0.5, 30.5);
-      hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane + 1");
-      hist->GetYaxis()->SetTitle("Efficiency");
-      hist->SetMinimum(0.4);
-      hist->SetMaximum(1.);
-      hist->SetMarkerStyle(20);
-      hist->SetMarkerSize(0.5);
-      for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); layer++) {
-        for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-          float efficiency = stripEfficiency->getBarrelEfficiency(section, sector, layer, plane, 2);
-          float efficiencyError = stripEfficiency->getBarrelEfficiencyError(section, sector, layer, plane, 2);
-          float bin = (layer - 1) * 2 + plane + 1;
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinError(bin, efficiencyError);
-        }
-      }
-      TString title;
       if (section == BKLMElementNumbers::c_BackwardSection)
         title.Form("BKLM backward sector %d", sector);
       else
         title.Form("BKLM forward sector %d", sector);
       hist->SetTitle(title.Data());
-      hist->Draw("e");
-      TString name;
-      name.Form("efficiency_subdetector_%d_section_%d_sector_%d.pdf", subdetector, section, sector);
-      canvas->Print(name.Data());
-      canvas->Update();
-      delete hist;
+      hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane + 1");
+      for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); layer++) {
+        for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
+          efficiency = stripEfficiency->getBarrelEfficiency(section, sector, layer, plane, 2);
+          efficiencyError = stripEfficiency->getBarrelEfficiencyError(section, sector, layer, plane, 2);
+          bin = (layer - 1) * 2 + plane + 1;
+        }
+      }
     } else {
-      TH1F* hist = new TH1F("eklm_planes_0", "", 30, 0.5, 30.5);
-      if (section == EKLMElementNumbers::c_BackwardSection)
+      if (section == EKLMElementNumbers::c_BackwardSection) {
         hist->SetBins(24, 0.5, 24.5);
-      else
+        title.Form("EKLM backward sector %d", sector);
+      } else {
         hist->SetBins(28, 0.5, 28.5);
+        title.Form("EKLM forward sector %d", sector);
+      }
+      hist->SetTitle(title.Data());
       hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane");
-      hist->GetYaxis()->SetTitle("Efficiency");
-      hist->SetMinimum(0.4);
-      hist->SetMaximum(1.);
-      hist->SetMarkerStyle(20);
-      hist->SetMarkerSize(0.5);
       const EKLM::ElementNumbersSingleton* elementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
       for (int layer = 1; layer <= elementNumbersEKLM->getMaximalDetectorLayerNumber(section); layer++) {
         for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-          float efficiency = stripEfficiency->getEndcapEfficiency(section, sector, layer, plane, 2);
-          float efficiencyError = stripEfficiency->getEndcapEfficiencyError(section, sector, layer, plane, 2);
-          float bin = (layer - 1) * 2 + plane;
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinContent(bin, efficiency);
-          hist->SetBinError(bin, efficiencyError);
+          efficiency = stripEfficiency->getEndcapEfficiency(section, sector, layer, plane, 2);
+          efficiencyError = stripEfficiency->getEndcapEfficiencyError(section, sector, layer, plane, 2);
+          bin = (layer - 1) * 2 + plane;
         }
       }
-      TString title;
-      if (section == EKLMElementNumbers::c_BackwardSection)
-        title.Form("EKLM backward sector %d", sector);
-      else
-        title.Form("EKLM forward sector %d", sector);
-      hist->SetTitle(title.Data());
-      hist->Draw("e");
-      TString name;
-      name.Form("efficiency_subdetector_%d_section_%d_sector_%d.pdf", subdetector, section, sector);
-      canvas->Print(name.Data());
-      canvas->Update();
-      delete hist;
     }
+    hist->SetBinContent(bin, efficiency);
+    hist->SetBinContent(bin, efficiency);
+    hist->SetBinError(bin, efficiencyError);
+    hist->Draw("e");
+    TString name;
+    name.Form("efficiency_subdetector_%d_section_%d_sector_%d.pdf", subdetector, section, sector);
+    canvas->Print(name.Data());
+    canvas->Update();
+    delete hist;
+    delete canvas;
   }
 }

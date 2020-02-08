@@ -20,6 +20,11 @@
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
+// kFitter
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Matrix/SymMatrix.h>
+#include <CLHEP/Vector/LorentzVector.h>
+
 // DataObjects
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -34,6 +39,7 @@
 namespace Belle2 {
 
   class Particle;
+  struct TrackAndWeight;
 
   /**
    * Tag side Vertex Fitter module for modular analysis
@@ -117,7 +123,11 @@ namespace Belle2 {
     double m_tagVNDF;             /**< Number of degrees of freedom in the tag vertex fit */
     double m_tagVChi2;            /**< chi^2 value of the tag vertex fit result */
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
+    std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
     bool m_verbose;               /**< choose if you want to print extra infos */
+    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter) */
+    TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
+
 
     /** central method for the tag side vertex fit */
     bool doVertexFit(Particle* Breco);
@@ -159,8 +169,17 @@ namespace Belle2 {
     /** eliminates an invalid track from a track list **/
     void eliminateTrack(std::vector<int>& listTracks, int trackPosition);
 
+    /** Get a list of track results from a list of tracks removing the Kshorts **/
+    bool getTracksWithoutKS(std::vector<const Track*> const&  tagTracks, std::vector<TrackAndWeight>& trackAndWeights);
+
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);
+
+
+    /**
+     * make the vertex fit on the tag side with chosen fit algorithm
+     */
+    bool makeGeneralFit();
 
     /**
      * make the vertex fit on the tag side:
@@ -168,15 +187,21 @@ namespace Belle2 {
      * tracks coming from Ks removed
      * all other tracks used
      */
-    bool makeGeneralFit();
+    bool makeGeneralFitRave();
+
+    /**
+     * make the vertex fit on the tag side:
+     * KFit
+     * tracks coming from Ks removed
+     * all other tracks used
+     */
+    bool makeGeneralFitKFit();
 
     /**
      * calculate DeltaT and MC-DeltaT (rec - tag) in ps from Breco and Btag vertices
      * DT = Dl / gamma beta c  ,  l = boost direction
      */
     void deltaT(Particle* Breco);
-
-
 
     /**
      * Print a TVector3 (useful for debugging)

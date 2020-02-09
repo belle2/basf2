@@ -93,7 +93,6 @@ void KLMCalibrationChecker::checkStripEfficiency()
     hist->SetMarkerStyle(20);
     hist->SetMarkerSize(0.5);
     TString title;
-    float efficiency, efficiencyError, bin;
     if (subdetector == KLMElementNumbers::c_BKLM) {
       if (section == BKLMElementNumbers::c_BackwardSection)
         title.Form("BKLM backward sector %d", sector);
@@ -103,9 +102,11 @@ void KLMCalibrationChecker::checkStripEfficiency()
       hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane + 1");
       for (int layer = 1; layer <= BKLMElementNumbers::getMaximalLayerNumber(); layer++) {
         for (int plane = 0; plane <= BKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-          efficiency = stripEfficiency->getBarrelEfficiency(section, sector, layer, plane, 2);
-          efficiencyError = stripEfficiency->getBarrelEfficiencyError(section, sector, layer, plane, 2);
-          bin = (layer - 1) * 2 + plane + 1;
+          int bin = (layer - 1) * 2 + plane + 1;
+          float efficiency = stripEfficiency->getBarrelEfficiency(section, sector, layer, plane, 2);
+          float efficiencyError = stripEfficiency->getBarrelEfficiencyError(section, sector, layer, plane, 2);
+          hist->SetBinContent(bin, efficiency);
+          hist->SetBinError(bin, efficiencyError);
         }
       }
     } else {
@@ -121,15 +122,14 @@ void KLMCalibrationChecker::checkStripEfficiency()
       const EKLM::ElementNumbersSingleton* elementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
       for (int layer = 1; layer <= elementNumbersEKLM->getMaximalDetectorLayerNumber(section); layer++) {
         for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
-          efficiency = stripEfficiency->getEndcapEfficiency(section, sector, layer, plane, 2);
-          efficiencyError = stripEfficiency->getEndcapEfficiencyError(section, sector, layer, plane, 2);
-          bin = (layer - 1) * 2 + plane;
+          int bin = (layer - 1) * 2 + plane;
+          float efficiency = stripEfficiency->getEndcapEfficiency(section, sector, layer, plane, 2);
+          float efficiencyError = stripEfficiency->getEndcapEfficiencyError(section, sector, layer, plane, 2);
+          hist->SetBinContent(bin, efficiency);
+          hist->SetBinError(bin, efficiencyError);
         }
       }
     }
-    hist->SetBinContent(bin, efficiency);
-    hist->SetBinContent(bin, efficiency);
-    hist->SetBinError(bin, efficiencyError);
     hist->Draw("e");
     TString name;
     name.Form("efficiency_subdetector_%d_section_%d_sector_%d.pdf", subdetector, section, sector);

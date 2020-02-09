@@ -280,8 +280,7 @@ class Mails:
                    "person) produced warnings/errors or " \
                    "because their warning/error status " \
                    "changed. \n" \
-                   "Below is a detailed list of all problematic " \
-                   "plots/scripts with new/changed offenders highlighted:\n\n"
+                   "Below is a detailed list of all new/changed offenders:\n\n"
         else:
             body = "This is a full list of validation plots/scripts that" \
                    " produced warnings/errors and include you as contact" \
@@ -290,6 +289,23 @@ class Mails:
         body += "There were problems with the validation of the " \
             "following plots/scripts:\n\n"
         for plot in plots:
+            compared_to_yesterday = plots[plot]["compared_to_yesterday"]
+            body_plot = ""
+            if compared_to_yesterday == "unchanged":
+                if incremental:
+                    # Do not include.
+                    continue
+            elif compared_to_yesterday == "new":
+                body_plot = '<b style="color: red;">[NEW]</b><br>'
+            elif compared_to_yesterday == "changed":
+                body_plot = '<b style="color: red;">' \
+                             '[Warnings/comparison CHANGED]</b><br>'
+            else:
+                body_plot = \
+                    f'<b style="color: red;">[UNEXPECTED compared_to_yesterday ' \
+                    f'flag: "{compared_to_yesterday}". Please alert the ' \
+                    f'validation maintainer.]</b><br>'
+
             # compose descriptive error message
             if plots[plot]["comparison_result"] == "error":
                 errormsg = "comparison unequal"
@@ -298,12 +314,6 @@ class Mails:
             else:
                 errormsg = plots[plot]["comparison_result"]
 
-            body_plot = ""
-            if plots[plot]["compared_to_yesterday"] == "new":
-                body_plot += '<b style="color: red;">[NEW]</b><br>'
-            elif plots[plot]["compared_to_yesterday"] == "changed":
-                body_plot += '<b style="color: red;">' \
-                             '[Warnings/comparison CHANGED]</b><br>'
             body_plot += "<b>{plot}</b><br>"
             body_plot += "<b>Package:</b> {package}<br>"
             body_plot += "<b>Rootfile:</b> {rootfile}.root<br>"

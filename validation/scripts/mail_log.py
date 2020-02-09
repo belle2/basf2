@@ -47,7 +47,7 @@ class Mails:
     @var _mail_data_new: Current mail data. Will be filled on instantiation.
     """
 
-    def __init__(self, validation):
+    def __init__(self, validation, include_expert_plots=False):
         """!
         Initializes an instance of the Mail class from an instance of the
         Validation class. Assumes that a comparison json file exists,
@@ -58,6 +58,7 @@ class Mails:
         later comparison.
 
         @param validation: validation.Validation instance
+        @param include_expert_plots: Should expert plots be included?
         """
 
         self._validator = validation
@@ -88,7 +89,9 @@ class Mails:
             self._mail_data_old = None
 
         # current mail data
-        self._mail_data_new = self._create_mail_log(comparison_json)
+        self._mail_data_new = self._create_mail_log(
+            comparison_json, include_expert_plots=include_expert_plots
+        )
 
     def _create_mail_log_failed_scripts(self) -> Dict[str, Dict[str, str]]:
         """!
@@ -148,7 +151,8 @@ class Mails:
 
         return mail_log
 
-    def _create_mail_log(self, comparison) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def _create_mail_log(self, comparison, include_expert_plots=False) \
+            -> Dict[str, Dict[str, Dict[str, str]]]:
         """!
         Takes the entire comparison json file, finds all the plots where
         comparison failed, finds info about failed scripts and saves them in
@@ -179,6 +183,8 @@ class Mails:
         for package in comparison["packages"]:
             for plotfile in package["plotfiles"]:
                 for plot in plotfile["plots"]:
+                    if not include_expert_plots and plot["is_expert"]:
+                        continue
                     skip = True
                     if plot["comparison_result"] in ["error"]:
                         skip = False

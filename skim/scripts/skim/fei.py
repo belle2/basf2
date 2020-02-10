@@ -101,7 +101,7 @@ def B0Hadronic(path):
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
@@ -209,7 +209,7 @@ def BplusHadronic(path):
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
@@ -483,7 +483,7 @@ def B0SL(path):
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
@@ -499,7 +499,7 @@ def B0SL(path):
         * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
         * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
         * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
-          (``daughter(1,p)>1.0`` or ``daughter(2,p)>1.0``, depending
+          (``daughter(1, p) > 1.0`` or ``daughter(2, p) > 1.0``, depending
           on decay mode ID)
 
     Parameters:
@@ -568,7 +568,7 @@ def BplusSL(path):
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)

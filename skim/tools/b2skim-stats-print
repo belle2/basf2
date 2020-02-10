@@ -599,7 +599,7 @@ def getStatSpecifier():
             'CombineMC': None
         },
         'cpuTimePerEvent': {
-            'LongName': 'CPU time per event on KEKCC (s)',
+            'LongName': 'CPU time per input event on KEKCC (s)',
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': False,
@@ -609,7 +609,7 @@ def getStatSpecifier():
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
         'HS06TimePerEvent': {
-            'LongName': 'Estimated CPU time per event (HS06)',
+            'LongName': 'Estimated CPU time per input event (HS06)',
             'FloatFormat': '.3f',
             'PrintToScreen': False,
             'PrintToConfluence': True,
@@ -639,13 +639,23 @@ def getStatSpecifier():
             'CombineMC': None
         },
         'udstSizePerSkimmedEvent': {
-            'LongName': 'uDST size of passed events (kB)',
+            'LongName': 'uDST size per skimmed event (kB)',
             'FloatFormat': '.3f',
             'PrintToScreen': True,
             'PrintToConfluence': True,
             'PrintAverages': True,
             'Calculate': lambda skim, sample: udstSize(skim, sample) / nSkimmedEvents(skim, sample),
             'CalculationDescription': 'File size of output uDST divided by number of skimmed events.',
+            'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
+        },
+        'udstSizePerInputEvent': {
+            'LongName': 'uDST size per input event (kB)',
+            'FloatFormat': '.3f',
+            'PrintToScreen': False,
+            'PrintToConfluence': True,
+            'PrintAverages': True,
+            'Calculate': lambda skim, sample: udstSize(skim, sample) / nInputEvents(skim, sample),
+            'CalculationDescription': 'File size of output uDST divided by number of input events.',
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
         'udstSizePerFile': {

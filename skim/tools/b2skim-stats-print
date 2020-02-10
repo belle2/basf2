@@ -552,6 +552,9 @@ def getStatSpecifier():
         statSpecifier (dict): A nested dict specifying how each statistic should
             be handled.
     """
+    # KEKCC HEPSpec per core
+    HEPSpecPerCore = 24.57
+
     statSpecifier = {
         'RetentionRate': {
             'LongName': 'Retention rate (%)',
@@ -609,7 +612,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'PrintAverages': True,
-            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * 20,
+            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * HEPSpecPerCore,
             'CalculationDescription': 'CPU time of test job divided by number of input events.',
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
@@ -619,7 +622,7 @@ def getStatSpecifier():
             'PrintToScreen': False,
             'PrintToConfluence': True,
             'PrintAverages': False,
-            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * get_events_per_file(sample) * 20,
+            'Calculate': lambda skim, sample: cpuTime(skim, sample) / nInputEvents(skim, sample) * get_events_per_file(sample) * HEPSpecPerCore,
             'CalculationDescription': ('CPU time of test job, divided by number of input events, multiplied by average number of events in a file of this sample type.'),
             'CombineMC': lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(statDict, mcCampaign, beamBackground)
         },
@@ -1013,7 +1016,7 @@ def printToConfluence(allSkimStats, statSpecifier, mcSampleLabels, dataSampleLab
         confluenceStrings.append(f'|| {statSpecifier[stat]["LongName"]} | {statSpecifier[stat]["CalculationDescription"]} |')
     confluenceStrings.append("\n*Note*: The units used for resource usage estimates in grid production are "
                              "HEP-Spec06 (HS06). To obtain estimates in units of HS06, we multiply CPU time on "
-                             "KEKCC by a factor of 20.")
+                             "KEKCC by a factor of 24.57.")
 
     confluenceStrings += ['', 'h1. List of test files for each sample']
     for sample in samples:

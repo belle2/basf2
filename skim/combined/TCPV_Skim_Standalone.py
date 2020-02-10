@@ -18,7 +18,7 @@ from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
 
 
 import skimExpertFunctions as expert
-gb2_setuprel = 'release-04-00-00'
+
 
 skimpath = b2.Path()
 fileList = expert.get_test_file("MC12_mixedBGx1")
@@ -38,6 +38,8 @@ stdPi('all', path=skimpath)
 stdPi0s('loose', path=skimpath)
 stdPhotons('loose', path=skimpath)
 stdKshorts(path=skimpath)
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 
 
 ma.cutAndCopyList('gamma:E15', 'gamma:loose', '1.4<E<4', path=skimpath)
@@ -59,7 +61,6 @@ from skim.tcpv import TCPVList
 expert.add_skim('TCPV', TCPVList(path=skimpath), path=skimpath)
 
 expert.setSkimLogging(path=skimpath)
-b2.process(path=skimpath)
-
+b2.process(skimpath)
 # print out the summary
 print(b2.statistics)

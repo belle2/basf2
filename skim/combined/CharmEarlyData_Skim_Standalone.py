@@ -42,30 +42,16 @@ stdPi('all', path=charmpath)
 stdK('all', path=charmpath)
 stdE('all', path=charmpath)
 stdMu('all', path=charmpath)
-stdKshorts(path=charmpath)
-mergedKshorts(path=charmpath)
+
+from skim.charm import EarlyData_DstToD0PiD0ToHpHmPi0
+EarlyData_DstToD0PiD0ToHpHmPi0List = EarlyData_DstToD0PiD0ToHpHmPi0(path=charmpath)
+expert.add_skim("EarlyData_DstToD0Pi_D0ToHpHmPi0", EarlyData_DstToD0PiD0ToHpHmPi0List, path=charmpath)
 
 
-from skim.charm import D0ToHpJm
-D0ToHpJmList = D0ToHpJm(charmpath)
-expert.add_skim("XToD0_D0ToHpJm", D0ToHpJmList, path=charmpath)
+from skim.charm import EarlyData_DstToD0PiD0ToHpJmPi0
+EarlyData_DstToD0PiD0ToHpJmPi0List = EarlyData_DstToD0PiD0ToHpJmPi0(charmpath)
+expert.add_skim("EarlyData_DstToD0Pi_D0ToHpJmPi0", EarlyData_DstToD0PiD0ToHpJmPi0List, path=charmpath)
 
-
-from skim.charm import DstToD0PiD0ToHpJmPi0
-DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(charmpath)
-expert.add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
-
-from skim.charm import D0ToNeutrals
-expert.add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=charmpath), path=charmpath)
-
-
-from skim.charm import DstToD0PiD0ToHpHmPi0
-DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=charmpath)
-expert.add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
-
-from skim.charm import DpToKsHp
-DpToKsHpList = DpToKsHp(charmpath)
-expert.add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
 
 expert.setSkimLogging(path=charmpath)
 b2.process(charmpath)

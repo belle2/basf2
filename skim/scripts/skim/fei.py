@@ -55,32 +55,38 @@ def B0Hadronic(path):
     Tag modes
         All available FEI :math:`B^0` hadronic tags are reconstructed.
 
-        * :math:`B^0 \\to D^- \\pi^+`
-        * :math:`B^0 \\to D^- \\pi^+ \\pi^0`
-        * :math:`B^0 \\to D^- \\pi^+ \\pi^0 \\pi^0`
-        * :math:`B^0 \\to D^- \\pi^+ \\pi^+ \\pi^-`
-        * :math:`B^0 \\to D^- \\pi^+ \\pi^+ \\pi^- \\pi^0`
-        * :math:`B^0 \\to \\overline{D}^0 \\pi^+ \\pi^0`
-        * :math:`B^0 \\to D^- D^0 K^+`
-        * :math:`B^0 \\to D^- D^{0*}(2010) K^+`
-        * :math:`B^0 \\to D^{+*} D^0 K^+`
-        * :math:`B^0 \\to D^{+*} D^{0*}(2010) K^+`
-        * :math:`B^0 \\to D^- D^+ K_S^0`
-        * :math:`B^0 \\to D^{+*} D^+ K_S^0`
-        * :math:`B^0 \\to D^- D^{+*} K_S^0`
-        * :math:`B^0 \\to D^{+*} D^{+*} K_S^0`
-        * :math:`B^0 \\to D_s^+ D^-`
-        * :math:`B^0 \\to D^{+*} \\pi^+`
-        * :math:`B^0 \\to D^{+*} \\pi^+ \\pi^0`
-        * :math:`B^0 \\to D^{+*} \\pi^+ \\pi^0 \\pi^0`
-        * :math:`B^0 \\to D^{+*} \\pi^+ \\pi^+ \\pi^-`
-        * :math:`B^0 \\to D^{+*} \\pi^+ \\pi^+ \\pi^- \\pi^0`
-        * :math:`B^0 \\to D_s^{+*} D^-`
-        * :math:`B^0 \\to D_s^+ D^{+*}`
-        * :math:`B^0 \\to D_s^{+*} D^{+*}`
-        * :math:`B^0 \\to J/\\psi\\, K_S^0`
-        * :math:`B^0 \\to J/\\psi\\, K^+ \\pi^-`
-        * :math:`B^0 \\to J/\\psi\\, K_S^0 \\pi^+ \\pi^-`
+        0. :math:`B^0 \\to D^- \\pi^+`
+        1. :math:`B^0 \\to D^- \\pi^+ \\pi^0`
+        2. :math:`B^0 \\to D^- \\pi^+ \\pi^0 \\pi^0`
+        3. :math:`B^0 \\to D^- \\pi^+ \\pi^+ \\pi^-`
+        4. :math:`B^0 \\to D^- \\pi^+ \\pi^+ \\pi^- \\pi^0`
+        5. :math:`B^0 \\to \\overline{D^0} \\pi^+ \\pi^-`
+        6. :math:`B^0 \\to D^- D^0 K^+`
+        7. :math:`B^0 \\to D^- D^{0*} K^+`
+        8. :math:`B^0 \\to D^{-*} D^0 K^+`
+        9. :math:`B^0 \\to D^{-*} D^{0*} K^+`
+        10. :math:`B^0 \\to D^- D^+ K^0_S`
+        11. :math:`B^0 \\to D^{-*} D^+ K^0_S`
+        12. :math:`B^0 \\to D^- D^{+*} K^0_S`
+        13. :math:`B^0 \\to D^{-*} D^{+*} K^0_S`
+        14. :math:`B^0 \\to D^+_s D^-`
+        15. :math:`B^0 \\to D^{-*} \\pi^+`
+        16. :math:`B^0 \\to D^{-*} \\pi^+ \\pi^0`
+        17. :math:`B^0 \\to D^{-*} \\pi^+ \\pi^0 \\pi^0`
+        18. :math:`B^0 \\to D^{-*} \\pi^+ \\pi^+ \\pi^-`
+        19. :math:`B^0 \\to D^{-*} \\pi^+ \\pi^+ \\pi^- \\pi^0`
+        20. :math:`B^0 \\to D^{+*}_s D^-`
+        21. :math:`B^0 \\to D^+_s D^{-*}`
+        22. :math:`B^0 \\to D^{+*}_s D^{-*}`
+        23. :math:`B^0 \\to J/\\psi K^0_S`
+        24. :math:`B^0 \\to J/\\psi K^+ \\pi^-`
+        25. :math:`B^0 \\to J/\\psi K^0_S \\pi^+ \\pi^-`
+        26. :math:`B^0 \\to \\Lambda^{-}_{c} p \\pi^+ \\pi^-`
+        27. :math:`B^0 \\to \\overline{D^0} p \\bar{p}`
+        28. :math:`B^0 \\to D^- p \\bar{p} \\pi^+`
+        29. :math:`B^0 \\to D^{-*} p \\bar{p} \\pi^+`
+        30. :math:`B^0 \\to \\overline{D^0} p \\bar{p} \\pi^+ \\pi^-`
+        31. :math:`B^0 \\to \\overline{D^{0*}} p \\bar{p} \\pi^+ \\pi^-`
 
         From `Thomas Keck's thesis <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_,
         "the channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used
@@ -88,41 +94,34 @@ def B0Hadronic(path):
         technical restrictions in the KFitter algorithm".
 
     Cuts applied
-       pi+ cuts:
+       This skim uses the following track and cluster definitions.
 
-       * :math:`d_0 < 0.5`
-       * :math:`-2 < z_0 < 2`
-       * :math:`\\text{nCDCHits} > 20`
-
-       gamma cuts:
-
-       * :math:`0.296706 < \\theta < 2.61799`
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+         and :math:`p_T > 0.1\\,\\text{GeV}`
+       * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
+         and :math:`E>0.1\\,\\text{GeV}`
 
        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
-          `modularAnalysis.buildEventShape`, calculated using all
-          neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
-          are no tracks or clusters of sufficient energy, then the
-          event is given an :math:`R_2` value of 1.)
+          `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
-        * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
-        * :math:`\\text{visibleEnergyOfEventCMS}>4`
-        * :math:`2<E_{\\text{ECL}}<7`
+        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
+        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
+        * :math:`2\\,\\text{GeV}<E_{\\text{cleaned tracks & clusters in ECL}}<7\\,\\text{GeV}`
 
         Tag side :math:`B` cuts:
 
         * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
         * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
-        * :math:`\\text{signal probability} > 0.001`
+        * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23)
 
     Parameters:
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``B0HadronicList``, a Python list containing the string
+        B0HadronicList (list(str)): A Python list containing the string
         :code:`'B0:generic'`, the name of the particle list for
         hadronic :math:`B^0` skim candidates.
     """
@@ -165,72 +164,72 @@ def BplusHadronic(path):
     Tag modes
         All available FEI :math:`B^+` hadronic tags are reconstructed.
 
-        * :math:`B^+ \\to \\overline{D}^0 \\pi^+`
-        * :math:`B^+ \\to \\overline{D}^0 \\pi^+ \\pi^0`
-        * :math:`B^+ \\to \\overline{D}^0 \\pi^+ \\pi^0 \\pi^0`
-        * :math:`B^+ \\to \\overline{D}^0 \\pi^+ \\pi^+ \\pi^-`
-        * :math:`B^+ \\to \\overline{D}^0 \\pi^+ \\pi^+ \\pi^- \\pi^0`
-        * :math:`B^+ \\to \\overline{D}^0 D^+`
-        * :math:`B^+ \\to \\overline{D}^0 D^+ K_S^0`
-        * :math:`B^+ \\to \\overline{D}^{0*} D^+ K_S^0`
-        * :math:`B^+ \\to \\overline{D}^0 D^{+*} K_S^0`
-        * :math:`B^+ \\to \\overline{D}^{0*} D^{+*} K_S^0`
-        * :math:`B^+ \\to \\overline{D}^0 D^0 K^+`
-        * :math:`B^+ \\to \\overline{D}^{0*} D^0 K^+`
-        * :math:`B^+ \\to \\overline{D}^0 D^{0*}(2010) K^+`
-        * :math:`B^+ \\to \\overline{D}^{0*} D^{0*}(2010) K^+`
-        * :math:`B^+ \\to D_s^+ \\overline{D}^0`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\pi^+`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\pi^+ \\pi^0`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\pi^+ \\pi^0 \\pi^0`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\pi^+ \\pi^+ \\pi^-`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\pi^+ \\pi^+ \\pi^- \\pi^0`
-        * :math:`B^+ \\to D_s^{+*} \\overline{D}^0`
-        * :math:`B^+ \\to D_s^+ \\overline{D}^{0*}`
-        * :math:`B^+ \\to \\overline{D}^0 K^+`
-        * :math:`B^+ \\to D^- \\pi^+ \\pi^+`
-        * :math:`B^+ \\to D^- \\pi^+ \\pi^+ \\pi^0`
-        * :math:`B^+ \\to J/\\psi\\, K^+`
-        * :math:`B^+ \\to J/\\psi\\, K^+ \\pi^+ \\pi^-`
-        * :math:`B^+ \\to J/\\psi\\, K^+ \\pi^0`
-        * :math:`B^+ \\to J/\\psi\\, K_S^0 \\pi^+`
+        0. :math:`B^+ \\to \\overline{D^0} \\pi^+`
+        1. :math:`B^+ \\to \\overline{D^0} \\pi^+ \\pi^0`
+        2. :math:`B^+ \\to \\overline{D^0} \\pi^+ \\pi^0 \\pi^0`
+        3. :math:`B^+ \\to \\overline{D^0} \\pi^+ \\pi^+ \\pi^-`
+        4. :math:`B^+ \\to \\overline{D^0} \\pi^+ \\pi^+ \\pi^- \\pi^0`
+        5. :math:`B^+ \\to \\overline{D^0} D^+`
+        6. :math:`B^+ \\to \\overline{D^0} D^+ K^0_S`
+        7. :math:`B^+ \\to \\overline{D^{0*}} D^+ K^0_S`
+        8. :math:`B^+ \\to \\overline{D^0} D^{+*} K^0_S`
+        9. :math:`B^+ \\to \\overline{D^{0*}} D^{+*} K^0_S`
+        10. :math:`B^+ \\to \\overline{D^0} D^0 K^+`
+        11. :math:`B^+ \\to \\overline{D^{0*}} D^0 K^+`
+        12. :math:`B^+ \\to \\overline{D^0} D^{0*} K^+`
+        13. :math:`B^+ \\to \\overline{D^{0*}} D^{0*} K^+`
+        14. :math:`B^+ \\to D^+_s \\overline{D^0}`
+        15. :math:`B^+ \\to \\overline{D^{0*}} \\pi^+`
+        16. :math:`B^+ \\to \\overline{D^{0*}} \\pi^+ \\pi^0`
+        17. :math:`B^+ \\to \\overline{D^{0*}} \\pi^+ \\pi^0 \\pi^0`
+        18. :math:`B^+ \\to \\overline{D^{0*}} \\pi^+ \\pi^+ \\pi^-`
+        19. :math:`B^+ \\to \\overline{D^{0*}} \\pi^+ \\pi^+ \\pi^- \\pi^0`
+        20. :math:`B^+ \\to D^{+*}_s \\overline{D^0}`
+        21. :math:`B^+ \\to D^+_s \\overline{D^{0*}}`
+        22. :math:`B^+ \\to \\overline{D^0} K^+`
+        23. :math:`B^+ \\to D^- \\pi^+ \\pi^+`
+        24. :math:`B^+ \\to D^- \\pi^+ \\pi^+ \\pi^0`
+        25. :math:`B^+ \\to J/\\psi K^+`
+        26. :math:`B^+ \\to J/\\psi K^+ \\pi^+ \\pi^-`
+        27. :math:`B^+ \\to J/\\psi K^+ \\pi^0`
+        28. :math:`B^+ \\to J/\\psi K^0_S \\pi^+`
+        29. :math:`B^+ \\to \\Lambda^{-}_{c} p \\pi^+ \\pi^0`
+        30. :math:`B^+ \\to \\Lambda^{-}_{c} p \\pi^+ \\pi^- \\pi^+`
+        31. :math:`B^+ \\to \\overline{D^0} p \\bar{p} \\pi^+`
+        32. :math:`B^+ \\to \\overline{D^{0*}} p \\bar{p} \\pi^+`
+        33. :math:`B^+ \\to D^+ p \\bar{p} \\pi^+ \\pi^-`
+        34. :math:`B^+ \\to D^{+*} p \\bar{p} \\pi^+ \\pi^-`
+        35. :math:`B^+ \\to \\Lambda^{-}_{c} p \\pi^+`
 
     Cuts applied
-       pi+ cuts:
+       This skim uses the following track and cluster definitions.
 
-       * :math:`d_0 < 0.5`
-       * :math:`-2 < z_0 < 2`
-       * :math:`\\text{nCDCHits} > 20`
-
-       gamma cuts:
-
-       * :math:`0.296706 < \\theta < 2.61799`
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+         and :math:`p_T > 0.1\\,\\text{GeV}`
+       * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
+         and :math:`E>0.1\\,\\text{GeV}`
 
        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
-          `modularAnalysis.buildEventShape`, calculated using all
-          neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
-          are no tracks or clusters of sufficient energy, then the
-          event is given an :math:`R_2` value of 1.)
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
+          `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
-        * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
-        * :math:`\\text{visibleEnergyOfEventCMS}>4`
-        * :math:`2<E_{\\text{ECL}}<7`
+        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
+        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
+        * :math:`2\\,\\text{GeV}<E_{\\text{cleaned tracks & clusters in ECL}}<7\\,\\text{GeV}`
 
         Tag side :math:`B` cuts:
 
         * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
         * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
-        * :math:`\\text{signal probability} > 0.001`
+        * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25)
 
     Parameters:
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``BplusHadronicList``, a Python list containing the string
+        BplusHadronicList (list(str)): A Python list containing the string
         :code:`'B+:generic'`, the name of the particle list for
         hadronic :math:`B^+` skim candidates.
     """
@@ -467,39 +466,32 @@ def B0SL(path):
         SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with
         SL :math:`D` are not reconstructed.
 
-        * :math:`B^0 \\to D^- \\mu^+ \\nu_{e}`
-        * :math:`B^0 \\to D^- \\mu^+ \\nu_{\\mu}`
-        * :math:`B^0 \\to D^{-*} \\mu^+ \\nu_{e}`
-        * :math:`B^0 \\to D^{-*} \\mu^+ \\nu_{\\mu}`
-        * :math:`B^0 \\to \\overline{D}^0 \\pi^- \\mu^+ \\nu_{e}`
-        * :math:`B^0 \\to \\overline{D}^0 \\pi^- \\mu^+ \\nu_{\\mu}`
-        * :math:`B^0 \\to \\overline{D}^{0*} \\pi^- \\mu^+ \\nu_{e}`
-        * :math:`B^0 \\to \\overline{D}^{0*} \\pi^- \\mu^+ \\nu_{\\mu}`
+        0. :math:`B^0 \\to D^- e^+`
+        1. :math:`B^0 \\to D^- \\mu^+`
+        2. :math:`B^0 \\to D^{-*} e^+`
+        3. :math:`B^0 \\to D^{-*} \\mu^+`
+        4. :math:`B^0 \\to \\overline{D^0} \\pi^- e^+`
+        5. :math:`B^0 \\to \\overline{D^0} \\pi^- \\mu^+`
+        6. :math:`B^0 \\to \\overline{D^{0*}} \\pi^- e^+`
+        7. :math:`B^0 \\to \\overline{D^{0*}} \\pi^- \\mu^+`
 
     Cuts applied
-       pi+ cuts:
+       This skim uses the following track and cluster definitions.
 
-       * :math:`d_0 < 0.5`
-       * :math:`-2 < z_0 < 2`
-       * :math:`\\text{nCDCHits} > 20`
-
-       gamma cuts:
-
-       * :math:`0.296706 < \\theta < 2.61799`
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+         and :math:`p_T > 0.1\\,\\text{GeV}`
+       * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
+         and :math:`E>0.1\\,\\text{GeV}`
 
        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
-          `modularAnalysis.buildEventShape`, calculated using all
-          neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
-          are no tracks or clusters of sufficient energy, then the
-          event is given an :math:`R_2` value of 1.)
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
+          `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`\\text{nCleanedTracks(abs}(z0) < 2.0 \\text{ and } abs(d0) < 0.5 \\text{ and } pt>0.1)>=3`
-        * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{ and } E>0.2)>=3`
-        * :math:`\\text{visibleEnergyOfEventCMS}>4`
-        * :math:`2<E_{\\text{ECL}}<7`
+        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
+        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
+        * :math:`2\\,\\text{GeV}<E_{\\text{cleaned tracks & clusters in ECL}}<7\\,\\text{GeV}`
 
         Tag side :math:`B` cuts:
 
@@ -514,7 +506,7 @@ def B0SL(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``B0SLList``, a Python list containing the string
+        B0SLList (list(str)): A Python list containing the string
         :code:`'B0:semileptonic'`, the name of the particle list for
         SL :math:`B^0` skim candidates.
     """
@@ -559,39 +551,33 @@ def BplusSL(path):
         SL :math:`B^+` tags are reconstructed. Hadronic :math:`B^+`
         with SL :math:`D` are not reconstructed.
 
-        * :math:`B^+ \\to \\overline{D}^0 \\mu^+ \\nu_{e}`
-        * :math:`B^+ \\to \\overline{D}^0 \\mu^+ \\nu_{\\mu}`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\mu^+ \\nu_{e}`
-        * :math:`B^+ \\to \\overline{D}^{0*} \\mu^+ \\nu_{\\mu}`
-        * :math:`B^+ \\to D^- \\pi^+ \\mu^+ \\nu_{e}`
-        * :math:`B^+ \\to D^- \\pi^+ \\mu^+ \\nu_{\\mu}`
-        * :math:`B^+ \\to D^{-*} \\pi^+ \\mu^+ \\nu_{e}`
-        * :math:`B^+ \\to D^{-*} \\pi^+ \\mu^+ \\nu_{\\mu}`
+        0. :math:`B^0 \\to \\overline{D^0} e^+`
+        1. :math:`B^0 \\to \\overline{D^0} \\mu^+`
+        2. :math:`B^0 \\to \\overline{D^{0*}} e^+`
+        3. :math:`B^0 \\to \\overline{D^{0*}} \\mu^+`
+        4. :math:`B^0 \\to D^- \\pi^+ e^+`
+        5. :math:`B^0 \\to D^- \\pi^+ \\mu^+`
+        6. :math:`B^0 \\to D^{-*} \\pi^+ e^+`
+        7. :math:`B^0 \\to D^{-*} \\pi^+ \\mu^+`
 
     Cuts applied
-       pi+ cuts:
+       This skim uses the following track and cluster definitions.
 
-       * :math:`d_0 < 0.5`
-       * :math:`-2 < z_0 < 2`
-       * :math:`\\text{nCDCHits} > 20`
-
-       gamma cuts:
-
-       * :math:`0.296706 < \\theta < 2.61799`
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+         and :math:`p_T > 0.1\\,\\text{GeV}`
+       * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
+         and :math:`E>0.1\\,\\text{GeV}`
 
        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
-          `modularAnalysis.buildEventShape`, calculated using all
-          neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
-          charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
-          are no tracks or clusters of sufficient energy, then the
-          event is given an :math:`R_2` value of 1.)
-       * :math:`n_{\\text{tracks}} \\geq 4`
-       * :math:`\\text{nCleanedTracks(abs}(z_0) < 2.0 \\text{ and abs}(d0) < 0.5 \\text{ and }p_t>0.1)>=3`
-       * :math:`\\text{nCleanedECLClusters}(0.296706 < \\theta < 2.61799 \\text{{ and } E>0.2)>=3`
-       * :math:`\\text{visibleEnergyOfEventCMS}>4`
-       * :math:`2<E_{\\text{ECL}}<7`
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
+          `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
+        * :math:`n_{\\text{tracks}} \\geq 4`
+        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
+        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
+        * :math:`2\\,\\text{GeV}<E_{\\text{cleaned tracks & clusters in ECL}}<7\\,\\text{GeV}`
+
 
         Tag side :math:`B` cuts:
 
@@ -606,7 +592,7 @@ def BplusSL(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``BplusSLList``, a Python list containing the string
+        BplusSLList (list(str)): A Python list containing the string
         :code:`'B+:semileptonic'`, the name of the particle list for
         SL :math:`B^+` skim candidates.
     """
@@ -647,7 +633,7 @@ def runFEIforB0SL(path):
     ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
     ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>=3', path=path)
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and pt>0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
@@ -709,7 +695,7 @@ def runFEIforBplusSL(path):
     """
     # Pre-selection cuts
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                        cut='pt > 0.1 and d0<0.5 and -2<z0<2 and pt>0.1', path=path)
+                        cut='pt > 0.1 and d0<0.5 and -2<z0<2', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 

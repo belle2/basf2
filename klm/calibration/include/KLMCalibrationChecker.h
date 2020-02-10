@@ -42,9 +42,14 @@ namespace Belle2 {
     void setTestingPayload(const std::string& testingPayloadName);
 
     /**
-     * Prepare local database.
+     * Set Global Tag name.
      */
-    void prepareLocalDatabase();
+    void setGlobalTag(const std::string& GlobalTagName);
+
+    /**
+     * Prepare the database.
+     */
+    void prepareDatabase();
 
     /**
      * Check strip efficiency.
@@ -67,6 +72,11 @@ namespace Belle2 {
      * Testing payload location.
      */
     std::string m_testingPayloadName = "";
+
+    /**
+     * Global Tag name.
+     */
+    std::string m_GlobalTagName = "";
 
   };
 

@@ -55,7 +55,12 @@ void KLMCalibrationChecker::setTestingPayload(const std::string& testingPayloadN
   m_testingPayloadName = testingPayloadName;
 }
 
-void KLMCalibrationChecker::prepareLocalDatabase()
+void KLMCalibrationChecker::setGlobalTag(const std::string& GlobalTagName)
+{
+  m_GlobalTagName = GlobalTagName;
+}
+
+void KLMCalibrationChecker::prepareDatabase()
 {
   /* Mimic a module initialization. */
   StoreObjPtr<EventMetaData> eventMetaData;
@@ -68,17 +73,29 @@ void KLMCalibrationChecker::prepareLocalDatabase()
   dbStore.update();
   dbStore.updateEvent();
   auto& dbConfiguration = Conditions::Configuration::getInstance();
-  dbConfiguration.prependTestingPayloadLocation(m_testingPayloadName.c_str());
+  if ((m_testingPayloadName != "") and (m_GlobalTagName == ""))
+    dbConfiguration.prependTestingPayloadLocation(m_testingPayloadName);
+  else if ((m_testingPayloadName == "") and (m_GlobalTagName != ""))
+    dbConfiguration.prependGlobalTag(m_GlobalTagName);
+  else
+    B2FATAL("Setting both testing payload and Global Tag or setting no one of them.");
 }
 
 void KLMCalibrationChecker::checkStripEfficiency()
 {
   /* Prepare the database. */
-  prepareLocalDatabase();
+  prepareDatabase();
   /* Now we can read the payload. */
   DBObjPtr<KLMStripEfficiency> stripEfficiency;
   if (not stripEfficiency.isValid())
     B2FATAL("Strip efficiency data are not valid.");
+  if (m_GlobalTagName != "")
+    B2INFO("Analyzing the following payload:"
+           << LogVar("Global Tag", m_GlobalTagName.c_str())
+           << LogVar("Name", stripEfficiency.getName())
+           << LogVar("Revision", stripEfficiency.getRevision())
+           << LogVar("IoV", stripEfficiency.getIoV()));
+  /* Finally, loop over KLM sectors to check the efficiency. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {
     int subdetector = klmSector.getSubdetector();

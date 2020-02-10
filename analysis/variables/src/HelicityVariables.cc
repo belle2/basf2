@@ -314,20 +314,19 @@ namespace Belle2 {
 
                       Otherwise, it returns 0.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum", cosHelicityAngleBeamMomentum,
+    REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum,
                       R"DOC(
-                      Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided
-                      (where :math:`i` is the parameter passed to the function),
+                      Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
                       assuming that the mother of the provided particle correspond to the centre-of-mass System, whose parameters are
                       automatically loaded by the function, given the accelerators conditions.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngle", cosHelicityAngle,
+    REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle,
                       R"DOC(
                       Cosine of the helicity angle between the momentum of the provided particle and the momentum of the selected granddaughter
                       in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
 
-                      This variable needs two integer arguments: the first one is the index of the daughter and the second one is the index of the granddaughter.
+                      This variable needs two integer arguments: the first one, ``i``, is the index of the daughter and the second one, ``j`` is the index of the granddaughter.
 
                       For example, in the Decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, 
                       if the provided particle is :math:`B^0` and the selected indices are (0, 0),
@@ -336,7 +335,7 @@ namespace Belle2 {
 
                       This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
 
-    REGISTER_VARIABLE("cosAcoplanarityAngle", cosAcoplanarityAngle,
+    REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle,
                       R"DOC(
                       Cosine of the acoplanarity angle (:math:`\Phi` in the 
                       `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722). Given a two-body decay, the acoplanarity angle is defined as
@@ -346,7 +345,7 @@ namespace Belle2 {
                       normal vectors of the decay planes. Each normal vector is the cross product of the momentum of one daughter (in the frame of the mother) and the
                       momentum of one of the granddaughters (in the reference frame of the daughter).
 
-                      This variable needs two integer arguments: the first one is the index of the first grand daughter, and the second one the index of the
+                      This variable needs two integer arguments: the first one, ``i`` is the index of the first grand daughter, and the second one, ``j`` the index of the
                       second granddaughter. 
 
                       For example, in the Decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is B0 and the selected indices are (0, 0),
@@ -357,10 +356,10 @@ namespace Belle2 {
                       Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleDaughter", cosHelicityAngleDaughter,
+    REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter,
                       R"DOC(
                       Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
-                      The second argument is the index of the grand daughter that defines the angle, default is 0.
+                      The optional second argument is the index of the grand daughter that defines the angle, default is 0.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle,

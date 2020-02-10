@@ -51,7 +51,7 @@ def getAllSamples(mcCampaign):
         f'{mcCampaign}_taupairBGx0',
     ]
 
-    dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8']
+    dataSamples = ['proc9_exp3', 'proc9_exp7', 'proc9_exp8', 'bucket7_exp8', 'proc10_exp7', 'proc10_exp8']
 
     return mcSamples, dataSamples
 
@@ -93,7 +93,7 @@ def getArgumentParser():
                         'run is limited to the size of the test files '
                         '(~200,000 for MC files and ~20,000 for data files).')
     parser.add_argument('--mccampaign', default='MC12',
-                        choices=['MC9', 'MC10', 'MC11', 'MC12'],
+                        choices=['MC9', 'MC10', 'MC11', 'MC12','MC13'],
                         help='The MC campaign to test on.')
 
     sampleGroup = parser.add_mutually_exclusive_group()

@@ -57,6 +57,10 @@ namespace Belle2 {
     int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/
     int m_svdTrkSVDHits = 0; /**< number of SVD hits on the track*/
     int m_svdTrkCDCHits = 0; /**< number of CDC hits on the track*/
+    float m_svdTrkTraversedLength = 0; /**< traversed length of the track in the sensor*/
+    float m_svdTrkSeedX = 0; /**< track position seed, X component*/
+    float m_svdTrkSeedY = 0; /**< track position seed, Y component*/
+    float m_svdTrkSeedZ = 0; /**< track position seed, Z component*/
     float m_svdTrkPos = 0; /**< track position*/
     float m_svdTrkPosOS = 0; /**< track position on the other side*/
     float m_svdTrkPosErr = 0; /**< track position error*/

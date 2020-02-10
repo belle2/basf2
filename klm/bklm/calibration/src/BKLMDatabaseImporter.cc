@@ -116,18 +116,6 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
         channelId = MaxiChannel - iStrip + 1;
 
       if (plane == BKLMElementNumbers::c_PhiPlane) {
-        // Start settings for exp. 10.
-        if (isExperiment10) {
-          if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
-            if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
-              channelId = MaxiChannel - channelId + 1;
-              if (layer == 1)
-                channelId += -2;
-              if (layer == 2)
-                channelId += 1;
-            }
-          }
-        } // End settings for exp. 10.
         if (layer == 1)
           channelId += 4;
         if (layer == 2)

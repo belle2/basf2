@@ -131,7 +131,7 @@ void KLM::ScintillatorSimulator::setChannelData(
   const EKLMChannelData* channelData)
 {
   m_Pedestal = channelData->getPedestal();
-  m_PhotoelectronAmplitude = channelData->getPedestal();
+  m_PhotoelectronAmplitude = channelData->getPhotoelectronAmplitude();
   m_Threshold = channelData->getThreshold();
 }
 

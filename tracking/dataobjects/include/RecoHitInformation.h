@@ -78,7 +78,7 @@ namespace Belle2 {
       c_MCTrackFinderAuxiliaryHit,
       c_invalidTrackFinder,
       // non CKF-based track finders
-      c_LegendreTrackFinder,
+      c_CDCTrackFinder,
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,

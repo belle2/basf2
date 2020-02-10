@@ -376,13 +376,12 @@ void XTCalibrationAlgorithm::write()
               for (int i = 0; i < 8; ++i) {
                 par[i] = m_xtPrior[l][lr][al][th][i];
               }
-            } else { // if modes are different, simple xt is used.
-              par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
+            } else {
+              B2FATAL("XT mode before/after calibration is different!");
             }
 
-
           } else {
-            if (par[1] < 0) {
+            if (par[1] < 0) { // if negative c1, privious xt is kept.
               for (int i = 0; i < 8; ++i) {
                 par[i] = m_xtPrior[l][lr][al][th][i];
               }

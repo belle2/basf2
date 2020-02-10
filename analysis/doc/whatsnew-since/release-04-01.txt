@@ -17,6 +17,11 @@ Vertex Fitting
     with the mother constrained to the beam four-momentum
     (``fit_type=fourC``).
 
+ * Added ``smearing`` parameter to `vertex.KFit`. 
+   When you perform vertex fit with IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), IP profile is smeared by the given value. 
+   The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile. 
+   Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.  
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -101,6 +106,7 @@ Modules
    by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the module are now using double precision.
    The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
+ * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
 
 Utilities
 +++++++++

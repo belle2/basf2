@@ -1082,6 +1082,16 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     B2Pi0->appendDaughter(B2Gamma1);
     B2Pi0->appendDaughter(B2Gamma2);
 
+    // Add chisq of mass-constrained Kfit
+    B2Pi0->addExtraInfo("chiSquared", mdstPi0.chisq());
+
+    // Ndf of a pi0 mass-constrained kinematic fit is 1
+    B2Pi0->addExtraInfo("ndf", 1);
+
+    // Add p-value to extra Info
+    double prob = TMath::Prob(mdstPi0.chisq(), 1);
+    B2Pi0->setPValue(prob);
+
     // Add particle to particle list
     plist->addParticle(B2Pi0);
   }

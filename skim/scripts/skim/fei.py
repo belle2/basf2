@@ -88,17 +88,17 @@ def B0Hadronic(path):
         technical restrictions in the KFitter algorithm".
 
     Cuts applied
-       pi+ cuts:
+        :math:`\\pi^+` cuts:
 
-       * :math: `d_0 < 0.5`
-       * :math: `-2 < z_0 < 2`
-       * :math: `\\text{nCDCHits} > 20`
+        * ``d0 < 0.5``
+        * ``-2 < z0 < 2``
+        * ``nCDCHits > 20``
 
-       gamma cuts:
+        gamma cuts:
 
-       * :math: `0.296706 < \\theta < 2.61799`
+        * :math:`0.296706 < \\theta < 2.61799`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
@@ -107,9 +107,9 @@ def B0Hadronic(path):
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3`
-        * :math:`nCleanedECLClusters(0.296706 < \\theta < 2.61799 and E>0.2)>1`
-        * :math:`visibleEnergyOfEventCMS>4`
+        * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits > 20) >= 3``
+        * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E > 0.2) > 1``
+        * ``visibleEnergyOfEventCMS > 4``
         * :math:`E_{\\text{ECL}}<9`
 
         Tag side :math:`B` cuts:
@@ -196,29 +196,29 @@ def BplusHadronic(path):
         * :math:`B^+ \\to J/\\psi\\, K_S^0 \\pi^+`
 
     Cuts applied
-       pi+ cuts:
+        :math:`\\pi^+` cuts:
 
-       * :math: `d_0 < 0.5`
-       * :math: `-2 < z_0 < 2`
-       * :math: `\\text{nCDCHits} > 20`
+        * ``d0 < 0.5``
+        * ``-2 < z0 < 2``
+        * ``nCDCHits > 20``
 
-       gamma cuts:
+        gamma cuts:
 
-       * :math: `0.296706 < \\theta < 2.61799`
+        * :math:`0.296706 < \\theta < 2.61799`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
           charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math:`nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3`
-        * :math:`nCleanedECLClusters(0.296706 < \\theta < 2.61799 and E>0.2)>1`
-        * :math:`visibleEnergyOfEventCMS>4`
-        * :math:`E_{\\text{ECL}}<9`
+        * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits > 20) >= 3``
+        * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E > 0.2) > 1``
+        * ``visibleEnergyOfEventCMS > 4``
+        * :math:`E_{\\text{ECL}} < 9`
 
         Tag side :math:`B` cuts:
 
@@ -477,29 +477,29 @@ def B0SL(path):
         * :math:`B^0 \\to \\overline{D}^{0*} \\pi^- \\mu^+ \\nu_{\\mu}`
 
     Cuts applied
-       pi+ cuts:
+        :math:`\\pi^+` cuts:
 
-       * :math: `d_0 < 0.5`
-       * :math: `-2 < z_0 < 2`
-       * :math: `\\text{nCDCHits} > 20`
+        * ``d0 < 0.5``
+        * ``-2 < z0 < 2``
+        * ``nCDCHits > 20``
 
-       gamma cuts:
+        gamma cuts:
 
-       * :math: `0.296706 < \\theta < 2.61799`
+        * :math:`0.296706 < \\theta < 2.61799`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
           charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
         * :math:`n_{\\text{tracks}} \\geq 4`
-        * :math: `nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3`
-        * :math: `nCleanedECLClusters(0.296706 < \\theta < 2.61799 and E>0.2)>1`
-        * :math: `visibleEnergyOfEventCMS>4`
-        * :math: `E_{\\text{ECL}}<9`
+        * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits > 20) >= 3``
+        * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E > 0.2) > 1``
+        * ``visibleEnergyOfEventCMS > 4``
+        * :math:`E_{\\text{ECL}} < 9`
 
         Tag side :math:`B` cuts:
 
@@ -507,7 +507,7 @@ def B0SL(path):
         * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
         * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
         * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
-          (``daughter(1,p)>1.0`` or ``daughter(2,p)>1.0``, depending
+          (``daughter(1, p) > 1.0`` or ``daughter(2, p) > 1.0``, depending
           on decay mode ID)
 
     Parameters:
@@ -569,29 +569,29 @@ def BplusSL(path):
         * :math:`B^+ \\to D^{-*} \\pi^+ \\mu^+ \\nu_{\\mu}`
 
     Cuts applied
-       pi+ cuts:
+        :math:`\\pi^+` cuts:
 
-       * :math: `d_0 < 0.5`
-       * :math: `-2 < z_0 < 2`
-       * :math: `\\text{nCDCHits} > 20`
+        * ``d0 < 0.5``
+        * ``-2 < z0 < 2``
+        * ``nCDCHits > 20``
 
-       gamma cuts:
+        gamma cuts:
 
-       * :math: `0.296706 < \\theta < 2.61799`
+        * :math:`0.296706 < \\theta < 2.61799`
 
-       Event pre-cuts:
+        Event pre-cuts:
 
-       * :math:`R_2 < 0.4` (`foxWolframR2` from
+        * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all
           neutral clusters with :math:`E>0.1\\,\\text{GeV}`, and all
           charged tracks with :math:`p_T>0.1\\,\\text{GeV}`. If there
           are no tracks or clusters of sufficient energy, then the
           event is given an :math:`R_2` value of 1.)
-       * :math:`n_{\\text{tracks}} \\geq 4`
-       * :math:`nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3`
-       * :math:`nCleanedECLClusters(0.296706 < \\theta < 2.61799 and E>0.2)>1`
-       * :math:`visibleEnergyOfEventCMS>4`
-       * :math:`E_{\\text{ECL}}<9`
+        * :math:`n_{\\text{tracks}} \\geq 4`
+        * ``nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits > 20) >= 3``
+        * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E > 0.2) > 1``
+        * ``visibleEnergyOfEventCMS > 4``
+        * :math:`E_{\\text{ECL}}<9`
 
         Tag side :math:`B` cuts:
 

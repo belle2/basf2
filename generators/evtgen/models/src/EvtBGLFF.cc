@@ -3,9 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
  *                                                                        *
- * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -41,17 +40,14 @@ EvtBGLFF::EvtBGLFF(double bglap_0, double bglap_1, double bglap_2, double bglap_
 EvtBGLFF::EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, double bglc_1, double bglc_2)
 {
 
-  double V_cb = 4.16558e-2;
-  double eta_EW = 1.0066;
-  double eta_ew_Vcb = V_cb * eta_EW;
+  a_0 = bgla_0;
+  a_1 = bgla_1;
 
-  a_0 = bgla_0 / eta_ew_Vcb;
-  a_1 = bgla_1 / eta_ew_Vcb;
-  b_0 = bglb_0 / eta_ew_Vcb;
-  b_1 = bglb_1 / eta_ew_Vcb;
-  // c_0 will be defined later
-  c_1 = bglc_1 / eta_ew_Vcb;
-  c_2 = bglc_2 / eta_ew_Vcb;
+  b_0 = bglb_0;
+  b_1 = bglb_1;
+
+  c_1 = bglc_1;
+  c_2 = bglc_2;
 
   return;
 }
@@ -95,6 +91,7 @@ void EvtBGLFF::getscalarff(EvtId parent, EvtId,
 
 void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a1f,
                            double* a2f, double* vf, double* a0f)
+
 {
 
   double mb = EvtPDL::getMeanMass(parent);
@@ -103,16 +100,16 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
   // Form factors have a general form, with parameters passed in
   // from the arguements.
 
-  double r = mass / mb;
+  const double r = mass / mb;
   double z = (sqrt(w + 1.) - sqrt(2.)) / (sqrt(w + 1) + sqrt(2.));
-  double rstar = (2. * sqrt(mb * mass)) / (mb + mass);
-  double chiT_plus33 = 5.28e-4;
-  double chiT_minus33 = 3.07e-4;
-  double n_i = 2.6;
-  double axialvector_poles[4] = {6.730, 6.736, 7.135, 7.142};
-  double vector_poles[4] = {6.337, 6.899, 7.012, 7.280};
+  const double rstar = (2. * sqrt(mb * mass)) / (mb + mass);
+  const double chiT_plus33 = 5.28e-4;
+  const double chiT_minus33 = 3.07e-4;
+  const double n_i = 2.6;
+  const double axialvector_poles[4] = {6.730, 6.736, 7.135, 7.142};
+  const double vector_poles[4] = {6.337, 6.899, 7.012, 7.280};
 
-  double c_0 = (mb - mass) / mb * sqrt(0.5) / (1 + r + 2. * sqrt(r)) * b_0;
+  const double c_0 = (mb - mass) / mb * sqrt(0.5) / (1 + r + 2. * sqrt(r)) * b_0;
 
   double phi_g = sqrt(256. * n_i / (3. * M_PI * chiT_plus33)) * r * r * (1. + z) * (1. + z) / sqrt(1. - z) / pow((1. + r) *
                  (1. - z) + 2. * sqrt(r) * (1. + z), 4.);
@@ -123,7 +120,7 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
 
   double p_g = 1.;
   double p_f = 1.;
-  double term3 = sqrt((mb + mass) * (mb + mass) - (mb - mass) * (mb - mass));
+  const double term3 = sqrt((mb + mass) * (mb + mass) - (mb - mass) * (mb - mass));
   for (int i = 0; i < 4; i++) {
     double term1 = sqrt((mb + mass) * (mb + mass) - vector_poles[i] * vector_poles[i]);
     double term2 = sqrt((mb + mass) * (mb + mass) - axialvector_poles[i] * axialvector_poles[i]);
@@ -141,13 +138,9 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
   double r1 = (w + 1.) * mb * mass * g / f;
   double r2 = (w - r) / (w - 1) - F1 / mb / (w - 1) / f;
 
-  double r0 = 1.15;
-
   *a1f = (w + 1.) / 2. * rstar * ha1;
   *a2f = (r2 / rstar) * ha1;
   *vf  = (r1 / rstar) * ha1;
-  *a0f = (r0 / rstar) * ha1;
-
 
   return;
 }

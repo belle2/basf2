@@ -3,9 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
  *                                                                        *
- * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -77,9 +76,9 @@ private:
       a_0 + a_1*z
       For the expansion of form factors F1, the order of series N=2, i.e.
       c_0 + c_1 * z + c_2 * z**2
-      (g,f and F1 are the sub-terms of helicity amplitude)
+      (g, f and F1 are the sub-terms of helicity amplitude)
 
-      Fitted values taken from a private discussion of Florian Bernlochner based on
+      Fitted values are taken from a private discussion of Florian Bernlochner based on
       B.Grinstein and A.Kobach, Phys. Lett. B 771(2017)359-364
 
 

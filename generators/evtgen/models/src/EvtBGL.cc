@@ -3,9 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
  *                                                                        *
- * Jan. 2020: Added B0 -> D*lnu by Chaoyi Lyu                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -127,7 +126,7 @@ void EvtBGL::init()
       bglffmodel = new EvtBGLFF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5));
       calcamp = new EvtSemiLeptonicVectorAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL (N=3) model for vector meson daughters needs 6 arguments. Sorry." << endl;
+      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL model for vector meson daughters needs 6 arguments. Sorry." << endl;
       ::abort();
     }
   } else {

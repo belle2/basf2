@@ -546,7 +546,7 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
         "ExpectedEventCPUTime": skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel],
-        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerSkimmedEvent"][statsSampleLabel],
+        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel],
         "InputSandboxFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
         "InputData": LPNList,
         "Priority": 8,

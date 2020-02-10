@@ -86,7 +86,7 @@ def getArgumentParser():
     parser.add_argument('-c', '--combined', nargs='+', default=[],
                         choices=['all']+allCombinedSkims, metavar='SKIM',
                         help='List of combined skims to run.')
-    parser.add_argument('--mccampaign', default='MC12',
+    parser.add_argument('--mccampaign', default='MC13',
                         choices=['MC9', 'MC10', 'MC11', 'MC12','MC13'],
                         help='The MC campaign to test on.')
 

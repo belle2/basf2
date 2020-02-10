@@ -16,7 +16,6 @@ from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
 
-gb2_setuprel = "release-04-00-00"
 
 # Create skim path
 btocharmlesspath = b2.Path()

@@ -475,7 +475,6 @@ def getAllSamples(mcCampaign):
     }
 
     dataSampleLabels = {
-
         'proc10_exp8': 'Data: proc10 exp. 8',
         'proc10_exp7': 'Data: proc10 exp. 7',
         'proc9_exp3': 'Data: proc9 exp. 3',

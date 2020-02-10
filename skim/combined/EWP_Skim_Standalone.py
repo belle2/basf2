@@ -15,7 +15,7 @@ from stdCharged import stdE, stdMu, stdPi
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
 
-gb2_setuprel = 'release-04-00-00'
+
 fileList = expert.get_test_file("MC12_mixedBGx1")
 path = b2.Path()
 

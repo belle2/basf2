@@ -38,15 +38,16 @@ class Mails:
     """!
     Provides functionality to send mails in case of failed scripts / validation
     plots.
+    The mail data is built upon instantiation, the `send_mails` method
+    sends the actual mails.
 
-    @var validator: Instance of validation.Validation
-    @var mail_data_new: Current mail data
-    @var comparison_json: Get JSON object with comparison data (serialization
-        of json_objects.Comparison)
-    @var mail_data_old: Yesterday's mail data (generated from comparison_json)
+
+    @var _validator: Instance of validation.Validation
+    @var _mail_data_old: Yesterday's mail data (generated from comparison_json)
+    @var _mail_data_new: Current mail data. Will be filled on instantiation.
     """
 
-    def __init__(self, validation):
+    def __init__(self, validation, include_expert_plots=False):
         """!
         Initializes an instance of the Mail class from an instance of the
         Validation class. Assumes that a comparison json file exists,
@@ -57,12 +58,13 @@ class Mails:
         later comparison.
 
         @param validation: validation.Validation instance
+        @param include_expert_plots: Should expert plots be included?
         """
 
-        self.validator = validation
+        self._validator = validation
 
         # read contents from comparison.json
-        work_folder = self.validator.work_folder
+        work_folder = self._validator.work_folder
         revisions = ['reference'] + available_revisions(work_folder)
         comparison_json_file = \
             validationpath.get_html_plots_tag_comparison_json(
@@ -70,24 +72,26 @@ class Mails:
                 revisions
             )
         with open(comparison_json_file) as f:
-            self.comparison_json = json.load(f)
+            comparison_json = json.load(f)
 
         # yesterday's mail data
         old_mail_data_path = os.path.join(
-            self.validator.get_log_folder(), "mail_data.json"
+            self._validator.get_log_folder(), "mail_data.json"
         )
         try:
             with open(old_mail_data_path) as f:
-                self.mail_data_old = json.load(f)
+                self._mail_data_old = json.load(f)
         except FileNotFoundError:
             print(
                 f"Could not find old mail_data.json at {old_mail_data_path}.",
                 file=sys.stderr
             )
-            self.mail_data_old = None
+            self._mail_data_old = None
 
         # current mail data
-        self.mail_data_new = self._create_mail_log(self.comparison_json)
+        self._mail_data_new = self._create_mail_log(
+            comparison_json, include_expert_plots=include_expert_plots
+        )
 
     def _create_mail_log_failed_scripts(self) -> Dict[str, Dict[str, str]]:
         """!
@@ -97,7 +101,7 @@ class Mails:
         """
 
         # get failed scripts
-        with open(os.path.join(self.validator.get_log_folder(),
+        with open(os.path.join(self._validator.get_log_folder(),
                                "list_of_failed_scripts.log")) as f:
             failed_scripts = f.read().splitlines()
 
@@ -109,8 +113,8 @@ class Mails:
             for suffix in ["py", "C"]:
                 failed_script = failed_script.replace("." + suffix,
                                                       "_" + suffix)
-            if self.validator.get_script_by_name(failed_script):
-                script = self.validator.get_script_by_name(failed_script)
+            if self._validator.get_script_by_name(failed_script):
+                script = self._validator.get_script_by_name(failed_script)
             else:
                 # can't do anything if script is not found
                 continue
@@ -147,7 +151,8 @@ class Mails:
 
         return mail_log
 
-    def _create_mail_log(self, comparison) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def _create_mail_log(self, comparison, include_expert_plots=False) \
+            -> Dict[str, Dict[str, Dict[str, str]]]:
         """!
         Takes the entire comparison json file, finds all the plots where
         comparison failed, finds info about failed scripts and saves them in
@@ -178,6 +183,8 @@ class Mails:
         for package in comparison["packages"]:
             for plotfile in package["plotfiles"]:
                 for plot in plotfile["plots"]:
+                    if not include_expert_plots and plot["is_expert"]:
+                        continue
                     skip = True
                     if plot["comparison_result"] in ["error"]:
                         skip = False
@@ -216,7 +223,7 @@ class Mails:
                 for script in failed_scripts[contact]:
                     mail_log[contact][script] = failed_scripts[contact][script]
 
-        return self._flag_new_failures(mail_log, self.mail_data_old)
+        return self._flag_new_failures(mail_log, self._mail_data_old)
 
     @staticmethod
     def _flag_new_failures(
@@ -280,8 +287,7 @@ class Mails:
                    "person) produced warnings/errors or " \
                    "because their warning/error status " \
                    "changed. \n" \
-                   "Below is a detailed list of all problematic " \
-                   "plots/scripts with new/changed offenders highlighted:\n\n"
+                   "Below is a detailed list of all new/changed offenders:\n\n"
         else:
             body = "This is a full list of validation plots/scripts that" \
                    " produced warnings/errors and include you as contact" \
@@ -290,6 +296,23 @@ class Mails:
         body += "There were problems with the validation of the " \
             "following plots/scripts:\n\n"
         for plot in plots:
+            compared_to_yesterday = plots[plot]["compared_to_yesterday"]
+            body_plot = ""
+            if compared_to_yesterday == "unchanged":
+                if incremental:
+                    # Do not include.
+                    continue
+            elif compared_to_yesterday == "new":
+                body_plot = '<b style="color: red;">[NEW]</b><br>'
+            elif compared_to_yesterday == "changed":
+                body_plot = '<b style="color: red;">' \
+                             '[Warnings/comparison CHANGED]</b><br>'
+            else:
+                body_plot = \
+                    f'<b style="color: red;">[UNEXPECTED compared_to_yesterday ' \
+                    f'flag: "{compared_to_yesterday}". Please alert the ' \
+                    f'validation maintainer.]</b><br>'
+
             # compose descriptive error message
             if plots[plot]["comparison_result"] == "error":
                 errormsg = "comparison unequal"
@@ -298,12 +321,6 @@ class Mails:
             else:
                 errormsg = plots[plot]["comparison_result"]
 
-            body_plot = ""
-            if plots[plot]["compared_to_yesterday"] == "new":
-                body_plot += '<b style="color: red;">[NEW]</b><br>'
-            elif plots[plot]["compared_to_yesterday"] == "changed":
-                body_plot += '<b style="color: red;">' \
-                             '[Warnings/comparison CHANGED]</b><br>'
             body_plot += "<b>{plot}</b><br>"
             body_plot += "<b>Package:</b> {package}<br>"
             body_plot += "<b>Rootfile:</b> {rootfile}.root<br>"
@@ -337,6 +354,7 @@ class Mails:
 
         return body
 
+    # todo: this logic should probably be put somewhere else
     @staticmethod
     def _force_full_report() -> bool:
         """ Should a full (=non incremental) report be sent?
@@ -364,25 +382,25 @@ class Mails:
             print("Sending incremental report.")
 
         recipients = []
-        for contact in self.mail_data_new:
+        for contact in self._mail_data_new:
             # if the errors are the same as yesterday, don't send a new mail
-            if incremental and self._check_if_same(self.mail_data_new[contact]):
+            if incremental and self._check_if_same(self._mail_data_new[contact]):
                 # don't send mail
                 continue
             recipients.append(contact)
 
             # set the mood of the b2bot
-            if len(self.mail_data_new[contact]) < 4:
+            if len(self._mail_data_new[contact]) < 4:
                 mood = "meh"
-            elif len(self.mail_data_new[contact]) < 7:
+            elif len(self._mail_data_new[contact]) < 7:
                 mood = "angry"
-            elif len(self.mail_data_new[contact]) < 10:
+            elif len(self._mail_data_new[contact]) < 10:
                 mood = "livid"
             else:
                 mood = "dead"
 
             body = self._compose_message(
-                self.mail_data_new[contact],
+                self._mail_data_new[contact],
                 incremental=incremental
             )
 
@@ -400,9 +418,9 @@ class Mails:
             )
 
         # send a happy mail to folks whose failed plots work now
-        if self.mail_data_old:
-            for contact in self.mail_data_old:
-                if contact not in self.mail_data_new:
+        if self._mail_data_old:
+            for contact in self._mail_data_old:
+                if contact not in self._mail_data_new:
                     recipients.append(contact)
                     body = "Your validation plots work fine now!"
                     mail_utils.send_mail(
@@ -419,6 +437,6 @@ class Mails:
         """
         Dump mail json.
         """
-        with open(os.path.join(self.validator.get_log_folder(),
+        with open(os.path.join(self._validator.get_log_folder(),
                                "mail_data.json"), "w") as f:
-            json.dump(self.mail_data_new, f, sort_keys=True, indent=4)
+            json.dump(self._mail_data_new, f, sort_keys=True, indent=4)

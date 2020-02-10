@@ -34,34 +34,36 @@ def BsigToD0hTohhList(path):
 
     **Decay Modes**:
 
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    1. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
+    2. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
 
-    3.  :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
+    3. :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
 
-    4.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) \\pi^+`,
+    4. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) \\pi^+`,
 
-    5.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+    5. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
 
-    6.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) K^+`,
+    6. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) K^+`,
 
-    7.  :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
+    7. :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
 
-    8.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
+    8. :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
+
 
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+
+    1. ``1.5 < M_D0 < 2.2``
+
+    2. ``5.2 < Mbc``
+
+    3. ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadD0_hh_loose()  from the ``charm.py`` script where D0 channels are defined.
-
-
+      This skim uses ``loadD0_hh_loose()``  from the ``charm.py`` script where :math:`D^0` channels are defined.
     """
 
     __author__ = "H. Atmacan"
@@ -114,12 +116,12 @@ def BsigToD0hToKshhList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+        1. ``1.5 < M_D0 < 2.2``
+        2. ``5.2 < Mbc``
+        3. ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadD0_Kshh_loose()  from the ``charm.py`` script where D0 channels are defined.
+      This skim uses ``loadD0_Kshh_loose()``  from the ``charm.py`` script where D0 channels are defined.
 
     """
     __author__ = "M. Nayak"
@@ -160,12 +162,16 @@ def BsigToD0hToKspi0List(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+
+    1. ``1.5 < M_D0 < 2.2``
+
+    2. ``5.2 < Mbc``
+
+    3. ``abs(deltaE) < 0.3``
+
 
     Note:
-    This skim uses loadD0_Kspi0_loose()  from the ``charm.py`` script where D0 channels are defined.
+      This skim uses ``loadD0_Kspi0_loose()``  from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
     __author__ = "M. Nayak"
@@ -206,12 +212,16 @@ def BsigToD0hToKspipipi0List(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.8 < M_D0 < 1.9
-    2. 5.25 < Mbc
-    3. abs(deltaE) < 0.2
+
+    1. ``1.8 < M_D0 < 1.9``
+
+    2. ``5.25 < Mbc``
+
+    3. ``abs(deltaE) < 0.2``
+
 
     Note:
-    This skim uses loadD0_Kspipipi0() from the ``charm.py`` script where D0 channels are defined.
+      This skim uses ``loadD0_Kspipipi0()`` from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
     __author__ = "N. Rout"
@@ -254,14 +264,16 @@ def BsigToD0hToKpiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. Mbc > 5.2
-    3. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D0 < 2.0``
+
+    2. ``Mbc > 5.2``
+
+    3. ``abs(deltaE) < 0.5``
+
 
     Note:
-    This skim uses loadStdD0_Kpi() from the ``charm.py`` script
-    where D0 channels are defined.
-
+      This skim uses ``loadStdD0_Kpi()`` from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
 
@@ -304,13 +316,16 @@ def BsigToD0hToKpipipiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. Mbc > 5.2
-    3. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D0 < 2.0``
+
+    2. ``Mbc > 5.2``
+
+    3. ``abs(deltaE) < 0.5``
+
 
     Note:
-    This skim uses loadStdD0_Kpipipi() from the ``charm.py`` script
-    where D0 channels are defined.
+      This skim uses ``loadStdD0_Kpipipi()`` from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
     __author__ = "Niharika Rout"
@@ -344,17 +359,18 @@ def loadB0toDpi_Kpipi(path):
     **Decay Mode**:
 
 
-    1.  :math:`B^{0}\\to \\D^{-} (\\D^{0} to K^+ pi^- pi^-) \\pi^+`
+    1.  :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    2. Mbc > 5.2
-    3. abs(deltaE) < 0.3
+
+    1. ``Mbc > 5.2``
+
+    2. ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadStdDplus_Kpipi from the ``charm.py`` script
-    where D- channel is defined.
+      This skim uses ``loadStdDplus_Kpipi()`` from the ``charm.py`` script where :math:`D^-` channel is defined.
 
     """
 
@@ -379,18 +395,19 @@ def loadB0toDstarPi_Kpi(path):
 
     **Decay Mode**:
 
-
-    1.  :math:`B^{0}\\to \\D^{*-} (\\D^{0} to K^+ pi^-) \\pi^+`
+    1.  :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) \\pi^+`
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    2. Mbc > 5.2
-    3. abs(deltaE) < 0.3
+
+    1. ``Mbc > 5.2``
+
+    2. ``abs(deltaE) < 0.3``
+
 
     Note:
-    This skim uses loadStdDstarPlus_D0pi_Kpi from the ``charm.py`` script
-    where D*- channel is defined.
+        This skim uses ``loadStdDstarPlus_D0pi_Kpi()`` from the ``charm.py`` script where the :math:`D^{*-}` channel is defined.
 
     """
 
@@ -403,32 +420,30 @@ def loadB0toDstarPi_Kpi(path):
 
 def loadB0toDstarPi_Kpipipi(path):
     """
-   **Skim Author**: C. La Licata
+    **Skim Author**: C. La Licata
 
-   **Skim Name**: B0toDstarPi_D0pi_Kpipipi
+    **Skim Name**: B0toDstarPi_D0pi_Kpipipi
 
-   **Skim Category**: physics, hadronic neutral B to charm
+    **Skim Category**: physics, hadronic neutral B to charm
 
-   **Skim Code**: 14120700
+    **Skim Code**: 14120700
 
-   **Working Group**: BtoCharm (WG4)
+    **Working Group**: BtoCharm (WG4)
 
-   **Decay Mode**:
+    **Decay Mode**:
 
 
-   1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^- pi^- pi^+) \\pi^+`
+    1.  :math:`B^{0}\\to (D^{*-} \\to K^+ \\pi^- \\pi^- \\pi^+) \\pi^+`
 
-   **Particle Lists**: Standard lists for all particles.
+    **Particle Lists**: Standard lists for all particles.
 
-   **Additional Cuts**:
-   2. Mbc > 5.2
-   3. abs(deltaE) < 0.3
+    **Additional Cuts**:
 
-   Note:
-   This skim uses  from the ``charm.py`` script
-   where D*- channel is defined.
+    1. ``Mbc > 5.2``
 
-   """
+    2. ``abs(deltaE) < 0.3``
+
+    """
 
     Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
 
@@ -460,8 +475,10 @@ def DoubleCharmList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    2. 5.2 < Mbc < 5.29
-    3. abs(deltaE) < 0.5
+
+    1. ``5.2 < Mbc < 5.29``
+
+    2. ``abs(deltaE) < 0.5``
 
     """
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'

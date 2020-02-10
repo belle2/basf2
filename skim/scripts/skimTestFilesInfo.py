@@ -184,7 +184,14 @@ kekcc_locations = [
      'mdst/sub00/mdst_000034_prod00007405_task10020000034.root'),
 
 
-
+    ('MC12_eeeeBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007515_task10020000001.root'),
+    ('MC12_eeeeBGx1', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007464_task10020000001.root'),
+    ('MC12_eemumuBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007516_task10020000001.root'),
+    # ('MC12_eemumuBGx0','/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007465_task10020000001.root'),
+    ('MC12_mumuBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007517_task10020000001.root'),
+    ('MC12_mumuBGx1', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007466_task10020000001.root'),
+    ('MC12_eeBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007519_task10020000001.root'),
+    ('MC12_eeBGx1', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007468_task10020000001.root'),
 
     ('MC11_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-02-00-01/DB00000411/MC11/prod00005678/s00/e0000/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000995_prod00005678_task00000995.root'),

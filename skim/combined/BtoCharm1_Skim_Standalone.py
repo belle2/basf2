@@ -16,7 +16,6 @@ from stdV0s import stdKshorts
 from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdLightMesons
 import skimExpertFunctions as expert
 
-gb2_setuprel = 'release-04-00-00'
 
 btocharmpath = b2.Path()
 

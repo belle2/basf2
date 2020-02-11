@@ -1,4 +1,5 @@
 log/
-skimStats.json
-confluenceTables.txt
+*.json
+*.txt
 *.yaml
+

@@ -85,11 +85,10 @@ combined_skims = {
         'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
     ],
     'CharmHigh': [
-        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJmPi0',
-        'DstToD0Pi_D0ToHpHmPi0', 'XToDp_DpToKsHp'
+        'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
     ],
     'CharmLow': [
-        'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare', 'XToD0_D0ToHpJm'
+        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare'
     ],
     'CharmEarlyData': [
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'

@@ -17,6 +17,8 @@
 #include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
+#include <analysis/VertexFitting/TreeFitter/FeedthroughParticle.h>
+#include <analysis/VertexFitting/TreeFitter/InternalTrack.h>
 
 #include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
@@ -158,15 +160,18 @@ namespace TreeFitter {
                                   forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
-
+    } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
+      if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> feedthrough
+        rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
+      } else { // Got gammas -> Internal track
+        rc = new InternalTrack(particle, mother, config, forceFitAll, true);
+      }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||
                particle->getECLCluster() ||
                particle->getKLMCluster()) { // external particles and final states
-
       if (particle->getTrack()) {
         rc = new RecoTrack(particle, mother);
-
       } else if (particle->getECLCluster()) {
         rc = new RecoPhoton(particle, mother);
 
@@ -277,6 +282,15 @@ namespace TreeFitter {
       fitparams.getCovariance()(tauindex, tauindex) = 1.;
     }
     return status;
+  }
+
+  const ParticleBase* ParticleBase::mother() const
+  {
+    const ParticleBase* rc = m_mother;
+    while (rc && rc->type() == kFeedthroughParticle) {
+      rc = rc->mother();
+    }
+    return rc;
   }
 
   std::string ParticleBase::parname(int thisindex) const

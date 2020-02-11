@@ -141,6 +141,7 @@ namespace TreeFitter {
       case lifetime:     rc = "lifetime";   break;
       case merged:       rc = "merged";     break;
       case conversion:   rc = "conversion"; break;
+      case helix:        rc = "helix";      break;
       case ntypes:
       case unknown:
         break;

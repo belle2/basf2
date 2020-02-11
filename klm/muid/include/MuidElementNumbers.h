@@ -12,6 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
@@ -42,6 +43,15 @@ namespace Belle2 {
       c_CrossBarrelExitForwardMax = 51,
       c_CrossBarrelExitBackwardMin = 52,
       c_CrossBarrelExitBackwardMax = 66
+    };
+
+    /**
+     * Labels for detectors crossed.
+     */
+    enum DetectorsCrossed {
+      c_Both = 0,
+      c_OnlyBarrel = KLMElementNumbers::c_BKLM,
+      c_OnlyEndcap = KLMElementNumbers::c_EKLM,
     };
 
     /**
@@ -140,7 +150,7 @@ namespace Belle2 {
     static constexpr int m_MaximalOutcome = c_CrossBarrelExitBackwardMax;
 
     /** Maximal value of the detector selector (for transverse scattering). */
-    static constexpr int m_MaximalDetector = 2;
+    static constexpr int m_MaximalDetector = c_OnlyEndcap;
 
     /** Maximal value of NDof/2 (for transverse scattering). */
     static constexpr int m_MaximalHalfNDof = 18;

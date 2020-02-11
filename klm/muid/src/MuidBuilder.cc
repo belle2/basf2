@@ -240,11 +240,11 @@ namespace Belle2 {
     double x = chiSquared / ndof;
 
     /* Assume that the track crossed both barrel and endcap. */
-    int detector = 0;
+    int detector = MuidElementNumbers::c_Both;
     if (muid->getEndcapExtLayer() < 0) {
-      detector = 1; /* Crossed barrel only. */
+      detector = MuidElementNumbers::c_OnlyBarrel; /* Crossed barrel only. */
     } else if (muid->getBarrelExtLayer() < 0) {
-      detector = 2;  /* Crossed endcap only. */
+      detector = MuidElementNumbers::c_OnlyEndcap;  /* Crossed endcap only. */
     }
 
     /* Use spline interpolation of the logarithms of the PDF to avoid binning artifacts.

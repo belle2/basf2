@@ -28,6 +28,7 @@
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/muid/MuidBuilder.h>
+#include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -1815,16 +1816,13 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
 void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)
 {
-
-  // Done with this track: compute likelihoods and fill the muid object
-
+  /* Done with this track: compute KLM likelihoods and fill the relative dataobject. */
   int lastExtLayer(extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1);
   // outcome: 0=didn't reach KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
   int outcome(0);
   if ((extState.lastBarrelExtLayer >= 0) || (extState.lastEndcapExtLayer >= 0)) {
     outcome = ((extState.lastEndcapExtLayer < 0) ? 1 : 2) + (extState.escaped ? 2 : 0);
   }
-
   klmMuidLikelihood->setOutcome(outcome);
   klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);
   klmMuidLikelihood->setEndcapExtLayer(extState.lastEndcapExtLayer);
@@ -1838,9 +1836,7 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   klmMuidLikelihood->setDegreesOfFreedom(extState.nPoint);
   klmMuidLikelihood->setExtLayerPattern(extState.extLayerPattern);
   klmMuidLikelihood->setHitLayerPattern(extState.hitLayerPattern);
-
-// Do likelihood calculation
-
+  /* Do KLM likelihood calculation. */
   double junk = 0.0;
   double muon = 0.0;
   double pion = 0.0;
@@ -1854,7 +1850,7 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   double logL_p = -1.0E20;
   double logL_d = -1.0E20;
   double logL_e = -1.0E20;
-  if (outcome != 0) { // extrapolation reached KLM sensitive volume
+  if (outcome != MuidElementNumbers::c_NotReached) { /* Extrapolation reached KLM sensitive volume. */
     int charge = (klmMuidLikelihood->getPDGCode() > 0);
     if ((abs(klmMuidLikelihood->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(klmMuidLikelihood->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
@@ -1879,10 +1875,10 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
     if (proton > 0.0) logL_p = log(proton);
     if (deuteron > 0.0) logL_d = log(deuteron);
     if (electron > 0.0) logL_e = log(electron);
-    // normalize the PDF values
+    /* Normalize the PDF values. */
     double denom = muon + pion + kaon + proton + deuteron + electron;
     if (denom < 1.0E-20) {
-      junk = 1.0; // anomaly: should be very rare
+      junk = 1.0; /* Anomaly: should be very rare. */
     } else {
       muon /= denom;
       pion /= denom;
@@ -1892,7 +1888,6 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
       electron /= denom;
     }
   }
-
   klmMuidLikelihood->setJunkPDFValue(junk);
   klmMuidLikelihood->setMuonPDFValue(muon);
   klmMuidLikelihood->setPionPDFValue(pion);
@@ -1906,5 +1901,4 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   klmMuidLikelihood->setLogL_p(logL_p);
   klmMuidLikelihood->setLogL_d(logL_d);
   klmMuidLikelihood->setLogL_e(logL_e);
-
 }

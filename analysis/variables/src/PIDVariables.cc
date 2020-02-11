@@ -319,16 +319,45 @@ namespace Belle2 {
       return func;
     }
 
-    double mostLikelyPDG(const Particle* part)
+    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments)
     {
-      auto* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<double>::quiet_NaN();
-      return pid->getMostLikely().getPDGCode();
+      if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
+        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
+        return nullptr;
+      }
+      double prob[Const::ChargedStable::c_SetSize];
+      if (arguments.size() == 0) {
+        for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) prob[i] = 1. / Const::ChargedStable::c_SetSize;
+      }
+      if (arguments.size() == Const::ChargedStable::c_SetSize) {
+        try {
+          int i = 0;
+          for (std::string arg : arguments) {
+            prob[i++] = std::stoi(arg);
+          }
+        } catch (std::invalid_argument& e) {
+          B2ERROR("All arguments of mostLikelyPDG must be a float number");
+          return nullptr;
+        }
+      }
+      auto func = [prob](const Particle * part) -> double {
+        auto* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<double>::quiet_NaN();
+        return pid->getMostLikely(prob).getPDGCode();
+      };
+      return func;
     }
 
-    double isMostLikely(const Particle* part)
+    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments)
     {
-      return mostLikelyPDG(part) == abs(part->getPDGCode());
+      if (arguments.size() != 0 and arguments.size() != 6) {
+        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for isMostLikelyPDG");
+        return nullptr;
+      }
+      auto func = [arguments](const Particle * part) -> double {
+        return mostLikelyPDG(arguments)(part) == abs(part->getPDGCode());
+      };
+      return func;
     }
 
     //*************

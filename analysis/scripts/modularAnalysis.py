@@ -1745,7 +1745,8 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=[],
-                     belle_sources=False, fillWithMostLikely=False, path=None):
+                     belle_sources=False, fillWithMostLikely=False,
+                     chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1758,13 +1759,16 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the inputParticlelists
                               option will be ignored.
+    @param chargedPIDPriors   The prior PID fractions, which can be used to
+                              regulate amount of certain charged particle species, should be a list of
+                              six float if not None
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     fillParticleList('pi+:roe_default', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
+        stdMostLikely(chargedPIDPriors, path=path)
         inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
@@ -2438,7 +2442,7 @@ def writePi0EtaVeto(
 
 
 def buildEventKinematics(inputListNames=[], default_cleanup=True,
-                         fillWithMostLikely=False, path=None):
+                         chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
@@ -2452,13 +2456,16 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the options inputListNames and default_cleanup
                               will be ignored.
+    @param chargedPIDPriors   The prior PID fractions, which can be used to
+                              regulate amount of certain charged particle species, should be a list of
+                              six float if not None
     @param default_cleanup    if True, apply default clean up cuts to default
                               ParticleLists pi+:evtkin and gamma:evtkin.
     @param path               modules are added to this path
     """
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
+        stdMostLikely(chargedPIDPriors, path=path)
         inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
@@ -2493,6 +2500,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
                     fillWithMostLikely=False,
+                    chargedPIDPriors=None,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2534,6 +2542,9 @@ def buildEventShape(inputListNames=[],
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the options inputListNames
                               and default_cleanup will be ignored.
+    @param chargedPIDPriors   The prior PID fractions, which can be used to
+                              regulate amount of certain charged particle species, should be a list of
+                              six float if not None
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
@@ -2558,7 +2569,7 @@ def buildEventShape(inputListNames=[],
     """
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
+        stdMostLikely(chargedPIDPriors, path=path)
         inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtshape', '', path=path)
         inputListNames += ['gamma:evtshape']

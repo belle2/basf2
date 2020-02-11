@@ -63,9 +63,8 @@ def get_default_channels(
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
         # HOTFIX
         from variables import variables
-        variables.addAlias('kIDBelle', 'atcPIDBelle(3,2)')
         chargedVariables = ['eIDBelle',
-                            'kIDBelle',
+                            'atcPIDBelle(3,2)',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
@@ -1058,7 +1057,7 @@ def get_fr_channels(convertedFromBelle=False):
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
         chargedVariables = ['eIDBelle',
-                            'kIDBelle',
+                            'atcPIDBelle(3,2)',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']

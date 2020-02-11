@@ -321,6 +321,7 @@ def add_cdst_output(
     calibrationBranches = [
         'RecoTracks',
         'EventT0',
+        'PXDClustersFromTracks',
         'SVDEventInfo',
         'SVDShaperDigits',
         'SVDRecoDigits',
@@ -389,6 +390,7 @@ def add_cdst_output(
             'EventT0',
             'CDCDedxTracks',
             'SVDShaperDigitsFromTracks',
+            'PXDClustersFromTracks',
             'EventT0',
             'VXDDedxTracks',
             'CDCDedxLikelihoods',

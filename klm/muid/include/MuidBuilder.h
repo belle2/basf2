@@ -33,7 +33,7 @@ namespace Belle2 {
     ~MuidBuilder();
 
     //! Get the PDF for a particular hypothesis
-    double getPDF(const KLMMuidLikelihood*, bool isForward) const;
+    double getPDF(const KLMMuidLikelihood*) const;
 
   private:
 
@@ -53,7 +53,7 @@ namespace Belle2 {
     void spline(int, double, double*, double*, double*, double*);
 
     //! Get the per-layer PDF for a particular hypothesis
-    double getPDFLayer(const KLMMuidLikelihood*, bool) const;
+    double getPDFLayer(const KLMMuidLikelihood*) const;
 
     //! Get the transverse-coordinate PDF for a particular hypothesis
     double getPDFRchisq(const KLMMuidLikelihood*) const;

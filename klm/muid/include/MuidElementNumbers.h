@@ -72,6 +72,15 @@ namespace Belle2 {
     static bool checkExtrapolationOutcome(int outcome, int lastLayer);
 
     /**
+     * Calculate the track extrapolation outcome.
+     * @param[in] isForward       Forward or backward.
+     * @param[in] escaped         Escaped or not from KLM volumes.
+     * @param[in] lastBarrelLayer Last barrel layer crossed during the extrapolation.
+     * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
+     */
+    static int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
+
+    /**
      * Get maximal barrel layer number (0-based).
      */
     static constexpr int getMaximalBarrelLayer()

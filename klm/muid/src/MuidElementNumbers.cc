@@ -69,3 +69,32 @@ bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
     return false;
   return true;
 }
+
+int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer)
+{
+  int outcome = MuidElementNumbers::c_NotReached;
+  if ((lastBarrelLayer >= 0) || (lastEndcapLayer >= 0)) {
+    /* Stop or exit in barrel. */
+    if (lastEndcapLayer < 0)
+      outcome = escaped ? MuidElementNumbers::c_ExitBarrel : MuidElementNumbers::c_StopInBarrel;
+    /* Stop or exit in endcap. */
+    else {
+      if (escaped) {
+        if (lastBarrelLayer < 0) /* Exit in endcap with no barrel hits. */
+          outcome = isForward ? MuidElementNumbers::c_ExitForwardEndcap :
+                    MuidElementNumbers::c_ExitBackwardEndcap;
+        else /* Exit in endcap with barrel hits. */
+          outcome = (isForward ? MuidElementNumbers::c_CrossBarrelExitForwardMin : MuidElementNumbers::c_CrossBarrelExitBackwardMin) +
+                    lastBarrelLayer;
+      } else {
+        if (lastBarrelLayer < 0) /* Stop in endcap with no barrel hits. */
+          outcome = isForward ? MuidElementNumbers::c_StopInForwardEndcap :
+                    MuidElementNumbers::c_StopInBackwardEndcap;
+        else /* Stop in endcap with barrel hits. */
+          outcome = (isForward ? MuidElementNumbers::c_CrossBarrelStopInForwardMin : MuidElementNumbers::c_CrossBarrelStopInBackwardMin) +
+                    lastBarrelLayer;
+      }
+    }
+  }
+  return outcome;
+}

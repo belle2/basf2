@@ -1817,13 +1817,11 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)
 {
   /* Done with this track: compute KLM likelihoods and fill the relative dataobject. */
-  int lastExtLayer(extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1);
-  // outcome: 0=didn't reach KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
-  int outcome(0);
-  if ((extState.lastBarrelExtLayer >= 0) || (extState.lastEndcapExtLayer >= 0)) {
-    outcome = ((extState.lastEndcapExtLayer < 0) ? 1 : 2) + (extState.escaped ? 2 : 0);
-  }
+  int lastExtLayer = extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1;
+  int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, extState.escaped, extState.lastBarrelExtLayer,
+                extState.lastEndcapExtLayer);
   klmMuidLikelihood->setOutcome(outcome);
+  klmMuidLikelihood->setIsForward(isForward);
   klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);
   klmMuidLikelihood->setEndcapExtLayer(extState.lastEndcapExtLayer);
   klmMuidLikelihood->setBarrelHitLayer(extState.lastBarrelHitLayer);
@@ -1855,19 +1853,19 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
     if ((abs(klmMuidLikelihood->getPDGCode()) == Const::muon.getPDGCode()) ||
         (abs(klmMuidLikelihood->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
     if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(klmMuidLikelihood, isForward);
-      pion = m_PionPlusPar->getPDF(klmMuidLikelihood, isForward);
-      kaon = m_KaonPlusPar->getPDF(klmMuidLikelihood, isForward);
-      proton = m_ProtonPar->getPDF(klmMuidLikelihood, isForward);
-      deuteron = m_DeuteronPar->getPDF(klmMuidLikelihood, isForward);
-      electron = m_PositronPar->getPDF(klmMuidLikelihood, isForward);
+      muon = m_MuonPlusPar->getPDF(klmMuidLikelihood);
+      pion = m_PionPlusPar->getPDF(klmMuidLikelihood);
+      kaon = m_KaonPlusPar->getPDF(klmMuidLikelihood);
+      proton = m_ProtonPar->getPDF(klmMuidLikelihood);
+      deuteron = m_DeuteronPar->getPDF(klmMuidLikelihood);
+      electron = m_PositronPar->getPDF(klmMuidLikelihood);
     } else {
-      muon = m_MuonMinusPar->getPDF(klmMuidLikelihood, isForward);
-      pion = m_PionMinusPar->getPDF(klmMuidLikelihood, isForward);
-      kaon = m_KaonMinusPar->getPDF(klmMuidLikelihood, isForward);
-      proton = m_AntiprotonPar->getPDF(klmMuidLikelihood, isForward);
-      deuteron = m_AntideuteronPar->getPDF(klmMuidLikelihood, isForward);
-      electron = m_ElectronPar->getPDF(klmMuidLikelihood, isForward);
+      muon = m_MuonMinusPar->getPDF(klmMuidLikelihood);
+      pion = m_PionMinusPar->getPDF(klmMuidLikelihood);
+      kaon = m_KaonMinusPar->getPDF(klmMuidLikelihood);
+      proton = m_AntiprotonPar->getPDF(klmMuidLikelihood);
+      deuteron = m_AntideuteronPar->getPDF(klmMuidLikelihood);
+      electron = m_ElectronPar->getPDF(klmMuidLikelihood);
     }
     if (muon > 0.0) logL_mu = log(muon);
     if (pion > 0.0) logL_pi = log(pion);

@@ -85,8 +85,11 @@ namespace Belle2 {
     //! @return number of degrees of freedom in chi-squared calculation
     int getDegreesOfFreedom() const { return m_DegreesOfFreedom; }
 
-    //! @return outcome of this extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
-    unsigned int getOutcome() const { return m_Outcome; }
+    //! @return outcome of this extrapolation
+    int getOutcome() const { return m_Outcome; }
+
+    //! @return if this extrapolation was in forward or backward
+    bool getIsForward() const { return m_IsForward; }
 
     //! @return outermost BKLM layer crossed by track during extrapolation
     int getBarrelExtLayer() const { return m_BarrelExtLayer; }
@@ -189,8 +192,12 @@ namespace Belle2 {
     void setDegreesOfFreedom(int dof) { m_DegreesOfFreedom = dof; }
 
     //! assign outcome of this extrapolation
-    //! @param outcome final outcome of this extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
-    void setOutcome(unsigned int outcome) { m_Outcome = outcome; }
+    //! @param outcome final outcome of this extrapolation
+    void setOutcome(int outcome) { m_Outcome = outcome; }
+
+    //! assign forward of backward for this extrapolation
+    //! @param isForward fordward or backward for this extrapolation
+    void setIsForward(bool isForward) { m_IsForward = isForward; }
 
     //! assign outermost BKLM layer crossed by track during extrapolation
     //! @param layer outermost BKLM layer crossed by track during extrapolation
@@ -284,12 +291,10 @@ namespace Belle2 {
     int m_DegreesOfFreedom;
 
     //! outcome of this extrapolation.
-    //! 0=track didn't reach KLM during extrapolation,
-    //! 1=track stopped in BKLM during extrapolation,
-    //! 2=track stopped in EKLM during extrapolation,
-    //! 3=track exited BKLM during extrapolation,
-    //! 4=track exited EKLM during extrapolation.
-    unsigned int m_Outcome;
+    int m_Outcome;
+
+    //! is the extrapolation in forward or backward?
+    bool m_IsForward;
 
     //! outermost BKLM layer crossed by track during extrapolation
     int m_BarrelExtLayer;
@@ -326,7 +331,7 @@ namespace Belle2 {
     float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Needed to make the ROOT object storable
-    ClassDef(KLMMuidLikelihood, 1)
+    ClassDef(KLMMuidLikelihood, 2)
 
   };
 }

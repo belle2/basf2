@@ -152,15 +152,16 @@ namespace Belle2 {
     D[n - 1] = D[n - 2];
   }
 
-  double MuidBuilder::getPDF(const KLMMuidLikelihood* muid, bool isForward) const
+  double MuidBuilder::getPDF(const KLMMuidLikelihood* muid) const
   {
-    return getPDFLayer(muid, isForward) * getPDFRchisq(muid);
+    return getPDFLayer(muid) * getPDFRchisq(muid);
   }
 
-  double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid, bool isForward) const
+  double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
   {
+    /* Setup the main ingredients for the calculation. */
     int outcome = muid->getOutcome();
-    if ((outcome <= MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::c_ExitForwardEndcap))
+    if ((outcome <= MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::getMaximalOutcome()))
       return 0.0;
     int barrelExtLayer = muid->getBarrelExtLayer();
     if (barrelExtLayer > MuidElementNumbers::getMaximalBarrelLayer())
@@ -170,27 +171,7 @@ namespace Belle2 {
       return 0.0;
     unsigned int extLayerPattern = muid->getExtLayerPattern();
     unsigned int hitLayerPattern = muid->getHitLayerPattern();
-
-    int lastLayer = barrelExtLayer;
-    if (outcome == MuidElementNumbers::c_StopInForwardEndcap) { // forward endcap stop (no barrel hits)
-      lastLayer = endcapExtLayer;
-      if (barrelExtLayer < 0) {
-        outcome = isForward ? MuidElementNumbers::c_StopInForwardEndcap :
-                  MuidElementNumbers::c_StopInBackwardEndcap; // forward or backward endcap stop (no barrel hits)
-      } else {
-        outcome = (isForward ? MuidElementNumbers::c_CrossBarrelStopInForwardMin : MuidElementNumbers::c_CrossBarrelStopInBackwardMin) +
-                  barrelExtLayer; // forward/backward endcap stop (B+E)
-      }
-    } else if (outcome == MuidElementNumbers::c_ExitForwardEndcap) { // forward endcap exit (no barrel hits)
-      lastLayer = endcapExtLayer;
-      if (barrelExtLayer < 0) {
-        outcome = isForward ? MuidElementNumbers::c_ExitForwardEndcap :
-                  MuidElementNumbers::c_ExitBackwardEndcap;  // forward or backward endcap exit (no barrel hits)
-      } else {
-        outcome = (isForward ? MuidElementNumbers::c_CrossBarrelExitForwardMin : MuidElementNumbers::c_CrossBarrelExitBackwardMin) +
-                  barrelExtLayer; // forward/backward endcap exit (B+E)
-      }
-    }
+    int lastLayer = (endcapExtLayer < 0) ? barrelExtLayer : endcapExtLayer;
 
     /* Longitudinal PDF computation for barrel. */
     double pdf = 1.0;
@@ -209,7 +190,8 @@ namespace Belle2 {
       testBit <<= 1; /* Move to next bit. */
     }
     /* Longitudinal PDF computation for endcap. */
-    int maxLayer = isForward ? MuidElementNumbers::getMaximalEndcapForwardLayer() : MuidElementNumbers::getMaximalEndcapBackwardLayer();
+    int maxLayer = muid->getIsForward() ? MuidElementNumbers::getMaximalEndcapForwardLayer() :
+                   MuidElementNumbers::getMaximalEndcapBackwardLayer();
     testBit = 1 << (MuidElementNumbers::getMaximalBarrelLayer() + 1);
     for (int layer = 0; layer <= endcapExtLayer; ++layer) {
       if ((testBit & extLayerPattern) != 0) {

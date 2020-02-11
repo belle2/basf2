@@ -23,6 +23,9 @@ MuidElementNumbers::~MuidElementNumbers()
 
 bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
 {
+  /* KLM volume not reached during the extrapolation. */
+  if (outcome == MuidElementNumbers::c_NotReached)
+    return false;
   /* Barrel stop: never in layer 14. */
   if ((outcome == MuidElementNumbers::c_StopInBarrel)
       && (lastLayer > MuidElementNumbers::getMaximalBarrelLayer() - 1))

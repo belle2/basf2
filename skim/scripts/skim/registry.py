@@ -65,7 +65,6 @@ skim_registry = [
     ('17230400', 'XToDp_DpToKsHp'),  # D+ -> Ks h+
     ('19130100', 'CharmlessHad2Body'),
     ('19130200', 'CharmlessHad3Body'),
-    ('14130200', 'DoubleCharm'),
     ('16460100', 'ISRpipicc'),
     ('10600100', 'Systematics'),
     ('10620200', 'SystematicsLambda'),

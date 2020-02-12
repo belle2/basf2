@@ -1759,9 +1759,10 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the inputParticlelists
                               option will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, which can be used to
-                              regulate amount of certain charged particle species, should be a list of
-                              six float if not None
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+                              amount of certain charged particle species, should be a list of
+                              six floats if not None. The order of particle types is
+                              the following: [e-, mu-, pi-, K-, p+, d+]
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
@@ -2456,9 +2457,10 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the options inputListNames and default_cleanup
                               will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, which can be used to
-                              regulate amount of certain charged particle species, should be a list of
-                              six float if not None
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+                              amount of certain charged particle species, should be a list of
+                              six floats if not None. The order of particle types is
+                              the following: [e-, mu-, pi-, K-, p+, d+]
     @param default_cleanup    if True, apply default clean up cuts to default
                               ParticleLists pi+:evtkin and gamma:evtkin.
     @param path               modules are added to this path
@@ -2542,9 +2544,10 @@ def buildEventShape(inputListNames=[],
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the options inputListNames
                               and default_cleanup will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, which can be used to
-                              regulate amount of certain charged particle species, should be a list of
-                              six float if not None
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+                              amount of certain charged particle species, should be a list of
+                              six floats if not None. The order of particle types is
+                              the following: [e-, mu-, pi-, K-, p+, d+]
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.

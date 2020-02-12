@@ -63,6 +63,7 @@ Variables
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
+ * Added PID prior hypothesis to the :b2:var:`pidMostLikelyPDG` and the :b2:var:`pidIsMostLikely` variables. 
  * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
    :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,

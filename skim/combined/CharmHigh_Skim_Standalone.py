@@ -19,7 +19,6 @@ from stdV0s import mergedKshorts, stdKshorts
 import skimExpertFunctions as expert
 
 
-gb2_setuprel = 'release-03-02-02'
 b2.set_log_level(b2.LogLevel.INFO)
 
 charmpath = b2.Path()
@@ -47,16 +46,12 @@ stdKshorts(path=charmpath)
 mergedKshorts(path=charmpath)
 
 
-from skim.charm import D0ToHpJm
-D0ToHpJmList = D0ToHpJm(charmpath)
-expert.add_skim("XToD0_D0ToHpJm", D0ToHpJmList, path=charmpath)
-
-
 from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(charmpath)
 expert.add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
 
 from skim.charm import D0ToNeutrals
+
 expert.add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=charmpath), path=charmpath)
 
 

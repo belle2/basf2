@@ -152,7 +152,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 
   // Check whether the particle have an (EM) field force exerting upon it
   //
-  G4FieldManager* fieldMgr = 0;
+  G4FieldManager* fieldMgr = nullptr;
   G4bool          fieldExertsForce = false ;
 
   if ((particleMagneticCharge != 0.0)) {

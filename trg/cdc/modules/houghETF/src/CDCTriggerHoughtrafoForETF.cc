@@ -823,11 +823,12 @@ CDCTriggerHoughETFModule::calcEventTiming()
     }
   }
   if (m_t0CalcMethod == 0) {
-    return ftlists[m_arrivalOrder];
+    std::sort(ftlists.begin(), ftlists.end());
+    return ftlists[m_arrivalOrder] * 2;
   } else if (m_t0CalcMethod == 1) {
-    return median(ftlists) & -2;
+    return median(ftlists) * 2;
   } else {
-    return medianInTimeWindow(ftlists) & -2;
+    return medianInTimeWindow(ftlists) * 2;
   }
 }
 
@@ -848,7 +849,7 @@ CDCTriggerHoughETFModule::median(std::vector<int> v)
 int
 CDCTriggerHoughETFModule::medianInTimeWindow(std::vector<int> v)
 {
-  int med = median(v) & -2; // digitization
+  int med = median(v);
   int tstart = med - m_timeWindowStart;
   int tend   = med - m_timeWindowEnd;
 
@@ -856,8 +857,8 @@ CDCTriggerHoughETFModule::medianInTimeWindow(std::vector<int> v)
 
   for (auto& t : v)  if (t > tstart && t <= tend) _inWindow.push_back(t);
   if (_inWindow.size() == 0) {
-    return med & -2;
+    return med;
   } else {
-    return median(_inWindow) & -2;
+    return median(_inWindow);
   }
 }

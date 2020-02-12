@@ -12,9 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <string>
 
 // SimHits
@@ -45,7 +44,8 @@
 namespace Belle2 {
 
   /**
-   * A module that sets m_backgroundTag variable in SimHits (see SimHitBase.h).
+   * A module that sets m_backgroundTag variable in SimHits (see
+   * BackgroundMetaData.h).
    * @return true if at least one SimHit store array has entries.
    */
   class BeamBkgTagSetterModule : public Module {
@@ -99,7 +99,7 @@ namespace Belle2 {
     std::string m_specialFor; /**< ordinary or special file for ECL, PXD */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
-    SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
+    BackgroundMetaData::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
     BackgroundMetaData::EFileType m_fileType; /**< file type to set */
 
     StoreArray<PXDSimHit> m_pxdSimHits; /**< PXD simulated hits */

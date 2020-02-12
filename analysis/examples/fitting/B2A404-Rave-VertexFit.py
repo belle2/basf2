@@ -31,7 +31,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import vertexRave
+from vertex import vertexRave
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
@@ -69,12 +69,12 @@ vertexRave('D0:kpi', 0.0, path=my_path)
 reconstructDecay('D*+ -> D0:kpi pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
+# perform MC matching (MC truth association)
+matchMCTruth('D*+', path=my_path)
+
 # perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D*+', 0.0, path=my_path)
-
-# perform MC matching (MC truth asociation)
-matchMCTruth('D*+', path=my_path)
 
 # Select variables that we want to store to ntuple
 

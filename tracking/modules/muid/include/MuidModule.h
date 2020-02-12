@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MUIDMODULE_H
-#define MUIDMODULE_H
+#pragma once
 
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -21,7 +22,8 @@ namespace Belle2 {
 
   class TrackExtrapolateG4e;
 
-  /** The geant4e-based muon identification module.
+  /**
+   * The geant4e-based muon identification module.
    *
    * This module extrapolates tracks outward from the outer perimeter of the CDC
    * using geant4e through the ECL and KLM and uses the matching hits to
@@ -31,7 +33,6 @@ namespace Belle2 {
    * a geometry building module should have been executed before this module is called.
    *
    */
-
   class MuidModule : public Module {
 
   public:
@@ -64,36 +65,6 @@ namespace Belle2 {
 
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_Hypotheses;
-
-    //! Name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string m_TracksColName;
-
-    //! Name of the RecoTrack collection of the reconstructed tracks to be extrapolated
-    std::string m_RecoTracksColName;
-
-    //! Name of the extHit collection of the extrapolation hits
-    std::string m_ExtHitsColName;
-
-    //! Name of the muid collection of the muon identification information
-    std::string m_MuidsColName;
-
-    //! Name of the muidHit collection of the extrapolation hits
-    std::string m_MuidHitsColName;
-
-    //! Name of the BKLM 2D hits collection
-    std::string m_BKLMHitsColName;
-
-    //! Name of the EKLM 2D hits collection
-    std::string m_EKLMHitsColName;
-
-    //! Name of the KLMCluster collection
-    std::string m_KLMClustersColName;
-
-    //! Name of the ECLCluster collection
-    std::string m_ECLClustersColName;
-
-    //! Name of the TrackClusterSeparation collection
-    std::string m_TrackClusterSeparationsColName;
 
     //! Mean hit - trigger time (ns)
     double m_MeanDt;
@@ -148,5 +119,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // MUIDMODULE_H

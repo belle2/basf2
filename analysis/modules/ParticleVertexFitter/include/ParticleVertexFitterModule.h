@@ -81,6 +81,7 @@ namespace Belle2 {
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
+    double m_smearing;            /**< smearing width applied to IP tube */
 
     /**
      * Main steering routine
@@ -194,7 +195,7 @@ namespace Belle2 {
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      * Pi0 particles are treated separately so they are filled to another vector.
      */
-    bool fillFitParticles(const Particle* mother, std::vector<unsigned>& fitChildren, std::vector<unsigned>& pi0Children);
+    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
 
     /**
      * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
@@ -213,6 +214,9 @@ namespace Belle2 {
 
     /**  calculate iptube constraint (quasi cylinder along boost direction) for RAVE fit*/
     void findConstraintBoost(double cut);
+
+    /** smear beam spot covariance */
+    void smearBeamSpot(double width);
   };
 
 } // Belle2 namespace

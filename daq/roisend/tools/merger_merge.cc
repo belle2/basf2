@@ -8,6 +8,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <map>
+#include <arpa/inet.h>
 
 #include "daq/roisend/util.h"
 #include "daq/roisend/b2_socket.h"
@@ -24,6 +26,7 @@ using namespace std;
 #define LOG_FPRINTF (fprintf)
 #define ERR_FPRINTF (fprintf)
 
+std::map<int, std::string> myconn;
 
 static int
 MM_init_connect_to_onsen(const char* host, const unsigned int port)
@@ -189,7 +192,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
   }
   if (ret != sizeof(unsigned int)) {
     ERR_FPRINTF(stderr, "merger_merge: recv(): Unexpected return value (%d)\n", ret);
-    return -1;
+    return -2;
   }
 
   n_words_from_hltout = ntohl(n_words_from_hltout);
@@ -202,7 +205,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
   }
   if (size_t(ret) != n_bytes_from_hltout) {
     ERR_FPRINTF(stderr, "merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
-    return -1;
+    return -2;
   }
 
 
@@ -397,6 +400,12 @@ main(int argc, char* argv[])
         return (-1);
       }
       printf("New socket connection t=%d\n", t);
+
+      char address[INET_ADDRSTRLEN];
+      inet_ntop(AF_INET, &isa.sin_addr, address, sizeof(address));
+
+      myconn[sd_acc] = address;
+
       fflush(stdout);
       FD_SET(t, &allset);
       if (minfd == sd_acc) minfd = t;
@@ -410,18 +419,26 @@ main(int argc, char* argv[])
           /* recv packet */
           int ret;
           ret = MM_get_packet(fd, buf);
-          if (ret == -1) {
-            ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
-            ERR_FPRINTF(stderr, "[ERROR] Connection from HLT was closed on HLT side (hltout2merge)\n");
+          if (ret < 0) { // -2 will not have a errno set
+            if (ret == -1) {
+              ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
+            } else {
+              ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]\n", fd);
+            }
+            ERR_FPRINTF(stderr, "[ERROR] Connection from HLT was closed on HLT side (hltout2merge) from %s\n",
+                        myconn[fd].c_str());
             /* connection from HLT is lost */
-            ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
-            exit(1);
+            // using exit here will dump ALL still open connections from other HLTs
+            // rethink if we dont exit but process these to limit loss of events.
+            // ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+            // exit(1);
+            ret = 0;
           }
           n_bytes_from_hltout = ret;
 
           //    printf ( "RoI received : Event count = % d\n", event_count );
 
-          if (event_count < 40 || event_count % 10000 == 0) {
+          if (ret > 0 && (event_count < 40 || event_count % 10000 == 0)) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] received event from ROI transmitter\n", event_count);
             LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned % ld\n", n_bytes_from_hltout);
             dump_binary(stderr, buf, n_bytes_from_hltout);

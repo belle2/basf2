@@ -118,26 +118,19 @@ def diff_function(args):
         print(prefix, cut)
         print("\x1b[0m", end="")
 
-    for c, i1, i2, j1, j2 in diff.get_opcodes():
-        if c == "equal":
+    def print_cuts(prefix, cuts):
+        for c in cuts:
+            print_cut(c, prefix)
+
+    for tag, i1, i2, j1, j2 in diff.get_opcodes():
+        if tag == "equal":
             if args.only_changes:
                 continue
-            assert len(range(i1, i2)) == len(range(j1, j2))
-            for i in range(i1, i2):
-                print_cut(diff.a[i])
-        elif c == "replace":
-            assert len(range(i1, i2)) == len(range(j1, j2))
-            for i, j in zip(range(i1, i2), range(j1, j2)):
-                print_cut(diff.a[i], "-")
-                print_cut(diff.b[j], "+")
-        elif c in "delete":
-            for i in range(i1, i2):
-                print_cut(diff.a[i], prefix="-")
-        elif c == "insert":
-            for j in range(j1, j2):
-                print_cut(diff.b[j], "+")
-        else:
-            raise ValueError("Do not understand the output of diff!")
+            print_cuts(" ", diff.b[j1:j2])
+        if tag in ["delete", "replace"]:
+            print_cuts("-", diff.a[i1:i2])
+        if tag in ["insert", "replace"]:
+            print_cuts("+", diff.b[j1:j2])
 
 
 def add_cut_function(args):

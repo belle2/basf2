@@ -22,23 +22,28 @@ def get_calibrations(input_data, **kwargs):
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
-    print(file_to_iov_mumu)
-    print(file_to_iov_hadron)
+    # print(file_to_iov_mumu)
+    # print(file_to_iov_hadron)
 
     # We might have requested an enormous amount of data across a requested range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
     max_files_per_run = 100
 
-    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
+    # If you are using Raw data there's a chance that input files could have zero events.
+    # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
+    # Currently we don't have a good way of filtering this on the automated side, so we can check here.
+    min_events_per_file = 100
+
+    # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run)
+    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
-    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run)
+    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
@@ -81,14 +86,14 @@ def get_calibrations(input_data, **kwargs):
                           dependencies=[cal2]
                           )
 
-    # space resolution and time zero
+    # space resolution
     cal4 = CDCCalibration(name='sr0',
                           algorithms=[sr_algo()],
                           input_file_dict=input_file_dict,
                           max_iterations=1,
                           dependencies=[cal3]
                           )
-
+    # t0
     cal5 = CDCCalibration(name='tz2',
                           algorithms=[tz_algo()],
                           input_file_dict=input_file_dict,
@@ -265,7 +270,6 @@ class CDCCalibration(Calibration):
                                     input_files=file_list,
                                     pre_collector_path=pre_collector(max_events=max_events),
                                     )
-            collection.backend_args = {'queue': queue}
             self.add_collection(name=skim_type, collection=collection)
 
         self.max_iterations = max_iterations

@@ -136,10 +136,8 @@ main.add_module(particlegun)
 sim.add_simulation(main, components=['KLM'])
 basf2.set_module_parameters(main, type='Geometry', useDB=False, components=['KLM'])
 
-bklm_packer = basf2.register_module('BKLMRawPacker')
-eklm_packer = basf2.register_module('EKLMRawPacker')
-main.add_module(bklm_packer)
-main.add_module(eklm_packer)
+klm_packer = basf2.register_module('KLMPacker')
+main.add_module(klm_packer)
 
 unpacker = basf2.register_module('KLMUnpacker')
 unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')

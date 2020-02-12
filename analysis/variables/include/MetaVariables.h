@@ -70,6 +70,17 @@ namespace Belle2 {
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns 1 if the given particle appears to be a daughter in the decay chain of given lists.
+     */
+    Manager::FunctionPtr isDescendantOfList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
+     * It makes only sense for lists created with fillParticleListFromMC function with addDaughters=True argument.
+     */
+    Manager::FunctionPtr isMCDescendantOfList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns a function which returns the the variable for the closest
      * particle in the provided particle list
      */
@@ -411,6 +422,18 @@ namespace Belle2 {
     */
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns the value of the variable in the rest frame of the recoiling particle to the tag side B meson.
+     * The variable should only be applied to an Upsilon(4S) list. E.g. ``useTagSideRecoilRestFrame(daughter(1, daughter(1, p)), 0)``
+     * applied on a Upsilon(4S) list (``Upsilon(4S)->B+:tag B-:sig``) returns the momentum of the second daughter of the signal B
+     * meson in the signal B meson rest frame."
+     */
+    Manager::FunctionPtr useTagSideRecoilRestFrame(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns a  function that returns the value of a variable calculated using new mass assumptions for the daughters' masses.
+    */
+    Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
 
 
   }

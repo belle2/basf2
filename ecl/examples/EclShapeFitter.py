@@ -54,7 +54,11 @@ Uses ECLDigits, ECLDsps, ECLTrigs dataobjects
 
 class ShapeFitterModule(Module):
     def initialize(self):
+        '''
+        '''
+        #: Event number
         self.evtn = 0
+        #: Store array of ECLDigits
         self.digits = Belle2.PyStoreArray('ECLDigits')
 
     def event(self):

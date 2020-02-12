@@ -10,6 +10,29 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <map>
+#include <Geant4/G4Transform3D.hh>
+#include <root/TMatrixD.h>
+#include <genfit/StateOnPlane.h>
+#include <root/TGeoMatrix.h>
+#include <set>
+
+#include <framework/logging/Logger.h>
+
+#include <mdst/dbobjects/BeamSpot.h>
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/dbobjects/CDCCalibration.h>
+#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Hierarchy.h>

@@ -15,17 +15,16 @@ rootFileName = '../MDSTtoUDST'
 logFileName = rootFileName + '.log'
 sys.stdout = open(logFileName, 'w')
 
-import os
-from basf2 import *
-from modularAnalysis import *
+import basf2
+from modularAnalysis import outputUdst
 
-main = create_path()
-input = register_module('RootInput')
+main = basf2.create_path()
+input = basf2.register_module('RootInput')
 input.param('inputFileName', '../DSTtoMDST.mdst.root')
 main.add_module(input)
 outputUdst('../MDSTtoUDST.udst.root', path=main)
 
-process(main)
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

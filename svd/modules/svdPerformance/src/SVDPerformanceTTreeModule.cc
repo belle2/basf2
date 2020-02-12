@@ -70,10 +70,20 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdTruePos", &m_svdTruePos, "svdTruePos/F");
   m_t_U->Branch("svdClPhi", &m_svdClPhi, "svdClPhi/F");
   m_t_U->Branch("svdClZ", &m_svdClZ, "svdClZ/F");
+  m_t_U->Branch("svdTrkSeedX", &m_svdTrkSeedX, "svdTrkSeedX/F");
+  m_t_U->Branch("svdTrkSeedY", &m_svdTrkSeedY, "svdTrkSeedY/F");
+  m_t_U->Branch("svdTrkSeedZ", &m_svdTrkSeedZ, "svdTrkSeedZ/F");
+  m_t_U->Branch("svdTrkTraversedLength", &m_svdTrkTraversedLength, "svdTrkTraversedLength/F");
+  m_t_U->Branch("svdTrkPXDHits", &m_svdTrkPXDHits, "svdTrkPXDHits/i");
+  m_t_U->Branch("svdTrkSVDHits", &m_svdTrkSVDHits, "svdTrkSVDHits/i");
+  m_t_U->Branch("svdTrkCDCHits", &m_svdTrkCDCHits, "svdTrkCDCHits/i");
   m_t_U->Branch("svdTrkPos", &m_svdTrkPos, "svdTrkPos/F");
+  m_t_U->Branch("svdTrkPosOS", &m_svdTrkPosOS, "svdTrkPosOS/F");
   m_t_U->Branch("svdTrkPosErr", &m_svdTrkPosErr, "svdTrkPosErr/F");
+  m_t_U->Branch("svdTrkPosErrOS", &m_svdTrkPosErrOS, "svdTrkPosErrOS/F");
   m_t_U->Branch("svdTrkQoP", &m_svdTrkQoP, "svdTrkQoP/F");
   m_t_U->Branch("svdTrkPrime", &m_svdTrkPrime, "svdTrkPrime/F");
+  m_t_U->Branch("svdTrkPrimeOS", &m_svdTrkPrimeOS, "svdTrkPrimeOS/F");
   m_t_U->Branch("svdTrkPosUnbiased", &m_svdTrkPosUnbiased, "svdTrkPosUnbiased/F");
   m_t_U->Branch("svdTrkPosErrUnbiased", &m_svdTrkPosErrUnbiased, "svdTrkPosErrUnbiased/F");
   m_t_U->Branch("svdTrkQoPUnbiased", &m_svdTrkQoPUnbiased, "svdTrkQoPUnbiased/F");
@@ -93,10 +103,20 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdTruePos", &m_svdTruePos, "svdTruePos/F");
   m_t_V->Branch("svdClPhi", &m_svdClPhi, "svdClPhi/F");
   m_t_V->Branch("svdClZ", &m_svdClZ, "svdClZ/F");
+  m_t_V->Branch("svdTrkSeedX", &m_svdTrkSeedX, "svdTrkSeedX/F");
+  m_t_V->Branch("svdTrkSeedY", &m_svdTrkSeedY, "svdTrkSeedY/F");
+  m_t_V->Branch("svdTrkSeedZ", &m_svdTrkSeedZ, "svdTrkSeedZ/F");
+  m_t_V->Branch("svdTrkTraversedLength", &m_svdTrkTraversedLength, "svdTrkTraversedLength/F");
+  m_t_V->Branch("svdTrkPXDHits", &m_svdTrkPXDHits, "svdTrkPXDHits/i");
+  m_t_V->Branch("svdTrkSVDHits", &m_svdTrkSVDHits, "svdTrkSVDHits/i");
+  m_t_V->Branch("svdTrkCDCHits", &m_svdTrkCDCHits, "svdTrkCDCHits/i");
   m_t_V->Branch("svdTrkPos", &m_svdTrkPos, "svdTrkPos/F");
+  m_t_V->Branch("svdTrkPosOS", &m_svdTrkPosOS, "svdTrkPosOS/F");
   m_t_V->Branch("svdTrkPosErr", &m_svdTrkPosErr, "svdTrkPosErr/F");
+  m_t_V->Branch("svdTrkPosErrOS", &m_svdTrkPosErrOS, "svdTrkPosErrOS/F");
   m_t_V->Branch("svdTrkQoP", &m_svdTrkQoP, "svdTrkQoP/F");
   m_t_V->Branch("svdTrkPrime", &m_svdTrkPrime, "svdTrkPrime/F");
+  m_t_V->Branch("svdTrkPrimeOS", &m_svdTrkPrimeOS, "svdTrkPrimeOS/F");
   m_t_V->Branch("svdTrkPosUnbiased", &m_svdTrkPosUnbiased, "svdTrkPosUnbiased/F");
   m_t_V->Branch("svdTrkPosErrUnbiased", &m_svdTrkPosErrUnbiased, "svdTrkPosErrUnbiased/F");
   m_t_V->Branch("svdTrkQoPUnbiased", &m_svdTrkQoPUnbiased, "svdTrkQoPUnbiased/F");
@@ -120,6 +140,14 @@ void SVDPerformanceTTreeModule::event()
     }
     const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
     B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
+
+    m_svdTrkPXDHits = (trk.getPXDHitList()).size();
+    m_svdTrkSVDHits = (trk.getSVDHitList()).size();
+    m_svdTrkCDCHits = (trk.getCDCHitList()).size();
+
+    m_svdTrkSeedX = (trk.getPositionSeed()).X();
+    m_svdTrkSeedY = (trk.getPositionSeed()).Y();
+    m_svdTrkSeedZ = (trk.getPositionSeed()).Z();
 
     for (unsigned int i = 0; i < svdClusters.size(); i++) {
 
@@ -175,9 +203,13 @@ void SVDPerformanceTTreeModule::event()
         m_svdClPhi = svdPhi_1;
         m_svdClZ = svdZ_1;
         m_svdTrkPos = svd_predIntersect_1[3];
+        m_svdTrkPosOS = svd_predIntersect_1[4];
         m_svdTrkPosErr = sqrt(covMatrix_1[3][3]);
+        m_svdTrkPosErrOS = sqrt(covMatrix_1[4][4]);
         m_svdTrkQoP = svd_predIntersect_1[0];
         m_svdTrkPrime = svd_predIntersect_1[1];
+        m_svdTrkPrimeOS = svd_predIntersect_1[2];
+        m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
         m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
         m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
         m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
@@ -209,9 +241,13 @@ void SVDPerformanceTTreeModule::event()
         m_svdClPhi = svdPhi_1;
         m_svdClZ = svdZ_1;
         m_svdTrkPos = svd_predIntersect_1[4];
+        m_svdTrkPosOS = svd_predIntersect_1[3];
         m_svdTrkPosErr = sqrt(covMatrix_1[4][4]);
+        m_svdTrkPosErrOS = sqrt(covMatrix_1[3][3]);
         m_svdTrkQoP = svd_predIntersect_1[0];
         m_svdTrkPrime = svd_predIntersect_1[2];
+        m_svdTrkPrimeOS = svd_predIntersect_1[1];
+        m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
         m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
         m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
         m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];

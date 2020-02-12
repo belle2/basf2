@@ -35,6 +35,7 @@
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/utility/ECLDspEmulator.h>
 
 using namespace std;
 using namespace Belle2;
@@ -146,13 +147,59 @@ void ECLDigitizerModule::beginRun()
 void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
                                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
 {
-  const int n16 = 16; // number of points before signal n16 = 16
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
   const fitparams_t& r = m_fitparams[t.ifunc];
-  shapeFitter((short int*)m_idn[t.idn].id, (int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-              (int*)r.fg31, (int*)r.fg32, (int*)r.fg33,
-              (int*)FitA, (int*)&ttrig, (int*)&n16,
-              &m_lar, &m_ltr, &m_lq , &m_chi);
+
+  short int* id = (short int*)m_idn[t.idn].id;
+
+  int A0  = (int) * (id + 0) - 128;
+  int Askip  = (int) * (id + 1) - 128;
+
+  int Ahard  = (int) * (id + 2);
+  int k_a = (int) * ((unsigned char*)id + 26);
+  int k_b = (int) * ((unsigned char*)id + 27);
+  int k_c = (int) * ((unsigned char*)id + 28);
+  int k_16 = (int) * ((unsigned char*)id + 29);
+  int k1_chi = (int) * ((unsigned char*)id + 24);
+  int k2_chi = (int) * ((unsigned char*)id + 25);
+
+  int chi_thres = (int) * (id + 15);
+
+  int trg_time = ttrig;
+
+  auto result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
+                       (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
+                       trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k_16, k1_chi,
+                       k2_chi, chi_thres);
+
+  m_lar = result.amp;
+  m_ltr = result.time;
+  m_lq  = result.quality;
+  m_chi = result.chi2;
+
+  //== Set precision of chi^2 to be the same as in the raw data.
+  int discarded_bits = 0;
+  if ((m_chi & 0x7800000) != 0) {
+    m_chi = 0x7800000;
+  } else if ((m_chi & 0x0600000) != 0) {
+    discarded_bits = 14;
+  } else if ((m_chi & 0x0180000) != 0) {
+    discarded_bits = 12;
+  } else if ((m_chi & 0x0060000) != 0) {
+    discarded_bits = 10;
+  } else if ((m_chi & 0x0018000) != 0) {
+    discarded_bits = 8;
+  } else if ((m_chi & 0x0006000) != 0) {
+    discarded_bits = 6;
+  } else if ((m_chi & 0x0001800) != 0) {
+    discarded_bits = 4;
+  } else if ((m_chi & 0x0000600) != 0) {
+    discarded_bits = 2;
+  }
+  if (discarded_bits > 0) {
+    m_chi >>= discarded_bits;
+    m_chi <<= discarded_bits;
+  }
 }
 
 int ECLDigitizerModule::shapeSignals()
@@ -192,7 +239,7 @@ int ECLDigitizerModule::shapeSignals()
 
   // add only background hits
   for (const auto& hit : m_eclHits) {
-    if (hit.getBackgroundTag() == ECLHit::bg_none) continue;
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) continue;
     int j = hit.getCellId() - 1; //0~8735
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
@@ -286,7 +333,7 @@ void ECLDigitizerModule::event()
   vector<ch_t> hitmap;
   for (const auto& hit : m_eclHits) {
     int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 

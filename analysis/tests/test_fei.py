@@ -13,8 +13,7 @@ import subprocess
 import ROOT
 
 import fei
-from fei.config import *
-from fei import core
+from fei.config import Particle
 
 import numpy as np
 
@@ -49,33 +48,33 @@ def print_path(a, b):
 
 def get_small_unittest_channels():
     pion = Particle('pi+',
-                    MVAConfiguration(variables=['p', 'dr'],
-                                     target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
-                                        bestCandidateMode='highest',
-                                        bestCandidateVariable='piid',
-                                        bestCandidateCut=20),
-                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                    fei.config.MVAConfiguration(variables=['p', 'dr'],
+                                                target='isPrimarySignal'),
+                    fei.config.PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                                                   bestCandidateMode='highest',
+                                                   bestCandidateVariable='piid',
+                                                   bestCandidateCut=20),
+                    fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
 
     kaon = Particle('K+',
-                    MVAConfiguration(variables=['p', 'dr'],
-                                     target='isPrimarySignal'),
-                    PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
-                                        bestCandidateMode='highest',
-                                        bestCandidateVariable='Kid',
-                                        bestCandidateCut=20),
-                    PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                    fei.config.MVAConfiguration(variables=['p', 'dr'],
+                                                target='isPrimarySignal'),
+                    fei.config.PreCutConfiguration(userCut='[dr < 2] and [abs(dz) < 4]',
+                                                   bestCandidateMode='highest',
+                                                   bestCandidateVariable='Kid',
+                                                   bestCandidateCut=20),
+                    fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.01))
     kaon.addChannel(['K+:FSP'])
 
     D0 = Particle('D0',
-                  MVAConfiguration(variables=['M', 'p'],
-                                   target='isSignal'),
-                  PreCutConfiguration(userCut='1.7 < M < 1.95',
-                                      bestCandidateMode='lowest',
-                                      bestCandidateVariable='abs(dM)',
-                                      bestCandidateCut=20),
-                  PostCutConfiguration(bestCandidateCut=10, value=0.001))
+                  fei.config.MVAConfiguration(variables=['M', 'p'],
+                                              target='isSignal'),
+                  fei.config.PreCutConfiguration(userCut='1.7 < M < 1.95',
+                                                 bestCandidateMode='lowest',
+                                                 bestCandidateVariable='abs(dM)',
+                                                 bestCandidateCut=20),
+                  fei.config.PostCutConfiguration(bestCandidateCut=10, value=0.001))
     D0.addChannel(['K-', 'pi+'])
     D0.addChannel(['pi-', 'pi+'])
 
@@ -533,9 +532,9 @@ class TestPreReconstruction(unittest.TestCase):
 class TestPostReconstruction(unittest.TestCase):
 
     def test_get_missing_channels(self):
-        pion = Particle('pi+:unittest', MVAConfiguration(variables=['p', 'dr'], target='isPrimarySignal'))
+        pion = Particle('pi+:unittest', fei.config.MVAConfiguration(variables=['p', 'dr'], target='isPrimarySignal'))
         pion.addChannel(['pi+:FSP'])
-        D0 = Particle('D0:unittest', MVAConfiguration(variables=['M', 'p'], target='isSignal'))
+        D0 = Particle('D0:unittest', fei.config.MVAConfiguration(variables=['M', 'p'], target='isSignal'))
         D0.addChannel(['K-:unittest', 'pi+:unittest'])
         D0.addChannel(['pi-:unittest', 'pi+:unittest'])
         config = fei.config.FeiConfiguration(monitor=False, prefix="UNITTEST")

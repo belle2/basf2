@@ -10,19 +10,18 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdMu, stdE, stdMu
-from stdV0s import *
-from stdPi0s import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPi0s import loadStdSkimPi0
+from stdPhotons import loadStdSkimPhoton
+from stdV0s import mergedKshorts, stdKshorts
+import skimExpertFunctions as expert
 
 
-gb2_setuprel = 'release-03-02-02'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-charmpath = Path()
+charmpath = b2.Path()
 fileList = [
 
     '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +
@@ -30,7 +29,7 @@ fileList = [
 
 ]
 
-inputMdstList('default', fileList, path=charmpath)
+ma.inputMdstList('default', fileList, path=charmpath)
 
 
 loadStdSkimPhoton(path=charmpath)
@@ -47,28 +46,24 @@ stdKshorts(path=charmpath)
 mergedKshorts(path=charmpath)
 
 
-from skim.charm import D0ToHpJm
-D0ToHpJmList = D0ToHpJm(charmpath)
-add_skim("XToD0_D0ToHpJm", D0ToHpJmList, path=charmpath)
-
-
 from skim.charm import DstToD0PiD0ToHpJmPi0
 DstToD0PiD0ToHpJmPi0List = DstToD0PiD0ToHpJmPi0(charmpath)
-add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToHpJmPi0", DstToD0PiD0ToHpJmPi0List, path=charmpath)
 
 from skim.charm import D0ToNeutrals
-add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=charmpath), path=charmpath)
+
+expert.add_skim('XToD0_D0ToNeutrals', D0ToNeutrals(path=charmpath), path=charmpath)
 
 
 from skim.charm import DstToD0PiD0ToHpHmPi0
 DstToD0PiD0ToHpHmPi0List = DstToD0PiD0ToHpHmPi0(path=charmpath)
-add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
+expert.add_skim("DstToD0Pi_D0ToHpHmPi0", DstToD0PiD0ToHpHmPi0List, path=charmpath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(charmpath)
-add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
+expert.add_skim("XToDp_DpToKsHp", DpToKsHpList, path=charmpath)
 
-setSkimLogging(path=charmpath)
-process(charmpath)
+expert.setSkimLogging(path=charmpath)
+b2.process(charmpath)
 
-print(statistics)
+print(b2.statistics)

@@ -19,11 +19,16 @@ skim_registry = [
     ('15420100', 'BottomoniumEtabExclusive'),
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
-    ('14140100', 'BtoDh_hh'),
-    ('14120300', 'BtoDh_Kspi0'),
-    ('14140200', 'BtoDh_Kshh'),
-    ('14120400', 'BtoDh_Kspipipi0'),
-    ('14140500', 'BtoDh_Kspi0pi0'),
+    ('14140100', 'BtoD0h_hh'),
+    ('14120300', 'BtoD0h_Kspi0'),
+    ('14140200', 'BtoD0h_Kshh'),
+    ('14120400', 'BtoD0h_Kspipipi0'),
+    # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
+    ('14140101', 'BtoD0h_Kpi'),
+    ('14140102', 'BtoD0h_Kpipipi'),
+    ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
+    ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -33,13 +38,14 @@ skim_registry = [
     ('12160300', 'BtoXll_LFV'),
     ('14120500', 'BtoPi0Pi0'),
     ('17240100', 'DstToD0Pi_D0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
-    # ('17240100', 'DstToD0PiD0ToHpJm'),  # D* -> D0 -> K pi/pi pi/K K
     ('17240200', 'DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
     ('17240300', 'DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
     ('17240400', 'DstToD0Pi_D0ToKsOmega'),  # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
     ('17240500', 'DstToD0Pi_D0ToHpJmEta'),  # D* -> D0 -> K- pi+ eta (RS+WS)
     ('17240600', 'DstToD0Pi_D0ToNeutrals'),  # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
     ('17240700', 'DstToD0Pi_D0ToHpHmKs'),  # D* -> D0 -> h h Ks
+    ('17240800', 'EarlyData_DstToD0Pi_D0ToHpJmPi0'),  # D* -> D0 -> K- pi+ pi0 (RS+WS)
+    ('17240900', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'),  # D* -> D0 -> h h pi0
     ('17230100', 'XToD0_D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     # ('17230100', 'D0ToHpJm'),  # D0 -> K pi/pi pi/K K
     ('17230200', 'XToD0_D0ToNeutrals'),  # D0 -> pi0 pi0/Ks pi0/Ks Ks
@@ -69,22 +75,23 @@ skim_registry = [
     ('18570700', 'TauThrust'),
 ]
 
+#: A dict listing which standalone skims are included the combined skim scripts
 combined_skims = {
-    'BtoCharm': [
-        'BtoDh_Kshh', 'BtoDh_hh', 'BtoDh_Kspi0', 'BtoDh_Kspipipi0'
+    'BtoCharm1': [
+        'BtoD0h_Kshh', 'BtoD0h_hh', 'BtoD0h_Kspi0', 'BtoD0h_Kspipipi0'
     ],
-    'BtoCharmless': [
-        'CharmlessHad2Body', 'CharmlessHad3Body'
+
+    'BtoCharm2': [
+        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
     ],
     'CharmHigh': [
-
+        'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
     ],
     'CharmLow': [
-
+        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare'
     ],
-    'CombinedSystematics': [
-        'Systematics', 'SystematicsLambda', 'SystematicsTracking', 'Resonance',
-        'SystematicsRadMuMu', 'SystematicsRadEE'
+    'CharmEarlyData': [
+        'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
         'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
@@ -92,22 +99,19 @@ combined_skims = {
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'
     ],
-    'feiCombined': [
-        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
-    ],
     'feiHadronicCombined': [
         'feiHadronicB0', 'feiHadronicBplus'
     ],
     'feiSLCombined': [
         'feiSLB0', 'feiSLBplus'
     ],
-    'MiscCombined': [
-        'TCPV', 'TauLFV', 'TauThrust', 'TauGeneric'
+    'TCPV': [
+        'TCPV',
     ],
-    'Quarkonium': [
-        'ISRpipicc', 'BottomoniumEtabExclusive', 'BottomoniumUpsilon'
+    'Leptonic': [
+        'LeptonicUntagged'
     ],
-    'Semileptonic': [
-        'PRsemileptonicUntagged', 'LeptonicUntagged', 'SLUntagged'
+    'TauCombined': [
+        'TauLFV', 'TauGeneric', 'TauThrust'
     ]
 }

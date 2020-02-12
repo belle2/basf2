@@ -9,21 +9,21 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
+import basf2 as b2
+import modularAnalysis as ma
+from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
-path = Path()
+path = b2.Path()
 
-inputMdst('default', '../feiSLB0.udst.root', path=path)
+ma.inputMdst('default', '../feiSLB0.udst.root', path=path)
 
-variables.addAlias('sigProb', 'extraInfo(SignalProbability)')
-variables.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
-variables.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
-variables.addAlias('d0_M', 'daughter(0,M)')
-variables.addAlias('decayModeID', 'extraInfo(decayModeID)')
-variables.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
+vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+vm.addAlias('d0_M', 'daughter(0,M)')
+vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
 
 histogramFilename = 'feiSLB0_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'
@@ -52,5 +52,5 @@ create_validation_histograms(
                    'Decay mode ID', '#log_10(signal probability)', 'colz')],
     path=path)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

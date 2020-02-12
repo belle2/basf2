@@ -61,7 +61,7 @@ SVDChargeSharingAnalysisModule::SVDChargeSharingAnalysisModule()
   addParam("outputDirName", m_outputDirName, "Name of the output directory.");
   addParam("outputRootFileName", m_outputRootFileName, "Name of output rootfile.");
   addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.");
-  addParam("useTrackInfo", m_useTrackInfo, "True if using clusters related to tracks in the analysis");
+  addParam("useTrackInfo", m_useTrackInfo, "True if using clusters related to tracks in the analysis", bool(true));
 }
 
 SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
@@ -181,7 +181,12 @@ void SVDChargeSharingAnalysisModule::initialize()
 
 void SVDChargeSharingAnalysisModule::event()
 {
-  if (m_useTrackInfo == true) BOOST_FOREACH(Track & track, m_Tracks) {
+  if (m_useTrackInfo == false) {
+    B2ERROR(" you must use track information! change the module parameter to TRUE");
+    return;
+  }
+
+  BOOST_FOREACH(Track & track, m_Tracks) {
 
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
@@ -257,9 +262,7 @@ void SVDChargeSharingAnalysisModule::event()
 
     } //clusters
   } //tracks
-  else { // no tracking information
-    // TODO implement it
-  }
+
 } //event()
 
 

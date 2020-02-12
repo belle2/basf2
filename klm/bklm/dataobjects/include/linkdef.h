@@ -11,7 +11,6 @@
 #pragma link C++ class Belle2::BKLMDigit+;
 #pragma link C++ class Belle2::BKLMHit1d+;
 #pragma link C++ class Belle2::BKLMHit2d+;
-#pragma link C++ class Belle2::BKLMElementID+;
 #pragma link C++ class Belle2::BKLMTrack+;
 #pragma link C++ class Belle2::BKLMDigitOutOfRange+;
 

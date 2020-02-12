@@ -461,7 +461,7 @@ def BtoD0rhoList(path):
 
     **Skim Category**: physics, hadronic B to charm
 
-    **Skim Code**: 1414100t
+    **Skim Code**: 14141007
 
     **Working Group**: BtoCharm (WG4)
 
@@ -749,7 +749,7 @@ def B0toDstarRhoList(path):
 
     **Skim Category**: physics, hadronic B to charm
 
-    **Skim Code**: 1412120t
+    **Skim Code**: 14121207
 
     **Working Group**: BtoCharm (WG4)
 

@@ -333,7 +333,7 @@ namespace Belle2 {
         try {
           int i = 0;
           for (std::string arg : arguments) {
-            prob[i++] = std::stoi(arg);
+            prob[i++] = std::stof(arg);
           }
         } catch (std::invalid_argument& e) {
           B2ERROR("All arguments of mostLikelyPDG must be a float number");

@@ -824,11 +824,11 @@ CDCTriggerHoughETFModule::calcEventTiming()
   }
   if (m_t0CalcMethod == 0) {
     std::sort(ftlists.begin(), ftlists.end());
-    return ftlists[m_arrivalOrder] * 2;
+    return ftlists[m_arrivalOrder];
   } else if (m_t0CalcMethod == 1) {
-    return median(ftlists) * 2;
+    return median(ftlists);
   } else {
-    return medianInTimeWindow(ftlists) * 2;
+    return medianInTimeWindow(ftlists);
   }
 }
 

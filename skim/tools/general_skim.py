@@ -13,6 +13,7 @@ import modularAnalysis as ma
 import skimExpertFunctions as expert
 from skim.registry import skim_registry as registry
 
+
 def get_argument_parser():
     """Return an ArgumentParser with all defined arguments.
     """

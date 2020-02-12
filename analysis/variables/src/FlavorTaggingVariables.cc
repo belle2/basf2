@@ -1865,10 +1865,8 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
               output = flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined();
-            }
           }
           return output;
         };
@@ -1889,10 +1887,8 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
               output = TMath::Sign(1, flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
-            }
           }
           return output;
         };
@@ -1913,8 +1909,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               double r = std::abs(flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
               if (r < 0.1) output = 0;
               if (r > 0.1 && r < 0.25) output = 1;
@@ -1944,8 +1939,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
               if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
               else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
@@ -1971,8 +1965,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
               if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
               else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
@@ -1998,8 +1991,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
               if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
               else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName

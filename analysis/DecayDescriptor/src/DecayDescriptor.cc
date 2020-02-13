@@ -29,12 +29,7 @@ DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),
   m_daughters(),
-  m_isIgnoreRadiatedPhotons(false),
-  m_isIgnoreIntermediate(false),
-  m_isIgnoreMassive(false),
-  m_isIgnoreNeutrino(false),
-  m_isIgnoreGamma(false),
-  m_isIgnoreBrems(false),
+  m_properties(0),
   m_isNULL(false),
   m_isInitOK(false)
 {
@@ -75,20 +70,16 @@ bool DecayDescriptor::init(const DecayString& s)
 
     // Identify arrow type
     if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-      m_isIgnoreRadiatedPhotons = true;
-      m_isIgnoreIntermediate = true;
+      m_properties |= c_isIgnoreRadiatedPhotons | c_isIgnoreIntermediate;
       if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
         B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
       }
     } else if (d->m_strArrow == "=norad=>") {
-      m_isIgnoreRadiatedPhotons = false;
-      m_isIgnoreIntermediate = true;
+      m_properties |= c_isIgnoreIntermediate;
     } else if (d->m_strArrow == "=direct=>") {
-      m_isIgnoreRadiatedPhotons = true;
-      m_isIgnoreIntermediate = false;
+      m_properties |= c_isIgnoreRadiatedPhotons;
     } else if (d->m_strArrow == "=exact=>") {
-      m_isIgnoreRadiatedPhotons = false;
-      m_isIgnoreIntermediate = false;
+      // do nothing
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
       m_isInitOK = false;
@@ -114,19 +105,19 @@ bool DecayDescriptor::init(const DecayString& s)
     // Initialise list of keywords
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
-      m_isIgnoreNeutrino = true;
+      m_properties |= c_isIgnoreNeutrino;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
-      m_isIgnoreGamma = true;
+      m_properties |= c_isIgnoreGamma;
     }
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
-      m_isIgnoreMassive = true;
+      m_properties |= c_isIgnoreMassive;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?brems")) != d->m_keywords.end()) {
-      m_isIgnoreBrems = true;
+      m_properties |= c_isIgnoreBrems;
     }
 
     return true;
@@ -200,7 +191,7 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
       int iPDGCode_daughter_p = 0;
       if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
       else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && (m_isIgnoreRadiatedPhotons or m_isIgnoreGamma)
+      if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma())
           && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
@@ -218,7 +209,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (!(m_isIgnoreIntermediate or m_isIgnoreMassive or m_isIgnoreNeutrino) && int(matches_global.size()) != nDaughters_p) return 0;
+  if (!(this->isIgnoreIntermediate() or this->isIgnoreMassive() or this->isIgnoreNeutrino())
+      && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.

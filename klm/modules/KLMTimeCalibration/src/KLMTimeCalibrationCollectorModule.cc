@@ -39,6 +39,9 @@
 #include <TH1I.h>
 #include <TH2D.h>
 
+/* C++ STL headers. */
+#include  <utility>
+
 
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -341,7 +344,6 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
 
 void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> bklmHit2ds)
 {
-  int iSub, iFor, iSec, iLay, iPla, iStr;
   double stripWidtm_HZ, stripWidtm_HPhi;
 
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
@@ -371,45 +373,10 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
                                                                    digitHit->isPhiReadout(), digitHit->getStrip());
 
-        std::multimap<int, ExtHit*>::iterator it;
-        ExtHit* extHit   = nullptr;
-        ExtHit* entryHit = nullptr;
-        ExtHit* exitHit  = nullptr;
-        for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
-          extHit = it->second;
-          int copyid = extHit->getCopyID();
-          m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
-          uint16_t globalID_extHit = m_elementNum->channelNumberBKLM(iFor, iSec, iLay, iPla, iStr);
+        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit);
+        ExtHit* entryHit = pair_extHits.first;
+        ExtHit* exitHit = pair_extHits.second;
 
-          B2DEBUG(20, "BKLM element numbers check. Scintillator Part." << LogVar("copyID_extHit", copyid) << LogVar("globalID_extHit",
-                  globalID_extHit) << LogVar("channelID", m_ev.channelId));
-          if (m_ev.channelId != globalID_extHit) continue;
-          B2DEBUG(20, "BKLM element numbers check. Scintillator Part.\n" <<
-                  "ExtHit Forward :: Digit Forward   " << iFor   << "  " << digitHit->getSection()   << std::endl <<
-                  "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << digitHit->getSector()    << std::endl <<
-                  "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << digitHit->getLayer()     << std::endl <<
-                  "ExtHit Plane   :: Digit Plane     " << iPla   << "  " << digitHit->isPhiReadout() << std::endl <<
-                  "ExtHit Channel :: Digit Channel   " << iStr   << "  " << digitHit->getStrip());
-
-          switch (extHit->getStatus()) {
-            case EXT_ENTER:
-              if (entryHit == nullptr) {
-                entryHit = extHit;
-              } else if (extHit->getTOF() < entryHit->getTOF()) {
-                entryHit = extHit;
-              }
-              break;
-            case EXT_EXIT:
-              if (exitHit == nullptr) {
-                exitHit = extHit;
-              } else if (extHit->getTOF() > exitHit->getTOF()) {
-                exitHit = extHit;
-              }
-              break;
-            default:
-              break;
-          }
-        }
         if (entryHit == nullptr || exitHit == nullptr) continue;
 
         m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
@@ -449,7 +416,7 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         m_ev.nPE = digitHit->getNPixel();
         m_ev.channelId = channelId_digit;
 
-        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, iLay);
+        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, digitHit->getLayer());
         getObjectPtr<TTree>("time_calibration_data")->Fill();
       }
     }
@@ -571,6 +538,57 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
       }
     }
   }
+}
+
+std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t kID)
+{
+  setDescription("KLM time calibration collector. Used for KLM hit and ExtHit matching.");
+
+  int iSub, iFor, iSec, iLay, iPla, iStr;
+  int iSubK, iForK, iSecK, iLayK, iPlaK, iStrK;
+
+  m_elementNum->channelNumberToElementNumbers(kID, &iSubK, &iForK, &iSecK, &iLayK, &iPlaK, &iStrK);
+
+  std::multimap<int, ExtHit*>::iterator it;
+  ExtHit* extHit = nullptr;
+  ExtHit* entryHit = nullptr;
+  ExtHit* exitHit = nullptr;
+
+  for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
+    extHit = it->second;
+    int copyid = extHit->getCopyID();
+    m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+
+    if (iSub != iSubK) continue;
+    if (iFor != iForK) continue;
+    if (iSec != iSecK) continue;
+    if (iLay != iLayK) continue;
+    if (iSub == KLMElementNumbers::c_EKLM || (iSub == KLMElementNumbers::c_BKLM && iLay > 2)) {
+      if (iPla != iPlaK) continue;
+      if (iStr != iStrK) continue;
+    }
+
+    switch (extHit->getStatus()) {
+      case EXT_ENTER:
+        if (entryHit == nullptr) {
+          entryHit = extHit;
+        } else if (extHit->getTOF() < entryHit->getTOF()) {
+          entryHit = extHit;
+        }
+        break;
+      case EXT_EXIT:
+        if (exitHit == nullptr) {
+          exitHit = extHit;
+        } else if (extHit->getTOF() > exitHit->getTOF()) {
+          exitHit = extHit;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  std::pair<ExtHit*, ExtHit*> p_extHits = std::make_pair(entryHit, exitHit);
+  return p_extHits;
 }
 
 void KLMTimeCalibrationCollectorModule::finish()

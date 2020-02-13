@@ -68,6 +68,9 @@ namespace Belle2 {
     /** collect hits information for scintillator of EKLM */
     void collectScintEnd(RelationVector<EKLMHit2d>);
 
+    /** match KLM hit and extHit */
+    std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID);
+
     /** debug flag */
     bool m_Debug;
 
@@ -151,3 +154,4 @@ namespace Belle2 {
     TTree* m_outTree;
   };
 }
+

@@ -139,8 +139,10 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   int iPDGCode_p = 0;
-  if (const auto* part_test = dynamic_cast<const Particle*>(p)) iPDGCode_p = part_test->getPDGCode();
-  else if (const auto* mc_test = dynamic_cast<const MCParticle*>(p)) iPDGCode_p = mc_test->getPDG();
+  if (const auto* part_test = dynamic_cast<const Particle*>(p))
+    iPDGCode_p = part_test->getPDGCode();
+  else if (const auto* mc_test = dynamic_cast<const MCParticle*>(p))
+    iPDGCode_p = mc_test->getPDG();
   else {
     B2WARNING("Template type not supported!");
     return 0;
@@ -189,10 +191,15 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
     for (int jDaughter_p = 0; jDaughter_p < nDaughters_p; jDaughter_p++) {
       const T* daughter = daughterList[jDaughter_p];
       int iPDGCode_daughter_p = 0;
-      if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
-      else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma())
-          && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      if (const auto* part_test = dynamic_cast<const Particle*>(daughter))
+        iPDGCode_daughter_p = part_test->getPDGCode();
+      else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter))
+        iPDGCode_daughter_p = mc_test->getPDG();
+
+      if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma() or this->isIgnoreBrems())
+          && iPDGCode_daughter_p == 22)
+        matches_global.insert(jDaughter_p);
+
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;

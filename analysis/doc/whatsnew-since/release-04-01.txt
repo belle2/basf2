@@ -107,6 +107,7 @@ Modules
    The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
  * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
+ * Both flavor taggers support ROE masks. Added new maskName argument.
 
 Utilities
 +++++++++

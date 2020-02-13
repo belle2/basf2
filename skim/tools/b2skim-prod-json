@@ -451,25 +451,6 @@ def get_DBGlobalTag(releaseNumber):
         sys.exit(1)
 
 
-def get_HS06_per_event(skimStatsDict, skimName, sampleLabel):
-    """Convert KEKCC CPU time into HEP-SPEC06 (the standard unit used for
-    expressing CPU usage). According to
-    `Confluence <https://confluence.desy.de/display/BI/Production+Definition>`_,
-    the conversion factor is about 20.
-
-    Args:
-        skimStatsDict (dict): The skim stats read in from ``skimStats.json``.
-        skimName (str): The name of the skim to retrieve the statistic for.
-        sampleLabel (str): The label of the test sample to get the statistic for.
-
-    Returns:
-        HS06TimePerEvent (float): The converted time per event, now in units of HS06.
-    """
-    CPUTimePerEvent = skimStatsDict[skimName]["cpuTimePerEvent"][sampleLabel]
-    HS06TimePerEvent = CPUTimePerEvent * 20
-    return HS06TimePerEvent
-
-
 def get_beam_energy_from_registry(sampleRegistry):
     """Read the input YAML file and retrieve the list of beam energies. Check
     for whether more than one beam energy is listed in the registry. Prints an
@@ -548,11 +529,11 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
     if args.mc:
         dataOrMC = "MC"
         fabricationType = "MCSkim"
-        LPNPrefix = "/belle/MC/skim"
+        LPNPrefix = "/belle/MC"
     else:
         dataOrMC = "data"
         fabricationType = "DataSkim"
-        LPNPrefix = "/belle/Data/skim"
+        LPNPrefix = "/belle/Data"
 
     skimRequestDict = {
         "FabricationType": fabricationType,
@@ -564,8 +545,8 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "Campaign": args.campaign,
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
-        "ExpectedEventCPUTime": get_HS06_per_event(skimStatsDict, skimName, statsSampleLabel),
-        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerSkimmedEvent"][statsSampleLabel],
+        "ExpectedEventCPUTime": skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel],
+        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel],
         "InputSandboxFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
         "InputData": LPNList,
         "Priority": 8,

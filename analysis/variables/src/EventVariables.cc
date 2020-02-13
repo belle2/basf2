@@ -57,6 +57,37 @@ namespace Belle2 {
       return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
+    double isChargedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      if (!mcParticles) {
+        return 0.0;
+      }
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 521) return 1.0;
+      }
+      return 0.0;
+    }
+
+    double isUnmixedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      if (!mcParticles) {
+        return 0.0;
+      }
+      std::vector<int> bPDGs;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 511) bPDGs.push_back(pdg_no);
+      }
+      if (bPDGs.size() == 2) {
+        return bPDGs[0] * bPDGs[1] < 0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
@@ -447,6 +478,11 @@ namespace Belle2 {
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
                       "[Eventbased] 1.0 if event does contain an Y(4S) and therefore is not a continuum Event");
+
+    REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
+                      "[Eventbased] true if event contains a charged B-meson");
+    REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
+                      "[Eventbased] true if event contains opposite flavor neutral B-mesons");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");

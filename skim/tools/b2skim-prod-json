@@ -116,9 +116,6 @@ import yaml
 
 from basf2 import B2ERROR, B2INFO, B2WARNING
 from conditions_db import ConditionsDB, encode_name
-from ROOT import PyConfig
-# Importing ROOT in skimExpertFunctions has the side-effect of hijacking argument parsing
-PyConfig.IgnoreCommandLineOptions = True
 from skimExpertFunctions import encodeSkimName
 from skim.registry import combined_skims as combinedSkimsInfo
 
@@ -162,9 +159,11 @@ def get_skim_stats_dict():
         with open("skimStats.json") as skimStatsFile:
             skimStatsDict = json.load(skimStatsFile)
     except FileNotFoundError:
-        B2ERROR("Could not find required file `skimStats.json` in current directory.\n"
-                "          Please run `b2skim-stats-print` with the `-J` flag, and put\n"
-                "          the output `skimStats.json` in the current directory.")
+        B2ERROR(
+            "Could not find required file `skimStats.json` in current directory.\n"
+            "          Please run `b2skim-stats-print` with the `-J` flag, and put\n"
+            "          the output `skimStats.json` in the current directory."
+        )
         sys.exit(1)
 
     return skimStatsDict
@@ -178,25 +177,47 @@ def verify_registry(sampleRegistry, mc):
         sampleRegistry (dict): The input data/MC registry as a dict.
         mc (bool): Are these JSON files being produced for MC skims?
     """
-    expectedMCEntries = ["sampleLabel", "LPNPrefix", "inputReleaseNumber",
-                         "inputDBGlobalTag", "mcCampaign", "prodNumber",
-                         "experimentNumber", "beamEnergy", "inputDataLevel",
-                         "mcType", "mcBackground", "runNumber"]
-    expectedDataEntries = ["LPNPrefix", "inputReleaseNumber", "inputDBGlobalTag",
-                           "procNumber", "prodNumber", "experimentNumber",
-                           "beamEnergy", "inputDataLevel", "runNumbers"]
+    expectedMCEntries = [
+        "sampleLabel",
+        "LPNPrefix",
+        "inputReleaseNumber",
+        "inputDBGlobalTag",
+        "mcCampaign",
+        "prodNumber",
+        "experimentNumber",
+        "beamEnergy",
+        "inputDataLevel",
+        "mcType",
+        "mcBackground",
+        "runNumber",
+    ]
+    expectedDataEntries = [
+        "LPNPrefix",
+        "inputReleaseNumber",
+        "inputDBGlobalTag",
+        "procNumber",
+        "prodNumber",
+        "experimentNumber",
+        "beamEnergy",
+        "inputDataLevel",
+        "runNumbers",
+    ]
 
     missingEntries = []
     if mc:
-        missingEntries = [(sampleLabel, expectedEntry)
-                          for (sampleLabel, sampleInfo) in sampleRegistry.items()
-                          for expectedEntry in expectedMCEntries
-                          if expectedEntry not in sampleInfo.keys()]
+        missingEntries = [
+            (sampleLabel, expectedEntry)
+            for (sampleLabel, sampleInfo) in sampleRegistry.items()
+            for expectedEntry in expectedMCEntries
+            if expectedEntry not in sampleInfo.keys()
+        ]
     else:
-        missingEntries = [(sampleLabel, expectedEntry)
-                          for (sampleLabel, sampleInfo) in sampleRegistry.items()
-                          for expectedEntry in expectedDataEntries
-                          if expectedEntry not in sampleInfo.keys()]
+        missingEntries = [
+            (sampleLabel, expectedEntry)
+            for (sampleLabel, sampleInfo) in sampleRegistry.items()
+            for expectedEntry in expectedDataEntries
+            if expectedEntry not in sampleInfo.keys()
+        ]
 
     if missingEntries:
         for sampleLabel, missingEntry in missingEntries:
@@ -220,13 +241,14 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
     sampleLabels = [sampleInfo["sampleLabel"] for sampleInfo in sampleRegistry.values()]
 
     # Verify that all the requested skims have statistics listed
-    missingSkims = [skim for skim in skims
-                    if skim not in skimStatsDict.keys()]
+    missingSkims = [skim for skim in skims if skim not in skimStatsDict.keys()]
     if missingSkims:
         for missingSkim in missingSkims:
-            B2ERROR(f"Cannot find stats for {missingSkim} skim in skimStats.json.\n"
-                    "          Perhaps you misspelled it or forgot to produce the\n"
-                    "          stats with `b2skim-stats-print`?")
+            B2ERROR(
+                f"Cannot find stats for {missingSkim} skim in skimStats.json.\n"
+                "          Perhaps you misspelled it or forgot to produce the\n"
+                "          stats with `b2skim-stats-print`?"
+            )
         sys.exit(1)
 
     # Verify that all the requested samples were tested, and returned non-None values
@@ -234,13 +256,17 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
         try:
             statValue = skimStatsDict[skim][statistic][sampleLabel]
             if statValue is None:
-                B2ERROR(f"The value for {statistic} for {skim} skim on {sampleLabel} sample"
-                        "is `None`! This value is required for the produced JSON files.")
+                B2ERROR(
+                    f"The value for {statistic} for {skim} skim on {sampleLabel} sample"
+                    "is `None`! This value is required for the produced JSON files."
+                )
                 sys.exit(1)
         except KeyError:
-            B2ERROR(f"Missing value for {statistic} for {skim} skim on {sampleLabel} sample."
-                    "Perhaps you misspelled it or forgot to produce the stats "
-                    "with `b2skim-stats-print`.")
+            B2ERROR(
+                f"Missing value for {statistic} for {skim} skim on {sampleLabel} sample."
+                "Perhaps you misspelled it or forgot to produce the stats "
+                "with `b2skim-stats-print`."
+            )
             sys.exit(1)
 
 
@@ -308,25 +334,36 @@ def get_lpn_list(sampleInfo, mc):
         # Allow prod numbers, run numbers and database global tag ID to just be numbers in YAML file
         # (without *e.g.* prod00.. at start). This will pad a number with the correct number of
         # zeros, and add the correct letters at the front.
-        prodNumbers = [str(n) if str(n).startswith("prod") else "prod" + str(n).zfill(8) for n in prodNumbers]
+        prodNumbers = [
+            str(n) if str(n).startswith("prod") else "prod" + str(n).zfill(8)
+            for n in prodNumbers
+        ]
 
         if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
-            sampleInfo["inputDBGlobalTag"] = "DB" + str(sampleInfo["inputDBGlobalTag"]).zfill(8)
+            sampleInfo["inputDBGlobalTag"] = "DB" + str(
+                sampleInfo["inputDBGlobalTag"]
+            ).zfill(8)
 
         if not str(sampleInfo["runNumber"]).startswith("r"):
             sampleInfo["runNumber"] = "r" + str(sampleInfo["runNumber"]).zfill(5)
 
-        LPNList = [str(Path(sampleInfo["LPNPrefix"],
-                            sampleInfo["inputReleaseNumber"],
-                            sampleInfo["inputDBGlobalTag"],
-                            sampleInfo["mcCampaign"],
-                            prodNumber,
-                            sampleInfo["experimentNumber"],
-                            sampleInfo["beamEnergy"],
-                            sampleInfo["runNumber"],
-                            sampleInfo["mcType"],
-                            sampleInfo["inputDataLevel"]))
-                   for prodNumber in prodNumbers]
+        LPNList = [
+            str(
+                Path(
+                    sampleInfo["LPNPrefix"],
+                    sampleInfo["inputReleaseNumber"],
+                    sampleInfo["inputDBGlobalTag"],
+                    sampleInfo["mcCampaign"],
+                    prodNumber,
+                    sampleInfo["experimentNumber"],
+                    sampleInfo["beamEnergy"],
+                    sampleInfo["runNumber"],
+                    sampleInfo["mcType"],
+                    sampleInfo["inputDataLevel"],
+                )
+            )
+            for prodNumber in prodNumbers
+        ]
     else:
         # Allow prod number, experiment number, run numbers and database global tag ID to just be
         # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each number with the
@@ -335,23 +372,36 @@ def get_lpn_list(sampleInfo, mc):
             sampleInfo["prodNumber"] = "prod" + str(sampleInfo["prodNumber"]).zfill(8)
 
         if not str(sampleInfo["inputDBGlobalTag"]).startswith("DB"):
-            sampleInfo["inputDBGlobalTag"] = "DB" + str(sampleInfo["inputDBGlobalTag"]).zfill(8)
+            sampleInfo["inputDBGlobalTag"] = "DB" + str(
+                sampleInfo["inputDBGlobalTag"]
+            ).zfill(8)
 
         if not str(sampleInfo["experimentNumber"]).startswith("e"):
-            sampleInfo["experimentNumber"] = "e" + str(sampleInfo["experimentNumber"]).zfill(4)
+            sampleInfo["experimentNumber"] = "e" + str(
+                sampleInfo["experimentNumber"]
+            ).zfill(4)
 
-        sampleInfo["runNumbers"] = [str(n) if str(n).startswith("r") else "r" + str(n).zfill(5) for n in sampleInfo["runNumbers"]]
+        sampleInfo["runNumbers"] = [
+            str(n) if str(n).startswith("r") else "r" + str(n).zfill(5)
+            for n in sampleInfo["runNumbers"]
+        ]
 
-        LPNList = [str(Path(sampleInfo["LPNPrefix"],
-                            sampleInfo["inputReleaseNumber"],
-                            sampleInfo["inputDBGlobalTag"],
-                            sampleInfo["procNumber"],
-                            sampleInfo["prodNumber"],
-                            sampleInfo["experimentNumber"],
-                            sampleInfo["beamEnergy"],
-                            run,
-                            sampleInfo["inputDataLevel"]))
-                   for run in sampleInfo["runNumbers"]]
+        LPNList = [
+            str(
+                Path(
+                    sampleInfo["LPNPrefix"],
+                    sampleInfo["inputReleaseNumber"],
+                    sampleInfo["inputDBGlobalTag"],
+                    sampleInfo["procNumber"],
+                    sampleInfo["prodNumber"],
+                    sampleInfo["experimentNumber"],
+                    sampleInfo["beamEnergy"],
+                    run,
+                    sampleInfo["inputDataLevel"],
+                )
+            )
+            for run in sampleInfo["runNumbers"]
+        ]
 
     return LPNList
 
@@ -377,6 +427,7 @@ def get_DBGlobalTag(releaseNumber):
     """
     # Check that the release number is of the correct form
     import re
+
     r = re.compile("^release(-[0-9]{2}){3}$")
     if not r.match(releaseNumber):
         B2ERROR("Release number must be of the form 'release-XX-XX-XX'.")
@@ -384,7 +435,7 @@ def get_DBGlobalTag(releaseNumber):
 
     initialReleaseNumber = releaseNumber
 
-    _, majorNumber, minorNumber, patchNumber = releaseNumber.split('-')
+    _, majorNumber, minorNumber, patchNumber = releaseNumber.split("-")
     patchNumber = int(patchNumber)
     minorNumber = int(minorNumber)
 
@@ -418,14 +469,18 @@ def get_DBGlobalTag(releaseNumber):
     if len(globalTags) == 1:
         # If only one available, use that
         DBGlobalTag, releaseNumber = globalTags[0]
-        B2INFO(f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}.")
+        B2INFO(
+            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
+        )
         return DBGlobalTag
 
     elif len(globalTags) >= 1:
         # If multiple available, ask user what they want
         nGlobalTags = len(globalTags)
-        B2INFO("Multiple conditions database global tags found.\n"
-               f"Please select (one of 1--{nGlobalTags}).")
+        B2INFO(
+            "Multiple conditions database global tags found.\n"
+            f"Please select (one of 1--{nGlobalTags})."
+        )
         for iGlobalTag, (DBGlobalTag, releaseNumber) in enumerate(globalTags):
             print(f"  [{iGlobalTag+1}] {releaseNumber}: {DBGlobalTag}")
 
@@ -441,13 +496,17 @@ def get_DBGlobalTag(releaseNumber):
                 break
 
         DBGlobalTag, releaseNumber = globalTags[selection]
-        B2INFO(f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}.")
+        B2INFO(
+            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
+        )
         return DBGlobalTag
 
     else:
         # If none available, throw an error
-        B2ERROR(f"Could not find any conditions database global tags for releases between\n"
-                "release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}.")
+        B2ERROR(
+            f"Could not find any conditions database global tags for releases between\n"
+            "release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
+        )
         sys.exit(1)
 
 
@@ -488,15 +547,19 @@ def warn_local_script(args):
         dataOrMC = "data"
 
     skimScript = args.local_skim_script
-    if not skimScript.endswith('.py'):
-        skimScript += '.py'
+    if not skimScript.endswith(".py"):
+        skimScript += ".py"
 
-    localScriptDirectory = str(Path(dataOrMC, args.campaign, args.release, 'SkimScripts'))
+    localScriptDirectory = str(
+        Path(dataOrMC, args.campaign, args.release, "SkimScripts")
+    )
 
     for skimName in args.skims:
-        B2WARNING(f"Using local skim script! Please make sure to place sandbox file {skimScript}\n"
-                  f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}\n"
-                  f"          and modify {skimName}_Skim_Standalone.py to import this script.")
+        B2WARNING(
+            f"Using local skim script! Please make sure to place sandbox file {skimScript}\n"
+            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}\n"
+            f"          and modify {skimName}_Skim_Standalone.py to import this script."
+        )
 
 
 def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, LPNList):
@@ -517,7 +580,9 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         skimRequestDict (dict): A dict ready to be saved as a JSON file.
     """
     sampleInfo = sampleRegistry[sampleLabel]
-    statsSampleLabel = sampleInfo["sampleLabel"]  # Get label used by `b2skim-stats-print`
+    statsSampleLabel = sampleInfo[
+        "sampleLabel"
+    ]  # Get label used by `b2skim-stats-print`
 
     skimStatsDict = get_skim_stats_dict()
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
@@ -545,8 +610,12 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "Campaign": args.campaign,
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
-        "ExpectedEventCPUTime": skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel],
-        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel],
+        "ExpectedEventCPUTime": skimStatsDict[skimName]["HS06TimePerEvent"][
+            statsSampleLabel
+        ],
+        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerInputEvent"][
+            statsSampleLabel
+        ],
         "InputSandboxFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
         "InputData": LPNList,
         "Priority": 8,
@@ -554,25 +623,29 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "SteeringFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
-            {"SkimDecayMode": encodeSkimName(individualSkim),
-             "DataLevel": "udst"} for individualSkim in individualSkims
-        ]
+            {"SkimDecayMode": encodeSkimName(individualSkim), "DataLevel": "udst"}
+            for individualSkim in individualSkims
+        ],
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
     if args.mc:
         if sampleInfo["mcBackground"] == "BGx0":
-            skimRequestDict["MCEventType"] = sampleInfo["mcType"] + sampleInfo["mcBackground"]
+            skimRequestDict["MCEventType"] = (
+                sampleInfo["mcType"] + sampleInfo["mcBackground"]
+            )
         else:
             skimRequestDict["MCEventType"] = sampleInfo["mcType"]
 
     if args.local_skim_script:
         # Read in the name of the local skim module from the arguments
         skimScript = args.local_skim_script
-        if not skimScript.endswith('.py'):
-            skimScript += '.py'
+        if not skimScript.endswith(".py"):
+            skimScript += ".py"
 
-        localScriptDirectory = str(Path(dataOrMC, args.campaign, args.release, 'SkimScripts'))
+        localScriptDirectory = str(
+            Path(dataOrMC, args.campaign, args.release, "SkimScripts")
+        )
         skimRequestDict["InputSandboxFile"] = [skimScript]
         skimRequestDict["InputSandboxFilePrefix"] = localScriptDirectory
 
@@ -609,22 +682,31 @@ def write_json_files(sampleRegistry, args, outputDirectory):
 
             # MC campaign number is likely already in skim campaign name, so don't include it in sample label
             if args.mc:
-                sampleLabelForFilename = sampleInfo["mcType"] + sampleInfo["mcBackground"]
+                sampleLabelForFilename = (
+                    sampleInfo["mcType"] + sampleInfo["mcBackground"]
+                )
             else:
                 sampleLabelForFilename = sampleLabel
 
             for LPNList in LPNLists:
                 prodNumber += 1
-                skimRequestDict = make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, LPNList)
+                skimRequestDict = make_request_dict(
+                    args, sampleRegistry, skimName, sampleLabel, prodNumber, LPNList
+                )
 
-                outputFileName = Path(outputDirectory, f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}.json")
+                outputFileName = Path(
+                    outputDirectory,
+                    f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}.json",
+                )
                 if outputFileName.exists():
                     B2WARNING(f"Overwriting {outputFileName}")
                 with open(outputFileName, "w") as outputFile:
                     json.dump(skimRequestDict, outputFile, indent=4)
 
-        B2INFO(f"Make sure to copy {skimName}_Skim_Standalone.py to "
-               f"{get_base_directory(args)}/{args.campaign}/{args.release}/SkimScripts/")
+        B2INFO(
+            f"Make sure to copy {skimName}_Skim_Standalone.py to "
+            f"{get_base_directory(args)}/{args.campaign}/{args.release}/SkimScripts/"
+        )
 
     return prodNumber
 
@@ -636,39 +718,73 @@ def get_argument_parser():
         parser (argparse.ArgumentParser): A parser which defines the skim
             campaign, release number, and starting prod number.
     """
-    description, epilog = __doc__.split('--epilog--')
+    description, epilog = __doc__.split("--epilog--")
     parser = argparse.ArgumentParser(
         description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=epilog
+        epilog=epilog,
     )
 
-    parser.add_argument("sampleRegistryYaml",
-                        help="YAML file defining the samples produce JSON files for.")
-    parser.add_argument("-s", "--skims", required=True, nargs="+",
-                        metavar="SKIM", choices=combinedSkimsInfo.keys(),
-                        help="List of skims to produce request files for. "
-                        "Only accepts combined skims listed in `skim.registry.combined_skims`.")
-    parser.add_argument("-n", "--starting-prod-number", required=True, type=int,
-                        help="Starting prod number of the JSON files.")
-    parser.add_argument("-o", "--output-base-directory", required=True,
-                        help="Base directory for output. "
-                        "This should be the base directory of the ``B2P/MC`` or ``B2P/data`` repo.")
-    parser.add_argument("-c", "--campaign", required=True,
-                        help="Name of the campaign, *e.g.* SKIMDATAx1.")
-    parser.add_argument("-r", "--release", required=True,
-                        help="The basf2 to release to be used, *e.g.* release-04-00-03.")
-    parser.add_argument("-l", "--local-skim-script",
-                        help="File name of the local skim script to use, if any. *e.g.* ``ewp_local.py``. "
-                        "Should not include any path before the file name.")
-    parser.add_argument("-1", "--one-lpn-per-json", action="store_true",
-                        help="Only include one LPN in each JSON file.")
+    parser.add_argument(
+        "sampleRegistryYaml",
+        help="YAML file defining the samples produce JSON files for.",
+    )
+    parser.add_argument(
+        "-s",
+        "--skims",
+        required=True,
+        nargs="+",
+        metavar="SKIM",
+        choices=combinedSkimsInfo.keys(),
+        help="List of skims to produce request files for. "
+        "Only accepts combined skims listed in `skim.registry.combined_skims`.",
+    )
+    parser.add_argument(
+        "-n",
+        "--starting-prod-number",
+        required=True,
+        type=int,
+        help="Starting prod number of the JSON files.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-base-directory",
+        required=True,
+        help="Base directory for output. "
+        "This should be the base directory of the ``B2P/MC`` or ``B2P/data`` repo.",
+    )
+    parser.add_argument(
+        "-c",
+        "--campaign",
+        required=True,
+        help="Name of the campaign, *e.g.* SKIMDATAx1.",
+    )
+    parser.add_argument(
+        "-r",
+        "--release",
+        required=True,
+        help="The basf2 to release to be used, *e.g.* release-04-00-03.",
+    )
+    parser.add_argument(
+        "-l",
+        "--local-skim-script",
+        help="File name of the local skim script to use, if any. *e.g.* ``ewp_local.py``. "
+        "Should not include any path before the file name.",
+    )
+    parser.add_argument(
+        "-1",
+        "--one-lpn-per-json",
+        action="store_true",
+        help="Only include one LPN in each JSON file.",
+    )
 
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)
-    mcDataGroup.add_argument('--mc', '--MC', action='store_true',
-                             help='Produce JSON files for MC.')
-    mcDataGroup.add_argument('--data', '--Data', action='store_true',
-                             help='Produce JSON files for data.')
+    mcDataGroup.add_argument(
+        "--mc", "--MC", action="store_true", help="Produce JSON files for MC."
+    )
+    mcDataGroup.add_argument(
+        "--data", "--Data", action="store_true", help="Produce JSON files for data."
+    )
 
     return parser
 
@@ -686,9 +802,13 @@ def main():
     finalProdNumber = write_json_files(sampleRegistry, args, outputDirectory)
 
     warn_local_script(args)
-    B2INFO(f"Successfully generated {', '.join(args.skims)} JSON files for {', '.join(sampleRegistry.keys())} samples.")
+    B2INFO(
+        f"Successfully generated {', '.join(args.skims)} JSON files for {', '.join(sampleRegistry.keys())} samples."
+    )
     B2INFO(f"The JSON files were saved to {outputDirectory}")
-    B2INFO(f"The prod numbers of these files range from {args.starting_prod_number} to {finalProdNumber}.")
+    B2INFO(
+        f"The prod numbers of these files range from {args.starting_prod_number} to {finalProdNumber}."
+    )
 
 
 if __name__ == "__main__":

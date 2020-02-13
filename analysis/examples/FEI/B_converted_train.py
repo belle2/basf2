@@ -39,6 +39,7 @@ if feistate.stage <= 0:
             'validation',
             False),
         applyHadronBJSkim=True,
+        enableNisKsFinder=False,
         path=path)
 else:
     ma.inputMdstList('Belle', [], path)

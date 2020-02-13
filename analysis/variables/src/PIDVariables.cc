@@ -18,6 +18,8 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
+#include <framework/utilities/Conversion.h>
+
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
@@ -333,7 +335,7 @@ namespace Belle2 {
         try {
           int i = 0;
           for (std::string arg : arguments) {
-            prob[i++] = std::stof(arg);
+            prob[i++] = Belle2::convertString<float>(arg);
           }
         } catch (std::invalid_argument& e) {
           B2ERROR("All arguments of mostLikelyPDG must be a float number");
@@ -351,7 +353,7 @@ namespace Belle2 {
     Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 0 and arguments.size() != 6) {
-        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for isMostLikelyPDG");
+        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidIsMostLikely");
         return nullptr;
       }
       auto func = [arguments](const Particle * part) -> double {

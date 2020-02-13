@@ -34,6 +34,7 @@ DecayDescriptor::DecayDescriptor() :
   m_isIgnoreMassive(false),
   m_isIgnoreNeutrino(false),
   m_isIgnoreGamma(false),
+  m_isIgnoreBrems(false),
   m_isNULL(false),
   m_isInitOK(false)
 {
@@ -122,6 +123,10 @@ bool DecayDescriptor::init(const DecayString& s)
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
       m_isIgnoreMassive = true;
+    }
+    // For gamma
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?brems")) != d->m_keywords.end()) {
+      m_isIgnoreBrems = true;
     }
 
     return true;

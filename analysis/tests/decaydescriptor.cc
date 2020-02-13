@@ -146,6 +146,7 @@ namespace {
     EXPECT_EQ(dd1.isIgnoreMassive(), true);
     EXPECT_EQ(dd1.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd1.isIgnoreGamma(), false);
+    EXPECT_EQ(dd1.isIgnoreBrems(), false);
 
     // ?nu means accept missing neutrino
     DecayDescriptor dd2;
@@ -156,6 +157,7 @@ namespace {
     EXPECT_EQ(dd2.isIgnoreMassive(), false);
     EXPECT_EQ(dd2.isIgnoreNeutrino(), true);
     EXPECT_EQ(dd2.isIgnoreGamma(), false);
+    EXPECT_EQ(dd2.isIgnoreBrems(), false);
 
     // !nu does not change anything. It is reserved for future updates.
     DecayDescriptor dd3;
@@ -166,6 +168,7 @@ namespace {
     EXPECT_EQ(dd3.isIgnoreMassive(), false);
     EXPECT_EQ(dd3.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd3.isIgnoreGamma(), false);
+    EXPECT_EQ(dd3.isIgnoreBrems(), false);
 
     // ?gamma means ignore missing gamma
     DecayDescriptor dd4;
@@ -176,6 +179,7 @@ namespace {
     EXPECT_EQ(dd4.isIgnoreMassive(), false);
     EXPECT_EQ(dd4.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd4.isIgnoreGamma(), true);
+    EXPECT_EQ(dd4.isIgnoreBrems(), false);
 
     // !gamma does not change anything. It is reserved for future updates.
     DecayDescriptor dd5;
@@ -186,6 +190,7 @@ namespace {
     EXPECT_EQ(dd5.isIgnoreMassive(), false);
     EXPECT_EQ(dd5.isIgnoreNeutrino(), false);
     EXPECT_EQ(dd5.isIgnoreGamma(), false);
+    EXPECT_EQ(dd5.isIgnoreBrems(), false);
 
     // ... ?nu ?gamma means accept missing massive
     DecayDescriptor dd6;
@@ -196,6 +201,18 @@ namespace {
     EXPECT_EQ(dd6.isIgnoreMassive(), true);
     EXPECT_EQ(dd6.isIgnoreNeutrino(), true);
     EXPECT_EQ(dd6.isIgnoreGamma(), true);
+    EXPECT_EQ(dd6.isIgnoreBrems(), false);
+
+    // ?gamma means ignore missing gamma
+    DecayDescriptor dd7;
+    initok = dd7.init("B0:candidates -> K+:loose pi-:loose ?brems");
+    EXPECT_EQ(initok, true);
+    EXPECT_EQ(dd7.isIgnoreRadiatedPhotons(), true);
+    EXPECT_EQ(dd7.isIgnoreIntermediate(), true);
+    EXPECT_EQ(dd7.isIgnoreMassive(), false);
+    EXPECT_EQ(dd7.isIgnoreNeutrino(), false);
+    EXPECT_EQ(dd7.isIgnoreGamma(), false);
+    EXPECT_EQ(dd7.isIgnoreBrems(), true);
 
   }
 

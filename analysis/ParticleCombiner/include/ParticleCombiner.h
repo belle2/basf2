@@ -266,6 +266,8 @@ namespace Belle2 {
     bool m_isIgnoreNeutrino;
     /** Ignore missing gamma? */
     bool m_isIgnoreGamma;
+    /** Ignore added Brems gamma? */
+    bool m_isIgnoreBrems;
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

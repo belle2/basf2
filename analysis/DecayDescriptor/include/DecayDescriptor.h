@@ -46,6 +46,8 @@ namespace Belle2 {
     bool m_isIgnoreNeutrino;
     /** Ignore missing gamma? */
     bool m_isIgnoreGamma;
+    /** Ignore added Brems gamma? */
+    bool m_isIgnoreBrems;
     /** Is this the NULL object? */
     bool m_isNULL;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
@@ -166,6 +168,11 @@ namespace Belle2 {
     bool isIgnoreGamma() const
     {
       return m_isIgnoreGamma;
+    }
+    /** Check if added Brems gammas shall be ignored. */
+    bool isIgnoreBrems() const
+    {
+      return m_isIgnoreBrems;
     }
 
     /** Is the decay or the particle self conjugated */

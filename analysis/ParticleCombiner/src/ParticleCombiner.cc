@@ -118,6 +118,7 @@ namespace Belle2 {
     m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
     m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
     m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
+    m_isIgnoreBrems = decaydescriptor.isIgnoreBrems();
 
 
     // Mother particle
@@ -175,6 +176,7 @@ namespace Belle2 {
     m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
     m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
     m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
+    m_isIgnoreBrems = decaydescriptor.isIgnoreBrems();
 
 
     // Mother particle
@@ -449,6 +451,7 @@ namespace Belle2 {
     if (m_isIgnoreMassive) property |= Particle::PropertyFlags::c_isIgnoreMassive;
     if (m_isIgnoreNeutrino) property |= Particle::PropertyFlags::c_isIgnoreNeutrino;
     if (m_isIgnoreGamma) property |= Particle::PropertyFlags::c_isIgnoreGamma;
+    if (m_isIgnoreBrems) property |= Particle::PropertyFlags::c_isIgnoreBrems;
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,

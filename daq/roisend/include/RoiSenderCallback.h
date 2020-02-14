@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     void load(const DBObject&, const std::string&);
-    void start();
+    void start(int /*expno*/, int /*runno*/);
     void stop();
     void recover(const DBObject&, const std::string&);
     void abort();

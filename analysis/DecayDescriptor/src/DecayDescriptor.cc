@@ -70,14 +70,15 @@ bool DecayDescriptor::init(const DecayString& s)
 
     // Identify arrow type
     if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-      m_properties |= c_isIgnoreRadiatedPhotons | c_isIgnoreIntermediate;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons ;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreIntermediate;
       if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
         B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
       }
     } else if (d->m_strArrow == "=norad=>") {
-      m_properties |= c_isIgnoreIntermediate;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreIntermediate;
     } else if (d->m_strArrow == "=direct=>") {
-      m_properties |= c_isIgnoreRadiatedPhotons;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
     } else if (d->m_strArrow == "=exact=>") {
       // do nothing
     } else {
@@ -105,19 +106,19 @@ bool DecayDescriptor::init(const DecayString& s)
     // Initialise list of keywords
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
-      m_properties |= c_isIgnoreNeutrino;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreNeutrino;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
-      m_properties |= c_isIgnoreGamma;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreGamma;
     }
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
-      m_properties |= c_isIgnoreMassive;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreMassive;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?addbrems")) != d->m_keywords.end()) {
-      m_properties |= c_isIgnoreBrems;
+      m_properties |= Particle::PropertyFlags::c_isIgnoreBrems;
     }
 
     return true;

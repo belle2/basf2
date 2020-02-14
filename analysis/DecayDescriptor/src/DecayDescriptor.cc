@@ -116,7 +116,7 @@ bool DecayDescriptor::init(const DecayString& s)
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
       m_properties |= Particle::PropertyFlags::c_isIgnoreMassive;
     }
-    // For gamma
+    // For brems photons
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?addbrems")) != d->m_keywords.end()) {
       m_properties |= Particle::PropertyFlags::c_isIgnoreBrems;
     }

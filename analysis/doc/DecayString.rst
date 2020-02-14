@@ -68,12 +68,12 @@ One can configure :code:`isSignal` to accept missing particles or not to accept 
 
 Keywords
 ^^^^^^^^
-If one put the following keywords at the end of the decay string, :code:`'isSignal'` will accept missing massive particles/neutrinos/gammas(not radiated), respectively, and added gammas by bremsstrahlung tools.  
+If one put the following keywords at the end of the decay string, :code:`'isSignal'` will accept missing massive particles/neutrinos/gammas(not radiated), respectively, or gammas added by bremsstrahlung tools.  
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
 * :code:`'?gamma'` Missing gammas are ignored 
-* :code:`'?addbrems'` Added gammas by bremsstrahlung tools are ignored 
+* :code:`'?addbrems'` Gammas added by bremsstrahlung tools are ignored 
 
 These are useful to analyze inclusive processes with fully-inclusive method. 
 

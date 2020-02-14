@@ -33,6 +33,7 @@ skim_registry = [
     ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
     # ('14120900', 'B0toDstarPi_D0pi_Kpipi0'),  To be added B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi0
     ('14141007', 'BtoD0rho'),
+    ('14141107', 'BtoDstar0rho'),
     ('14141000', 'BtoD0rho_Kpi'),
     ('14141001', 'BtoD0rho_Kpipipi'),
     ('14141002', 'BtoD0rho_Kpipi0'),

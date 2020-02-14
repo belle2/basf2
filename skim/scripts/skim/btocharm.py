@@ -470,7 +470,55 @@ def BtoD0rhoList(path):
     1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to
                          K^+\\pi^-, K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    1. 1.7 < M_D0 < 2.0
+    2. 0.47 < M_rho < 1.07
+    3. cosHel_rho < 0.95
+    4. Mbc > 5.2
+    5. abs(deltaE) < 0.5
+
+    Note:
+    This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
+    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+
+    """
+
+    __author__ = "Fernando Abudinen"
+
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.95'
+
+    BsigChannels = [
+                    'anti-D0:Kpi rho+:all',
+                    'anti-D0:Kpipipi rho+:all',
+                    'anti-D0:Kpipi0 rho+:all',
+                    ]
+    BsigList = []
+    for chID, channel in enumerate(BsigChannels):
+        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0rho' + str(chID))
+
+    Lists = BsigList
+    return Lists
+
+
+def BtoDstar0rhoList(path):
+    """
+
+    **Skim Author**: Fernando Abudinen
+
+    **Skim Name**: BtoDstar0rho
+
+    **Skim Category**: physics, hadronic B to charm
+
+    **Skim Code**: 14141107
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Modes**:
+
+    1.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to
                          K^+ \\pi^-, K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
                          \\pi^0) \\rho^+`,
 
@@ -494,17 +542,14 @@ def BtoD0rhoList(path):
     Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
 
     BsigChannels = [
-                    'anti-D0:Kpi rho+:all',
-                    'anti-D0:Kpipipi rho+:all',
-                    'anti-D0:Kpipi0 rho+:all',
                     'anti-D*0:D0_Kpi rho+:all',
                     'anti-D*0:D0_Kpipipi rho+:all',
                     'anti-D*0:D0_Kpipi0 rho+:all'
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
+        ma.reconstructDecay('B+:BtoDstar0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoDstar0rho' + str(chID))
 
     Lists = BsigList
     return Lists

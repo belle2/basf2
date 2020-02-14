@@ -2501,8 +2501,6 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
-                    fillWithMostLikely=False,
-                    chargedPIDPriors=None,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2541,13 +2539,6 @@ def buildEventShape(inputListNames=[],
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the options inputListNames
-                              and default_cleanup will be ignored.
-    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
-                              amount of certain charged particle species, should be a list of
-                              six floats if not None. The order of particle types is
-                              the following: [e-, mu-, pi-, K-, p+, d+]
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
@@ -2570,13 +2561,6 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
-    if fillWithMostLikely:
-        from stdCharged import stdMostLikely
-        stdMostLikely(chargedPIDPriors, path=path)
-        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtshape', '', path=path)
-        inputListNames += ['gamma:evtshape']
-
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)

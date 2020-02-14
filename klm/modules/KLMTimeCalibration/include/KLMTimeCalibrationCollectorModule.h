@@ -59,17 +59,20 @@ namespace Belle2 {
     void finish() override;
 
   private:
-    /** collect hits information for RPC of BKLM */
+    /** Collect hits information for RPC of BKLM */
     void collectRPC(RelationVector<BKLMHit2d>);
 
-    /** collect hits information for scintillator of BKLM */
+    /** Collect hits information for scintillator of BKLM */
     void collectScint(RelationVector<BKLMHit2d>);
 
-    /** collect hits information for scintillator of EKLM */
+    /** Collect hits information for scintillator of EKLM */
     void collectScintEnd(RelationVector<EKLMHit2d>);
 
-    /** match KLM hit and extHit */
+    /** Match KLM hit and extHit */
     std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID);
+
+    /** Save position difference betwen matched kLMHit and ExtHit. */
+    void storeDistDiff(TVector3 pDiff);
 
     /** debug flag */
     bool m_Debug;

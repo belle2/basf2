@@ -244,8 +244,6 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
   double l;
-  int iSub, iFor, iSec, iLay, iPla, iStr;
-  int iSubD, iForD, iSecD, iLayD, iPlaD, iStrD;
 
   for (unsigned i = 0; i < hit2ds.size(); ++i) {
     EKLMHit2d* hit2d = hit2ds[i];
@@ -263,48 +261,9 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       m_ev.channelId = m_elementNum->channelNumberEKLM(localID);
       m_ev.inRPC = 0;
 
-      m_elementNum->channelNumberToElementNumbers(m_ev.channelId, &iSubD, &iForD, &iSecD, &iLayD, &iPlaD, &iStrD);
-
-      std::multimap<int, ExtHit*>::iterator it;
-      ExtHit* extHit   = nullptr;
-      ExtHit* entryHit = nullptr;
-      ExtHit* exitHit  = nullptr;
-      for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
-        extHit = it->second;
-        int copyid = extHit->getCopyID();
-        m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
-        uint16_t globalID_extHit = m_elementNum->channelNumberEKLM(iFor, iSec, iLay, iPla, iStr);
-
-        B2DEBUG(20, "EKLM element numbers check." << LogVar("copyID_extHit", copyid) << LogVar("globalID_extHit",
-                globalID_extHit) << LogVar("channelID", m_ev.channelId));
-        if (m_ev.channelId != globalID_extHit) continue;
-        B2DEBUG(20, "EKLM element numbers check.\n" <<
-                "ExtHit Sub     :: Digit Sub       " << iSub   << "  " << iSubD << std::endl <<
-                "ExtHit Forward :: Digit Forward   " << iFor   << "  " << iForD << std::endl <<
-                "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << iSecD << std::endl <<
-                "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << iLayD << std::endl <<
-                "ExtHit Plane   :: Digit Plane     " << iPla   << "  " << iPlaD << std::endl <<
-                "ExtHit Channel :: Digit Channel   " << iStr   << "  " << iStrD);
-
-        switch (extHit->getStatus()) {
-          case EXT_ENTER:
-            if (entryHit == nullptr) {
-              entryHit = extHit;
-            } else if (extHit->getTOF() < entryHit->getTOF()) {
-              entryHit = extHit;
-            }
-            break;
-          case EXT_EXIT:
-            if (exitHit == nullptr) {
-              exitHit = extHit;
-            } else if (extHit->getTOF() > exitHit->getTOF()) {
-              exitHit = extHit;
-            }
-            break;
-          default:
-            break;
-        }
-      }
+      std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(m_ev.channelId);
+      ExtHit* entryHit = pair_extHits.first;
+      ExtHit* exitHit = pair_extHits.second;
       if (entryHit == nullptr || exitHit == nullptr) continue;
 
       m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
@@ -313,15 +272,7 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       TVector3 positionGlobal_digit = digitHit->getPosition();
       TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
 
-      double diffM = positionGlobal_diff.Mag();
-      double diffX = positionGlobal_diff.X();
-      double diffY = positionGlobal_diff.Y();
-      double diffZ = positionGlobal_diff.Z();
-      getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
-      getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
-      getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
-      getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
-      //if (diffM > 10.0) continue;
+      storeDistDiff(positionGlobal_diff);
 
       l = m_geoParE->getStripLength(digitHit->getStrip()) / CLHEP::mm * Unit::mm;
       hitGlobal_extHit.setX(positionGlobal_extHit.X() / Unit::mm * CLHEP::mm);
@@ -331,12 +282,11 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       hitLocal_extHit = (*tr) * hitGlobal_extHit;
 
       m_ev.dist = 0.5 * l - hitLocal_extHit.x() / CLHEP::mm * Unit::mm;
-
       m_ev.recTime = digitHit->getTime();
       m_ev.eDep = digitHit->getCharge();
       m_ev.nPE = digitHit->getNPE();
 
-      getObjectPtr<TH2D>("m_HfTime_end")->Fill(m_ev.flyTime, iLay);
+      getObjectPtr<TH2D>("m_HfTime_end")->Fill(m_ev.flyTime, digitHit->getLayer());
       getObjectPtr<TTree>("time_calibration_data")->Fill();
     }
   }
@@ -345,7 +295,6 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
 void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> bklmHit2ds)
 {
   double stripWidtm_HZ, stripWidtm_HPhi;
-
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
     BKLMHit2d* hit2d = bklmHit2ds[iH2];
     if (hit2d->inRPC()) continue;
@@ -353,8 +302,8 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
 
     RelationVector<BKLMHit1d> bklmHit1ds = hit2d->getRelationsTo<BKLMHit1d>();
     if (bklmHit1ds.size() != 2) continue;
-    TVector3 positionGlobal_hit2d = hit2d->getGlobalPosition();
 
+    TVector3 positionGlobal_hit2d = hit2d->getGlobalPosition();
     const bklm::Module* corMod = m_geoParB->findModule(hit2d->getSection(), hit2d->getSector(), hit2d->getLayer());
     stripWidtm_HZ = corMod->getZStripWidth();
     stripWidtm_HPhi = corMod->getPhiStripWidth();
@@ -368,38 +317,22 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         BKLMDigit* digitHit = digits[iHd];
         if (digitHit->inRPC() || !digitHit->isAboveThreshold()) continue;
 
-        m_ev.inRPC = digitHit->inRPC();
-
-        uint16_t channelId_digit = m_elementNum->channelNumberBKLM(digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
-                                                                   digitHit->isPhiReadout(), digitHit->getStrip());
-
+        uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
+                                     digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
+                                     digitHit->isPhiReadout(), digitHit->getStrip());
         std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit);
         ExtHit* entryHit = pair_extHits.first;
         ExtHit* exitHit = pair_extHits.second;
-
         if (entryHit == nullptr || exitHit == nullptr) continue;
 
+        m_ev.inRPC = digitHit->inRPC();
         m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
 
         TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
         TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-
         B2DEBUG(29, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
 
-        double diffM = positionGlobal_diff.Mag();
-        double diffX = positionGlobal_diff.X();
-        double diffY = positionGlobal_diff.Y();
-        double diffZ = positionGlobal_diff.Z();
-        getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
-        getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
-        getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
-        getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
-        m_ev.diffDistX = diffX;
-        m_ev.diffDistY = diffY;
-        m_ev.diffDistZ = diffZ;
-
-        // If the Layer is filpped?
-        m_ev.isFlipped = corMod->isFlipped();
+        storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
                                                          positionGlobal_extHit.X(), positionGlobal_extHit.Y(), positionGlobal_extHit.Z()), true);
         const CLHEP::Hep3Vector positionLocal_hit2d = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -410,6 +343,7 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
         double propaLength = propaLengthV3[2 - digitHit->isPhiReadout()];
 
+        m_ev.isFlipped = corMod->isFlipped();
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;
         m_ev.eDep = digitHit->getEDep();
@@ -425,115 +359,70 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
 
 void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bklmHit2ds)
 {
-  int iSub, iFor, iSec, iLay, iPla, iStr;
-
+  //int iSub, iFor, iSec, iLay, iPla, iStr;
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
     B2DEBUG(20, "BKLMHit2d related Track loop begins");
 
     BKLMHit2d* hit2d = bklmHit2ds[iH2];
     if (!hit2d->inRPC()) continue;
+    if (hit2d->isOutOfTime()) continue;
     RelationVector<BKLMHit1d> bklmHit1ds = hit2d->getRelationsTo<BKLMHit1d>();
     if (bklmHit1ds.size() != 2) continue;
-    if (hit2d->isOutOfTime()) continue;
 
     TVector3 positionGlobal_hit2d = hit2d->getGlobalPosition();
-
-    std::multimap<int, ExtHit*>::iterator it;
-    ExtHit* extHit   = nullptr;
-    ExtHit* entryHit = nullptr;
-    ExtHit* exitHit  = nullptr;
-    for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
-      extHit = it->second;
-      int copyid = extHit->getCopyID();
-      m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
-      B2DEBUG(20, "BKLM element numbers check. RPC Part.\n" <<
-              "ExtHit Forward :: Digit Forward   " << iFor   << "  " << hit2d->getSection() << std::endl <<
-              "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << hit2d->getSector()  << std::endl <<
-              "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << hit2d->getLayer());
-      if (iFor != hit2d->getSection() || iSec != hit2d->getSector() || iLay != hit2d->getLayer()) continue;
-
-      switch (extHit->getStatus()) {
-        case EXT_ENTER:
-          if (entryHit == nullptr) {
-            entryHit = extHit;
-          } else if (extHit->getTOF() < entryHit->getTOF()) {
-            entryHit = extHit;
-          }
-          break;
-        case EXT_EXIT:
-          if (exitHit == nullptr) {
-            exitHit = extHit;
-          } else if (extHit->getTOF() > exitHit->getTOF()) {
-            exitHit = extHit;
-          }
-          break;
-        default:
-          break;
-      }
-    }
-
-    if (entryHit == nullptr || exitHit == nullptr) continue;
-
-    m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
-
-    TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
-    TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-
-    B2DEBUG(29, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
-
-    double diffM = positionGlobal_diff.Mag();
-    double diffX = positionGlobal_diff.X();
-    double diffY = positionGlobal_diff.Y();
-    double diffZ = positionGlobal_diff.Z();
-    getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
-    getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
-    getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
-    getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
-    m_ev.diffDistX = diffX;
-    m_ev.diffDistY = diffY;
-    m_ev.diffDistZ = diffZ;
-
     const bklm::Module* corMod = m_geoParB->findModule(hit2d->getSection(), hit2d->getSector(), hit2d->getLayer());
     double stripWidtm_HZ = corMod->getZStripWidth();
     double stripWidtm_HPhi = corMod->getPhiStripWidth();
-
-    // If the Layer is filpped?
-    m_ev.isFlipped = corMod->isFlipped();
-    const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
-                                                     positionGlobal_extHit.X(), positionGlobal_extHit.Y(), positionGlobal_extHit.Z()), true);
-    const CLHEP::Hep3Vector positionLocal_hit2d = corMod->globalToLocal(CLHEP::Hep3Vector(
-                                                    positionGlobal_hit2d.X(), positionGlobal_hit2d.Y(), positionGlobal_hit2d.Z()), true);
-    const CLHEP::Hep3Vector diffLocal = positionLocal_extHit - positionLocal_hit2d;
-    if (fabs(diffLocal.z()) > stripWidtm_HZ  || fabs(diffLocal.y()) > stripWidtm_HPhi) continue;
-
-    const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
-
     for (unsigned iH1 = 0; iH1 < bklmHit1ds.size(); ++iH1) {
       BKLMHit1d* hit1d = bklmHit1ds[iH1];
       RelationVector<BKLMDigit> digits = hit1d->getRelationsTo<BKLMDigit>();
       getObjectPtr<TH1I>("m_HnDigit_rpc")->Fill(digits.size());
       if (digits.size() > 5) continue;
 
-      double propaLength = propaLengthV3[2 - int(hit1d->isPhiReadout())];
-
       for (unsigned iHd = 0; iHd < digits.size(); ++iHd) {
         BKLMDigit* digitHit = digits[iHd];
 
         m_ev.inRPC = digitHit->inRPC();
-        uint16_t channelId_digit = m_elementNum->channelNumberBKLM(digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
-                                                                   digitHit->isPhiReadout(), digitHit->getStrip());
+        uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
+                                     digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
+                                     digitHit->isPhiReadout(), digitHit->getStrip());
 
+        /*
         B2DEBUG(20, "BKLM element numbers check. RPC Part.\n" <<
                 "ExtHit Forward :: Digit Forward   " << iFor   << "  " << digitHit->getSection()   << std::endl <<
                 "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << digitHit->getSector()    << std::endl <<
                 "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << digitHit->getLayer());
+        */
+
+        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit);
+        ExtHit* entryHit = pair_extHits.first;
+        ExtHit* exitHit = pair_extHits.second;
+        if (entryHit == nullptr || exitHit == nullptr) continue;
+
+        m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
+        TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
+        TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
+        B2DEBUG(29, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+
+        storeDistDiff(positionGlobal_diff);
+        const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
+                                                         positionGlobal_extHit.X(), positionGlobal_extHit.Y(), positionGlobal_extHit.Z()), true);
+        const CLHEP::Hep3Vector positionLocal_hit2d = corMod->globalToLocal(CLHEP::Hep3Vector(
+                                                        positionGlobal_hit2d.X(), positionGlobal_hit2d.Y(), positionGlobal_hit2d.Z()), true);
+        const CLHEP::Hep3Vector diffLocal = positionLocal_extHit - positionLocal_hit2d;
+        if (fabs(diffLocal.z()) > stripWidtm_HZ  || fabs(diffLocal.y()) > stripWidtm_HPhi) continue;
+
+        const CLHEP::Hep3Vector propaLengthV3 = corMod->getPropagationDistance(positionLocal_extHit);
+        double propaLength = propaLengthV3[2 - int(hit1d->isPhiReadout())];
+
+        m_ev.isFlipped = corMod->isFlipped();
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;
         m_ev.eDep = digitHit->getEDep();
         m_ev.nPE = digitHit->getNPixel();
         m_ev.channelId = channelId_digit;
 
-        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, iLay);
+        getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, digitHit->getLayer());
         getObjectPtr<TTree>("time_calibration_data")->Fill();
       }
     }
@@ -589,6 +478,21 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t
   }
   std::pair<ExtHit*, ExtHit*> p_extHits = std::make_pair(entryHit, exitHit);
   return p_extHits;
+}
+
+void KLMTimeCalibrationCollectorModule::storeDistDiff(TVector3 pDiff)
+{
+  double diffM = pDiff.Mag();
+  double diffX = pDiff.X();
+  double diffY = pDiff.Y();
+  double diffZ = pDiff.Z();
+  getObjectPtr<TH1D>("m_HposiDiff")->Fill(diffM);
+  getObjectPtr<TH1D>("m_HposiXDiff")->Fill(diffX);
+  getObjectPtr<TH1D>("m_HposiYDiff")->Fill(diffY);
+  getObjectPtr<TH1D>("m_HposiZDiff")->Fill(diffZ);
+  m_ev.diffDistX = diffX;
+  m_ev.diffDistY = diffY;
+  m_ev.diffDistZ = diffZ;
 }
 
 void KLMTimeCalibrationCollectorModule::finish()

@@ -203,7 +203,7 @@ namespace {
     EXPECT_EQ(dd6.isIgnoreGamma(), true);
     EXPECT_EQ(dd6.isIgnoreBrems(), false);
 
-    // ?gamma means ignore missing gamma
+    // ?brems means ignore photon added by Brems-correction tools (modularAnalysis.correctBrems / modularAnalysis.correctBremsBelle)
     DecayDescriptor dd7;
     initok = dd7.init("B0:candidates -> K+:loose pi-:loose ?brems");
     EXPECT_EQ(initok, true);

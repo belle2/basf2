@@ -432,6 +432,10 @@ main(int argc, char* argv[])
             // rethink if we dont exit but process these to limit loss of events.
             // ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
             // exit(1);
+            close(fd);
+            FD_CLR(fd, &allset); //opposite of FD_SET
+            connected_hlts--;
+            if (connected_hlts == 0) stop_running = true;
             ret = 0;
           }
           n_bytes_from_hltout = ret;

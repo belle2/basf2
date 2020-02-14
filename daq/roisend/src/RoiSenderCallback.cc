@@ -79,12 +79,20 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
 
 void RoiSenderCallback::start(int /*expno*/, int /*runno*/)
 {
-  // do nothing
+  if (m_pid_merger != 0) {
+    int pid = m_pid_merger;
+    kill(pid, SIGUSR1);
+    LogFile::info("Send SIGUSR1 to (pid=%d)", pid);// attention, race condition!
+  }
 }
 
 void RoiSenderCallback::stop(void)
 {
-  // do nothing
+  if (m_pid_merger != 0) {
+    int pid = m_pid_merger;
+    kill(pid, SIGUSR2);
+    LogFile::info("Send SIGUSR2 to (pid=%d)", pid);// attention, race condition!
+  }
 }
 
 void RoiSenderCallback::abort(void)

@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2015 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr, Martin Ritter                               *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,72 +17,108 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
-  /** Metadata information about a file
-   *
-   *  See BELLE2-NOTE-TE-2015-028: Event, File, and Dataset Metadata for a
-   *  detailed definition. Available at: https://docs.belle2.org/record/287?ln=en
+  /**
+   *  MonitoringObject is a basic object to hold data for the run-dependency monitoring
+   *  Run summary TCanvases and monitoring variables
    */
+
   class MonitoringObject : public TNamed {
 
   public:
     /** Constructor.
      */
     MonitoringObject() {};
-
+    /** Constructor with name (always use this)
+     */
     MonitoringObject(const std::string& name)
     {
       fName = name;
     }
 
-
-    const std::string& getName() const {return std::string(fName);}
-
-    //    void setCreationData(const std::string& date, const std::string& release)
-    //{m_date = date; m_release = release;}
-
+    /**
+     * Add Canvas to monitoring object
+     * @param canv pointer to canvas to add
+     */
     void addCanvas(TCanvas* canv)
     {
+      for (auto cc : m_Canvases) {
+        if (cc->GetName() == canv->GetName()) {
+          B2ERROR("Canvas with name " << canv->GetName() << " already in the " << fName <<
+                  " MonitoringObject! Use different name (or call getCanvas(name) to access pointer to the existing TCanvas).");
+          return;
+        }
+      }
       m_Canvases.push_back(canv);
     };
 
-    void addVariable(const std::string& var, float val)
+    /**
+     * set value to float variable (new variable is made if not yet existing)
+     * @param var variable name
+     * @param val variable value
+     * @param err variable error
+     */
+    void setVariable(const std::string& var, float val, float err = -1)
     {
-      m_vars.insert({var, val});
+      auto vv = m_vars.find(var);
+      if (vv != m_vars.end()) vv->second = std::pair<float, float>(val, err);
+      else m_vars.insert({var, std::pair<float, float>(val, err)});
     }
 
-    void addVariable(const std::string& var, const std::string& val)
+    /**
+     * set value to string variable (new variable is made if not yet existing)
+     * @param var variable name
+     * @param val variable value
+     */
+    void setVariable(const std::string& var, const std::string& val)
     {
-      m_strVars.insert({var, val});
+      auto vv = m_strVars.find(var);
+      if (vv != m_strVars.end()) vv->second = val;
+      else m_strVars.insert({var, val});
     }
 
-    const std::map<std::string, float>& getVariables()
+    /**
+     * Get map of all float variables
+     */
+    const std::map<std::string, std::pair<float, float>>& getVariables()
     {
       return m_vars;
     }
 
+    /**
+     * Get map of all string variables
+     */
     const std::map<std::string, std::string>& getStringVariables()
     {
       return m_strVars;
     }
 
+    /**
+     * Get pointer to existing canvas with given name (NULL is returned if not existing)
+     */
+    TCanvas* getCanvas(const std::string& name)
+    {
+      for (auto cc : m_Canvases) {
+        if (cc->GetName() == name) return cc;
+      }
+      B2WARNING("TCanvas with name " << name << " not found in MonitoringObject " << fName);
+      return NULL;
+    };
+
 
 
   private:
 
-    //TString fName;
+    std::vector<TCanvas*> m_Canvases; /**< vector of all TCanvases */
 
-    std::vector<TCanvas*> m_Canvases;
+    std::map<std::string, std::pair<float, float>> m_vars; /**< map of all float variables with their errors */
 
-    std::map<std::string, float> m_vars;
+    std::map<std::string, std::string> m_strVars; /**< map of all string variables */
 
-    std::map<std::string, std::string> m_strVars;
-
-    std::string m_description;
-
-    ClassDefOverride(MonitoringObject, 1); /**< Metadata information about a file. */
+    ClassDefOverride(MonitoringObject, 1); /**< classdef */
 
   }; //class
 

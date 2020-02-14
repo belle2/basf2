@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2015 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr, Martin Ritter                               *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,8 +22,8 @@ using namespace std;
 using namespace Belle2;
 
 DQMFileMetaData::DQMFileMetaData() :
-  m_nEvents(0), m_experiment(0), m_run(0), m_date(""), m_release(""), m_databaseGlobalTag(""), m_procID(""),
-  m_isMC(true), m_mcEvents(0)
+  m_nEvents(0), m_experiment(0), m_run(0), m_date(""), m_release(""), m_procID(""), m_rtype(""), m_isMC(false),
+  m_databaseGlobalTag("")
 {
 }
 
@@ -41,7 +41,6 @@ void DQMFileMetaData::Print(Option_t* option) const
     printer.put("run date", m_date);
     printer.put("release", m_release);
     printer.put("isMC", m_isMC);
-    printer.put("mcEvents", m_mcEvents);
     printer.put("globalTag", m_databaseGlobalTag);
   }
   std::cout << "=== DQMFileMetaData ===\n";
@@ -62,4 +61,5 @@ std::string DQMFileMetaData::getJsonStr() const
     {"globalTag", m_databaseGlobalTag},
   };
   return metadata.dump(2);*/
+
 }

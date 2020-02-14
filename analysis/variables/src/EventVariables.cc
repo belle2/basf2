@@ -482,7 +482,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
                       "[Eventbased] true if event contains a charged B-meson");
     REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
-                      "[Eventbased] true if event contains opposite flavor neutral B-mesons");
+                      R"DOC([Eventbased] true if event contains opposite flavor neutral B-mesons,
+false in case for same flavor B-mesons and NaN if an event has no generated neutral B)DOC");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");

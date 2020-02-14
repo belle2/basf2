@@ -487,7 +487,7 @@ def BtoD0rhoList(path):
 
     __author__ = "Fernando Abudinen"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.95'
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9'
 
     BsigChannels = [
                     'anti-D0:Kpi rho+:all',
@@ -539,7 +539,7 @@ def BtoDstar0rhoList(path):
 
     __author__ = "Fernando Abudinen"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9'
 
     BsigChannels = [
                     'anti-D*0:D0_Kpi rho+:all',

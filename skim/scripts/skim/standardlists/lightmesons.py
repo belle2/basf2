@@ -91,7 +91,7 @@ def loadStdLooseRhoPlus(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('rho+:loose -> pi0:loose pi+:loose', '0.47 < M < 1.07', 1, persistent, path)
+    ma.reconstructDecay('rho+:loose -> pi+:loose pi0:loose', '0.47 < M < 1.07', 1, persistent, path)
     return 'rho+:loose'
 
 
@@ -103,9 +103,9 @@ def loadStdAllRhoPlus(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('rho+:all -> pi0:bth_skim pi+:all', '0.47 < M < 1.07 and ' +
-                        'daughter(1,thetaInCDCAcceptance) > 0 and abs(daughter(1,dr)) < 0.5 and ' +
-                        'abs(daughter(1,dz)) < 3', 1, persistent, path)
+    ma.reconstructDecay('rho+:all -> pi+:all pi0:bth_skim ', '0.47 < M < 1.07 and ' +
+                        'daughter(0,thetaInCDCAcceptance) > 0 and abs(daughter(0,dr)) < 0.5 and ' +
+                        'abs(daughter(0,dz)) < 3', 1, persistent, path)
     return 'rho+:all'
 
 

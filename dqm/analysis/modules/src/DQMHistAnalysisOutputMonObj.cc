@@ -14,6 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include "TFile.h"
+#include "TString.h"
 #include <time.h>
 
 using namespace std;
@@ -32,7 +33,7 @@ DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistoFile", m_filename, "Output Histogram Filename", std::string("histo.root"));
+  addParam("HistoFile", m_filename, "Output Histogram Filename", std::string(""));
   addParam("ProcID", m_procID, "Processing id (online,proc10, etc.)", std::string("online"));
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: Constructor done.");
 }
@@ -68,11 +69,16 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   StoreObjPtr<EventMetaData> lastEvtMeta;
 
   B2INFO("open file");
-  TFile f(m_filename.data(), "recreate");
+  int run = lastEvtMeta->getRun();
+  int exp = lastEvtMeta->getExperiment();
+  TString fname;
+  if (m_filename.length()) fname = m_filename;
+  else fname = TString::Format("mon_e%04dr%06d.root", exp, run);
+  TFile f(fname, "recreate");
 
   // set meta data info
   m_metaData->setNEvents(lastEvtMeta->getEvent());
-  m_metaData->setExperimentRun(lastEvtMeta->getRun(), lastEvtMeta->getExperiment());
+  m_metaData->setExperimentRun(exp, run);
   time_t ts = lastEvtMeta->getTime() / 1e9;
   struct tm* timeinfo;
   timeinfo = localtime(&ts);

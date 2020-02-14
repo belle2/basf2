@@ -604,7 +604,7 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "FabricationType": fabricationType,
         "ProductionName": f"{args.campaign}_{prodNumber}",
         "ProductionGroup": "skim",
-        "Description": f"{args.campaign} skim campaign. {skimName} combined skim on {sampleLabel} {dataOrMC}.",
+        "Description": f"{args.campaign} {skimName} skim on {sampleLabel}.",
         "Release": args.release,
         "DBGlobalTag": get_DBGlobalTag(args.release),
         "Campaign": args.campaign,

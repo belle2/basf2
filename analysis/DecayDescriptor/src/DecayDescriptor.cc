@@ -116,7 +116,7 @@ bool DecayDescriptor::init(const DecayString& s)
       m_properties |= c_isIgnoreMassive;
     }
     // For gamma
-    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?brems")) != d->m_keywords.end()) {
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?addbrems")) != d->m_keywords.end()) {
       m_properties |= c_isIgnoreBrems;
     }
 

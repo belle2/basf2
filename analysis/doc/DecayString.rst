@@ -73,7 +73,7 @@ If one put the following keywords at the end of the decay string, :code:`'isSign
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
 * :code:`'?gamma'` Missing gammas are ignored 
-* :code:`'?brems'` Added gammas by bremsstrahlung tools are ignored 
+* :code:`'?addbrems'` Added gammas by bremsstrahlung tools are ignored 
 
 These are useful to analyze inclusive processes with fully-inclusive method. 
 
@@ -89,7 +89,7 @@ Keywords must be placed at the end of the decay string. It is not allowed to put
 	# isSignal of Xsu:missMassive accepts missing massive FSP and gamma (such as pi0 -> gamma gamma)
 	reconstructDecay('B+:inclusive    -> mu-:loose ... ?nu ?gamma',    '', path=mypath)
 	# isSignal of B+:inclusive accepts missing massive FSP, neutrino, and gamma. 
-	reconstructDecay('B+:brems        -> K+:loose e-:corrected e+:corrected ?brems', '', path=mypath)
+	reconstructDecay('B+:brems        -> K+:loose e-:corrected e+:corrected ?addbrems', '', path=mypath)
 	# isSignal of B+:brems accepts photons added by bremsstrahlung tools (correctBrems or correctBremsBelle).
 
 .. _Arrows:

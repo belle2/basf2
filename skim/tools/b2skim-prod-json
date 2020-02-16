@@ -562,7 +562,15 @@ def warn_local_script(args):
         )
 
 
-def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, LPNList):
+def make_request_dict(
+    args,
+    sampleRegistry,
+    skimName,
+    sampleLabel,
+    prodNumber,
+    LPNList,
+    LPNBlockIdentifier=None,
+):
     """Construct a dict for one skim and one set of data. Dict contains all the
     required fields for skim production.
 
@@ -575,21 +583,24 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         sampleLabel (str): Label in the registry for group of data in this job.
         prodNumber (int): Number to label this production request.
         LPNList (list): List of LPNs to include in the JSON file.
+        LPNBlockIdentifier (str): Extra identifier to be appended to filenames and prod
+            names to make sure they are unique.
 
     Returns:
         skimRequestDict (dict): A dict ready to be saved as a JSON file.
     """
     sampleInfo = sampleRegistry[sampleLabel]
-    statsSampleLabel = sampleInfo[
-        "sampleLabel"
-    ]  # Get label used by `b2skim-stats-print`
+    # Get label used by `b2skim-stats-print`
+    statsSampleLabel = sampleInfo["sampleLabel"]
+
+    # Append the identifier if we need to
+    if LPNBlockIdentifier:
+        sampleLabel += LPNBlockIdentifier
 
     skimStatsDict = get_skim_stats_dict()
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
     individualSkims = combinedSkimsInfo[skimName]
-
-    args.campaign = args.campaign
 
     if args.mc:
         dataOrMC = "MC"
@@ -610,12 +621,12 @@ def make_request_dict(args, sampleRegistry, skimName, sampleLabel, prodNumber, L
         "Campaign": args.campaign,
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
-        "ExpectedEventCPUTime": skimStatsDict[skimName]["HS06TimePerEvent"][
-            statsSampleLabel
-        ],
-        "ExpectedEventSize": skimStatsDict[skimName]["udstSizePerInputEvent"][
-            statsSampleLabel
-        ],
+        "ExpectedEventCPUTime": (
+            skimStatsDict[skimName]["HS06TimePerEvent"][statsSampleLabel]
+        ),
+        "ExpectedEventSize": (
+            skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
+        ),
         "InputSandboxFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
         "InputData": LPNList,
         "Priority": 8,
@@ -688,19 +699,33 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             else:
                 sampleLabelForFilename = sampleLabel
 
-            for LPNList in LPNLists:
+            for LPNBlockNumber, LPNList in enumerate(LPNLists):
                 prodNumber += 1
+
+                # If we have broken up the LPNs into one-per-file, then we need to add some more
+                # letters and numbers to keep our prod names and filenames unique
+                if args.one_lpn_per_json:
+                    LPNBlockIdentifier = f"b{LPNBlockNumber + 1}"
+                    outputFileName = f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                else:
+                    LPNBlockIdentifier = ""
+                    outputFileName = f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}.json"
+
+                outputFilePath = Path(outputDirectory, outputFileName)
+
                 skimRequestDict = make_request_dict(
-                    args, sampleRegistry, skimName, sampleLabel, prodNumber, LPNList
+                    args,
+                    sampleRegistry,
+                    skimName,
+                    sampleLabel,
+                    prodNumber,
+                    LPNList,
+                    LPNBlockIdentifier,
                 )
 
-                outputFileName = Path(
-                    outputDirectory,
-                    f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}.json",
-                )
-                if outputFileName.exists():
-                    B2WARNING(f"Overwriting {outputFileName}")
-                with open(outputFileName, "w") as outputFile:
+                if outputFilePath.exists():
+                    B2WARNING(f"Overwriting {outputFilePath}")
+                with open(outputFilePath, "w") as outputFile:
                     json.dump(skimRequestDict, outputFile, indent=4)
 
         B2INFO(

@@ -32,7 +32,8 @@ entries for data and MC.
         sampleLabel: proc9_exp3
         LPNPrefix: /belle/Data
         inputReleaseNumber: release-03-02-02
-        prodNumber: 8530  # prodNumber, inputDBGlobalTag, experimentNumber, and runNumbers can be integers
+        # prodNumber, inputDBGlobalTag, experimentNumber, and runNumbers can be integers
+        prodNumber: 8530
         inputDBGlobalTag: 654
         procNumber: proc9
         experimentNumber: 3
@@ -63,7 +64,8 @@ entries for data and MC.
         sampleLabel: MC12_chargedBGx1
         LPNPrefix: /belle/MC
         inputReleaseNumber: release-03-01-00
-        inputDBGlobalTag: 547  # inputDBGlobalTag, prodNumber, and runNumber can be integers
+        # inputDBGlobalTag, prodNumber, and runNumber can be integers
+        inputDBGlobalTag: 547
         mcCampaign: MC12b
         prodNumber:
             - 7799  # prodNumber can be a list
@@ -75,16 +77,18 @@ entries for data and MC.
         inputDataLevel: mdst
         runNumber: 0
 
-To produce JSON files for a list of combined skims, pass this tool the YAML file and the names of
-the skims. The combined skims must be defined in `skim.registry.combined_skims`. The other required
-arguments include the starting prod ID, skim campaign, intended release to be used, and base
-directory of the repository to output the JSON files in.
+To produce JSON files for a list of combined skims, pass this tool the YAML file and the
+names of the skims. The combined skims must be defined in
+`skim.registry.combined_skims`. The other required arguments include the skim campaign,
+intended release to be used, and base directory of the repository to output the JSON
+files in.
 
-This tool is designed to work with the ``skimStats.json`` output of ``b2skim-stats-print`` (see
-:ref:`testing-skims`). The YAML files can be used to specify which sample statistics are to be used
-for each dataset, with the keyword ``sampleLabel``---this must match one of the sample labels used by
-the skim statistics tools. ``skimStats.json`` must be present in the current directory when this
-tool is run.
+This tool is designed to work with the ``skimStats.json`` output of
+``b2skim-stats-print`` (see :ref:`testing-skims`). The YAML files can be used to specify
+which sample statistics are to be used for each dataset, with the keyword
+``sampleLabel``---this must match one of the sample labels used by the skim statistics
+tools. ``skimStats.json`` must be present in the current directory when this tool is
+run.
 
 --epilog--
 .. rubric:: Example usage
@@ -230,9 +234,9 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
     issues are found, print an error and exit.
 
     Args:
-        args (argparse.ArgumentParser): An argparser expected to contain values
-            for campaign name, starting prod number, and list of skims. Can also
-            be any object which has these as attributes.
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims. Can also be any object which has these as
+            attributes.
         sampleRegistry (dict): The input data/MC registry as a dict.
         skimStatsDict (dict): A dict containing the tested skim statistics.
     """
@@ -263,8 +267,8 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
                 sys.exit(1)
         except KeyError:
             B2ERROR(
-                f"Missing value for {statistic} for {skim} skim on {sampleLabel} sample."
-                "Perhaps you misspelled it or forgot to produce the stats "
+                f"Missing value for {statistic} for {skim} skim on {sampleLabel} "
+                "sample. Perhaps you misspelled it or forgot to produce the stats "
                 "with `b2skim-stats-print`."
             )
             sys.exit(1)
@@ -328,12 +332,13 @@ def get_lpn_list(sampleInfo, mc):
             prodNumbers = [sampleInfo["prodNumber"]]
 
         # Allow prod numbers, run number and database global tag ID to just be
-        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each number with the
-        # correct number of zeros, and add the correct letters at the front.
+        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each
+        # number with the correct number of zeros, and add the correct letters at the
+        # front.
 
-        # Allow prod numbers, run numbers and database global tag ID to just be numbers in YAML file
-        # (without *e.g.* prod00.. at start). This will pad a number with the correct number of
-        # zeros, and add the correct letters at the front.
+        # Allow prod numbers, run numbers and database global tag ID to just be numbers
+        # in YAML file (without *e.g.* prod00.. at start). This will pad a number with
+        # the correct number of zeros, and add the correct letters at the front.
         prodNumbers = [
             str(n) if str(n).startswith("prod") else "prod" + str(n).zfill(8)
             for n in prodNumbers
@@ -365,9 +370,10 @@ def get_lpn_list(sampleInfo, mc):
             for prodNumber in prodNumbers
         ]
     else:
-        # Allow prod number, experiment number, run numbers and database global tag ID to just be
-        # numbers in YAML file (without *e.g.* prod0000 at start). This will pad each number with the
-        # correct number of zeros, and add the correct letters at the front.
+        # Allow prod number, experiment number, run numbers and database global tag ID
+        # to just be numbers in YAML file (without *e.g.* prod0000 at start). This will
+        # pad each number with the correct number of zeros, and add the correct letters
+        # at the front.
         if not str(sampleInfo["prodNumber"]).startswith("prod"):
             sampleInfo["prodNumber"] = "prod" + str(sampleInfo["prodNumber"]).zfill(8)
 
@@ -433,7 +439,7 @@ def get_DBGlobalTag(releaseNumber):
         B2ERROR("Release number must be of the form 'release-XX-XX-XX'.")
         sys.exit(1)
 
-    initialReleaseNumber = releaseNumber
+    initialReleaseNumber = releaseNumber  # noqa F841
 
     _, majorNumber, minorNumber, patchNumber = releaseNumber.split("-")
     patchNumber = int(patchNumber)
@@ -444,7 +450,10 @@ def get_DBGlobalTag(releaseNumber):
     globalTags = []
 
     while minorNumber >= 0:
-        releaseNumber = f"release-{majorNumber}-{str(minorNumber).zfill(2)}-{str(patchNumber).zfill(2)}"
+        releaseNumber = (
+            f"release-{majorNumber}-{str(minorNumber).zfill(2)}-"
+            f"{str(patchNumber).zfill(2)}"
+        )
 
         try:
             req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
@@ -563,25 +572,18 @@ def warn_local_script(args):
 
 
 def make_request_dict(
-    args,
-    sampleRegistry,
-    skimName,
-    sampleLabel,
-    prodNumber,
-    LPNList,
-    LPNBlockIdentifier=None,
+    args, sampleRegistry, skimName, sampleLabel, LPNList, LPNBlockIdentifier=None,
 ):
     """Construct a dict for one skim and one set of data. Dict contains all the
     required fields for skim production.
 
     Args:
-        args (argparse.ArgumentParser): An argparser expected to contain values
-            for campaign name, starting prod number, and list of skims. Can also
-            be any object which has these as attributes.
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims. Can also be any object which has these as
+            attributes.
         sampleRegistry (dict): The input data registry as a dict.
         skimName (str): The name of the combined group of skims (*e.g.* feiSLCombined, BtoCharm).
         sampleLabel (str): Label in the registry for group of data in this job.
-        prodNumber (int): Number to label this production request.
         LPNList (list): List of LPNs to include in the JSON file.
         LPNBlockIdentifier (str): Extra identifier to be appended to filenames and prod
             names to make sure they are unique.
@@ -613,7 +615,7 @@ def make_request_dict(
 
     skimRequestDict = {
         "FabricationType": fabricationType,
-        "ProductionName": f"{args.campaign}_{prodNumber}",
+        "ProductionName": f"{args.campaign}_{skimName}_{sampleLabel}",
         "ProductionGroup": "skim",
         "Description": f"{args.campaign} {skimName} skim on {sampleLabel}.",
         "Release": args.release,
@@ -668,14 +670,10 @@ def write_json_files(sampleRegistry, args, outputDirectory):
 
     Args:
         sampleRegistry (dict): The input data registry as a dict.
-        args (argparse.ArgumentParser): An argparser expected to contain values
-            for campaign name, starting prod number, and list of skims.
+        args (argparse.ArgumentParser): An argparser expected to contain values for
+            campaign name and list of skims.
         outputDirectory (pathlib.Path, str): The location to save the JSON files.
-
-    Returns:
-        finalProdNumber (int): The greatest prod number used in the JSON files.
     """
-    prodNumber = args.starting_prod_number - 1
 
     if args.one_lpn_per_json:
         B2INFO("Producing JSON files with one LPN per JSON file.")
@@ -700,16 +698,17 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 sampleLabelForFilename = sampleLabel
 
             for LPNBlockNumber, LPNList in enumerate(LPNLists):
-                prodNumber += 1
 
                 # If we have broken up the LPNs into one-per-file, then we need to add some more
                 # letters and numbers to keep our prod names and filenames unique
                 if args.one_lpn_per_json:
-                    LPNBlockIdentifier = f"b{LPNBlockNumber + 1}"
-                    outputFileName = f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                    LPNBlockIdentifier = f"_b{LPNBlockNumber + 1}"
+                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
                 else:
                     LPNBlockIdentifier = ""
-                    outputFileName = f"{args.campaign}_{prodNumber}_{skimName}_{sampleLabelForFilename}.json"
+                    outputFileName = (
+                        f"{args.campaign}_{skimName}_{sampleLabelForFilename}.json"
+                    )
 
                 outputFilePath = Path(outputDirectory, outputFileName)
 
@@ -718,7 +717,6 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                     sampleRegistry,
                     skimName,
                     sampleLabel,
-                    prodNumber,
                     LPNList,
                     LPNBlockIdentifier,
                 )
@@ -732,8 +730,6 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             f"Make sure to copy {skimName}_Skim_Standalone.py to "
             f"{get_base_directory(args)}/{args.campaign}/{args.release}/SkimScripts/"
         )
-
-    return prodNumber
 
 
 def get_argument_parser():
@@ -763,13 +759,6 @@ def get_argument_parser():
         choices=combinedSkimsInfo.keys(),
         help="List of skims to produce request files for. "
         "Only accepts combined skims listed in `skim.registry.combined_skims`.",
-    )
-    parser.add_argument(
-        "-n",
-        "--starting-prod-number",
-        required=True,
-        type=int,
-        help="Starting prod number of the JSON files.",
     )
     parser.add_argument(
         "-o",
@@ -824,16 +813,14 @@ def main():
     outputDirectory = get_output_directory(args, sampleRegistry)
     outputDirectory.mkdir(parents=True, exist_ok=True)
 
-    finalProdNumber = write_json_files(sampleRegistry, args, outputDirectory)
+    write_json_files(sampleRegistry, args, outputDirectory)
 
     warn_local_script(args)
     B2INFO(
-        f"Successfully generated {', '.join(args.skims)} JSON files for {', '.join(sampleRegistry.keys())} samples."
+        f"Successfully generated {', '.join(args.skims)} JSON files for "
+        f"{', '.join(sampleRegistry.keys())} samples."
     )
     B2INFO(f"The JSON files were saved to {outputDirectory}")
-    B2INFO(
-        f"The prod numbers of these files range from {args.starting_prod_number} to {finalProdNumber}."
-    )
 
 
 if __name__ == "__main__":

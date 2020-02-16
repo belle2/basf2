@@ -605,11 +605,9 @@ def make_request_dict(
     individualSkims = combinedSkimsInfo[skimName]
 
     if args.mc:
-        dataOrMC = "MC"
         fabricationType = "MCSkim"
         LPNPrefix = "/belle/MC"
     else:
-        dataOrMC = "data"
         fabricationType = "DataSkim"
         LPNPrefix = "/belle/Data"
 
@@ -629,11 +627,11 @@ def make_request_dict(
         "ExpectedEventSize": (
             skimStatsDict[skimName]["udstSizePerInputEvent"][statsSampleLabel]
         ),
-        "InputSandboxFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
+        "InputSandboxFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
         "InputData": LPNList,
         "Priority": 8,
         "SteeringFile": f"{skimName}_Skim_Standalone.py",
-        "SteeringFilePrefix": f"{dataOrMC}/{args.campaign}/{args.release}/SkimScripts",
+        "SteeringFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
             {"SkimDecayMode": encodeSkimName(individualSkim), "DataLevel": "udst"}
@@ -656,9 +654,7 @@ def make_request_dict(
         if not skimScript.endswith(".py"):
             skimScript += ".py"
 
-        localScriptDirectory = str(
-            Path(dataOrMC, args.campaign, args.release, "SkimScripts")
-        )
+        localScriptDirectory = str(Path(args.campaign, args.release, "SkimScripts"))
         skimRequestDict["InputSandboxFile"] = [skimScript]
         skimRequestDict["InputSandboxFilePrefix"] = localScriptDirectory
 

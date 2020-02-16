@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <map>
+#include <set>
 #include <arpa/inet.h>
 
 #include "daq/roisend/util.h"
@@ -17,6 +18,7 @@
 #include "daq/roisend/h2m.h"
 
 #include "daq/rfarm/manager/RFFlowStat.h"
+#include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
 
@@ -28,6 +30,9 @@ using namespace std;
 
 std::map<int, std::string> myconn;
 std::map<int, unsigned int> mycount;
+
+std::set<int> triggers;
+unsigned int event_number_max = 0;
 
 bool got_sigusr1 = false;
 bool got_sigusr2 = false;
@@ -63,6 +68,45 @@ static void catch_pipe_function(int /*signo*/)
 {
 //     puts("SIGPIPE caught\n");
   got_sigpipe = true;
+}
+
+void clear_triggers(void)
+{
+  triggers.clear();
+  event_number_max = 0;
+}
+
+void plot_triggers(void)
+{
+  if (!triggers.empty()) {
+    ERR_FPRINTF(stderr, "merger_merge: trigger low=%u high=%u triggers %lu max %u\n", *triggers.begin(), *(--triggers.end()),
+                triggers.size(), event_number_max);
+    int i = 0;
+    for (auto& it : triggers) {
+      ERR_FPRINTF(stderr, "Miss trig %u\n", it);
+      if (i++ == 20) {
+        ERR_FPRINTF(stderr, "... too many missing to report\n");
+        break;
+      }
+    }
+  } else {
+    ERR_FPRINTF(stderr, "merger_merge: missing triggers 0\n");
+  }
+}
+
+void check_event_nr(unsigned int event_number)
+{
+  // this code might not detect missing trigger nr 0
+  // it is assumed, that run number change has been checked and handled before
+  if (event_number_max < event_number) {
+    for (uint32_t e = event_number_max + 1; e < event_number; e ++) {
+      triggers.insert(e);
+    }
+    event_number_max = event_number;
+  } else {
+    // we dont fill event_number in the if above, thus we dont have to remove it
+    triggers.erase(event_number);
+  }
 }
 
 static int
@@ -264,6 +308,7 @@ void print_stat(void)
     if (it.first != 0) sum += it.second;
   }
   ERR_FPRINTF(stderr, "sum %u out %u diff %d\n", sum, mycount[0], (int)(mycount[0] - sum));
+  plot_triggers();
   ERR_FPRINTF(stderr, "--- STAT END ---\n");
 }
 
@@ -272,6 +317,7 @@ void print_stat(void)
 int
 main(int argc, char* argv[])
 {
+  int current_runnr = -1; // problem: handover without abort
   // int n_hltout = 0;
   int sd_acc = -1;
   int sd_con = -1;
@@ -383,6 +429,8 @@ main(int argc, char* argv[])
   fflush(stderr);
   fflush(stdout);
 
+  clear_triggers();
+
   fd_set allset;
   FD_ZERO(&allset);
   FD_SET(sd_acc, &allset);
@@ -486,7 +534,8 @@ main(int argc, char* argv[])
           //    printf ( "RoI received : Event count = % d\n", event_count );
           if (ret > 0) {
             mycount[fd]++;
-            if (event_count < 40 || event_count % 100000 == 0) {
+            check_event_nr(0);
+            if (event_count < 5  /*|| event_count % 100000 == 0*/) {
               LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] received event from ROI transmitter\n", event_count);
               LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned % ld\n", n_bytes_from_hltout);
               dump_binary(stderr, buf, n_bytes_from_hltout);
@@ -498,6 +547,38 @@ main(int argc, char* argv[])
         if (n_bytes_from_hltout > 0) {
           int ret;
           unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+
+          // extract trigger number, run+exp nr and fill it in a table.
+
+          int runnr = 0;
+          int eventnr = 0;
+
+          // From ROIpayload.h
+          //     enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
+          //    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
+
+          if (n_bytes_from_hltout >= 5 * 4) {
+            boost::spirit::endian::ubig32_t* iptr = (boost::spirit::endian::ubig32_t*)ptr_head_to_onsen;
+            eventnr = iptr[3];
+            runnr = (iptr[4] & 0x3FFF00) >> 8;
+//             ERR_FPRINTF(stderr, "%08X %08X %08X %08X %08X -> %08X %08X \n",
+//                         (unsigned int)iptr[0],(unsigned int) iptr[1],(unsigned int) iptr[2],(unsigned int) iptr[3],(unsigned int) iptr[4], eventnr, runnr);
+          }
+
+          if (runnr > current_runnr) {
+            print_stat();
+            clear_triggers();
+            current_runnr = runnr;
+          } else if (runnr < current_runnr) {
+            // got some event from old run
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: Got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
+                        eventnr);
+          }
+
+          if (runnr == current_runnr) {
+            // seperate if, as we might set it in the if above
+            check_event_nr(eventnr);
+          }
 
           n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
           while (1) {
@@ -532,13 +613,17 @@ main(int argc, char* argv[])
           flstat->log(n_bytes_to_onsen);
 
           mycount[0]++;
-          if (event_count < 10 /*|| event_count % 10000 == 0*/) {
+          if (event_count < 5 /*|| event_count % 10000 == 0*/) {
             LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }
         }
       }
       event_count++;
+      if (event_count % 1000000 == 0) {
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u triggers %lu max %u\n", *triggers.begin(), *(--triggers.end()),
+                    triggers.size(), event_number_max);
+      }
     }
   }
 

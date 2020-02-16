@@ -78,8 +78,12 @@ int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, bool escap
   int outcome = MuidElementNumbers::c_NotReached;
   if ((lastBarrelLayer >= 0) || (lastEndcapLayer >= 0)) {
     /* Stop or exit in barrel. */
-    if (lastEndcapLayer < 0)
-      outcome = escaped ? MuidElementNumbers::c_ExitBarrel : MuidElementNumbers::c_StopInBarrel;
+    if (lastEndcapLayer < 0) {
+      if (escaped) /* Exit in barrel. */
+        outcome = MuidElementNumbers::c_ExitBarrel;
+      else /* Stop in barrel. */
+        outcome = MuidElementNumbers::c_StopInBarrel;
+    }
     /* Stop or exit in endcap. */
     else {
       if (escaped) {

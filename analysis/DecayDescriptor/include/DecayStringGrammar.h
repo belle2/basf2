@@ -56,7 +56,7 @@ namespace Belle2 {
              string("=exact=>");
 
     // Keyword for custom MC Matching
-    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma");
+    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma") | string("?addbrems");
     keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist

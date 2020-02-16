@@ -12,6 +12,7 @@
 
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <vector>
 #include <string>
@@ -36,16 +37,8 @@ namespace Belle2 {
     int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /** Ignore radiated photons? */
-    bool m_isIgnoreRadiatedPhotons;
-    /** Ignore intermediate particles or resonances? */
-    bool m_isIgnoreIntermediate;
-    /** Ignore missing massive final state particles? */
-    bool m_isIgnoreMassive;
-    /** Ignore missing neutrino? */
-    bool m_isIgnoreNeutrino;
-    /** Ignore missing gamma? */
-    bool m_isIgnoreGamma;
+    /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    int m_properties;
     /** Is this the NULL object? */
     bool m_isNULL;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
@@ -142,30 +135,40 @@ namespace Belle2 {
     {
       return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
     }
+    /** return property of the particle. */
+    int getProperty() const
+    {
+      return m_properties;
+    }
     /** Check if additional radiated photons shall be ignored. */
     bool isIgnoreRadiatedPhotons() const
     {
-      return m_isIgnoreRadiatedPhotons;
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) > 0;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
     {
-      return m_isIgnoreIntermediate;
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreIntermediate) > 0;
     }
     /** Check if missing massive final state particles shall be ignored. */
     bool isIgnoreMassive() const
     {
-      return m_isIgnoreMassive;
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreMassive) > 0;
     }
     /** Check if missing neutrinos shall be ignored. */
     bool isIgnoreNeutrino() const
     {
-      return m_isIgnoreNeutrino;
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreNeutrino) > 0;
     }
     /** Check if missing gammas shall be ignored. */
     bool isIgnoreGamma() const
     {
-      return m_isIgnoreGamma;
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreGamma) > 0;
+    }
+    /** Check if added Brems gammas shall be ignored. */
+    bool isIgnoreBrems() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_isIgnoreBrems) > 0;
     }
 
     /** Is the decay or the particle self conjugated */

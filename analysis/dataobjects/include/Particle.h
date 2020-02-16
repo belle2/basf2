@@ -109,6 +109,7 @@ namespace Belle2 {
       c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
       c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
       c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+      c_isIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
     };
 
     /**

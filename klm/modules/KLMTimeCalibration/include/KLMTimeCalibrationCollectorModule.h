@@ -96,7 +96,7 @@ namespace Belle2 {
     struct KLMTimeCalibrationAlgorithm::Event m_ev;
 
     /** BKLM geometry para. */
-    bklm::GeometryPar* m_geoParB;
+    const bklm::GeometryPar* m_geoParB;
 
     /** EKLM geometry para. */
     const EKLM::GeometryData* m_geoParE;

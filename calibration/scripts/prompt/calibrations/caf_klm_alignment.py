@@ -195,13 +195,15 @@ def get_collector(input_data_name):
     if input_data_name == "raw_physics":
         return basf2.register_module(
                    'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment'],
+                   components=['BKLMAlignment', 'EKLMAlignment',
+                               'EKLMSegmentAlignment'],
                    useGblTree=True,
                    minPValue=1e-5)
     elif input_data_name == "raw_cosmic":
         return basf2.register_module(
                    'MillepedeCollector',
-                   components=['BKLMAlignment', 'EKLMAlignment'],
+                   components=['BKLMAlignment', 'EKLMAlignment',
+                               'EKLMSegmentAlignment'],
                    tracks=['CosmicRecoTracks'],
                    useGblTree=True,
                    minPValue=1e-5)

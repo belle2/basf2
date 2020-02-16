@@ -14,13 +14,15 @@ from prompt import CalibrationSettings
 # Will be used to construct the calibration in the automated system, as well as set up the submission web forms.
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
+from prompt.calibrations.vxdcdc_alignment import settings as vxdcdc_alignment
+
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="KLM alignmnent",
                                expert_username="chilikin",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["raw_physics", "raw_cosmic"],
-                               depends_on=[])
+                               depends_on=[vxdcdc_alignment])
 
 ##############################
 

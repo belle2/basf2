@@ -195,7 +195,7 @@ namespace Belle2 {
     //! @param outcome final outcome of this extrapolation
     void setOutcome(int outcome) { m_Outcome = outcome; }
 
-    //! assign forward of backward for this extrapolation
+    //! assign forward or backward for this extrapolation
     //! @param isForward fordward or backward for this extrapolation
     void setIsForward(bool isForward) { m_IsForward = isForward; }
 

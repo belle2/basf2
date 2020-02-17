@@ -116,8 +116,11 @@ def BsigToD0hToKshhList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
+
         1. ``1.5 < M_D0 < 2.2``
+
         2. ``5.2 < Mbc``
+
         3. ``abs(deltaE) < 0.3``
 
     Note:
@@ -474,11 +477,16 @@ def BtoD0rho_KpiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D0 < 2.0``
+
+    2. ``0.47 < M_rho < 1.07``
+
+    3. ``DM_Dstar_D < 0.16``
+
+    4. ``Mbc > 5.2``
+
+    5. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstar0_D0pi0_Kpi() from the ``charm.py`` script,
@@ -526,12 +534,18 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. DM_Dstar_D < 0.16
-    3. 0.6 < M_rho < 0.9
-    4. cosHel_rho < 0.90
-    5. Mbc > 5.2
-    6. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D0 < 2.0``
+
+    2. ``DM_Dstar_D < 0.16``
+
+    3. ``0.6 < M_rho < 0.9``
+
+    4. ``cosHel_rho < 0.90``
+
+    5. ``Mbc > 5.2``
+
+    6. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
@@ -577,10 +591,14 @@ def B0toDrho_KpipiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+
+    1. ``1.8 < M_D < 1.9``
+
+    2. ``0.47 < M_rho < 1.07``
+
+    4. ``Mbc > 5.2``
+
+    5. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses loadStdDplus_Kpipi() from the ``charm.py`` script,
@@ -617,10 +635,14 @@ def B0toDrho_KspiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+
+    1. ``1.8 < M_D < 1.9``
+
+    2. ``0.47 < M_rho < 1.07``
+
+    4. ``Mbc > 5.2``
+
+    5. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
@@ -657,11 +679,16 @@ def B0toDstarRho_KpiList(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D < 2.0``
+
+    2. ``0.47 < M_rho < 1.07``
+
+    3. ``DM_Dstar_D < 0.16``
+
+    4. ``Mbc > 5.2``
+
+    5. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstarPlus_D0pi_Kpi() from the ``charm.py`` script,
@@ -700,11 +727,16 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+
+    1. ``1.7 < M_D < 2.0``
+
+    2. ``0.47 < M_rho < 1.07``
+
+    3. ``DM_Dstar_D < 0.16``
+
+    4. ``Mbc > 5.2``
+
+    5. ``abs(deltaE) < 0.3``
 
     Note:
     This skim uses loadStdD0 and loadStdDstarPlus_D0pi functions from the ``charm.py`` script,

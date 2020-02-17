@@ -529,7 +529,7 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
     1. 1.7 < M_D0 < 2.0
     2. DM_Dstar_D < 0.16
     3. 0.6 < M_rho < 0.9
-    4. cosHel_rho < 0.95
+    4. cosHel_rho < 0.90
     5. Mbc > 5.2
     6. abs(deltaE) < 0.5
 

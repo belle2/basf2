@@ -79,8 +79,9 @@ void clear_triggers(void)
 void plot_triggers(void)
 {
   if (!triggers.empty()) {
-    ERR_FPRINTF(stderr, "merger_merge: trigger low=%u high=%u triggers %lu max %u\n", *triggers.begin(), *(--triggers.end()),
-                triggers.size(), event_number_max);
+    ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
+                *(--triggers.end()),
+                triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
     for (auto& it : triggers) {
       ERR_FPRINTF(stderr, "Miss trig %u\n", it);
@@ -90,7 +91,7 @@ void plot_triggers(void)
       }
     }
   } else {
-    ERR_FPRINTF(stderr, "merger_merge: missing triggers 0\n");
+    ERR_FPRINTF(stderr, "[RESULT] merger_merge: missing triggers 0\n");
   }
 }
 
@@ -534,10 +535,9 @@ main(int argc, char* argv[])
           //    printf ( "RoI received : Event count = % d\n", event_count );
           if (ret > 0) {
             mycount[fd]++;
-            check_event_nr(0);
             if (event_count < 5  /*|| event_count % 100000 == 0*/) {
-              LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] received event from ROI transmitter\n", event_count);
-              LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned % ld\n", n_bytes_from_hltout);
+              LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] received event from ROI transmitter\n", event_count);
+              LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
               dump_binary(stderr, buf, n_bytes_from_hltout);
             }
           }
@@ -563,6 +563,8 @@ main(int argc, char* argv[])
             runnr = (iptr[4] & 0x3FFF00) >> 8;
 //             ERR_FPRINTF(stderr, "%08X %08X %08X %08X %08X -> %08X %08X \n",
 //                         (unsigned int)iptr[0],(unsigned int) iptr[1],(unsigned int) iptr[2],(unsigned int) iptr[3],(unsigned int) iptr[4], eventnr, runnr);
+          } else {
+            LOG_FPRINTF(stderr, "[ERROR] merger_merge: packet to small to hold useful header (%ld)\n", n_bytes_from_hltout);
           }
 
           if (runnr > current_runnr) {

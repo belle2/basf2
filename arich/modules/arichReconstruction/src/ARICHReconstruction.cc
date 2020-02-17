@@ -84,16 +84,22 @@ namespace Belle2 {
     m_zaero[m_nAerogelLayers  ] = m_arichgp->getDetectorZPosition();
     m_zaero[m_nAerogelLayers + 1] = m_zaero[m_nAerogelLayers] + m_arichgp->getHAPDGeometry().getWinThickness();
 
-    m_mirrorNorms.clear();
-    m_mirrorPoints.clear();
-    for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
-      m_mirrorNorms.push_back(getMirrorNorm(i));
-      m_mirrorPoints.push_back(getMirrorPoint(i));
+    if (m_mirrAlign.hasChanged()) {
+      m_mirrorNorms.clear();
+      m_mirrorPoints.clear();
+      for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
+        m_mirrorNorms.push_back(getMirrorNorm(i));
+        m_mirrorPoints.push_back(getMirrorPoint(i));
+      }
     }
 
-    for (int iTile = 1; iTile < 125; iTile++) {
-      m_tilePars[iTile - 1][0] = m_tileAlign->getAlignmentElement(iTile).getAlpha();
-      m_tilePars[iTile - 1][1] = m_tileAlign->getAlignmentElement(iTile).getBeta();
+    if (m_tileAlign) {
+      if (m_tileAlign.hasChanged()) {
+        for (int iTile = 1; iTile < 125; iTile++) {
+          m_tilePars[iTile - 1][0] = m_tileAlign->getAlignmentElement(iTile).getAlpha();
+          m_tilePars[iTile - 1][1] = m_tileAlign->getAlignmentElement(iTile).getBeta();
+        }
+      }
     }
   }
 

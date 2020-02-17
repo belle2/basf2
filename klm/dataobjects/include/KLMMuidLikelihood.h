@@ -85,7 +85,9 @@ namespace Belle2 {
     //! @return number of degrees of freedom in chi-squared calculation
     int getDegreesOfFreedom() const { return m_DegreesOfFreedom; }
 
-    //! @return outcome of this extrapolation
+    //! @return outcome of this extrapolation.
+    //! All the possible outcome values are defined in MuidElementNumbers
+    //! (see enum Outcome and calculateExtrapolationOutcome).
     unsigned int getOutcome() const { return m_Outcome; }
 
     //! @return if this extrapolation was in forward or backward

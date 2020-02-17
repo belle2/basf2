@@ -623,8 +623,8 @@ main(int argc, char* argv[])
       }
       event_count++;
       if (event_count % 1000000 == 0) {
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u triggers %lu max %u\n", *triggers.begin(), *(--triggers.end()),
-                    triggers.size(), event_number_max);
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
+                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
       }
     }
   }

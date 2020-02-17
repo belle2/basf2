@@ -21,7 +21,7 @@ MuidElementNumbers::~MuidElementNumbers()
 {
 }
 
-bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
+bool MuidElementNumbers::checkExtrapolationOutcome(unsigned int outcome, int lastLayer)
 {
   /* KLM volume not reached during the extrapolation. */
   if (outcome == MuidElementNumbers::c_NotReached)
@@ -73,9 +73,10 @@ bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
   return true;
 }
 
-int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer)
+unsigned int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer,
+    int lastEndcapLayer)
 {
-  int outcome = MuidElementNumbers::c_NotReached;
+  unsigned int outcome = MuidElementNumbers::c_NotReached;
   if ((lastBarrelLayer >= 0) || (lastEndcapLayer >= 0)) {
     /* Stop or exit in barrel. */
     if (lastEndcapLayer < 0) {

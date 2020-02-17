@@ -86,7 +86,7 @@ namespace Belle2 {
     int getDegreesOfFreedom() const { return m_DegreesOfFreedom; }
 
     //! @return outcome of this extrapolation
-    int getOutcome() const { return m_Outcome; }
+    unsigned int getOutcome() const { return m_Outcome; }
 
     //! @return if this extrapolation was in forward or backward
     bool getIsForward() const { return m_IsForward; }
@@ -193,7 +193,7 @@ namespace Belle2 {
 
     //! assign outcome of this extrapolation
     //! @param outcome final outcome of this extrapolation
-    void setOutcome(int outcome) { m_Outcome = outcome; }
+    void setOutcome(unsigned int outcome) { m_Outcome = outcome; }
 
     //! assign forward or backward for this extrapolation
     //! @param isForward fordward or backward for this extrapolation
@@ -291,7 +291,7 @@ namespace Belle2 {
     int m_DegreesOfFreedom;
 
     //! outcome of this extrapolation.
-    int m_Outcome;
+    unsigned int m_Outcome;
 
     //! is the extrapolation in forward or backward?
     bool m_IsForward;

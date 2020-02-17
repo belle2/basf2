@@ -160,7 +160,7 @@ namespace Belle2 {
   double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
   {
     /* Setup the main ingredients for the calculation. */
-    int outcome = muid->getOutcome();
+    unsigned int outcome = muid->getOutcome();
     if ((outcome <= MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::getMaximalOutcome()))
       return 0.0;
     int barrelExtLayer = muid->getBarrelExtLayer();

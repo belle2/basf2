@@ -1818,8 +1818,8 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
 {
   /* Done with this track: compute KLM likelihoods and fill the relative dataobject. */
   int lastExtLayer = extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1;
-  int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, extState.escaped, extState.lastBarrelExtLayer,
-                extState.lastEndcapExtLayer);
+  unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, extState.escaped, extState.lastBarrelExtLayer,
+                         extState.lastEndcapExtLayer);
   klmMuidLikelihood->setOutcome(outcome);
   klmMuidLikelihood->setIsForward(isForward);
   klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);

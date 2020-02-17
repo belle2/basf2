@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param[in] outcome   Track extrapolation outcome.
      * @param[in] lastLayer Last layer crossed during the extrapolation.
      */
-    static bool checkExtrapolationOutcome(int outcome, int lastLayer);
+    static bool checkExtrapolationOutcome(unsigned int outcome, int lastLayer);
 
     /**
      * Calculate the track extrapolation outcome.
@@ -78,7 +78,7 @@ namespace Belle2 {
      * @param[in] lastBarrelLayer Last barrel layer crossed during the extrapolation.
      * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
      */
-    static int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
+    static unsigned int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
 
     /**
      * Get maximal barrel layer number (0-based).

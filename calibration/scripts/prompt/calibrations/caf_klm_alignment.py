@@ -64,7 +64,7 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    max_files_per_run = 1000000
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
@@ -138,6 +138,7 @@ def get_calibrations(input_data, **kwargs):
                 segment, ipar)
         index.increment()
 
+    millepede.algo.setMinEntries(500000)
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
 
@@ -176,10 +177,12 @@ def get_calibrations(input_data, **kwargs):
     #####
     # Algorithm step config
 
+    from caf.strategies import SequentialRunByRun
+
     cal_klm.algorithms = [millepede.algo]
 
     for algorithm in cal_klm.algorithms:
-        # algorithm.strategy = KLMStripEfficiency
+        algorithm.strategy = SequentialRunByRun
         algorithm.params = {"apply_iov": output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one

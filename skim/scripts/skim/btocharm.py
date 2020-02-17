@@ -452,109 +452,6 @@ def loadB0toDstarPi_Kpipipi(path):
     return ['B0:Dstarpi_Kpipipi']
 
 
-def BtoD0rhoList(path):
-    """
-
-    **Skim Author**: Fernando Abudinen
-
-    **Skim Name**: BtoD0rho
-
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14141007
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to
-                         K^+\\pi^-, K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. cosHel_rho < 0.95
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
-
-    Note:
-    This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
-    """
-
-    __author__ = "Fernando Abudinen"
-
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9'
-
-    BsigChannels = [
-                    'anti-D0:Kpi rho+:all',
-                    'anti-D0:Kpipipi rho+:all',
-                    'anti-D0:Kpipi0 rho+:all',
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
-
-    Lists = BsigList
-    return Lists
-
-
-def BtoDstar0rhoList(path):
-    """
-
-    **Skim Author**: Fernando Abudinen
-
-    **Skim Name**: BtoDstar0rho
-
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14141107
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-
-    1.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to
-                         K^+ \\pi^-, K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\rho^+`,
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
-
-    Note:
-    This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
-    """
-
-    __author__ = "Fernando Abudinen"
-
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9'
-
-    BsigChannels = [
-                    'anti-D*0:D0_Kpi rho+:all',
-                    'anti-D*0:D0_Kpipipi rho+:all',
-                    'anti-D*0:D0_Kpipi0 rho+:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoDstar0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoDstar0rho' + str(chID))
-
-    Lists = BsigList
-    return Lists
-
-
 def BtoD0rho_KpiList(path):
     """
 
@@ -605,12 +502,12 @@ def BtoD0rho_KpiList(path):
     return Lists
 
 
-def BtoD0rho_KpipipiList(path):
+def BtoD0rho_Kpipipi_Kpipi0List(path):
     """
 
     **Skim Author**: Fernando Abudinen
 
-    **Skim Name**: BtoD0rho_Kpipipi
+    **Skim Name**: BtoD0rho_Kpipipi_Kpipi0
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -620,86 +517,41 @@ def BtoD0rho_KpipipiList(path):
 
     **Decay Modes**:
 
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^+ \\pi^-) \\rho^+`,
+    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^+ \\pi^-) \\pi^0) \\rho^+`,
+    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\rho^+`,
+
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
     1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
+    2. DM_Dstar_D < 0.16
+    3. 0.6 < M_rho < 0.9
+    4. cosHel_rho < 0.95
+    5. Mbc > 5.2
+    6. abs(deltaE) < 0.5
 
     Note:
-    This skim uses loadStdD0_Kpipipi() and loadStdDstar0_D0pi0_Kpipipi() from the ``charm.py`` script,
+    This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
     where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
     """
 
     __author__ = "Fernando Abudinen"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9 and 0.6 <= daughter(1,M) <= 0.9'
 
-    BsigChannels = ['anti-D0:Kpipipi rho+:all',
-                    'anti-D*0:D0_Kpipipi rho+:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho_Kpipipi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho_Kpipipi' + str(chID))
-
-    Lists = BsigList
-    return Lists
-
-
-def BtoD0rho_Kpipi0List(path):
-    """
-
-    **Skim Author**: Fernando Abudinen
-
-    **Skim Name**: BtoD0rho_Kpipi0
-
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14141002
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^0) \\rho^+`,
-
-    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0) \\rho^+`,
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
-
-    Note:
-    This skim uses loadStdD0_Kpipi0() and loadStdDstar0_D0pi0_Kpipi0() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
-    """
-
-    __author__ = "Fernando Abudinen"
-
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
-
-    BsigChannels = ['anti-D0:Kpipi0 rho+:all',
+    BsigChannels = [
+                    'anti-D0:Kpipipi rho+:all',
+                    'anti-D0:Kpipi0 rho+:all',
+                    'anti-D*0:D0_Kpipipi rho+:all',
                     'anti-D*0:D0_Kpipi0 rho+:all'
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho_Kpipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho_Kpipi0' + str(chID))
+        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0rho' + str(chID))
 
     Lists = BsigList
     return Lists
@@ -785,58 +637,6 @@ def B0toDrho_KspiList(path):
     return ['B0:B0toDrho_Kspi']
 
 
-def B0toDstarRhoList(path):
-    """
-
-    **Skim Author**: Fernando Abudinen
-
-    **Skim Name**: B0toDstarRho_D0pi
-
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14121207
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-
-    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to
-                         K^+ \\pi^-, K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^-) \\rho^+`,
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.7 < M_D < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
-
-    Note:
-    This skim uses loadStdDstarPlus_D0pi functions from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
-    """
-
-    __author__ = "Fernando Abudinen"
-
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
-
-    BsigChannels = [
-                    'D*-:D0_Kpi rho+:all',
-                    'D*-:D0_Kpipipi rho+:all',
-                    'D*-:D0_Kpipi0 rho+:all',
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
-
-    Lists = BsigList
-    return Lists
-
-
 def B0toDstarRho_KpiList(path):
     """
 
@@ -864,7 +664,7 @@ def B0toDstarRho_KpiList(path):
     5. abs(deltaE) < 0.5
 
     Note:
-    This skim uses loadStdDstarPlus_D0pi_Kpi() from the ``charm.py`` script,
+    This skim uses loadStdD0_Kpi() and loadStdDstarPlus_D0pi_Kpi() from the ``charm.py`` script,
     where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
@@ -878,12 +678,12 @@ def B0toDstarRho_KpiList(path):
     return ['B0:BtoDstarRho_D0pi_Kpi']
 
 
-def B0toDstarRho_KpipipiList(path):
+def B0toDstarRho_Kpipipi_Kpipi0List(path):
     """
 
     **Skim Author**: Fernando Abudinen
 
-    **Skim Name**: B0toDstarRho_D0pi_Kpipipi
+    **Skim Name**: B0toDstarRho_Kpipipi_Kpipi0
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -893,19 +693,21 @@ def B0toDstarRho_KpipipiList(path):
 
     **Decay Modes**:
 
-    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^+ \\pi^-) \\pi^-) \\rho^+`,
+    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to
+                         K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^-) \\rho^+`,
 
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
+    1. 1.7 < M_D < 2.0
     2. 0.47 < M_rho < 1.07
     3. DM_Dstar_D < 0.16
     4. Mbc > 5.2
     5. abs(deltaE) < 0.5
 
     Note:
-    This skim uses loadStdDstarPlus_D0pi_Kpipipi() from the ``charm.py`` script,
+    This skim uses loadStdD0 and loadStdDstarPlus_D0pi functions from the ``charm.py`` script,
     where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
@@ -914,50 +716,17 @@ def B0toDstarRho_KpipipiList(path):
 
     Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
 
-    ma.reconstructDecay('B0:BtoDstarRho_D0pi_Kpipipi -> D*-:D0_Kpipipi rho+:all', Bcuts, 1, path=path)
+    BsigChannels = [
+                    'D*-:D0_Kpipipi rho+:all',
+                    'D*-:D0_Kpipi0 rho+:all',
+                    ]
+    BsigList = []
+    for chID, channel in enumerate(BsigChannels):
+        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0rho' + str(chID))
 
-    return ['B0:BtoDstarRho_D0pi_Kpipipi']
-
-
-def B0toDstarRho_Kpipi0List(path):
-    """
-
-    **Skim Author**: Fernando Abudinen
-
-    **Skim Name**: B0toDstarRho_D0pi_Kpipi0
-
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14121202
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-
-    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^-) \\rho^+`,
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.7 < M_D0 < 2.0
-    2. 0.47 < M_rho < 1.07
-    3. DM_Dstar_D < 0.16
-    4. Mbc > 5.2
-    5. abs(deltaE) < 0.5
-
-    Note:
-    This skim uses loadStdDstarPlus_D0pi_Kpipi0() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
-
-    """
-
-    __author__ = "Fernando Abudinen"
-
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
-
-    ma.reconstructDecay('B0:BtoDstarRho_D0pi_Kpipi0 -> D*-:D0_Kpipi0 rho+:all', Bcuts, 1, path=path)
-
-    return ['B0:BtoDstarRho_D0pi_Kpipi0']
+    Lists = BsigList
+    return Lists
 
 
 def DoubleCharmList(path):

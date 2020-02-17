@@ -3,8 +3,8 @@
 
 #####################################################################
 #
-# B+ -> anti-D0 (-> Kpi, Kpipipi, Kpipi0, Kspipi) rho+,
-#       anti-D*0( -> D0(-> Kpi, Kpipipi, Kpipi0, Kspipi) pi0) rho+ skim
+# B+ -> anti-D0 (-> Kpipipi, Kpipi0) rho+,
+#       anti-D*0( -> D0(-> Kpipipi, Kpipi0) pi0) rho+ skim
 # Fernando Abudinen
 #
 #####################################################################
@@ -20,7 +20,7 @@ b2.gb2_setuprel = 'release-04-01-01'
 
 path = b2.create_path()
 
-skimCode = sef.encodeSkimName('BtoD0rho')
+skimCode = sef.encodeSkimName('B0toDstarRho_D0pi_Kpipipi_Kpipi0')
 
 fileList = sef.get_test_file("MC12_mixedBGx1")
 
@@ -35,18 +35,16 @@ ma.applyCuts(list_name='pi+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 
 # B+ -> anti-D0 rho+, anti-D*0( -> D0 pi0) rho+
-from skim.btocharm import BtoD0rhoList
+from skim.btocharm import B0toDstarRho_Kpipipi_Kpipi0List
 import skim.standardlists.charm as ssc
 
-ssc.loadStdD0_Kpi(path=path)
 ssc.loadStdD0_Kpipipi(path=path)
 ssc.loadStdD0_Kpipi0(path=path)
-ssc.loadStdDstar0_D0pi0_Kpi(path=path)
-ssc.loadStdDstar0_D0pi0_Kpipipi(path=path)
-ssc.loadStdDstar0_D0pi0_Kpipi0(path=path)
-BtoD0rho_list = BtoD0rhoList(path=path)
-sef.skimOutputUdst(skimCode, BtoD0rho_list, path=path)
-ma.summaryOfLists(BtoD0rho_list, path=path)
+ssc.loadStdDstarPlus_D0pi_Kpipipi(path=path)
+ssc.loadStdDstarPlus_D0pi_Kpipi0(path=path)
+B0toDstarRho_Kpipipi_Kpipi0_list = B0toDstarRho_Kpipipi_Kpipi0List(path=path)
+sef.skimOutputUdst(skimCode, B0toDstarRho_Kpipipi_Kpipi0_list, path=path)
+ma.summaryOfLists(B0toDstarRho_Kpipipi_Kpipi0_list, path=path)
 
 
 sef.setSkimLogging(path)

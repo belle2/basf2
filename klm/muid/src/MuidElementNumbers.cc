@@ -21,8 +21,11 @@ MuidElementNumbers::~MuidElementNumbers()
 {
 }
 
-bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
+bool MuidElementNumbers::checkExtrapolationOutcome(unsigned int outcome, int lastLayer)
 {
+  /* KLM volume not reached during the extrapolation. */
+  if (outcome == MuidElementNumbers::c_NotReached)
+    return false;
   /* Barrel stop: never in layer 14. */
   if ((outcome == MuidElementNumbers::c_StopInBarrel)
       && (lastLayer > MuidElementNumbers::getMaximalBarrelLayer() - 1))
@@ -68,4 +71,48 @@ bool MuidElementNumbers::checkExtrapolationOutcome(int outcome, int lastLayer)
       && (lastLayer > MuidElementNumbers::getMaximalEndcapBackwardLayer()))
     return false;
   return true;
+}
+
+unsigned int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer,
+    int lastEndcapLayer)
+{
+  unsigned int outcome = MuidElementNumbers::c_NotReached;
+  if ((lastBarrelLayer >= 0) || (lastEndcapLayer >= 0)) {
+    /* Stop or exit in barrel. */
+    if (lastEndcapLayer < 0) {
+      if (escaped)
+        outcome = MuidElementNumbers::c_ExitBarrel;
+      else
+        outcome = MuidElementNumbers::c_StopInBarrel;
+    }
+    /* Stop or exit in endcap. */
+    else {
+      if (escaped) {
+        if (lastBarrelLayer < 0) { /* Exit in endcap with no barrel hits. */
+          if (isForward)
+            outcome = MuidElementNumbers::c_ExitForwardEndcap;
+          else
+            outcome = MuidElementNumbers::c_ExitBackwardEndcap;
+        } else { /* Exit in endcap with barrel hits. */
+          if (isForward)
+            outcome = MuidElementNumbers::c_CrossBarrelExitForwardMin + lastBarrelLayer;
+          else
+            outcome = MuidElementNumbers::c_CrossBarrelExitBackwardMin + lastBarrelLayer;
+        }
+      } else {
+        if (lastBarrelLayer < 0) { /* Stop in endcap with no barrel hits. */
+          if (isForward)
+            outcome = MuidElementNumbers::c_StopInForwardEndcap;
+          else
+            outcome = MuidElementNumbers::c_StopInBackwardEndcap;
+        } else { /* Stop in endcap with barrel hits. */
+          if (isForward)
+            outcome = MuidElementNumbers::c_CrossBarrelStopInForwardMin + lastBarrelLayer;
+          else
+            outcome = MuidElementNumbers::c_CrossBarrelStopInBackwardMin + lastBarrelLayer;
+        }
+      }
+    }
+  }
+  return outcome;
 }

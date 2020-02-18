@@ -12,6 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
 namespace Belle2 {
@@ -45,6 +46,15 @@ namespace Belle2 {
     };
 
     /**
+     * Labels for detectors crossed.
+     */
+    enum DetectorsCrossed {
+      c_Both = 0,
+      c_OnlyBarrel = KLMElementNumbers::c_BKLM,
+      c_OnlyEndcap = KLMElementNumbers::c_EKLM,
+    };
+
+    /**
      * Constructor.
      */
     MuidElementNumbers();
@@ -59,7 +69,16 @@ namespace Belle2 {
      * @param[in] outcome   Track extrapolation outcome.
      * @param[in] lastLayer Last layer crossed during the extrapolation.
      */
-    static bool checkExtrapolationOutcome(int outcome, int lastLayer);
+    static bool checkExtrapolationOutcome(unsigned int outcome, int lastLayer);
+
+    /**
+     * Calculate the track extrapolation outcome.
+     * @param[in] isForward       Forward or backward.
+     * @param[in] escaped         Escaped or not from KLM volumes.
+     * @param[in] lastBarrelLayer Last barrel layer crossed during the extrapolation.
+     * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
+     */
+    static unsigned int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
 
     /**
      * Get maximal barrel layer number (0-based).
@@ -140,7 +159,7 @@ namespace Belle2 {
     static constexpr int m_MaximalOutcome = c_CrossBarrelExitBackwardMax;
 
     /** Maximal value of the detector selector (for transverse scattering). */
-    static constexpr int m_MaximalDetector = 2;
+    static constexpr int m_MaximalDetector = c_OnlyEndcap;
 
     /** Maximal value of NDof/2 (for transverse scattering). */
     static constexpr int m_MaximalHalfNDof = 18;

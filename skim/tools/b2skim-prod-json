@@ -115,6 +115,7 @@ from functools import lru_cache
 from itertools import product
 import json
 from pathlib import Path
+import re
 import sys
 import yaml
 
@@ -431,9 +432,6 @@ def get_DBGlobalTag(releaseNumber):
     Returns:
         DBGlobalTag (str): the database global tag, in the format DBxxxxxxxx.
     """
-    # Check that the release number is of the correct form
-    import re
-
     r = re.compile("^release(-[0-9]{2}){3}$")
     if not r.match(releaseNumber):
         B2ERROR("Release number must be of the form 'release-XX-XX-XX'.")
@@ -540,6 +538,27 @@ def get_beam_energy_from_registry(sampleRegistry):
         sys.exit(1)
 
 
+def strip_campaign(label):
+    """Remove anything that looks like an MC campaign from the beginning of a label.
+    This function could be extended to also strip "procX" or "bucketY" from labels.
+
+    Args:
+        label (str): A sample label.
+
+    Returns:
+        labelWithoutCampaign (str): The same sample label, but without the MC campaign
+            at the beginning.
+    """
+    # This regex makes the following replacements:
+    #   MC13a_ccbar --> ccbar
+    #   M13_ccbar   --> ccbar
+    #   M13b_ccbar  --> ccbar
+    #   MC12ccbar   --> ccbar
+    #   MC11accbar  --> accbar (will not remove the 'a' in this case)
+    MCCampaignRegex = r"^MC?[0-9]{2}(_|[a-z]_)?"
+    return re.sub(MCCampaignRegex, "", label)
+
+
 def warn_local_script(args):
     """If a local script is given print a warning that a local script will be used.
 
@@ -613,7 +632,7 @@ def make_request_dict(
 
     skimRequestDict = {
         "FabricationType": fabricationType,
-        "ProductionName": f"{args.campaign}_{skimName}_{sampleLabel}",
+        "ProductionName": f"{args.campaign}_{skimName}_{strip_campaign(sampleLabel)}",
         "ProductionGroup": "skim",
         "Description": f"{args.campaign} {skimName} skim on {sampleLabel}.",
         "Release": args.release,
@@ -641,12 +660,7 @@ def make_request_dict(
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
     if args.mc:
-        if sampleInfo["mcBackground"] == "BGx0":
-            skimRequestDict["MCEventType"] = (
-                sampleInfo["mcType"] + sampleInfo["mcBackground"]
-            )
-        else:
-            skimRequestDict["MCEventType"] = sampleInfo["mcType"]
+        skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
 
     if args.local_skim_script:
         # Read in the name of the local skim module from the arguments
@@ -686,12 +700,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 LPNLists = [SampleLPNList]
 
             # MC campaign number is likely already in skim campaign name, so don't include it in sample label
-            if args.mc:
-                sampleLabelForFilename = (
-                    sampleInfo["mcType"] + sampleInfo["mcBackground"]
-                )
-            else:
-                sampleLabelForFilename = sampleLabel
+            sampleLabelForFilename = strip_campaign(sampleLabel)
 
             for LPNBlockNumber, LPNList in enumerate(LPNLists):
 

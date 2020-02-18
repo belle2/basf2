@@ -665,7 +665,7 @@ def getStatSpecifier():
         "cpuTimePerEvent": {
             "LongName": "CPU time per input event on KEKCC (s)",
             "FloatFormat": ".3f",
-            "PrintToScreen": True,
+            "PrintToScreen": False,
             "PrintToConfluence": False,
             "PrintAverages": False,
             "Calculate": lambda skim, sample: (
@@ -681,7 +681,7 @@ def getStatSpecifier():
         "HS06TimePerEvent": {
             "LongName": "Estimated CPU time per input event (HS06)",
             "FloatFormat": ".3f",
-            "PrintToScreen": False,
+            "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
             "Calculate": lambda skim, sample: (
@@ -779,7 +779,7 @@ def getStatSpecifier():
         "logSize": {
             "LongName": "Log size of test (kB)",
             "FloatFormat": ".1f",
-            "PrintToScreen": False,
+            "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
             "Calculate": lambda skim, sample: logSize(skim, sample),
@@ -789,7 +789,7 @@ def getStatSpecifier():
         "logSizePerEvent": {
             "LongName": "Log size per event (B)",
             "FloatFormat": ".2f",
-            "PrintToScreen": True,
+            "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
             "Calculate": lambda skim, sample: (

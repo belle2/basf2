@@ -19,6 +19,7 @@ def arichVariablesToNtuple(decayString, variables, arichSelector, treename='vari
     Parameters:
         decayString (str): specifies type of Particles and determines the name of the ParticleList
         variables (list(str)): the list of variables (which must be registered in the VariableManager)
+        arichSelector (str): decay string that marks the particles to which arich info should be appended
         treename (str): name of the ntuple tree
         filename (str): which is used to store the variables
         path (basf2.Path): the basf2 path where the analysis is processed

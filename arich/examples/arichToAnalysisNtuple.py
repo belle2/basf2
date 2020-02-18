@@ -25,9 +25,11 @@ import vertex as vx
 # create path
 my_path = b2.create_path()
 
-# load input ROOT file
+# load example input ROOT file (can override with -i option)
+fname = "/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0008/4S/GoodRuns/r00827/"\
+    "skim/hlt_hadron/cdst/sub00/cdst.physics.0008.00827.HLT1.hlt_hadron.f00000.root"
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file('B2rhogamma_rho2pipi.root', 'examples', False),
+             filename=fname,
              path=my_path)
 
 

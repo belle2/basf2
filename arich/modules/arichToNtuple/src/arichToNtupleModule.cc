@@ -264,13 +264,11 @@ void arichToNtupleModule::addARICHBranches(const std::string& name)
   ARICH::ARICHTree* tree = new ARICH::ARICHTree();
   m_arich.push_back(tree);
   m_tree->get().Branch((name + "_detPhot").c_str(),  &tree->detPhot,  "detPhot/I");
-  m_tree->get().Branch((name + "_numBkg").c_str(),  &tree->numBkg,  "e/F:mu:pi:K:p:d");
   m_tree->get().Branch((name + "_expPhot").c_str(),  &tree->expPhot,  "e/F:mu:pi:K:p:d");
   m_tree->get().Branch((name + "_logL").c_str(),  &tree->logL,  "e/F:mu:pi:K:p:d");
   m_tree->get().Branch((name + "_recHit").c_str(), &tree->recHit,  "PDG/I:x/F:y:z:p:theta:phi");
   m_tree->get().Branch((name + "_mcHit").c_str(), &tree->mcHit,  "PDG/I:x/F:y:z:p:theta:phi");
   m_tree->get().Branch((name + "_winHit").c_str(),  &tree->winHit,  "x/F:y");
-  m_tree->get().Branch((name + "_nRec").c_str(), &tree->nRec, "nRec/I");
   m_tree->get().Branch((name + "_photons").c_str(), "std::vector<Belle2::ARICHPhoton>", &tree->photons);
 
 }
@@ -286,6 +284,12 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
     for (const ExtHit& hit : track->getRelationsTo<ExtHit>()) {
       const ARICHTrack* atrk = hit.getRelated<ARICHTrack>();
       if (!atrk) continue;
+
+      if (atrk->hitsWindow()) {
+        TVector2 winHit = atrk->windowHitPosition();
+        m_arich[iTree]->winHit[0] = winHit.X();
+        m_arich[iTree]->winHit[1] = winHit.Y();
+      }
 
       m_arich[iTree]->photons = atrk->getPhotons();
 

@@ -209,7 +209,6 @@ def get_collector(input_data_name):
                    'MillepedeCollector',
                    components=['BKLMAlignment', 'EKLMAlignment',
                                'EKLMSegmentAlignment'],
-                   tracks=['CosmicRecoTracks'],
                    useGblTree=True,
                    minPValue=1e-5)
 

@@ -147,21 +147,9 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     # scintillator hits are rejected.
     basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
 
-    main.add_module("MergerCosmicTracks",
-                    recoTracksStoreArrayName="RecoTracks",
-                    mergedRecoTracksStoreArrayName="CosmicRecoTracks",
-                    usingMagneticField=True)
-
     main.add_module('DAFRecoFitter',
-                    recoTracksStoreArrayName='CosmicRecoTracks',
                     pdgCodesToUseForFitting=[13],
                     resortHits=True)
-
-    main.add_module("TrackCreator",
-                    recoTrackColName="CosmicRecoTracks",
-                    trackColName="CosmicTracks",
-                    trackFitResultColName="CosmicTrackFitResults",
-                    useClosestHitToIP=True)
 
     main.add_module('SetupGenfitExtrapolation',
                     noiseBetheBloch=False,

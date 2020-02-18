@@ -78,7 +78,7 @@ void DQMHistAnalysisMonObjModule::endRun()
   if (bits) bits->Draw();
 
   // set values of monitoring variables (if variable already exists this will change its value, otherwise it will insert new variable)
-  // with error
+  // with error (also asymmetric error can be used as m_monObj->setVariable(name, value, upError, downError))
   m_monObj->setVariable("hitsPerEvent", hits ? hits->GetMean() : 0, hits ? hits->GetMeanError() : -1);
   // without error
   m_monObj->setVariable("bitsMean", bits ? bits->GetMean() : 0);

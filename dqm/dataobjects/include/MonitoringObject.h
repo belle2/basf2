@@ -59,13 +59,17 @@ namespace Belle2 {
      * set value to float variable (new variable is made if not yet existing)
      * @param var variable name
      * @param val variable value
-     * @param err variable error
+     * @param upErr variable size of positive error
+     * @param dwErr variable size of negative error (if not set, symmetric error with size upErr is used)
      */
-    void setVariable(const std::string& var, float val, float err = -1)
+    void setVariable(const std::string& var, float val, float upErr = -1., float dwErr = -1.)
     {
       auto vv = m_vars.find(var);
-      if (vv != m_vars.end()) vv->second = std::pair<float, float>(val, err);
-      else m_vars.insert({var, std::pair<float, float>(val, err)});
+      std::vector<float> varCont(val);
+      if (upErr > 0) varCont.push_back(upErr);
+      if (dwErr > 0) varCont.push_back(dwErr);
+      if (vv != m_vars.end()) vv->second = varCont;
+      else m_vars.insert({var, varCont});
     }
 
     /**
@@ -83,7 +87,7 @@ namespace Belle2 {
     /**
      * Get map of all float variables
      */
-    const std::map<std::string, std::pair<float, float>>& getVariables()
+    const std::map<std::string, std::vector<float>>& getVariables()
     {
       return m_vars;
     }
@@ -114,7 +118,7 @@ namespace Belle2 {
 
     std::vector<TCanvas*> m_Canvases; /**< vector of all TCanvases */
 
-    std::map<std::string, std::pair<float, float>> m_vars; /**< map of all float variables with their errors */
+    std::map<std::string, std::vector<float>> m_vars; /**< map of all float variables with their errors */
 
     std::map<std::string, std::string> m_strVars; /**< map of all string variables */
 

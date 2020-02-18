@@ -7,6 +7,9 @@
 # information to daughter pions in the analysis output ntuple
 # As input CDST file is needed (no arich info except likelihoods is available in mdst!)
 #
+# See https://confluence.desy.de/display/BI/Usage+of+arichToNtuple+module
+# for more details, including description of all arich variables that are added to ntuple
+#
 # Contributors: Luka Santelj (Feb 2020)
 #               (luka.santelj@ijs.si)
 ################################################################################

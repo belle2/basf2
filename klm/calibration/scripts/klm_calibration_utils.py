@@ -121,7 +121,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
             self.send_final_state(self.FAILED)
 
 
-def get_cosmic_pre_collector_path(entry_sequence=""):
+def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     """
     Parameters:
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
@@ -139,15 +139,27 @@ def get_cosmic_pre_collector_path(entry_sequence=""):
 
     # Unpackers and reconstruction.
     add_unpackers(main)
-    add_cosmics_reconstruction(main, merge_tracks=False)
+    add_cosmics_reconstruction(main, pruneTracks=False, add_muid_hits=True,
+                               merge_tracks=False)
+    # Disable the time window in muid module by setting it to 1 second.
+    # This is necessary because the  alignment needs to be performed before
+    # the time calibration; if the time window is not disabled, then all
+    # scintillator hits are rejected.
+    basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
 
-    # Fill muon particle list
-    ma.fillParticleList('mu+:all', '1 < p and p < 11', path=main)
+    main.add_module('DAFRecoFitter',
+                    pdgCodesToUseForFitting=[13],
+                    resortHits=True)
+
+    main.add_module('SetupGenfitExtrapolation',
+                    noiseBetheBloch=False,
+                    noiseCoulomb=False,
+                    noiseBrems=False)
 
     return main
 
 
-def get_physics_pre_collector_path(entry_sequence=""):
+def get_alignment_pre_collector_path_physics(entry_sequence=""):
     """
     Parameters:
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
@@ -159,22 +171,25 @@ def get_physics_pre_collector_path(entry_sequence=""):
     if entry_sequence:
         root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
         main.add_module(root_input)
+
     main.add_module('Gearbox')
     main.add_module('Geometry')
 
-    # HLT selection.
-    empty_path = basf2.create_path()
-    trigger_skim = basf2.register_module('TriggerSkim')
-    trigger_skim.param('triggerLines', 'software_trigger_cut&skim&accept_mumu_2trk')
-    trigger_skim.if_false(empty_path, basf2.AfterConditionPath.END)
-    main.add_module(trigger_skim)
-
     # Unpackers and reconstruction.
     add_unpackers(main)
-    add_reconstruction(main)
-    ma.fillParticleList('mu+:all',
-                        '1 < p and p < 11 and abs(d0) < 2 and abs(z0) < 5',
-                        path=main)
+    add_reconstruction(main, pruneTracks=False, add_muid_hits=True)
+    # Disable the time window in muid module by setting it to 1 second.
+    # This is necessary because the  alignment needs to be performed before
+    # the time calibration; if the time window is not disabled, then all
+    # scintillator hits are rejected.
+    basf2.set_module_parameters(main, 'Muid', MaxDt=1e9)
+
+    main.add_module('DAFRecoFitter', resortHits=True)
+
+    main.add_module('SetupGenfitExtrapolation',
+                    noiseBetheBloch=False,
+                    noiseCoulomb=False,
+                    noiseBrems=False)
 
     return main
 

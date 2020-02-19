@@ -90,6 +90,9 @@ namespace Belle2 {
     /** Whether to use the color code for warnings and errors. */
     bool m_color = true;
 
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
+
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation
     std::vector <chid> mychid;

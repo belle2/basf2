@@ -54,6 +54,9 @@ DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
+
+  m_monObj = getMonitoringObject("pxd");
+
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
@@ -77,6 +80,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
+  m_monObj->addCanvas(m_cCharge);
 
   m_gCharge = new TGraphErrors();
   m_gCharge->SetName("Track_Cluster_Charge");
@@ -173,6 +177,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         int p = m_gCharge->GetN();
         m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
+        m_monObj->setVariable(("trackclustercharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
+                              m_fLandau->GetParError(1));
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
@@ -282,6 +288,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->Draw();
     m_line_low->Draw();
 
+    m_monObj->setVariable("trackclustercharge", mean, diff);
   }
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");

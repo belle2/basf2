@@ -119,10 +119,10 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetTTUtime(n),
          rawftsw.GetTTCtime(n),
          rawftsw.GetTRGType(n),
-         (int)(tv.tv_sec),
-         (int)(tv.tv_usec),
-         (int)(tv_pc.tv_sec),
-         (int)(tv_pc.tv_usec));
+         (unsigned int)(tv.tv_sec),
+         (unsigned int)(tv.tv_usec),
+         (unsigned int)(tv_pc.tv_sec),
+         (unsigned int)(tv_pc.tv_usec));
   //  rawftsw.Get15bitTLUTag(n) );
 
   //

@@ -38,13 +38,16 @@ void DQMFileMetaData::Print(Option_t* option) const
   printer.put("Run", m_run);
 
   if (all) {
+    printer.put("run type", m_rtype);
     printer.put("run date", m_date);
+    printer.put("processing", m_procID);
     printer.put("release", m_release);
     printer.put("isMC", m_isMC);
     printer.put("globalTag", m_databaseGlobalTag);
   }
   std::cout << "=== DQMFileMetaData ===\n";
   std::cout << printer.string();
+  std::cout << "=======================\n";
 }
 
 

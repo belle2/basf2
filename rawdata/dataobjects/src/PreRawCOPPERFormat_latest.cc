@@ -652,9 +652,6 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
-    if ((cur_ftsw_eve32 % 2000000) == ((unsigned int)m_node_id & 0x000000ff) + 200) {
-      m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
-    }
 
     ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
@@ -716,9 +713,6 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
-    if ((cur_ftsw_eve32 % 2000000) == ((unsigned int)m_node_id & 0x000000ff) + 300) {
-      m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
-    }
 
     ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 

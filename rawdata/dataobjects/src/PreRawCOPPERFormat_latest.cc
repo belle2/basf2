@@ -268,11 +268,11 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
     sprintf(err_buf,
-            "[WARNING] ARICH test. Ignore this error. ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, GetDriverChkSum(n), CalcDriverChkSum(n),
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    //    err_flag = 1;
+    err_flag = 1;
   }
 
   //
@@ -801,12 +801,11 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
     char err_buf[500];
-    sprintf(err_buf,
-            "[WARNING] Ignore this error(ARICH test). ERROR_EVENT : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    //    B2FATAL(err_buf); // to reduce multiple error messages
+    B2FATAL(err_buf); // to reduce multiple error messages
   }
 
   //

@@ -533,9 +533,6 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
 
-    if ((cur_ftsw_eve32 % 2000000) == ((unsigned int)m_node_id & 0x000000ff)) {
-      m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] = 0xff550001;
-    }
     ff55_lower_bits = m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF;
 
     if (ff55_higher_bits != 0xff550000) {

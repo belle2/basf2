@@ -64,10 +64,12 @@ namespace Belle2 {
      */
     void setVariable(const std::string& var, float val, float upErr = -1., float dwErr = -1.)
     {
-      auto vv = m_vars.find(var);
-      std::vector<float> varCont(val);
+
+      std::vector<float> varCont;
+      varCont.push_back(val);
       if (upErr > 0) varCont.push_back(upErr);
       if (dwErr > 0) varCont.push_back(dwErr);
+      auto vv = m_vars.find(var);
       if (vv != m_vars.end()) vv->second = varCont;
       else m_vars.insert({var, varCont});
     }
@@ -112,7 +114,12 @@ namespace Belle2 {
       return NULL;
     };
 
+    const std::vector<TCanvas*>& getListOfCanvases()
+    {
+      return m_Canvases;
+    }
 
+    void Print() const;
 
   private:
 

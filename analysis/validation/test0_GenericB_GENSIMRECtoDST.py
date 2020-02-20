@@ -8,17 +8,17 @@
 </header>
 """
 
-from basf2 import *
+import basf2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from beamparameters import add_beamparameters
 
-set_random_seed(12345)
+basf2.set_random_seed(12345)
 
-main = create_path()
+main = basf2.create_path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [0])
 eventinfosetter.param('expList', [0])
@@ -26,10 +26,10 @@ main.add_module(eventinfosetter)
 
 # set the BeamParameters for running at Y(4S)
 beamparameters = add_beamparameters(main, "Y4S")
-print_params(beamparameters)
+basf2.print_params(beamparameters)
 
 # generate BBbar events
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = basf2.register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation,  digitisers and clusterisers
@@ -39,12 +39,12 @@ add_simulation(main)
 add_reconstruction(main)
 
 # dst output
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
 main.add_module(output)
 
 # Go!
-process(main)
+basf2.process(main)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_PERFORMANCE_H_
-#define SVD_PERFORMANCE_H_
-
+#pragma once
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 
@@ -210,37 +208,8 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = NULL);
-    /** Function returning TH3F */
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
-                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
-    /** Function returning TH3F */
-    TH3F* createHistogram3D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t* binsX, const char* titleX,
-                            Int_t nbinsY, Double_t* binsY, const char* titleY,
-                            Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
-    /** Function duplicating a TH1*/
-    TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
-
-    /** Function creating the ration (bin by bin) of two TH1*/
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
-
-
-
-    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< efficiency */
-
-    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
-                              TH3F* h3_MCParticle = NULL);  /**< inefficiency */
-    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);  /**< purity */
 
   };
 }
 
-#endif /* SVDPerformanceModule_H_ */
 

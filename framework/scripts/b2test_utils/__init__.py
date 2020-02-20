@@ -31,6 +31,11 @@ def skip_test(reason, py_case=None):
 
     Useful if the test depends on some external condition like a web service and
     missing this dependency should not fail the test run.
+
+    Parameters:
+        reason (str): the reason to skip the test.
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
     """
     if py_case:
         py_case.skipTest(reason)
@@ -331,3 +336,18 @@ def get_object_with_name(object_name, root=None):
         return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
 
     return getattr(root, object_name)
+
+
+def skip_test_if_light(py_case=None):
+    """
+    Skips the test if we are running in a light build (maybe this test tests
+    some generation example or whatever)
+
+    Parameters:
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
+    """
+    try:
+        import generators
+    except ModuleNotFoundError:
+        skip_test(reason="We're in a light build.", py_case=py_case)

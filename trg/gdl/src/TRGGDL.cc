@@ -203,12 +203,14 @@ namespace Belle2 {
   void
   TRGGDL::update(bool)
   {
+    /*
     TRGDebug::enterStage("TRGGDL update");
 
     if (TRGDebug::level())
       cout << TRGDebug::tab() << name() << " do nothing..." << endl;
 
     TRGDebug::leaveStage("TRGGDL update");
+    */
   }
 
   TRGGDL::~TRGGDL()
@@ -327,10 +329,10 @@ namespace Belle2 {
     */
     if (_debugLevel > 9) printf("TRGGDL:dataSimulation Start\n");
     unsigned _evt = bevt->getEvent();
-    TRGDebug::enterStage("TRGGDL dataSim");
+//  TRGDebug::enterStage("TRGGDL dataSim");
 
-    if (TRGDebug::level())
-      cout << TRGDebug::tab() << name() << " do nothing..." << endl;
+//  if (TRGDebug::level())
+//    cout << TRGDebug::tab() << name() << " do nothing..." << endl;
 
     if (!m_InputBitsDB) B2INFO("no database of gdl input bits");
     int N_InputBits = m_InputBitsDB->getninbit();
@@ -373,6 +375,21 @@ namespace Belle2 {
           }
           psnm_fired ? _psnBits.push_back(true) : _psnBits.push_back(false);
           GDLResult->setPreScale((i / 32), (i % 32), m_PrescalesDB->getprescales(i));
+          if (! strcmp(m_FTDLBitsDB->getoutbitname(i), "hie")) {
+            if (_debugLevel == 971 && ftdl_fired) {
+              int i_ehigh    = m_InputBitsDB->getinbitnum("ehigh");
+              int i_bha_veto = m_InputBitsDB->getinbitnum("bha_veto");
+              printf("TRGGDL:hie:i=%d,evt=%d,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
+                     i, _evt, m_PrescalesDB->getprescales(i),
+                     _inpBits[i_ehigh] ? 1 : 0,
+                     _inpBits[i_bha_veto] ? 1 : 0,
+                     ftdl_fired ? 1 : 0,
+                     psnm_fired ? 1 : 0,
+                     i_ehigh,
+                     i_bha_veto,
+                     m_FTDLBitsDB->getoutbitname(i));
+            }
+          }
         }
 
       } else {
@@ -516,7 +533,8 @@ namespace Belle2 {
 
   bool TRGGDL::doprescale(int f)
   {
-    if (! f) return false;
+    if (f == 0) return false;
+    if (f == 1) return true;
     double ran = gRandom->Uniform(f);
     return (ceil(ran) == f);
   }
@@ -525,10 +543,10 @@ namespace Belle2 {
   void
   TRGGDL::firmwareSimulation(void)
   {
-    TRGDebug::enterStage("TRGGDL firmSim");
+//  TRGDebug::enterStage("TRGGDL firmSim");
 
-    if (TRGDebug::level())
-      cout << TRGDebug::tab() << "Making dummy input signals" << endl;
+//  if (TRGDebug::level())
+//    cout << TRGDebug::tab() << "Making dummy input signals" << endl;
 
     //...Clear signal bundles...
     if (_isb) {

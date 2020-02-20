@@ -528,6 +528,9 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,
-                      "[Eventbased][Calibration] Event T0 relative to trigger time in ns");
+                      "[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the\n"
+                      "trigger time. The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.\n"
+                      "This Event t0 variable is the final combined value of all the event time measurements.\n"
+                      "(Currently only the CDC and ECL are used in this combination.)");
   }
 }

@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 namespace Belle2 {
 
+  /** class to contain the cut on svd hit time at SP creation step*/
   class SVDHitTimeSelectionFunction : public TObject {
 
   public:

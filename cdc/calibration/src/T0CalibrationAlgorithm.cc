@@ -83,9 +83,9 @@ void T0CalibrationAlgorithm::createHisto()
     m_hT0b[ib] = new TH1F(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
   }
   //read data
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
@@ -189,7 +189,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   //  const double dt0Mean = hm_All->GetMean();
   for (int ilay = 0; ilay < 56; ++ilay) {
     for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
-      dt[ilay][iwire] -= dEventT0;
+      dt[ilay][iwire] += dEventT0;
     }
   }
 

@@ -16,5 +16,6 @@ env['TOOLS_LIBS']['b2hlt_finalhistoserver'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2'
 env['TOOLS_LIBS']['b2hlt_rawhistoserver'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
 env['TOOLS_LIBS']['b2hlt_proxyhistoserver'] = ['$ROOT_LIBS', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
 env['TOOLS_LIBS']['b2hlt_read_histos'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
+env['TOOLS_LIBS']['b2hlt_create_histos'] = ['$ROOT_LIBS', 'framework', 'daq_hbasf2', 'hlt_softwaretrigger_dataobjects', 'rawdata_dataobjects', 'daq_dataobjects', 'boost_program_options', 'tracking_dataobjects']
 
 Return('env')

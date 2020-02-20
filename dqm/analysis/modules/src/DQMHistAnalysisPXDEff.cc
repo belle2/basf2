@@ -208,10 +208,14 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, ihit);
       m_hEffAll->SetPassedEvents(j, imatch);
 
+      if (j == 6) continue; // wrkaround for 1.3.2 module
+
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      error_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.50 + moduleAverageErr));
-      warn_flag |= false; // (moduleAverageErr > 0.0 && moduleAverage < (0.60 + moduleAverageErr));
+      error_flag |= (ihit > 10)
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.85); // error if upper error value is below limit
+      warn_flag |= (ihit > 10)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // (and not only the actual eff value)
     }
   }
 
@@ -220,6 +224,14 @@ void DQMHistAnalysisPXDEffModule::event()
 
   auto gr = m_hEffAll->GetPaintedGraph();
   if (gr) {
+    for (int i = 0; i < gr->GetN(); i++) {
+      gr->SetPointEXhigh(i, 0.);
+      gr->SetPointEXlow(i, 0.);
+      // this has to be done first, as it will recalc Min/Max and destroy axis
+      Double_t x, y;
+      gr->GetPoint(i, x, y);
+      gr->SetPoint(i, x - 0.01, y);
+    }
     gr->SetMinimum(0);
     gr->SetMaximum(m_PXDModules.size());
     auto ay = gr->GetYaxis();
@@ -232,10 +244,6 @@ void DQMHistAnalysisPXDEffModule::event()
         ax->SetBinLabel(i + 1, ModuleName);
         B2RESULT(ModuleName);
       }
-    }
-    for (int i = 0; i < gr->GetN(); i++) {
-      gr->SetPointEXhigh(i, 0.);
-      gr->SetPointEXlow(i, 0.);
     }
 
     gr->SetLineColor(4);
@@ -254,7 +262,6 @@ void DQMHistAnalysisPXDEffModule::event()
     if (all < 100.) {
       m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
     } else {
-      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
       if (error_flag) {
         m_cEffAll->Pad()->SetFillColor(kRed);// Red
       } else if (warn_flag) {

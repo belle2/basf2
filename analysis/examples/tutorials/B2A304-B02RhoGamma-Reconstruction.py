@@ -26,8 +26,6 @@ import variables.utils as vu
 from stdPhotons import stdPhotons
 import stdCharged as stdc
 
-b2.conditions.disable_globaltag_replay()
-
 # create path
 my_path = b2.create_path()
 
@@ -56,7 +54,7 @@ ma.reconstructDecay(decayString='B0 -> rho0 gamma:tight',
                     cut='5.2 < Mbc < 5.29 and abs(deltaE) < 2.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0', path=my_path)
 
 # Select variables that we want to store to ntuple

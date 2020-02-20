@@ -124,8 +124,8 @@ g4sim.param('EnableVisualization', True)
 # Here you can select visualization driver and visualization commands.
 # This creates VRML file,
 # change VRML2FILE to HepRepFile to create HepRep file.
-g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-                           '/vis/scene/add/axes 0 0 0 100 mm'])
+g4sim.param('UICommandsAtIdle', ['/vis/open VRML2FILE', '/vis/drawVolume',
+                                 '/vis/scene/add/axes 0 0 0 100 mm'])
 
 # Saves the geometry as a Root file
 geosaver = register_module('ExportGeometry')

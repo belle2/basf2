@@ -54,7 +54,7 @@ namespace Belle2 {
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
 
-    int m_tb = -1;
+    int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;

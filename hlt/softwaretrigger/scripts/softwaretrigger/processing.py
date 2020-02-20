@@ -199,7 +199,8 @@ def add_hlt_processing(path,
 
     # Make sure to create ROI payloads for sending them to ONSEN
     # Do this for all events
-    # Normally, the payload assembler dismisses the event if the software trigger says "no"
+    # Normally, the payload assembler marks the event with the software trigger decision to inform the hardware to
+    # drop the data for the event in case the decision is "no"
     # However, if we are running in monitoring mode, we ignore the decision
     pxd_ignores_hlt_decision = (softwaretrigger_mode == constants.SoftwareTriggerModes.monitor)
     add_roi_payload_assembler(path, ignore_hlt_decision=pxd_ignores_hlt_decision)

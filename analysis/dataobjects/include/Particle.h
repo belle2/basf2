@@ -334,6 +334,7 @@ namespace Belle2 {
         m_particleType = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
 
     /**
@@ -605,6 +606,15 @@ namespace Belle2 {
     const std::vector<int>& getDaughterIndices() const
     {
       return m_daughterIndices;
+    }
+
+    /**
+     * Retruns a vector of properties of daughter particles
+     * @return vector of daughter properties
+     */
+    const std::vector<int>& getDaughterProperties() const
+    {
+      return m_daughterProperties;
     }
 
     /**

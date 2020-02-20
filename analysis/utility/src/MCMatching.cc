@@ -270,8 +270,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   }
 
   //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
-  int daughterStatus = 0;
+  const int daughterStatusesAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
+  int daughterStatuses = 0;
 
   //Vector to store all the MC (n*grand-)daughters of the mother of the bremsstrahlung corrected particle
   vector<const MCParticle*> genParts;
@@ -280,8 +280,10 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     if (mcParticle && mcParticle->getMother()) appendParticles(mcParticle->getMother(), genParts);
   }
 
+  vector<int> daughterProperties = particle->getDaughterProperties();
   for (unsigned i = 0; i < nChildren; ++i) {
     const Particle* daughter = particle->getDaughter(i);
+    int daughterStatus = 0;
     //Now, if the daughter is a brems photon, start the special treatment
     if (particle->hasExtraInfo("bremsCorrected") && daughter->getPDGCode() == Const::photon.getPDGCode()) {
       //First, check if the daugther has an MC particle related
@@ -304,8 +306,13 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         daughterStatus |= getMCErrors(daughter);
       }
     } else daughterStatus |= getMCErrors(daughter);
+
+    int daughterStatusAcceptMask = (~c_Correct);
+    if (i < daughterProperties.size()) daughterStatusAcceptMask =  makeDaughterAcceptMask(daughterProperties[i]);
+    daughterStatuses |= (daughterStatus & daughterStatusAcceptMask);
+
   }
-  status |= (daughterStatus & daughterStatusAcceptMask);
+  status |= (daughterStatuses & daughterStatusesAcceptMask);
 
   status |= getMissingParticleFlags(particle, mcParticle);
 
@@ -494,4 +501,15 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
   if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;
+}
+
+int MCMatching::makeDaughterAcceptMask(int daughterProperty)
+{
+  int flags = 0;
+
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreMisID) flags |= (MCMatching::c_MisID);
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreDecayInFlight) flags |= (MCMatching::c_DecayInFlight);
+
+  return (~flags);
+
 }

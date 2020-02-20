@@ -42,8 +42,6 @@ namespace Belle2 {
     /** constructor */
     SVDCoGCalibrationFunction()
     {
-      //      B2INFO("SVDCOGCalibrationFunction constructor");
-
       // The m_implementations vector is static.
       // We have to initialize it just once.
       if (m_implementations.size() == 0) {
@@ -54,19 +52,15 @@ namespace Belle2 {
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
 
-      //      B2INFO("SVDCOGCalibrationFunction filled m_implementations");
-
       // The m_implementationsErr vector is static.
       // We have to initialize it just once.
       if (m_implementationsErr.size() == 0) {
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol1TBdepErr);
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol3TBindepErr);
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol5TBindepErr);
-        //m_implementations.push_back(
+        //m_implementationsErr.push_back(
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
-
-      //      B2INFO("SVDCOGCalibrationFunction filled m_implementationsErr");
 
       m_current = m_implementations.size() - 1;
 
@@ -96,31 +90,6 @@ namespace Belle2 {
       m_scale[3] = tb3;
     }
 
-    /** TO TRASH set the trigger bin dependent shift error
-    void set_biasError(double tb0, double tb1, double tb2, double tb3)
-    {
-      m_biasError[0] = tb0;
-      m_biasError[1] = tb1;
-      m_biasError[2] = tb2;
-      m_biasError[3] = tb3;
-    }
-     set the trigger bin dependent scale error
-    void set_scaleError(double tb0, double tb1, double tb2, double tb3)
-    {
-      m_scaleError[0] = tb0;
-      m_scaleError[1] = tb1;
-      m_scaleError[2] = tb2;
-      m_scaleError[3] = tb3;
-    }
-    set the trigger bin dependent covariance between shift and scale
-    void set_scaleBiasCovariance(double tb0, double tb1, double tb2, double tb3)
-    {
-    m_scaleBiasCovariance[0] = tb0;
-      m_scaleBiasCovariance[1] = tb1;
-      m_scaleBiasCovariance[2] = tb2;
-      m_scaleBiasCovariance[3] = tb3;
-      }
-    */
 
     //SETTERS FOR function ID = 1 (pol3TBindep)
     /** set the */
@@ -153,21 +122,11 @@ namespace Belle2 {
     /** total number of trigger bins */
     static const int nTriggerBins = 4;
 
-    /** residual = (EventT0 - CoGTime Corrected) mean and sigma from gaussian fit*/
-    double m_residMean[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual meanTO TRASH */
-    double m_residSigma[ nTriggerBins ] = {0}; /**< trigger-bin dependent residual sigma TO TRASH */
-    double m_residMeanError[ nTriggerBins ] = {0}; /**< trigger-bin dependent mean error TO TRASH */
-    double m_residSigmaError[ nTriggerBins ] = {0}; /**< trigger-bin dependent sigma error TO TRASH */
-
-
     /** function parameters & implementations*/
 
     /** ID = {0}, pol1TBdep VERSION: correctedValue = t * scale[tb] + bias[tb] */
     double m_bias[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias*/
     double m_scale[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale*/
-    double m_biasError[ nTriggerBins ] = {0}; /**< trigger-bin dependent bias error TO TRASH */
-    double m_scaleError[ nTriggerBins ] = {0}; /**< trigger-bin dependent scale error TO TRASH */
-    double m_scaleBiasCovariance[ nTriggerBins ] = {0}; /**< trigger-bin dependent covariance between scale and bias errors TO TRASH */
     /** pol1 TB dep version implementation*/
     double pol1TBdep(double raw_time, int tb) const
     {
@@ -218,7 +177,7 @@ namespace Belle2 {
     static std::vector < cogFunctionErr > m_implementationsErr; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDCoGCalibrationFunction, 4)
+    ClassDef(SVDCoGCalibrationFunction, 5)
   };
 
 }

@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/Particle.h>
+#include <framework/dataobjects/UncertainHelix.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <analysis/VertexFitting/TreeFitter/InternalTrack.h>
@@ -38,11 +39,26 @@ namespace TreeFitter {
     m_covariance(5, 5)
   {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
-    m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
-    for (int row = 0; row < 5; ++row) {
-      m_covariance(row, row) = 1.; // Some value, see if I can find any better....
-    }
 
+    TMatrixFSym cartestianCovarianceE = particle->getMomentumVertexErrorMatrix();
+    TMatrixDSym cartestianCovariance(6);
+    for (int i = 0; i < 3; ++ i) {
+      for (int j = 0; j < 3; ++j) {
+        cartestianCovariance(i  , j) = cartestianCovarianceE(i  , j);   //
+        cartestianCovariance(i  , j + 3) = cartestianCovarianceE(i  , j + 4); // Skipping j   = 3, which corresponds to energy
+        cartestianCovariance(i + 3, j) = cartestianCovarianceE(i + 4, j); // Skipping i   = 3, which corresponds to energy
+        cartestianCovariance(i + 3, j + 3) = cartestianCovarianceE(i + 4, j + 4); // Skipping i,j = 3, which corresponds to energy
+      }
+    }
+    Belle2::UncertainHelix uncertainHelix(particle->getVertex(), particle->getMomentum(), particle->getCharge(), m_bfield,
+                                          cartestianCovariance, particle->getPValue());
+    m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
+    TMatrixDSym cov = uncertainHelix.getCovariance();
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+        m_covariance(i, j) = cov(i, j);
+      }
+    }
     if (particle) {
       for (Belle2::Particle* daughter : particle->getDaughters()) {
         addDaughter(daughter, config, forceFitAll);

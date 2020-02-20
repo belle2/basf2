@@ -480,18 +480,18 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
 {
   int flags = 0;
 
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) {
     flags |= (MCMatching::c_MissFSR);
     flags |= (MCMatching::c_MissPHOTOS);
   }
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) {
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreMassive) {
     flags |= (MCMatching::c_MissMassiveParticle);
     flags |= (MCMatching::c_MissKlong);
   }
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) flags |= (MCMatching::c_MissGamma);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreGamma) flags |= (MCMatching::c_MissGamma);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;
 }

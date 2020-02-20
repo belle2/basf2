@@ -143,32 +143,32 @@ namespace Belle2 {
     /** Check if additional radiated photons shall be ignored. */
     bool isIgnoreRadiatedPhotons() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) > 0;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreIntermediate) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreIntermediate) > 0;
     }
     /** Check if missing massive final state particles shall be ignored. */
     bool isIgnoreMassive() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreMassive) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreMassive) > 0;
     }
     /** Check if missing neutrinos shall be ignored. */
     bool isIgnoreNeutrino() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreNeutrino) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreNeutrino) > 0;
     }
     /** Check if missing gammas shall be ignored. */
     bool isIgnoreGamma() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreGamma) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreGamma) > 0;
     }
     /** Check if added Brems gammas shall be ignored. */
     bool isIgnoreBrems() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreBrems) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreBrems) > 0;
     }
 
     /** Is the decay or the particle self conjugated */

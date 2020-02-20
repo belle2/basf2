@@ -104,12 +104,14 @@ namespace Belle2 {
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
       c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
-      c_isIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
-      c_isIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
-      c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
-      c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
-      c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
-      c_isIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
+      c_IsIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
+      c_IsIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
+      c_IsIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
+      c_IsIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
+      c_IsIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+      c_IsIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
+      c_IsIgnoreMisID = 128, /**< Is the particle MC matched with the ignore MisID flag set? */
+      c_IsIgnoreDecayInFlight = 256, /**< Is the particle MC matched with the ignore DecayInFlight flag set?*/
     };
 
     /**
@@ -842,6 +844,7 @@ namespace Belle2 {
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
     int m_properties; /**< particle property */
+    std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue

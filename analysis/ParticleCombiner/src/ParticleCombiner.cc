@@ -119,9 +119,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    if (mother->isUnspecified()) {
-      m_properties |= Particle::PropertyFlags::c_IsUnspecified;
-    }
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -173,9 +171,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    if (mother->isUnspecified()) {
-      m_properties |= Particle::PropertyFlags::c_IsUnspecified;
-    }
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();

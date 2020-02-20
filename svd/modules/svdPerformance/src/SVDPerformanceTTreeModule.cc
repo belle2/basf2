@@ -28,6 +28,9 @@
 #include <TDirectory.h>
 #include <math.h>
 #include <iostream>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
 
 using namespace Belle2;
 using namespace std;
@@ -70,9 +73,10 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdTruePos", &m_svdTruePos, "svdTruePos/F");
   m_t_U->Branch("svdClPhi", &m_svdClPhi, "svdClPhi/F");
   m_t_U->Branch("svdClZ", &m_svdClZ, "svdClZ/F");
-  m_t_U->Branch("svdTrkSeedX", &m_svdTrkSeedX, "svdTrkSeedX/F");
-  m_t_U->Branch("svdTrkSeedY", &m_svdTrkSeedY, "svdTrkSeedY/F");
-  m_t_U->Branch("svdTrkSeedZ", &m_svdTrkSeedZ, "svdTrkSeedZ/F");
+  m_t_U->Branch("svdTrkd0", &m_svdTrkd0, "svdTrkd0/F");
+  m_t_U->Branch("svdTrkz0", &m_svdTrkz0, "svdTrkz0/F");
+  m_t_U->Branch("svdTrkpT", &m_svdTrkpT, "svdTrkpT/F");
+  m_t_U->Branch("svdTrkpCM", &m_svdTrkpCM, "svdTrkpCM/F");
   m_t_U->Branch("svdTrkTraversedLength", &m_svdTrkTraversedLength, "svdTrkTraversedLength/F");
   m_t_U->Branch("svdTrkPXDHits", &m_svdTrkPXDHits, "svdTrkPXDHits/i");
   m_t_U->Branch("svdTrkSVDHits", &m_svdTrkSVDHits, "svdTrkSVDHits/i");
@@ -103,9 +107,10 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdTruePos", &m_svdTruePos, "svdTruePos/F");
   m_t_V->Branch("svdClPhi", &m_svdClPhi, "svdClPhi/F");
   m_t_V->Branch("svdClZ", &m_svdClZ, "svdClZ/F");
-  m_t_V->Branch("svdTrkSeedX", &m_svdTrkSeedX, "svdTrkSeedX/F");
-  m_t_V->Branch("svdTrkSeedY", &m_svdTrkSeedY, "svdTrkSeedY/F");
-  m_t_V->Branch("svdTrkSeedZ", &m_svdTrkSeedZ, "svdTrkSeedZ/F");
+  m_t_V->Branch("svdTrkd0", &m_svdTrkd0, "svdTrkd0/F");
+  m_t_V->Branch("svdTrkz0", &m_svdTrkz0, "svdTrkz0/F");
+  m_t_V->Branch("svdTrkpT", &m_svdTrkpT, "svdTrkpT/F");
+  m_t_V->Branch("svdTrkpCM", &m_svdTrkpCM, "svdTrkpCM/F");
   m_t_V->Branch("svdTrkTraversedLength", &m_svdTrkTraversedLength, "svdTrkTraversedLength/F");
   m_t_V->Branch("svdTrkPXDHits", &m_svdTrkPXDHits, "svdTrkPXDHits/i");
   m_t_V->Branch("svdTrkSVDHits", &m_svdTrkSVDHits, "svdTrkSVDHits/i");
@@ -138,16 +143,33 @@ void SVDPerformanceTTreeModule::event()
     if (! trk.wasFitSuccessful()) {
       continue;
     }
+    int pionCode = 211;
+
+    RelationVector<Track> theTK = DataStore::getRelationsWithObj<Track>(&trk);
+
+    if (theTK[0] == NULL) {
+      continue;
+    }
+
+    if (theTK.size() != 0) {
+      const TrackFitResult*  tfr = theTK[0]->getTrackFitResult(Const::ChargedStable(pionCode));
+      if (tfr) {
+        m_svdTrkd0 = tfr->getD0();
+        m_svdTrkz0 = tfr->getZ0();
+        m_svdTrkpT = tfr->getMomentum().Perp();
+        TLorentzVector pStar = tfr->get4Momentum();
+        pStar.Boost(0, 0, 3. / 11);
+        m_svdTrkpCM = pStar.P();
+      }
+    }
+
+
     const vector<SVDCluster* > svdClusters = trk.getSVDHitList();
     B2DEBUG(40, "FITTED TRACK:   NUMBER OF SVD HITS = " << svdClusters.size());
 
     m_svdTrkPXDHits = (trk.getPXDHitList()).size();
     m_svdTrkSVDHits = (trk.getSVDHitList()).size();
     m_svdTrkCDCHits = (trk.getCDCHitList()).size();
-
-    m_svdTrkSeedX = (trk.getPositionSeed()).X();
-    m_svdTrkSeedY = (trk.getPositionSeed()).Y();
-    m_svdTrkSeedZ = (trk.getPositionSeed()).Z();
 
     for (unsigned int i = 0; i < svdClusters.size(); i++) {
 

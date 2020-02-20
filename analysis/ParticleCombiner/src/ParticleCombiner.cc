@@ -130,6 +130,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -182,6 +185,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -435,13 +441,13 @@ namespace Belle2 {
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }

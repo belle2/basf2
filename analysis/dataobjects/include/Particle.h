@@ -176,6 +176,25 @@ namespace Belle2 {
              TClonesArray* arrayPointer = nullptr);
 
     /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param particle property
+     * @param daughter particle properties
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             int properties,
+             const std::vector<int>& daughterProperties,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
      * Constructor from a reconstructed track (mdst object Track);
      * @param track pointer to Track object
      * @param chargedStable Type of charged particle
@@ -917,10 +936,11 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 11); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
+    // v11: added m_daughterProperties
 
     friend class ParticleSubset;
   };

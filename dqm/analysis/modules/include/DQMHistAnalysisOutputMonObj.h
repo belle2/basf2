@@ -13,6 +13,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <dqm/dataobjects/DQMFileMetaData.h>
 #include <string>
+#include <TBranch.h>
 
 namespace Belle2 {
   /*! Class definition for the module to store MonitoringObject to output root file*/
@@ -37,6 +38,10 @@ namespace Belle2 {
 
     //! Makes entry with monitoring variables in the run summary TTree
     void addTreeEntry();
+
+    //! if new variables is added to run summary TTree this files
+    // missing (previous) entries in the TTree (with the value from the first run)
+    void fillBranch(TBranch* br);
 
     // Data members
   private:

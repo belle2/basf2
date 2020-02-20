@@ -148,23 +148,31 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
     for (auto& var : vars) {
       std::string brname = obj.first + "_" + var.first;
       auto branch = tree->GetBranch((brname).c_str());
-      if (!branch) branch = tree->Branch((brname).c_str(), &((var.second).at(0)));
-      else branch->SetAddress(&((var.second).at(0)));
+      if (!branch) {
+        branch = tree->Branch((brname).c_str(), &((var.second).at(0)));
+        fillBranch(branch);
+      } else branch->SetAddress(&((var.second).at(0)));
 
       if ((var.second).size() == 2) {
         auto errBranch = tree->GetBranch((brname).c_str() + TString("_err"));
-        if (!errBranch) errBranch = tree->Branch((brname).c_str() + TString("_err"), &((var.second).at(1)));
-        else errBranch->SetAddress(&((var.second).at(1)));
+        if (!errBranch) {
+          errBranch = tree->Branch((brname).c_str() + TString("_err"), &((var.second).at(1)));
+          fillBranch(errBranch);
+        } else errBranch->SetAddress(&((var.second).at(1)));
       }
 
       if ((var.second).size() == 3) {
         auto errBranch1 = tree->GetBranch((brname).c_str() + TString("_upErr"));
-        if (!errBranch1) errBranch1 = tree->Branch((brname).c_str() + TString("_upErr"), &((var.second).at(1)));
-        else errBranch1->SetAddress(&((var.second).at(1)));
+        if (!errBranch1) {
+          errBranch1 = tree->Branch((brname).c_str() + TString("_upErr"), &((var.second).at(1)));
+          fillBranch(errBranch1);
+        } else errBranch1->SetAddress(&((var.second).at(1)));
 
         auto errBranch2 = tree->GetBranch((brname).c_str() + TString("_dwErr"));
-        if (!errBranch2) errBranch2 = tree->Branch((brname).c_str() + TString("_dwErr"), &((var.second).at(2)));
-        else errBranch2->SetAddress(&((var.second).at(2)));
+        if (!errBranch2) {
+          errBranch2 = tree->Branch((brname).c_str() + TString("_dwErr"), &((var.second).at(2)));
+          fillBranch(errBranch2);
+        } else errBranch2->SetAddress(&((var.second).at(2)));
 
       }
     }
@@ -176,6 +184,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
       if (!branch) {
         std::string ty = brname + "/C";
         branch = tree->Branch((brname).c_str(), cc, ty.c_str());
+        fillBranch(branch);
       } else branch->SetAddress(cc);
     }
   }
@@ -185,6 +194,18 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   treeFile->Close();
 
 }
+
+void DQMHistAnalysisOutputMonObjModule::fillBranch(TBranch* branch)
+{
+  TTree* tree = (TTree*)branch->GetTree();
+  int nentr = tree->GetEntries();
+  for (int i = 0; i < nentr; i++) {
+    tree->GetEntry(i);
+    branch->Fill();
+  }
+}
+
+
 
 void DQMHistAnalysisOutputMonObjModule::terminate()
 {

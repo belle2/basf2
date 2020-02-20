@@ -83,6 +83,10 @@ void DQMHistAnalysisMonObjModule::endRun()
   // without error
   m_monObj->setVariable("bitsMean", bits ? bits->GetMean() : 0);
 
+  // set string variable
+  m_monObj->setVariable("mode", "nominal");
+
+
   B2DEBUG(20, "DQMHistAnalysisMonObj : endRun called");
 }
 

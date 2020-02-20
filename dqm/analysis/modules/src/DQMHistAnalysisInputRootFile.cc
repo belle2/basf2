@@ -133,7 +133,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       }
       if (!hpass) continue;
 
-      h->SetName((dirname + "/" + hname).c_str());
+      if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);
 
       std::string name = dirname + "_" + hname;

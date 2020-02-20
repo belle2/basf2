@@ -146,39 +146,40 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
                                                         obj.second)->getVariables());
     const std::map<std::string, std::string>& strVars = (obj.second)->getStringVariables();
     for (auto& var : vars) {
-
-      auto branch = tree->GetBranch((var.first).c_str());
-      if (!branch) branch = tree->Branch((var.first).c_str(), &((var.second).at(0)));
+      std::string brname = obj.first + "_" + var.first;
+      auto branch = tree->GetBranch((brname).c_str());
+      if (!branch) branch = tree->Branch((brname).c_str(), &((var.second).at(0)));
       else branch->SetAddress(&((var.second).at(0)));
 
       if ((var.second).size() == 2) {
-        auto errBranch = tree->GetBranch((var.first).c_str() + TString("_err"));
-        if (!errBranch) errBranch = tree->Branch((var.first).c_str() + TString("_err"), &((var.second).at(1)));
+        auto errBranch = tree->GetBranch((brname).c_str() + TString("_err"));
+        if (!errBranch) errBranch = tree->Branch((brname).c_str() + TString("_err"), &((var.second).at(1)));
         else errBranch->SetAddress(&((var.second).at(1)));
       }
 
       if ((var.second).size() == 3) {
-        auto errBranch1 = tree->GetBranch((var.first).c_str() + TString("_upErr"));
-        if (!errBranch1) errBranch1 = tree->Branch((var.first).c_str() + TString("_upErr"), &((var.second).at(1)));
+        auto errBranch1 = tree->GetBranch((brname).c_str() + TString("_upErr"));
+        if (!errBranch1) errBranch1 = tree->Branch((brname).c_str() + TString("_upErr"), &((var.second).at(1)));
         else errBranch1->SetAddress(&((var.second).at(1)));
 
-        auto errBranch2 = tree->GetBranch((var.first).c_str() + TString("_dwErr"));
-        if (!errBranch2) errBranch2 = tree->Branch((var.first).c_str() + TString("_dwErr"), &((var.second).at(2)));
+        auto errBranch2 = tree->GetBranch((brname).c_str() + TString("_dwErr"));
+        if (!errBranch2) errBranch2 = tree->Branch((brname).c_str() + TString("_dwErr"), &((var.second).at(2)));
         else errBranch2->SetAddress(&((var.second).at(2)));
 
       }
     }
 
     for (auto& var : strVars) {
+      std::string brname = obj.first + "_" + var.first;
       char* cc = const_cast<char*>((var.second).c_str());
-      auto branch = tree->GetBranch((var.first).c_str());
+      auto branch = tree->GetBranch((brname).c_str());
       if (!branch) {
-        std::string ty = var.first + "/C";
-        branch = tree->Branch((var.first).c_str(), cc, ty.c_str());
+        std::string ty = brname + "/C";
+        branch = tree->Branch((brname).c_str(), cc, ty.c_str());
       } else branch->SetAddress(cc);
     }
-
   }
+
   tree->Fill();
   tree->Write(0, TObject::kWriteDelete, 0);
   treeFile->Close();

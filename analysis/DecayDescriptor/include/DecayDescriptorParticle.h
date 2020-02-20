@@ -28,6 +28,10 @@ namespace Belle2 {
     bool m_isSelected;
     /** Is particle unspecified by marking @ ? */
     bool m_isUnspecified;
+    /** Ignore misID? */
+    bool m_isIgnoreMisID;
+    /** Ignore decayInFlight? */
+    bool m_isIgnoreDecayInFlight;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
@@ -77,9 +81,19 @@ namespace Belle2 {
       return m_iPDGCode;
     }
     /** Is the particle unspecified? */
-    int isUnspecified() const
+    bool isUnspecified() const
     {
       return m_isUnspecified;
+    }
+    /** Check if misID shall be ignored. */
+    bool isIgnoreMisID() const
+    {
+      return m_isIgnoreMisID;
+    }
+    /** Check if decayInFlight shall be ignored. */
+    bool isIgnoreDecayInFlight() const
+    {
+      return m_isIgnoreDecayInFlight;
     }
   };
 }

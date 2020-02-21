@@ -312,7 +312,7 @@ def set_central_database_networkparams(**argk):
     Set some expert database connection details
 
     .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.expert_settings <<ConditionsConfiguration.expert_settings>` instead
+       Please use `basf2.conditions.expert_settings <ConditionsConfiguration.expert_settings>` instead
     """
     B2WARNING("basf2.set_central_database_networkparams() is deprecated, please use basf2.conditions.expert_settings()")
     return conditions.expert_settings(**argk)

@@ -62,7 +62,8 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
   addParam("timeAlgorithm", m_timeAlgorithm,
-           " int to choose time algorithm:  0 = 6-sample CoG (default), 1 = 3-sample CoG,  2 = 3-sample ELS", m_timeAlgorithm);
+           " int to choose time algorithm:  0 = 6-sample CoG (default for 6-sample acquisition mode), 1 = 3-sample CoG (default for 3-sample acquisition mode),  2 = 3-sample ELS",
+           m_timeAlgorithm);
   addParam("useDB", m_useDB,
            "if false use clustering module parameters", m_useDB);
 
@@ -242,7 +243,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float SNR = cluster.getSNR();
   float position = cluster.getPosition();
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
-  //this is the 6-sample CoG time and will be used to compute the 6-sample CoG cluster time, it will not be used for in 3-sample time algorithms:
+  //this is the 6-sample CoG time, it will not be used for in 3-sample time algorithms:
   float time = cluster.getTime();
   float timeError = cluster.getTimeError();
   int firstFrame = cluster.getFirstFrame();
@@ -255,19 +256,19 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-
   //depending on the algorithm time contains different information:
-  //6-sample CoG (0): this is the final time you do not do anything else
-  //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate and correct for FirstFrame and TriggerBin:
+  //6-sample CoG (0): this is the calibrated already
+  //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
   float caltime = time;
   if ((m_timeAlgorithm == 1) || eventinfo->getModeByte().getDAQMode() == 1)
     caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
   else if (m_timeAlgorithm == 2)
     caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
 
+  // last step:
+  // shift cluster time by TB time AND by FirstFrame ( FF = 0 for the 6-sample CoG Time)
+  // NOTE: this shift is removed in the SVDCogTimeCalibrationCollector in the CAF
   constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
-  // shift cluster time by average TB time AND by FirstFrame ( = 0 for hte 6-sample CoG Time)
-  // to do: reapply shift in CAF
   time = caltime - eventinfo->getSVD2FTSWTimeShift() + stepSize * firstFrame;
 
   //  Store Cluster into Datastore

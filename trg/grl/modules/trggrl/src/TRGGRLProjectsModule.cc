@@ -699,10 +699,10 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "bha_11") {bit = bha_type11;}
     else if (bitname == "bha_12") {bit = bha_type12;}
     else if (bitname == "bha_13") {bit = bha_type13;}
-    else if (bitname == "c_0") {bit = nclst_0;}
-    else if (bitname == "c_1") {bit = nclst_1;}
-    else if (bitname == "c_2") {bit = nclst_2;}
-    else if (bitname == "c_3") {bit = nclst_3;}
+    else if (bitname == "clst_0") {bit = nclst_0;}
+    else if (bitname == "clst_1") {bit = nclst_1;}
+    else if (bitname == "clst_2") {bit = nclst_2;}
+    else if (bitname == "clst_3") {bit = nclst_3;}
     else if (bitname == "ebg_0") {bit = ecl_bg_0;}
     else if (bitname == "ebg_1") {bit = ecl_bg_1;}
     else if (bitname == "ebg_2") {bit = ecl_bg_2;}
@@ -713,17 +713,17 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_phys") {bit = ecl_phys;}
     else if (bitname == "ecl_oflo") {bit = ecl_oflo;}
     else if (bitname == "ecl_3dbha") {bit = ecl_3dbha;}
-    else if (bitname == "lml_0") {bit = ecl_lml_0;}
-    else if (bitname == "lml_1") {bit = ecl_lml_1;}
-    else if (bitname == "lml_2") {bit = ecl_lml_2;}
-    else if (bitname == "lml_3") {bit = ecl_lml_3;}
-    else if (bitname == "lml_4") {bit = ecl_lml_4;}
-    else if (bitname == "lml_5") {bit = ecl_lml_5;}
-    else if (bitname == "lml_6") {bit = ecl_lml_6;}
-    else if (bitname == "lml_7") {bit = ecl_lml_7;}
-    else if (bitname == "lml_8") {bit = ecl_lml_8;}
-    else if (bitname == "lml_9") {bit = ecl_lml_9;}
-    else if (bitname == "lml_10") {bit = ecl_lml_10;}
+    else if (bitname == "ecl_lml_0") {bit = ecl_lml_0;}
+    else if (bitname == "ecl_lml_1") {bit = ecl_lml_1;}
+    else if (bitname == "ecl_lml_2") {bit = ecl_lml_2;}
+    else if (bitname == "ecl_lml_3") {bit = ecl_lml_3;}
+    else if (bitname == "ecl_lml_4") {bit = ecl_lml_4;}
+    else if (bitname == "ecl_lml_5") {bit = ecl_lml_5;}
+    else if (bitname == "ecl_lml_6") {bit = ecl_lml_6;}
+    else if (bitname == "ecl_lml_7") {bit = ecl_lml_7;}
+    else if (bitname == "ecl_lml_8") {bit = ecl_lml_8;}
+    else if (bitname == "ecl_lml_9") {bit = ecl_lml_9;}
+    else if (bitname == "ecl_lml_10") {bit = ecl_lml_10;}
     else if (bitname == "top_0") {bit = false;}
     else if (bitname == "top_1") {bit = false;}
     else if (bitname == "top_2") {bit = false;}
@@ -747,14 +747,14 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "veto") {bit = false;}
     else if (bitname == "samhem") {bit = nSameHem1Trk > 0;}
     else if (bitname == "opohem") {bit = nOppHem1Trk > 0;}
-    else if (bitname == "n1_0") {bit = nclst1_0;}
-    else if (bitname == "n1_1") {bit = nclst1_1;}
-    else if (bitname == "n1_2") {bit = nclst1_2;}
-    else if (bitname == "n1_3") {bit = nclst1_3;}
-    else if (bitname == "n2_0") {bit = nclst2_0;}
-    else if (bitname == "n2_1") {bit = nclst2_1;}
-    else if (bitname == "n2_2") {bit = nclst2_2;}
-    else if (bitname == "n2_3") {bit = nclst2_3;}
+    else if (bitname == "n1gev_0") {bit = nclst1_0;}
+    else if (bitname == "n1gev_1") {bit = nclst1_1;}
+    else if (bitname == "n1gev_2") {bit = nclst1_2;}
+    else if (bitname == "n1gev_3") {bit = nclst1_3;}
+    else if (bitname == "n2gev_0") {bit = nclst2_0;}
+    else if (bitname == "n2gev_1") {bit = nclst2_1;}
+    else if (bitname == "n2gev_2") {bit = nclst2_2;}
+    else if (bitname == "n2gev_3") {bit = nclst2_3;}
     else if (bitname == "cdcecl_0") {bit = cdcecl_0;}
     else if (bitname == "cdcecl_1") {bit = cdcecl_1;}
     else if (bitname == "cdcecl_2") {bit = cdcecl_2;}

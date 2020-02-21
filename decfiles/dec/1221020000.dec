@@ -2,8 +2,8 @@
 # Descriptor: [B+ -> Jpsi [ -> l+ l-] K*+ ]cc
 # NickName: Bu_JpsiKstp_ll
 # Documentation:
-# Tested: 
-# Physics WG:
+# Tested: Yes
+# Physics WG: EWP
 # Responsible: Soumen Haldet
 # Email: soumen.halder@tifr.res.in
 # Cuts: None
@@ -11,7 +11,7 @@
 # Comments:
 
 # Define aliases
-Alias MyJpsi J/psi
+Alias Jpsi_sig J/psi
 #
 # Y(4S) -> B+ B-
 #
@@ -23,16 +23,16 @@ Enddecay
 # B+ -> J/psi(1S) K*+
 #
 Decay B+sig
-1.000 MyJpsi K*+   SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+1.000 Jpsi_sig K*+   SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
 Enddecay
 CDecay B-sig
 
 #
 # J/psi(1S) -> e+ e-
 #
-Decay MyJpsi
-0.5000 e+ e-         PHOTOS VLL;
-0.5000 mu+ mu-         PHOTOS VLL;
+Decay Jpsi_sig
+0.5000 e+ e-      VLL    PHOTOS;
+0.5000 mu+ mu-    VLL    PHOTOS;
 Enddecay
 
 End

@@ -483,7 +483,7 @@ namespace Belle2 {
       return part->getMass() - part->getPDGMass();
     }
 
-    double particleInvariantMass(const Particle* part)
+    double particleInvariantMassFromDaughters(const Particle* part)
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
@@ -504,8 +504,8 @@ namespace Belle2 {
         TLorentzVector dt1;
         TLorentzVector dt2;
         TLorentzVector dtsum;
-        double mpi = 0.1396;
-        double mpr = 0.9383;
+        double mpi = Const::pionMass;
+        double mpr = Const::protonMass;
         dt1 = daughters[0]->get4Vector();
         dt2 = daughters[1]->get4Vector();
         double E1 = hypot(mpi, dt1.P());
@@ -521,11 +521,7 @@ namespace Belle2 {
     double particleInvariantMassError(const Particle* part)
     {
       float invMass = part->getMass();
-
-      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
-      for (unsigned i = 0; i < part->getNDaughters(); i++) {
-        covarianceMatrix += part->getDaughter(i)->getMomentumErrorMatrix();
-      }
+      TMatrixFSym covarianceMatrix = part->getMomentumErrorMatrix();
 
       TVectorF jacobian(Particle::c_DimMomentum);
       jacobian[0] = -1.0 * part->getPx() / invMass;
@@ -541,20 +537,43 @@ namespace Belle2 {
       return TMath::Sqrt(result);
     }
 
-    double particleInvariantMassSignificance(const Particle* part)
+    double particleInvariantMassErrorFromDaughters(const Particle* part)
     {
-      float invMass = part->getMass();
-      float nomMass = part->getPDGMass();
-      float massErr = particleInvariantMassError(part);
+      double invMass = particleInvariantMassFromDaughters(part);
+      const Manager::Var* px = Manager::Instance().getVariable("daughterSumOf(px)");
+      const Manager::Var* py = Manager::Instance().getVariable("daughterSumOf(py)");
+      const Manager::Var* pz = Manager::Instance().getVariable("daughterSumOf(pz)");
+      const Manager::Var* E  = Manager::Instance().getVariable("daughterSumOf(E)");
 
-      return (invMass - nomMass) / massErr;
+      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
+      for (unsigned i = 0; i < part->getNDaughters(); i++) {
+        covarianceMatrix += part->getDaughter(i)->getMomentumErrorMatrix();
+      }
+
+      TVectorF jacobian(Particle::c_DimMomentum);
+      jacobian[0] = -1.0 * px->function(part) / invMass;
+      jacobian[1] = -1.0 * py->function(part) / invMass;
+      jacobian[2] = -1.0 * pz->function(part) / invMass;
+      jacobian[3] = 1.0 * E->function(part) / invMass;
+
+      double result = jacobian * (covarianceMatrix * jacobian);
+
+      if (result < 0.0)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      return TMath::Sqrt(result);
     }
 
-    double particleInvariantMassBeforeFitSignificance(const Particle* part)
+    double particleInvariantMassSignificance(const Particle* part)
     {
-      float invMass = particleInvariantMass(part);
+      return particleDMass(part) / particleInvariantMassError(part);
+    }
+
+    double particleInvariantMassSignificanceFromDaughters(const Particle* part)
+    {
+      float invMass = particleInvariantMassFromDaughters(part);
       float nomMass = part->getPDGMass();
-      float massErr = particleInvariantMassError(part);
+      float massErr = particleInvariantMassErrorFromDaughters(part);
 
       return (invMass - nomMass) / massErr;
     }
@@ -1040,18 +1059,22 @@ namespace Belle2 {
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "invariant mass squared (determined from particle's 4-momentum vector)");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMass,
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");
+                      "uncertainty of invariant mass");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
-                      "signed deviation of particle's invariant mass from its nominal mass");
-    REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
-                      "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
+                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)");
+    REGISTER_VARIABLE("SigMBF", particleInvariantMassSignificanceFromDaughters, R"DOC(
+                       signed deviation of particle's invariant mass as determined from particle's daughter 4-momentum vectors from its nominal mass in units of the uncertainty on the invariant mass.
+                      
+                       As long as the daughter particle properties have not been updated after a vertex fit, this is the significance Before the Fit (BF).
+                      
+                       Alternatively, one can use `variablesToExtraInfo` prior to the vertex fit to access pre-fit values.)DOC");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
                       "component x of 3-momentum recoiling against given Particle");

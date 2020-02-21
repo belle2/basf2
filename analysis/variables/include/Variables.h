@@ -165,7 +165,7 @@ namespace Belle2 {
     /**
      * return mass (determined from particle's daughter 4-momentum vectors)
      */
-    double particleInvariantMass(const Particle* part);
+    double particleInvariantMassFromDaughters(const Particle* part);
 
     /**
      * return mass (determined from particle's daughter 4-momentum vectors under proton mass assumption)
@@ -173,19 +173,24 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
+     * return uncertainty of the invariant mass
      */
     double particleInvariantMassError(const Particle* part);
 
     /**
-     * return signed deviation of particle's invariant mass from its nominal mass
+     * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
+     */
+    double particleInvariantMassErrorFromDaughters(const Particle* part);
+
+    /**
+     * return signed deviation of particle's invariant mass from its nominal mass in units of uncertainty on the invariant mass
      */
     double particleInvariantMassSignificance(const Particle* part);
 
     /**
-     * return signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass
+     * return signed deviation of particle's invariant mass as determined from particle's daughter 4-momentum vectors from its nominal mass in units of uncertainty on the invariant mass
      */
-    double particleInvariantMassBeforeFitSignificance(const Particle* part);
+    double particleInvariantMassSignificanceFromDaughters(const Particle* part);
 
     /**
      * return mass squared (determined from particle's 4-momentum vector)
@@ -266,7 +271,7 @@ namespace Belle2 {
 
     /**
      *
-     * return invarian mass squared of the system recoiling against given Particle
+     * return invariant mass squared of the system recoiling against given Particle
      */
     double recoilMassSquared(const Particle* particle);
 

@@ -491,6 +491,7 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
   }
   if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
   if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) flags |= (MCMatching::c_MissGamma);
+  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;
 }

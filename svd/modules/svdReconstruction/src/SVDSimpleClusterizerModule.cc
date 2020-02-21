@@ -19,6 +19,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
+#include <svd/dataobjects/SVDEventInfo.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
@@ -184,6 +186,7 @@ void SVDSimpleClusterizerModule::event()
     aStrip.noise = thisNoise;
     //this is the 6-sample CoG time and will be used to compute the 6-sample CoG cluster time, it will not be used for in 3-sample time algorithms:
     aStrip.time = m_storeDigits[i]->getTime();
+    aStrip.timeError = m_storeDigits[i]->getTimeError();
 
     //try to add the strip to the existing cluster
     if (! clusterCandidate.add(thisSensorID, thisSide, aStrip)) {
@@ -239,22 +242,33 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   float SNR = cluster.getSNR();
   float position = cluster.getPosition();
   float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
+  //this is the 6-sample CoG time and will be used to compute the 6-sample CoG cluster time, it will not be used for in 3-sample time algorithms:
   float time = cluster.getTime();
-  float timeError = cluster.getTimeError(); //not implemented yet
+  float timeError = cluster.getTimeError();
   int firstFrame = cluster.getFirstFrame();
+
+  //first check SVDEventInfo name
+  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  if (!temp_eventinfo.isOptional("SVDEventInfo"))
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+
 
   //depending on the algorithm time contains different information:
   //6-sample CoG (0): this is the final time you do not do anything else
   //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate and correct for FirstFrame and TriggerBin:
   float caltime = time;
-  if (m_timeAlgorithm == 1)
+  if ((m_timeAlgorithm == 1) || eventinfo->getModeByte().getDAQMode() == 1)
     caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
-  if (m_timeAlgorithm == 2)
+  else if (m_timeAlgorithm == 2)
     caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
 
   constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
-  if (m_timeAlgorithm == 1 || m_timeAlgorithm == 2)
-    time = caltime + stepSize * (firstFrame - getTriggerBin() / 4);
+  // shift cluster time by average TB time AND by FirstFrame ( = 0 for hte 6-sample CoG Time)
+  // to do: reapply shift in CAF
+  time = caltime - eventinfo->getSVD2FTSWTimeShift() + stepSize * firstFrame;
 
   //  Store Cluster into Datastore
   m_storeClusters.appendNew(SVDCluster(
@@ -310,21 +324,3 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 }
 
-int SVDSimpleClusterizerModule::getTriggerBin() const
-{
-
-
-  //first check SVDEventTInfo name
-  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
-  std::string m_svdEventInfoName = "SVDEventInfo";
-  if (!temp_eventinfo.isOptional("SVDEventInfo"))
-    m_svdEventInfoName = "SVDEventInfoSim";
-
-  //then get Tigger Bin from SVDEventInfo
-  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
-  if (!eventinfo) B2ERROR("No SVDEventInfo!");
-  int triggerbin = eventinfo->getModeByte().getTriggerBin();
-
-  return triggerbin;
-
-}

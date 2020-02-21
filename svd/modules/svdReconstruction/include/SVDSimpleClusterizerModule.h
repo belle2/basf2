@@ -97,7 +97,7 @@ namespace Belle2 {
       bool m_useDB = true;
       /** selects the algorithm to compute the cluster tim
        *  0 = 6-sample CoG (default)
-       *  1 = 3-sample CoG
+       *  1 = 3-sample CoG (TO DO: default if 3-sample acquisition mode)
        *  2 = 3-sample ELS
        */
       int m_timeAlgorithm = 0;
@@ -109,8 +109,6 @@ namespace Belle2 {
 
       SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
       SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/
-
-      int getTriggerBin() const; /**<get the TriggerBin from SVDEventInfo */
 
       void writeClusters(SimpleClusterCandidate clusterCand); /**<write the cluster candidate to clusters*/
     };//end class declaration

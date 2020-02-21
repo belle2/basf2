@@ -1432,14 +1432,16 @@ to a plane perpendicular to the shower axis.
 Returns lateral energy distribution (shower variable). It is defined as following:
 
 .. math::
-    S = \frac{\sum_{i=3}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=3}^{n} w_{i} E_{i} r^2_{i} + w_{0} E_{0} r^2_{0} + w_{1} E_{1} r^2_{0}}
+    S = \frac{\sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}{(w_{0} E_{0} + w_{1} E_{1}) r^2_{0} + \sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}
 
-where :math:`E_{i} = (E_0, E_1, ...)` are the single crystal energies sorted by energy, :math:`w_{i}` is
-the crystal weight, :math:`r_{i}` is the distance of the :math:`i`-th digit to the shower center projected to
-a plane perpendicular to the shower axis, and :math:`r_{0} \approx 5\,cm` is the distance between two crystals.
+where :math:`E_{i} = (E_{0}, E_{1}, ...)` are the single crystal energies sorted by energy
+(:math:`E_{0}` is the highest energy and :math:`E_{1}` the second highest), :math:`w_{i}`
+is the crystal weight, :math:`r_{i}` is the distance of the :math:`i`-th digit to the
+shower center projected to a plane perpendicular to the shower axis,
+and :math:`r_{0} \approx 5\,cm` is the distance between two crystals.
 
-clusterLAT peaks around 0.3 for radially symmetrical electromagnetic showers and is larger for hadronic events,
-and electrons with a close-by radiative or Bremsstrahlung photon.
+clusterLAT peaks around 0.3 for radially symmetrical electromagnetic showers and is larger
+for hadronic events, and electrons with a close-by radiative or Bremsstrahlung photon.
 
 .. note::
     | Please read `this <importantNoteECL>` first.

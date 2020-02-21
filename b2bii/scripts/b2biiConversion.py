@@ -7,6 +7,7 @@ import os
 import re
 import requests
 import http
+from ctypes import cdll
 
 
 def setupBelleDatabaseServer():
@@ -74,6 +75,12 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
+
+    # If we are on KEKCC make sure we load the correct NeuroBayes library
+    try:
+        cdll.LoadLibrary('/sw/belle/local/neurobayes-4.3.1/lib/libNeuroBayesCore_shared.so')
+    except:
+        pass
 
     if useBelleDBServer is None:
         setupBelleDatabaseServer()

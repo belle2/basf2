@@ -84,14 +84,14 @@ namespace Belle2 {
         std::vector<double> svdAngle;
         std::vector<double> r;
         std::vector<double> deltaX;
-        int dimz = 0;
+        unsigned int dimz = 0;
 
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos.push_back(z);
           dimz++;
         }
-        int dimThetaZ = 0;
+
         for (double ThetaZ : activeParams.getArray("ThetaZ", {0})) {
           thetaZ.push_back(ThetaZ);
         }

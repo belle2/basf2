@@ -29,6 +29,7 @@ namespace Belle2 {
       float noise; /**<strip noise*/
       int cellID; /**<strip cellID*/
       float time; /**<6-sample CoG strip time*/
+      float timeError; /**<6-sample CoG strip time error*/
     };
 
     /**
@@ -103,13 +104,14 @@ namespace Belle2 {
       float get3SampleELSRawTime() const;
 
       /**
-       * return the error on the time of the cluster depending on the m_timeAlgorithm, not implemented yet
+       * return the error on the time of the cluster depending on the m_timeAlgorithm,
+       * implemented only for the 6-Sample CoG
        */
       float getTimeError() const;
       /**
        * return the time of the cluster for the 6-sample CoG
        */
-      float get6SampleCoGTimeError() const  { return m_6SampleTime; }
+      float get6SampleCoGTimeError() const  { return m_6SampleTimeError; }
       /**
        * return the time of the cluster for the 3-sample CoG
        */
@@ -132,15 +134,16 @@ namespace Belle2 {
        */
       std::pair<int, std::vector<float>> getMaxSum3Samples() const;
 
-
-      /**
-       * set max frame computed with the MaxSum algorithm
-       */
-      void setFirstFrame() {m_firstFrame = getMaxSum3Samples().first;}
       /**
        * return the first frame
+       * always 0 if 6-Sample CoG
        */
-      int getFirstFrame() {return m_firstFrame;}
+      int getFirstFrame()
+      {
+        if (m_timeAlgorithm == 0)
+          return 0;
+        return getMaxSum3Samples().first;
+      }
 
       /**
        * return the position of the cluster
@@ -226,7 +229,7 @@ namespace Belle2 {
       int m_seedIndex;
 
       /** first frame selected with the max-sum algorithm */
-      int m_firstFrame = 0;
+      //      int m_firstFrame = 0;
 
       /** vector containing the strips in the cluster */
       std::vector<stripInCluster> m_strips;

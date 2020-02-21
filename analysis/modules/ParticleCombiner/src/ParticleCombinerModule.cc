@@ -187,9 +187,8 @@ namespace Belle2 {
       }
 
       Particle* newParticle = particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
 
-      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+      outputList->addParticle(newParticle);
 
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);

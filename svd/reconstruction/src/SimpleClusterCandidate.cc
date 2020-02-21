@@ -94,12 +94,20 @@ namespace Belle2 {
 
       int clusterSize = m_strips.size();
 
+      double weightSum = 0;
       double noise = 0;
       for (auto aStrip : m_strips) {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
         m_charge += aStrip.charge;
         m_6SampleTime += aStrip.time * aStrip.charge;
+
+        float tmp_sigmaSquared = aStrip.timeError / aStrip.timeError;
+        weightSum +=  tmp_sigmaSquared;
+        //FIXME: use error to weight the time of each strip in the cluster
+        // it seems to yield a worst resolution vs EventT0 and an additional 1 ns bias
+        //  m_6SampleTime += aStrip.time / tmp_sigmaSquared;
+        // additional change also below: m_6SampleTime /= weightSum instead of m_6SampleTime/=m_charge
         noise += aStrip.noise * aStrip.noise;
       }
 
@@ -110,6 +118,8 @@ namespace Belle2 {
 
       noise = sqrt(noise);
       m_6SampleTime /= m_charge;
+      //      m_6SampleTime /= weightSum;
+      m_6SampleTimeError = 1. / TMath::Sqrt(weightSum);
       m_SNR = m_charge / noise;
 
 
@@ -166,7 +176,6 @@ namespace Belle2 {
       else
         m_position -= sensorInfo.getLorentzShift(m_isUside, m_position);
 
-      m_6SampleTimeError = 6; //order of magnitude
     };
 
     bool SimpleClusterCandidate::isGoodCluster()
@@ -259,14 +268,14 @@ namespace Belle2 {
     {
 
       //no obvious way to compute the error yet
-      return 0;
+      return 6;
     }
 
     float SimpleClusterCandidate::get3SampleELSTimeError() const
     {
 
       //no obvious way to compute the error yet
-      return 0;
+      return 6;
     }
 
 
@@ -285,7 +294,7 @@ namespace Belle2 {
 
       Belle2::SVDShaperDigit::APVFloatSamples returnSamples = {0, 0, 0, 0, 0, 0};
       //FIXME: the name of the StoreArray of RecoDigits and ShaperDigits
-      // must taken from the SimpleClusterizer.
+      // must be taken from the SimpleClusterizer.
       const StoreArray<SVDRecoDigit> m_storeRecoDigits("SVDRecoDigits");
       for (auto istrip : m_strips) {
         const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>("SVDShaperDigits");

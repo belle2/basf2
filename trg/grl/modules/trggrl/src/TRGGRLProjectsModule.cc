@@ -238,10 +238,12 @@ void TRGGRLProjectsModule::event()
   int nTrk3D = cdc3DTrkArray.getEntries();
   int nTrkZ10 = 0;
   int nTrkZ25 = 0;
+  int nTrkZ40 = 0;
   for (int itrk = 0; itrk < nTrk3D; itrk++) {
     double z0 = cdc3DTrkArray[itrk]->getZ0();
     if (abs(z0) < 10.) {nTrkZ10++;}
     if (abs(z0) < 25.) {nTrkZ25++;}
+    if (abs(z0) < 40.) {nTrkZ40++;}
   }
 
   trgInfo->setN3Dfittertrk(nTrk3D);
@@ -624,6 +626,16 @@ void TRGGRLProjectsModule::event()
   bool cdcecl_2 = (trackphimatch.getEntries() == 3);
   bool cdcecl_3 = (trackphimatch.getEntries() > 3);
 
+  int n_c2gev = 0;
+  for (int i = 0; i < trackphimatch.getEntries(); i++) {
+    if (trackphimatch[i]->get_e() >= 2.0) {n_c2gev++;}
+  }
+
+  bool c2gev_0 = (n_c2gev == 1);
+  bool c2gev_1 = (n_c2gev == 2);
+  bool c2gev_2 = (n_c2gev == 3);
+  bool c2gev_3 = (n_c2gev > 3);
+
   int N_KLMb2b = 0;
   for (int i = 0; i < klmtracklist.getEntries(); i++) {
     for (int j = 0; j < klmtracklist.getEntries(); j++) {
@@ -667,10 +679,10 @@ void TRGGRLProjectsModule::event()
     std::string bitname(m_InputBitsDB->getinbitname(i));
 
     bool bit = false;
-    if (bitname == "t3_0") {bit = nTrk3D == 0;}
-    else if (bitname == "t3_1") {bit = nTrk3D == 1;}
-    else if (bitname == "t3_2") {bit = nTrk3D == 2;}
-    else if (bitname == "t3_3") {bit = nTrk3D >= 3;}
+    if (bitname == "t3_0") {bit = nTrkZ40 == 0;}
+    else if (bitname == "t3_1") {bit = nTrkZ40 == 1;}
+    else if (bitname == "t3_2") {bit = nTrkZ40 == 2;}
+    else if (bitname == "t3_3") {bit = nTrkZ40 >= 3;}
     else if (bitname == "t2_0") {bit = nTrk2D == 0;}
     else if (bitname == "t2_1") {bit = nTrk2D == 1;}
     else if (bitname == "t2_2") {bit = nTrk2D == 2;}
@@ -759,6 +771,10 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "cdcecl_1") {bit = cdcecl_1;}
     else if (bitname == "cdcecl_2") {bit = cdcecl_2;}
     else if (bitname == "cdcecl_3") {bit = cdcecl_3;}
+    else if (bitname == "c2gev_0") {bit = c2gev_0;}
+    else if (bitname == "c2gev_1") {bit = c2gev_1;}
+    else if (bitname == "c2gev_2") {bit = c2gev_2;}
+    else if (bitname == "c2gev_3") {bit = c2gev_3;}
     else if (bitname == "cdcklm_0") {bit = cdcklm_0;}
     else if (bitname == "cdcklm_1") {bit = cdcklm_1;}
     else if (bitname == "cdcklm_2") {bit = cdcklm_2;}

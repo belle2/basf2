@@ -77,9 +77,9 @@ namespace Belle2 {
     TGraphErrors* h_crate_time_offsets = nullptr;
 
     /** TCanvas for ECL logic summary. */
-    TCanvas* c_logic_summary;
+    TCanvas* c_logic_summary = nullptr;
     /** Histogram for ECL logic summary. */
-    TH2F* h_logic_summary;
+    TH2F* h_logic_summary = nullptr;
 
     /** Find TCanvas by name. */
     TCanvas* findCanv(TString);

@@ -14,16 +14,19 @@
 namespace Belle2 {
 
   void TOPCalTimeWalk::set(const std::vector<double>& timeWalkParams,
-                           double a, double b)
+                           double noise, double quadratic)
   {
     m_timeWalkParams = timeWalkParams;
-    m_a = a;
-    m_b = b;
+    m_noise = noise;
+    m_quadratic = quadratic;
     m_status = c_Calibrated;
   }
 
   double TOPCalTimeWalk::getTimeWalk(int pulseHeight) const
   {
+    /* time walk parameters are coefficients in a polynomial
+     * that is evaluated at x = pulseHeight here */
+
     double f = 0;
     double x = 1;
     for (auto p : m_timeWalkParams) {
@@ -37,7 +40,7 @@ namespace Belle2 {
   {
     if (pulseHeight <= 0) return 0;
     double x = pulseHeight;
-    return pow(m_a / x, 2) + pow(m_b * x * x, 2);
+    return pow(m_noise / x, 2) + pow(m_quadratic * x * x, 2);
   }
 
   double TOPCalTimeWalk::getSigma(int pulseHeight) const

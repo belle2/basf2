@@ -40,52 +40,52 @@ namespace Belle2 {
 
     /**
      * Sets all the parameters and switches status to calibrated
-     * @param timeWalkParams parameters of time-walk calibration curve (polynomial) [ns]
-     * @param a electronic time resolution: noise term excess parameter [ns]
-     * @param b electronic time resolution: quadratic term parameter [ns]
+     * @param timeWalkParams polynomial coefficients of time-walk calibration curve [ns]
+     * @param noise noise term excess coefficient of electronic time resolution [ns]
+     * @param quadratic quadratic term coefficient of electronic time resolution [ns]
      */
-    void set(const std::vector<double>& timeWalkParams, double a, double b);
+    void set(const std::vector<double>& timeWalkParams, double noise, double quadratic);
 
     /**
-     * Switches calibration status to unusable to flag badly calibrated constant
+     * Switches calibration status to unusable to flag badly calibrated constants
      */
     void setUnusable() {m_status = c_Unusable;}
 
     /**
-     * Returns time walk parameters of the calibration curve
-     * @return parameters of a polynomial [ns]
+     * Returns polynomial coefficients of time walk calibration curve
+     * @return coefficents of polynomial [ns]
      */
     const std::vector<double>& getTimeWalkParams() const {return m_timeWalkParams;}
 
     /**
-     * Returns noise term excess parameter of electronic time resolution
-     * @terurn noise term excess parameter [ns]
+     * Returns noise term excess coefficient of electronic time resolution
+     * @return noise term excess coefficient [ns]
      */
-    double getA() const {return m_a;}
+    double getNoiseCoefficient() const {return m_noise;}
 
     /**
-     * Returns quadratic term parameter of electronic time resolution
-     * @terurn quadratic term parameter [ns]
+     * Returns quadratic term coefficient of electronic time resolution
+     * @return quadratic term coefficient [ns]
      */
-    double getB() const {return m_b;}
+    double getQuadraticCoefficient() const {return m_quadratic;}
 
     /**
      * Returns time-walk at given pulse height
-     * @param pulseHeight pulse height
+     * @param pulseHeight pulse height [ADC counts]
      * @return time-walk [ns]
      */
     double getTimeWalk(int pulseHeight) const;
 
     /**
      * Returns an excess of electronic time resolution at given pulse height
-     * @param pulseHeight pulse height
+     * @param pulseHeight pulse height [ADC counts]
      * @return excess sigma squared [ns^2]
      */
     double getSigmaSq(int pulseHeight) const;
 
     /**
      * Returns an excess of electronic time resolution at given pulse height
-     * @param pulseHeight pulse height
+     * @param pulseHeight pulse height [ADC counts]
      * @return excess sigma [ns]
      */
     double getSigma(int pulseHeight) const;
@@ -111,8 +111,8 @@ namespace Belle2 {
   private:
 
     std::vector<double> m_timeWalkParams; /**< parameters of calibration curve [ns] */
-    double m_a = 0; /**< noise term excess parameter [ns] */
-    double m_b = 0; /**< quadratic term parameter [ns] */
+    double m_noise = 0; /**< noise term excess coefficient [ns] */
+    double m_quadratic = 0; /**< quadratic term coefficient [ns] */
     EStatus m_status = c_Default; /**< calibration status */
 
     ClassDef(TOPCalTimeWalk, 1); /**< ClassDef */

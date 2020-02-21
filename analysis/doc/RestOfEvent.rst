@@ -55,7 +55,7 @@ by using command ``basf2 variables.py`` under the **Rest of Event** section.
   Names or behavior of the ROE variables may vary from release to release. 
   Please recheck list of variables ``basf2 variables.py`` when switching between the releases.
 
-After reconstructing the ROE, one can use ROE-dependent modules, like :doc:`FlavorTagger`, `ContinuumSuppression`, `FullEventInterpretation` and other algorithms.
+After reconstructing the ROE, one can use ROE-dependent modules, like :doc:`FlavorTagger`, `ContinuumSuppression`, :doc:`FullEventInterpretation` and other algorithms.
 
 ROE particle type hypothesis
 ----------------------------

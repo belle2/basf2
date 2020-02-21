@@ -27,11 +27,10 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription("Collector module used to create the histograms needed for the SVD CoG-Time calibration");
+  setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
-  addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
 }
 
@@ -63,7 +62,6 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
-  m_svdRD.isRequired(m_svdRecoDigits);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -110,16 +108,35 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
     return;
   }
+
+  //get SVDEventInfo
+  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  if (!temp_eventinfo.isOptional("SVDEventInfo"))
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
-    SVDCluster* cluster = m_svdCls[cl];
-    RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
+
     float clTime = m_svdCls[cl]->getClsTime();
+
+    //remove firstFrame and triggerBin correction applied in the clusterizer
+    constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
+    clTime = clTime - (- eventinfo->getSVD2FTSWTimeShift() + stepSize * m_svdCls[cl]->getFirstFrame());
+
+    //get cluster side
     int side = m_svdCls[cl]->isUCluster();
+
+    //get VxdID
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
+
+    //fill histograms only if EventT0 is there
     if (m_eventT0->hasEventT0()) {
+
       float eventT0 = m_eventT0->getEventT0();
-      float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
-      float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift();
+
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);

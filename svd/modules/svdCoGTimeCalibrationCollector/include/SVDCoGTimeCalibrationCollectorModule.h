@@ -37,7 +37,7 @@
 #include <framework/logging/Logger.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
 
 namespace Belle2 {
@@ -76,10 +76,6 @@ namespace Belle2 {
     /**SVDCluster */
     std::string m_svdClusters; /**< Name of the SVDClusters store array used as parameter of the module*/
     StoreArray<SVDCluster> m_svdCls; /**< SVDClusters store array*/
-
-    /**SVDRecoDigits */
-    std::string m_svdRecoDigits; /**< Name of the SVDRecoDigits store array used as parameter of the module*/
-    StoreArray<SVDRecoDigit> m_svdRD; /**< SVDRecoDigits store array*/
 
     /**EventT0 */
     std::string m_eventTime; /**< Name of the EventT0 store object pointer used as parameter of the module*/

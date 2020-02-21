@@ -110,6 +110,7 @@ Modules
  * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
  * Both flavor taggers support ROE masks. Added new maskName argument.
  * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
+ * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
 
 Utilities
 +++++++++

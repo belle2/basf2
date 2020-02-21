@@ -10,14 +10,14 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 
 
-def stdXi(fitter='treefitter', b2bii=False, path=None):
+def stdXi(fitter='TreeFit', b2bii=False, path=None):
     """
     Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-        fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``treefitter``)
+        fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
@@ -30,7 +30,7 @@ def stdXi(fitter='treefitter', b2bii=False, path=None):
             'Lambda0:merged',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
+            [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
             [ daughter(0,protonID) > 0.01 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
@@ -43,29 +43,29 @@ def stdXi(fitter='treefitter', b2bii=False, path=None):
             'Lambda0:mdst',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 ]^[0.5] ) > 0.35 ] and \
+            [ dr > 0.35 ] and \
             [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
             [ daughter(0,atcPIDBelle(4,2)) > 0.2 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
 
     # stdXi-
-    if fitter == 'kfitter':
+    if fitter == 'KFit':
         massVertexKFit('Lambda0:reco', 0.0, '', path=path)
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
         vertexKFit('Xi-:reco', conf_level=0.0, path=path)
-    elif fitter == 'treefitter':
+    elif fitter == 'TreeFit':
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
         treeFit('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
-        B2ERROR(f"stdXi: invalid fitter ({fitter}). Choose from kfitter or treefitter")
+        B2ERROR(f"stdXi: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
     cutAndCopyList(
         'Xi-:std',
         'Xi-:reco',
         '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-        [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0. and \
-        formula([dx^2 + dy^2 + dz^2 ]^[0.5])<formula([daughter(0,dx)^2 + daughter(0,dy)^2 + daughter(0,dz)^2]^[0.5])] and \
+        [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
+        formula([dr^2 + dz^2 ]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2]^[0.5])] and \
         [ chiProb > 0.0 ]',
         True,
         path=path)
@@ -92,7 +92,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
             'Lambda0:merged',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
+            [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
             [ daughter(0,protonID) > 0.01 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
@@ -119,7 +119,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
             'Lambda0:mdst',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 ]^[0.5] ) > 0.35 ] and \
+            [ dr > 0.35 ] and \
             [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
             [ daughter(0,atcPIDBelle(4,2)) > 0.2 ] and \
             [ chiProb > 0.0 ]',
@@ -140,21 +140,21 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         'Xi0:prelim',
         '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
          [ daughter(0,cosAngleBetweenMomentumAndVertexVectorInXYPlane) < cosAngleBetweenMomentumAndVertexVectorInXYPlane ] and \
-         [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.0 and \
-         formula([dx^2 + dy^2 + dz^2]^[0.5])<formula([daughter(0,dx)^2 + daughter(0,dy)^2 + daughter(0,dz)^2]^[0.5])] and \
+         [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.0 and \
+         formula([dr^2 + dz^2]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2]^[0.5])] and \
          [ chiProb > 0.0 ]',
         True,
         path=path)
 
 
-def stdOmega(fitter='treefitter', b2bii=False, path=None):
+def stdOmega(fitter='TreeFit', b2bii=False, path=None):
     """
     Reconstruct the standard :math:`\Omega^-` ``ParticleList`` named ``Omega-:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-        fitter (str): specify either ``kfitter`` or ``treefit`` for the vertex reconstructions (default ``treefitter``)
+        fitter (str): specify either ``KFit`` or ``TreeFit`` for the vertex reconstructions (default ``TreeFit``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
@@ -167,7 +167,7 @@ def stdOmega(fitter='treefitter', b2bii=False, path=None):
             'Lambda0:merged',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
+            [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.35 ] and \
             [ daughter(0,protonID) > 0.01 ] and \
             [ chiProb > 0.0 ]',
             True, path=path)
@@ -180,7 +180,7 @@ def stdOmega(fitter='treefitter', b2bii=False, path=None):
             'Lambda0:mdst',
             '[ abs( dM ) < 0.0035 ] and \
             [ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 ]^[0.5] ) > 0.35 ] and \
+            [ dr > 0.35 ] and \
             [ daughter(0,atcPIDBelle(4,3)) > 0.2 ] and \
             [ daughter(0,atcPIDBelle(4,2)) > 0.2 ] and \
             [ chiProb > 0.0 ]',
@@ -188,23 +188,23 @@ def stdOmega(fitter='treefitter', b2bii=False, path=None):
 
     stdK('all', path=path)
     # stdOmega-
-    if fitter == 'kfitter':
+    if fitter == 'KFit':
         massVertexKFit('Lambda0:reco', 0.0, '', path=path)
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
         vertexKFit('Omega-:reco', conf_level=0.0, path=path)
-    elif fitter == 'treefitter':
+    elif fitter == 'TreeFit':
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
         treeFit('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)
     else:
-        B2ERROR(f"stdOmega: invalid fitter ({fitter}). Choose from kfitter or treefitter")
+        B2ERROR(f"stdOmega: invalid fitter ({fitter}). Choose from KFit or TreeFit")
 
     if not b2bii:
         cutAndCopyList(
             'Omega-:std',
             'Omega-:reco',
             '[ cosAngleBetweenMomentumAndVertexVector > 0.0] and \
-            [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0. and \
-            formula([dx^2 + dy^2 + dz^2]^[0.5])<formula([daughter(0,dx)^2 + daughter(0,dy)^2 + daughter(0,dz)^2]^[0.5])] and \
+            [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
+            formula([dr^2 + dz^2]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2]^[0.5])] and \
             [ chiProb > 0.0 ] and \
             [ daughter(1,kaonID) > 0.01 ]',
             True,
@@ -215,8 +215,8 @@ def stdOmega(fitter='treefitter', b2bii=False, path=None):
             'Omega-:std',
             'Omega-:reco',
             '[ cosAngleBetweenMomentumAndVertexVector > 0.0 ] and \
-            [ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0. and \
-            formula([dx^2 + dy^2 + dz^2]^[0.5])<formula([daughter(0,dx)^2 + daughter(0,dy)^2 + daughter(0,dz)^2 ]^[0.5])] and \
+            [ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0. and \
+            formula([dr^2 + dz^2]^[0.5])<formula([daughter(0,dr)^2 + daughter(0,dz)^2 ]^[0.5])] and \
             [ chiProb > 0.0 ] and \
             [ daughter(1,atcPIDBelle(3,4)) > 0.2 and daughter(1,atcPIDBelle(3,2)) > 0.2 ]',
             True,
@@ -240,7 +240,7 @@ def goodXi(xitype='loose', path=None):
             'Xi-:veryloose',
             'Xi-:std',
             '[ daughter(1,pt) > 0.05 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.1 ]',
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.1 ]',
             True,
             path=path)
 
@@ -249,7 +249,7 @@ def goodXi(xitype='loose', path=None):
             'Xi-:loose',
             'Xi-:std',
             '[ daughter(1,pt) > 0.05 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.1 and \
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.1 and \
             formula([daughter(0,cosAngleBetweenMomentumAndVertexVectorInXYPlane)/cosAngleBetweenMomentumAndVertexVectorInXYPlane])\
 <1.006 ]',
             True,
@@ -260,7 +260,7 @@ def goodXi(xitype='loose', path=None):
             'Xi-:tight',
             'Xi-:std',
             '[ daughter(1,pt) > 0.1 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.15 and \
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.15 and \
             formula([daughter(0,cosAngleBetweenMomentumAndVertexVectorInXYPlane)/cosAngleBetweenMomentumAndVertexVectorInXYPlane])\
 <1.001 ]',
             True,
@@ -284,7 +284,7 @@ def goodXi0(xitype='loose', path=None):
         cutAndCopyList(
             'Xi0:veryloose',
             'Xi0:std',
-            '[ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.25 and \
+            '[ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.25 and \
             daughter(1,p) > 0.1 and \
             abs( daughter(1,dM) ) < 0.0174 ]',
             True,
@@ -295,7 +295,7 @@ def goodXi0(xitype='loose', path=None):
         cutAndCopyList(
             'Xi0:loose',
             'Xi0:std',
-            '[ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.5 and \
+            '[ formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.5 and \
             daughter(1,p) > 0.15 and \
             abs( daughter(1,dM) ) < 0.0174 ]',
             True,
@@ -306,7 +306,7 @@ def goodXi0(xitype='loose', path=None):
         cutAndCopyList(
             'Xi0:tight',
             'Xi0:std',
-            '[ formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 1.4 and \
+            '[ formula( [ dr^2 + dz^2 ]^[0.5] ) > 1.4 and \
             daughter(1,p) > 0.25 and \
             abs( daughter(1,dM) ) < 0.0116 ]',
             True,
@@ -332,7 +332,7 @@ def goodOmega(omegatype='loose', path=None):
             'Omega-:veryloose',
             'Omega-:std',
             '[ daughter(1,pt) > 0.15 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.05 ]',
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.05 ]',
             True,
             path=path)
 
@@ -341,7 +341,7 @@ def goodOmega(omegatype='loose', path=None):
             'Omega-:loose',
             'Omega-:std',
             '[ daughter(1,pt) > 0.15 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.15 and \
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.15 and \
             formula([daughter(0,cosAngleBetweenMomentumAndVertexVectorInXYPlane)/cosAngleBetweenMomentumAndVertexVectorInXYPlane])\
 <1.0015 ]',
             True,
@@ -352,7 +352,7 @@ def goodOmega(omegatype='loose', path=None):
             'Omega-:tight',
             'Omega-:std',
             '[ daughter(1,pt) > 0.3 and \
-            formula( [ dx^2 + dy^2 + dz^2 ]^[0.5] ) > 0.15 and \
+            formula( [ dr^2 + dz^2 ]^[0.5] ) > 0.15 and \
             formula([daughter(0,cosAngleBetweenMomentumAndVertexVectorInXYPlane)/cosAngleBetweenMomentumAndVertexVectorInXYPlane])\
 <1.0005 ]',
             True,

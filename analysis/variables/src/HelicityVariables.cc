@@ -363,7 +363,7 @@ namespace Belle2 {
 
                       For example, in the decay: :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected index is 0,
                       the variable will return the helicity angle of the :math:`\mu^+`.
-                      If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}).
+                      If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`).
                       In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
 
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");

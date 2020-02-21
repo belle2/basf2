@@ -600,7 +600,7 @@ namespace Belle2 {
     }
 
     /**
-     * Retruns a vector of store array indices of daughter particles
+     * Returns a vector of store array indices of daughter particles
      * @return vector of store array indices of daughter particle
      */
     const std::vector<int>& getDaughterIndices() const
@@ -609,7 +609,7 @@ namespace Belle2 {
     }
 
     /**
-     * Retruns a vector of properties of daughter particles
+     * Returns a vector of properties of daughter particles
      * @return vector of daughter properties
      */
     const std::vector<int>& getDaughterProperties() const

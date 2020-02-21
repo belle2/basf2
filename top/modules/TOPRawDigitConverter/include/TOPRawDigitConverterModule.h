@@ -115,7 +115,7 @@ namespace Belle2 {
     DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
     DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
-    DBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
 
     // r.m.s of pedestals (noise) of individual channels

@@ -171,9 +171,10 @@ namespace Belle2 {
       }
     }
     if (not m_timeWalk.isValid()) {
-      B2FATAL("Time-walk calibration is not available for run "
-              << evtMetaData->getRun()
-              << " of experiment " << evtMetaData->getExperiment());
+      // B2FATAL("Time-walk calibration is not available for run "
+      B2WARNING("Time-walk calibration is not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
     }
     if (m_pedestalRMS > 0 and not m_noises.isValid()) {
       B2FATAL("Channel noise levels are not available for run "
@@ -381,9 +382,10 @@ namespace Belle2 {
         }
 
         auto pulseHeight = rawDigit.getValuePeak();
-        double timeErrorSq = timeError * timeError + m_timeWalk->getSigmaSq(pulseHeight);
+        double timeErrorSq = timeError * timeError;
+        if (m_timeWalk.isValid()) timeErrorSq += m_timeWalk->getSigmaSq(pulseHeight);
 
-        if (m_useTimeWalkCalibration) {
+        if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
           if (m_timeWalk->isCalibrated()) {
             time -= m_timeWalk->getTimeWalk(pulseHeight);
           }

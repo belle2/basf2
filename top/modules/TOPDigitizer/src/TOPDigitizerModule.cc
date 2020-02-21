@@ -130,11 +130,6 @@ namespace Belle2 {
     // default pulse height generator
     m_pulseHeightGenerator = PulseHeightGenerator(m_ADCx0, m_ADCp1, m_ADCp2, m_ADCmax);
 
-    if (m_useDatabase) {
-      // pass time walk DB object to time digitizers
-      TimeDigitizer::setTimeWalk(m_timeWalk);
-    }
-
   }
 
 
@@ -198,10 +193,14 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
-      if (not m_timeWalk.isValid()) {
-        B2FATAL("Time-walk parameters requested but not available for run "
-                << evtMetaData->getRun()
-                << " of experiment " << evtMetaData->getExperiment());
+      if (m_timeWalk.isValid()) {
+        TimeDigitizer::setTimeWalk(&m_timeWalk);
+      } else {
+        TimeDigitizer::setTimeWalk(0);
+        // B2FATAL("Time-walk parameters requested but not available for run "
+        B2WARNING("Time-walk parameters not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
       }
     } else if (m_useSampleTimeCalibration) {
       if (not m_timebases.isValid()) {

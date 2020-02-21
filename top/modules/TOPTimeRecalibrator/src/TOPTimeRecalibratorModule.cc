@@ -124,9 +124,10 @@ namespace Belle2 {
     }
     if (m_useTimeWalkCalibration) {
       if (not m_timeWalk.isValid()) {
-        B2FATAL("Time-walk calibration requested but not available for run "
-                << evtMetaData->getRun()
-                << " of experiment " << evtMetaData->getExperiment());
+        // B2FATAL("Time-walk calibration requested but not available for run "
+        B2WARNING("Time-walk calibration is not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
       }
     }
 
@@ -182,7 +183,7 @@ namespace Belle2 {
       double time = sampleTimes->getTime(window, rawTimeLeading) - timeOffset;
 
       // apply other calibrations
-      if (m_useTimeWalkCalibration) {
+      if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
         if (m_timeWalk->isCalibrated()) {
           time -= m_timeWalk->getTimeWalk(digit.getPulseHeight());
         }

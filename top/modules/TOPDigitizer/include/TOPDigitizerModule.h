@@ -141,7 +141,7 @@ namespace Belle2 {
     DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< pulse height param. */
     DBObjPtr<TOPCalChannelThreshold> m_thresholds; /**< channel thresholds */
     DBObjPtr<TOPCalChannelNoise> m_noises; /**< channel noise levels (r.m.s) */
-    DBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
     DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // default for no DB or calibration not available

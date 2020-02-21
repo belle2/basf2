@@ -98,7 +98,7 @@ namespace Belle2 {
       /**
        * Stores pointer to time walk DB object defined in TOPDigitizerModule
        */
-      static void setTimeWalk(DBObjPtr<TOPCalTimeWalk>& timeWalk) {s_timeWalk = &timeWalk;}
+      static void setTimeWalk(DBObjPtr<TOPCalTimeWalk>* timeWalk) {s_timeWalk = timeWalk;}
 
       /**
        * Sets sample times

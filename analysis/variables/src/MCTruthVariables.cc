@@ -827,18 +827,18 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
                       "It behaves according to DecayStringGrammar.");
-    REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Misidentification of charged FSP is allowed. \n"
-                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
-    REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Misidentification of charged FSP is allowed.");
-    REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
-    REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
+    // REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
+    //                   "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+    //                   "Misidentification of charged FSP is allowed. \n"
+    //                   "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
+    // REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
+    //                   "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+    //                   "Misidentification of charged FSP is allowed.");
+    // REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
+    //                   "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
+    // REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
+    //                   "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+    //                   "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
 
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
@@ -857,18 +857,18 @@ namespace Belle2 {
                       "Generated momentum of a particles MC mother particle");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
                       "Check the array index of a particle's related MCParticle");
-    REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
-                      isSignalAcceptMissingNeutrino,
-                      "same as isSignal, but also accept missing neutrino");
-    REGISTER_VARIABLE("isSignalAcceptMissingMassive",
-                      isSignalAcceptMissingMassive,
-                      "same as isSignal, but also accept missing massive particle");
-    REGISTER_VARIABLE("isSignalAcceptMissingGamma",
-                      isSignalAcceptMissingGamma,
-                      "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
-    REGISTER_VARIABLE("isSignalAcceptMissing",
-                      isSignalAcceptMissing,
-                      "same as isSignal, but also accept missing particle");
+    // REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
+    //                   isSignalAcceptMissingNeutrino,
+    //                   "same as isSignal, but also accept missing neutrino");
+    // REGISTER_VARIABLE("isSignalAcceptMissingMassive",
+    //                   isSignalAcceptMissingMassive,
+    //                   "same as isSignal, but also accept missing massive particle");
+    // REGISTER_VARIABLE("isSignalAcceptMissingGamma",
+    //                   isSignalAcceptMissingGamma,
+    //                   "same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
+    // REGISTER_VARIABLE("isSignalAcceptMissing",
+    //                   isSignalAcceptMissing,
+    //                   "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
                       "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,

@@ -914,6 +914,13 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
+    /**
+     * Generate the PDG code with correct sign, using the charge
+     * @param charge of the particle
+     * @param chargedStable Type of charged particle
+     */
+    int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
+
     ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit

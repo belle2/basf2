@@ -13,9 +13,50 @@ settings = CalibrationSettings(name="CDC Tracking",
                                depends_on=[])
 
 
+import basf2
+from random import choice, seed
+
+
+def select_files(all_input_files, min_events, max_processed_events_per_file):
+    basf2.B2INFO("Attempting to choose a good subset of files")
+    # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
+    total_events = 0
+    chosen_files = []
+    while total_events < min_events:
+        # If the set is empty we must have used all available files. Here we break and continue. But you may want to
+        # raise an Error...
+        if not all_input_files:
+            break
+        # Randomly select a file
+        new_file_choice = choice(all_input_files)
+        # Remove it from the list so it can't be chosen again
+        all_input_files.remove(new_file_choice)
+        # Find the number of events in the file
+        total_events_in_file = events_in_basf2_file(new_file_choice)
+        if not total_events_in_file:
+            # Uh Oh! Zero event file, skip it
+            continue
+        events_contributed = 0
+        if total_events_in_file < max_processed_events_per_file:
+            # The file contains less than the max amount we have set (entrySequences)
+            events_contributed = total_events_in_file
+        else:
+            events_contributed = max_processed_events_per_file
+        chosen_files.append(new_file_choice)
+        total_events += events_contributed
+
+    basf2.B2INFO(f"Total chosen files = {len(chosen_files)}")
+    basf2.B2INFO(f"Total events in chosen files = {total_events}")
+    if total_events < min_events:
+        raise ValueError(
+            f"There weren't enough files events selected when max_processed_events_per_file={max_processed_events_per_file}")
+    return chosen_files
+
+
 ################################################
 # Required function called by b2caf-prompt-run #
 ################################################
+
 
 def get_calibrations(input_data, **kwargs):
     import basf2
@@ -37,26 +78,35 @@ def get_calibrations(input_data, **kwargs):
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
     min_events_per_file = 100
 
+    max_events_per_calibration = int(1e6)
+    max_events_per_file = 2000
+
     # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
+    chosen_files_mumu = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
+    chosen_files_hadron = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
     max_files_per_run_bcr = 10
     reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics,
                                                                max_files_per_run_bcr, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
+    chosen_files_Bcosmics = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
     input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron,
                        "Bcosmics": input_files_Bcosmics}
+
+    chosen_file_dict = {"hlt_mumu": chosen_files_mumu, "hlt_hadron": chosen_files_hadron,
+                        "Bcosmics": chosen_files_Bcosmics}
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
@@ -68,21 +118,21 @@ def get_calibrations(input_data, **kwargs):
     # t0
     cal0 = CDCCalibration(name='tz0',
                           algorithms=[tz_algo()],
-                          input_file_dict=input_file_dict,
+                          input_file_dict=chosen_file_dict,
                           max_iterations=4,
                           )
 
     # tw
     cal1 = CDCCalibration(name='tw0',
                           algorithms=[tw_algo()],
-                          input_file_dict=input_file_dict,
+                          input_file_dict=chosen_file_dict,
                           max_iterations=1,
                           dependencies=[cal0]
                           )
 
     cal2 = CDCCalibration(name='tz1',
                           algorithms=[tz_algo()],
-                          input_file_dict=input_file_dict,
+                          input_file_dict=chosen_file_dict,
                           max_iterations=4,
                           dependencies=[cal1]
                           )
@@ -105,7 +155,7 @@ def get_calibrations(input_data, **kwargs):
     # t0
     cal5 = CDCCalibration(name='tz2',
                           algorithms=[tz_algo()],
-                          input_file_dict=input_file_dict,
+                          input_file_dict=chosen_file_dict,
                           max_iterations=4,
                           dependencies=[cal4]
                           )
@@ -304,7 +354,7 @@ class CDCCalibration(Calibration):
                  input_file_dict,
                  max_iterations=5,
                  dependencies=None,
-                 max_events=10000):
+                 max_events=5000):
         for algo in algorithms:
             algo.setHistFileName(name)
 

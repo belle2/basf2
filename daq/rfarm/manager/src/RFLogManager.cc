@@ -106,7 +106,8 @@ void RFLogManager::timestamp(char* buf)
   //  struct tm      result;
   gettimeofday(&tb, NULL);
   tp = localtime(&tb.tv_sec);
-  sprintf(buf, "%02d:%02d:%02d.%03d ",
+  sprintf(buf, "[%04d-%02d-%02d %02d:%02d:%02d.%03d] ",
+          tp->tm_year, tp->tm_mon, tp->tm_day,
           tp->tm_hour, tp->tm_min, tp->tm_sec, (int)(tb.tv_usec / 1000));
   return;
 }

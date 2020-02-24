@@ -254,8 +254,6 @@ def pre_collector_cr(max_events=None):
                                )
     return reco_path
 
-+
-
 
 def collector(bField=True, is_cosmic=False):
     """

@@ -43,6 +43,9 @@ Some extra variables are provided externally, for example :b2:var:`isCloneTrack`
         :variables: isSignal,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
+
+.. _The_error_flags:
+
 ~~~~~~~~~~~~~~~
 The error flags
 ~~~~~~~~~~~~~~~

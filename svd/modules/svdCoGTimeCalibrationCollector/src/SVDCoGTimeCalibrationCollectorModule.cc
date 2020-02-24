@@ -135,7 +135,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
     if (m_eventT0->hasEventT0()) {
 
       float eventT0 = m_eventT0->getEventT0();
-      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift();
+      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift() + m_svdCls[cl]->getFirstFrame();
 
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);

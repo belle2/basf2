@@ -10,6 +10,7 @@
 
 #include <trg/cdc/modules/unpacker/CDCTriggerUnpackerModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 
 #include <array>
 #include <bitset>
@@ -547,6 +548,11 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "Scaling factors to be applied onto the NN Output."
            "Leave it empty to load values from the Conditions DB",
            defaultOutputScale);
+  addParam("useDB", m_useDB,
+           "Use values stored in the payload of the ConditionsDB."
+           "Currently this affects the output scaling of the Neurotrigger as well as the"
+           "bit configuration of its unpacker.",
+           false);
 
 
 }
@@ -642,8 +648,8 @@ void CDCTriggerUnpackerModule::initialize()
       m_subTrigger.push_back(dynamic_cast<SubTrigger*>(m_neuro));
     }
   }
-  if (m_NNOutputScale.size() < 2) {
-    B2DEBUG(2, "Load unscaling weights from network in database: " << m_cdctriggerneuroconfig->getNNName());
+  if (m_NNOutputScale.size() < 2 or m_useDB == true) {
+    B2DEBUG(2, "Load unscaling weights for Neurotrigger from network in database: " << m_cdctriggerneuroconfig->getNNName());
     m_mlp_scale = m_cdctriggerneuroconfig->getMLPs()[0];
   } else {
     std::vector<unsigned short> nodes = {27, 27, 2};
@@ -768,8 +774,14 @@ void CDCTriggerUnpackerModule::event()
   }
   B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
-    decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
-               m_delayNNSelect, m_mlp_scale);
+    if (m_useDB == true) {
+      std::cout << "start decoding .. " << std::endl;
+      decodeNNIO2(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
+                  m_delayNNSelect, m_cdctriggerneuroconfig);
+    } else {
+      decodeNNIO(&m_bitsToNN, &m_bitsFromNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs, m_delayNNOutput,
+                 m_delayNNSelect, m_mlp_scale);
+    }
   }
   B2DEBUG(99, " all is unpacked ##### ");
 }

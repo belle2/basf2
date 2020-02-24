@@ -345,6 +345,8 @@ namespace Belle2 {
     std::vector<float> m_NNOutputScale;
     /** fake object to assign the user set scaling values to */
     CDCTriggerMLP m_mlp_scale;
+    /** bool value for wether to use the conditions database */
+    bool m_useDB;
   };
 
 }

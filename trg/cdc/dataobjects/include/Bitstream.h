@@ -12,7 +12,8 @@
 #define NUM_TSF 5
 #define T2D_TO_3D_WIDTH 747
 #define NN_IN_WIDTH 982
-#define NN_OUT_WIDTH 570
+//#define NN_OUT_WIDTH 570
+#define NN_OUT_WIDTH 709
 
 
 namespace Belle2 {

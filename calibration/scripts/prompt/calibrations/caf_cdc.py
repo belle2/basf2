@@ -3,6 +3,8 @@
 """CDC tracking calibration. Performs the T0 determination using HLT skimmed raw data."""
 
 from prompt import CalibrationSettings
+from prompt.utils import events_in_basf2_file
+
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
@@ -78,8 +80,8 @@ def get_calibrations(input_data, **kwargs):
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
     min_events_per_file = 100
 
-    max_events_per_calibration = int(1e6)
-    max_events_per_file = 2000
+    max_events_per_calibration = 100000
+    max_events_per_file = 3000
 
     # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
@@ -92,14 +94,14 @@ def get_calibrations(input_data, **kwargs):
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    chosen_files_hadron = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
+    chosen_files_hadron = select_files(input_files_hadron, max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
     max_files_per_run_bcr = 10
     reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics,
                                                                max_files_per_run_bcr, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
-    chosen_files_Bcosmics = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
+    chosen_files_Bcosmics = select_files(input_files_Bcosmics, max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
     input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron,

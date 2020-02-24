@@ -19,8 +19,6 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
-#include <svd/dataobjects/SVDEventInfo.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::SVD;
@@ -251,7 +249,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   //first check SVDEventInfo name
   StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
   std::string m_svdEventInfoName = "SVDEventInfo";
-  if (!temp_eventinfo.isOptional("SVDEventInfo"))
+  if (!temp_eventinfo.isValid())
     m_svdEventInfoName = "SVDEventInfoSim";
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");

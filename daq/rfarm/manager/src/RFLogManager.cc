@@ -148,7 +148,7 @@ void RFLogManager::Info(const char* fmt, ...)
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[info]", msg);
+  WriteLog("[INFO]", msg);
   if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
     int pars[2];
     pars[0] = 2;
@@ -164,7 +164,7 @@ void RFLogManager::Warning(const char* fmt, ...)
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[warning]", msg);
+  WriteLog("[WARNING]", msg);
   if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
     int pars[2];
     pars[0] = 4;
@@ -180,7 +180,7 @@ void RFLogManager::Error(const char* fmt, ...)
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[error]", msg);
+  WriteLog("[ERROR]", msg);
   if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
     int pars[2];
     pars[0] = 5;
@@ -196,7 +196,7 @@ void RFLogManager::Fatal(const char* fmt, ...)
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[fatal]", msg);
+  WriteLog("[FATAL]", msg);
   if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
     int pars[2];
     pars[0] = 6;
@@ -212,7 +212,7 @@ void RFLogManager::Abort(const char* fmt, ...)
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[abort]", msg);
+  WriteLog("[ABORT]", msg);
   b2nsm_sendany(m_lognode, "LOG", 0, NULL, strlen(msg), msg, NULL);
   abort();
 }

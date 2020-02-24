@@ -7,6 +7,7 @@ import os
 import re
 import requests
 import http
+from ctypes import cdll
 
 
 def setupBelleDatabaseServer():
@@ -79,19 +80,23 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
         useBelleDBServer (str): None to use the recommended BelleDB server.
-        generatorLevelReconstruction (bool): Enables to bypass corrections applied in B2BIIFixMdst.
+        generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
         generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
         path (basf2.Path): Path to add modules in.
         entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
             the entries which are processed for each inputFileName.
-        convertECLCrystalEnergies (bool): Enables to convert Datecl_mc_ehits into ECLHits
-        convertExtHits (bool): Enables to convert Mdst_ecl_trk into ExtHits.
         matchType2E9oE25Threshold (float): Clusters with a E9/E25 value above this threshold are classified as neutral
             even if tracks are matched to their connected region (matchType == 2 in basf).
         enableNisKsFinder (bool): Enables to convert nisKsFinder information.
         HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
     """
+
+    # If we are on KEKCC make sure we load the correct NeuroBayes library
+    try:
+        cdll.LoadLibrary('/sw/belle/local/neurobayes-4.3.1/lib/libNeuroBayesCore_shared.so')
+    except:
+        pass
 
     if useBelleDBServer is None:
         setupBelleDatabaseServer()
@@ -127,8 +132,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
         if (HadronA is not True and HadronB is True):
-            B2WARNING('HadronB(J) skim includes HadronA requirements. '
-                      'Are you sure you want to turn off HadronA when HadronB(J) is still applied?')
+            B2WARNING('Hadron A is turned off, but HadronB(J) skim includes HadronA requirements...')
         path.add_module(fix)
 
         if(applySkim):
@@ -136,8 +140,11 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             # discard 'bad events' marked by fixmdst
             fix.if_value('<=0', emptypath)
         else:
-            B2INFO('applySkim is set to be False. '
-                   'No bad events marked by fixmdst will be discard.')
+            B2INFO('applySkim is set to be False.'
+                   'No bad events marked by fixmdst will be discard.'
+                   'Corrections will still be applied.')
+    else:
+        B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
     # Convert MDST Module
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):

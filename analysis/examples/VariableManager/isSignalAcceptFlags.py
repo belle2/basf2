@@ -30,11 +30,13 @@ ma.matchMCTruth('K_S0:merged', path=mypath)
 ma.matchMCTruth(list_name='D0:Example', path=mypath)
 ma.matchMCTruth(list_name='D*+:Example', path=mypath)
 
-vu.add_isSignalTags()
+vm.addAlias("isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle)")
+vm.addAlias("isSignalAcceptMissGammaAndDecayInFlight", "isSignalAcceptFlags(c_MissGamma, c_DecayInFlight)")
 basic_vars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_variables \
              + ["isExtendedSignal", "isSignalAcceptWrongFSPs", "isSignalAcceptBremsPhotons",
                 "isSignalAcceptMissingNeutrino", "isSignalAcceptMissingMassive",
-                "isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"]
+                "isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"] \
+             + ["isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptMissGammaAndDecayInFlight"]
 
 
 Dst_string_variables = vu.create_aliases_for_selected(list_of_variables=basic_vars + ['Q'],
@@ -66,7 +68,7 @@ Dst_string_variables = vu.create_aliases_for_selected(list_of_variables=basic_va
 # vm.addAlias("isSignalTest", "passesCut((mcErrors & ~%d) == 0)"%(512))
 
 # ma.variablesToNtuple('D*+:Example', Dst_string_variables + ["isSignalTest"], filename="isSignalTags.root",
-ma.variablesToNtuple('D*+:Example', Dst_string_variables, filename="isSignalTags.root",
+ma.variablesToNtuple('D*+:Example', Dst_string_variables, filename="isSignalAcceptFlags.root",
                      treename='Dst', path=mypath)
 
 b2.process(mypath)

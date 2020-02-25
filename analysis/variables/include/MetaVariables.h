@@ -52,6 +52,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
+     * same as isSignal, but accept certain mcError bits
+     */
+    Manager::FunctionPtr isSignalAcceptFlags(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns 1 if the same mdst source object was used to create a particle in
      * the list (0 if not and -1 for non-mdst source based particles
      */

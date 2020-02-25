@@ -132,7 +132,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
         if (HadronA is not True and HadronB is True):
-            B2WARNING('Hadron A is turned off, but HadronB(J) skim includes HadronA requirements...')
+            B2WARNING('The Hadron A skim is turned off.'
+                      'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
         path.add_module(fix)
 
         if(applySkim):
@@ -141,7 +142,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             fix.if_value('<=0', emptypath)
         else:
             B2INFO('applySkim is set to be False.'
-                   'No bad events marked by fixmdst will be discard.'
+                   'No bad events marked by fixmdst will be discarded.'
                    'Corrections will still be applied.')
     else:
         B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')

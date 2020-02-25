@@ -34,22 +34,22 @@ cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
 
 # default granurality
-granulesD = ((cut_L3+cut_b+cut_U, 'L3_barrel_U'),
-             (cut_L3+cut_b+cut_V, 'L3_barrel_V'),
-             (cut_L456+cut_b+cut_U, 'L456_barrel_U'),
-             (cut_L456+cut_b+cut_V, 'L456_barrel_V'),
-             (cut_L456+cut_s+cut_U, 'L456_slanted_U'),
-             (cut_L456+cut_s+cut_V, 'L456_slanted_V'))
+granulesD = ((cut_L3+cut_b, 'L3_barrel'),
+             (cut_L3+cut_b, 'L3_barrel'),
+             (cut_L456+cut_b, 'L456_barrel'),
+             (cut_L456+cut_b, 'L456_barrel'),
+             (cut_L456+cut_s, 'L456_slanted'),
+             (cut_L456+cut_s, 'L456_slanted'))
 
 
 # granurality taking into account layers and type of sensor;
-granulesLayersT = ((cut_L3+cut_b, 'L3_barrel'),
-                   (cut_L4+cut_b, 'L4_barrel'),
-                   (cut_L4+cut_s, 'L4_slanted'),
-                   (cut_L5+cut_b, 'L5_barrel'),
-                   (cut_L5+cut_s, 'L5_slanted'),
-                   (cut_L6+cut_b, 'L6_barrel'),
-                   (cut_L6+cut_s, 'L6_slanted'))
+granulesLayersTypes = ((cut_L3+cut_b, 'L3_barrel'),
+                       (cut_L4+cut_b, 'L4_barrel'),
+                       (cut_L4+cut_s, 'L4_slanted'),
+                       (cut_L5+cut_b, 'L5_barrel'),
+                       (cut_L5+cut_s, 'L5_slanted'),
+                       (cut_L6+cut_b, 'L6_barrel'),
+                       (cut_L6+cut_s, 'L6_slanted'))
 
 
 def ploter(name, title, nbins, xmin, xmax, x_label, y_label,

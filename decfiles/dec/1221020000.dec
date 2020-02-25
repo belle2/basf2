@@ -31,8 +31,8 @@ CDecay B-sig
 # J/psi(1S) -> e+ e-
 #
 Decay Jpsi_sig
-0.5000 e+ e-      VLL    PHOTOS;
-0.5000 mu+ mu-    VLL    PHOTOS;
+0.5000 e+ e-    PHOTOS  VLL;
+0.5000 mu+ mu-  PHOTOS  VLL;
 Enddecay
 
 End

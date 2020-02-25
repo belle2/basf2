@@ -35,10 +35,7 @@ cut_V = R.TCut('strip_dir==1')  # V_N
 
 # default granurality
 granulesD = ((cut_L3+cut_b, 'L3_barrel'),
-             (cut_L3+cut_b, 'L3_barrel'),
              (cut_L456+cut_b, 'L456_barrel'),
-             (cut_L456+cut_b, 'L456_barrel'),
-             (cut_L456+cut_s, 'L456_slanted'),
              (cut_L456+cut_s, 'L456_slanted'))
 
 

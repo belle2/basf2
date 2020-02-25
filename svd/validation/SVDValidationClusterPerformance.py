@@ -107,7 +107,7 @@ ploter(
 
 ploter(
     name='VPositionResolution_size3plus',
-    title='Cluster position resolution for 3 or more strips on U side',
+    title='Cluster position resolution for 3 or more strips on V side',
     nbins=100,
     xmin=-0.01,
     xmax=0.01,
@@ -222,8 +222,8 @@ ploter(
 
 
 ploter(
-    name='timeResolution',
-    title='Cluster time resolution',
+    name='timeResolution_U',
+    title='Cluster time resolution on U side',
     nbins=200,
     xmin=-100,
     xmax=100,
@@ -232,7 +232,24 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_clsTime - truehit_time',
-    cut='',
+    cut='(strip_dir==0)',
+    descr='(reconstructed time of the Cluster) - (time of the Truehit) for all Clusters related to TrueHits',
+    check='peak around 0',
+    isShifter=True)
+
+
+ploter(
+    name='timeResolution_V',
+    title='Cluster time resolution on V side',
+    nbins=200,
+    xmin=-100,
+    xmax=100,
+    x_label='Cluster time resolution (ns)',
+    y_label='counts',
+    granules=granulesD,
+    tree=tree,
+    expr='cluster_clsTime - truehit_time',
+    cut='(strip_dir==1)',
     descr='(reconstructed time of the Cluster) - (time of the Truehit) for all Clusters related to TrueHits',
     check='peak around 0',
     isShifter=True)

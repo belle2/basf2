@@ -19,10 +19,8 @@ from plotUtils import *
 # open the files with simulated and reconstructed events data
 input = R.TFile.Open("../SVDValidationTTree.root")
 
-# loads ttrees
 tree = input.Get("tree")
 
-# ClusterPerformance
 histsCP = R.TFile.Open("ClusterPerformance.root", "recreate")
 
 ploter(

@@ -26,9 +26,9 @@ histsTP = R.TFile.Open("TrackingPerformance.root", "recreate")
 ploter(
     name='U_V_time_difference',
     title='U-V time difference',
-    nbins=50,
-    xmin=-5,
-    xmax=5,
+    nbins=100,
+    xmin=-10,
+    xmax=10,
     x_label='Cluster time difference (ns)',
     y_label='counts',
     granules=granulesLayersTypes,

@@ -2812,10 +2812,10 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
     REGISTER_VARIABLE("isSignalAcceptFlags(flag1, flag2, ...)", isSignalAcceptFlags,
-											"Same as isSignal but accept certain mcError bits.\n"
-											"For example, you could use isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle) to \n"
-											"represent isSignalAcceptMissingNeutrinoAndWrongFSP and \n"
-											"isSignalAcceptFlags(c_MissGamma, c_DecayInFlight) to represent isSignalAcceptMissGammaAndDecayInFlight.\n"
+                      "Same as isSignal but accept certain mcError bits.\n"
+                      "For example, you could use isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle) to \n"
+                      "represent isSignalAcceptMissingNeutrinoAndWrongFSP and \n"
+                      "isSignalAcceptFlags(c_MissGamma, c_DecayInFlight) for isSignalAcceptMissGammaAndDecayInFlight.\n"
                       "More error flag definition could be found in analysis/utility/include/MCMatching.h .");
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"

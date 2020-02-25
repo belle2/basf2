@@ -28,6 +28,7 @@ from SVDValidationTTree import *
 from SVDValidationTTreeStrip import *
 from SVDValidationTTreeSimhit import *
 from SVDValidationTTreeSpacePoint import *
+from SVDValidationTTreeRecoTrack import *
 
 set_random_seed(12345)
 
@@ -64,6 +65,9 @@ svdvalidationspacepoint = SVDValidationTTreeSpacePoint()
 main.add_module(svdvalidationspacepoint)
 svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
+svdvalidationtrack = SVDValidationTTreeRecoTrack()
+main.add_module(svdvalidationtrack)
+
 
 process(main)
 

@@ -48,6 +48,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
   });
   // global transformation before placing the whole backward part in the top logical volume
   G4Transform3D gTrans = (fp == bp.end()) ? G4Translate3D(0, 0, -1020) : get_transform(*fp);
+  if (fp != bp.end()) bp.erase(fp); // now not needed
 
   // cppcheck-suppress knownConditionTrueFalse
   if (b_inner_support_ring) {
@@ -274,8 +275,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
   }
 
   // cppcheck-suppress knownConditionTrueFalse
-  //if (b_preamplifier) { // FIXME get Alexei to help here
-  if (false) {
+  if (b_preamplifier) {
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
@@ -347,16 +347,18 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
 
 
     for (int i = 0; i < 8; i++)
-      new G4PVPlacement(G4RotateX3D(M_PI)*G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1496 - 185 + 359. / 2,
-                        -1.0 * gTrans.dz() + 434 + 5 + (257. - 5.) / 2), l_all, "lall_physical", top, false, i, overlap);
+      new G4PVPlacement(gTrans * G4RotateX3D(M_PI)*G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0,
+                        1496 - 185 + 359. / 2,
+                        434 + 5 + (257. - 5.) / 2), l_all, "lall_physical", top, false, i, overlap);
 
 
     G4VSolid* s1a = new G4Box("leg_p1a", 130. / 2, 178. / 2, 5. / 2);
     G4LogicalVolume* l1a = new G4LogicalVolume(s1a, Materials::get("SUS304"), "l1a", 0, 0, 0);
     l1a->SetVisAttributes(batt);
     for (int i = 0; i < 8; i++)
-      new G4PVPlacement(G4RotateX3D(M_PI)*G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1496 - 185 + 178. / 2,
-                        -1.0 * gTrans.dz() + 434 + 5 - 5. / 2), l1a, "l1a_physical", top, false, i, overlap);
+      new G4PVPlacement(gTrans * G4RotateX3D(M_PI)*G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0,
+                        1496 - 185 + 178. / 2,
+                        434 + 5 - 5. / 2), l1a, "l1a_physical", top, false, i, overlap);
 
   }
 

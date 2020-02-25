@@ -22,3 +22,19 @@ input = R.TFile.Open("../SVDValidationTTreeTrack.root")
 tree = input.Get("tree")
 
 histsTP = R.TFile.Open("TrackingPerformance.root", "recreate")
+
+ploter(
+    name='U_V_time_difference',
+    title='U-V time difference',
+    nbins=50,
+    xmin=-5,
+    xmax=5,
+    x_label='Cluster time difference (ns)',
+    y_label='counts',
+    granules=granulesLayersTypes,
+    tree=tree,
+    expr='cluster_uvTimeDiff',
+    cut='',
+    descr='time difference between opposite sides of clusters belonging to the same layer',
+    check='peak around 0',
+    isShifter=True)

@@ -41,14 +41,15 @@ granulesD = ((cut_L3+cut_b+cut_U, 'L3_barrel_U'),
              (cut_L456+cut_s+cut_U, 'L456_slanted_U'),
              (cut_L456+cut_s+cut_V, 'L456_slanted_V'))
 
-# granurality takieng into account layers and type of sensor; for cut_V we have saved diffrence between U and V time
-granulesLayers = ((cut_L3+cut_b+cut_V, 'L3_barrel'),
-                  (cut_L4+cut_b+cut_V, 'L4_barrel'),
-                  (cut_L4+cut_s+cut_V, 'L4_slanted'),
-                  (cut_L5+cut_b+cut_V, 'L5_barrel'),
-                  (cut_L5+cut_s+cut_V, 'L5_slanted'),
-                  (cut_L6+cut_b+cut_V, 'L6_barrel'),
-                  (cut_L6+cut_s+cut_V, 'L6_slanted'))
+
+# granurality taking into account layers and type of sensor;
+granulesLayersT = ((cut_L3+cut_b, 'L3_barrel'),
+                   (cut_L4+cut_b, 'L4_barrel'),
+                   (cut_L4+cut_s, 'L4_slanted'),
+                   (cut_L5+cut_b, 'L5_barrel'),
+                   (cut_L5+cut_s, 'L5_slanted'),
+                   (cut_L6+cut_b, 'L6_barrel'),
+                   (cut_L6+cut_s, 'L6_slanted'))
 
 
 def ploter(name, title, nbins, xmin, xmax, x_label, y_label,

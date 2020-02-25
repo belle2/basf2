@@ -98,6 +98,9 @@ Particle::Particle(const TLorentzVector& momentum,
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
   }
 }
 
@@ -125,6 +128,9 @@ Particle::Particle(const TLorentzVector& momentum,
     m_particleType    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
   }
 }
@@ -155,6 +161,9 @@ Particle::Particle(const TLorentzVector& momentum,
     m_particleType    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
   }
 }
@@ -627,6 +636,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
+  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
 void Particle::removeDaughter(const Particle* daughter)
@@ -637,6 +647,7 @@ void Particle::removeDaughter(const Particle* daughter)
   for (unsigned i = 0; i < getNDaughters(); i++) {
     if (m_daughterIndices[i] == daughter->getArrayIndex()) {
       m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterProperties.erase(m_daughterProperties.begin() + i);
       i--;
     }
   }

@@ -3,7 +3,7 @@
 
 """
 <header>
-    <input>SVDValidationTTreeTrack.root</input>
+    <input>SVDValidationTTreeRecoTrack.root</input>
     <output>TrackingPerformance.root</output>
     <description>
     Validation plots related to tracking performance.
@@ -17,7 +17,7 @@
 from plotUtils import *
 
 # open the files with simulated and reconstructed events data
-input = R.TFile.Open("../SVDValidationTTreeTrack.root")
+input = R.TFile.Open("../SVDValidationTTreeRecoTrack.root")
 
 tree = input.Get("tree")
 

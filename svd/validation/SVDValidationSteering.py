@@ -12,11 +12,11 @@
 """
 <header>
   <input>EvtGenSimRec.root</input>
-  <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeStrip.root</output>
   <output>SVDValidationTTreeSpacePoint.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
+  <output>SVDValidationTTreeRecoTrack.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>

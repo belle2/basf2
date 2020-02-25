@@ -11,11 +11,14 @@ import variables.utils as vu
 mypath = b2.Path()
 
 # add input file and ParticleLoader modules to the path
-ma.inputMdst(
-    'default',
-    '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S' +
-    '/r00000/mixed/mdst/sub00/mdst_000141_prod00007392_task10020000141.root',
-    path=mypath)
+ma.inputMdstList('default', [basf2.find_file('analysis/tests/mdst.root')], path=mypath)
+
+# or you could use the following file, if you are in kekcc
+# ma.inputMdst(
+#     'default',
+#     '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S' +
+#     '/r00000/mixed/mdst/sub00/mdst_000141_prod00007392_task10020000141.root',
+#     path=mypath)
 
 ma.fillParticleList('pi+:all', '', path=mypath)
 ma.fillParticleList('K+:all', '', path=mypath)

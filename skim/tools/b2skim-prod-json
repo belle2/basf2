@@ -661,6 +661,8 @@ def make_request_dict(
     # We only want the MCEventType to include the beam background level if the sample is BGx0
     if args.mc:
         skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
+    if skimRequestDict["mcBackground"] == "BGx0" and not skimRequestDict["mcBackground"].endswith("BGx0"):
+        skimRequestDict["mcBackground"] += "BGx0"
 
     if args.local_skim_script:
         # Read in the name of the local skim module from the arguments

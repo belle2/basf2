@@ -44,11 +44,11 @@ Some extra variables are provided externally, for example :b2:var:`isCloneTrack`
         :noindex:
 
 
-.. _The_error_flags:
+.. _Error_flags:
 
-~~~~~~~~~~~~~~~
-The error flags
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+Error flags
+~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 

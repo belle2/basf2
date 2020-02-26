@@ -39,13 +39,13 @@ This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
 Grammar for custom MCMatching
 -----------------------------
 One can use a specific grammar for the decay string to configure how :b2:var:`isSignal` and :b2:var:`mcErrors` are behaving, which are variables of :ref:`MCMatching`. 
-The grammar is composed of :ref:`Markers`, :ref:`Keywords`, and :ref:`Arrows`. 
-By default, :b2:var:`'isSignal'` requires that all final state particle daughters are correctly reconstructed except for radiated photons and intermediate states. 
+The grammar is composed of ``Markers`` (:ref:`Marker_of_unspecified_particle` and :ref:`Markers_for_Final_State_Particles`), :ref:`Keywords`, and :ref:`Arrows`. 
+By default, :b2:var:`isSignal` requires that all final state particle daughters are correctly reconstructed except for radiated photons and intermediate states. 
 One can configure :b2:var:`isSignal` to accept missing particles or not to accept missing radiated photons or intermediate resonances.
 
 .. tip:: 
-        If a specific grammar is used, :ref:`The_error_flags` are removed from :b2:var:`mcErrors`. So one cannot know if a event ordinally has the flags which are accepted by the grammar.
-	To obtain the information, one can use usual decay string and specific variables, such as :b2:var:`isSignalMissingNeutrino`, to identify signal events.
+    If a specific grammar is used, :ref:`The_error_flags` are removed from :b2:var:`mcErrors`. So one cannot know if a event ordinally has the flags which are accepted by the grammar.
+    To obtain the information, one can use usual decay string and specific variables, such as :b2:var:`isSignalAcceptMissingNeutrino`, to identify signal events.
 
 
 .. _Marker_of_unspecified_particle:
@@ -55,13 +55,13 @@ Marker of unspecified particle
 
 Particle can be marked as unspecified particle with an at-sign, :code:`'@'`, in the decayString.
 If the particle is marked as unspecified it will not checked for its identity when doing :ref:`MCMatching`. Any particle which decays into the correct daughters will be flagged as correct. 
-For example the DecayString @Xsd -> K+ pi- would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
+For example the DecayString :code:`'@Xsd -> K+ pi-'` would match all particles which decay into a Kaon and a pion, for example K*, B0, D0, ...
 Still the daughters need to be stated correctly so this can be used for "sum of exclusive" decays.
 Here is an example of use:
 
 .. code-block:: python
- 
-        from modularAnalysis import reconstructDecay, copyLists
+
+	from modularAnalysis import reconstructDecay, copyLists
 	reconstructDecay('@Xsd:0 -> K_S0:all',                   '', path=mypath)
 	reconstructDecay('@Xsd:1 -> K+:loose pi-:loose',         '', path=mypath)
 	reconstructDecay('@Xsd:2 -> K+:loose pi-:loose pi0:all', '', path=mypath)
@@ -83,7 +83,7 @@ Here is an example of use:
 
 .. code-block:: python
  
-        from modularAnalysis import reconstructDecay
+	from modularAnalysis import reconstructDecay
 
 	# isSignal of D0:decayInFlight accepts DecayInFlight for pi+:loose
 	reconstructDecay('D0:decayInFlight -> K-:loose (decay)pi+:loose', '', path=mypath)

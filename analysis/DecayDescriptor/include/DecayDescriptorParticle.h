@@ -28,7 +28,7 @@ namespace Belle2 {
     std::string m_strName;
     /** Is particle selected? */
     bool m_isSelected;
-    /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
     int m_properties;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;

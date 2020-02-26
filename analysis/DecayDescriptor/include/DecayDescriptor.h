@@ -37,7 +37,7 @@ namespace Belle2 {
     int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
     int m_properties;
     /** Is this the NULL object? */
     bool m_isNULL;

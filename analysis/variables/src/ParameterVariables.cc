@@ -313,7 +313,7 @@ namespace Belle2 {
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum.Boost(motherBoost);
 
-      result = cos(daugMomentum.Angle(motherMomentum.Vect()));
+      result = daugMomentum.Angle(motherMomentum.Vect());
 
       return result;
     }
@@ -333,7 +333,7 @@ namespace Belle2 {
       const auto& frame = ReferenceFrame::GetCurrent();
       TVector3 a = frame.getMomentum(particle->getDaughter(daughter1)).Vect();
       TVector3 b = frame.getMomentum(particle->getDaughter(daughter2)).Vect();
-      return cos(a.Angle(b));
+      return a.Angle(b);
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -356,7 +356,7 @@ namespace Belle2 {
       const auto& frame = ReferenceFrame::GetCurrent();
       TVector3 daughterMomentumVector = frame.getMomentum(particle->getDaughter(daughter)).Vect();
 
-      return cos(daughterMomentumVector.Angle(vertexDiffVector));
+      return daughterMomentumVector.Angle(vertexDiffVector);
     }
 
     double azimuthalAngleInDecayPlane(const Particle* particle, const std::vector<double>& daughters)
@@ -493,10 +493,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
-                      "cosine of the angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
-    REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "cosine of the angle between i-th and j-th daughters");
+                      "Angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
+    REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "Angle between i-th and j-th daughters");
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
-                      cosine of the angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
+                      Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(
                       Azimuthal angle of i-th daughter in decay plane towards projection of particle momentum into decay plane.

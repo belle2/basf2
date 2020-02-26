@@ -4,7 +4,7 @@
 """
 <header>
     <input>SVDValidationTTreeRecoDigit.root</input>
-    <output>RecoDigitPerformance.root</output>
+    <output>SVDRecoDigitPerformance.root</output>
     <description>
     Validation plots related to RecoDigit performance.
     </description>
@@ -21,7 +21,7 @@ input = R.TFile.Open("../SVDValidationTTreeRecoDigit.root")
 
 tree = input.Get("tree")
 
-histsRDP = R.TFile.Open("RecoDigitPerformance.root", "recreate")
+histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
 ploter(
     name='timeResolution',
@@ -31,7 +31,7 @@ ploter(
     xmax=100,
     x_label='RecoDigit time resolution (ns)',
     y_label='counts',
-    granules=granulesLayersTypes,
+    granules=granulesD,
     tree=tree,
     expr='recodigit_time - truehit_time',
     cut='',

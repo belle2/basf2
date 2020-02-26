@@ -4,7 +4,7 @@
 """
 <header>
     <input>SVDValidationTTree.root</input>
-    <output>ClusterPerformance.root</output>
+    <output>SVDClusterPerformance.root</output>
     <description>
     Validation plots related to cluster performance.
     </description>
@@ -21,7 +21,7 @@ input = R.TFile.Open("../SVDValidationTTree.root")
 
 tree = input.Get("tree")
 
-histsCP = R.TFile.Open("ClusterPerformance.root", "recreate")
+histsCP = R.TFile.Open("SVDClusterPerformance.root", "recreate")
 
 ploter(
     name='UPositionResolution_size1',

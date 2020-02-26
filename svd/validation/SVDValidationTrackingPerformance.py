@@ -4,7 +4,7 @@
 """
 <header>
     <input>SVDValidationTTreeRecoTrack.root</input>
-    <output>TrackingPerformance.root</output>
+    <output>SVDTrackingPerformance.root</output>
     <description>
     Validation plots related to tracking performance.
     </description>
@@ -21,7 +21,7 @@ input = R.TFile.Open("../SVDValidationTTreeRecoTrack.root")
 
 tree = input.Get("tree")
 
-histsTP = R.TFile.Open("TrackingPerformance.root", "recreate")
+histsTP = R.TFile.Open("SVDTrackingPerformance.root", "recreate")
 
 ploter(
     name='U_V_time_difference',

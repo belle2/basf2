@@ -30,6 +30,7 @@ from SVDValidationTTreeStrip import *
 from SVDValidationTTreeSimhit import *
 from SVDValidationTTreeSpacePoint import *
 from SVDValidationTTreeRecoTrack import *
+from SVDValidationTTreeRecoDigit import *
 
 set_random_seed(12345)
 

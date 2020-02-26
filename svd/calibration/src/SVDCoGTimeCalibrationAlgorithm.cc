@@ -81,6 +81,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Fit("pol3", "RQ");
           double par[4];
           pol3->GetParameters(par);
+          // double meanT0 = hEventT0->GetMean();
+          // double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
@@ -107,7 +109,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 
 bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
-  auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  auto eventT0Hist = getObjectPtr<TH1F>("hRawCoGTimeL3V");
   float meanEventT0 = eventT0Hist->GetMean();
   if (!m_previousEventT0) {
     B2INFO("Setting start payload boundary to be the first run ("

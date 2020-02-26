@@ -59,6 +59,8 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   registerObject<TH1F>("hEventT0FromCDST", m_hEventT0FromCDST);
   m_hEventT0FromCDSTSync = new TH1F("hEventT0FromCDSTSync", "EventT0FromCDSTSync", 200, -100, 100);
   registerObject<TH1F>("hEventT0FromCDSTSync", m_hEventT0FromCDSTSync);
+  m_hRawCoGTimeL3V = new TH1F("hRawCoGTimeL3V", "RawCoGTimeL3V", 200, -100, 100);
+  registerObject<TH1F>("hRawCoGTimeL3V", m_hRawCoGTimeL3V);
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
@@ -130,6 +132,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
 
     //get VxdID
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
+    short unsigned int layer = theVxdID.getLayerNumber();
 
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasEventT0()) {
@@ -142,6 +145,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
+      if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawCoGTimeL3V")->Fill(clTime);}
     }
   };
 }

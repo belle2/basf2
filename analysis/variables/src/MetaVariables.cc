@@ -729,12 +729,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double min = -999;
+          double min = std::numeric_limits<double>::quiet_NaN();
           for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
-            if (iValue == -999) continue;
-            if (min == -999) min = iValue;
+            if (std::isnan(iValue)) continue;
+            if (std::isnan(min)) min = iValue;
             if (iValue < min) min = iValue;
           }
           return min;
@@ -750,11 +750,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double max = -999;
+          double max = std::numeric_limits<double>::quiet_NaN();
           for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
-            if (iValue == -999) continue;
+            if (std::isnan(iValue)) continue;
+            if (std::isnan(max)) max = iValue;
             if (iValue > max) max = iValue;
           }
           return max;
@@ -2530,7 +2531,7 @@ namespace Belle2 {
           const Particle* p = particle;
 
           int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
-          if ((ancestor_level <= 0) or (isnan(ancestor_level)))
+          if ((ancestor_level <= 0) or (std::isnan(ancestor_level)))
           {
             return std::numeric_limits<float>::quiet_NaN();
           }

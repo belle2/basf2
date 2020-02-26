@@ -29,7 +29,7 @@ def stdKlongs(listtype='all', path=None):
 
     # all KLM clusters
     if listtype == 'all':
-        fillParticleList('K_L0:all', 'isFromKLM > 0', True, path)
+        fillParticleList('K_L0:all', '[isFromKLM > 0] and [klmClusterKlId >= 0] and [klmClusterKlId <= 1]', True, path)
     else:
         B2WARNING("Only the 'all' list is currently recommended.")
         B2WARNING("Ignoring the requested type: %s and instead loading the 'all' list" % listtype)

@@ -19,8 +19,7 @@ def stdKlongs(listtype='all', path=None):
         This function is a placeholder for Klong selections. Currently
         everything but the 'all' list is disabled pending study.
 
-    Prepares the 'K_L0:all' list with not cuts (all KLM clusters with no track
-    are loaded).
+    Prepares the 'K_L0:all' list with not cuts (all KLM clusters are loaded).
 
     Parameters:
         listtype (str): name of standard list options (currently only

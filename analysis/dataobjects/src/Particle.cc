@@ -162,9 +162,6 @@ Particle::Particle(const TLorentzVector& momentum,
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
-    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
-      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
-    }
   }
 }
 

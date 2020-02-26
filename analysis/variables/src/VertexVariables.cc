@@ -486,16 +486,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
-                      "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexY", particleProductionY,
                       "Returns the y position of particle production vertex.");
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
                       "Returns the z position of particle production vertex.");
     // Production vertex covariance matrix
     REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
-                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0,1 or 2. Returns -999 if particle has no production covariance matrix.");
+                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.");
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
-                      "Returns the x position uncertainty of particle production vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,
                       "Returns the y position uncertainty of particle production vertex.");
     REGISTER_VARIABLE("prodVertexZErr", particleProductionZErr,

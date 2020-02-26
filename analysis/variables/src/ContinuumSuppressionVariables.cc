@@ -310,7 +310,7 @@ namespace Belle2 {
                       "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
+                      "Returns NaN if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,

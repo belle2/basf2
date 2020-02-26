@@ -2674,7 +2674,7 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
 and ``variable``, the name of the function or variable for that generator particle.
-If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
+If ``index`` goes beyond the length of the MCParticles array, NaN will be returned.
 
 E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is 
 the Upsilon(4S) in a generic decay.
@@ -2683,7 +2683,7 @@ the first MC Particle, which is the momentum of the second B meson in a generic 
 )DOC");
     REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
 [Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
-If no generator level :math:`\Upsilon(4S)` exists for the event, -999 will be returned.
+If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be returned.
 
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
 ``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
@@ -2775,13 +2775,14 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
-                      "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
-                      "If particle is a nullptr, -999 is returned. Please use eventExtraInfo(name) if you want EventExtraInfo variable.\n"
-                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
+                      "The extraInfo has to be set by a module first.\n"
+                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the MVAExpert module.\n"
+                      "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
+                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "If nothing is set under this name, -999 is returned.");
+                      "If nothing is set under this name, NaN is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");

@@ -5,6 +5,7 @@
 ! mar-2017: change in some commons
 ! dec-2017: change in some commons
 ! oct-2018: change in some commons
+! feb-2020: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -1046,6 +1047,108 @@
       IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
       IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
       GET_PIK_YD=PIK_YD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KXE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXE=PIK_KXE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYE=PIK_KYE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZE=PIK_KZE(K, ICH)
+
+      END
+
+      
+      REAL FUNCTION GET_PIK_KXD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXD=PIK_KXD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYD=PIK_KYD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZD=PIK_KZD(K, ICH)
 
       END
 

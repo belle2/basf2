@@ -42,7 +42,12 @@ namespace Belle2 {
       float xd = 0; /**< unfolded x coordinate of a pixel */
       float yd = 0; /**< unfolded y coordinate of a pixel */
       int type = 0; /**< 0 unknown, 1 direct photon, 2 reflected photon */
-      float alpha = 0; /**< photon impact angle on photo-cathode */
+      float kxe = 0; /**< reconstructed photon direction in x at emission */
+      float kye = 0; /**< reconstructed photon direction in y at emission */
+      float kze = 0; /**< reconstructed photon direction in z at emission */
+      float kxd = 0; /**< reconstructed photon direction in x at detection */
+      float kyd = 0; /**< reconstructed photon direction in y at detection */
+      float kzd = 0; /**< reconstructed photon direction in z at detection */
     };
 
     /**

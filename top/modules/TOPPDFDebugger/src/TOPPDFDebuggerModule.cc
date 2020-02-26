@@ -262,7 +262,12 @@ namespace Belle2 {
           peak.xd = reco.getPDFPeakXD(pixelID, k);
           peak.yd = reco.getPDFPeakYD(pixelID, k);
           peak.type = reco.getPDFPeakType(pixelID, k);
-          // peak.alpha =
+          peak.kxe = reco.getPDFPeakKxe(pixelID, k);
+          peak.kye = reco.getPDFPeakKye(pixelID, k);
+          peak.kze = reco.getPDFPeakKze(pixelID, k);
+          peak.kxd = reco.getPDFPeakKxd(pixelID, k);
+          peak.kyd = reco.getPDFPeakKyd(pixelID, k);
+          peak.kzd = reco.getPDFPeakKzd(pixelID, k);
           associatedPDF->appendPeak(peak, wt);
         }
       }

@@ -34,6 +34,8 @@ Standard Particle Lists
    However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `vertexRave` or to `KFit`.
  * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.
 
+ * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
+
 Variables
 +++++++++
 

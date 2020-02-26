@@ -110,7 +110,7 @@ Modules
  * Both flavor taggers support ROE masks. Added new maskName argument.
  * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``, ``c_DecayInFlight``, and ``c_MisID``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
    One can add ``(decay)`` and/or ``(misID)`` to the begining of the particle name to accept ``c_DecayInFlight`` and/or ``c_MisID``. 
-   The following is an example, :code:`'reconstructDecay('D0:decayInFlightMisID -> (misID)(decay)K-:loose (decay)(misID)pi+:loose', '', path=mypath)'`
+   The following is an example, :code:`'reconstructDecay('D0:sig -> (misID)K-:loose (decay)pi+:loose', '', path=mypath)'`
 		
 
 Utilities

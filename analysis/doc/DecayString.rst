@@ -100,7 +100,7 @@ Here is an example of use:
 
 Keywords
 ^^^^^^^^
-If one put the following keywords at the end of the decay string, :code:`'isSignal'` will accept missing massive particles/neutrinos/gammas(not radiated), respectively, or gammas added by bremsstrahlung tools.  
+If one put the following keywords at the end of the decay string, :b2:var:`isSignal` will accept missing massive particles/neutrinos/gammas(not radiated), respectively, or gammas added by bremsstrahlung tools.  
 
 * :code:`'...'` Missing massive final state particles are ignored
 * :code:`'?nu'` Missing neutrinos are ignored
@@ -128,7 +128,7 @@ Keywords must be placed at the end of the decay string. It is not allowed to put
 
 Arrows
 ^^^^^^
-In addition to the common arrow :code:`'->'`, one can use different types of arrows. If the following verbose arrow is used, :code:`isSignal` will consider missing radiated photons and/or missing intermediate resonances. 
+In addition to the common arrow :code:`'->'`, one can use different types of arrows. If the following verbose arrow is used, :b2:var:`isSignal` will consider missing radiated photons and/or missing intermediate resonances. 
 
 * :code:`'->'` intermediate resonances and radiated photons are ignored
 * :code:`'-->'`, :code:`'=>'` and :code:`'==>'` work same as :code:`'->'`. These three will be deprecated in release-05, please consider to use :code:`'->'`.

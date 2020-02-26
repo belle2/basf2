@@ -537,45 +537,9 @@ namespace Belle2 {
       return TMath::Sqrt(result);
     }
 
-    double particleInvariantMassErrorFromDaughters(const Particle* part)
-    {
-      double invMass = particleInvariantMassFromDaughters(part);
-      const Manager::Var* px = Manager::Instance().getVariable("daughterSumOf(px)");
-      const Manager::Var* py = Manager::Instance().getVariable("daughterSumOf(py)");
-      const Manager::Var* pz = Manager::Instance().getVariable("daughterSumOf(pz)");
-      const Manager::Var* E  = Manager::Instance().getVariable("daughterSumOf(E)");
-
-      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
-      for (unsigned i = 0; i < part->getNDaughters(); i++) {
-        covarianceMatrix += part->getDaughter(i)->getMomentumErrorMatrix();
-      }
-
-      TVectorF jacobian(Particle::c_DimMomentum);
-      jacobian[0] = -1.0 * px->function(part) / invMass;
-      jacobian[1] = -1.0 * py->function(part) / invMass;
-      jacobian[2] = -1.0 * pz->function(part) / invMass;
-      jacobian[3] = 1.0 * E->function(part) / invMass;
-
-      double result = jacobian * (covarianceMatrix * jacobian);
-
-      if (result < 0.0)
-        return std::numeric_limits<double>::quiet_NaN();
-
-      return TMath::Sqrt(result);
-    }
-
     double particleInvariantMassSignificance(const Particle* part)
     {
       return particleDMass(part) / particleInvariantMassError(part);
-    }
-
-    double particleInvariantMassSignificanceFromDaughters(const Particle* part)
-    {
-      float invMass = particleInvariantMassFromDaughters(part);
-      float nomMass = part->getPDGMass();
-      float massErr = particleInvariantMassErrorFromDaughters(part);
-
-      return (invMass - nomMass) / massErr;
     }
 
     double particleMassSquared(const Particle* part)
@@ -1044,9 +1008,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
 
-
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
-
 
     REGISTER_VARIABLE("M", particleMass,
                       "invariant mass (determined from particle's 4-momentum vector)");
@@ -1069,12 +1031,6 @@ namespace Belle2 {
                       "uncertainty of invariant mass");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
                       "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)");
-    REGISTER_VARIABLE("SigMBF", particleInvariantMassSignificanceFromDaughters, R"DOC(
-                       signed deviation of particle's invariant mass as determined from particle's daughter 4-momentum vectors from its nominal mass in units of the uncertainty on the invariant mass.
-                      
-                       As long as the daughter particle properties have not been updated after a vertex fit, this is the significance Before the Fit (BF).
-                      
-                       Alternatively, one can use `variablesToExtraInfo` prior to the vertex fit to access pre-fit values.)DOC");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
                       "component x of 3-momentum recoiling against given Particle");
@@ -1097,7 +1053,6 @@ namespace Belle2 {
                       "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
                       "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
-
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")

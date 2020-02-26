@@ -2516,7 +2516,6 @@ namespace Belle2 {
 
         if (part != nullptr) {
           pdg_code = std::abs(part->PdgCode());
-
         } else {
           try {
             pdg_code = Belle2::convertString<int>(arg);
@@ -2536,8 +2535,7 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN();
           }
 
-          const MCParticle* i_p;
-          i_p = p->getMCParticle();
+          const MCParticle* i_p = p->getMCParticle();
 
           for (int a = 0; a < ancestor_level ; a = a + 1)
           {

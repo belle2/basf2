@@ -3,24 +3,6 @@ Changes in the analysis package since release-04-00
 
 Variables
 +++++++++
- * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
-   transformation of track parameters relative to IP when used for tracks.
-   `dr` did not center at zero before and now it does.
-
- * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
-   particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
-   The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
- * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit: 
-   :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
-   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`, 
-   :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
-   :b2:var:`TagTrackTrueDistanceToTagV`
- * Added :b2:var:`genParticleIndexOfAncestor` variable that returns :b2:var:`genParticleIndex` of the first ancestor of the given type.
- * Added :b2:var:`firstMCAncestorOfType` variable that returns requested variable of the first gen-level ancestor of the given type.
-
- * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
-   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
-   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
 
  * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
@@ -45,6 +27,7 @@ Variables
  * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the output.
    The new variable returns the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables ``FBDT_qrCombined`` and ``FANN_qrCombined`` do.
    Now we can evaluate the output of both taggers in the same way.
+ * Bug fix to guard against range exceptions in :b2:var:`KSFWVariables` (see :issue:`BII-6138`).
 
 Modules
 +++++++

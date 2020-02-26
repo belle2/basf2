@@ -37,7 +37,7 @@ namespace Belle2 {
     int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
     int m_properties;
     /** Is this the NULL object? */
     bool m_isNULL;
@@ -50,7 +50,7 @@ namespace Belle2 {
     B+ -> [ D+ -> ^K+ pi0 ] pi0
     decay path of K+ is
     [(0, B), (0, D), (0 K)]
-    Every selected partcile has its own hierarchy path and
+    Every selected particle has its own hierarchy path and
     they are stored as a vector in this variable:
     For the decayString
     B+ -> [ D+ -> ^K+ pi0 ] ^pi0
@@ -72,7 +72,7 @@ namespace Belle2 {
     {
       return m_isNULL ? nullptr : this;
     }
-    /** Defaut ctor. */
+    /** Default ctor. */
     DecayDescriptor();
 
     /** Want the default copy ctor. */
@@ -97,12 +97,12 @@ namespace Belle2 {
     in the init(const std::string) function. */
     bool init(const DecayString& s);
 
-    /** Checy if the DecayDescriptor matches with the given Particle.
+    /** Check if the DecayDescriptor matches with the given Particle.
     0 = no match
     1 = matches DecayDescriptor
     2 = matches charge conjugated DecayDescriptor
     3 = matches DeacyDescriptor AND charge conjugated DecayDescriptor
-    -1, -2, -3 : same, but match is not unambigous. */
+    -1, -2, -3 : same, but match is not unambiguous. */
     int match(const Particle* p) {return match<Particle>(p, -1);}
 
     /** See match(const Particle* p). */

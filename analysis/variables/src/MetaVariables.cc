@@ -1511,7 +1511,7 @@ namespace Belle2 {
         auto func = [var](const Particle * particle) -> double { return std::cos(var->function(particle)); };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function sin");
+        B2FATAL("Wrong number of arguments for meta function cos");
       }
     }
 
@@ -2756,7 +2756,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "E.g. sin(?) returns the sine of the value of the variable.");
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
-                      "E.g. sin(?) returns the cosine of the value of the variable.");
+                      "E.g. cos(?) returns the cosine of the value of the variable.");
     REGISTER_VARIABLE("log10(variable)", log10,
                       "Returns log10 value of the given variable.\n"
                       "E.g. log10(?) returns the log10 of the value of the variable.");

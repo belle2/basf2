@@ -435,6 +435,10 @@ namespace Belle2 {
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns variable of particle's gen-level ancestor of given type
+     */
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments);
 
   }
 }

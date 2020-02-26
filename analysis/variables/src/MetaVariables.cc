@@ -2506,6 +2506,52 @@ namespace Belle2 {
     }
 
 
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int pdg_code = -1;
+        std::string arg = arguments[0];
+        std::string variable_of_interest = arguments[1];
+        TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+
+        if (part != nullptr) {
+          pdg_code = std::abs(part->PdgCode());
+        } else {
+          try {
+            pdg_code = Belle2::convertString<int>(arg);
+          } catch (std::exception& e) {}
+        }
+
+        if (pdg_code == -1) {
+          B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
+        }
+
+        auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
+          const Particle* p = particle;
+
+          int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
+          if ((ancestor_level <= 0) or (isnan(ancestor_level)))
+          {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+
+          const MCParticle* i_p = p->getMCParticle();
+
+          for (int a = 0; a < ancestor_level ; a = a + 1)
+          {
+            i_p = i_p->getMother();
+          }
+          const Particle* m_p = new Particle(i_p);
+          return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varForFirstMCAncestorOfType (expected 2: type and variable of interest)");
+      }
+    }
+
+
+
 
 
     VARIABLE_GROUP("MetaFunctions");
@@ -2872,7 +2918,8 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
 )DOC");
-
+    REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC")
 
   }
 }

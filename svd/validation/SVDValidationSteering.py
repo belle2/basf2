@@ -17,6 +17,7 @@
   <output>SVDValidationTTreeSpacePoint.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
   <output>SVDValidationTTreeRecoTrack.root</output>
+  <output>SVDValidationTTreeRecoDigit.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
@@ -67,6 +68,8 @@ svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
 svdvalidationtrack = SVDValidationTTreeRecoTrack()
 main.add_module(svdvalidationtrack)
+svdvalidationdigit = SVDValidationTTreeRecoDigit()
+main.add_module(svdvalidationdigit)
 
 
 process(main)

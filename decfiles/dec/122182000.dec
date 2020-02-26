@@ -1,10 +1,10 @@
-# EventType: 1221020000
+# EventType: 122182000
 # Descriptor: [B+ -> Jpsi [ -> l+ l-] K*+ ]cc
 # NickName: Bu_JpsiKstp_ll
 # Documentation:
 # Tested: Yes
 # Physics WG: EWP
-# Responsible: Soumen Haldet
+# Responsible: Soumen Halder
 # Email: soumen.halder@tifr.res.in
 # Cuts: None
 # Date: 20200209

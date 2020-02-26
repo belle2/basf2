@@ -373,9 +373,9 @@ void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
 }
 
 
-void Belle2PhysicsList::UseLongLivedNeutralParticles(G4int pdg, G4double mass)
+void Belle2PhysicsList::UseLongLivedNeutralParticles()
 {
-  G4LongLivedNeutralPhysics* pLongLivedNeutral = new G4LongLivedNeutralPhysics(pdg, mass);
+  G4LongLivedNeutralPhysics* pLongLivedNeutral = new G4LongLivedNeutralPhysics();
   RegisterPhysics(pLongLivedNeutral);
   pLongLivedNeutral->ConstructParticle();
 }

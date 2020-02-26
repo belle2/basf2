@@ -22,13 +22,18 @@ using namespace std;
 using namespace Belle2;
 using namespace CLHEP;
 
-G4LongLivedNeutral::G4LongLivedNeutral(const G4String& name,
-                                       G4double  mass,
-                                       G4int     encoding)
-  : G4ParticleDefinition(name, mass / Unit::MeV * CLHEP::MeV, 0.0 * MeV, 0,
+G4LongLivedNeutral::G4LongLivedNeutral(const G4String& name)
+//                                        G4double  mass,
+//                                        G4int     encoding)
+//   : G4ParticleDefinition(name, mass / Unit::MeV * CLHEP::MeV, 0.0 * MeV, 0,
+//                          0, 0, 0,
+//                          0, 0, 0,
+//                          "scalar", 0.0, 0, encoding,
+//                          false, 0, 0)
+  : G4ParticleDefinition(name, 0, 0.0 * MeV, 0,
                          0, 0, 0,
                          0, 0, 0,
-                         "scalar", 0.0, 0, encoding,
+                         "scalar", 0.0, 0, 0,
                          false, 0, 0)
 //Arguments for constructor are as follows
 // name       mass          width         charge
@@ -38,8 +43,7 @@ G4LongLivedNeutral::G4LongLivedNeutral(const G4String& name,
 // stable     lifetime      decay_table
 {
 
-  B2DEBUG(0, "neutral long-lived particle created: m(MeV)= " << this->GetPDGMass()
-          << " pdg= " << encoding);
+  B2DEBUG(0, "neutral long-lived particle created: m(MeV)= " << this->GetPDGMass());
 
 }
 

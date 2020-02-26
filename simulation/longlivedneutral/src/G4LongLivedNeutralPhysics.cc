@@ -12,6 +12,8 @@
 
 #include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 #include <simulation/longlivedneutral/G4LongLivedNeutral.h>
+#include <simulation/longlivedneutral/G4LongLivedNeutralDecay.h>
+#include <simulation/longlivedneutral/G4LongLivedNeutralTransportation.h>
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
@@ -24,6 +26,7 @@
 #include <G4hMultipleScattering.hh>
 #include <G4hhIonisation.hh>
 #include <G4hIonisation.hh>
+#include <G4Decay.hh>
 #include <G4PhysicsListHelper.hh>
 #include <G4BuilderType.hh>
 #include <CLHEP/Units/SystemOfUnits.h>
@@ -33,13 +36,11 @@ using namespace std;
 using namespace Belle2;
 using namespace CLHEP;
 
-G4LongLivedNeutralPhysics::G4LongLivedNeutralPhysics(int pdg, double mass)
-  : G4VPhysicsConstructor("LongLivedNeutralPhysics_PDG" + std::to_string(pdg)),
+G4LongLivedNeutralPhysics::G4LongLivedNeutralPhysics()
+  : G4VPhysicsConstructor("LongLivedNeutralPhysics"),
     fLLPN(0)
 {
-  fParticleName = "LongLivedNeutralParticle_PDG" + std::to_string(pdg);
-  fMass = mass;
-  fEncoding = pdg;
+
 }
 
 G4LongLivedNeutralPhysics::~G4LongLivedNeutralPhysics()
@@ -48,11 +49,22 @@ G4LongLivedNeutralPhysics::~G4LongLivedNeutralPhysics()
 
 void G4LongLivedNeutralPhysics::ConstructParticle()
 {
-  fLLPN = new G4LongLivedNeutral(fParticleName, fMass,  fEncoding);
+  fLLPN = new G4LongLivedNeutral("LongLivedNeutralParticle");
 }
 
 
 void G4LongLivedNeutralPhysics::ConstructProcess()
 {
   G4cout << "G4LongLivedNeutralPhysics::ConstructProcess" << G4endl;
+
+  G4ProcessManager* pmanager = fLLPN->GetProcessManager();
+
+  // remove all processes added per default (em scintillation and transport)
+  for (int i = 0; i <= pmanager->GetProcessListLength(); ++i) {
+    pmanager->RemoveProcess(i);
+  }
+  pmanager->RemoveProcess(0);
+
+  pmanager->AddProcess(new G4LongLivedNeutralTransportation(), -1, 0, 0);
+  pmanager->AddProcess(new G4LongLivedNeutralDecay(), 0, -1, 0);
 }

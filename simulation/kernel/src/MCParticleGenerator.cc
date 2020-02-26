@@ -87,12 +87,17 @@ void MCParticleGenerator::addParticle(MCParticle& mcParticle,
 
   //MS: distinguish optical photon from the rest of particles
   bool opticalPhoton = mcParticle.getPDG() == 0 && mcParticle.getEnergy() < 10.0 * Unit::eV;
+  //SD: add neutral long-lived particle
+  bool neutral_llp = mcParticle.getCharge() == 0.0 && mcParticle.getLifetime() > 0.0;
 
   G4ParticleDefinition* pdef = NULL;
   if (opticalPhoton) {
     pdef = G4OpticalPhoton::OpticalPhotonDefinition();
   } else {
     pdef = G4ParticleTable::GetParticleTable()->FindParticle(mcParticle.getPDG());
+    if (pdef == NULL && neutral_llp) {
+      pdef = G4ParticleTable::GetParticleTable()->FindParticle("LongLivedNeutralParticle");
+    }
   }
 
   if (pdef == NULL) {

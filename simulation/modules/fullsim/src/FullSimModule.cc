@@ -151,16 +151,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
-  addParam("LongLivedNeutral", m_LongLivedNeutral,
-           "If set to true, simulate long-lived neutral particles. Set mass and pdg values for each new particle.",
-           false);
-  addParam("LongLivedPdg", m_LongLivedPdg,
-           "PDG values of added long-lived neutral particles to be simulated.",
-           vector<int> {0});
-  addParam("LongLivedMass", m_LongLivedMass,
-           "Mass values of added long-lived neutral particles to be simulated in GeV.",
-           vector<double> {0});
-
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
   m_magneticField = NULL;
@@ -225,14 +215,7 @@ void FullSimModule::initialize()
     physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
     physicsList->SetECLProductionCutValue(m_eclProductionCut);
     physicsList->SetKLMProductionCutValue(m_klmProductionCut);
-
-    if (m_LongLivedNeutral) {
-      if (m_LongLivedPdg.size() != m_LongLivedMass.size()) B2FATAL("PDG values and masses for long-lived neutrals not equal in size.");
-      B2DEBUG(0, "registered long-lived neutral physics.");
-      for (unsigned int llp = 0; llp < m_LongLivedPdg.size(); llp++) {
-        physicsList->UseLongLivedNeutralParticles(m_LongLivedPdg.at(llp), m_LongLivedMass.at(llp));
-      }
-    }
+    physicsList->UseLongLivedNeutralParticles();
 
     //Apply the Geant4 UI commands in PreInit State - before initialization
     if (m_uiCommandsAtPreInit.size() > 0) {
@@ -256,13 +239,7 @@ void FullSimModule::initialize()
       physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
 
-    if (m_LongLivedNeutral) {
-      if (m_LongLivedPdg.size() != m_LongLivedMass.size()) B2FATAL("PDG values and masses for long-lived neutrals not equal in size.");
-      B2DEBUG(0, "registered long-lived neutral physics.");
-      for (unsigned int llp = 0; llp < m_LongLivedPdg.size(); llp++) {
-        physicsList->RegisterPhysics(new G4LongLivedNeutralPhysics(m_LongLivedPdg.at(llp), m_LongLivedMass.at(llp)));
-      }
-    }
+    physicsList->RegisterPhysics(new G4LongLivedNeutralPhysics());
 
     physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 

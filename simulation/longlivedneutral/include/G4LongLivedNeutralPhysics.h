@@ -30,7 +30,7 @@ namespace Belle2 {
      * @param pdg
      * @param mass
      */
-    explicit G4LongLivedNeutralPhysics(int pdg, double mass);
+    explicit G4LongLivedNeutralPhysics();
 
     /**
      * Destructor.
@@ -64,9 +64,9 @@ namespace Belle2 {
     G4LongLivedNeutralPhysics(const G4LongLivedNeutralPhysics& copy);
 
     G4LongLivedNeutral* fLLPN; /**< Pointer to the neutral long lived definition in GEANT4*/
-    G4double  fMass; /**< Mass value of the neutral long lived particle*/
-    G4int     fEncoding; /**< PDG value assigned to the neutral long lived particle*/
-    G4String fParticleName; /**< Internal name assigned to the neutral long lived particle*/
+//     G4double  fMass; /**< Mass value of the neutral long lived particle*/
+//     G4int     fEncoding; /**< PDG value assigned to the neutral long lived particle*/
+//     G4String fParticleName; /**< Internal name assigned to the neutral long lived particle*/
   };
 
 } //end Belle2 namespace

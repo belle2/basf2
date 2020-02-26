@@ -42,9 +42,7 @@ namespace Belle2 {
      * @param mass Mass of the neutral long-lived particle.
      * @param encoding PDG code of the neutral long-live particle.
      */
-    G4LongLivedNeutral(const G4String& name,
-                       G4double  mass,
-                       G4int     encoding);
+    G4LongLivedNeutral(const G4String& name);
 
 
   private:

@@ -132,7 +132,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
 
     //get VxdID
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
-    short unsigned int layer = theVxdID.getLayerNumber();
+    short unsigned int layer = m_svdCls[cl]->getSensorID().getLayerNumber();
 
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasEventT0()) {

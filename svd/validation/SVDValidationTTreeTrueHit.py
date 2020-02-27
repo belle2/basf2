@@ -70,7 +70,7 @@ class SVDValidationTTreeTrueHit(Module):
             print("len(clusters) = ", len(clusters))
             for cluster in clusters:
                 # Sensor identification
-                sensorID = simhit.getSensorID()
+                sensorID = cluster.getSensorID()
                 self.data.sensor_id = int(sensorID)
                 sensorNum = sensorID.getSensorNumber()
                 self.data.sensor = sensorNum

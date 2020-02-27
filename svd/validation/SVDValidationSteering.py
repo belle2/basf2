@@ -18,6 +18,7 @@
   <output>SVDValidationTTreeSimhit.root</output>
   <output>SVDValidationTTreeRecoTrack.root</output>
   <output>SVDValidationTTreeRecoDigit.root</output>
+  <output>SVDValidationTTreeTrueHit.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
@@ -31,6 +32,7 @@ from SVDValidationTTreeSimhit import *
 from SVDValidationTTreeSpacePoint import *
 from SVDValidationTTreeRecoTrack import *
 from SVDValidationTTreeRecoDigit import *
+from SVDValidationTTreeTrueHit import *
 
 set_random_seed(12345)
 
@@ -71,6 +73,8 @@ svdvalidationtrack = SVDValidationTTreeRecoTrack()
 main.add_module(svdvalidationtrack)
 svdvalidationdigit = SVDValidationTTreeRecoDigit()
 main.add_module(svdvalidationdigit)
+svdvalidationtruehit = SVDValidationTTreeTrueHit()
+main.add_module(svdvalidationtruehit)
 
 
 process(main)

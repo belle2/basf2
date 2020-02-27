@@ -66,7 +66,7 @@ class SVDValidationTTreeTrueHit(Module):
         print("\nlen(svd_truehits) = ", len(svd_truehits))
         for truehit in svd_truehits:
             self.data.truehit_cluster = -999
-            clusters = truehit.getRelationsWith('SVDClusters')
+            clusters = truehit.getRelationsFrom('SVDClusters')
             print("len(clusters) = ", len(clusters))
             for cluster in clusters:
                 # Sensor identification

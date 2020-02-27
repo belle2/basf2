@@ -31,6 +31,7 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
         'validation',
         False),
     applyHadronBJSkim=True,
+    enableNisKsFinder=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 

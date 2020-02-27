@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact> K. Adamczyk, adamczykarol@gmail.com </contact>
+  <contact> SVD Software Group, svd-software@belle2.org </contact>
   <description>
     This module is used for the SVD validation.
     It gets information about clusters related to SVDRecoTracks, saving
@@ -20,8 +20,6 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
-from ROOT import PyConfig
-from ROOT import TVector3
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataRecoTrack {\

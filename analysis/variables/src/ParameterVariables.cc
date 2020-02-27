@@ -301,6 +301,8 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
+      B2WARNING("decayAngle used to return the cosine of the decay angle, but now returns the angle as suggested by the variable name. Please check the impact of this change on your analysis.");
+
       double result = 0.0;
 
       TLorentzVector motherMomentum = particle->get4Vector();
@@ -323,6 +325,8 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
+      B2WARNING("daughterAngle(i,j) used to return the cosine of an angle, but now returns an angle as suggested by the variable name. Please check the impact of this change on your analysis.");
+
       int nDaughters = static_cast<int>(particle->getNDaughters());
 
       long daughter1 = std::lround(daughters[0]);
@@ -340,6 +344,8 @@ namespace Belle2 {
     {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
+
+      B2WARNING("pointingAngle(i) used to return the cosine of an angle, but now returns an angle as suggested by the variable name. Please check the impact of this change on your analysis.");
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))

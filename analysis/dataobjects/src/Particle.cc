@@ -1138,11 +1138,10 @@ bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& funct
 
 int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::ChargedStable& chargedStable)
 {
-  // PDG codes for leptons with negative charge are positive, while for hadrons are negative
   int absPDGCode = chargedStable.getPDGCode();
   int PDGCode = absPDGCode * chargeSign;
-  // sign flip for leptons
-  if (absPDGCode <= Const::muon.getPDGCode()) PDGCode = -PDGCode;
+  // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
+  if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
 }
 

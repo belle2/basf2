@@ -263,7 +263,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     //    B2INFO("Combined t0 (raw ns) = " << t0CombinedDecisionNow);
 
     // revo clock when t0 decision was supposed to be posted to GDL
-    int revoClockGDL = (rdat[index + 2] >> 18) & 0x3ff;
+    int revoClockGDL = (rdat[index + 2] >> 18) & 0x7ff;
     //    B2INFO("rvc when t0 was supposed to be posted to GDL/GRL = " << revoClockGDL);
 
     testPattern = (rdat[index + 2] >> 29) & 0x7;

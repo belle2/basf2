@@ -2454,39 +2454,44 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
     @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
                               If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the options inputListNames and default_cleanup
-                              will be ignored.
+    @param fillWithMostLikely if True, the module uses the most likely particle mass hypothesis for charged particles
+                              according to the PID likelihood and the option inputListNames will be ignored.
     @param chargedPIDPriors   The prior PID fractions, that are used to regulate
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param default_cleanup    if True, apply default clean up cuts to default
-                              ParticleLists pi+:evtkin and gamma:evtkin.
+    @param default_cleanup    if True and either inputListNames empty or fillWithMostLikely True, default clean up cuts are applied
     @param path               modules are added to this path
     """
+    trackCuts = 'pt > 0.1'
+    trackCuts += ' and -0.8660 < cosTheta < 0.9535'
+    trackCuts += ' and -3.0 < dz < 3.0'
+    trackCuts += ' and -0.5 < dr < 0.5'
+
+    gammaCuts = 'E > 0.05'
+    gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
         stdMostLikely(chargedPIDPriors, path=path)
         inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
+        if default_cleanup:
+            B2INFO("Using default cleanup in EventKinematics module.")
+            for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']:
+                applyCuts(f'{ptype}:mostlikely', trackCuts, path=path)
+            applyCuts('gamma:evtkin', gammaCuts, path=path)
+        else:
+            B2INFO("No cleanup in EventKinematics module.")
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
         fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
-
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
-            trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
             applyCuts('pi+:evtkin', trackCuts, path=path)
-
-            gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")

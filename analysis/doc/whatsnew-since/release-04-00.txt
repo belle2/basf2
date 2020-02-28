@@ -11,7 +11,7 @@ Variables
    particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
    The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
  
- * Added :b2:var:`mcParticleIsInList` which checks the underlying MC particles (either matched or generator level).
+ * Added :b2:var:`mcParticleIsInMCList` which checks the underlying MC particles (either matched or generator level).
 
  * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
    Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.

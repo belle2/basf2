@@ -2491,7 +2491,7 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
   }
 
-  TEST_F(MetaVariableTest, mcParticleIsInList)
+  TEST_F(MetaVariableTest, mcParticleIsInMCList)
   {
     // datastore things
     DataStore::Instance().reset();
@@ -2554,8 +2554,8 @@ namespace {
     // not in the list
 
     // get the variable
-    const Manager::Var* vnonsense = Manager::Instance().getVariable("mcParticleIsInList(NONEXISTANTLIST)");
-    const Manager::Var* vsensible = Manager::Instance().getVariable("mcParticleIsInList(testList)");
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("mcParticleIsInMCList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("mcParticleIsInMCList(testList)");
 
     // -
     EXPECT_B2FATAL(vnonsense->function(photon));

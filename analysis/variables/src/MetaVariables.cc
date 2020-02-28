@@ -479,11 +479,11 @@ namespace Belle2 {
       return func;
     }
 
-    Manager::FunctionPtr mcParticleIsInList(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr mcParticleIsInMCList(const std::vector<std::string>& arguments)
     {
       // unpack arguments, there should be only one: the name of the list we're checking
       if (arguments.size() != 1) {
-        B2FATAL("Wrong number of arguments for mcParticleIsInList");
+        B2FATAL("Wrong number of arguments for mcParticleIsInMCList");
       }
       auto listName = arguments[0];
 
@@ -492,7 +492,7 @@ namespace Belle2 {
         // check the list exists
         StoreObjPtr<ParticleList> list(listName);
         if (!(list.isValid()))
-          B2FATAL("Invalid Listname " << listName << " given to mcParticleIsInList");
+          B2FATAL("Invalid Listname " << listName << " given to mcParticleIsInMCList");
 
         // this can only be true for mc-matched particles or particles are created from MCParticles
         const MCParticle* mcp = particle->getMCParticle();
@@ -2682,7 +2682,7 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
 )DOC");
 
-    REGISTER_VARIABLE("mcParticleIsInList(particleListName)", mcParticleIsInList, R"DOC(
+    REGISTER_VARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
 Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
 (or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
 

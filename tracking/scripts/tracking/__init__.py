@@ -204,6 +204,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
 
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
+
     # output tracks
     cdc_reco_tracks = "CDCRecoTracks"
     svd_cdc_reco_tracks = "SVDCDCRecoTracks"
@@ -275,6 +279,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
                          merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
@@ -363,7 +371,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
         path.add_module(material_effects)
 
     # SET StoreArray names
-
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
@@ -371,8 +378,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-
-    # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
@@ -405,6 +410,10 @@ def add_vxd_standalone_cosmics_finder(
     :param max_rejected_sps: Maximal number of retries to refit a track after the worst spacepoint was removed;
                              defaults to 5;
     """
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)

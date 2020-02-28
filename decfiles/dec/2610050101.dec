@@ -53,7 +53,7 @@ Decay D*-
 Enddecay
 
 Decay anti-D0sig
-1.0000     KS0sig   pi+   pi-       PHOTOS    PHSP;
+1.0000     KS0sig   pi+   pi-       PHOTOS    D_DALITZ;
 Enddecay
 
 Decay KS0sig

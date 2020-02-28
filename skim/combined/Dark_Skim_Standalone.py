@@ -13,7 +13,6 @@ import stdCharged as charged
 import stdPhotons as photons
 import skimExpertFunctions as expert
 
-gb2_setuprel = 'release-04-00-00'
 
 darkskimpath = b2.Path()
 
@@ -32,7 +31,7 @@ expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 
-expert.setSkimLogging(path=darkskimpath)
+expert.setSkimLogging(darkskimpath, ['ParticleCombiner'])
 b2.process(darkskimpath)
 
 # print out the summary

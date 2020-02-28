@@ -86,6 +86,9 @@ namespace Belle2 {
     /** Load timing window from database (true) or not (false). */
     bool m_LoadTimingFromDB;
 
+    /** Ignore scintillators (to debug their electronics mapping). */
+    bool m_IgnoreScintillators;
+
     /** BKLM time window. */
     DBObjPtr<BKLMTimeWindow> m_Timing;
 

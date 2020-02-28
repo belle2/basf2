@@ -12,5 +12,6 @@
 #pragma link C++ class Belle2::PIDPriorsTable+;
 #pragma link C++ class Belle2::PIDPriors+;
 #pragma link C++ class Belle2::ChargedPidMVAWeights+;
+#pragma link C++ enum Belle2::ChargedPidMVAWeights::ChargedPidMVATrainingMode+; //implicit
 
 #endif

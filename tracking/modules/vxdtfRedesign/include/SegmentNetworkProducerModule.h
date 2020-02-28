@@ -128,6 +128,9 @@ namespace Belle2 {
     /// Name for network container data store object created by this module.
     std::string m_PARAMNetworkOutputName;
 
+    /// Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding)
+    std::string m_PARAMEventLevelTrackingInfoName;
+
     /// Boolean to set whether to add an additional SpacePoint as a virtual interaction point.
     bool m_PARAMAddVirtualIP = false;
 

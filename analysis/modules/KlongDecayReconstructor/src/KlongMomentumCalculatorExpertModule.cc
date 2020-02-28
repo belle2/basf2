@@ -224,7 +224,7 @@ namespace Belle2 {
         break;
       }
 
-      koutputList->addParticle(kparticle->getArrayIndex(), kparticle->getPDGCode(), kparticle->getFlavorType());
+      koutputList->addParticle(kparticle);
       kparticle->addExtraInfo("permID", idx);
 
     } //while

@@ -286,6 +286,22 @@ namespace Belle2 {
       return Manager::Instance().getVariable("pidProbabilityExpert(1000010020, ALL)")->function(part);
     }
 
+    Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1) {
+        B2ERROR("Need exactly one argument for pidChargedBDTScore: pdgCodeHyp");
+        return nullptr;
+      }
+
+      auto pdgCodeHyp(arguments.at(0));
+
+      auto func = [pdgCodeHyp](const Particle * part) -> double {
+        auto name = "pidChargedBDTScore_" + pdgCodeHyp;
+        return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
+      };
+      return func;
+    }
+
     Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
@@ -396,41 +412,6 @@ namespace Belle2 {
     }
 
 
-    // Needed by the flavor tagger algorithm
-    double kIDBelle(const Particle* part)
-    {
-      //default values Belle style
-      float accs = 0.5;
-      float tofs = 0.5;
-      float cdcs = 0.5;
-
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-
-      if (pid) {
-        Const::PIDDetectorSet set = Const::ARICH;
-        accs = pid->getProbability(Const::kaon, Const::pion, set);
-        set = Const::TOP;
-        tofs = pid->getProbability(Const::kaon, Const::pion, set);
-        set = Const::TOP + Const::SVD;
-        cdcs = pid->getProbability(Const::kaon, Const::pion, set);
-      }
-
-      if (tofs > 0.999) tofs = 0.999;
-      if (tofs < 0.001) tofs = 0.001;
-      if (cdcs > 0.999) cdcs = 0.999;
-      if (cdcs < 0.001) cdcs = 0.001;
-
-      float s = accs * tofs * cdcs;
-      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
-
-      float r = s / (b + s);
-
-      return r;
-    }
-
-
-
-
     // PID variables to be used for analysis
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID, "the particle identification probability under the particle's own hypothesis");
@@ -447,8 +428,6 @@ namespace Belle2 {
                       "proton identification probability defined as :math:`\\mathcal{L}_p/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("deuteronID", deuteronID,
                       "deuteron identification probability defined as :math:`\\mathcal{L}_d/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
-    REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)", pidPairChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. Currently uses only ECL inputs.");
 
     // Metafunctions for experts to access the basic PID quantities
     VARIABLE_GROUP("PID_expert");
@@ -462,10 +441,15 @@ namespace Belle2 {
                       "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
+    REGISTER_VARIABLE("pidChargedBDTScore(pdgCodeHyp)", pidChargedBDTScore,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.");
+    REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)", pidPairChargedBDTScore,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.");
     REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
                       "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
     REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,
                       "Returns 1 if the PID likelihood for the particle given its PID is the largest one");
+
     // B2BII PID
     VARIABLE_GROUP("PID_belle");
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
@@ -477,8 +461,6 @@ namespace Belle2 {
                       "returns true if Belle's PID Muon_likelihood() is usable (reliable).");
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
                       "returns Belle's electron ID (eid(3,-1,5).prob()) variable.");
-    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability belle-style.");
-
 
   }
 }

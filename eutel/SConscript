@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'vxd']
-
-Return('env')

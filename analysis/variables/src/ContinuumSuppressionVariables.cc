@@ -142,6 +142,7 @@ namespace Belle2 {
         }
         int index = -1;
 
+        // all possible names
         std::vector<std::string> names = {"mm2",   "et",
                                           "hso00", "hso01", "hso02", "hso03", "hso04",
                                           "hso10", "hso12", "hso14",
@@ -149,18 +150,30 @@ namespace Belle2 {
                                           "hoo0",  "hoo1",  "hoo2",  "hoo3",  "hoo4"
                                          };
 
+        // find the index of the name
         for (unsigned i = 0; i < names.size(); ++i) {
           if (variableName == names[i])
             index = i;
         }
 
+        // throw helfpul error if name provided was not in allowed list
+        if (index == -1) {
+          std::string allowed = "";
+          for (auto n : names)
+            allowed += n + ", ";
+          B2FATAL("Variable name provided: " << variableName << " is not one of the allowed options. Please choose from one of:" << allowed);
+        }
+
         auto func = [index, useFS1](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
-          if (!qq)
-            return std::numeric_limits<double>::quiet_NaN();
+          if (!qq) return std::numeric_limits<double>::quiet_NaN();
+
+          // get the KSFW moments
           std::vector<float> ksfw = qq->getKsfwFS0();
           if (useFS1)
             ksfw = qq->getKsfwFS1();
+
+          if (ksfw.size() == 0) B2FATAL("Could not find any KSFW moments");
           return ksfw.at(index);
         };
         return func;
@@ -297,7 +310,7 @@ namespace Belle2 {
                       "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
+                      "Returns NaN if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
                       "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,

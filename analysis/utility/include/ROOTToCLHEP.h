@@ -16,6 +16,7 @@
 #include <CLHEP/Vector/LorentzVector.h>
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
+#include <TMatrixDSym.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -47,6 +48,25 @@ namespace Belle2 {
      * @param[in] matrix Matrix.
      */
     inline CLHEP::HepSymMatrix getHepSymMatrix(const TMatrixFSym& matrix)
+    {
+      int n = matrix.GetNrows();
+      CLHEP::HepSymMatrix m(n);
+      /*
+       * CLHEP::HepSymMatrix is stored as a lower triangular matrix,
+       * thus it is sufficient to set only the corresponding elements.
+       */
+      for (int i = 0; i < n; ++i) {
+        for (int j = 0; j <= i; ++j)
+          m[i][j] = matrix[i][j];
+      }
+      return m;
+    }
+
+    /**
+     * Convert TMatrixDSym to CLHEP::HepSymMatrix.
+     * @param[in] matrix Matrix.
+     */
+    inline CLHEP::HepSymMatrix getHepSymMatrix(const TMatrixDSym& matrix)
     {
       int n = matrix.GetNrows();
       CLHEP::HepSymMatrix m(n);

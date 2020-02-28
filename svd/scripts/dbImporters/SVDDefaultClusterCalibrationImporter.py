@@ -33,9 +33,14 @@ now = datetime.datetime.now()
 
 
 class defaultSVDClusterCalibrationImporter(basf2.Module):
+    """
+    Defining the python module to do the import.
+    """
 
     def beginRun(self):
-
+        """
+        call the functions to import the cluster parameters
+        """
         iov = Belle2.IntervalOfValidity.always()
 
         # SpacePoint time

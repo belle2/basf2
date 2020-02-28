@@ -23,6 +23,7 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCellIdMapping.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -53,7 +54,8 @@ namespace Belle2 {
       phiId = 22,
       thetaId = 23,
       cellId = 24,
-      mcenergy = 25
+      mcenergy = 25,
+      usedforenergy = 26
     };
 
     // enum with available center types
@@ -290,6 +292,26 @@ namespace Belle2 {
               edep += digitMCRelations.weight(i);
             }
             return edep;
+          } else if (varid == varType::usedforenergy) {
+            const ECLCluster* cluster = particle->getECLCluster();
+            if (cluster) {
+              unsigned int cellid = eclCalDigits[storearraypos]->getCellId();
+
+              std::vector<unsigned int> listCellIds;
+              auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
+              for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
+                const auto shower = clusterShowerRelations.object(ir);
+                listCellIds = shower->getListOfCrystalsForEnergy();
+              }
+
+              if (std::find(listCellIds.begin(), listCellIds.end(), cellid) != listCellIds.end()) { //find is faster than count
+                return 1;
+              }
+
+              return 0;
+            }
+            return std::numeric_limits<double>::quiet_NaN();
+
           }
         } else {
           return std::numeric_limits<double>::quiet_NaN();
@@ -554,6 +576,17 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentHadronEnergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the 1 if the eclcladigit was used in the energy calculation
+    double getUsedForClusterEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::usedforenergy, ECLCalDigitVariable::centerType::maxCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -954,12 +987,46 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
 
       double sum = 0.0;
-      auto clusterDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
-      for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
-        sum += clusterDigitRelations.weight(ir);
+      auto mcDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+      for (unsigned int ir = 0; ir < mcDigitRelations.size(); ++ir) {
+        sum += mcDigitRelations.weight(ir);
       }
 
       return sum;
+
+    }
+
+    double getClusterECLCalDigitMCEnergy(const Particle* particle)
+    {
+      // get MCParticle (return if there is none)
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        std::vector<unsigned int> listCellIds;
+        auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
+        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
+          const auto shower = clusterShowerRelations.object(ir);
+          listCellIds = shower->getListOfCrystalsForEnergy();
+        }
+
+        double sum = 0.0;
+        auto clusterDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+        for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+
+          // check if this digit is in the current cluster
+          unsigned int cellid = clusterDigitRelations.object(ir)->getCellId();
+          if (std::find(listCellIds.begin(), listCellIds.end(), cellid) != listCellIds.end()) { //find is faster than count
+            sum += clusterDigitRelations.weight(ir);
+          }
+        }
+
+        return sum;
+      }
+
+      return std::numeric_limits<float>::quiet_NaN();
 
     }
 
@@ -1016,6 +1083,9 @@ namespace Belle2 {
                       "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitCellId(i, j)", getCellId,
                       "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+    REGISTER_VARIABLE("eclcaldigitUsedForClusterEnergy(i, j)", getUsedForClusterEnergy,
+                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+
     REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
     REGISTER_VARIABLE("eclcaldigitCenterCellPhiId", getCenterCellPhiId, "[calibration] Returns the center cell phi id");
@@ -1111,6 +1181,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
                       "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
+
+    REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
 
 
   }

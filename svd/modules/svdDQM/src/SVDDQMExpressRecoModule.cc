@@ -5,8 +5,6 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys, Giulia Casarosa, Giuliana Rizzo             *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 

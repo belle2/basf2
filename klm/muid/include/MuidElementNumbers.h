@@ -101,9 +101,9 @@ namespace Belle2 {
 
     /**
      * Calculate hypothesis number from PDG code.
-     * @param[in] PDG PDG code.
+     * @param[in] pdg PDG code.
      */
-    static Hypothesis calculateHypothesisFromPDG(int PDG);
+    static Hypothesis calculateHypothesisFromPDG(int pdg);
 
     /**
      * Get maximal barrel layer number (0-based).

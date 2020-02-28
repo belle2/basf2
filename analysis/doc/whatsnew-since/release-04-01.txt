@@ -117,7 +117,6 @@ Modules
    One can add ``(decay)`` and/or ``(misID)`` to the begining of the particle name to accept ``c_DecayInFlight`` and/or ``c_MisID``. 
    The following is an example, :code:`'reconstructDecay('D0:sig -> (misID)K-:loose (decay)pi+:loose', '', path=mypath)'`
 		
- * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
  * Modified `modularAnalysis.matchMCTruth` to work always recursively. Once one calls `modularAnalysis.matchMCTruth` for a particle, the MC Matching is done for not only the particle but also all daughters of the particle correctly.
    This modification does not change the MC Matching of the particle for which `modularAnalysis.matchMCTruth` is called.
 

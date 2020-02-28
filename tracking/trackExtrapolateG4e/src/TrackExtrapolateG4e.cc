@@ -13,7 +13,6 @@
 
 /* Belle 2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/GearDir.h>
@@ -331,9 +330,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
 void TrackExtrapolateG4e::beginRun(bool byMuid)
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-  int expNo = evtMetaData->getExperiment();
-  B2DEBUG(20, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
+  B2DEBUG(20, (byMuid ? "muid" : "ext"));
   if (byMuid) {
     if (!m_klmChannelStatus.isValid())
       B2FATAL("KLM channel status data are not available.");
@@ -341,34 +338,35 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM strip efficiency data are not available.");
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
-    if (m_MuonPlusPar != nullptr) {
-      if (m_ExpNo == expNo) { return; }
-      delete m_MuonPlusPar;
-      delete m_MuonMinusPar;
-      delete m_PionPlusPar;
-      delete m_PionMinusPar;
-      delete m_KaonPlusPar;
-      delete m_KaonMinusPar;
-      delete m_ProtonPar;
-      delete m_AntiprotonPar;
-      delete m_DeuteronPar;
-      delete m_AntideuteronPar;
-      delete m_ElectronPar;
-      delete m_PositronPar;
+    if (!m_MuonPlusPar) {
+      if (m_muidParameters.hasChanged()) { /* Clear MuidBuilder if MuidParameters payload changed. */
+        delete m_MuonPlusPar;
+        delete m_MuonMinusPar;
+        delete m_PionPlusPar;
+        delete m_PionMinusPar;
+        delete m_KaonPlusPar;
+        delete m_KaonMinusPar;
+        delete m_ProtonPar;
+        delete m_AntiprotonPar;
+        delete m_DeuteronPar;
+        delete m_AntideuteronPar;
+        delete m_ElectronPar;
+        delete m_PositronPar;
+      } else /* Return if MuidBuilder is already initialized. */
+        return;
     }
-    m_ExpNo = expNo;
-    m_MuonPlusPar = new MuidBuilder(expNo, "MuonPlus");
-    m_MuonMinusPar = new MuidBuilder(expNo, "MuonMinus");
-    m_PionPlusPar = new MuidBuilder(expNo, "PionPlus");
-    m_PionMinusPar = new MuidBuilder(expNo, "PionMinus");
-    m_KaonPlusPar = new MuidBuilder(expNo, "KaonPlus");
-    m_KaonMinusPar = new MuidBuilder(expNo, "KaonMinus");
-    m_ProtonPar = new MuidBuilder(expNo, "Proton");
-    m_AntiprotonPar = new MuidBuilder(expNo, "Antiproton");
-    m_DeuteronPar = new MuidBuilder(expNo, "Deuteron");
-    m_AntideuteronPar = new MuidBuilder(expNo, "Antideuteron");
-    m_ElectronPar = new MuidBuilder(expNo, "Electron");
-    m_PositronPar = new MuidBuilder(expNo, "Positron");
+    m_MuonPlusPar = new MuidBuilder("MuonPlus");
+    m_MuonMinusPar = new MuidBuilder("MuonMinus");
+    m_PionPlusPar = new MuidBuilder("PionPlus");
+    m_PionMinusPar = new MuidBuilder("PionMinus");
+    m_KaonPlusPar = new MuidBuilder("KaonPlus");
+    m_KaonMinusPar = new MuidBuilder("KaonMinus");
+    m_ProtonPar = new MuidBuilder("Proton");
+    m_AntiprotonPar = new MuidBuilder("Antiproton");
+    m_DeuteronPar = new MuidBuilder("Deuteron");
+    m_AntideuteronPar = new MuidBuilder("Antideuteron");
+    m_ElectronPar = new MuidBuilder("Electron");
+    m_PositronPar = new MuidBuilder("Positron");
   }
 }
 

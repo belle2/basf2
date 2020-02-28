@@ -51,12 +51,12 @@ namespace Belle2 {
     }
   }
 
-  MuidBuilder::MuidBuilder(int expNo, const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
+  MuidBuilder::MuidBuilder(const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
   {
     /* Fill PDFs by reading database. */
     fillPDFs(hypothesisName);
     if (m_ReducedChiSquaredDx == 0.0)
-      B2FATAL("Failed to read " << hypothesisName << " PDFs for experiment " << expNo);
+      B2FATAL("Invalid PDFs for " << hypothesisName << " hypothesis.");
   }
 
   MuidBuilder::~MuidBuilder()

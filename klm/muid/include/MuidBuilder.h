@@ -26,8 +26,8 @@ namespace Belle2 {
 
   public:
 
-    //! Constructor with arguments (experiment #, particleID hypothesis)
-    MuidBuilder(int, const char*);
+    //! Constructor with arguments
+    MuidBuilder(const char*);
 
     //! Destructor
     ~MuidBuilder();

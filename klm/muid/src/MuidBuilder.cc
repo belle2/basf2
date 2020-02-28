@@ -50,28 +50,28 @@ MuidBuilder::MuidBuilder() : m_ReducedChiSquaredDx(0.0)
   }
 }
 
-MuidBuilder::MuidBuilder(int PDG) : m_ReducedChiSquaredDx(0.0)
+MuidBuilder::MuidBuilder(int pdg) : m_ReducedChiSquaredDx(0.0)
 {
-  int hypothesis = MuidElementNumbers::calculateHypothesisFromPDG(PDG);
+  MuidElementNumbers::Hypothesis hypothesis = MuidElementNumbers::calculateHypothesisFromPDG(pdg);
   if (hypothesis == MuidElementNumbers::c_NotValid)
-    B2FATAL("The particle associated to the PDG code " << PDG << " is not supported.");
+    B2FATAL("The particle associated to the PDG code " << pdg << " is not supported.");
   /* Fill PDFs by reading database. */
   fillPDFs(hypothesis);
   if (m_ReducedChiSquaredDx == 0.0)
-    B2FATAL("Invalid PDFs for PDG code " <<  PDG);
+    B2FATAL("Invalid PDFs for PDG code " <<  pdg);
 }
 
 MuidBuilder::~MuidBuilder()
 {
 }
 
-void MuidBuilder::fillPDFs(int hypothesis)
+void MuidBuilder::fillPDFs(MuidElementNumbers::Hypothesis hypothesis)
 {
   for (int outcome = 1; outcome <= MuidElementNumbers::getMaximalOutcome(); ++outcome) {
     for (int lastLayer = 0; lastLayer <= MuidElementNumbers::getMaximalBarrelLayer(); ++lastLayer) {
       if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
         break;
-      std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
+      std::vector<double> layerPDF = m_MuidParameters->getProfile(hypothesis, outcome, lastLayer);
       for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
         m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];
       }
@@ -83,10 +83,10 @@ void MuidBuilder::fillPDFs(int hypothesis)
   for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
 
     for (int halfNdof = 1; halfNdof <= MuidElementNumbers::getMaximalHalfNdof(); ++halfNdof) {
-      m_ReducedChiSquaredThreshold[detector][halfNdof] = m_muidParameters->getThreshold(hypothesis, detector, halfNdof * 2);
-      m_ReducedChiSquaredScaleY[detector][halfNdof] = m_muidParameters->getScaleY(hypothesis, detector, halfNdof * 2);
-      m_ReducedChiSquaredScaleX[detector][halfNdof] = m_muidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
-      std::vector<double> reducedChiSquaredPDF = m_muidParameters->getPDF(hypothesis, detector, halfNdof * 2);
+      m_ReducedChiSquaredThreshold[detector][halfNdof] = m_MuidParameters->getThreshold(hypothesis, detector, halfNdof * 2);
+      m_ReducedChiSquaredScaleY[detector][halfNdof] = m_MuidParameters->getScaleY(hypothesis, detector, halfNdof * 2);
+      m_ReducedChiSquaredScaleX[detector][halfNdof] = m_MuidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
+      std::vector<double> reducedChiSquaredPDF = m_MuidParameters->getPDF(hypothesis, detector, halfNdof * 2);
       if (reducedChiSquaredPDF.size() != MuidElementNumbers::getSizeReducedChiSquared()) {
         B2ERROR("TransversePDF vector for hypothesis " << hypothesis << "  detector " << detector
                 << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MuidElementNumbers::getSizeReducedChiSquared());

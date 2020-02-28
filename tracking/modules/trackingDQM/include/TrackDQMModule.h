@@ -79,6 +79,38 @@ namespace Belle2 {
     TH1F* m_UBResidualsPXDV = nullptr;
     /** Unbiased residuals for SVD v */
     TH1F* m_UBResidualsSVDV = nullptr;
+
+    // half-shells
+    /** Unbiased residuals in X for PXD for Ying */
+    TH1F* m_UBResidualsPXDX_Ying = nullptr;
+    /** Unbiased residuals in X for PXD for Yang */
+    TH1F* m_UBResidualsPXDX_Yang = nullptr;
+    /** Unbiased residuals in X for PXD for Pat */
+    TH1F* m_UBResidualsSVDX_Pat = nullptr;
+    /** Unbiased residuals in X for PXD for Mat */
+    TH1F* m_UBResidualsSVDX_Mat = nullptr;
+
+    /** Unbiased residuals in Y for PXD for Ying */
+    TH1F* m_UBResidualsPXDY_Ying = nullptr;
+    /** Unbiased residuals in Y for PXD for Yang */
+    TH1F* m_UBResidualsPXDY_Yang = nullptr;
+    /** Unbiased residuals in Y for PXD for Pat */
+    TH1F* m_UBResidualsSVDY_Pat = nullptr;
+    /** Unbiased residuals in Y for PXD for Mat */
+    TH1F* m_UBResidualsSVDY_Mat = nullptr;
+
+    /** Unbiased residuals in Z for PXD for Ying */
+    TH1F* m_UBResidualsPXDZ_Ying = nullptr;
+    /** Unbiased residuals in Z for PXD for Yang */
+    TH1F* m_UBResidualsPXDZ_Yang = nullptr;
+    /** Unbiased residuals in Z for PXD for Pat */
+    TH1F* m_UBResidualsSVDZ_Pat = nullptr;
+    /** Unbiased residuals in Z for PXD for Mat */
+    TH1F* m_UBResidualsSVDZ_Mat = nullptr;
+
+    bool IsYing(int ladderNumber, int layerNumber);
+    bool IsPat(int ladderNumber, int layerNumber);
+
     /** Unbiased residuals for PXD and SVD v per sensor*/
     TH1F** m_UBResidualsSensorV = nullptr;
     /** Track related clusters - hitmap in IP angle range */

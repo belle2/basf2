@@ -233,6 +233,8 @@ The module can be used for:
 
 For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 
+.. _MCDecayString:
+
 ---------------
 MC decay string
 ---------------
@@ -261,6 +263,8 @@ This will produce a file with all of the decay strings in it, along with the dec
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
 Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
+
+.. _TauDecayMCModes:
 
 ------------------
 Tau decay MC modes

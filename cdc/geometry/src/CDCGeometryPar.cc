@@ -2315,11 +2315,18 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 
     //estimate an initial value
     //    bool check = false;
-    double det = a[1] * a[1] - 4.*a[2] * a[0];
-    if (a[2] != 0. && det >= 0.) {
-      //2nd-order approx. near t=0
-      //Choose the solution with dx/dt > 0 which gives x=0
-      minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
+    //    bool nointersection = false;
+    if (a[2] != 0.) {  //2nd-order approx. near t=0
+      const double det = a[1] * a[1] - 4.*a[2] * a[0];
+      if (det >= 0.) {
+        //Choose the solution with dx/dt > 0 which gives x=0
+        minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
+      } else {
+        //Choose the solution with smallest x
+        //  nointersection = true;
+        minTime = -a[1]  / (2.*a[2]);
+        //  cout <<"smallest-x solution= " << minTime << endl;
+      }
     } else if (a[1] != 0.) {
       minTime = -a[0] / a[1];  //1st-order approx.
     } else {
@@ -2384,13 +2391,18 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     //choose minMinTime for not-converged case
     if (nIter == (maxIter + 1)) minTime = minMinTime;
 
-    if (minTime > 20.) {
-      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
+    /*
+    if (fabs(minTime) > 20.) {
+      B2WARNING("CDCGeometryPar::getMinDriftTime: |minDriftTime| > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
                 iCLayer << " "
                 << lr <<
                 " " << alpha << " " << theta << " " << minTime);
     }
-
+    if (nointersection) {
+      cout <<"final minTime= " << minTime << endl;
+      cout <<"final minx   = " << a[0] + a[1] * minTime + a[2] *pow(minTime,2) + a[3] *pow(minTime,3) + a[4] *pow(minTime,4) + a[5] *pow(minTime,5) << endl;
+    }
+    */
     /*
     if (check) {
       double dmin = 999.;

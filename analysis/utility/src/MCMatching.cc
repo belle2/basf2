@@ -105,13 +105,13 @@ bool MCMatching::setMCTruth(const Particle* particle)
   }
 
   // check, if for all daughter particles Particle -> MCParticle relation exists
+  bool daugMCTruth = true;
   for (int i = 0; i < nChildren; ++i) {
     const Particle* daugP = particle->getDaughter(i);
-    //returns quickly when not found
-    bool daugMCTruth = setMCTruth(daugP);
-    if (!daugMCTruth)
-      return false;
+    daugMCTruth &= setMCTruth(daugP);
   }
+  if (!daugMCTruth)
+    return false;
 
   int motherIndex = 0;
   if (nChildren == 1) {

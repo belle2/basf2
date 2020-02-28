@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This module defines wrapper functions around the analysis modules. An overview can
-be found at https://confluence.desy.de/display/BI/Physics+AnalysisSteering
+This module defines wrapper functions around the analysis modules.
 """
 
 from basf2 import register_module, create_path

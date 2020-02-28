@@ -382,7 +382,7 @@ namespace Belle2 {
       //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
       int hit_val = y[20] + y[21] - (y[12] + y[13] + y[14] + y[15]) / 2;
-      if (hit_val < hit_thr) {
+      if (hit_val <= hit_thr) {
         validity_code += 4;
       }
 

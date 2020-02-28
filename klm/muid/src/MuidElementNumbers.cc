@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/muid/MuidElementNumbers.h>
 
+/* Belle2 headers. */
+#include <framework/gearbox/Const.h>
+
 using namespace Belle2;
 
 MuidElementNumbers::MuidElementNumbers()
@@ -115,4 +118,36 @@ unsigned int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, b
     }
   }
   return outcome;
+}
+
+MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(int PDG)
+{
+  switch (PDG) {
+    case -11:
+      return MuidElementNumbers::c_Positron;
+    case 11:
+      return MuidElementNumbers::c_Electron;
+    case 1000010020:
+      return MuidElementNumbers::c_Deuteron;
+    case -1000010020:
+      return MuidElementNumbers::c_AntiDeuteron;
+    case 2212:
+      return MuidElementNumbers::c_Proton;
+    case -2212:
+      return MuidElementNumbers::c_AntiProton;
+    case 211:
+      return MuidElementNumbers::c_PionPlus;
+    case -211:
+      return MuidElementNumbers::c_PionMinus;
+    case 321:
+      return MuidElementNumbers::c_KaonPlus;
+    case -321:
+      return MuidElementNumbers::c_KaonMinus;
+    case 13:
+      return MuidElementNumbers::c_MuonPlus;
+    case -13:
+      return MuidElementNumbers::c_MuonMinus;
+    default:
+      return MuidElementNumbers::c_NotValid;
+  }
 }

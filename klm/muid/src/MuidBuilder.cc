@@ -50,31 +50,23 @@ MuidBuilder::MuidBuilder() : m_ReducedChiSquaredDx(0.0)
   }
 }
 
-MuidBuilder::MuidBuilder(const char hypothesisName[]) : m_ReducedChiSquaredDx(0.0)
+MuidBuilder::MuidBuilder(int PDG) : m_ReducedChiSquaredDx(0.0)
 {
+  int hypothesis = MuidElementNumbers::calculateHypothesisFromPDG(PDG);
+  if (hypothesis == MuidElementNumbers::c_NotValid)
+    B2FATAL("The particle associated to the PDG code " << PDG << " is not supported.");
   /* Fill PDFs by reading database. */
-  fillPDFs(hypothesisName);
+  fillPDFs(hypothesis);
   if (m_ReducedChiSquaredDx == 0.0)
-    B2FATAL("Invalid PDFs for " << hypothesisName << " hypothesis.");
+    B2FATAL("Invalid PDFs for PDG code " <<  PDG);
 }
 
 MuidBuilder::~MuidBuilder()
 {
 }
 
-void MuidBuilder::fillPDFs(const char hypothesisName[])
+void MuidBuilder::fillPDFs(int hypothesis)
 {
-  std::vector<std::string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
-  int hypothesis = -1;
-  for (unsigned int ii = 0; ii < hypotheses.size(); ii++) {
-    if (hypothesisName == hypotheses[ii]) {
-      hypothesis = ii;
-      break;
-    }
-  }
-  if (hypothesis == -1)
-    B2FATAL("MuidBuilder::fillPDFs(): hypothesisName " << hypothesisName << "is not expected. ");
-
   for (int outcome = 1; outcome <= MuidElementNumbers::getMaximalOutcome(); ++outcome) {
     for (int lastLayer = 0; lastLayer <= MuidElementNumbers::getMaximalBarrelLayer(); ++lastLayer) {
       if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
@@ -96,7 +88,7 @@ void MuidBuilder::fillPDFs(const char hypothesisName[])
       m_ReducedChiSquaredScaleX[detector][halfNdof] = m_muidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
       std::vector<double> reducedChiSquaredPDF = m_muidParameters->getPDF(hypothesis, detector, halfNdof * 2);
       if (reducedChiSquaredPDF.size() != MuidElementNumbers::getSizeReducedChiSquared()) {
-        B2ERROR("TransversePDF vector for hypothesis " << hypothesisName << "  detector " << detector
+        B2ERROR("TransversePDF vector for hypothesis " << hypothesis << "  detector " << detector
                 << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MuidElementNumbers::getSizeReducedChiSquared());
         m_ReducedChiSquaredDx = 0.0; /* Invalidate the PDFs for this hypothesis. */
       } else {

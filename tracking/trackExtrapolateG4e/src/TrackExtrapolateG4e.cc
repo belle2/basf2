@@ -355,18 +355,18 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       } else /* Return if MuidBuilder is already initialized. */
         return;
     }
-    m_MuonPlusPar = new MuidBuilder("MuonPlus");
-    m_MuonMinusPar = new MuidBuilder("MuonMinus");
-    m_PionPlusPar = new MuidBuilder("PionPlus");
-    m_PionMinusPar = new MuidBuilder("PionMinus");
-    m_KaonPlusPar = new MuidBuilder("KaonPlus");
-    m_KaonMinusPar = new MuidBuilder("KaonMinus");
-    m_ProtonPar = new MuidBuilder("Proton");
-    m_AntiprotonPar = new MuidBuilder("Antiproton");
-    m_DeuteronPar = new MuidBuilder("Deuteron");
-    m_AntideuteronPar = new MuidBuilder("Antideuteron");
-    m_ElectronPar = new MuidBuilder("Electron");
-    m_PositronPar = new MuidBuilder("Positron");
+    m_MuonPlusPar = new MuidBuilder(-Const::muon.getPDGCode());
+    m_MuonMinusPar = new MuidBuilder(Const::muon.getPDGCode());
+    m_PionPlusPar = new MuidBuilder(Const::pion.getPDGCode());
+    m_PionMinusPar = new MuidBuilder(-Const::pion.getPDGCode());
+    m_KaonPlusPar = new MuidBuilder(Const::kaon.getPDGCode());
+    m_KaonMinusPar = new MuidBuilder(-Const::kaon.getPDGCode());
+    m_ProtonPar = new MuidBuilder(Const::proton.getPDGCode());
+    m_AntiprotonPar = new MuidBuilder(-Const::proton.getPDGCode());
+    m_DeuteronPar = new MuidBuilder(Const::deuteron.getPDGCode());
+    m_AntideuteronPar = new MuidBuilder(-Const::deuteron.getPDGCode());
+    m_ElectronPar = new MuidBuilder(Const::electron.getPDGCode());
+    m_PositronPar = new MuidBuilder(-Const::electron.getPDGCode());
   }
 }
 

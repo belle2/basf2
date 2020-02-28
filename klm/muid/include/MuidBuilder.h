@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     //! Constructor with arguments
-    MuidBuilder(const char*);
+    MuidBuilder(int);
 
     //! Destructor
     ~MuidBuilder();
@@ -47,7 +47,7 @@ namespace Belle2 {
     MuidBuilder& operator=(const MuidBuilder&);
 
     //! Get probability density functions for this particleID hypothesis from Dababase
-    void fillPDFs(const char*);
+    void fillPDFs(int);
 
     //! Construct spline interpolation coefficients (first, second, third derivatives)
     void spline(int, double, double*, double*, double*, double*);

@@ -55,6 +55,25 @@ namespace Belle2 {
     };
 
     /**
+     * Hypothesis number.
+     */
+    enum Hypothesis {
+      c_NotValid = -1,
+      c_Positron = 0,
+      c_Electron = 1,
+      c_Deuteron = 2,
+      c_AntiDeuteron = 3,
+      c_Proton = 4,
+      c_AntiProton = 5,
+      c_PionPlus = 6,
+      c_PionMinus = 7,
+      c_KaonPlus = 8,
+      c_KaonMinus = 9,
+      c_MuonPlus = 10,
+      c_MuonMinus = 11,
+    };
+
+    /**
      * Constructor.
      */
     MuidElementNumbers();
@@ -79,6 +98,12 @@ namespace Belle2 {
      * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
      */
     static unsigned int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
+
+    /**
+     * Calculate hypothesis number from PDG code.
+     * @param[in] PDG PDG code.
+     */
+    static Hypothesis calculateHypothesisFromPDG(int PDG);
 
     /**
      * Get maximal barrel layer number (0-based).

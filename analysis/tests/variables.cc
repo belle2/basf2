@@ -2501,17 +2501,23 @@ namespace {
     StoreArray<MCParticle> mcparticles;
     StoreArray<Particle> particles;
     StoreObjPtr<ParticleList> list("testList");
+    StoreObjPtr<ParticleList> anotherlist("supplimentaryList");
 
     mcparticles.registerInDataStore();
     particles.registerInDataStore();
     particles.registerRelationTo(mcparticles);
     DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
     list.registerInDataStore(flags);
+    anotherlist.registerInDataStore(flags);
 
     DataStore::Instance().setInitializeActive(false);
     // end datastore setup
+
     list.create();
     list->initialize(22, "testList");
+
+    anotherlist.create();
+    anotherlist->initialize(22, "supplimentaryList");
 
     // MCParticles
     auto* mcphoton = mcparticles.appendNew();
@@ -2522,9 +2528,13 @@ namespace {
     mcelectron->setPDG(11);
     mcelectron->setStatus(MCParticle::c_PrimaryParticle);
 
-    auto* mcother = mcparticles.appendNew();
-    mcother->setPDG(22);
-    mcother->setStatus(MCParticle::c_PrimaryParticle);
+    auto* mcanotherelectron = mcparticles.appendNew();
+    mcanotherelectron->setPDG(22);
+    mcanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcyetanotherelectron = mcparticles.appendNew();
+    mcyetanotherelectron->setPDG(22);
+    mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
 
     // particles
     auto* photon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
@@ -2536,7 +2546,11 @@ namespace {
     list->addParticle(electron);
 
     auto* other = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
-    other->addRelationTo(mcother);
+    other->addRelationTo(mcanotherelectron);
+
+    auto* yetanotherelectron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    yetanotherelectron->addRelationTo(mcyetanotherelectron);
+    anotherlist->addParticle(yetanotherelectron);
     // not in the list
 
     // get the variable
@@ -2548,6 +2562,7 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(photon), 1.0);
     EXPECT_FLOAT_EQ(vsensible->function(electron), 1.0);
     EXPECT_FLOAT_EQ(vsensible->function(other), 0.0);
+    EXPECT_FLOAT_EQ(vsensible->function(yetanotherelectron), 0.0);
 
     // now mock up some other type particles
     Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);

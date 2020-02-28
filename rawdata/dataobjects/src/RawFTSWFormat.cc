@@ -93,14 +93,11 @@ unsigned int RawFTSWFormat::GetFrameCount(int n)
 void RawFTSWFormat::GetPCTimeVal(int n, struct timeval* tv)
 {
   char err_buf[500];
-  if (m_already_warned_getpctimeval == 0) {
-    sprintf(err_buf,
-            "[WARNING] This function is not supported in the version of RawFTSW format that you're using. Just returining tv_sec=0 and tv_usec = 0. ( n= %d) Please check disscussion about this handling at https://stash.desy.de/projects/B2/repos/software/pull-requests/5633/ : %s %s %d: \n",
-            n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s\n", err_buf); fflush(stdout);
-    B2WARNING(err_buf);
-    m_already_warned_getpctimeval = 1;
-  }
+  sprintf(err_buf,
+          "[WARNING] This function is not supported in the version of RawFTSW format that you're using. Just returining tv_sec=0 and tv_usec = 0. ( n= %d) Please check disscussion about this handling at https://stash.desy.de/projects/B2/repos/software/pull-requests/5633/ : %s %s %d: \n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  B2WARNING(err_buf);
   tv->tv_sec = 0;
   tv->tv_usec = 0;
 

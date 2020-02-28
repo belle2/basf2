@@ -107,8 +107,6 @@ namespace Belle2 {
     virtual unsigned int GetFrameCount(int n);
 
   protected :
-    /// Flag to check if warning about unsupported function is already issued in GetPCTimeVal() in RawFTSWFormat.cc.
-    int m_already_warned_getpctimeval = 0; //! do not record
 
   };
 

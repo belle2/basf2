@@ -125,7 +125,7 @@ MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(in
   /* For leptons, the sign of the PDG code is opposite to the charge. */
   if (pdg == Const::electron.getPDGCode())
     return MuidElementNumbers::c_Electron;
-  if (pdg == -Const::deuteron.getPDGCode())
+  if (pdg == -Const::electron.getPDGCode())
     return MuidElementNumbers::c_Positron;
   if (pdg == Const::muon.getPDGCode())
     return MuidElementNumbers::c_MuonMinus;

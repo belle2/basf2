@@ -44,7 +44,7 @@ By default, :b2:var:`isSignal` requires that all final state particle daughters 
 One can configure :b2:var:`isSignal` to accept missing particles or not to accept missing radiated photons or intermediate resonances.
 
 .. tip:: 
-    If a specific grammar is used, :ref:`The_error_flags` are removed from :b2:var:`mcErrors`. So one cannot know if a event ordinally has the flags which are accepted by the grammar.
+    If a specific grammar is used, :ref:`Error_flags` are removed from :b2:var:`mcErrors`. So one cannot know if a event ordinally has the flags which are accepted by the grammar.
     To obtain the information, one can use usual decay string and specific variables, such as :b2:var:`isSignalAcceptMissingNeutrino`, to identify signal events.
 
 

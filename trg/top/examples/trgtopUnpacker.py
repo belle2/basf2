@@ -2,9 +2,9 @@
 #
 # -----------------------------------------------------------------------------------
 #
-#                        GDL trigger Unpacker module
+#                        TOP L1 trigger Unpacker module
 #
-#    usage : %> basf2 TrgGdlUnpacker.py [input sroot file name]
+#    usage : %> basf2 trgtopUnpacker.py [input sroot file name]
 #
 # -----------------------------------------------------------------------------------
 from basf2 import *
@@ -15,7 +15,7 @@ argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 
 if argc != 2:
-    sys.exit("trggdlUnpacker.py> # of arg is strange.\n 1.rootname\n Exit.")
+    sys.exit("trgtopUnpacker.py> # of arg is strange.\n 1.rootname\n Exit.")
 
 if argc == 2:
     f_in_root = argvs[1]
@@ -23,7 +23,6 @@ if argc == 2:
 # set_log_level(LogLevel.ERROR)
 set_log_level(LogLevel.INFO)
 
-# use_central_database("TRGGDL_201811")
 use_central_database("online")
 
 # input

@@ -21,10 +21,6 @@ include directive to avoid an undefined reference on compilation.
 using namespace std;
 using namespace Belle2;
 
-const double clkTo1ns = 0.5 / .508877;
-
-#define NUMBER_OF_SLOTS 16
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------

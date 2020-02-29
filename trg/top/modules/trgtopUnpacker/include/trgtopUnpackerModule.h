@@ -25,6 +25,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#define NUMBER_OF_SLOTS 16
+
 namespace Belle2 {
   /**
   * TRG TOP Unpacker
@@ -33,9 +35,12 @@ namespace Belle2 {
   *
   *
   */
+
   class TRGTOPUnpackerModule : public Module {
 
   public:
+
+    static constexpr double clkTo1ns = 0.5 / 0.508877;
 
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.

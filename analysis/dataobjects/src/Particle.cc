@@ -101,9 +101,11 @@ Particle::Particle(const TLorentzVector& momentum,
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
   }
 }
-
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -114,6 +116,40 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_arrayPointer(arrayPointer)
+{
+  m_pdgCode = pdgCode;
+  m_flavorType = flavorType;
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
+  set4Vector(momentum);
+  resetErrorMatrix();
+  m_properties = properties;
+
+  if (!daughterIndices.empty()) {
+    m_particleType    = c_Composite;
+    if (getArrayPointer() == nullptr) {
+      B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
+  }
+}
+
+
+Particle::Particle(const TLorentzVector& momentum,
+                   const int pdgCode,
+                   EFlavorType flavorType,
+                   const std::vector<int>& daughterIndices,
+                   const int properties,
+                   const std::vector<int>& daughterProperties,
+                   TClonesArray* arrayPointer) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1),
+  m_daughterIndices(daughterIndices),
+  m_daughterProperties(daughterProperties),
   m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(arrayPointer)
 {
@@ -597,6 +633,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
+  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
 void Particle::removeDaughter(const Particle* daughter)
@@ -607,6 +644,7 @@ void Particle::removeDaughter(const Particle* daughter)
   for (unsigned i = 0; i < getNDaughters(); i++) {
     if (m_daughterIndices[i] == daughter->getArrayIndex()) {
       m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterProperties.erase(m_daughterProperties.begin() + i);
       i--;
     }
   }

@@ -118,7 +118,10 @@ Modules
  * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
  * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
  * Both flavor taggers support ROE masks. Added new maskName argument.
- * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
+ * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``, ``c_DecayInFlight``, and ``c_MisID``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
+   One can add ``(decay)`` and/or ``(misID)`` to the begining of the particle name to accept ``c_DecayInFlight`` and/or ``c_MisID``. 
+   The following is an example, :code:`'reconstructDecay('D0:sig -> (misID)K-:loose (decay)pi+:loose', '', path=mypath)'`
+		
  * Modified `modularAnalysis.matchMCTruth` to work always recursively. Once one calls `modularAnalysis.matchMCTruth` for a particle, the MC Matching is done for not only the particle but also all daughters of the particle correctly.
    This modification does not change the MC Matching of the particle for which `modularAnalysis.matchMCTruth` is called.
 

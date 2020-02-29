@@ -43,9 +43,12 @@ Some extra variables are provided externally, for example :b2:var:`isCloneTrack`
         :variables: isSignal,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
-~~~~~~~~~~~~~~~
-The error flags
-~~~~~~~~~~~~~~~
+
+.. _Error_flags:
+
+~~~~~~~~~~~
+Error flags
+~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 

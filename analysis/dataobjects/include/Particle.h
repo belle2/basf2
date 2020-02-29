@@ -104,12 +104,14 @@ namespace Belle2 {
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
       c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
-      c_isIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
-      c_isIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
-      c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
-      c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
-      c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
-      c_isIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
+      c_IsIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
+      c_IsIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
+      c_IsIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
+      c_IsIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
+      c_IsIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+      c_IsIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
+      c_IsIgnoreMisID = 128, /**< Is the particle MC matched with the ignore MisID flag set? */
+      c_IsIgnoreDecayInFlight = 256, /**< Is the particle MC matched with the ignore DecayInFlight flag set?*/
     };
 
     /**
@@ -171,6 +173,25 @@ namespace Belle2 {
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
              int properties,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param particle property
+     * @param daughter particle properties
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             int properties,
+             const std::vector<int>& daughterProperties,
              TClonesArray* arrayPointer = nullptr);
 
     /**
@@ -313,6 +334,7 @@ namespace Belle2 {
         m_particleType = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
 
     /**
@@ -578,12 +600,21 @@ namespace Belle2 {
     }
 
     /**
-     * Retruns a vector of store array indices of daughter particles
+     * Returns a vector of store array indices of daughter particles
      * @return vector of store array indices of daughter particle
      */
     const std::vector<int>& getDaughterIndices() const
     {
       return m_daughterIndices;
+    }
+
+    /**
+     * Returns a vector of properties of daughter particles
+     * @return vector of daughter properties
+     */
+    const std::vector<int>& getDaughterProperties() const
+    {
+      return m_daughterProperties;
     }
 
     /**
@@ -842,6 +873,7 @@ namespace Belle2 {
     EParticleType m_particleType;  /**< particle type */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
     int m_properties; /**< particle property */
+    std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
     /**
      * Identifier that can be used to identify whether the particle is unqiue
@@ -921,10 +953,11 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
+    ClassDef(Particle, 11); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
+    // v11: added m_daughterProperties
 
     friend class ParticleSubset;
   };

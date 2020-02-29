@@ -50,6 +50,7 @@ Particle::Particle() :
   resetErrorMatrix();
 }
 
+
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -58,6 +59,7 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -74,6 +76,7 @@ Particle::Particle(const TLorentzVector& momentum,
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -135,6 +138,7 @@ Particle::Particle(const TLorentzVector& momentum,
   }
 }
 
+
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
@@ -176,19 +180,14 @@ Particle::Particle(const Track* track,
   auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
   if (closestMassFitResult == nullptr) return;
 
-  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
-  const auto trackFit = closestMassFitResult;
-
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
   setMdstArrayIndex(track->getArrayIndex());
 
-  // set PDG code TODO: ask Anze why this procedure is needed?
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  const auto trackFit = closestMassFitResult;
+  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -198,6 +197,7 @@ Particle::Particle(const Track* track,
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
 }
+
 
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
@@ -214,10 +214,7 @@ Particle::Particle(const int trackArrayIndex,
   setMdstArrayIndex(trackArrayIndex);
 
   m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -227,6 +224,7 @@ Particle::Particle(const int trackArrayIndex,
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
 }
+
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -263,6 +261,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   storeErrorMatrix(clustercovmat);
 }
 
+
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -287,6 +286,7 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   resetErrorMatrix();
   //storeErrorMatrix(klmCluster->getErrorMatrix());
 }
+
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -1172,6 +1172,15 @@ bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& funct
       for (size_t i = 0; i < p->getNDaughters(); ++i) qq.push(p->getDaughter(i));
   }
   return false;
+}
+
+int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::ChargedStable& chargedStable)
+{
+  int absPDGCode = chargedStable.getPDGCode();
+  int PDGCode = absPDGCode * chargeSign;
+  // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
+  if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
+  return PDGCode;
 }
 
 

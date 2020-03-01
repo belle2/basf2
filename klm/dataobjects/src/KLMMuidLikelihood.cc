@@ -43,33 +43,8 @@ KLMMuidLikelihood::KLMMuidLikelihood() :
   }
 }
 
-KLMMuidLikelihood::KLMMuidLikelihood(int pdgCode) :
-  m_PDGCode(pdgCode),
-  m_JunkPDFValue(0.0),
-  m_Status(0),
-  m_ChiSquared(0.0),
-  m_DegreesOfFreedom(0),
-  m_Outcome(0),
-  m_IsForward(true),
-  m_BarrelExtLayer(-1),
-  m_EndcapExtLayer(-1),
-  m_BarrelHitLayer(-1),
-  m_EndcapHitLayer(-1),
-  m_ExtLayer(-1),
-  m_HitLayer(-1),
-  m_ExtLayerPattern(0),
-  m_HitLayerPattern(0)
+KLMMuidLikelihood::~KLMMuidLikelihood()
 {
-  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
-    m_PDFValue[particle.getIndex()] = 0.0;
-    m_LogL[particle.getIndex()] = -1.0E20;
-  }
-  for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
-    m_ExtBKLMEfficiencyValue[i] = 1.0;
-  }
-  for (int i = 0; i < EKLMElementNumbers::getMaximalLayerNumber(); ++i) {
-    m_ExtEKLMEfficiencyValue[i] = 1.0;
-  }
 }
 
 unsigned int KLMMuidLikelihood::getTotalBarrelHits() const

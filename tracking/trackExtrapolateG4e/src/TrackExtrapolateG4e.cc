@@ -542,7 +542,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != nullptr) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
-  KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
+  KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(); // rest of this object will be filled later
+  klmMuidLikelihood->setPDGCode(extState.pdgCode);
   if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidLikelihood); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);

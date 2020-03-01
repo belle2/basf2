@@ -29,12 +29,8 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     KLMMuidLikelihood();
 
-    //! Constructor with initial value
-    //! @param pdgCode PDG code of the hypothesis used for this extrapolation
-    explicit KLMMuidLikelihood(int pdgCode);
-
     //! Destructor
-    virtual ~KLMMuidLikelihood() {}
+    ~KLMMuidLikelihood();
 
     //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
@@ -138,6 +134,10 @@ namespace Belle2 {
 
     //! @return EKLM efficiency vector
     float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; }
+
+    //! set PDG code of the hypothesis for this extrapolation
+    //! @param pdg PDG code of the hypothesis for this extrapolation
+    void setPDGCode(int pdg) { m_PDGCode = pdg; }
 
     //! assign normalized PDF value for this extrapolation
     //! @param pdfValue Normalized PDF value

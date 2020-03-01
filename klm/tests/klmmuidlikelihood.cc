@@ -53,7 +53,8 @@ namespace Belle2 {
 
     // Test the non-default constructor
     int pdg = 13;
-    m_muid = muids.appendNew(pdg);
+    m_muid = muids.appendNew();
+    m_muid->setPDGCode(pdg);
     EXPECT_EQ(m_muid->getPDGCode(), pdg);
     EXPECT_EQ(m_muid->getOutcome(), 0);
     EXPECT_EQ(m_muid->getHitLayer(), -1);

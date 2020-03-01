@@ -550,6 +550,11 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
     Note:
     This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
     where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+
+   .. Warning::
+       This skim saves only three randomly-chosen :math:`B^{+}` candidates in a 'B+:BtoD0rho_merged' list,
+       since the candidate multiplicity of this skim is very high.
+
     """
 
     __author__ = "Fernando Abudinen"
@@ -567,8 +572,13 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
         ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B+:BtoD0rho' + str(chID))
 
-    Lists = BsigList
-    return Lists
+    ma.copyLists(outputListName='B+:BtoD0rho_merged', inputListNames=BsigList, path=path)
+
+    # Select only three random candidates to save them as these channels have high multiplicity.
+    ma.rankByHighest(particleList='B+:BtoD0rho_merged', variable='cos(mdstIndex)', numBest=3,
+                     outputVariable='cosMdstIndex_rank', path=path)
+
+    return ['B+:BtoD0rho_merged']
 
 
 def B0toDrho_KpipiList(path):

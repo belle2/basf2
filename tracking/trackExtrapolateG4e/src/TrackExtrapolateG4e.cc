@@ -312,8 +312,6 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   }
 
   m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
-
-  /* Prepare the MuidBuilder.*/
 }
 
 void TrackExtrapolateG4e::beginRun(bool byMuid)

@@ -402,8 +402,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
   if (m_DefaultHypotheses != nullptr) { delete m_DefaultHypotheses; }
   if (byMuid) {
     delete m_TargetMuid;
-    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)                                                                   delete
-      muidBuilder;
+    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
+      delete muidBuilder;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;

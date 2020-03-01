@@ -167,7 +167,8 @@ std::vector<int> MuidElementNumbers::getPDGVector(int charge)
 std::vector<int> MuidElementNumbers::getPDGVector()
 {
   std::vector<int> pdgVector = getPDGVector(1);
-  pdgVector.insert(pdgVector.end(), getPDGVector(-1).begin(), getPDGVector(-1).end());
+  std::vector<int> temp = getPDGVector(-1);
+  pdgVector.insert(pdgVector.end(), temp.begin(), temp.end());
   std::sort(pdgVector.begin(), pdgVector.end());
   return pdgVector;
 }

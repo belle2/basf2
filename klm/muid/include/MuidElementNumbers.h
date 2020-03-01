@@ -15,6 +15,9 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
+/* C++ headers. */
+#include <vector>
+
 namespace Belle2 {
 
   /**
@@ -168,6 +171,27 @@ namespace Belle2 {
     {
       return m_MaximalReducedChiSquared;
     }
+
+    /**
+     * Get a vector with all the hypothesis numbers used for Muid.
+     */
+    static std::vector<Hypothesis> getHypothesisVector()
+    {
+      return std::vector({c_Positron, c_Electron, c_Deuteron, c_AntiDeuteron, c_Proton, c_AntiProton, c_PionPlus, c_PionMinus, c_KaonPlus, c_KaonMinus, c_MuonPlus, c_MuonMinus});
+    }
+
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Only the codes of the selected charge are returned.
+     * @param[in] charge Only codes of the selected charge are returned.
+     */
+    static std::vector<int> getPDGVector(int charge);
+
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Both positive and negative charges are returned.
+     */
+    static std::vector<int> getPDGVector();
 
   protected:
 

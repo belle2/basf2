@@ -16,19 +16,7 @@ using namespace Belle2;
 
 KLMMuidLikelihood::KLMMuidLikelihood() :
   m_PDGCode(0),
-  m_MuonPDFValue(0.0),
-  m_PionPDFValue(0.0),
-  m_KaonPDFValue(0.0),
-  m_ProtonPDFValue(0.0),
-  m_DeuteronPDFValue(0.0),
-  m_ElectronPDFValue(0.0),
   m_JunkPDFValue(0.0),
-  m_LogL_mu(-1.0E20),
-  m_LogL_pi(-1.0E20),
-  m_LogL_K(-1.0E20),
-  m_LogL_p(-1.0E20),
-  m_LogL_d(-1.0E20),
-  m_LogL_e(-1.0E20),
   m_Status(0),
   m_ChiSquared(0.0),
   m_DegreesOfFreedom(0),
@@ -43,6 +31,10 @@ KLMMuidLikelihood::KLMMuidLikelihood() :
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
+  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+    m_PDFValue[particle.getIndex()] = 0.0;
+    m_LogL[particle.getIndex()] = -1.0E20;
+  }
   for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
     m_ExtBKLMEfficiencyValue[i] = 1.0;
   }
@@ -53,19 +45,7 @@ KLMMuidLikelihood::KLMMuidLikelihood() :
 
 KLMMuidLikelihood::KLMMuidLikelihood(int pdgCode) :
   m_PDGCode(pdgCode),
-  m_MuonPDFValue(0.0),
-  m_PionPDFValue(0.0),
-  m_KaonPDFValue(0.0),
-  m_ProtonPDFValue(0.0),
-  m_DeuteronPDFValue(0.0),
-  m_ElectronPDFValue(0.0),
   m_JunkPDFValue(0.0),
-  m_LogL_mu(-1.0E20),
-  m_LogL_pi(-1.0E20),
-  m_LogL_K(-1.0E20),
-  m_LogL_p(-1.0E20),
-  m_LogL_d(-1.0E20),
-  m_LogL_e(-1.0E20),
   m_Status(0),
   m_ChiSquared(0.0),
   m_DegreesOfFreedom(0),
@@ -80,6 +60,10 @@ KLMMuidLikelihood::KLMMuidLikelihood(int pdgCode) :
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
+  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+    m_PDFValue[particle.getIndex()] = 0.0;
+    m_LogL[particle.getIndex()] = -1.0E20;
+  }
   for (int i = 0; i < BKLMElementNumbers::getMaximalLayerNumber(); ++i) {
     m_ExtBKLMEfficiencyValue[i] = 1.0;
   }

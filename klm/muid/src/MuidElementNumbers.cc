@@ -151,3 +151,23 @@ MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(in
   /* Only charged final state particles are supported. */
   return MuidElementNumbers::c_NotValid;
 }
+
+std::vector<int> MuidElementNumbers::getPDGVector(int charge)
+{
+  std::vector<int> pdgVector;
+  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+    if ((particle == Const::electron) || (particle == Const::muon))
+      pdgVector.push_back(-charge * particle.getPDGCode());
+    else
+      pdgVector.push_back(charge * particle.getPDGCode());
+  }
+  return pdgVector;
+}
+
+std::vector<int> MuidElementNumbers::getPDGVector()
+{
+  std::vector<int> pdgVector = getPDGVector(1);
+  pdgVector.insert(pdgVector.end(), getPDGVector(-1).begin(), getPDGVector(-1).end());
+  std::sort(pdgVector.begin(), pdgVector.end());
+  return pdgVector;
+}

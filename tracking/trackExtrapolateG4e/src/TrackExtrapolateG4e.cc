@@ -61,7 +61,6 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <vector>
 
 #define TWOPI (2.0*M_PI)
 #define PI_8 (0.125*M_PI)
@@ -113,19 +112,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveForwardEndcapLayer(0), // initialized later
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
-  m_ExpNo(0), // modified later
-  m_MuonPlusPar(nullptr), // modified later
-  m_MuonMinusPar(nullptr), // modified later
-  m_PionPlusPar(nullptr), // modified later
-  m_PionMinusPar(nullptr), // modified later
-  m_KaonPlusPar(nullptr), // modified later
-  m_KaonMinusPar(nullptr), // modified later
-  m_ProtonPar(nullptr), // modified later
-  m_AntiprotonPar(nullptr), // modified later
-  m_DeuteronPar(nullptr), // modified later
-  m_AntideuteronPar(nullptr), // modified later
-  m_ElectronPar(nullptr), // modified later
-  m_PositronPar(nullptr), // modified later
   m_eklmTransformData(nullptr) // initialized later
 {
   for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
@@ -326,6 +312,8 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   }
 
   m_eklmTransformData = &(EKLM::TransformDataGlobalAligned::Instance());
+
+  /* Prepare the MuidBuilder.*/
 }
 
 void TrackExtrapolateG4e::beginRun(bool byMuid)
@@ -338,35 +326,17 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM strip efficiency data are not available.");
     if (!m_muidParameters.isValid())
       B2FATAL("Muid parameters are not available.");
-    if (!m_MuonPlusPar) {
-      if (m_muidParameters.hasChanged()) { /* Clear MuidBuilder if MuidParameters payload changed. */
-        delete m_MuonPlusPar;
-        delete m_MuonMinusPar;
-        delete m_PionPlusPar;
-        delete m_PionMinusPar;
-        delete m_KaonPlusPar;
-        delete m_KaonMinusPar;
-        delete m_ProtonPar;
-        delete m_AntiprotonPar;
-        delete m_DeuteronPar;
-        delete m_AntideuteronPar;
-        delete m_ElectronPar;
-        delete m_PositronPar;
-      } else /* Return if MuidBuilder is already initialized. */
+    std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
+    if (!m_MuidBuilderMap.empty()) {
+      if (m_muidParameters.hasChanged()) { /* Clear m_MuidBuilderMap if MuidParameters payload changed. */
+        for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
+          delete muidBuilder;
+        m_MuidBuilderMap.clear();
+      } else /* Return if m_MuidBuilderMap is already initialized. */
         return;
     }
-    m_MuonPlusPar = new MuidBuilder(-Const::muon.getPDGCode());
-    m_MuonMinusPar = new MuidBuilder(Const::muon.getPDGCode());
-    m_PionPlusPar = new MuidBuilder(Const::pion.getPDGCode());
-    m_PionMinusPar = new MuidBuilder(-Const::pion.getPDGCode());
-    m_KaonPlusPar = new MuidBuilder(Const::kaon.getPDGCode());
-    m_KaonMinusPar = new MuidBuilder(-Const::kaon.getPDGCode());
-    m_ProtonPar = new MuidBuilder(Const::proton.getPDGCode());
-    m_AntiprotonPar = new MuidBuilder(-Const::proton.getPDGCode());
-    m_DeuteronPar = new MuidBuilder(Const::deuteron.getPDGCode());
-    m_AntideuteronPar = new MuidBuilder(-Const::deuteron.getPDGCode());
-    m_ElectronPar = new MuidBuilder(Const::electron.getPDGCode());
-    m_PositronPar = new MuidBuilder(-Const::electron.getPDGCode());
+    for (int pdg : muidPdgCodes)
+      m_MuidBuilderMap.insert(std::pair<int, MuidBuilder*>(pdg, new MuidBuilder(pdg)));
   }
 }
 
@@ -434,18 +404,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
   if (m_DefaultHypotheses != nullptr) { delete m_DefaultHypotheses; }
   if (byMuid) {
     delete m_TargetMuid;
-    delete m_MuonPlusPar;
-    delete m_MuonMinusPar;
-    delete m_PionPlusPar;
-    delete m_PionMinusPar;
-    delete m_KaonPlusPar;
-    delete m_KaonMinusPar;
-    delete m_ProtonPar;
-    delete m_AntiprotonPar;
-    delete m_DeuteronPar;
-    delete m_AntideuteronPar;
-    delete m_ElectronPar;
-    delete m_PositronPar;
+    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)                                                                   delete
+      muidBuilder;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;
@@ -1833,68 +1793,27 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   klmMuidLikelihood->setExtLayerPattern(extState.extLayerPattern);
   klmMuidLikelihood->setHitLayerPattern(extState.hitLayerPattern);
   /* Do KLM likelihood calculation. */
-  double junk = 0.0;
-  double muon = 0.0;
-  double pion = 0.0;
-  double kaon = 0.0;
-  double proton = 0.0;
-  double deuteron = 0.0;
-  double electron = 0.0;
-  double logL_mu = -1.0E20;
-  double logL_pi = -1.0E20;
-  double logL_K = -1.0E20;
-  double logL_p = -1.0E20;
-  double logL_d = -1.0E20;
-  double logL_e = -1.0E20;
   if (outcome != MuidElementNumbers::c_NotReached) { /* Extrapolation reached KLM sensitive volume. */
+    double denom = 0.0;
     int charge = (klmMuidLikelihood->getPDGCode() > 0);
-    if ((abs(klmMuidLikelihood->getPDGCode()) == Const::muon.getPDGCode()) ||
-        (abs(klmMuidLikelihood->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
-    if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(klmMuidLikelihood);
-      pion = m_PionPlusPar->getPDF(klmMuidLikelihood);
-      kaon = m_KaonPlusPar->getPDF(klmMuidLikelihood);
-      proton = m_ProtonPar->getPDF(klmMuidLikelihood);
-      deuteron = m_DeuteronPar->getPDF(klmMuidLikelihood);
-      electron = m_PositronPar->getPDF(klmMuidLikelihood);
-    } else {
-      muon = m_MuonMinusPar->getPDF(klmMuidLikelihood);
-      pion = m_PionMinusPar->getPDF(klmMuidLikelihood);
-      kaon = m_KaonMinusPar->getPDF(klmMuidLikelihood);
-      proton = m_AntiprotonPar->getPDF(klmMuidLikelihood);
-      deuteron = m_AntideuteronPar->getPDF(klmMuidLikelihood);
-      electron = m_ElectronPar->getPDF(klmMuidLikelihood);
+    std::vector<int> signedPdgVector = MuidElementNumbers::getPDGVector(charge);
+    std::map<int, double> mapPdgPDF;
+    for (int pdg : signedPdgVector) {
+      auto search = m_MuidBuilderMap.find(pdg);
+      if (search == m_MuidBuilderMap.end())
+        B2FATAL("Something went wrong: PDF for " << pdg << " code not found!");
+      double pdf = (search->second)->getPDF(klmMuidLikelihood);
+      denom += pdf;
+      mapPdgPDF.insert(std::pair<int, double>(std::abs(pdg), pdf));
     }
-    if (muon > 0.0) logL_mu = log(muon);
-    if (pion > 0.0) logL_pi = log(pion);
-    if (kaon > 0.0) logL_K = log(kaon);
-    if (proton > 0.0) logL_p = log(proton);
-    if (deuteron > 0.0) logL_d = log(deuteron);
-    if (electron > 0.0) logL_e = log(electron);
-    /* Normalize the PDF values. */
-    double denom = muon + pion + kaon + proton + deuteron + electron;
-    if (denom < 1.0E-20) {
-      junk = 1.0; /* Anomaly: should be very rare. */
-    } else {
-      muon /= denom;
-      pion /= denom;
-      kaon /= denom;
-      proton /= denom;
-      deuteron /= denom;
-      electron /= denom;
+    if (denom < 1.0E-20)
+      klmMuidLikelihood->setJunkPDFValue(1.0); /* Anomaly: should be very rare. */
+    else {
+      for (auto const& [pdg, pdf] : mapPdgPDF) {
+        klmMuidLikelihood->setPDFValue(pdf, std::abs(pdg));
+        if (pdf > 0.0)
+          klmMuidLikelihood->setLogL(std::log(pdf), std::abs(pdg));
+      }
     }
   }
-  klmMuidLikelihood->setJunkPDFValue(junk);
-  klmMuidLikelihood->setMuonPDFValue(muon);
-  klmMuidLikelihood->setPionPDFValue(pion);
-  klmMuidLikelihood->setKaonPDFValue(kaon);
-  klmMuidLikelihood->setProtonPDFValue(proton);
-  klmMuidLikelihood->setDeuteronPDFValue(deuteron);
-  klmMuidLikelihood->setElectronPDFValue(electron);
-  klmMuidLikelihood->setLogL_mu(logL_mu);
-  klmMuidLikelihood->setLogL_pi(logL_pi);
-  klmMuidLikelihood->setLogL_K(logL_K);
-  klmMuidLikelihood->setLogL_p(logL_p);
-  klmMuidLikelihood->setLogL_d(logL_d);
-  klmMuidLikelihood->setLogL_e(logL_e);
 }

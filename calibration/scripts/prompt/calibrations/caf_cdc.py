@@ -62,6 +62,7 @@ def select_files(all_input_files, min_events, max_processed_events_per_file):
 
 def get_calibrations(input_data, **kwargs):
     import basf2
+    from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
@@ -70,42 +71,26 @@ def get_calibrations(input_data, **kwargs):
     # print(file_to_iov_mumu)
     # print(file_to_iov_hadron)
 
-    # We might have requested an enormous amount of data across a requested range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 100
-
-    # If you are using Raw data there's a chance that input files could have zero events.
-    # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
-    # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 100
-
     max_events_per_calibration = 100000
     max_events_per_file = 3000
 
-    # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
-    # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
-
-    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
+    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, 10)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
-    chosen_files_mumu = select_files(input_files_mumu, max_events_per_calibration, max_events_per_file)
+    chosen_files_mumu = select_files(input_files_mumu[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
-    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
+    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, 10)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    chosen_files_hadron = select_files(input_files_hadron, max_events_per_calibration, max_events_per_file)
+    chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
-    max_files_per_run_bcr = 10
-    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics,
-                                                               max_files_per_run_bcr, min_events_per_file)
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 10)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
-    chosen_files_Bcosmics = select_files(input_files_Bcosmics, max_events_per_calibration, max_events_per_file)
+    chosen_files_Bcosmics = select_files(input_files_Bcosmics[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
-    input_file_dict = {"hlt_mumu": input_files_mumu, "hlt_hadron": input_files_hadron,
-                       "Bcosmics": input_files_Bcosmics}
+    input_file_dict = {"hlt_mumu": reduced_file_to_iov_mumu, "hlt_hadron": reduced_file_to_iov_hadron,
+                       "Bcosmics": reduced_file_to_iov_Bcosmics}
 
     chosen_file_dict = {"hlt_mumu": chosen_files_mumu, "hlt_hadron": chosen_files_hadron,
                         "Bcosmics": chosen_files_Bcosmics}
@@ -122,13 +107,15 @@ def get_calibrations(input_data, **kwargs):
                           algorithms=[tz_algo()],
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
+                          max_events=max_events_per_file
                           )
 
     # tw
     cal1 = CDCCalibration(name='tw0',
                           algorithms=[tw_algo()],
                           input_file_dict=chosen_file_dict,
-                          max_iterations=1,
+                          max_iterations=2,
+                          max_events=max_events_per_file,
                           dependencies=[cal0]
                           )
 
@@ -136,6 +123,7 @@ def get_calibrations(input_data, **kwargs):
                           algorithms=[tz_algo()],
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
+                          max_events=max_events_per_file,
                           dependencies=[cal1]
                           )
 
@@ -159,6 +147,7 @@ def get_calibrations(input_data, **kwargs):
                           algorithms=[tz_algo()],
                           input_file_dict=chosen_file_dict,
                           max_iterations=4,
+                          max_events=max_events_per_file,
                           dependencies=[cal4]
                           )
 

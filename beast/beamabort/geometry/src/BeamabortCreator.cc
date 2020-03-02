@@ -150,7 +150,7 @@ namespace Belle2 {
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
         l_pa->SetVisAttributes(magenta);
         G4Transform3D transform;
-        for (int i = 0; i < dimz; i++) {
+        for (unsigned int i = 0; i < dimz; i++) {
           B2INFO("DIA-" << i << "RotateZ3D phi: " << phi[i]);
 
           if (phase == 1) {
@@ -178,7 +178,7 @@ namespace Belle2 {
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
         l_BEAMABORT->SetVisAttributes(orange);
 
-        for (int i = 0; i < dimz; i++) {
+        for (unsigned int i = 0; i < dimz; i++) {
 
           if (phase == 1)
             transform = G4Translate3D(x_pos[i], y_pos[i],

@@ -17,8 +17,8 @@ calculated, and how they are calculated. It also contains entries which
 determine whether a statistic is printed to the screen or included in the
 Confluence tables.
 
-The functions ``printToJson``, ``printToScreen``, and ``printToConfluence``
-handle all the output of the statistics tables.
+The functions ``printToJson``, ``printToScreen``, ``printToConfluence``, and
+``printToMarkdown`` handle all the output of the statistics tables.
 """
 
 
@@ -1346,7 +1346,7 @@ def printToMarkdown(
         )
         markdownTables.append(table)
 
-    markdownFileName = "SkimStats.md"
+    markdownFileName = "skimStats.md"
     with open(markdownFileName, "w") as markdownFile:
         markdownFile.write("\n".join(markdownTables))
 
@@ -1486,13 +1486,13 @@ if __name__ == "__main__":
             )
 
         if args.markdown:
-            printToConfluence(
+            printToMarkdown(
                 allSkimStats,
-                statSpecifier,
                 mcSampleLabels,
                 dataSampleLabels,
-                samples,
                 beamBackgrounds,
+                args.mconly,
+                args.dataonly,
             )
 
     except ModuleNotFoundError:

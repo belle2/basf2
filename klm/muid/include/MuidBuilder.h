@@ -32,7 +32,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] pdg PDG code of the particle hypothesis.
      */
-    MuidBuilder(int pdg);
+    explicit MuidBuilder(int pdg);
 
     /**
      * Destructor.

@@ -47,6 +47,17 @@ KLMMuidLikelihood::~KLMMuidLikelihood()
 {
 }
 
+int KLMMuidLikelihood::getCharge() const
+{
+  int charge = 1;
+  int pdg = KLMMuidLikelihood::getPDGCode();
+  if (pdg < 0)
+    charge = -charge;
+  if ((std::abs(pdg) == Const::muon.getPDGCode()) || (std::abs(pdg) == Const::electron.getPDGCode()))
+    charge = -charge;
+  return charge
+}
+
 unsigned int KLMMuidLikelihood::getTotalBarrelHits() const
 {
   unsigned int hits = 0;

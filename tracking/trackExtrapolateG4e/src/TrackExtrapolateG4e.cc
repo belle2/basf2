@@ -1794,13 +1794,13 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   /* Do KLM likelihood calculation. */
   if (outcome != MuidElementNumbers::c_NotReached) { /* Extrapolation reached KLM sensitive volume. */
     double denom = 0.0;
-    int charge = (klmMuidLikelihood->getPDGCode() > 0);
+    int charge = klmMuidLikelihood->getCharge();
     std::vector<int> signedPdgVector = MuidElementNumbers::getPDGVector(charge);
     std::map<int, double> mapPdgPDF;
     for (int pdg : signedPdgVector) {
       auto search = m_MuidBuilderMap.find(pdg);
       if (search == m_MuidBuilderMap.end())
-        B2FATAL("Something went wrong: PDF for " << pdg << " code not found!");
+        B2FATAL("Something went wrong: PDF for PDG code " << pdg << " not found!");
       double pdf = (search->second)->getPDF(klmMuidLikelihood);
       denom += pdf;
       mapPdgPDF.insert(std::pair<int, double>(std::abs(pdg), pdf));

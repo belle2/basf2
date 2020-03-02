@@ -35,6 +35,9 @@ namespace Belle2 {
     //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
 
+    //! @return charge of the hypothesis used for this extrapolation
+    int getCharge() const;
+
     //! @return normalized PDF value for this extrapolation
     //! @param pdg PDG code of the hypothesis
     double getPDFValue(int pdg) const { return m_PDFValue[Const::ChargedStable(pdg).getIndex()]; }

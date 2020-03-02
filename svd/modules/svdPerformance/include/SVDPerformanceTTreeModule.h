@@ -79,6 +79,7 @@ namespace Belle2 {
     unsigned int m_svdLadder = 0; /**< ladder */
     unsigned int m_svdSensor = 0; /**< sensor */
     unsigned int m_svdSize = 0; /**< size */
+    unsigned int m_svdTB = 0; /**< trigger bin */
   };
 }
 

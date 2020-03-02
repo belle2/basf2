@@ -19,6 +19,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
@@ -99,6 +100,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_U->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
   m_t_U->Branch("svdSize", &m_svdSize, "svdSize/i");
+  m_t_U->Branch("svdTB", &m_svdTB, "svdTB/i");
   //Tree for SVD v overlapping clusters
   m_t_V = new TTree("t_V", "Tree for M_SVD v-clusters");
   m_t_V->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
@@ -135,11 +137,22 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdLadder", &m_svdLadder, "svdLadder/i");
   m_t_V->Branch("svdSensor", &m_svdSensor, "svdSensor/i");
   m_t_V->Branch("svdSize", &m_svdSize, "svdSize/i");
+  m_t_V->Branch("svdTB", &m_svdTB, "svdTB/i");
 
 }
 
 void SVDPerformanceTTreeModule::event()
 {
+
+  //first check SVDEventInfo name
+  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  if (!temp_eventinfo.isValid())
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+  m_svdTB = eventinfo->getModeByte().getTriggerBin();
+
   bool isMC = Environment::Instance().isMC();
 
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();

@@ -26,7 +26,7 @@ namespace Belle2 {
   REG_MODULE(MdstPID)
 
   MdstPIDModule::MdstPIDModule() : Module(),
-    m_pid(NULL)
+    m_pid(nullptr)
   {
     setDescription("Create MDST PID format (PIDLikelihood objects) from subdetector PID info.");
     setPropertyFlags(c_ParallelProcessingCertified);

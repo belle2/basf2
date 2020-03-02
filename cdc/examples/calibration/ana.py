@@ -92,7 +92,7 @@ if reUnpack:
                          # Enable/Disable to store the CDCRawHit Object.
                          enableStoreCDCRawHit=True,
                          enableDatabase=False,
-                         xmlMapFileName="cdc/data/ch_map_201702.dat",
+                         xmlMapFileName="data/cdc/ch_map_201702.dat",
                          # Enable/Disable print out the ADC/TDC data to the terminal.
                          enablePrintOut=False,
                          enable2ndHit=False,

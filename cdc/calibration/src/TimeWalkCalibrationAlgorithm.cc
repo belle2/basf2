@@ -57,26 +57,24 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
   float x;
   float t_mea;
-  float w;
   float t_fit;
   float ndf;
   float Pval;
   unsigned short adc;
-  int IWire;
-  int lay;
+  unsigned short IWire;
+  Byte_t lay;
 
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("IWire", &IWire);
   tree->SetBranchAddress("x_u", &x);
   tree->SetBranchAddress("t", &t_mea);
   tree->SetBranchAddress("t_fit", &t_fit);
-  tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
   tree->SetBranchAddress("adc", &adc);
 
   /* Disable unused branch */
-  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf", "adc"};
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit", "Pval", "ndf", "adc"};
   tree->SetBranchStatus("*", 0);
 
   for (TString brname : list_vars) {

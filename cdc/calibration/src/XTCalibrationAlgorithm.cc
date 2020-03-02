@@ -55,7 +55,7 @@ void XTCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  int lay;
+  Byte_t lay;
   float dt;
   float dx;
   float Pval, alpha, theta;

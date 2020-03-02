@@ -79,8 +79,8 @@ namespace Belle2 {
       float x_mea;             /**< measure drift length (signed by left right).*/
       float x_u;               /**< X_fit for unbiased track fit.*/
       float x_b;               /**< X_fit for biased track fit.*/
-      int lay;                  /**< Layer ID. */
-      int IWire;                /**< Wire ID. */
+      Byte_t lay;              /**< Layer ID. */
+      unsigned short IWire;    /**< Wire ID. */
       float Pval;              /**< P-value of fitted track.  */
       float ndf;               /**< degree of freedom. */
       float d0;                /**< Track Parameter, d0. */

@@ -74,7 +74,7 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  int lay;
+  Byte_t lay;
   float w;
   float x_u;
   float x_b;

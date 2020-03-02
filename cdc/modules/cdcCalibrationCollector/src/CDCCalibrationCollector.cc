@@ -76,9 +76,9 @@ void CDCCalibrationCollectorModule::prepare()
   m_tree->Branch<float>("t", &t);
   m_tree->Branch<unsigned short>("adc", &adc);
   //  m_tree->Branch<int>("boardID", &boardID);
-  m_tree->Branch<int>("lay", &lay);
+  m_tree->Branch<Byte_t>("lay", &lay);
   m_tree->Branch<float>("weight", &weight);
-  m_tree->Branch<int>("IWire", &IWire);
+  m_tree->Branch<unsigned short>("IWire", &IWire);
   m_tree->Branch<float>("Pval", &Pval);
   m_tree->Branch<float>("ndf", &ndf);
   if (m_storeTrackParams) {

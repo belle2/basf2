@@ -3,16 +3,13 @@
 
 """
 <header>
-  <contact> SVD Software Group, svd-software@belle2.org </contact>
-  <description>
+    <contact> SVD Software Group, svd-software@belle2.org </contact>
+    <description>
     This module is used for the SVD validation.
     It gets information about truehits, saving in a ttree in a ROOT file.
-  </description>
+    </description>
 </header>
 """
-import sys
-import math
-
 from basf2 import *
 
 # Some ROOT tools
@@ -27,7 +24,7 @@ gROOT.ProcessLine('struct EventDataTrueHit {\
     int ladder;\
     int sensor;\
     int sensor_type;\
-    float truehit_cluster;\
+    int strip_dir;\
     };')
 
 from ROOT import EventDataTrueHit
@@ -60,37 +57,39 @@ class SVDValidationTTreeTrueHit(Module):
 
     def event(self):
         """Find truehit and save needed information"""
-
-        # Start with truehits and use the relation to get the corresponding
-        svd_truehits = Belle2.PyStoreArray('SVDTrueHits')
-        print("\nlen(svd_truehits) = ", len(svd_truehits))
-        for truehit in svd_truehits:
-            self.data.truehit_cluster = -999
-            clusters = truehit.getRelationsFrom('SVDClusters')
-            print("len(clusters) = ", len(clusters))
-            for cluster in clusters:
-                # Sensor identification
-                sensorID = cluster.getSensorID()
-                self.data.sensor_id = int(sensorID)
-                sensorNum = sensorID.getSensorNumber()
-                self.data.sensor = sensorNum
-                layerNum = sensorID.getLayerNumber()
-                self.data.layer = layerNum
-                ladderNum = sensorID.getLadderNumber()
-                self.data.ladder = ladderNum
-                if (layerNum == 3):
-                    sensorType = 1
+        # Start with truehits and use the relation to get the corresponding clusters
+        svdtruehits = Belle2.PyStoreArray('SVDTrueHits')
+        for truehit in svdtruehits:
+            # Sensor identification
+            sensorID = truehit.getSensorID()
+            self.data.sensor_id = int(sensorID)
+            sensorNum = sensorID.getSensorNumber()
+            self.data.sensor = sensorNum
+            layerNum = sensorID.getLayerNumber()
+            self.data.layer = layerNum
+            if (layerNum == 3):
+                sensorType = 1
+            else:
+                if (sensorNum == 1):
+                    sensorType = 0
                 else:
-                    if (sensorNum == 1):
-                        sensorType = 0
+                    sensorType = 1
+            self.data.sensor_type = sensorType
+            ladderNum = sensorID.getLadderNumber()
+            self.data.ladder = ladderNum
+            #
+            clusters = truehit.getRelationsFrom('SVDClusters')
+            if len(clusters) == 0:
+                self.data.strip_dir = -1
+            else:
+                for cluster in clusters:
+                    if cluster.isUCluster():
+                        self.data.strip_dir = 0
                     else:
-                        sensorType = 1
-                self.data.sensor_type = sensorType
-                #
-                self.data.truehit_cluster = 1
-                # Fill tree
-                self.file.cd()
-                self.tree.Fill()
+                        self.data.strip_dir = 1
+            # Fill tree
+            self.file.cd()
+            self.tree.Fill()
 
     def terminate(self):
         """Close the output file. """

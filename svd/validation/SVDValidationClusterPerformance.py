@@ -38,7 +38,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size==1)&&(strip_dir==0)',
+    cut=cut_Usize1,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for one strip on U side',
     check='peak around 0',
     isShifter=False)
@@ -54,7 +54,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size==1)&&(strip_dir==1)',
+    cut=cut_Vsize1,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for one strip on V side',
     check='peak around 0',
     isShifter=False)
@@ -70,7 +70,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size==2)&&(strip_dir==0)',
+    cut=cut_Usize2,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for two strips on U side',
     check='peak around 0',
     isShifter=False)
@@ -86,7 +86,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size==2)&&(strip_dir==1)',
+    cut=cut_Vsize2,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for two strips on V side',
     check='peak around 0',
     isShifter=False)
@@ -102,7 +102,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size>2)&&(strip_dir==0)',
+    cut=cut_Usize3plus,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for >2 strips on U side',
     check='peak around 0',
     isShifter=False)
@@ -118,7 +118,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_position - truehit_position',
-    cut='(cluster_size>2)&&(strip_dir==1)',
+    cut=cut_Vsize3plus,
     descr='position resolution = (reconstructed position of the Cluster) - (position of the Truehit); for >2 strips on V side',
     check='peak around 0',
     isShifter=False)
@@ -134,10 +134,11 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size==1)&&(strip_dir==0)',
+    cut=cut_Usize1,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for one strip on U side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
+
 
 ploter(
     name='VPositionPull_size1',
@@ -150,7 +151,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size==1)&&(strip_dir==1)',
+    cut=cut_Vsize1,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for one strip on V side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
@@ -167,7 +168,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size==2)&&(strip_dir==0)',
+    cut=cut_Usize2,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for two strips on U side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
@@ -183,7 +184,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size==2)&&(strip_dir==1)',
+    cut=cut_Vsize2,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for two strips on V side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
@@ -200,7 +201,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size>2)&&(strip_dir==0)',
+    cut=cut_Usize3plus,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for 3 or more strips on U side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
@@ -217,7 +218,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut='(cluster_size>2)&&(strip_dir==1)',
+    cut=cut_Vsize3plus,
     descr='Pull: (cluster_position - truehit_position)/cluster_positionSigma; for 3 or more strips on V side',
     check='peak around 0 with RMS less than 2',
     isShifter=False)
@@ -234,7 +235,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_clsTime - truehit_time',
-    cut='(strip_dir==0)',
+    cut=cut_U,
     descr='(reconstructed time of the Cluster) - (time of the Truehit) for all Clusters related to TrueHits',
     check='peak around 0',
     isShifter=True)
@@ -251,7 +252,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_clsTime - truehit_time',
-    cut='(strip_dir==1)',
+    cut=cut_V,
     descr='(reconstructed time of the Cluster) - (time of the Truehit) for all Clusters related to TrueHits',
     check='peak around 0',
     isShifter=True)

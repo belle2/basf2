@@ -4,6 +4,7 @@
 """
 <header>
     <input>SVDValidationTTree.root</input>
+    <input>SVDValidationTTreeTrueHit.root</input>
     <output>SVDClusterPerformance.root</output>
     <description>
     Validation plots related to cluster performance.
@@ -16,10 +17,13 @@
 
 from plotUtils import *
 
-# open the files with simulated and reconstructed events data
+# open the files with generated and reconstructed information for clusters
 input = R.TFile.Open("../SVDValidationTTree.root")
+input2 = R.TFile.Open("../SVDValidationTTreeTrueHit.root")
 
 tree = input.Get("tree")
+tree2 = input2.Get("tree")
+
 
 histsCP = R.TFile.Open("SVDClusterPerformance.root", "recreate")
 

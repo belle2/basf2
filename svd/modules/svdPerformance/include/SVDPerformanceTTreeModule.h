@@ -44,7 +44,7 @@ namespace Belle2 {
 
     TTree* m_t_U = nullptr; /**< tree containing info related to the U side clusters*/
     TTree* m_t_V = nullptr;  /**< tree containing info related to the V side clusters*/
-    /* Branches of SVD u-clusters tree */
+    /* Branches of SVD u and v clusters tree */
     float m_svdClCharge = 0;      /**< cluster charge */
     float m_svdClSNR = 0;      /**< cluster SNR */
     float m_svdClTime = 0;      /**< cluster time */
@@ -54,6 +54,8 @@ namespace Belle2 {
     float m_svdTruePos = -99;      /**< true position */
     float m_svdClPhi = 0;   /**< cluster global phi */
     float m_svdClZ = 0;     /**< cluster global Z */
+    std::vector<float> m_svdStripCharge; /**< charge of the strips of the cluster*/
+    std::vector<float> m_svdStripTime; /**< time of the strips of the cluster*/
     int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/
     int m_svdTrkSVDHits = 0; /**< number of SVD hits on the track*/
     int m_svdTrkCDCHits = 0; /**< number of CDC hits on the track*/

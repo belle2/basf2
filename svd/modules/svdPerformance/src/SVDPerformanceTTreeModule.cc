@@ -17,6 +17,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/core/Environment.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
@@ -64,9 +65,11 @@ void SVDPerformanceTTreeModule::initialize()
 
   //Tree for SVD u overlapping clusters
   m_t_U = new TTree("t_U", "Tree for SVD u-clusters");
-  m_t_U->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_U->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
+  m_t_U->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
+  m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_U->Branch("svdStripTime", &m_svdStripTime);
   m_t_U->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_U->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
   m_t_U->Branch("svdClPosErr", &m_svdClPosErr, "svdClPosErr/F");
@@ -98,9 +101,11 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdSize", &m_svdSize, "svdSize/i");
   //Tree for SVD v overlapping clusters
   m_t_V = new TTree("t_V", "Tree for M_SVD v-clusters");
-  m_t_V->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
   m_t_V->Branch("svdClSNR", &m_svdClSNR, "svdClSNR/F");
+  m_t_V->Branch("svdClCharge", &m_svdClCharge, "svdClCharge/F");
+  m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
+  m_t_V->Branch("svdStripTime", &m_svdStripTime);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_V->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
   m_t_V->Branch("svdClPosErr", &m_svdClPosErr, "svdClPosErr/F");
@@ -240,7 +245,21 @@ void SVDPerformanceTTreeModule::event()
         m_svdLadder = svd_Ladder_1;
         m_svdSensor = svd_Sensor_1;
         m_svdSize = strips_1;
+
+        m_svdStripCharge.clear();
+        m_svdStripTime.clear();
+        //retrieve relations and set strip charges and times
+        RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+        if (theRecoDigits.size() != m_svdSize)
+          B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
+
+        for (unsigned int d = 0; d < m_svdSize; d++) {
+          m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+          m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+        }
+
         m_t_U->Fill();
+
       } else {
         const int strips_1 = svd_1->getSize();
         const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
@@ -278,6 +297,20 @@ void SVDPerformanceTTreeModule::event()
         m_svdLadder = svd_Ladder_1;
         m_svdSensor = svd_Sensor_1;
         m_svdSize = strips_1;
+
+        m_svdStripCharge.clear();
+        m_svdStripTime.clear();
+
+        //retrieve relations and set strip charges and times
+        RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+        if (theRecoDigits.size() != m_svdSize)
+          B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
+
+        for (unsigned int d = 0; d < m_svdSize; d++) {
+          m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+          m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+        }
+
         m_t_V->Fill();
       }
     }

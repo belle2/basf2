@@ -32,6 +32,8 @@ cut_s = R.TCut('sensor_type==0')  # slanted
 cut_b = R.TCut('sensor_type==1')  # barrel
 cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
+cut_noU = R.TCut('strip_dir!=0')  # V_P or -1
+cut_noV = R.TCut('strip_dir!=1')  # U_N or -1
 
 # default granurality
 granulesD = ((cut_L3+cut_b, 'L3_barrel'),
@@ -56,7 +58,37 @@ def ploter(name, title, nbins, xmin, xmax, x_label, y_label,
     for g in granules:
         hName = f'{name}_{g[1]}'
         h = create1DHist(hName, title, nbins, xmin, xmax, x_label, y_label)
-        tree.Draw(f'{expr}>>{hName}', g[0]+R.TCut(cut), 'goff')
+        if cut == "":
+            selection = g[0]
+        else:
+            selection = g[0] + cut
+        tree.Draw(f'{expr}>>{hName}', selection, 'goff')
         addDetails(h, descr, check, contact_str, isShifter)
         h.SetTitle(f'{title} ({g[1]})')
         h.Write(hName)
+
+
+def plotEff(name, title, x_label, y_label,
+            granules,
+            tree, expr, cutALL, cut,
+            descr, check, contact_str=SVDContact, isShifter=False):
+    hName = f'{name}'
+    h = create1DHist(hName, title, len(granules), 1, len(granules)+1, x_label, y_label)
+    h.GetYaxis().SetRangeUser(0, 1.4)
+    for i, g in enumerate(granules, 1):
+        h.GetXaxis().SetBinLabel(i, g[1])
+        if cutALL == "":
+            selectionALL = g[0]
+        else:
+            selectionALL = g[0] + cutALL
+        n_all = tree.Draw(f'{expr}', selectionALL, 'goff')
+        if cut == "":
+            selection = g[0]
+        else:
+            selection = g[0] + cut
+        n_selected = tree.Draw(f'{expr}', selectionALL+selection, 'goff')
+        h.SetBinContent(i, n_selected/n_all)
+        h.SetBinError(i, (n_selected/n_all)*(1/n_selected+1/n_all)**0.5)
+    addDetails(h, descr, check, contact_str, isShifter)
+    h.SetTitle(f'{title}')
+    h.Write(hName)

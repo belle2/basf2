@@ -22,13 +22,13 @@ This is a list of the ``klm`` modules. Some modules (in the ``klm/bklm`` and ``k
 Clusterization
 --------------
 
-Few words about how a `KLMCluster` is built starting from `BKLMHit2d` and `EKLMHit2d` are more than desiderable.
+Few words about how a ``KLMCluster`` is built starting from ``BKLMHit2d`` and ``EKLMHit2d`` are more than desiderable.
 
 
 Muon identification
 -------------------
 
-It would be veeery nice to document here the algorithm for the muon identification (and the `MuidBuilder` class).
+It would be veeery nice to document here the algorithm for the muon identification (and the ``MuidBuilder`` class).
 
 
 Calibration

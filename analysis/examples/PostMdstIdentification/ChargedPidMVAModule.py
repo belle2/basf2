@@ -50,6 +50,19 @@ def argparser():
                         A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test.
                         Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:
                         '--testHyposPDGCodePair 11,211 13,211'""")
+    parser.add_argument(
+        "--addECLOnly",
+        dest="add_ecl_only",
+        action="store_true",
+        default=False,
+        help="Apply the BDT also for the ECL-only training. This will result in a separate score branch in the ntuple.")
+    parser.add_argument("--global_tag_append",
+                        type=str,
+                        nargs="+",
+                        default=None,
+                        help="Names of conditions DB global tag(s) to append on tp of GT replay."
+                        "NB: these GTs will have lowest priority."
+                        "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",
                         dest="debug",
                         action="store",
@@ -70,7 +83,10 @@ if __name__ == '__main__':
     from variables import variables
     from ROOT import Belle2
 
-    print(basf2.conditions.globaltags)
+    if args.global_tag_append is not None:
+        for tag in args.global_tag_append:
+            basf2.conditions.append_globaltag(tag)
+        print(f"Appending GTs:\n{args.global_tag_append}")
 
     # ------------
     # Create path.
@@ -91,12 +107,12 @@ if __name__ == '__main__':
     # ---------------------------------------
 
     std_charged = {
-        Belle2.Const.electron.getPDGCode(): {"EVTGEN_ID": "e+",        "NAME": "e",  "FULLNAME": "electron", "CUT": ""},
-        Belle2.Const.muon.getPDGCode(): {"EVTGEN_ID": "mu+",       "NAME": "mu", "FULLNAME": "muon",     "CUT": ""},
-        Belle2.Const.pion.getPDGCode(): {"EVTGEN_ID": "pi+",       "NAME": "pi", "FULLNAME": "pion",     "CUT": ""},
-        Belle2.Const.kaon.getPDGCode(): {"EVTGEN_ID": "K+",        "NAME": "K",  "FULLNAME": "kaon",     "CUT": ""},
-        Belle2.Const.proton.getPDGCode(): {"EVTGEN_ID": "p+",        "NAME": "p",  "FULLNAME": "proton",   "CUT": ""},
-        Belle2.Const.deuteron.getPDGCode(): {"EVTGEN_ID": "deuteron",  "NAME": "d",  "FULLNAME": "deuteron", "CUT": ""},
+        Belle2.Const.electron.getPDGCode(): {"EVTGEN_ID": "e+", "NAME": "e", "FULLNAME": "electron", "CUT": ""},
+        Belle2.Const.muon.getPDGCode(): {"EVTGEN_ID": "mu+", "NAME": "mu", "FULLNAME": "muon", "CUT": ""},
+        Belle2.Const.pion.getPDGCode(): {"EVTGEN_ID": "pi+", "NAME": "pi", "FULLNAME": "pion", "CUT": ""},
+        Belle2.Const.kaon.getPDGCode(): {"EVTGEN_ID": "K+", "NAME": "K", "FULLNAME": "kaon", "CUT": ""},
+        Belle2.Const.proton.getPDGCode(): {"EVTGEN_ID": "p+", "NAME": "p", "FULLNAME": "proton", "CUT": ""},
+        Belle2.Const.deuteron.getPDGCode(): {"EVTGEN_ID": "deuteron", "NAME": "d", "FULLNAME": "deuteron", "CUT": ""},
     }
 
     plists = [(f"{d.get('EVTGEN_ID')}:{d.get('FULLNAME')}s", d.get("CUT")) for d in std_charged.values()]
@@ -142,12 +158,21 @@ if __name__ == '__main__':
         applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                            path=path,
                            trainingMode=Belle2.ChargedPidMVAWeights.c_Multiclass)
+        if args.add_ecl_only:
+            applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                               path=path,
+                               trainingMode=Belle2.ChargedPidMVAWeights.c_ECL_Multiclass)
     elif binary_pid:
         for s, b in args.testHyposPDGCodePair:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
                                trainingMode=Belle2.ChargedPidMVAWeights.c_Classification,
                                binaryHypoPDGCodes=(s, b))
+            if args.add_ecl_only:
+                applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
+                                   path=path,
+                                   trainingMode=Belle2.ChargedPidMVAWeights.c_ECL_Classification,
+                                   binaryHypoPDGCodes=(s, b))
 
     if args.debug:
         for m in path.modules():
@@ -160,22 +185,33 @@ if __name__ == '__main__':
     # ---------------
 
     if global_pid:
+
         append = "_vs_".join(map(str, std_charged.keys()))
+
+        variables = [f"pidChargedBDTScore({pdgId}, ALL)" for pdgId in std_charged]
+        if args.add_ecl_only:
+            variables += [f"pidChargedBDTScore({pdgId}, ECL)" for pdgId in std_charged]
+
     elif binary_pid:
+
         append = "__".join([f"{s}_vs_{b}" for s, b in args.testHyposPDGCodePair])
+
+        variables = [f"pidPairChargedBDTScore({s}, {b}, ALL)" for s, b in args.testHyposPDGCodePair]
+        if args.add_ecl_only:
+            variables += [f"pidPairChargedBDTScore({s}, {b}, ECL)" for s, b in args.testHyposPDGCodePair]
 
     filename = f"chargedpid_ntuples__{append}.root"
 
     for plistname, _ in plists:
         if global_pid:
             variablesToNtuple(decayString=plistname,
-                              variables=[f"pidChargedBDTScore({pdgId})" for pdgId in std_charged],
+                              variables=variables,
                               treename=plistname.split(':')[1],
                               filename=filename,
                               path=path)
         elif binary_pid:
             variablesToNtuple(decayString=plistname,
-                              variables=[f"pidPairChargedBDTScore({s},{b})" for s, b in args.testHyposPDGCodePair],
+                              variables=variables,
                               treename=plistname.split(':')[1],
                               filename=filename,
                               path=path)

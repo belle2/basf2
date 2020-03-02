@@ -60,7 +60,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "all") return Const::SVD + Const::CDC + Const::TOP + Const::ARICH + Const::ECL + Const::KLM;
+        if (val == "all") return Const::PIDDetectors::c_set;
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;
@@ -72,7 +72,18 @@ namespace Belle2 {
       return result;
     }
 
-
+    // Specialisation of valid detectors parser for ChargedBDT.
+    Const::PIDDetectorSet parseDetectorsChargedBDT(const std::vector<std::string>& arguments)
+    {
+      Const::PIDDetectorSet result;
+      for (std::string val : arguments) {
+        boost::to_lower(val);
+        if (val == "all") return Const::PIDDetectors::c_set;
+        else if (val == "ecl") result += Const::ECL;
+        else B2ERROR("Invalid detector component: " << val << " for charged BDT.");
+      }
+      return result;
+    }
 
     //*************
     // Belle II
@@ -288,15 +299,30 @@ namespace Belle2 {
 
     Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 1) {
-        B2ERROR("Need exactly one argument for pidChargedBDTScore: pdgCodeHyp");
+      if (arguments.size() != 2) {
+        B2ERROR("Need exactly two arguments for pidChargedBDTScore: pdgCodeHyp, detector");
         return nullptr;
       }
 
-      auto pdgCodeHyp(arguments.at(0));
+      int hypPdgId;
+      try {
+        hypPdgId = std::stoi(arguments.at(0));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        return nullptr;
+      }
+      Const::ChargedStable hypType = Const::ChargedStable(hypPdgId);
 
-      auto func = [pdgCodeHyp](const Particle * part) -> double {
-        auto name = "pidChargedBDTScore_" + pdgCodeHyp;
+      std::vector<std::string> detectors(arguments.begin() + 1, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectorsChargedBDT(detectors);
+
+      auto func = [hypType, detectorSet](const Particle * part) -> double {
+        auto name = "pidChargedBDTScore_" + std::to_string(hypType.getPDGCode());
+        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        {
+          auto det = detectorSet[iDet];
+          name += "_" + std::to_string(det);
+        }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
       return func;
@@ -304,16 +330,37 @@ namespace Belle2 {
 
     Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 2) {
-        B2ERROR("Need exactly two arguments for pidPairChargedBDTScore: pdgCodeHyp, pdgCodeTest");
+      if (arguments.size() != 3) {
+        B2ERROR("Need exactly three arguments for pidPairChargedBDTScore: pdgCodeHyp, pdgCodeTest, detector.");
         return nullptr;
       }
 
-      auto pdgCodeHyp(arguments.at(0));
-      auto pdgCodeTest(arguments.at(1));
+      int hypPdgId, testPdgId;
+      try {
+        hypPdgId = std::stoi(arguments.at(0));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        return nullptr;
+      }
+      try {
+        testPdgId = std::stoi(arguments.at(1));
+      } catch (std::invalid_argument& e) {
+        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        return nullptr;
+      }
+      Const::ChargedStable hypType = Const::ChargedStable(hypPdgId);
+      Const::ChargedStable testType = Const::ChargedStable(testPdgId);
 
-      auto func = [pdgCodeHyp, pdgCodeTest](const Particle * part) -> double {
-        auto name = "pidPairChargedBDTScore_" + pdgCodeHyp + "_VS_" + pdgCodeTest;
+      std::vector<std::string> detectors(arguments.begin() + 2, arguments.end());
+      Const::PIDDetectorSet detectorSet = parseDetectorsChargedBDT(detectors);
+
+      auto func = [hypType, testType, detectorSet](const Particle * part) -> double {
+        auto name = "pidPairChargedBDTScore_" + std::to_string(hypType.getPDGCode()) + "_VS_" + std::to_string(testType.getPDGCode());
+        for (size_t iDet(0); iDet < detectorSet.size(); ++iDet)
+        {
+          auto det = detectorSet[iDet];
+          name += "_" + std::to_string(det);
+        }
         return (part->hasExtraInfo(name)) ? part->getExtraInfo(name) : std::numeric_limits<float>::quiet_NaN();
       };
       return func;
@@ -441,10 +488,10 @@ namespace Belle2 {
                       "probability for the pdgCodeHyp mass hypothesis respect to all the other ones, using an arbitrary set of detectors :math:`\\mathcal{L}_{hyp}/(\\Sigma_{\\text{all~hyp}}\\mathcal{L}_{i}`. ");
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
-    REGISTER_VARIABLE("pidChargedBDTScore(pdgCodeHyp)", pidChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.");
-    REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest)", pidPairChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.");
+    REGISTER_VARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detctors, or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.");
+    REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest, detector)", pidPairChargedBDTScore,
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detctors, or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.");
     REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
                       "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
     REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,

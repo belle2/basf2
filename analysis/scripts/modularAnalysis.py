@@ -2719,10 +2719,33 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     plSet = set(particleLists)
 
+    # Map the training mode enum value to the actual name of the payload in the GT.
+    payloadNames = {
+        Belle2.ChargedPidMVAWeights.c_Classification: {"mode": "Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_Multiclass: {"mode": "Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_Classification: {"mode": "ECL_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: {"mode": "ECL_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_PSD_Classification: {"mode": "PSD_Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: {"mode": "PSD_Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: {"mode": "ECL_PSD_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
+    }
+
+    if payloadNames.get(trainingMode) is None:
+        B2FATAL("The chosen training mode integer identifier:\n", trainingMode,
+                "\nis not supported. Please choose among the following:\n",
+                "\n".join(f"{key}:{val.get('mode')}" for key, val in sorted(payloadNames.items())))
+
+    mode = payloadNames.get(trainingMode).get("mode")
+    detector = payloadNames.get(trainingMode).get("detector")
+
+    payloadName = f"ChargedPidMVAWeights_{mode}"
+
     if binaryHypoPDGCodes == (0, 0):
         # MULTI-CLASS training mode.
 
         chargedpid = register_module("ChargedPidMVAMulticlass")
+        chargedpid.set_name(f"ChargedPidMVAMulticlass_{mode}")
 
     else:
         # BINARY training mode.
@@ -2743,31 +2766,17 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
                     "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
 
         chargedpid = register_module("ChargedPidMVA")
-        chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}")
+        chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
         chargedpid.param("sigHypoPDGCode", binaryHypoPDGCodes[0])
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
 
     chargedpid.param("particleLists", list(plSet))
 
-    # Map the training mode enum value to the actual name of the payload in the GT.
-    payloadNames = {
-        Belle2.ChargedPidMVAWeights.c_Classification: "Classification",
-        Belle2.ChargedPidMVAWeights.c_Multiclass: "Multiclass",
-        Belle2.ChargedPidMVAWeights.c_ECL_Classification: "ECL_Classification",
-        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: "ECL_Multiclass",
-        Belle2.ChargedPidMVAWeights.c_PSD_Classification: "PSD_Classification",
-        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: "PSD_Multiclass",
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: "ECL_PSD_Classification",
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: "ECL_PSD_Multiclass"
-    }
-
-    if payloadNames.get(trainingMode) is None:
-        B2FATAL("The chosen training mode integer identifier:\n", trainingMode,
-                "\nis not supported. Please choose among the following:\n",
-                "\n".join(f"{key}:{val}" for key, val in sorted(payloadNames.items())))
-
-    payloadName = f"ChargedPidMVAWeights_{payloadNames.get(trainingMode)}"
     chargedpid.param("payloadName", payloadName)
+
+    # Ensure the module knows whether we are using ECL-only training mode.
+    if detector == "ECL":
+        chargedpid.param("useECLOnlyTraining", True)
 
     path.add_module(chargedpid)
 

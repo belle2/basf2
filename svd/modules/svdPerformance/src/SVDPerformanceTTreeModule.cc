@@ -210,122 +210,128 @@ void SVDPerformanceTTreeModule::event()
       const unsigned short svd_Ladder_1 = svd_id_1.getLadderNumber();
       const unsigned short svd_Sensor_1 = svd_id_1.getSensorNumber();
 
-      const TVectorD resUnBias_1 =  fittedResult_1->getResidual(0, false).getState();
-      genfit::MeasuredStateOnPlane state_unbiased = fittedResult_1->getFittedState(false);
-      const TVectorD& svd_predIntersect_unbiased = state_unbiased.getState();
-      const TMatrixDSym& covMatrix_unbiased = state_unbiased.getCov();
-      genfit::MeasuredStateOnPlane state_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1);
-      const TVectorD& svd_predIntersect_1 = state_1.getState();
-      const TMatrixDSym& covMatrix_1 = state_1.getCov();
+      try {
+        const TVectorD resUnBias_1 =  fittedResult_1->getResidual(0, false).getState();
+        genfit::MeasuredStateOnPlane state_unbiased = fittedResult_1->getFittedState(false);
+        const TVectorD& svd_predIntersect_unbiased = state_unbiased.getState();
+        const TMatrixDSym& covMatrix_unbiased = state_unbiased.getCov();
+        genfit::MeasuredStateOnPlane state_1 = trk.getMeasuredStateOnPlaneFromRecoHit(infoSVD_1);
+        const TVectorD& svd_predIntersect_1 = state_1.getState();
+        const TMatrixDSym& covMatrix_1 = state_1.getCov();
 
-      if (svd_1->isUCluster()) {
+        if (svd_1->isUCluster()) {
 
-        const int strips_1 = svd_1->getSize();
+          const int strips_1 = svd_1->getSize();
 
-        const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-        const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
-        const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-        const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-        double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-        double svdZ_1 = svdGlobal_1(2);
+          const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+          const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
+          double svdZ_1 = svdGlobal_1(2);
 
-        //Fill SVD tree for u-overlaps if required by the user
-        m_svdRes = res_U_1;
-        m_svdClTime = svd_1->getClsTime();
-        m_svdClSNR = svd_1->getSNR();
-        m_svdClCharge = svd_1->getCharge();
-        m_svdClPos = svd_1->getPosition();
-        m_svdClPosErr = svd_1->getPositionSigma();
-        if (isMC && trueHit_1.size() > 0)
-          m_svdTruePos = trueHit_1[0]->getU();
-        else
-          m_svdTruePos = -99;
-        m_svdClPhi = svdPhi_1;
-        m_svdClZ = svdZ_1;
-        m_svdTrkPos = svd_predIntersect_1[3];
-        m_svdTrkPosOS = svd_predIntersect_1[4];
-        m_svdTrkPosErr = sqrt(covMatrix_1[3][3]);
-        m_svdTrkPosErrOS = sqrt(covMatrix_1[4][4]);
-        m_svdTrkQoP = svd_predIntersect_1[0];
-        m_svdTrkPrime = svd_predIntersect_1[1];
-        m_svdTrkPrimeOS = svd_predIntersect_1[2];
-        m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
-        m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
-        m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
-        m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
-        m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[1];
-        m_svdLayer = svd_Layer_1;
-        m_svdLadder = svd_Ladder_1;
-        m_svdSensor = svd_Sensor_1;
-        m_svdSize = strips_1;
+          //Fill SVD tree for u-overlaps if required by the user
+          m_svdRes = res_U_1;
+          m_svdClTime = svd_1->getClsTime();
+          m_svdClSNR = svd_1->getSNR();
+          m_svdClCharge = svd_1->getCharge();
+          m_svdClPos = svd_1->getPosition();
+          m_svdClPosErr = svd_1->getPositionSigma();
+          if (isMC && trueHit_1.size() > 0)
+            m_svdTruePos = trueHit_1[0]->getU();
+          else
+            m_svdTruePos = -99;
+          m_svdClPhi = svdPhi_1;
+          m_svdClZ = svdZ_1;
+          m_svdTrkPos = svd_predIntersect_1[3];
+          m_svdTrkPosOS = svd_predIntersect_1[4];
+          m_svdTrkPosErr = sqrt(covMatrix_1[3][3]);
+          m_svdTrkPosErrOS = sqrt(covMatrix_1[4][4]);
+          m_svdTrkQoP = svd_predIntersect_1[0];
+          m_svdTrkPrime = svd_predIntersect_1[1];
+          m_svdTrkPrimeOS = svd_predIntersect_1[2];
+          m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
+          m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
+          m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
+          m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
+          m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[1];
+          m_svdLayer = svd_Layer_1;
+          m_svdLadder = svd_Ladder_1;
+          m_svdSensor = svd_Sensor_1;
+          m_svdSize = strips_1;
 
-        m_svdStripCharge.clear();
-        m_svdStripTime.clear();
-        //retrieve relations and set strip charges and times
-        RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
-        if (theRecoDigits.size() != m_svdSize)
-          B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
+          m_svdStripCharge.clear();
+          m_svdStripTime.clear();
+          //retrieve relations and set strip charges and times
+          RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+          if (theRecoDigits.size() != m_svdSize)
+            B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
 
-        for (unsigned int d = 0; d < m_svdSize; d++) {
-          m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-          m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+          for (unsigned int d = 0; d < m_svdSize; d++) {
+            m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+            m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+          }
+
+          m_t_U->Fill();
+
+        } else {
+          const int strips_1 = svd_1->getSize();
+          const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+          const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+          double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
+          double svdZ_1 = svdGlobal_1(2);
+
+          m_svdRes = res_V_1;
+          m_svdClTime = svd_1->getClsTime();
+          m_svdClSNR = svd_1->getSNR();
+          m_svdClCharge = svd_1->getCharge();
+          m_svdClPos = svd_1->getPosition();
+          m_svdClPosErr = svd_1->getPositionSigma();
+          if (isMC && trueHit_1.size() > 0)
+            m_svdTruePos = trueHit_1[0]->getV();
+          else
+            m_svdTruePos = -99;
+          m_svdClPhi = svdPhi_1;
+          m_svdClZ = svdZ_1;
+          m_svdTrkPos = svd_predIntersect_1[4];
+          m_svdTrkPosOS = svd_predIntersect_1[3];
+          m_svdTrkPosErr = sqrt(covMatrix_1[4][4]);
+          m_svdTrkPosErrOS = sqrt(covMatrix_1[3][3]);
+          m_svdTrkQoP = svd_predIntersect_1[0];
+          m_svdTrkPrime = svd_predIntersect_1[2];
+          m_svdTrkPrimeOS = svd_predIntersect_1[1];
+          m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
+          m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
+          m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
+          m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
+          m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[2];
+          m_svdLayer = svd_Layer_1;
+          m_svdLadder = svd_Ladder_1;
+          m_svdSensor = svd_Sensor_1;
+          m_svdSize = strips_1;
+
+          m_svdStripCharge.clear();
+          m_svdStripTime.clear();
+
+          //retrieve relations and set strip charges and times
+          RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
+          if (theRecoDigits.size() != m_svdSize)
+            B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
+
+          for (unsigned int d = 0; d < m_svdSize; d++) {
+            m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+            m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+          }
+
+          m_t_V->Fill();
         }
-
-        m_t_U->Fill();
-
-      } else {
-        const int strips_1 = svd_1->getSize();
-        const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-        const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
-        const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-        const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-        double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-        double svdZ_1 = svdGlobal_1(2);
-
-        m_svdRes = res_V_1;
-        m_svdClTime = svd_1->getClsTime();
-        m_svdClSNR = svd_1->getSNR();
-        m_svdClCharge = svd_1->getCharge();
-        m_svdClPos = svd_1->getPosition();
-        m_svdClPosErr = svd_1->getPositionSigma();
-        if (isMC && trueHit_1.size() > 0)
-          m_svdTruePos = trueHit_1[0]->getV();
-        else
-          m_svdTruePos = -99;
-        m_svdClPhi = svdPhi_1;
-        m_svdClZ = svdZ_1;
-        m_svdTrkPos = svd_predIntersect_1[4];
-        m_svdTrkPosOS = svd_predIntersect_1[3];
-        m_svdTrkPosErr = sqrt(covMatrix_1[4][4]);
-        m_svdTrkPosErrOS = sqrt(covMatrix_1[3][3]);
-        m_svdTrkQoP = svd_predIntersect_1[0];
-        m_svdTrkPrime = svd_predIntersect_1[2];
-        m_svdTrkPrimeOS = svd_predIntersect_1[1];
-        m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
-        m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
-        m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
-        m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
-        m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[2];
-        m_svdLayer = svd_Layer_1;
-        m_svdLadder = svd_Ladder_1;
-        m_svdSensor = svd_Sensor_1;
-        m_svdSize = strips_1;
-
-        m_svdStripCharge.clear();
-        m_svdStripTime.clear();
-
-        //retrieve relations and set strip charges and times
-        RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
-        if (theRecoDigits.size() != m_svdSize)
-          B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize);
-
-        for (unsigned int d = 0; d < m_svdSize; d++) {
-          m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-          m_svdStripTime.push_back(theRecoDigits[d]->getTime());
-        }
-
-        m_t_V->Fill();
+      } catch (...) {
+        B2INFO("oops...something went wrong in getting the unbiased state, skipping this cluster.");
+        continue;
       }
+
     }
   }
 }

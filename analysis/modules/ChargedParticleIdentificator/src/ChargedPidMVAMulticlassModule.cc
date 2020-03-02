@@ -175,11 +175,8 @@ void ChargedPidMVAMulticlassModule::event()
         if (m_ecl_only) {
           score_varname += "_" + std::to_string(Const::ECL);
         } else {
-          // for (const auto& det : Const::PIDDetectors::c_set) {
-          //   score_varname += "_" + std::to_string(det);
-          // }
-          for (size_t iDet(0); iDet < Const::PIDDetectors::c_set.size(); ++iDet) {
-            score_varname += "_" + std::to_string(Const::PIDDetectors::c_set[iDet]);
+          for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
+            score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
           }
         }
 

@@ -60,7 +60,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "all") return Const::PIDDetectors::c_set;
+        if (val == "all") return Const::PIDDetectors::set();
         else if (val == "svd") result += Const::SVD;
         else if (val == "cdc") result += Const::CDC;
         else if (val == "top") result += Const::TOP;
@@ -78,7 +78,7 @@ namespace Belle2 {
       Const::PIDDetectorSet result;
       for (std::string val : arguments) {
         boost::to_lower(val);
-        if (val == "all") return Const::PIDDetectors::c_set;
+        if (val == "all") return Const::PIDDetectors::set();
         else if (val == "ecl") result += Const::ECL;
         else B2ERROR("Invalid detector component: " << val << " for charged BDT.");
       }

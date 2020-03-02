@@ -68,29 +68,29 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_hadron = input_data["hlt_hadron"]
     file_to_iov_Bcosmics = input_data["Bcosmics"]
 
-    # print(file_to_iov_mumu)
-    # print(file_to_iov_hadron)
+    max_files_per_run = 10
+    min_events_per_file = 1000
 
     max_events_per_calibration = 100000
     max_events_per_file = 3000
 
-    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, 10)
+    reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     chosen_files_mumu = select_files(input_files_mumu[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
-    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, 10)
+    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
-    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, 10)
+    reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, max_files_per_run, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
     chosen_files_Bcosmics = select_files(input_files_Bcosmics[:], max_events_per_calibration, max_events_per_file)
     basf2.B2INFO(f"Total number of Bcosmics files actually used as input = {len(input_files_Bcosmics)}")
 
     input_file_dict = {"hlt_mumu": reduced_file_to_iov_mumu, "hlt_hadron": reduced_file_to_iov_hadron,
-                       "Bcosmics": reduced_file_to_iov_Bcosmics}
+                       "Bcosmics": chosen_files_Bcosmics}
 
     chosen_file_dict = {"hlt_mumu": chosen_files_mumu, "hlt_hadron": chosen_files_hadron,
                         "Bcosmics": chosen_files_Bcosmics}

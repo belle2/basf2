@@ -4280,6 +4280,16 @@ namespace {
                              particledEdx)));
     EXPECT_FALSE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH, SVD)")->function(
                               particledEdx)));
+    //Mostlikely PDG tests:
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx), 1.00001e+09);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 11);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx), 211);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)

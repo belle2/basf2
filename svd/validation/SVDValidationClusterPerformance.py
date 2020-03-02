@@ -255,3 +255,33 @@ ploter(
     descr='(reconstructed time of the Cluster) - (time of the Truehit) for all Clusters related to TrueHits',
     check='peak around 0',
     isShifter=True)
+
+
+plotEff(
+    name='ClusterizationEfficiency_U',
+    title='Efficiency of clusterization for U side',
+    x_label='SVD regions',
+    y_label='Efficiency',
+    granules=granulesLayers,
+    tree=tree2,
+    expr='strip_dir',
+    cutALL=cut_noV,
+    cut=cut_U,
+    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    check='Should be close to 1 in all bins',
+    isShifter=True)
+
+
+plotEff(
+    name='ClusterizationEfficiency_V',
+    title='Efficiency of clusterization for V side',
+    x_label='Efficiency',
+    y_label='',
+    granules=granulesLayers,
+    tree=tree2,
+    expr='strip_dir',
+    cutALL=cut_noU,
+    cut=cut_V,
+    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    check='Should be close to 1 in all bins',
+    isShifter=True)

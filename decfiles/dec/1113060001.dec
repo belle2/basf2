@@ -1,6 +1,6 @@
 # EventType: 1113060001
 # Descriptor: [B0 -> [D*- [ D0 -> K- pi+ pi+ pi-] pi- ] rho+]
-# NickName: Bd_Dstrho+_DsttoDpi-_DtoKpipipi
+# NickName: Bd_Dstrho+_DsttoDpi-_DtoK-pi+pi+pi-
 # Documentation: Neutral B decay into D*- rho+ with D0 to K 3pi needed for phase3 data validation
 # Tested: Yes
 # Physics WG: BtoCharm(less)

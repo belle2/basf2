@@ -222,8 +222,8 @@ def fillCharmSkimKs(path):
     global haveFilledCharmSkimKs
     if haveFilledCharmSkimKs == 0:
         haveFilledCharmSkimKs = 1
-        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.4 < M < 0.6', True, path=path)
-        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.4 < M < 0.6', 1, True, path=path)
+        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
         ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
     else:
         pass
@@ -235,13 +235,11 @@ def DstToD0PiD0ToHpHmKs(path):
     ma.fillParticleList('pi+:hphmks', mySel, path=path)
     ma.fillParticleList('K+:hphmks', mySel, path=path)
 
-    fillCharmSkimKs(path)
-
     D0cuts = '1.75 < M < 1.95'
     Dstcuts = '0 < Q < 0.022 and useCMSFrame(p)>2.3'
 
-    D0_Channels = ['pi-:hphmks pi+:hphmks K_S0:charmskim',
-                   'K-:hphmks K+:hphmks K_S0:charmskim'
+    D0_Channels = ['pi-:hphmks pi+:hphmks K_S0:merged',
+                   'K-:hphmks K+:hphmks K_S0:merged'
                    ]
     DstList = []
 
@@ -342,8 +340,8 @@ def DpToKsHp(path):
     fillCharmSkimKs(path)
 
     Dpcuts = '1.72 < M < 1.98 and useCMSFrame(p)>2'
-    Dp_Channels = ['K_S0:charmskim pi+:kshp',
-                   'K_S0:charmskim K+:kshp',
+    Dp_Channels = ['K_S0:merged pi+:kshp',
+                   'K_S0:merged K+:kshp',
                    ]
 
     DpList = []

@@ -625,6 +625,42 @@ def B0toDrho_KpipiList(path):
     return ['B0:B0toDrho_Kpipi']
 
 
+def loadB0toDstarPi_Kpipi0(path):
+    """
+    **Skim Author**: C. La Licata
+
+    **Skim Name**: B0toDstarPi_D0pi_Kpipi0
+
+    **Skim Category**: physics, hadronic neutral B to charm
+
+    **Skim Code**: 14120700
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Mode**:
+
+
+    1.  :math:`B^{0}\\to \\D^{*-} (\\to K^+ pi^- pi^0) \\pi^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    2. Mbc > 5.2
+    3. abs(deltaE) < 0.3
+
+    Note:
+    This skim uses loadStdDstarPlus_D0pi_Kpipi0 from the ``charm.py`` script
+    where D*- channel is defined.
+
+    """
+
+    Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:Dstarpi_Kpipi0 -> D*-:D0_Kpipi0 pi+:all', Bcuts, 0, path=path)
+
+    return ['B0:Dstarpi_Kpipi0']
+
+
 def B0toDrho_KspiList(path):
     """
 

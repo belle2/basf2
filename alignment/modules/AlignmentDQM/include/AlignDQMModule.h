@@ -154,7 +154,16 @@ namespace Belle2 {
     /** Unbiased residuals in Z for PXD for Mat */
     TH1F* m_UBResidualsSVDZ_Mat = nullptr;
 
+    /**
+    * Returns true if sensor with given ladderNumber and layerNumber is in the Ying half-shell.
+    * Returns false otherwise.
+    */
     bool IsYing(int ladderNumber, int layerNumber);
+
+    /**
+    * Returns true if sensor with given ladderNumber and layerNumber is in the Pat half-shell.
+    * Returns false otherwise.
+    */
     bool IsPat(int ladderNumber, int layerNumber);
 
     /** Unbiased residuals for PXD and SVD v per sensor*/

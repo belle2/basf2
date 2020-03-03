@@ -5,9 +5,13 @@
 Skim list building functions for charm analyses.
 """
 """
-note: The Hp, Hm and Jm in the function name represent
+-- note:: The Hp, Hm and Jm in the function name represent
 arbitrary charged particles with positive or negative
 charge.
+"""
+"""
+-- note:: The charged conjugate channels are always included
+in every charm skim list.
 """
 
 __authors__ = [
@@ -24,10 +28,41 @@ haveFilledCharmSkimKs = 0
 
 def D0ToHpJm(path):
     """
-    Skim list for D0 to 2 charged FSP channels
-    **Skim Author**:
+    Skim list for D0 to 2 charged FSPs.
+
+    **Skim Author**: Giulia Casarosa
+
+    **Skim Name**: XToD0_D0ToHpJm
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17230100
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{0}\\to \\pi^+ K^-`,
+
+    2. :math:`D^{0}\\to \\pi^+ \\pi^-`,
+
+    3. :math:`D^{0}\\to K^+ \\pi^-`,
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799 ``
+
+    2. ``1.80 < M(D0) < 1.93``
+
+    3. ``pcms(D0) > 2.2``
 
     """
+
+    __author__ = "Giulia Casarosa"
+
     mySel = 'abs(d0) < 1 and abs(z0) < 3'
     mySel += ' and 0.296706 < theta < 2.61799'
     ma.fillParticleList('pi+:mygood', mySel, path=path)
@@ -56,6 +91,35 @@ def D0ToHpJm(path):
 
 
 def DstToD0PiD0ToHpJm(path):
+    """
+    Same as D0ToHpJm, but requiring the D0 is from D*+ -> D0 pi+ process.
+
+    **Skim Author**: Giulia Casarosa
+
+    **Skim Name**: DstToD0Pi_D0ToHpJm
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240100
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to D^{0} \\pi^+, where the D^{0} is reconstructed by D0ToHpJm()`
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``All Cuts in D0ToHpJm()``
+
+    2. ``0 < Q < 0.018``
+
+    """
+
+    __author__ = "Giulia Casarosa"
 
     D0List = D0ToHpJm(path)
 
@@ -70,6 +134,43 @@ def DstToD0PiD0ToHpJm(path):
 
 
 def DstToD0PiD0ToHpJmPi0(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to pi0 and two charged FSPs,
+    where the kinds of two charged FSPs are different.
+    The wrong sign(WS) mode, D*- to pi- D0, is also included.
+
+    **Skim Author**: Emma Oxford
+
+    **Skim Name**: DstToD0Pi_D0ToHpJmPi0
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240200
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
+
+    2. :math:`WS: D^{*-}\\to \\pi^- D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.70 < M(D0) < 2.10``
+
+    2. ``M(D*)-M(D0) < 0.16``
+
+    3. ``pcms(D*) > 2.0``
+
+
+    """
+
+    __author__ = "Emma Oxford"
+
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
     charmcuts = '1.70 < M < 2.10'
     ma.cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
@@ -85,6 +186,11 @@ def DstToD0PiD0ToHpJmPi0(path):
 
 
 def EarlyData_DstToD0PiD0ToHpJmPi0(path):
+    """
+    An special version of DstToD0PiD0ToHpJmPi0() to deal with Early Data.
+    Cut criteria are not finially decided, and could be changed. Please check the
+    code in the master branch to get uptodate information.
+    """
     mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
     mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
     ma.fillParticleList('pi+:myhjp0', mySel, path=path)
@@ -109,6 +215,40 @@ def EarlyData_DstToD0PiD0ToHpJmPi0(path):
 
 
 def DstToD0PiD0ToHpHmPi0(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to pi0 and two conjugate charged FSPs.
+
+    **Skim Author**: Emma Oxford
+
+    **Skim Name**: DstToD0Pi_D0ToHpHmPi0
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240300
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^{0}`
+
+    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ K^- \\pi^{0}`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.70 < M(D0) < 2.10``
+
+    2. ``M(D*)-M(D0) < 0.16``
+
+    3. ``pcms(D*) > 2.0``
+
+
+    """
+
+    __author__ = "Emma Oxford"
+
     Dstcuts = 'massDifference(0) < 0.160 and useCMSFrame(p) > 2.0'
     charmcuts = '1.70 < M < 2.10'
     ma.cutAndCopyList('pi0:myskim', 'pi0:skim', '', path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
@@ -127,6 +267,11 @@ def DstToD0PiD0ToHpHmPi0(path):
 
 
 def EarlyData_DstToD0PiD0ToHpHmPi0(path):
+    """
+    A special version of DstToD0PiD0ToHpHmPi0() to deal with Early Data.
+    Cut criteria are not finially decided, and could be changed. Please check the
+    code in the master branch to get uptodate information.
+    """
     mySel = 'abs(d0) < 0.5 and abs(z0) < 1.0'  # IP cut, tighter than previous skims
     mySel += ' and 0.296706 < theta < 2.61799'  # CDC acceptance cut
     ma.fillParticleList('pi+:myhhp0', mySel, path=path)
@@ -155,6 +300,46 @@ def EarlyData_DstToD0PiD0ToHpHmPi0(path):
 
 
 def DstToD0PiD0ToHpJmEta(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs,
+    where the kinds of two charged FSPs are different.
+    The wrong sign(WS) mode, D*- to pi- D0, is also included.
+
+    -- warning:: This skim list is inactive which means its code
+    could be outdated and problematic. If you want to use (or awaken)
+    this list, please contact Charm WG.
+
+    **Skim Author**: Inactive
+
+    **Skim Name**: DstToD0Pi_D0ToHpJmEta
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240500
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
+
+    2. :math:`WS: D^{*-}\\to \\pi^- D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+    1. ``0.49 < M(eta) < 0.55, p(eta) > 0.28``
+
+    1. ``1.78 < M(D0) < 1.93, pcms(D0) > 2.2``
+
+    2. ``Q < 0.018``
+
+
+    """
+
+    __author__ = ""
+
     ma.reconstructDecay('eta:myskim -> gamma:loose gamma:loose', '0.49 < M < 0.55 and p > 0.28', path=path)
     Dstcuts = '0 < Q < 0.018'
     charmcuts = '1.78 < M < 1.93 and useCMSFrame(p) > 2.2'
@@ -173,6 +358,43 @@ def DstToD0PiD0ToHpJmEta(path):
 
 
 def DstToD0PiD0ToKsOmega(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to Ks pi+ pi- pi0.
+
+    -- warning:: This skim list is inactive which means its code
+    could be outdated and problematic. If you want to use (or awaken)
+    this list, please contact Charm WG.
+
+    **Skim Author**: Inactive
+
+    **Skim Name**: DstToD0Pi_D0ToKsOmega
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240400
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^- \\pi^{0}`
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``0.11 < M(pi0) < 0.15, p(pi0) > 25``
+
+    2. ``1.7< M(D0) < 2.0, pcms(D0) > 2.4``
+
+    3. ``Q < 0.018``
+
+
+    """
+
+    __author__ = ""
+
     ma.cutAndCopyList('pi0:mypi0', 'pi0:skim', '0.11 < M < 0.15 and p > 0.25 ', path=path)
     ma.reconstructDecay('omega:3pi -> pi+:loose pi-:loose pi0:mypi0', '', path=path)
 
@@ -189,6 +411,42 @@ def DstToD0PiD0ToKsOmega(path):
 
 
 def D0ToNeutrals(path):
+    """
+    Skim list for D0 to neutral FSPs.
+
+    -- warning:: This skim list is inactive which means its code
+    could be outdated and problematic. If you want to use (or awaken)
+    this list, please contact Charm WG.
+
+    **Skim Author**: Giulia Casarosa
+
+    **Skim Name**: XToD0_D0ToNeutrals
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17230200
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
+
+    2. :math:`D^{0}\\to \\K_{S} \\pi^{0}`
+
+    3. :math:`D^{0}\\to \\K_{S} \\K_{S}`
+
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.78 < M(D0) < 1.94, pcms(D0) > 2.2``
+
+    """
+
+    __author__ = ""
+
     charmcuts = '1.78 < M < 1.94 and useCMSFrame(p)>2.2'
     D0_Channels = ['pi0:skim pi0:skim',
                    'K_S0:merged pi0:skim',
@@ -212,6 +470,41 @@ def D0ToNeutrals(path):
 
 
 def DstToD0Neutrals(path):
+    """
+    Same as D0ToNeutrals(), but requiring that the D0 is from D* decay.
+
+    -- warning:: This skim list is inactive which means its code
+    could be outdated and problematic. If you want to use (or awaken)
+    this list, please contact Charm WG.
+
+    **Skim Author**: Giulia Casarosa
+
+    **Skim Name**: DstToD0Pi_D0ToNeutrals
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240600
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, where the D^{0} is reconstructed by D0ToNeutrals()`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.70 < M(D0) < 2.10``
+
+    2. ``M(D*)-M(D0) < 0.16``
+
+    3. ``pcms(D*) > 2.0``
+
+
+    """
+
+    __author__ = "Emma Oxford"
 
     D0List = D0ToNeutrals(path)
 
@@ -237,6 +530,44 @@ def fillCharmSkimKs(path):
 
 
 def DstToD0PiD0ToHpHmKs(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to Ks and two conjugate charged FSPs.
+
+    **Skim Author**: Yeqi Chen
+
+    **Skim Name**: DstToD0Pi_D0ToHpHmKs
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17240700
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^-`
+
+    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\K^+ \\K^-`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``Tracks: same as D0ToHpJm()``
+
+    2. ``Ks: directly taken from stdKshort()``
+
+    3. ``1.75 < M(D0) < 1.95``
+
+    4. ``Q < 0.022``
+
+    5. ``pcms(D*) > 2.3``
+
+
+    """
+
+    __author__ = "Yeqi Chen"
+
     mySel = 'abs(d0) < 1 and abs(z0) < 3'
     mySel += ' and 0.296706 < theta < 2.61799'
     ma.fillParticleList('pi+:hphmks', mySel, path=path)
@@ -260,6 +591,46 @@ def DstToD0PiD0ToHpHmKs(path):
 
 
 def CharmRare(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to rare decay.
+
+    **Skim Author**: Doris Yangsoo Kim, Jaeyeon Kim
+
+    **Skim Name**: DstToD0Pi_D0ToRare
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17230300
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`
+
+    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`
+
+    3. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\e+ \\mu-`
+
+    4. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\e- \\mu+`
+
+    5. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi+ \\pi-`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.78 < M(D0) < 1.94``
+
+    2. ``0 < Q < 0.02 ``
+
+    3. ``pcms(D*) > 2.2``
+
+
+    """
+
+    __author__ = "Jaeyeon Kim"
+
     charmcuts = '1.78 < M < 1.94'
     Dstcuts = '0 < Q < 0.02 and 2.2 < useCMSFrame(p)'
 
@@ -281,6 +652,45 @@ def CharmRare(path):
 
 
 def CharmSemileptonic(path):
+    """
+    Skim list for D*+ to pi+ D0, D0 to semileptonic decay.
+
+    -- warning:: This skim list is inactive which means its code
+    could be outdated and problematic. If you want to use (or awaken)
+    this list, please contact Charm WG.
+
+    **Skim Author**: Inactive
+
+    **Skim Name**: DstToD0Pi_D0ToSemileptonic
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17260900
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1.1 :math:`e^+e^- \\to D^{*+} D^{*-}, D^{*+}(tag)\\to \\pi^+ D0,`
+
+    1.2 :math:`D^{*-}\\to \\overline{D}^{0} \\pi^-, \\overline{D}^{0} \\to K^+ \\nu l^-`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+
+    1. ``1.82 < M(D0) < 1.92``
+
+    2. ``1.9 < M(D*) < 2.1``
+
+    3. ``M(D*)-M(D0) < 0.15``
+
+
+    """
+
+    __author__ = ""
+
     Dcuts = '1.82 < M < 1.92'
     DstarSLcuts = '1.9 < M < 2.1'
     antiD0SLcuts = 'massDifference(0)<0.15'
@@ -339,6 +749,39 @@ def CharmSemileptonic(path):
 
 
 def DpToKsHp(path):
+    """
+    Skim list for D+ to Ks h+.
+
+    **Skim Author**: Guanda Gong
+
+    **Skim Name**:  XToDp_DpToKsHp
+
+    **Skim Category**: physics, charm
+
+    **Skim Code**: 17230400
+
+    **Working Group**: Charm (WG7)
+
+    **Decay Modes**
+
+    1. :math:`D^+ \\to K_{S} \\pi^+`
+
+    2. :math:`D^+ \\to K_{S} K^+`
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``Tracks: same as D0ToHpJm()``
+
+    2. ``Ks: directly taken from stdKshort()``
+
+    3. ``1.72 < M(D+) < 1.98, pcms(D+) > 2``
+
+
+    """
+
+    __author__ = "Guanda Gong"
     mySel = 'abs(d0) < 1 and abs(z0) < 3'
     mySel += ' and 0.296706 < theta < 2.61799'
     ma.fillParticleList('pi+:kshp', mySel, path=path)

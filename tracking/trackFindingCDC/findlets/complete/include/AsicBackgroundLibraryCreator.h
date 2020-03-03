@@ -15,7 +15,7 @@
 #include <framework/database/DBArray.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <tracking/trackFindingCDC/mva/Recorder.h>
-#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
+#include <cdc/dbobjects/CDCCrossTalkClasses.h>
 
 namespace Belle2 {
 

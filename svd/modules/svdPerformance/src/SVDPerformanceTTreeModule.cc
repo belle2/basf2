@@ -267,10 +267,11 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          for (unsigned int d = 0; d < m_svdSize; d++) {
-            m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-            m_svdStripTime.push_back(theRecoDigits[d]->getTime());
-          }
+          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+            for (unsigned int d = 0; d < m_svdSize; d++) {
+              m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+              m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+            }
 
           m_t_U->Fill();
 
@@ -315,15 +316,17 @@ void SVDPerformanceTTreeModule::event()
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
 
+
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          for (unsigned int d = 0; d < m_svdSize; d++) {
-            m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
-            m_svdStripTime.push_back(theRecoDigits[d]->getTime());
-          }
+          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+            for (unsigned int d = 0; d < m_svdSize; d++) {
+              m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
+              m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+            }
 
           m_t_V->Fill();
         }

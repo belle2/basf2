@@ -17,6 +17,7 @@
 #include <trg/ecl/dataobjects/TRGECLCluster.h>
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/grl/dataobjects/TRGGRLShortTrack.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <string>
 #include <memory>
@@ -88,7 +89,9 @@ namespace Belle2 {
 
     /** Short tracking logic*/
     void short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto, std::vector<bool>  phimap_i,
-                        std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2, StoreObjPtr<TRGGRLInfo> trgInfo);
+                        std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
+                        StoreArray<TRGGRLShortTrack> grlst, StoreArray<TRGGRLShortTrack> grlst_tmp,
+                        StoreObjPtr<TRGGRLInfo> trgInfo);
 
     /** Short track extrapolation (to endcap) function*/
     void extrapolation(int pattern, int& l, int& r, int& ec);
@@ -145,6 +148,8 @@ namespace Belle2 {
     std::string m_grlphotonlist;
     /**Track Segment list*/
     std::string m_hitCollectionName;
+    /**GRL short track list*/
+    std::string m_grlstCollectionName;
     /** Name of the StoreArray holding projects information from grl */
     std::string m_TrgGrlInformationName;
     /** Short tracking patterns based on SL0*/

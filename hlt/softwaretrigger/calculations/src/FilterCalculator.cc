@@ -457,7 +457,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
 
     if (negativeP > 2. and positiveP > 2. and calculationResult["nTrkLoose"] == 2 and
         calculationResult["nTrkTight"] >= 1 and dphi > 175. and
-        pmissTheta > 10. and (pmissTheta < 5. or pmissTheta > 175.) and electronEP) {
+        (pmissTheta < 5. or pmissTheta > 175.) and electronEP) {
       calculationResult["isrRadBhabha"] = 1;
     }
     if ((pmissTheta < 20. or pmissTheta > 160.) and

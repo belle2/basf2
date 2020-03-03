@@ -165,20 +165,19 @@ void SVDPerformanceTTreeModule::event()
 
     RelationVector<Track> theTK = DataStore::getRelationsWithObj<Track>(&trk);
 
-    if (theTK[0] == NULL) {
+    if (theTK.size() == 0) {
       continue;
     }
 
-    if (theTK.size() != 0) {
-      const TrackFitResult*  tfr = theTK[0]->getTrackFitResult(Const::ChargedStable(pionCode));
-      if (tfr) {
-        m_svdTrkd0 = tfr->getD0();
-        m_svdTrkz0 = tfr->getZ0();
-        m_svdTrkpT = tfr->getMomentum().Perp();
-        TLorentzVector pStar = tfr->get4Momentum();
-        pStar.Boost(0, 0, 3. / 11);
-        m_svdTrkpCM = pStar.P();
-      }
+
+    const TrackFitResult*  tfr = theTK[0]->getTrackFitResult(Const::ChargedStable(pionCode));
+    if (tfr) {
+      m_svdTrkd0 = tfr->getD0();
+      m_svdTrkz0 = tfr->getZ0();
+      m_svdTrkpT = tfr->getMomentum().Perp();
+      TLorentzVector pStar = tfr->get4Momentum();
+      pStar.Boost(0, 0, 3. / 11);
+      m_svdTrkpCM = pStar.P();
     }
 
 

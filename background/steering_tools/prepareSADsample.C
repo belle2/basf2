@@ -20,6 +20,7 @@ struct SADTree {
   double E = 0;  /**< E at lost position [GeV] (in fact momentum magnitude!) */
   double rate = 0; /**< lost rate [Hz] */
   double ss = 0; /**< scattered position (|s|<Ltot/2) [m] */
+  double ssraw = 0; /**< scattered position [m] */
   int nturn = 0; /**< number of turns from scattered to lost */
   double sraw = 0; /**< s at lost position [m] before matching G4 beam pipe inner surface */
   double xraw = 0; /**< x at lost position [m] before matching G4 beam pipe inner surface */
@@ -61,6 +62,7 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   chain.SetBranchAddress("E", &m_sad.E);
   chain.SetBranchAddress("rate", &m_sad.rate);
   chain.SetBranchAddress("ss", &m_sad.ss);
+  chain.SetBranchAddress("ssraw", &m_sad.ssraw);
   chain.SetBranchAddress("sraw", &m_sad.sraw);
   chain.SetBranchAddress("nturn", &m_sad.nturn);
   chain.SetBranchAddress("xraw", &m_sad.xraw);
@@ -78,15 +80,16 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
 
   TFile* file = TFile::Open(outputFile.c_str(), "recreate");
   TTree* tree = new TTree("sad", "selected SAD particles: abs(s) < 4.0 m");
+  tree->Branch("sraw", &m_sad.sraw, "sraw/D");
   tree->Branch("s", &m_sad.s, "s/D");
+  tree->Branch("ss", &m_sad.ss, "ss/D");
+  tree->Branch("ssraw", &m_sad.ssraw, "ssraw/D");
   tree->Branch("x", &m_sad.x, "x/D");
   tree->Branch("px", &m_sad.px, "px/D");
   tree->Branch("y", &m_sad.y, "y/D");
   tree->Branch("py", &m_sad.py, "py/D");
   tree->Branch("E", &m_sad.E, "E/D");
   tree->Branch("rate", &m_sad.rate, "rate/D");
-  tree->Branch("ss", &m_sad.ss, "ss/D");
-  tree->Branch("sraw", &m_sad.sraw, "sraw/D");
   tree->Branch("nturn", &m_sad.nturn, "nturn/I");
   tree->Branch("xraw", &m_sad.xraw, "xraw/D");
   tree->Branch("yraw", &m_sad.yraw, "yraw/D");
@@ -99,6 +102,7 @@ void prepareSADsample(std::string inputFile, std::string outputFile)
   for(int i = 0; i < numEntries; i++) {
     chain.GetEntry(i);
     m_sad.rate /= nFiles;
+    // IR
     if(abs(m_sad.s) < 4.0) {
       tree->Fill();
       rate += m_sad.rate;

@@ -70,18 +70,14 @@ class SVDValidationTTreeRecoDigit(Module):
             digit_truehits = digit.getRelationsTo('SVDTrueHits')
             # We want only digits with exactly one associated TrueHit
             if len(digit_truehits) != 1:
-                # print("len(digit_truehits) != 1")
                 continue
             for truehit in digit_truehits:
-                sensorInfo = Belle2.VXD.GeoCache.get(digit.getSensorID())
-                # Let's store some data
                 # Sensor identification
                 sensorID = digit.getSensorID()
                 self.data.sensor_id = int(sensorID)
                 sensorNum = sensorID.getSensorNumber()
                 self.data.sensor = sensorNum
                 layerNum = sensorID.getLayerNumber()
-                # print("layerNum = ", layerNum)
                 self.data.layer = layerNum
                 if (layerNum == 3):
                     sensorType = 1  # Barrel
@@ -91,7 +87,6 @@ class SVDValidationTTreeRecoDigit(Module):
                     else:
                         sensorType = 1
                 self.data.sensor_type = sensorType
-                # print("sensorType = ", sensorType)
                 ladderNum = sensorID.getLadderNumber()
                 self.data.ladder = ladderNum
                 # Digit information

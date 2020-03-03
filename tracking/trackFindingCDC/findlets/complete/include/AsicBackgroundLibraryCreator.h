@@ -84,10 +84,10 @@ namespace Belle2 {
       /// min. number of hits on the track
       size_t m_minimal_hits_on_track{40};
 
-      /// max. chi2 for the track
-
-      /// Recorder
+      /// Recorder for the root output
       std::unique_ptr<Recorder> m_recorder;
+
+      // Variables to be stored:
 
       /// all 8 channels
       asicChannel m_asic_info[8];

@@ -89,9 +89,11 @@ class SVDValidationTTreeRecoDigit(Module):
                 self.data.sensor_type = sensorType
                 ladderNum = sensorID.getLadderNumber()
                 self.data.ladder = ladderNum
-                # Digit information
+                if digit.isUStrip():
+                    self.data.strip_dir = 0
+                else:
+                    self.data.strip_dir = 1
                 self.data.recodigit_time = digit.getTime()
-                # TrueHit information
                 self.data.truehit_time = truehit.getGlobalTime()
                 # Fill tree
                 self.file.cd()

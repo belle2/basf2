@@ -469,7 +469,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("distance", particleDistance,
                       R"DOC(3D distance between the IP and the particle decay vertex, if available.
 
-In case the particle has been creaded from a track, the distance is defined between the POCA and IP. 
+In case the particle has been created from a track, the distance is defined between the POCA and IP.
 If the particle is built from an ECL cluster, the decay vertex is set to the nominal IP. 
 If the particle is created from a KLM cluster, the distance is calculated between the IP and the cluster itself.)DOC");
 

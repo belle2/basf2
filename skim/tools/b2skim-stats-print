@@ -1338,15 +1338,20 @@ def printToMarkdown(
 
         df = df.reindex(index)
         df = df.rename(index=renamingPairs)
+        # Make entries in first column bold
+        df.rename(index={label: f"**{label}**" for label in df.index}, inplace=True)
 
         table = tabulate(
             df[selectedStats], headers=headers, tablefmt="pipe", floatfmt=floatFormat,
         )
+
+        table = table.replace(" nan ", " --  ")
+        markdownTables.append(f"**Performance statistics for {skimName} skim:**")
         markdownTables.append(table)
 
     markdownFileName = "skimStats.md"
     with open(markdownFileName, "w") as markdownFile:
-        markdownFile.write("\n".join(markdownTables))
+        markdownFile.write("\n\n".join(markdownTables))
 
     print(
         f"\nWrote tables to {markdownFileName}. This format is suitable for including "

@@ -55,11 +55,11 @@ void XTCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  Byte_t lay;
-  float dt;
-  float dx;
-  float Pval, alpha, theta;
-  float ndf;
+  UChar_t lay;
+  Float_t dt;
+  Float_t dx;
+  Float_t Pval, alpha, theta;
+  Float_t ndf;
 
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("t", &dt);

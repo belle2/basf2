@@ -72,7 +72,7 @@ def get_calibrations(input_data, **kwargs):
     min_events_per_file = 1000
 
     max_events_per_calibration = 100000
-    max_events_per_file = 3000
+    max_events_per_file = 5000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())

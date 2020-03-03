@@ -55,14 +55,14 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  float x;
-  float t_mea;
-  float t_fit;
-  float ndf;
-  float Pval;
-  unsigned short adc;
-  unsigned short IWire;
-  Byte_t lay;
+  Float_t x;
+  Float_t t_mea;
+  Float_t t_fit;
+  Float_t ndf;
+  Float_t Pval;
+  UShort_t adc;
+  UShort_t IWire;
+  UChar_t lay;
 
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("IWire", &IWire);

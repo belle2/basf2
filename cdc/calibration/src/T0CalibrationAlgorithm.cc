@@ -31,13 +31,13 @@ void T0CalibrationAlgorithm::createHisto()
 {
 
   B2INFO("Creating histograms");
-  float x;
-  float t_mea;
-  float t_fit;
-  float ndf;
-  float Pval;
-  unsigned short IWire;
-  Byte_t lay;
+  Float_t x;
+  Float_t t_mea;
+  Float_t t_fit;
+  Float_t ndf;
+  Float_t Pval;
+  UShort_t IWire;
+  UChar_t lay;
 
   auto tree = getObjectPtr<TTree>("tree");
   tree->SetBranchAddress("lay", &lay);

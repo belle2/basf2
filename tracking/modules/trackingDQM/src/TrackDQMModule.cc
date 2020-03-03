@@ -734,7 +734,7 @@ void TrackDQMModule::event()
             TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
             auto globalResidual = info.vectorToGlobal(localResidual, true);
 
-            if (IsYing(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
+            if (IsNotYang(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
               m_UBResidualsPXDX_Ying->Fill(globalResidual.x());
               m_UBResidualsPXDY_Ying->Fill(globalResidual.y());
               m_UBResidualsPXDZ_Ying->Fill(globalResidual.z());
@@ -787,7 +787,7 @@ void TrackDQMModule::event()
                 TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
                 auto globalResidual = info.vectorToGlobal(localResidual, true);
 
-                if (IsPat(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
+                if (IsNotMat(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
                   m_UBResidualsSVDX_Pat->Fill(globalResidual.x());
                   m_UBResidualsSVDY_Pat->Fill(globalResidual.y());
                   m_UBResidualsSVDZ_Pat->Fill(globalResidual.z());
@@ -844,30 +844,30 @@ void TrackDQMModule::event()
   else m_trackingErrorFlags->Fill(0.0);
 }
 
-bool TrackDQMModule::IsYing(int ladderNumber, int layerNumber)
+bool TrackDQMModule::IsNotYang(int ladderNumber, int layerNumber)
 {
   switch (layerNumber) {
     case 1:
-      return ladderNumber <= 4;
+      return ladderNumber > 4 || ladderNumber < 1;
     case 2:
-      return ladderNumber <= 6;
+      return ladderNumber > 6 || ladderNumber < 1;
     default:
-      return false;
+      return true;
   }
 }
 
-bool TrackDQMModule::IsPat(int ladderNumber, int layerNumber)
+bool TrackDQMModule::IsNotMat(int ladderNumber, int layerNumber)
 {
   switch (layerNumber) {
     case 3:
-      return ladderNumber <= 2 || ladderNumber >= 6;
+      return ladderNumber < 3 || ladderNumber > 5;
     case 4:
-      return ladderNumber <= 3 || ladderNumber >= 9;
+      return ladderNumber < 4 || ladderNumber > 8;
     case 5:
-      return ladderNumber <= 4 || ladderNumber >= 11;
+      return ladderNumber < 5 || ladderNumber > 10;
     case 6:
-      return ladderNumber <= 5 || ladderNumber >= 14;
+      return ladderNumber < 6 || ladderNumber > 13;
     default:
-      return false;
+      return true;
   }
 }

@@ -109,16 +109,30 @@ namespace Belle2 {
     TH1F* m_UBResidualsSVDZ_Mat = nullptr;
 
     /**
-    * Returns true if sensor with given ladderNumber and layerNumber is in the Ying half-shell.
-    * Returns false otherwise.
+    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Yang half-shell, therefore it should be in the Ying half-shell if it's from PXD detector.
+    * Returns false if the sensor is in the Yang.
+    *
+    * Possible combinations of parameters for Yang:
+    *
+    * | layerNumber | ladderNumber          |
+    * | 1           | 5, 6, 7, 8            |
+    * | 2           | 7, 8, 9, 10, 11, 12   |
     */
-    bool IsYing(int ladderNumber, int layerNumber);
+    bool IsNotYang(int ladderNumber, int layerNumber);
 
     /**
-    * Returns true if sensor with given ladderNumber and layerNumber is in the Pat half-shell.
-    * Returns false otherwise.
+    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
+    * Returns false if the sensor is int the Pat.
+    *
+    * Possible combinations of parameters for Pat:
+    *
+    * | layerNumber | ladderNumber                  |
+    * | 3           | 3, 4, 5                       |
+    * | 4           | 4, 5, 6, 7, 8                 |
+    * | 5           | 5, 6, 7, 8, 9, 10             |
+    * | 6           | 6, 7, 8, 9, 10, 11, 12, 13    |
     */
-    bool IsPat(int ladderNumber, int layerNumber);
+    bool IsNotMat(int ladderNumber, int layerNumber);
 
     /** Unbiased residuals for PXD and SVD v per sensor*/
     TH1F** m_UBResidualsSensorV = nullptr;

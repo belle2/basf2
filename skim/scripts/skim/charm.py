@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for charm analyses.. """
-
+"""
+Skim list building functions for charm analyses.
+"""
+"""
+note: The Hp, Hm and Jm in the function name represent
+arbitrary charged particles with positive or negative
+charge.
+"""
 
 __authors__ = [
     ""
@@ -17,6 +23,11 @@ haveFilledCharmSkimKs = 0
 
 
 def D0ToHpJm(path):
+    """
+    Skim list for D0 to 2 charged FSP channels
+    **Skim Author**:
+
+    """
     mySel = 'abs(d0) < 1 and abs(z0) < 3'
     mySel += ' and 0.296706 < theta < 2.61799'
     ma.fillParticleList('pi+:mygood', mySel, path=path)
@@ -163,19 +174,15 @@ def DstToD0PiD0ToHpJmEta(path):
 
 def DstToD0PiD0ToKsOmega(path):
     ma.cutAndCopyList('pi0:mypi0', 'pi0:skim', '0.11 < M < 0.15 and p > 0.25 ', path=path)
-    ma.reconstructDecay('eta:3pi -> pi+:loose pi-:loose pi0:mypi0', '0.4 < M < 0.65', path=path)
-    ma.reconstructDecay('omega:3pi -> pi+:loose pi-:loose pi0:mypi0', '0.65 < M < 0.9', path=path)
+    ma.reconstructDecay('omega:3pi -> pi+:loose pi-:loose pi0:mypi0', '', path=path)
 
-    charmcuts = '1.78 < M < 1.93 and useCMSFrame(p)>2.2'
-    ma.reconstructDecay('D0:Eta -> K_S0:merged eta:3pi', charmcuts, path=path)
-    vertex.treeFit('D0:Eta', conf_level=0.001, path=path)
-    ma.reconstructDecay('D0:Omega -> K_S0:merged omega:3pi', charmcuts, path=path)
-    vertex.treeFit('D0:Omega', conf_level=0.001, path=path)
-    ma.copyLists('D0:KsOmega', ['D0:Eta', 'D0:Omega'], path=path)
+    charmcuts = '1.7 < M < 2 and useCMSFrame(p)>2.4'
+    ma.reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=path)
+    # vertex.treeFit('D0:KsOmega', conf_level=0.001, path=path)
 
     DstList = []
     ma.reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)
-    vertex.KFit('D*+:KsOmega', conf_level=0.001, path=path)
+    # vertex.KFit('D*+:KsOmega', conf_level=0.001, path=path)
     DstList.append('D*+:KsOmega')
 
     return DstList

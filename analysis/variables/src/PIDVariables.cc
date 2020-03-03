@@ -17,6 +17,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/utilities/Conversion.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -111,7 +112,7 @@ namespace Belle2 {
       }
       int pdgCode;
       try {
-        pdgCode = std::stoi(arguments[0]);
+        pdgCode = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
@@ -144,13 +145,13 @@ namespace Belle2 {
       }
       int pdgCodeHyp, pdgCodeTest;
       try {
-        pdgCodeHyp = std::stoi(arguments[0]);
+        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
       }
       try {
-        pdgCodeTest = std::stoi(arguments[1]);
+        pdgCodeTest = Belle2::convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidDeltaLogLikelihoodValueExpert must be a PDG code");
         return nullptr;
@@ -182,13 +183,13 @@ namespace Belle2 {
       }
       int pdgCodeHyp = 0, pdgCodeTest = 0;
       try {
-        pdgCodeHyp = std::stoi(arguments[0]);
+        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidPairProbabilityExpert must be PDG code");
         return nullptr;
       }
       try {
-        pdgCodeTest = std::stoi(arguments[1]);
+        pdgCodeTest = Belle2::convertString<int>(arguments[1]);
       } catch (std::invalid_argument& e) {
         B2ERROR("Second argument of pidPairProbabilityExpert must be PDG code");
         return nullptr;
@@ -220,7 +221,7 @@ namespace Belle2 {
       }
       int pdgCodeHyp = 0;
       try {
-        pdgCodeHyp = std::stoi(arguments[0]);
+        pdgCodeHyp = Belle2::convertString<int>(arguments[0]);
       } catch (std::invalid_argument& e) {
         B2ERROR("First argument of pidProbabilityExpert must be PDG code");
         return nullptr;
@@ -306,9 +307,9 @@ namespace Belle2 {
 
       int hypPdgId;
       try {
-        hypPdgId = std::stoi(arguments.at(0));
+        hypPdgId = Belle2::convertString<int>(arguments.at(0));
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        B2ERROR("First argument of pidChargedBDTScore must be an integer (PDG code).");
         return nullptr;
       }
       Const::ChargedStable hypType = Const::ChargedStable(hypPdgId);
@@ -337,15 +338,15 @@ namespace Belle2 {
 
       int hypPdgId, testPdgId;
       try {
-        hypPdgId = std::stoi(arguments.at(0));
+        hypPdgId = Belle2::convertString<int>(arguments.at(0));
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        B2ERROR("First argument of pidPairChargedBDTScore must be an integer (PDG code).");
         return nullptr;
       }
       try {
-        testPdgId = std::stoi(arguments.at(1));
+        testPdgId = Belle2::convertString<int>(arguments.at(1));
       } catch (std::invalid_argument& e) {
-        B2ERROR("First argument of pidChargedBDTScore must be an integer.");
+        B2ERROR("First argument of pidPairChargedBDTScore must be an integer (PDG code).");
         return nullptr;
       }
       Const::ChargedStable hypType = Const::ChargedStable(hypPdgId);
@@ -489,9 +490,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                       "returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0. ");
     REGISTER_VARIABLE("pidChargedBDTScore(pdgCodeHyp, detector)", pidChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detctors, or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.");
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses. The second argument specifies which BDT training to use: based on 'ALL' PID detectors, or 'ECL' only. The choice depends on the ChargedPidMVAMulticlassModule's configuration.");
     REGISTER_VARIABLE("pidPairChargedBDTScore(pdgCodeHyp, pdgCodeTest, detector)", pidPairChargedBDTScore,
-                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detctors, or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.");
+                      "returns the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis. The second argument specifies which BDT training to use: based on 'ALL' PID detectors, or 'ECL' only. The choice depends on the ChargedPidMVAModule's configuration.");
     REGISTER_VARIABLE("pidMostLikelyPDG", mostLikelyPDG,
                       "Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.");
     REGISTER_VARIABLE("pidIsMostLikely", isMostLikely,

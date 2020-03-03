@@ -348,6 +348,7 @@ def add_cdst_output(
         'CDCTriggerNeuroTracks',
         'CDCTriggerNeuroTracksInput',
         'TRGGDLUnpackerStores',
+        'TRGTOPUnpackerStores',
         'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',

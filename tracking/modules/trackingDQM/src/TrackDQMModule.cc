@@ -844,7 +844,7 @@ void TrackDQMModule::event()
   else m_trackingErrorFlags->Fill(0.0);
 }
 
-bool AlignDQMModule::IsNotYang(int ladderNumber, int layerNumber)
+bool TrackDQMModule::IsNotYang(int ladderNumber, int layerNumber)
 {
   switch (layerNumber) {
     case 1:
@@ -856,7 +856,7 @@ bool AlignDQMModule::IsNotYang(int ladderNumber, int layerNumber)
   }
 }
 
-bool AlignDQMModule::IsNotMat(int ladderNumber, int layerNumber)
+bool TrackDQMModule::IsNotMat(int ladderNumber, int layerNumber)
 {
   switch (layerNumber) {
     case 3:

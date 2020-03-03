@@ -168,9 +168,9 @@ namespace Belle2 {
 
     /**
     * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
-    * Returns false if the sensor is int the Pat.
+    * Returns false if the sensor is int the Mat.
     *
-    * Possible combinations of parameters for Pat:
+    * Possible combinations of parameters for Mat:
     *
     * | layerNumber | ladderNumber               |
     * | 3           | 3, 4, 5                    |

@@ -1367,9 +1367,9 @@ bool AlignDQMModule::IsNotYang(int ladderNumber, int layerNumber)
 {
   switch (layerNumber) {
     case 1:
-      return ladderNumber > 4 || ladderNumber < 1;
+      return ladderNumber < 5 || ladderNumber > 8;
     case 2:
-      return ladderNumber > 6 || ladderNumber < 1;
+      return ladderNumber < 7 || ladderNumber > 12;
     default:
       return true;
   }

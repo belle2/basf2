@@ -38,7 +38,7 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            std::string("ChargedPidMVAWeights"));
   addParam("useECLOnlyTraining",
            m_ecl_only,
-           "Specifiy whether to use an ECL-only training of the MVA.",
+           "Specify whether to use an ECL-only training of the MVA.",
            bool(false));
 }
 

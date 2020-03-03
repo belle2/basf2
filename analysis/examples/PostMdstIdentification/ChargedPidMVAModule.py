@@ -60,7 +60,7 @@ def argparser():
                         type=str,
                         nargs="+",
                         default=None,
-                        help="Names of conditions DB global tag(s) to append on tp of GT replay."
+                        help="List of names of conditions DB global tag(s) to append on top of GT replay."
                         "NB: these GTs will have lowest priority."
                         "Pass a space-separated list of names.")
     parser.add_argument("-d", "--debug",

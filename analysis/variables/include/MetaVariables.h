@@ -58,6 +58,12 @@ namespace Belle2 {
     Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns 1 if the same matched mcparticle is matched to a particle in
+     * the list (0 if not). Also works for lists filled from mcparticles.
+     */
+    Manager::FunctionPtr mcParticleIsInMCList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
      * given particle Lists.
      */

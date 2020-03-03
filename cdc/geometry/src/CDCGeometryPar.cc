@@ -486,7 +486,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 // Open a file
 void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) const
 {
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -504,7 +504,7 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
 // Open a file using boost (to be able to read a gzipped file)
 void CDCGeometryPar::openFile(boost::iostreams::filtering_istream& ifs, const std::string& fileName0) const
 {
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -757,7 +757,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   openFileB(ifs, fileName0);
   //TODO: use openFile() in cdc/utilities instead of the following 18 lines <- done
   /*
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -1043,7 +1043,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 {
   std::string fileName0 = gbxParams.getString("deltazFileName");
-  fileName0 = "/cdc/data/" + fileName0;
+  fileName0 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
@@ -1229,7 +1229,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
 
   ifstream ifs;
   //  openFileA(ifs, fileName0);
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1, true);
 
   if (fileName == "") {

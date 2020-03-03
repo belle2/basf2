@@ -64,6 +64,7 @@ def get_default_channels(
         # HOTFIX
         from variables import variables
         variables.addAlias('Kid_belle', 'atcPIDBelle(3,2)')
+        variables.addAlias('SigMBF', 'SigM')
 
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)',

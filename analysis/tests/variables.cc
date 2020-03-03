@@ -2491,6 +2491,88 @@ namespace {
     EXPECT_FLOAT_EQ(vsensible->function(undefined_), -1.0);
   }
 
+  TEST_F(MetaVariableTest, mcParticleIsInMCList)
+  {
+    // datastore things
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+
+    // needed to mock up
+    StoreArray<MCParticle> mcparticles;
+    StoreArray<Particle> particles;
+    StoreObjPtr<ParticleList> list("testList");
+    StoreObjPtr<ParticleList> anotherlist("supplimentaryList");
+
+    mcparticles.registerInDataStore();
+    particles.registerInDataStore();
+    particles.registerRelationTo(mcparticles);
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+    list.registerInDataStore(flags);
+    anotherlist.registerInDataStore(flags);
+
+    DataStore::Instance().setInitializeActive(false);
+    // end datastore setup
+
+    list.create();
+    list->initialize(22, "testList");
+
+    anotherlist.create();
+    anotherlist->initialize(22, "supplimentaryList");
+
+    // MCParticles
+    auto* mcphoton = mcparticles.appendNew();
+    mcphoton->setPDG(22);
+    mcphoton->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcelectron = mcparticles.appendNew();
+    mcelectron->setPDG(11);
+    mcelectron->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcanotherelectron = mcparticles.appendNew();
+    mcanotherelectron->setPDG(22);
+    mcanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcyetanotherelectron = mcparticles.appendNew();
+    mcyetanotherelectron->setPDG(22);
+    mcyetanotherelectron->setStatus(MCParticle::c_PrimaryParticle);
+
+    // particles
+    auto* photon = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    photon->addRelationTo(mcphoton);
+    list->addParticle(photon);
+
+    auto* electron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    electron->addRelationTo(mcelectron);
+    list->addParticle(electron);
+
+    auto* other = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    other->addRelationTo(mcanotherelectron);
+
+    auto* yetanotherelectron = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 22);
+    yetanotherelectron->addRelationTo(mcyetanotherelectron);
+    anotherlist->addParticle(yetanotherelectron);
+    // not in the list
+
+    // get the variable
+    const Manager::Var* vnonsense = Manager::Instance().getVariable("mcParticleIsInMCList(NONEXISTANTLIST)");
+    const Manager::Var* vsensible = Manager::Instance().getVariable("mcParticleIsInMCList(testList)");
+
+    // -
+    EXPECT_B2FATAL(vnonsense->function(photon));
+    EXPECT_FLOAT_EQ(vsensible->function(photon), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(electron), 1.0);
+    EXPECT_FLOAT_EQ(vsensible->function(other), 0.0);
+    EXPECT_FLOAT_EQ(vsensible->function(yetanotherelectron), 0.0);
+
+    // now mock up some other type particles
+    Particle composite({0.5 , 0.4 , 0.5 , 0.8}, 512, Particle::c_Unflavored, Particle::c_Composite, 0);
+    Particle undefined({0.3 , 0.3 , 0.4 , 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1);
+    auto* composite_ = particles.appendNew(undefined);
+    auto* undefined_ = particles.appendNew(composite);
+    EXPECT_FLOAT_EQ(vsensible->function(composite_), 0.0);
+    EXPECT_FLOAT_EQ(vsensible->function(undefined_), 0.0);
+  }
+
   TEST_F(MetaVariableTest, mostB2BAndClosestParticles)
   {
     /* Mock up an event with a "photon" and an "electron" which are nearly back to
@@ -4198,6 +4280,16 @@ namespace {
                              particledEdx)));
     EXPECT_FALSE(std::isnan(Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, ECL, TOP, ARICH, SVD)")->function(
                               particledEdx)));
+    //Mostlikely PDG tests:
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particledEdx), 1.00001e+09);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.5, 0.1, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 11);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.5, 0.1, 0.1, 0.1, 0.1)")->function(particledEdx), 13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.5, 0.1, 0.1, 0.1)")->function(particledEdx), 211);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
+    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 
   TEST_F(PIDVariableTest, MissingLikelihood)

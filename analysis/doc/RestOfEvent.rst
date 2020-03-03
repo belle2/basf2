@@ -67,7 +67,6 @@ This can be changed by passing an additional argument to the builder method:
 
 ::
 
-  import basf2 as b2
   import modularAnalysis as ma
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, path = mainPath)
@@ -80,8 +79,30 @@ Also, the neutral particles, photons and :math:`K_L^0`'s will be supplied to the
   If the option ``fillWithMostLikely=True`` appears more than once in the steering script,
   a warning about multiple ``X+:mostlikely`` particle lists fill attempts may appear, which is totally fine.
 
+Charged PID priors
+------------------
+
+User can provide prior expectations for the most probable mass hypothesis mentioned above. This is useful to suppress harmful mis-IDs, like charged pion 
+becoming a muon because their PID likelihoods are very similar. The priors are provided in from of a list containing 6 float numbers, which correspond to 
+:math:`[ e^\mp, \mu^\mp, \pi^\mp K^\pm, p^\pm, d^\pm]`.
+
+Here is an example of the prior usage:
+
+::
+
+  import modularAnalysis as ma
+  # Build the ROE object:
+  ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, 
+        chargedPIDPriors=[0.0, 0.0, 1.0, 1.0, 0.0, 0.0], path = mainPath)
+
+In this example, only kaons and pions will enter ROE. The same functionality is enabled for Event Shape and the Event Kinematics algorithms. 
+
+.. note::
+  An additional study is needed to fully understand the prior behavior.
+  Please share your experience.
+
 Selection cut based method
-==========================
+--------------------------
 
 Nevertheless, there is an option to add particle lists manually:
 

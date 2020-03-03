@@ -114,23 +114,23 @@ namespace Belle2 {
     *
     * Possible combinations of parameters for Yang:
     *
-    * | layerNumber | ladderNumber          |
-    * | 1           | 5, 6, 7, 8            |
-    * | 2           | 7, 8, 9, 10, 11, 12   |
+    * | layerNumber | ladderNumber        |
+    * | 1           | 5, 6, 7, 8          |
+    * | 2           | 7, 8, 9, 10, 11, 12 |
     */
     bool IsNotYang(int ladderNumber, int layerNumber);
 
     /**
     * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
-    * Returns false if the sensor is int the Pat.
+    * Returns false if the sensor is int the Mat.
     *
-    * Possible combinations of parameters for Pat:
+    * Possible combinations of parameters for Mat:
     *
-    * | layerNumber | ladderNumber                  |
-    * | 3           | 3, 4, 5                       |
-    * | 4           | 4, 5, 6, 7, 8                 |
-    * | 5           | 5, 6, 7, 8, 9, 10             |
-    * | 6           | 6, 7, 8, 9, 10, 11, 12, 13    |
+    * | layerNumber | ladderNumber               |
+    * | 3           | 3, 4, 5                    |
+    * | 4           | 4, 5, 6, 7, 8              |
+    * | 5           | 5, 6, 7, 8, 9, 10          |
+    * | 6           | 6, 7, 8, 9, 10, 11, 12, 13 |
     */
     bool IsNotMat(int ladderNumber, int layerNumber);
 

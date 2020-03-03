@@ -24,8 +24,8 @@ tree = input.Get("tree")
 histsRDP = R.TFile.Open("SVDRecoDigitPerformance.root", "recreate")
 
 ploter(
-    name='timeResolution',
-    title='Resolution of the reconstructed time of a single strip',
+    name='timeResolution_sideU',
+    title='Resolution of the reconstructed time of a single strip on side U',
     nbins=200,
     xmin=-100,
     xmax=100,
@@ -34,7 +34,23 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='recodigit_time - truehit_time',
-    cut='',
+    cut=cut_U,
+    descr='(reconstructed time of the RecoDigit) - (time of the Truehit) for all RecoDigit related to TrueHits',
+    check='peak around 0',
+    isShifter=True)
+
+ploter(
+    name='timeResolution_sideV',
+    title='Resolution of the reconstructed time of a single strip on side V',
+    nbins=200,
+    xmin=-100,
+    xmax=100,
+    x_label='RecoDigit time resolution (ns)',
+    y_label='counts',
+    granules=granulesD,
+    tree=tree,
+    expr='recodigit_time - truehit_time',
+    cut=cut_V,
     descr='(reconstructed time of the RecoDigit) - (time of the Truehit) for all RecoDigit related to TrueHits',
     check='peak around 0',
     isShifter=True)

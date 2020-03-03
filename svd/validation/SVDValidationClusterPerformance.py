@@ -276,8 +276,8 @@ plotEff(
 plotEff(
     name='ClusterizationEfficiency_V',
     title='Efficiency of clusterization for V side',
-    x_label='Efficiency',
-    y_label='',
+    x_label='SVD regions',
+    y_label='Efficiency',
     granules=granulesLayersTypes,
     tree=tree2,
     expr='strip_dir',

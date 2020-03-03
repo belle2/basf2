@@ -28,7 +28,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -757,12 +756,6 @@ namespace Belle2 {
     // load reconstructed neutral KLM cluster's as Klongs or neutrons
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
-
-      if ((cluster->getRelatedTo<KlId>()) == NULL)
-        continue;
-
-      if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
-        continue;
 
       if (std::isnan(cluster->getMomentumMag())) {
         B2WARNING("Skipping KLMCluster because of nan momentum.");

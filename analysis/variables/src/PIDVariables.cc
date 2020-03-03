@@ -18,6 +18,8 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
+#include <framework/utilities/Conversion.h>
+
 #include <boost/algorithm/string.hpp>
 
 #include <iostream>
@@ -319,16 +321,45 @@ namespace Belle2 {
       return func;
     }
 
-    double mostLikelyPDG(const Particle* part)
+    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments)
     {
-      auto* pid = part->getPIDLikelihood();
-      if (!pid) return std::numeric_limits<double>::quiet_NaN();
-      return pid->getMostLikely().getPDGCode();
+      if (arguments.size() != 0 and arguments.size() != Const::ChargedStable::c_SetSize) {
+        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidMostLikelyPDG");
+        return nullptr;
+      }
+      double prob[Const::ChargedStable::c_SetSize];
+      if (arguments.size() == 0) {
+        for (unsigned int i = 0; i < Const::ChargedStable::c_SetSize; i++) prob[i] = 1. / Const::ChargedStable::c_SetSize;
+      }
+      if (arguments.size() == Const::ChargedStable::c_SetSize) {
+        try {
+          int i = 0;
+          for (std::string arg : arguments) {
+            prob[i++] = Belle2::convertString<float>(arg);
+          }
+        } catch (std::invalid_argument& e) {
+          B2ERROR("All arguments of mostLikelyPDG must be a float number");
+          return nullptr;
+        }
+      }
+      auto func = [prob](const Particle * part) -> double {
+        auto* pid = part->getPIDLikelihood();
+        if (!pid) return std::numeric_limits<double>::quiet_NaN();
+        return pid->getMostLikely(prob).getPDGCode();
+      };
+      return func;
     }
 
-    double isMostLikely(const Particle* part)
+    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments)
     {
-      return mostLikelyPDG(part) == abs(part->getPDGCode());
+      if (arguments.size() != 0 and arguments.size() != 6) {
+        B2ERROR("Need zero or exactly " << Const::ChargedStable::c_SetSize << " arguments for pidIsMostLikely");
+        return nullptr;
+      }
+      auto func = [arguments](const Particle * part) -> double {
+        return mostLikelyPDG(arguments)(part) == abs(part->getPDGCode());
+      };
+      return func;
     }
 
     //*************
@@ -412,41 +443,6 @@ namespace Belle2 {
     }
 
 
-    // Needed by the flavor tagger algorithm
-    double kIDBelle(const Particle* part)
-    {
-      //default values Belle style
-      float accs = 0.5;
-      float tofs = 0.5;
-      float cdcs = 0.5;
-
-      const PIDLikelihood* pid = part->getPIDLikelihood();
-
-      if (pid) {
-        Const::PIDDetectorSet set = Const::ARICH;
-        accs = pid->getProbability(Const::kaon, Const::pion, set);
-        set = Const::TOP;
-        tofs = pid->getProbability(Const::kaon, Const::pion, set);
-        set = Const::TOP + Const::SVD;
-        cdcs = pid->getProbability(Const::kaon, Const::pion, set);
-      }
-
-      if (tofs > 0.999) tofs = 0.999;
-      if (tofs < 0.001) tofs = 0.001;
-      if (cdcs > 0.999) cdcs = 0.999;
-      if (cdcs < 0.001) cdcs = 0.001;
-
-      float s = accs * tofs * cdcs;
-      float b = (1. - accs) * (1. - tofs) * (1. - cdcs);
-
-      float r = s / (b + s);
-
-      return r;
-    }
-
-
-
-
     // PID variables to be used for analysis
     VARIABLE_GROUP("PID");
     REGISTER_VARIABLE("particleID", particleID, "the particle identification probability under the particle's own hypothesis");
@@ -496,8 +492,6 @@ namespace Belle2 {
                       "returns true if Belle's PID Muon_likelihood() is usable (reliable).");
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
                       "returns Belle's electron ID (eid(3,-1,5).prob()) variable.");
-    REGISTER_VARIABLE("kIDBelle", kIDBelle, "kaon identification probability belle-style.");
-
 
   }
 }

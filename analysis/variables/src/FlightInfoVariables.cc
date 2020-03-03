@@ -810,11 +810,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
                       "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
-                      "Returns -999 in case anything goes wrong.");
+                      "Returns NaN in case anything goes wrong.");
     REGISTER_VARIABLE("vertexDistanceOfDaughterErr(daughterN, option = '')", vertexDistanceOfDaughterErr,
                       "If any second argument is provided it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
-                      "Returns -999 in case anything goes wrong.");
+                      "Returns NaN in case anything goes wrong.");
     REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
                       "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.");

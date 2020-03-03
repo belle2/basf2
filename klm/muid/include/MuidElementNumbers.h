@@ -15,6 +15,9 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
 
+/* C++ headers. */
+#include <vector>
+
 namespace Belle2 {
 
   /**
@@ -55,6 +58,25 @@ namespace Belle2 {
     };
 
     /**
+     * Hypothesis number.
+     */
+    enum Hypothesis {
+      c_NotValid = -1,
+      c_Positron = 0,
+      c_Electron = 1,
+      c_Deuteron = 2,
+      c_AntiDeuteron = 3,
+      c_Proton = 4,
+      c_AntiProton = 5,
+      c_PionPlus = 6,
+      c_PionMinus = 7,
+      c_KaonPlus = 8,
+      c_KaonMinus = 9,
+      c_MuonPlus = 10,
+      c_MuonMinus = 11,
+    };
+
+    /**
      * Constructor.
      */
     MuidElementNumbers();
@@ -79,6 +101,12 @@ namespace Belle2 {
      * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
      */
     static unsigned int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
+
+    /**
+     * Calculate hypothesis number from PDG code.
+     * @param[in] pdg PDG code.
+     */
+    static Hypothesis calculateHypothesisFromPDG(int pdg);
 
     /**
      * Get maximal barrel layer number (0-based).
@@ -143,6 +171,19 @@ namespace Belle2 {
     {
       return m_MaximalReducedChiSquared;
     }
+
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Only the codes of the selected charge are returned.
+     * @param[in] charge Only codes of the selected charge are returned.
+     */
+    static std::vector<int> getPDGVector(int charge);
+
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Both positive and negative charges are returned.
+     */
+    static std::vector<int> getPDGVector();
 
   protected:
 

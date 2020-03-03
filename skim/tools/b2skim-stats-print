@@ -1283,8 +1283,8 @@ def printToConfluence(
 def printToMarkdown(
     allSkimStats, mcSampleLabels, dataSampleLabels, beamBackgrounds, mcOnly, dataOnly,
 ):
-    """Format the skim performance statistics as a markdown table, which can be copied
-    and pasted
+    """Format the skim performance statistics as a markdown table, which will be
+    formatted nicely if pasted into a pull request on BitBucket.
 
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
@@ -1309,9 +1309,7 @@ def printToMarkdown(
 
     markdownTables = []
     for skimName, skimStats in allSkimStats.items():
-        print(f"\nPerformance statistics for {skimName} skim:")
-
-        # Only print some stats to screen
+        # Only print some stats
         df = pd.DataFrame(skimStats, columns=selectedStats)
 
         # Handle skims only being run on data or MC
@@ -1351,9 +1349,8 @@ def printToMarkdown(
         markdownFile.write("\n".join(markdownTables))
 
     print(
-        f"\nWrote tables to {markdownFileName}. The contents of this file can "
-        "be copied directly to Confluence as Wiki markup in the markup editor "
-        "(accessible via ctrl-shift-D or cmd-shift-D)."
+        f"\nWrote tables to {markdownFileName}. This format is suitable for including "
+        "in pull request comments."
     )
 
 

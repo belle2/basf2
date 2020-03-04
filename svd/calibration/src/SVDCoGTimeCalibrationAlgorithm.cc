@@ -122,7 +122,8 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
            << currentRun.first << "," << currentRun.second << ")");
     m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
     return true;
+  } else {
+    return false;
   }
-  return false;
 }
 

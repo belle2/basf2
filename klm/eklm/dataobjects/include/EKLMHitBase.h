@@ -11,7 +11,7 @@
 #pragma once
 
 /* ROOT headers. */
-#include <TObject.h>
+#include <Rtypes.h>
 
 namespace Belle2 {
 

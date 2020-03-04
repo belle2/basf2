@@ -15,8 +15,6 @@
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 
 /* CLHEP headers. */
-#include <CLHEP/Matrix/DiagMatrix.h>
-#include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Matrix/Vector.h>
 

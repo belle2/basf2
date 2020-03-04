@@ -12,9 +12,10 @@
 #include <klm/eklm/calibration/EKLMChannelDataImporter.h>
 
 /* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 #include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
@@ -88,13 +89,15 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
   int i, n;
   int copper, dataConcentrator, lane, daughterCard, channel, active;
   /* cppcheck-suppress variableScope */
-  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
-  const int* sectorGlobal;
+  const uint16_t* detectorChannel;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMDataConcentratorLane dataConcentratorLane;
+  const KLMElementNumbers* klmElementNumbers =
+    &(KLMElementNumbers::Instance());
+  DBObjPtr<KLMElectronicsMap> electronicsMap;
+  KLMElectronicsChannel electronicsChannel;
   TFile* file;
   TTree* tree;
   file = new TFile(activeChannelsData, "");
@@ -108,20 +111,20 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
   tree->SetBranchAddress("active", &active);
   for (i = 0; i < n; i++) {
     tree->GetEntry(i);
-    dataConcentratorLane.setCopper(copper);
-    dataConcentratorLane.setDataConcentrator(dataConcentrator);
-    dataConcentratorLane.setLane(lane);
-    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == nullptr) {
+    electronicsChannel.setCopper(copper);
+    electronicsChannel.setSlot(dataConcentrator);
+    electronicsChannel.setLane(lane);
+    electronicsChannel.setAxis(1);
+    electronicsChannel.setChannel(1);
+    detectorChannel = electronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
-                                                 &layer, &sector);
-    plane = daughterCard / 5 + 1;
-    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
-    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    klmElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
@@ -139,13 +142,15 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   float voltage;
   /* cppcheck-suppress variableScope */
-  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
-  const int* sectorGlobal;
+  const uint16_t* detectorChannel;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMDataConcentratorLane dataConcentratorLane;
+  const KLMElementNumbers* klmElementNumbers =
+    &(KLMElementNumbers::Instance());
+  DBObjPtr<KLMElectronicsMap> electronicsMap;
+  KLMElectronicsChannel electronicsChannel;
   TFile* file;
   TTree* tree;
   file = new TFile(highVoltageData, "");
@@ -159,20 +164,20 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
   tree->SetBranchAddress("voltage", &voltage);
   for (i = 0; i < n; i++) {
     tree->GetEntry(i);
-    dataConcentratorLane.setCopper(copper);
-    dataConcentratorLane.setDataConcentrator(dataConcentrator);
-    dataConcentratorLane.setLane(lane);
-    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == nullptr) {
+    electronicsChannel.setCopper(copper);
+    electronicsChannel.setSlot(dataConcentrator);
+    electronicsChannel.setLane(lane);
+    electronicsChannel.setAxis(1);
+    electronicsChannel.setChannel(1);
+    detectorChannel = electronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
-                                                 &layer, &sector);
-    plane = daughterCard / 5 + 1;
-    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
-    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    klmElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
@@ -191,13 +196,15 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   int lookbackTime, lookbackWindowWidth;
   /* cppcheck-suppress variableScope */
-  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
-  const int* sectorGlobal;
+  const uint16_t* detectorChannel;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMDataConcentratorLane dataConcentratorLane;
+  const KLMElementNumbers* klmElementNumbers =
+    &(KLMElementNumbers::Instance());
+  DBObjPtr<KLMElectronicsMap> electronicsMap;
+  KLMElectronicsChannel electronicsChannel;
   TFile* file;
   TTree* tree;
   file = new TFile(lookbackWindowData, "");
@@ -212,20 +219,20 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
   tree->SetBranchAddress("lookback_window_width", &lookbackWindowWidth);
   for (i = 0; i < n; i++) {
     tree->GetEntry(i);
-    dataConcentratorLane.setCopper(copper);
-    dataConcentratorLane.setDataConcentrator(dataConcentrator);
-    dataConcentratorLane.setLane(lane);
-    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == nullptr) {
+    electronicsChannel.setCopper(copper);
+    electronicsChannel.setSlot(dataConcentrator);
+    electronicsChannel.setLane(lane);
+    electronicsChannel.setAxis(1);
+    electronicsChannel.setChannel(1);
+    detectorChannel = electronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
-                                                 &layer, &sector);
-    plane = daughterCard / 5 + 1;
-    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
-    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    klmElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(
@@ -245,13 +252,15 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   int copper, dataConcentrator, lane, daughterCard, channel;
   int active, pedestalMin, threshold, adjustmentVoltage;
   /* cppcheck-suppress variableScope */
-  int section, layer, sector, plane, strip, stripFirmware, stripGlobal;
+  int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
-  const int* sectorGlobal;
+  const uint16_t* detectorChannel;
   const EKLM::ElementNumbersSingleton* elementNumbers =
     &(EKLM::ElementNumbersSingleton::Instance());
-  DBObjPtr<EKLMElectronicsMap> electronicsMap;
-  EKLMDataConcentratorLane dataConcentratorLane;
+  const KLMElementNumbers* klmElementNumbers =
+    &(KLMElementNumbers::Instance());
+  DBObjPtr<KLMElectronicsMap> electronicsMap;
+  KLMElectronicsChannel electronicsChannel;
   TFile* file;
   TTree* tree;
   file = new TFile(thresholdsData, "");
@@ -268,20 +277,20 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   tree->SetBranchAddress("adjustment_voltage", &adjustmentVoltage);
   for (i = 0; i < n; i++) {
     tree->GetEntry(i);
-    dataConcentratorLane.setCopper(copper);
-    dataConcentratorLane.setDataConcentrator(dataConcentrator);
-    dataConcentratorLane.setLane(lane);
-    sectorGlobal = electronicsMap->getSectorByLane(&dataConcentratorLane);
-    if (sectorGlobal == nullptr) {
+    electronicsChannel.setCopper(copper);
+    electronicsChannel.setSlot(dataConcentrator);
+    electronicsChannel.setLane(lane);
+    electronicsChannel.setAxis(1);
+    electronicsChannel.setChannel(1);
+    detectorChannel = electronicsMap->getDetectorChannel(&electronicsChannel);
+    if (detectorChannel == nullptr) {
       B2FATAL("Wrong DAQ channel in calibration data: copper = " << copper <<
               ", data_concentrator = " << dataConcentrator << ", lane = " <<
               lane);
     }
-    elementNumbers->sectorNumberToElementNumbers(*sectorGlobal, &section,
-                                                 &layer, &sector);
-    plane = daughterCard / 5 + 1;
-    stripFirmware = (daughterCard % 5) * 15 + channel + 1;
-    strip = elementNumbers->getStripSoftwareByFirmware(stripFirmware);
+    klmElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                               strip);
     EKLMChannelData* channelData = const_cast<EKLMChannelData*>(

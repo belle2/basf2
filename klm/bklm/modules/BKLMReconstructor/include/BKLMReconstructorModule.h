@@ -16,6 +16,7 @@
 #include <klm/bklm/dataobjects/BKLMHit2d.h>
 #include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -88,6 +89,12 @@ namespace Belle2 {
 
     /** Ignore scintillators (to debug their electronics mapping). */
     bool m_IgnoreScintillators;
+
+    /** Ignore this module (to debug its electronics mapping). */
+    int m_IgnoreModule;
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** BKLM time window. */
     DBObjPtr<BKLMTimeWindow> m_Timing;

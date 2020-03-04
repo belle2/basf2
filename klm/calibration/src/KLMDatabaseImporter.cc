@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/calibration/KLMDatabaseImporter.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>

@@ -25,7 +25,7 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorith
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
   m_StripEfficiency = new KLMStripEfficiency();
-  int nPlanes = m_PlaneArrayIndex->getNPlanes();
+  int nPlanes = m_PlaneArrayIndex->getNElements();
   m_Efficiency = new float[nPlanes];
   m_ExtHitsPlane = new int[nPlanes];
 }
@@ -40,7 +40,7 @@ KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 {
   TFile* outputFile = new TFile(m_OutputFileName.c_str(), "recreate");
-  int nPlanes = m_PlaneArrayIndex->getNPlanes();
+  int nPlanes = m_PlaneArrayIndex->getNElements();
   TH1F* efficiencyHistogram =
     new TH1F("plane_efficiency", "KLM plane efficiency",
              nPlanes, -0.5, double(nPlanes) - 0.5);
@@ -124,7 +124,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
 int KLMStripEfficiencyAlgorithm::newMeasuredPlanes(float* efficiency) const
 {
   int newPlanes = 0;
-  for (int i = 0; i < m_PlaneArrayIndex->getNPlanes(); ++i) {
+  for (int i = 0; i < m_PlaneArrayIndex->getNElements(); ++i) {
     if (m_Efficiency[i] > 0 && efficiency[i] == 0)
       newPlanes++;
   }
@@ -134,7 +134,7 @@ int KLMStripEfficiencyAlgorithm::newMeasuredPlanes(float* efficiency) const
 int KLMStripEfficiencyAlgorithm::newExtHitsPlanes(int* extHitsPlane) const
 {
   int newPlanes = 0;
-  for (int i = 0; i < m_PlaneArrayIndex->getNPlanes(); ++i) {
+  for (int i = 0; i < m_PlaneArrayIndex->getNElements(); ++i) {
     if (m_ExtHitsPlane[i] > 0 && extHitsPlane[i] == 0)
       newPlanes++;
   }

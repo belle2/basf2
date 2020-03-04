@@ -201,7 +201,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       std::vector<double> arguments;
       for (auto& arg : functionArguments) {
         double number = 0;
-        number = Belle2::convertString<float>(arg);
+        number = Belle2::convertString<double>(arg);
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;

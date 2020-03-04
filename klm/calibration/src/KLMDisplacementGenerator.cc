@@ -16,11 +16,11 @@
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
-#include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/Unit.h>
 
 /* ROOT headers. */
 #include <TFile.h>
+#include <TRandom.h>
 #include <TTree.h>
 
 using namespace Belle2;

@@ -30,7 +30,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  /** Test class for the MuidBuilder class. */
+  /** Test class for the MuidBuilder class, using the payloads in the default (master) Global Tag. */
   class MuidBuilderTest : public ::testing::Test {
 
   protected:
@@ -66,12 +66,12 @@ namespace Belle2 {
 
   };
 
-  /** Test some setters and getters. */
+  /** Test the MuidBuilder class. */
   TEST_F(MuidBuilderTest, MuidBuilder)
   {
     StoreArray<KLMMuidLikelihood> muids;
 
-    /* Create results for a muon with 14 hits in the barrel. */
+    /* Test for a muon with 14 hits in the barrel. */
     int pdg = 13;
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
@@ -104,7 +104,7 @@ namespace Belle2 {
     }
     logLVector.clear();
 
-    /* Test the positive-charged hypotheses. */
+    /* Test for the positive-charged hypotheses. */
     std::vector<int> pdgVectorPlus = MuidElementNumbers::getPDGVector(1);
     logLVector = { -169.215, -0.284881, -45.7914, -42.7717, -95.9839, -118.769};
     for (size_t i = 0; i < pdgVector.size(); ++i) {
@@ -115,7 +115,7 @@ namespace Belle2 {
     }
     logLVector.clear();
 
-    /* Muon with some discrepancies in hit and ext. patterns. */
+    /* Test for a muon with some discrepancies in hit and ext. patterns. */
     bitExtPattern = std::bitset<30>(std::string("11111111111111"));
     extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     bitHitPattern = std::bitset<30>(std::string("11011111111101"));
@@ -146,7 +146,7 @@ namespace Belle2 {
     }
     logLVector.clear();
 
-    /* Muon with large discrepancies in hit and ext. patterns. */
+    /* Test for a muon with large discrepancies in hit and ext. patterns. */
     bitExtPattern = std::bitset<30>(std::string("11111111111111"));
     extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     bitHitPattern = std::bitset<30>(std::string("11"));
@@ -177,7 +177,7 @@ namespace Belle2 {
     }
     logLVector.clear();
 
-    /* Muon with hits in both barrel and endcaps. */
+    /* Test for a muon with hits in both barrel and endcaps. */
     bitExtPattern = std::bitset<30>(std::string("1111100000000000000000111"));
     extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     bitHitPattern = std::bitset<30>(std::string("1111100000000000000000111"));

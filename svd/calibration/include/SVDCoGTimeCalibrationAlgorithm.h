@@ -26,36 +26,35 @@ namespace Belle2 {
   class SVDCoGTimeCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to SVDCoGTimeCalibrationCollector
+    /**Constructor set the prefix to SVDCoGTimeCalibrationCollector*/
     explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
 
-    /// Destructor
+    /** Destructor*/
     virtual ~SVDCoGTimeCalibrationAlgorithm() {}
 
-    /// Setter for m_allowedT0Shift
+    /** Setter for m_allowedT0Shift*/
     void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}
 
-    /// Getter for m_allowedT0Shift
+    /** Getter for m_allowedT0Shift*/
     float getAllowedTimeShift() {return m_allowedTimeShift;}
 
-    /// Set the minimum entries required in the histograms
+    /** Set the minimum entries required in the histograms*/
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}
 
-    /// Get the minimum entries required in the histograms
+    /** Get the minimum entries required in the histograms*/
     int getMinEntries() {return m_minEntries;}
 
   protected:
 
-    /// Run algo on data
+    /** Run algo on data*/
     virtual EResult calibrate() override;
 
-    /// If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function
-    //  in the base class.
+    /** If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function in the base class.*/
     virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
 
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
-      // m_previousEventT0.reset();
+      /** m_previousEventT0.reset();*/
       m_previousRawCoGTimeMeanL3V.reset();
     }
 

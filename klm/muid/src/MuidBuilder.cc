@@ -19,7 +19,6 @@
 
 /* C++ headers. */
 #include <cmath>
-#include <fstream>
 
 using namespace Belle2;
 

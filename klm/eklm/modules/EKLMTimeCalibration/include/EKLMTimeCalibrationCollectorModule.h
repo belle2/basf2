@@ -23,9 +23,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 
-/* C++ headers. */
-#include <string>
-
 namespace Belle2 {
 
   /**

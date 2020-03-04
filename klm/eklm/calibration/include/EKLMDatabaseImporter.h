@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 

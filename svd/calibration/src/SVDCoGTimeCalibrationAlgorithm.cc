@@ -116,14 +116,14 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
            << currentRun.first << "," << currentRun.second << ")");
     m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
     return true;
-  }
-  if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
+  } else if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
     B2INFO("Histogram mean has shifted from " << m_previousRawCoGTimeMeanL3V.value()
            << " to " << meanRawCoGTimeL3V << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
     m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
     return true;
+  } else {
+    return false;
   }
-  return false;
 }
 

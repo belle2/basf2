@@ -28,7 +28,7 @@ haveFilledCharmSkimKs = 0
 
 def D0ToHpJm(path):
     """
-    Skim list for D0 to 2 charged FSPs.
+    Skim list for D0 to two charged FSPs.
 
     **Skim Author**: Giulia Casarosa
 
@@ -53,7 +53,7 @@ def D0ToHpJm(path):
 
     **Additional Cuts**:
 
-    1. ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799 ``
+    1. ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
 
     2. ``1.80 < M(D0) < 1.93``
 
@@ -106,7 +106,8 @@ def DstToD0PiD0ToHpJm(path):
 
     **Decay Modes**
 
-    1. :math:`D^{*+}\\to D^{0} \\pi^+, where the D^{0} is reconstructed by D0ToHpJm()`
+    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where the D^{0} is reconstructed by D0ToHpJm()`:w
+    `
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -329,6 +330,7 @@ def DstToD0PiD0ToHpJmEta(path):
     **Particle Lists**: Standard lists for all particles.
 
     **Additional Cuts**:
+
     1. ``0.49 < M(eta) < 0.55, p(eta) > 0.28``
 
     1. ``1.78 < M(D0) < 1.93, pcms(D0) > 2.2``
@@ -432,9 +434,9 @@ def D0ToNeutrals(path):
 
     1. :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
 
-    2. :math:`D^{0}\\to \\K_{S} \\pi^{0}`
+    2. :math:`D^{0}\\to K_{S} \\pi^{0}`
 
-    3. :math:`D^{0}\\to \\K_{S} \\K_{S}`
+    3. :math:`D^{0}\\to K_{S} K_{S}`
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -489,7 +491,7 @@ def DstToD0Neutrals(path):
 
     **Decay Modes**
 
-    1. :math:`D^{*+}\\to \\pi^+ D^{0}, where the D^{0} is reconstructed by D0ToNeutrals()`
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by D0ToNeutrals()
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -547,7 +549,7 @@ def DstToD0PiD0ToHpHmKs(path):
 
     1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\pi^+ \\pi^-`
 
-    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} \\K^+ \\K^-`
+    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{S} K^+ K^-`
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -606,15 +608,15 @@ def CharmRare(path):
 
     **Decay Modes**
 
-    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`
+    1. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to ee`,
 
-    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`
+    2. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\mu \\mu`,
 
-    3. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\e+ \\mu-`
+    3. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^+ \\mu^-`,
 
-    4. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\e- \\mu+`
+    4. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to e^- \\mu^+`,
 
-    5. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi+ \\pi-`
+    5. :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^-`,
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -622,7 +624,7 @@ def CharmRare(path):
 
     1. ``1.78 < M(D0) < 1.94``
 
-    2. ``0 < Q < 0.02 ``
+    2. ``0 < Q < 0.02``
 
     3. ``pcms(D*) > 2.2``
 
@@ -671,7 +673,9 @@ def CharmSemileptonic(path):
 
     **Decay Modes**
 
-    1.1 :math:`e^+e^- \\to D^{*+} D^{*-}, D^{*+}(tag)\\to \\pi^+ D0,`
+    1.1 :math:`e^+e^- \\to D^{*+} D^{*-}`,
+
+    1.2 :math:`D^{*+}(tag)\\to \\pi^+ D0`,
 
     1.2 :math:`D^{*-}\\to \\overline{D}^{0} \\pi^-, \\overline{D}^{0} \\to K^+ \\nu l^-`
 

@@ -10,6 +10,8 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
+from rawdata import add_unpackers
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,

@@ -89,12 +89,7 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
     environmentType = "default"
 
     if belleOrBelle2Flag == "Belle":
-        from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
 
-        isBelleMC = True
-        if belleData == "BelleDataConv":
-            isBelleMC = False
-        setupB2BIIDatabase(isBelleMC)  # False for Belle Data True for Belle MC
         os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
         os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
@@ -292,7 +287,7 @@ if __name__ == '__main__':
 
         mcMatchAndBuildROE(belleOrBelle2Flag=belleOrBelle2Flag)
         applyCPVTools(mode=mode)
-        ma.process(cp_val_path)
+        b2.process(cp_val_path)
         print(b2.statistics)
 
     if mode == "Teacher":

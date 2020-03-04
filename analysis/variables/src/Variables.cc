@@ -483,7 +483,7 @@ namespace Belle2 {
       return part->getMass() - part->getPDGMass();
     }
 
-    double particleInvariantMass(const Particle* part)
+    double particleInvariantMassFromDaughters(const Particle* part)
     {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
@@ -504,8 +504,8 @@ namespace Belle2 {
         TLorentzVector dt1;
         TLorentzVector dt2;
         TLorentzVector dtsum;
-        double mpi = 0.1396;
-        double mpr = 0.9383;
+        double mpi = Const::pionMass;
+        double mpr = Const::protonMass;
         dt1 = daughters[0]->get4Vector();
         dt2 = daughters[1]->get4Vector();
         double E1 = hypot(mpi, dt1.P());
@@ -521,11 +521,7 @@ namespace Belle2 {
     double particleInvariantMassError(const Particle* part)
     {
       float invMass = part->getMass();
-
-      TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
-      for (unsigned i = 0; i < part->getNDaughters(); i++) {
-        covarianceMatrix += part->getDaughter(i)->getMomentumErrorMatrix();
-      }
+      TMatrixFSym covarianceMatrix = part->getMomentumErrorMatrix();
 
       TVectorF jacobian(Particle::c_DimMomentum);
       jacobian[0] = -1.0 * part->getPx() / invMass;
@@ -543,20 +539,7 @@ namespace Belle2 {
 
     double particleInvariantMassSignificance(const Particle* part)
     {
-      float invMass = part->getMass();
-      float nomMass = part->getPDGMass();
-      float massErr = particleInvariantMassError(part);
-
-      return (invMass - nomMass) / massErr;
-    }
-
-    double particleInvariantMassBeforeFitSignificance(const Particle* part)
-    {
-      float invMass = particleInvariantMass(part);
-      float nomMass = part->getPDGMass();
-      float massErr = particleInvariantMassError(part);
-
-      return (invMass - nomMass) / massErr;
+      return particleDMass(part) / particleInvariantMassError(part);
     }
 
     double particleMassSquared(const Particle* part)
@@ -1025,9 +1008,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosToThrustOfEvent", cosToThrustOfEvent,
                       "Returns the cosine of the angle between the particle and the thrust axis of the event, as calculate by the EventShapeCalculator module. buildEventShape() must be run before calling this variable")
 
-
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
-
 
     REGISTER_VARIABLE("M", particleMass,
                       "invariant mass (determined from particle's 4-momentum vector)");
@@ -1040,18 +1021,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("M2", particleMassSquared,
                       "invariant mass squared (determined from particle's 4-momentum vector)");
 
-    REGISTER_VARIABLE("InvM", particleInvariantMass,
+    REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
                       "invariant mass (determined from particle's daughter 4-momentum vectors)");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
                       "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
-                      "uncertainty of invariant mass (determined from particle's daughter 4 - momentum vectors)");
+                      "uncertainty of invariant mass");
     REGISTER_VARIABLE("SigM", particleInvariantMassSignificance,
-                      "signed deviation of particle's invariant mass from its nominal mass");
-    REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
-                      "signed deviation of particle's invariant mass(determined from particle's daughter 4-momentum vectors) from its nominal mass");
+                      "signed deviation of particle's invariant mass from its nominal mass in units of the uncertainty on the invariant mass (dM/ErrM)");
 
     REGISTER_VARIABLE("pxRecoil", recoilPx,
                       "component x of 3-momentum recoiling against given Particle");
@@ -1074,7 +1053,6 @@ namespace Belle2 {
                       "invariant mass squared of the system recoiling against given Particle");
     REGISTER_VARIABLE("m2RecoilSignalSide", m2RecoilSignalSide,
                       "Squared recoil mass of the signal side which is calculated in the CMS frame under the assumption that the signal and tag side are produced back to back and the tag side energy equals the beam energy. The variable must be applied to the Upsilon and the tag side must be the first, the signal side the second daughter ");
-
 
     REGISTER_VARIABLE("b2bTheta", b2bTheta,
                       "Polar angle in the lab system that is back-to-back to the particle in the CMS. Useful for low multiplicity studies.")

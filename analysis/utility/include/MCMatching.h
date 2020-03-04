@@ -172,5 +172,11 @@ namespace Belle2 {
      */
     static int getFlagsIgnoredByProperty(const Belle2::Particle* particle);
 
+    /**
+     * Returns the daughter mask from given daughterProperty.
+     * @return ORed combination of MCErrorFlags to be accepted for the daughter
+     */
+    static int makeDaughterAcceptMask(int daughterProperty);
+
   };
 }

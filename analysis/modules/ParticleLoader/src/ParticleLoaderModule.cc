@@ -28,7 +28,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -65,7 +64,7 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
 
     addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://confluence.desy.de/display/BI/Physics+DecayString and https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions).",
+             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see :ref:`DecayString` and `cut_strings_selections`).",
              emptyDecayStringsAndCuts);
 
     addParam("useMCParticles", m_useMCParticles,
@@ -757,12 +756,6 @@ namespace Belle2 {
     // load reconstructed neutral KLM cluster's as Klongs or neutrons
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
-
-      if ((cluster->getRelatedTo<KlId>()) == NULL)
-        continue;
-
-      if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
-        continue;
 
       if (std::isnan(cluster->getMomentumMag())) {
         B2WARNING("Skipping KLMCluster because of nan momentum.");

@@ -20,15 +20,22 @@ skim_registry = [
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
     ('14140100', 'BtoD0h_hh'),
-    ('14120300', 'BtoD0h_Kspi0'),
+    ('14140101', 'BtoD0h_Kpi'),
+    ('14140102', 'BtoD0h_Kpipipi'),  # TODO: merge with anti-D0 -> K- pi+ pi0 and chnage name
     ('14140200', 'BtoD0h_Kshh'),
+    ('14120300', 'BtoD0h_Kspi0'),
     ('14120400', 'BtoD0h_Kspipipi0'),
     # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
-    ('14140101', 'BtoD0h_Kpi'),
-    ('14140102', 'BtoD0h_Kpipipi'),
     ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    # ('14120601', 'B0toDpi_Kspi'),   B0 -> D-(Ks pi-)pi+ To be added
     ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
-    ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
+    ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # TODO: merge with anti-D0 -> K- pi+ pi0 and change name
+    ('14141000', 'BtoD0rho_Kpi'),
+    ('14141001', 'BtoD0rho_Kpipipi_Kpipi0'),
+    ('14121100', 'B0toDrho_Kpipi'),
+    ('14121101', 'B0toDrho_Kspi'),
+    ('14121200', 'B0toDstarRho_D0pi_Kpi'),
+    ('14121201', 'B0toDstarRho_D0pi_Kpipipi_Kpipi0'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -54,7 +61,6 @@ skim_registry = [
     ('17230400', 'XToDp_DpToKsHp'),  # D+ -> Ks h+
     ('19130100', 'CharmlessHad2Body'),
     ('19130200', 'CharmlessHad3Body'),
-    ('14130200', 'DoubleCharm'),
     ('16460100', 'ISRpipicc'),
     ('10600100', 'Systematics'),
     ('10620200', 'SystematicsLambda'),
@@ -85,11 +91,10 @@ combined_skims = {
         'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
     ],
     'CharmHigh': [
-        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJmPi0',
-        'DstToD0Pi_D0ToHpHmPi0', 'XToDp_DpToKsHp'
+        'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
     ],
     'CharmLow': [
-        'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare', 'XToD0_D0ToHpJm'
+        'XToD0_D0ToHpJm', 'DstToD0Pi_D0ToHpJm', 'DstToD0Pi_D0ToHpHmKs', 'DstToD0Pi_D0ToRare'
     ],
     'CharmEarlyData': [
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'

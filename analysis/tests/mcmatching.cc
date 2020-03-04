@@ -1225,18 +1225,18 @@ namespace {
       EXPECT_EQ(MCMatching::c_MissingResonance | MCMatching::c_MissPHOTOS, MCMatching::getMCErrors(B)) << d.getString();
       EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
 
-      // '=norad=>' c_isIgnoreIntermediate
-      B->setProperty(Particle::PropertyFlags::c_isIgnoreIntermediate);
+      // '=norad=>' c_IsIgnoreIntermediate
+      B->setProperty(Particle::PropertyFlags::c_IsIgnoreIntermediate);
       EXPECT_EQ(MCMatching::c_MissPHOTOS, MCMatching::getMCErrors(B)) << d.getString();
       EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
 
-      // '=direct=>' c_isIgnoreRadiatedPhotons
-      B->setProperty(Particle::PropertyFlags::c_isIgnoreRadiatedPhotons);
+      // '=direct=>' c_IsIgnoreRadiatedPhotons
+      B->setProperty(Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons);
       EXPECT_EQ(MCMatching::c_MissingResonance, MCMatching::getMCErrors(B)) << d.getString();
       EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
 
-      // '->' c_isIgnoreRadiatedPhotons and c_isIgnoreIntermediate
-      B->setProperty(Particle::PropertyFlags::c_isIgnoreRadiatedPhotons | Particle::PropertyFlags::c_isIgnoreIntermediate);
+      // '->' c_IsIgnoreRadiatedPhotons and c_IsIgnoreIntermediate
+      B->setProperty(Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons | Particle::PropertyFlags::c_IsIgnoreIntermediate);
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(B)) << d.getString();
       EXPECT_EQ(Variable::isSignal(B), 1.0) << d.getString();
     }

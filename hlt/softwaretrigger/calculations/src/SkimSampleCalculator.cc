@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
@@ -435,4 +436,91 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   calculationResult["Radee"] = radee;
 
+  // Dimuon skim (mumutight) taken from the offline skim
+  double mumutight = 0.;
+  double eMumuTotGammas = 0.;
+  int nTracks = 0;
+
+  int nGammas = m_gammaParticles->getListSize();
+
+  for (int t = 0; t < nGammas; t++) {
+    const Particle* part = m_gammaParticles->getParticle(t);
+    const auto& frame = ReferenceFrame::GetCurrent();
+    eMumuTotGammas += frame.getMomentum(part).E();
+  }
+
+  StoreArray<Track> tracks;
+  nTracks = tracks.getEntries();
+
+  if (m_pionParticles->getListSize() == 2) {
+
+    //------------First track variables----------------
+    for (unsigned int k = 0; k < m_pionParticles->getListSize() - 1; k++) {
+
+      Particle* part1 = m_pionParticles->getParticle(k);
+      if (!part1) continue;
+
+      const auto chargep1 = part1->getCharge();
+      if (abs(chargep1) != 1) continue;
+
+      const ECLCluster* eclTrack1 = part1->getECLCluster();
+      if (!eclTrack1) continue;
+      if (!eclTrack1->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+      const Track* track1 = part1->getTrack();
+      if (!track1) continue;
+
+      const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
+      if (!trackFit1) continue;
+
+      TLorentzVector V4p0 = trackFit1->get4Momentum();
+      const TVector3 V3p0 = (PCmsLabTransform::labToCms(V4p0)).Vect();
+      double Pp0 = V3p0.Mag();
+      double Thetap0 = (V3p0).Theta() * TMath::RadToDeg();
+      double Phip0 = (V3p0).Phi() * TMath::RadToDeg();
+
+
+      //------------Second track variables----------------
+      for (unsigned int l = k + 1; l < m_pionParticles->getListSize(); l++) {
+
+        Particle* part2 = m_pionParticles->getParticle(l);
+        if (!part2) continue;
+
+        const auto chargep2 = part2->getCharge();
+        if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
+
+        const ECLCluster* eclTrack2 = part2->getECLCluster();
+        if (!eclTrack2) continue;
+        if (!eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+        const Track* track2 = part2->getTrack();
+        if (!track2) continue;
+
+        const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
+        if (!trackFit2) continue;
+
+        TLorentzVector V4p1 = trackFit2->get4Momentum();
+        const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+        double Pp1 = V3p1.Mag();
+        double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
+        double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+
+        double acopPhi = fabs(180 - fabs(Phip0 - Phip1));
+        double acopTheta = fabs(fabs(Thetap0 + Thetap1) - 180);
+
+        double eTotMumuTracks = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) + eclTrack2->getEnergy(
+                                  ECLCluster::EHypothesisBit::c_nPhotons);
+
+        double EMumutot = eTotMumuTracks + eMumuTotGammas;
+
+        bool mumutight_tag = eTotMumuTracks < 2 && EMumutot < 2 && acopPhi < 10 && acopTheta < 10 && nTracks == 2 && Pp0 > 0.5 && Pp1 > 0.5;
+
+        if (mumutight_tag) mumutight = 1;
+
+
+      }
+    }
+  }
+
+  calculationResult["MumuTight"] = mumutight;
 }

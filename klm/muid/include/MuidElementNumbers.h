@@ -12,7 +12,11 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+
+/* C++ headers. */
+#include <vector>
 
 namespace Belle2 {
 
@@ -45,6 +49,34 @@ namespace Belle2 {
     };
 
     /**
+     * Labels for detectors crossed.
+     */
+    enum DetectorsCrossed {
+      c_Both = 0,
+      c_OnlyBarrel = KLMElementNumbers::c_BKLM,
+      c_OnlyEndcap = KLMElementNumbers::c_EKLM,
+    };
+
+    /**
+     * Hypothesis number.
+     */
+    enum Hypothesis {
+      c_NotValid = -1,
+      c_Positron = 0,
+      c_Electron = 1,
+      c_Deuteron = 2,
+      c_AntiDeuteron = 3,
+      c_Proton = 4,
+      c_AntiProton = 5,
+      c_PionPlus = 6,
+      c_PionMinus = 7,
+      c_KaonPlus = 8,
+      c_KaonMinus = 9,
+      c_MuonPlus = 10,
+      c_MuonMinus = 11,
+    };
+
+    /**
      * Constructor.
      */
     MuidElementNumbers();
@@ -59,7 +91,22 @@ namespace Belle2 {
      * @param[in] outcome   Track extrapolation outcome.
      * @param[in] lastLayer Last layer crossed during the extrapolation.
      */
-    static bool checkExtrapolationOutcome(int outcome, int lastLayer);
+    static bool checkExtrapolationOutcome(unsigned int outcome, int lastLayer);
+
+    /**
+     * Calculate the track extrapolation outcome.
+     * @param[in] isForward       Forward or backward.
+     * @param[in] escaped         Escaped or not from KLM volumes.
+     * @param[in] lastBarrelLayer Last barrel layer crossed during the extrapolation.
+     * @param[in] lastEndcapLayer Last endcap layer crossed during the extrapolation.
+     */
+    static unsigned int calculateExtrapolationOutcome(bool isForward, bool escaped, int lastBarrelLayer, int lastEndcapLayer);
+
+    /**
+     * Calculate hypothesis number from PDG code.
+     * @param[in] pdg PDG code.
+     */
+    static Hypothesis calculateHypothesisFromPDG(int pdg);
 
     /**
      * Get maximal barrel layer number (0-based).
@@ -125,6 +172,19 @@ namespace Belle2 {
       return m_MaximalReducedChiSquared;
     }
 
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Only the codes of the selected charge are returned.
+     * @param[in] charge Only codes of the selected charge are returned.
+     */
+    static std::vector<int> getPDGVector(int charge);
+
+    /**
+     * Get a vector with all the hypothesis PDG codes used for Muid.
+     * Both positive and negative charges are returned.
+     */
+    static std::vector<int> getPDGVector();
+
   protected:
 
     /** Maximal barrel layer number (0-based). */
@@ -140,7 +200,7 @@ namespace Belle2 {
     static constexpr int m_MaximalOutcome = c_CrossBarrelExitBackwardMax;
 
     /** Maximal value of the detector selector (for transverse scattering). */
-    static constexpr int m_MaximalDetector = 2;
+    static constexpr int m_MaximalDetector = c_OnlyEndcap;
 
     /** Maximal value of NDof/2 (for transverse scattering). */
     static constexpr int m_MaximalHalfNDof = 18;

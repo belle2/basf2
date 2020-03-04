@@ -10,7 +10,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
-from stdPi0s import loadStdSkimPi0
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 b2.set_log_level(b2.LogLevel.INFO)
@@ -24,11 +24,10 @@ fileList = expert.get_test_file("MC12_mixedBGx1")
 
 ma.inputMdstList('default', fileList, path=path)
 
-
+loadStdPi0ForBToHadrons(path=path)
 stdPi('all', path=path)
 stdK('all', path=path)
 stdKshorts(path=path)
-loadStdSkimPi0(path=path)
 
 # B+ to anti-D0(->Kspipipi0)h+ Skim
 from skim.btocharm import BsigToD0hToKspipipi0List

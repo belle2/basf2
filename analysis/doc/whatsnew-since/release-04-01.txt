@@ -34,12 +34,16 @@ Standard Particle Lists
    However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `vertexRave` or to `KFit`.
  * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.
 
+ * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
+
 Variables
 +++++++++
 
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
+ * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level
+   ancestor of the given type.   
  * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
    transformation of track parameters relative to IP when used for tracks. 
    `dr` did not center at zero before and now it does.
@@ -63,6 +67,7 @@ Variables
    specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
+ * Added PID prior hypothesis to the :b2:var:`pidMostLikelyPDG` and the :b2:var:`pidIsMostLikely` variables. 
  * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
    :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
@@ -70,6 +75,12 @@ Variables
    :b2:var:`TagTrackTrueDistanceToTagV`
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
+ * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a pseudo-significance.
+
+ .. hint:: It is recommended to use `variablesToExtraInfo` prior to a vertex fit to access pre-fit values,
+           not only for mass significances but also for vertex positions, etc.
+
 
 Modules
 +++++++
@@ -107,6 +118,15 @@ Modules
    The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
  * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
+ * Both flavor taggers support ROE masks. Added new maskName argument.
+ * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``, ``c_DecayInFlight``, and ``c_MisID``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
+   One can add ``(decay)`` and/or ``(misID)`` to the begining of the particle name to accept ``c_DecayInFlight`` and/or ``c_MisID``. 
+   The following is an example, :code:`'reconstructDecay('D0:sig -> (misID)K-:loose (decay)pi+:loose', '', path=mypath)'`
+		
+ * Modified `modularAnalysis.matchMCTruth` to work always recursively. Once one calls `modularAnalysis.matchMCTruth` for a particle, the MC Matching is done for not only the particle but also all daughters of the particle correctly.
+   This modification does not change the MC Matching of the particle for which `modularAnalysis.matchMCTruth` is called.
+ * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
+ * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
 
 Utilities
 +++++++++

@@ -262,6 +262,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_ecl_cluster_properties_modules(path, components)
     add_ecl_eip_module(path, components)
     add_pid_module(path, components)
+    add_pxd_track_cluster_modules(path, components)
 
     if addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
@@ -677,6 +678,17 @@ def add_dedx_modules(path, components=None):
         path.add_module(VXDdEdxPID)
 
 
+def add_pxd_track_cluster_modules(path, components=None):
+    """
+    Add the pxd clusters from tracks module to the path.
+
+    :param path: The path to add the modules to.
+    :param components: The components to use or None to use all standard components.
+    """
+    if components is None or ('PXD' in components and ('SVD' in components or 'CDC' in components)):
+        path.add_module('PXDClustersFromTracks')
+
+
 def prepare_cdst_analysis(path, components=None):
     """
     Adds to a (analysis) path all the modules needed to
@@ -714,3 +726,4 @@ def prepare_cdst_analysis(path, components=None):
     add_ecl_eip_module(path, components)
     add_pid_module(path, components)
     add_ecl_track_brem_finder(path, components)
+    add_pxd_track_cluster_modules(path, components)

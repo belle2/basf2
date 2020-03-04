@@ -56,7 +56,7 @@ PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : Calibration
 
 void PXDClusterChargeCollectorModule::prepare() // Do your initialise() stuff here
 {
-  m_pxdClusters.isRequired();
+  m_pxdClusters.isRequired(m_storeClustersName);
   m_tracks.isOptional(); //m_storeTracksName);
   m_recoTracks.isOptional(); //m_storeRecoTracksName);
 
@@ -198,7 +198,7 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
       RelationVector<RecoTrack> recoTrack = track.getRelationsTo<RecoTrack>(m_storeRecoTracksName);
       if (!recoTrack.size()) continue;
-      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0]);
+      RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(recoTrack[0], m_storeClustersName);
 
       const TrackFitResult* tfr = track.getTrackFitResultWithClosestMass(Const::pion);
       double correction = 1.0;

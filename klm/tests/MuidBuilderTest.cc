@@ -13,7 +13,7 @@
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -64,14 +64,17 @@ namespace Belle2 {
     /** Pointer to a MuidBuilder class. */
     MuidBuilder* m_muidBuilder = nullptr;
 
+    /** Vector of negative charged hypotheses. */
+    std::vector<int> m_pdgVectorMinus = MuidElementNumbers::getPDGVector(-1);
+
+    /** Vector of positive charged hypotheses. */
+    std::vector<int> m_pdgVectorPlus = MuidElementNumbers::getPDGVector(1);
   };
 
-  /** Test the MuidBuilder class. */
-  TEST_F(MuidBuilderTest, MuidBuilder)
+  /** Test for a muon with 14 hits in the barrel. */
+  TEST_F(MuidBuilderTest, MuidBuilder01)
   {
     StoreArray<KLMMuidLikelihood> muids;
-
-    /* Test for a muon with 14 hits in the barrel. */
     int pdg = 13;
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
@@ -94,39 +97,41 @@ namespace Belle2 {
     m_muid->setOutcome(outcome);
     m_muid->setChiSquared(chiSquared);
     m_muid->setDegreesOfFreedom(degreesOfFreedom);
-    std::vector<int> pdgVector = MuidElementNumbers::getPDGVector(-1);
     std::vector<float> logLVector = { -169.215, -0.288937, -46.5124, -49.7292, -72.7715, -96.2517};
-    for (size_t i = 0; i < pdgVector.size(); ++i) {
-      m_muidBuilder = new MuidBuilder(pdgVector.at(i));
+    for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
       EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
       delete m_muidBuilder;
     }
     logLVector.clear();
-
     /* Test for the positive-charged hypotheses. */
-    std::vector<int> pdgVectorPlus = MuidElementNumbers::getPDGVector(1);
+    m_pdgVectorPlus = MuidElementNumbers::getPDGVector(1);
     logLVector = { -169.215, -0.284881, -45.7914, -42.7717, -95.9839, -118.769};
-    for (size_t i = 0; i < pdgVector.size(); ++i) {
-      m_muidBuilder = new MuidBuilder(pdgVectorPlus.at(i));
+    for (size_t i = 0; i < m_pdgVectorPlus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorPlus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
       EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
       delete m_muidBuilder;
     }
-    logLVector.clear();
+  }
 
-    /* Test for a muon with some discrepancies in hit and ext. patterns. */
-    bitExtPattern = std::bitset<30>(std::string("11111111111111"));
-    extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
-    bitHitPattern = std::bitset<30>(std::string("11011111111101"));
-    hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
-    isForward = true;
-    escaped = false;
-    lastBarrelLayer = 13;
-    lastEndcapLayer = -1;
-    outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
-    chiSquared = 23.5;
-    degreesOfFreedom = 24;
+  /** Test for a muon with some discrepancies in hit and ext. patterns. */
+  TEST_F(MuidBuilderTest, MuidBuilder02)
+  {
+    StoreArray<KLMMuidLikelihood> muids;
+    int pdg = 13;
+    std::bitset<30> bitExtPattern(std::string("11111111111111"));
+    unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
+    std::bitset<30> bitHitPattern = std::bitset<30>(std::string("11011111111101"));
+    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
+    bool isForward = true;
+    bool escaped = false;
+    int lastBarrelLayer = 13;
+    int lastEndcapLayer = -1;
+    unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
+    double chiSquared = 23.5;
+    int degreesOfFreedom = 24;
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     m_muid->setExtLayerPattern(extPattern);
@@ -137,27 +142,31 @@ namespace Belle2 {
     m_muid->setOutcome(outcome);
     m_muid->setChiSquared(chiSquared);
     m_muid->setDegreesOfFreedom(degreesOfFreedom);
-    logLVector = { -147.07, -6.37567, -40.9424, -43.8204, -63.8973, -84.6684};
-    for (size_t i = 0; i < pdgVector.size(); ++i) {
-      m_muidBuilder = new MuidBuilder(pdgVector.at(i));
+    std::vector<float> logLVector = { -147.07, -6.37567, -40.9424, -43.8204, -63.8973, -84.6684};
+    for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
       EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
       delete m_muidBuilder;
     }
-    logLVector.clear();
+  }
 
-    /* Test for a muon with large discrepancies in hit and ext. patterns. */
-    bitExtPattern = std::bitset<30>(std::string("11111111111111"));
-    extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
-    bitHitPattern = std::bitset<30>(std::string("11"));
-    hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
-    isForward = true;
-    escaped = false;
-    lastBarrelLayer = 1;
-    lastEndcapLayer = -1;
-    outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
-    chiSquared = 7.5;
-    degreesOfFreedom = 4;
+  /** Test for a muon with large discrepancies in hit and ext. patterns. */
+  TEST_F(MuidBuilderTest, MuidBuilder03)
+  {
+    StoreArray<KLMMuidLikelihood> muids;
+    int pdg = 13;
+    std::bitset<30> bitExtPattern(std::string("11111111111111"));
+    unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
+    std::bitset<30> bitHitPattern = std::bitset<30>(std::string("11"));
+    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
+    bool isForward = true;
+    bool escaped = false;
+    int lastBarrelLayer = 1;
+    int lastEndcapLayer = -1;
+    unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
+    double chiSquared = 7.5;
+    int degreesOfFreedom = 4;
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     m_muid->setExtLayerPattern(extPattern);
@@ -168,27 +177,31 @@ namespace Belle2 {
     m_muid->setOutcome(outcome);
     m_muid->setChiSquared(chiSquared);
     m_muid->setDegreesOfFreedom(degreesOfFreedom);
-    logLVector = { -13.0068, -1.82853, -4.78739, -6.44048, -6.67272, -6.8342};
-    for (size_t i = 0; i < pdgVector.size(); ++i) {
-      m_muidBuilder = new MuidBuilder(pdgVector.at(i));
+    std::vector<float> logLVector = { -13.0068, -1.82853, -4.78739, -6.44048, -6.67272, -6.8342};
+    for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
       EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
       delete m_muidBuilder;
     }
-    logLVector.clear();
+  }
 
-    /* Test for a muon with hits in both barrel and endcaps. */
-    bitExtPattern = std::bitset<30>(std::string("1111100000000000000000111"));
-    extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
-    bitHitPattern = std::bitset<30>(std::string("1111100000000000000000111"));
-    hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
-    isForward = true;
-    escaped = false;
-    lastBarrelLayer = 2;
-    lastEndcapLayer = 9;
-    outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
-    chiSquared = 16.5;
-    degreesOfFreedom = 16;
+  /** Test for a muon with hits in both barrel and endcaps. */
+  TEST_F(MuidBuilderTest, MuidBuilder04)
+  {
+    StoreArray<KLMMuidLikelihood> muids;
+    int pdg = 13;
+    std::bitset<30> bitExtPattern(std::string("1111100000000000000000111"));
+    unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
+    std::bitset<30> bitHitPattern = std::bitset<30>(std::string("1111100000000000000000111"));
+    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
+    bool isForward = true;
+    bool escaped = false;
+    int lastBarrelLayer = 2;
+    int lastEndcapLayer = 9;
+    unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
+    double chiSquared = 16.5;
+    int degreesOfFreedom = 16;
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     m_muid->setExtLayerPattern(extPattern);
@@ -199,14 +212,13 @@ namespace Belle2 {
     m_muid->setOutcome(outcome);
     m_muid->setChiSquared(chiSquared);
     m_muid->setDegreesOfFreedom(degreesOfFreedom);
-    logLVector = { -18.3899, -0.303499, -5.48054, -6.21227, -7.09687, -9.839};
-    for (size_t i = 0; i < pdgVector.size(); ++i) {
-      m_muidBuilder = new MuidBuilder(pdgVector.at(i));
+    std::vector<float> logLVector = { -18.3899, -0.303499, -5.48054, -6.21227, -7.09687, -9.839};
+    for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
       EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
       delete m_muidBuilder;
     }
-
   }
 
 }

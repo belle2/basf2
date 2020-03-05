@@ -1968,6 +1968,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
 
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
 
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
@@ -1993,7 +1994,7 @@ namespace {
     TLorentzVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
     TLorentzVector dau0_4vec_Lab, dau1_4vec_Lab;
     dau0_4vec_Lab = PCmsLabTransform::cmsToLab(
-                      dau0_4vec_CM); //why is eveybody using the extendend method when there are the functions that do all the steps for us?
+                      dau0_4vec_CM); //why is everybody using the extended method when there are the functions that do all the steps for us?
     dau1_4vec_Lab = PCmsLabTransform::cmsToLab(dau1_4vec_CM);
 
     // add the two photons (now in the Lab frame) as the two daughters of some particle and create the latter
@@ -3566,7 +3567,7 @@ namespace {
     EXPECT_TRUE(std::isnan(var_d->function(not_child_2)));
 
 
-    // // All but they have differnt K0s mothers
+    // // All but they have different K0s mothers
     const Manager::Var* var_310 = Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, mdstIndex)");
     ASSERT_NE(var_310, nullptr);
     EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
@@ -4128,7 +4129,7 @@ namespace {
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
     // Fill by hand likelihood values for all the detectors and hypothesis
-    // This is clearly not a phyisical case, since a particle cannot leave good
+    // This is clearly not a physical case, since a particle cannot leave good
     // signals in both TOP and ARICH
     auto* lAll = likelihood.appendNew();
     lAll->setLogLikelihood(Const::TOP, Const::electron, 0.18);
@@ -4228,7 +4229,7 @@ namespace {
     EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
 
-    // Check what hapens if no Likelihood is available
+    // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));
     EXPECT_TRUE(std::isnan(pionID(particleNoID)));
@@ -4878,6 +4879,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
   }
+
+  // Tests of ContinuumSuppressionVariables
+
   TEST_F(MetaVariableTest, KSFWVariables)
   {
     // simple tests that do not require the ROE builder nor the CS builder
@@ -4890,6 +4894,43 @@ namespace {
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+  }
 
+  TEST_F(MetaVariableTest, CleoConeCS)
+  {
+    // simple tests that do not require the ROE builder nor the CS builder
+
+    // check that garbage input throws helpful B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(NONSENSE)"));
+
+    // check that string other than ROE for second argument throws B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(0, NOTROE)"));
+
+    // check for NaN if we don't have a CS object for this particle
+    StoreArray<Particle> myParticles;
+    const Particle* particle_with_no_cs = myParticles.appendNew();
+    const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
+    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+  }
+
+  TEST_F(MetaVariableTest, TransformedNetworkOutput)
+  {
+    // check that garbage input throws helpful B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONSENSE)"));
+
+    // check that helpful B2FATAL is thrown if second or third argument is not a double
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, NOTDOUBLE)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, NOTDOUBLE, 1)"));
+
+    // check for NaN if network output variable does not exist (no matter whether particle is provided or not)
+    StoreArray<Particle> myParticles;
+    const Particle* particle = myParticles.appendNew();
+    const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    EXPECT_TRUE(std::isnan(var->function(particle)));
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    if (not eventExtraInfo.isValid())
+      eventExtraInfo.create();
+    var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    EXPECT_TRUE(std::isnan(var->function(nullptr)));
   }
 }

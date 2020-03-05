@@ -32,8 +32,6 @@
 
 #include <cmath>
 
-#include <boost/lexical_cast.hpp>
-
 
 namespace Belle2 {
   namespace Variable {
@@ -189,9 +187,8 @@ namespace Belle2 {
         int coneNumber = 0;
         try {
           coneNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The first argument of the CleoCones meta function must be an integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The first argument of the CleoConeCS meta function must be an integer!");
         }
 
         bool useROE = false;
@@ -230,23 +227,31 @@ namespace Belle2 {
         try {
           low  = Belle2::convertString<double>(arguments[1]);
           high = Belle2::convertString<double>(arguments[2]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be doubles!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("Second and third argument of transformedNetworkOutput meta function must be doubles!");
         }
+
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName, low, high](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
+              return eventExtraInfo->getExtraInfo(extraInfoName);
+            } else {
+              return std::numeric_limits<double>::quiet_NaN();
+            }
           }
-          return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          if (particle->hasExtraInfo(extraInfoName))
+          {
+            return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          } else {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function transformedNetworkOutput");
       }
     }
 

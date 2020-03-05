@@ -25,7 +25,6 @@
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <set>
 #include <utility>
@@ -379,7 +378,7 @@ vector<string> DecayDescriptor::getSelectionNames()
       // stop, if nothing found
       if (itOccurrence == strNames.end()) break;
       // create new particle name by attaching a number
-      string strNameNew = strNameOld + boost::lexical_cast<string>(iOccurrence);
+      string strNameNew = strNameOld + std::to_string(iOccurrence);
       // ceck if the new particle name exists already, if not, then it is OK to use it
       if (count(strNames.begin(), strNames.end(), strNameNew) == 0) {
         *itOccurrence = strNameNew;

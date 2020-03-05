@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
@@ -387,8 +386,8 @@ namespace Belle2 {
         try {
           ielement = Belle2::convertString<int>(arguments[0]);
           jelement = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Arguments of prodVertexCov function must be integer!");
+        } catch (std::invalid_argument&) {
+          B2ERROR("Arguments of prodVertexCov function must be integer!");
           return nullptr;
         }
       }

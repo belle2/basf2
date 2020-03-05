@@ -808,7 +808,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     int dauIndex = 0;
     try {
       dauIndex = Belle2::convertString<int>(indexString);
-    } catch (boost::bad_lexical_cast&) {
+    } catch (std::invalid_argument&) {
       B2WARNING("Found the string " << indexString << "instead of a daughter index.");
       return nullptr;
     }

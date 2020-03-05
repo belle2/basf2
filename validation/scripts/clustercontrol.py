@@ -51,11 +51,6 @@ class Cluster:
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 
-        #: The command to submit a job. 'LOGFILE' will be replaced by the
-        #: actual log file name
-        #: self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
-        self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
-
         #: The path, where the help files are being created
         #: Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
@@ -164,7 +159,7 @@ class Cluster:
         # revision. The execute the command (i.e. run basf2 or ROOT on a
         # steering file). Write the return code of that into a *.done file.
         # Delete the helpfile-shellscript.
-        tmp_name = self.path + '/' + 'script_' + job.name + '.sh'
+        tmp_name = self._get_tmp_name(job)
         with open(tmp_name, 'w+') as tmp_file:
             tmp_file.write('#!/bin/bash \n\n' +
                            'BELLE2_NO_TOOLS_CHECK=1 \n' +
@@ -180,8 +175,18 @@ class Cluster:
         os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
         # Prepare the command line command for submission to the cluster
-        params = self.submit_command.replace('LOGFILE',
-                                             log_file).split() + [tmp_name]
+        params = [
+            "bsub",
+            "-o",
+            log_file,
+            "-e",
+            log_file,
+            "-q",
+            "l",
+            tmp_name,
+            "-J",
+            self._generate_id(job)
+        ]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
@@ -198,8 +203,15 @@ class Cluster:
             if process.wait() != 0:
                 job.status = 'failed'
         else:
-            os.system(f'echo 0 > {self.path}/script_{job.name}.done')
-            os.system(f'rm {tmp_name}')
+            self._cleanup(job)
+
+    def _cleanup(self, job: Script):
+        tmp_name = self._get_tmp_name(job)
+        os.system(f'echo 0 > {self.path}/script_{job.name}.done')
+        os.system(f'rm {tmp_name}')
+
+    def _get_tmp_name(self, job: Script):
+        return self.path + '/' + 'script_' + job.name + '.sh'
 
     def is_job_finished(self, job: Script):
         """!
@@ -235,9 +247,28 @@ class Cluster:
         else:
             return [False, 0]
 
-    # noinspection PyMethodMayBeStatic
     def terminate(self, job: Script):
-        """! Terminate a running job, not support with this backend so
-        ignore the call
+        """! Terminate a running job
         """
-        pass
+        params = [
+            "bkill",
+            "-J",
+            self._generate_id(job)
+        ]
+
+        self.logger.debug(subprocess.list2cmdline(params))
+
+        process = subprocess.Popen(
+            params,
+            stdout=self.clusterlog,
+            stderr=subprocess.STDOUT
+        )
+        process.wait()
+        self._cleanup(job)
+
+    @staticmethod
+    def _generate_id(job: Script) -> str:
+        """ Returns an ID for the job. """
+        return str(abs(hash(
+            job.package + job.path + job.name)
+        ))[:10]

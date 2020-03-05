@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import ROOT
 
+# std
 import os.path
-import validationcomparison
-import validationpath
-import metaoptions
 import math
 import json
+from typing import List, Optional
 
+# 3rd
+import ROOT
+
+# ours
+import metaoptions
+import validationcomparison
+import validationpath
 from validationfunctions import strip_ext, index_from_revision, get_style
 import json_objects
+from validationrootobject import RootObject
 
 
 # todo: [Ref, low prio, medium work] Refactor into class with uniform interface
@@ -47,7 +52,12 @@ class Plotuple:
         n-tuples) are stored (without the file extension!)
     """
 
-    def __init__(self, root_objects, revisions, work_folder):
+    def __init__(
+            self,
+            root_objects: List[RootObject],
+            revisions: List[str],
+            work_folder: str
+    ):
         """!
         The default constructor for a Plotuple-object.
         @param root_objects: A list of Root-objects which belong
@@ -66,11 +76,11 @@ class Plotuple:
 
         # A list of all problems that occured with this Plotuple,
         # e.g. missing reference object, missing meta-information...
-        self.warnings = []
+        self.warnings = []  # type: List[str]
 
         # Find the reference element. If we can't find one, set it to 'None'
         # The reference-object for this Plotuple object
-        self.reference = None
+        self.reference = None  # type: Optional[RootObject]
         for root_object in self.root_objects:
             if root_object.is_reference:
                 self.reference = root_object
@@ -147,17 +157,17 @@ class Plotuple:
         self.comparison_result = "not_compared"
 
         # The json file, in which the ntuple information is stored
-        self.file = None
+        self.file = None  # type: Optional[str]
 
-        self.html_content = None
+        self.html_content = None  # type: Optional[str]
 
         #: width of the plotted image in pixels, will be set by the draw
         #: function
-        self.width = None
+        self.width = None  # type: Optional[int]
 
         #: height of the plotted image in pixels, will be set by the draw
         #: function
-        self.height = None
+        self.height = None  # type: Optional[int]
 
         # Deal with incomplete information
         if self.description == '' or self.description is None:

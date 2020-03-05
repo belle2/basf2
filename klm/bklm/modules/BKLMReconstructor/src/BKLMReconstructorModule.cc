@@ -12,7 +12,6 @@
 #include <klm/bklm/modules/BKLMReconstructor/BKLMReconstructorModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/Module.h>
 
 /* Belle 2 headers. */
@@ -53,6 +52,9 @@ BKLMReconstructorModule::BKLMReconstructorModule() :
   addParam("LoadTimingFromDB", m_LoadTimingFromDB,
            "Load timing window from database (true) or not (false).",
            bool(true));
+  addParam("IgnoreScintillators", m_IgnoreScintillators,
+           "Ignore scintillators (to debug their electronics mapping).",
+           false);
 }
 
 BKLMReconstructorModule::~BKLMReconstructorModule()
@@ -87,6 +89,8 @@ void BKLMReconstructorModule::event()
   std::map<uint16_t, int> channelDigitMap;
   for (int index = 0; index < m_Digits.getEntries(); ++index) {
     const BKLMDigit* digit = m_Digits[index];
+    if (m_IgnoreScintillators && !digit->inRPC())
+      continue;
     if (digit->inRPC() || digit->isAboveThreshold()) {
       int module = digit->getModuleID();
       uint16_t channel = BKLMElementNumbers::getChannelByModule(module);

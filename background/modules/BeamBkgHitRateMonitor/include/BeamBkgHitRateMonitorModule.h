@@ -99,6 +99,7 @@ namespace Belle2 {
     double m_topTimeOffset; /**< TOP: time offset of hits [ns] */
     double m_topTimeWindow; /**< TOP: time window in which to count hits [ns] */
     std::string m_svdShaperDigitsName; /**< SVD: name of the SVDShaperDigits collection */
+    double m_svdThrCharge; /**< SVD: energy cut on cluster charge */
     std::map<std::string, std::string> m_additionalDataDescription; /**< additional metadata description */
 
     // collections

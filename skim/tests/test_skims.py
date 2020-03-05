@@ -11,11 +11,9 @@ from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts, mergedKshorts
-from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
-from skim.standardlists.lightmesons import loadStdLightMesons
-from skim.standardlists.dileptons import loadStdDiLeptons
-from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons, loadStdJpsiToee, loadStdJpsiTomumu
+from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -24,6 +22,7 @@ ma.inputMdstList('MC9', Belle2.FileSystem.findFile('analysis/tests/mdst.root'), 
 
 
 stdPi0s('loose', path=skimpath)
+loadStdPi0ForBToHadrons(path=skimpath)
 stdPhotons('loose', path=skimpath)
 stdPhotons('all', path=skimpath)
 stdPhotons('tight', path=skimpath)  # also builds loose list
@@ -209,14 +208,22 @@ expert.add_skim('feiSLBplus', fei.BplusSL(path=skimpath), path=skimpath)
 expert.add_skim('feiSLB0', fei.B0SL(path=skimpath), path=skimpath)
 
 # Dark Sector Skims
+
+
+cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+minimum = 'E > 0.1'  # GeV
+angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
+ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=skimpath)
+
+sp = b2.Path()
 from skim import dark
-expert.add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
+
 expert.add_skim('ALP3Gamma', dark.ALP3GammaList(path=skimpath), path=skimpath)
 expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('DielectronPlusMissingEnergy', dark.DielectronPlusMissingEnergyList(path=skimpath), path=skimpath)
 expert.add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=skimpath), path=skimpath)
-
+expert.add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=skimpath), path=skimpath)
 expert.setSkimLogging(path=skimpath)
 
 # process the basf2 path in a temporary directory (so all of the skimmed udst

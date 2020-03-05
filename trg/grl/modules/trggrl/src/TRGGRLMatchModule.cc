@@ -220,6 +220,7 @@ void TRGGRLMatchModule::event()
       matphi->set_dphi_d(dphi_d_tmp);
       matphi->addRelationTo(track2Dlist[i]);
       matphi->addRelationTo(clusterlist[cluster_ind_phi]);
+      matphi->set_e(clusterlist[cluster_ind_phi]->getEnergyDep());
       //   track2Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
       clusterlist[cluster_ind_phi]->addRelationTo(track2Dlist[i]);
     }

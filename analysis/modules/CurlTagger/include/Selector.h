@@ -24,7 +24,7 @@ namespace Belle2 {
       Selector() {};
 
       /** Destructor */
-      ~Selector() {};
+      virtual ~Selector() {};
 
       /** returns selector response that two particles are actual from same mc/data particle */
       virtual float getResponse(Particle*, Particle*) = 0;

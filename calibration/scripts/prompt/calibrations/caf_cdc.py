@@ -270,7 +270,6 @@ class CDCCalibration(Calibration):
                                     input_files=file_list,
                                     pre_collector_path=pre_collector(max_events=max_events),
                                     )
-            collection.backend_args = {'queue': queue}
             self.add_collection(name=skim_type, collection=collection)
 
         self.max_iterations = max_iterations

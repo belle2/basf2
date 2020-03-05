@@ -149,7 +149,7 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = particle.getDaughters();
 
       if (daughters.size() < 2)
-        B2FATAL("Reconstructing particle as a daughter of a decay with less then 2 daughters!");
+        B2FATAL("Reconstructing particle as a daughter of a decay with less than 2 daughters!");
 
       if (daughters.size() > 3)
         B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
@@ -196,9 +196,8 @@ namespace Belle2 {
       }
 
       Particle* newParticle = particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
 
-      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+      outputList->addParticle(newParticle);
       newParticle->addExtraInfo("decayModeID", m_decayModeID);
 
     } //while

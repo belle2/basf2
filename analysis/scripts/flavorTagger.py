@@ -104,6 +104,7 @@ def set_FlavorTagger_pid_aliases():
     utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
 
     if getBelleOrBelle2() == "Belle":
+        utils._variablemanager.addAlias('kIDBelle', 'ifNANgiveX(atcPIDBelle(3,2), 0.5)')
         utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
@@ -558,7 +559,7 @@ def setVariables():
         variables['MaximumPstar'].append('distance')
 
 
-def FillParticleLists(mode='Expert', path=None):
+def FillParticleLists(mode='Expert', maskName='', path=None):
     """
     Fills the particle Lists for all categories.
     """
@@ -575,13 +576,15 @@ def FillParticleLists(mode='Expert', path=None):
         if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
 
             # Filling particle list for actual category
-            ma.fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+            ma.fillParticleList(particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                              'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
             readyParticleLists.append(particleList)
 
         else:
             if 'pi+:inRoe' not in readyParticleLists:
                 ma.fillParticleList(
-                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                 'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 readyParticleLists.append('pi+:inRoe')
 
             if 'K_S0:inRoe' not in readyParticleLists:
@@ -594,14 +597,16 @@ def FillParticleLists(mode='Expert', path=None):
 
             if particleList == 'K+:inRoe':
                 ma.fillParticleList(
-                    particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                    particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                  'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 # Precut done to prevent from overtraining, found not necessary now
                 # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
                 ma.fillParticleList(
-                    'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                    'p+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
                 KFit(particleList, 0.01, path=path)
                 # if mode != 'Expert':
@@ -1050,7 +1055,8 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    belleOrBelle2="Belle2",
+    belleOrBelle2='Belle2',
+    maskName='',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,
@@ -1084,6 +1090,7 @@ def flavorTagger(
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
+      @param maskName                          Gets ROE particles from a specified ROE mask.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
@@ -1159,18 +1166,22 @@ def flavorTagger(
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
-        ma.signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
+        ma.signalSideParticleListsFilter(
+            particleLists,
+            'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
+            roe_path,
+            deadEndPath)
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
-        ma.signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
+        ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
         # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
         flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)
 
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
-        if FillParticleLists(mode, roe_path):
+        if FillParticleLists(mode, maskName, roe_path):
             if eventLevel(mode, weightFiles, roe_path):
                 combinerLevel(mode, weightFiles, roe_path)
                 if mode == 'Expert':

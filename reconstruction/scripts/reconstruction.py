@@ -10,6 +10,8 @@ from geometry import check_components
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
 
+from rawdata import add_unpackers
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -321,6 +323,7 @@ def add_cdst_output(
     calibrationBranches = [
         'RecoTracks',
         'EventT0',
+        'PXDClustersFromTracks',
         'SVDEventInfo',
         'SVDShaperDigits',
         'SVDRecoDigits',
@@ -389,6 +392,7 @@ def add_cdst_output(
             'EventT0',
             'CDCDedxTracks',
             'SVDShaperDigitsFromTracks',
+            'PXDClustersFromTracks',
             'EventT0',
             'VXDDedxTracks',
             'CDCDedxLikelihoods',

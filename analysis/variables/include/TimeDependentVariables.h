@@ -3,12 +3,15 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
+
+#include<vector>
+#include "TVector3.h"
 
 namespace Belle2 {
   class Particle;
@@ -253,6 +256,175 @@ namespace Belle2 {
      *
      */
     double particleInternalTagVMCFlavor(const Particle*);
+
+
+    /**
+     * Return the X component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Y component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Z component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the d0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the z0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)
+     *
+     */
+    double particleTagVNFitTracks(const Particle* particle);
+
+    /**
+     * returns the weight assigned by Rave to the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the distance between the centre of the constraint and the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex);
+
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the distance between the centre of the constraint and the tag vtx
+     *
+     */
+    double tagVDistanceToConstraint(const Particle* part);
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag vtx
+     *
+     */
+    double tagVDistanceToConstraintErr(const Particle* part);
+
+
+    /**
+     * returns the measured distance between the tag vtx and the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the estimated uncertainty on the distance between the tag vtx and
+     * the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the true distance between the true B Tag decay vertex and the particle
+     * corresponding to the tag vtx track indexed by trackIndex.
+     *
+     */
+    double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return  the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the X component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Y component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Z component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex);
+
+
 
   }
 }

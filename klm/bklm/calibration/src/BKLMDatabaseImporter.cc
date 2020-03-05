@@ -14,7 +14,6 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
@@ -23,7 +22,6 @@
 
 /* Belle 2 headers. */
 #include <framework/database/Database.h>
-#include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
@@ -116,18 +114,6 @@ void BKLMDatabaseImporter::loadDefaultElectronicMapping(bool isExperiment10)
         channelId = MaxiChannel - iStrip + 1;
 
       if (plane == BKLMElementNumbers::c_PhiPlane) {
-        // Start settings for exp. 10.
-        if (isExperiment10) {
-          if (layer < BKLMElementNumbers::c_FirstRPCLayer) {
-            if (sector == 1 || sector == 2 || sector == 4 || sector == 5 || sector == 6 || sector == 8) {
-              channelId = MaxiChannel - channelId + 1;
-              if (layer == 1)
-                channelId += -2;
-              if (layer == 2)
-                channelId += 1;
-            }
-          }
-        } // End settings for exp. 10.
         if (layer == 1)
           channelId += 4;
         if (layer == 2)
@@ -199,6 +185,24 @@ void BKLMDatabaseImporter::setElectronicMappingLane(
     if ((channelSection == section) &&
         (channelSector == sector) &&
         (channelLayer == layer))
+      m_ElectronicsChannels[i].second.setLane(lane);
+  }
+}
+
+void BKLMDatabaseImporter::setElectronicMappingLane(
+  int section, int sector, int layer, int plane, int lane)
+{
+  int channelSection, channelSector, channelLayer, channelPlane, strip;
+  unsigned int n = m_ElectronicsChannels.size();
+  for (unsigned int i = 0; i < n; ++i) {
+    uint16_t channel = m_ElectronicsChannels[i].first;
+    BKLMElementNumbers::channelNumberToElementNumbers(
+      channel, &channelSection, &channelSector, &channelLayer, &channelPlane,
+      &strip);
+    if ((channelSection == section) &&
+        (channelSector == sector) &&
+        (channelLayer == layer) &&
+        (channelPlane == plane))
       m_ElectronicsChannels[i].second.setLane(lane);
   }
 }

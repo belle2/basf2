@@ -13,7 +13,7 @@ import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
-gb2_setuprel = 'release-04-00-00'
+
 
 # create a new path
 skimpath = b2.Path()

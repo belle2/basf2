@@ -19,14 +19,11 @@ rootoutput = register_module('RootOutput')
 
 Packer = register_module('SVDPacker')
 Packer.param('NodeID', nodeid)
-Packer.param('svdDigitListName', 'SVDDigits')
+Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')
-unPacker.param('svdDigitListName', 'newSVDDigits')
-
-unPacker.param('GenerateShaperDigits', True)
 unPacker.param('svdShaperDigitListName', 'newSVDShaperDigits')
 
 

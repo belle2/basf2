@@ -7,6 +7,7 @@ import os
 import re
 import requests
 import http
+from ctypes import cdll
 
 
 def setupBelleDatabaseServer():
@@ -68,13 +69,18 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
-                                  convertECLCrystalEnergies=False,
-                                  convertExtHits=False,
-                                  matchType2E9oE25Threshold=-1.1):
+                                  matchType2E9oE25Threshold=-1.1,
+                                  enableNisKsFinder=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
     """
+
+    # If we are on KEKCC make sure we load the correct NeuroBayes library
+    try:
+        cdll.LoadLibrary('/sw/belle/local/neurobayes-4.3.1/lib/libNeuroBayesCore_shared.so')
+    except:
+        pass
 
     if useBelleDBServer is None:
         setupBelleDatabaseServer()
@@ -117,9 +123,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
-    convert.param("convertECLCrystalEnergies", convertECLCrystalEnergies)
-    convert.param("convertExtHits", convertExtHits)
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
+    convert.param("nisKsInfo", enableNisKsFinder)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

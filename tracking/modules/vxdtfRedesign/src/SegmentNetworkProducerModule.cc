@@ -39,6 +39,11 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            "Unique name for the DirectedNodeNetworkContainer Store Object Pointer created and filled by this module.",
            string(""));
 
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
+
   addParam("addVirtualIP",
            m_PARAMAddVirtualIP,
            "Whether to add a SpacePoint for a virtual interaction point to be considered by the network creation.",
@@ -132,7 +137,7 @@ void SegmentNetworkProducerModule::initialize()
 
   m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
-  m_eventLevelTrackingInfo.registerInDataStore();
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 
@@ -142,11 +147,6 @@ void SegmentNetworkProducerModule::event()
 
   if (m_vxdtfFilters == nullptr) {
     B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
-  }
-
-  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
-  if (!m_eventLevelTrackingInfo.isValid()) {
-    m_eventLevelTrackingInfo.create();
   }
 
   // make sure that network exists:

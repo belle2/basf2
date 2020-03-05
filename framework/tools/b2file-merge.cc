@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <string>
 #include <set>
+#include <regex>
 
 using namespace Belle2;
 namespace po = boost::program_options;
@@ -26,6 +27,16 @@ namespace fs = boost::filesystem;
 /** Simple typedef to conveniently define a exp,run,evt structure with a
  * working comparison operator */
 using EventInfo = std::tuple<int, int, unsigned int>;
+
+namespace {
+  /** Remove the legacy ip information globaltag from the given string of comma separated
+   * globaltags */
+  std::string removeLegacyGt(const std::string& globaltags)
+  {
+    std::regex legacy_gt(",?Legacy_IP_Information");
+    return std::regex_replace(globaltags, legacy_gt, "");
+  }
+}
 
 int main(int argc, char* argv[])
 {
@@ -192,8 +203,16 @@ The following restrictions apply:
           B2ERROR("Steering file for " << std::quoted(input) << " differs from previous files.");
         }
         if(fileMetaData.getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
-          B2ERROR("Database globalTag in " << std::quoted(input) << " differs from previous files: " <<
-                  fileMetaData.getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
+          // Related to BII-6093: we were adding the legacy gt only dependent on input file age, not creation release.
+          // This means there is a chance we want to merge files with and without the globaltag added if they cross the
+          // boundary. It doesn't hurt to keep the gt but we know we could process some of the files without it so as a remedy we
+          // check if the only difference is the legacy gt and if so we remove it from the output metadata ...
+          if(removeLegacyGt(fileMetaData.getDatabaseGlobalTag()) == removeLegacyGt(outputMetaData->getDatabaseGlobalTag())) {
+            outputMetaData->setDatabaseGlobalTag(removeLegacyGt(outputMetaData->getDatabaseGlobalTag()));
+          } else {
+            B2ERROR("Database globalTag in " << std::quoted(input) << " differs from previous files: " <<
+                    fileMetaData.getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
+          }
         }
         if(fileMetaData.getDataDescription() != outputMetaData->getDataDescription()){
           KeyValuePrinter cur(true);

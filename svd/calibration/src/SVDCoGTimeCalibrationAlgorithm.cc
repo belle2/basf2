@@ -98,29 +98,32 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 
+  delete f;
+
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;
   return c_OK;
-  delete f;
 }
 
 bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
-  auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
-  float meanEventT0 = eventT0Hist->GetMean();
-  if (!m_previousEventT0) {
+  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  auto rawCoGTimeL3V = getObjectPtr<TH1F>("hRawCoGTimeL3V");
+  // float meanEventT0 = eventT0Hist->GetMean();
+  float meanRawCoGTimeL3V = rawCoGTimeL3V->GetMean();
+  if (!m_previousRawCoGTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousEventT0.emplace(meanEventT0);
+    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
     return true;
-  }
-  if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
-    B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
-           << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
+  } else if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousRawCoGTimeMeanL3V.value()
+           << " to " << meanRawCoGTimeL3V << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousEventT0.emplace(meanEventT0);
+    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
     return true;
+  } else {
+    return false;
   }
-  return false;
 }
 

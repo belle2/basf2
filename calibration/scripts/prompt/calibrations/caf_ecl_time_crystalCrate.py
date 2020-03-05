@@ -94,7 +94,7 @@ def get_calibrations(input_data, **kwargs):
     rec_path_bhabha.add_module('Geometry', useDB=True)
 
     # for new 2020 cdst format
-    components = ['CDC', 'ECL']
+    components = ['ECL']
     prepare_cdst_analysis(rec_path_bhabha, components=components)
 
     col_bhabha = register_module('ECLBhabhaTCollector')
@@ -164,7 +164,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Calibration setup for crystals iteration 1
 
-    cal_crystals_1 = Calibration("ECLcrystalTimeCalibration_physics_2")
+    cal_crystals_1 = Calibration("ECLcrystalTimeCalibration_physics_1")
     cal_crystals_1.add_collection(name="bhabha", collection=eclTCol)
     cal_crystals_1.algorithms = [eclTAlgCrystals]
 

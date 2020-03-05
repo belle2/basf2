@@ -49,7 +49,9 @@ namespace Belle2 {
       DBStore& dbStore = DBStore::Instance();
       dbStore.update();
       dbStore.updateEvent();
-      Conditions::Configuration::getInstance();
+      auto& dbConfiguration = Conditions::Configuration::getInstance();
+      std::vector<std::string> tags = dbConfiguration.getDefaultGlobalTags();
+      dbConfiguration.setGlobalTags(tags);
     }
 
     /** Clear the DataStore */

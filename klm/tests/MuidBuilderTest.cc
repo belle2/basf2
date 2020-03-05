@@ -14,8 +14,9 @@
 #include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
-#include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
+#include <framework/database/DBStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -52,6 +53,7 @@ namespace Belle2 {
       auto& dbConfiguration = Conditions::Configuration::getInstance();
       std::vector<std::string> tags = dbConfiguration.getDefaultGlobalTags();
       dbConfiguration.setGlobalTags(tags);
+      Database::Instance().initialize();
     }
 
     /** Clear the DataStore */

@@ -3,6 +3,7 @@
 """Implements some extra utilities for doing KLM calibration with the CAF."""
 
 import collections
+import os
 
 import basf2
 
@@ -148,7 +149,9 @@ class KLMStripEfficiency(AlgorithmStrategy):
             # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.FAILED)
 
-    def execute_over_run_list(self, run_list, iteration, apply_iov):
+    def execute_over_run_list(self, run_list, iteration, apply_iov,
+                              forced_calibration, calibration_stage,
+                              output_file):
         """
         Execute over run list.
         """
@@ -156,6 +159,11 @@ class KLMStripEfficiency(AlgorithmStrategy):
             self.machine.setup_algorithm()
         else:
             self.first_execution = False
+        self.machine.algorithm.algorithm.setForcedCalibration(
+            forced_calibration)
+        self.machine.algorithm.algorithm.setCalibrationStage(calibration_stage)
+        if (output_file is not None):
+            self.machine.algorithm.algorithm.setOutputFileName(output_file)
         self.machine.execute_runs(runs=run_list, iteration=iteration,
                                   apply_iov=apply_iov)
         if (self.machine.result.result == AlgResult.ok.value) or \
@@ -176,7 +184,9 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
         # Initial run.
         for exp_run in experiment_runs[experiment]:
-            self.execute_over_run_list([exp_run], iteration, apply_iov)
+            self.execute_over_run_list(
+                [exp_run], iteration, apply_iov, False,
+                KLMStripEfficiencyAlgorithm.c_MeasurablePlaneCheck, None)
             result = self.machine.result.result
             algorithm_results = KLMStripEfficiencyAlgorithm.Results(
                 self.machine.algorithm.algorithm.getResults())
@@ -260,6 +270,212 @@ class KLMStripEfficiency(AlgorithmStrategy):
             while (j <= i):
                 run_data[j][4] = 'none'
                 j += 1
+
+        # Merge runs that do not have enough data. If both this and next
+        # run do not have enough data, then merge the collected data.
+        i = 0
+        j = 0
+        while (i < len(run_data) - 1):
+            while ((run_data[i][1] == 2) and (run_data[i + 1][1] == 2)):
+                if (run_data[i][4] != run_data[i + 1][4]):
+                    break
+                basf2.B2INFO('Merging run %d (not enough data) into '
+                             'run %d (not enough data).' %
+                             (run_data[i + 1][0], run_data[i][0]))
+                run_data[i][2].extend(run_data[i + 1][2])
+                del run_data[i + 1]
+                self.execute_over_run_list(
+                    run_data[i][2], iteration, apply_iov, False,
+                    KLMStripEfficiencyAlgorithm.c_MeasurablePlaneCheck, None)
+                run_data[i][1] = self.machine.result.result
+                run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
+                    self.machine.algorithm.algorithm.getResults())
+                result_str = calibration_result_string(run_data[i][1])
+                basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
+                if (i >= len(run_data) - 1):
+                    break
+            i += 1
+
+        # Merge runs that do not have enough data into normal runs.
+        def merge_runs(run_data, run_not_enough_data, run_normal, forced):
+            basf2.B2INFO('Merging run %d (not enough data) into '
+                         'run %d (normal).' %
+                         (run_data[run_not_enough_data][0],
+                          run_data[run_normal][0]))
+            run_data[run_normal][2].extend(run_data[run_not_enough_data][2])
+            self.execute_over_run_list(
+                run_data[run_normal][2], iteration, apply_iov, forced,
+                KLMStripEfficiencyAlgorithm.c_MeasurablePlaneCheck, None)
+            run_data[run_normal][1] = self.machine.result.result
+            run_data[run_normal][3] = KLMStripEfficiencyAlgorithm.Results(
+                self.machine.algorithm.algorithm.getResults())
+            result_str = calibration_result_string(run_data[run_normal][1])
+            basf2.B2INFO('Run %d: %s.' % (run_data[run_normal][0], result_str))
+            if (run_data[run_normal][1] != 0):
+                basf2.B2FATAL('Merging run %d into run %d failed.' %
+                              (run_data[run_not_enough_data][0],
+                               run_data[run_normal][0]))
+            del run_data[run_not_enough_data]
+
+        i = 0
+        while (i < len(run_data)):
+            if (run_data[i][1] == 2):
+                if (run_data[i][4] == 'next'):
+                    merge_runs(run_data, i, i + 1, False)
+                elif (run_data[i][4] == 'previous'):
+                    merge_runs(run_data, i, i - 1, False)
+                else:
+                    i += 1
+            else:
+                i += 1
+        i = 0
+        while (i < len(run_data)):
+            if (run_data[i][1] == 2 and run_data[i][4] == 'none'):
+                new_planes_previous = -1
+                new_planes_next = -1
+                if (i < len(run_data) - 1):
+                    new_planes_next = run_data[i][3].newExtHitsPlanes(
+                        run_data[i + 1][3].getExtHitsPlane())
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_planes_next, run_data[i][0],
+                                  run_data[i + 1][0]))
+                if (i > 0):
+                    new_planes_previous = run_data[i][3].newExtHitsPlanes(
+                        run_data[i - 1][3].getExtHitsPlane())
+                    basf2.B2INFO('There are %d new active modules in run %d '
+                                 'relatively to run %d.' %
+                                 (new_planes_previous,
+                                  run_data[i][0], run_data[i - 1][0]))
+                run_for_merging = -1
+                # If a forced merge of the normal run with another run from
+                # a different range of runs with not enough data has already
+                # been performed, then the list of active modules may change
+                # and there would be 0 new modules. Consequently, the number
+                # of modules is checked to be greater or equal than 0. However,
+                # there is no guarantee that the same added module would be
+                # calibrated normally. Thus, a forced merge is performed anyway.
+                if (new_planes_previous >= 0 and new_planes_next < 0):
+                    run_for_merging = i - 1
+                elif (new_planes_previous < 0 and new_planes_next >= 0):
+                    run_for_merging = i + 1
+                elif (new_planes_previous >= 0 and new_planes_next >= 0):
+                    if (new_planes_previous < new_planes_next):
+                        run_for_merging = i - 1
+                    else:
+                        run_for_merging = i + 1
+                else:
+                    basf2.B2INFO('Cannot determine run for merging for run %d, '
+                                 'performing its forced calibration.' %
+                                 (run_data[i][0]))
+                    self.execute_over_run_list(
+                        run_data[i][2], iteration, apply_iov, True,
+                        KLMStripEfficiencyAlgorithm.c_MeasurablePlaneCheck,
+                        None)
+                    run_data[i][1] = self.machine.result.result
+                    run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
+                        self.machine.algorithm.algorithm.getResults())
+                    result_str = calibration_result_string(run_data[i][1])
+                    if (run_data[i][1] != 0):
+                        basf2.B2FATAL('Forced calibration of run %d failed.' %
+                                      (run_data[i][0]))
+                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
+                if (run_for_merging >= 0):
+                    merge_runs(run_data, i, run_for_merging, True)
+            else:
+                i += 1
+
+        # Stage 2: determination of maximal run ranges.
+        # The set of calibrated planes should be the same for all small
+        # run ranges within the large run range.
+        run_ranges.clear()
+        i = 0
+        while (i < len(run_data)):
+            j = i + 1
+            while (j < len(run_data)):
+                planes_differ = False
+                if (run_data[j][3].newMeasuredPlanes(
+                        run_data[i][3].getEfficiency()) != 0):
+                    planes_differ = True
+                if (run_data[i][3].newMeasuredPlanes(
+                        run_data[j][3].getEfficiency()) != 0):
+                    planes_differ = True
+                if (planes_differ):
+                    basf2.B2INFO('Run %d: the set of planes is different '
+                                 'from run %d.'
+                                 % (run_data[j][0], run_data[i][0]))
+                    break
+                else:
+                    basf2.B2INFO('Run %d: the set of planes is the same '
+                                 'as for run %d.'
+                                 % (run_data[j][0], run_data[i][0]))
+                    j = j + 1
+            run_ranges.append([i, j])
+            i = j
+
+        # Stage 3: final calibration.
+
+        # Output directory.
+        if (not os.path.isdir('efficiency')):
+            os.mkdir('efficiency')
+
+        # Merge runs.
+        def merge_runs_2(run_data, run_1, run_2):
+            basf2.B2INFO('Merging run %d into run %d.' %
+                         (run_data[run_2][0], run_data[run_1][0]))
+            run_data[run_1][2].extend(run_data[run_2][2])
+            output_file = 'efficiency/efficiency_%d_%d.root' % \
+                          (run_data[run_1][2][0].exp, run_data[run_1][2][0].run)
+            self.execute_over_run_list(
+                run_data[run_1][2], iteration, apply_iov, False,
+                KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement,
+                output_file)
+            run_data[run_1][1] = self.machine.result.result
+            run_data[run_1][3] = KLMStripEfficiencyAlgorithm.Results(
+                self.machine.algorithm.algorithm.getResults())
+            result_str = calibration_result_string(run_data[run_1][1])
+            basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
+                         'precision %f.' %
+                         (run_data[run_1][0], result_str, 0.02,
+                          # run_data[run_1][3].getRequestedPrecision(),
+                          run_data[run_1][3].getAchievedPrecision()))
+
+        for run_range in run_ranges:
+            i = run_range[0]
+            while (i < run_range[1]):
+                output_file = 'efficiency/efficiency_%d_%d.root' % \
+                              (run_data[i][2][0].exp, run_data[i][2][0].run)
+                self.execute_over_run_list(
+                    run_data[i][2], iteration, apply_iov, False,
+                    KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement,
+                    output_file)
+                run_data[i][1] = self.machine.result.result
+                run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
+                    self.machine.algorithm.algorithm.getResults())
+                result_str = calibration_result_string(run_data[i][1])
+                basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
+                             'precision %f.' %
+                             (run_data[i][0], result_str, 0.02,
+                              # run_data[i][3].getRequestedPrecision(),
+                              run_data[i][3].getAchievedPrecision()))
+                if (run_data[i][1] == 2):
+                    j = i + 1
+                    while (j < run_range[1]):
+                        merge_runs_2(run_data, i, j)
+                        run_data[j][1] = -1
+                        j = j + 1
+                        if (run_data[i][1] == 0):
+                            break
+                    i = j
+                else:
+                    i = i + 1
+
+        i = 0
+        while (i < len(run_data)):
+            if (run_data[i][1] == -1):
+                del run_data[i]
+            else:
+                i = i + 1
 
 
 def get_alignment_pre_collector_path_cosmic(entry_sequence=""):

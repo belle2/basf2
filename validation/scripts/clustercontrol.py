@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
 import subprocess
 import stat
 import shutil
+
+# ours
+from validationscript import Script
 
 
 class Cluster:
@@ -114,7 +118,7 @@ class Cluster:
 
         return True
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -153,6 +157,7 @@ class Cluster:
             # 'options' contains an option-string for basf2, e.g. '-n 100'
             command = f'basf2 {job.path} {options}'
 
+        # todo: why not use the temp library in python's stdlib? /klieret
         # Create a helpfile-shellscript, which contains all the commands that
         # need to be executed by the cluster.
         # First, set up the basf2 tools and perform b2setup with the correct
@@ -196,7 +201,7 @@ class Cluster:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
             os.system(f'rm {tmp_name}')
 
-    def is_job_finished(self, job):
+    def is_job_finished(self, job: Script):
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
@@ -231,7 +236,7 @@ class Cluster:
             return [False, 0]
 
     # noinspection PyMethodMayBeStatic
-    def terminate(self, job):
+    def terminate(self, job: Script):
         """! Terminate a running job, not support with this backend so
         ignore the call
         """

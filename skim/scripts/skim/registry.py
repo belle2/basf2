@@ -89,7 +89,7 @@ combined_skims = {
     ],
 
     'BtoCharm2': [
-        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
+        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi'
     ],
     'CharmHigh': [
         'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'

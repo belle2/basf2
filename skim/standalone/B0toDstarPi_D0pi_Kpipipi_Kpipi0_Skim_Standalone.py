@@ -43,25 +43,17 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5',
              path=mypath)
 
 # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> K+ pi- pi0 and D0 -> k- pi+ pi+ pi-
-from skim.btocharm import loadB0toDstarPi_Kpipi0, loadB0toDstarPi_Kpipipi
+from skim.btocharm import loadB0toDstarPi_Kpipipi_Kpipi0List
 from skim.standardlists.charm import loadStdD0_Kpipi0, loadStdDstarPlus_D0pi_Kpipi0
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
 loadStdD0_Kpipi0(path=mypath)
 loadStdDstarPlus_D0pi_Kpipi0(path=mypath)
-B0toDstarPiList_Kpipi0 = loadB0toDstarPi_Kpipi0(path=mypath)
 loadStdD0_Kpipipi(path=mypath)
 loadStdDstarPlus_D0pi_Kpipipi(path=mypath)
-B0toDstarPiList_Kpipipi = loadB0toDstarPi_Kpipipi(path=mypath)
+B0toDstarPiList_Kpipipi_kpipi0 = loadB0toDstarPi_Kpipipi_Kpipi0List(path=mypath)
 
-B0toDstarPiList = []
-
-for chID, channel in enumerate(B0toDstarPiList_Kpipi0):
-    B0toDstarPiList.append(channel)
-for chID, channel in enumerate(B0toDstarPiList_Kpipipi):
-    B0toDstarPiList.append(channel)
-
-skimOutputUdst(skimCode, B0toDstarPiList, path=mypath)
-ma.summaryOfLists(B0toDstarPiList, path=mypath)
+skimOutputUdst(skimCode, B0toDstarPiList_Kpipipi_kpipi0, path=mypath)
+ma.summaryOfLists(B0toDstarPiList_Kpipipi_kpipi0, path=mypath)
 
 setSkimLogging(mypath)
 b2.process(mypath)

@@ -402,11 +402,9 @@ def DstToD0PiD0ToKsOmega(path):
 
     charmcuts = '1.7 < M < 2 and useCMSFrame(p)>2.4'
     ma.reconstructDecay('D0:KsOmega -> K_S0:merged omega:3pi', charmcuts, path=path)
-    # vertex.treeFit('D0:KsOmega', conf_level=0.001, path=path)
 
     DstList = []
     ma.reconstructDecay('D*+:KsOmega -> D0:KsOmega pi+:all', '0 < Q < 0.018', path=path)
-    # vertex.KFit('D*+:KsOmega', conf_level=0.001, path=path)
     DstList.append('D*+:KsOmega')
 
     return DstList

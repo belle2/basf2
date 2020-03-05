@@ -2,6 +2,8 @@
 
 """Implements some extra utilities for doing KLM calibration with the CAF."""
 
+import collections
+
 import basf2
 
 from rawdata import add_unpackers
@@ -13,6 +15,20 @@ from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
+
+
+def calibration_result_string(result):
+    if (result == 0):
+        res = 'successful'
+    elif (result == 1):
+        res = 'iteration is necessary'
+    elif (result == 2):
+        res = 'not enough data'
+    elif (result == 3):
+        res = 'failure'
+    elif (result == 4):
+        res = 'undefined'
+    return res
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
@@ -32,6 +48,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
+        self.first_execution = True
 
     def run(self, iov, iteration, queue):
         """
@@ -80,7 +97,18 @@ class KLMStripEfficiency(AlgorithmStrategy):
         if "apply_iov" in self.algorithm.params:
             apply_iov = self.algorithm.params["apply_iov"]
 
+        # Sort runs by experiment.
+        experiment_runs = collections.defaultdict(list)
+        for exp_run in runs_to_execute:
+            experiment_runs[exp_run.exp].append(exp_run)
+
+        # Process experiment.
+        for experiment in experiment_runs.keys():
+            self.process_experiment(experiment, experiment_runs, iteration,
+                                    apply_iov)
+
         # apply_iov forces the execute_runs() function to use this IoV as the value for saveCalibration()
+        self.machine.setup_algorithm()
         self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
         basf2.B2INFO(f"Finished execution with result code {self.machine.result.result}")
 
@@ -119,6 +147,119 @@ class KLMStripEfficiency(AlgorithmStrategy):
             self.machine.fail()
             # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.FAILED)
+
+    def execute_over_run_list(self, run_list, iteration, apply_iov):
+        """
+        Execute over run list.
+        """
+        if not self.first_execution:
+            self.machine.setup_algorithm()
+        else:
+            self.first_execution = False
+        self.machine.execute_runs(runs=run_list, iteration=iteration,
+                                  apply_iov=apply_iov)
+        if (self.machine.result.result == AlgResult.ok.value) or \
+           (self.machine.result.result == AlgResult.iterate.value):
+            self.machine.complete()
+        else:
+            self.machine.fail()
+
+    def process_experiment(self, experiment, experiment_runs, iteration,
+                           apply_iov):
+        """
+        Process runs from experiment.
+        """
+        # Run lists. They have the following format: run number,
+        # calibration result code, ExpRun, algorithm results, merge information.
+        run_data = []
+        run_data_klm_excluded = []
+
+        # Initial run.
+        for exp_run in experiment_runs[experiment]:
+            self.execute_over_run_list([exp_run], iteration, apply_iov)
+            result = self.machine.result.result
+            algorithm_results = KLMStripEfficiencyAlgorithm.Results(
+                self.machine.algorithm.algorithm.getResults())
+            if (algorithm_results.getExtHits() > 0):
+                run_data.append(
+                    [exp_run.run, result, [exp_run], algorithm_results, ''])
+            else:
+                run_data_klm_excluded.append(
+                    [exp_run.run, result, [exp_run], algorithm_results, ''])
+            result_str = calibration_result_string(result)
+            basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))
+
+        # Sort by run number.
+        run_data.sort(key=lambda x: x[0])
+        run_data_klm_excluded.sort(key=lambda x: x[0])
+
+        # Create list of runs that do not have enough data.
+        run_ranges = []
+        i = 0
+        while (i < len(run_data)):
+            if (run_data[i][1] == 2):
+                j = i
+                while (run_data[j][1] == 2):
+                    j += 1
+                    if (j >= len(run_data)):
+                        break
+                run_ranges.append([i, j])
+                i = j
+            else:
+                i += 1
+
+        # Determine whether the runs with insufficient data can be merged to
+        # the next or previous normal run.
+        def can_merge(run_data, run_not_enough_data, run_normal):
+            return run_data[run_not_enough_data][3].newExtHitsPlanes(
+                       run_data[run_normal][3].getExtHitsPlane()) == 0
+
+        for run_range in run_ranges:
+            next_run = run_range[1]
+            # To mark as 'none' at the end if there are no normal runs.
+            j = run_range[0]
+            i = next_run - 1
+            if (next_run < len(run_data)):
+                while (i >= run_range[0]):
+                    if (can_merge(run_data, i, next_run)):
+                        basf2.B2INFO('Run %d (not enough data) can be merged '
+                                     'into the next normal run %d.' %
+                                     (run_data[i][0], run_data[next_run][0]))
+                        run_data[i][4] = 'next'
+                    else:
+                        basf2.B2INFO('Run %d (not enough data) cannot be '
+                                     'merged into the next normal run %d, '
+                                     'will try the previous one.' %
+                                     (run_data[i][0], run_data[next_run][0]))
+                        break
+                    i -= 1
+                if (i < run_range[0]):
+                    continue
+            previous_run = run_range[0] - 1
+            if (previous_run >= 0):
+                while (j <= i):
+                    if (can_merge(run_data, j, previous_run)):
+                        basf2.B2INFO('Run %d (not enough data) can be merged '
+                                     'into the previous normal run %d.' %
+                                     (run_data[j][0],
+                                      run_data[previous_run][0]))
+                        run_data[j][4] = 'previous'
+                    else:
+                        basf2.B2INFO('Run %d (not enough data) cannot be '
+                                     'merged into the previous normal run %d.' %
+                                     (run_data[j][0],
+                                      run_data[previous_run][0]))
+                        break
+                    j += 1
+                if (j > i):
+                    continue
+            basf2.B2INFO('A range of runs with not enough data is found '
+                         'that cannot be merged into neither previous nor '
+                         'next normal run: from %d to %d.' %
+                         (run_data[j][0], run_data[i][0]))
+            while (j <= i):
+                run_data[j][4] = 'none'
+                j += 1
 
 
 def get_alignment_pre_collector_path_cosmic(entry_sequence=""):

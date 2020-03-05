@@ -735,11 +735,11 @@ void ECLBhabhaTCollectorModule::collect()
 
 
             // Code to determine the phi and theta of the crystal.
-            //TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
+            TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
             phi_ECLCaldigits_bothClusters.push_back(0);
             theta_ECLCaldigits_bothClusters.push_back(0);
-            /* B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
-                    << ", phi = " << crystal3Vec.Phi()); */
+            B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
+                    << ", phi = " << crystal3Vec.Phi());
 
             E_ECLCaldigits_bothClusters.push_back(tempE);
             amp_ECLDigits_bothClusters.push_back(ecl_dig->getAmp());

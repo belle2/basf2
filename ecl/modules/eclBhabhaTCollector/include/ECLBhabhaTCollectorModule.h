@@ -202,7 +202,7 @@ namespace Belle2 {
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
 
-    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > m_ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
 
 

@@ -806,7 +806,7 @@ void ECLBhabhaTCollectorModule::collect()
 
     // Apply the time walk correction: time shift as a function of the amplitude corrected by the electronics calibration.
     //    The electronics calibration also accounts for crystals that have a dead pre-amp and thus half the normal amplitude.
-    double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
+    double energyTimeShift = m_ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
 
     B2DEBUG(35, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
             ", t(E) shift = " << energyTimeShift << " ns");

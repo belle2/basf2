@@ -3,7 +3,7 @@
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
 from prompt import CalibrationSettings
-from reconstruction import *
+from reconstruction import prepare_cdst_analysis
 
 ##############################
 # REQUIRED VARIABLE #

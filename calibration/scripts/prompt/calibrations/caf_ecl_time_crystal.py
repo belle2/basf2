@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""ECL timing calibration that performs the crate calibrations, one for each physics run."""
+"""ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
 
 from prompt import CalibrationSettings
 from reconstruction import *

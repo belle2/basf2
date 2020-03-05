@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""ECL timing calibration that performs the crate calibrations, one for each physics run."""
+"""ECL timing calibration that performs the crystal and crate calibrations."""
 
 from prompt import CalibrationSettings
 from reconstruction import *
@@ -78,7 +78,6 @@ def get_calibrations(input_data, **kwargs):
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
     ###################################################
-    import basf2
     from basf2 import register_module, create_path
     import ROOT
     from ROOT import Belle2
@@ -130,7 +129,7 @@ def get_calibrations(input_data, **kwargs):
     eclTAlgCrystals = Belle2.ECL.eclBhabhaTAlgorithm()
 
     # Define the CAF algorithm arguments
-    # Set the cellIDLo to be larger than cellIDHi so that no crystal
+    # Set the crateIDLo to be larger than crateIDHi so that no crate
     #    calibrations will be performed.
     eclTAlgCrystals.crateIDLo = 3
     eclTAlgCrystals.crateIDHi = 2
@@ -243,8 +242,6 @@ def get_calibrations(input_data, **kwargs):
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     # Calibrations will be executed in this order as a result of the dependencies defined by the "dependes_on(...)".
-    # return [cal_crates_1, cal_crystals_1, cal_crates_2, cal_crystals_2]
     return [cal_crates_1, cal_crystals_1, cal_crates_2, cal_crystals_2, cal_crates_3, cal_crystals_3, cal_crates_4, cal_crystals_4]
-    # return [cal_crates]
 
 ##############################

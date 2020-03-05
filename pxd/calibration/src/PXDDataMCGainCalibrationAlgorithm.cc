@@ -157,8 +157,8 @@ CalibrationAlgorithm::EResult PXDDataMCGainCalibrationAlgorithm::calibrate()
   set<VxdID> pxdSensors;
 
   // Read back existing DB payloads
-  PXDClusterChargeMapPar* chargeMapPtr = 0;
-  PXDGainMapPar* gainMapPtr = 0;
+  PXDClusterChargeMapPar* chargeMapPtr = nullptr;
+  PXDGainMapPar* gainMapPtr = nullptr;
   auto dbtree = getObjectPtr<TTree>("dbtree");
   dbtree->SetBranchAddress("run", &m_run);
   dbtree->SetBranchAddress("exp", &m_exp);
@@ -240,11 +240,8 @@ CalibrationAlgorithm::EResult PXDDataMCGainCalibrationAlgorithm::calibrate()
 
   }
 
-  // Delete DB pointers
-  delete chargeMapPtr;
-  chargeMapPtr = 0;
-  delete gainMapPtr;
-  gainMapPtr = 0;
+  chargeMapPtr = nullptr;
+  gainMapPtr = nullptr;
 
   // Save the charge map to database. Note that this will set the database object name to the same as the collector but you
   // are free to change it.

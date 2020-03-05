@@ -138,15 +138,13 @@ void PXDClusterChargeCollectorModule::startRun() // Do your beginRun() stuff her
     DBObjPtr<PXDClusterChargeMapPar> chargeMap(m_chargeName);
     m_chargeMap = *chargeMap;
   } else {
-    PXDClusterChargeMapPar* chargeMap = new PXDClusterChargeMapPar();
-    m_chargeMap = *chargeMap;
+    m_chargeMap = PXDClusterChargeMapPar();
   }
   if (m_gainName.length()) {
     DBObjPtr<PXDGainMapPar> gainMap(m_gainName);
     m_gainMap = *gainMap;
   } else {
-    PXDGainMapPar* gainMap = new PXDGainMapPar();
-    m_gainMap = *gainMap;
+    m_gainMap = PXDGainMapPar();
   }
   getObjectPtr<TTree>("dbtree")->Fill();
 }

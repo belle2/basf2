@@ -244,18 +244,11 @@ class Plotuple:
             self.mop
         )
 
-        if tester is None:
-            self.comparison_result_long = "Comparison not possible, because no" \
-                "appropriate comparison class could be " \
-                "found."
-            self.comparison_result = "error"
-
-        else:
-            self.comparison_result_long = tester.comparison_result_long.format(
-                revision1=self.reference.revision,
-                revision2=self.newest.revision
-            )
-            self.comparison_result = tester.comparison_result
+        self.comparison_result_long = tester.comparison_result_long.format(
+            revision1=self.reference.revision,
+            revision2=self.newest.revision
+        )
+        self.comparison_result = tester.comparison_result
 
     def _set_background(self, canvas):
 

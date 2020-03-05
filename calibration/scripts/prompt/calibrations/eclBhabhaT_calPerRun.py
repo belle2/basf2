@@ -3,6 +3,7 @@
 """ECL timing calibration that performs the crate calibrations, one for each physics run."""
 
 from prompt import CalibrationSettings
+from reconstruction import *
 
 ##############################
 # REQUIRED VARIABLE #
@@ -89,6 +90,10 @@ def get_calibrations(input_data, **kwargs):
     rec_path_bhabha.add_module(root_input)
     rec_path_bhabha.add_module('Gearbox')
     rec_path_bhabha.add_module('Geometry', useDB=True)
+
+    # for new 2020 cdst format
+    components = ['CDC', 'ECL']
+    prepare_cdst_analysis(rec_path_bhabha, components=components)
 
     col_bhabha = register_module('ECLBhabhaTCollector')
     col_bhabha.param('timeAbsMax', 250)

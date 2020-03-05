@@ -107,19 +107,27 @@ class IntervalOfValidity:
 
     def __lt__(self, other):
         """Sort by run values"""
+        if not isinstance(other, IntervalOfValidity):
+            return NotImplemented
         return (self.__first, self.__final) < (other.__first, other.__final)
 
     def __and__(self, other):
         """Intersection between iovs. Will return None if the payloads don't overlap"""
+        if not isinstance(other, IntervalOfValidity):
+            return NotImplemented
         return self.intersect(other)
 
     def __or__(self, other):
         """Union between iovs. Will return None if the iovs don't overlap or
         connect to each other"""
+        if not isinstance(other, IntervalOfValidity):
+            return NotImplemented
         return self.union(other, False)
 
     def __sub__(self, other):
         """Difference between iovs. Will return None if nothing is left over"""
+        if not isinstance(other, IntervalOfValidity):
+            return NotImplemented
         return self.subtract(other)
 
     def __hash__(self):
@@ -145,8 +153,6 @@ class IntervalOfValidity:
         if other.first > self.first and other.final < self.final:
             # the one we want to remove is in the middle, return a pair of iovs
             # by subtracting two extended once
-            end_run = other.first_run - 1
-            end_exp = other.first_exp if end_run >= 0 else other.first_exp - 1
             iov1 = self.subtract(IntervalOfValidity(other.first + (-1, -1)))
             iov2 = self.subtract(IntervalOfValidity((0, 0) + other.final))
             return (iov1, iov2)
@@ -277,7 +283,7 @@ class IoVSet:
                 existing iov in the set will raise a ValueError.
             allow_startone (bool): If True also join iovs if one covers the
                 whole experiment and the next one starts at run 1 in the next
-                experiment. Of False they will only be joined if the next one
+                experiment. If False they will only be joined if the next one
                 starts at run 0.
         """
         #: The set of iovs
@@ -334,7 +340,7 @@ class IoVSet:
         # check whether we override overlap settings
         if allow_overlaps is None:
             allow_overlaps = self.__allow_overlaps
-        # we can remove a set from a set :D
+        # we can add a set to a set :D
         if isinstance(iov, IoVSet):
             for element in iov:
                 self.add(element)

@@ -153,13 +153,17 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
                                                       key="pr_{part_name}")
             }
 
+            # Basic peel function to get Quality Indicators
+            qualityindicator_crops = peelers.peel_quality_indicators(reco_track)
+
             crops.update(dict(**hit_content_crops,
                               **mc_particle_crops,
                               **subdetector_hit_efficiency_crops,
                               **mc_hit_efficiencies_in_all_pr_tracks_crops,
                               **event_crops,
                               **store_array_crops,
-                              **pr_purity_information
+                              **pr_purity_information,
+                              **qualityindicator_crops
                               ))
 
         return crops

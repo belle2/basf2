@@ -265,21 +265,43 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
     svd_qi = nan
-    space_point_track_cand = reco_track.getRelated('SPTrackCands')
+    cdc_qi = nan
+    qi = nan
 
-    if not space_point_track_cand:
+    if reco_track:
+        qi = reco_track.getQualityIndicator()
+        space_point_track_cand = reco_track.getRelated('SPTrackCands')
+
+        # adjust relations if SVD->CDC CKF enabled
+        if not space_point_track_cand:
+            svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+            if svd_cdc_track_cand:
+                svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+            if not svd_track_cand:
+                temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
+                if svd_track_cand:
+                    space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
+
+        if space_point_track_cand:
+            svd_qi = space_point_track_cand.getQualityIndicator()
+
         svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
         if svd_cdc_track_cand:
-            svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
-            if svd_track_cand:
-                space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
+            cdc_track_cand = svd_cdc_track_cand.getRelated('CDCRecoTracks')
+            if not cdc_track_cand:
+                cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
+            if not cdc_track_cand:
+                temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
 
-    if space_point_track_cand:
-        svd_qi = space_point_track_cand.getQualityIndicator()
+        if cdc_track_cand:
+            cdc_qi = cdc_track_cand.getQualityIndicator()
 
     crops = dict(
-        quality_indicator=reco_track.getQualityIndicator(),
+        quality_indicator=qi,
         svd_quality_indicator=svd_qi,
+        cdc_qualityindicator=cdc_qi,
     )
 
     return crops

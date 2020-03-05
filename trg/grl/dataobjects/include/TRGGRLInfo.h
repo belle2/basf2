@@ -465,7 +465,7 @@ namespace Belle2 {
     std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 2); /*< the class title */
+    ClassDef(TRGGRLInfo, 3); /*< the class title */
   };
 } // end namespace Belle2
 

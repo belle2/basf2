@@ -27,7 +27,7 @@ skim_registry = [
     ('14120400', 'BtoD0h_Kspipipi0'),
     # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
     ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
-    # ('14120601', 'B0toDpi_Kspi'),   B0 -> D-(Ks pi-)pi+ To be added
+    ('14120601', 'B0toDpi_Kspi'),   # B0 -> D-(Ks pi-)pi+
     ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
     # merge  B0 -> D*-(anti-D0 pi-)pi+ with anti-D0 -> k- pi+ pi+ pi- and anti-D0 -> K- pi+ pi0
     ('14120800', 'B0toDstarPi_D0pi_Kpipipi_Kpipi0'),

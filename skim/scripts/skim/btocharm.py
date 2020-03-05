@@ -807,6 +807,48 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
     return Lists
 
 
+def B0toDpi_KspiList(path):
+    """
+
+    **Skim Author**: Chiara La Licata
+
+    **Skim Name**: B0toDpi_Kspi
+
+    **Skim Category**: physics, hadronic B to charm
+
+    **Skim Code**: 14120601
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Modes**:
+
+    1.  :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\pi^+`,
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.8 < M_D < 1.9``
+
+    2. ``Mbc > 5.2``
+
+    3. ``abs(deltaE) < 0.3``
+
+    Note:
+    This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
+    where D0 channels are defined.
+
+    """
+
+    __author__ = "Fernando Abudinen"
+
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:B0toDpi_Kspi -> D-:Kspi pi+:all', Bcuts, 1, path=path)
+
+    return ['B0:B0toDpi_Kspi']
+
+
 def DoubleCharmList(path):
     """
     **Skim Author**: Phillip Urquijo

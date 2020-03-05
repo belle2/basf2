@@ -14,15 +14,12 @@
 /* KLM headers. */
 #include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
-#include <klm/eklm/geometry/AlignmentChecker.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

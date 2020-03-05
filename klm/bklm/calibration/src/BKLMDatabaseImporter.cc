@@ -14,7 +14,6 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
 #include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/dbobjects/BKLMSimulationPar.h>
@@ -23,7 +22,6 @@
 
 /* Belle 2 headers. */
 #include <framework/database/Database.h>
-#include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>

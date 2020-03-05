@@ -18,7 +18,6 @@
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/eklm/dataobjects/EKLMDigit.h>
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>

@@ -11,7 +11,6 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
 #include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 
 /* Belle 2 headers. */

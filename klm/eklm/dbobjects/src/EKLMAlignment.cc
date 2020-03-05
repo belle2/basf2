@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/eklm/dbobjects/EKLMAlignment.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 EKLMAlignment::EKLMAlignment()

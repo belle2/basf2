@@ -12,7 +12,6 @@
 #include <klm/bklm/modules/BKLMReconstructor/BKLMReconstructorModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/Module.h>
 
 /* Belle 2 headers. */

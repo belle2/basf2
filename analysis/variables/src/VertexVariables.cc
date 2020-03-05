@@ -466,7 +466,13 @@ namespace Belle2 {
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position
-    REGISTER_VARIABLE("distance", particleDistance, "3D distance from the vertex or POCA to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance,
+                      R"DOC(3D distance between the IP and the particle decay vertex, if available.
+
+In case the particle has been created from a track, the distance is defined between the POCA and IP.
+If the particle is built from an ECL cluster, the decay vertex is set to the nominal IP. 
+If the particle is created from a KLM cluster, the distance is calculated between the IP and the cluster itself.)DOC");
+
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
                       "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP");

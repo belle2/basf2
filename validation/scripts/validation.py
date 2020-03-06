@@ -1097,7 +1097,7 @@ class Validation:
         # execute slow scripts first
         self.sort_scripts(remaining_scripts)
 
-        def handle_finished_script(script_obj):
+        def handle_finished_script(script_obj: Script):
             # Write to log that the script finished
             self.log.debug('Finished: ' + script_obj.path)
 
@@ -1146,7 +1146,7 @@ class Validation:
                     )
                 )
 
-        def handle_unfinished_script(script_obj):
+        def handle_unfinished_script(script_obj: Script):
             if (time.time() - script_obj.last_report_time) / 60.0 > \
                     self.running_script_reporting_interval:
                 print(
@@ -1167,20 +1167,20 @@ class Validation:
                 script_obj.status = ScriptStatus.failed
                 self.log.warning(
                     f'Script {script_obj.path} did not finish after '
-                    f'{total_runtime_in_minutes} minutes, skipping '
+                    f'{total_runtime_in_minutes} minutes, attempting to '
+                    f'terminate. '
                 )
                 # kill the running process
                 script_obj.control.terminate(script_obj)
                 # Skip all dependent scripts
                 self.skip_script(
                     script_obj,
-                    reason="Script '{}' did not finish in time, so we're"
-                           "setting it to 'skipped' so that all dependent "
-                           "scripts will be skipped "
-                           "as well.".format(script_object.path)
+                    reason=f"Script '{script_object.path}' did not finish in "
+                           f"time, so we're setting it to 'failed' so that all "
+                           f"dependent scripts will be skipped."
                 )
 
-        def handle_waiting_script(script_obj):
+        def handle_waiting_script(script_obj: Script):
             # Determine the way of execution depending on whether
             # data files are created
             if script_obj.header and \

@@ -182,12 +182,16 @@ class Cluster:
 
             # Submit job
             process = subprocess.Popen(
-                params, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines=True
+                params,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
             stdout, stderr = process.communicate()
-            self.logger.debug(f"Stdout of job submission: '{stdout}'.")
-            self.logger.debug(f"Stderr of job submission: '{stderr}'.")
+            if stdout:
+                self.logger.debug(f"Stdout of job submission: '{stdout}'.")
+            if stderr:
+                self.logger.debug(f"Stderr of job submission: '{stderr}'.")
 
             if process.wait() != 0:
                 # Submission did not succeed
@@ -259,11 +263,14 @@ class Cluster:
                 params,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                universal_newlines=True,
             )
 
             stdout, stderr = process.communicate()
-            self.logger.debug(f"Stdout of job termination: '{stdout}'.")
-            self.logger.debug(f"Stderr of job termination: '{stderr}'.")
+            if stdout:
+                self.logger.debug(f"Stdout of job termination: '{stdout}'.")
+            if stderr:
+                self.logger.debug(f"Stderr of job termination: '{stderr}'.")
 
             return_code = process.wait()
             if return_code != 0:

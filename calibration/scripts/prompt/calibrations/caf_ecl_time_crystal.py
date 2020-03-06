@@ -114,7 +114,7 @@ def get_calibrations(input_data, **kwargs):
     eclTAlgCrystals = Belle2.ECL.eclBhabhaTAlgorithm()
 
     # Define the CAF algorithm arguments
-    # Set the cellIDLo to be larger than cellIDHi so that no crystal
+    # Set the crateIDLo to be larger than crateIDHi so that no crate
     #    calibrations will be performed.
     eclTAlgCrystals.crateIDLo = 3
     eclTAlgCrystals.crateIDHi = 2

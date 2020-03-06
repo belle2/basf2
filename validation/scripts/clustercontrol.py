@@ -134,7 +134,6 @@ class Cluster:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        # Path where log file is supposed to be created
         log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
 
         # Remove any left over done files
@@ -142,7 +141,6 @@ class Cluster:
         if os.path.isfile(donefile_path):
             os.remove(donefile_path)
 
-        # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
         if extension == '.C':
             # .c files are executed with root
@@ -152,7 +150,6 @@ class Cluster:
             # 'options' contains an option-string for basf2, e.g. '-n 100'
             command = f'basf2 {job.path} {options}'
 
-        # todo: why not use the temp library in python's stdlib? /klieret
         # Create a helpfile-shellscript, which contains all the commands that
         # need to be executed by the cluster.
         # First, set up the basf2 tools and perform b2setup with the correct
@@ -176,16 +173,8 @@ class Cluster:
 
         # Prepare the command line command for submission to the cluster
         params = [
-            "bsub",
-            "-o",
-            log_file,
-            "-e",
-            log_file,
-            "-q",
-            "l",
-            tmp_name,
-            "-J",
-            self._generate_id(job)
+            "bsub", "-o", log_file, "-e", log_file, "-q", "l",
+            "-J", self._generate_id(job), tmp_name,
         ]
 
         # Log the command we are about the execute
@@ -203,14 +192,16 @@ class Cluster:
             if process.wait() != 0:
                 job.status = 'failed'
         else:
+            os.system(f'echo 0 > {self.path}/script_{job.name}.done')
             self._cleanup(job)
 
-    def _cleanup(self, job: Script):
+    def _cleanup(self, job: Script) -> None:
+        """ Clean up after job has finished. """
         tmp_name = self._get_tmp_name(job)
-        os.system(f'echo 0 > {self.path}/script_{job.name}.done')
         os.system(f'rm {tmp_name}')
 
-    def _get_tmp_name(self, job: Script):
+    def _get_tmp_name(self, job: Script) -> str:
+        """ Name of temporary file used for job submission. """
         return self.path + '/' + 'script_' + job.name + '.sh'
 
     def is_job_finished(self, job: Script):

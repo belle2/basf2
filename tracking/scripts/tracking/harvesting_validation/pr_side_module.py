@@ -198,6 +198,38 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_clone_or_match",
     )
 
+    #: Make profile of the clone rate versus seed tan(lambda)
+    #: Rename the quantities to names that display nicely by root latex translation
+    save_clone_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_tan_lambda_estimate': 'seed tan #lambda',
+        },
+        y='clone rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+        bins=50
+    )
+
+    #: Make profile of the clone rate versus seed transverse momentum
+    #: Rename the quantities to names that display nicely by root latex translation
+    save_clone_rate_by_seed_pt_profile = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='clone rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+        bins=50
+    )
+
     #: Save RecoTrack fake-rate information
     save_fake_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",

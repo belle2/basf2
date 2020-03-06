@@ -124,7 +124,7 @@ def get_calibrations(input_data, **kwargs):
 
     cal_klm.algorithms = [alg]
 
-    from klm_calibration_utils import KLMStripEfficiency
+    from klm_strip_efficiency import KLMStripEfficiency
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency

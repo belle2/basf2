@@ -311,13 +311,15 @@ def BtoD0h_Kpipipi_Kpipi0List(path):
     **Decay Modes**:
 
 
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) \\pi^+`,
+    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) K^+`,
+    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
 
-    3.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^0) \\pi^+`,
+    3.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\pi^+`
 
-    4.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^0) K^+`
+    4.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\K^+`
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -344,14 +346,23 @@ def BtoD0h_Kpipipi_Kpipi0List(path):
                     'anti-D0:Kpipipi K+:all',
                     'anti-D0:Kpipi0 pi+:all',
                     'anti-D0:Kpipi0 K+:all',
+                    'anti-D*0:D0_Kpipipi pi+:all',
+                    'anti-D*0:D0_Kpipipi K+:all',
+                    'anti-D*0:D0_Kpipi0 pi+:all',
+                    'anti-D*0:D0_Kpipi0 K+:all'
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
         ma.reconstructDecay('B+:BtoD0h' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
         BsigList.append('B+:BtoD0h' + str(chID))
 
-    Lists = BsigList
-    return Lists
+    ma.copyLists(outputListName='B+:BtoD0h_merged', inputListNames=BsigList, path=path)
+
+    # Select only three random candidates
+    ma.rankByHighest(particleList='B+:BtoD0h_merged', variable='cos(mdstIndex)', numBest=3,
+                     outputVariable='cosMdstIndex_rank', path=path)
+
+    return ['B+:BtoD0h_merged']
 
 
 def loadB0toDpi_Kpipi(path):

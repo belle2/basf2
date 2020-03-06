@@ -3,7 +3,8 @@
 
 #######################################################
 #
-# B+ -> anti-D0 (Kpipipi, Kpipi0) h+ skims
+# B+ -> anti-D0 (Kpipipi, Kpipi0) h+
+#    -> anti-D*0( -> D0(-> Kpipipi, Kpipi0) pi0) h+ skim
 # Niharika Rout, Chiara La Licata
 #
 ######################################################
@@ -35,9 +36,12 @@ ma.applyCuts(list_name='K+:all', cut='abs(dr) < 2 and abs(dz) < 5', path=path)
 # B- to D(->Kpipipi, ->Kpipi0)h- Skim
 from skim.btocharm import BtoD0h_Kpipipi_Kpipi0List
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdD0_Kpipi0
+from skim.standardlists.charm import loadStdDstar0_D0pi0_Kpipipi, loadStdDstar0_D0pi0_Kpipi0
 
 loadStdD0_Kpipipi(path=path)
 loadStdD0_Kpipi0(path=path)
+loadStdDstar0_D0pi0_Kpipipi(path=path)
+loadStdDstar0_D0pi0_Kpipi0(path=path)
 BtoD0h_Kpipipi_kpipi0_list = BtoD0h_Kpipipi_Kpipi0List(path=path)
 sef.skimOutputUdst(skimCode, BtoD0h_Kpipipi_kpipi0_list, path=path)
 ma.summaryOfLists(BtoD0h_Kpipipi_kpipi0_list, path=path)

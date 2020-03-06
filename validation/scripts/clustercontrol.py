@@ -186,8 +186,8 @@ class Cluster:
                 universal_newlines=True
             )
             stdout, stderr = process.communicate()
-            self.logger.debug(f"Stdout of job submission: {stdout}")
-            self.logger.debug(f"Stderr of job submission: {stderr}")
+            self.logger.debug(f"Stdout of job submission: '{stdout}'.")
+            self.logger.debug(f"Stderr of job submission: '{stderr}'.")
 
             if process.wait() != 0:
                 # Submission did not succeed
@@ -196,7 +196,7 @@ class Cluster:
             else:
                 # Submission succeeded. Get Job ID by parsing output, so that
                 # we can terminate the job later.
-                res = re.search(stdout, "Job <([0-9]*)> is submitted")
+                res = re.search("Job <([0-9]*)> is submitted", stdout)
                 if res:
                     job.job_id = res.group(1)
                 else:
@@ -262,8 +262,8 @@ class Cluster:
             )
 
             stdout, stderr = process.communicate()
-            self.logger.debug(f"Stdout of job termination: {stdout}")
-            self.logger.debug(f"Stderr of job termination: {stderr}")
+            self.logger.debug(f"Stdout of job termination: '{stdout}'.")
+            self.logger.debug(f"Stderr of job termination: '{stderr}'.")
 
             return_code = process.wait()
             if return_code != 0:

@@ -127,6 +127,7 @@ Modules
    This modification does not change the MC Matching of the particle for which `modularAnalysis.matchMCTruth` is called.
  * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
  * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
+ * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
 
 Utilities
 +++++++++

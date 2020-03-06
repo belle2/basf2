@@ -347,6 +347,23 @@ useful in combination with the visible signal side, for example in semileptonic
   More improvements will come soon.
 
 
+Create ROE using MCParticles
+----------------------------
+
+It is possible to create ROE using MCParticles:
+
+::
+
+  ma.fillParticleListFromMC("B0:gen", signal_selection, 
+        addDaughters=True, skipNonPrimaryDaughters=True, path=main_path)
+  ma.buildRestOfEventFromMC("B0:gen",path=main_path)
+
+It is important to add primary daughters to the signal side particle and not to forget to provide a selection cut. 
+
+.. note::
+  ROE masks and many of the ROE variables are working only with reconstructed particles.
+  As a workaround one can reconstruct ROE as a particle.
+
 MVA based cleaning
 ------------------
 

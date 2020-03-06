@@ -1786,6 +1786,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
 def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name name of the input ParticleList
+    @param mask_name             name of the ROEMask to be used
     """
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
@@ -1798,6 +1800,9 @@ def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
 def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
     """
     if (len(inputParticlelists) == 0):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',

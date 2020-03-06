@@ -13,7 +13,7 @@ from stdCharged import stdK, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
-from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.lightmesons import loadStdLightMesons, loadStdPi0ForBToHadrons
 import skimExpertFunctions as expert
 
 
@@ -25,15 +25,19 @@ ma.inputMdstList('default', fileList, path=btocharmpath)
 
 stdPi('all', path=btocharmpath)
 stdK('all', path=btocharmpath)
-
+loadStdPi0ForBToHadrons(path=btocharmpath)
 
 # B- to D(->Kpipipi)h- Skim
-from skim.btocharm import BsigToD0hToKpipipiList
-from skim.standardlists.charm import loadStdD0_Kpipipi
+from skim.btocharm import BtoD0h_Kpipipi_Kpipi0List
+from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdD0_Kpipi0
+from skim.standardlists.charm import loadStdDstar0_D0pi0_Kpipipi, loadStdDstar0_D0pi0_Kpipi0
 
 loadStdD0_Kpipipi(path=btocharmpath)
-BtoD0h_Kpipipi_list = BsigToD0hToKpipipiList(path=btocharmpath)
-expert.add_skim('BtoD0h_Kpipipi', BtoD0h_Kpipipi_list, path=btocharmpath)
+loadStdD0_Kpipi0(path=btocharmpath)
+loadStdDstar0_D0pi0_Kpipipi(path=btocharmpath)
+loadStdDstar0_D0pi0_Kpipi0(path=btocharmpath)
+BtoD0h_Kpipipi_list = BtoD0h_Kpipipi_Kpipi0List(path=btocharmpath)
+expert.add_skim('BtoD0h_Kpipipi_Kpipi0', BtoD0h_Kpipipi_list, path=btocharmpath)
 
 # B+ to D(->h+h-)h+ Skim
 from skim.btocharm import BsigToD0hToKpiList
@@ -60,12 +64,15 @@ B0toDstarPiList_Kpi = loadB0toDstarPi_Kpi(path=btocharmpath)
 expert.add_skim('B0toDstarPi_D0pi_Kpi', B0toDstarPiList_Kpi, path=btocharmpath)
 
 # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> K- pi+ pi- pi+ Skim
-from skim.btocharm import loadB0toDstarPi_Kpipipi
+from skim.btocharm import loadB0toDstarPi_Kpipipi_Kpipi0List
+from skim.standardlists.charm import loadStdD0_Kpipi0, loadStdDstarPlus_D0pi_Kpipi0
 from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
-
+loadStdD0_Kpipi0(path=btocharmpath)
+loadStdDstarPlus_D0pi_Kpipi0(path=btocharmpath)
+loadStdD0_Kpipipi(path=btocharmpath)
 loadStdDstarPlus_D0pi_Kpipipi(path=btocharmpath)
-B0toDstarPiList_Kpipipi = loadB0toDstarPi_Kpipipi(path=btocharmpath)
-expert.add_skim('B0toDstarPi_D0pi_Kpipipi', B0toDstarPiList_Kpipipi, path=btocharmpath)
+B0toDstarPiList_Kpipipi = loadB0toDstarPi_Kpipipi_Kpipi0List(path=btocharmpath)
+expert.add_skim('B0toDstarPi_D0pi_Kpipipi_Kpipi0', B0toDstarPiList_Kpipipi, path=btocharmpath)
 
 
 expert.setSkimLogging(path=btocharmpath)

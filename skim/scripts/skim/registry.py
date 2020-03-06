@@ -21,7 +21,7 @@ skim_registry = [
     ('11130300', 'LeptonicUntagged'),
     ('14140100', 'BtoD0h_hh'),
     ('14140101', 'BtoD0h_Kpi'),
-    ('14140102', 'BtoD0h_Kpipipi_Kpipi0'),  # TODO: merge with anti-D0 -> K- pi+ pi0 and chnage name
+    ('14140102', 'BtoD0h_Kpipipi_Kpipi0'),  # B+ -> anti-D0/anti-D0* (K- pi+ pi+ pi-, K- pi+ pi0) h+
     ('14140200', 'BtoD0h_Kshh'),
     ('14120300', 'BtoD0h_Kspi0'),
     ('14120400', 'BtoD0h_Kspipipi0'),
@@ -89,7 +89,7 @@ combined_skims = {
     ],
 
     'BtoCharm2': [
-        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi'
+        'BtoD0h_Kpi', 'BtoD0h_Kpipipi_Kpipi0', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi_Kpipi0'
     ],
     'CharmHigh': [
         'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'

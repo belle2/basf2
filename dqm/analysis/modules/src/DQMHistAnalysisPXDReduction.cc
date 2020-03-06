@@ -45,6 +45,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
 
+  m_monObj = getMonitoringObject("pxd");
+
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here

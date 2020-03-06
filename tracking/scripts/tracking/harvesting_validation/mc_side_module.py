@@ -153,6 +153,9 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
                                                       key="pr_{part_name}")
             }
 
+            # Information on TrackFinders
+            trackfinder_crops = peelers.peel_trackfinder(reco_track)
+
             # Basic peel function to get Quality Indicators
             qualityindicator_crops = peelers.peel_quality_indicators(reco_track)
 
@@ -163,6 +166,7 @@ class MCSideTrackingValidationModule(harvesting.HarvestingModule):
                               **event_crops,
                               **store_array_crops,
                               **pr_purity_information,
+                              **trackfinder_crops,
                               **qualityindicator_crops
                               ))
 

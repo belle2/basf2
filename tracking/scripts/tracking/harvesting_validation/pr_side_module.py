@@ -99,6 +99,9 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         # Peel function to get hit purity of subdetectors
         subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
 
+        # Information on TrackFinders
+        trackfinder_crops = peelers.peel_trackfinder(reco_track)
+
         # Basic peel function to get Quality Indicators
         qualityindicator_crops = peelers.peel_quality_indicators(reco_track)
 
@@ -118,6 +121,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **subdetector_hit_purity_crops,  # Custom
+            **trackfinder_crops,
             **qualityindicator_crops,
             **seed_fit_crops,
             **fit_crops,

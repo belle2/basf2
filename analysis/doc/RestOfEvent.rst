@@ -342,6 +342,7 @@ useful in combination with the visible signal side, for example in semileptonic
 :math:`B`-meson decays, where tag side has been reconstructed using :doc:`FullEventInterpretation`.
 
 .. hint::
+  It is recommended to try to use ROE variables first, unless it is *absolutely* necessary to reconstruct ROE as a particle in your analysis.
   The decay vertex of the resulting particles can be fitted by `KFit`.
   Also MC truth-matching works, but after removing all neutral hadrons matched to tracks. 
   More improvements will come soon.

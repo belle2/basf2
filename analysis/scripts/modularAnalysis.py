@@ -1795,6 +1795,24 @@ def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     path.add_module(roeBuilder)
 
 
+def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    """
+    if (len(inputParticlelists) == 0):
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
+                 'n0', 'nu_e', 'nu_mu', 'nu_tau']
+        for t in types:
+            fillParticleListFromMC("%s:roe_default_gen" % t,   '', False, True, path=path)
+            inputParticlelists += ["%s:roe_default_gen" % t]
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('MCROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('fromMC', True)
+    path.add_module(roeBuilder)
+
+
 def appendROEMask(list_name,
                   mask_name,
                   trackSelection,

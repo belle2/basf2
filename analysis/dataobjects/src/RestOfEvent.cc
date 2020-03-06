@@ -46,6 +46,11 @@ void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAd
 }
 bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* toAddParticle)
 {
+  // If ROE is filled with Particles created from MCParticle, check the MCParticle equality
+  if (roeParticle->getParticleType() == Particle::EParticleType::c_MCParticle
+      and toAddParticle->getParticleType() == Particle::EParticleType::c_MCParticle) {
+    return roeParticle->getMCParticle() == toAddParticle->getMCParticle();
+  }
   if (roeParticle->isCopyOf(toAddParticle)) {
     return true;
   }

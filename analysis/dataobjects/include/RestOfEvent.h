@@ -173,7 +173,8 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(int pdgCode = 0, bool isNested = false): m_isNested(isNested), m_pdgCode(pdgCode) { };
+    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false):
+      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -389,8 +390,9 @@ namespace Belle2 {
     // persistent data members
     std::set<int> m_particleIndices;   /**< StoreArray indices to unused particles */
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
-    bool m_isNested;                   /**< Nested ROE indicator */
     int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
+    bool m_isNested;                   /**< Nested ROE indicator */
+    bool m_isFromMC;                   /**< Nested ROE indicator */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

@@ -13,7 +13,7 @@ from stdCharged import stdK, stdPi
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
-from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdLightMesons, loadStdAllRhoPlus
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
 import skimExpertFunctions as expert
 
 
@@ -27,7 +27,6 @@ stdPi('all', path=btocharmpath)
 stdK('all', path=btocharmpath)
 loadStdPi0ForBToHadrons(path=btocharmpath)
 stdKshorts(path=btocharmpath)
-loadStdPi0ForBToHadrons(path=btocharmpath)
 loadStdAllRhoPlus(path=btocharmpath)
 
 # B+ to anti-D0(->h+h-)h+ Skim

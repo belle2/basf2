@@ -177,7 +177,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         int p = m_gCharge->GetN();
         m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
-        m_monObj->setVariable(("trackclustercharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
                               m_fLandau->GetParError(1));
       }
 
@@ -213,7 +213,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist");
         h->Draw("same hist");
 
-        double data = 1.0;
+        double data = 1.0; // thats useless at the moment
         canvas->Pad()->SetFrameFillColor(10);
         if (m_color) {
           if (hh1->GetEntries() < 1000) {

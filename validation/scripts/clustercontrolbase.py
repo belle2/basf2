@@ -156,11 +156,10 @@ class ClusterBase:
 
         return [donefile_exists, returncode]
 
-    def terminate(self):
+    def terminate(self, job: Script):
         """!
-        Terminate the jobs and loose all resources
         """
-        self.clusterlog.close()
+        self.logger.error("Script termination not supported.")
 
     @abstractmethod
     def adjust_path(self, path):

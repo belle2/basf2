@@ -66,10 +66,10 @@ namespace Belle2 {
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
     addParam("TOPDigitCollectionName", m_topDigitCollectionName,
-             "Name of the collection of TOPDigits", string("TOPDigits"));
+             "Name of the collection of TOPDigits", string(""));
     addParam("TOPLikelihoodCollectionName", m_topLikelihoodCollectionName,
-             "Name of the produced collection of TOPLikelihoods", string("TOPLikelihoods"));
-    addParam("TOPPullCollectionName", m_topPullCollectionName, "Name of the collection of produced TOPPulls", string("TOPPulls"));
+             "Name of the produced collection of TOPLikelihoods", string(""));
+    addParam("TOPPullCollectionName", m_topPullCollectionName, "Name of the collection of produced TOPPulls", string(""));
 
   }
 

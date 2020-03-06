@@ -16,13 +16,12 @@ from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 import skimExpertFunctions as sef
 
 b2.set_log_level(b2.LogLevel.INFO)
-b2.gb2_setuprel = 'release-04-01-01'
 
 path = b2.create_path()
 
 skimCode = sef.encodeSkimName('BtoD0h_Kpipipi_Kpipi0')
 
-fileList = sef.get_test_file("MC12_mixedBGx1")
+fileList = sef.get_test_file("MC13_mixedBGx1")
 
 ma.inputMdstList('default', fileList, path=path)
 

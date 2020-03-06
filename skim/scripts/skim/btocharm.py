@@ -353,8 +353,8 @@ def BtoD0h_Kpipipi_Kpipi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0h' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0h' + str(chID))
+        ma.reconstructDecay('B+:BtoD0h_Khh_Khpi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0h_Khh_Khpi0' + str(chID))
 
     ma.copyLists(outputListName='B+:BtoD0h_merged', inputListNames=BsigList, path=path)
 

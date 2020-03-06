@@ -21,13 +21,12 @@ from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file, skimOutputUdst
 
 b2.set_log_level(b2.LogLevel.INFO)
-gb2_setuprel = 'release-04-01-01'
 
 mypath = b2.Path()
 
 skimCode = encodeSkimName('B0toDstarPi_D0pi_Kpipipi_Kpipi0')
 
-fileList = get_test_file("MC12_mixedBGx1")
+fileList = get_test_file("MC13_mixedBGx1")
 
 ma.inputMdstList('default', fileList, path=mypath)
 

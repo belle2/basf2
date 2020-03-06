@@ -16,7 +16,6 @@ from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 import skimExpertFunctions as sef
 
 b2.set_log_level(b2.LogLevel.INFO)
-b2.gb2_setuprel = 'release-04-01-01'
 
 path = b2.create_path()
 

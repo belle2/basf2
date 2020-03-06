@@ -188,10 +188,12 @@ class Cluster:
                 universal_newlines=True,
             )
             stdout, stderr = process.communicate()
-            if stdout:
-                self.logger.debug(f"Stdout of job submission: '{stdout}'.")
-            if stderr:
-                self.logger.debug(f"Stderr of job submission: '{stderr}'.")
+            if stdout.strip():
+                self.logger.debug(f"Stdout of job submission: "
+                                  f"'{stdout.strip()}'.")
+            if stderr.strip():
+                self.logger.debug(f"Stderr of job submission: "
+                                  f"'{stderr.strip()}'.")
 
             if process.wait() != 0:
                 # Submission did not succeed
@@ -267,10 +269,12 @@ class Cluster:
             )
 
             stdout, stderr = process.communicate()
-            if stdout:
-                self.logger.debug(f"Stdout of job termination: '{stdout}'.")
-            if stderr:
-                self.logger.debug(f"Stderr of job termination: '{stderr}'.")
+            if stdout.strip():
+                self.logger.debug(f"Stdout of job termination: "
+                                  f"'{stdout.strip()}'.")
+            if stderr.strip():
+                self.logger.debug(f"Stderr of job termination: "
+                                  f"'{stderr.strip()}'.")
 
             return_code = process.wait()
             if return_code != 0:

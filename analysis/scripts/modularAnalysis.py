@@ -1803,7 +1803,8 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
                  'n0', 'nu_e', 'nu_mu', 'nu_tau']
         for t in types:
-            fillParticleListFromMC("%s:roe_default_gen" % t,   '', False, True, path=path)
+            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
             inputParticlelists += ["%s:roe_default_gen" % t]
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('MCROEBuilder_' + target_list_name)

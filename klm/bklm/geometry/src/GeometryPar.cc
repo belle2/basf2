@@ -13,7 +13,6 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/dbobjects/BKLMAlignment.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 
@@ -21,7 +20,6 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
 using namespace std;

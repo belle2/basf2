@@ -182,7 +182,7 @@ void TRGGRLProjectsModule::initialize()
     TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
+  //m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 }
 
@@ -212,7 +212,7 @@ void TRGGRLProjectsModule::event()
   StoreArray<TRGGRLPHOTON> grlphoton("TRGGRLPhotons");
   StoreObjPtr<BinnedEventT0> m_eventTime;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-  trgInfo.create();
+  //trgInfo.create();
   //---------------------------------------------------------------------
   //..Use only clusters within 100 ns of event timing (from ECL).
   int ntrgArray = trgArray.getEntries();
@@ -666,6 +666,20 @@ void TRGGRLProjectsModule::event()
   bool nclst2_2 = (N_clst2 == 3);
   bool nclst2_3 = (N_clst2 > 3);
 
+  int N_ST = trgInfo->getNshorttrk();
+  int s2s3 = trgInfo->gets2s3();
+  int s2s5 = trgInfo->gets2s5();
+  int s2so = trgInfo->gets2so();
+  int s2f3 = trgInfo->gets2f3();
+  int s2f5 = trgInfo->gets2f5();
+  int s2fo = trgInfo->gets2fo();
+  int bwdsb  = trgInfo->getbwdsb();
+  int bwdnb  = trgInfo->getbwdnb();
+  int fwdsb  = trgInfo->getfwdsb();
+  int fwdnb  = trgInfo->getfwdnb();
+  int brlfb  = trgInfo->getbrlfb();
+  int brlnb  = trgInfo->getbrlnb();
+
   //---------------------------------------------------------------------
   //..Filling InputBits
   //..Naming is based on trg/gdl/src/TrgBitData.cc
@@ -687,12 +701,30 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "t2_1") {bit = nTrk2D == 1;}
     else if (bitname == "t2_2") {bit = nTrk2D == 2;}
     else if (bitname == "t2_3") {bit = nTrk2D >= 3;}
+    else if (bitname == "ts_0") {bit = N_ST == 0;}
+    else if (bitname == "ts_1") {bit = N_ST == 1;}
+    else if (bitname == "ts_2") {bit = N_ST == 2;}
+    else if (bitname == "ts_3") {bit = N_ST >= 3;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}
     else if (bitname == "cdc_b2b5") {bit = Trk_b2b_1to5;}
     else if (bitname == "cdc_b2b7") {bit = Trk_b2b_1to7;}
     else if (bitname == "cdc_b2b9") {bit = Trk_b2b_1to9;}
+    else if (bitname == "s2s3") {bit = s2s3 > 0;}
+    else if (bitname == "s2s5") {bit = s2s5 > 0;}
+    else if (bitname == "s2so") {bit = s2so > 0;}
+    else if (bitname == "s2f3") {bit = s2f3 > 0;}
+    else if (bitname == "s2f5") {bit = s2f5 > 0;}
+    else if (bitname == "s2fo") {bit = s2fo > 0;}
+    else if (bitname == "bwdsb") {bit = bwdsb > 0;}
+    else if (bitname == "bwdnb") {bit = bwdnb > 0;}
+    else if (bitname == "fwdsb") {bit = fwdsb > 0;}
+    else if (bitname == "fwdnb") {bit = fwdnb > 0;}
+    else if (bitname == "brlfb1") {bit = brlfb == 1;}
+    else if (bitname == "brlfb2") {bit = brlfb == 2;}
+    else if (bitname == "brlnb1") {bit = brlnb == 1;}
+    else if (bitname == "brlnb2") {bit = brlnb == 2;}
     else if (bitname == "ehigh") {bit = ehigh;}
     else if (bitname == "elow") {bit = elow;}
     else if (bitname == "elum") {bit = elum;}

@@ -15,7 +15,7 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPi0s import loadStdSkimPi0
 from stdPhotons import loadStdSkimPhoton
-from stdV0s import mergedKshorts, stdKshorts
+from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 
 
@@ -46,6 +46,7 @@ stdPi('95eff', path=charmpath)
 stdK('95eff', path=charmpath)
 stdE('95eff', path=charmpath)
 stdMu('95eff', path=charmpath)
+stdKshorts(path=charmpath)
 
 
 from skim.charm import D0ToHpJm

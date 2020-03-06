@@ -13,7 +13,6 @@
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>

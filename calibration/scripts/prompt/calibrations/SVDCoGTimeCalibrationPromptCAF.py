@@ -20,6 +20,7 @@ from caf.utils import ExpRun, IoV
 
 import reconstruction as reco
 import modularAnalysis as ana
+from caf.strategies import SequentialBoundaries
 
 input_branches = [
     'SVDShaperDigitsFromTracks',
@@ -81,40 +82,18 @@ def get_calibrations(input_data, **kwargs):
 
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
-    input_files_physics = list(reduced_file_to_iov_physics.keys())
-    basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
+    # reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file=1)
+    # input_files_physics = list(reduced_file_to_iov_physics.keys())
+    good_input_files = list(reduced_file_to_iov_physics.keys())
+    basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")
 
-    '''
-    print(" ")
-    print("INPUT FILES")
-    print(" ")
-    print(input_files_physics)
-    print(" ")
-    '''
-
-    good_input_files = []
-    runs = []
-    expNum = int()
-    for i in input_files_physics:
-        file_list = glob.glob(i)
-        for f in file_list:
-            tf = TFile.Open(f)
-            tree = tf.Get("tree")
-            if tree.GetEntries() != 0:
-                good_input_files.append(f)
-                print("Good run (entries !=0): " + str(f))
-                inputStringSplit = f.split("/")
-                s_run = str(inputStringSplit[10])
-                s_exp = str(inputStringSplit[8])
-                print(str(s_run) + " " + str(s_exp))
-                runNum = runs.append(int(s_run[1:6]))
-                expNum = int(s_exp[1:5])
-
-    runs.sort()
+    exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]
+    runs = sorted([i.run_low for i in reduced_file_to_iov_physics.values()])
 
     firstRun = runs[0]
     lastRun = runs[-1]
+    expNum = exps[0]
 
     if not len(good_input_files):
         print("No good input files found! Check that the input files have entries != 0!")
@@ -145,13 +124,14 @@ def get_calibrations(input_data, **kwargs):
     calibration = Calibration('SVDCoGTime',
                               collector=collector,
                               algorithms=algorithm,
-                              input_files=input_files_physics,
+                              input_files=good_input_files,
                               pre_collector_path=path,
                               )
 
     # calibration.pre_algorithms = pre_alg
-    calibration.strategies = strategies.SequentialRunByRun
+    # calibration.strategies = strategies.SequentialRunByRun
     # calibration.strategies = strategies.SingleIOV
+    calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}

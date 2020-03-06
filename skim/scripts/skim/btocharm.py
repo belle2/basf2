@@ -296,11 +296,11 @@ def BsigToD0hToKpiList(path):
     return Lists
 
 
-def BsigToD0hToKpipipiList(path):
+def BtoD0h_Kpipipi_Kpipi0List(path):
     """
-    **Skim Author**: N. Rout
+    **Skim Author**: C. La Licata
 
-    **Skim Name**: BtoD0h_Kpipipi
+    **Skim Name**: BtoD0h_Kpipipi_Kpipi0
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -315,6 +315,10 @@ def BsigToD0hToKpipipiList(path):
 
     2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) K^+`,
 
+    3.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^0) \\pi^+`,
+
+    4.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^0) K^+`
+
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -324,24 +328,27 @@ def BsigToD0hToKpipipiList(path):
 
     2. ``Mbc > 5.2``
 
-    3. ``abs(deltaE) < 0.5``
+    3. ``abs(deltaE) < 0.3``
 
 
     Note:
-      This skim uses ``loadStdD0_Kpipipi()`` from the ``charm.py`` script where :math:`D^0` channels are defined.
+      This skim uses ``loadStdD0_Kpipipi()`` and ``loadStdD0_Kpipi0()``
+      from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
-    __author__ = "Niharika Rout"
+    __author__ = "C. La Licata"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.5'
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
 
     BsigChannels = ['anti-D0:Kpipipi pi+:all',
-                    'anti-D0:Kpipipi K+:all'
+                    'anti-D0:Kpipipi K+:all',
+                    'anti-D0:Kpipi0 pi+:all',
+                    'anti-D0:Kpipi0 K+:all',
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0h_Kpipipi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0h_Kpipipi' + str(chID))
+        ma.reconstructDecay('B+:BtoD0h' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0h' + str(chID))
 
     Lists = BsigList
     return Lists

@@ -108,6 +108,9 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_hReduction->Reset(); // dont sum up!!!
 
   bool enough = false;
+  double ireduction = 0.0;
+  int ireductioncnt = 0;
+//   int ccnt = 1;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
@@ -118,10 +121,16 @@ void DQMHistAnalysisPXDReductionModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << name << " found in mem");
-      m_hReduction->Fill(i, hh1->GetMean());
+//       B2INFO("Histo " << name << " found in mem");
+      auto mean = hh1->GetMean();
+      m_hReduction->Fill(i, mean);
       if (hh1->GetEntries() > 100) enough = true;
+      if (mean > 0) {
+        ireduction += mean; // well fit would be better
+        ireductioncnt++;
+      }
     }
+//     ccnt++;
   }
   m_cReduction->cd();
 
@@ -148,10 +157,13 @@ void DQMHistAnalysisPXDReductionModule::event()
 //     m_line3->Draw();
   }
 
+  double data = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
+
+  m_monObj->setVariable("reduction", data);
+
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-  double data = 0; // what do we want to return?
 
   SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

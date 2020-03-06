@@ -503,13 +503,13 @@ class Validation:
 
         # : reporting time (in minutes)
         # the time in minutes when there will
-        # be there first logoutput if a script is still not complete This
-        # prints every 30 minutes which scripts are still running
+        # be the first log output if a script is still not complete This
+        # prints every x minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
         #: The maximum time before a script is skipped, if it does not
-        #: terminate The current limit is 10h
-        self.script_max_runtime_in_minutes = 720
+        #: terminate
+        self.script_max_runtime_in_minutes = 60*5
 
         #: Number of parallel processes
         self.parallel = None

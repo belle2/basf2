@@ -288,7 +288,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->Draw();
     m_line_low->Draw();
 
-    m_monObj->setVariable("trackclustercharge", mean, diff);
+    m_monObj->setVariable("trackcharge", mean, diff);
   }
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");

@@ -31,6 +31,8 @@ main.add_module(arich)
 # output created MonitoringObject to the root file
 outroot = register_module('DQMHistAnalysisOutputMonObj')
 outroot.param('ProcID', 'online')  # set processing ID
+# uncomment to to store monitoring variables to run summary TTree
+# outroot.param('TreeFile', 'run_tree.root')
 main.add_module(outroot)
 
 

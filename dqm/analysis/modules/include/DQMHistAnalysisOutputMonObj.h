@@ -13,6 +13,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <dqm/dataobjects/DQMFileMetaData.h>
 #include <string>
+#include <TBranch.h>
 
 namespace Belle2 {
   /*! Class definition for the module to store MonitoringObject to output root file*/
@@ -35,11 +36,19 @@ namespace Belle2 {
     virtual void endRun() override;
     virtual void terminate() override;
 
+    //! Makes entry with monitoring variables in the run summary TTree
+    void addTreeEntry();
+
+    //! if new variables is added to run summary TTree this files
+    // missing (previous) entries in the TTree (with the value from the first run)
+    void fillBranch(TBranch* br);
+
     // Data members
   private:
 
     std::string m_filename;/**< file name of root file */
-    std::string m_procID;
+    std::string m_procID;/**< processing id (online,proc10,etc)*/
+    std::string m_treeFile;/**< if set, entry with monitoring variables is made in the run summary TTree*/
     DQMFileMetaData* m_metaData; /** output file meta data */
   };
 } // end namespace Belle2

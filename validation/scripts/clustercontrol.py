@@ -7,6 +7,8 @@ import os
 import subprocess
 import stat
 import shutil
+import re
+from typing import Tuple
 
 # ours
 from validationscript import Script
@@ -85,12 +87,14 @@ class Cluster:
         self.logger.debug(f'Setting up the following release: {self.b2setup}')
 
         # Define the folder in which the log of the cluster messages will be
-        # stored (same folder like the log for validate_basf2.py)
+        # stored
         clusterlog_dir = './html/logs/__general__/'
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
 
+        # fixme: When will this be closed?
         #: The file object to which all cluster messages will be written
+        #: Opened once for all job submissions
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
     # noinspection PyMethodMayBeStatic
@@ -173,24 +177,36 @@ class Cluster:
 
         # Prepare the command line command for submission to the cluster
         params = [
-            "bsub", "-o", log_file, "-e", log_file, "-q", "l",
-            "-J", self._generate_id(job), tmp_name,
+            "bsub", "-o", log_file, "-e", log_file, "-q", "l", tmp_name,
         ]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
 
-        # Submit it to the cluster. The steering
-        # file output will be written to 'log_file' (see above).
-        # If we are performing a dry run, don't send anything to the cluster
-        # and just create the *.done file right away and delete the *.sh file.
         if not dry:
-            process = subprocess.Popen(params, stdout=self.clusterlog,
-                                       stderr=subprocess.STDOUT)
+            # Submit job
+            process = subprocess.Popen(
+                params, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                universal_newlines=True
+            )
+            output, error = process.communicate()
+            self.clusterlog.writelines([output, error])
 
-            # Check whether the submission succeeded
             if process.wait() != 0:
+                # Submission did not succeed
                 job.status = 'failed'
+                self._cleanup(job)
+            else:
+                # Submission succeeded. Get Job ID by parsing output, so that
+                # we can terminate the job later.
+                res = re.search(output, "Job <([0-9]*)> is submitted")
+                if res:
+                    job.job_id = res.group(1)
+                else:
+                    self.logger.error(
+                        "Could not find job id! Will not be able to terminate"
+                        " this job, even if necessary."
+                    )
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
             self._cleanup(job)
@@ -204,62 +220,53 @@ class Cluster:
         """ Name of temporary file used for job submission. """
         return self.path + '/' + 'script_' + job.name + '.sh'
 
-    def is_job_finished(self, job: Script):
+    def is_job_finished(self, job: Script) -> Tuple[bool, int]:
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
         Also deletes the .done-File once it has returned True.
 
         @param job: The job of which we want to know if it finished
-        @return: True if the job has finished, otherwise False
+        @return: (True if the job has finished, exit code). If we can't find the
+            exit code in the '.done'-file, the returncode will be -666.
+            If the job is not finished, the exit code is returned as 0.
         """
 
-        # If there is a file indicating the job is done, that is its name:
         donefile_path = f"{self.path}/script_{job.name}.done"
 
-        # Check if such a file exists. If so, this means that the job has
-        # finished.
         if os.path.isfile(donefile_path):
-
-            # Read the returncode/exit_status for the job from the *.done-file
+            # Job finished.
+            # Read the returncode/exit_status
             with open(donefile_path) as f:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
                     returncode = -666
 
-            # Delete the *.done file
             os.remove(donefile_path)
 
-            # Return that the job is finished + the return code for it
-            return [True, returncode]
+            return True, returncode
 
-        # If no such file exists, the job has not yet finished
         else:
-            return [False, 0]
+            # If no such file exists, the job has not yet finished
+            return False, 0
 
     def terminate(self, job: Script):
         """! Terminate a running job
         """
-        params = [
-            "bkill",
-            "-J",
-            self._generate_id(job)
-        ]
+        if job.job_id:
+            params = ["bkill", job.job_id]
+            self.logger.debug(subprocess.list2cmdline(params))
 
-        self.logger.debug(subprocess.list2cmdline(params))
-
-        process = subprocess.Popen(
-            params,
-            stdout=self.clusterlog,
-            stderr=subprocess.STDOUT
-        )
-        process.wait()
-        self._cleanup(job)
-
-    @staticmethod
-    def _generate_id(job: Script) -> str:
-        """ Returns an ID for the job. """
-        return str(abs(hash(
-            job.package + job.path + job.name)
-        ))[:10]
+            process = subprocess.Popen(
+                params,
+                stdout=self.clusterlog,
+                stderr=subprocess.STDOUT
+            )
+            process.wait()
+            self._cleanup(job)
+        else:
+            self.logger.error(
+                "Termination of the job corresponding to steering file "
+                f"{job.path} has been requested, but no job id is available."
+                f" Can't do anything.")

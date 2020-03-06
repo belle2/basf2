@@ -92,11 +92,6 @@ class Cluster:
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
 
-        # fixme: When will this be closed?
-        #: The file object to which all cluster messages will be written
-        #: Opened once for all job submissions
-        self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
-
     # noinspection PyMethodMayBeStatic
     def adjust_path(self, path):
         """!
@@ -184,13 +179,15 @@ class Cluster:
         self.logger.debug(subprocess.list2cmdline(params))
 
         if not dry:
+
             # Submit job
             process = subprocess.Popen(
                 params, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 universal_newlines=True
             )
-            output, error = process.communicate()
-            self.clusterlog.writelines([output, error])
+            stdout, stderr = process.communicate()
+            self.logger.debug(f"Stdout of job submission: {stdout}")
+            self.logger.debug(f"Stderr of job submission: {stderr}")
 
             if process.wait() != 0:
                 # Submission did not succeed
@@ -199,13 +196,13 @@ class Cluster:
             else:
                 # Submission succeeded. Get Job ID by parsing output, so that
                 # we can terminate the job later.
-                res = re.search(output, "Job <([0-9]*)> is submitted")
+                res = re.search(stdout, "Job <([0-9]*)> is submitted")
                 if res:
                     job.job_id = res.group(1)
                 else:
                     self.logger.error(
-                        "Could not find job id! Will not be able to terminate"
-                        " this job, even if necessary."
+                        f"Could not find job id! Will not be able to terminate"
+                        f" this job, even if necessary. "
                     )
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
@@ -260,13 +257,26 @@ class Cluster:
 
             process = subprocess.Popen(
                 params,
-                stdout=self.clusterlog,
-                stderr=subprocess.STDOUT
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
             )
-            process.wait()
+
+            stdout, stderr = process.communicate()
+            self.logger.debug(f"Stdout of job termination: {stdout}")
+            self.logger.debug(f"Stderr of job termination: {stderr}")
+
+            return_code = process.wait()
+            if return_code != 0:
+                # Failed
+                self.logger.error(
+                    f"Got nonzero return code: {return_code}. Probably wasn't "
+                    f"able to cancel job."
+                )
+
             self._cleanup(job)
         else:
             self.logger.error(
                 "Termination of the job corresponding to steering file "
                 f"{job.path} has been requested, but no job id is available."
-                f" Can't do anything.")
+                f" Can't do anything."
+            )

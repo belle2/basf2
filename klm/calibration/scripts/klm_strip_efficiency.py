@@ -6,6 +6,7 @@ import collections
 import os
 
 import basf2
+from ROOT import Belle2
 
 from caf.utils import IoV, AlgResult
 from caf.utils import runs_overlapping_iov, runs_from_vector
@@ -91,8 +92,8 @@ class KLMStripEfficiency(AlgorithmStrategy):
         runs_to_execute = sorted(runs_to_execute)
 
         apply_iov = None
-        if "apply_iov" in self.algorithm.params:
-            apply_iov = self.algorithm.params["apply_iov"]
+        # if "apply_iov" in self.algorithm.params:
+        #    apply_iov = self.algorithm.params["apply_iov"]
 
         # Sort runs by experiment.
         experiment_runs = collections.defaultdict(list)
@@ -104,44 +105,15 @@ class KLMStripEfficiency(AlgorithmStrategy):
             self.process_experiment(experiment, experiment_runs, iteration,
                                     apply_iov)
 
-        # apply_iov forces the execute_runs() function to use this IoV as the value for saveCalibration()
-        self.machine.setup_algorithm()
-        self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
-        basf2.B2INFO(f"Finished execution with result code {self.machine.result.result}")
-
-        # At this point you can test the result code and decide if you want to actually commit payloads using
-        #
-        # self.machine.result
-        #
-        # If you want to save the payloads for later and commit them use:
-        #
-        # payloads = self.machine.algorithm.algorithm.getPayloadValues()
-        #
-        # and then to commit them to localdb later:
-        #
-        # self.machine.algorithm.algorithm.commit(payloads)
-        #
-        # To execute again, just complete or fail: and do setup again. This will NOT re-run the loggin setup etc.
-        #
-        # self.machine.complete()
-        # self.machine.setup_algorithm()
-        # self.machine.execute_runs(runs=runs_to_execute, iteration=iteration, apply_iov=apply_iov)
-
         # Whenever you have a final result that can't be changed e.g. a success you committed, or a failure you can't
         # force past or merge runs to avoid. You should send that result out.
         self.send_result(self.machine.result)
 
         # Check the result and commit
         if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
-            # Valid exit codes mean we can complete properly
-            self.machine.complete()
-            # Commit all the current payloads (didn't bother saving them for later)
-            self.machine.algorithm.algorithm.commit()
             # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.COMPLETED)
         else:
-            # Either there wasn't enough data or the algorithm failed
-            self.machine.fail()
             # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.FAILED)
 
@@ -174,9 +146,9 @@ class KLMStripEfficiency(AlgorithmStrategy):
         Process runs from experiment.
         """
         # Run lists. They have the following format: run number,
-        # calibration result code, ExpRun, algorithm results, merge information.
+        # calibration result code, ExpRun, algorithm results,
+        # merge information, payload.
         run_data = []
-        run_data_klm_excluded = []
 
         # Initial run.
         for exp_run in experiment_runs[experiment]:
@@ -186,18 +158,16 @@ class KLMStripEfficiency(AlgorithmStrategy):
             result = self.machine.result.result
             algorithm_results = KLMStripEfficiencyAlgorithm.Results(
                 self.machine.algorithm.algorithm.getResults())
+            # If number of hits is 0, then KLM is excluded. Such runs
+            # can be ignored safely.
             if (algorithm_results.getExtHits() > 0):
-                run_data.append(
-                    [exp_run.run, result, [exp_run], algorithm_results, ''])
-            else:
-                run_data_klm_excluded.append(
-                    [exp_run.run, result, [exp_run], algorithm_results, ''])
+                run_data.append([exp_run.run, result, [exp_run],
+                                 algorithm_results, '', None])
             result_str = calibration_result_string(result)
             basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))
 
         # Sort by run number.
         run_data.sort(key=lambda x: x[0])
-        run_data_klm_excluded.sort(key=lambda x: x[0])
 
         # Create list of runs that do not have enough data.
         run_ranges = []
@@ -416,19 +386,21 @@ class KLMStripEfficiency(AlgorithmStrategy):
             os.mkdir('efficiency')
 
         # Merge runs.
-        def merge_runs_2(run_data, run_1, run_2):
+        def merge_runs_2(run_data, run_1, run_2, forced):
             basf2.B2INFO('Merging run %d into run %d.' %
                          (run_data[run_2][0], run_data[run_1][0]))
             run_data[run_1][2].extend(run_data[run_2][2])
             output_file = 'efficiency/efficiency_%d_%d.root' % \
                           (run_data[run_1][2][0].exp, run_data[run_1][2][0].run)
             self.execute_over_run_list(
-                run_data[run_1][2], iteration, apply_iov, False,
+                run_data[run_1][2], iteration, apply_iov, forced,
                 KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement,
                 output_file)
             run_data[run_1][1] = self.machine.result.result
             run_data[run_1][3] = KLMStripEfficiencyAlgorithm.Results(
                 self.machine.algorithm.algorithm.getResults())
+            run_data[run_1][5] = \
+                self.machine.algorithm.algorithm.getPayloadValues()
             result_str = calibration_result_string(run_data[run_1][1])
             basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
                          'precision %f.' %
@@ -441,13 +413,20 @@ class KLMStripEfficiency(AlgorithmStrategy):
             while (i < run_range[1]):
                 output_file = 'efficiency/efficiency_%d_%d.root' % \
                               (run_data[i][2][0].exp, run_data[i][2][0].run)
+                # Force calibration if there are no more runs in the range.
+                if (i == run_range[1] - 1):
+                    forced_calibration = True
+                else:
+                    forced_calibration = False
                 self.execute_over_run_list(
-                    run_data[i][2], iteration, apply_iov, False,
+                    run_data[i][2], iteration, apply_iov, forced_calibration,
                     KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement,
                     output_file)
                 run_data[i][1] = self.machine.result.result
                 run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
                     self.machine.algorithm.algorithm.getResults())
+                run_data[i][5] = \
+                    self.machine.algorithm.algorithm.getPayloadValues()
                 result_str = calibration_result_string(run_data[i][1])
                 basf2.B2INFO('Run %d: %s; requested precision %f, achieved '
                              'precision %f.' %
@@ -457,7 +436,13 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 if (run_data[i][1] == 2):
                     j = i + 1
                     while (j < run_range[1]):
-                        merge_runs_2(run_data, i, j)
+                        # Force calibration if there are no more runs
+                        # in the range.
+                        if (i == run_range[1] - 1):
+                            forced_calibration = True
+                        else:
+                            forced_calibration = False
+                        merge_runs_2(run_data, i, j, forced_calibration)
                         run_data[j][1] = -1
                         j = j + 1
                         if (run_data[i][1] == 0):
@@ -472,3 +457,34 @@ class KLMStripEfficiency(AlgorithmStrategy):
                 del run_data[i]
             else:
                 i = i + 1
+
+        # Stage 4: write the results to the database.
+        def commit_payload(run_data, run):
+            basf2.B2INFO('Writing run %d.' % (run_data[run][0]))
+            self.machine.algorithm.algorithm.commit(run_data[run][5])
+
+        for i in range(0, len(run_data)):
+            # Get first run again due to possible mergings.
+            run_data[i][2].sort(key=lambda x: x.run)
+            first_run = run_data[i][2][0].run
+            # Set IOV for the current run.
+            # The last run will be overwritten when writing the result.
+            run_data[i][5].front().iov = \
+                Belle2.IntervalOfValidity(experiment, first_run, experiment, -1)
+            # If the calibration result is different, write the previous run.
+            if (i > 0):
+                iov = run_data[previous_run][5].front().iov
+                run_data[previous_run][5].front().iov = \
+                    Belle2.IntervalOfValidity(experiment, iov.getRunLow(),
+                                              experiment, first_run - 1)
+                commit_payload(run_data, previous_run)
+                previous_run = i
+            if (i == 0):
+                previous_run = 0
+            # Write the current run if it is the last run.
+            if (i == len(run_data) - 1):
+                iov = run_data[i][5].front().iov
+                run_data[i][5].front().iov = \
+                    Belle2.IntervalOfValidity(experiment, iov.getRunLow(),
+                                              -1, -1)
+                commit_payload(run_data, i)

@@ -13,6 +13,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -115,9 +116,9 @@ namespace Belle2 {
       qq.push(particle);
       while (!qq.empty()) {
         auto d = qq.front(); // get daughter
-        qq.pop();            // remove the daugher from the queue
+        qq.pop();            // remove the daughter from the queue
         if (isCloneTrack(d)) return 1.0;
-        size_t nDau = d->getNDaughters(); // number of daughers of daughters
+        size_t nDau = d->getNDaughters(); // number of daughters of daughters
         for (size_t iDau = 0; iDau < nDau; iDau++)
           qq.push(d->getDaughter(iDau));
       }
@@ -331,7 +332,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Px();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Px();
     }
 
     double particleMCMatchPY(const Particle* part)
@@ -340,7 +343,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Py();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Py();
     }
 
     double particleMCMatchPZ(const Particle* part)
@@ -349,7 +354,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Pz();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Pz();
     }
 
     double particleMCMatchPT(const Particle* part)
@@ -358,7 +365,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Pt();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Pt();
     }
 
     double particleMCMatchE(const Particle* part)
@@ -367,7 +376,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getEnergy();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).E();
     }
 
     double particleMCMatchP(const Particle* part)
@@ -376,7 +387,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Mag();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).P();
     }
 
     double particleMCMatchTheta(const Particle* part)
@@ -385,7 +398,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Theta();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Theta();
     }
 
     double particleMCMatchPhi(const Particle* part)
@@ -394,7 +409,9 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Phi();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Phi();
     }
 
     double particleMCRecoilMass(const Particle* part)
@@ -739,7 +756,7 @@ namespace Belle2 {
        * this particle.
        *
        * Note that for track-based particles this is different from the mc match
-       * of the partcle (which it inherits from the mc match of the track)
+       * of the particle (which it inherits from the mc match of the track)
        */
       const MCParticle* matchedToParticle = particle->getMCParticle();
       if (!matchedToParticle) return std::numeric_limits<float>::quiet_NaN();
@@ -870,7 +887,7 @@ namespace Belle2 {
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
+                      "return 1 if the particle is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
                       "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,

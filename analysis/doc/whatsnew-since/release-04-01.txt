@@ -81,6 +81,8 @@ Variables
  .. hint:: It is recommended to use `variablesToExtraInfo` prior to a vertex fit to access pre-fit values,
            not only for mass significances but also for vertex positions, etc.
 
+ * Fixed truth kinematic variables (`mcPX`, `mcPY`, ...) to respect the current reference frame, so that they can be accessed not
+   only in the lab frame but for example as well in the CMS frame using `useCMSFrame`.
 
 Modules
 +++++++

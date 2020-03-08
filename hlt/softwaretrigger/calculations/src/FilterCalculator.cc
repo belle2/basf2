@@ -444,8 +444,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     if (calculationResult["maximumPCMS"] < 2 and dphi > 160 and (pmissTheta < 25. or pmissTheta > 155.)) {
       calculationResult["eexxSelect"] = 1;
       if (electronEP) {
-        // TODO: The same??
         calculationResult["eeee"] = 1;
+      } else {
         calculationResult["eemm"] = 1;
       }
     }

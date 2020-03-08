@@ -401,6 +401,7 @@ namespace Belle2 {
       result.hit_thr = validity_code / 4;
       result.skip_thr = skip_thr_flag;
       result.low_amp = low_ampl;
+      result.pedestal = result.fit[0];
 
       result.chi2 = chi_sq;
 

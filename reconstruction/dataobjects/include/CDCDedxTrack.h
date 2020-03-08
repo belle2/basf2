@@ -99,13 +99,10 @@ namespace Belle2 {
 
     /** Get dE/dx truncated mean for this track */
     double getDedx() const { return m_dedxAvgTruncated; }
-
     /** Get dE/dx truncated mean without the saturation correction for this track */
     double getDedxNoSat() const { return m_dedxAvgTruncatedNoSat; }
-
     /** Get the error on the dE/dx truncated mean for this track */
     double getDedxError() const { return m_dedxAvgTruncatedErr; }
-
     /** Get the dE/dx mean for this track */
     double getDedxMean() const { return m_dedxAvg; }
 
@@ -114,19 +111,15 @@ namespace Belle2 {
 
     /** Return the track momentum valid in the CDC */
     double getMomentum() const { return m_pCDC; }
-
     /** Return cos(theta) for this track */
     double getCosTheta() const { return m_cosTheta; }
-
     /** Return the charge for this track */
     int getCharge() const { return m_charge; }
-
     /** Return the total path length for this track */
     double getLength() const { return m_length; }
 
     /** Return the cosine correction for this track */
     double getCosineCorrection() const { return m_cosCor; }
-
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
 
@@ -135,13 +128,10 @@ namespace Belle2 {
 
     /** Set the dE/dx truncated average for this track */
     void setDedx(double mean) { m_dedxAvgTruncated = mean; }
-
     /** Set the dE/dx truncated average without the saturation correction for this track */
     void setDedxNoSat(double mean) { m_dedxAvgTruncatedNoSat = mean; }
-
     /** Set the error on the dE/dx truncated mean for this track */
     void setDedxError(double error) { m_dedxAvgTruncatedErr = error; }
-
     /** Set the dE/dx mean for this track */
     void setDedxMean(double mean) { m_dedxAvg = mean; }
 
@@ -150,24 +140,20 @@ namespace Belle2 {
 
 
     // Layer level
+
     /** Return the number of layer hits for this track */
     int getNLayerHits() const { return m_lDedx.size(); }
-
     /** Return the number of hits used to determine the truncated mean */
     double getNLayerHitsUsed() const { return m_lNHitsUsed; }
 
     /** Return the number of hits combined per layer */
     int getNHitsCombined(int i) const { return m_lNHitsCombined[i]; }
-
     /** Return the wire number of the longest hit per layer */
     int getWireLongestHit(int i) const { return m_lWireLongestHit[i]; }
-
     /** Return the (global) layer number for a layer hit */
     int getLayer(int i) const { return m_lLayer[i]; }
-
     /** Return the distance travelled in this layer */
     double getLayerPath(int i) const { return m_lPath[i]; }
-
     /** Return the total dE/dx for this layer */
     double getLayerDedx(int i) const { return m_lDedx[i]; }
 
@@ -176,36 +162,30 @@ namespace Belle2 {
 
 
     // Hit level
+
     /** Return the number of hits for this track */
     int size() const { return m_hDedx.size(); }
 
     /** Return the sensor ID for this hit: wire number in the layer */
     int getWireInLayer(int i) const { return m_hLWire[i]; }
-
     /** Return the sensor ID for this hit: wire number for CDC (0-14336) */
     int getWire(int i) const { return m_hWire[i]; }
-
     /** Return the (global) layer number for a hit */
     int getHitLayer(int i) const { return m_hLayer[i]; }
 
     /** Return the path length through the cell for this hit */
     double getPath(int i) const { return m_hPath[i]; }
-
     /** Return the dE/dx value for this hit */
     double getDedx(int i) const { return m_hDedx[i]; }
-
     /** Return the adcCount for this hit */
     int getADCCount(int i) const { return m_hADCCount[i]; }
-
     /** Return the distance of closest approach to the sense wire for this hit */
     double getDoca(int i) const { return m_hDoca[i]; }
-
     /** Return the entrance angle in the CDC cell for this hit */
     double getEnta(int i) const { return m_hEnta[i]; }
 
     /** Return rescaled doca value for cell height=width assumption */
     double getDocaRS(int i) const { return m_hDocaRS[i]; }
-
     /** Return rescaled enta value for cell height=width assumption */
     double getEntaRS(int i) const { return m_hEntaRS[i]; }
 
@@ -214,37 +194,24 @@ namespace Belle2 {
 
     /** Return the ionization charge collected for this hit */
     double getDE(int i) const { return m_hdE[i]; }
-
     /** Return the height of the CDC cell */
     double getCellHeight(int i) const { return m_hCellHeight[i]; }
-
     /** Return the half-width of the CDC cell */
     double getCellHalfWidth(int i) const { return m_hCellHalfWidth[i]; }
-
     /** Return the drift distance for this hit */
     double getDriftD(int i) const { return m_hDriftD[i]; }
-
     /** Return the drift distance resolution for this hit */
     double getDriftDRes(int i) const { return m_hDriftDRes[i]; }
 
     /** Return the wire gain for this hit */
     double getWireGain(int i) const { return m_hWireGain[i]; }
-
     /** Return the 2D correction for this hit */
     double getTwoDCorrection(int i) const { return m_hTwodCor[i]; }
-
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
     /** Return the PID (chi) value */
     double getChi(int i) const { return m_cdcChi[i]; }
-
-    /** Return the PID (predicted mean) value */
-    double getPmean(int i) const { return m_predmean[i]; }
-
-    /** Return the PID (predicted reso) value */
-    double getPreso(int i) const { return m_predres[i]; }
-
     /** Return the PID (logL) value */
     double getLogl(int i) const { return m_cdcLogl[i]; }
 

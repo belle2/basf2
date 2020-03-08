@@ -19,8 +19,8 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
 
     main.add_module('Gearbox')
     main.add_module('Geometry')
@@ -57,8 +57,8 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
 
     main.add_module('Gearbox')
     main.add_module('Geometry')
@@ -93,8 +93,8 @@ def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
     if raw_format:
         prepare_cdst_analysis(main)
     else:

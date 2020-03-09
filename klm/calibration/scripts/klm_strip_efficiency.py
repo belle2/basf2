@@ -46,6 +46,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
+        #: Flag for the first execution of this AlgorithmStrategy
         self.first_execution = True
 
     def run(self, iov, iteration, queue):

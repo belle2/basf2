@@ -152,7 +152,6 @@ void TRGGRLMatchModule::initialize()
 
   StoreArray<TRGGRLShortTrack> grlst;
   grlst.registerInDataStore(m_grlstCollectionName);
-  StoreArray<TRGGRLShortTrack> grlst_tmp; // temporary buffer
 
   m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
@@ -195,7 +194,6 @@ void TRGGRLMatchModule::event()
   StoreArray<TRGGRLMATCHKLM> trackKLMmatch(m_klmmatch_tracklist);
   StoreArray<TRGGRLPHOTON> grlphoton(m_grlphotonlist);
   StoreArray<TRGGRLShortTrack> grlst(m_grlstCollectionName);
-  StoreArray<TRGGRLShortTrack> grlst_tmp;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
   trgInfo.create();
 
@@ -332,7 +330,7 @@ void TRGGRLMatchModule::event()
 // Short tracking
   std::vector<bool> map_veto(64, 0);
   make_veto_map(track2Dlist, map_veto);
-  short_tracking(tslist, map_veto, track_phimap_i, patterns_base0, patterns_base2, grlst, grlst_tmp, trgInfo);
+  short_tracking(tslist, map_veto, track_phimap_i, patterns_base0, patterns_base2, grlst, trgInfo);
 
 }
 
@@ -746,7 +744,7 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
 void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto,
                                        std::vector<bool>  phimap_i,
                                        std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
-                                       StoreArray<TRGGRLShortTrack> grlst, StoreArray<TRGGRLShortTrack> grlst_tmp,
+                                       StoreArray<TRGGRLShortTrack> grlst,
                                        StoreObjPtr<TRGGRLInfo> trgInfo)
 {
   std::vector<bool> SL0(64, 0);
@@ -819,11 +817,17 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
         std::cout<<std::endl;
   */
 //-- doing short tracking
+
+  std::vector< std::vector<int> > stlist_buf(0);
+
   for (int i = 0; i < 64; i++) {
 
-    // set a ST in the array no matter it is found or not
-    TRGGRLShortTrack* st = grlst_tmp.appendNew();
-    st->set_TS_ID(0, -1);
+    int ID0 = 0;
+    int ID1 = 0;
+    int ID2 = 0;
+    int ID3 = 0;
+    int ID4 = 0;
+    stlist_buf.push_back({0, 0, 0, 0, 0, 0});
 
     if (!SL0[i] || !SL2[i]) continue;
     bool SL0_already_found = false;
@@ -866,11 +870,11 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
       if (SL2[i] && SL0[N64(i + x0)] && SL1[N64(i + x1)] && SL3[N64(i + x3)] && SL4[N64(i + x4)] && !SL2_already_found) {
         ST2[i] = true;
-        st->set_TS_ID(0, N64(i + x0));
-        st->set_TS_ID(1, N64(i + x1));
-        st->set_TS_ID(2, i);
-        st->set_TS_ID(3, N64(i + x3));
-        st->set_TS_ID(4, N64(i + x4));
+        ID0 = N64(i + x0);
+        ID1 = N64(i + x1);
+        ID2 = i;
+        ID3 = N64(i + x3);
+        ID4 = N64(i + x4);
         SL2_already_found = true; // if it has been found in previous pattern, no need to do it again.
       }
 
@@ -885,6 +889,17 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
         SL0_already_found = true; // if it has been found in previous pattern, no need to do it again.
       }
 
+      if (SL2_already_found && SL0_already_found) break;
+
+    }
+
+    if (SL2_already_found) {
+      stlist_buf[i][0] = 1;
+      stlist_buf[i][1] = ID0;
+      stlist_buf[i][2] = ID1;
+      stlist_buf[i][3] = ID2;
+      stlist_buf[i][4] = ID3;
+      stlist_buf[i][5] = ID4;
     }
   }
 
@@ -968,11 +983,11 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
       L++; R--;
       int index = N64((L + R) / 2); // fill the middle one when multiple ST is found continuously in the map
       TRGGRLShortTrack* st = grlst.appendNew();
-      st->set_TS_ID(0, grlst_tmp[index]->get_TS_ID(0));
-      st->set_TS_ID(1, grlst_tmp[index]->get_TS_ID(1));
-      st->set_TS_ID(2, grlst_tmp[index]->get_TS_ID(2));
-      st->set_TS_ID(3, grlst_tmp[index]->get_TS_ID(3));
-      st->set_TS_ID(4, grlst_tmp[index]->get_TS_ID(4));
+      st->set_TS_ID(0, stlist_buf[index][1]);
+      st->set_TS_ID(1, stlist_buf[index][2]);
+      st->set_TS_ID(2, stlist_buf[index][3]);
+      st->set_TS_ID(3, stlist_buf[index][4]);
+      st->set_TS_ID(4, stlist_buf[index][5]);
     }
   }
 

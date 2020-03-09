@@ -131,6 +131,10 @@ void VariablesToNtupleModule::initialize()
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
+      if (m_particleList.empty() && var->description.find("[Eventbased]") == string::npos) {
+        B2ERROR("Variable '" << varStr << "' is not an event-based variable!");
+        continue;
+      }
       m_functions.push_back(var->function);
     }
     enumerate++;

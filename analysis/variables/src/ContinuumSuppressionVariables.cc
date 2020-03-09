@@ -303,7 +303,7 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "Event-Level Reduced Fox-Wolfram moment R2");
+    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("R2"          , R2          , "Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Magnitude of the signal B thrust axis");
     REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");

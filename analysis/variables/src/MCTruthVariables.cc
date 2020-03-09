@@ -1012,7 +1012,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("isMC", isMC,
-                      "Returns 1 if run on MC and 0 for data.");
+                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
 
   }
 }

@@ -693,18 +693,18 @@ void TRGGRLProjectsModule::event()
     std::string bitname(m_InputBitsDB->getinbitname(i));
 
     bool bit = false;
-    if (bitname == "t3_0") {bit = nTrkZ40 == 0;}
-    else if (bitname == "t3_1") {bit = nTrkZ40 == 1;}
-    else if (bitname == "t3_2") {bit = nTrkZ40 == 2;}
-    else if (bitname == "t3_3") {bit = nTrkZ40 >= 3;}
-    else if (bitname == "t2_0") {bit = nTrk2D == 0;}
-    else if (bitname == "t2_1") {bit = nTrk2D == 1;}
-    else if (bitname == "t2_2") {bit = nTrk2D == 2;}
-    else if (bitname == "t2_3") {bit = nTrk2D >= 3;}
-    else if (bitname == "ts_0") {bit = N_ST == 0;}
-    else if (bitname == "ts_1") {bit = N_ST == 1;}
-    else if (bitname == "ts_2") {bit = N_ST == 2;}
-    else if (bitname == "ts_3") {bit = N_ST >= 3;}
+    if (bitname == "t3_0") {bit = nTrkZ40 == 1;}
+    else if (bitname == "t3_1") {bit = nTrkZ40 == 2;}
+    else if (bitname == "t3_2") {bit = nTrkZ40 == 3;}
+    else if (bitname == "t3_3") {bit = nTrkZ40 > 3;}
+    else if (bitname == "t2_0") {bit = nTrk2D == 1;}
+    else if (bitname == "t2_1") {bit = nTrk2D == 2;}
+    else if (bitname == "t2_2") {bit = nTrk2D == 3;}
+    else if (bitname == "t2_3") {bit = nTrk2D > 3;}
+    else if (bitname == "ts_0") {bit = N_ST == 1;}
+    else if (bitname == "ts_1") {bit = N_ST == 2;}
+    else if (bitname == "ts_2") {bit = N_ST == 3;}
+    else if (bitname == "ts_3") {bit = N_ST > 3;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}

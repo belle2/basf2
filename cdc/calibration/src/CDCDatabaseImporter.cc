@@ -988,7 +988,6 @@ void CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileN
   for (size_t a = 1; a <= 8196; a += 1) {
     probs[a - 1] = prob->GetBinContent(a);
   }
-  prob->Delete();
   fIn.Close();
   dbCDCCrossTalkLibrary->setPCrossTalk(probs);
 

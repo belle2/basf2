@@ -1,12 +1,3 @@
-'''
-Sample script to generte ASIC cross-talk library.  Usage:
-
-basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file>
-
-Validated using
-
-'''
-
 import basf2
 import sys
 import rawdata
@@ -14,7 +5,11 @@ import tracking
 
 
 def main():
+    """
+       Sample script to generte ASIC cross-talk library.  Usage:
 
+        basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file>
+    """
     global_tag = "data_reprocessing_prompt_rel4_patchb"
     basf2.conditions.override_globaltags()
     basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",
@@ -28,7 +23,7 @@ def main():
     # Output file
     file_name = sys.argv[2]
 
-    branches = ['EventMetaData', 'ROIs', 'ROIpayload',  'RawCDCs']
+    branches = ['EventMetaData',  'RawCDCs']
     path.add_module("RootInput", inputFileNames=inputFilename, branchNames=branches)
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)

@@ -58,7 +58,7 @@ namespace Belle2 {
          @param ADCin  input channel ADC value
          @param TOTin  input channel TOT value
          @param entry  for multiple entries given (channel,ADC) value either return random (entry=0) or specific one (entry>0). If entry > max entries, entry % max entries is used
-         @param insertSignalToOutput Add signlal to the output  vector
+         @param insertSignalToOutput Add signal to the output  vector
     */
     const vector< pair<Short_t, asicChannel> > getLibraryCrossTalk(Short_t channel, Short_t TDCin, Short_t ADCin, Short_t TOTin,
         size_t entry = 0, bool insertSignalToOutput = false) const
@@ -212,7 +212,7 @@ namespace Belle2 {
     std::vector<adcAsicTuple>  m_library;   ///< Library
     array<float, 8196>   m_pCrossTalk;      ///< x-talk probability
 
-    ClassDef(CDCCrossTalkLibrary, 1); /**< ClassDef */
+    ClassDef(CDCCrossTalkLibrary, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

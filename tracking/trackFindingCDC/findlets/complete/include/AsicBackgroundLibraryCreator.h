@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2012 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sasha Glazov, Tracking group                             *
@@ -33,7 +33,7 @@ namespace Belle2 {
       /// Default constructor
       AsicBackgroundLibraryCreator() = default;
 
-      /// Access database here, open library for writting:
+      /// Access database here, open library for writing:
       void initialize() final;
 
       /// Reload channel map if needed
@@ -93,30 +93,30 @@ namespace Belle2 {
       asicChannel m_asic_info[8];
 
       /// signal boardID
-      UChar_t m_board;
+      UChar_t m_board{0};
 
       /// signal channelID
-      UChar_t m_channel;
+      UChar_t m_channel{0};
 
       /// For debuging, store also number of channels with hits
-      UChar_t m_n_hit;
+      UChar_t m_n_hit{0};
 
       // Store also distance to the signal as well as minimal distance to bg
 
       /// Distance to signal hit
-      float m_dist_signal;
+      float m_dist_signal{0};
 
       /// min. distance to non-linked hits
-      float m_dist_bg;
+      float m_dist_bg{0};
 
       /// ADC of the signal
-      Short_t m_adc_sig;
+      Short_t m_adc_sig{0};
 
       /// Max. ADC background
-      Short_t m_adc_max_bg;
+      Short_t m_adc_max_bg{0};
 
       /// Number of hits on the track
-      UShort_t m_n_hit_track;
+      UShort_t m_n_hit_track{0};
 
     };
   }

@@ -62,7 +62,7 @@ void AsicBackgroundLibraryCreator::initialize()
   m_channelMapFromDB = std::make_unique<DBArray<CDCChannelMap>> ();
 
   if ((*m_channelMapFromDB).isValid()) {
-    B2DEBUG(100, "CDC Channel map is  valid");
+    B2DEBUG(29, "CDC Channel map is  valid");
   } else {
     B2FATAL("CDC Channel map is not valid");
   }
@@ -143,12 +143,12 @@ void AsicBackgroundLibraryCreator::exposeParameters(ModuleParamList* moduleParam
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalDistanceSignal"),
                                 m_distance_signal_max,
-                                "maximal distance from track to signal hit",
+                                "maximal distance in cm from track to signal hit",
                                 m_distance_signal_max);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalDistanceBackground"),
                                 m_distance_background_min,
-                                "minimal distance from track to background hit",
+                                "minimal distance in cm from track to background hit",
                                 m_distance_background_min);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAxialHitsOnly"),
@@ -167,8 +167,8 @@ void AsicBackgroundLibraryCreator::exposeParameters(ModuleParamList* moduleParam
                                 m_minimal_hits_on_track);
 
   // set some defaults:
-  moduleParamList->getParameter<std::string>("inputTracks").setDefaultValue("bla");
-  moduleParamList->getParameter<std::string>("inputWireHits").setDefaultValue("blab");
+  moduleParamList->getParameter<std::string>("inputTracks").setDefaultValue("CDCTrackVector");
+  moduleParamList->getParameter<std::string>("inputWireHits").setDefaultValue("CDCWireHitVector");
 }
 
 void AsicBackgroundLibraryCreator::terminate()
@@ -228,7 +228,7 @@ void AsicBackgroundLibraryCreator::selectAsic(const std::vector<const CDCWireHit
   }
 
   if (signalTrack == nullptr) {
-    B2DEBUG(100, "AsicBackgroundLibraryCreator::No track found for the signal hit");
+    B2DEBUG(29, "AsicBackgroundLibraryCreator::No track found for the signal hit");
     return;
   }
 
@@ -266,7 +266,7 @@ void AsicBackgroundLibraryCreator::selectAsic(const std::vector<const CDCWireHit
   }
 
   // add to the library
-  //  std::cout << " Total number of hits=" << wireHits.size() << "\n";
+
   m_n_hit = wireHits.size();
 
   m_adc_max_bg = 0;

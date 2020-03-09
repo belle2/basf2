@@ -966,7 +966,7 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
       //-- Fill the store array
       L++; R--;
-      int index = (L + R) / 2; // fill the middle one when multiple ST is found continuously in the map
+      int index = N64((L + R) / 2); // fill the middle one when multiple ST is found continuously in the map
       TRGGRLShortTrack* st = grlst.appendNew();
       st->set_TS_ID(0, grlst_tmp[index]->get_TS_ID(0));
       st->set_TS_ID(1, grlst_tmp[index]->get_TS_ID(1));

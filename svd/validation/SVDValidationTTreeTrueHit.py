@@ -56,40 +56,58 @@ class SVDValidationTTreeTrueHit(Module):
         """ Does nothing """
 
     def event(self):
-        """Find truehit and save needed information"""
-        # Start with truehits and use the relation to get the corresponding clusters
+        """ Start with truehits and use the relation to get the corresponding clusters """
         svdtruehits = Belle2.PyStoreArray('SVDTrueHits')
         for truehit in svdtruehits:
-            # Sensor identification
-            sensorID = truehit.getSensorID()
-            self.data.sensor_id = int(sensorID)
-            sensorNum = sensorID.getSensorNumber()
-            self.data.sensor = sensorNum
-            layerNum = sensorID.getLayerNumber()
-            self.data.layer = layerNum
-            if (layerNum == 3):
-                sensorType = 1
-            else:
-                if (sensorNum == 1):
-                    sensorType = 0
-                else:
-                    sensorType = 1
-            self.data.sensor_type = sensorType
-            ladderNum = sensorID.getLadderNumber()
-            self.data.ladder = ladderNum
-            #
             clusters = truehit.getRelationsFrom('SVDClusters')
             if len(clusters) == 0:
+                # Sensor identification
+                sensorID = truehit.getSensorID()
+                self.data.sensor_id = int(sensorID)
+                sensorNum = sensorID.getSensorNumber()
+                self.data.sensor = sensorNum
+                layerNum = sensorID.getLayerNumber()
+                self.data.layer = layerNum
+                if (layerNum == 3):
+                    sensorType = 1
+                else:
+                    if (sensorNum == 1):
+                        sensorType = 0
+                    else:
+                        sensorType = 1
+                self.data.sensor_type = sensorType
+                ladderNum = sensorID.getLadderNumber()
+                self.data.ladder = ladderNum
                 self.data.strip_dir = -1
+                # Fill tree
+                self.file.cd()
+                self.tree.Fill()
             else:
                 for cluster in clusters:
+                    # Sensor identification
+                    sensorID = truehit.getSensorID()
+                    self.data.sensor_id = int(sensorID)
+                    sensorNum = sensorID.getSensorNumber()
+                    self.data.sensor = sensorNum
+                    layerNum = sensorID.getLayerNumber()
+                    self.data.layer = layerNum
+                    if (layerNum == 3):
+                        sensorType = 1
+                    else:
+                        if (sensorNum == 1):
+                            sensorType = 0
+                        else:
+                            sensorType = 1
+                    self.data.sensor_type = sensorType
+                    ladderNum = sensorID.getLadderNumber()
+                    self.data.ladder = ladderNum
                     if cluster.isUCluster():
                         self.data.strip_dir = 0
                     else:
                         self.data.strip_dir = 1
-            # Fill tree
-            self.file.cd()
-            self.tree.Fill()
+                    # Fill tree
+                    self.file.cd()
+                    self.tree.Fill()
 
     def terminate(self):
         """Close the output file. """

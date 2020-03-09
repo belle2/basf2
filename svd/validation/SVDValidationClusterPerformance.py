@@ -268,7 +268,9 @@ plotEff(
     expr='strip_dir',
     cutALL=cut_noV,
     cut=cut_U,
-    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    descr='(number of clusters related to TrueHit) / (number of Truehits);\
+          Evaluates the clusterizer efficiency. \
+          This will depend on the clusterizer parameters cutSeed and cutAdjacent.',
     check='Should be close to 1 in all bins',
     isShifter=True)
 
@@ -283,6 +285,8 @@ plotEff(
     expr='strip_dir',
     cutALL=cut_noU,
     cut=cut_V,
-    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    descr='(number of clusters related to TrueHit) / (number of Truehits);\
+          Evaluates the clusterizer efficiency. \
+          This will depend on the clusterizer parameters cutSeed and cutAdjacent.',
     check='Should be close to 1 in all bins',
     isShifter=True)

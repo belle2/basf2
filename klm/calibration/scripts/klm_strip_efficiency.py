@@ -439,7 +439,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
                     while (j < run_range[1]):
                         # Force calibration if there are no more runs
                         # in the range.
-                        if (i == run_range[1] - 1):
+                        if (j == run_range[1] - 1):
                             forced_calibration = True
                         else:
                             forced_calibration = False

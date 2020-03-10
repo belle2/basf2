@@ -174,6 +174,11 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
       for (auto* storedParticleDaughter : storedParticleDaughters) {
         bool toAdd = true;
+        if ((m_fromMC and storedParticleDaughter->getParticleType() != Particle::EParticleType::c_MCParticle)
+            or (!m_fromMC and storedParticleDaughter->getParticleType() == Particle::EParticleType::c_MCParticle)) {
+          B2FATAL("The value of fromMC parameter is not consisted with the type of provided particles, MC vs Reco");
+        }
+        // Remove non primary MCParticles
         if (m_fromMC and !storedParticleDaughter->getMCParticle()->hasStatus(MCParticle::c_PrimaryParticle)) {
           nExcludedParticles++;
           continue;

@@ -48,6 +48,10 @@ bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* 
 {
   // If ROE is filled with Particles created from MCParticle, check the MCParticle equality
   if (roeParticle->getParticleType() == Particle::EParticleType::c_MCParticle
+      and toAddParticle->getParticleType() != Particle::EParticleType::c_MCParticle) {
+    B2FATAL("Something went wrong: MCParticle in ROE is compared to a non MC Particle. Please check your script!");
+  }
+  if (roeParticle->getParticleType() == Particle::EParticleType::c_MCParticle
       and toAddParticle->getParticleType() == Particle::EParticleType::c_MCParticle) {
     return roeParticle->getMCParticle() == toAddParticle->getMCParticle();
   }

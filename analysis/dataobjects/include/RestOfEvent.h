@@ -392,7 +392,7 @@ namespace Belle2 {
     std::vector<Mask> m_masks;         /**< List of the ROE masks */
     int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
     bool m_isNested;                   /**< Nested ROE indicator */
-    bool m_isFromMC;                   /**< Nested ROE indicator */
+    bool m_isFromMC;                   /**< MC ROE indicator */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list

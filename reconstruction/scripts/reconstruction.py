@@ -320,6 +320,21 @@ def add_cdst_output(
     """
 
     branches = [
+        'Tracks',
+        'V0s',
+        'TrackFitResults',
+        'EventLevelTrackingInfo',
+        'PIDLikelihoods',
+        'TracksToPIDLikelihoods',
+        'ECLClusters',
+        'ECLClustersToTracksNamedBremsstrahlung',
+        'EventLevelClusteringInfo',
+        'TracksToECLClusters',
+        'KLMClusters',
+        'KlIds',
+        'KLMClustersToKlIds',
+        'TRGSummary',
+        'SoftwareTriggerResult',
         'RecoTracks',
         'EventT0',
         'PXDClustersFromTracks',

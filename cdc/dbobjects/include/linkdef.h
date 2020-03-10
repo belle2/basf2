@@ -38,12 +38,19 @@
 #pragma link C++ class Belle2::CDCFEElectronics+;
 #pragma link C++ class Belle2::CDCEDepToADCConversions+;
 #pragma link C++ class Belle2::CDCWireHitRequirements+;
+#pragma link C++ class Belle2::CDCCrossTalkLibrary+;
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+;
+
+#pragma link C++ class Belle2::asicChannel+;  // implicit
+#pragma link C++ class Belle2::adcAsicTuple+; // implicit
+
 
 #pragma link C++ class std::map <unsigned short, float>+;
 #pragma link C++ class std::vector<float>+;
 #pragma link C++ class std::map <unsigned short, std::vector<float>>+;
 #pragma link C++ class std::pair<unsigned short, std::vector<float>>+;
+
+#pragma link C++ class std::vector<Belle2::adcAsicTuple>+;
 
 #pragma read sourceClass="Belle2::CDCTimeWalks" version="[-1]" \
   source="std::map<unsigned short, float> m_tws" \

@@ -83,6 +83,7 @@ Variables
 
  * Fixed truth kinematic variables (`mcPX`, `mcPY`, ...) to respect the current reference frame, so that they can be accessed not
    only in the lab frame but for example as well in the CMS frame using `useCMSFrame`.
+ * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
 
 Modules
 +++++++

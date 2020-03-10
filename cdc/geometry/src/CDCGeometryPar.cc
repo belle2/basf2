@@ -437,7 +437,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
       B2DEBUG(100, "CDCGeometryPar: Read badwire from DB");
       setBadWire();  //Set bad-wire (from DB)
     } else {
-      readBadWire(gbxParams);  //Read bad-wire (from file)
+      //      readBadWire(gbxParams);  //Read bad-wire (from file)
+      B2FATAL("Text file input mode for bdwires is disabled now!");
     }
 
     if (gcp.getChMapInputType()) {
@@ -1112,6 +1113,7 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
 }
 
 
+/*
 // Read bad-wires.
 void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 {
@@ -1146,6 +1148,7 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 
   ifs.close();
 }
+*/
 
 
 // Read time-walk parameters
@@ -1338,7 +1341,7 @@ void CDCGeometryPar::calcMeanT0()
 // Set bad-wire (from DB)
 void CDCGeometryPar::setBadWire()
 {
-  m_badWire = (*m_badWireFromDB)->getWires();
+  //  m_badWire = (*m_badWireFromDB)->getWires();
   calcMeanT0();
 }
 

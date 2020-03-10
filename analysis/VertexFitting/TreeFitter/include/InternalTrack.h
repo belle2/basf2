@@ -100,9 +100,6 @@ namespace TreeFitter {
 
     /** B field value */
     double m_bfield;
-
-    /** only lower triangle filled! */
-    Eigen::Matrix<double, 5, 5>m_covariance;
   } ;
 
 }

@@ -35,30 +35,10 @@ namespace TreeFitter {
     m_noEnergySum(noEnergySum),
     m_automatic_vertex_constraining(config.m_automatic_vertex_constraining),
     m_isconversion(false),
-    m_bfield(0.),
-    m_covariance(5, 5)
+    m_bfield(0.)
   {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
 
-    TMatrixFSym cartestianCovarianceE = particle->getMomentumVertexErrorMatrix();
-    TMatrixDSym cartestianCovariance(6);
-    for (int i = 0; i < 3; ++ i) {
-      for (int j = 0; j < 3; ++j) {
-        cartestianCovariance(i  , j) = cartestianCovarianceE(i  , j);   //
-        cartestianCovariance(i  , j + 3) = cartestianCovarianceE(i  , j + 4); // Skipping j   = 3, which corresponds to energy
-        cartestianCovariance(i + 3, j) = cartestianCovarianceE(i + 4, j); // Skipping i   = 3, which corresponds to energy
-        cartestianCovariance(i + 3, j + 3) = cartestianCovarianceE(i + 4, j + 4); // Skipping i,j = 3, which corresponds to energy
-      }
-    }
-    Belle2::UncertainHelix uncertainHelix(particle->getVertex(), particle->getMomentum(), particle->getCharge(), m_bfield,
-                                          cartestianCovariance, particle->getPValue());
-    m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
-    TMatrixDSym cov = uncertainHelix.getCovariance();
-    for (int i = 0; i < 5; ++i) {
-      for (int j = 0; j < 5; ++j) {
-        m_covariance(i, j) = cov(i, j);
-      }
-    }
     if (particle) {
       for (Belle2::Particle* daughter : particle->getDaughters()) {
         addDaughter(daughter, config, forceFitAll);
@@ -213,7 +193,7 @@ namespace TreeFitter {
   void InternalTrack::addToConstraintList(constraintlist& list,
                                           int depth) const
   {
-    list.push_back(Constraint(this, Constraint::helix, depth, 5, 3));
+    list.push_back(Constraint(this, Constraint::helix, depth, 5, 5));
 
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
@@ -238,13 +218,12 @@ namespace TreeFitter {
         break;
       default:
         status |= ParticleBase::projectConstraint(type, fitparams, p);
-
     }
     return status;
   }
 
   ErrCode InternalTrack::projectHelixConstraint(const FitParams& fitparams,
-                                                Projection& p) const
+                                                Projection&       p) const
   {
     ErrCode status;
     const int posIndexMother = mother()->posIndex();
@@ -252,19 +231,42 @@ namespace TreeFitter {
     const int posindex       = posIndex();
     Eigen::Matrix<double, 1, 6> positionAndMomentumIn  = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
     Eigen::Matrix<double, 1, 6> positionAndMomentumOut = Eigen::Matrix<double, 1, 6>::Zero(1, 6);
-    positionAndMomentumIn.segment(0, 3) = fitparams.getStateVector().segment(posIndexMother, 3);
-    positionAndMomentumIn.segment(3, 3) = fitparams.getStateVector().segment(momindex, 3);
+
+    positionAndMomentumIn.segment(0, 3)  = fitparams.getStateVector().segment(posIndexMother, 3);
+    positionAndMomentumIn.segment(3, 3)  = fitparams.getStateVector().segment(momindex, 3);
     positionAndMomentumOut.segment(0, 3) = fitparams.getStateVector().segment(posindex, 3);
     for (ParticleBase* daughter : m_daughters) {
       const int momIndexDaughter = daughter->momIndex();
       positionAndMomentumOut.segment(3, 3) += fitparams.getStateVector().segment(momIndexDaughter, 3);
     }
-    Belle2::Helix helixIn = Belle2::Helix(
-                              TVector3(positionAndMomentumIn(0), positionAndMomentumIn(1), positionAndMomentumIn(2)),
-                              TVector3(positionAndMomentumIn(3), positionAndMomentumIn(4), positionAndMomentumIn(5)),
-                              charge(),
-                              m_bfield
-                            );
+
+    TVector3 vertexPosition(positionAndMomentumIn(0), positionAndMomentumIn(1), positionAndMomentumIn(2));
+    TVector3 momentum(positionAndMomentumIn(3), positionAndMomentumIn(4), positionAndMomentumIn(5));
+
+    TMatrixDSym carthesianCovariance(6);
+    for (size_t i = 0 ; i < 6; ++i) {
+      carthesianCovariance(i, i) = 1.;
+    }
+
+    Belle2::UncertainHelix helixIn(
+      vertexPosition,
+      momentum,
+      charge(),
+      m_bfield,
+      carthesianCovariance,
+      1.
+    );
+    // Set up covariance matrix
+    Eigen::Matrix<double, 5, 5> covarianceMatrix = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
+    TMatrixDSym covarianceMatrixROOT = helixIn.getCovariance();
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+        covarianceMatrix(i, j) = covarianceMatrixROOT(i, j);
+        if (i != j) {        covarianceMatrix(i, j) = 0.; }
+      }
+      covarianceMatrix(i, i) += 1.;
+    }
+
     Belle2::Helix helixOut = Belle2::Helix(
                                TVector3(positionAndMomentumOut(0), positionAndMomentumOut(1), positionAndMomentumOut(2)),
                                TVector3(positionAndMomentumOut(3), positionAndMomentumOut(4), positionAndMomentumOut(5)),
@@ -273,25 +275,23 @@ namespace TreeFitter {
                              );
 
     Eigen::Matrix<double, 5, 6> jacobian = Eigen::Matrix<double, 5, 6>::Zero(5, 6);
-    HelixUtils::getJacobianToCartesianFrameworkHelix(jacobian,
-                                                     positionAndMomentumIn(0),
-                                                     positionAndMomentumIn(1),
-                                                     positionAndMomentumIn(2),
-                                                     positionAndMomentumIn(3),
-                                                     positionAndMomentumIn(4),
-                                                     positionAndMomentumIn(5),
-                                                     m_bfield,
-                                                     charge()
-                                                    );
+    HelixUtils::getJacobianToCartesianFrameworkHelix(
+      jacobian,
+      positionAndMomentumIn(0),
+      positionAndMomentumIn(1),
+      positionAndMomentumIn(2),
+      positionAndMomentumIn(3),
+      positionAndMomentumIn(4),
+      positionAndMomentumIn(5),
+      m_bfield,
+      charge()
+    );
 
-    Eigen::Matrix<double, 1, 5> residuals;
-
-    p.getResiduals().segment(0, 5) = residuals;
-    residuals(0) = helixIn.getD0()        - helixOut.getD0();
-    residuals(1) = helixIn.getPhi0()      - helixOut.getPhi0();
-    residuals(2) = helixIn.getOmega()     - helixOut.getOmega();
-    residuals(3) = helixIn.getZ0()        - helixOut.getZ0();
-    residuals(4) = helixIn.getTanLambda() - helixOut.getTanLambda();
+    p.getResiduals().segment(0, 5)(0) = helixIn.getD0()        - helixOut.getD0();
+    p.getResiduals().segment(0, 5)(1) = helixIn.getPhi0()      - helixOut.getPhi0();
+    p.getResiduals().segment(0, 5)(2) = helixIn.getOmega()     - helixOut.getOmega();
+    p.getResiduals().segment(0, 5)(3) = helixIn.getZ0()        - helixOut.getZ0();
+    p.getResiduals().segment(0, 5)(4) = helixIn.getTanLambda() - helixOut.getTanLambda();
 
     //account for periodic boundary in phi residual
     double phiResidual = p.getResiduals().segment(0, 5)(1);
@@ -302,7 +302,7 @@ namespace TreeFitter {
     phiResidual -= pi;
     p.getResiduals().segment(0, 5)(1) = phiResidual;
 
-    p.getV().triangularView<Eigen::Lower>() = m_covariance.triangularView<Eigen::Lower>();
+    p.getV().triangularView<Eigen::Lower>() = covarianceMatrix.triangularView<Eigen::Lower>();
     p.getH().block<5, 3>(0, posIndexMother) = -1.0 * jacobian.block<5, 3>(0, 0);
     p.getH().block<5, 3>(0, momindex)       = -1.0 * jacobian.block<5, 3>(0, 3);
     return status;

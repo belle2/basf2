@@ -28,9 +28,7 @@ namespace TreeFitter {
       if (particle->getNDaughters() != 1) {
         B2ERROR("FeedthroughParticles can only be initialized with a single daughter.");
       }
-      for (Belle2::Particle* daughter : particle->getDaughters()) {
-        addDaughter(daughter, config, forceFitAll);
-      }
+      addDaughter(particle->getDaughters()[0], config, forceFitAll);
     } else {
       B2ERROR("Trying to create a FeedthroughParticle from NULL. This should never happen.");
     }

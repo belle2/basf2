@@ -43,13 +43,13 @@ namespace TreeFitter {
     virtual void addToConstraintList(constraintlist& alist, int depth) const;
 
     /** get particle type */
-    int type() const {return kFeedthroughParticle;}
+    int type() const override {return kFeedthroughParticle;}
 
     /** take posIndex from daughter */
-    int posIndex() const;
+    int posIndex() const override;
 
     /** take momIndex from daughter */
-    int momIndex() const;
+    int momIndex() const override;
 
   };
 

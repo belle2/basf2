@@ -308,8 +308,7 @@ def add_cdst_output(
     rawFormat=False
 ):
     """
-    This function adds the cDST output modules (mDST + calibration objects) to a path,
-    saving only objects defined as part of the cDST data format.
+    This function add the rootOutput module with the settings needed to produce a cdst to a path,
 
     @param path Path to add modules to
     @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
@@ -320,7 +319,7 @@ def add_cdst_output(
     @param rawFormat saves the cdsts in the raw+tracking format.
     """
 
-    calibrationBranches = [
+    branches = [
         'RecoTracks',
         'EventT0',
         'PXDClustersFromTracks',
@@ -375,7 +374,7 @@ def add_cdst_output(
     ]
 
     if rawFormat:
-        calibrationBranches = [
+        branches = [
             'EventMetaData',
             'RawPXDs',
             'RawSVDs',
@@ -393,16 +392,24 @@ def add_cdst_output(
             'CDCDedxTracks',
             'SVDShaperDigitsFromTracks',
             'PXDClustersFromTracks',
-            'EventT0',
             'VXDDedxTracks',
             'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods',
-            'SVDEventInfo']
+            'VXDDedxLikelihoods'
+            ]
 
     if dataDescription is None:
         dataDescription = {}
     dataDescription.setdefault("dataLevel", "cdst")
-    return mdst.add_mdst_output(path, mc, filename, additionalBranches + calibrationBranches, dataDescription)
+
+    persistentBranches = ['FileMetaData']
+    if mc:
+        branches += ['MCParticles', 'TracksToMCParticles',
+                     'ECLClustersToMCParticles', 'KLMClustersToMCParticles']
+        persistentBranches += ['BackgroundInfo']
+    branches += additionalBranches
+
+    return path.add_module("RootOutput", outputFileName=filename, branchNames=branches,
+                           branchNamesPersistent=persistentBranches, additionalDataDescription=dataDescription)
 
 
 def add_arich_modules(path, components=None):

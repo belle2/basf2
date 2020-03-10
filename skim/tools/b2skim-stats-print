@@ -545,6 +545,19 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
+    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # and older) so here is a hack.
+    # TODO: remove once when we regularly add the same low mult samples
+    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    if mcCampaignNumber > 12:
+        mcSampleLabels.update({
+            f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+            # f"{mcCampaign}_eeBGx1": f"{mcCampaign}: ee BGx1",
+            f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+            f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
+        })
+
     dataSampleLabels = {
         "proc10_exp8": "Data: proc10 exp. 8",
         "proc10_exp7": "Data: proc10 exp. 7",

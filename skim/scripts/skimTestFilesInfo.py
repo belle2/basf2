@@ -56,6 +56,13 @@ total_input_files = [
     ('MC13_ssbarBGx1', 1920),
     ('MC13_ccbarBGx1', 6650),
     ('MC13_taupairBGx1', 4600),
+
+    ('MC13_ggBGx1', 25201),
+    ('MC13_eeBGx1', -1),  # TODO
+    ('MC13_mumuBGx1', 2297),
+    ('MC13_eeeeBGx1', 36843),
+    ('MC13_eemumuBGx1', 15096),
+
     ('MC13_mixedBGx0', 510),
     ('MC13_chargedBGx0', 540),
     ('MC13_uubarBGx0', 1606),
@@ -69,7 +76,6 @@ total_input_files = [
 # Average number of events in test files
 nEventsPerFile = {
 
-
     # TODO: get estimates for these
     # 'proc10_exp7': ,
     # 'proc10_exp8': ,
@@ -79,8 +85,6 @@ nEventsPerFile = {
     'proc9_exp8': 7846,
     'bucket7_exp8': 11242,
 
-
-
     'MC13_mixedBGx1': 200000,
     'MC13_chargedBGx1': 200000,
     'MC13_uubarBGx1': 197609,
@@ -88,6 +92,12 @@ nEventsPerFile = {
     'MC13_ssbarBGx1': 189320,
     'MC13_ccbarBGx1': 195621,
     'MC13_taupairBGx1': 200000,
+
+    'MC13_ggBGx1': 9390,
+    'MC13_eeBGx1': -1,  # TODO
+    'MC13_mumuBGx1': 10000,
+    'MC13_eeeeBGx1': 10000,
+    'MC13_eemumuBGx1': 10000,
 
     'MC12_mixedBGx1': 200000,
     'MC12_chargedBGx1': 200000,
@@ -108,7 +118,7 @@ nEventsPerFile = {
 #: location of test files on kekcc
 kekcc_locations = [
 
-
+    # data
     ('proc10_exp7', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0007/4S/GoodRuns/r03491/all/' +
      'mdst/sub00/mdst.physics.0007.03491.HLT1.f00001.root'),
     ('proc10_exp8', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0008/4S/GoodRuns/r01291/all/' +
@@ -121,6 +131,8 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0008.01527.HLT4.hlt_hadron.f00000.root'),
     ('bucket7_exp8', '/group/belle2/dataprod/Data/release-03-02-04/DB00000677/bucket7/e0008/4S/GoodRuns/r03123/skim/hlt_hadron/' +
      'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
+
+    # generic MC13 BGx1
     ('MC13_mixedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009434/s00/e1003/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000001_prod00009434_task10020000001.root'),
     ('MC13_chargedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009435/s00/e1003/4S/r00000/charged/' +
@@ -136,6 +148,14 @@ kekcc_locations = [
     ('MC13_taupairBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009441/s00/e1003/4S/r00000/taupair/' +
      'mdst/sub00/mdst_000001_prod00009441_task10020000001.root'),
 
+    # low multiplicity MC13
+    ('MC13_ggBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/3700001000/3700001000_eph3_0.root'),
+    # ('MC13_eeBGx1', 'FIXME')
+    ('MC13_mumuBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/mumu/mumu_eph3_0.root'),
+    ('MC13_eeeeBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/eeee/eeee_eph3_0.root'),
+    ('MC13_eemumuBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/eemumu/eemumu_eph3_0.root'),
+
+    # generic MC13 BGx0
     ('MC13_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009545/s00/e1003/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000001_prod00009545_task10020000001.root'),
     ('MC13_chargedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/' +
@@ -151,9 +171,7 @@ kekcc_locations = [
     ('MC13_taupairBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009561/s00/e1003/4S/r00000/taupair/' +
      'mdst/sub00/mdst_000001_prod00009561_task10020000001.root'),
 
-
-
-
+    # generic MC12 BGx1
     ('MC12_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000141_prod00007392_task10020000141.root'),
     ('MC12_chargedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007394/s00/e1003/4S/r00000/charged/' +
@@ -168,6 +186,8 @@ kekcc_locations = [
      'mdst/sub00/mdst_000141_prod00007400_task10020000142.root'),
     ('MC12_taupairBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007404/s00/e1003/4S/r00000/taupair/' +
      'mdst/sub00/mdst_000171_prod00007404_task10020000172.root'),
+
+    # generic MC12 BGx0
     ('MC12_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007393/s00/e1003/4S/r00000/mixed/' +
      'mdst/sub00/mdst_000018_prod00007393_task10020000018.root'),
     ('MC12_chargedBGx0', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007395/s00/e1003/4S/r00000/charged/' +
@@ -183,7 +203,7 @@ kekcc_locations = [
     ('MC12_taupairBGx0', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007405/s00/e1003/4S/r00000/taupair/' +
      'mdst/sub00/mdst_000034_prod00007405_task10020000034.root'),
 
-
+    # low multiplicity MC12
     ('MC12_eeeeBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007515_task10020000001.root'),
     ('MC12_eeeeBGx1', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007464_task10020000001.root'),
     ('MC12_eemumuBGx0', '/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007516_task10020000001.root'),

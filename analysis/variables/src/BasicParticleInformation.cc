@@ -86,7 +86,7 @@ It's 0 for composite particles.
 
 
  .. tip::
-    If you are looking for unique identifier of the particle, please use b2:var:`mdstSource`.
+    If you are looking for unique identifier of the particle, please use `mdstSource`.
     )DOC");
     REGISTER_VARIABLE("mdstSource", particleMdstSource, R"DOC(
 Returns unique identifier of final state particle.

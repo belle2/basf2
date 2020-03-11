@@ -266,16 +266,13 @@ plotRegions(
     x_label='SVD regions',
     y_label='Efficiency',
     granules=granulesLayersTypes,
-    tree=tree3,
+    tree=tree2,
     expr='strip_dir',
     cutALL=cut_noV,
     cut=cut_U,
-    descr='(number of clusters related to TrueHit) / (number of Truehits);\
-          Evaluates the clusterizer efficiency. \
-          This will depend on the clusterizer parameters cutSeed and cutAdjacent.',
+    descr='(number of clusters related to TrueHit) / (number of Truehits)',
     check='Should be close to 1 in all bins',
     isShifter=True)
-
 
 plotRegions(
     name='ClusterizationEfficiency_V',
@@ -283,15 +280,14 @@ plotRegions(
     x_label='SVD regions',
     y_label='Efficiency',
     granules=granulesLayersTypes,
-    tree=tree3,
+    tree=tree2,
     expr='strip_dir',
     cutALL=cut_noU,
     cut=cut_V,
-    descr='(number of clusters related to TrueHit) / (number of Truehits);\
-          Evaluates the clusterizer efficiency. \
-          This will depend on the clusterizer parameters cutSeed and cutAdjacent.',
+    descr='(number of clusters related to TrueHit) / (number of Truehits)',
     check='Should be close to 1 in all bins',
     isShifter=True)
+
 
 plotRegions(
     name='ClusterizationPurity_U',

@@ -260,7 +260,7 @@ ploter(
     isShifter=True)
 
 
-plotEff(
+plotRegions(
     name='ClusterizationEfficiency_U',
     title='Efficiency of clusterization for U side',
     x_label='SVD regions',
@@ -277,7 +277,7 @@ plotEff(
     isShifter=True)
 
 
-plotEff(
+plotRegions(
     name='ClusterizationEfficiency_V',
     title='Efficiency of clusterization for V side',
     x_label='SVD regions',
@@ -291,4 +291,52 @@ plotEff(
           Evaluates the clusterizer efficiency. \
           This will depend on the clusterizer parameters cutSeed and cutAdjacent.',
     check='Should be close to 1 in all bins',
+    isShifter=True)
+
+plotRegions(
+    name='ClusterizationPurity_U',
+    title='Purity of clusterization for U side',
+    x_label='SVD regions',
+    y_label='Purity',
+    granules=granulesLayers,
+    tree=tree3,
+    expr='strip_dir',
+    cutALL=cut_noV,
+    cut=cut_oneTH,
+    descr='(number of clusters related to one TrueHit) / (number of clusters).\
+    Evaluates the fraction of signal cluster over the total number of clusters.',
+    check='Should be close to 1 in all bins',
+    isShifter=True)
+
+
+plotRegions(
+    name='ClusterizationPurity_V',
+    title='Purity of clusterization for V side',
+    x_label='SVD regions',
+    y_label='Purity',
+    granules=granulesLayers,
+    tree=tree3,
+    expr='strip_dir',
+    cutALL=cut_noU,
+    cut=cut_oneTH,
+    descr='(number of clusters related to one TrueHit) / (number of clusters).\
+    Evaluates the fraction of signal cluster over the total number of clusters.',
+    check='Should be close to 1 in all bins',
+    isShifter=True)
+
+# comment for above plot. It shows multiplicity of truehit related to one cluster
+ploter(
+    name='cluster_truehits_number',
+    title='cluster_truehits_number',
+    nbins=10,
+    xmin=0,
+    xmax=10,
+    x_label='clusters_length',
+    y_label='counts',
+    granules=granulesLayers,
+    tree=tree3,
+    expr='cluster_truehits_number',
+    cut='',
+    descr='Number of TrueHits related to one cluster. Signal cluster is associated to one TrueHit.',
+    check='...',
     isShifter=True)

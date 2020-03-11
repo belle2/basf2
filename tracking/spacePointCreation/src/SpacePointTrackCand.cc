@@ -153,6 +153,13 @@ void SpacePointTrackCand::removeSpacePoint(int indexInTrackCand)
   m_sortingParameters.erase(m_sortingParameters.begin() + indexInTrackCand);
 }
 
+void SpacePointTrackCand::forwardAssignmentState(bool assigned) const
+{
+  for (const SpacePoint* spacePoint : m_trackSpacePoints) {
+    spacePoint->setAssignmentState(assigned);
+  }
+}
+
 // genfit::TrackCand prints to stdout, as does the Print method from ROOT TVectorD (which is invoked here).
 // I build a stringstrem, which I then hand over B2DEBUG
 // there is a somewhat nasty hack to intercept the output to the stdout by redirecting the stdout to a buffer, which can then be put into a stringstream. This is however platform-dependent and not very C++ like and therefore not done here (this would be needed for having the ROOT output in the log files which are created from within a steering file)

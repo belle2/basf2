@@ -54,9 +54,12 @@ namespace Belle2 {
     std::string m_nameSpacePointTrackCands;
 
     /** If True copy selected SpacePoints to new StoreArray,
-     * If False deactivate remaining SpacePoints.
+     * If False deactivate remaining SpacePointTrackCands.
      */
     bool m_subsetCreation;
+
+    /// Reset flag of hits for tracks that do not pass QI, so that that hits can be used again
+    bool m_resetAssignmentState;
 
     /** Name of optional output StoreArray containing SpacePointTrackCands */
     std::string m_newNameSpacePointTrackCands;

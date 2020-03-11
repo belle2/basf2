@@ -27,6 +27,8 @@ BestVXDTrackCandidatesSelectorModule::BestVXDTrackCandidatesSelectorModule() : M
   addParam("SubsetSize", m_subsetSize, "Target size of selected subset.", (unsigned short)(1000));
   addParam("SubsetCreation", m_subsetCreation,
            "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePoints.", bool(false));
+  addParam("resetAssignmentState", m_resetAssignmentState,
+           "Reset flag of hits for tracks that do not pass QI, so that that hits can be used again.", bool(false));
   addParam("NewNameSpacePointTrackCands", m_newNameSpacePointTrackCands,
            "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset. If the target name is equal to the source candidates not matching the selection criteria are deleted.",
            std::string("BestSpacePointTrackCands"));
@@ -63,6 +65,9 @@ void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
     for (int iTracks = 0; iTracks < nTracks - m_subsetSize; ++iTracks) {
       int iCandidate = sortedTrackCandIndices[iTracks];
       m_spacePointTrackCands[iCandidate]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
+      if (m_resetAssignmentState) {
+        m_spacePointTrackCands[iCandidate]->forwardAssignmentState(false);
+      }
     }
   }
 }
@@ -77,11 +82,21 @@ void BestVXDTrackCandidatesSelectorModule::selectSubset()
 
     // select subset of desired size
     std::set<int> subset(sortedTrackCandIndices.cbegin(), sortedTrackCandIndices.cbegin() + m_subsetSize);
-    m_bestCandidates.select([subset](const SpacePointTrackCand * sptc) {return subset.count(sptc->getArrayIndex()) != 0;});
+    m_bestCandidates.select([this, subset](const SpacePointTrackCand * sptc) {
+      if (m_resetAssignmentState) {
+        sptc->forwardAssignmentState(false);
+      }
+      return subset.count(sptc->getArrayIndex()) != 0;
+    });
   } else {
     // only need to do something if target StoreArray is different from source StoreArray
     if (m_newNameSpacePointTrackCands != m_nameSpacePointTrackCands) {
-      m_bestCandidates.select([](const SpacePointTrackCand*) {return true;});
+      m_bestCandidates.select([this](const SpacePointTrackCand * sptc) {
+        if (m_resetAssignmentState) {
+          sptc->forwardAssignmentState(false);
+        }
+        return true;
+      });
     }
   }
 }

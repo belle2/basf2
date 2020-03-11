@@ -84,6 +84,7 @@ Variables
  * Fixed truth kinematic variables (`mcPX`, `mcPY`, ...) to respect the current reference frame, so that they can be accessed not
    only in the lab frame but for example as well in the CMS frame using `useCMSFrame`.
  * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
+ * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those recovered at analysis-level using `modularAnalysis.reconstructDecay`).
 
 Modules
 +++++++
@@ -96,6 +97,8 @@ Modules
    :b2:mod:`BestCandidateSelection` module.
  * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
+ * Tweaks to the :b2:mod:`ParticleLoader` for how it creates particles from V0s, it now preserves the link to the mdst object.
+   These changes are all under-the-hood should be transparent to users.
  * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
  * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.

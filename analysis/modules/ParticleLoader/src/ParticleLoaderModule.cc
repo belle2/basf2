@@ -487,7 +487,7 @@ namespace Belle2 {
         if (mcParticleM)
           newDaugM->addRelationTo(mcParticleM);
 
-        // sum the 4-momentuma of the daughters and construct a particle object
+        // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
         Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
                      Particle::EParticleType::c_V0, v0->getArrayIndex());

@@ -655,6 +655,7 @@ namespace Belle2 {
 
   double TrepsB::tpgetq(double _s, double z, double _q2max)
   {
+    B2INFO("Parameter _s=" << _s << " given but not used");
     // get one Q2 value
     double q2min = me * me * z * z / (1. - z);
     double rk = 1. / log(_q2max / q2min);
@@ -830,12 +831,14 @@ namespace Belle2 {
   double TrepsB::tpform(double _q2, double _w) const
   {
     //form factor effect
+    B2INFO("Parameters _q2=" << _q2 << " and _w=" << _w << " are given but not used");
     double dis = 1.0 ;
     return dis ;
   }
 
   double TrepsB::tpangd(double _z, double _w)
   {
+    B2INFO("Parameters _z=" << _z << " and _w=" << _w << " are given but not used");
     double c = 1.0 ;
     return c;
   }
@@ -848,6 +851,10 @@ namespace Belle2 {
     // be canceled.
     // CAUTION!: The 4-momenta of particles are represented in the e+e- c.m. system
     //
+    B2INFO("User decision routine for extra generation condition is not used."
+           << " _pe(" << _pe.Px() << "," << _pe.Py() << "," << _pe.Pz() << "), "
+           << " _pp(" << _pp.Px() << "," << _pp.Py() << "," << _pp.Pz() << "), "
+           << " *part at " << part << " and _npart = " << _npart << " are given but not used");
     return 1 ;
   }
 
@@ -855,6 +862,9 @@ namespace Belle2 {
                       TLorentzVector _pe, TLorentzVector _pp,
                       Part_gen* part, int n) const
   {
+    B2INFO("iev = " << iev << " _pe(" << _pe.Px() << "," << _pe.Py() << "," << _pe.Pz() << "), "
+           << " _pp(" << _pp.Px() << "," << _pp.Py() << "," << _pp.Pz() << "), "
+           << " *part at " << part << " and n = " << n << " are given but not used");
   }
 
   void TrepsB::print_event() const

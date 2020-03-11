@@ -262,9 +262,7 @@ namespace TreeFitter {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
         covarianceMatrix(i, j) = covarianceMatrixROOT(i, j);
-        if (i != j) {        covarianceMatrix(i, j) = 0.; }
       }
-      covarianceMatrix(i, i) += 1.;
     }
 
     Belle2::Helix helixOut = Belle2::Helix(

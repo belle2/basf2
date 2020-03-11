@@ -35,6 +35,11 @@ namespace Belle2 {
     double particleIsFromTrack(const Particle* part);
 
     /**
+     * return 1 if this particle was created from a V0, 0 otherwise
+     */
+    double particleIsFromV0(const Particle* part);
+
+    /**
      * return StoreArray index (0-based) of the MDST object from which the Particle was created
      */
     double particleMdstArrayIndex(const Particle* part);

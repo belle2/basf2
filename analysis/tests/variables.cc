@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
@@ -34,6 +35,7 @@
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -313,9 +315,11 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<TrackFitResult> myResults;
     StoreArray<Track> myTracks;
+    StoreArray<V0> myV0s;
     StoreArray<Particle> myParticles;
     myResults.registerInDataStore();
     myTracks.registerInDataStore();
+    myV0s.registerInDataStore();
     myParticles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
@@ -347,10 +351,12 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     EXPECT_TRUE(vIsFromTrack->function(part));
     EXPECT_FALSE(vIsFromECL->function(part));
     EXPECT_FALSE(vIsFromKLM->function(part));
+    EXPECT_FALSE(vIsFromV0->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -358,6 +364,29 @@ namespace {
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
 
+    //-----------------------------------------------------------------------
+    // now add another track and mock up a V0 and a V0-based particle
+    myResults.appendNew(position, momentum, cov6, charge * -1,
+                        Const::electron, pValue, bField, CDCValue, 16777215);
+    Track secondTrack;
+    secondTrack.setTrackFitResultIndex(Const::electron, 1);
+    Track* savedTrack2 = myTracks.appendNew(secondTrack);
+    myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
+    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
+    const TLorentzVector v0Momentum(momentum * 2, (momentum * 2).Mag());
+    auto v0particle = myParticles.appendNew(v0Momentum, 22,
+                                            Particle::c_Unflavored, Particle::c_V0, 0);
+    v0particle->appendDaughter(0, false);
+    v0particle->appendDaughter(1, false);
+    //-----------------------------------------------------------------------
+
+    EXPECT_FALSE(vIsFromTrack->function(v0particle));
+    EXPECT_FALSE(vIsFromECL->function(v0particle));
+    EXPECT_FALSE(vIsFromKLM->function(v0particle));
+    EXPECT_TRUE(vIsFromV0->function(v0particle));
+
+    const Manager::Var* vNDaughters = Manager::Instance().getVariable("nDaughters");
+    EXPECT_FLOAT_EQ(vNDaughters->function(v0particle), 2);
   }
 
   class MCTruthVariablesTest : public ::testing::Test {

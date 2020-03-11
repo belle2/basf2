@@ -4,6 +4,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/V0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/TestHelpers.h>
@@ -30,12 +31,14 @@ namespace {
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
       StoreArray<KLMCluster> klmClusters;
+      StoreArray<V0> v0s;
       particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
       roes.registerInDataStore();
       klmClusters.registerInDataStore();
+      v0s.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
@@ -95,6 +98,20 @@ namespace {
       EXPECT_FLOAT_EQ(1337, p.getEnergy());
       EXPECT_EQ(cluster, p.getECLCluster());
       EXPECT_EQ(nullptr, p.getTrack());
+    }
+    {
+      // test constructor used for V0s (there is not actually a V0 constructor,
+      // the heavy-lifting is done in the particle loader), but this is V0-style
+      // construction with EParticleType::V0 and the correct getters
+      StoreArray<V0> v0s;
+      V0* v0 = v0s.appendNew(V0());
+      TLorentzVector momentum(1, 2, 3, 4);
+      Particle p(momentum, 310, Particle::c_Unflavored, Particle::c_V0, 0);
+      EXPECT_EQ(310, p.getPDGCode());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_EQ(Particle::c_V0, p.getParticleType());
+      EXPECT_EQ(0u, p.getMdstArrayIndex());
+      EXPECT_EQ(p.getV0(), v0); // pointers should be same
     }
   }
 

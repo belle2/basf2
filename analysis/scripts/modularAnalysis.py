@@ -1809,8 +1809,8 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
     """
     if (len(inputParticlelists) == 0):
         # Type of particles to use for ROEBuilder
-        # K_S0 and Lambda0 are added here because some of them are decayed
-        # hadronically
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
         types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
                  'n0', 'nu_e', 'nu_mu', 'nu_tau',
                  'K_S0', 'Lambda0']

@@ -23,7 +23,7 @@
 // $Log$
 
 
-using namespace std;
+// using namespace std;
 
 
 // system include files
@@ -69,7 +69,7 @@ namespace Belle2 {
     parts = new Part_cont [20];
     pppp = new TLorentzVector [30];
 
-    ifstream infile(parameterFile);
+    std::ifstream infile(parameterFile);
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
@@ -189,11 +189,11 @@ namespace Belle2 {
     totalCrossSectionForMC = 0.;
 
     // Load Differential Cross Section table
-    ifstream infile(diffcrosssectionFile);
+    std::ifstream infile(diffcrosssectionFile);
     if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
-      double w; // W [GeV]
+      // double w; // W [GeV]
       double diffCrossSection; // Number of events for given W
 
       double previousW = 0.;
@@ -238,7 +238,7 @@ namespace Belle2 {
 
       // Load Wlist_table
 
-      ifstream infile(wlistFile);
+      std::ifstream infile(wlistFile);
       if (!infile) {
         B2FATAL("Can't open W-list input file") ;
       } else {
@@ -294,6 +294,8 @@ namespace Belle2 {
 
 
       return prew;
+    } else {
+      B2FATAL("Undefined mode for wtable. Can be 1 or 0. Called with  " << mode) ;
     }
   }
 
@@ -318,7 +320,7 @@ namespace Belle2 {
     // added by S.U on Sep.29,1997
     imode = 0;
 
-    double xxx = tpgetd(0, rs, dmin, dmax, q2max);
+    // double xxx = tpgetd(0, rs, dmin, dmax, q2max);
     tpgetz(0);
 
     B2DEBUG(20, "In Treps, W has been set to be " << std::setprecision(5) <<
@@ -763,7 +765,7 @@ namespace Belle2 {
 
   double TrepsB::tpxint(double r, double _rs, double _q2max) const
   {
-    const double alpppi = 0.002322816 ;
+    // const double alpppi = 0.002322816 ;
 
     double y = sqrt(r * _rs);
     double z = sqrt(_rs / r);

@@ -5,6 +5,7 @@
 <header>
     <input>SVDValidationTTree.root</input>
     <input>SVDValidationTTreeTrueHit.root</input>
+    <input>SVDValidationTTreeCluster.root</input>
     <output>SVDClusterPerformance.root</output>
     <description>
     Validation plots related to cluster performance.
@@ -20,10 +21,11 @@ from plotUtils import *
 # open the files with generated and reconstructed information for clusters
 input = R.TFile.Open("../SVDValidationTTree.root")
 input2 = R.TFile.Open("../SVDValidationTTreeTrueHit.root")
+input3 = R.TFile.Open("../SVDValidationTTreeCluster.root")
 
 tree = input.Get("tree")
 tree2 = input2.Get("tree")
-
+tree3 = input3.Get("tree")
 
 histsCP = R.TFile.Open("SVDClusterPerformance.root", "recreate")
 
@@ -264,7 +266,7 @@ plotEff(
     x_label='SVD regions',
     y_label='Efficiency',
     granules=granulesLayersTypes,
-    tree=tree2,
+    tree=tree3,
     expr='strip_dir',
     cutALL=cut_noV,
     cut=cut_U,
@@ -281,7 +283,7 @@ plotEff(
     x_label='SVD regions',
     y_label='Efficiency',
     granules=granulesLayersTypes,
-    tree=tree2,
+    tree=tree3,
     expr='strip_dir',
     cutALL=cut_noU,
     cut=cut_V,

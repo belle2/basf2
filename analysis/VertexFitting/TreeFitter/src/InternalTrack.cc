@@ -169,21 +169,7 @@ namespace TreeFitter {
   ErrCode InternalTrack::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
-
-    const TMatrixFSym& errorMatrix = particle()->getMomentumVertexErrorMatrix();
-    const int posindex = posIndex();
-    const int momindex = momIndex();
-    for (int row = 0; row < 3; ++row) {
-      fitparams.getCovariance()(momindex + row,
-                                momindex + row) = 1000 * errorMatrix[row][row]; // has to be aligned with the order in Particle.h (order is: px, py, pz, E, x, y, z)
-      // taken from RecoTrack::InitCovariance(...)
-      fitparams.getCovariance()(posindex + row,
-                                posindex + row) = 1000 * errorMatrix[row + 4][row + 4]; // Order in Particle.h:  px, py, pz, E, x, y, z
-    }
-    if (hasEnergy()) {
-      fitparams.getCovariance()(momindex + 3, momindex + 3) = 1000 * errorMatrix[3][3]; // Index 3 comes from order in Particle.h
-    }
-
+    ParticleBase::initCovariance(fitparams);
     for (ParticleBase* daughter : m_daughters) {
       status |= daughter->initCovariance(fitparams);
     }
@@ -244,8 +230,13 @@ namespace TreeFitter {
     TVector3 momentum(positionAndMomentumIn(3), positionAndMomentumIn(4), positionAndMomentumIn(5));
 
     TMatrixDSym carthesianCovariance(6);
-    for (size_t i = 0 ; i < 6; ++i) {
-      carthesianCovariance(i, i) = 1.;
+    for (size_t i = 0 ; i < 3; ++i) {
+      for (size_t j = 0; j < 3; ++j) {
+        carthesianCovariance(i  , j) = fitparams.getCovariance()(posindex + i, posindex + j);
+        carthesianCovariance(i  , j + 3) = fitparams.getCovariance()(posindex + i, momindex + j);
+        carthesianCovariance(i + 3, j) = fitparams.getCovariance()(momindex + i, posindex + j);
+        carthesianCovariance(i + 3, j + 3) = fitparams.getCovariance()(momindex + i, momindex + j);
+      }
     }
 
     Belle2::UncertainHelix helixIn(

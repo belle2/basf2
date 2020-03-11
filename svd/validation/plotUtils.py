@@ -40,6 +40,9 @@ cut_Usize2 = R.TCut('(cluster_size==2)&&(strip_dir==0)')
 cut_Vsize2 = R.TCut('(cluster_size==2)&&(strip_dir==1)')
 cut_Usize3plus = R.TCut('(cluster_size>2)&&(strip_dir==0)')
 cut_Vsize3plus = R.TCut('(cluster_size>2)&&(strip_dir==1)')
+cut_oneTH = R.TCut('cluster_truehits_number==1')  # one TrueHit associated with SVDCluster
+cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
+
 
 # default granurality
 granulesD = ((cut_L3+cut_b, 'L3_barrel'),
@@ -74,10 +77,10 @@ def ploter(name, title, nbins, xmin, xmax, x_label, y_label,
         h.Write(hName)
 
 
-def plotEff(name, title, x_label, y_label,
-            granules,
-            tree, expr, cutALL, cut,
-            descr, check, contact_str=SVDContact, isShifter=False):
+def plotRegions(name, title, x_label, y_label,
+                granules,
+                tree, expr, cutALL, cut,
+                descr, check, contact_str=SVDContact, isShifter=False):
     hName = f'{name}'
     h = create1DHist(hName, title, len(granules), 1, len(granules)+1, x_label, y_label)
     h.GetYaxis().SetRangeUser(0, 1.4)

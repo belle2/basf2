@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Set the wire in the list
      * @param wid wire-id to be registered
-     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; specify eff > 1 for hot/noisy wire
+     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; eff > 1 for hot/noisy wire
      */
     void setWire(const WireID& wid, double eff = 0)
     {
@@ -43,7 +43,7 @@ namespace Belle2 {
      * Set the wire in the list
      * @param iCLayer (continuous) layer-id of badwire
      * @param iWire   wire-id of badwire
-     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; specify eff > 1 for hot/noisy wire
+     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; eff > 1 for hot/noisy wire
      */
     void setWire(unsigned short iCLayer, unsigned short iWire, double eff = 0)
     {

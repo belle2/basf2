@@ -105,9 +105,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -177,14 +177,14 @@ vertex = [
 
 #: Replacement for MCVertex tuple tool
 mc_vertex = [
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDistance',
-    'mcRho',
-    'mcProdVertexX',
-    'mcProdVertexY',
-    'mcProdVertexZ'
+    'mcDecayVertexRho',
+    'mcProductionVertexX',
+    'mcProductionVertexY',
+    'mcProductionVertexZ'
 ]
 
 #: CPV and Tag-side related variables

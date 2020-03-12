@@ -151,7 +151,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double mcProductionVertexToIPX(const Particle* part)
+    double mcProductionVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -162,7 +162,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double mcProductionVertexToIPY(const Particle* part)
+    double mcProductionVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -173,7 +173,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double mcProductionVertexToIPZ(const Particle* part)
+    double mcProductionVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -457,11 +457,11 @@ namespace Belle2 {
                       "Returns the y position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProductionVertexZ", mcProductionVertexZ,
                       "Returns the z position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProductionVertexToIPX", mcProductionVertexToIPX,
+    REGISTER_VARIABLE("mcProductionVertexFromIPX", mcProductionVertexFromIPX,
                       "Returns the x position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProductionVertexToIPY", mcProductionVertexToIPY,
+    REGISTER_VARIABLE("mcProductionVertexFromIPY", mcProductionVertexFromIPY,
                       "Returns the y position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProductionVertexToIPZ", mcProductionVertexToIPZ,
+    REGISTER_VARIABLE("mcProductionVertexFromIPZ", mcProductionVertexFromIPZ,
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position

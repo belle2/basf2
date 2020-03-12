@@ -84,17 +84,17 @@ namespace Belle2 {
     /**
      * return x production vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcProductionVertexToIPX(const Particle* part);
+    double mcProductionVertexFromIPX(const Particle* part);
 
     /**
      * return y production vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcProductionVertexToIPY(const Particle* part);
+    double mcProductionVertexFromIPY(const Particle* part);
 
     /**
      * return z production vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcProductionVertexToIPZ(const Particle* part);
+    double mcProductionVertexFromIPZ(const Particle* part);
 
     /**
      * return position in x relative to origin

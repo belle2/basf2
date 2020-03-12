@@ -154,8 +154,8 @@ b_vars = vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=d_vars,
                                    decay_string='B- -> ^D0 pi-') + \
     vu.create_aliases(list_of_variables=['decayModeID'],
-                      wrapper='daughter(0,extraInfo(variable))',
-                      prefix="D") + \
+                      wrapper='daughter(0,extraInfo({variable}))',
+                      prefix="D0") + \
     ['foxWolframR2']
 
 u4s_vars = vc.mc_truth + \
@@ -165,8 +165,6 @@ u4s_vars = vc.mc_truth + \
     vc.kinematics + \
     vu.create_aliases_for_selected(list_of_variables=b_vars,
                                    decay_string='Upsilon(4S) -> ^B- mu+') + \
-    vu.create_aliases_for_selected(list_of_variables=d_vars,
-                                   decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
     vu.create_aliases_for_selected(list_of_variables=mu_vars,
                                    decay_string='Upsilon(4S) -> B- ^mu+')
 

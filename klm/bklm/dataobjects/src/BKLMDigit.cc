@@ -13,7 +13,6 @@
 
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 
 using namespace Belle2;
 

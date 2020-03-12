@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
@@ -387,8 +386,8 @@ namespace Belle2 {
         try {
           ielement = Belle2::convertString<int>(arguments[0]);
           jelement = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Arguments of prodVertexCov function must be integer!");
+        } catch (std::invalid_argument&) {
+          B2ERROR("Arguments of prodVertexCov function must be integer!");
           return nullptr;
         }
       }
@@ -466,7 +465,13 @@ namespace Belle2 {
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position
-    REGISTER_VARIABLE("distance", particleDistance, "3D distance from the vertex or POCA to interaction point");
+    REGISTER_VARIABLE("distance", particleDistance,
+                      R"DOC(3D distance between the IP and the particle decay vertex, if available.
+
+In case the particle has been created from a track, the distance is defined between the POCA and IP.
+If the particle is built from an ECL cluster, the decay vertex is set to the nominal IP. 
+If the particle is created from a KLM cluster, the distance is calculated between the IP and the cluster itself.)DOC");
+
     REGISTER_VARIABLE("significanceOfDistance", particleDistanceSignificance,
                       "significance of distance from vertex or POCA to interaction point(-1 in case of numerical problems)");
     REGISTER_VARIABLE("dx", particleDX, "vertex or POCA in case of tracks x in respect to IP");
@@ -486,16 +491,16 @@ namespace Belle2 {
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");
     // Production vertex position
     REGISTER_VARIABLE("prodVertexX", particleProductionX,
-                      "Returns the x position of particle production vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the x position of particle production vertex. Returns NaN if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexY", particleProductionY,
                       "Returns the y position of particle production vertex.");
     REGISTER_VARIABLE("prodVertexZ", particleProductionZ,
                       "Returns the z position of particle production vertex.");
     // Production vertex covariance matrix
     REGISTER_VARIABLE("prodVertexCov(i,j)", particleProductionCovElement,
-                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0,1 or 2. Returns -999 if particle has no production covariance matrix.");
+                      "Returns the ij covariance matrix component of particle production vertex, arguments i,j should be 0, 1 or 2. Returns NaN if particle has no production covariance matrix.");
     REGISTER_VARIABLE("prodVertexXErr", particleProductionXErr,
-                      "Returns the x position uncertainty of particle production vertex. Returns -999 if particle has no production vertex.");
+                      "Returns the x position uncertainty of particle production vertex. Returns NaN if particle has no production vertex.");
     REGISTER_VARIABLE("prodVertexYErr", particleProductionYErr,
                       "Returns the y position uncertainty of particle production vertex.");
     REGISTER_VARIABLE("prodVertexZErr", particleProductionZErr,

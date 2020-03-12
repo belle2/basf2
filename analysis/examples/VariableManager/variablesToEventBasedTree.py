@@ -30,6 +30,13 @@ mypath.add_module('VariablesToEventBasedTree',
                   variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
                              'daughter(0, kaonID)', 'daughter(1, pionID)'],
                   event_variables=['nTracks', 'isMC'])
+# It's possible to have multiple event-based trees in the same output file.
+# Of course their names have to be different.
+mypath.add_module('VariablesToEventBasedTree',
+                  particleList='K-',
+                  treeName='kaon',
+                  variables=['isSignal', 'mcErrors', 'p', 'E', 'kaonID'],
+                  event_variables=['nTracks', 'isMC'])
 
 # process the data
 basf2.process(mypath)

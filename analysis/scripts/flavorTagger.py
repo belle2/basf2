@@ -104,6 +104,7 @@ def set_FlavorTagger_pid_aliases():
     utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
 
     if getBelleOrBelle2() == "Belle":
+        utils._variablemanager.addAlias('kIDBelle', 'ifNANgiveX(atcPIDBelle(3,2), 0.5)')
         utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')

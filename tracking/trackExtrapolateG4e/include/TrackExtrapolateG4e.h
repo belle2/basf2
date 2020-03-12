@@ -34,6 +34,7 @@
 #include <G4TouchableHandle.hh>
 
 /* C++ headers. */
+#include <map>
 #include <string>
 #include <vector>
 
@@ -417,47 +418,11 @@ namespace Belle2 {
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
     double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
-    //! experiment number for the current set of particle-hypothesis PDFs
-    int m_ExpNo;
-
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
 
-    //! probability density function for positive-muon hypothesis
-    MuidBuilder* m_MuonPlusPar;
-
-    //! probability density function for negative-muon hypothesis
-    MuidBuilder* m_MuonMinusPar;
-
-    //! probability density function for positive-pion hypothesis
-    MuidBuilder* m_PionPlusPar;
-
-    //! probability density function for negative-pion hypothesis
-    MuidBuilder* m_PionMinusPar;
-
-    //! probability density function for positive-kaon hypothesis
-    MuidBuilder* m_KaonPlusPar;
-
-    //! probability density function for negative-kaon hypothesis
-    MuidBuilder* m_KaonMinusPar;
-
-    //! probability density function for proton hypothesis
-    MuidBuilder* m_ProtonPar;
-
-    //! probability density function for antiproton hypothesis
-    MuidBuilder* m_AntiprotonPar;
-
-    //! probability density function for deuteron hypothesis
-    MuidBuilder* m_DeuteronPar;
-
-    //! probability density function for antideuteron hypothesis
-    MuidBuilder* m_AntideuteronPar;
-
-    //! probability density function for electron hypothesis
-    MuidBuilder* m_ElectronPar;
-
-    //! probability density function for positron hypothesis
-    MuidBuilder* m_PositronPar;
+    //! PDF for the charged final state particle hypotheses
+    std::map<int, MuidBuilder*> m_MuidBuilderMap;
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;

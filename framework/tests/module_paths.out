@@ -38,14 +38,13 @@
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
+[INFO] ===Error Summary================================================================
+[ERROR] In module final  { module: final }
+    (last message occurred 2 times)
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+    (last message occurred 2 times)
 [INFO] ================================================================================
-[INFO] Error summary: 4 errors and 0 warnings occurred.
-[ERROR] In module ReturnFalse1Condition
-[INFO]  (last message occurred 2 times in total)
-[ERROR] In module final
-[INFO]  (last message occurred 2 times in total)
-[INFO] ================================================================================
-
+[ERROR] in total, 4 errors occurred during processing
 [INFO] second process() call follows...
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -85,12 +84,11 @@
 [INFO] <<< End run: 2
 [INFO] ========================================================================
 [INFO] terminating SelectOddEvents
+[INFO] ===Error Summary================================================================
+[ERROR] In module final  { module: final }
+    (last message occurred 2 times)
+[ERROR] In module ReturnFalse1Condition  { module: ReturnFalse1Condition }
+    (last message occurred 2 times)
 [INFO] ================================================================================
-[INFO] Error summary: 4 errors and 0 warnings occurred.
-[ERROR] In module ReturnFalse1Condition
-[INFO]  (last message occurred 2 times in total)
-[ERROR] In module final
-[INFO]  (last message occurred 2 times in total)
-[INFO] ================================================================================
-
+[ERROR] in total, 4 errors occurred during processing
 [[[]] -> EventInfoSetter -> [SelectOddEvents(? >=1[Progress -> [[]]] ) -> EventInfoPrinter] -> PrintCollections -> ReturnFalse(? <1[ReturnFalse1Condition] ) -> final]

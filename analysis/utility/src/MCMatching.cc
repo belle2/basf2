@@ -105,13 +105,13 @@ bool MCMatching::setMCTruth(const Particle* particle)
   }
 
   // check, if for all daughter particles Particle -> MCParticle relation exists
+  bool daugMCTruth = true;
   for (int i = 0; i < nChildren; ++i) {
     const Particle* daugP = particle->getDaughter(i);
-    //returns quickly when not found
-    bool daugMCTruth = setMCTruth(daugP);
-    if (!daugMCTruth)
-      return false;
+    daugMCTruth &= setMCTruth(daugP);
   }
+  if (!daugMCTruth)
+    return false;
 
   int motherIndex = 0;
   if (nChildren == 1) {
@@ -270,8 +270,8 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   }
 
   //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
-  int daughterStatus = 0;
+  const int daughterStatusesAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
+  int daughterStatuses = 0;
 
   //Vector to store all the MC (n*grand-)daughters of the mother of the bremsstrahlung corrected particle
   vector<const MCParticle*> genParts;
@@ -280,8 +280,10 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     if (mcParticle && mcParticle->getMother()) appendParticles(mcParticle->getMother(), genParts);
   }
 
+  vector<int> daughterProperties = particle->getDaughterProperties();
   for (unsigned i = 0; i < nChildren; ++i) {
     const Particle* daughter = particle->getDaughter(i);
+    int daughterStatus = 0;
     //Now, if the daughter is a brems photon, start the special treatment
     if (particle->hasExtraInfo("bremsCorrected") && daughter->getPDGCode() == Const::photon.getPDGCode()) {
       //First, check if the daugther has an MC particle related
@@ -304,8 +306,13 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
         daughterStatus |= getMCErrors(daughter);
       }
     } else daughterStatus |= getMCErrors(daughter);
+
+    int daughterStatusAcceptMask = (~c_Correct);
+    if (i < daughterProperties.size()) daughterStatusAcceptMask =  makeDaughterAcceptMask(daughterProperties[i]);
+    daughterStatuses |= (daughterStatus & daughterStatusAcceptMask);
+
   }
-  status |= (daughterStatus & daughterStatusAcceptMask);
+  status |= (daughterStatuses & daughterStatusesAcceptMask);
 
   status |= getMissingParticleFlags(particle, mcParticle);
 
@@ -480,18 +487,29 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
 {
   int flags = 0;
 
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) {
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) {
     flags |= (MCMatching::c_MissFSR);
     flags |= (MCMatching::c_MissPHOTOS);
   }
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreMassive) {
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreMassive) {
     flags |= (MCMatching::c_MissMassiveParticle);
     flags |= (MCMatching::c_MissKlong);
   }
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreGamma) flags |= (MCMatching::c_MissGamma);
-  if (part->getProperty() & Particle::PropertyFlags::c_isIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreGamma) flags |= (MCMatching::c_MissGamma);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;
+}
+
+int MCMatching::makeDaughterAcceptMask(int daughterProperty)
+{
+  int flags = 0;
+
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreMisID) flags |= (MCMatching::c_MisID);
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreDecayInFlight) flags |= (MCMatching::c_DecayInFlight);
+
+  return (~flags);
+
 }

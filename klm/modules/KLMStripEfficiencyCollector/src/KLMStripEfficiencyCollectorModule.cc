@@ -64,7 +64,7 @@ void KLMStripEfficiencyCollectorModule::prepare()
   m_tracks.isRequired();
   m_extHits.isRequired();
   m_MuonList.isRequired(m_MuonListName);
-  int nPlanes = m_PlaneArrayIndex->getNPlanes();
+  int nPlanes = m_PlaneArrayIndex->getNElements();
   TH1F* matchedDigitsInPlane = new TH1F(
     "matchedDigitsInPlane", "Number of matching (B|E)KLMDigits",
     nPlanes, -0.5, double(nPlanes) - 0.5);

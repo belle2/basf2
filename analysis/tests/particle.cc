@@ -122,12 +122,58 @@ namespace {
     EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
     EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughterProperties().size());
 
     const Particle pLocal(momentum, 411, Particle::c_Unflavored, daughterIndices, particles.getPtr());
     EXPECT_DOUBLE_EQ(p.getMass(), pLocal.getMass());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughterProperties().size());
+
+    Particle outsideArray;
+    EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);
+    EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
+  }
+
+  TEST_F(ParticleTest, DaughterProperties)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    std::vector<int> daughterProperties;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
+
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+    EXPECT_EQ(411, p.getPDGCode());
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
+    EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+    EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleType());
+    EXPECT_EQ(0u, p.getMdstArrayIndex());
+    EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughterProperties().size());
+    EXPECT_EQ(Particle::PropertyFlags::c_Ordinary, (p.getDaughterProperties())[0]);
+
+
+    const Particle pLocal(momentum, 411, Particle::c_Unflavored, daughterIndices,
+                          Particle::PropertyFlags::c_Ordinary, daughterProperties,
+                          particles.getPtr());
+    EXPECT_DOUBLE_EQ(p.getMass(), pLocal.getMass());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughterProperties().size());
 
     Particle outsideArray;
     EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);

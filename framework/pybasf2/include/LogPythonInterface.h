@@ -82,6 +82,13 @@ namespace Belle2 {
     void setPackageLogConfig(const std::string& package, const LogConfig& config);
 
     /**
+     * Set maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    void setMaxMessageRepetitions(unsigned repetitions);
+
+    /**
      * Get the log level
      *
      * @return The log level
@@ -118,6 +125,12 @@ namespace Belle2 {
      */
     LogConfig& getPackageLogConfig(const std::string& package);
 
+    /**
+     * Get maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    unsigned getMaxMessageRepetitions() const;
 
     /**
      * Add a file as output connection

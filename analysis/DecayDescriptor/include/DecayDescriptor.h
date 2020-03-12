@@ -1,12 +1,12 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
 
@@ -37,7 +37,7 @@ namespace Belle2 {
     int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
     int m_properties;
     /** Is this the NULL object? */
     bool m_isNULL;
@@ -50,7 +50,7 @@ namespace Belle2 {
     B+ -> [ D+ -> ^K+ pi0 ] pi0
     decay path of K+ is
     [(0, B), (0, D), (0 K)]
-    Every selected partcile has its own hierarchy path and
+    Every selected particle has its own hierarchy path and
     they are stored as a vector in this variable:
     For the decayString
     B+ -> [ D+ -> ^K+ pi0 ] ^pi0
@@ -72,7 +72,7 @@ namespace Belle2 {
     {
       return m_isNULL ? nullptr : this;
     }
-    /** Defaut ctor. */
+    /** Default ctor. */
     DecayDescriptor();
 
     /** Want the default copy ctor. */
@@ -97,12 +97,12 @@ namespace Belle2 {
     in the init(const std::string) function. */
     bool init(const DecayString& s);
 
-    /** Checy if the DecayDescriptor matches with the given Particle.
+    /** Check if the DecayDescriptor matches with the given Particle.
     0 = no match
     1 = matches DecayDescriptor
     2 = matches charge conjugated DecayDescriptor
     3 = matches DeacyDescriptor AND charge conjugated DecayDescriptor
-    -1, -2, -3 : same, but match is not unambigous. */
+    -1, -2, -3 : same, but match is not unambiguous. */
     int match(const Particle* p) {return match<Particle>(p, -1);}
 
     /** See match(const Particle* p). */
@@ -143,32 +143,32 @@ namespace Belle2 {
     /** Check if additional radiated photons shall be ignored. */
     bool isIgnoreRadiatedPhotons() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreRadiatedPhotons) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) > 0;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreIntermediate) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreIntermediate) > 0;
     }
     /** Check if missing massive final state particles shall be ignored. */
     bool isIgnoreMassive() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreMassive) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreMassive) > 0;
     }
     /** Check if missing neutrinos shall be ignored. */
     bool isIgnoreNeutrino() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreNeutrino) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreNeutrino) > 0;
     }
     /** Check if missing gammas shall be ignored. */
     bool isIgnoreGamma() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreGamma) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreGamma) > 0;
     }
     /** Check if added Brems gammas shall be ignored. */
     bool isIgnoreBrems() const
     {
-      return (m_properties & Particle::PropertyFlags::c_isIgnoreBrems) > 0;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreBrems) > 0;
     }
 
     /** Is the decay or the particle self conjugated */

@@ -21,6 +21,15 @@ namespace Belle2 {
      * returns true if event doesn't contain an Y(4S)
      */
     double isContinuumEvent(const Particle*);
+    /**
+     * returns true if event contains a charged B-meson
+     */
+    double isChargedBEvent(const Particle*);
+    /**
+     * returns true if event contains opposite flavor neutral B-mesons
+     */
+    double isUnmixedBEvent(const Particle*);
+
 
     /*
      * Variable used as target for Continuum Suppression Training

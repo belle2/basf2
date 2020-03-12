@@ -16,6 +16,7 @@
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
+#include <framework/gearbox/Const.h>
 
 namespace Belle2 {
 
@@ -27,54 +28,61 @@ namespace Belle2 {
     //! Empty constructor for ROOT IO (needed to make the class storable)
     KLMMuidLikelihood();
 
-    //! Constructor with initial value
-    //! @param pdgCode PDG code of the hypothesis used for this extrapolation
-    explicit KLMMuidLikelihood(int pdgCode);
-
     //! Destructor
-    virtual ~KLMMuidLikelihood() {}
+    ~KLMMuidLikelihood();
 
     //! @return PDG code of the hypothesis used for this extrapolation
     int getPDGCode() const { return m_PDGCode; }
 
+    //! @return charge of the hypothesis used for this extrapolation
+    int getCharge() const;
+
+    //! @return normalized PDF value for this extrapolation
+    //! @param pdg PDG code of the hypothesis
+    double getPDFValue(int pdg) const { return m_PDFValue[Const::ChargedStable(pdg).getIndex()]; }
+
     //! @return muon PDF value for this extrapolation (normalized with all others)
-    double getMuonPDFValue() const { return m_MuonPDFValue; }
+    double getMuonPDFValue() const { return getPDFValue(Const::muon.getPDGCode()); }
 
     //! @return pion PDF value for this extrapolation (normalized with all others)
-    double getPionPDFValue() const { return m_PionPDFValue; }
+    double getPionPDFValue() const { return getPDFValue(Const::pion.getPDGCode()); }
 
     //! @return kaon PDF value for this extrapolation (normalized with all others)
-    double getKaonPDFValue() const { return m_KaonPDFValue; }
+    double getKaonPDFValue() const { return getPDFValue(Const::kaon.getPDGCode()); }
 
     //! @return proton PDF value for this extrapolation (normalized with all others)
-    double getProtonPDFValue() const { return m_ProtonPDFValue; }
+    double getProtonPDFValue() const { return getPDFValue(Const::proton.getPDGCode()); }
 
     //! @return deuteron PDF value for this extrapolation (normalized with all others)
-    double getDeuteronPDFValue() const { return m_DeuteronPDFValue; }
+    double getDeuteronPDFValue() const { return getPDFValue(Const::deuteron.getPDGCode()); }
 
     //! @return electron PDF value for this extrapolation (normalized with all others)
-    double getElectronPDFValue() const { return m_ElectronPDFValue; }
+    double getElectronPDFValue() const { return getPDFValue(Const::electron.getPDGCode()); }
 
     //! @return junk PDF value for this extrapolation (1 if Muon+Pion+Kaon+Proton+Electron ~ 0)
     double getJunkPDFValue() const { return m_JunkPDFValue; }
 
     //! @return muon log-likelihood for this extrapolation (not normalized)
-    double getLogL_mu() const {return m_LogL_mu;}
+    //! @param pdg PDG code of the hypothesis
+    double getLogL(int pdg) const { return m_LogL[Const::ChargedStable(pdg).getIndex()]; }
+
+    //! @return muon log-likelihood for this extrapolation (not normalized)
+    double getLogL_mu() const { return getLogL(Const::muon.getPDGCode()); }
 
     //! @return pion log-likelihood for this extrapolation (not normalized)
-    double getLogL_pi() const {return m_LogL_pi;}
+    double getLogL_pi() const { return getLogL(Const::pion.getPDGCode()); }
 
     //! @return kaon log-likelihood for this extrapolation (not normalized)
-    double getLogL_K() const {return m_LogL_K;}
+    double getLogL_K() const { return getLogL(Const::kaon.getPDGCode()); }
 
     //! @return proton log-likelihood for this extrapolation (not normalized)
-    double getLogL_p() const {return m_LogL_p;}
+    double getLogL_p() const { return getLogL(Const::proton.getPDGCode()); }
 
     //! @return deuteron log-likelihood for this extrapolation (not normalized)
-    double getLogL_d() const {return m_LogL_d;}
+    double getLogL_d() const { return getLogL(Const::deuteron.getPDGCode()); }
 
     //! @return electron log-likelihood for this extrapolation (not normalized)
-    double getLogL_e() const {return m_LogL_e;}
+    double getLogL_e() const { return getLogL(Const::electron.getPDGCode()); }
 
     //! @return status word (bit pattern) for this extrapolation
     unsigned int getStatus() const { return m_Status; }
@@ -129,57 +137,71 @@ namespace Belle2 {
     //! @return EKLM efficiency vector
     float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; }
 
+    //! set PDG code of the hypothesis for this extrapolation
+    //! @param pdg PDG code of the hypothesis for this extrapolation
+    void setPDGCode(int pdg) { m_PDGCode = pdg; }
+
+    //! assign normalized PDF value for this extrapolation
+    //! @param pdfValue Normalized PDF value
+    //! @param pdg PDG code of the hypothesis
+    void setPDFValue(double pdfValue, int pdg) { m_PDFValue[Const::ChargedStable(pdg).getIndex()] = pdfValue; }
+
     //! assign muon PDF value for this extrapolation
     //! @param pdfValue muon PDF value (normalized) for this extrapolation
-    void setMuonPDFValue(double pdfValue) { m_MuonPDFValue = pdfValue; }
+    void setMuonPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::muon.getPDGCode()); }
 
     //! assign pion PDF value for this extrapolation
     //! @param pdfValue pion PDF value (normalized) for this extrapolation
-    void setPionPDFValue(double pdfValue) { m_PionPDFValue = pdfValue; }
+    void setPionPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::pion.getPDGCode()); }
 
     //! assign kaon PDF value for this extrapolation
     //! @param pdfValue kaon PDF value (normalized) for this extrapolation
-    void setKaonPDFValue(double pdfValue) { m_KaonPDFValue = pdfValue; }
+    void setKaonPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::kaon.getPDGCode()); }
 
     //! assign proton PDF value for this extrapolation
     //! @param pdfValue proton PDF value (normalized) for this extrapolation
-    void setProtonPDFValue(double pdfValue) { m_ProtonPDFValue = pdfValue; }
+    void setProtonPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::proton.getPDGCode()); }
 
     //! assign deuteron PDF value for this extrapolation
     //! @param pdfValue deuteron PDF value (normalized) for this extrapolation
-    void setDeuteronPDFValue(double pdfValue) { m_DeuteronPDFValue = pdfValue; }
+    void setDeuteronPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::deuteron.getPDGCode()); }
 
     //! assign electron PDF value for this extrapolation
     //! @param pdfValue electron PDF value (normalized) for this extrapolation
-    void setElectronPDFValue(double pdfValue) { m_ElectronPDFValue = pdfValue; }
+    void setElectronPDFValue(double pdfValue) { setPDFValue(pdfValue, Const::electron.getPDGCode()); }
 
     //! assign junk flag for this extrapolation
     //! @param pdfValue junk flag for this extrapolation (0 if not junk, 1 if junk)
     void setJunkPDFValue(double pdfValue) { m_JunkPDFValue = pdfValue; }
 
+    //! assign unnormalized log-likelihood for this extrapolation
+    //! @param value Logarithm of PDF value (unnormalized) for this extrapolation
+    //! @param pdg PDG code of the hypothesis
+    void setLogL(double value, int pdg) { m_LogL[Const::ChargedStable(pdg).getIndex()] = value; }
+
     //! assign muon log-likelihood for this extrapolation
     //! @param value logarithm of muon PDF value (unnormalized) for this extrapolation
-    void setLogL_mu(double value) { m_LogL_mu = value; }
+    void setLogL_mu(double value) { setLogL(value, Const::muon.getPDGCode()); }
 
     //! assign pion log-likelihood for this extrapolation
     //! @param value logarithm of pion PDF value (unnormalized) for this extrapolation
-    void setLogL_pi(double value) { m_LogL_pi = value; }
+    void setLogL_pi(double value) { setLogL(value, Const::pion.getPDGCode()); }
 
     //! assign kaon log-likelihood for this extrapolation
     //! @param value logarithm of kaon PDF value (unnormalized) for this extrapolation
-    void setLogL_K(double value) { m_LogL_K = value; }
+    void setLogL_K(double value) { setLogL(value, Const::kaon.getPDGCode()); }
 
     //! assign proton log-likelihood for this extrapolation
     //! @param value logarithm of proton PDF value (unnormalized) for this extrapolation
-    void setLogL_p(double value) { m_LogL_p = value; }
+    void setLogL_p(double value) { setLogL(value, Const::proton.getPDGCode()); }
 
     //! assign deuteron log-likelihood for this extrapolation
     //! @param value logarithm of deuteron PDF value (unnormalized) for this extrapolation
-    void setLogL_d(double value) { m_LogL_d = value; }
+    void setLogL_d(double value) { setLogL(value, Const::deuteron.getPDGCode()); }
 
     //! assign electron log-likelihood for this extrapolation
     //! @param value logarithm of electron PDF value (unnormalized) for this extrapolation
-    void setLogL_e(double value) { m_LogL_e = value; }
+    void setLogL_e(double value) { setLogL(value, Const::electron.getPDGCode()); }
 
     //! assign status word (bit pattern) for this extrapolation
     //! @param status final state of this extrapolation
@@ -244,44 +266,14 @@ namespace Belle2 {
     //! PDG particleID hypothesis used for this extrapolation (typically muon)
     int m_PDGCode;
 
-    //! Muon PDF value for this extrapolation (normalized with all others)
-    float m_MuonPDFValue;
-
-    //! Pion PDF value for this extrapolation (normalized with all others)
-    float m_PionPDFValue;
-
-    //! Kaon PDF value for this extrapolation (normalized with all others)
-    float m_KaonPDFValue;
-
-    //! Proton PDF value for this extrapolation (normalized with all others)
-    float m_ProtonPDFValue;
-
-    //! Deuteron PDF value for this extrapolation (normalized with all others)
-    float m_DeuteronPDFValue;
-
-    //! Electron PDF value for this extrapolation (normalized with all others)
-    float m_ElectronPDFValue;
-
     //! Junk flag for this extrapolation (0 if not junk, 1 if junk)
     float m_JunkPDFValue;
 
-    //! Muon log-likelihood for this extrapolation (not normalized)
-    float m_LogL_mu;
+    //! Normalized PDF values for this extrapolation
+    float m_PDFValue[Const::ChargedStable::c_SetSize];
 
-    //! Pion log-likelihood for this extrapolation (not normalized)
-    float m_LogL_pi;
-
-    //! Kaon log-likelihood for this extrapolation (not normalized)
-    float m_LogL_K;
-
-    //! Proton log-likelihood for this extrapolation (not normalized)
-    float m_LogL_p;
-
-    //! Deuteron log-likelihood for this extrapolation (not normalized)
-    float m_LogL_d;
-
-    //! Electron log-likelihood for this extrapolation (not normalized)
-    float m_LogL_e;
+    //! Log-likelihood for this extrapolation (not normalized)
+    float m_LogL[Const::ChargedStable::c_SetSize];
 
     //! Status word (bit pattern) for this extrapolation
     unsigned int m_Status;
@@ -333,7 +325,7 @@ namespace Belle2 {
     float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
     //! Needed to make the ROOT object storable
-    ClassDef(KLMMuidLikelihood, 2)
+    ClassDef(KLMMuidLikelihood, 3)
 
   };
 }

@@ -12,6 +12,7 @@ import modularAnalysis as ma
 from stdCharged import stdK, stdPi
 from stdV0s import mergedKshorts
 import skimExpertFunctions as expert
+import stdV0s
 
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -30,6 +31,7 @@ ma.inputMdstList('default', fileList, path=ckshppath)
 
 stdPi('all', path=ckshppath)
 stdK('all', path=ckshppath)
+stdV0s.stdKshorts(path=ckshppath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(ckshppath)

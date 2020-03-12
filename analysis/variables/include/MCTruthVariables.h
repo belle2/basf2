@@ -173,7 +173,7 @@ namespace Belle2 {
     double particleMCMomentumTransfer2(const Particle* part);
 
     /**
-     * return decay time of matched MCParticle (-999.0 if the particle is not matched)
+     * return decay time of matched MCParticle (NaN if the particle is not matched)
      * note this is the delta time between decay of the particle and collision
      */
     double particleMCMatchDecayTime(const Particle* particle);
@@ -183,32 +183,32 @@ namespace Belle2 {
     double particleMCMatchLifeTime(const Particle* particle);
 
     /**
-     * return px of matched MCParticle (-999.0 if the particle is not matched)
+     * return px of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchPX(const Particle* particle);
 
     /**
-     * return py of matched MCParticle (-999.0 if the particle is not matched)
+     * return py of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchPY(const Particle* particle);
 
     /**
-     * return pz of matched MCParticle (-999.0 if the particle is not matched)
+     * return pz of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchPZ(const Particle* particle);
 
     /**
-     * return pt of matched MCParticle (-999.0 if the particle is not matched)
+     * return pt of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchPT(const Particle* particle);
 
     /**
-     * return Energy of matched MCParticle (-999.0 if the particle is not matched)
+     * return Energy of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchE(const Particle* particle);
 
     /**
-     * return total momentum of matched MCParticle (-999.0 if the particle is not matched)
+     * return total momentum of matched MCParticle (NaN if the particle is not matched)
      */
     double particleMCMatchP(const Particle* particle);
 
@@ -269,14 +269,14 @@ namespace Belle2 {
 
     /**
      * return number of steps to i-th daughter from the particle at generator level.
-     * return -1, if no MCParticle is associated to the particle or the i-th daughter.
-     * return -999, if i-th daughter does not exist.
+     * return NaN, if no MCParticle is associated to the particle or the i-th daughter.
+     * return NaN, if i-th daughter does not exist.
      */
     int genNStepsToDaughter(const Particle* particle, const std::vector<double>& arguments);
 
     /**
      * return number of missing daughters having assigned PDG codes
-     * return -1, if the particle does not have related MC Particle
+     * return NaN, if the particle does not have related MC Particle
      */
     int genNMissingDaughter(const Particle* particle, const std::vector<double>& arguments);
 

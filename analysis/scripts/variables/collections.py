@@ -180,7 +180,7 @@ mc_vertex = [
     'mcDecayVertexX',
     'mcDecayVertexY',
     'mcDecayVertexZ',
-    'mcDistance',
+    'mcDecayVertexToIPDistance',
     'mcDecayVertexRho',
     'mcProductionVertexX',
     'mcProductionVertexY',

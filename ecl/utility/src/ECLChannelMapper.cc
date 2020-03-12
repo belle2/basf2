@@ -28,8 +28,16 @@ ECLChannelMapper::ECLChannelMapper()
 
 }
 
+bool ECLChannelMapper::initFromFile()
+{
+  std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
+  return initFromFile(filePath.c_str());
+}
+
 bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 {
+  B2WARNING("Reading possibly outdated ECLChannelMap from " << eclMapFileName);
+
   ifstream mapFile(eclMapFileName);
   if (mapFile.is_open()) {
 
@@ -103,9 +111,7 @@ bool ECLChannelMapper::initFromDB()
   }
 
   if (!channelMap.isValid()) {
-    B2WARNING("ECLChannelMapper:: Could not get ECLChannelMap from the database. Trying to initialize from text file");
-    std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
-    return initFromFile(filePath.c_str());
+    B2FATAL("ECLChannelMapper:: Could not get ECLChannelMap from the database.");
   }
 
   const auto& mappingBAR = channelMap->getMappingBAR();

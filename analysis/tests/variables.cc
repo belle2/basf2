@@ -4762,12 +4762,12 @@ namespace {
   }
 
 
-  TEST_F(VertexVariablesTest, mcDecayVertexToIPDistance)
+  TEST_F(VertexVariablesTest, mcDecayVertexFromIPDistance)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexToIPDistance");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }

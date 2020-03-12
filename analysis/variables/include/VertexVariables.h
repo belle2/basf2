@@ -44,27 +44,27 @@ namespace Belle2 {
     /**
      * return x decay vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcDecayVertexToIPX(const Particle* part);
+    double mcDecayVertexFromIPX(const Particle* part);
 
     /**
      * return y decay vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcDecayVertexToIPY(const Particle* part);
+    double mcDecayVertexFromIPY(const Particle* part);
 
     /**
      * return z decay vertex coordinate of matched generated particle with respect to the IP
      */
-    double mcDecayVertexToIPZ(const Particle* part);
+    double mcDecayVertexFromIPZ(const Particle* part);
 
     /**
      * return transverse distance to interaction point of matched generated particle decay vertex
      */
-    double mcDecayVertexToIPRho(const Particle* part);
+    double mcDecayVertexFromIPRho(const Particle* part);
 
     /**
      * return distance to interaction point of matched generated particle decay vertex
      */
-    double mcDecayVertexToIPDistance(const Particle* part);
+    double mcDecayVertexFromIPDistance(const Particle* part);
 
     /**
      * return x production vertex coordinate of matched generated particle

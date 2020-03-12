@@ -44,7 +44,7 @@ Variables
 
  * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
- * Renamed ``mcProdVertexX``, ``mcProdVertexY``, ``mcProdVertexZ``, and ``mcProdVertexRho`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, :b2:var:`mcProductionVertexZ`, and :b2:var:`mcProductionVertexRho`.  
+ * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
  * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
  * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
  * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level

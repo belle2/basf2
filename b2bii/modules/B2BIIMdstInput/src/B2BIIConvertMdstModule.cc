@@ -64,6 +64,7 @@
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
 #include "belle_legacy/tables/evtcls.h"
+#include "belle_legacy/tables/trg.h"
 
 
 #include <cmath>
@@ -173,6 +174,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
+  addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
 
   m_realData = false;
 
@@ -215,6 +217,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   extraInfoMap.registerInDataStore();
 
   if (m_convertEvtcls) m_evtCls.registerInDataStore();
+  if (m_convertRecTrg) m_recTrg.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -348,6 +351,9 @@ void B2BIIConvertMdstModule::event()
 
   // 11. Convert Evtcls panther table information
   if (m_convertEvtcls) convertEvtclsTable();
+
+  // 12. Convert trigger information from rectrg_summary3
+  if (m_convertRecTrg) convertRecTrgTable();
 
 }
 
@@ -1226,6 +1232,31 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
   }
 
 }
+
+void B2BIIConvertMdstModule::convertRecTrgTable()
+{
+
+  // Create StoreObj if it is not valid
+  if (not m_recTrg.isValid()) {
+    m_recTrg.create();
+  }
+
+  // Pull rectrg_summary3 from manager
+  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+
+  std::string name = "rectrg_summary3_m_final";
+  // Only one entry in each event
+  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+
+  // Converting m_final(3)
+  for (int index = 0; index < 3; ++index) {
+    std::string iVar = name + std::to_string(index);
+    m_recTrg->addExtraInfo(iVar, (*eflagIterator).final(index));
+    B2DEBUG(99, "m_final(" << index << ") = " << m_recTrg->getExtraInfo(iVar));
+  }
+
+}
+
 
 //-----------------------------------------------------------------------------
 // CONVERT OBJECTS

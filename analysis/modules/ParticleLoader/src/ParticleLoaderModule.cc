@@ -457,8 +457,8 @@ namespace Belle2 {
         std::pair<Track*, Track*> v0Tracks = v0->getTracks();
         std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
-        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP, v0TrackFitResults.first->getParticleType());
-        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM, v0TrackFitResults.second->getParticleType());
+        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP);
+        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM);
 
         const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
         const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
@@ -587,12 +587,8 @@ namespace Belle2 {
           continue;
         }
 
-        // create particle and add it to the Particle list. The Particle class
-        // internally also uses the getTrackFitResultWithClosestMass() to load the best available
-        // track fit result
-
-        // Particle particle(track, type);
-        Particle particle(track->getArrayIndex(), trackFit, type, trackFit->getParticleType());
+        // create particle and add it to the Particle list.
+        Particle particle(track->getArrayIndex(), trackFit, type);
 
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 

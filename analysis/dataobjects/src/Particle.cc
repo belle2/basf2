@@ -172,21 +172,25 @@ Particle::Particle(const TLorentzVector& momentum,
 
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
+  Particle(track ? track->getArrayIndex() : 0, track ? track->getTrackFitResultWithClosestMass(chargedStable) : nullptr,
+           chargedStable)
+{
+}
+
+Particle::Particle(const int trackArrayIndex,
+                   const TrackFitResult* trackFit,
+                   const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
-  if (!track) return;
-
-  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-  if (closestMassFitResult == nullptr) return;
+  if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  setMdstArrayIndex(track->getArrayIndex());
+  setMdstArrayIndex(trackArrayIndex);
 
-  const auto trackFit = closestMassFitResult;
-  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
+  m_pdgCodeUsedForFit = trackFit->getParticleType().getPDGCode();
   m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
@@ -198,7 +202,7 @@ Particle::Particle(const Track* track,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
-
+//FIXME: Deprecated, to be removed after release-05
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable,
@@ -1199,5 +1203,3 @@ int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::Charg
   if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
 }
-
-

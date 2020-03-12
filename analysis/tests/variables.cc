@@ -4731,83 +4731,83 @@ namespace {
   };
 
   // MC vertex tests
-  TEST_F(VertexVariablesTest, mcX)
+  TEST_F(VertexVariablesTest, mcDecayVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
   }
 
-  TEST_F(VertexVariablesTest, mcY)
+  TEST_F(VertexVariablesTest, mcDecayVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
   }
 
-  TEST_F(VertexVariablesTest, mcZ)
+  TEST_F(VertexVariablesTest, mcDecayVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
   }
 
 
-  TEST_F(VertexVariablesTest, mcDistance)
+  TEST_F(VertexVariablesTest, mcDecayVertexToIPDistance)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcDistance");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexToIPDistance");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcRho)
+  TEST_F(VertexVariablesTest, mcDecayVertexRho)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcRho");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexX)
+  TEST_F(VertexVariablesTest, mcProductionVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexY)
+  TEST_F(VertexVariablesTest, mcProductionVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexZ)
+  TEST_F(VertexVariablesTest, mcProductionVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
   }

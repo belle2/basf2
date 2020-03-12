@@ -113,7 +113,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double mcDistance(const Particle* part)
+    double mcDecayVertexToIPDistance(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -449,7 +449,7 @@ namespace Belle2 {
                       "Returns the z position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcDecayVertexToIPRho", mcDecayVertexToIPRho,
                       "Returns the transverse position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDistance", mcDistance,
+    REGISTER_VARIABLE("mcDecayVertexToIPDistance", mcDecayVertexToIPDistance,
                       "Returns the distance of the decay vertex of the matched generated particle from the IP. Returns nan if the particle has no matched generated particle.");
     REGISTER_VARIABLE("mcProductionVertexX", mcProductionVertexX,
                       "Returns the x position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");

@@ -109,6 +109,7 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
+    StoreArray<TrackFitResult> trackfitresults;
     StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
@@ -121,6 +122,9 @@ namespace Belle2 {
     }
     if (pidlikelihoods.isOptional()) {
       particles.registerRelationTo(pidlikelihoods);
+    }
+    if (trackfitresults.isOptional()) {
+      particles.registerRelationTo(trackfitresults);
     }
 
     if (m_useMCParticles) {
@@ -478,11 +482,13 @@ namespace Belle2 {
           newDaugP->addRelationTo(pidP);
         if (mcParticleP)
           newDaugP->addRelationTo(mcParticleP);
+        newDaugP->addRelationTo(v0TrackFitResults.first);
 
         if (pidM)
           newDaugM->addRelationTo(pidM);
         if (mcParticleM)
           newDaugM->addRelationTo(mcParticleM);
+        newDaugM->addRelationTo(v0TrackFitResults.second);
 
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
 
@@ -584,7 +590,10 @@ namespace Belle2 {
         // create particle and add it to the Particle list. The Particle class
         // internally also uses the getTrackFitResultWithClosestMass() to load the best available
         // track fit result
-        Particle particle(track, type);
+
+        // Particle particle(track, type);
+        Particle particle(track->getArrayIndex(), trackFit, type, trackFit->getParticleType());
+
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 
           Particle* newPart = particles.appendNew(particle);
@@ -592,6 +601,7 @@ namespace Belle2 {
             newPart->addRelationTo(pid);
           if (mcParticleWithWeight.first)
             newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
+          newPart->addRelationTo(trackFit);
 
           if (cut->check(newPart))
             plist->addParticle(newPart);

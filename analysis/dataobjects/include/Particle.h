@@ -693,6 +693,13 @@ namespace Belle2 {
     const Track* getTrack() const;
 
     /**
+     * Returns the pointer to the TrackFitResult that was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track.
+     * @return const pointer to the TrackFitResult
+     */
+    const TrackFitResult* getTrackFitResult() const;
+
+    /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which
      * was used to create this Particle (ParticleType == c_Track).
      * NULL pointer is returned, if the Particle was not made from Track or if the Track has no

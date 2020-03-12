@@ -711,6 +711,23 @@ const Track* Particle::getTrack() const
     return nullptr;
 }
 
+const TrackFitResult* Particle::getTrackFitResult() const
+{
+  // if the particle is related to a TrackFitResult then return this
+  auto* selfrelated = this->getRelatedTo<TrackFitResult>();
+  if (selfrelated)
+    return selfrelated;
+
+  // if not get the TFR with closest mass to this particle
+  auto* selftrack = this->getTrack();
+  if (selftrack)
+    return selftrack->getTrackFitResultWithClosestMass(
+             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+
+  // otherwise we're probably not a track based particle
+  return nullptr;
+}
+
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
   if (m_particleType == c_Track) {

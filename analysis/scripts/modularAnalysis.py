@@ -487,13 +487,28 @@ def correctBremsBelle(outputListName,
 
 def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
-    Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    Copy all unique Particle indices from all input ParticleLists to the
+    single output ParticleList.
     Note that the Particles themselves are not copied.
     The original and copied ParticleLists will point to the same Particles.
+
     Duplicates are removed based on the first-come, first-served principle.
     Therefore, the order of the input ParticleLists matters.
     If you want to select the best duplicate based on another criterion, have
     a look at the function `mergeListsWithBestDuplicate`.
+
+    .. note::
+        Also note that two particles are different (for these purposes) if they
+        have a different order of daughters.
+
+        .. code-block::python
+
+            reconstructDecay("D0:a -> K- pi+", "", path=mypath)
+            reconstructDecay("D0:b -> pi+ K-", "", path=mypath)
+            copyLists("D0:ab", ["D0:a", "D0:b"], path=mypath) # double counts
+
+        If you merge ParticleLists that you reconstructed with a different
+        order of daughters you will **not** remove duplicates.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied

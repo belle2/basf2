@@ -97,7 +97,7 @@ If you have a physics analysis sensitive to this change: please discuss with the
 .. note::
         As a consequence of this, there is now a **difference** between the variables
         ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
-        and similarly for variables ( :b2:var:`mcDecayVeretxX`, :b2:var:`mcDecayVeretxY`, :b2:var:`mcDecayVeretxZ` )  compared to ( :b2:var:`mcDecayVrertexToIPX`, :b2:var:`mcDecayVrertexToIPY` and :b2:var:`mcDecayVrertexToIPZ` ).
+        and similarly for variables ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ` )  compared to ( :b2:var:`mcDecayVrertexToIPX`, :b2:var:`mcDecayVrertexToIPY` and :b2:var:`mcDecayVrertexToIPZ` ).
 
 .. rubric:: Redesign of the Conditions Database Interface
 

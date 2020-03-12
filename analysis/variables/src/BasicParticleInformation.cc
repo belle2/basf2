@@ -35,7 +35,7 @@ namespace Belle2 {
       return part->getMdstArrayIndex();
     }
 
-    double particleMdstSource(const Particle* part)
+    double uniqueParticleIdentifier(const Particle* part)
     {
       return part->getMdstSource();
     }
@@ -75,22 +75,22 @@ Store array index (0 - based) of the MDST object from which the Particle was cre
 It's 0 for composite particles.
 
 .. tip:: 
-    It is not unique identifier of particle. For example, pion and gamma can have the same `mdstIndex`:
+    It is not a unique identifier of particle. For example, a pion and a gamma can have the same `mdstIndex`:
     pions are created from tracks whereas gammas are created from ECL clusters; tracks and
-    ECL clusters are stored in different arrays; gamma created from ECL cluster with index 0 and
-    pion created from track with index 0 will both have `mdstIndex` equal to 0, but they will be different particles.
+    ECL clusters are stored in different arrays. A photon may be created from ECL cluster with index 0 and a
+    pion may be created from track with index 0 will both have :b2:var:`mdstIndex` equal to 0, but they will be different particles.
 
 .. tip:: 
-    Two particles of the same type can also have the same `mdstIndex`. This would mean that they are created from the same object. 
-    For example, if pion and kaon have the same  `mdstIndex` it means that they are created from the same track.
+    Two particles of the same type can also have the same :b2:var:`mdstIndex`. This would mean that they are created from the same object. 
+    For example, if pion and kaon have the same :b2:var:`mdstIndex` it means that they are created from the same track.
 
 
  .. tip::
-    If you are looking for unique identifier of the particle, please use `mdstSource`.
+    If you are looking for unique identifier of the particle, please use :b2:var:`uniqueParticleIdentifier`.
     )DOC");
-    REGISTER_VARIABLE("mdstSource", particleMdstSource, R"DOC(
+    REGISTER_VARIABLE("uniqueParticleIdentifier", uniqueParticleIdentifier, R"DOC(
 Returns unique identifier of final state particle.
-Particles created from the same object (e.g. from the same track) have different `mdstSource` value.)DOC");
+Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC");
 
     REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
                       "returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not");

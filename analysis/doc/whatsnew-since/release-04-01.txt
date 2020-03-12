@@ -42,6 +42,7 @@ Variables
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
+ * Rename ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
  * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level
    ancestor of the given type.   
  * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial

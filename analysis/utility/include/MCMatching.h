@@ -178,7 +178,7 @@ namespace Belle2 {
      * @return flags of given daughter
      */
     static int getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MCParticle* mcParticle,
-                                             std::vector<const MCParticle*>& genParts);
+                                             const std::vector<const MCParticle*>& genParts);
 
     /**
      * Determines the number of daughter particles which are not neutrinos.

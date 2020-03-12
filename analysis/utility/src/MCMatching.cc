@@ -355,7 +355,7 @@ int MCMatching::getFlagsOfDaughters(const Particle* particle, const MCParticle* 
 
 
 int MCMatching::getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MCParticle* mcParticle,
-                                              vector<const MCParticle*>& genParts)
+                                              const vector<const MCParticle*>& genParts)
 {
   //At first, call getMCErrors as usual
   int daughterStatus = getMCErrors(daughter);

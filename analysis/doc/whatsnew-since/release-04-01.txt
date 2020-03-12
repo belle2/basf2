@@ -22,7 +22,7 @@ Vertex Fitting
    The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile. 
    Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.  
 
- * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.TreeFitter`.
+ * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
    This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
    TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
 

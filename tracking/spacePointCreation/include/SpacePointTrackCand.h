@@ -343,10 +343,6 @@ namespace Belle2 {
     /** remove a SpacePoint (and its sorting parameter) from the SpacePointTrackCand */
     void removeSpacePoint(int indexInTrackCand);
 
-    /** Set the assigmment flag of all hits belonging to this track to the given value (default true),
-       * but do not touch any flags of the track itself. */
-    void forwardAssignmentState(bool assigned = true) const;
-
     /** Overloading the less operator to compare SPTCs based on their quality index. This is used in
      *  in SPTCSelectorXBestPerFamily for instance. */
     bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndicator < rhs.m_qualityIndicator; }

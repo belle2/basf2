@@ -204,7 +204,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         to the path that sets the quality indicator property of the found CDC standalone tracks
     :param add_vxdTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found VXDTF2 tracks
-        (Standard triplet QI is replaced in this case).
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

@@ -58,9 +58,6 @@ namespace Belle2 {
      */
     bool m_subsetCreation;
 
-    /// Reset flag of hits for tracks that do not pass QI, so that that hits can be used again
-    bool m_resetAssignmentState;
-
     /** Name of optional output StoreArray containing SpacePointTrackCands */
     std::string m_newNameSpacePointTrackCands;
 

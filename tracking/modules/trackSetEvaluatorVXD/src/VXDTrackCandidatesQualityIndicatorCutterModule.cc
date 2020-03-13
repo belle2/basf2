@@ -23,9 +23,7 @@ VXDTrackCandidatesQualityIndicatorCutterModule::VXDTrackCandidatesQualityIndicat
   addParam("NameSpacePointTrackCands", m_nameSpacePointTrackCands, "Name of expected StoreArray.", std::string(""));
   addParam("minRequiredQuality", m_minRequiredQuality, "Minimum value of qualityIndicator to keep candidate active.", float(0));
   addParam("SubsetCreation", m_subsetCreation,
-           "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePointTrackCands.", bool(false));
-  addParam("resetAssignmentState", m_resetAssignmentState,
-           "Reset flag of hits for tracks that do not pass QI, so that that hits can be used again.", bool(false));
+           "If True copy selected SpacePoints to new StoreArray, if False deactivate remaining SpacePoints.", bool(false));
   addParam("NewNameSpacePointTrackCands", m_newNameSpacePointTrackCands,
            "Only required if 'CreateNewStoreArray' is true. Name of StoreArray to store the subset. If the target name is equal to the source candidates not matching the selection criteria are deleted.",
            std::string("BestSpacePointTrackCands"));
@@ -55,19 +53,12 @@ void VXDTrackCandidatesQualityIndicatorCutterModule::deactivateCandidates()
   for (SpacePointTrackCand& sptc : m_spacePointTrackCands) {
     if (sptc.getQualityIndicator() < m_minRequiredQuality) {
       sptc.removeRefereeStatus(SpacePointTrackCand::c_isActive);
-      if (m_resetAssignmentState) {
-        sptc.forwardAssignmentState(false);
-      }
+      // Note: assignment state of individual hits does not have to be changed here (assignment not set until SPTC2RTConverterModule)
     }
   }
 }
 
 void VXDTrackCandidatesQualityIndicatorCutterModule::selectSubset()
 {
-  m_goodCandidates.select([this](const SpacePointTrackCand * sptc) {
-    if (m_resetAssignmentState) {
-      sptc->forwardAssignmentState(false);
-    }
-    return sptc->getQualityIndicator() >= this->m_minRequiredQuality;
-  });
+  m_goodCandidates.select([this](const SpacePointTrackCand * sptc) {return sptc->getQualityIndicator() >= this->m_minRequiredQuality;});
 }

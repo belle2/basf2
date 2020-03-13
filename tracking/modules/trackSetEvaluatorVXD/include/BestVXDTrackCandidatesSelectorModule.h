@@ -56,7 +56,7 @@ namespace Belle2 {
     /** Name of input StoreArray containing SpacePointTrackCands */
     std::string m_nameSpacePointTrackCands;
 
-    /** If True copy selected SpacePoints to new StoreArray,
+    /** If True copy selected SpacePointTrackCands to new StoreArray,
      * If False deactivate remaining SpacePointTrackCands.
      */
     bool m_subsetCreation;

@@ -1,15 +1,24 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-# The isSignalAcceptFlags(flag1, flag2...) is same as isSignal but would also
-# return ture when indicated error flags are set. For example, you could use
-# isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle) to represent
-# isSignalAcceptMissingNeutrinoAndWrongFSP:
-#   >>>vm.addAlias("isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle)")
-# and
-# isSignalAcceptFlags(c_MissGamma, c_DecayInFlight)
-# for isSignalAcceptMissGammaAndDecayInFlight:
-#   >>>vm.addAlias("isSignalAcceptMissGammaAndDecayInFlight", "isSignalAcceptFlags(c_MissGamma, c_DecayInFlight)")
+# add_isSignalAcceptFlags() in variables.utils decodes the mcErrors codes into human readable tags
+# like `isSignalAcceptMissingGamma`. After release-05-00-00 all isSignalSomething tags would be
+# implemented in add_isSignalAcceptFlags() instead of analysis/variables/src/MCTruthVariables.cc.
+#
+# Example:
+#
+#     Call this function before using isSignalSomething:
+#     >>> variables.utils.add_isSignalAcceptFlags()
+#     >>> variables.variables.addAlias("D0_isSignalAcceptMissingGamma", "daughter(0, isSignalAcceptMissingGamma)")
+#     >>> modularAnalysis.variablesToNtuple("D*+:reconstruction",
+#     ...                                   ["isSignalAcceptMissingGamma", "D0_isSignalAcceptMissingGamma"],
+#     ...                                   filename=YourFile, treename=YourTreeName, path=YourPath)
+#
+# The decoding process is implemented by the meta function unmask(), which looks like:
+# >>> vm.addAlias("isSignalAcceptMissingGammaAndDecayInFlight", "passesCut(unmask(mcErrors," +
+# ...             "%d) == %d)" % (c_MissGamma | c_DecayInFlight, c_Correct))
+# For more infomation, please check analysis/scripts/variables/utils.py. And you could also easily
+# learn how to define a new isSignalSomething from the code in add_isSignalAcceptFlags().
 #
 # Guanda Gong
 #
@@ -22,6 +31,10 @@ from variables import variables as vm
 import variables.collections as vc
 import variables.utils as vu
 import stdV0s
+
+# adjust log level, which would be helpful when debugging
+# b2.logging.log_level = b2.LogLevel.DEBUG
+b2.logging.log_level = b2.LogLevel.INFO
 
 # Create a new path
 mypath = b2.Path()
@@ -42,18 +55,19 @@ ma.reconstructDecay('D*+:Example -> pi+:all D0:Example', '0 < Q < 0.022 and useC
 # add MC matching process, during which the isSignal and mcErrors are calculated
 ma.matchMCTruth(list_name='D*+:Example', path=mypath)
 
-# *** Use isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle) to represent
-# isSignalAcceptMissingNeutrinoAndWrongFSP ***
-vm.addAlias("isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle)")
-# *** Use isSignalAcceptFlags(c_MissGamma, c_DecayInFlight) to represent isSignalAcceptMissGammaAndDecayInFlight ***
-vm.addAlias("isSignalAcceptMissGammaAndDecayInFlight", "isSignalAcceptFlags(c_MissGamma, c_DecayInFlight)")
+# Call add_isSignalAcceptFlags() before using isSignalSomething
+vu.add_isSignalAcceptFlags()
 
 # declare what variables are needed
 basic_vars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_variables
-basic_vars += ["isSignalAcceptWrongFSPs"]
-basic_vars += ["isSignalAcceptMissingNeutrino", "isSignalAcceptMissingMassive"]
-basic_vars += ["isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"]
-basic_vars += ["isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptMissGammaAndDecayInFlight"]
+
+isSignalSomething_vars = ["isSignalAcceptWrongFSPs"]
+isSignalSomething_vars += ["isSignalAcceptMissingNeutrino", "isSignalAcceptMissingMassive"]
+isSignalSomething_vars += ["isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"]
+isSignalSomething_vars += ["isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptMissingGammaAndDecayInFlight"]
+
+basic_vars += isSignalSomething_vars
+
 
 # declare variables of which particles are needed to read out, while declaring the specified variables for
 # certain particles like Q for Dst and charge for slow pion
@@ -82,8 +96,11 @@ Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_v
                                                        decay_string='D*+ -> pi+ [D0 -> pi- pi+ [K_S0 -> pi+ ^pi-]]',
                                                        prefix='KsPi2')
 
+vm.printAliases()
+
+
 # save the variables using variablesToNtuple
-ma.variablesToNtuple('D*+:Example', Dst_string_variables, filename="isSignalAcceptFlags.root",
+ma.variablesToNtuple('D*+:Example', Dst_string_variables + isSignalSomething_vars, filename="isSignalAcceptFlags.root",
                      treename='Dst', path=mypath)
 
 b2.process(mypath)

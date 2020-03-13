@@ -52,9 +52,9 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
-     * same as isSignal, but accept certain mcError bits
+     * Set certain bits in a variable to zero
      */
-    Manager::FunctionPtr isSignalAcceptFlags(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments);
 
 
     /**

@@ -1382,45 +1382,42 @@ namespace Belle2 {
       }
     }
 
-
-    Manager::FunctionPtr isSignalAcceptFlags(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments)
     {
-      // convert error bit names to error bits
-      std::vector<int> acceptBits;
-      for (auto& argument : arguments) {
-        // this would need to be change when the definition of bits change
-        if (argument == "c_MissFSR")               acceptBits.push_back(MCMatching::c_MissFSR);
-        else if (argument == "c_MissingResonance")      acceptBits.push_back(MCMatching::c_MissingResonance);
-        else if (argument == "c_DecayInFlight")         acceptBits.push_back(MCMatching::c_DecayInFlight);
-        else if (argument == "c_MissNeutrino")          acceptBits.push_back(MCMatching::c_MissNeutrino);
-        else if (argument == "c_MissGamma")             acceptBits.push_back(MCMatching::c_MissGamma);
-        else if (argument == "c_MissMassiveParticle")   acceptBits.push_back(MCMatching::c_MissMassiveParticle);
-        else if (argument == "c_MissKlong")             acceptBits.push_back(MCMatching::c_MissKlong);
-        else if (argument == "c_MisID")                 acceptBits.push_back(MCMatching::c_MisID);
-        else if (argument == "c_AddedWrongParticle")    acceptBits.push_back(MCMatching::c_AddedWrongParticle);
-        else if (argument == "c_InternalError")         acceptBits.push_back(MCMatching::c_InternalError);
-        else if (argument == "c_MissPHOTOS")            acceptBits.push_back(MCMatching::c_MissPHOTOS);
-        else if (argument == "c_AddedRecoBremsPhoton")  acceptBits.push_back(MCMatching::c_AddedRecoBremsPhoton);
-        else B2FATAL("Wrong flag `" << argument << "` given to isSignalAcceptFlags");
-      }
+      if (arguments.size() >= 2) {
+        // get the function pointer of variable to be unmasked
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
 
-      // clean the accepted bits
-      auto func = [acceptBits](const Particle * particle) -> double {
-        const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
-        if (mcparticle == nullptr)
-          return std::numeric_limits<double>::quiet_NaN();
-        int status = MCMatching::getMCErrors(particle, mcparticle);
-        for (auto& acceptBit : acceptBits)
-        {
-          status &= (~acceptBit);
+        // get the final mask which summarize all the input masks
+        int finalMask = 0;
+        for (int i = 1; i < arguments.size(); ++i) {
+          try {
+            finalMask |= Belle2::convertString<int>(arguments[i]);
+          } catch (boost::bad_lexical_cast&) {
+            B2FATAL("The input flags to meta function unmask() should be integer!");
+            return nullptr;
+          }
         }
 
-        return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-      };
-      return func;
+        // unmask the variable
+        auto func = [var, finalMask](const Particle * particle) -> double {
+          int value = int(var->function(particle));
 
+          // judge if the value is nan before unmasking
+          if (std::isnan(value))
+            return std::numeric_limits<double>::quiet_NaN();
+
+          // apply the final mask
+          value &= (~finalMask);
+
+          return value;
+        };
+        return func;
+
+      } else {
+        B2FATAL("Wrong number of arguments for meta function unmask");
+      }
     }
-
 
 
     Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
@@ -2811,12 +2808,11 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
-    REGISTER_VARIABLE("isSignalAcceptFlags(flag1, flag2, ...)", isSignalAcceptFlags,
-                      "Same as isSignal but accept certain mcError bits.\n"
-                      "For example, you could use isSignalAcceptFlags(c_MissNeutrino ,c_MisID, c_AddedWrongParticle) to \n"
-                      "represent isSignalAcceptMissingNeutrinoAndWrongFSP and \n"
-                      "isSignalAcceptFlags(c_MissGamma, c_DecayInFlight) for isSignalAcceptMissGammaAndDecayInFlight.\n"
-                      "More error flag definition could be found in analysis/utility/include/MCMatching.h .");
+    REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
+                      "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
+                      "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
+                      "unmask(variable, 2, 8, 16) or unmask(variable, 26).\n"
+                      "");
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");

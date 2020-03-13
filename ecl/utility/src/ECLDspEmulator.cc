@@ -153,6 +153,14 @@ namespace Belle2 {
       ECLShapeFit result;
       result.fit.resize(31);
 
+      //== Check for pedestal amplitude overflow
+
+      if (z00 > 0x3FFFF) {
+        skip_fit = true;
+        validity_code = c_InternalError;
+        A1 = -128;
+      }
+
       /***   FIRST APPROXIMATION   ***/
 
       //== First approximation without time correction
@@ -279,7 +287,7 @@ namespace Belle2 {
 
             if (B3 >= 0x37FE)
               delta_T = 2047;
-            else if (B3 <= 0x800)
+            else if ((B3 >> 1) <= 0x400)
               delta_T = -2047;
             else
               delta_T = ((B3 * 3 + 4) >> 3) - 3072;
@@ -389,7 +397,7 @@ namespace Belle2 {
       //== Compare amplitude to SKIP_THR
       //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
-      if (A1 < skip_thr) {
+      if (A1 < skip_thr && validity_code != c_InternalError) {
         skip_thr_flag = true;
       }
 

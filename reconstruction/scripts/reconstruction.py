@@ -433,7 +433,10 @@ def add_cdst_output(
         'BKLMHit1ds',
         'BKLMHit2dsToBKLMHit1ds',
         'BKLMHit1dsToBKLMDigits',
-        'SVDShaperDigitsFromTracks'
+        'SVDShaperDigitsFromTracks',
+        'TRGGDLUnpackerStores',
+        'VXDDedxTracks',
+        'VXDDedxLikelihoods'
     ]
 
     if rawFormat:

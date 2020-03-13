@@ -425,6 +425,7 @@ namespace Belle2 {
 
         Const::ChargedStable pTypeP(Const::pion);
         Const::ChargedStable pTypeM(Const::pion);
+        Particle::EFlavorType v0FlavorType = Particle::c_Unflavored;
 
         if (v0Type.getPDGCode() == Const::Kshort.getPDGCode()) { // K0s -> pi+ pi-
           pTypeP = Const::pion;
@@ -432,9 +433,11 @@ namespace Belle2 {
         } else if (v0Type.getPDGCode() == Const::Lambda.getPDGCode()) { // Lambda -> p+ pi-
           pTypeP = Const::proton;
           pTypeM = Const::pion;
+          v0FlavorType = Particle::c_Flavored; // K0s are not flavoured, lambdas are
         } else if (v0Type.getPDGCode() == Const::antiLambda.getPDGCode()) { // anti-Lambda -> pi+ anti-p-
           pTypeP = Const::pion;
           pTypeM = Const::proton;
+          v0FlavorType = Particle::c_Flavored;
         } else if (v0Type.getPDGCode() == Const::photon.getPDGCode()) { // gamma -> e+ e-
           pTypeP = Const::electron;
           pTypeM = Const::electron;
@@ -474,29 +477,34 @@ namespace Belle2 {
           newDaugP = particles.appendNew(daugP);
         }
 
+        // if there are PIDLikelihoods and MCParticles then also add relations to the particles
         if (pidP)
           newDaugP->addRelationTo(pidP);
         if (mcParticleP)
           newDaugP->addRelationTo(mcParticleP);
-
         if (pidM)
           newDaugM->addRelationTo(pidM);
         if (mcParticleM)
           newDaugM->addRelationTo(mcParticleM);
 
+        // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
+        Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
+                     Particle::EParticleType::c_V0, v0->getArrayIndex());
 
-        Particle v0P(v0Momentum, v0Type.getPDGCode());
+        // add the daughters of the V0 (in the correct order) and don't update
+        // the type to c_Composite (i.e. maintain c_V0)
         if (correctOrder) {
-          v0P.appendDaughter(newDaugP);
-          v0P.appendDaughter(newDaugM);
+          v0P.appendDaughter(newDaugP, false);
+          v0P.appendDaughter(newDaugM, false);
         } else {
-          v0P.appendDaughter(newDaugM);
-          v0P.appendDaughter(newDaugP);
+          v0P.appendDaughter(newDaugM, false);
+          v0P.appendDaughter(newDaugP, false);
         }
 
+        // append the particle to the Particle StoreArray and check that we pass
+        // any cuts before adding the new particle to the ParticleList
         Particle* newPart = particles.appendNew(v0P);
-
         string listName = get<c_PListName>(v02Plist);
         auto& cut = get<c_CutPointer>(v02Plist);
         StoreObjPtr<ParticleList> plist(listName);

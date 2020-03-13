@@ -31,6 +31,7 @@ namespace Belle2 {
   class TrackFitResult;
   class MCParticle;
   class PIDLikelihood;
+  class V0;
 
   /**
    * Class to store reconstructed particles.
@@ -76,7 +77,7 @@ namespace Belle2 {
     /**
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_MCParticle, c_Composite};
+    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -691,6 +692,14 @@ namespace Belle2 {
      * @return const pointer to the Track
      */
     const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the V0 object that was used to create this
+     * Particle (if ParticleType == c_V0). NULL pointer is returned if the
+     * Particle was not made from a V0.
+     * @return const pointer to the V0
+     */
+    const V0* getV0() const;
 
     /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which

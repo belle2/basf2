@@ -815,7 +815,9 @@ namespace Belle2 {
         //        std::map<unsigned short, float>::iterator it = m_badWire.find(wid.getEWire());
         //        bool torf = (it != m_badWire.end()) ? true : false;
         //        return torf;
-        return (*m_badWireFromDB)->isBadWire(wid);
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isBadWire(wid) : false;
+        return torf;
+
       }
 
       /**
@@ -823,7 +825,17 @@ namespace Belle2 {
        */
       inline bool isDeadWire(const WireID& wid, double& eff)
       {
-        return (*m_badWireFromDB)->isDeadWire(wid, eff);
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isDeadWire(wid, eff) : false;
+        return torf;
+      }
+
+      /**
+       * Inquire if the wire is hot
+       */
+      inline bool isHotWire(const WireID& wid)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isHotWire(wid) : false;
+        return torf;
       }
 
       /**

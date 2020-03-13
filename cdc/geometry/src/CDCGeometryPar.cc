@@ -1321,19 +1321,26 @@ void CDCGeometryPar::setT0()
 void CDCGeometryPar::calcMeanT0()
 {
   B2DEBUG(29, "calcMeanT0 start");
-  unsigned short nw = 0;
+  double effiSum = 0.;
   m_meanT0 = 0.;
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
       if (m_t0[iCL][iW] == 0.) continue;
       const WireID wid = WireID(iCL, iW);
+      if (isHotWire(wid)) continue;
       if (isBadWire(wid)) continue;
       //TODO try to reject strage t0s more
-      ++nw;
-      m_meanT0 += m_t0[iCL][iW];
+      double effi = 1.;
+      isDeadWire(wid, effi);
+      effiSum += effi;
+      m_meanT0 += effi * m_t0[iCL][iW];
     }
   }
-  if (nw > 0) m_meanT0 /= nw;
+  if (effiSum > 0.) {
+    m_meanT0 /= effiSum;
+  } else {
+    B2FATAL("Wire efficiency sum <= 0!");
+  }
   B2DEBUG(29, "calcMeanT0 end");
 }
 

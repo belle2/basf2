@@ -369,87 +369,87 @@ void AlignDQMModule::defineHisto()
   DirAlignHalfShells->cd();
   // X
   // Unbiased residuals in X for PXD for Ying
-  name = str(format("Alig_UBResidualsPXDX_Ying"));
-  title = str(format("Unbiased residuals in X for PXD for Ying"));
+  name = "Alig_UBResidualsPXDX_Ying";
+  title = "Unbiased residuals in X for PXD for Ying";
   m_UBResidualsPXDX_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDX_Ying->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDX_Ying->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in X for PXD for Yang
-  name = str(format("Alig_UBResidualsPXDX_Yang"));
-  title = str(format("Unbiased residuals in X for PXD for Yang"));
+  name = "Alig_UBResidualsPXDX_Yang";
+  title = "Unbiased residuals in X for PXD for Yang";
   m_UBResidualsPXDX_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDX_Yang->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDX_Yang->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in X for SVD for Pat
-  name = str(format("Alig_UBResidualsSVDX_Pat"));
-  title = str(format("Unbiased residuals in X for SVD for Pat"));
+  name = "Alig_UBResidualsSVDX_Pat";
+  title = "Unbiased residuals in X for SVD for Pat";
   m_UBResidualsSVDX_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDX_Pat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDX_Pat->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in X for SVD for Mat
-  name = str(format("Alig_UBResidualsSVDX_Mat"));
-  title = str(format("Unbiased residuals in X for SVD for Mat"));
+  name = "Alig_UBResidualsSVDX_Mat";
+  title = "Unbiased residuals in X for SVD for Mat";
   m_UBResidualsSVDX_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDX_Mat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDX_Mat->GetYaxis()->SetTitle("counts");
 
   // Y
   // Unbiased residuals in Y for PXD for Ying
-  name = str(format("Alig_UBResidualsPXDY_Ying"));
-  title = str(format("Unbiased residuals in Y for PXD for Ying"));
+  name = "Alig_UBResidualsPXDY_Ying";
+  title = "Unbiased residuals in Y for PXD for Ying";
   m_UBResidualsPXDY_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDY_Ying->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDY_Ying->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Y for PXD for Yang
-  name = str(format("Alig_UBResidualsPXDY_Yang"));
-  title = str(format("Unbiased residuals in Y for PXD for Yang"));
+  name = "Alig_UBResidualsPXDY_Yang";
+  title = "Unbiased residuals in Y for PXD for Yang";
   m_UBResidualsPXDY_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDY_Yang->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDY_Yang->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Y for SVD for Pat
-  name = str(format("Alig_UBResidualsSVDY_Pat"));
-  title = str(format("Unbiased residuals in Y for SVD for Pat"));
+  name = "Alig_UBResidualsSVDY_Pat";
+  title = "Unbiased residuals in Y for SVD for Pat";
   m_UBResidualsSVDY_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDY_Pat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDY_Pat->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Y for SVD for Mat
-  name = str(format("Alig_UBResidualsSVDY_Mat"));
-  title = str(format("Unbiased residuals in Y for SVD for Mat"));
+  name = "Alig_UBResidualsSVDY_Mat";
+  title = "Unbiased residuals in Y for SVD for Mat";
   m_UBResidualsSVDY_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDY_Mat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDY_Mat->GetYaxis()->SetTitle("counts");
 
   // Z
   // Unbiased residuals in Z for PXD for Ying
-  name = str(format("Alig_UBResidualsPXDZ_Ying"));
-  title = str(format("Unbiased residuals in Z for PXD for Ying"));
+  name = "Alig_UBResidualsPXDZ_Ying";
+  title = "Unbiased residuals in Z for PXD for Ying";
   m_UBResidualsPXDZ_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDZ_Ying->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDZ_Ying->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Z for PXD for Yang
-  name = str(format("Alig_UBResidualsPXDZ_Yang"));
-  title = str(format("Unbiased residuals in Z for PXD for Yang"));
+  name = "Alig_UBResidualsPXDZ_Yang";
+  title = "Unbiased residuals in Z for PXD for Yang";
   m_UBResidualsPXDZ_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsPXDZ_Yang->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsPXDZ_Yang->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Z for SVD for Pat
-  name = str(format("Alig_UBResidualsSVDZ_Pat"));
-  title = str(format("Unbiased residuals in Z for SVD for Pat"));
+  name = "Alig_UBResidualsSVDZ_Pat";
+  title = "Unbiased residuals in Z for SVD for Pat";
   m_UBResidualsSVDZ_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDZ_Pat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDZ_Pat->GetYaxis()->SetTitle("counts");
 
   // Unbiased residuals in Z for SVD for Mat
-  name = str(format("Alig_UBResidualsSVDZ_Mat"));
-  title = str(format("Unbiased residuals in Z for SVD for Mat"));
+  name = "Alig_UBResidualsSVDZ_Mat";
+  title = "Unbiased residuals in Z for SVD for Mat";
   m_UBResidualsSVDZ_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDZ_Mat->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDZ_Mat->GetYaxis()->SetTitle("counts");

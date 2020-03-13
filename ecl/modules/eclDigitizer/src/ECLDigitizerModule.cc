@@ -33,6 +33,7 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLDspWithExtraInfo.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <ecl/utility/ECLDspEmulator.h>
@@ -68,6 +69,11 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
   addParam("WaveformThresholdOverride", m_WaveformThresholdOverride,
            "If gt 0 value is applied to all crystals for waveform saving threshold. If lt 0 dbobject is used. (GeV)", -1.0);
+  addParam("StoreDspWithExtraInfo", m_storeDspWithExtraInfo,
+           "Flag to store Dsp with extra information in addition to normal Dsp (default: false)", false);
+  addParam("DspWithExtraInfoThreshold", m_DspWithExtraInfoThreshold, "Threshold above with to store Dsp with extra information [GeV]",
+           0.02);
+
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -77,6 +83,7 @@ ECLDigitizerModule::~ECLDigitizerModule()
 void ECLDigitizerModule::initialize()
 {
   m_eclDsps.registerInDataStore();
+  if (m_storeDspWithExtraInfo) m_eclDspsWithExtraInfo.registerInDataStore();
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
@@ -96,6 +103,8 @@ void ECLDigitizerModule::initialize()
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
   m_eclDsps.registerRelationTo(m_eclDigits);
+  if (m_storeDspWithExtraInfo)
+    m_eclDspsWithExtraInfo.registerRelationTo(m_eclDigits);
   m_eclDigits.registerRelationTo(m_eclHits);
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
@@ -221,17 +230,25 @@ int ECLDigitizerModule::shapeSignals()
 
   const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
   const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
+  const double T2ticks = ec.m_rf / ec.s_clock;  // conversion to ADC ticks
 
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
     int j = hit.getCellId() - 1; //0~8735
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
+
+    m_adc[j].energyConversion = m_calib[j].ascale * E2GeV * 20000;
+    m_adc[j].flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
+    m_adc[j].timeshift += m_calib[j].tshift * hit.getEnergyDep();
+    m_adc[j].timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
+    m_adc[j].totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
+    m_adc[j].totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
+
     if (m_HadronPulseShape == true) {
       double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
       m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
       m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
-      m_adc[j].totalHadron += hit.getHadronEnergyDep();
     } else {
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
     }
@@ -390,6 +407,19 @@ void ECLDigitizerModule::event()
         eclDsp->setDspA(FitA);
       }
 
+      // only store extra info if requested and above threshold
+      if (m_storeDspWithExtraInfo and  a.totalDep >= m_DspWithExtraInfoThreshold) {
+        const auto eclDspWithExtraInfo = m_eclDspsWithExtraInfo.appendNew();
+        eclDspWithExtraInfo->setCellId(CellId);
+        eclDspWithExtraInfo->setDspA(FitA);
+        eclDspWithExtraInfo->setEnergyDep(a.totalDep);
+        eclDspWithExtraInfo->setHadronEnergyDep(a.totalHadronDep);
+        eclDspWithExtraInfo->setFlightTime(a.flighttime / a.totalDep);
+        eclDspWithExtraInfo->setTimeShift(a.timeshift / a.totalDep);
+        eclDspWithExtraInfo->setTimeToSensor(a.timetosensor / a.totalDep);
+        eclDspWithExtraInfo->setEnergyConversion(a.energyConversion * 20000);
+      }
+
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
@@ -400,6 +430,11 @@ void ECLDigitizerModule::event()
       else eclDigit->setChi(0);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
+
+      // set relation to DspWithExtraInfo
+      for (auto& DspWithExtraInfo : m_eclDspsWithExtraInfo) {
+        if (eclDigit->getCellId() == DspWithExtraInfo.getCellId()) DspWithExtraInfo.addRelationTo(eclDigit);
+      }
     }
   } //store each crystal hit
   if (comp) delete comp;

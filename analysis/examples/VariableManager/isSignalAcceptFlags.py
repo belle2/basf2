@@ -36,7 +36,6 @@ import stdV0s
 
 # adjust log level, which would be helpful when debugging
 # b2.logging.log_level = b2.LogLevel.DEBUG
-b2.logging.log_level = b2.LogLevel.INFO
 
 # Create a new path
 mypath = b2.Path()
@@ -57,52 +56,52 @@ ma.reconstructDecay('D*+:Example -> pi+:all D0:Example', '0 < Q < 0.022 and useC
 # add MC matching process, during which the isSignal and mcErrors are calculated
 ma.matchMCTruth(list_name='D*+:Example', path=mypath)
 
-# Call add_isSignalAcceptFlags() before using isSignalSomething
-vu.add_isSignalAcceptFlags()
-
 # declare what variables are needed
 basic_vars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_variables
 
+# In principle, add_isSignalAcceptFlags() should be called before using isSignalAcceptSomething. However,
+# this function is called automatically in analysis/scripts/variables/__init__.py when importing variables module,
+# so you don't need to really call it. All you need to do is be aware of this function is called automatically.
+# vu.add_isSignalAcceptFlags()
+
+# The following isSignalSomthing variables are predefined in add_isSignalAcceptFlags(),
 isSignalSomething_vars = ["isSignalAcceptWrongFSPs"]
 isSignalSomething_vars += ["isSignalAcceptMissingNeutrino", "isSignalAcceptMissingMassive"]
 isSignalSomething_vars += ["isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"]
 isSignalSomething_vars += ["isSignalAcceptMissingNeutrinoAndWrongFSP", "isSignalAcceptMissingGammaAndDecayInFlight"]
 
+# Try to defined your onw isSignalAcceptSomthing
+
+# c_Correct = 0    # This Particle and all its daughters are perfectly reconstructed.
+# c_MissFSR = 1    # A Final State Radiation (FSR) photon is not reconstructed (based
+# # on MCParticle::c_IsFSRPhoton).
+# c_MissingResonance = 2    # The associated MCParticle decay contained additional non-final-state
+# # particles (e.g. a rho) that weren't reconstructed. This is probably O.K. in most cases
+# c_DecayInFlight = 4    # A Particle was reconstructed from the secondary decay product of the actual particle.
+# # This means that a wrong hypothesis was used to reconstruct it, which e.g. for tracks might
+# # mean a pion hypothesis was used for a secondary electron.
+# c_MissNeutrino = 8    # A neutrino is missing (not reconstructed).
+# c_MissGamma = 16   # A photon (not FSR) is missing (not reconstructed).
+# c_MissMassiveParticle = 32   # A generated massive FSP is missing (not reconstructed).
+# c_MissKlong = 64   # A Klong is missing (not reconstructed).
+# c_MisID = 128  # One of the charged final state particles is mis-identified.
+# c_AddedWrongParticle = 256  # A non-FSP Particle has wrong PDG code, meaning one of the daughters (or their daughters)
+# # belongs to another Particle.
+# c_InternalError = 512  # There was an error in MC matching. Not a valid match. Might indicate fake/background track or cluster.
+# c_MissPHOTOS = 1024  # A photon created by PHOTOS was not reconstructed (based on MCParticle::c_IsPHOTOSPhoton)
+# # A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle) has no MC particle
+# c_AddedRecoBremsPhoton = 2048
+# # assigned, or it doesn't belong to the decay chain
+vm.addAlias("isSignalAcceptMissingGammaAndMissingNeutrino", "passesCut(unmask(mcErrors, 8, 16) == 0)")
+isSignalSomething_vars += ["isSignalAcceptMissingGammaAndMissingNeutrino"]
+
 basic_vars += isSignalSomething_vars
-
-
-# declare variables of which particles are needed to read out, while declaring the specified variables for
-# certain particles like Q for Dst and charge for slow pion
-Dst_string_variables = vu.create_aliases_for_selected(list_of_variables=basic_vars + ['Q'],
-                                                      decay_string='^D*+ -> pi+ D0',
-                                                      prefix='Dst')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars + ['charge'],
-                                                       decay_string='D*+ -> ^pi+ D0',
-                                                       prefix='spi')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ ^D0',
-                                                       prefix='D0')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ [D0 -> ^pi- pi+ K_S0]',
-                                                       prefix='pim')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ [D0 -> pi- ^pi+ K_S0]',
-                                                       prefix='pip')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ [D0 -> pi- pi+ ^K_S0]',
-                                                       prefix='Ks')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ [D0 -> pi- pi+ [K_S0 -> ^pi+ pi-]]',
-                                                       prefix='KsPi1')
-Dst_string_variables += vu.create_aliases_for_selected(list_of_variables=basic_vars,
-                                                       decay_string='D*+ -> pi+ [D0 -> pi- pi+ [K_S0 -> pi+ ^pi-]]',
-                                                       prefix='KsPi2')
 
 vm.printAliases()
 
 
 # save the variables using variablesToNtuple
-ma.variablesToNtuple('D*+:Example', Dst_string_variables + isSignalSomething_vars, filename="isSignalAcceptFlags.root",
+ma.variablesToNtuple('D*+:Example', basic_vars, filename="isSignalAcceptFlags.root",
                      treename='Dst', path=mypath)
 
 b2.process(mypath)

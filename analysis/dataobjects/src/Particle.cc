@@ -20,6 +20,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -739,6 +740,16 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
     return nullptr;
+}
+
+const V0* Particle::getV0() const
+{
+  if (m_particleType == c_V0) {
+    StoreArray<V0> v0s;
+    return v0s[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
 }
 
 

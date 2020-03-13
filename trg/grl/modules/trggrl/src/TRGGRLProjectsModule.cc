@@ -612,9 +612,9 @@ void TRGGRLProjectsModule::event()
   }
 
   bool klm_hit = klmtracklist.getEntries() > 0;
-  bool klm_0 = (klmtracklist.getEntries() == 1);
-  bool klm_1 = (klmtracklist.getEntries() == 2);
-  bool klm_2 = (klmtracklist.getEntries() > 2);
+  bool klm_0 = (klmtracklist.getEntries() & (1 << 0)) != 0;
+  bool klm_1 = (klmtracklist.getEntries() & (1 << 1)) != 0;
+  bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
 
   bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
   bool cdcklm_1 = (trackKLMmatch.getEntries() == 2);

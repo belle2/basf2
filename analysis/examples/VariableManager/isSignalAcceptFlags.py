@@ -18,7 +18,9 @@
 # >>> vm.addAlias("isSignalAcceptMissingGammaAndDecayInFlight", "passesCut(unmask(mcErrors," +
 # ...             "%d) == %d)" % (c_MissGamma | c_DecayInFlight, c_Correct))
 # For more infomation, please check analysis/scripts/variables/utils.py. And you could also easily
-# learn how to define a new isSignalSomething from the code in add_isSignalAcceptFlags().
+# learn how to define a new isSignalSomething from the code in add_isSignalAcceptFlags(). The definition of mc match
+# error flags could be found in:
+# https://b2-master.belle2.org/software/development/sphinx/analysis/doc/MCMatching.html#error-flags
 #
 # Guanda Gong
 #

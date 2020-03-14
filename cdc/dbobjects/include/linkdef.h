@@ -64,4 +64,15 @@
       m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)); \
     }\
   }"
+
+#pragma read sourceClass="Belle2::CDCBadWires" version="[-1]" \
+  source="std::vector<unsigned short> m_wires" \
+  targetClass="Belle2::CDCBadWires" \
+  target="m_wires" \
+  code="{ \
+    float effi = 0.; \
+    for (int i=0; i < onfile.m_wires.size(); ++i) { \
+      m_wires.insert(std::pair<unsigned short,float>(onfile.m_wires[i], effi)); \
+    }\
+  }"
 #endif

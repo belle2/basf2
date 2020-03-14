@@ -257,7 +257,7 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
 
   int status = 0;
 
-  // Check if particle (non FSP) has different PDG code from mcParticle
+  // Check if particle (non FSP) has different PDG code than mcParticle
   const Particle::EFlavorType flavorType = particle->getFlavorType();
   if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
       or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG()))) {
@@ -293,7 +293,7 @@ int MCMatching::getFlagsOfFSP(const Particle* particle, const MCParticle* mcPart
   if (particle->getPDGCode() == mcParticle->getPDG())
     return MCErrorFlags::c_Correct;
 
-  // if PDG of particle is different with that of mcParticle
+  // if PDG of particle is different from that of mcParticle
   if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) {
     // if particle is primary, add the c_MisID flag.
     return MCErrorFlags::c_MisID;

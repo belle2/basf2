@@ -93,7 +93,7 @@ bool MCMatching::setMCTruth(const Particle* particle)
   if (particle->hasExtraInfo(c_extraInfoMCErrors))
     return true;
 
-  if (auto mcParticle = particle->getRelatedTo<MCParticle>()) {
+  if (particle->getRelatedTo<MCParticle>()) {
     //nothing to do
     return true;
   }

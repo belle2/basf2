@@ -46,7 +46,8 @@ def run_copylists():
     dump_3_v2nts(["c", "d", "cd"], path=pa)
 
     # third test: check that two lists with the same daughers in different
-    # orders are included twice (because they are different particles)
+    # orders doesn't double count
+    # (they are different Belle2::Particles but we should match them)
     ma.reconstructDecay("vpho:e -> K+ pi-", "", path=pa)
     ma.reconstructDecay("vpho:f -> pi- K+", "", path=pa)
     ma.copyLists("vpho:ef", ["vpho:e", "vpho:f"], path=pa)
@@ -76,10 +77,10 @@ class TestCopyLists(unittest.TestCase):
         self.assertEqual(self._count("c") + self._count("d"), self._count("cd"))
 
     def test_different_daughter_order(self):
-        """Merging two lists with daughters in a different order should include
-        each of them twice (they are different particles)."""
+        """Merging two lists with daughters in a different order should not
+        double count."""
         self.assertEqual(self._count("e"), self._count("e"))
-        self.assertEqual(self._count("e") + self._count("f"), self._count("ef"))
+        self.assertEqual(self._count("e"), self._count("ef"))
 
 
 if __name__ == "__main__":

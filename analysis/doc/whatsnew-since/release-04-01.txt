@@ -22,6 +22,8 @@ Vertex Fitting
    The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile. 
    Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.  
 
+ * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -140,7 +142,9 @@ Modules
  * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
  * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
 
-Utilities
-+++++++++
+Utilities and core objects
+++++++++++++++++++++++++++
 
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
+ * Added a relation between Track-based Particles and TrackFitResults.
+ * Added a ``getTrackFitResult`` method to Particle.

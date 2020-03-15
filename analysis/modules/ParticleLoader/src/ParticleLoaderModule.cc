@@ -109,6 +109,7 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
+    StoreArray<TrackFitResult> trackfitresults;
     StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
@@ -121,6 +122,9 @@ namespace Belle2 {
     }
     if (pidlikelihoods.isOptional()) {
       particles.registerRelationTo(pidlikelihoods);
+    }
+    if (trackfitresults.isOptional()) {
+      particles.registerRelationTo(trackfitresults);
     }
 
     if (m_useMCParticles) {
@@ -456,8 +460,8 @@ namespace Belle2 {
         std::pair<Track*, Track*> v0Tracks = v0->getTracks();
         std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
-        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP, v0TrackFitResults.first->getParticleType());
-        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM, v0TrackFitResults.second->getParticleType());
+        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP);
+        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM);
 
         const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
         const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
@@ -482,10 +486,13 @@ namespace Belle2 {
           newDaugP->addRelationTo(pidP);
         if (mcParticleP)
           newDaugP->addRelationTo(mcParticleP);
+        newDaugP->addRelationTo(v0TrackFitResults.first);
+
         if (pidM)
           newDaugM->addRelationTo(pidM);
         if (mcParticleM)
           newDaugM->addRelationTo(mcParticleM);
+        newDaugM->addRelationTo(v0TrackFitResults.second);
 
         // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
@@ -589,10 +596,9 @@ namespace Belle2 {
           continue;
         }
 
-        // create particle and add it to the Particle list. The Particle class
-        // internally also uses the getTrackFitResultWithClosestMass() to load the best available
-        // track fit result
-        Particle particle(track, type);
+        // create particle and add it to the Particle list.
+        Particle particle(track->getArrayIndex(), trackFit, type);
+
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 
           Particle* newPart = particles.appendNew(particle);
@@ -600,6 +606,7 @@ namespace Belle2 {
             newPart->addRelationTo(pid);
           if (mcParticleWithWeight.first)
             newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
+          newPart->addRelationTo(trackFit);
 
           if (cut->check(newPart))
             plist->addParticle(newPart);

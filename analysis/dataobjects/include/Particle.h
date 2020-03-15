@@ -213,10 +213,22 @@ namespace Belle2 {
      *        This can be different as chargedStable as we don't fit all tracks with
      *        all hypothesis.
      */
+    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable,
              const Const::ChargedStable& chargedStableUsedForFit);
+
+    /**
+     * Constructor from a reconstructed Track given as TrackFitResult.
+     * To be used to create Particle objects from tracks with full control over
+     * the hypothesis (e.g. V0 daugthers).
+     * @param trackArrayIndex track StoreArray index
+     * @param trackFit pointer to TrackFitResult object
+     * @param chargedStable Type of charged particle
+     */
+    Particle(int trackArrayIndex, const TrackFitResult* trackFit,
+             const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -692,6 +704,13 @@ namespace Belle2 {
      * @return const pointer to the Track
      */
     const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the TrackFitResult that was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track.
+     * @return const pointer to the TrackFitResult
+     */
+    const TrackFitResult* getTrackFitResult() const;
 
     /**
      * Returns the pointer to the V0 object that was used to create this

@@ -487,7 +487,7 @@ def correctBremsBelle(outputListName,
 
 def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
-    Copy all unique Particle indices from all input ParticleLists to the
+    Copy all Particle indices from all input ParticleLists to the
     single output ParticleList.
     Note that the Particles themselves are not copied.
     The original and copied ParticleLists will point to the same Particles.

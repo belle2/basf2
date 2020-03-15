@@ -121,7 +121,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC9", "MC10", "MC11", "MC12", "MC13"],
+        choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
     )
     parser.add_argument(

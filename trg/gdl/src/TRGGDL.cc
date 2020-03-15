@@ -263,6 +263,7 @@ namespace Belle2 {
         if (_debugLevel > 89) printf("TRGGDL:TRGGRLInfo found.\n");
       }
 
+      _inpBits.clear();
       int input_summary = 0;
       for (int i = 0; i < N_InputBits; i++) {
         if (_debugLevel > 89) printf("TRGGDL:ABC:i(%d)\n", i);

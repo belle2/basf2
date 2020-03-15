@@ -9,6 +9,10 @@
 
 #include "daq/rfarm/manager/RFConf.h"
 
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+
 using namespace std;
 using namespace Belle2;
 

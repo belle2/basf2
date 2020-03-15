@@ -1,6 +1,11 @@
 
 #include <daq/roisend/RoiSenderCallback.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <csignal>
 
 using namespace Belle2;
 using namespace std;

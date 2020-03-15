@@ -2,9 +2,7 @@
 #define MMAP_STATISTICS_H
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>

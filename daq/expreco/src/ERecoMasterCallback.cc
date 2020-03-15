@@ -7,12 +7,12 @@
 #include "daq/rfarm/manager/RfUnitInfo.h"
 
 #include <daq/slc/nsm/NSMCommunicator.h>
-
+#include <daq/slc/runcontrol/RCCommand.h>
+#include <daq/slc/runcontrol/RCHandlerException.h>
 #include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
-
-#include <unistd.h>
+#include <daq/slc/base/TimeoutException.h>
 
 using namespace Belle2;
 

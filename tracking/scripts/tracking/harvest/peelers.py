@@ -278,14 +278,17 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
 
         # adjust relations if SVD->CDC CKF enabled
         if not space_point_track_cand:
-            svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-            if svd_cdc_track_cand:
-                svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+            svd_track_cand = reco_track.getRelated('SVDRecoTracks')
+            if not svd_track_cand:
+                svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+                if svd_cdc_track_cand:
+                    svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
             if not svd_track_cand:
                 temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-                svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
-                if svd_track_cand:
-                    space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
+                if temp_svd_track_cand:
+                    svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
+        if svd_track_cand:
+            space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
 
         if space_point_track_cand:
             svd_qi = space_point_track_cand.getQualityIndicator()
@@ -297,7 +300,8 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
                 cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
             if not cdc_track_cand:
                 temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-                cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
+                if temp_cdc_track_cand:
+                    cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
 
         if cdc_track_cand:
             cdc_qi = cdc_track_cand.getQualityIndicator()
@@ -322,23 +326,6 @@ def peel_trackfinder(reco_track, key="{part_name}"):
     used_CDCtoSVDCKF = False
 
     if reco_track:
-        # adjust relations if SVD->CDC CKF enabled
-        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-        if svd_cdc_track_cand:
-            svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
-        if not svd_track_cand:
-            temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-            svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
-
-        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-        if svd_cdc_track_cand:
-            cdc_track_cand = svd_cdc_track_cand.getRelated('CDCRecoTracks')
-            if not cdc_track_cand:
-                cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
-            if not cdc_track_cand:
-                temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-                cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
-
         if reco_track.getNumberOfSVDHits() > 0:
             info = get_reco_hit_information(reco_track, reco_track.getSVDHitList()[0])
             svd_tf = info.getFoundByTrackFinder()

@@ -7,8 +7,18 @@
 //-
 
 #include "daq/rfarm/manager/RFLogManager.h"
-#include <iostream>
+#include "daq/rfarm/manager/RFNSM.h"
+
+#include <nsm2/belle2nsm.h>
+
+#include <fcntl.h>
+#include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
+
+#include <cstdarg>
+#include <cstring>
+#include <iostream>
 
 using namespace Belle2;
 using namespace std;

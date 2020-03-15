@@ -2,7 +2,6 @@
 #define _Belle2_RFRunControlCallback_hh
 
 #include <daq/slc/runcontrol/RCCallback.h>
-#include <daq/slc/nsm/NSMData.h>
 
 namespace Belle2 {
 

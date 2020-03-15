@@ -20,6 +20,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -172,21 +173,25 @@ Particle::Particle(const TLorentzVector& momentum,
 
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
+  Particle(track ? track->getArrayIndex() : 0, track ? track->getTrackFitResultWithClosestMass(chargedStable) : nullptr,
+           chargedStable)
+{
+}
+
+Particle::Particle(const int trackArrayIndex,
+                   const TrackFitResult* trackFit,
+                   const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
-  if (!track) return;
-
-  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-  if (closestMassFitResult == nullptr) return;
+  if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  setMdstArrayIndex(track->getArrayIndex());
+  setMdstArrayIndex(trackArrayIndex);
 
-  const auto trackFit = closestMassFitResult;
-  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
+  m_pdgCodeUsedForFit = trackFit->getParticleType().getPDGCode();
   m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
@@ -198,7 +203,7 @@ Particle::Particle(const Track* track,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
-
+//FIXME: Deprecated, to be removed after release-05
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable,
@@ -711,6 +716,23 @@ const Track* Particle::getTrack() const
     return nullptr;
 }
 
+const TrackFitResult* Particle::getTrackFitResult() const
+{
+  // if the particle is related to a TrackFitResult then return this
+  auto* selfrelated = this->getRelatedTo<TrackFitResult>();
+  if (selfrelated)
+    return selfrelated;
+
+  // if not get the TFR with closest mass to this particle
+  auto* selftrack = this->getTrack();
+  if (selftrack)
+    return selftrack->getTrackFitResultWithClosestMass(
+             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+
+  // otherwise we're probably not a track based particle
+  return nullptr;
+}
+
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
   if (m_particleType == c_Track) {
@@ -718,6 +740,16 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
     return nullptr;
+}
+
+const V0* Particle::getV0() const
+{
+  if (m_particleType == c_V0) {
+    StoreArray<V0> v0s;
+    return v0s[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
 }
 
 
@@ -1182,5 +1214,3 @@ int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::Charg
   if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
 }
-
-

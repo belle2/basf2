@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
@@ -34,6 +35,7 @@
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -313,9 +315,11 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<TrackFitResult> myResults;
     StoreArray<Track> myTracks;
+    StoreArray<V0> myV0s;
     StoreArray<Particle> myParticles;
     myResults.registerInDataStore();
     myTracks.registerInDataStore();
+    myV0s.registerInDataStore();
     myParticles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
@@ -347,10 +351,12 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     EXPECT_TRUE(vIsFromTrack->function(part));
     EXPECT_FALSE(vIsFromECL->function(part));
     EXPECT_FALSE(vIsFromKLM->function(part));
+    EXPECT_FALSE(vIsFromV0->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -358,6 +364,29 @@ namespace {
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
 
+    //-----------------------------------------------------------------------
+    // now add another track and mock up a V0 and a V0-based particle
+    myResults.appendNew(position, momentum, cov6, charge * -1,
+                        Const::electron, pValue, bField, CDCValue, 16777215);
+    Track secondTrack;
+    secondTrack.setTrackFitResultIndex(Const::electron, 1);
+    Track* savedTrack2 = myTracks.appendNew(secondTrack);
+    myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
+    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
+    const TLorentzVector v0Momentum(momentum * 2, (momentum * 2).Mag());
+    auto v0particle = myParticles.appendNew(v0Momentum, 22,
+                                            Particle::c_Unflavored, Particle::c_V0, 0);
+    v0particle->appendDaughter(0, false);
+    v0particle->appendDaughter(1, false);
+    //-----------------------------------------------------------------------
+
+    EXPECT_FALSE(vIsFromTrack->function(v0particle));
+    EXPECT_FALSE(vIsFromECL->function(v0particle));
+    EXPECT_FALSE(vIsFromKLM->function(v0particle));
+    EXPECT_TRUE(vIsFromV0->function(v0particle));
+
+    const Manager::Var* vNDaughters = Manager::Instance().getVariable("nDaughters");
+    EXPECT_FLOAT_EQ(vNDaughters->function(v0particle), 2);
   }
 
   class MCTruthVariablesTest : public ::testing::Test {
@@ -4731,83 +4760,83 @@ namespace {
   };
 
   // MC vertex tests
-  TEST_F(VertexVariablesTest, mcX)
+  TEST_F(VertexVariablesTest, mcDecayVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
   }
 
-  TEST_F(VertexVariablesTest, mcY)
+  TEST_F(VertexVariablesTest, mcDecayVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
   }
 
-  TEST_F(VertexVariablesTest, mcZ)
+  TEST_F(VertexVariablesTest, mcDecayVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
   }
 
 
-  TEST_F(VertexVariablesTest, mcDistance)
+  TEST_F(VertexVariablesTest, mcDecayVertexFromIPDistance)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcDistance");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcRho)
+  TEST_F(VertexVariablesTest, mcDecayVertexRho)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcRho");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexX)
+  TEST_F(VertexVariablesTest, mcProductionVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexY)
+  TEST_F(VertexVariablesTest, mcProductionVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexZ)
+  TEST_F(VertexVariablesTest, mcProductionVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
   }

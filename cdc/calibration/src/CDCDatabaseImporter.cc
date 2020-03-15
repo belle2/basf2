@@ -234,14 +234,15 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   bw.construct();
 
   int iL(0), iC(0), nRead(0);
+  double effi(0.);
 
   while (true) {
-    stream >> iL >> iC;
+    stream >> iL >> iC >> effi;
     if (stream.eof()) break;
     ++nRead;
-    bw->setWire(WireID(iL, iC));
+    bw->setWire(WireID(iL, iC), effi);
     //      if (m_debug) {
-    //  std::cout << iL << " " << iC << std::endl;
+    //  std::cout << iL << " " << iC << " " << effi << std::endl;
     //      }
   }
   stream.close();

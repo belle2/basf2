@@ -18,6 +18,7 @@
 #include <TH1.h>
 
 #include <boost/program_options.hpp>
+#include <fstream>
 #include <iostream>
 
 

@@ -2129,27 +2129,6 @@ def markDuplicate(particleList, prioritiseV0, path):
     path.add_module(markdup)
 
 
-def V0ListMerger(firstList, secondList, prioritiseV0, path):
-    """
-    Merge two particle lists, vertex them and trim duplicates
-
-    @param firstList first particle list to merge
-    @param secondList second particle list to merge
-    @param prioritiseV0 if true, give V0s a higher priority
-    """
-
-    from vertex import vertexKFit
-    listName = firstList.split(':')[0]
-    if (listName == secondList.split(':')[0]):
-        outList = listName + ':merged'
-        copyLists(outList, [firstList, secondList], False, path)
-        KFit(outList, 0.0, path=path)
-        markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
-    else:
-        B2ERROR("Lists to be merged contain different particles")
-
-
 PI0ETAVETO_COUNTER = 0
 
 

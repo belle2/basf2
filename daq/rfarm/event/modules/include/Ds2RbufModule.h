@@ -10,10 +10,8 @@
 #define DS2RBUFMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/pcore/DataStoreStreamer.h>
 
 #include <string>

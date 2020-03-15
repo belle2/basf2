@@ -13,6 +13,11 @@
 #include "daq/rfarm/manager/RFEventProcessor.h"
 #include "daq/rfarm/manager/RFNSM.h"
 
+#include <unistd.h>
+
+#include <csignal>
+#include <cstring>
+
 using namespace std;
 using namespace Belle2;
 

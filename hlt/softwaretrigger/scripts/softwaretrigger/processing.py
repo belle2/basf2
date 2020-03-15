@@ -172,13 +172,7 @@ def add_hlt_processing(path,
     doom.if_true(discard_path, basf2.AfterConditionPath.CONTINUE)
 
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(
-        path,
-        run_type=run_type,
-        components=reco_components,
-        nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
-        nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX,
-        **kwargs)
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)

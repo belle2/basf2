@@ -7,7 +7,9 @@
 //-
 
 #include <daq/dataflow/modules/TxSocketModule.h>
-#include <stdlib.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/pcore/EvtMessage.h>
 
 using namespace std;
 using namespace Belle2;

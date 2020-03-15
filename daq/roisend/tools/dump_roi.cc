@@ -6,10 +6,10 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 //-
 
+#include <arpa/inet.h>
+
 #include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <arpa/inet.h>
 #include <time.h>
 #include <sys/time.h>
 

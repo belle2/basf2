@@ -817,6 +817,45 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr mcDaughterDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First two arguments of mcDaughterDiffOf meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOf");
+      }
+    }
+
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
@@ -892,6 +931,56 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
       }
     }
+
+    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        // have to tell cppcheck that these lines are fine, because it doesn't
+        // support the lambda function syntax and throws a (wrong) variableScope
+
+        // cppcheck-suppress variableScope
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of mcDaughterDiffOfPhi meta function must be integers!");
+          return nullptr;
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else
+          {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOfPhi");
+      }
+    }
+
 
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
@@ -1230,6 +1319,41 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterAngleInBetween");
+      }
+    }
+
+    Manager::FunctionPtr mcDaughterAngleInBetween(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2 || arguments.size() == 3) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          std::vector<TLorentzVector> pDaus;
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            const MCParticle* dauMcPart = dauPart->getRelated<MCParticle>();
+            if (dauPart && dauMcPart)
+              pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+            else {
+              return std::numeric_limits<double>::quiet_NaN();
+            }
+          }
+
+          // Calculates the angle between the selected particles
+          if (pDaus.size() == 2)
+            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+          else
+            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterAngleInBetween");
       }
     }
 
@@ -2710,6 +2834,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns p_j - p_i)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+    REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
+                      "MC matched version of the 'daughterDiffOf' function."); 
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. useRestFrame(grandDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
@@ -2720,6 +2846,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "For a generic variable difference, see daughterDiffOf.");
+    REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
+                      "MC matched version of the 'daughterDiffOfPhi' function."); 
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in phi between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
@@ -2767,6 +2895,8 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     ``daughterAngleInBetween(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
 
 )DOC");
+    REGISTER_VARIABLE("mcDaughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngleInBetween, R"DOC(
+mc matched version of the 'daughterAngleInBetwee' function. )DOC");     
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."

@@ -19,7 +19,7 @@ ECLTimingUtilities::ECLTimingUtilities()
 { }
 
 // Time offset as a function of the signal amplitude measured in units of ticks
-double ECLTimingUtilities::energyDependentTimeOffsetElectronic(const double amp)
+double ECLTimingUtilities::energyDependentTimeOffsetElectronic(const double amp) const
 {
   return  energyDependenceTimeOffsetFitParam_p1 + pow((energyDependenceTimeOffsetFitParam_p3 /
                                                        (amp + energyDependenceTimeOffsetFitParam_p2)),

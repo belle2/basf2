@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Ewan Hill (ehill@mail.ubc.ca)                            *
@@ -34,13 +34,13 @@ namespace Belle2 {
        * or "energy dependence equation using Alex function"
        * In units of clock ticks: 1/(4fRF) = 0.4913 ns/clock tick
        */
-      double energyDependentTimeOffsetElectronic(const double amplitude);
+      double energyDependentTimeOffsetElectronic(const double amplitude) const;
 
 
       /**
        * Sets the time walk function parameters to the values given by the user
        */
-      void setTimeWalkFuncParams(double p1, double p2, double p3, double p4, double p5, double p6)
+      void setTimeWalkFuncParams(const double p1, const double p2, const double p3, const double p4, const double p5, const double p6)
       {
         energyDependenceTimeOffsetFitParam_p1 = p1 ;
         energyDependenceTimeOffsetFitParam_p2 = p2 ;

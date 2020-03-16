@@ -62,8 +62,9 @@ void SVDDQMInjectionModule::defineHisto()
 void SVDDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
-  m_digits.isRequired(m_SVDShaperDigitsName);
+
+  m_rawTTD.isOptional();
+  m_digits.isOptional(m_SVDShaperDigitsName);
 }
 
 void SVDDQMInjectionModule::beginRun()
@@ -79,6 +80,17 @@ void SVDDQMInjectionModule::beginRun()
 
 void SVDDQMInjectionModule::event()
 {
+
+  if (!m_rawTTD.isValid()) {
+    B2WARNING("Missing RawFTSW, SVDDQMInjection is skipped.");
+    return;
+  }
+
+  if (!m_digits.isValid()) {
+    B2WARNING("Missing " << m_SVDShaperDigitsName << ", SVDDQMInjection is skipped.");
+    return;
+  }
+
 
   for (auto& it : m_rawTTD) {
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<

@@ -1786,12 +1786,43 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
 def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name      name of the input ParticleList
+    @param mask_name             name of the ROEMask to be used
+    @param path                  modules are added to this path
     """
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('nestedROEMask', maskName)
     roeBuilder.param('createNestedROE', True)
+    path.add_module(roeBuilder)
+
+
+def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
+    @param path               modules are added to this path
+    """
+    if (len(inputParticlelists) == 0):
+        # Type of particles to use for ROEBuilder
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
+                 'n0', 'nu_e', 'nu_mu', 'nu_tau',
+                 'K_S0', 'Lambda0']
+        for t in types:
+            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
+            inputParticlelists += ["%s:roe_default_gen" % t]
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('MCROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('fromMC', True)
     path.add_module(roeBuilder)
 
 

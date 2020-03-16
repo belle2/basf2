@@ -281,12 +281,12 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
             svd_track_cand = reco_track.getRelated('SVDRecoTracks')
             if not svd_track_cand:
                 svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-            if svd_cdc_track_cand:
-                svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
-                if not svd_track_cand:
-                    temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-                    if temp_svd_track_cand:
-                        svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
+                if svd_cdc_track_cand:
+                    svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+            if not svd_track_cand:
+                temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                if temp_svd_track_cand:
+                    svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
             if svd_track_cand:
                 space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
 

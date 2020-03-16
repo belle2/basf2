@@ -5,7 +5,7 @@
 import basf2
 
 from rawdata import add_unpackers
-from reconstruction import add_cosmics_reconstruction, add_reconstruction
+from reconstruction import add_cosmics_reconstruction, add_reconstruction, prepare_cdst_analysis
 import modularAnalysis as ma
 
 
@@ -19,8 +19,8 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
 
     main.add_module('Gearbox')
     main.add_module('Geometry')
@@ -57,8 +57,8 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
 
     main.add_module('Gearbox')
     main.add_module('Geometry')
@@ -82,20 +82,24 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     return main
 
 
-def get_cdst_pre_collector_path(entry_sequence=""):
+def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
     """
     Parameters:
         entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
+        raw_format  (bool): True if cDST input files are in the raw+tracking format.
 
     Returns:
         basf2.Path:  A reconstruction path to run before the collector. Used for cDST input files.
     """
     main = basf2.create_path()
     if entry_sequence:
-        root_input = basf2.register_module("RootInput", entrySequences=[entry_sequence])
-        main.add_module(root_input)
-    main.add_module('Gearbox')
-    main.add_module('Geometry')
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
+    if raw_format:
+        prepare_cdst_analysis(main)
+    else:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
 
     # Fill muon particle list
     ma.fillParticleList('mu+:all',

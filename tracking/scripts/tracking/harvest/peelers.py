@@ -293,17 +293,20 @@ def peel_quality_indicators(reco_track, key="{part_name}"):
         if space_point_track_cand:
             svd_qi = space_point_track_cand.getQualityIndicator()
 
-        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-        if svd_cdc_track_cand:
-            cdc_track_cand = svd_cdc_track_cand.getRelated('CDCRecoTracks')
-            if not cdc_track_cand:
-                cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
-            if not cdc_track_cand:
-                temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
-                if temp_cdc_track_cand:
-                    cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
-            if cdc_track_cand:
-                cdc_qi = cdc_track_cand.getQualityIndicator()
+        cdc_track_cand = reco_track.getRelated('CDCRecoTracks')
+        if not cdc_track_cand:
+            svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+            if svd_cdc_track_cand:
+                cdc_track_cand = svd_cdc_track_cand.getRelated('CDCRecoTracks')
+                if not cdc_track_cand:
+                    cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
+                if not cdc_track_cand:
+                    temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                    if temp_cdc_track_cand:
+                        cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
+
+        if cdc_track_cand:
+            cdc_qi = cdc_track_cand.getQualityIndicator()
 
     crops = dict(
         quality_indicator=qi,

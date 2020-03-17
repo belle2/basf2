@@ -29,6 +29,7 @@ paramloader = basf2.register_module('Gearbox')
 # Geometry builder
 geobuilder = basf2.register_module('Geometry')
 geobuilder.param('components', ['KLM'])
+geobuilder.param('useDB', False)
 
 # Full Geant4 simulation
 g4sim = basf2.register_module('FullSim')
@@ -36,9 +37,8 @@ g4sim = basf2.register_module('FullSim')
 # Digitizers
 klm_digitizer = basf2.register_module('KLMDigitizer')
 
-# Packers
-bklm_packer = basf2.register_module('BKLMRawPacker')
-eklm_packer = basf2.register_module('EKLMRawPacker')
+# Packer
+klm_packer = basf2.register_module('KLMPacker')
 
 # Unpacker
 klm_unpacker = basf2.register_module('KLMUnpacker')
@@ -64,8 +64,7 @@ main.add_module(geobuilder)
 main.add_module(g4sim)
 
 main.add_module(klm_digitizer)
-main.add_module(bklm_packer)
-main.add_module(eklm_packer)
+main.add_module(klm_packer)
 main.add_module(klm_unpacker)
 main.add_module(bklm_reconstructor)
 main.add_module(eklm_reconstructor)

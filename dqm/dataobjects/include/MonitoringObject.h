@@ -56,48 +56,33 @@ namespace Belle2 {
     };
 
     /**
-     * set value to float variable (new variable is made if not yet existing)
-     * @param var variable name
-     * @param val variable value
-     * @param upErr variable size of positive error
-     * @param dwErr variable size of negative error (if not set, symmetric error with size upErr is used)
-     */
-    void setVariable(const std::string& var, float val, float upErr = -1., float dwErr = -1.)
-    {
-
-      std::vector<float> varCont;
-      varCont.push_back(val);
-      if (upErr > 0) varCont.push_back(upErr);
-      if (dwErr > 0) varCont.push_back(dwErr);
-      auto vv = m_vars.find(var);
-      if (vv != m_vars.end()) vv->second = varCont;
-      else m_vars.insert({var, varCont});
-    }
-
-    /**
-     * set value to string variable (new variable is made if not yet existing)
-     * @param var variable name
-     * @param val variable value
-     */
-    void setVariable(const std::string& var, const std::string& val)
-    {
-      auto vv = m_strVars.find(var);
-      if (vv != m_strVars.end()) vv->second = val;
-      else m_strVars.insert({var, val});
-    }
-
-    /**
      * Get map of all float variables
      */
-    const std::map<std::string, std::vector<float>>& getVariables()
+    const std::map<std::string, float>& getVariables()
     {
       return m_vars;
     }
 
     /**
-     * Get map of all string variables
+     * Get map of all float variables upper errors
      */
-    const std::map<std::string, std::string>& getStringVariables()
+    const std::map<std::string, float>& getUpError()
+    {
+      return m_upErr;
+    }
+
+    /**
+     * Get map of all float variables lower errors
+     */
+    const std::map<std::string, float>& getLowError()
+    {
+      return m_dwErr;
+    }
+
+    /**
+     * Get vector of all string variables
+     */
+    const std::vector<std::pair<std::string, std::string>>& getStringVariables()
     {
       return m_strVars;
     }
@@ -114,20 +99,74 @@ namespace Belle2 {
       return NULL;
     };
 
+    /**
+     * Get list of all canvases
+     */
     const std::vector<TCanvas*>& getListOfCanvases()
     {
       return m_Canvases;
     }
 
+    /**
+     * Print content of MonitoringObject
+     */
     void Print() const;
+
+    /**
+     * set value to float variable (new variable is made if not yet existing)
+     * @param var variable name
+     * @param val variable value
+     * @param upErr variable size of positive error
+     * @param dwErr variable size of negative error (if not set, symmetric error with size upErr is used)
+     */
+    void setVariable(const std::string& var, float val, float upErr = -1., float dwErr = -1)
+    {
+
+      auto vv = m_vars.find(var);
+      if (vv != m_vars.end()) vv->second = val;
+      else m_vars.insert({var, val});
+
+      if (upErr > 0) {
+        auto vvE = m_upErr.find(var);
+        if (vvE != m_upErr.end()) vvE->second = upErr;
+        else m_upErr.insert({var, upErr});
+      }
+
+      if (dwErr > 0) {
+        auto vvE = m_dwErr.find(var);
+        if (vvE != m_dwErr.end()) vvE->second = dwErr;
+        else m_dwErr.insert({var, dwErr});
+      }
+
+    }
+
+    /**
+     * set value to string variable (new variable is made if not yet existing)
+     * @param var variable name
+     * @param val variable value
+     */
+    void setVariable(const std::string& var, const std::string& val)
+    {
+
+      for (auto& pair : m_strVars) {
+        if (pair.first == var) {
+          pair.second = val;
+          return;
+        }
+      }
+      m_strVars.push_back(std::pair<std::string, std::string>(var, val));
+    }
+
 
   private:
 
     std::vector<TCanvas*> m_Canvases; /**< vector of all TCanvases */
 
-    std::map<std::string, std::vector<float>> m_vars; /**< map of all float variables with their errors */
+    std::map<std::string, float> m_vars;  /**< map of all float variables */
+    std::map<std::string, float> m_upErr; /**< map of upper errors of variables */
+    std::map<std::string, float> m_dwErr; /**< map of lower errors of variables */
 
-    std::map<std::string, std::string> m_strVars; /**< map of all string variables */
+    std::vector<std::pair<std::string, std::string>> m_strVars; /**< map of all string variables */
 
     ClassDefOverride(MonitoringObject, 1); /**< classdef */
 

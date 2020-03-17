@@ -72,12 +72,21 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   StoreObjPtr<EventMetaData> lastEvtMeta;
 
   B2INFO("open file");
-  int run = lastEvtMeta->getRun();
-  int exp = lastEvtMeta->getExperiment();
+  TH1* hrun = findHist("DQMInfo/runno");
+  TH1* hexp = findHist("DQMInfo/expno");
+
+  int run = hrun ? std::stoi(hrun->GetTitle()) : 0;//lastEvtMeta->getRun();
+  int exp = hexp ? std::stoi(hexp->GetTitle()) : 0;//lastEvtMeta->getExperiment();
   TString fname;
   if (m_filename.length()) fname = m_filename;
   else fname = TString::Format("mon_e%04dr%06d.root", exp, run);
-  TFile f(fname, "recreate");
+
+  TFile f(fname, "NEW");
+
+  if (f.IsZombie()) {
+    B2WARNING("File " << fname << "already exists and it will not be rewritten. If desired please delete file and re-run.");
+    return;
+  }
 
   // set meta data info
   m_metaData->setNEvents(lastEvtMeta->getEvent());
@@ -86,13 +95,19 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   struct tm* timeinfo;
   timeinfo = localtime(&ts);
   m_metaData->setRunDate(asctime(timeinfo));
+
+  TH1* runtype = findHist("DQMInfo/rtype");
+  if (runtype) m_metaData->setRunType(std::string(runtype->GetTitle()));
+
+  TH1* hnevt = findHist("DAQ/Nevent");
+  if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
   m_metaData->Write();
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
   for (const auto& obj : objts)(obj.second)->Write();
 
-  f.Write();
+  //  f.Write();
   f.Close();
 
   if (m_treeFile.length() > 0) addTreeEntry();
@@ -109,6 +124,8 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
 
   int run = m_metaData->getRun();
   int expe = m_metaData->getExperiment();
+  int rune = 0;
+  int expee = 0;
   char* rel = const_cast<char*>(m_metaData->getRelease().c_str());
   char* db = const_cast<char*>(m_metaData->getDatabaseGlobalTag().c_str());
   char* datee = const_cast<char*>(m_metaData->getRunDate().c_str());
@@ -122,6 +139,19 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   auto b_datetime = tree->GetBranch("datetime");
   auto b_rtype = tree->GetBranch("rtype");
   auto b_procID = tree->GetBranch("procID");
+
+  /*if(b_run){
+    b_run->SetAddress(&rune);
+    b_exp->SetAddress(&expee);
+    for(int ie = 0; ie<b_run->GetEntries(); ie++){
+      b_run->GetEntry(ir);
+      b_exp->GetEntry(ir);
+      if(rune == run && expee = expe){
+
+      }
+    }
+    }*/
+
 
   if (!b_run) tree->Branch("run", &run, "run/I");
   else b_run->SetAddress(&run);

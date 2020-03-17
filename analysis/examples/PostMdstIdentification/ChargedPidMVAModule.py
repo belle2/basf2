@@ -46,16 +46,16 @@ def argparser():
                         type=sb_pair,
                         nargs='+',
                         default=(0, 0),
-                        help="""Option required in binary mode.
-                        A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test.
-                        Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:
-                        '--testHyposPDGCodePair 11,211 13,211'""")
-    parser.add_argument(
-        "--addECLOnly",
-        dest="add_ecl_only",
-        action="store_true",
-        default=False,
-        help="Apply the BDT also for the ECL-only training. This will result in a separate score branch in the ntuple.")
+                        help="Option required in binary mode."
+                        "A list of pdgId pairs of the (S, B) charged stable particle mass hypotheses to test."
+                        "Pass a space-separated list of (>= 1) S,B pdgIds, e.g.:"
+                        "'--testHyposPDGCodePair 11,211 13,211'")
+    parser.add_argument("--addECLOnly",
+                        dest="add_ecl_only",
+                        action="store_true",
+                        default=False,
+                        help="Apply the BDT also for the ECL-only training."
+                        "This will result in a separate score branch in the ntuple.")
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     args = argparser().parse_args()
 
     import basf2
-    from modularAnalysis import fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts, applyChargedPidMVA
+    from modularAnalysis import inputMdst, fillParticleLists, variablesToNtuple, matchMCTruth, applyCuts, applyChargedPidMVA
     from variables import variables
     from ROOT import Belle2
 
@@ -94,12 +94,13 @@ if __name__ == '__main__':
 
     path = basf2.create_path()
 
-    # --------------------------
-    # Add RootInput to the path.
-    # --------------------------
+    # ----------
+    # Add input.
+    # ----------
 
-    rootinput = basf2.register_module("RootInput")
-    path.add_module(rootinput)
+    inputMdst(environmentType="default",
+              filename=basf2.find_file("mdst13.root", "validation"),
+              path=path)
 
     # ---------------------------------------
     # Load standard charged stable particles,

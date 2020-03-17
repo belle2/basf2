@@ -508,12 +508,14 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         double acopPhi = fabs(180 - fabs(Phip0 - Phip1));
         double acopTheta = fabs(fabs(Thetap0 + Thetap1) - 180);
 
-        double eTotMumuTracks = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) + eclTrack2->getEnergy(
-                                  ECLCluster::EHypothesisBit::c_nPhotons);
+        double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
+        double eTotMumuTracks = enECLTrack1 + enECLTrack2;
         double EMumutot = eTotMumuTracks + eMumuTotGammas;
 
-        bool mumutight_tag = eTotMumuTracks < 2 && EMumutot < 2 && acopPhi < 10 && acopTheta < 10 && nTracks == 2 && Pp0 > 0.5 && Pp1 > 0.5;
+        bool mumutight_tag = enECLTrack1 < 0.5 && enECLTrack2 < 0.5 && EMumutot < 2 && acopPhi < 10 && acopTheta < 10 && nTracks == 2
+                             && Pp0 > 0.5 && Pp1 > 0.5;
 
         if (mumutight_tag) mumutight = 1;
 

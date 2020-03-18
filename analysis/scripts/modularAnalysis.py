@@ -2473,12 +2473,12 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
-    trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-    trackCuts += ' and -3.0 < dz < 3.0'
-    trackCuts += ' and -0.5 < dr < 0.5'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz)'
+    trackCuts += ' and dr < 0.5'
 
     gammaCuts = 'E > 0.05'
-    gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+    gammaCuts += ' and thetaInCDCAcceptance'
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -2584,13 +2584,13 @@ def buildEventShape(inputListNames=[],
         if default_cleanup:
             B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
+            trackCuts += ' and thetaInCDCAcceptance'
+            trackCuts += ' and abs(dz) < 3.0'
+            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")

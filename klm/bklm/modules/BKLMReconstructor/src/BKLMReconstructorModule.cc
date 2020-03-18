@@ -21,7 +21,6 @@
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
 
@@ -146,7 +145,7 @@ void BKLMReconstructorModule::event()
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_IfAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
-      if (fabs(time - m_PromptTime) > m_PromptWindow)
+      if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
     }
   }

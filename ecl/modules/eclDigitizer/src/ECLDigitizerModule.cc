@@ -231,7 +231,6 @@ int ECLDigitizerModule::shapeSignals()
 
   const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
   const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
-  const double T2ticks = ec.m_rf / ec.s_clock;  // conversion to ADC ticks
 
   // emulate response for ECL hits after ADC measurements
   for (const auto& hit : m_eclSimHits) {
@@ -375,6 +374,13 @@ void ECLDigitizerModule::event()
   for (int j = 0; j < ec.m_nch; j++) {
     adccounts_t& a = m_adc[j];
 
+    //normalize the MC true arrival times
+    if (m_adc[j].totalDep > 0) {
+      m_adc[j].flighttime /= m_adc[j].totalDep;
+      m_adc[j].timeshift /= m_adc[j].totalDep;
+      m_adc[j].timetosensor /= m_adc[j].totalDep;
+    }
+
     // if background waveform is here there is no need to generate
     // electronic noise since it is already in the waveform
     if (isBGOverlay) {
@@ -415,9 +421,9 @@ void ECLDigitizerModule::event()
         eclDspWithExtraMCInfo->setDspA(FitA);
         eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
         eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
-        eclDspWithExtraMCInfo->setFlightTime(a.flighttime / a.totalDep);
-        eclDspWithExtraMCInfo->setTimeShift(a.timeshift / a.totalDep);
-        eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor / a.totalDep);
+        eclDspWithExtraMCInfo->setFlightTime(a.flighttime);
+        eclDspWithExtraMCInfo->setTimeShift(a.timeshift);
+        eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor);
         eclDspWithExtraMCInfo->setEnergyConversion(a.energyConversion * 20000);
       }
 

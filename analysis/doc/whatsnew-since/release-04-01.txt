@@ -112,8 +112,8 @@ Modules
  * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
  * Removed module ``CreateBsigFromFullRecoBtag``
  * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
- * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
- * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
+ * Removed module ``FSRCorrection`` in favour of `BremsFinder` and `BelleBremRecovery`.
+ * In `ChargedPidMVA` module, remove handling of particle list modified by the removed ``FSRCorrection`` module.
  * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
  * Added `ChargedPidMVAMulticlass` module to allow performing global PID (one-vs-rest), using an MVA trained in multi-class mode.
  * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.

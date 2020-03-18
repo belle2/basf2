@@ -20,68 +20,103 @@
 
 namespace Belle2 {
 
-  //! Store the muon-identification information for an extrapolated track
+  /**
+   * Class to store the likelihoods from KLM with additional informations related to the extrapolation.
+   */
   class KLMMuidLikelihood : public RelationsObject {
 
   public:
 
-    //! Empty constructor for ROOT IO (needed to make the class storable)
+    /**
+     * Constructor.
+     */
     KLMMuidLikelihood();
 
-    //! Destructor
+    /**
+     * Destructor.
+     */
     ~KLMMuidLikelihood();
 
-    //! @return PDG code of the hypothesis used for this extrapolation
+    /**
+     * Get the PDG code of the particle hypothesis used during the extrapolation.
+     */
     int getPDGCode() const { return m_PDGCode; }
 
-    //! @return charge of the hypothesis used for this extrapolation
-    int getCharge() const;
-
-    //! @return normalized PDF value for this extrapolation
-    //! @param pdg PDG code of the hypothesis
+    /**
+     * Get the normalized PDF.
+     * @param[in] pdg PDG code of the hypothesis.
+     */
     double getPDFValue(int pdg) const { return m_PDFValue[Const::ChargedStable(pdg).getIndex()]; }
 
-    //! @return muon PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the muon hypothesis.
+     */
     double getMuonPDFValue() const { return getPDFValue(Const::muon.getPDGCode()); }
 
-    //! @return pion PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the pion hypothesis.
+     */
     double getPionPDFValue() const { return getPDFValue(Const::pion.getPDGCode()); }
 
-    //! @return kaon PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the kaon hypothesis.
+     */
     double getKaonPDFValue() const { return getPDFValue(Const::kaon.getPDGCode()); }
 
-    //! @return proton PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the proton hypothesis.
+     */
     double getProtonPDFValue() const { return getPDFValue(Const::proton.getPDGCode()); }
 
-    //! @return deuteron PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the deuteron hypothesis.
+     */
     double getDeuteronPDFValue() const { return getPDFValue(Const::deuteron.getPDGCode()); }
 
-    //! @return electron PDF value for this extrapolation (normalized with all others)
+    /**
+     * Get the normalized PDF for the electron hypothesis.
+     */
     double getElectronPDFValue() const { return getPDFValue(Const::electron.getPDGCode()); }
 
-    //! @return junk PDF value for this extrapolation (1 if Muon+Pion+Kaon+Proton+Electron ~ 0)
+    /**
+     * Get the junk PDF value (it returns 1 if Muon+Pion+Kaon+Proton+Deuteron+Electron ~ 0).
+     */
     double getJunkPDFValue() const { return m_JunkPDFValue; }
 
-    //! @return muon log-likelihood for this extrapolation (not normalized)
-    //! @param pdg PDG code of the hypothesis
+    /**
+     * Get the log-likelihood (not normalized).
+     * @param[in] pdg PDG code of the hypothesis.
+     */
     double getLogL(int pdg) const { return m_LogL[Const::ChargedStable(pdg).getIndex()]; }
 
-    //! @return muon log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the muon hypothesis.
+     */
     double getLogL_mu() const { return getLogL(Const::muon.getPDGCode()); }
 
-    //! @return pion log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the pion hypothesis.
+     */
     double getLogL_pi() const { return getLogL(Const::pion.getPDGCode()); }
 
-    //! @return kaon log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the kaon hypothesis.
+     */
     double getLogL_K() const { return getLogL(Const::kaon.getPDGCode()); }
 
-    //! @return proton log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the proton hypothesis.
+     */
     double getLogL_p() const { return getLogL(Const::proton.getPDGCode()); }
 
-    //! @return deuteron log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the deuteron hypothesis.
+     */
     double getLogL_d() const { return getLogL(Const::deuteron.getPDGCode()); }
 
-    //! @return electron log-likelihood for this extrapolation (not normalized)
+    /**
+     * Get the log-likelihood (not normalized) for the electron hypothesis.
+     */
     double getLogL_e() const { return getLogL(Const::electron.getPDGCode()); }
 
     //! @return status word (bit pattern) for this extrapolation

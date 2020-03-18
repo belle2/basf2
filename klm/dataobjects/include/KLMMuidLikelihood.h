@@ -1,4 +1,4 @@
-/**************************************************************************
+B/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
@@ -43,6 +43,11 @@ namespace Belle2 {
     int getPDGCode() const { return m_PDGCode; }
 
     /**
+     * Get the charge of the particle hypothesis used during the extrapolation.
+     */
+    int getCharge() const;
+
+    /**
      * Get the normalized PDF.
      * @param[in] pdg PDG code of the hypothesis.
      */
@@ -79,7 +84,7 @@ namespace Belle2 {
     double getElectronPDFValue() const { return getPDFValue(Const::electron.getPDGCode()); }
 
     /**
-     * Get the junk PDF value (it returns 1 if Muon+Pion+Kaon+Proton+Deuteron+Electron ~ 0).
+     * Get the junk flag (1 if jung, 0 if not).
      */
     double getJunkPDFValue() const { return m_JunkPDFValue; }
 
@@ -119,58 +124,89 @@ namespace Belle2 {
      */
     double getLogL_e() const { return getLogL(Const::electron.getPDGCode()); }
 
-    //! @return status word (bit pattern) for this extrapolation
-    unsigned int getStatus() const { return m_Status; }
-
-    //! @return chi-squared for this extrapolation
+    /**
+     * Get the chi-square of the extrapolation.
+     */
     double getChiSquared() const { return m_ChiSquared; }
 
-    //! @return number of degrees of freedom in chi-squared calculation
+    /**
+     * Get the number of degrees of freedom (= 2 times the number of KLM hits) for the chi-square computation.
+     */
     int getDegreesOfFreedom() const { return m_DegreesOfFreedom; }
 
-    //! @return outcome of this extrapolation.
-    //! All the possible outcome values are defined in MuidElementNumbers
-    //! (see enum Outcome and calculateExtrapolationOutcome).
+    /**
+     * Get the outcome of this extrapolation.
+     * All the possible outcome values are defined in MuidElementNumbers
+     * (see enum Outcome and calculateExtrapolationOutcome).
+     */
     unsigned int getOutcome() const { return m_Outcome; }
 
-    //! @return if this extrapolation was in forward or backward
+    /**
+     * Return if this extrapolation is in forward or backward B/EKLM.
+     */
     bool getIsForward() const { return m_IsForward; }
 
-    //! @return outermost BKLM layer crossed by track during extrapolation
+    /**
+     * Get the outermost BKLM layer crossed in the extrapolation.
+     */
     int getBarrelExtLayer() const { return m_BarrelExtLayer; }
 
-    //! @return outermost EKLM layer crossed by track during extrapolation
+    /**
+     * Get the outermost EKLM layer crossed in the extrapolation.
+     */
     int getEndcapExtLayer() const { return m_EndcapExtLayer; }
 
-    //! @return outermost BKLM layer with a matching hit
-    int getBarrelHitLayer() const { return m_BarrelHitLayer; }
-
-    //! @return outermost EKLM layer with a matching hit
-    int getEndcapHitLayer() const { return m_EndcapHitLayer; }
-
-    //! @return outermost BKLM or EKLM layer crossed by track during extrapolation
+    /**
+     * Get the outermost KLM layer crossed in the extrapolation.
+     */
     int getExtLayer() const { return m_ExtLayer; }
 
-    //! @return outermost BKLM or EKLM layer with a matching hit
+    /**
+     * Get the outermost BKLM layer actually crossed by the track.
+     */
+    int getBarrelHitLayer() const { return m_BarrelHitLayer; }
+
+    /**
+     * Get the outermost EKLM layer actually crossed by the track.
+     */
+    int getEndcapHitLayer() const { return m_EndcapHitLayer; }
+
+    /**
+     * Get the outermost KLM layer actually crossed by the track.
+     */
     int getHitLayer() const { return m_HitLayer; }
 
-    //! @return layer-crossing bit pattern during extrapolation
+    /**
+     * Get the pattern of the layers crossed in the extrapolation.
+     */
     unsigned int getExtLayerPattern() const { return m_ExtLayerPattern; }
 
-    //! @return matching-hit bit pattern
+    /**
+     * Get the pattern of the layers actually crossed by the track.
+     */
     unsigned int getHitLayerPattern() const { return m_HitLayerPattern; }
 
-    //! @return total number of matching BKLM hits
+    /**
+     * Get the total number of crossed BKLM layers.
+     */
     unsigned int getTotalBarrelHits() const;
 
-    //! @return total number of matching EKLM hits
+    /**
+     * Get the total number of crossed EKLM layers.
+     */
     unsigned int getTotalEndcapHits() const;
 
-    //! @return BKLM efficiency value
-    float getExtBKLMEfficiencyValue(int index) const { return m_ExtBKLMEfficiencyValue[index]; }
+    /**
+     * Get the efficiency of a given BKLM layer.
+     * @param[in] layer BKLM layer.
+     */
+    float getExtBKLMEfficiencyValue(int layer) const { return m_ExtBKLMEfficiencyValue[layer]; }
 
-    //! @return EKLM efficiency vector
-    float getExtEKLMEfficiencyValue(int index) const { return m_ExtEKLMEfficiencyValue[index]; }
+    /**
+     * Get the efficiency of a given EKLM layer.
+     * @param[in] layer EKLM layer
+     */
+    float getExtEKLMEfficiencyValue(int layer) const { return m_ExtEKLMEfficiencyValue[layer]; }
 
     //! set PDG code of the hypothesis for this extrapolation
     //! @param pdg PDG code of the hypothesis for this extrapolation
@@ -298,31 +334,28 @@ namespace Belle2 {
 
   private:
 
-    //! PDG particleID hypothesis used for this extrapolation (typically muon)
+    /** PDG code of the particle hypothesis used during the extrapolation. */
     int m_PDGCode;
 
-    //! Junk flag for this extrapolation (0 if not junk, 1 if junk)
-    float m_JunkPDFValue;
-
-    //! Normalized PDF values for this extrapolation
+    /** Array of normalized PDFs. */
     float m_PDFValue[Const::ChargedStable::c_SetSize];
 
-    //! Log-likelihood for this extrapolation (not normalized)
+    /** Junk flag (1 if junk, 0 if not). */
+    bool m_JunkPDFValue;
+
+    /** Array of log-likelihoods (not normalized). */
     float m_LogL[Const::ChargedStable::c_SetSize];
 
-    //! Status word (bit pattern) for this extrapolation
-    unsigned int m_Status;
-
-    //! Chi-squared for this extrapolation
+    /** Chi-square of the extrapolation. */
     float m_ChiSquared;
 
-    //! number of degrees of freedom used in chi-squared calculation
+    /** Number of degrees of freedom (= 2 times the number of KLM hits) for the chi-square computation. */
     int m_DegreesOfFreedom;
 
-    //! outcome of this extrapolation.
+    /** Outcome of this extrapolation. */
     unsigned int m_Outcome;
 
-    //! is the extrapolation in forward or backward?
+    /** Flag to determine if this extrapolation is in forward or backward B/EKLM. */
     bool m_IsForward;
 
     //! outermost BKLM layer crossed by track during extrapolation
@@ -353,14 +386,14 @@ namespace Belle2 {
     //! bits 15..28 = endcap layers 1..14)
     unsigned int m_HitLayerPattern;
 
-    //! Vector of BKLM layer efficiencies.
+    /** Array of BKLM layer efficiencies. */
     float m_ExtBKLMEfficiencyValue[BKLMElementNumbers::getMaximalLayerNumber()];
 
-    //! Vector of EKLM layer efficiencies
+    /** Array of EKLM layer efficiencies. */
     float m_ExtEKLMEfficiencyValue[EKLMElementNumbers::getMaximalLayerNumber()];
 
-    //! Needed to make the ROOT object storable
-    ClassDef(KLMMuidLikelihood, 3)
+    /** Class version. */
+    ClassDef(KLMMuidLikelihood, 4)
 
   };
 }

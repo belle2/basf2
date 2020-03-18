@@ -293,11 +293,9 @@ namespace Belle2 {
     /** additional information of the 2D finder track */
     StoreArray<CDCTriggerFinderClone> m_2DFinderClones;
 
-    /** bitstream of Neuro input (combination of stereo TS and single 2D track) */
-    StoreArray<CDCTriggerUnpacker::NNInputBitStream> m_bitsToNN;
 
-    /** bitstream of Neuro output (including intermediate results) */
-    StoreArray<CDCTriggerUnpacker::NNOutputBitStream> m_bitsFromNN;
+    /** bitstream of Neuro input and output (including intermediate results) */
+    StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
 
     /** decoded Neuro tracks */
     StoreArray<CDCTriggerTrack> m_NeuroTracks;
@@ -310,6 +308,9 @@ namespace Belle2 {
 
     /** decoded track segment hits from the neural network input */
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
+
+    /** all decoded stereo track segment hits from the neural network input */
+    StoreArray<CDCTriggerSegmentHit> m_NNInputTSHitsAll;
 
     /** debug level specified in the steering file */
     int m_debugLevel = 0;
@@ -347,7 +348,10 @@ namespace Belle2 {
     CDCTriggerMLP m_mlp_scale;
     /** bool value for wether to use the conditions database */
     bool m_useDB;
+    /** bool value wether to simulate 13 bit drift time by using 2dcc */
+    bool m_sim13dt;
   };
+
 
 }
 

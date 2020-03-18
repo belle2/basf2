@@ -32,6 +32,7 @@ namespace Belle2 {
     virtual ~CDCTriggerNeuroConfig() {};
 
     struct B2FormatLine {
+      B2FormatLine() : start(0), end(0), offset(0) {}
       /** start bit number in B2Link */
       int start;
       /** end bit number in B2Link */

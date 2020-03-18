@@ -18,6 +18,7 @@
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 
 namespace Belle2 {
+
   namespace CDCTriggerUnpacker {
 
     constexpr double pi() { return std::atan(1) * 4; }
@@ -33,8 +34,6 @@ namespace Belle2 {
     static constexpr int nAxialTSF = NUM_TSF; // 5
     static constexpr int nStereoTSF = 4;
     static constexpr int T2DOutputWidth = T2D_TO_3D_WIDTH; // 747
-    static constexpr int NNInputWidth = NN_IN_WIDTH; // 982
-    static constexpr int NNOutputWidth = NN_OUT_WIDTH; // 570
     static constexpr unsigned lenTS = 21;   // ID (8 bit) + t (9 bit) + LR (2 bit) + priority (2 bit)
 
     static constexpr int nMax2DTracksPerClock = 6;
@@ -61,15 +60,33 @@ namespace Belle2 {
     using T2DOutputBus = std::array<T2DOutputVector, nTrackers>;
     using T2DOutputBitStream = Bitstream<T2DOutputBus>;
 
-    using NNInputVector = std::array<char, NNInputWidth>;
-    using NNInputBus = std::array<NNInputVector, nTrackers>;
-    using NNInputBitStream = Bitstream<NNInputBus>;
+    using NNVector = std::array<char, NN_WIDTH>;
+    using NNBus = std::array<NNVector, nTrackers>;
+    using NNBitStream = Bitstream<NNBus>;
+    // using NNInputVector = std::array<char, NNInputWidth>;
+    // using NNInputBus = std::array<NNInputVector, nTrackers>;
+    // using NNInputBitStream = Bitstream<NNInputBus>;
 
-    using NNOutputVector = std::array<char, NNOutputWidth>;
-    using NNOutputBus = std::array<NNOutputVector, nTrackers>;
-    using NNOutputBitStream = Bitstream<NNOutputBus>;
+    // using NNOutputVector = std::array<char, NNOutputWidth>;
+    // using NNOutputBus = std::array<NNOutputVector, nTrackers>;
+    // using NNOutputBitStream = Bitstream<NNOutputBus>;
 
     // functions
+    std::string padto(std::string s, unsigned l)
+    {
+      if (s.size() < l) {
+        s.insert(s.begin(), l - s.size(), ' ');
+      }
+      return s;
+    }
+    std::string padright(std::string s, unsigned l)
+    {
+      if (s.size() < l) {
+        s.insert(s.end(), l - s.size(), ' ');
+      }
+      return s;
+    }
+
     void printBuffer(int* buf, int nwords)
     {
       for (int j = 0; j < nwords; ++j) {
@@ -250,21 +267,18 @@ namespace Belle2 {
     };
     struct B2LDataField {
       B2LDataField(
-        StoreArray<CDCTriggerUnpacker::NNInputBitStream>* bitsToNN,
-        StoreArray<CDCTriggerUnpacker::NNOutputBitStream>* bitsFromNN,
+        StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
         unsigned foundtime,
         unsigned iTracker,
         const CDCTriggerNeuroConfig::B2FormatLine b2line)
       {
+        NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
+        data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
 
-        if (b2line.end < NN_IN_WIDTH) {
-          NNInputBitStream* bitsIn = (*bitsToNN)[foundtime + b2line.offset];
-          data = slv_to_bin_string(bitsIn->signal()[iTracker]).substr(NN_IN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
-        } else {
-          NNOutputBitStream* bitsOutEnable = (*bitsFromNN)[foundtime + b2line.offset];
-          data = slv_to_bin_string(bitsOutEnable->signal()[iTracker]).substr(NN_IN_WIDTH + NN_OUT_WIDTH - 1 - b2line.end,
-                 b2line.end - b2line.start + 1);
-        }
+
+        // std::cout << "new datafield: " << b2line.name << ": " << b2line.start << ", " << b2line.end << ", " << data << std::endl;
+
+
       }
       std::string data;
     };
@@ -365,7 +379,7 @@ namespace Belle2 {
     tsOut decodeTSHit(std::string tsIn)
     {
       constexpr unsigned lenID = 8;
-      constexpr unsigned lenPriorityTime = 9;
+      constexpr unsigned lenPriorityTime = 9; //(twodcc.size() > 0) ? 13 : 9;
       constexpr unsigned lenLR = 2;
       constexpr unsigned lenPriorityPosition = 2;
       constexpr std::array<unsigned, 4> tsLens = {
@@ -376,6 +390,37 @@ namespace Belle2 {
       tsOut tsOutput;
       tsOutput[0] = std::bitset<tsLens[0]>(tsIn.substr(tsPos[0], tsLens[0])).to_ulong();
       tsOutput[1] = std::bitset<tsLens[1]>(tsIn.substr(tsPos[1], tsLens[1])).to_ulong();
+      tsOutput[2] = std::bitset<tsLens[2]>(tsIn.substr(tsPos[2], tsLens[2])).to_ulong();
+      tsOutput[3] = std::bitset<tsLens[3]>(tsIn.substr(tsPos[3], tsLens[3])).to_ulong();
+      return tsOutput;
+    }
+    tsOut decodeTSHit(std::string tsIn, std::string twodcc)
+    {
+      constexpr unsigned lenID = 8;
+      constexpr unsigned lenPriorityTime = 9; //(twodcc.size() > 0) ? 13 : 9;
+      constexpr unsigned lenLR = 2;
+      constexpr unsigned lenPriorityPosition = 2;
+      constexpr std::array<unsigned, 4> tsLens = {
+        lenID, lenPriorityTime, lenLR, lenPriorityPosition
+      };
+      std::string C = tsIn.substr(lenID + 5, 4);
+      std::string B = tsIn.substr(lenID, 5);
+      std::string Bp = twodcc.substr(4, 5);
+      std::string Ap = twodcc.substr(0, 4);
+      int pt;
+      std::string pts;
+      if (std::stoi(B, 0, 2) <= std::stoi(Bp, 0, 2)) {
+        pts = Ap + B + C;
+      } else {
+        B2DEBUG(14, "2DCC overflow detected!");
+        pts = std::bitset<4>(std::stoi(Ap, 0, 2) - 1).to_string() + B + C;
+      }
+      pt = std::stoi(pts, 0, 2);
+      std::array<unsigned, 5> tsPos = { 0 };
+      std::partial_sum(tsLens.begin(), tsLens.end(), tsPos.begin() + 1);
+      tsOut tsOutput;
+      tsOutput[0] = std::bitset<tsLens[0]>(tsIn.substr(tsPos[0], tsLens[0])).to_ulong();
+      tsOutput[1] = pt; // std::bitset<tsLens[1]>(tsIn.substr(tsPos[1], tsLens[1])).to_ulong();
       tsOutput[2] = std::bitset<tsLens[2]>(tsIn.substr(tsPos[2], tsLens[2])).to_ulong();
       tsOutput[3] = std::bitset<tsLens[3]>(tsIn.substr(tsPos[3], tsLens[3])).to_ulong();
       return tsOutput;
@@ -398,7 +443,9 @@ namespace Belle2 {
                                     std::string p_ts4,
                                     std::string p_ts6,
                                     std::string p_ts8,
-                                    unsigned iTracker)
+                                    unsigned iTracker,
+                                    std::string p_2dcc,
+                                    bool sim13dt)
     {
 //constexpr unsigned lenomega = p_omega.size();
       unsigned lencharge = p_charge.size();
@@ -415,15 +462,20 @@ namespace Belle2 {
       // omega in 1/cm
       // omega = 1/R = c * B / pt
       trackout.omega = Const::speedOfLight * BField / 0.3 / 34 * omegafirm;
+
+
+
+
       int phi = std::stoi(p_phi, 0, 2);
       // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
       double globalPhi0 = pi() / 4 + pi() / 2 / 80 * (phi + 1) + pi() / 2 * iTracker; // see document above
-      std::cout << "asdfasdf " << p_ts0.size() << std::endl;
-      trackout.ts[0] = decodeTSHit(p_ts0);
-      trackout.ts[1] = decodeTSHit(p_ts2);
-      trackout.ts[2] = decodeTSHit(p_ts4);
-      trackout.ts[3] = decodeTSHit(p_ts6);
-      trackout.ts[4] = decodeTSHit(p_ts8);
+
+
+      trackout.ts[0] = (sim13dt) ? decodeTSHit(p_ts0, p_2dcc) : decodeTSHit(p_ts0);
+      trackout.ts[1] = (sim13dt) ? decodeTSHit(p_ts2, p_2dcc) : decodeTSHit(p_ts2);
+      trackout.ts[2] = (sim13dt) ? decodeTSHit(p_ts4, p_2dcc) : decodeTSHit(p_ts4);
+      trackout.ts[3] = (sim13dt) ? decodeTSHit(p_ts6, p_2dcc) : decodeTSHit(p_ts6);
+      trackout.ts[4] = (sim13dt) ? decodeTSHit(p_ts8, p_2dcc) : decodeTSHit(p_ts8);
       // rotate the tracks to the correct quadrant (iTracker)
       if (globalPhi0 > pi() * 2) {
         globalPhi0 -= pi() * 2;
@@ -475,24 +527,26 @@ namespace Belle2 {
      *
      *  @return         TRGNeuroTrack containing z, theta, sector, MLP input and related TS hit
      */
-    TRGNeuroTrack decodeNNTrack2(std::string p_mlpout1,
-                                 std::string p_mlpout2,
+    TRGNeuroTrack decodeNNTrack2(std::string p_mlpout_z,
+                                 std::string p_mlpout_theta,
                                  std::string p_tsfsel,
                                  std::string p_mlpin_alpha,
                                  std::string p_mlpin_drifttime,
                                  std::string p_mlpin_id,
                                  std::string p_netsel,
-                                 const DBObjPtr<CDCTriggerNeuroConfig> neurodb)
+                                 const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
+                                 std::string p_2dcc,
+                                 bool sim13dt)
     {
       // constexpr unsigned lenMLP = 13;
-      float scale_z = 1. / (1 << (p_mlpout1.size() - 1));
-      float scale_theta = 1. / (1 << (p_mlpout2.size() - 1));
+      float scale_z = 1. / (1 << (p_mlpout_z.size() - 1));
+      float scale_theta = 1. / (1 << (p_mlpout_theta.size() - 1));
       float scale_alpha = 1. / (1 << (p_mlpin_alpha.size() - 1));
       float scale_drifttime = 1. / (1 << (p_mlpin_drifttime.size() - 1));
       float scale_id = 1. / (1 << (p_mlpin_id.size() - 1));
       TRGNeuroTrack foundTrack;
-      int theta_raw = mlp_bin_to_signed_int(p_mlpout1);
-      int z_raw = mlp_bin_to_signed_int(p_mlpout2);
+      int theta_raw = mlp_bin_to_signed_int(p_mlpout_theta);
+      int z_raw = mlp_bin_to_signed_int(p_mlpout_z);
       std::vector<float> unscaledT = neurodb->getMLPs()[0].unscaleTarget({(z_raw * scale_z), (theta_raw * scale_theta)});
       foundTrack.z = unscaledT[0];
       foundTrack.theta = unscaledT[1];
@@ -506,7 +560,8 @@ namespace Belle2 {
         foundTrack.inputID[iSL] =
           mlp_bin_to_signed_int(p_mlpin_id.substr((8 - iSL) * p_mlpin_drifttime.size() / 9, p_mlpin_drifttime.size() / 9)) * scale_id;
         foundTrack.ts[iSL] =  // order: SL8, ..., SL0
-          decodeTSHit(p_tsfsel.substr((8 - iSL) * lenTS, lenTS));
+          (sim13dt) ? decodeTSHit(p_tsfsel.substr((8 - iSL) * lenTS, lenTS), p_2dcc) : decodeTSHit(p_tsfsel.substr((8 - iSL) * lenTS,
+              lenTS)); //, p_2dcc);
       }
       return foundTrack;
     }
@@ -731,7 +786,7 @@ namespace Belle2 {
      */
     CDCTriggerTrack* decodeNNInput(short iclock,
                                    unsigned iTracker,
-                                   NNInputBitStream* bitsIn,
+                                   NNBitStream* bitsIn,
                                    StoreArray<CDCTriggerTrack>* store2DTracks,
                                    StoreArray<CDCTriggerSegmentHit>* tsHits)
     {
@@ -740,6 +795,7 @@ namespace Belle2 {
       // omega (7 bit) + phi (7 bit) + 5 * TS (21 bit) + old track found(6bit) + valid stereo bit (1bit) + drift threshold (9bit)
       const auto slvIn = bitsIn->signal()[iTracker];
       std::string strIn = slv_to_bin_string(slvIn);
+      strIn = strIn.substr(NN_WIDTH - 570 - 496, 982);
       // decode stereo hits
       for (unsigned iSt = 0; iSt < nStereoTSF; ++iSt) {
         for (unsigned iHit = 0; iHit < 10; ++iHit) {
@@ -857,8 +913,8 @@ namespace Belle2 {
      */
     void decodeNNOutput(short foundTime,
                         unsigned iTracker,
-                        NNOutputBitStream* bitsOut,
-                        NNOutputBitStream* bitsSelectTS,
+                        NNBitStream* bitsOut,
+                        NNBitStream* bitsSelectTS,
                         StoreArray<CDCTriggerTrack>* storeNNTracks,
                         StoreArray<CDCTriggerSegmentHit>* tsHits,
                         StoreArray<CDCTriggerMLPInput>* storeNNInputs,
@@ -867,8 +923,10 @@ namespace Belle2 {
     {
       const auto slvOut = bitsOut->signal()[iTracker];
       std::string strTrack = slv_to_bin_string(slvOut);
+      strTrack = strTrack.substr(496, 570);
       const auto slvSelect = bitsSelectTS->signal()[iTracker];
       std::string strSelect = slv_to_bin_string(slvSelect);
+      strSelect = strSelect.substr(496, 570);
       TRGNeuroTrack trkNN = decodeNNTrack(strTrack, strSelect, mlp);
       B2DEBUG(15, "make new NN track with , z:" << trkNN.z << ", theta:" << trkNN.theta <<
               ", sector:" << trkNN.sector << ", clock " << foundTime);
@@ -930,164 +988,243 @@ namespace Belle2 {
      */
 
     void decodeNNIO2(
-      StoreArray<CDCTriggerUnpacker::NNInputBitStream>* bitsToNN,
-      StoreArray<CDCTriggerUnpacker::NNOutputBitStream>* bitsFromNN,
+      StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
       StoreArray<CDCTriggerTrack>* store2DTracks,
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
+      StoreArray<CDCTriggerSegmentHit>* tsHitsAll,
       StoreArray<CDCTriggerMLPInput>* storeNNInputs,
       std::vector<int> delayNNOutput,
       std::vector<int> delayNNSelect,
-      const DBObjPtr<CDCTriggerNeuroConfig> neurodb)
+      const DBObjPtr<CDCTriggerNeuroConfig> neurodb,
+      bool sim13dt)
     {
-
-      for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
+      for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
+        B2DEBUG(10, "----------------------------------------------------------------------------------------------------");
+        B2DEBUG(10, padright("  Unpacking Tracker: " + std::to_string(iTracker), 100));
         // loop over boards belonging to geometrical sectors
-        for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
-          // check for NNEnable bit:
-          B2LDataField nnenable(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("Enable NNT"));
-          if (!(nnenable.data == "1")) {
-            continue;
-          }
-          // define variables to fill from the bitstream, B2LDataField holds just the string, not the unpacked data yet
-          B2LDataField p_driftthreshold(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("DriftThreshold"));
-          B2LDataField p_valstereobit(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("ValStereobit"));
-          B2LDataField p_foundoldtrack(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("FoundOldTrack"));
-          B2LDataField p_phi(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("Phi"));
-          B2LDataField p_omega(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("Omega"));
-          B2LDataField p_ts8(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF8"));
-          B2LDataField p_ts6(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF6"));
-          B2LDataField p_ts4(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF4"));
-          B2LDataField p_ts2(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF2"));
-          B2LDataField p_ts0(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF0"));
-          B2LDataField p_tsf1(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF1"));
-          B2LDataField p_tsf3(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF3"));
-          B2LDataField p_tsf5(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF5"));
-          B2LDataField p_tsf7(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("TSF7"));
-          B2LDataField p_tsfsel(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("SelectedTS"));
-          B2LDataField p_mlpin_alpha(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("MLPInput_Alpha"));
-          B2LDataField p_mlpin_drifttime(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("MLPInput_Drifttime"));
-          B2LDataField p_mlpin_id(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("MLPInput_ID"));
-          B2LDataField p_netsel(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("NetSel"));
-          B2LDataField p_mlpout1(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOutput_Z"));
-          B2LDataField p_mlpout2(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOutput_Theta"));
-          B2LDataField p_extendedpts(bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine("extendedPriorityTimes"));
-          // B2LDataField  (bitsToNN, bitsFromNN, iclock, iTracker, neurodb->getB2FormatLine(""));
 
-          std::cout << "data fields filled" << std::endl;
+        for (short iclock = 0; iclock < bitsNN->getEntries(); ++iclock) {
+          // check for NNEnable bit:
+          // B2LDataField p_nnenable(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("NNEnable"));
+          // if (!(p_nnenable.data == "1")) {
+          //   continue;
+          // }
+          B2LDataField p_nnenable(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("NNEnable"));
+
+          if (p_nnenable.data == "1") {
+            B2DEBUG(10, padright("----UnpackerClock: " + std::to_string(iclock) + "    NNENABLE SET!", 100));
+          } else {
+            B2DEBUG(14, padright("    UnpackerClock: " + std::to_string(iclock), 100));
+          }
+          //for (auto x : neurodb->getB2Format()) {
+          //  std::cout << x.name << ",  " << x.start << "  " << x.end << std::endl;
+          //} // TODO: move to initialize of unpacker module!
+
+
+          CDCTriggerNeuroConfig::B2FormatLine nnall;
+          nnall.start = 0;
+          nnall.end = 2047;
+          nnall.offset = 0;
+          nnall.name = "nnall";
+          B2LDataField p_nnall(bitsNN, iclock, iTracker, nnall);
+          B2DEBUG(20, padright("      all bits: ", 100));
+          B2DEBUG(20, padright("        " + p_nnall.data, 100));
+          // define variables to fill from the bitstream, B2LDataField holds just the string, not the unpacked data yet
+          B2LDataField p_driftthreshold(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("DriftThreshold"));
+          B2LDataField p_valstereobit(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("ValStereoBit"));
+          B2LDataField p_foundoldtrack(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("FoundOldTrack"));
+          B2LDataField p_phi(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Phi"));
+          B2LDataField p_omega(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Omega"));
+          B2LDataField p_ts8(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS8"));
+          B2LDataField p_ts6(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS6"));
+          B2LDataField p_ts4(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS4"));
+          B2LDataField p_ts2(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS2"));
+          B2LDataField p_ts0(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS0"));
+          B2LDataField p_tsf1(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF1"));
+          B2LDataField p_tsf3(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF3"));
+          B2LDataField p_tsf5(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF5"));
+          B2LDataField p_tsf7(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF7"));
+          B2LDataField p_tsfsel(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSFsel"));
+          B2LDataField p_mlpin_alpha(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_alpha"));
+          B2LDataField p_mlpin_drifttime(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_driftt"));
+          B2LDataField p_mlpin_id(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_id"));
+          B2LDataField p_netsel(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Netsel"));
+          B2LDataField p_mlpout_z(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOut_z"));
+          B2LDataField p_mlpout_theta(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOut_theta"));
+          B2LDataField p_extendedpts(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("extendedPriorityTimes"));
+          B2LDataField p_2dcc(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("2dcc"));
+          // B2LDataField  (bitsNN, iclock, iTracker, neurodb->getB2FormatLine(""));
+
           CDCTriggerTrack* track2D = nullptr;
           // decode stereo hits
-          unsigned sln = 0;
-          for (auto stereolayer : {p_tsf1, p_tsf3, p_tsf5, p_tsf7}) {
-            for (unsigned iHit = 0; iHit < 10; ++iHit) {
-              tsOut ts = decodeTSHit(stereolayer.data.substr(iHit * lenTS, lenTS));
-              if (ts[3] > 0) { // if it is 0, it means 'no hit'
-                addTSHit(ts, sln * 2 + 1, iTracker, tsHits, iclock);
+          if (true) { // (p_nnenable.data == "1") {
+            unsigned sln = 0;
+            B2DEBUG(11, padright("      Stereos: ", 100));
+            for (auto stereolayer : {p_tsf1, p_tsf3, p_tsf5, p_tsf7}) {
+              std::string tsstr = " | ";
+              for (unsigned iHit = 0; iHit < 10; ++iHit) {
+                tsOut ts = (sim13dt) ? decodeTSHit(stereolayer.data.substr(iHit * lenTS, lenTS),
+                                                   p_2dcc.data) : decodeTSHit(stereolayer.data.substr(iHit * lenTS, lenTS));
+                if (ts[3] > 0) { // if it is 0, it means 'no hit'
+                  unsigned iTS = TSIDInSL(ts[0], sln * 2 + 1, iTracker);
+                  tsstr += std::to_string(iTS) + ", " + std::to_string(ts[1]) + ", " + std::to_string(ts[2]) + ", " + std::to_string(ts[3]) + " | ";
+                  addTSHit(ts, sln * 2 + 1, iTracker, tsHitsAll, iclock);
+                }
               }
-            }
-            ++sln;
-          }
-          if (std::all_of(p_phi.data.begin(), p_phi.data.end(), [](char i) {return i == 0;})) {
-            B2DEBUG(1, "Empty Phi Value found for 2DTrack, should not happen!");
-            continue;
-          }
-          std::cout << "unpacking 2d now .. " << std::endl;
-          TRG2DFinderTrack trk2D = decode2DTrack2(
-                                     "00", //charge
-                                     p_omega.data,
-                                     p_phi.data,
-                                     p_ts0.data,
-                                     p_ts2.data,
-                                     p_ts4.data,
-                                     p_ts6.data,
-                                     p_ts8.data,
-                                     iTracker);
-
-          std::cout << "2d now unpacked .. " << std::endl;
-          std::vector<bool> foundoldtrack = decodefoundoldtrack(p_foundoldtrack.data);
-          std::vector<bool> driftthreshold = decodedriftthreshold(p_driftthreshold.data);
-          bool valstereobit = decodevalstereobit(p_valstereobit.data);
-
-          B2DEBUG(15, "bits for foundoldtrack:    "   << foundoldtrack[0]
-                  << foundoldtrack[1]
-                  << foundoldtrack[2]
-                  << foundoldtrack[3]
-                  << foundoldtrack[4]
-                  << foundoldtrack[5]);
-          B2DEBUG(15, "bits for driftthreshold:   "   << driftthreshold[0]
-                  << driftthreshold[1]
-                  << driftthreshold[2]
-                  << driftthreshold[3]
-                  << driftthreshold[4]
-                  << driftthreshold[5]
-                  << driftthreshold[6]
-                  << driftthreshold[7]
-                  << driftthreshold[8]);
-          B2DEBUG(15, "bits for valstereobit:     "   << valstereobit);
-          B2DEBUG(15, "make new 2D track with phi " << trk2D.phi0 << " omega " << trk2D.omega << " clock " << iclock);
-
-          track2D = store2DTracks->appendNew(trk2D.phi0, trk2D.omega, 0., foundoldtrack, driftthreshold, valstereobit, iclock, iTracker);
-          // add axial hits and create relations
-          for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
-            const auto& ts = trk2D.ts[iAx];
-            if (ts[3] > 0) {
-              CDCTriggerSegmentHit* hit =
-                addTSHit(ts, 2 * iAx, iTracker, tsHits, iclock);
-              track2D->addRelationTo(hit);
+              B2DEBUG(11, padright("        SL" + std::to_string(sln * 2 + 1) + tsstr, 100));
+              ++sln;
             }
           }
+          B2DEBUG(10, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
+          if (p_nnenable.data == "1") {
+            std::vector<bool> foundoldtrack = decodefoundoldtrack(p_foundoldtrack.data);
+            std::vector<bool> driftthreshold = decodedriftthreshold(p_driftthreshold.data);
+            bool valstereobit = decodevalstereobit(p_valstereobit.data);
 
+            if (std::all_of(p_phi.data.begin(), p_phi.data.end(), [](char i) {return i == 0;})) {
+              B2ERROR("Empty Phi Value found for 2DTrack, should not happen!");
+              continue;
+            }
+            TRG2DFinderTrack trk2D = decode2DTrack2(
+                                       "00", //charge
+                                       p_omega.data,
+                                       p_phi.data,
+                                       p_ts0.data,
+                                       p_ts2.data,
+                                       p_ts4.data,
+                                       p_ts6.data,
+                                       p_ts8.data,
+                                       iTracker,
+                                       p_2dcc.data,
+                                       sim13dt);
+            track2D = store2DTracks->appendNew(trk2D.phi0, trk2D.omega, 0., foundoldtrack, driftthreshold, valstereobit, iclock, iTracker);
+            B2DEBUG(10, padright("      2DTrack: (phi=" + std::to_string(trk2D.phi0) + ", omega=" + std::to_string(
+                                   trk2D.omega) + ", update=" + std::to_string(foundoldtrack[1]) + ")", 100));
 
-          if (track2D) {
-            TRGNeuroTrack trkNN = decodeNNTrack2(p_mlpout1.data,
-                                                 p_mlpout2.data,
-                                                 p_tsfsel.data,
-                                                 p_mlpin_alpha.data,
-                                                 p_mlpin_drifttime.data,
-                                                 p_mlpin_id.data,
-                                                 p_netsel.data,
-                                                 neurodb);
-
-            B2DEBUG(15, "make new NN track with , z:" << trkNN.z << ", theta:" << trkNN.theta <<
-                    ", sector:" << trkNN.sector << ", clock " << iclock);
-
-            double phi0 = track2D->getPhi0();
-            double omega = track2D->getOmega();
-
-            std::vector<bool> tsvector(9, false);
-            for (unsigned iSL = 0; iSL < 9; ++iSL) {
-              if (trkNN.ts[iSL][3] > 0) {
-                tsvector[iSL] = true;
+            // add axial hits and create relations
+            std::string tsstr;
+            for (unsigned iAx = 0; iAx < nAxialTSF; ++iAx) {
+              const auto& ts = trk2D.ts[iAx];
+              if (ts[3] > 0) {
+                CDCTriggerSegmentHit* hit =
+                  addTSHit(ts, 2 * iAx, iTracker, tsHits, iclock);
+                unsigned iTS = TSIDInSL(ts[0], iAx * 2, iTracker);
+                tsstr += "(SL" + std::to_string(iAx * 2) + ", " + std::to_string(iTS) + ", " + std::to_string(ts[1]) + ", " + std::to_string(
+                           ts[2]) + ", " + std::to_string(ts[3]) + "),";
+                track2D->addRelationTo(hit);
               }
             }
-            CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
-                                                                trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
-                                                                track2D->getValidStereoBit(), trkNN.sector, tsvector, iclock, iTracker);
-            std::vector<float> inputVector(27, 0.);
-            for (unsigned iSL = 0; iSL < 9; ++iSL) {
-              inputVector[3 * iSL] = trkNN.inputID[iSL];
-              inputVector[3 * iSL + 1] = trkNN.inputT[iSL];
-              inputVector[3 * iSL + 2] = trkNN.inputAlpha[iSL];
-            }
-            CDCTriggerMLPInput* storeInput =
-              storeNNInputs->appendNew(inputVector, trkNN.sector);
-            trackNN->addRelationTo(storeInput);
-            track2D->addRelationTo(trackNN);
+            B2DEBUG(10, padright("      2DTrack TS: " + tsstr, 100));
 
-            for (unsigned iSL = 0; iSL < 9; ++iSL) {
-              if (trkNN.ts[iSL][3] > 0) {
-                CDCTriggerSegmentHit* hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
-                trackNN->addRelationTo(hit);
+
+            if (track2D) {
+              TRGNeuroTrack trkNN = decodeNNTrack2(p_mlpout_z.data,
+                                                   p_mlpout_theta.data,
+                                                   p_tsfsel.data,
+                                                   p_mlpin_alpha.data,
+                                                   p_mlpin_drifttime.data,
+                                                   p_mlpin_id.data,
+                                                   p_netsel.data,
+                                                   neurodb,
+                                                   p_2dcc.data,
+                                                   sim13dt);
+
+              B2DEBUG(10, padright("      NNTrack: (z=" + std::to_string(trkNN.z) + ", theta=" + std::to_string(trkNN.theta) + ")", 100));
+
+              double phi0 = track2D->getPhi0();
+              double omega = track2D->getOmega();
+
+              std::vector<bool> tsvector(9, false);
+              tsstr = "";
+              for (unsigned iSL = 0; iSL < 9; ++iSL) {
+                if (trkNN.ts[iSL][3] > 0) {
+                  tsvector[iSL] = true;
+                  unsigned iTS = TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker);
+                  tsstr += "(SL" + std::to_string(iSL) + ", " + std::to_string(iTS) + ", " + std::to_string(trkNN.ts[iSL][1]) + ", " + std::to_string(
+                             trkNN.ts[iSL][2]) + ", " + std::to_string(trkNN.ts[iSL][3]) + "),\n";
+
+
+                } else {
+                  tsstr += "( - ),\n";
+                }
+              }
+              B2DEBUG(10, padright("      NNTrack TS: " + tsstr, 100));
+
+              CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
+                                                                  trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),
+                                                                  track2D->getValidStereoBit(), trkNN.sector, tsvector, iclock, iTracker);
+              std::vector<float> inputVector(27, 0.);
+              for (unsigned iSL = 0; iSL < 9; ++iSL) {
+                inputVector[3 * iSL] = trkNN.inputID[iSL];
+                inputVector[3 * iSL + 1] = trkNN.inputT[iSL];
+                inputVector[3 * iSL + 2] = trkNN.inputAlpha[iSL];
+              }
+              CDCTriggerMLPInput* storeInput =
+                storeNNInputs->appendNew(inputVector, trkNN.sector);
+              trackNN->addRelationTo(storeInput);
+              track2D->addRelationTo(trackNN);
+
+              for (unsigned iSL = 0; iSL < 9; ++iSL) {
+                if (trkNN.ts[iSL][3] > 0) {
+                  CDCTriggerSegmentHit* hit = nullptr;
+                  // if (sim13dt) {
+                  //   // get extended priority time for stereos from the allstereots storearray
+                  //   for (int ihit = 0; ihit<tsHitsAll->getEntries(); ++ihit) {
+                  //     CDCTriggerSegmentHit* compare = (*tsHitsAll)[ihit];
+                  //     if (compare->getISuperLayer() == iSL &&
+                  //         compare->getIWireCenter() == TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker) &&
+                  //         compare->getPriorityPosition() == trkNN.ts[iSL][3] &&
+                  //         compare->getLeftRight() == trkNN.ts[iSL][2] ) {
+                  //       hit = compare;
+                  //     }
+                  //   }
+                  //   if (!(!hit)) {
+                  //     tsHits->appendNew(hit->getISuperLayer(), hit->getIWireCenter(), hit->getPriorityPosition(), hit->getLeftRight(), hit->priorityTime(), 0, hit->foundTime(), iTracker);
+                  //   }
+                  //   // get the extended pt for axials from the already existing 2d TS
+                  //   for (int ihit = 0; ihit<tsHits->getEntries(); ++ihit) {
+                  //     CDCTriggerSegmentHit* compare = (*tsHits)[ihit];
+                  //     if (compare->getISuperLayer() == iSL &&
+                  //         compare->getIWireCenter() == TSIDInSL(trkNN.ts[iSL][0], iSL, iTracker) &&
+                  //         compare->getPriorityPosition() == trkNN.ts[iSL][3] &&
+                  //         compare->getLeftRight() == trkNN.ts[iSL][2] ) {
+                  //       hit = compare;
+                  //     }
+                  //   }
+
+                  // }
+                  if (!hit) {
+                    hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
+                    // if (sim13dt) {
+                    //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
+                    // }
+                  }
+                  trackNN->addRelationTo(hit);
+                }
               }
             }
+
+
+            //
+            //  B2DEBUG(15, "bits for foundoldtrack: ");
+            //  for (auto x : foundoldtrack) {
+            //    B2DEBUG(15, x);
+            //  }
+            //  B2DEBUG(15, "bits for driftthreshold:   ");
+            //  for (auto x : driftthreshold) {
+            //    B2DEBUG(15, x);
+            //  }
+            //  B2DEBUG(15, "bits for valstereobit:     "   << valstereobit);
+            //  B2DEBUG(15, "make new 2D track with phi " << trk2D.phi0 << " omega " << trk2D.omega << " clock " << iclock);
+
           }
         }
       }
     }
 
     void decodeNNIO(
-      StoreArray<CDCTriggerUnpacker::NNInputBitStream>* bitsToNN,
-      StoreArray<CDCTriggerUnpacker::NNOutputBitStream>* bitsFromNN,
+      StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
       StoreArray<CDCTriggerTrack>* store2DTracks,
       StoreArray<CDCTriggerTrack>* storeNNTracks,
       StoreArray<CDCTriggerSegmentHit>* tsHits,
@@ -1096,20 +1233,21 @@ namespace Belle2 {
       std::vector<int> delayNNSelect,
       const CDCTriggerMLP& mlp)
     {
-      for (short iclock = 0; iclock < bitsFromNN->getEntries(); ++iclock) {
-        NNInputBitStream* bitsIn = (*bitsToNN)[iclock];
-        NNOutputBitStream* bitsOutEnable = (*bitsFromNN)[iclock];
+      for (short iclock = 0; iclock < bitsNN->getEntries(); ++iclock) {
+        NNBitStream* bitsIn = (*bitsNN)[iclock];
+        NNBitStream* bitsOutEnable = (*bitsNN)[iclock];
         for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
           const auto slvOutEnable = bitsOutEnable->signal()[iTracker];
-          std::string stringOutEnable = slv_to_bin_string(slvOutEnable).substr(NN_OUT_WIDTH - 570, NN_OUT_WIDTH);
-          std::cout << stringOutEnable << std::endl;
+          const auto slvIn = bitsIn->signal()[iTracker];
+          std::string stringOutEnable = slv_to_bin_string(slvOutEnable); //.substr(NN_OUT_WIDTH - 570, NN_OUT_WIDTH);
+          std::string stringIn = slv_to_bin_string(slvIn); //.substr(NN_OUT_WIDTH - 570, NN_OUT_WIDTH);
           if (stringOutEnable.c_str()[0] == '1') {
             CDCTriggerTrack* nntrack2D = decodeNNInput(iclock, iTracker, bitsIn, store2DTracks, tsHits);
             if (nntrack2D) {
               int foundTime = iclock + delayNNOutput[iTracker];
-              if (foundTime  < bitsFromNN->getEntries()) {
-                NNOutputBitStream* bitsOut = (*bitsFromNN)[foundTime];
-                NNOutputBitStream* bitsSelectTS = (*bitsFromNN)[iclock + delayNNSelect[iTracker]];
+              if (foundTime  < bitsNN->getEntries()) {
+                NNBitStream* bitsOut = (*bitsNN)[foundTime];
+                NNBitStream* bitsSelectTS = (*bitsNN)[iclock + delayNNSelect[iTracker]];
                 decodeNNOutput(iclock, iTracker, bitsOut, bitsSelectTS,
                                storeNNTracks, tsHits, storeNNInputs,
                                nntrack2D, mlp);

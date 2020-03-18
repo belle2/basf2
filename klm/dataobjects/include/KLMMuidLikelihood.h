@@ -1,4 +1,4 @@
-B/**************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
@@ -358,32 +358,34 @@ namespace Belle2 {
     /** Flag to determine if this extrapolation is in forward or backward B/EKLM. */
     bool m_IsForward;
 
-    //! outermost BKLM layer crossed by track during extrapolation
+    /** Outermost BKLM layer crossed in the extrapolation. */
     int m_BarrelExtLayer;
 
-    //! outermost EKLM layer crossed by track during extrapolation
+    /** Outermost EKLM layer crossed in the extrapolation. */
     int m_EndcapExtLayer;
 
-    //! outermost BKLM layer with a matching hit
-    int m_BarrelHitLayer;
-
-    //! outermost EKLM layer with a matching hit
-    int m_EndcapHitLayer;
-
-    //! outermost BKLM or EKLM layer crossed by track during extrapolation
+    /** Outermost KLM layer crossed in the extrapolation. */
     int m_ExtLayer;
 
-    //! outermost BKLM or EKLM layer with a matching hit
+    /** Outermost BKLM layer actually crossed by the track. */
+    int m_BarrelHitLayer;
+
+    /** Outermost EKLM layer actually crossed by the track. */
+    int m_EndcapHitLayer;
+
+    /** Outermost KLM layer actually crossed by the track. */
     int m_HitLayer;
 
-    //! Layer-crossing bit pattern during extrapolation
-    //! (bits 0..14 = barrel layers 1..15,
-    //! bits 15..28 = endcap layers 1..14)
+    /**
+     * Pattern of the layers crossed in the extrapolation
+     * (bits 0..14 = BKLM layers 1..15, bits 15..28 = EKLM layers 1..14).
+     */
     unsigned int m_ExtLayerPattern;
 
-    //! Matching-hit bit pattern
-    //! (bits 0..14 = barrel layers 1..15,
-    //! bits 15..28 = endcap layers 1..14)
+    /**
+     * Pattern of the layers actually crossed by the track
+     * (bits 0..14 = BKLM layers 1..15, bits 15..28 = EKLM layers 1..14).
+     */
     unsigned int m_HitLayerPattern;
 
     /** Array of BKLM layer efficiencies. */

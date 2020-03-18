@@ -151,6 +151,14 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         string listName = mother->getFullName();
 
+        // special case. if the list is called "all" it may not have a
+        // corresponding cut string this can introduce very dangerous bugs
+        string listLabel = mother->getLabel();
+        if (listLabel == "all")
+          if (cutParameter != "")
+            B2FATAL("You have tried to create a list " << listName <<
+                    " with cuts! This is *very* error prone. To be safe, please don't use \"all\", \"loose\", or \"tight\" for your own lists.");
+
         if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 

@@ -116,8 +116,9 @@ void DQMHistAnalysisECLModule::normalize(std::string c_name, std::string h_name,
         Double_t entries = h->GetBinContent(i + 1);
         if (weight) h->SetBinContent(i + 1, entries / weight);
       }
-      h->Draw();
+      h->Draw("HIST");
     }
+    c->Draw();
     c->Modified();
     c->Update();
   }
@@ -176,8 +177,9 @@ void DQMHistAnalysisECLModule::event()
         TH1* h_psd_norm = findHist(str(boost::format("ECL/%1%_cid") % id));
         if (h_psd != NULL && h_psd_norm != NULL) {
           h_psd->Divide(h_psd, h_psd_norm);
-          h_psd->Draw();
+          h_psd->Draw("HIST");
         }
+        c_psd->Draw();
         c_psd->Modified();
         c_psd->Update();
       }

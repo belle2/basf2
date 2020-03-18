@@ -82,7 +82,7 @@ void BKLMReconstructorModule::beginRun()
     m_PromptTime = m_Timing->getPromptTime();
     /* Not use the promt window value from database
      * until the time calibration is ready. */
-    m_PromptWindow = m_Timing->getPromptWindow();
+    // m_PromptWindow = m_Timing->getPromptWindow();
   }
 }
 

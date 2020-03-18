@@ -91,6 +91,7 @@ discretePt:
   m_parameters.xVertexParams  = {0.0, 10 * Unit::um};
   m_parameters.yVertexParams  = {0.0, 59 * Unit::nm};
   m_parameters.zVertexParams  = {0.0, 190 * Unit::um};
+  m_parameters.timeParams     = {0.0 * Unit::ns};
 
   //Parameter definition
   addParam("nTracks", m_parameters.nTracks,
@@ -114,7 +115,7 @@ discretePt:
            "polylineCos or discrete", string("uniform"));
   addParam("timeGeneration", m_timeDist,
            "Time distribution: one of fixed, uniform, normal, normalCos, polyline, uniformCos, "
-           "polylineCos or discrete", string("uniform"));
+           "polylineCos or discrete", string("fixed"));
   addParam("vertexGeneration", m_vertexDist,
            "Vertex (x,y,z) distribution: one of fixed, uniform, normal, polyline or "
            "discrete", string("fixed"));

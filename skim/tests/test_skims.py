@@ -10,7 +10,7 @@ import skimExpertFunctions as expert
 from stdCharged import stdPi, stdK, stdE, stdMu, stdPr
 from stdPhotons import stdPhotons, loadStdSkimPhoton
 from stdPi0s import stdPi0s, loadStdSkimPi0
-from stdV0s import stdKshorts, mergedKshorts
+from stdV0s import stdKshorts
 from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdLightMesons
 from skim.standardlists.dileptons import loadStdDiLeptons, loadStdJpsiToee, loadStdJpsiTomumu
 from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
@@ -27,7 +27,6 @@ stdPhotons('loose', path=skimpath)
 stdPhotons('all', path=skimpath)
 stdPhotons('tight', path=skimpath)  # also builds loose list
 stdKshorts(path=skimpath)
-mergedKshorts(path=skimpath)  # add due to charm skims need it
 stdPi('loose', path=skimpath)
 stdK('loose', path=skimpath)
 stdPr('loose', path=skimpath)

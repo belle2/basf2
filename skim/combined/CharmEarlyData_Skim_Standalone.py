@@ -15,7 +15,7 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPi0s import loadStdSkimPi0
 from stdPhotons import loadStdSkimPhoton
-from stdV0s import mergedKshorts, stdKshorts
+from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 
 

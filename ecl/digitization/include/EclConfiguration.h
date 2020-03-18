@@ -64,12 +64,12 @@ namespace Belle2 {
         void AddHit(const double a, const double t0, const signalsample_t& q);
         double total; /**< total deposition (sum of m_s array) */
         double c[m_nsmp]; /**< flash ADC measurements */
-        double totalHadronDep; /**< total hadron energy deposition*/
-        double totalDep; /**< total energy deposition*/
+        double totalHadronDep; /**< total true hadron energy deposition*/
+        double totalDep; /**< total true energy deposition*/
         double energyConversion; /**< energy conversion factor*/
-        double flighttime; /**< time weighted by true deposited energy*/
-        double timeshift; /**< time shift*/
-        double timetosensor; /**< time to sensor*/
+        double flighttime; /**< simulated time weighted by true deposited energy*/
+        double timeshift; /**< simulated time shift*/
+        double timetosensor; /**< simulated time to sensor*/
       };
 
       /** a struct for the fit parameters */

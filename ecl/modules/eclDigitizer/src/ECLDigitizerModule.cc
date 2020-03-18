@@ -33,7 +33,7 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLDspWithExtraInfo.h>
+#include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <ecl/utility/ECLDspEmulator.h>
@@ -69,9 +69,10 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
   addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
   addParam("WaveformThresholdOverride", m_WaveformThresholdOverride,
            "If gt 0 value is applied to all crystals for waveform saving threshold. If lt 0 dbobject is used. (GeV)", -1.0);
-  addParam("StoreDspWithExtraInfo", m_storeDspWithExtraInfo,
-           "Flag to store Dsp with extra information in addition to normal Dsp (default: false)", false);
-  addParam("DspWithExtraInfoThreshold", m_DspWithExtraInfoThreshold, "Threshold above with to store Dsp with extra information [GeV]",
+  addParam("StoreDspWithExtraMCInfo", m_storeDspWithExtraMCInfo,
+           "Flag to store Dsp with extra MC information in addition to normal Dsp (default: false)", false);
+  addParam("DspWithExtraMCInfoThreshold", m_DspWithExtraMCInfoThreshold,
+           "Threshold above with to store Dsp with extra MC information [GeV]",
            0.02);
 
 }
@@ -83,7 +84,7 @@ ECLDigitizerModule::~ECLDigitizerModule()
 void ECLDigitizerModule::initialize()
 {
   m_eclDsps.registerInDataStore();
-  if (m_storeDspWithExtraInfo) m_eclDspsWithExtraInfo.registerInDataStore();
+  if (m_storeDspWithExtraMCInfo) m_eclDspsWithExtraMCInfo.registerInDataStore();
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
@@ -103,8 +104,8 @@ void ECLDigitizerModule::initialize()
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
 
   m_eclDsps.registerRelationTo(m_eclDigits);
-  if (m_storeDspWithExtraInfo)
-    m_eclDspsWithExtraInfo.registerRelationTo(m_eclDigits);
+  if (m_storeDspWithExtraMCInfo)
+    m_eclDspsWithExtraMCInfo.registerRelationTo(m_eclDigits);
   m_eclDigits.registerRelationTo(m_eclHits);
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
@@ -407,17 +408,17 @@ void ECLDigitizerModule::event()
         eclDsp->setDspA(FitA);
       }
 
-      // only store extra info if requested and above threshold
-      if (m_storeDspWithExtraInfo and  a.totalDep >= m_DspWithExtraInfoThreshold) {
-        const auto eclDspWithExtraInfo = m_eclDspsWithExtraInfo.appendNew();
-        eclDspWithExtraInfo->setCellId(CellId);
-        eclDspWithExtraInfo->setDspA(FitA);
-        eclDspWithExtraInfo->setEnergyDep(a.totalDep);
-        eclDspWithExtraInfo->setHadronEnergyDep(a.totalHadronDep);
-        eclDspWithExtraInfo->setFlightTime(a.flighttime / a.totalDep);
-        eclDspWithExtraInfo->setTimeShift(a.timeshift / a.totalDep);
-        eclDspWithExtraInfo->setTimeToSensor(a.timetosensor / a.totalDep);
-        eclDspWithExtraInfo->setEnergyConversion(a.energyConversion * 20000);
+      // only store extra MC info if requested and above threshold
+      if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
+        const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew();
+        eclDspWithExtraMCInfo->setCellId(CellId);
+        eclDspWithExtraMCInfo->setDspA(FitA);
+        eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
+        eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
+        eclDspWithExtraMCInfo->setFlightTime(a.flighttime / a.totalDep);
+        eclDspWithExtraMCInfo->setTimeShift(a.timeshift / a.totalDep);
+        eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor / a.totalDep);
+        eclDspWithExtraMCInfo->setEnergyConversion(a.energyConversion * 20000);
       }
 
       const auto eclDigit = m_eclDigits.appendNew();
@@ -432,8 +433,8 @@ void ECLDigitizerModule::event()
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
 
       // set relation to DspWithExtraInfo
-      for (auto& DspWithExtraInfo : m_eclDspsWithExtraInfo) {
-        if (eclDigit->getCellId() == DspWithExtraInfo.getCellId()) DspWithExtraInfo.addRelationTo(eclDigit);
+      for (auto& DspWithExtraMCInfo : m_eclDspsWithExtraMCInfo) {
+        if (eclDigit->getCellId() == DspWithExtraMCInfo.getCellId()) DspWithExtraMCInfo.addRelationTo(eclDigit);
       }
     }
   } //store each crystal hit

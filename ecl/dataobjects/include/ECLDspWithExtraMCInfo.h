@@ -9,8 +9,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDSPWITHEXTRAINFO_H
-#define ECLDSPWITHEXTRAINFO_H
+#ifndef ECLDSPWITHEXTRAMCINFO_H
+#define ECLDSPWITHEXTRAMCINFO_H
 
 #include <framework/datastore/RelationsObject.h>
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
    *
    */
 
-  class ECLDspWithExtraInfo : public ECLDsp {
+  class ECLDspWithExtraMCInfo : public ECLDsp {
   public:
     /*! Set total true deposited energy
     */
@@ -88,7 +88,7 @@ namespace Belle2 {
     double m_timeshift{0};   /**< Time shift (weighted by true energy) */
     double m_timetosensor{0};   /**< time to sensor (weighted by true energy) */
 
-    ClassDef(ECLDspWithExtraInfo, 1);
+    ClassDef(ECLDspWithExtraMCInfo, 1);
 
   };
 } // end namespace Belle2

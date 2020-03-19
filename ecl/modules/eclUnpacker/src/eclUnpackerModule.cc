@@ -14,6 +14,9 @@
 //STL
 #include <iomanip>
 
+//Framework
+#include <framework/dataobjects/EventMetaData.h>
+
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
 
@@ -78,7 +81,8 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_EvtNum(0),
+  m_globalEvtNum(0),
+  m_localEvtNum(0),
   m_bufPtr(0),
   m_bufPos(0),
   m_bufLength(0),
@@ -104,7 +108,7 @@ ECLUnpackerModule::ECLUnpackerModule() :
   addParam("storeUnmapped", m_storeUnmapped,         "Store ECLDsp for channels that don't "
            "exist in ECL mapping", false);
 
-  m_EvtNum = 0;
+  m_localEvtNum = 0;
 }
 
 ECLUnpackerModule::~ECLUnpackerModule()
@@ -152,6 +156,11 @@ void ECLUnpackerModule::event()
   m_eclDsps.clear();
   m_eclTrigs.clear();
 
+  if (m_eventMetaData.isValid()) {
+    m_globalEvtNum = m_eventMetaData->getEvent();
+  } else {
+    m_globalEvtNum = -1;
+  }
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
@@ -163,7 +172,7 @@ void ECLUnpackerModule::event()
     }
   }
 
-  m_EvtNum++;
+  m_localEvtNum++;
 
 }
 
@@ -257,7 +266,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     // pointer to data from COPPER/FINESSE
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
-    B2DEBUG_eclunpacker(21, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
+    B2DEBUG_eclunpacker(21, "***** iEvt " << m_localEvtNum << " node " << std::hex << nodeID);
 
     // dump buffer data
     for (int i = 0; i < m_bufLength; i++) {
@@ -342,6 +351,12 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
         else if (triggerTag != triggerTag0) {
           doTagsReport(iCrate, triggerTag0, triggerTag);
           triggerTag0 |= (1 << 16);
+        }
+
+        if (m_globalEvtNum >= 0) {
+          if (triggerTag != (m_globalEvtNum & 0xFFFF)) {
+            doEvtNumReport(iCrate, triggerTag, m_globalEvtNum);
+          }
         }
 
         value = readNextCollectorWord();
@@ -490,6 +505,16 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
 }
 
+void ECLUnpackerModule::doEvtNumReport(unsigned int iCrate, int tag, int evt_number)
+{
+  if (!evtNumReported(iCrate)) {
+    B2ERROR("ECL trigger tag is inconsistent with event number."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger tag", tag)
+            << LogVar("event number", evt_number));
+    m_evtNumReportedMask |= 1 << (iCrate - 1);
+  }
+}
 void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
 {
   if (!tagsReported(iCrate)) {

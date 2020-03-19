@@ -16,7 +16,7 @@ using namespace Belle2;
 
 KLMMuidLikelihood::KLMMuidLikelihood() :
   m_PDGCode(0),
-  m_JunkPDFValue(0.0),
+  m_JunkPDFValue(false),
   m_ChiSquared(0.0),
   m_DegreesOfFreedom(0),
   m_Outcome(0),

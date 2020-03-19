@@ -331,11 +331,12 @@ void ECLDQMModule::event()
     h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Trigger tag flag #2 histogram filling.
   }
 
-  if (m_ECLTrigs.getEntries() > 0) trigtag1 /= m_ECLTrigs.getEntries();
-
-  int compar = (65535 & m_iEvent);
-  if (compar == trigtag1) flagtag = 0;
-  h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  if (m_ECLTrigs.getEntries() > 0) {
+    trigtag1 /= m_ECLTrigs.getEntries();
+    int compar = (65535 & m_iEvent);
+    if (compar == trigtag1) flagtag = 0;
+    h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  }
 
   for (auto& aECLCalDigit : m_ECLCalDigits) {
     int cid        = aECLCalDigit.getCellId();

@@ -15,6 +15,8 @@
 #     1) prepare the input files
 #     2) actually overlay the data
 #
+# IMPORTANT: default paths are for KEKCC only!!
+#
 # examples are in svd/examples/overlayUtils.py
 #
 ######

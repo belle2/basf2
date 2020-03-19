@@ -7,7 +7,10 @@
 #
 # Author:  Giulia Casarosa
 #
-# Usage: basf2 runEventT0DQM.py -i "<path/to/file.root>"
+# Usage: basf2 overlayUtils.py [cosmics, xTalk, user-defined]
+#        user-defined rootfiles are also usable
+#        but you need to specify the path to the rootfiles as
+#        third argument of overlay_svd_data()
 #
 # 2020 Belle II Collaboration
 #############################################################
@@ -23,7 +26,8 @@ tag = "unused"
 if len(sys.argv) == 2:
     tag = sys.argv[1]
 
-# PREPARE YOUR INPUT FILES - not working properly at the moment:
+# PREPARE YOUR INPUT FILES - ERROR printed at the end does not
+#                            affect output files
 # function provides output rootfile with SVDShaperDigits only
 '''
 main = create_path()
@@ -85,7 +89,6 @@ main.add_module(
     FADCmode=True)
 main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
-# main.add_module('RootOutput', outputFileName='RootOutput_100evt_'+str(tag)+'.root')
 main.add_module('Progress')
 
 print_path(main)

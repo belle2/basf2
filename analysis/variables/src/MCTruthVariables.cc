@@ -43,22 +43,6 @@ namespace Belle2 {
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
 
-    double isExtendedSignal(const Particle* part)
-    {
-      B2WARNING("isExtendedSignal is deprecated and will be removed. Please use isSignalAcceptWrongFSPs which is exact same variable");
-
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return std::numeric_limits<double>::quiet_NaN();
-
-      int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits
-      status &= (~MCMatching::c_MisID);
-      status &= (~MCMatching::c_AddedWrongParticle);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
     double isSignalAcceptWrongFSPs(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -844,10 +828,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
                       "It behaves according to DecayStringGrammar.");
-    REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Misidentification of charged FSP is allowed. \n"
-                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");

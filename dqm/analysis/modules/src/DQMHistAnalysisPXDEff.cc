@@ -233,7 +233,8 @@ void DQMHistAnalysisPXDEffModule::event()
       gr->GetPoint(i, x, y);
       gr->SetPoint(i, x - 0.01, y);
       auto val = gr->GetErrorYlow(i);
-      if (val > 0) {
+      if (i != 5) { // exclude 1.3.2
+        /// check for val > 0.0) { would exclude all zero efficient modules!!!
         if (scale_min > val) scale_min = val;
       }
     }

@@ -58,7 +58,7 @@ namespace Belle2 {
              "List of files with measured beam background ");
     addParam("extensionName", m_extensionName,
              "name added to default branch names", string("_beamBG"));
-    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string("BackgroundInfo"));
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
   }
 
   BGOverlayInputModule::~BGOverlayInputModule()

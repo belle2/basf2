@@ -51,7 +51,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string("BackgroundInfo"));
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
     addParam("PXDDigitsName", m_PXDDigitsName,
              "name of PXD collection to overlay with BG", string(""));
     addParam("SVDShaperDigitsName", m_SVDShaperDigitsName,

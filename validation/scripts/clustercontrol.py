@@ -217,7 +217,7 @@ class Cluster:
     def _cleanup(self, job: Script) -> None:
         """ Clean up after job has finished. """
         tmp_name = self._get_tmp_name(job)
-        os.system(f'rm {tmp_name}')
+        os.unlink(tmp_name)
 
     def _get_tmp_name(self, job: Script) -> str:
         """ Name of temporary file used for job submission. """

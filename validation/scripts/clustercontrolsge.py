@@ -219,7 +219,7 @@ class Cluster:
                 job.status = 'failed'
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
-            os.system(f'rm {tmp_name}')
+            os.unlink(tmp_name)
 
     def is_job_finished(self, job: Script):
         """!

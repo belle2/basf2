@@ -172,7 +172,7 @@ class Cluster:
 
         # Prepare the command line command for submission to the cluster
         params = [
-            "bsub", "-o", log_file, "-e", log_file, "-q", "l", tmp_name,
+            "bsub", "-oo", log_file, "-q", "l", tmp_name,
         ]
 
         # Log the command we are about the execute

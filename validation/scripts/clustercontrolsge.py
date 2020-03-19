@@ -56,7 +56,7 @@ class Cluster:
         # actual log file name
         self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,'
                                'h_fsize={requirement_storage}G '
-                               '-o {logfile} -e {logfile} -q {queuename} -V')
+                               '-oo {logfile} -q {queuename} -V')
 
         #: required vmem by the job in GB, required on DESY NAF, otherwise
         #: jobs get killed due to memory consumption

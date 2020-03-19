@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Kirill Chilikin, Giacomo De Pietro,               *
+ * Contributors: Kirill Chilikin, Giacomo De Pietro,                      *
  *               Leo Piilonen, Timofey Uglov                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -64,40 +64,40 @@ static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
 
 KLMReconstructorModule::KLMReconstructorModule() :
   Module(),
-  m_BklmGeoPar(nullptr),
-  m_EklmGeoDat(nullptr),
-  m_nStrip(0),
-  m_TransformData(nullptr),
-  m_TimeCalibrationData(nullptr)
+  m_bklmGeoPar(nullptr),
+  m_eklmGeoDat(nullptr),
+  m_eklmNStrip(0),
+  m_eklmTransformData(nullptr),
+  m_eklmTimeCalibrationData(nullptr)
 {
   setDescription("Create BKLMHit1ds from BKLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from EKLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
-  addParam("CoincidenceWindow", m_CoincidenceWindow,
+  addParam("CoincidenceWindow", m_bklmCoincidenceWindow,
            "Half-width time coincidence window between adjacent BKLMDigits or orthogonal BKLMHit1ds (ns).",
            double(50.0));
   // MC 1 GeV/c muons: mean prompt time is 0.43 ns
-  addParam("PromptTime", m_PromptTime,
+  addParam("PromptTime", m_bklmPromptTime,
            "Nominal time of prompt BKLMHit2ds (ns).",
            double(0.0));
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
   // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
   // approximately. The time window can be readjusted after completion of
   // the implementation of KLM time calibration.
-  addParam("PromptWindow", m_PromptWindow,
+  addParam("PromptWindow", m_bklmPromptWindow,
            "Half-width time window of BKLMHit2ds relative to PrompTime (ns).",
            //double(50.0));
            double(10000.0));
-  addParam("IfAlign", m_IfAlign,
+  addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));
-  addParam("LoadTimingFromDB", m_LoadTimingFromDB,
+  addParam("LoadTimingFromDB", m_bklmLoadTimingFromDB,
            "Load timing window from database (true) or not (false).",
            bool(true));
-  addParam("IgnoreScintillators", m_IgnoreScintillators,
+  addParam("IgnoreScintillators", m_bklmIgnoreScintillators,
            "Ignore scintillators (to debug their electronics mapping).",
            false);
-  addParam("CheckSegmentIntersection", m_CheckSegmentIntersection,
+  addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
 }
 
@@ -108,54 +108,54 @@ KLMReconstructorModule::~KLMReconstructorModule()
 void KLMReconstructorModule::initialize()
 {
   /* BKLM. */
-  m_BklmDigits.isRequired();
-  m_BklmHit1ds.registerInDataStore();
-  m_BklmHit2ds.registerInDataStore();
-  m_BklmHit1ds.registerRelationTo(m_BklmDigits);
-  m_BklmHit2ds.registerRelationTo(m_BklmHit1ds);
-  m_BklmGeoPar = bklm::GeometryPar::instance();
+  m_bklmDigits.isRequired();
+  m_bklmHit1ds.registerInDataStore();
+  m_bklmHit2ds.registerInDataStore();
+  m_bklmHit1ds.registerRelationTo(m_bklmDigits);
+  m_bklmHit2ds.registerRelationTo(m_bklmHit1ds);
+  m_bklmGeoPar = bklm::GeometryPar::instance();
   /* EKLM. */
-  m_EklmDigits.isRequired();
-  m_EklmHit2ds.registerInDataStore();
-  m_EklmAlignmentHits.registerInDataStore();
-  m_EklmHit2ds.registerRelationTo(m_EklmDigits);
-  m_EklmAlignmentHits.registerRelationTo(m_EklmHit2ds);
-  m_TransformData =
+  m_eklmDigits.isRequired();
+  m_eklmHit2ds.registerInDataStore();
+  m_eklmAlignmentHits.registerInDataStore();
+  m_eklmHit2ds.registerRelationTo(m_eklmDigits);
+  m_eklmAlignmentHits.registerRelationTo(m_eklmHit2ds);
+  m_eklmTransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
-  m_EklmGeoDat = &(EKLM::GeometryData::Instance());
-  if (m_EklmGeoDat->getNPlanes() != 2)
+  m_eklmGeoDat = &(EKLM::GeometryData::Instance());
+  if (m_eklmGeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
-  m_nStrip = m_EklmGeoDat->getMaximalStripGlobalNumber();
-  m_TimeCalibrationData = new const EKLMTimeCalibrationData*[m_nStrip];
+  m_eklmNStrip = m_eklmGeoDat->getMaximalStripGlobalNumber();
+  m_eklmTimeCalibrationData = new const EKLMTimeCalibrationData*[m_eklmNStrip];
 }
 
 void KLMReconstructorModule::beginRun()
 {
   /* BKLM. */
-  if (m_LoadTimingFromDB) {
-    if (!m_Timing.isValid())
+  if (m_bklmLoadTimingFromDB) {
+    if (!m_bklmTiming.isValid())
       B2FATAL("BKLM time window data are not available.");
-    m_CoincidenceWindow = m_Timing->getCoincidenceWindow();
-    m_PromptTime = m_Timing->getPromptTime();
+    m_bklmCoincidenceWindow = m_bklmTiming->getCoincidenceWindow();
+    m_bklmPromptTime = m_bklmTiming->getPromptTime();
     /* Not use the promt window value from database
      * until the time calibration is ready. */
-    // m_PromptWindow = m_Timing->getPromptWindow();
+    // m_bklmPromptWindow = m_bklmTiming->getPromptWindow();
   }
   /* EKLM. */
   /* cppcheck-suppress variableScope */
   int i;
-  if (!m_RecPar.isValid())
+  if (!m_eklmRecPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
-  if (!m_TimeCalibration.isValid())
+  if (!m_eklmTimeCalibration.isValid())
     B2FATAL("EKLM time calibration data is not available.");
-  if (m_TimeCalibration.hasChanged()) {
-    for (i = 0; i < m_nStrip; i++) {
-      m_TimeCalibrationData[i] =
-        m_TimeCalibration->getTimeCalibrationData(i + 1);
-      if (m_TimeCalibrationData[i] == nullptr) {
+  if (m_eklmTimeCalibration.hasChanged()) {
+    for (i = 0; i < m_eklmNStrip; i++) {
+      m_eklmTimeCalibrationData[i] =
+        m_eklmTimeCalibration->getTimeCalibrationData(i + 1);
+      if (m_eklmTimeCalibrationData[i] == nullptr) {
         B2FATAL("EKLM time calibration data is missing for strip "
                 << i + 1 << ".");
-        m_TimeCalibrationData[i] = &m_DefaultTimeCalibrationData;
+        m_eklmTimeCalibrationData[i] = &m_eklmDefaultTimeCalibrationData;
       }
     }
   }
@@ -172,9 +172,9 @@ void KLMReconstructorModule::reconstructBKLMHits()
   /* Construct BKLMHit1Ds from BKLMDigits. */
   /* Sort BKLMDigits by module and strip number. */
   std::map<uint16_t, int> channelDigitMap;
-  for (int index = 0; index < m_BklmDigits.getEntries(); ++index) {
-    const BKLMDigit* digit = m_BklmDigits[index];
-    if (m_IgnoreScintillators && !digit->inRPC())
+  for (int index = 0; index < m_bklmDigits.getEntries(); ++index) {
+    const BKLMDigit* digit = m_bklmDigits[index];
+    if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
     if (digit->inRPC() || digit->isAboveThreshold()) {
       int module = digit->getModuleID();
@@ -186,12 +186,12 @@ void KLMReconstructorModule::reconstructBKLMHits()
     return;
   std::vector<const BKLMDigit*> digitCluster;
   uint16_t previousChannel = channelDigitMap.begin()->first;
-  double averageTime = m_BklmDigits[channelDigitMap.begin()->second]->getTime();
+  double averageTime = m_bklmDigits[channelDigitMap.begin()->second]->getTime();
   for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
-    const BKLMDigit* digit = m_BklmDigits[it->second];
+    const BKLMDigit* digit = m_bklmDigits[it->second];
     double digitTime = digit->getTime();
-    if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_CoincidenceWindow)) {
-      m_BklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
+    if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_bklmCoincidenceWindow)) {
+      m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
       digitCluster.clear();
     }
     previousChannel = it->first;
@@ -199,35 +199,35 @@ void KLMReconstructorModule::reconstructBKLMHits()
     averageTime = (n * averageTime + digitTime) / (n + 1.0);
     digitCluster.push_back(digit);
   }
-  m_BklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
+  m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
 
   /* Construct BKLMHit2Ds from orthogonal same-module BKLMHit1Ds. */
-  for (int i = 0; i < m_BklmHit1ds.getEntries(); ++i) {
-    int moduleID = m_BklmHit1ds[i]->getModuleID();
-    const bklm::Module* m = m_BklmGeoPar->findModule(m_BklmHit1ds[i]->getSection(), m_BklmHit1ds[i]->getSector(),
-                                                     m_BklmHit1ds[i]->getLayer());
-    bool isPhiReadout = m_BklmHit1ds[i]->isPhiReadout();
-    for (int j = i + 1; j < m_BklmHit1ds.getEntries(); ++j) {
+  for (int i = 0; i < m_bklmHit1ds.getEntries(); ++i) {
+    int moduleID = m_bklmHit1ds[i]->getModuleID();
+    const bklm::Module* m = m_bklmGeoPar->findModule(m_bklmHit1ds[i]->getSection(), m_bklmHit1ds[i]->getSector(),
+                                                     m_bklmHit1ds[i]->getLayer());
+    bool isPhiReadout = m_bklmHit1ds[i]->isPhiReadout();
+    for (int j = i + 1; j < m_bklmHit1ds.getEntries(); ++j) {
       if (!BKLMElementNumbers::hitsFromSameModule(
-            moduleID, m_BklmHit1ds[j]->getModuleID()))
+            moduleID, m_bklmHit1ds[j]->getModuleID()))
         continue;
-      if (isPhiReadout == m_BklmHit1ds[j]->isPhiReadout())
+      if (isPhiReadout == m_bklmHit1ds[j]->isPhiReadout())
         continue;
       int phiIndex = isPhiReadout ? i : j;
       int zIndex   = isPhiReadout ? j : i;
-      const BKLMHit1d* phiHit = m_BklmHit1ds[phiIndex];
-      const BKLMHit1d* zHit = m_BklmHit1ds[zIndex];
+      const BKLMHit1d* phiHit = m_bklmHit1ds[phiIndex];
+      const BKLMHit1d* zHit = m_bklmHit1ds[zIndex];
       CLHEP::Hep3Vector local = m->getLocalPosition(phiHit->getStripAve(), zHit->getStripAve());
       CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(local);
       double phiTime = phiHit->getTime() - propagationTimes.y();
       double zTime = zHit->getTime() - propagationTimes.z();
-      if (std::fabs(phiTime - zTime) > m_CoincidenceWindow)
+      if (std::fabs(phiTime - zTime) > m_bklmCoincidenceWindow)
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
-      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_IfAlign);
+      CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
-      BKLMHit2d* hit2d = m_BklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
-      if (std::fabs(time - m_PromptTime) > m_PromptWindow)
+      BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
+      if (std::fabs(time - m_bklmPromptTime) > m_bklmPromptWindow)
         hit2d->isOutOfTime(true);
     }
   }
@@ -237,20 +237,20 @@ bool KLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
                                      double time)
 {
   return time < pos.mag() / Const::speedOfLight -
-         2.0 * m_RecPar->getTimeResolution();
+         2.0 * m_eklmRecPar->getTimeResolution();
 }
 
 double KLMReconstructorModule::getTime(EKLMDigit* d, double dist)
 {
   int strip;
-  strip = m_EklmGeoDat->stripNumber(d->getSection(), d->getLayer(), d->getSector(),
+  strip = m_eklmGeoDat->stripNumber(d->getSection(), d->getLayer(), d->getSector(),
                                     d->getPlane(), d->getStrip()) - 1;
   return d->getTime() -
-         (dist / m_TimeCalibration->getEffectiveLightSpeed() +
-          m_TimeCalibrationData[strip]->getTimeShift());
+         (dist / m_eklmTimeCalibration->getEffectiveLightSpeed() +
+          m_eklmTimeCalibrationData[strip]->getTimeShift());
   /**
    * TODO: Subtract time correction given by
-   * m_TimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()).
+   * m_eklmTimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()).
    * It requires a new firmware version that will be able to extract amplitude.
    */
 }
@@ -261,10 +261,10 @@ void KLMReconstructorModule::reconstructEKLMHits()
   double d1, d2, t, t1, t2, sd;
   std::vector<EKLMDigit*> digitVector;
   std::vector<EKLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
-  n = m_EklmDigits.getEntries();
+  n = m_eklmDigits.getEntries();
   for (i = 0; i < n; i++) {
-    if (m_EklmDigits[i]->isGood())
-      digitVector.push_back(m_EklmDigits[i]);
+    if (m_eklmDigits[i]->isGood())
+      digitVector.push_back(m_eklmDigits[i]);
   }
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);
@@ -347,9 +347,9 @@ void KLMReconstructorModule::reconstructEKLMHits()
          * If strips do not intersect, then continue.
          */
         HepGeom::Point3D<double> crossPoint(0, 0, 0);
-        if (!m_TransformData->intersection(*it4, *it6, &crossPoint,
-                                           &d1, &d2, &sd,
-                                           m_CheckSegmentIntersection)) {
+        if (!m_eklmTransformData->intersection(*it4, *it6, &crossPoint,
+                                               &d1, &d2, &sd,
+                                               m_eklmCheckSegmentIntersection)) {
           it6 = it7;
           continue;
         }
@@ -358,18 +358,18 @@ void KLMReconstructorModule::reconstructEKLMHits()
             t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
             t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
             t = (t1 + t2) / 2;
-            EKLMHit2d* hit2d = m_EklmHit2ds.appendNew(*it8);
+            EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
             hit2d->setEDep((*it8)->getEDep() + (*it9)->getEDep());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
             hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                            m_RecPar->getTimeResolution() /
-                            m_RecPar->getTimeResolution());
+                            m_eklmRecPar->getTimeResolution() /
+                            m_eklmRecPar->getTimeResolution());
             hit2d->setTime(t);
             hit2d->setMCTime(((*it8)->getMCTime() + (*it9)->getMCTime()) / 2);
             hit2d->addRelationTo(*it8);
             hit2d->addRelationTo(*it9);
             for (i = 0; i < 2; i++) {
-              EKLMAlignmentHit* alignmentHit = m_EklmAlignmentHits.appendNew(i);
+              EKLMAlignmentHit* alignmentHit = m_eklmAlignmentHits.appendNew(i);
               alignmentHit->addRelationTo(hit2d);
             }
             /* Exit the loop. Equivalent to selection of the earliest hit. */
@@ -392,6 +392,6 @@ void KLMReconstructorModule::endRun()
 
 void KLMReconstructorModule::terminate()
 {
-  delete m_TransformData;
-  delete[] m_TimeCalibrationData;
+  delete m_eklmTransformData;
+  delete[] m_eklmTimeCalibrationData;
 }

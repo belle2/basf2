@@ -33,7 +33,8 @@
 namespace Belle2 {
 
   /**
-   * Create BKLMHit1ds from BKLMDigits and then create BKLMHit2ds from BKLMHit1ds.
+   * Create BKLMHit1ds from BKLMDigits and then create BKLMHit2ds from BKLMHit1ds;
+   * create EKLMHit2ds from EKLMDigits.
    */
   class KLMReconstructorModule : public Module {
 
@@ -105,37 +106,37 @@ namespace Belle2 {
     /* BKLM parameters. */
 
     /** BKLM GeometryPar singleton. */
-    bklm::GeometryPar* m_BklmGeoPar;
+    bklm::GeometryPar* m_bklmGeoPar;
 
     /** Half-width time coincidence window between adjacent BKLMDigits or orthogonal BKLMHit1ds (ns). */
-    double m_CoincidenceWindow;
+    double m_bklmCoincidenceWindow;
 
     /** Nominal time of prompt BKLMHit2ds (ns). */
-    double m_PromptTime;
+    double m_bklmPromptTime;
 
     /** Half-width window of BKLMHit2ds relative to m_PrompTime (ns). */
-    double m_PromptWindow;
+    double m_bklmPromptWindow;
 
     /** Perform alignment correction (true) or not (false). */
-    bool m_IfAlign;
+    bool m_bklmIfAlign;
 
     /** Load timing window from database (true) or not (false). */
-    bool m_LoadTimingFromDB;
+    bool m_bklmLoadTimingFromDB;
 
     /** Ignore scintillators (to debug their electronics mapping). */
-    bool m_IgnoreScintillators;
+    bool m_bklmIgnoreScintillators;
 
     /** BKLM time window. */
-    DBObjPtr<BKLMTimeWindow> m_Timing;
+    DBObjPtr<BKLMTimeWindow> m_bklmTiming;
 
     /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
+    StoreArray<BKLMDigit> m_bklmDigits;
 
     /** BKLM 1d hits. */
-    StoreArray<BKLMHit1d> m_BklmHit1ds;
+    StoreArray<BKLMHit1d> m_bklmHit1ds;
 
     /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_BklmHit2ds;
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
 
     /* EKLM parameters. */
 
@@ -143,37 +144,37 @@ namespace Belle2 {
      * Check if segments intersect. Normally should be true, but it may be
      * necessary to turn this check off for debugging.
      */
-    bool m_CheckSegmentIntersection;
+    bool m_eklmCheckSegmentIntersection;
 
     /** Geometry data. */
-    const EKLM::GeometryData* m_EklmGeoDat;
+    const EKLM::GeometryData* m_eklmGeoDat;
 
     /** Number of strips. */
-    int m_nStrip;
+    int m_eklmNStrip;
 
     /** Transformation data. */
-    EKLM::TransformData* m_TransformData;
+    EKLM::TransformData* m_eklmTransformData;
 
     /** Reconstruction parameters. */
-    DBObjPtr<EKLMReconstructionParameters> m_RecPar;
+    DBObjPtr<EKLMReconstructionParameters> m_eklmRecPar;
 
     /** Time calibration data. */
-    DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;
+    DBObjPtr<EKLMTimeCalibration> m_eklmTimeCalibration;
 
     /** Time calibration data for individual strips. */
-    const EKLMTimeCalibrationData** m_TimeCalibrationData;
+    const EKLMTimeCalibrationData** m_eklmTimeCalibrationData;
 
     /** Default time calibration data. */
-    EKLMTimeCalibrationData m_DefaultTimeCalibrationData;
+    EKLMTimeCalibrationData m_eklmDefaultTimeCalibrationData;
 
     /** Digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
+    StoreArray<EKLMDigit> m_eklmDigits;
 
     /** EKLM 2d hits. */
-    StoreArray<EKLMHit2d> m_EklmHit2ds;
+    StoreArray<EKLMHit2d> m_eklmHit2ds;
 
     /** Alignment Hits. */
-    StoreArray<EKLMAlignmentHit> m_EklmAlignmentHits;
+    StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
 
   };
 } // end namespace Belle2

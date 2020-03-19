@@ -474,14 +474,7 @@ def add_cdst_output(
             'PXDClustersFromTracks',
             'VXDDedxTracks',
             'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods',
-            'CDCTrigger2DFinderTracks',
-            'CDCTriggerNNInputFinderTracks',
-            'CDCTriggerNNInputBits',
-            'CDCTriggerNNInputSegmentHits',
-            'CDCTriggerNNOutputBits',
-            'CDCTriggerNeuroTracks',
-            'CDCTriggerNeuroTracksInput'
+            'VXDDedxLikelihoods'
             ]
 
         if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:

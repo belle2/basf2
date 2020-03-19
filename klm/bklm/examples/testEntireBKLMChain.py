@@ -67,7 +67,7 @@ main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')
 
 # Add the reconstruction
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 
 # Add the self-tracking
 main.add_module('BKLMTracking',

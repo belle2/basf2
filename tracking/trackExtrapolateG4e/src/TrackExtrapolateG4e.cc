@@ -1806,7 +1806,7 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
       mapPdgPDF.insert(std::pair<int, double>(std::abs(pdg), pdf));
     }
     if (denom < 1.0E-20)
-      klmMuidLikelihood->setJunkPDFValue(1.0); /* Anomaly: should be very rare. */
+      klmMuidLikelihood->setJunkPDFValue(true); /* Anomaly: should be very rare. */
     else {
       for (auto const& [pdg, pdf] : mapPdgPDF) {
         klmMuidLikelihood->setPDFValue(pdf, std::abs(pdg));

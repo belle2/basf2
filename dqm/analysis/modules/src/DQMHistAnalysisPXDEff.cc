@@ -224,6 +224,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
   auto gr = m_hEffAll->GetPaintedGraph();
   if (gr) {
+    double scale_min = 1.0;
     for (int i = 0; i < gr->GetN(); i++) {
       gr->SetPointEXhigh(i, 0.);
       gr->SetPointEXlow(i, 0.);
@@ -231,11 +232,17 @@ void DQMHistAnalysisPXDEffModule::event()
       Double_t x, y;
       gr->GetPoint(i, x, y);
       gr->SetPoint(i, x - 0.01, y);
+      auto val = gr->GetErrorYlow(i);
+      if (val > 0) {
+        if (scale_min > val) scale_min = val;
+      }
     }
+    if (scale_min == 1.0) scale_min = 0.0;
+    if (scale_min > 0.9) scale_min = 0.9;
     gr->SetMinimum(0);
     gr->SetMaximum(m_PXDModules.size());
     auto ay = gr->GetYaxis();
-    if (ay) ay->SetRangeUser(0, 1.0);
+    if (ay) ay->SetRangeUser(scale_min, 1.0);
     auto ax = gr->GetXaxis();
     if (ax) {
       ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());

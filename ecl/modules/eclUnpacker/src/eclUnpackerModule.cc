@@ -512,7 +512,7 @@ void ECLUnpackerModule::doEvtNumReport(unsigned int iCrate, int tag, int evt_num
             << LogVar("crate", iCrate)
             << LogVar("trigger tag", tag)
             << LogVar("event number", evt_number));
-    m_evtNumReportedMask |= 1 << (iCrate - 1);
+    m_evtNumReportedMask |= 1L << (iCrate - 1);
   }
 }
 void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
@@ -521,7 +521,7 @@ void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
     B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
             << LogVar("crate", iCrate)
             << LogVar("trigger tag0", tag0) << LogVar("trigger tag1", tag1));
-    m_tagsReportedMask |= 1 << (iCrate - 1);
+    m_tagsReportedMask |= 1L << (iCrate - 1);
   }
 }
 void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phase1)
@@ -530,7 +530,7 @@ void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phas
     B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
             << LogVar("crate", iCrate)
             << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
-    m_phasesReportedMask |= 1 << (iCrate - 1);
+    m_phasesReportedMask |= 1L << (iCrate - 1);
   }
 }
 void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
@@ -538,7 +538,7 @@ void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
   if (!badHeaderReported(iCrate)) {
     B2ERROR("Bad shaper header."
             << LogVar("crate", iCrate));
-    m_badHeaderReportedMask |= 1 << (iCrate - 1);
+    m_badHeaderReportedMask |= 1L << (iCrate - 1);
   }
 }
 

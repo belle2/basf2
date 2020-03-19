@@ -106,22 +106,22 @@ namespace Belle2 {
      * Check if the problem with trg tag <-> evt number inconsistency was
      * already reported for crate iCrate.
      */
-    bool evtNumReported(unsigned int iCrate) { return m_evtNumReportedMask & (1 << (iCrate - 1)); }
+    bool evtNumReported(unsigned int iCrate) { return m_evtNumReportedMask & (1L << (iCrate - 1)); }
     /**
      * Check if the problem with different trigger tags was already reported
      * for crate iCrate.
      */
-    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1 << (iCrate - 1)); }
+    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1L << (iCrate - 1)); }
     /**
      * Check if the problem with different trigger phases was already reported
      * for crate iCrate.
      */
-    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
+    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1L << (iCrate - 1)); }
     /**
      * Check if the problem with bad shaper header was already reported
      * for crate iCrate.
      */
-    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
+    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1L << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;

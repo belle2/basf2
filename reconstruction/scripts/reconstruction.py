@@ -437,7 +437,14 @@ def add_cdst_output(
         'SVDShaperDigitsFromTracks',
         'TRGGDLUnpackerStores',
         'VXDDedxTracks',
-        'VXDDedxLikelihoods'
+        'VXDDedxLikelihoods',
+        'CDCTrigger2DFinderTracks',
+        'CDCTriggerNNInputFinderTracks',
+        'CDCTriggerNNInputBits',
+        'CDCTriggerNNInputSegmentHits',
+        'CDCTriggerNNOutputBits',
+        'CDCTriggerNeuroTracks',
+        'CDCTriggerNeuroTracksInput'
     ]
 
     if rawFormat:
@@ -467,7 +474,14 @@ def add_cdst_output(
             'PXDClustersFromTracks',
             'VXDDedxTracks',
             'CDCDedxLikelihoods',
-            'VXDDedxLikelihoods'
+            'VXDDedxLikelihoods',
+            'CDCTrigger2DFinderTracks',
+            'CDCTriggerNNInputFinderTracks',
+            'CDCTriggerNNInputBits',
+            'CDCTriggerNNInputSegmentHits',
+            'CDCTriggerNNOutputBits',
+            'CDCTriggerNeuroTracks',
+            'CDCTriggerNeuroTracksInput'
             ]
 
         if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:

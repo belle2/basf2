@@ -8,6 +8,7 @@ import subprocess
 import stat
 import shutil
 import re
+import traceback
 from typing import Tuple
 
 # ours
@@ -179,30 +180,33 @@ class Cluster:
         self.logger.debug(subprocess.list2cmdline(params))
 
         if not dry:
-
-            # Submit job
-            process = subprocess.Popen(
-                params,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
-            stdout, stderr = process.communicate()
-            if stdout.strip():
-                self.logger.debug(f"Stdout of job submission: "
-                                  f"'{stdout.strip()}'.")
-            if stderr.strip():
-                self.logger.debug(f"Stderr of job submission: "
-                                  f"'{stderr.strip()}'.")
-
-            if process.wait() != 0:
-                # Submission did not succeed
+            try:
+                proc = subprocess.run(
+                    params,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+            except subprocess.CalledProcessError:
                 job.status = 'failed'
+                self.logger.error("Failed to submit job. Here's the traceback:")
+                self.logger.error(traceback.format_exc())
+                self.logger.error("Will attempt to cleanup job files.")
                 self._cleanup(job)
+                return
             else:
+                if proc.stdout.strip():
+                    self.logger.debug(
+                        f"Stdout of job submission: '{proc.stdout.strip()}'."
+                    )
+                if proc.stderr.strip():
+                    self.logger.debug(
+                        f"Stderr of job submission: '{proc.stderr.strip()}'."
+                    )
+
                 # Submission succeeded. Get Job ID by parsing output, so that
                 # we can terminate the job later.
-                res = re.search("Job <([0-9]*)> is submitted", stdout)
+                res = re.search("Job <([0-9]*)> is submitted", proc.stdout)
                 if res:
                     job.job_id = res.group(1)
                 else:
@@ -260,31 +264,30 @@ class Cluster:
         if job.job_id:
             params = ["bkill", job.job_id]
             self.logger.debug(subprocess.list2cmdline(params))
-
-            process = subprocess.Popen(
-                params,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                universal_newlines=True,
-            )
-
-            stdout, stderr = process.communicate()
-            if stdout.strip():
-                self.logger.debug(f"Stdout of job termination: "
-                                  f"'{stdout.strip()}'.")
-            if stderr.strip():
-                self.logger.debug(f"Stderr of job termination: "
-                                  f"'{stderr.strip()}'.")
-
-            return_code = process.wait()
-            if return_code != 0:
-                # Failed
-                self.logger.error(
-                    f"Got nonzero return code: {return_code}. Probably wasn't "
-                    f"able to cancel job."
+            try:
+                proc = subprocess.run(
+                    params,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
                 )
-
-            self._cleanup(job)
+            except subprocess.CalledProcessError:
+                job.status = 'failed'
+                self.logger.error(
+                    f"Probably wasn't able to cancel job. Here's the traceback:"
+                )
+                self.logger.error(traceback.format_exc())
+            else:
+                if proc.stdout.strip():
+                    self.logger.debug(
+                        f"Stdout of job termination: '{proc.stdout.strip()}'."
+                    )
+                if proc.stderr.strip():
+                    self.logger.debug(
+                        f"Stderr of job termination: '{proc.stderr.strip()}'."
+                    )
+            finally:
+                self._cleanup(job)
         else:
             self.logger.error(
                 "Termination of the job corresponding to steering file "

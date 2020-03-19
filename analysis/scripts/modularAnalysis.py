@@ -2474,7 +2474,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     """
     trackCuts = 'pt > 0.1'
     trackCuts += ' and thetaInCDCAcceptance'
-    trackCuts += ' and abs(dz)'
+    trackCuts += ' and abs(dz) < 3'
     trackCuts += ' and dr < 0.5'
 
     gammaCuts = 'E > 0.05'

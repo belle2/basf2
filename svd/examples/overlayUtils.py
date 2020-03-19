@@ -28,9 +28,20 @@ if len(sys.argv) == 2:
 '''
 main = create_path()
 
+# cosmics
 svdou.prepare_svd_overlay(main,\
- ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_120.root"]
-)
+ ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_120.root",\
+      "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_101.root",
+"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_100.root",\
+"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_10.root",\
+"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_1.root",\
+"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_2.root"
+])
+
+# xTalk
+svdou.prepare_svd_overlay(main,\
+                              ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/xTalk/physics*f00001.root"]
+                          )
 
 process(main)
 '''
@@ -46,7 +57,6 @@ eventinfosetter.param('expList', [0])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [10])
 main.add_module(eventinfosetter)
-main.add_module('EventInfoPrinter')
 
 # register HistoModules for DQM plots
 main.add_module("HistoManager", histoFileName="SVDDQMOutput_"+str(tag)+".root")
@@ -75,7 +85,7 @@ main.add_module(
     FADCmode=True)
 main.add_module('SVDDQMExpressReco', offlineZSShaperDigits='SVDShaperDigitsZS5')
 
-main.add_module('RootOutput', outputFileName='RootOutput_100evt_'+str(tag)+'.root')
+# main.add_module('RootOutput', outputFileName='RootOutput_100evt_'+str(tag)+'.root')
 main.add_module('Progress')
 
 print_path(main)

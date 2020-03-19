@@ -55,10 +55,8 @@ def overlay_svd_data(path, datatype="cosmics", overlayfiles=""):
 
     overlayDir = "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/"
 
-    if str(datatype) == "xTalk":
-        overlayfiles = str(overlayDir)+str(datatype)+"/physics*.root"
-    if str(datatype) == "cosmics":
-        overlayfiles = str(overlayDir)+str(datatype)+"/reco*_1.root"
+    if str(datatype) == "xTalk" or str(datatype) == "cosmics":
+        overlayfiles = str(overlayDir)+str(datatype)+"/*_overlay.root"
 
     print(" ** SVD OVERLAY UTIL CALLED **")
     print(" -> overlaying the following files to simulation: ")

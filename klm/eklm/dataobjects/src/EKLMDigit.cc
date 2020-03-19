@@ -20,8 +20,7 @@ EKLMDigit::EKLMDigit() : KLMDigit()
 {
 }
 
-EKLMDigit::EKLMDigit(const EKLMSimHit* hit)
-  : KLMDigit(hit), EKLMHitBase((EKLMHitBase)(*hit))
+EKLMDigit::EKLMDigit(const EKLMSimHit* hit) : KLMDigit(hit)
 {
 }
 

@@ -46,6 +46,96 @@ namespace Belle2 {
     }
 
     /**
+     * Get section number.
+     * @return Section number.
+     */
+    int getSection() const
+    {
+      return m_Section;
+    }
+
+    /**
+     * Set section number.
+     * @param[in] section Section number.
+     */
+    void setSection(int section)
+    {
+      m_Section = section;
+    }
+
+    /**
+     * Get sector number.
+     * @return Sector number.
+     */
+    int getSector() const
+    {
+      return m_Sector;
+    }
+
+    /**
+     * Set sector number.
+     * @param[in] sector Sector number.
+     */
+    void setSector(int sector)
+    {
+      m_Sector = sector;
+    }
+
+    /**
+     * Get layer number.
+     * @return Layer number.
+     */
+    int getLayer() const
+    {
+      return m_Layer;
+    }
+
+    /**
+     * Set layer number.
+     * @param[in] layer Layer number.
+     */
+    void setLayer(int layer)
+    {
+      m_Layer = layer;
+    }
+
+    /**
+     * Get plane number.
+     * @return Plane number.
+     */
+    int getPlane() const
+    {
+      return m_Plane;
+    }
+
+    /**
+     * Set plane number.
+     * @param[in] plane Plane number.
+     */
+    void setPlane(int plane)
+    {
+      m_Plane = plane;
+    }
+
+    /**
+     * Get strip number.
+     * @return Strip number.
+     */
+    int getStrip() const
+    {
+      return m_Strip;
+    }
+
+    /**
+     * Set strip number.
+     * @param[in] strip Strip number.
+     */
+    void setStrip(int strip)
+    {
+      m_Strip = strip;
+    }
+
+    /**
      * Get charge.
      * @return Charge.
      */
@@ -100,6 +190,69 @@ namespace Belle2 {
     }
 
     /**
+      * Get hit time.
+      * @return Hit time.
+      */
+    float getTime() const
+    {
+      return m_Time;
+    }
+
+    /**
+     * Set hit time.
+     * @param[in] time hit time.
+     */
+    void setTime(float time)
+    {
+      m_Time = time;
+    }
+
+    /**
+     * Get energy deposit.
+     * @return Energy deposit.
+     */
+    float getEDep() const
+    {
+      return m_EDep;
+    }
+
+    /**
+     * Set EDep.
+     * @param[in] eDep Energy deposit.
+     */
+    void setEDep(float eDep)
+    {
+      m_EDep = eDep;
+    }
+
+    /**
+     * Increase energy deposit.
+     * @param[in] eDep Energy deposit.
+     */
+    void increaseEDep(float deltaEDep)
+    {
+      m_EDep += deltaEDep;
+    }
+
+    /**
+     * Get the lund code of the (leading) particle.
+     * @return Particle code.
+     */
+    int getPDG() const
+    {
+      return m_PDG;
+    }
+
+    /**
+     * Set the lund code of the (leading) particle
+     * @param[in] pdg Particle code.
+     */
+    void setPDG(int pdg)
+    {
+      m_PDG = pdg;
+    }
+
+    /**
      * Get number of photoelectrons (fit result).
      * @return Number of photoelectrons.
      */
@@ -137,42 +290,6 @@ namespace Belle2 {
     bool isGood() const
     {
       return m_fitStatus == KLM::c_ScintillatorFirmwareSuccessfulFit;
-    }
-
-    /**
-     * Get plane number.
-     * @return Plane number.
-     */
-    int getPlane() const
-    {
-      return m_Plane;
-    }
-
-    /**
-     * Set plane number.
-     * @param[in] plane Plane number.
-     */
-    void setPlane(int plane)
-    {
-      m_Plane = plane;
-    }
-
-    /**
-     * Get strip number.
-     * @return Strip number.
-     */
-    int getStrip() const
-    {
-      return m_Strip;
-    }
-
-    /**
-     * Set strip number.
-     * @param[in] strip Strip number.
-     */
-    void setStrip(int strip)
-    {
-      m_Strip = strip;
     }
 
     /**
@@ -216,6 +333,15 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_ElementNumbers; //! ROOT streamer
 
+    /** Number of section. */
+    int m_Section;
+
+    /** Number of sector. */
+    int m_Sector;
+
+    /** Number of layer. */
+    int m_Layer;
+
     /** Number of plane. */
     int m_Plane;
 
@@ -230,6 +356,15 @@ namespace Belle2 {
 
     /** TDC (time provided by ASIC). */
     uint16_t m_TDC;
+
+    /** Time of the hit. */
+    float m_Time;
+
+    /** Energy deposition. */
+    float m_EDep;
+
+    /** PDG code of the (leading) particle. */
+    int m_PDG;
 
     /** Generated number of photoelectrons (MC only). */
     int m_GeneratedNPE;

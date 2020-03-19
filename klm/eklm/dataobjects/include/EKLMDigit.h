@@ -26,7 +26,7 @@ namespace Belle2 {
    * Main reconstruction hit class. Contains information about the
    * hitted strips.
    */
-  class EKLMDigit : public KLMDigit, public EKLMHitBase,
+  class EKLMDigit : public KLMDigit,
     public EKLMHitGlobalCoord, public EKLMHitMCTime {
 
   public:

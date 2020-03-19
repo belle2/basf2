@@ -410,6 +410,9 @@ def add_cdst_output(
         'CDCTriggerNNInput2DFinderTracks',
         'CDCTriggerNeuroTracks',
         'CDCTriggerNeuroTracksInput',
+        'CDCTriggerNNInputFinderTracks',
+        'CDCTriggerNNInputBits',
+        'CDCTriggerNNOutputBits',
         'TRGGDLUnpackerStores',
         'TRGTOPUnpackerStores',
         'TracksToBKLMHit2ds',
@@ -438,13 +441,6 @@ def add_cdst_output(
         'TRGGDLUnpackerStores',
         'VXDDedxTracks',
         'VXDDedxLikelihoods',
-        'CDCTrigger2DFinderTracks',
-        'CDCTriggerNNInputFinderTracks',
-        'CDCTriggerNNInputBits',
-        'CDCTriggerNNInputSegmentHits',
-        'CDCTriggerNNOutputBits',
-        'CDCTriggerNeuroTracks',
-        'CDCTriggerNeuroTracksInput'
     ]
 
     if rawFormat:

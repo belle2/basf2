@@ -12,4 +12,4 @@
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
 [INFO] ParticleLoader's Summary of Actions:
-[FATAL] You have tried to create a list e+:all with cuts! This is *very* error prone. To be safe, please don't use "all", "loose", or "tight" for your own lists.
+[FATAL] You have tried to create a list e+:all with cuts! This is *very* error prone, so it is now forbidden.

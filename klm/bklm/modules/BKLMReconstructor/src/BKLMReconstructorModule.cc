@@ -21,7 +21,6 @@
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::bklm;
 
@@ -42,10 +41,13 @@ BKLMReconstructorModule::BKLMReconstructorModule() :
            "Nominal time of prompt BKLMHit2ds (ns).",
            double(0.0));
   // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
+  // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
+  // approximately. The time window can be readjusted after completion of
+  // the implementation of KLM time calibration.
   addParam("PromptWindow", m_PromptWindow,
            "Half-width time window of BKLMHit2ds relative to PrompTime (ns).",
            //double(50.0));
-           double(2000.0));
+           double(10000.0));
   addParam("IfAlign", m_IfAlign,
            "Perform alignment correction (true) or not (false).",
            bool(true));
@@ -78,7 +80,9 @@ void BKLMReconstructorModule::beginRun()
       B2FATAL("BKLM time window data are not available.");
     m_CoincidenceWindow = m_Timing->getCoincidenceWindow();
     m_PromptTime = m_Timing->getPromptTime();
-    m_PromptWindow = m_Timing->getPromptWindow();
+    /* Not use the promt window value from database
+     * until the time calibration is ready. */
+    // m_PromptWindow = m_Timing->getPromptWindow();
   }
 }
 
@@ -141,8 +145,8 @@ void BKLMReconstructorModule::event()
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_IfAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
-      if (fabs(time - m_PromptTime) > m_PromptWindow)
-        hit2d->isOutOfTime();
+      if (std::fabs(time - m_PromptTime) > m_PromptWindow)
+        hit2d->isOutOfTime(true);
     }
   }
 }

@@ -183,7 +183,6 @@ void KLMUnpackerModule::unpackBKLMDigit(
                      &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
   int subdetector, section, sector, layer, plane, strip;
-  int moduleId;
   KLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
   detectorChannel =

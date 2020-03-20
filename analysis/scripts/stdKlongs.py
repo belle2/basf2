@@ -10,6 +10,7 @@
 #
 ########################################################
 
+from basf2 import B2FATAL
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 
@@ -31,10 +32,11 @@ def stdKlongs(listtype='allklm', path=None):
     if listtype == 'allklm':
         fillParticleList('K_L0:allklm', '[isFromKLM > 0] and [klmClusterKlId >= 0] and [klmClusterKlId <= 1]', True, path)
     else:
-        B2WARNING("Only the 'allklm' list is currently recommended.")
-        B2WARNING("Ignoring the requested type: %s and instead loading the 'allklm' list" % listtype)
-        stdKlongs('all')
+        B2FATAL("""
+Only the 'allklm' list (all KLM clusters) is currently supported. Please use:
 
+stdKlongs('allklm', path=mypath)
+""")
 #    # loose KLs, removes buggy KLM clusters
 #    elif listtype == 'veryLoose':
 #        stdKlongs('all', path)
@@ -74,19 +76,3 @@ def stdKlongs(listtype='allklm', path=None):
 #            tight_selection,
 #            True,
 #            path)
-
-
-# Used in skimming code
-def loadStdSkimKL0(path):
-    """Load KLongs for skimming.
-
-    Parameters:
-        path (basf2.Path): modules are added to this path
-    """
-    stdKlongs('loose', path)
-    cutAndCopyList(
-        'K_L0:skim',
-        'K_L0:loose',
-        '',
-        True,
-        path)

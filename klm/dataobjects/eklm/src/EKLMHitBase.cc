@@ -17,7 +17,7 @@ EKLMHitBase::EKLMHitBase()
 {
   m_PDG = -1;
   m_Time = -1;
-  m_EDep = -1;
+  m_EnergyDeposit = -1;
   m_Section = -1;
   m_Layer = -1;
   m_Sector = -1;
@@ -31,7 +31,7 @@ EKLMHitBase::EKLMHitBase(int Section, int Layer, int Sector)
 {
   m_PDG = -1;
   m_Time = -1;
-  m_EDep = -1;
+  m_EnergyDeposit = -1;
   m_Section = Section;
   m_Layer = Layer;
   m_Sector = Sector;
@@ -87,18 +87,18 @@ void EKLMHitBase::setTime(float Time)
   m_Time = Time;
 }
 
-float EKLMHitBase::getEDep() const
+float EKLMHitBase::getEnergyDeposit() const
 {
-  return m_EDep;
+  return m_EnergyDeposit;
 }
 
-void EKLMHitBase::setEDep(float EDep)
+void EKLMHitBase::setEnergyDeposit(float EnergyDeposit)
 {
-  m_EDep = EDep;
+  m_EnergyDeposit = EnergyDeposit;
 }
 
-void EKLMHitBase::increaseEDep(float deltaEDep)
+void EKLMHitBase::increaseEnergyDeposit(float deltaEnergyDeposit)
 {
-  m_EDep += deltaEDep;
+  m_EnergyDeposit += deltaEnergyDeposit;
 }
 

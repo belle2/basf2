@@ -25,7 +25,7 @@ BKLMHit2d::BKLMHit2d() :
   m_ModuleID(0),
   m_ZStrips(0),
   m_Time(0.0),
-  m_EDep(0.0)
+  m_EnergyDeposit(0.0)
 {
   m_GlobalPosition[0] = 0.0;
   m_GlobalPosition[1] = 0.0;
@@ -47,7 +47,7 @@ BKLMHit2d::BKLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ, const CLHEP
   m_GlobalPosition[1] = globalPos.y();
   m_GlobalPosition[2] = globalPos.z();
   m_Time = time;
-  m_EDep = hitPhi->getEDep() + hitZ->getEDep();
+  m_EnergyDeposit = hitPhi->getEnergyDeposit() + hitZ->getEnergyDeposit();
 
   addRelationTo(hitPhi);
   addRelationTo(hitZ);
@@ -59,7 +59,7 @@ BKLMHit2d::BKLMHit2d(const BKLMHit2d& h) :
   m_ModuleID(h.m_ModuleID),
   m_ZStrips(h.m_ZStrips),
   m_Time(h.m_Time),
-  m_EDep(h.m_EDep)
+  m_EnergyDeposit(h.m_EnergyDeposit)
 {
   m_GlobalPosition[0] = h.m_GlobalPosition[0];
   m_GlobalPosition[1] = h.m_GlobalPosition[1];
@@ -72,7 +72,7 @@ BKLMHit2d& BKLMHit2d::operator=(const BKLMHit2d& h)
   m_ModuleID = h.m_ModuleID;
   m_ZStrips = h.m_ZStrips;
   m_Time = h.m_Time;
-  m_EDep = h.m_EDep;
+  m_EnergyDeposit = h.m_EnergyDeposit;
   m_GlobalPosition[0] = h.m_GlobalPosition[0];
   m_GlobalPosition[1] = h.m_GlobalPosition[1];
   m_GlobalPosition[2] = h.m_GlobalPosition[2];

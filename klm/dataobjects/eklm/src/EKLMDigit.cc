@@ -38,11 +38,11 @@ DigitBase::EAppendStatus EKLMDigit::addBGDigit(const DigitBase* bg)
   if (!this->isGood())
     return DigitBase::c_Append;
   /* MC data from digit with larger energy. */
-  if (this->getEDep() < bgDigit->getEDep()) {
+  if (this->getEnergyDeposit() < bgDigit->getEnergyDeposit()) {
     this->setPDG(bgDigit->getPDG());
     this->setMCTime(bgDigit->getMCTime());
   }
-  this->setEDep(this->getEDep() + bgDigit->getEDep());
+  this->setEnergyDeposit(this->getEnergyDeposit() + bgDigit->getEnergyDeposit());
   if (this->getTime() > bgDigit->getTime())
     this->setTime(bgDigit->getTime());
   this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));

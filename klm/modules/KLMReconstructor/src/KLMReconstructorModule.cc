@@ -361,7 +361,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
             t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
             t = (t1 + t2) / 2;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
-            hit2d->setEDep((*it8)->getEDep() + (*it9)->getEDep());
+            hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() + (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
             hit2d->setChiSq((t1 - t2) * (t1 - t2) /
                             m_eklmRecPar->getTimeResolution() /

@@ -119,7 +119,7 @@ namespace Belle2 {
 
     //! Get energy deposition
     //! @return energy deposition (MeV)
-    float getEDep() const { return m_EDep; }
+    float getEnergyDeposit() const { return m_EnergyDeposit; }
 
   private:
 
@@ -131,7 +131,7 @@ namespace Belle2 {
     float m_Time;
 
     //! reconstructed pulse height (MeV)
-    float m_EDep;
+    float m_EnergyDeposit;
 
     //! Needed to make the ROOT object storable
     ClassDef(BKLMHit1d, 3)

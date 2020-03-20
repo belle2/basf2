@@ -126,11 +126,11 @@ namespace Belle2 {
 
     //! Get energy deposition
     //! @return energy deposition (MeV)
-    double getEDep() const { return (double)m_EDep; }
+    double getEnergyDeposit() const { return (double)m_EnergyDeposit; }
 
     //! Increase energy deposition
     //! @param eDep Amount of additional energy deposition (MeV)
-    void increaseEDep(double eDep) { m_EDep += eDep; }
+    void increaseEnergyDeposit(double eDep) { m_EnergyDeposit += eDep; }
 
     //! Adjust time (for background-overlay hit)
     //! @param delta time shift (ns)
@@ -146,7 +146,7 @@ namespace Belle2 {
     float m_Time;
 
     //! energy deposition (MeV)
-    float m_EDep;
+    float m_EnergyDeposit;
 
     //! time-of-propagation (ns) from hit to sensor
     float m_PropagationTime;

@@ -28,7 +28,7 @@ BKLMHit1d::BKLMHit1d() :
   RelationsObject(),
   m_ModuleID(0),
   m_Time(0.0),
-  m_EDep(0.0)
+  m_EnergyDeposit(0.0)
 {
 }
 
@@ -37,7 +37,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
   RelationsObject()
 {
   m_Time = 0.0;
-  m_EDep = 0.0;
+  m_EnergyDeposit = 0.0;
   m_ModuleID = 0;
   if (digits.size() == 0) {
     B2WARNING("Attempt to create a BKLMHit1d with no BKLMDigits");
@@ -61,7 +61,7 @@ BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
       continue;
     }
     m_Time += digit->getTime();
-    m_EDep += digit->getEDep();
+    m_EnergyDeposit += digit->getEnergyDeposit();
     int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);
     stripMax = std::max(stripMax, strip);
@@ -80,7 +80,7 @@ BKLMHit1d::BKLMHit1d(const BKLMHit1d& h) :
   RelationsObject(h),
   m_ModuleID(h.m_ModuleID),
   m_Time(h.m_Time),
-  m_EDep(h.m_EDep)
+  m_EnergyDeposit(h.m_EnergyDeposit)
 {
 }
 
@@ -89,6 +89,6 @@ BKLMHit1d& BKLMHit1d::operator=(const BKLMHit1d& h)
 {
   m_ModuleID = h.m_ModuleID;
   m_Time = h.m_Time;
-  m_EDep = h.m_EDep;
+  m_EnergyDeposit = h.m_EnergyDeposit;
   return *this;
 }

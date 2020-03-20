@@ -211,27 +211,27 @@ namespace Belle2 {
      * Get energy deposit.
      * @return Energy deposit.
      */
-    float getEDep() const
+    float getEnergyDeposit() const
     {
-      return m_EDep;
+      return m_EnergyDeposit;
     }
 
     /**
-     * Set EDep.
+     * Set EnergyDeposit.
      * @param[in] eDep Energy deposit.
      */
-    void setEDep(float eDep)
+    void setEnergyDeposit(float eDep)
     {
-      m_EDep = eDep;
+      m_EnergyDeposit = eDep;
     }
 
     /**
      * Increase energy deposit.
      * @param[in] eDep Energy deposit.
      */
-    void increaseEDep(float deltaEDep)
+    void increaseEnergyDeposit(float deltaEnergyDeposit)
     {
-      m_EDep += deltaEDep;
+      m_EnergyDeposit += deltaEnergyDeposit;
     }
 
     /**
@@ -361,7 +361,7 @@ namespace Belle2 {
     float m_Time;
 
     /** Energy deposition. */
-    float m_EDep;
+    float m_EnergyDeposit;
 
     /** PDG code of the (leading) particle. */
     int m_PDG;

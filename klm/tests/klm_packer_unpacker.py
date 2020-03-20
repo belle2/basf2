@@ -99,7 +99,7 @@ class PackerUnpackerTest(basf2.Module):
             # assert digit.getModuleID() == digit_unpacked.getModuleID()
             # assert digit.getTime() == digit_unpacked.getTime()
             # assert digit.getNPixel() == digit_unpacked.getNPixel()
-            # assert digit.getEDep() == digit_unpacked.getEDep()
+            # assert digit.getEnergyDeposit() == digit_unpacked.getEnergyDeposit()
 
         for i in range(len(eklm_digits_sorted)):
 
@@ -111,7 +111,7 @@ class PackerUnpackerTest(basf2.Module):
             assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getLayer() == digit_unpacked.getLayer()
             assert digit.getSector() == digit_unpacked.getSector()
-            # assert digit.getEDep() == digit_unpacked.getEDep()
+            # assert digit.getEnergyDeposit() == digit_unpacked.getEnergyDeposit()
             # assert digit.getTime() == digit_unpacked.getTime()
             # From EKLMDigit
             assert digit.getPlane() == digit_unpacked.getPlane()

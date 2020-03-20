@@ -195,7 +195,7 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
       bklmDigit->setFitStatus(simulator.getFitStatus());
       bklmDigit->setNPixel(simulator.getNPE());
-      bklmDigit->setEDep(simulator.getEnergy());
+      bklmDigit->setEnergyDeposit(simulator.getEnergy());
     }
   }
 }
@@ -239,7 +239,7 @@ void KLMDigitizerModule::digitizeEKLM()
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
     eklmDigit->setPosition(simHit->getPosition());
     eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
-    eklmDigit->setEDep(simulator.getEnergy());
+    eklmDigit->setEnergyDeposit(simulator.getEnergy());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
       tdc = simulator.getFPGAFit()->getStartTime();
       eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());

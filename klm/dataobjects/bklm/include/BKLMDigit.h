@@ -73,7 +73,7 @@ namespace Belle2 {
 
     //! Get MC-simulation energy deposition
     //! @return MC-simulation energy deposition (MeV)
-    float getSimEDep() const { return m_SimEDep; }
+    float getSimEnergyDeposit() const { return m_SimEnergyDeposit; }
 
     //! Get the number of simulated MPPC pixels
     //! @return the number of simulated MPPC pixels
@@ -97,7 +97,7 @@ namespace Belle2 {
     float m_SimTime;
 
     //! MC-simulation pulse height (MeV)
-    float m_SimEDep;
+    float m_SimEnergyDeposit;
 
     //! simulated number of MPPC pixels
     int m_SimNPixel;

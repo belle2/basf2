@@ -96,18 +96,18 @@ void MCMatcherKLMClustersModule::event()
               if (it == mcParticles.end()) {
                 mcParticles.insert(std::pair<MCParticle*, double>(
                                      bklmMCParticles[i6],
-                                     bklmSimHits[i5]->getEDep()));
+                                     bklmSimHits[i5]->getEnergyDeposit()));
               } else {
-                it->second = it->second + bklmSimHits[i5]->getEDep();
+                it->second = it->second + bklmSimHits[i5]->getEnergyDeposit();
               }
               if (m_Hit2dRelations) {
                 it = mcParticlesHit.find(bklmMCParticles[i6]);
                 if (it == mcParticlesHit.end()) {
                   mcParticlesHit.insert(std::pair<MCParticle*, double>(
                                           bklmMCParticles[i6],
-                                          bklmSimHits[i5]->getEDep()));
+                                          bklmSimHits[i5]->getEnergyDeposit()));
                 } else {
-                  it->second = it->second + bklmSimHits[i5]->getEDep();
+                  it->second = it->second + bklmSimHits[i5]->getEnergyDeposit();
                 }
               }
             }
@@ -144,18 +144,18 @@ void MCMatcherKLMClustersModule::event()
             if (it == mcParticles.end()) {
               mcParticles.insert(std::pair<MCParticle*, double>(
                                    eklmMCParticles[i5],
-                                   eklmSimHits[i4]->getEDep()));
+                                   eklmSimHits[i4]->getEnergyDeposit()));
             } else {
-              it->second = it->second + eklmSimHits[i4]->getEDep();
+              it->second = it->second + eklmSimHits[i4]->getEnergyDeposit();
             }
             if (m_Hit2dRelations) {
               it = mcParticlesHit.find(eklmMCParticles[i5]);
               if (it == mcParticlesHit.end()) {
                 mcParticlesHit.insert(std::pair<MCParticle*, double>(
                                         eklmMCParticles[i5],
-                                        eklmSimHits[i4]->getEDep()));
+                                        eklmSimHits[i4]->getEnergyDeposit()));
               } else {
-                it->second = it->second + eklmSimHits[i4]->getEDep();
+                it->second = it->second + eklmSimHits[i4]->getEnergyDeposit();
               }
             }
           }

@@ -20,7 +20,7 @@ using namespace Belle2;
 BKLMDigit::BKLMDigit() :
   KLMDigit(),
   m_SimTime(0.0),
-  m_SimEDep(0.0),
+  m_SimEnergyDeposit(0.0),
   m_SimNPixel(0),
   m_NPixel(0.0)
 {
@@ -30,7 +30,7 @@ BKLMDigit::BKLMDigit() :
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   KLMDigit(),
   m_SimTime(simHit->getTime()),
-  m_SimEDep(simHit->getEDep()),
+  m_SimEnergyDeposit(simHit->getEnergyDeposit()),
   m_SimNPixel(0),
   m_NPixel(0.0)
 {
@@ -40,13 +40,13 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_Plane = simHit->getPlane();
   m_Strip = strip;
   m_Time = m_SimTime + simHit->getPropagationTime();
-  m_EDep = m_SimEDep;
+  m_EnergyDeposit = m_SimEnergyDeposit;
 }
 
 BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
   KLMDigit(),
   m_SimTime(0.0),
-  m_SimEDep(0.0),
+  m_SimEnergyDeposit(0.0),
   m_SimNPixel(0),
   m_NPixel(0.0)
 {
@@ -64,7 +64,7 @@ BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   KLMDigit(),
   m_SimTime(simHit->getTime()),
-  m_SimEDep(simHit->getEDep()),
+  m_SimEnergyDeposit(simHit->getEnergyDeposit()),
   m_SimNPixel(0),
   m_NPixel(0.0)
 {
@@ -74,7 +74,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   m_Plane = simHit->getPlane();
   m_Strip = simHit->getStrip();
   m_Time = m_SimTime + simHit->getPropagationTime();
-  m_EDep = m_SimEDep;
+  m_EnergyDeposit = m_SimEnergyDeposit;
 }
 
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
@@ -91,10 +91,10 @@ DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
 
   //in rpc energy deposits are not additive
   if (!bgDigit->inRPC()) {
-    if (this->getEDep() < bgDigit->getEDep()) {
+    if (this->getEnergyDeposit() < bgDigit->getEnergyDeposit()) {
       //do something
     }
-    this->setEDep(this->getEDep() + bgDigit->getEDep());
+    this->setEnergyDeposit(this->getEnergyDeposit() + bgDigit->getEnergyDeposit());
   }
   //is the timing actually affected in the scinti layers if the first hit is below threshold?
   //i.e. should we check if it is above?

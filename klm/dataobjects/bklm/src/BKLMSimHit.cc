@@ -18,7 +18,7 @@ BKLMSimHit::BKLMSimHit() :
   SimHitBase(),
   m_ModuleID(0),
   m_Time(0.0),
-  m_EDep(0.0),
+  m_EnergyDeposit(0.0),
   m_PropagationTime(0.0)
 {
 }
@@ -28,7 +28,7 @@ BKLMSimHit::BKLMSimHit(int moduleID, double propTime, double time, double eDep) 
   SimHitBase(),
   m_ModuleID(moduleID),
   m_Time(time),
-  m_EDep(eDep),
+  m_EnergyDeposit(eDep),
   m_PropagationTime(propTime)
 {
 }
@@ -38,7 +38,7 @@ BKLMSimHit::BKLMSimHit(const BKLMSimHit& hit) :
   SimHitBase(hit),
   m_ModuleID(hit.m_ModuleID),
   m_Time(hit.m_Time),
-  m_EDep(hit.m_EDep),
+  m_EnergyDeposit(hit.m_EnergyDeposit),
   m_PropagationTime(hit.m_PropagationTime)
 {
 }
@@ -48,7 +48,7 @@ BKLMSimHit& BKLMSimHit::operator=(const BKLMSimHit& hit)
 {
   m_ModuleID = hit.m_ModuleID;
   m_Time = hit.m_Time;
-  m_EDep = hit.m_EDep;
+  m_EnergyDeposit = hit.m_EnergyDeposit;
   m_PropagationTime = hit.m_PropagationTime;
   return *this;
 }

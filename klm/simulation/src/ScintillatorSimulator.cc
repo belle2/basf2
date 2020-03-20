@@ -166,9 +166,9 @@ void KLM::ScintillatorSimulator::simulate(
   for (std::multimap<uint16_t, const BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
-    m_Energy = m_Energy + hit->getEDep();
+    m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
     double sipmDistance = hit->getPropagationTime() *
                           m_DigPar->getFiberLightSpeed();
@@ -199,9 +199,9 @@ void KLM::ScintillatorSimulator::simulate(
   for (std::multimap<uint16_t, const EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
-    m_Energy = m_Energy + hit->getEDep();
+    m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
     double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().x();
     double time = hit->getTime() +

@@ -18,14 +18,14 @@ namespace Belle2 {
   /**
    * BKLM electronics channel.
    */
-  class BKLMElectronicsChannel : public TObject {
+  class KLMElectronicsChannel : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    BKLMElectronicsChannel() :
+    KLMElectronicsChannel() :
       m_Copper(0),
       m_Slot(0),
       m_Lane(0),
@@ -42,7 +42,7 @@ namespace Belle2 {
      * @param[in] axis    Axis.
      * @param[in] channel Channel.
      */
-    BKLMElectronicsChannel(
+    KLMElectronicsChannel(
       int copper, int slot, int lane, int axis, int channel) :
       m_Copper(copper),
       m_Slot(slot),
@@ -55,7 +55,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~BKLMElectronicsChannel()
+    ~KLMElectronicsChannel()
     {
     }
 
@@ -147,7 +147,7 @@ namespace Belle2 {
     /**
      * Operator <.
      */
-    bool operator<(const BKLMElectronicsChannel& channel) const;
+    bool operator<(const KLMElectronicsChannel& channel) const;
 
   private:
 
@@ -167,7 +167,7 @@ namespace Belle2 {
     int m_Channel;
 
     /** Class version. */
-    ClassDef(BKLMElectronicsChannel, 1);
+    ClassDef(KLMElectronicsChannel, 1);
 
   };
 

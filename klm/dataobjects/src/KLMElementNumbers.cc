@@ -34,6 +34,19 @@ const KLMElementNumbers& KLMElementNumbers::Instance()
   return klmElementNumbers;
 }
 
+uint16_t KLMElementNumbers::channelNumber(
+  int subdetector, int section, int sector, int layer, int plane,
+  int strip) const
+{
+  switch (subdetector) {
+    case c_BKLM:
+      return channelNumberBKLM(section, sector, layer, plane, strip);
+    case c_EKLM:
+      return channelNumberEKLM(section, sector, layer, plane, strip);
+  }
+  B2FATAL("Incorrect subdetector number: " << subdetector);
+}
+
 uint16_t KLMElementNumbers::channelNumberBKLM(
   int section, int sector, int layer, int plane, int strip) const
 {
@@ -162,6 +175,14 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
   return module;
 }
 
+uint16_t KLMElementNumbers::moduleNumberByChannel(uint16_t channel) const
+{
+  int subdetector, section, sector, layer, plane, strip;
+  channelNumberToElementNumbers(channel, &subdetector, &section, &sector,
+                                &layer, &plane, &strip);
+  return moduleNumber(subdetector, section, sector, layer);
+}
+
 void KLMElementNumbers::moduleNumberToElementNumbers(
   uint16_t module, int* subdetector, int* section, int* sector,
   int* layer) const
@@ -218,4 +239,12 @@ int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
     return layer;
   else
     return BKLMElementNumbers::getMaximalLayerNumber() + layer;
+}
+
+int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
+{
+  if (subdetector == c_BKLM)
+    return 0;
+  else
+    return 1;
 }

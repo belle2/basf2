@@ -10,21 +10,22 @@
 
 #pragma once
 
-/* External headers. */
+/* DQM headers. */
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
+
+/* ROOT headers. */
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
-
-/* Belle2 headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dbobjects/bklm/BKLMElectronicsMap.h>
-#include <klm/dbobjects/eklm/EKLMElectronicsMap.h>
-#include <framework/database/DBObjPtr.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
 
 namespace Belle2 {
 
@@ -98,11 +99,8 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
-    /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
-
-    /** EKLM electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

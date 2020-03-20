@@ -13,6 +13,7 @@
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+#include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;
 
@@ -263,35 +264,10 @@ int EKLMElementNumbers::getStripByGlobalStrip(int stripGlobal)
   return (stripGlobal - 1) % m_MaximalStripNumber + 1;
 }
 
-int EKLMElementNumbers::getStripSoftwareByFirmware(int stripFirmware) const
+std::string EKLMElementNumbers::getHSLBName(int copper, int slot)
 {
-  int segment, strip;
-  segment = (stripFirmware - 1) / m_NStripsSegment;
-  /* Order of segment readout boards in the firmware is opposite. */
-  segment = 4 - segment;
-  strip = segment * m_NStripsSegment +
-          (stripFirmware - 1) % m_NStripsSegment + 1;
-  return strip;
-}
-
-int EKLMElementNumbers::getStripFirmwareBySoftware(int stripSoftware) const
-{
-  int segment, strip;
-  segment = (stripSoftware - 1) / m_NStripsSegment;
-  /* Order of segment readout boards in the firmware is opposite. */
-  segment = 4 - segment;
-  strip = segment * m_NStripsSegment +
-          (stripSoftware - 1) % m_NStripsSegment + 1;
-  return strip;
-}
-
-void EKLMElementNumbers::getAsicChannel(
-  int plane, int strip, int* asic, int* channel) const
-{
-  int stripFirmware = getStripFirmwareBySoftware(strip);
-  int asicMod5 = (stripFirmware - 1) / m_NStripsSegment;
-  *channel = (stripFirmware - 1) % m_NStripsSegment;
-  *asic = asicMod5 + m_MaximalSegmentNumber * (plane - 1);
+  char hslb = 'a' + slot - 1;
+  return "800" + std::to_string(copper - EKLM_ID) + hslb;
 }
 
 int EKLMElementNumbers::getMaximalDetectorLayerNumber(int section) const

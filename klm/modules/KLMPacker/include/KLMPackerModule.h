@@ -13,9 +13,8 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/eklm/EKLMDigit.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
-#include <klm/dbobjects/bklm/BKLMElectronicsMap.h>
-#include <klm/dbobjects/eklm/EKLMElectronicsMap.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -99,21 +98,18 @@ namespace Belle2 {
     /** Event meta data. */
     StoreObjPtr<EventMetaData> m_EventMetaData;
 
-    /* BKLM objects. */
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
-    /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_BklmElectronicsMap;
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /* BKLM objects. */
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_BklmDigits;
 
     /* EKLM objects. */
-
-    /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_EklmElementNumbers;
-
-    /** EKLM electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_EklmElectronicsMap;
 
     /** EKLM digits. */
     StoreArray<EKLMDigit> m_EklmDigits;

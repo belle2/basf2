@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dbobjects/bklm/BKLMElectronicsChannel.h>
+#include <klm/dbobjects/KLMElectronicsChannel.h>
 
 /* C++ headers. */
 #include <map>
@@ -21,19 +21,19 @@ namespace Belle2 {
   /**
    * BKLM electronics map.
    */
-  class BKLMElectronicsMap: public TObject {
+  class KLMElectronicsMap: public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    BKLMElectronicsMap();
+    KLMElectronicsMap();
 
     /**
      * Destructor.
      */
-    ~BKLMElectronicsMap();
+    ~KLMElectronicsMap();
 
     /**
      * Get detector channel by electronics channel.
@@ -41,14 +41,14 @@ namespace Belle2 {
      * @return Detector channel, nullptr if not found.
      */
     const uint16_t* getDetectorChannel(
-      BKLMElectronicsChannel* electronicsChannel) const;
+      KLMElectronicsChannel* electronicsChannel) const;
 
     /**
      * Get electronics channel by detector channel.
      * @param[in] detectorChannel Detector channel.
      * @return Electronics channel, nullptr if not found.
      */
-    const BKLMElectronicsChannel* getElectronicsChannel(
+    const KLMElectronicsChannel* getElectronicsChannel(
       uint16_t detectorChannel) const;
 
     /**
@@ -66,13 +66,13 @@ namespace Belle2 {
   private:
 
     /** Detector channel - electronics channel map. */
-    std::map<uint16_t, BKLMElectronicsChannel> m_MapDetectorElectronics;
+    std::map<uint16_t, KLMElectronicsChannel> m_MapDetectorElectronics;
 
     /** Electronics channel - detector channel map. */
-    std::map<BKLMElectronicsChannel, uint16_t> m_MapElectronicsDetector;
+    std::map<KLMElectronicsChannel, uint16_t> m_MapElectronicsDetector;
 
     /** Class version. */
-    ClassDef(Belle2::BKLMElectronicsMap, 1);
+    ClassDef(Belle2::KLMElectronicsMap, 1);
 
   };
 

@@ -264,37 +264,11 @@ namespace Belle2 {
     int getStripByGlobalStrip(int stripGlobal);
 
     /**
-     * Get software strip number by firmware strip number.
-     * @param[in] stripFirmware Firmware strip number.
-     */
-    int getStripSoftwareByFirmware(int stripFirmware) const;
-
-    /**
-     * Get firmware strip number by software strip number.
-     * @param[in] stripFirmware Firmware strip number.
-     */
-    int getStripFirmwareBySoftware(int stripSoftware) const;
-
-    /**
-     * Get ASIC and channel numbers (both are 0-based)
-     * by plane and strip numbers.
-     * @param[in]  plane   Plane.
-     * @param[in]  strip   Strip,
-     * @param[out] asic    ASIC.
-     * @param[out] channel Channel.
-     */
-    void getAsicChannel(int plane, int strip, int* asic, int* channel) const;
-
-    /**
      * Get HSLB name.
-     * @param[in] copper           Copper.
-     * @param[in[ dataConcentrator Data concentrator.
+     * @param[in] copper Copper.
+     * @param[in] slot   Slot.
      */
-    static std::string getHSLBName(int copper, int dataConcentrator)
-    {
-      char hslb = 'a' + dataConcentrator;
-      return "800" + std::to_string(copper) + hslb;
-    }
+    static std::string getHSLBName(int copper, int slot);
 
     /**
      * Get maximal section number.

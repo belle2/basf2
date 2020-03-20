@@ -68,13 +68,3 @@ void EKLMDatabaseImporter::importSimulationParameters()
                          m_ExperimentHigh, m_RunHigh);
   simPar.import(iov);
 }
-
-void EKLMDatabaseImporter::importElectronicsMap(
-  const EKLMElectronicsMap* electronicsMap)
-{
-  DBImportObjPtr<EKLMElectronicsMap> electronicsMapImport;
-  electronicsMapImport.construct(*electronicsMap);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  electronicsMapImport.import(iov);
-}

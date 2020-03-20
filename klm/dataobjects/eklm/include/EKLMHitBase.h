@@ -86,12 +86,6 @@ namespace Belle2 {
     void setEnergyDeposit(float eDep);
 
     /**
-     * Increase energy deposit.
-     * @param[in] eDep Energy deposit.
-     */
-    void increaseEnergyDeposit(float deltaEnergyDeposit);
-
-    /**
      * Get hit time.
      * @return Hit time.
      */

@@ -226,15 +226,6 @@ namespace Belle2 {
     }
 
     /**
-     * Increase energy deposit.
-     * @param[in] eDep Energy deposit.
-     */
-    void increaseEnergyDeposit(float deltaEnergyDeposit)
-    {
-      m_EnergyDeposit += deltaEnergyDeposit;
-    }
-
-    /**
      * Get the lund code of the (leading) particle.
      * @return Particle code.
      */

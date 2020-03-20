@@ -96,9 +96,3 @@ void EKLMHitBase::setEnergyDeposit(float EnergyDeposit)
 {
   m_EnergyDeposit = EnergyDeposit;
 }
-
-void EKLMHitBase::increaseEnergyDeposit(float deltaEnergyDeposit)
-{
-  m_EnergyDeposit += deltaEnergyDeposit;
-}
-

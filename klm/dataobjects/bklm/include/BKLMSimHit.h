@@ -128,10 +128,6 @@ namespace Belle2 {
     //! @return energy deposition (MeV)
     double getEnergyDeposit() const { return (double)m_EnergyDeposit; }
 
-    //! Increase energy deposition
-    //! @param eDep Amount of additional energy deposition (MeV)
-    void increaseEnergyDeposit(double eDep) { m_EnergyDeposit += eDep; }
-
     //! Adjust time (for background-overlay hit)
     //! @param delta time shift (ns)
     void shiftInTime(float delta) override { m_Time += delta; }

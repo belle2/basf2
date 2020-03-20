@@ -37,7 +37,7 @@ ma.fillParticleList(decayString='gamma:minimal',
                     path=my_path)
 
 # Builds the event shape enabling explicitly ALL the variables.
-# Most of the are actually enabled by defoult, but here we prefer
+# Most of them are actually enabled by default, but here we prefer
 # to list explicitly all the flags
 ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:minimal'],
                    allMoments=True,
@@ -51,11 +51,11 @@ ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:minimal'],
                    checkForDuplicates=False,
                    path=my_path)
 
-# Here we use the pre-defined collection 'event_shape', that contains
+# Here we use the predefined collection 'event_shape', that contains
 # thrust, sphericity, aplanarity, FW ratios up to 4, harmonic moments w/respect to
 # the thrust axis up to 4 and all the cleo cones w/respect to the thrust axis.
 # In addition, we will save also the forward and backward hemisphere (or "jet") energies,
-# and the 2nd order harmonic moment calculate respect to the collision axis (i.e. the z axis)
+# and the 2nd order harmonic moment calculated with respect to the collision axis (i.e. the z axis)
 ma.variablesToNtuple('',
                      variables=['event_shape',
                                 'backwardHemisphereEnergy',

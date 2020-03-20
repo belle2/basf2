@@ -427,26 +427,6 @@ def copyList(outputListName, inputListName, writeOut=False, path=None):
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
-def correctFSR(outputListName,
-               inputListName,
-               gammaListName,
-               angleThreshold=5.0,
-               energyThreshold=1.0,
-               writeOut=False,
-               path=None):
-    """
-    WARNING:
-      The :b2:mod:`FSRCorrection` module is now deprecated.
-      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
-      The latter resembles the previous principle of FSRCorrection but does no
-      longer contain the faulty first-come, first-served approach. For Belle II
-      data it is recommended to use correctBrems(), which should perform better.
-    """
-
-    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
-              "When analysing Belle II data, it is recommended to use correctBrems().")
-
-
 def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
@@ -2473,12 +2453,12 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
-    trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-    trackCuts += ' and -3.0 < dz < 3.0'
-    trackCuts += ' and -0.5 < dr < 0.5'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3'
+    trackCuts += ' and dr < 0.5'
 
     gammaCuts = 'E > 0.05'
-    gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+    gammaCuts += ' and thetaInCDCAcceptance'
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -2584,13 +2564,13 @@ def buildEventShape(inputListNames=[],
         if default_cleanup:
             B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
+            trackCuts += ' and thetaInCDCAcceptance'
+            trackCuts += ' and abs(dz) < 3.0'
+            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")

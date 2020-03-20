@@ -114,6 +114,13 @@ class ExamplesTest(unittest.TestCase):
 
         self._test_examples_dir('analysis/examples/VariableManager/')
 
+    def test_postmdstidentification_examples(self):
+        """
+        Test supported PostMdstIdentification examples.
+        """
+
+        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
+
 
 if __name__ == '__main__':
     with clean_working_directory():

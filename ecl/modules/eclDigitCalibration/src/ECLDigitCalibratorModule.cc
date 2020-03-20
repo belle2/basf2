@@ -83,17 +83,17 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
 
   // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
   addParam("energyDependenceTimeOffsetFitParam_p1", m_energyDependenceTimeOffsetFitParam_p1,
-           "Fit parameter (p1) for applying correction to the time offset as a function of the energy (amplitude)", 0.) ;
+           "Fit parameter (p1) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
   addParam("energyDependenceTimeOffsetFitParam_p2", m_energyDependenceTimeOffsetFitParam_p2,
-           "Fit parameter (p2) for applying correction to the time offset as a function of the energy (amplitude)", 88449.) ;
+           "Fit parameter (p2) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
   addParam("energyDependenceTimeOffsetFitParam_p3", m_energyDependenceTimeOffsetFitParam_p3,
-           "Fit parameter (p3) for applying correction to the time offset as a function of the energy (amplitude)", 0.20867E+06) ;
+           "Fit parameter (p3) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
   addParam("energyDependenceTimeOffsetFitParam_p4", m_energyDependenceTimeOffsetFitParam_p4,
-           "Fit parameter (p4) for applying correction to the time offset as a function of the energy (amplitude)", 3.1482) ;
+           "Fit parameter (p4) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
   addParam("energyDependenceTimeOffsetFitParam_p5", m_energyDependenceTimeOffsetFitParam_p5,
-           "Fit parameter (p5) for applying correction to the time offset as a function of the energy (amplitude)", 7.4747) ;
+           "Fit parameter (p5) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
   addParam("energyDependenceTimeOffsetFitParam_p6", m_energyDependenceTimeOffsetFitParam_p6,
-           "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", 1279.3) ;
+           "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
 
 
   // Parallel processing certification
@@ -173,12 +173,26 @@ void ECLDigitCalibratorModule::initialize()
     m_pol2Max = 0.;
   }
 
-  ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
-                                     m_energyDependenceTimeOffsetFitParam_p2,
-                                     m_energyDependenceTimeOffsetFitParam_p3,
-                                     m_energyDependenceTimeOffsetFitParam_p4,
-                                     m_energyDependenceTimeOffsetFitParam_p5,
-                                     m_energyDependenceTimeOffsetFitParam_p6) ;
+  if ((m_energyDependenceTimeOffsetFitParam_p1 != -999) &&
+      (m_energyDependenceTimeOffsetFitParam_p2 != -999) &&
+      (m_energyDependenceTimeOffsetFitParam_p3 != -999) &&
+      (m_energyDependenceTimeOffsetFitParam_p4 != -999) &&
+      (m_energyDependenceTimeOffsetFitParam_p5 != -999) &&
+      (m_energyDependenceTimeOffsetFitParam_p6 != -999)) {
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p1 = " << m_energyDependenceTimeOffsetFitParam_p1);
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p2 = " << m_energyDependenceTimeOffsetFitParam_p2);
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p3 = " << m_energyDependenceTimeOffsetFitParam_p3);
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p4 = " << m_energyDependenceTimeOffsetFitParam_p4);
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p5 = " << m_energyDependenceTimeOffsetFitParam_p5);
+    B2DEBUG(80, "m_energyDependenceTimeOffsetFitParam_p6 = " << m_energyDependenceTimeOffsetFitParam_p6);
+
+    ECLTimeUtil->setTimeWalkFuncParams(m_energyDependenceTimeOffsetFitParam_p1,
+                                       m_energyDependenceTimeOffsetFitParam_p2,
+                                       m_energyDependenceTimeOffsetFitParam_p3,
+                                       m_energyDependenceTimeOffsetFitParam_p4,
+                                       m_energyDependenceTimeOffsetFitParam_p5,
+                                       m_energyDependenceTimeOffsetFitParam_p6) ;
+  }
 }
 
 // begin run
@@ -285,6 +299,7 @@ void ECLDigitCalibratorModule::event()
       // No correction for MC
       bool m_IsMCFlag = Environment::Instance().isMC();
       B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag) ;
+
       if (!m_IsMCFlag) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
                                  m_timeInverseSlope ;
@@ -293,7 +308,6 @@ void ECLDigitCalibratorModule::event()
                 energyTimeShift << " ns") ;
         calibratedTime -= energyTimeShift ;
       }
-
     }
 
     B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);

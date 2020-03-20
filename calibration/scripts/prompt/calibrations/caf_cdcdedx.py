@@ -21,6 +21,8 @@ from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedx
 from caf.framework import Calibration, CAF, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV
 from prompt import CalibrationSettings
+import reconstruction as recon
+
 gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
@@ -57,6 +59,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
     # Rungain Precollector path
     Calibrate_RGTrial = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RGTrial)
     Calibrate_RGTrial.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -90,6 +93,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------1b. Run Gain Pre (No Payload saving)
     # Rungain Precollector path
     Calibrate_RGPre = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RGPre)
     Calibrate_RGPre.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -124,6 +128,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------2. CosineCorr Gain
     # Cosine Precollector path
     Calibrate_CC = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_CC)
     Calibrate_CC.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -155,6 +160,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------3. WireGain Gain
     # WireGain Precollector path
     Calibrate_WG = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_WG)
     Calibrate_WG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -188,6 +194,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------4. Final Run Gain to take Wire and Cosine correction in effect
     # Rungain Precollector path
     Calibrate_RG = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RG)
     Calibrate_RG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,

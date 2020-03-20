@@ -306,6 +306,8 @@ def add_svd_track_finding(
     :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
     :param add_mva_quality_indicator: Add the VVXDQualityEstimatorMVA module to set the quality indicator
            property for tracks from VXDTF2 standalone tracking
+           (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+           -> setting this option to 'True' will have some influence on the final track collection)
     """
 
     if not is_svd_used(components):
@@ -509,6 +511,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
+            filterParameters={"cut": 0.0},
+            deleteTracks=False,
+            resetTakenFlag=False
         )
 
     # Export CDCTracks to RecoTracks representation

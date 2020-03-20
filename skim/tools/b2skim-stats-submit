@@ -47,6 +47,19 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0",
     ]
 
+    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # and older) so here is a hack.
+    # TODO: remove once when we regularly add the same low mult samples
+    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    if mcCampaignNumber > 12:
+        mcSamples += [
+            f"{mcCampaign}_ggBGx1",
+            # f"{mcCampaign}_eeBGx1",
+            f"{mcCampaign}_mumuBGx1",
+            f"{mcCampaign}_eeeeBGx1",
+            f"{mcCampaign}_eemumuBGx1",
+        ]
+
     dataSamples = [
         "proc9_exp3",
         "proc9_exp7",
@@ -120,7 +133,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC9", "MC10", "MC11", "MC12", "MC13"],
+        choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
     )
 

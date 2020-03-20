@@ -8,21 +8,9 @@
 // Date : 11 - Dec - 2002
 //-
 
-#include <iostream>
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
 #include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-#include <signal.h>
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
+
+#include <string>
 
 namespace Belle2 {
   class SharedMem {

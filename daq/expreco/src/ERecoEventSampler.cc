@@ -9,6 +9,12 @@
 
 #include "daq/expreco/ERecoEventSampler.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <csignal>
 #include <iostream>
 
 #define RFEVSOUT stdout

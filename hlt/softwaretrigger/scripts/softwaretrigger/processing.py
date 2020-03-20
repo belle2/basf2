@@ -157,17 +157,25 @@ def add_hlt_processing(path,
     # Unpack the event content
     add_unpackers(path, components=unpacker_components)
 
-    # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
-
-    # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
-
     # Build up two paths: one for all accepted events...
     accept_path = basf2.Path()
 
     # ... and one for all dismissed events
     discard_path = basf2.Path()
+
+    # Run EventsOfDoomBuster savely, i.e. do not discard the events, put sent the event into the metadata path.
+    # This way the EventsOfDoomBuster is run twice (second time in add_reconstruction) but it will not bust any
+    # events, as we filtered here already. Caveat: nCDCHitsMax and nSVDShaperDigitsMax have to be equal in both
+    # modules.
+    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
+                           nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX)
+    doom.if_true(discard_path, basf2.AfterConditionPath.CONTINUE)
+
+    # Do the reconstruction needed for the HLT decision
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+
+    # Add the part of the dqm modules, which should run after every reconstruction
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:

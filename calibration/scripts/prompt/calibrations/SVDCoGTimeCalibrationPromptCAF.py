@@ -18,18 +18,11 @@ from caf import backends
 from caf import strategies
 from caf.utils import ExpRun, IoV
 
-import reconstruction as reco
+import svd as svd
 import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 
-input_branches = [
-    'SVDShaperDigitsFromTracks',
-    'EventT0',
-    'SVDShaperDigits',
-]
-
 now = datetime.datetime.now()
-# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
                                expert_username="gdujany",
@@ -61,8 +54,11 @@ def get_calibrations(input_data, **kwargs):
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
 
+    # unpack raw svd data and produce: SVDEventInfo and SVDShaperDigits
+    svd.add_svd_unpacker(path)
+
     # run SVD reconstruction, changing names of StoreArray
-    reco.add_svd_reconstruction(path)
+    svd.add_svd_reconstruction(path)
 
     for moda in path.modules():
         if moda.name() == 'SVDCoGTimeEstimator':

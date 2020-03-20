@@ -51,6 +51,11 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
                                 m_param_deleteTracks,
                                 "Delete tracks below cut instead of just assigning quality indicator.",
                                 m_param_deleteTracks);
+
+  moduleParamList->addParameter(prefixed(prefix, "resetTakenFlag"),
+                                m_param_resetTakenFlag,
+                                "Reset taken flag for deleted tracks so that hits can be used by subsequent TFs.",
+                                m_param_resetTakenFlag);
 }
 
 void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
@@ -63,8 +68,11 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
   }
 
   if (m_param_deleteTracks) { // delete track with QI below cut threshold
-    auto reject = [](const CDCTrack & track) {
+    auto reject = [this](const CDCTrack & track) {
       const double qualityIndicator = track.getQualityIndicator();
+      if (m_param_resetTakenFlag && std::isnan(qualityIndicator)) {
+        track.forwardTakenFlag(false);
+      }
       return std::isnan(qualityIndicator);
     };
     erase_remove_if(tracks, reject);

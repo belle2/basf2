@@ -427,26 +427,6 @@ def copyList(outputListName, inputListName, writeOut=False, path=None):
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
-def correctFSR(outputListName,
-               inputListName,
-               gammaListName,
-               angleThreshold=5.0,
-               energyThreshold=1.0,
-               writeOut=False,
-               path=None):
-    """
-    WARNING:
-      The :b2:mod:`FSRCorrection` module is now deprecated.
-      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
-      The latter resembles the previous principle of FSRCorrection but does no
-      longer contain the faulty first-come, first-served approach. For Belle II
-      data it is recommended to use correctBrems(), which should perform better.
-    """
-
-    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
-              "When analysing Belle II data, it is recommended to use correctBrems().")
-
-
 def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
@@ -1786,12 +1766,43 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
 def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name      name of the input ParticleList
+    @param mask_name             name of the ROEMask to be used
+    @param path                  modules are added to this path
     """
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('nestedROEMask', maskName)
     roeBuilder.param('createNestedROE', True)
+    path.add_module(roeBuilder)
+
+
+def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
+    @param path               modules are added to this path
+    """
+    if (len(inputParticlelists) == 0):
+        # Type of particles to use for ROEBuilder
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
+                 'n0', 'nu_e', 'nu_mu', 'nu_tau',
+                 'K_S0', 'Lambda0']
+        for t in types:
+            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
+            inputParticlelists += ["%s:roe_default_gen" % t]
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('MCROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('fromMC', True)
     path.add_module(roeBuilder)
 
 
@@ -2110,27 +2121,6 @@ def markDuplicate(particleList, prioritiseV0, path):
     markdup.param('particleList', particleList)
     markdup.param('prioritiseV0', prioritiseV0)
     path.add_module(markdup)
-
-
-def V0ListMerger(firstList, secondList, prioritiseV0, path):
-    """
-    Merge two particle lists, vertex them and trim duplicates
-
-    @param firstList first particle list to merge
-    @param secondList second particle list to merge
-    @param prioritiseV0 if true, give V0s a higher priority
-    """
-
-    from vertex import vertexKFit
-    listName = firstList.split(':')[0]
-    if (listName == secondList.split(':')[0]):
-        outList = listName + ':merged'
-        copyLists(outList, [firstList, secondList], False, path)
-        KFit(outList, 0.0, path=path)
-        markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
-    else:
-        B2ERROR("Lists to be merged contain different particles")
 
 
 PI0ETAVETO_COUNTER = 0
@@ -2463,12 +2453,12 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
-    trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-    trackCuts += ' and -3.0 < dz < 3.0'
-    trackCuts += ' and -0.5 < dr < 0.5'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3'
+    trackCuts += ' and dr < 0.5'
 
     gammaCuts = 'E > 0.05'
-    gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+    gammaCuts += ' and thetaInCDCAcceptance'
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -2574,13 +2564,13 @@ def buildEventShape(inputListNames=[],
         if default_cleanup:
             B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
+            trackCuts += ' and thetaInCDCAcceptance'
+            trackCuts += ' and abs(dz) < 3.0'
+            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")

@@ -554,7 +554,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Theta();
+      return b2blab.Theta();
     }
 
     double b2bPhi(const Particle* part)
@@ -563,7 +563,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Phi();
+      return b2blab.Phi();
     }
 
     double b2bClusterTheta(const Particle* part)
@@ -582,7 +582,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Theta();
+      return b2blab.Theta();
     }
 
     double b2bClusterPhi(const Particle* part)
@@ -601,7 +601,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Phi();
+      return b2blab.Phi();
     }
 
 
@@ -720,7 +720,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Px();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Px();
     }
 
     double recoilPy(const Particle* particle)
@@ -730,7 +732,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Py();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Py();
     }
 
     double recoilPz(const Particle* particle)
@@ -740,7 +744,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Pz();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Pz();
     }
 
 
@@ -751,7 +757,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).P();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).P();
     }
 
     double recoilMomentumTheta(const Particle* particle)
@@ -761,7 +769,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Vect().Theta();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Theta();
     }
 
     double recoilMomentumPhi(const Particle* particle)
@@ -771,7 +781,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Vect().Phi();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Phi();
     }
 
     double recoilEnergy(const Particle* particle)
@@ -781,7 +793,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).E();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).E();
     }
 
     double recoilMass(const Particle* particle)
@@ -791,7 +805,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).M();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).M();
     }
 
     double recoilMassSquared(const Particle* particle)
@@ -801,7 +817,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).M2();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).M2();
     }
 
     double m2RecoilSignalSide(const Particle* part)
@@ -1042,9 +1060,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum in the lab system");
+                      "Polar angle of a particle's missing momentum");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimutal angle of a particle's missing momentum in the lab system");
+                      "Azimutal angle of a particle's missing momentum");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,

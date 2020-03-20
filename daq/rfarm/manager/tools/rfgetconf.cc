@@ -6,6 +6,7 @@
 // Date : 27 - Mar - 2015
 //-
 
+#include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 

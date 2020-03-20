@@ -36,9 +36,9 @@ namespace Belle2 {
 
     /**
      * Constructor for EKLM simulation.
-     * @param[in] hit EKLM simulation hit.
+     * @param[in] simHit EKLM simulation hit.
      */
-    KLMDigit(const EKLMSimHit* hit);
+    KLMDigit(const EKLMSimHit* simHit);
 
     /**
      * Constructor for BKLM RPC simulation.

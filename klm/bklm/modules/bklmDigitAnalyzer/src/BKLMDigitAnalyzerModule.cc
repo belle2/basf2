@@ -60,7 +60,7 @@ void BKLMDigitAnalyzerModule::initialize()
 {
   m_digit.isRequired();
   m_digitRaw.isRequired();
-  m_digitOutOfRange.isRequired();
+  m_digitOutOfRange.isRequired("BKLMDigitsOutOfRange");
   m_digitEventInfo.isRequired();
 }
 
@@ -185,7 +185,7 @@ void BKLMDigitAnalyzerModule::event()
     // Some warnings (they should never appear, but it's better to be sure)
     if ((digitEventInfo->getRPCHits() + digitEventInfo->getSciHits()) != (int)digitEventInfo->getRelationsFrom<BKLMDigit>().size())
       B2WARNING("BKLMDigitAnalyzer:: the total number of BKLMDigit differs from the sum of RPC and scintillator hits stored in BKLMEventDigitDebug!");
-    if (digitEventInfo->getOutOfRangeHits() != (int)digitEventInfo->getRelationsTo<BKLMDigitOutOfRange>().size())
+    if (digitEventInfo->getOutOfRangeHits() != (int)digitEventInfo->getRelationsTo<BKLMDigit>("BKLMDigitsOutOfRange").size())
       B2WARNING("BKLMDigitAnalyzer:: the total number of BKLMDigit differs from the number of outOfRange-flagged hits stored in BKLMEventDigitDebug!");
 
     for (const BKLMDigit& digit : digitEventInfo->getRelationsFrom<BKLMDigit>()) {

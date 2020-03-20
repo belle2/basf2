@@ -320,17 +320,17 @@ namespace Belle2 {
   }
 
 
-  bool ParticleGenerator::loadNext()
+  bool ParticleGenerator::loadNext(bool loadAntiParticle)
   {
 
     bool loadedNext = false;
     while (true) {
-      switch (m_iParticleType) {
-        case 0: loadedNext = loadNextParticle(false); break; //Particles
-        case 1: loadedNext = loadNextParticle(true); break; //Anti-Particles
-        case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
-        default: return false;
-      }
+      if (m_iParticleType == 0) loadedNext = loadNextParticle(false);
+      else if (m_iParticleType == 1) {
+        if (loadAntiParticle) loadedNext = loadNextParticle(true);
+      } else if (m_iParticleType == 2) loadedNext = loadNextSelfConjugatedParticle();
+      else return false;
+
       if (loadedNext)
         return true;
       ++m_iParticleType;

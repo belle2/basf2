@@ -43,23 +43,6 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_EnergyDeposit = m_SimEnergyDeposit;
 }
 
-BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
-  KLMDigit(),
-  m_SimTime(0.0),
-  m_SimEnergyDeposit(0.0),
-  m_SimNPixel(0),
-  m_NPixel(0.0)
-{
-  m_Section = BKLMElementNumbers::getSectionByModule(moduleID);
-  m_Sector = BKLMElementNumbers::getSectorByModule(moduleID);
-  m_Layer = BKLMElementNumbers::getLayerByModule(moduleID);
-  m_Plane = BKLMElementNumbers::getPlaneByModule(moduleID);
-  m_Strip = BKLMElementNumbers::getStripByModule(moduleID);
-  m_Charge = charge;
-  m_CTime = ctime;
-  m_TDC = tdc;
-}
-
 // Constructor with initial values for a scint simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   KLMDigit(),

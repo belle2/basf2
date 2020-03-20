@@ -11,9 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 /* Belle 2 headers. */
 #include <framework/dataobjects/DigitBase.h>

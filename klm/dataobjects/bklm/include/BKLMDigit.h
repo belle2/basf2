@@ -35,13 +35,6 @@ namespace Belle2 {
     //! @param simHit pointer to the BKLMSimHit
     explicit BKLMDigit(const BKLMSimHit* simHit);
 
-    //!Constructor with initial values for a real data hit
-    //! @param moduleID gives sector, layer and strip
-    //! @param ctime gives lower 16 bits of B2TT CTIME
-    //! @param tdc the tdc value
-    //! @@param charge the charge (number of photons for the scintillator strips)
-    BKLMDigit(int moduleID, int ctime, short tdc, short charge);
-
     //! Destructor
     virtual ~BKLMDigit() {}
 

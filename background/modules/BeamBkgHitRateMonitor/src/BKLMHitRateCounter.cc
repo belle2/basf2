@@ -53,7 +53,7 @@ void BKLMHitRateCounter::accumulate(unsigned timeStamp)
   // accumulate hits
   for (const BKLMDigit& digit : m_digits) {
     // Discard scintillators hits below the theshdold
-    if (!digit.inRPC() && !digit.isAboveThreshold())
+    if (!digit.inRPC() && !digit.isGood())
       continue;
 
     int layerGlobal = BKLMElementNumbers::layerGlobalNumber(digit.getSection(), digit.getSector(), digit.getLayer()) - 1;

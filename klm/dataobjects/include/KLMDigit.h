@@ -289,7 +289,7 @@ namespace Belle2 {
      */
     bool isGood() const
     {
-      return m_fitStatus == KLM::c_ScintillatorFirmwareSuccessfulFit;
+      return m_FitStatus == KLM::c_ScintillatorFirmwareSuccessfulFit;
     }
 
     /**
@@ -298,7 +298,7 @@ namespace Belle2 {
      */
     int getFitStatus()
     {
-      return m_fitStatus;
+      return m_FitStatus;
     }
 
     /**
@@ -307,7 +307,7 @@ namespace Belle2 {
      */
     void setFitStatus(int s)
     {
-      m_fitStatus = s;
+      m_FitStatus = s;
     }
 
     /**
@@ -370,7 +370,7 @@ namespace Belle2 {
     int m_GeneratedNPE;
 
     /** Fit status. */
-    int m_fitStatus;
+    int m_FitStatus;
 
     /** MC time at SiPM. */
     float m_sMCTime;

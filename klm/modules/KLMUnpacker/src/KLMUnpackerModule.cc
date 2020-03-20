@@ -279,7 +279,9 @@ void KLMUnpackerModule::unpackBKLMDigit(
     bklmDigit->setTime(
       m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
     if (raw.charge < m_scintThreshold)
-      bklmDigit->isAboveThreshold(true);
+      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+    else
+      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
   }
   bklmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)

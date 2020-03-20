@@ -176,9 +176,11 @@ void KLMReconstructorModule::reconstructBKLMHits()
     const BKLMDigit* digit = m_bklmDigits[index];
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
-    if (digit->inRPC() || digit->isAboveThreshold()) {
-      int module = digit->getModuleID();
-      uint16_t channel = BKLMElementNumbers::getChannelByModule(module);
+    if (digit->inRPC() || digit->isGood()) {
+      uint16_t channel = BKLMElementNumbers::channelNumber(
+                           digit->getSection(), digit->getSector(),
+                           digit->getLayer(), digit->getPlane(),
+                           digit->getStrip());
       channelDigitMap.insert(std::pair<uint16_t, int>(channel, index));
     }
   }

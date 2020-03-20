@@ -13,15 +13,13 @@
 /* KLM headers. */
 #include <klm/bklm/dataobjects/BKLMElementNumbers.h>
 #include <klm/bklm/dataobjects/BKLMStatus.h>
-
-/* Belle 2 headers. */
-#include <framework/dataobjects/DigitBase.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 namespace Belle2 {
   class BKLMSimHit;
 
   //! Store one BKLM strip hit as a ROOT object
-  class BKLMDigit : public DigitBase {
+  class BKLMDigit : public KLMDigit {
 
   public:
 
@@ -68,72 +66,20 @@ namespace Belle2 {
       return getLayer() >= BKLMElementNumbers::c_FirstRPCLayer;
     }
 
-    //! Determine whether the scint hit is usable in fit
-    //! @return whether the scint hit is usable (true) or not (false) in pulse-shape fit
-    bool isAboveThreshold() const { return ((m_ModuleID & BKLM_ABOVETHRESHOLD_MASK) != 0); }
-
-    //! Get section number
-    //! @return section number (1=forward or 0=backward) of this strip
-    int getSection() const
-    {
-      return BKLMElementNumbers::getSectionByModule(m_ModuleID);
-    }
-
-    //! Get sector number
-    //! @return sector number of this strip (1..8)
-    int getSector() const
-    {
-      return BKLMElementNumbers::getSectorByModule(m_ModuleID);
-    }
-
-    //! Get layer number
-    //! @return layer number of this strip (1..15)
-    int getLayer() const
-    {
-      return BKLMElementNumbers::getLayerByModule(m_ModuleID);
-    }
-
-    //! Get plane number.
-    //! @return Plane number (0=z, 1=phi).
-    int getPlane() const
-    {
-      return BKLMElementNumbers::getPlaneByModule(m_ModuleID);
-    }
-
     //! Get readout coordinate
     //! @return readout coordinate (TRUE=phi, FALSE=z) of this strip
     bool isPhiReadout() const
     {
-      return BKLMElementNumbers::getPlaneByModule(m_ModuleID) ==
-             BKLMElementNumbers::c_PhiPlane;
+      return m_Plane == BKLMElementNumbers::c_PhiPlane;
     }
-
-    //! Get strip number
-    //! @return strip number (1..64)
-    int getStrip() const
-    {
-      return BKLMElementNumbers::getStripByModule(m_ModuleID);
-    }
-
-    //! Get detector-module ID
-    //! @return unique detector-module ID (internally calculated)
-    int getModuleID() const { return m_ModuleID; }
 
     //! Get MC-simulation hit time
     //! @return MC-simulation hit time (ns)
     float getSimTime() const { return m_SimTime; }
 
-    //! Get scint's reconstructed hit time
-    //! @return reconstructed hit time (ns) from scint pulse-shape analysis
-    float getTime() const { return m_Time; }
-
     //! Get MC-simulation energy deposition
     //! @return MC-simulation energy deposition (MeV)
     float getSimEDep() const { return m_SimEDep; }
-
-    //! Get scint's reconstructed energy deposition
-    //! @return reconstructed energy deposition (MeV)
-    float getEDep() const { return m_EDep; }
 
     //! Get the number of simulated MPPC pixels
     //! @return the number of simulated MPPC pixels
@@ -143,35 +89,6 @@ namespace Belle2 {
     //! @return the number of reconstructed MPPC pixels
     float getNPixel() const { return m_NPixel; }
 
-    //! Get the charge value
-    int getCharge() const { return m_Charge; }
-
-    //! @return ctime
-    int getCTime() const { return m_CTime; }
-
-    //! Get the status of scint pulse-shape fit
-    //! @return status of scint pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus returned as int!)
-    int getFitStatus() { return m_FitStatus; }
-
-    //! Determine whether two BKLMDigits refer to the same strip
-    //! @return whether two BKLMDigits refer to the same strip (true) or not (false)
-    bool match(const BKLMDigit* d) const
-    {
-      return BKLMElementNumbers::hitsFromSameChannel(m_ModuleID, d->getModuleID());
-    }
-
-    //! Sets whether scint hit is usable in fit
-    //! @param flag above threshold (true) or not (false)
-    void isAboveThreshold(bool flag) { m_ModuleID = (flag ? m_ModuleID | BKLM_ABOVETHRESHOLD_MASK : m_ModuleID & ~BKLM_ABOVETHRESHOLD_MASK); }
-
-    //! Set reconstructed time
-    //! @param time reconstructed time (ns) from scint pulse-shape analysis
-    void setTime(float time) { m_Time = time; }
-
-    //! Set reconstructed energy deposition
-    //! @param eDep reconstructed energy (MeV) from scint pulse-shape analysis
-    void setEDep(float eDep) { m_EDep = eDep; }
-
     //! Set the number of simulated MPPC pixels (scintillator only)
     //! @param nPixel number of simulated MPPC pixels
     void setSimNPixel(int nPixel) { m_SimNPixel = nPixel; }
@@ -180,45 +97,19 @@ namespace Belle2 {
     //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
 
-    //! Set the charge value
-    void setCharge(int charge) { m_Charge = charge; }
-
-    //! Set the status of the pulse-shape fit (enum EKLM::ScintillatorFirmwareFitStatus --> int!)
-    //! @param status completion status of the pulse-shape analysis
-    void setFitStatus(int status) { m_FitStatus = status; }
-
   private:
-
-    //!lowest 16 bits of the B2TT CTIME signal
-    int m_CTime;
-
-    //! detector-module identifier
-    //! @sa BKLMStatus.h
-    int m_ModuleID;
 
     //! MC-simulation event hit time (ns)
     float m_SimTime;
 
-    //! reconstructed hit time relative to trigger (ns)
-    float m_Time;
-
     //! MC-simulation pulse height (MeV)
     float m_SimEDep;
-
-    //! reconstructed pulse height (MeV)
-    float m_EDep;
 
     //! simulated number of MPPC pixels
     int m_SimNPixel;
 
     //! reconstructed number of MPPC pixels (=photoelectrons in EKLM)
     float m_NPixel;
-
-    //! reconstructed charge value of MPPC
-    int m_Charge;
-
-    //! pulse-fit status
-    int m_FitStatus;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc

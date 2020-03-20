@@ -18,99 +18,63 @@ using namespace Belle2;
 
 // empty constructor for ROOT - do not use this
 BKLMDigit::BKLMDigit() :
-  DigitBase(),
-  m_CTime(0),
-  m_ModuleID(0),
+  KLMDigit(),
   m_SimTime(0.0),
-  m_Time(0.0),
   m_SimEDep(0.0),
-  m_EDep(0.0),
   m_SimNPixel(0),
-  m_NPixel(0.0),
-  m_Charge(0.0),
-  m_FitStatus(0)
+  m_NPixel(0.0)
 {
 }
 
 // Constructor with initial values for an RPC simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
-  DigitBase(),
-  m_CTime(0),
+  KLMDigit(),
   m_SimTime(simHit->getTime()),
-  m_Time(m_SimTime + simHit->getPropagationTime()),
   m_SimEDep(simHit->getEDep()),
-  m_EDep(m_SimEDep),
   m_SimNPixel(0),
-  m_NPixel(0.0),
-  m_Charge(0.0),
-  m_FitStatus(0)
+  m_NPixel(0.0)
 {
-  m_ModuleID = simHit->getModuleID();
-  BKLMElementNumbers::setStripInModule(m_ModuleID, strip);
+  m_Section = simHit->getSection();
+  m_Sector = simHit->getSector();
+  m_Layer = simHit->getLayer();
+  m_Plane = simHit->getPlane();
+  m_Strip = strip;
+  m_Time = m_SimTime + simHit->getPropagationTime();
+  m_EDep = m_SimEDep;
 }
 
 BKLMDigit::BKLMDigit(int moduleID, int ctime, short tdc, short charge) :
-  DigitBase(),
-  m_CTime(ctime),
-  m_ModuleID(moduleID),
+  KLMDigit(),
   m_SimTime(0.0),
-  m_Time(0.0),
   m_SimEDep(0.0),
-  m_EDep(0.0),
   m_SimNPixel(0),
-  m_NPixel(0.0),
-  m_Charge(charge),
-  m_FitStatus(0)
+  m_NPixel(0.0)
 {
-  (void)tdc;
+  m_Section = BKLMElementNumbers::getSectionByModule(moduleID);
+  m_Sector = BKLMElementNumbers::getSectorByModule(moduleID);
+  m_Layer = BKLMElementNumbers::getLayerByModule(moduleID);
+  m_Plane = BKLMElementNumbers::getPlaneByModule(moduleID);
+  m_Strip = BKLMElementNumbers::getStripByModule(moduleID);
+  m_Charge = charge;
+  m_CTime = ctime;
+  m_TDC = tdc;
 }
 
 // Constructor with initial values for a scint simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
-  DigitBase(),
-  m_CTime(0),
-  m_ModuleID(simHit->getModuleID()),
+  KLMDigit(),
   m_SimTime(simHit->getTime()),
-  m_Time(m_SimTime + simHit->getPropagationTime()),
   m_SimEDep(simHit->getEDep()),
-  m_EDep(m_SimEDep),
   m_SimNPixel(0),
-  m_NPixel(0.0),
-  m_Charge(0.0),
-  m_FitStatus(0)
+  m_NPixel(0.0)
 {
-}
-
-// Copy constructor
-BKLMDigit::BKLMDigit(const BKLMDigit& digit) :
-  DigitBase(digit),
-  m_CTime(digit.m_CTime),
-  m_ModuleID(digit.m_ModuleID),
-  m_SimTime(digit.m_SimTime),
-  m_Time(digit.m_Time),
-  m_SimEDep(digit.m_SimEDep),
-  m_EDep(digit.m_EDep),
-  m_SimNPixel(digit.m_SimNPixel),
-  m_NPixel(digit.m_NPixel),
-  m_Charge(digit.m_Charge),
-  m_FitStatus(digit.m_FitStatus)
-{
-}
-
-// Assignment operator
-BKLMDigit& BKLMDigit::operator=(const BKLMDigit& digit)
-{
-  m_CTime = digit.m_CTime;
-  m_ModuleID = digit.m_ModuleID;
-  m_SimTime = digit.m_SimTime;
-  m_Time = digit.m_Time;
-  m_SimEDep = digit.m_SimEDep;
-  m_EDep = digit.m_EDep;
-  m_SimNPixel = digit.m_SimNPixel;
-  m_NPixel = digit.m_NPixel;
-  m_Charge = digit.m_Charge;
-  m_FitStatus = digit.m_FitStatus;
-  return *this;
+  m_Section = simHit->getSection();
+  m_Sector = simHit->getSector();
+  m_Layer = simHit->getLayer();
+  m_Plane = simHit->getPlane();
+  m_Strip = simHit->getStrip();
+  m_Time = m_SimTime + simHit->getPropagationTime();
+  m_EDep = m_SimEDep;
 }
 
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
@@ -148,5 +112,6 @@ DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
 
 unsigned int BKLMDigit::getUniqueChannelID() const
 {
-  return m_ModuleID;;
+  /* FIXME: reimplement after merging. */
+  return 1;
 }

@@ -186,11 +186,9 @@ void KLMDigitizerModule::digitizeBKLM()
         tdc = simulator.getFPGAFit()->getStartTime();
         /* Differs from original BKLM definition! */
         bklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
-        bklmDigit->isAboveThreshold(true);
       } else {
         tdc = 0;
         bklmDigit->setCharge(m_DigPar->getADCRange() - 1);
-        bklmDigit->isAboveThreshold(false);
       }
       // Not implemented in BKLMDigit.
       // eklmDigit->setTDC(tdc);

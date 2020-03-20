@@ -11,7 +11,7 @@ KLMDigit::KLMDigit() :
   m_CTime(0),
   m_TDC(0),
   m_GeneratedNPE(-1),
-  m_fitStatus(-1),
+  m_FitStatus(-1),
   m_sMCTime(-1)
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
@@ -24,7 +24,7 @@ KLMDigit::KLMDigit(const EKLMSimHit* hit) :
   m_CTime(0),
   m_TDC(0),
   m_GeneratedNPE(-1),
-  m_fitStatus(-1),
+  m_FitStatus(-1),
   m_sMCTime(-1)
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());

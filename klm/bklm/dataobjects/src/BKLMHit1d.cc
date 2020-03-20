@@ -45,10 +45,18 @@ BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
   }
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
-  m_ModuleID = digits.front()->getModuleID();
+  const BKLMDigit* bklmDigit = digits.front();
+  BKLMElementNumbers::setSectionInModule(m_ModuleID, bklmDigit->getSection());
+  BKLMElementNumbers::setSectorInModule(m_ModuleID, bklmDigit->getSector());
+  BKLMElementNumbers::setLayerInModule(m_ModuleID, bklmDigit->getLayer());
+  BKLMElementNumbers::setPlaneInModule(m_ModuleID, bklmDigit->getPlane());
+  BKLMElementNumbers::setStripInModule(m_ModuleID, bklmDigit->getStrip());
   for (std::vector<const BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
     const BKLMDigit* digit = *iDigit;
-    if (!BKLMElementNumbers::hitsFromSamePlane(m_ModuleID, digit->getModuleID())) {
+    if (!(bklmDigit->getSection() == digit->getSection() &&
+          bklmDigit->getSector() == digit->getSector() &&
+          bklmDigit->getLayer() == digit->getLayer() &&
+          bklmDigit->getPlane() == digit->getPlane())) {
       B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
       continue;
     }

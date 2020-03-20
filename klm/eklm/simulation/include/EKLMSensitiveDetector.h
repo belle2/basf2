@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */

@@ -13,12 +13,12 @@
 #include <klm/bklm/calibration/BKLMDatabaseImporter.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
-#include <klm/bklm/dbobjects/BKLMSimulationPar.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/bklm/BKLMElectronicsMap.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
+#include <klm/dbobjects/bklm/BKLMSimulationPar.h>
+#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 
 /* Belle 2 headers. */
 #include <framework/database/Database.h>

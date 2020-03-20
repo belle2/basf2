@@ -12,8 +12,8 @@
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMTimeCalibration.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
 
 /* ROOT headers. */
 #include <TCanvas.h>

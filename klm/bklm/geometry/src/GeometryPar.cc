@@ -12,9 +12,9 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>

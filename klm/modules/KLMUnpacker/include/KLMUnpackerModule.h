@@ -11,17 +11,17 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigitOutOfRange.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
+#include <klm/dbobjects/bklm/BKLMElectronicsMap.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
+#include <klm/dbobjects/eklm/EKLMElectronicsMap.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>

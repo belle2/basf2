@@ -18,9 +18,9 @@
 
 /* Belle2 headers. */
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dbobjects/bklm/BKLMElectronicsMap.h>
+#include <klm/dbobjects/eklm/EKLMElectronicsMap.h>
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>

@@ -25,8 +25,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 using namespace std;

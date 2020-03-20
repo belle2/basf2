@@ -12,7 +12,7 @@
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
+#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */

@@ -25,8 +25,8 @@
 #include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>

@@ -108,8 +108,8 @@ if __name__ == "__main__":
         # Unpacker
         main.add_module('KLMUnpacker')
 
-        # BKLM reconstruction
-        main.add_module('BKLMReconstructor')
+        # KLM reconstruction
+        main.add_module('KLMReconstructor')
 
     # DQM
     main.add_module('KLMDQM')

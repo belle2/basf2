@@ -7,7 +7,7 @@ from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
 
 from basf2 import conditions
-conditions.override_globaltags(['validation_2019-11-29'])
+conditions.override_globaltags(['validation_2020-03-06'])
 
 main = create_path()
 

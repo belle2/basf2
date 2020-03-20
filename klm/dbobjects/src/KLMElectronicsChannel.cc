@@ -9,12 +9,12 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/dbobjects/bklm/BKLMElectronicsChannel.h>
+#include <klm/dbobjects/KLMElectronicsChannel.h>
 
 using namespace Belle2;
 
-bool BKLMElectronicsChannel::operator<(
-  const BKLMElectronicsChannel& channel) const
+bool KLMElectronicsChannel::operator<(
+  const KLMElectronicsChannel& channel) const
 {
   if (m_Copper < channel.m_Copper)
     return true;

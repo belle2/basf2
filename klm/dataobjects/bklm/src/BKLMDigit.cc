@@ -19,7 +19,6 @@ using namespace Belle2;
 // empty constructor for ROOT - do not use this
 BKLMDigit::BKLMDigit() :
   KLMDigit(),
-  m_SimTime(0.0),
   m_SimEnergyDeposit(0.0),
   m_SimNPixel(0),
   m_NPixel(0.0)
@@ -29,7 +28,6 @@ BKLMDigit::BKLMDigit() :
 // Constructor with initial values for an RPC simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   KLMDigit(),
-  m_SimTime(simHit->getTime()),
   m_SimEnergyDeposit(simHit->getEnergyDeposit()),
   m_SimNPixel(0),
   m_NPixel(0.0)
@@ -39,14 +37,14 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   m_Layer = simHit->getLayer();
   m_Plane = simHit->getPlane();
   m_Strip = strip;
-  m_Time = m_SimTime + simHit->getPropagationTime();
+  m_Time = simHit->getTime() + simHit->getPropagationTime();
   m_EnergyDeposit = m_SimEnergyDeposit;
+  m_MCTime = simHit->getTime();
 }
 
 // Constructor with initial values for a scint simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   KLMDigit(),
-  m_SimTime(simHit->getTime()),
   m_SimEnergyDeposit(simHit->getEnergyDeposit()),
   m_SimNPixel(0),
   m_NPixel(0.0)
@@ -56,8 +54,9 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   m_Layer = simHit->getLayer();
   m_Plane = simHit->getPlane();
   m_Strip = simHit->getStrip();
-  m_Time = m_SimTime + simHit->getPropagationTime();
+  m_Time = simHit->getTime() + simHit->getPropagationTime();
   m_EnergyDeposit = m_SimEnergyDeposit;
+  m_MCTime = simHit->getTime();
 }
 
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)

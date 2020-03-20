@@ -60,10 +60,6 @@ namespace Belle2 {
       return m_Plane == BKLMElementNumbers::c_PhiPlane;
     }
 
-    //! Get MC-simulation hit time
-    //! @return MC-simulation hit time (ns)
-    float getSimTime() const { return m_SimTime; }
-
     //! Get MC-simulation energy deposition
     //! @return MC-simulation energy deposition (MeV)
     float getSimEnergyDeposit() const { return m_SimEnergyDeposit; }
@@ -85,9 +81,6 @@ namespace Belle2 {
     void setNPixel(float nPixel) { m_NPixel = nPixel; }
 
   private:
-
-    //! MC-simulation event hit time (ns)
-    float m_SimTime;
 
     //! MC-simulation pulse height (MeV)
     float m_SimEnergyDeposit;

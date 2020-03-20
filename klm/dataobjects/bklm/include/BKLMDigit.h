@@ -42,12 +42,6 @@ namespace Belle2 {
     //! @@param charge the charge (number of photons for the scintillator strips)
     BKLMDigit(int moduleID, int ctime, short tdc, short charge);
 
-    //! Copy constructor
-    BKLMDigit(const BKLMDigit&);
-
-    //! Assignment operator
-    BKLMDigit& operator=(const BKLMDigit&);
-
     //! Destructor
     virtual ~BKLMDigit() {}
 

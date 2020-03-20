@@ -128,7 +128,6 @@ def _add_pxd_ckf_implementation(path, svd_cdc_reco_tracks, pxd_reco_tracks, loos
 
     if loose_settings:
         module_parameters["seedHitJumping"] = 1
-        module_parameters["onlyUseTracksWithSVD"] = False
 
     path.add_module("ToPXDCKF",
                     advanceHighFilterParameters={"direction": direction},

@@ -117,7 +117,9 @@ void CKFToPXDFindlet::apply()
   if (m_param_onlyUseTracksWithSVD) {
     const auto hasNoSVD = [](const RecoTrack * recoTrack) {
       const auto& svdHitList = recoTrack->getSortedSVDHitList();
-      return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
+      // Require at least one hit in layer 3 or 4 (for curling particles both directions have to be checked)
+      return svdHitList.empty() or (svdHitList.front()->getSensorID().getLayerNumber() > 4
+                                    and svdHitList.back()->getSensorID().getLayerNumber() > 4);
     };
     TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
   }

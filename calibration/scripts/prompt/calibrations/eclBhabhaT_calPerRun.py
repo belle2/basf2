@@ -93,10 +93,7 @@ def get_calibrations(input_data, **kwargs):
     if 'Geometry' not in rec_path_bhabha:
         rec_path_bhabha.add_module('Geometry', useDB=True)
 
-    # for new 2020 cdst format
-    # components = ['ECL']
-    # prepare_cdst_analysis(rec_path_bhabha, components=components)
-    prepare_cdst_analysis(rec_path_bhabha)
+    prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
 
     col_bhabha = register_module('ECLBhabhaTCollector')
     col_bhabha.param('timeAbsMax', 250)

@@ -226,24 +226,6 @@ namespace Belle2 {
     }
 
     /**
-     * Get the lund code of the (leading) particle.
-     * @return Particle code.
-     */
-    int getPDG() const
-    {
-      return m_PDG;
-    }
-
-    /**
-     * Set the lund code of the (leading) particle
-     * @param[in] pdg Particle code.
-     */
-    void setPDG(int pdg)
-    {
-      m_PDG = pdg;
-    }
-
-    /**
      * Get number of photoelectrons.
      * @return Number of photoelectrons.
      */
@@ -376,9 +358,6 @@ namespace Belle2 {
 
     /** Energy deposition. */
     float m_EnergyDeposit;
-
-    /** PDG code of the (leading) particle. */
-    int m_PDG;
 
     /** Number of photoelectrons. */
     float m_NPE;

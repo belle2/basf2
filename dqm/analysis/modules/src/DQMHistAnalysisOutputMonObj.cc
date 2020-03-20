@@ -89,7 +89,7 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   }
 
   // set meta data info
-  m_metaData->setNEvents(lastEvtMeta->getEvent());
+  //  m_metaData->setNEvents(lastEvtMeta->getEvent());
   m_metaData->setExperimentRun(exp, run);
   time_t ts = lastEvtMeta->getTime() / 1e9;
   struct tm* timeinfo;
@@ -107,7 +107,6 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   // write them to the output file
   for (const auto& obj : objts)(obj.second)->Write();
 
-  //  f.Write();
   f.Close();
 
   if (m_treeFile.length() > 0) addTreeEntry();
@@ -124,6 +123,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
 
   int run = m_metaData->getRun();
   int expe = m_metaData->getExperiment();
+  int nevt = m_metaData->getNEvents();
   int rune = 0;
   int expee = 0;
   char* rel = const_cast<char*>(m_metaData->getRelease().c_str());
@@ -139,7 +139,9 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   auto b_datetime = tree->GetBranch("datetime");
   auto b_rtype = tree->GetBranch("rtype");
   auto b_procID = tree->GetBranch("procID");
+  auto b_nevt = tree->GetBranch("nevt");
 
+  // this still needs to be sorted out
   /*if(b_run){
     b_run->SetAddress(&rune);
     b_exp->SetAddress(&expee);
@@ -149,14 +151,16 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
       if(rune == run && expee = expe){
 
       }
-    }
-    }*/
+      }
+      }*/
 
 
   if (!b_run) tree->Branch("run", &run, "run/I");
   else b_run->SetAddress(&run);
   if (!b_exp) tree->Branch("exp", &expe, "exp/I");
   else b_exp->SetAddress(&expe);
+  if (!b_nevt) tree->Branch("nevt", &nevt, "nevt/I");
+  else b_nevt->SetAddress(&nevt);
   if (!b_release) tree->Branch("release", rel, "release/C");
   else b_release->SetAddress(rel);
   if (!b_gt) tree->Branch("gt", db, "gt/C");
@@ -189,7 +193,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
       auto vvE1 = upErr.find(var.first);
       auto vvE2 = lowErr.find(var.first);
 
-      if (vvE1 != upErr.end() && vvE2 == upErr.end()) {
+      if (vvE1 != upErr.end() && vvE2 == lowErr.end()) {
         auto errBranch = tree->GetBranch((brname).c_str() + TString("_err"));
         if (!errBranch) {
           errBranch = tree->Branch((brname).c_str() + TString("_err"), &(vvE1->second));
@@ -197,7 +201,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
         } else errBranch->SetAddress(&(vvE1->second));
       }
 
-      if (vvE1 != upErr.end() && vvE2 != upErr.end()) {
+      if (vvE1 != upErr.end() && vvE2 != lowErr.end()) {
         auto errBranch1 = tree->GetBranch((brname).c_str() + TString("_upErr"));
         if (!errBranch1) {
           errBranch1 = tree->Branch((brname).c_str() + TString("_upErr"), &(vvE1->second));

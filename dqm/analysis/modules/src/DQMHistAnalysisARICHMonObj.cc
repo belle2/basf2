@@ -61,7 +61,7 @@ void DQMHistAnalysisARICHMonObjModule::initialize()
   m_c_tracks = new TCanvas("tracks", "tracks", 500, 500);
 
   m_apdHist = new ARICHChannelHist("tmpApdHist", "tmpApdHist", 2); /**<ARICH TObject to draw hit map for each APD*/
-  m_chHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 0); /**<ARICH TObject to draw hit map for each channel*/
+  //m_chHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 0); /**<ARICH TObject to draw hit map for each channel*/
   m_hapdHist = new ARICHChannelHist("tmpHapdHist", "tmpHapdHist", 1); /**<ARICH TObject to draw flash map for each HAPD*/
 
   // add canvases to MonitoringObject
@@ -132,18 +132,18 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   int nevt = 0;
   if (hitsPerEvent) nevt = hitsPerEvent->GetEntries();
   m_apdHist->fillFromTH1(chHit);
-  m_chHist->fillFromTH1(chHit);
+  //  m_chHist->fillFromTH1(chHit);
   if (nevt) {
     m_apdHist->Scale(1. / float(nevt));
-    m_chHist->Scale(1. / float(nevt));
+    // m_chHist->Scale(1. / float(nevt));
   }
 
   pp1->SetMaximum(0.1);
   m_apdHist->setPoly(pp1);
   pp1->SetMinimum(0.0001);
   pp2->SetMaximum(0.1 / 36.);
-  m_chHist->setPoly(pp2);
-  pp2->SetMinimum(0.0001 / 36.);
+  //  m_chHist->setPoly(pp2);
+  // pp2->SetMinimum(0.0001 / 36.);
 
 
   //TCanvas main
@@ -311,9 +311,9 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   m_c_mask->cd(2);
   pflash->Draw("colz");
   m_c_mask->cd(3);
-  pp2->Draw("colz");
-  pp2->GetXaxis()->SetTickLength(0);
-  pp2->GetYaxis()->SetTickLength(0);
+  // pp2->Draw("colz");
+  //pp2->GetXaxis()->SetTickLength(0);
+  //pp2->GetYaxis()->SetTickLength(0);
   gPad->SetLogz();
   m_c_mask->cd(4);
   hotCh->Draw("colz text");

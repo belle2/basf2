@@ -13,6 +13,8 @@
 /* KLM headers. */
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 /* Belle 2 headers. */
@@ -33,15 +35,28 @@ namespace Belle2 {
     KLMDigit();
 
     /**
-     * Constructor.
+     * Constructor for EKLM simulation.
      * @param[in] hit EKLM simulation hit.
      */
     KLMDigit(const EKLMSimHit* hit);
 
     /**
+     * Constructor for BKLM RPC simulation.
+     * @param[in] simHit BKLM simulation hit.
+     * @param[in] strip  Strip.
+     */
+    KLMDigit(const BKLMSimHit* simHit, int strip);
+
+    /**
+     * Constructor for BKLM RPC simulation.
+     * @param[in] simHit BKLM simulation hit.
+     */
+    KLMDigit(const BKLMSimHit* simHit);
+
+    /**
      * Destructor.
      */
-    ~KLMDigit()
+    virtual ~KLMDigit()
     {
     }
 

@@ -24,16 +24,23 @@ namespace Belle2 {
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
-    BKLMDigit();
+    BKLMDigit() : KLMDigit()
+    {
+    }
 
     //! Constructor with initial values for an RPC hit
     //! @param simHit pointer to the BKLMSimHit
     //! @param strip RPC strip number in a contiguous set
-    explicit BKLMDigit(const BKLMSimHit* simHit, int strip);
+    explicit BKLMDigit(const BKLMSimHit* simHit, int strip) :
+      KLMDigit(simHit, strip)
+    {
+    }
 
     //! Constructor with initial values for a scint hit
     //! @param simHit pointer to the BKLMSimHit
-    explicit BKLMDigit(const BKLMSimHit* simHit);
+    explicit BKLMDigit(const BKLMSimHit* simHit) : KLMDigit(simHit)
+    {
+    }
 
     //! Destructor
     virtual ~BKLMDigit() {}
@@ -60,14 +67,7 @@ namespace Belle2 {
       return m_Plane == BKLMElementNumbers::c_PhiPlane;
     }
 
-    //! Get MC-simulation energy deposition
-    //! @return MC-simulation energy deposition (MeV)
-    float getSimEnergyDeposit() const { return m_SimEnergyDeposit; }
-
   private:
-
-    //! MC-simulation pulse height (MeV)
-    float m_SimEnergyDeposit;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc

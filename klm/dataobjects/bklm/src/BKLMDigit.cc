@@ -16,43 +16,6 @@
 
 using namespace Belle2;
 
-// empty constructor for ROOT - do not use this
-BKLMDigit::BKLMDigit() :
-  KLMDigit(),
-  m_SimEnergyDeposit(0.0)
-{
-}
-
-// Constructor with initial values for an RPC simHit
-BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
-  KLMDigit(),
-  m_SimEnergyDeposit(simHit->getEnergyDeposit())
-{
-  m_Section = simHit->getSection();
-  m_Sector = simHit->getSector();
-  m_Layer = simHit->getLayer();
-  m_Plane = simHit->getPlane();
-  m_Strip = strip;
-  m_Time = simHit->getTime() + simHit->getPropagationTime();
-  m_EnergyDeposit = m_SimEnergyDeposit;
-  m_MCTime = simHit->getTime();
-}
-
-// Constructor with initial values for a scint simHit
-BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
-  KLMDigit(),
-  m_SimEnergyDeposit(simHit->getEnergyDeposit())
-{
-  m_Section = simHit->getSection();
-  m_Sector = simHit->getSector();
-  m_Layer = simHit->getLayer();
-  m_Plane = simHit->getPlane();
-  m_Strip = simHit->getStrip();
-  m_Time = simHit->getTime() + simHit->getPropagationTime();
-  m_EnergyDeposit = m_SimEnergyDeposit;
-  m_MCTime = simHit->getTime();
-}
-
 DigitBase::EAppendStatus BKLMDigit::addBGDigit(const DigitBase* bg)
 {
   const BKLMDigit* bgDigit = static_cast<const BKLMDigit*>(bg);

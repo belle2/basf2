@@ -31,3 +31,28 @@ KLMDigit::KLMDigit(const EKLMSimHit* hit) :
 {
   m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
 }
+
+KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) : KLMDigit()
+{
+  m_Section = simHit->getSection();
+  m_Sector = simHit->getSector();
+  m_Layer = simHit->getLayer();
+  m_Plane = simHit->getPlane();
+  m_Strip = strip;
+  m_Time = simHit->getTime() + simHit->getPropagationTime();
+  m_EnergyDeposit = simHit->getEnergyDeposit();
+  m_MCTime = simHit->getTime();
+}
+
+KLMDigit::KLMDigit(const BKLMSimHit* simHit) : KLMDigit()
+{
+  m_Section = simHit->getSection();
+  m_Sector = simHit->getSector();
+  m_Layer = simHit->getLayer();
+  m_Plane = simHit->getPlane();
+  m_Strip = simHit->getStrip();
+  m_Time = simHit->getTime() + simHit->getPropagationTime();
+  m_EnergyDeposit = simHit->getEnergyDeposit();
+  m_MCTime = simHit->getTime();
+}
+

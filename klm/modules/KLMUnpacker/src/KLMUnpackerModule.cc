@@ -68,18 +68,18 @@ void KLMUnpackerModule::initialize()
   m_RawKLMs.isRequired();
   /* Digits. */
   m_bklmDigits.registerInDataStore(m_outputBKLMDigitsName);
-  m_bklmDigitOutOfRanges.registerInDataStore();
+  m_bklmDigitsOutOfRange.registerInDataStore("BKLMDigitsOutOfRange");
   m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
   /* Event information. */
   m_DigitEventInfos.registerInDataStore();
   m_bklmDigits.registerRelationTo(m_DigitEventInfos);
-  m_bklmDigitOutOfRanges.registerRelationTo(m_DigitEventInfos);
+  m_bklmDigitsOutOfRange.registerRelationTo(m_DigitEventInfos);
   m_eklmDigits.registerRelationTo(m_DigitEventInfos);
   /* Raw data in dataobject format. */
   if (m_WriteDigitRaws) {
     m_klmDigitRaws.registerInDataStore();
     m_bklmDigits.registerRelationTo(m_klmDigitRaws);
-    m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
+    m_bklmDigitsOutOfRange.registerRelationTo(m_klmDigitRaws);
     m_eklmDigits.registerRelationTo(m_klmDigitRaws);
   }
 }
@@ -223,8 +223,8 @@ void KLMUnpackerModule::unpackBKLMDigit(
       klmDigitEventInfo->increaseOutOfRangeHits();
 
       // store the digit in the appropriate dataobject
-      BKLMDigitOutOfRange* bklmDigitOutOfRange =
-        m_bklmDigitOutOfRanges.appendNew(
+      BKLMDigit* bklmDigitOutOfRange =
+        m_bklmDigitsOutOfRange.appendNew(
           moduleId, raw.ctime, raw.tdc, raw.charge);
       if (m_WriteDigitRaws)
         bklmDigitOutOfRange->addRelationTo(klmDigitRaw);

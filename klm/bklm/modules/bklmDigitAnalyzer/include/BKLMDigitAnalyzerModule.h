@@ -12,7 +12,6 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMDigit.h>
-#include <klm/dataobjects/bklm/BKLMDigitOutOfRange.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
@@ -89,7 +88,7 @@ namespace Belle2 {
     StoreArray<KLMDigitRaw> m_digitRaw;
 
     //!  Input BKLMDigits whose time is out of range
-    StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;
+    StoreArray<BKLMDigit> m_digitOutOfRange;
 
     //! Output data array of analyzed BKLMDigit information
     StoreArray<KLMDigitEventInfo> m_digitEventInfo;

@@ -12,7 +12,6 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMDigit.h>
-#include <klm/dataobjects/bklm/BKLMDigitOutOfRange.h>
 #include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
@@ -192,11 +191,11 @@ namespace Belle2 {
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;
 
+    /** Out-of-range digits. */
+    StoreArray<BKLMDigit> m_bklmDigitsOutOfRange;
+
     /** Raw digits. */
     StoreArray<KLMDigitRaw> m_klmDigitRaws;
-
-    /** Out-of-range digits. */
-    StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
 
     /* Other common variables. */
 

@@ -562,10 +562,8 @@ def add_klm_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'KLM' in components:
-        eklm_rec = register_module('EKLMReconstructor')
-        path.add_module(eklm_rec)
-        bklm_rec = register_module('BKLMReconstructor')
-        path.add_module(bklm_rec)
+        klm_rec = register_module('KLMReconstructor')
+        path.add_module(klm_rec)
         klm_clusters_rec = register_module('KLMClustersReconstructor')
         path.add_module(klm_clusters_rec)
 

@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigitOutOfRange.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 

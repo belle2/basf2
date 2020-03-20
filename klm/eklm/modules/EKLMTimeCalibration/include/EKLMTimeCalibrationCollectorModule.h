@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 

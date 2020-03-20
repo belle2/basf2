@@ -7,8 +7,8 @@
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
 
 #include <gtest/gtest.h>
 

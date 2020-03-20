@@ -12,13 +12,13 @@
 #include <klm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
 
 /* Belle 2 headers. */
 #include <mdst/dataobjects/MCParticle.h>

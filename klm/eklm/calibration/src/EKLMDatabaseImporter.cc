@@ -12,8 +12,8 @@
 #include <klm/eklm/calibration/EKLMDatabaseImporter.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
-#include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
+#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
+#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
 
 /* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>

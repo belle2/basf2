@@ -11,17 +11,17 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
 /* Belle 2 headers. */

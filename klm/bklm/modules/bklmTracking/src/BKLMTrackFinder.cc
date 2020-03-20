@@ -12,7 +12,7 @@
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>

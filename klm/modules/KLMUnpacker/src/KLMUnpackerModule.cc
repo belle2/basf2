@@ -12,7 +12,7 @@
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/rawdata/RawData.h>
 

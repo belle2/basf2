@@ -12,16 +12,16 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
-#include <klm/eklm/dbobjects/EKLMTimeCalibration.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
+#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
+#include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 

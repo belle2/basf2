@@ -179,7 +179,6 @@ void KLMDigitizerModule::digitizeBKLM()
       // Not implemented in BKLMDigit.
       // eklmDigit->setMCTime(simHit->getTime());
       // eklmDigit->setSiPMMCTime(simulator.getMCTime());
-      // eklmDigit->setPosition(simHit->getPosition());
       bklmDigit->setSimNPixel(simulator.getGeneratedNPE());
       if (simulator.getFitStatus() ==
           KLM::c_ScintillatorFirmwareSuccessfulFit) {
@@ -237,7 +236,6 @@ void KLMDigitizerModule::digitizeEKLM()
     eklmDigit->addRelationTo(simHit);
     eklmDigit->setMCTime(simHit->getTime());
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
-    eklmDigit->setPosition(simHit->getPosition());
     eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
     eklmDigit->setEnergyDeposit(simulator.getEnergy());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {

@@ -296,7 +296,7 @@ namespace Belle2 {
      * Get fit status.
      * @return Fit status.
      */
-    int getFitStatus()
+    int getFitStatus() const
     {
       return m_FitStatus;
     }
@@ -308,6 +308,24 @@ namespace Belle2 {
     void setFitStatus(int s)
     {
       m_FitStatus = s;
+    }
+
+    /**
+     * Get MC time.
+     * @return MC time.
+     */
+    float getMCTime() const
+    {
+      return m_MCTime;
+    }
+
+    /**
+     * Set MC time.
+     * @param[in] time MC time.
+     */
+    void setMCTime(float time)
+    {
+      m_MCTime = time;
     }
 
     /**
@@ -371,6 +389,9 @@ namespace Belle2 {
 
     /** Fit status. */
     int m_FitStatus;
+
+    /** MC time. */
+    float m_MCTime;
 
     /** MC time at SiPM. */
     float m_sMCTime;

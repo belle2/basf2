@@ -12,6 +12,9 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMHitBase.h>
+#include <klm/dataobjects/eklm/EKLMHitGlobalCoord.h>
+#include <klm/dataobjects/eklm/EKLMHitMCTime.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>

@@ -11,8 +11,6 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/EKLMHitBase.h>
-#include <klm/dataobjects/eklm/EKLMHitMCTime.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigit.h>
@@ -23,8 +21,7 @@ namespace Belle2 {
    * Main reconstruction hit class. Contains information about the
    * hitted strips.
    */
-  class EKLMDigit : public KLMDigit,
-    public EKLMHitGlobalCoord, public EKLMHitMCTime {
+  class EKLMDigit : public KLMDigit, public EKLMHitGlobalCoord {
 
   public:
 

@@ -64,32 +64,10 @@ namespace Belle2 {
     //! @return MC-simulation energy deposition (MeV)
     float getSimEnergyDeposit() const { return m_SimEnergyDeposit; }
 
-    //! Get the number of simulated MPPC pixels
-    //! @return the number of simulated MPPC pixels
-    float getSimNPixel() const { return m_SimNPixel; }
-
-    //! Get the number of reconstructed MPPC pixels
-    //! @return the number of reconstructed MPPC pixels
-    float getNPixel() const { return m_NPixel; }
-
-    //! Set the number of simulated MPPC pixels (scintillator only)
-    //! @param nPixel number of simulated MPPC pixels
-    void setSimNPixel(int nPixel) { m_SimNPixel = nPixel; }
-
-    //! Set the number of reconstructed MPPC pixels (scintillator only)
-    //! @param nPixel number of reconstructed MPPC pixels from the pulse-shape analysis
-    void setNPixel(float nPixel) { m_NPixel = nPixel; }
-
   private:
 
     //! MC-simulation pulse height (MeV)
     float m_SimEnergyDeposit;
-
-    //! simulated number of MPPC pixels
-    int m_SimNPixel;
-
-    //! reconstructed number of MPPC pixels (=photoelectrons in EKLM)
-    float m_NPixel;
 
     //! Needed to make the ROOT object storable
     //! version 4 adds ctime etc

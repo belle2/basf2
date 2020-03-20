@@ -253,16 +253,21 @@ namespace Belle2 {
     }
 
     /**
-     * Get number of photoelectrons (fit result).
+     * Get number of photoelectrons.
      * @return Number of photoelectrons.
      */
     float getNPE() const
     {
-      /*
-       * TODO: the photoelectron / charge conversion constant should be
-       * determined from calibration.
-       */
-      return float(m_Charge) / 32;
+      return m_NPE;
+    }
+
+    /**
+     * Set number of photoelectrons.
+     * @param[in] npe Number of photoelectrons.
+     */
+    void setNPE(float npe)
+    {
+      m_NPE = npe;
     }
 
     /**
@@ -383,6 +388,9 @@ namespace Belle2 {
 
     /** PDG code of the (leading) particle. */
     int m_PDG;
+
+    /** Number of photoelectrons. */
+    float m_NPE;
 
     /** Generated number of photoelectrons (MC only). */
     int m_GeneratedNPE;

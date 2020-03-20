@@ -19,18 +19,14 @@ using namespace Belle2;
 // empty constructor for ROOT - do not use this
 BKLMDigit::BKLMDigit() :
   KLMDigit(),
-  m_SimEnergyDeposit(0.0),
-  m_SimNPixel(0),
-  m_NPixel(0.0)
+  m_SimEnergyDeposit(0.0)
 {
 }
 
 // Constructor with initial values for an RPC simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
   KLMDigit(),
-  m_SimEnergyDeposit(simHit->getEnergyDeposit()),
-  m_SimNPixel(0),
-  m_NPixel(0.0)
+  m_SimEnergyDeposit(simHit->getEnergyDeposit())
 {
   m_Section = simHit->getSection();
   m_Sector = simHit->getSector();
@@ -45,9 +41,7 @@ BKLMDigit::BKLMDigit(const BKLMSimHit* simHit, int strip) :
 // Constructor with initial values for a scint simHit
 BKLMDigit::BKLMDigit(const BKLMSimHit* simHit) :
   KLMDigit(),
-  m_SimEnergyDeposit(simHit->getEnergyDeposit()),
-  m_SimNPixel(0),
-  m_NPixel(0.0)
+  m_SimEnergyDeposit(simHit->getEnergyDeposit())
 {
   m_Section = simHit->getSection();
   m_Sector = simHit->getSector();

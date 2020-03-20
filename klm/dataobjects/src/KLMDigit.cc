@@ -5,6 +5,7 @@
 using namespace Belle2;
 
 KLMDigit::KLMDigit() :
+  m_Subdetector(0),
   m_Section(0),
   m_Sector(0),
   m_Layer(0),
@@ -20,10 +21,11 @@ KLMDigit::KLMDigit() :
   m_MCTime(0),
   m_sMCTime(0)
 {
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
+  m_Subdetector(KLMElementNumbers::c_EKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
@@ -40,9 +42,11 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_MCTime(simHit->getTime()),
   m_sMCTime(0)
 {
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
+  m_Subdetector(KLMElementNumbers::c_BKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
@@ -59,9 +63,11 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
   m_MCTime(simHit->getTime()),
   m_sMCTime(0)
 {
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
+  m_Subdetector(KLMElementNumbers::c_BKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
@@ -78,5 +84,30 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
   m_MCTime(simHit->getTime()),
   m_sMCTime(0)
 {
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+}
+
+unsigned int KLMDigit::getUniqueChannelID() const
+{
+  return m_ElementNumbers->channelNumber(m_Subdetector, m_Section, m_Layer,
+                                         m_Sector, m_Plane, m_Strip);
+}
+
+DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)
+{
+  const KLMDigit* bgDigit = (KLMDigit*)bg;
+  if (!bgDigit->isGood())
+    return DigitBase::c_DontAppend;
+  if (!this->isGood())
+    return DigitBase::c_Append;
+  /* MC data from digit with larger energy. */
+  if (this->getEnergyDeposit() < bgDigit->getEnergyDeposit())
+    this->setMCTime(bgDigit->getMCTime());
+  this->setEnergyDeposit(this->getEnergyDeposit() + bgDigit->getEnergyDeposit());
+  if (this->getTime() > bgDigit->getTime())
+    this->setTime(bgDigit->getTime());
+  this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
+  this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
+  return DigitBase::c_DontAppend;
 }
 

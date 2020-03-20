@@ -27,28 +27,22 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMDigit();
+    EKLMDigit() : KLMDigit()
+    {
+    }
 
     /**
      * Constructor from the EKLMSim2Hit.
-     * @param[in] Hit EKLMSim2Hit.
+     * @param[in] hit EKLMSim2Hit.
      */
-    explicit EKLMDigit(const EKLMSimHit* Hit);
+    explicit EKLMDigit(const EKLMSimHit* hit) : KLMDigit(hit)
+    {
+    }
 
     /**
      * Destructor.
      */
     ~EKLMDigit() {};
-
-    /**
-     * Get unique channel identifier.
-     */
-    unsigned int getUniqueChannelID() const override;
-
-    /**
-     * The pile-up method.
-     */
-    EAppendStatus addBGDigit(const DigitBase* bg) override;
 
   private:
 

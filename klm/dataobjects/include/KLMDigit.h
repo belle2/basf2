@@ -12,9 +12,9 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 /* Belle 2 headers. */
@@ -58,6 +58,34 @@ namespace Belle2 {
      */
     virtual ~KLMDigit()
     {
+    }
+
+    /**
+     * Get unique channel identifier.
+     */
+    unsigned int getUniqueChannelID() const override;
+
+    /**
+     * The pile-up method.
+     */
+    EAppendStatus addBGDigit(const DigitBase* bg) override;
+
+    /**
+     * Get subdetector number.
+     * @return Subdetector number.
+     */
+    int getSubdetector() const
+    {
+      return m_Subdetector;
+    }
+
+    /**
+     * Set subdetector number.
+     * @param[in] subdetector Subdetector number.
+     */
+    void setSubdetector(int subdetector)
+    {
+      m_Subdetector = subdetector;
     }
 
     /**
@@ -342,7 +370,10 @@ namespace Belle2 {
   protected:
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers; //! ROOT streamer
+    const KLMElementNumbers* m_ElementNumbers; //! ROOT streamer
+
+    /** Number of subdetector. */
+    int m_Subdetector;
 
     /** Number of section. */
     int m_Section;

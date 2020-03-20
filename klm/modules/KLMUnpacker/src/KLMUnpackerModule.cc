@@ -151,6 +151,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
     eklmDigit->addRelationTo(klmDigitRaw);
   eklmDigit->setTime(
     m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+  eklmDigit->setSubdetector(KLMElementNumbers::c_EKLM);
   eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
@@ -217,6 +218,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
       bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
       if (m_WriteDigitRaws)
         bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      bklmDigitOutOfRange->setSubdetector(KLMElementNumbers::c_BKLM);
       bklmDigitOutOfRange->setSection(section);
       bklmDigitOutOfRange->setLayer(layer);
       bklmDigitOutOfRange->setSector(sector);
@@ -297,6 +299,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
   bklmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
     bklmDigit->addRelationTo(klmDigitRaw);
+  bklmDigit->setSubdetector(KLMElementNumbers::c_BKLM);
   bklmDigit->setSection(section);
   bklmDigit->setLayer(layer);
   bklmDigit->setSector(sector);

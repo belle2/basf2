@@ -40,8 +40,7 @@ class Histogrammer(Module):
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
                               100, 0, 100))
-        self.hist.append(TH1F('BKLMDigits', 'BKLMDigits', 150, 0, 150))
-        self.hist.append(TH1F('EKLMDigits', 'EKLMDigits', 100, 0, 100))
+        self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         for h in self.hist:
             h.SetXTitle('number of digits in event')

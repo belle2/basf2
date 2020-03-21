@@ -95,8 +95,6 @@ class PackerUnpackerTest(basf2.Module):
             assert digit.inRPC() == digit_unpacked.inRPC()
             assert digit.getCTime() == digit_unpacked.getCTime()
             assert digit.getCharge() == digit_unpacked.getCharge()
-            assert digit.isAboveThreshold() == digit_unpacked.isAboveThreshold()
-            # assert digit.getModuleID() == digit_unpacked.getModuleID()
             # assert digit.getTime() == digit_unpacked.getTime()
             # assert digit.getNPixel() == digit_unpacked.getNPixel()
             # assert digit.getEnergyDeposit() == digit_unpacked.getEnergyDeposit()

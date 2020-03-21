@@ -103,11 +103,11 @@ void KLMTriggerModule::fillHits()
   int nEntries = klmDigits.getEntries();
   for (int i = 0; i < nEntries; ++i) {
     const KLMDigit* bklmDigit_i = klmDigits[i];
-    if (bklmDigit_i->getSection() != KLMElementNumbers::c_BKLM)
+    if (bklmDigit_i->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
     for (int j = i + 1; j < nEntries; ++j) {
       const KLMDigit* bklmDigit_j = klmDigits[j];
-      if (bklmDigit_j->getSection() != KLMElementNumbers::c_BKLM)
+      if (bklmDigit_j->getSubdetector() != KLMElementNumbers::c_BKLM)
         continue;
 
       if (bklmDigit_i->getSection() == bklmDigit_j->getSection() &&

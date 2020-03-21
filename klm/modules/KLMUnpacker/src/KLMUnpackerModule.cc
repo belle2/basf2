@@ -253,6 +253,9 @@ void KLMUnpackerModule::unpackBKLMDigit(
     if (!recordDebugHit)
       return;
   } else {
+    m_ElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     if (m_DebugElectronicsMap) {
       if (m_DAQChannelBKLMScintillators) {
         if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)

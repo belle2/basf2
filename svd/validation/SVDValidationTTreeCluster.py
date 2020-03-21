@@ -49,8 +49,6 @@ gROOT.ProcessLine('struct EventDataCluster {\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
     float truehit_time;\
-    int truehit_recodigit_number;\
-    int truehit_cluster_number;\
 };')
 
 
@@ -109,20 +107,13 @@ class SVDValidationTTreeCluster(Module):
                 #
                 self.data.strip_dir = -1
                 self.data.cluster_truehits_number = cluster_TrueHit_Length
-                self.data.truehit_recodigit_number = -1
-                # set rest vars as -1
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
             else:
                 # We want only clusters with exactly one associated TrueHit
                 for truehit in cluster_truehits:
-                    recoDigit_TrueHit = truehit.getRelationsFrom('SVDRecoDigits')  # SVDRecoDigitsToSVDTrueHits
                     self.data.cluster_truehits_number = cluster_TrueHit_Length
-                    self.data.truehit_recodigit_number = len(recoDigit_TrueHit)
-                    # number of clusters related to a TrueHit
-                    truehit_cluster_number = truehit.getRelationsFrom('SVDClusters')
-                    self.data.truehit_cluster_number = len(truehit_cluster_number)
                     sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
                     # Sensor identification
                     sensorID = cluster.getSensorID()

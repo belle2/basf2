@@ -13,12 +13,11 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
@@ -90,11 +89,11 @@ namespace Belle2 {
     /* EKLM methods. */
 
     /**
-     * Get 2d hit time corresponding to EKLMDigit.
-     * @param[in] d    EKLMDigit.
+     * Get 2d hit time corresponding to EKLM digit.
+     * @param[in] d    EKLM Digit.
      * @param[in] dist Distance from 2d hit to SiPM.
      */
-    double getTime(EKLMDigit* d, double dist);
+    double getTime(KLMDigit* d, double dist);
 
     /**
      * Check whether hit has too small time.
@@ -103,12 +102,15 @@ namespace Belle2 {
      */
     bool fastHit(HepGeom::Point3D<double>& pos, double time);
 
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
+
     /* BKLM parameters. */
 
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
 
-    /** Half-width time coincidence window between adjacent BKLMDigits or orthogonal BKLMHit1ds (ns). */
+    /** Half-width time coincidence window between adjacent KLMDigits or orthogonal BKLMHit1ds (ns). */
     double m_bklmCoincidenceWindow;
 
     /** Nominal time of prompt BKLMHit2ds (ns). */
@@ -128,9 +130,6 @@ namespace Belle2 {
 
     /** BKLM time window. */
     DBObjPtr<BKLMTimeWindow> m_bklmTiming;
-
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_bklmHit1ds;
@@ -166,9 +165,6 @@ namespace Belle2 {
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_eklmDefaultTimeCalibrationData;
-
-    /** Digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;

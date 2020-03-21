@@ -179,6 +179,22 @@ namespace Belle2 {
     }
 
     /**
+     * Determine whether the hit is in RPC or scintillator.
+     * @return Whether hit is in RPC (true) or scintillator (false).
+     */
+    bool inRPC() const
+    {
+      return (m_Subdetector == KLMElementNumbers::c_BKLM &&
+              m_Layer >= BKLMElementNumbers::c_FirstRPCLayer);
+    }
+
+    /**
+     * Whether BKLM digit is in phi or z plane.
+     * @return True if the digit is in phi plane, false otherwise.
+     */
+    bool isPhiReadout() const;
+
+    /**
      * Get charge.
      * @return Charge.
      */

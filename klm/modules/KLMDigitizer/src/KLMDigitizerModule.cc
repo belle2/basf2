@@ -58,14 +58,12 @@ void KLMDigitizerModule::initialize()
 {
   m_bklmSimHits.isRequired();
   m_eklmSimHits.isRequired();
-  m_bklmDigits.registerInDataStore();
-  m_bklmDigits.registerRelationTo(m_bklmSimHits);
-  m_eklmDigits.registerInDataStore();
-  m_eklmDigits.registerRelationTo(m_eklmSimHits);
+  m_Digits.registerInDataStore();
+  m_Digits.registerRelationTo(m_bklmSimHits);
+  m_Digits.registerRelationTo(m_eklmSimHits);
   if (m_SaveFPGAFit) {
     m_FPGAFits.registerInDataStore();
-    m_bklmDigits.registerRelationTo(m_FPGAFits);
-    m_eklmDigits.registerRelationTo(m_FPGAFits);
+    m_Digits.registerRelationTo(m_FPGAFits);
   }
   m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
@@ -168,13 +166,13 @@ void KLMDigitizerModule::digitizeBKLM()
     if (rpc) {
       int strip = BKLMElementNumbers::getStripByModule(
                     m_ElementNumbers->localChannelNumberBKLM(it->first));
-      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit, strip);
+      KLMDigit* bklmDigit = m_Digits.appendNew(simHit, strip);
       bklmDigit->addRelationTo(simHit);
     } else {
       simulator.simulate(it, ub);
       if (simulator.getGeneratedNPE() == 0)
         continue;
-      BKLMDigit* bklmDigit = m_bklmDigits.appendNew(simHit);
+      KLMDigit* bklmDigit = m_Digits.appendNew(simHit);
       bklmDigit->addRelationTo(simHit);
       bklmDigit->setSiPMMCTime(simulator.getMCTime());
       bklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
@@ -228,7 +226,7 @@ void KLMDigitizerModule::digitizeEKLM()
     simulator.simulate(it, ub);
     if (simulator.getGeneratedNPE() == 0)
       continue;
-    EKLMDigit* eklmDigit = m_eklmDigits.appendNew(simHit);
+    KLMDigit* eklmDigit = m_Digits.appendNew(simHit);
     eklmDigit->addRelationTo(simHit);
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
     eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());

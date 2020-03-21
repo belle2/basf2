@@ -2,6 +2,9 @@
 /* Own header. */
 #include <klm/dataobjects/KLMDigit.h>
 
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 KLMDigit::KLMDigit() :
@@ -111,3 +114,9 @@ DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)
   return DigitBase::c_DontAppend;
 }
 
+bool KLMDigit::isPhiReadout() const
+{
+  if (m_Subdetector != KLMElementNumbers::c_BKLM)
+    B2FATAL("Function isPhiReadout() is called for EKLM digit.");
+  return m_Plane == BKLMElementNumbers::c_PhiPlane;
+}

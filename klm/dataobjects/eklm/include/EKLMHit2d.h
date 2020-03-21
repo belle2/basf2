@@ -11,10 +11,10 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/EKLMHitBase.h>
 #include <klm/dataobjects/eklm/EKLMHitGlobalCoord.h>
 #include <klm/dataobjects/eklm/EKLMHitMCTime.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -36,9 +36,9 @@ namespace Belle2 {
 
     /**
      * Constructor with two strips.
-     * @param[in] s1 One of EKLMDigits.
+     * @param[in] s1 One of KLMDigits.
      */
-    explicit EKLMHit2d(EKLMDigit* s1);
+    explicit EKLMHit2d(KLMDigit* s1);
 
     /**
      * Destructor.

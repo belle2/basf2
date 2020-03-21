@@ -19,7 +19,7 @@ EKLMHit2d::EKLMHit2d()
 }
 
 
-EKLMHit2d::EKLMHit2d(EKLMDigit* s1)
+EKLMHit2d::EKLMHit2d(KLMDigit* s1)
 {
   setSection(s1->getSection());
   setLayer(s1->getLayer());

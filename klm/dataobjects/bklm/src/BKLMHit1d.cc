@@ -32,32 +32,32 @@ BKLMHit1d::BKLMHit1d() :
 {
 }
 
-// Constructor with a cluster of contiguous parallel BKLMDigits
-BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
+// Constructor with a cluster of contiguous parallel KLMDigits
+BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
   RelationsObject()
 {
   m_Time = 0.0;
   m_EnergyDeposit = 0.0;
   m_ModuleID = 0;
   if (digits.size() == 0) {
-    B2WARNING("Attempt to create a BKLMHit1d with no BKLMDigits");
+    B2WARNING("Attempt to create a BKLMHit1d with no KLMDigits");
     return;
   }
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
-  const BKLMDigit* bklmDigit = digits.front();
+  const KLMDigit* bklmDigit = digits.front();
   BKLMElementNumbers::setSectionInModule(m_ModuleID, bklmDigit->getSection());
   BKLMElementNumbers::setSectorInModule(m_ModuleID, bklmDigit->getSector());
   BKLMElementNumbers::setLayerInModule(m_ModuleID, bklmDigit->getLayer());
   BKLMElementNumbers::setPlaneInModule(m_ModuleID, bklmDigit->getPlane());
   BKLMElementNumbers::setStripInModule(m_ModuleID, bklmDigit->getStrip());
-  for (std::vector<const BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    const BKLMDigit* digit = *iDigit;
+  for (std::vector<const KLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
+    const KLMDigit* digit = *iDigit;
     if (!(bklmDigit->getSection() == digit->getSection() &&
           bklmDigit->getSector() == digit->getSector() &&
           bklmDigit->getLayer() == digit->getLayer() &&
           bklmDigit->getPlane() == digit->getPlane())) {
-      B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
+      B2WARNING("Attempt to combine non-parallel or distinct-module KLMDigits");
       continue;
     }
     m_Time += digit->getTime();

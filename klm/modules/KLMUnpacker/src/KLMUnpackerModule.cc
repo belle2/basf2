@@ -30,13 +30,10 @@ REG_MODULE(KLMUnpacker)
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_triggerCTimeOfPreviousEvent(0)
 {
-  setDescription("KLM unpacker (creates BKLMDigits and EKLMDigits "
-                 "from RawKLM).");
+  setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("outputBKLMDigitsName", m_outputBKLMDigitsName,
-           "Name of BKLMDigit store array.", string(""));
-  addParam("outputEKLMDigitsName", m_outputEKLMDigitsName,
-           "Name of EKLMDigit store array.", string(""));
+  addParam("outputKLMDigitsName", m_outputKLMDigitsName,
+           "Name of KLMDigit store array.", string(""));
   addParam("WriteDigitRaws", m_WriteDigitRaws,
            "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
@@ -73,20 +70,17 @@ void KLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
   /* Digits. */
-  m_bklmDigits.registerInDataStore(m_outputBKLMDigitsName);
+  m_Digits.registerInDataStore(m_outputKLMDigitsName);
   m_bklmDigitsOutOfRange.registerInDataStore("BKLMDigitsOutOfRange");
-  m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
   /* Event information. */
   m_DigitEventInfos.registerInDataStore();
-  m_bklmDigits.registerRelationTo(m_DigitEventInfos);
+  m_Digits.registerRelationTo(m_DigitEventInfos);
   m_bklmDigitsOutOfRange.registerRelationTo(m_DigitEventInfos);
-  m_eklmDigits.registerRelationTo(m_DigitEventInfos);
   /* Raw data in dataobject format. */
   if (m_WriteDigitRaws) {
     m_klmDigitRaws.registerInDataStore();
-    m_bklmDigits.registerRelationTo(m_klmDigitRaws);
+    m_Digits.registerRelationTo(m_klmDigitRaws);
     m_bklmDigitsOutOfRange.registerRelationTo(m_klmDigitRaws);
-    m_eklmDigits.registerRelationTo(m_klmDigitRaws);
   }
 }
 
@@ -145,7 +139,7 @@ void KLMUnpackerModule::unpackEKLMDigit(
       *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
       &strip);
   }
-  EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
+  KLMDigit* eklmDigit = m_Digits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
     eklmDigit->addRelationTo(klmDigitRaw);
@@ -213,7 +207,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
       klmDigitEventInfo->increaseOutOfRangeHits();
 
       // store the digit in the appropriate dataobject
-      BKLMDigit* bklmDigitOutOfRange =
+      KLMDigit* bklmDigitOutOfRange =
         m_bklmDigitsOutOfRange.appendNew();
       bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
       if (m_WriteDigitRaws)
@@ -277,7 +271,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     return;
   }
 
-  BKLMDigit* bklmDigit;
+  KLMDigit* bklmDigit;
   if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
     klmDigitEventInfo->increaseRPCHits();
     // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
@@ -286,12 +280,12 @@ void KLMUnpackerModule::unpackBKLMDigit(
     // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
     std::pair<int, double> rpcTimes = m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
-    bklmDigit = m_bklmDigits.appendNew();
+    bklmDigit = m_Digits.appendNew();
     bklmDigit->setTime(rpcTimes.second);
   } else {
     klmDigitEventInfo->increaseSciHits();
     // For scintillator hits, store the ctime relative to the event header's trigger ctime
-    bklmDigit = m_bklmDigits.appendNew();
+    bklmDigit = m_Digits.appendNew();
     bklmDigit->setTime(
       m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
     if (raw.charge < m_scintThreshold)

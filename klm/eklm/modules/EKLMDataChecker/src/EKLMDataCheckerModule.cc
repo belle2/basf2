@@ -47,7 +47,9 @@ void EKLMDataCheckerModule::event()
   StripData data;
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    EKLMDigit* eklmDigit = m_Digits[i];
+    KLMDigit* eklmDigit = m_Digits[i];
+    if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     strip = m_GeoDat->stripNumber(
               eklmDigit->getSection(), eklmDigit->getLayer(),
               eklmDigit->getSector(), eklmDigit->getPlane(),

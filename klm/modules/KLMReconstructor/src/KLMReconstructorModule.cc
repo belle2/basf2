@@ -28,7 +28,7 @@ using namespace Belle2::bklm;
 
 REG_MODULE(KLMReconstructor)
 
-static bool compareSector(EKLMDigit* d1, EKLMDigit* d2)
+static bool compareSector(KLMDigit* d1, KLMDigit* d2)
 {
   int s1, s2;
   static const EKLM::ElementNumbersSingleton& elementNumbers =
@@ -40,22 +40,22 @@ static bool compareSector(EKLMDigit* d1, EKLMDigit* d2)
   return s1 < s2;
 }
 
-static bool comparePlane(EKLMDigit* d1, EKLMDigit* d2)
+static bool comparePlane(KLMDigit* d1, KLMDigit* d2)
 {
   return d1->getPlane() < d2->getPlane();
 }
 
-static bool compareStrip(EKLMDigit* d1, EKLMDigit* d2)
+static bool compareStrip(KLMDigit* d1, KLMDigit* d2)
 {
   return d1->getStrip() < d2->getStrip();
 }
 
-static bool compareTime(EKLMDigit* d1, EKLMDigit* d2)
+static bool compareTime(KLMDigit* d1, KLMDigit* d2)
 {
   return d1->getTime() < d2->getTime();
 }
 
-static bool sameSector(EKLMDigit* d1, EKLMDigit* d2)
+static bool sameSector(KLMDigit* d1, KLMDigit* d2)
 {
   return ((d1->getSection() == d2->getSection()) &&
           (d1->getLayer() == d2->getLayer()) &&
@@ -70,11 +70,11 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_eklmTransformData(nullptr),
   m_eklmTimeCalibrationData(nullptr)
 {
-  setDescription("Create BKLMHit1ds from BKLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from EKLMDigits.");
+  setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
   addParam("CoincidenceWindow", m_bklmCoincidenceWindow,
-           "Half-width time coincidence window between adjacent BKLMDigits or orthogonal BKLMHit1ds (ns).",
+           "Half-width time coincidence window between adjacent KLMDigits or orthogonal BKLMHit1ds (ns).",
            double(50.0));
   // MC 1 GeV/c muons: mean prompt time is 0.43 ns
   addParam("PromptTime", m_bklmPromptTime,
@@ -107,18 +107,17 @@ KLMReconstructorModule::~KLMReconstructorModule()
 
 void KLMReconstructorModule::initialize()
 {
+  m_Digits.isRequired();
   /* BKLM. */
-  m_bklmDigits.isRequired();
   m_bklmHit1ds.registerInDataStore();
   m_bklmHit2ds.registerInDataStore();
-  m_bklmHit1ds.registerRelationTo(m_bklmDigits);
+  m_bklmHit1ds.registerRelationTo(m_Digits);
   m_bklmHit2ds.registerRelationTo(m_bklmHit1ds);
   m_bklmGeoPar = bklm::GeometryPar::instance();
   /* EKLM. */
-  m_eklmDigits.isRequired();
   m_eklmHit2ds.registerInDataStore();
   m_eklmAlignmentHits.registerInDataStore();
-  m_eklmHit2ds.registerRelationTo(m_eklmDigits);
+  m_eklmHit2ds.registerRelationTo(m_Digits);
   m_eklmAlignmentHits.registerRelationTo(m_eklmHit2ds);
   m_eklmTransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
@@ -169,11 +168,13 @@ void KLMReconstructorModule::event()
 
 void KLMReconstructorModule::reconstructBKLMHits()
 {
-  /* Construct BKLMHit1Ds from BKLMDigits. */
-  /* Sort BKLMDigits by module and strip number. */
+  /* Construct BKLMHit1Ds from KLMDigits. */
+  /* Sort KLMDigits by module and strip number. */
   std::map<uint16_t, int> channelDigitMap;
-  for (int index = 0; index < m_bklmDigits.getEntries(); ++index) {
-    const BKLMDigit* digit = m_bklmDigits[index];
+  for (int index = 0; index < m_Digits.getEntries(); ++index) {
+    const KLMDigit* digit = m_Digits[index];
+    if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
     if (digit->inRPC() || digit->isGood()) {
@@ -186,14 +187,14 @@ void KLMReconstructorModule::reconstructBKLMHits()
   }
   if (channelDigitMap.empty())
     return;
-  std::vector<const BKLMDigit*> digitCluster;
+  std::vector<const KLMDigit*> digitCluster;
   uint16_t previousChannel = channelDigitMap.begin()->first;
-  double averageTime = m_bklmDigits[channelDigitMap.begin()->second]->getTime();
+  double averageTime = m_Digits[channelDigitMap.begin()->second]->getTime();
   for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
-    const BKLMDigit* digit = m_bklmDigits[it->second];
+    const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
     if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_bklmCoincidenceWindow)) {
-      m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
+      m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
       digitCluster.clear();
     }
     previousChannel = it->first;
@@ -201,7 +202,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
     averageTime = (n * averageTime + digitTime) / (n + 1.0);
     digitCluster.push_back(digit);
   }
-  m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> BKLMDigit
+  m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
 
   /* Construct BKLMHit2Ds from orthogonal same-module BKLMHit1Ds. */
   for (int i = 0; i < m_bklmHit1ds.getEntries(); ++i) {
@@ -242,7 +243,7 @@ bool KLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
          2.0 * m_eklmRecPar->getTimeResolution();
 }
 
-double KLMReconstructorModule::getTime(EKLMDigit* d, double dist)
+double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
 {
   int strip;
   strip = m_eklmGeoDat->stripNumber(d->getSection(), d->getLayer(), d->getSector(),
@@ -261,12 +262,14 @@ void KLMReconstructorModule::reconstructEKLMHits()
 {
   int i, n;
   double d1, d2, t, t1, t2, sd;
-  std::vector<EKLMDigit*> digitVector;
-  std::vector<EKLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
-  n = m_eklmDigits.getEntries();
+  std::vector<KLMDigit*> digitVector;
+  std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
+  n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    if (m_eklmDigits[i]->isGood())
-      digitVector.push_back(m_eklmDigits[i]);
+    if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
+    if (m_Digits[i]->isGood())
+      digitVector.push_back(m_Digits[i]);
   }
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);

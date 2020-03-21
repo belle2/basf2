@@ -11,9 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -32,8 +32,8 @@ namespace Belle2 {
     BKLMHit1d();
 
     //! Constructor with initial values
-    //! @param digits vector of contiguous BKLMDigits
-    explicit BKLMHit1d(const std::vector<const BKLMDigit*>& digits);
+    //! @param digits vector of contiguous KLMDigits
+    explicit BKLMHit1d(const std::vector<const KLMDigit*>& digits);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);

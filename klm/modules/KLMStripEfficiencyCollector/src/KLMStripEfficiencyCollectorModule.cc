@@ -29,7 +29,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   m_MatchingTree(nullptr),
   m_MatchedStrip(0)
 {
-  setDescription("Module for EKLM strips efficiency (data collection).");
+  setDescription("Module for KLM strip efficiency data collection.");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,

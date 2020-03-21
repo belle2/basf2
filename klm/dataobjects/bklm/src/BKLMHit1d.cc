@@ -46,6 +46,8 @@ BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
   const KLMDigit* bklmDigit = digits.front();
+  if (bklmDigit->getSubdetector() != KLMElementNumbers::c_BKLM)
+    B2FATAL("Trying to construct a BKLMHit1d using KLMDigits from EKLM.");
   BKLMElementNumbers::setSectionInModule(m_ModuleID, bklmDigit->getSection());
   BKLMElementNumbers::setSectorInModule(m_ModuleID, bklmDigit->getSector());
   BKLMElementNumbers::setLayerInModule(m_ModuleID, bklmDigit->getLayer());

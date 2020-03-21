@@ -59,6 +59,13 @@ granulesLayersTypes = ((cut_L3+cut_b, 'L3_barrel'),
                        (cut_L6+cut_b, 'L6_barrel'),
                        (cut_L6+cut_s, 'L6_slanted'))
 
+# granularity for time differences between neighbour layers
+granulesTD = ((cut_L3, 'L3-L4'),
+              (cut_L4, 'L4-L5'),
+              (cut_L5, 'L5-L6'))
+
+granulesL3 = ((cut_L3, 'L3'),)
+
 
 def ploter(name, title, nbins, xmin, xmax, x_label, y_label,
            granules,

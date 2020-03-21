@@ -320,19 +320,35 @@ plotRegions(
     check='Should be close to 1 in all bins',
     isShifter=True)
 
-# comment for above plot. It shows multiplicity of truehit related to one cluster
+
 ploter(
-    name='cluster_truehits_number',
-    title='cluster_truehits_number',
+    name='cluster_truehits_number_U',
+    title='cluster_truehits_number for U side',
     nbins=10,
     xmin=0,
     xmax=10,
-    x_label='clusters_length',
+    x_label='number of truehit for one clusters',
     y_label='counts',
     granules=granulesLayersTypes,
     tree=tree3,
     expr='cluster_truehits_number',
-    cut='',
-    descr='Number of TrueHits related to one cluster. Signal cluster is associated to one TrueHit.',
-    check='...',
-    isShifter=True)
+    cut=cut_noV,
+    descr='Multiplicity of TrueHits related to one cluster.',
+    check='Signal cluster is associated to one TrueHit.',
+    isShifter=False)
+
+ploter(
+    name='cluster_truehits_number_V',
+    title='cluster_truehits_number for V side',
+    nbins=10,
+    xmin=0,
+    xmax=10,
+    x_label='number of truehit for one clusters',
+    y_label='counts',
+    granules=granulesLayersTypes,
+    tree=tree3,
+    expr='cluster_truehits_number',
+    cut=cut_noU,
+    descr='Multiplicity of TrueHits related to one cluster.',
+    check='Signal cluster is associated to one TrueHit.',
+    isShifter=False)

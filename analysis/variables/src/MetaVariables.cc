@@ -2611,7 +2611,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
                       "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "Returns number of particles in the given particle List.");
+                      "[Eventbased] Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
                       "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,

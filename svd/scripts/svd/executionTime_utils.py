@@ -62,7 +62,7 @@ class SVDExtraEventStatisticsModule(PerEventStatisticsGetterModule):
         self.svd_ZS5strips = np.zeros(1, dtype=np.int32)
 
         #: branch address assignment for SVDSpacePoints
-        self.statistics.Branch('svdSPs', self.svd_clusters[0:], "svdSPs/I")
+        self.statistics.Branch('svdSPs', self.svd_sps[0:], "svdSPs/I")
         #: branch address assignment for SVDClusters
         self.statistics.Branch('svdClusters', self.svd_clusters[0:], "svdClusters/I")
         #: branch address assignment for SVDShaperDigits

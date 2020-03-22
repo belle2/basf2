@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This module defines wrapper functions around the analysis modules. An overview can
-be found at https://confluence.desy.de/display/BI/Physics+AnalysisSteering
+This module defines wrapper functions around the analysis modules.
 """
 
 from basf2 import register_module, create_path
@@ -426,26 +425,6 @@ def copyList(outputListName, inputListName, writeOut=False, path=None):
     """
 
     copyLists(outputListName, [inputListName], writeOut, path)
-
-
-def correctFSR(outputListName,
-               inputListName,
-               gammaListName,
-               angleThreshold=5.0,
-               energyThreshold=1.0,
-               writeOut=False,
-               path=None):
-    """
-    WARNING:
-      The :b2:mod:`FSRCorrection` module is now deprecated.
-      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
-      The latter resembles the previous principle of FSRCorrection but does no
-      longer contain the faulty first-come, first-served approach. For Belle II
-      data it is recommended to use correctBrems(), which should perform better.
-    """
-
-    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
-              "When analysing Belle II data, it is recommended to use correctBrems().")
 
 
 def correctBremsBelle(outputListName,
@@ -1745,7 +1724,8 @@ def looseMCTruth(list_name, path):
 
 
 def buildRestOfEvent(target_list_name, inputParticlelists=[],
-                     belle_sources=False, fillWithMostLikely=False, path=None):
+                     belle_sources=False, fillWithMostLikely=False,
+                     chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1758,13 +1738,17 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
                               according to PID likelihood and the inputParticlelists
                               option will be ignored.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+                              amount of certain charged particle species, should be a list of
+                              six floats if not None. The order of particle types is
+                              the following: [e-, mu-, pi-, K-, p+, d+]
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
     fillParticleList('pi+:roe_default', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
+        stdMostLikely(chargedPIDPriors, path=path)
         inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
@@ -1782,12 +1766,43 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
 def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name      name of the input ParticleList
+    @param mask_name             name of the ROEMask to be used
+    @param path                  modules are added to this path
     """
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('NestedROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('nestedROEMask', maskName)
     roeBuilder.param('createNestedROE', True)
+    path.add_module(roeBuilder)
+
+
+def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
+    """
+    Creates for each Particle in the given ParticleList a RestOfEvent
+    @param target_list_name   name of the input ParticleList
+    @param inputParticlelists list of input particle list names, which serve
+                              as a source of particles to build ROE, the FSP particles from
+                              target_list_name are excluded from ROE object
+    @param path               modules are added to this path
+    """
+    if (len(inputParticlelists) == 0):
+        # Type of particles to use for ROEBuilder
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+', 'K_L0',
+                 'n0', 'nu_e', 'nu_mu', 'nu_tau',
+                 'K_S0', 'Lambda0']
+        for t in types:
+            fillParticleListFromMC("%s:roe_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
+            inputParticlelists += ["%s:roe_default_gen" % t]
+    roeBuilder = register_module('RestOfEventBuilder')
+    roeBuilder.set_name('MCROEBuilder_' + target_list_name)
+    roeBuilder.param('particleList', target_list_name)
+    roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('fromMC', True)
     path.add_module(roeBuilder)
 
 
@@ -2108,27 +2123,6 @@ def markDuplicate(particleList, prioritiseV0, path):
     path.add_module(markdup)
 
 
-def V0ListMerger(firstList, secondList, prioritiseV0, path):
-    """
-    Merge two particle lists, vertex them and trim duplicates
-
-    @param firstList first particle list to merge
-    @param secondList second particle list to merge
-    @param prioritiseV0 if true, give V0s a higher priority
-    """
-
-    from vertex import vertexKFit
-    listName = firstList.split(':')[0]
-    if (listName == secondList.split(':')[0]):
-        outList = listName + ':merged'
-        copyLists(outList, [firstList, secondList], False, path)
-        KFit(outList, 0.0, path=path)
-        markDuplicate(outList, prioritiseV0, path)
-        applyCuts(outList, 'extraInfo(highQualityVertex)', path)
-    else:
-        B2ERROR("Lists to be merged contain different particles")
-
-
 PI0ETAVETO_COUNTER = 0
 
 
@@ -2438,7 +2432,7 @@ def writePi0EtaVeto(
 
 
 def buildEventKinematics(inputListNames=[], default_cleanup=True,
-                         fillWithMostLikely=False, path=None):
+                         chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using ParticleLists provided. If no ParticleList is provided, default ParticleLists are used
@@ -2449,35 +2443,44 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
     @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
                               If the list is empty, default ParticleLists pi+:evtkin and gamma:evtkin are filled.
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the options inputListNames and default_cleanup
-                              will be ignored.
-    @param default_cleanup    if True, apply default clean up cuts to default
-                              ParticleLists pi+:evtkin and gamma:evtkin.
+    @param fillWithMostLikely if True, the module uses the most likely particle mass hypothesis for charged particles
+                              according to the PID likelihood and the option inputListNames will be ignored.
+    @param chargedPIDPriors   The prior PID fractions, that are used to regulate
+                              amount of certain charged particle species, should be a list of
+                              six floats if not None. The order of particle types is
+                              the following: [e-, mu-, pi-, K-, p+, d+]
+    @param default_cleanup    if True and either inputListNames empty or fillWithMostLikely True, default clean up cuts are applied
     @param path               modules are added to this path
     """
+    trackCuts = 'pt > 0.1'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3'
+    trackCuts += ' and dr < 0.5'
+
+    gammaCuts = 'E > 0.05'
+    gammaCuts += ' and thetaInCDCAcceptance'
+
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
+        stdMostLikely(chargedPIDPriors, path=path)
         inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
+        if default_cleanup:
+            B2INFO("Using default cleanup in EventKinematics module.")
+            for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']:
+                applyCuts(f'{ptype}:mostlikely', trackCuts, path=path)
+            applyCuts('gamma:evtkin', gammaCuts, path=path)
+        else:
+            B2INFO("No cleanup in EventKinematics module.")
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtkin and gamma:evtkin to get the global kinematics of the event.")
         fillParticleList('pi+:evtkin', '', path=path)
         fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
-
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
-            trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
             applyCuts('pi+:evtkin', trackCuts, path=path)
-
-            gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")
@@ -2492,7 +2495,6 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
-                    fillWithMostLikely=False,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2531,9 +2533,6 @@ def buildEventShape(inputListNames=[],
     @param inputListNames     List of ParticleLists used to calculate the
                               event shape variables. If the list is empty the default
                               particleLists pi+:evtshape and gamma:evtshape are filled.
-    @param fillWithMostLikely if True, the module uses particle mass hypothesis for charged particles
-                              according to PID likelihood and the options inputListNames
-                              and default_cleanup will be ignored.
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
@@ -2556,13 +2555,6 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
-    if fillWithMostLikely:
-        from stdCharged import stdMostLikely
-        stdMostLikely(path=path)
-        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
-        fillParticleList('gamma:evtshape', '', path=path)
-        inputListNames += ['gamma:evtshape']
-
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
@@ -2572,13 +2564,13 @@ def buildEventShape(inputListNames=[],
         if default_cleanup:
             B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
+            trackCuts += ' and thetaInCDCAcceptance'
+            trackCuts += ' and abs(dz) < 3.0'
+            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")
@@ -2720,10 +2712,33 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     plSet = set(particleLists)
 
+    # Map the training mode enum value to the actual name of the payload in the GT.
+    payloadNames = {
+        Belle2.ChargedPidMVAWeights.c_Classification: {"mode": "Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_Multiclass: {"mode": "Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_Classification: {"mode": "ECL_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: {"mode": "ECL_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_PSD_Classification: {"mode": "PSD_Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: {"mode": "PSD_Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: {"mode": "ECL_PSD_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
+    }
+
+    if payloadNames.get(trainingMode) is None:
+        B2FATAL("The chosen training mode integer identifier:\n", trainingMode,
+                "\nis not supported. Please choose among the following:\n",
+                "\n".join(f"{key}:{val.get('mode')}" for key, val in sorted(payloadNames.items())))
+
+    mode = payloadNames.get(trainingMode).get("mode")
+    detector = payloadNames.get(trainingMode).get("detector")
+
+    payloadName = f"ChargedPidMVAWeights_{mode}"
+
     if binaryHypoPDGCodes == (0, 0):
         # MULTI-CLASS training mode.
 
         chargedpid = register_module("ChargedPidMVAMulticlass")
+        chargedpid.set_name(f"ChargedPidMVAMulticlass_{mode}")
 
     else:
         # BINARY training mode.
@@ -2744,31 +2759,17 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
                     "\n".join(f"{opt[0]} vs. {opt[1]}" for opt in binaryOpts))
 
         chargedpid = register_module("ChargedPidMVA")
-        chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}")
+        chargedpid.set_name(f"ChargedPidMVA_{binaryHypoPDGCodes[0]}_vs_{binaryHypoPDGCodes[1]}_{mode}")
         chargedpid.param("sigHypoPDGCode", binaryHypoPDGCodes[0])
         chargedpid.param("bkgHypoPDGCode", binaryHypoPDGCodes[1])
 
     chargedpid.param("particleLists", list(plSet))
 
-    # Map the training mode enum value to the actual name of the payload in the GT.
-    payloadNames = {
-        Belle2.ChargedPidMVAWeights.c_Classification: "Classification",
-        Belle2.ChargedPidMVAWeights.c_Multiclass: "Multiclass",
-        Belle2.ChargedPidMVAWeights.c_ECL_Classification: "ECL_Classification",
-        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: "ECL_Multiclass",
-        Belle2.ChargedPidMVAWeights.c_PSD_Classification: "PSD_Classification",
-        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: "PSD_Multiclass",
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: "ECL_PSD_Classification",
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: "ECL_PSD_Multiclass"
-    }
-
-    if payloadNames.get(trainingMode) is None:
-        B2FATAL("The chosen training mode integer identifier:\n", trainingMode,
-                "\nis not supported. Please choose among the following:\n",
-                "\n".join(f"{key}:{val}" for key, val in sorted(payloadNames.items())))
-
-    payloadName = f"ChargedPidMVAWeights_{payloadNames.get(trainingMode)}"
     chargedpid.param("payloadName", payloadName)
+
+    # Ensure the module knows whether we are using ECL-only training mode.
+    if detector == "ECL":
+        chargedpid.param("useECLOnlyTraining", True)
 
     path.add_module(chargedpid)
 

@@ -33,7 +33,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <limits>
 
@@ -58,8 +57,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useRestFrame");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function useRestFrame");
       }
     }
 
@@ -74,8 +72,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useCMSFrame");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function useCMSFrame");
       }
     }
 
@@ -90,8 +87,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useLabFrame");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function useLabFrame");
       }
     }
 
@@ -103,9 +99,8 @@ namespace Belle2 {
         int daughterIndexTagB = 0;
         try {
           daughterIndexTagB = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("Second argument of useTagSideRecoilRestFrame meta function must be integer!");
         }
 
         auto func = [var, daughterIndexTagB](const Particle * particle) -> double {
@@ -126,8 +121,7 @@ namespace Belle2 {
 
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function useTagSideRecoilRestFrame");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function useTagSideRecoilRestFrame");
       }
     }
 
@@ -152,8 +146,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function extraInfo");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function extraInfo");
       }
     }
 
@@ -172,8 +165,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function extraInfo");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function extraInfo");
       }
     }
 
@@ -198,8 +190,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function eventCached");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function eventCached");
       }
     }
 
@@ -228,8 +219,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function particleCached");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function particleCached");
       }
     }
 
@@ -357,9 +347,8 @@ namespace Belle2 {
         int pdgCode = 0;
         try {
           pdgCode = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The first argument of varFor meta function must be a positive integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The first argument of varFor meta function must be a positive integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [pdgCode, var](const Particle * particle) -> double {
@@ -476,6 +465,37 @@ namespace Belle2 {
         }
         return 0.0;
 
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr mcParticleIsInMCList(const std::vector<std::string>& arguments)
+    {
+      // unpack arguments, there should be only one: the name of the list we're checking
+      if (arguments.size() != 1) {
+        B2FATAL("Wrong number of arguments for mcParticleIsInMCList");
+      }
+      auto listName = arguments[0];
+
+      auto func = [listName](const Particle * particle) -> double {
+
+        // check the list exists
+        StoreObjPtr<ParticleList> list(listName);
+        if (!(list.isValid()))
+          B2FATAL("Invalid Listname " << listName << " given to mcParticleIsInMCList");
+
+        // this can only be true for mc-matched particles or particles are created from MCParticles
+        const MCParticle* mcp = particle->getMCParticle();
+        if (mcp == nullptr) return 0.0;
+
+        // check every particle in the input list is not matched to (or created from) the same MCParticle
+        for (unsigned i = 0; i < list->getListSize(); ++i)
+        {
+          const MCParticle* imcp = list->getParticle(i)->getMCParticle();
+          if ((imcp != nullptr) and (mcp->getArrayIndex() == imcp->getArrayIndex()))
+            return 1.0;
+        }
+        return 0.0;
       };
       return func;
     }
@@ -730,12 +750,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double min = -999;
+          double min = std::numeric_limits<double>::quiet_NaN();
           for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
-            if (iValue == -999) continue;
-            if (min == -999) min = iValue;
+            if (std::isnan(iValue)) continue;
+            if (std::isnan(min)) min = iValue;
             if (iValue < min) min = iValue;
           }
           return min;
@@ -751,11 +771,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double max = -999;
+          double max = std::numeric_limits<double>::quiet_NaN();
           for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
-            if (iValue == -999) continue;
+            if (std::isnan(iValue)) continue;
+            if (std::isnan(max)) max = iValue;
             if (iValue > max) max = iValue;
           }
           return max;
@@ -778,9 +799,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First two arguments of daughterDiffOf meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First two arguments of daughterDiffOf meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -811,9 +831,8 @@ namespace Belle2 {
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First four arguments of grandDaughterDiffOf meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First four arguments of grandDaughterDiffOf meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[4]);
         auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
@@ -846,9 +865,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of daughterDiffOfPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -889,9 +907,8 @@ namespace Belle2 {
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The four arguments of grandDaughterDiffOfPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The four arguments of grandDaughterDiffOfPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
         auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
@@ -934,9 +951,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -980,9 +996,8 @@ namespace Belle2 {
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
           agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
           bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The four arguments of grandDaughterDiffOfClusterPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The four arguments of grandDaughterDiffOfClusterPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("clusterPhi");
         auto func = [var, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
@@ -1028,9 +1043,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterDiffOfPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of daughterDiffOfPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -1070,9 +1084,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of daughterDiffOfClusterPhi meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(clusterPhi)");
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -1115,9 +1128,8 @@ namespace Belle2 {
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First two arguments of daughterDiffOf meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First two arguments of daughterDiffOf meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -1142,9 +1154,8 @@ namespace Belle2 {
         int daughterNumber = 0;
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
@@ -1168,9 +1179,8 @@ namespace Belle2 {
         int daughterNumber = 0;
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of daughterMotherDiffOf meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of daughterMotherDiffOf meta function must be integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
@@ -1230,9 +1240,8 @@ namespace Belle2 {
         std::vector<int> daughterIndices;
         try {
           for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The arguments of daughterClusterAngleInBetween meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The arguments of daughterClusterAngleInBetween meta function must be integers!");
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
@@ -1292,9 +1301,8 @@ namespace Belle2 {
         std::vector<int> daughterIndices;
         try {
           for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The arguments of daughterInvM meta function must be integers!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The arguments of daughterInvM meta function must be integers!");
         }
         auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
@@ -1325,9 +1333,8 @@ namespace Belle2 {
         int divideBy = 1;
         try {
           divideBy = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second argument of modulo  meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("Second argument of modulo meta function must be integer!");
         }
         auto func = [var, divideBy](const Particle * particle) -> double { return int(var->function(particle)) % divideBy; };
         return func;
@@ -1355,9 +1362,8 @@ namespace Belle2 {
         double defaultOutput;
         try {
           defaultOutput = Belle2::convertString<double>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The arguments of daughterInvM meta function must be a number!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The second argument of ifNANgiveX meta function must be a number!");
         }
         auto func = [var, defaultOutput](const Particle * particle) -> double {
           double output = var->function(particle);
@@ -1571,9 +1577,8 @@ namespace Belle2 {
         int daughterNumber = 0;
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of daughter meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of daughter meta function must be integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
@@ -1596,9 +1601,8 @@ namespace Belle2 {
         int daughterNumber = 0;
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of mcDaughter meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of mcDaughter meta function must be integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
         auto func = [var, daughterNumber](const Particle * particle) -> double {
@@ -1651,9 +1655,8 @@ namespace Belle2 {
         int particleNumber = 0;
         try {
           particleNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("First argument of genParticle meta function must be integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("First argument of genParticle meta function must be integer!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
 
@@ -1715,7 +1718,7 @@ namespace Belle2 {
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);
-        } catch (boost::bad_lexical_cast&)  {
+        } catch (std::invalid_argument&)  {
           B2ERROR("3rd argument of getVariableByRank meta function (Rank) must be an integer!");
           return nullptr;
         }
@@ -1784,9 +1787,8 @@ namespace Belle2 {
         } else {
           try {
             pdgCode = Belle2::convertString<int>(arguments[2]);;
-          } catch (boost::bad_lexical_cast&) {
-            B2WARNING("Third argument of veto meta function must be integer!");
-            return nullptr;
+          } catch (std::invalid_argument&) {
+            B2FATAL("Third argument of veto meta function must be integer!");
           }
         }
 
@@ -1896,8 +1898,8 @@ namespace Belle2 {
         int inputPDG = 0 ;
         try {
           inputPDG = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2ERROR("Argument must be an integer value.");
+        } catch (std::invalid_argument&) {
+          B2FATAL("Argument must be an integer value.");
         }
 
         auto func = [inputPDG](const Particle * particle) -> double{
@@ -2153,9 +2155,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         std::string listName = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        if (not var) {
-          B2FATAL("Could not find variable named " << arguments[1] << " given to averageValueInList");
-        }
+
         auto func = [listName, var](const Particle*) -> double {
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
@@ -2180,9 +2180,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         std::string listName = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        if (not var) {
-          B2FATAL("Could not find variable named " << arguments[1] << " given to medianValueInList");
-        }
+
         auto func = [listName, var](const Particle*) -> double {
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
@@ -2217,8 +2215,8 @@ namespace Belle2 {
       // expecting the list name
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments for meta function angleToClosestInList");
-      std::string listname = arguments[0];
 
+      std::string listname = arguments[0];
 
       auto func = [listname](const Particle * particle) -> double {
         // get the list and check it's valid
@@ -2253,12 +2251,11 @@ namespace Belle2 {
       // expecting the list name and a variable name
       if (arguments.size() != 2)
         B2FATAL("Wrong number of arguments for meta function closestInList");
+
       std::string listname = arguments[0];
 
       // the requested variable and check it exists
       const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-      if (not var)
-        B2FATAL("Invalid variable name " << arguments[1] << " given to closestInList");
 
       auto func = [listname, var](const Particle * particle) -> double {
         // get the list and check it's valid
@@ -2297,6 +2294,7 @@ namespace Belle2 {
       // expecting the list name
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments for meta function angleToMostB2BInList");
+
       std::string listname = arguments[0];
 
       auto func = [listname](const Particle * particle) -> double {
@@ -2333,12 +2331,11 @@ namespace Belle2 {
       // expecting the list name and a variable name
       if (arguments.size() != 2)
         B2FATAL("Wrong number of arguments for meta function mostB2BInList");
+
       std::string listname = arguments[0];
 
       // the requested variable and check it exists
       const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-      if (not var)
-        B2FATAL("Invalid variable name " << arguments[1] << " given to mostB2BInList");
 
       auto func = [listname, var](const Particle * particle) -> double {
         // get the list and check it's valid
@@ -2471,9 +2468,8 @@ namespace Belle2 {
           int dauIndex = 0;
           try {
             dauIndex = Belle2::convertString<int>(indexAndMass[0]);
-          } catch (boost::bad_lexical_cast&) {
-            B2WARNING("Found the string " << indexAndMass[0] << "instead of a daughter index.");
-            return nullptr;
+          } catch (std::invalid_argument&) {
+            B2FATAL("Found the string " << indexAndMass[0] << "instead of a daughter index.");
           }
 
           // Determine PDG code  corresponding to indexAndMass[1] using the particle names defined in evt.pdl
@@ -2543,6 +2539,52 @@ namespace Belle2 {
       else
         B2FATAL("Wrong number of arguments for meta function useAlternativeDaughterHypothesis");
     }
+
+
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int pdg_code = -1;
+        std::string arg = arguments[0];
+        std::string variable_of_interest = arguments[1];
+        TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+
+        if (part != nullptr) {
+          pdg_code = std::abs(part->PdgCode());
+        } else {
+          try {
+            pdg_code = Belle2::convertString<int>(arg);
+          } catch (std::exception& e) {}
+        }
+
+        if (pdg_code == -1) {
+          B2FATAL("Ancestor " + arg + " is not recognised. Please provide valid PDG code or particle name.");
+        }
+
+        auto func = [pdg_code, variable_of_interest](const Particle * particle) -> double {
+          const Particle* p = particle;
+
+          int ancestor_level = Manager::Instance().getVariable("hasAncestor(" + std::to_string(pdg_code) + ", 0)")->function(p);
+          if ((ancestor_level <= 0) or (std::isnan(ancestor_level)))
+          {
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+
+          const MCParticle* i_p = p->getMCParticle();
+
+          for (int a = 0; a < ancestor_level ; a = a + 1)
+          {
+            i_p = i_p->getMother();
+          }
+          const Particle* m_p = new Particle(i_p);
+          return Manager::Instance().getVariable(variable_of_interest)->function(m_p);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varForFirstMCAncestorOfType (expected 2: type and variable of interest)");
+      }
+    }
+
 
 
 
@@ -2642,6 +2684,14 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
 .. note::
   This only makes sense for particles that are not composite. Returns -1 for composite particles.
 )DOC");
+
+    REGISTER_VARIABLE("mcParticleIsInMCList(particleListName)", mcParticleIsInMCList, R"DOC(
+Returns 1.0 if the particle's matched MC particle is also matched to a particle in ``particleListName`` 
+(or if either of the lists were filled from generator level `modularAnalysis.fillParticleListFromMC`.)
+
+.. seealso:: :b2:var:`isMCDescendantOfList` to check daughters.
+)DOC");
+
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
@@ -2667,7 +2717,7 @@ Returns 1.0 if the underlying mdst object (e.g. track, or cluster) was used to c
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
 and ``variable``, the name of the function or variable for that generator particle.
-If ``index`` goes beyond the length of the MCParticles array, -999 will be returned.
+If ``index`` goes beyond the length of the MCParticles array, NaN will be returned.
 
 E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is 
 the Upsilon(4S) in a generic decay.
@@ -2676,7 +2726,7 @@ the first MC Particle, which is the momentum of the second B meson in a generic 
 )DOC");
     REGISTER_VARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
 [Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
-If no generator level :math:`\Upsilon(4S)` exists for the event, -999 will be returned.
+If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be returned.
 
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
 ``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
@@ -2768,13 +2818,14 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
-                      "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"
-                      "If particle is a nullptr, -999 is returned. Please use eventExtraInfo(name) if you want EventExtraInfo variable.\n"
-                      "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the MVAExpert.");
+                      "The extraInfo has to be set by a module first.\n"
+                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the MVAExpert module.\n"
+                      "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
+                      "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[Eventbased] Returns extra info stored under the given name in the event extra info.\n"
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
-                      "If nothing is set under this name, -999 is returned.");
+                      "If nothing is set under this name, NaN is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
                       "The result of second call to this variable in the same event will be provided from the cache.");
@@ -2916,7 +2967,8 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     ``useAlternativeDaughterHypothesis(mRecoil, 1:p+)`` will return the recoil mass of the particle assuming that the second daughter is a proton instead of whatever was used in reconstructing the decay. 
 
 )DOC");
-
+    REGISTER_VARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC")
 
   }
 }

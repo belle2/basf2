@@ -125,9 +125,8 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         try {
           idau = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2FATAL("The argument of cosHelicityAngleWrtCMSFrame must be an integer!");
-          return nullptr;
         }
       } else {
         B2FATAL("Wrong number of arguments for cosHelicityAngleIfCMSIsTheMother");
@@ -162,9 +161,8 @@ namespace Belle2 {
         try {
           iDau = Belle2::convertString<int>(arguments[0]);
           iGrandDau = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2FATAL("The two arguments of cosHelicityAngleIfRefFrameIsTheDaughter must be integers!");
-          return nullptr;
         }
       } else {
         B2FATAL("Wrong number of arguments for cosHelicityAngleIfRefFrameIsTheDaughter: two are needed.");
@@ -204,10 +202,8 @@ namespace Belle2 {
         try {
           iGrandDau1 = Belle2::convertString<int>(arguments[0]);
           iGrandDau2 = Belle2::convertString<int>(arguments[1]);
-
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2FATAL("The two arguments of cosAcoplanarityAngleIfRefFrameIsTheMother must be integers!");
-          return nullptr;
         }
       } else {
         B2FATAL("Wrong number of arguments for cosAcoplanarityAngleIfRefFrameIsTheMother: two are needed.");
@@ -274,7 +270,7 @@ namespace Belle2 {
         if (arguments.size() == 2) {
           iGrandDaughter = Belle2::convertString<int>(arguments[1]);
         }
-      } catch (boost::bad_lexical_cast&) {
+      } catch (std::invalid_argument&) {
         B2FATAL("The arguments of cosHelicityAngleDaughter must be integers!");
       }
 
@@ -363,7 +359,7 @@ namespace Belle2 {
 
                       For example, in the decay: :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected index is 0,
                       the variable will return the helicity angle of the :math:`\mu^+`.
-                      If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}).
+                      If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`).
                       In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
 
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");

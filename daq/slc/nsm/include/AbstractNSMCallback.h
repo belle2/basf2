@@ -2,16 +2,12 @@
 #define _Belle2_AbstractNSMCallback_hh
 
 #include "daq/slc/nsm/Callback.h"
-#include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMMessage.h"
 #include "daq/slc/nsm/NSMNode.h"
 #include "daq/slc/nsm/NSMCommand.h"
 
-#include "daq/slc/base/TimeoutException.h"
-
 #include <string>
 #include <vector>
-#include <typeinfo>
 
 namespace Belle2 {
 

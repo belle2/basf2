@@ -17,8 +17,8 @@ calculated, and how they are calculated. It also contains entries which
 determine whether a statistic is printed to the screen or included in the
 Confluence tables.
 
-The functions ``printToJson``, ``printToScreen``, and ``printToConfluence``
-handle all the output of the statistics tables.
+The functions ``printToJson``, ``printToScreen``, ``printToConfluence``, and
+``printToMarkdown`` handle all the output of the statistics tables.
 """
 
 
@@ -104,6 +104,15 @@ def getArgumentParser():
         help="Print a wiki markup table to be copied to Confluence.",
     )
     parser.add_argument(
+        "-M",
+        "--markdown",
+        action="store_true",
+        help=(
+            "Save a markdown table in a format that can be copied into "
+            "pull request comments."
+        ),
+    )
+    parser.add_argument(
         "-J",
         "--json",
         action="store_true",
@@ -112,7 +121,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC9", "MC10", "MC11", "MC12", "MC13"],
+        choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
     )
     parser.add_argument(
@@ -536,6 +545,19 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
+    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # and older) so here is a hack.
+    # TODO: remove once when we regularly add the same low mult samples
+    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    if mcCampaignNumber > 12:
+        mcSampleLabels.update({
+            f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+            # f"{mcCampaign}_eeBGx1": f"{mcCampaign}: ee BGx1",
+            f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+            f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
+        })
+
     dataSampleLabels = {
         "proc10_exp8": "Data: proc10 exp. 8",
         "proc10_exp7": "Data: proc10 exp. 7",
@@ -586,7 +608,7 @@ def getStatSpecifier():
       printed.
 
     * ``'PrintToScreen'`` (`bool`): Determines whether the statistic is included
-      in the table in terminal output.
+      in the table in terminal output or the markdown output.
 
     * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
       included in the Confluence table.
@@ -1182,11 +1204,6 @@ def printToScreen(
 
             pretty_print_table([headers] + rows, [-14] * nColumns)
 
-            B2WARNING(
-                "Please consider installing the third-party package `tabulate`:\n"
-                "    pip3 install tabulate --user"
-            )
-
 
 def printToConfluence(
     allSkimStats,
@@ -1273,6 +1290,85 @@ def printToConfluence(
         f"\nWrote tables to {confluenceFileName}. The contents of this file can "
         "be copied directly to Confluence as Wiki markup in the markup editor "
         "(accessible via ctrl-shift-D or cmd-shift-D)."
+    )
+
+
+def printToMarkdown(
+    allSkimStats, mcSampleLabels, dataSampleLabels, beamBackgrounds, mcOnly, dataOnly,
+):
+    """Format the skim performance statistics as a markdown table, which will be
+    formatted nicely if pasted into a pull request on BitBucket.
+
+    Args:
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+        beamBackgrounds (list): A list of beam background labels, such as "BGx1".
+        mcOnly (bool): Print only MC samples statistics.
+        dataOnly (bool): Print only data samples statistics.
+    """
+    statSpecifier = getStatSpecifier()
+    selectedStats = [
+        stat for (stat, statSpec) in statSpecifier.items() if statSpec["PrintToScreen"]
+    ]
+
+    headers = [statSpecifier[stat]["LongName"] for stat in selectedStats]
+    floatFormat = [""] + [statSpecifier[stat]["FloatFormat"] for stat in selectedStats]
+
+    markdownTables = []
+    for skimName, skimStats in allSkimStats.items():
+        # Only print some stats
+        df = pd.DataFrame(skimStats, columns=selectedStats)
+
+        # Handle skims only being run on data or MC
+        if mcOnly:
+            index = [
+                *[
+                    f"Combined MC {beamBackground}"
+                    for beamBackground in beamBackgrounds
+                ],
+                *mcSampleLabels.keys(),
+            ]
+            renamingPairs = mcSampleLabels
+        elif dataOnly:
+            index = list(dataSampleLabels.keys())
+            renamingPairs = dataSampleLabels
+        else:
+            index = [
+                *dataSampleLabels.keys(),
+                *[
+                    f"Combined MC {beamBackground}"
+                    for beamBackground in beamBackgrounds
+                ],
+                *mcSampleLabels.keys(),
+            ]
+            renamingPairs = {**dataSampleLabels, **mcSampleLabels}
+
+        df = df.reindex(index)
+        df = df.rename(index=renamingPairs)
+        # Make entries in first column bold
+        df.rename(index={label: f"**{label}**" for label in df.index}, inplace=True)
+
+        table = tabulate(
+            df[selectedStats], headers=headers, tablefmt="pipe", floatfmt=floatFormat,
+        )
+
+        table = table.replace(" nan ", " --  ")
+        markdownTables.append(f"**Performance statistics for {skimName} skim:**")
+        markdownTables.append(table)
+
+    markdownFileName = "skimStats.md"
+    with open(markdownFileName, "w") as markdownFile:
+        markdownFile.write("\n\n".join(markdownTables))
+
+    print(
+        f"\nWrote tables to {markdownFileName}. This format is suitable for including "
+        "in pull request comments."
     )
 
 
@@ -1404,6 +1500,16 @@ if __name__ == "__main__":
                 beamBackgrounds,
             )
 
+        if args.markdown:
+            printToMarkdown(
+                allSkimStats,
+                mcSampleLabels,
+                dataSampleLabels,
+                beamBackgrounds,
+                args.mconly,
+                args.dataonly,
+            )
+
     except ModuleNotFoundError:
         printToScreen(
             allSkimStats,
@@ -1416,7 +1522,12 @@ if __name__ == "__main__":
             tabulateAvailable=False,
         )
 
-        if args.confluence:
+        B2WARNING(
+            "Please consider installing the third-party package `tabulate`:\n"
+            "    pip3 install tabulate --user"
+        )
+
+        if args.confluence or args.markdown:
             B2ERROR(
                 "This tool relies on the third-party package `tabulate` to "
                 "format wiki markdown. The package is not currently installed, "

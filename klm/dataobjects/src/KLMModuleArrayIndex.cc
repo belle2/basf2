@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/dataobjects/KLMModuleArrayIndex.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 KLMModuleArrayIndex::KLMModuleArrayIndex() :

@@ -8,6 +8,9 @@
 
 #include <daq/dataflow/modules/DAQPerf.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
+
 //#define MAXEVTSIZE 400000000
 
 using namespace std;

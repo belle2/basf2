@@ -8,7 +8,7 @@ from ROOT import Belle2
 """
 Makes analysis variables (which can be used in many of the functions defined
 in :mod:`modularAnalysis`) available to Python.
-Details can be found on https://confluence.desy.de/display/BI/Physics+VariableManager
+Details can be found in the VariableManager section at https://software.belle2.org/
 """
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')

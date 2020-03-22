@@ -30,7 +30,8 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
         'analysis/mdstBelle1_exp65_charged.root',
         'validation',
         False),
-    applyHadronBJSkim=True,
+    applySkim=True,
+    enableNisKsFinder=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 

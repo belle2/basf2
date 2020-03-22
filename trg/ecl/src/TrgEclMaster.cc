@@ -1140,7 +1140,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   int bit_prescale = prescale & 0x01;
   int bit_burst = burst & 0x01;
   _Triggerbit[2] |= bit_lowmulti2;
-  _Triggerbit[2] <<= 2;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_burst;
   _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_prescale;
@@ -1148,10 +1148,12 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   _Triggerbit[2] |= bit_mumu;
   _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_3DBhabha_sel;
-  _Triggerbit[2] <<= 1;
+  _Triggerbit[2] <<= 10;
   _Triggerbit[2] |= ((bit_lowmulti1) >> 2) & 0x3FF;
+
+
   _Triggerbit[1] |= (bit_lowmulti1 & 0x03);
-  _Triggerbit[1] <<= 2;
+  _Triggerbit[1] <<= 1;
   _Triggerbit[1] |= bit_3Dbhabha;
   _Triggerbit[1] <<= 1;
   _Triggerbit[1] |= bit_ClusterOverflow;
@@ -1172,7 +1174,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
 
 
   _Triggerbit[0] |= (bit_bhabhatype & 0x0FFF);
-  _Triggerbit[0] <<= 12;
+  _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_2Dbhabha;
   _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_physics;

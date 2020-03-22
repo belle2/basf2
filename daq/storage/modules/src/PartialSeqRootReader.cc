@@ -8,18 +8,8 @@
 
 #include <daq/storage/modules/PartialSeqRootReader.h>
 
-#include <framework/core/Environment.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/io/RootIOUtilities.h>
-
 #include <iostream>
-#include <cmath>
-#include <cstdlib>
 #include <cstdio>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 

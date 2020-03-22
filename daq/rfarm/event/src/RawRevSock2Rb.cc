@@ -7,6 +7,9 @@
 //-
 
 #include "daq/rfarm/event/RawRevSock2Rb.h"
+#include "daq/dataflow/REvtSocket.h"
+
+#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;

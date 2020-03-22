@@ -3,6 +3,8 @@
 
 import re
 import os
+from typing import Optional, Dict, Any
+import logging
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
@@ -68,7 +70,7 @@ class Script:
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
-    def __init__(self, path, package, log):
+    def __init__(self, path: str, package: str, log: Optional[logging.Logger]):
         """!
         The default constructor.
         """
@@ -85,8 +87,8 @@ class Script:
         self.path = path
 
         # The runtime of the script
-        self.runtime = None
-        self.start_time = None
+        self.runtime = None  # type: Optional[int]
+        self.start_time = None  # type: Optional[int]
 
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
@@ -99,7 +101,7 @@ class Script:
         self.package = package
 
         # The information from the file header
-        self.header = None
+        self.header = None  # type: Optional[Dict, Any]
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -115,7 +117,12 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode = None
+        self.returncode = None  # type: Optional[int]
+
+        #: Id of job for job submission. This is set by some of the
+        #: cluster controls in order to terminate the job if it exceeds the
+        #: runtime.
+        self.job_id = None  # type: Optional[str]
 
     @staticmethod
     def sanitize_file_name(file_name):

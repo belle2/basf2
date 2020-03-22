@@ -20,15 +20,23 @@ skim_registry = [
     ('11160200', 'SLUntagged'),
     ('11130300', 'LeptonicUntagged'),
     ('14140100', 'BtoD0h_hh'),
-    ('14120300', 'BtoD0h_Kspi0'),
+    ('14140101', 'BtoD0h_Kpi'),
+    ('14140102', 'BtoD0h_Kpipipi_Kpipi0'),  # B+ -> anti-D0/anti-D0* (K- pi+ pi+ pi-, K- pi+ pi0) h+
     ('14140200', 'BtoD0h_Kshh'),
+    ('14120300', 'BtoD0h_Kspi0'),
     ('14120400', 'BtoD0h_Kspipipi0'),
     # ('14140500', 'BtoD0h_Kspi0pi0'), Add when skim script is ready
-    ('14140101', 'BtoD0h_Kpi'),
-    ('14140102', 'BtoD0h_Kpipipi'),
     ('14120600', 'B0toDpi_Kpipi'),  # B0 -> D-(k+ pi- pi-)pi+
+    ('14120601', 'B0toDpi_Kspi'),   # B0 -> D-(Ks pi-)pi+
     ('14120700', 'B0toDstarPi_D0pi_Kpi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
-    ('14120800', 'B0toDstarPi_D0pi_Kpipipi'),  # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k- pi+ pi- pi+
+    # merge  B0 -> D*-(anti-D0 pi-)pi+ with anti-D0 -> k- pi+ pi+ pi- and anti-D0 -> K- pi+ pi0
+    ('14120800', 'B0toDstarPi_D0pi_Kpipipi_Kpipi0'),
+    ('14141000', 'BtoD0rho_Kpi'),
+    ('14141001', 'BtoD0rho_Kpipipi_Kpipi0'),
+    ('14121100', 'B0toDrho_Kpipi'),
+    ('14121101', 'B0toDrho_Kspi'),
+    ('14121200', 'B0toDstarRho_D0pi_Kpi'),
+    ('14121201', 'B0toDstarRho_D0pi_Kpipipi_Kpipi0'),
     ('11180100', 'feiHadronicB0'),
     ('11180200', 'feiHadronicBplus'),
     ('11180300', 'feiSLB0'),
@@ -54,7 +62,6 @@ skim_registry = [
     ('17230400', 'XToDp_DpToKsHp'),  # D+ -> Ks h+
     ('19130100', 'CharmlessHad2Body'),
     ('19130200', 'CharmlessHad3Body'),
-    ('14130200', 'DoubleCharm'),
     ('16460100', 'ISRpipicc'),
     ('10600100', 'Systematics'),
     ('10620200', 'SystematicsLambda'),
@@ -69,7 +76,7 @@ skim_registry = [
     ('18020300', 'ALP3Gamma'),
     ('18520100', 'DimuonPlusMissingEnergy'),
     ('18520200', 'ElectronMuonPlusMissingEnergy'),
-    ('18520300', 'DielectronPlusMissingEnergy'),
+    # ('18520300', 'DielectronPlusMissingEnergy'),
     ('18520400', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
@@ -82,7 +89,7 @@ combined_skims = {
     ],
 
     'BtoCharm2': [
-        'BtoD0h_Kpi', 'BtoD0h_Kpipipi', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi'
+        'BtoD0h_Kpi', 'BtoD0h_Kpipipi_Kpipi0', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi_Kpipi0'
     ],
     'CharmHigh': [
         'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
@@ -94,7 +101,7 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
+        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'

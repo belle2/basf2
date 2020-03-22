@@ -460,7 +460,7 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event");
 
-    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
+    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,

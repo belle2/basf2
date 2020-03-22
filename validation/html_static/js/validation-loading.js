@@ -814,7 +814,6 @@ function getRevs() {
  */
 function selectedRevsListToString(selectedRevs) {
     let revString = "";
-    selectedRevs.sort();
     for (let i in selectedRevs) {
         if (i > 0) revString += ",";
         revString += selectedRevs[i];

@@ -10,14 +10,11 @@
 #define FASTRBUF2DSMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
 
 #include <pthread.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
 #include <framework/pcore/DataStoreStreamer.h>
 //#include <framework/datastore/DataStore.h>

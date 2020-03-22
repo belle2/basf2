@@ -95,15 +95,15 @@ run.
 
 * Produce requests for EWP and feiSLCombined skims on proc9::
 
-    $ %(prog)s Registry_proc9.yaml -s EWP feiSLCombined --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_proc9.yaml -s EWP feiSLCombined --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 
 * Produce requests for EWP on MC13, with one LPN per JSON file::
 
-    $ %(prog)s Registry_MC13.yaml -1 -s EWP --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_MC13.yaml -N 1 -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 
 * Produce requests for EWP on MC13, using local skim module script::
 
-    $ %(prog)s Registry_MC13.yaml -l ewp_local.py -s EWP --data -n 101 -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_MC13.yaml -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 """
 
 __author__ = "Phil Grace, Racha Cheaib"
@@ -112,7 +112,7 @@ __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 import argparse
 from functools import lru_cache
-from itertools import product
+from itertools import product, zip_longest
 import json
 from pathlib import Path
 import re
@@ -273,6 +273,29 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
                 "with `b2skim-stats-print`."
             )
             sys.exit(1)
+
+
+def group_iterable(iterable, GroupSize):
+    """Produce an iterator of iterators, where the individual iterators have a maximum
+    length `GroupSize`.
+
+    If, say, `GroupSize` is 10, and there are 35 elements in `iterable`, then the sublists
+    will contain, respectively, 10, 10, 10, and 5 elements.
+
+    Args:
+        iterable (list): List of values to be chunked into sublists.
+        GroupSize (int): Size of individual iterators.
+
+    Returns:
+        IteratorIterable (list(list)): A list containing all the same elements as the
+            original `iterable`, but reorganised into lists of a capped length.
+    """
+    args = [iter(iterable)] * GroupSize
+    IteratorIterable = [
+        [element for element in sublist if element is not None]
+        for sublist in zip_longest(*args)
+    ]
+    return IteratorIterable
 
 
 def get_base_directory(args):
@@ -661,6 +684,8 @@ def make_request_dict(
     # We only want the MCEventType to include the beam background level if the sample is BGx0
     if args.mc:
         skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
+        if sampleInfo["mcBackground"] == "BGx0" and not sampleInfo["mcType"].endswith("BGx0"):
+            skimRequestDict["MCEventType"] += "BGx0"
 
     if args.local_skim_script:
         # Read in the name of the local skim module from the arguments
@@ -685,17 +710,19 @@ def write_json_files(sampleRegistry, args, outputDirectory):
         outputDirectory (pathlib.Path, str): The location to save the JSON files.
     """
 
-    if args.one_lpn_per_json:
-        B2INFO("Producing JSON files with one LPN per JSON file.")
+    if args.lpns_per_json:
+        B2INFO(f"Producing JSON files with {args.lpns_per_json} "
+               f"LPN{'s'*(args.lpns_per_json>1)} per JSON file.")
 
     for skimName in args.skims:
         for sampleLabel, sampleInfo in sampleRegistry.items():
 
             SampleLPNList = get_lpn_list(sampleInfo, args.mc)
 
-            # Make a list of LPN lists so that we can optionally have only LPN per JSON file
-            if args.one_lpn_per_json:
-                LPNLists = [[LPN] for LPN in SampleLPNList]
+            # Make a list of LPN lists so that we can optionally have a maximum number
+            # of LPNs per JSON file.
+            if args.lpns_per_json:
+                LPNLists = group_iterable(SampleLPNList, args.lpns_per_json)
             else:
                 LPNLists = [SampleLPNList]
 
@@ -704,9 +731,10 @@ def write_json_files(sampleRegistry, args, outputDirectory):
 
             for LPNBlockNumber, LPNList in enumerate(LPNLists):
 
-                # If we have broken up the LPNs into one-per-file, then we need to add some more
-                # letters and numbers to keep our prod names and filenames unique
-                if args.one_lpn_per_json:
+                # If we have broken up the LPNs into some number per JSON file, then we
+                # need to add some more letters and numbers to keep our prod names and
+                # filenames unique.
+                if args.lpns_per_json:
                     LPNBlockIdentifier = f"_b{LPNBlockNumber + 1}"
                     outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
                 else:
@@ -791,10 +819,10 @@ def get_argument_parser():
         "Should not include any path before the file name.",
     )
     parser.add_argument(
-        "-1",
-        "--one-lpn-per-json",
-        action="store_true",
-        help="Only include one LPN in each JSON file.",
+        "-N",
+        "--lpns-per-json",
+        type=int,
+        help="Restrict number of LPNs in each JSON file to given number.",
     )
 
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)

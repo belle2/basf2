@@ -10,14 +10,10 @@
 #ifndef DESERIALIZERPXD_H
 #define DESERIALIZERPXD_H
 
-
 #include <string>
 #include <vector>
-#include <stdlib.h>
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 

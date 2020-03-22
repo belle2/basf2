@@ -23,9 +23,12 @@ class dump_digits(Module):
         #: Factors for decoding VXDId's
         self.vxdid_factors = (8192, 256, 32)
         # Get a handle on the GeoCache
+#: geoCache instance
         self.geoCache = Belle2.VXD.GeoCache.getInstance()
         # Record filenames
+#: noise calibrations database object
         self.noise_cal = Belle2.SVDNoiseCalibrations()
+#: pulse shape (gain, peak time, ...) database object
         self.pulse_cal = Belle2.SVDPulseShapeCalibrations()
 
     def beginRun(self):

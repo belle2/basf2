@@ -45,9 +45,8 @@ klm_unpacker = basf2.register_module('KLMUnpacker')
 klm_unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')
 klm_unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
 
-# Reconstructors
-bklm_reconstructor = basf2.register_module('BKLMReconstructor')
-eklm_reconstructor = basf2.register_module('EKLMReconstructor')
+# Reconstructor
+klm_reconstructor = basf2.register_module('KLMReconstructor')
 
 # Root file output
 output = basf2.register_module('RootOutput')

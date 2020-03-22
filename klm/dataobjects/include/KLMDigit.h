@@ -179,6 +179,32 @@ namespace Belle2 {
     }
 
     /**
+     * Get last strip number (for multi-strip digits).
+     * @return Last strip number.
+     */
+    int getLastStrip() const
+    {
+      return m_LastStrip;
+    }
+
+    /**
+     * Set last strip number (for multi-strip digits).
+     * @param[in] lastStrip Last strip number.
+     */
+    void setLastStrip(int lastStrip)
+    {
+      m_LastStrip = lastStrip;
+    }
+
+    /**
+     * Determine whether this digit is a multi-strip one or not.
+     */
+    bool isMultiStrip() const
+    {
+      return (m_LastStrip != 0);
+    }
+
+    /**
      * Determine whether the hit is in RPC or scintillator.
      * @return Whether hit is in RPC (true) or scintillator (false).
      */
@@ -405,6 +431,12 @@ namespace Belle2 {
 
     /** Number of strip. */
     int m_Strip;
+
+    /**
+     * Number of last strip (for multi-strip digits).
+     * If m_LastStrip equals 0, then this is a single-strip digit.
+     */
+    int m_LastStrip;
 
     /** Charge (integral of ADC signal). */
     uint16_t m_Charge;

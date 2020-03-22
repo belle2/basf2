@@ -14,6 +14,7 @@ KLMDigit::KLMDigit() :
   m_Layer(0),
   m_Plane(0),
   m_Strip(0),
+  m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
@@ -34,6 +35,7 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(simHit->getStrip()),
+  m_LastStrip(simHit->getStrip()),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
@@ -55,6 +57,7 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(strip),
+  m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
@@ -76,6 +79,7 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(simHit->getStrip()),
+  m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
@@ -106,11 +110,14 @@ DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)
   /* MC data from digit with larger energy. */
   if (this->getEnergyDeposit() < bgDigit->getEnergyDeposit())
     this->setMCTime(bgDigit->getMCTime());
-  this->setEnergyDeposit(this->getEnergyDeposit() + bgDigit->getEnergyDeposit());
+  this->setEnergyDeposit(this->getEnergyDeposit() +
+                         bgDigit->getEnergyDeposit());
   if (this->getTime() > bgDigit->getTime())
     this->setTime(bgDigit->getTime());
   this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
-  this->setNGeneratedPhotoelectrons(this->getNGeneratedPhotoelectrons() + bgDigit->getNGeneratedPhotoelectrons());
+  this->setNGeneratedPhotoelectrons(
+    this->getNGeneratedPhotoelectrons() +
+    bgDigit->getNGeneratedPhotoelectrons());
   return DigitBase::c_DontAppend;
 }
 

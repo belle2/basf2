@@ -43,6 +43,7 @@ namespace Belle2 {
       m_deltaT = 0;
       m_deltaTErr = 0;
       m_MCdeltaT = 0;
+      m_MCdeltaTapprox = 0;
       m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
@@ -113,6 +114,11 @@ namespace Belle2 {
      * Returns generated DeltaT
      */
     float getMCDeltaT();
+
+    /**
+     * Returns generated DeltaT
+     */
+    float getMCDeltaTapprox();
 
     /**
      * Returns fit algo type
@@ -271,6 +277,11 @@ namespace Belle2 {
     void setMCDeltaT(float DeltaT);
 
     /**
+     * Set generated DeltaTapprox
+     */
+    void setMCDeltaTapprox(float DeltaT);
+
+    /**
      * Set fit algo type
      */
     void setFitType(float FitType) ;
@@ -368,6 +379,7 @@ namespace Belle2 {
     TVector3 m_MCtagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
     float m_MCdeltaT;                   /**< generated Delta t */
+    float m_MCdeltaTapprox;             /**< generated Delta t approximated */
     int m_FitType;                      /**< Fit algo used */
     int m_NTracks;                      /**< Number of tracks used in the fit */
     float m_tagVl;                      /**< tagV component in the boost direction  */

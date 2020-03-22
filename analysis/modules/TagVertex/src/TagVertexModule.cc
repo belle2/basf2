@@ -66,7 +66,8 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
+    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
+    m_shiftZ(0), m_FitType(0), m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
     m_verbose(true)
   {
@@ -170,6 +171,7 @@ namespace Belle2 {
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(m_mcPDG);
           ver->setMCDeltaT(m_MCdeltaT);
+          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagTracks.size());
           ver->setTagVl(m_tagVl);
@@ -195,6 +197,7 @@ namespace Belle2 {
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(0.);
           ver->setMCDeltaT(m_MCdeltaT);
+          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagTracks.size());
           ver->setTagVl(m_tagVl);
@@ -1391,6 +1394,8 @@ namespace Belle2 {
   void TagVertexModule::deltaT(Particle* Breco)
   {
 
+    // deltaT and Approximated MCdeltaT
+
     PCmsLabTransform T;
 
     TVector3 boost = T.getBoostVector();
@@ -1408,8 +1413,11 @@ namespace Belle2 {
     double MCdl = MCdVert.Dot(boostDir);
     double MCdt = MCdl / (bg * c);
 
-
     m_deltaT = dt;
+    m_MCdeltaTapprox = MCdt;
+
+    // MCdeltaT=tau2-tau1
+    // TODO
     m_MCdeltaT = MCdt;
 
 

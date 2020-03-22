@@ -256,6 +256,18 @@ namespace Belle2 {
       return result;
     }
 
+    double particleMCDeltaTapprox(const Particle* particle)
+    {
+      double result = std::numeric_limits<float>::quiet_NaN();
+
+      auto* vert = particle->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = vert->getMCDeltaTapprox();
+
+      return result;
+    }
+
     double particleDeltaZ(const Particle* particle)
     {
       double result = std::numeric_limits<float>::quiet_NaN();
@@ -947,6 +959,8 @@ namespace Belle2 {
                       R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
     REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("MCDeltaTapprox", particleMCDeltaTapprox,
+                      R"DOC(Generated proper decay time difference (in z-difference approximation):math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
                       R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");

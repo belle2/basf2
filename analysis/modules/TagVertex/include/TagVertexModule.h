@@ -106,6 +106,7 @@ namespace Belle2 {
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_MCdeltaT;            /**< generated DeltaT */
+    double m_MCdeltaTapprox;      /**< generated DeltaT with z-coordinate approximation */
     TMatrixDSym m_constraintCov;  /**< constraint to be used in the tag vertex fit */
     TVector3 m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */

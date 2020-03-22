@@ -1455,6 +1455,11 @@ namespace {
     EXPECT_FLOAT_EQ(var2->function(pMother), 128);
     EXPECT_FLOAT_EQ(var2->function(pGrandMother), 512);
 
+    // unmask variable needs at least two arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors)"));
+
+    // all but the first argument have to be integers
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors, NOTINT)"));
   }
 
   TEST_F(MetaVariableTest, conditionalVariableSelector)

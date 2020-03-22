@@ -65,8 +65,8 @@ if __name__ == "__main__":
             raw_data = True
             basf2.conditions.override_globaltags(['online'])
             basf2.B2INFO('No Global Tag is set in FileMetaData; base GT automatically set to "online"')
-        else:
-            basf2.B2FATAL('Please provide a valid list of .sroot or .root input files.')
+    else:
+        basf2.B2FATAL('Please provide a valid list of .sroot or .root input files.')
 
     if not (args.prepend_gt == ''):
         for gt in reversed(args.prepend_gt):
@@ -108,8 +108,8 @@ if __name__ == "__main__":
         # Unpacker
         main.add_module('KLMUnpacker')
 
-        # BKLM reconstruction
-        main.add_module('BKLMReconstructor')
+        # KLM reconstruction
+        main.add_module('KLMReconstructor')
 
     # DQM
     main.add_module('KLMDQM')

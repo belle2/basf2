@@ -1,7 +1,7 @@
 #ifndef _Belle2_DynamicLoader_h
 #define _Belle2_DynamicLoader_h
 
-#include "daq/slc/system/DynamicLoadException.h"
+#include <string>
 
 namespace Belle2 {
 

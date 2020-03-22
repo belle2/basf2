@@ -827,6 +827,8 @@ class ConditionsDB:
                                          json={'fields': issue})
             else:
                 fields = {'issue': json.dumps(issue)}
+                if 'user' in data.keys():
+                    fields['user'] = data['user']
                 if password:
                     fields['token'] = password[0]
                     fields['secret'] = password[1]

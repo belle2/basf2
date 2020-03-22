@@ -268,10 +268,16 @@ void CDCDigitizerModule::event()
     m_wireID = m_aCDCSimHit->getWireID();
     //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
-    // Reject bad wire
+    // Reject totally-dead wire; to be replaced by isDeadWire() in future
     if (m_cdcgp->isBadWire(m_wireID)) {
       //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
       continue;
+    }
+    // Reject partly-dead wire as well
+    double eff = 1.;
+    if (m_cdcgp->isDeadWire(m_wireID, eff)) {
+      //      std::cout << "wid,eff= " << m_wireID << " " << eff << std::endl;
+      if (eff < gRandom->Uniform()) continue;
     }
 
     /*    // Special treatment for cosmic runs in April 2015

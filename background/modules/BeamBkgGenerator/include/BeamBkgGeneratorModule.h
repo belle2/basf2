@@ -87,6 +87,7 @@ namespace Belle2 {
       double ss = 0; /**< scattered position (|s|<Ltot/2) [m] */
       int nturn = 0; /**< number of turns from scattered to lost */
       double sraw = 0; /**< s at lost position [m] before matching G4 beam pipe inner surface */
+      double ssraw = 0; /**< scattered position [m] */
       double xraw = 0; /**< x at lost position [m] before matching G4 beam pipe inner surface */
       double yraw = 0; /**< y at lost position [m] before matching G4 beam pipe inner surface */
       double r = 0; /**< sqrt(x*x+y*y) [m] */

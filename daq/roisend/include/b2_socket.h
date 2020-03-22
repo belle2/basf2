@@ -4,10 +4,6 @@
 #ifndef B2_SOCKET_H
 #define B2_SOCKET_H
 
-
-#include <netinet/in.h>
-
-
 /* returns socket descriptor */
 int b2_create_accept_socket(const unsigned short port);
 

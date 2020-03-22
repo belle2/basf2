@@ -20,7 +20,7 @@ namespace Belle2 {
   public:
 
     /// Constructor set the prefix to SVDOccupancyCalibrationsCollector
-    SVDOccupancyCalibrationsAlgorithm(const std::string& str);
+    explicit SVDOccupancyCalibrationsAlgorithm(const std::string& str);
 
     /// Destructor
     virtual ~SVDOccupancyCalibrationsAlgorithm() {}

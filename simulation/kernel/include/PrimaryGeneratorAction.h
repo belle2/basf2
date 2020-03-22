@@ -47,7 +47,7 @@ namespace Belle2 {
        *
        * @param event Pointer to the G4Event.
        */
-      virtual void GeneratePrimaries(G4Event* event);
+      void GeneratePrimaries(G4Event* event);
 
 
     protected:

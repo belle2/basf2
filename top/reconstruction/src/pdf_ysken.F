@@ -134,13 +134,14 @@
          CALL TO_FIRST_PERIOD(FIC)
          YD=YD0+DYDDE*DEL_E
          CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),TYP,
-     &        NX,NY,XD,YD)
+     &        NX,NY,XD,YD,I0,K4)
       ENDDO
 
       END
 
 
-      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,TYP,NX,NY,XD,YD)
+      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,TYP,NX,NY,XD,YD,
+     &     I0,K4)
 
       IMPLICIT NONE
       INTEGER ICH
@@ -149,8 +150,10 @@
       INTEGER TYP
       INTEGER NX(3), NY(3)
       REAL XD, YD
+      INTEGER I0, K4
 #include "TOP_PIK.fi"
 #include "TOP_TDC.fi"
+#include "TOP_TOPF.fi"
       INTEGER N
       
       IF(TIM.LT.T_MIN.OR.TIM.GT.T_MAX) RETURN
@@ -182,6 +185,12 @@
       PIK_XD(N,ICH)=XD
       PIK_YD(N,ICH)=YD
       PIK_TYP(N,ICH)=TYP
+      PIK_KXE(N,ICH)=F_KX(I0,K4)
+      PIK_KYE(N,ICH)=F_KY(I0,K4)
+      PIK_KZE(N,ICH)=F_KZ(I0,K4)
+      PIK_KXD(N,ICH)=F_DIR(1)
+      PIK_KYD(N,ICH)=F_DIR(2)
+      PIK_KZD(N,ICH)=F_DIR(3)
 
       END
 

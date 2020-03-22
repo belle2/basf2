@@ -5,6 +5,7 @@
 ! mar-2017: change in some commons
 ! feb-2018: change in some commons
 ! oct-2018: change in some commons
+! feb-2020: change in some commons
 !----------------------------------------------------------------------
 
       SUBROUTINE SET_CHANNEL_MASK(MDN, ICH, FLAG)

@@ -15,11 +15,10 @@ import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPi0s import loadStdSkimPi0
 from stdPhotons import loadStdSkimPhoton
-from stdV0s import mergedKshorts, stdKshorts
+from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 
 
-gb2_setuprel = 'release-04-00-00'
 b2.set_log_level(b2.LogLevel.INFO)
 
 charmpath = b2.Path()
@@ -48,8 +47,11 @@ stdK('95eff', path=charmpath)
 stdE('95eff', path=charmpath)
 stdMu('95eff', path=charmpath)
 stdKshorts(path=charmpath)
-mergedKshorts(path=charmpath)
 
+
+from skim.charm import D0ToHpJm
+D0ToHpJmList = D0ToHpJm(charmpath)
+expert.add_skim("XToD0_D0ToHpJm", D0ToHpJmList, path=charmpath)
 
 from skim.charm import DstToD0PiD0ToHpJm
 DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(charmpath)
@@ -59,24 +61,11 @@ from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(charmpath)
 expert.add_skim("DstToD0Pi_D0ToHpHmKs", DstToD0PiD0ToHpHmKsList, path=charmpath)
 
-from skim.charm import DstToD0PiD0ToHpJmEta
-DstToD0PiD0ToHpJmEtaList = DstToD0PiD0ToHpJmEta(charmpath)
-expert.add_skim("DstToD0Pi_D0ToHpJmEta", DstToD0PiD0ToHpJmEtaList, path=charmpath)
-
-from skim.charm import DstToD0PiD0ToKsOmega
-DstList = DstToD0PiD0ToKsOmega(charmpath)
-expert.add_skim("DstToD0Pi_D0ToKsOmega", DstList, path=charmpath)
-
-from skim.charm import DstToD0Neutrals
-expert.add_skim("DstToD0Pi_D0ToNeutrals", DstToD0Neutrals(charmpath), path=charmpath)
 
 from skim.charm import CharmRare
 DstToD0Pi_D0ToRareList = CharmRare(charmpath)
 expert.add_skim("DstToD0Pi_D0ToRare", DstToD0Pi_D0ToRareList, path=charmpath)
 
-from skim.charm import CharmSemileptonic
-CSLList = CharmSemileptonic(charmpath)
-expert.add_skim("DstToD0Pi_D0ToSemileptonic", CSLList, path=charmpath)
 
 expert.setSkimLogging(path=charmpath)
 b2.process(charmpath)

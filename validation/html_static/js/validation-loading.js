@@ -330,8 +330,7 @@ function getDefaultRevisions(mode="rbn") {
     }
 
     if (mode === "all"){
-        // todo: remove this limitation if we find way too avoid too lengthy file names
-        return allRevisions.slice(0, 10);
+        return allRevisions;
     }
     else if (mode === "r"){
         return [referenceRevision].concat(releaseRevisions.slice(0, 1));
@@ -808,6 +807,7 @@ function getRevs() {
     return revs;
 }
 
+
 /**
  * Returns a string representation of the array of selected revisions.
  * We need that to create folder names & queries
@@ -815,7 +815,7 @@ function getRevs() {
 function selectedRevsListToString(selectedRevs) {
     let revString = "";
     for (let i in selectedRevs) {
-        if (i > 0) revString += "_";
+        if (i > 0) revString += ",";
         revString += selectedRevs[i];
     }
     return revString;

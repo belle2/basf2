@@ -104,17 +104,36 @@ namespace Belle2 {
     double deuteronID(const Particle* part);
 
     /**
-     * @return the charged Pid BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
+     * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
      *
-     * Currently uses ECL-only inputs.
-     *
-     * The signal hypothesis pdg and the test pdg are passed a vector of strings of size = 2.
+     * The signal hypothesis pdgId and the detector(s) used for the BDT training are passed as a vector of strings of size = 2.
      * Examples:
-     * Response of BDT trained for "e vs pi" separation = pidPairChargedBDTScore(11, 211)
+     * Response of BDT trained for multi-class separation, "e vs. others", BDT training based on all sub-detectors = pidChargedBDTScore(11, ALL)
      *
-     * If the BDT score for the given set of hypotheses is not available for the particle under test, return NaN.
+     * If the response for the given hypothesis and detector(s) is not available for the particle under test, return NaN.
+     */
+    Manager::FunctionPtr pidChargedBDTScore(const std::vector<std::string>& pdgCodeHyp);
+
+    /**
+     * @return the charged PID BDT score for a certain mass hypothesis with respect to an alternative hypothesis.
+     *
+     * The signal hypothesis pdgId, the test pdgId and the detector(s) used for the BDT training are passed as a vector of strings of size = 3.
+     * Examples:
+     * Response of BDT trained for binary "e vs pi" separation, BDT training based on all sub-detectors = pidPairChargedBDTScore(11, 211, ALL)
+     *
+     * If the response for the given set of hypotheses is not available for the particle under test, return NaN.
      */
     Manager::FunctionPtr pidPairChargedBDTScore(const std::vector<std::string>& arguments);
+
+    /**
+     * returns most likely PDG code based on PID information.
+     */
+    Manager::FunctionPtr mostLikelyPDG(const std::vector<std::string>& arguments);
+
+    /**
+     * returns true if a particle is assigned to its most likely type according to PID likelihood
+     */
+    Manager::FunctionPtr isMostLikely(const std::vector<std::string>& arguments);
 
     /**
      * Returns Belle's main PID variable to separate pions, kaons and protons:  atc_pid(3,1,5).prob()
@@ -139,13 +158,6 @@ namespace Belle2 {
      **/
     double eIDBelle(const Particle*);
 
-    /**
-     * Returns Belle's kaonID.
-     **/
-    double kIDBelle(const Particle*);
-
-
 
   }
 } // Belle2 namespace
-

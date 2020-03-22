@@ -78,6 +78,8 @@ namespace Belle2 {
              "TOP: time window in which to count hits [ns]", 100.0);
     addParam("svdShaperDigitsName", m_svdShaperDigitsName,
              "SVDShaperDigits collection name", string(""));
+    addParam("svdThrCharge", m_svdThrCharge,
+             "Energy cur on SVD Cluster charge in electrons", 15000.);
     addParam("additionalDataDescription", m_additionalDataDescription,
              "Additional dictionary of "
              "name->value pairs to be added to the file metadata to describe the data",
@@ -106,7 +108,7 @@ namespace Belle2 {
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
     m_monitors.push_back(pxd);
-    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName);
+    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge);
     m_monitors.push_back(svd);
     auto* cdc = new Background::CDCHitRateCounter();
     m_monitors.push_back(cdc);

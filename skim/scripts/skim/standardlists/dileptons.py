@@ -44,6 +44,40 @@ def loadStdLooseJpsi2ee(persistent=True, path=None):
     return 'J/psi:eeLoose'
 
 
+def loadStdJpsiToee(persistent=True, path=None):
+    """
+    Load the 'J/psi:ee' list from 'e+:all e-:all', with :math:`2.8 < M < 3.4~GeV`
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+
+    ma.reconstructDecay(
+        'J/psi:ee -> e+:bremCorr e-:bremCorr',
+        '2.8 < M < 3.4 and daughter(0, electronID) > 0.01 or daughter(1, electronID) > 0.01',
+        2,
+        persistent,
+        path)
+    return 'J/psi:ee'
+
+
+def loadStdJpsiTomumu(persistent=True, path=None):
+    """
+    Load the 'J/psi:mumu' list from 'mu+:withCuts mu+:withCuts', with :math:`2.8 < M < 3.4~GeV`
+    where mu+:withCuts list is with cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01"
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    ma.reconstructDecay(
+        'J/psi:mumu -> mu+:withCuts mu-:withCuts',
+        '2.8 < M < 3.4 and daughter(0, muonID) > 0.01 or daughter(1,muonID) > 0.01',
+        2,
+        persistent,
+        path)
+    return 'J/psi:mumu'
+
+
 def loadStdLoosepsi2s2mumu(persistent=True, path=None):
     """
     Load the 'psi(2S):mumuLoose' list from 'mu-:loose mu+:loose', with :math:`3.2 < M < 4.1~GeV`

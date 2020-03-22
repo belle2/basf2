@@ -60,13 +60,13 @@ class TestDecayChannel(unittest.TestCase):
 
     def test_Defaults(self):
         channel = fei.config.DecayChannel(name='D0:23', label='D0 ==> K- pi+',
-                                          decayString='D0:23 ==> K- pi+', daughters=['K-', 'pi+'],
+                                          decayString='D0:23 -> K- pi+', daughters=['K-', 'pi+'],
                                           mvaConfig=fei.config.MVAConfiguration(variables=['E']),
                                           preCutConfig=fei.config.PreCutConfiguration(userCut='test'),
                                           decayModeID=23)
         self.assertEqual(channel.name, 'D0:23')
         self.assertEqual(channel.label, 'D0 ==> K- pi+')
-        self.assertEqual(channel.decayString, 'D0:23 ==> K- pi+')
+        self.assertEqual(channel.decayString, 'D0:23 -> K- pi+')
         self.assertEqual(channel.daughters, ['K-', 'pi+'])
         self.assertEqual(channel.mvaConfig, fei.config.MVAConfiguration(variables=['E']))
         self.assertEqual(channel.preCutConfig, fei.config.PreCutConfiguration(userCut='test'))
@@ -179,7 +179,7 @@ class TestParticle(unittest.TestCase):
         channels = []
         channels.append(fei.config.DecayChannel(name='D0:generic_0',
                                                 label='D0:generic ==> pi-:generic pi+:generic',
-                                                decayString='D0:generic_0 ==> pi-:generic pi+:generic',
+                                                decayString='D0:generic_0 -> pi-:generic pi+:generic',
                                                 daughters=['pi-:generic', 'pi+:generic'],
                                                 mvaConfig=fei.config.MVAConfiguration(variables=['E',
                                                                                                  'daughter(0, p)',
@@ -188,7 +188,7 @@ class TestParticle(unittest.TestCase):
                                                 decayModeID=0))
         channels.append(fei.config.DecayChannel(name='D0:generic_1',
                                                 label='D0:generic ==> K-:generic pi+:generic',
-                                                decayString='D0:generic_1 ==> K-:generic pi+:generic',
+                                                decayString='D0:generic_1 -> K-:generic pi+:generic',
                                                 daughters=['K-:generic', 'pi+:generic'],
                                                 mvaConfig=fei.config.MVAConfiguration(variables=['E',
                                                                                                  'daughter(0, p)',
@@ -198,7 +198,7 @@ class TestParticle(unittest.TestCase):
                                                 decayModeID=1))
         channels.append(fei.config.DecayChannel(name='D0:generic_2',
                                                 label='D0:generic ==> K-:specific pi+:generic pi0:generic',
-                                                decayString='D0:generic_2 ==> K-:specific pi+:generic pi0:generic',
+                                                decayString='D0:generic_2 -> K-:specific pi+:generic pi0:generic',
                                                 daughters=['K-:specific', 'pi+:generic', 'pi0:generic'],
                                                 mvaConfig=fei.config.MVAConfiguration(variables=['E',
                                                                                                  'daughter(0, p)',
@@ -211,7 +211,7 @@ class TestParticle(unittest.TestCase):
                                                 decayModeID=2))
         channels.append(fei.config.DecayChannel(name='D0:generic_3',
                                                 label='D0:generic ==> K-:generic K+:generic',
-                                                decayString='D0:generic_3 ==> K-:generic K+:generic',
+                                                decayString='D0:generic_3 -> K-:generic K+:generic',
                                                 daughters=['K-:generic', 'K+:generic'],
                                                 mvaConfig=fei.config.MVAConfiguration(variables=['E',
                                                                                                  'daughter(0, p)',

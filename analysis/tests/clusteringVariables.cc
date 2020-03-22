@@ -306,6 +306,7 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     for (int i = 0; i < eclclusters.getEntries(); ++i)
       if (!eclclusters[i]->isTrack()) {
@@ -313,6 +314,7 @@ namespace {
         EXPECT_TRUE(vIsFromECL->function(p));
         EXPECT_FALSE(vIsFromKLM->function(p));
         EXPECT_FALSE(vIsFromTrack->function(p));
+        EXPECT_FALSE(vIsFromV0->function(p));
       }
   }
 

@@ -59,6 +59,24 @@ namespace Belle2 {
       return m;
     }
 
+    /**
+     * Convert CLHEP::HepSymMatrix to TMatrixFSym.
+     * @param[in] matrix Matrix.
+     */
+    inline TMatrixDSym getTMatrixDSym(const CLHEP::HepSymMatrix& matrix)
+    {
+      int n = matrix.num_row();
+      TMatrixDSym m(n);
+      /*
+       * TMatrixFSym is stored as a full matrix, thus all elements must be set.
+       */
+      for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+          m[i][j] = matrix[i][j];
+      }
+      return m;
+    }
+
   }
 
 }

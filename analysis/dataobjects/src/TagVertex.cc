@@ -3,7 +3,7 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Stefano Lacaprara                         *
+ * Contributors: Luigi Li Gioi, Stefano Lacaprara, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,6 +11,7 @@
 #include <analysis/dataobjects/TagVertex.h>
 
 using namespace Belle2;
+using namespace std;
 
 
 TVector3 TagVertex::getTagVertex()
@@ -18,7 +19,7 @@ TVector3 TagVertex::getTagVertex()
   return m_tagVertex;
 }
 
-TMatrixFSym TagVertex::getTagVertexErrMatrix()
+TMatrixDSym TagVertex::getTagVertexErrMatrix()
 {
   return m_tagVertexErrMatrix;
 }
@@ -26,6 +27,20 @@ TMatrixFSym TagVertex::getTagVertexErrMatrix()
 float TagVertex::getTagVertexPval()
 {
   return m_tagVertexPval;
+}
+
+const TrackFitResult* TagVertex::getVtxFitTrackResultPtr(unsigned int trackIndex)
+{
+  if (trackIndex >= m_vtxFitTracks.size())
+    return 0;
+  return m_vtxFitTracks.at(trackIndex);
+}
+
+const MCParticle* TagVertex::getVtxFitTrackMCParticle(unsigned int trackIndex)
+{
+  if (trackIndex >= m_vtxFitMCParticles.size())
+    return 0;
+  return m_vtxFitMCParticles.at(trackIndex);
 }
 
 float TagVertex::getDeltaT()
@@ -58,9 +73,32 @@ int TagVertex::getFitType()
   return m_FitType;
 }
 
+string TagVertex::getConstraintType()
+{
+  return m_constraintType;
+}
+
+TVector3 TagVertex::getConstraintCenter()
+{
+  if (m_constraintType == "noConstraint")
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
+  return m_constraintCenter;
+}
+
+TMatrixDSym TagVertex::getConstraintCov()
+{
+  return m_constraintCov;
+}
+
 int TagVertex::getNTracks()
 {
   return m_NTracks;
+}
+
+int TagVertex::getNFitTracks()
+{
+  return m_NFitTracks;
 }
 
 float TagVertex::getTagVl()
@@ -108,14 +146,57 @@ float TagVertex::getTagVChi2IP()
   return m_tagVChi2IP;
 }
 
+TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
+  return m_vtxFitTracks.at(trackIndex) -> getPosition();
+}
 
+
+TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::quiet_NaN());
+  return m_vtxFitTracks.at(trackIndex) -> getMomentum();
+}
+
+double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component)
+{
+  if (m_vtxFitTracks.size() <= trackIndex || component > 2)
+    return std::numeric_limits<float>::quiet_NaN();;
+  return m_vtxFitTracks.at(trackIndex) -> getMomentum()[component];
+}
+
+double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return std::numeric_limits<float>::quiet_NaN();;
+  return m_vtxFitTracks.at(trackIndex) -> getZ0();
+}
+
+double TagVertex::getVtxFitTrackD0(unsigned int trackIndex)
+{
+  if (m_vtxFitTracks.size() <= trackIndex)
+    return std::numeric_limits<float>::quiet_NaN();;
+  return m_vtxFitTracks.at(trackIndex) -> getD0();
+}
+
+double TagVertex::getRaveWeight(unsigned int trackIndex)
+{
+  if (m_raveWeights.size() <= trackIndex)
+    return std::numeric_limits<float>::quiet_NaN();;
+  return m_raveWeights.at(trackIndex);
+}
 
 void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
   m_tagVertex = tagVertex;
 }
 
-void TagVertex::setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix)
+void TagVertex::setTagVertexErrMatrix(const TMatrixDSym& TagVertexErrMatrix)
 {
   m_tagVertexErrMatrix = TagVertexErrMatrix;
 }
@@ -205,11 +286,48 @@ void TagVertex::setTagVChi2IP(float TagVChi2IP)
   m_tagVChi2IP = TagVChi2IP;
 }
 
+void TagVertex::setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks)
+{
+  m_vtxFitTracks = vtxFitTracks;
+  m_NFitTracks = vtxFitTracks.size();
+}
 
+void TagVertex::setVertexFitMCParticles(std::vector<const MCParticle*> const& vtxFitMCParticles)
+{
+  m_vtxFitMCParticles = vtxFitMCParticles;
+}
+
+void TagVertex::setRaveWeights(std::vector<double> const& raveWeights)
+{
+  m_raveWeights = raveWeights;
+}
+
+void TagVertex::setConstraintCenter(TVector3 const& constraintCenter)
+{
+  m_constraintCenter = constraintCenter;
+}
+
+void TagVertex::setConstraintCov(TMatrixDSym const& constraintCov)
+{
+  m_constraintCov.ResizeTo(constraintCov);
+  m_constraintCov = constraintCov;
+}
+
+void TagVertex::setConstraintType(std::string const& constraintType)
+{
+  m_constraintType = constraintType;
+}
 
 void  TagVertex::resetTagVertexErrorMatrix()
 {
-  TMatrixFSym temp(3);
+  TMatrixDSym temp(3);
   m_tagVertexErrMatrix.ResizeTo(temp);
   m_tagVertexErrMatrix = temp;
+}
+
+void  TagVertex::resetConstraintCov()
+{
+  TMatrixDSym temp(3);
+  m_constraintCov.ResizeTo(temp);
+  m_constraintCov = temp;
 }

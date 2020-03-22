@@ -108,6 +108,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("CDCProductionCut", m_cdcProductionCut, "[cm] Secondary production threshold in CDC envelope.", 0.0);
   addParam("ARICHTOPProductionCut", m_arichtopProductionCut, "[cm] Secondary production threshold in ARICH and TOP envelopes.", 0.0);
   addParam("ECLProductionCut", m_eclProductionCut, "[cm] Secondary production threshold in ECL envelope.", 0.0);
+  addParam("KLMProductionCut", m_klmProductionCut, "[cm] Secondary production threshold in BKLM and EKLM envelopes.", 0.0);
   addParam("MaxNumberSteps", m_maxNumberSteps,
            "The maximum number of steps before the track transportation is stopped and the track is killed.", 100000);
   addParam("PhotonFraction", m_photonFraction, "The fraction of Cerenkov photons which will be kept and propagated.", 0.5);
@@ -216,6 +217,7 @@ void FullSimModule::initialize()
     physicsList->SetCDCProductionCutValue(m_cdcProductionCut);
     physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
     physicsList->SetECLProductionCutValue(m_eclProductionCut);
+    physicsList->SetKLMProductionCutValue(m_klmProductionCut);
 
     //Apply the Geant4 UI commands in PreInit State - before initialization
     if (m_uiCommandsAtPreInit.size() > 0) {

@@ -209,11 +209,6 @@ namespace Belle2 {
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = NULL);
 
-    /** Function creating the ration (bin by bin) of two TH1*/
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
-
   };
 }
 

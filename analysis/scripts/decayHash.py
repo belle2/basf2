@@ -7,10 +7,10 @@ import struct
 import pdg
 import basf2
 
-from pybasf2 import *
+import pybasf2
 # inspect is also used by LogPythonInterface. Do not remove
 import inspect
-logging = LogPythonInterface()
+logging = pybasf2.LogPythonInterface()
 
 import numpy as np
 import collections

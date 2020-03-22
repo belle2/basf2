@@ -35,7 +35,7 @@ TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
   if (false) {
-    G4Track* aTrack;
+    G4Track* aTrack = nullptr;
     PreUserTrackingAction(aTrack);
     PostUserTrackingAction(aTrack);
   }

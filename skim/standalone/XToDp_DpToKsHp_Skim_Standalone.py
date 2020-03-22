@@ -10,7 +10,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
-from stdV0s import mergedKshorts
+from stdV0s import stdKshorts
 import skimExpertFunctions as expert
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -28,9 +28,9 @@ fileList = ['/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod000
 ma.inputMdstList('default', fileList, path=ckshppath)
 
 
-mergedKshorts(path=ckshppath)
-stdPi('loose', path=ckshppath)
-stdK('loose', path=ckshppath)
+stdPi('all', path=ckshppath)
+stdK('all', path=ckshppath)
+stdKshorts(path=ckshppath)
 
 from skim.charm import DpToKsHp
 DpToKsHpList = DpToKsHp(ckshppath)

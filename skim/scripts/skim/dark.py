@@ -14,17 +14,20 @@ __authors__ = [
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
+from skimExpertFunctions import ifEventPasses
 
 
 def SinglePhotonDarkList(path):
     """
-    Note:
-        * Single photon skim list for the dark photon analysis
-        * Skim code: 18020100
-        * Physics channel: ee → A'γ; A' → invisible
-        * Skim category: physics, dark sector
+    Single photon skim list for the dark photon analysis
 
-    Build the list  of single photon candidates for the dark photon to
+    **Skim code**: 18020100
+
+    **Physics channel**: ee → A'γ; A' → invisible
+
+    **Skim category**: physics, dark sector
+
+    Build the list of single photon candidates for the dark photon to
     invisible final state analysis.
 
     Parameters:
@@ -37,13 +40,13 @@ def SinglePhotonDarkList(path):
 
     # no good tracks in the event
     cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
-    ma.applyEventCuts('nCleanedTracks(' + cleaned + ') < 1', path=path)
 
     # no other photon above 100 MeV
     angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
     minimum = 'E > 0.1'  # GeV
     ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
-    ma.applyEventCuts('0 < nParticlesInList(gamma:100) < 2', path=path)
+    path2 = b2.Path()
+    ifEventPasses('0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks(' + cleaned + ') < 1', conditional_path=path2, path=path)
 
     # all remaining single photon events (== candidates) with region
     # dependent minimum energy in GeV
@@ -52,7 +55,7 @@ def SinglePhotonDarkList(path):
     region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
     region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
     region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
-    ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path)
+    ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
     return ['gamma:singlePhoton']
 
 
@@ -104,11 +107,13 @@ def _initialALP(path):
 
 def ALP3GammaList(path):
     """
-    Note:
-        * Neutral dark sector skim list for the ALP 3-photon analysis,
-        * Skim code:   18020300
-        * Physics channel: ee → aγ; a → γγ
-        * Skim category: physics, dark sector
+    Neutral dark sector skim list for the ALP 3-photon analysis.
+
+    **Skim code**: 18020300
+
+    **Physics channel**: ee → aγ; a → γγ
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim list builders
@@ -141,11 +146,13 @@ def ALP3GammaList(path):
 
 def LFVZpVisibleList(path):
     """
-    Note:
-        * Lepton flavour violating Z' skim, Z' to visible FS
-        * Skim code:  18520400
-        * Physics channel: ee --> e mu Z'; Z' --> e mu
-        * Skim category: physics, dark sector
+    Lepton flavour violating Z' skim, Z' to visible FS
+
+    **Skim code**: 18520400
+
+    **Physics channel**: ee --> e mu Z'; Z' --> e mu
+
+    **Skim category**: physics, dark sector
 
     The skim list for the LFV Z' to visible final state search
 
@@ -192,12 +199,14 @@ def LFVZpVisibleList(path):
 
 def DimuonPlusMissingEnergyList(path):
     """
-    Note:
-        * Dimuon + missing energy skim,
-          needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520100
-        * Physics channel: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
-        * Skim category: physics, dark sector
+    Dimuon + missing energy skim,
+    needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520100
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim
@@ -230,12 +239,14 @@ def DimuonPlusMissingEnergyList(path):
 
 def ElectronMuonPlusMissingEnergyList(path):
     """
-    Note:
-        * Electron-muon pair + missing energy skim,
-          needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520200
-        * Physics channel: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
-        * Skim category: physics, dark sector
+    Electron-muon pair + missing energy skim,
+    needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520200
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim
@@ -275,12 +286,14 @@ def DielectronPlusMissingEnergyList(path):
     Warning:
         This skim is currently deactivated, since the retention rate is too high
 
-    Note:
-        * Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
-          :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
-        * Skim code: 18520300
-        * Physics channel: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
-        * Skim category: physics, dark sector
+    Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
+    :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
+
+    **Skim code**: 18520300
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
+
+    **Skim category**: physics, dark sector
 
     Parameters:
         path (basf2.Path): the path to add the skim

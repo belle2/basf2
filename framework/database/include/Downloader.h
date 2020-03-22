@@ -37,7 +37,7 @@ namespace Belle2::Conditions {
      * @returns true if a new session was started, false if one was active already
      */
     bool startSession();
-    /** Finish an existing curl sesssion if any is active at the moment */
+    /** Finish an existing curl session if any is active at the moment */
     void finishSession();
     /** Make sure there's an active session and return a ScopeGuard object that
      * closes the session on destruction in case a new session was created;
@@ -52,7 +52,7 @@ namespace Belle2::Conditions {
     unsigned int getConnectionTimeout() const { return m_connectionTimeout; }
     /** Get the timeout to wait for stalled connections (<10KB/s), 0 means no timeout */
     unsigned int getStalledTimeout() const { return m_stalledTimeout; }
-    /** Get the number of retries to perform when downloading failes with HTTP response code >=500, 0 means no retries*/
+    /** Get the number of retries to perform when downloading fails with HTTP response code >=500, 0 means no retries*/
     unsigned int getMaxRetries() const { return m_maxRetries; }
     /** Get the backoff factor for retries in seconds */
     unsigned int getBackoffFactor() const { return m_backoffFactor; }
@@ -60,7 +60,7 @@ namespace Belle2::Conditions {
     void setConnectionTimeout(unsigned int timeout);
     /** Set the timeout to wait for stalled connections (<10KB/s), 0 disables timeout */
     void setStalledTimeout(unsigned int timeout);
-    /** Set the number of retries to perform when downloading failes with HTTP response code >=500, 0 disables retry */
+    /** Set the number of retries to perform when downloading fails with HTTP response code >=500, 0 disables retry */
     void setMaxRetries(unsigned int retries) { m_maxRetries = retries; }
     /** Set the backoff factor for retries in seconds. Minimum is 1 and 0 will be silently converted to 1 */
     void setBackoffFactor(unsigned int factor) { m_backoffFactor = std::max(1u, factor); }
@@ -102,8 +102,8 @@ namespace Belle2::Conditions {
     unsigned int m_connectionTimeout{60};
     /** Timeout to wait for stalled connections (<10KB/s) */
     unsigned int m_stalledTimeout{60};
-    /** Number of retries to perform when downloading failes with HTTP response code >=500 */
-    unsigned int m_maxRetries{3};
+    /** Number of retries to perform when downloading fails with HTTP response code >=500 */
+    unsigned int m_maxRetries{5};
     /** Backoff factor for retries in seconds */
     unsigned int m_backoffFactor{5};
   };

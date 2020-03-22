@@ -9,13 +9,6 @@
 #ifndef SENDTRAILER_H
 #define SENDTRAILER_H
 
-#include <string.h>
-
-//#include <framework/datastore/DataStore.h>
-
-//#include <TObject.h>
-
-
 namespace Belle2 {
 
   //  class SendTrailer{

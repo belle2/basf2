@@ -67,9 +67,3 @@ def getAllTrgNames():
     Belle2.DBStore.Instance().update(evt)
     size = Belle2.TRGSummary.c_ntrgWords * Belle2.TRGSummary.c_trgWordSize
     return [bits.getoutbitname(i) for i in range(size) if bits.getoutbitname(i) != '']
-
-
-# load isSignalAcceptSomething definition automatically
-# utils should be imported after the definition of std_vector()
-import variables.utils as vu
-vu.add_isSignalAcceptFlags()

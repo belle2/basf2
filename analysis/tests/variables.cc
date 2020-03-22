@@ -1404,12 +1404,6 @@ namespace {
     auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
     pMother->addRelationTo(mcMother);
 
-    // Test for particle that has no MC match
-    auto* p_noMC = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
-
-    // Test for particle that has MC match, but MC match has no daughter
-    auto* p_noDaughter = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 11);
-    p_noDaughter->addRelationTo(mcDaughter1);
 
     pMother->writeExtraInfo("mcErrors", 8);
     pGrandMother->writeExtraInfo("mcErrors", 8 | 16);

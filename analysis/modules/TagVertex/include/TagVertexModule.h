@@ -101,8 +101,10 @@ namespace Belle2 {
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
     TVector3 m_MCtagV;            /**< generated tag side vertex */
+    double   m_MCtagLifeTime;     /**< generated tag side life time of B-decay */
     int m_mcPDG;                  /**< generated tag side B flavor */
     TVector3 m_MCVertReco;        /**< generated Breco decay vertex */
+    double m_MCLifeTimeReco;      /**< generated Breco life time time */
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_MCdeltaT;            /**< generated DeltaT */

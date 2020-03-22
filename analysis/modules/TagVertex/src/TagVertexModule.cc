@@ -654,6 +654,11 @@ namespace Belle2 {
 
   }
 
+  static double getProperLifeTime(MCParticle* mc) //in ps
+  {
+    double beta = mc->getMomentum().Mag() / mc->getEnergy();
+    return 1e3 * mc->getLifetime() * sqrt(1 - pow(beta, 2));
+  }
 
   void TagVertexModule::BtagMCVertex(Particle* Breco)
   {
@@ -664,6 +669,7 @@ namespace Belle2 {
     TVector3 MCTagVert(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
                        std::numeric_limits<float>::quiet_NaN());
     int mcPDG = 0;
+    double mcTagLifeTime = -1;
 
     // Array of MC particles
     StoreArray<Belle2::MCParticle> mcParticles("");
@@ -683,9 +689,11 @@ namespace Belle2 {
         }
         if (isBreco) {
           m_MCVertReco = mc->getDecayVertex();
+          m_MCLifeTimeReco =  getProperLifeTime(mc);
           nReco++;
         } else {
           MCTagVert = mc->getDecayVertex();
+          mcTagLifeTime = getProperLifeTime(mc);
           mcPDG = mc->getPDG();
         }
       }
@@ -699,18 +707,22 @@ namespace Belle2 {
         if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
           double dcalc = (mc->getDecayVertex() - Breco->getVertex()).Mag();
           m_MCVertReco = mc->getDecayVertex();
+          m_MCLifeTimeReco  = getProperLifeTime(mc);
           if (dcalc < dref) {
             dref = dcalc;
             MCTagVert = mc->getDecayVertex();
+            mcTagLifeTime = getProperLifeTime(mc);
             mcPDG = mc->getPDG();
           } else {
             m_MCVertReco = mc->getDecayVertex();
+            m_MCLifeTimeReco  = getProperLifeTime(mc);
           }
         }
       }
     }
 
     m_MCtagV = MCTagVert;
+    m_MCtagLifeTime = mcTagLifeTime;
     m_mcPDG = mcPDG;
   }
 
@@ -1416,10 +1428,10 @@ namespace Belle2 {
     m_deltaT = dt;
     m_MCdeltaTapprox = MCdt;
 
-    // MCdeltaT=tau2-tau1
-    // TODO
-    m_MCdeltaT = MCdt;
-
+    // MCdeltaT=tauRec-tauTag
+    m_MCdeltaT = m_MCLifeTimeReco - m_MCtagLifeTime;
+    if (m_MCLifeTimeReco  == -1 || m_MCtagLifeTime == -1)
+      m_MCdeltaT =  std::numeric_limits<double>::quiet_NaN();
 
     // Calculate Delta t error
 

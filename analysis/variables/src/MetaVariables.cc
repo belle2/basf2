@@ -18,7 +18,6 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/utility/EvtPDLUtil.h>
-#include <analysis/utility/MCMatching.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/variables/VariableFormulaConstructor.h>
 

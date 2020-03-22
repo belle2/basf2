@@ -512,3 +512,16 @@ def add_collection(list_of_variables, collection_name):
 
     _variablemanager.addCollection(collection_name, _std_vector(*tuple(list_of_variables)))
     return collection_name
+
+
+def make_isSignal_alias(aliasName, flags):
+    mask = 0
+    for flag in flags:
+        if isinstance(flag, int):
+            mask |= flag
+        else:
+            informationString = "The type of input flags of make_isSignal_alias() should be integer."
+            informationString += "Now one of the input flags is " + str(int) + " ."
+            raise ValueError(informationString)
+
+    _variablemanager.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))

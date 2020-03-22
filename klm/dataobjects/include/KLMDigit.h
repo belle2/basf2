@@ -288,36 +288,36 @@ namespace Belle2 {
      * Get number of photoelectrons.
      * @return Number of photoelectrons.
      */
-    float getNPE() const
+    float getNPhotoelectrons() const
     {
-      return m_NPE;
+      return m_NPhotoelectrons;
     }
 
     /**
      * Set number of photoelectrons.
-     * @param[in] npe Number of photoelectrons.
+     * @param[in] nPhotoelectrons Number of photoelectrons.
      */
-    void setNPE(float npe)
+    void setNPhotoelectrons(float nPhotoelectrons)
     {
-      m_NPE = npe;
+      m_NPhotoelectrons = nPhotoelectrons;
     }
 
     /**
      * Get generated number of photoelectrons.
      * @return Number of photoelectrons.
      */
-    int getGeneratedNPE() const
+    int getNGeneratedPhotoelectrons() const
     {
-      return m_GeneratedNPE;
+      return m_NGeneratedPhotoelectrons;
     }
 
     /**
      * Set generated number of photoelectrons.
-     * @param[in] npe Number of photoelectrons.
+     * @param[in] nPhotoelectrons Number of photoelectrons.
      */
-    void setGeneratedNPE(int npe)
+    void setNGeneratedPhotoelectrons(int nPhotoelectrons)
     {
-      m_GeneratedNPE = npe;
+      m_NGeneratedPhotoelectrons = nPhotoelectrons;
     }
 
     /**
@@ -422,10 +422,10 @@ namespace Belle2 {
     float m_EnergyDeposit;
 
     /** Number of photoelectrons. */
-    float m_NPE;
+    float m_NPhotoelectrons;
 
     /** Generated number of photoelectrons (MC only). */
-    int m_GeneratedNPE;
+    int m_NGeneratedPhotoelectrons;
 
     /** Fit status. */
     int m_FitStatus;

@@ -18,8 +18,8 @@ KLMDigit::KLMDigit() :
   m_CTime(0),
   m_TDC(0),
   m_EnergyDeposit(0),
-  m_NPE(0),
-  m_GeneratedNPE(0),
+  m_NPhotoelectrons(0),
+  m_NGeneratedPhotoelectrons(0),
   m_FitStatus(0),
   m_MCTime(0),
   m_SiPMMCTime(0)
@@ -39,8 +39,8 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_TDC(0),
   m_Time(0),
   m_EnergyDeposit(simHit->getEnergyDeposit()),
-  m_NPE(0),
-  m_GeneratedNPE(0),
+  m_NPhotoelectrons(0),
+  m_NGeneratedPhotoelectrons(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
@@ -60,8 +60,8 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
   m_TDC(0),
   m_Time(simHit->getTime() + simHit->getPropagationTime()),
   m_EnergyDeposit(simHit->getEnergyDeposit()),
-  m_NPE(0),
-  m_GeneratedNPE(0),
+  m_NPhotoelectrons(0),
+  m_NGeneratedPhotoelectrons(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
@@ -81,8 +81,8 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
   m_TDC(0),
   m_Time(simHit->getTime() + simHit->getPropagationTime()),
   m_EnergyDeposit(simHit->getEnergyDeposit()),
-  m_NPE(0),
-  m_GeneratedNPE(0),
+  m_NPhotoelectrons(0),
+  m_NGeneratedPhotoelectrons(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
@@ -110,7 +110,7 @@ DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)
   if (this->getTime() > bgDigit->getTime())
     this->setTime(bgDigit->getTime());
   this->setCharge(std::min(this->getCharge(), bgDigit->getCharge()));
-  this->setGeneratedNPE(this->getGeneratedNPE() + bgDigit->getGeneratedNPE());
+  this->setNGeneratedPhotoelectrons(this->getNGeneratedPhotoelectrons() + bgDigit->getNGeneratedPhotoelectrons());
   return DigitBase::c_DontAppend;
 }
 

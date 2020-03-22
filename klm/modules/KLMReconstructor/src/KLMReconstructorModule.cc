@@ -253,7 +253,7 @@ double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
           m_eklmTimeCalibrationData[strip]->getTimeShift());
   /**
    * TODO: Subtract time correction given by
-   * m_eklmTimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPE()).
+   * m_eklmTimeCalibration->getAmplitudeTimeConstant() / sqrt(d->getNPhotoelectrons()).
    * It requires a new firmware version that will be able to extract amplitude.
    */
 }

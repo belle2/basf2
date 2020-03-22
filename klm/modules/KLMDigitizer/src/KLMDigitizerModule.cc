@@ -170,12 +170,12 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->addRelationTo(simHit);
     } else {
       simulator.simulate(it, ub);
-      if (simulator.getGeneratedNPE() == 0)
+      if (simulator.getNGeneratedPhotoelectrons() == 0)
         continue;
       KLMDigit* bklmDigit = m_Digits.appendNew(simHit);
       bklmDigit->addRelationTo(simHit);
       bklmDigit->setSiPMMCTime(simulator.getMCTime());
-      bklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
+      bklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
       if (simulator.getFitStatus() ==
           KLM::c_ScintillatorFirmwareSuccessfulFit) {
         tdc = simulator.getFPGAFit()->getStartTime();
@@ -187,7 +187,7 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->setTDC(tdc);
       bklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
       bklmDigit->setFitStatus(simulator.getFitStatus());
-      bklmDigit->setNPE(simulator.getNPE());
+      bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
       bklmDigit->setEnergyDeposit(simulator.getEnergy());
     }
   }
@@ -224,12 +224,12 @@ void KLMDigitizerModule::digitizeEKLM()
     }
     /* Simulation for a strip. */
     simulator.simulate(it, ub);
-    if (simulator.getGeneratedNPE() == 0)
+    if (simulator.getNGeneratedPhotoelectrons() == 0)
       continue;
     KLMDigit* eklmDigit = m_Digits.appendNew(simHit);
     eklmDigit->addRelationTo(simHit);
     eklmDigit->setSiPMMCTime(simulator.getMCTime());
-    eklmDigit->setGeneratedNPE(simulator.getGeneratedNPE());
+    eklmDigit->setNGeneratedPhotoelectrons(simulator.getNGeneratedPhotoelectrons());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit) {
       tdc = simulator.getFPGAFit()->getStartTime();
       eklmDigit->setCharge(simulator.getFPGAFit()->getMinimalAmplitude());
@@ -240,7 +240,7 @@ void KLMDigitizerModule::digitizeEKLM()
     eklmDigit->setTDC(tdc);
     eklmDigit->setTime(m_TimeConversion->getTimeSimulation(tdc, true));
     eklmDigit->setFitStatus(simulator.getFitStatus());
-    eklmDigit->setNPE(simulator.getNPE());
+    eklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
     eklmDigit->setEnergyDeposit(simulator.getEnergy());
     if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
         m_SaveFPGAFit) {

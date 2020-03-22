@@ -155,7 +155,7 @@ namespace Belle2 {
     /** Load threshold from DataBase (true) or not (false). */
     bool m_loadThresholdFromDB = true;
 
-    /** Threshold for the scintillator NPE .*/
+    /** Threshold for the scintillator NPhotoelectrons .*/
     double m_scintThreshold = 140;
 
     /* Common database objects. */

@@ -481,7 +481,7 @@ enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorSimulator::getFitStatus
   return m_FPGAStat;
 }
 
-double KLM::ScintillatorSimulator::getNPE()
+double KLM::ScintillatorSimulator::getNPhotoelectrons()
 {
   double intg;
   intg = m_FPGAFit.getAmplitude();
@@ -489,7 +489,7 @@ double KLM::ScintillatorSimulator::getNPE()
          m_PhotoelectronAmplitude;
 }
 
-int KLM::ScintillatorSimulator::getGeneratedNPE()
+int KLM::ScintillatorSimulator::getNGeneratedPhotoelectrons()
 {
   return m_npe;
 }

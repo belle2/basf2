@@ -367,20 +367,20 @@ namespace Belle2 {
 
     /**
      * Get SiPM MC time.
-     * @return Time.
+     * @return SiPM MC yime.
      */
     float getSiPMMCTime() const
     {
-      return m_sMCTime;
+      return m_SiPMMCTime;
     }
 
     /**
      * Set SiPM MC time.
-     * @param[in] t Time.
+     * @param[in] time Time.
      */
     void setSiPMMCTime(float t)
     {
-      m_sMCTime = t;
+      m_SiPMMCTime = t;
     }
 
   protected:
@@ -434,7 +434,7 @@ namespace Belle2 {
     float m_MCTime;
 
     /** MC time at SiPM. */
-    float m_sMCTime;
+    float m_SiPMMCTime;
 
     /** Class version. */
     ClassDefOverride(Belle2::KLMDigit, 1);

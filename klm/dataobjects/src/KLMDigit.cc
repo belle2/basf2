@@ -22,7 +22,7 @@ KLMDigit::KLMDigit() :
   m_GeneratedNPE(0),
   m_FitStatus(0),
   m_MCTime(0),
-  m_sMCTime(0)
+  m_SiPMMCTime(0)
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
@@ -43,7 +43,7 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_GeneratedNPE(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
-  m_sMCTime(0)
+  m_SiPMMCTime(0)
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
@@ -64,7 +64,7 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
   m_GeneratedNPE(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
-  m_sMCTime(0)
+  m_SiPMMCTime(0)
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
@@ -85,7 +85,7 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
   m_GeneratedNPE(0),
   m_FitStatus(0),
   m_MCTime(simHit->getTime()),
-  m_sMCTime(0)
+  m_SiPMMCTime(0)
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());
 }

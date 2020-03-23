@@ -157,7 +157,7 @@ class ClusterBase:
         return [donefile_exists, returncode]
 
     def terminate(self, job: Script):
-        """!
+        """! Terminate running job.
         """
         self.logger.error("Script termination not supported.")
 

@@ -191,6 +191,11 @@ double TagVertex::getRaveWeight(unsigned int trackIndex)
   return m_raveWeights.at(trackIndex);
 }
 
+int TagVertex::getFitTruthStatus()
+{
+  return m_fitTruthStatus;
+}
+
 void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
   m_tagVertex = tagVertex;
@@ -330,4 +335,9 @@ void  TagVertex::resetConstraintCov()
   TMatrixDSym temp(3);
   m_constraintCov.ResizeTo(temp);
   m_constraintCov = temp;
+}
+
+void TagVertex::setFitTruthStatus(int truthStatus)
+{
+  m_fitTruthStatus = truthStatus;
 }

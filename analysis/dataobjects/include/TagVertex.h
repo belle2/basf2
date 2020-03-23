@@ -60,6 +60,7 @@ namespace Belle2 {
       m_tagVChi2IP = 0;
       m_constraintType = "";
       m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
+      m_fitTruthStatus = 0;
     }
 
     // get methods
@@ -228,6 +229,11 @@ namespace Belle2 {
 
     double getRaveWeight(unsigned int trackIndex);
 
+    /**
+     * Get the status of the fit performed with the truth info of the tracks
+     */
+    int getFitTruthStatus();
+
     // set methods
 
     /**
@@ -358,6 +364,10 @@ namespace Belle2 {
 
     void setConstraintType(std::string const& constraintType);
 
+    /**
+     * Set the status of the fit performed with the truth info of the tracks
+     */
+    void setFitTruthStatus(int truthStatus);
 
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
@@ -386,6 +396,7 @@ namespace Belle2 {
     std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */
     TVector3 m_constraintCenter;        /**< centre of the constraint */
     TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
+    int m_fitTruthStatus;               /**< status of the fit when fitted with the truth info of the tracks */
 
 
     /**

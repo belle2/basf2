@@ -925,9 +925,8 @@ namespace Belle2 {
 
     int fitTruthStatus(const Particle* part)
     {
-      int result(-1);
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return std::numeric_limits<int>::quiet_NaN();
       return vert->getFitTruthStatus();
     }
 

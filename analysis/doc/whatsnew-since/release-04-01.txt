@@ -161,6 +161,7 @@ Modules
  * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
  * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
+ * In :b2:mod:`TagV` module, added the possibility to use the truth information from the tag particles in the vertex fit. The option :code:`useTruthInFit = True` switches that on. 
 
 Utilities and core objects
 ++++++++++++++++++++++++++

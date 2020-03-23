@@ -523,10 +523,10 @@ namespace Belle2 {
 
     if (m_useTruthInFit) {
       const MCParticle* mcBr = Breco->getRelated<MCParticle>();
-      if (!mcBr) cout << "failed to set the true BTube";
-      if (mcBr) {
+      if (!mcBr)
+        m_fitTruthStatus = 2;
+      if (mcBr)
         v4Final = mcBr->get4Vector();
-      }
     }
 
     PCmsLabTransform T;
@@ -1247,11 +1247,9 @@ namespace Belle2 {
     for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
       try {
         if (!m_useTruthInFit)
-          rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
-        if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
-          cout << "SALUT: in makeGeneralFitRave, didnt find MC particle" << endl;
+          rFit.addTrack(trackAndWeights.at(i).track);
+        if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle)
           m_fitTruthStatus = 2;
-        }
         if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
           TrackFitResult tfr(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
           rFit.addTrack(&tfr);
@@ -1361,19 +1359,18 @@ namespace Belle2 {
       if (!m_useTruthInFit) {
         const TrackFitResult* trackRes(NULL);
         trackRes = trackAndWeights.at(i).track;
-        Particle particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
+        Particle particle(dummyIndex, trackRes, Const::ChargedStable(211));
         addedOK = kFit.addParticle(&particle);
       }
 
       if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
         addedOK = 1;
         m_fitTruthStatus = 2;
-        cout << "SALUT: FAILED TO ADD A TRUE TRACK IN KFIT" << endl;
       }
 
       if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
         TrackFitResult trackRes(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
-        Particle particle(dummyIndex, &trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
+        Particle particle(dummyIndex, &trackRes, Const::ChargedStable(211));
         addedOK = kFit.addParticle(&particle);
       }
 

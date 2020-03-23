@@ -231,8 +231,8 @@ void DQMHistAnalysisPXDEffModule::event()
       // this has to be done first, as it will recalc Min/Max and destroy axis
       Double_t x, y;
       gr->GetPoint(i, x, y);
-      gr->SetPoint(i, x - 0.01, y);
-      auto val = gr->GetErrorYlow(i);
+      gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
+      auto val = y - gr->GetErrorYlow(i); // Error is relative to value
       if (i != 5) { // exclude 1.3.2
         /// check for val > 0.0) { would exclude all zero efficient modules!!!
         if (scale_min > val) scale_min = val;

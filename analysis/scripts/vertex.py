@@ -751,7 +751,7 @@ def TagV(
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
         useTruthInFit (bool): True when the tag vertex fit is performed with the true momentum and
-            position of the tracks (default is false). The variable "TagVFitTruthStatus" is set to 1
+            position of the tracks (default is false). The variable ``TagVFitTruthStatus`` is set to 1
             if the truth-matching succeeds and 2 otherwise.
         path (basf2.Path): modules are added to this path
 

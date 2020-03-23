@@ -6162,14 +6162,14 @@ Enddecay
 
 # Remove K- pi+ channel to avoid double counting in D Dalitz models
 Decay K*BR
-0.9940   anti-K0 pi0                                    VSS;
-0.0060   anti-K0 gamma                                  VSP_PWAVE;
+0.992656 anti-K0 pi0                                    VSS;
+0.007344 anti-K0 gamma                                  VSP_PWAVE;
 Enddecay
 
 # Remove K+ pi- channel to avoid double counting in D Dalitz models
 Decay K*0R
-0.9940   K0      pi0                                    VSS;
-0.0060   K0      gamma                                  VSP_PWAVE;
+0.992656 K0      pi0                                    VSS;
+0.007344 K0      gamma                                  VSP_PWAVE;
 Enddecay
 
 

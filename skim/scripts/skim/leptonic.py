@@ -12,6 +12,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim
 
 
 def LeptonicList(path):
@@ -66,3 +67,52 @@ def LeptonicList(path):
     ma.applyCuts('B-:L1', 'nTracks>=3', path=path)
     lepList = ['B-:L0', 'B-:L1']
     return lepList
+
+
+class LeptonicUntagged(BaseSkim):
+    """
+    Note:
+        * **Skim description**: Skim for leptonic analyses,
+          :math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`.
+        * **Skim LFN code**: 11130300
+        * **Working Group**: (Semi-)Leptonic and Missing Energy
+          Working Group (WG1)
+
+    Reconstructed decays
+        * :math:`B^- \\to e^-`
+        * :math:`B^- \\to \\mu^-`
+
+    Cuts applied
+        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
+        * :math:`\\text{electronID} > 0.5`
+        * :math:`\\text{muonID} > 0.5`
+        * :math:`n_{\\text{tracks}} \geq 3`
+    """
+
+    def setup(self, path):
+        from stdCharged import stdE, stdMu
+
+        stdE("all", path=path)
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList(
+            "e-:highP",
+            "e-:all",
+            "useCMSFrame(p) > 2.0 and electronID > 0.5",
+            True,
+            path=path,
+        )
+        ma.cutAndCopyList(
+            "mu-:highP",
+            "mu-:all",
+            "useCMSFrame(p) > 2.0 and muonID > 0.5",
+            True,
+            path=path,
+        )
+        ma.reconstructDecay("B-:L0 -> e-:highP", "", 1, path=path)
+        ma.reconstructDecay("B-:L1 -> mu-:highP", "", 2, path=path)
+        ma.applyCuts("B-:L0", "nTracks>=3", path=path)
+        ma.applyCuts("B-:L1", "nTracks>=3", path=path)
+        lepList = ["B-:L0", "B-:L1"]
+        return lepList

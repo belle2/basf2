@@ -1,2 +1,57 @@
-# TODO: Write a wrapper to run a skim using: `b2skim-run LeptonicUntagged` or
-# `b2skim-run tauThrust tauGeneric`
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""General steering file for running skims."""
+
+import argparse
+from importlib import import_module
+
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
+
+
+def get_argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+
+    parser.add_argument("skim", choices=["LeptonicUntagged"])
+    parser.add_argument("-n", "--input-events", default=None, type=int)
+    parser.add_argument(
+        "-i",
+        "--input-file-list",
+        dest="InputFileList",
+        nargs="+",
+        default=[expert.get_test_file("MC12_mixedBGx1")],
+    )
+    parser.add_argument("-o", "--output-udst-name", dest="OutputFileName")
+
+    return parser
+
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    SkimName = args.skim
+
+    path = b2.Path()
+
+    ma.inputMdstList("default", args.InputFileList, path=path)
+
+    ParentModule = import_module("skim.leptonic")
+    SkimClass = getattr(ParentModule, SkimName)()
+    SkimClass.setup(path)
+    SkimLists = SkimClass.build_lists(path)
+
+    OutputFileName = args.OutputFileName or expert.encodeSkimName(SkimName)
+    expert.skimOutputUdst(OutputFileName, SkimLists, path=path)
+
+    b2.set_log_level(b2.LogLevel.INFO)
+    expert.setSkimLogging(path=path)
+    ma.summaryOfLists(SkimLists, path=path)
+
+    b2.process(path)
+
+
+if __name__ == "__main__":
+    main()

@@ -213,3 +213,35 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     dataDescription.setdefault("skimDecayMode", skimDecayMode)
     add_mdst_output(outputFile, path)
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
+
+
+class BaseSkim:
+    """Base class for skims. Initialises a skim name, and creates template functions
+    required for each skim."""
+
+    def __init__(self):
+        self.name = self.__class__.__name__
+
+    def setup(self, path):
+        """Perform any setup steps necessary before running the skim. This may
+        include:
+            * adding required particle lists to the path,
+            * applying event-level cuts using `ifEventPasses`,
+            * running the FEI.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+        """
+        pass
+
+    def build_lists(self, path):
+        """Create the skim lists to be saved in the output uDST. This
+        function is where the main skim cuts should be applied.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+
+        Returns:
+            SkimLists (list(str)): List of particle list names.
+        """
+        pass

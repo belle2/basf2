@@ -17,6 +17,14 @@
 
 using namespace Belle2;
 
+
+TVector3 DistanceTools::poca(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
+{
+  TVector3 trackDir((1. / trackP.Mag()) * trackP);
+  TVector3 r(vtxPos - trackPos);
+  return trackPos + r.Dot(trackDir) * trackDir;
+}
+
 TVector3 DistanceTools::trackToVtxVec(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
 {
   TVector3 trackDir((1. / trackP.Mag()) * trackP);

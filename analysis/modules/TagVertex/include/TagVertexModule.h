@@ -95,6 +95,11 @@ namespace Belle2 {
     std::vector<double> m_raveWeights; /**< Store the weights used by Rave in the vtx fit so that they can be accessed later */
     std::vector<const MCParticle*>
     m_raveTracksMCParticles; /**< Store the MC particles corresponding to each track used by Rave in the vtx fit */
+    bool m_useTruthInFit;  /**< Set to true if the tag fit is to be made with the TRUE tag track momentum and position */
+    int m_fitTruthStatus; /**< Store info about whether the fit was performed with the truth info
+                           * 0 fit performed with measured parameters
+                           * 1 fit performed with true parameters
+                           * 2 unable to recover truth parameters */
     //std::vector<int> m_raveTracksMatchStatus; /**< stor the MC match status related to each track used by rave:
     //                                           * 0: no match, 1: match to good track (direct from tag B) 2: match to bad track */
     double m_fitPval;             /**< P value of the tag side fit result */
@@ -217,6 +222,14 @@ namespace Belle2 {
      * Print a TMatrixFSym (useful for debugging)
      */
     std::string printMatrix(TMatrixFSym const& mat);
+
+    /**
+     * If the fit has to be done with the truth info, Rave is fed with a track
+     * where the momentum is replaced by the true momentum and the position replaced
+     * by the point on the true particle trajectory closest to the measured track position
+     * The function below takes care of that.
+     */
+    TrackFitResult getTrackWithTrueCoordinates(TrackAndWeight const& taw);
   };
 
   /**

@@ -923,6 +923,14 @@ namespace Belle2 {
       return result(2);
     }
 
+    int fitTruthStatus(const Particle* part)
+    {
+      int result(-1);
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return result;
+      return vert->getFitTruthStatus();
+    }
+
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
@@ -1050,6 +1058,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagTrackTrueOriginZ(i)", tagTrackTrueOriginZ,
                       "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.")
 
+    REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
+                      "Returns the status of the fit performed with the truth info.")
   }
 }
 

@@ -424,6 +424,11 @@ namespace Belle2 {
      */
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex);
 
+    /**
+     * return the status of the fit performed with the true track parameters.
+     *
+     */
+    int fitTruthStatus(const Particle* part);
 
 
   }

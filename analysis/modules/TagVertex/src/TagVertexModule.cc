@@ -35,6 +35,7 @@
 #include <analysis/utility/ParticleCopy.h>
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
+#include <analysis/utility/DistanceTools.h>
 
 // vertex fitting
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
@@ -66,7 +67,8 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0), m_tagVl(0),
+    m_Bfield(0), m_fitTruthStatus(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0),
+    m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
     m_verbose(true)
   {
@@ -94,6 +96,8 @@ namespace Belle2 {
              "Minium number of PXD hits for a track to be used in the vertex fit", 0);
     addParam("fitAlgorithm", m_fitAlgo,
              "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
+    addParam("useTruthInFit", m_useTruthInFit,
+             "Use the true track parameters in the vertex fit", false);
 
 
   }
@@ -105,6 +109,8 @@ namespace Belle2 {
     // RAVE setup
     analysis::RaveSetup::initialize(1, m_Bfield);
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
+    // truth fit status will be set to 2 only if the MC info cannot be recovered
+    if (m_useTruthInFit) m_fitTruthStatus = 1;
 
     //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
     //input
@@ -187,6 +193,7 @@ namespace Belle2 {
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
           ver->setConstraintCov(m_constraintCov);
+          ver->setFitTruthStatus(m_fitTruthStatus);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -212,6 +219,7 @@ namespace Belle2 {
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
           ver->setConstraintCov(m_constraintCov);
+          ver->setFitTruthStatus(m_fitTruthStatus);
         }
       }
 
@@ -225,6 +233,12 @@ namespace Belle2 {
 
   bool TagVertexModule::doVertexFit(Particle* Breco)
   {
+    //reset the fit truth status in case it was set to 2 in a previous fit
+
+    if (m_useTruthInFit) m_fitTruthStatus = 1;
+
+    //set constraint type, reset pVal and B field
+
     if ((m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD") && m_constraintType == "noConstraint") {
       B2ERROR("TagVertex: not possible to use singleTrack with no constraint");
       return false;
@@ -503,12 +517,24 @@ namespace Belle2 {
 
     //get direction of B tag = opposite direction of B rec in CMF
 
+
+
     TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
+
+    //if we want the true info, replace the 4vector by the true one
+
+    if (m_useTruthInFit) {
+      const MCParticle* mcBr = Breco->getRelated<MCParticle>();
+      if (!mcBr) cout << "SALUT failed to set the true BTube";
+      if (mcBr) {
+        v4Final = mcBr->get4Vector();
+      }
+    }
+
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
     TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
     TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
-
 
     //To creat the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
@@ -570,6 +596,15 @@ namespace Belle2 {
 
     m_constraintCenter = tubecreatorBCopy.getVertex();
 
+    //if we want the true info, set the centre of the constraint to the primary vertex
+
+    if (m_useTruthInFit) {
+      const MCParticle* mcBr = Breco->getRelated<MCParticle>();
+      if (mcBr) {
+        m_constraintCenter = mcBr->getProductionVertex();
+      }
+    }
+
     m_constraintCov.ResizeTo(3, 3);
 
     for (int i(0); i < 3; ++i) {
@@ -586,6 +621,7 @@ namespace Belle2 {
     //(ie KFit way)
 
     m_tagMomentum = v4FinalNew;
+
 
     m_pvCov.ResizeTo(pv);
     m_pvCov = pv;
@@ -1212,7 +1248,16 @@ namespace Belle2 {
 
     for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
       try {
-        rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
+        if (!m_useTruthInFit)
+          rFit.addTrack(trackAndWeights.at(i).track); // Temporal fix: some mom go to Inf
+        if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
+          cout << "SALUT: in makeGeneralFitRave, didnt find MC particle" << endl;
+          m_fitTruthStatus = 2;
+        }
+        if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
+          TrackFitResult tfr(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
+          rFit.addTrack(&tfr);
+        }
       } catch (const rave::CheckedFloatException&) {
         B2ERROR("Exception caught in TagVertexModule::makeGeneralFitRave(): Invalid inputs (nan/inf)?");
       }
@@ -1313,12 +1358,25 @@ namespace Belle2 {
     int nTracksAdded(0);
 
     for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
-      const TrackFitResult* trackRes(NULL);
-      trackRes = trackAndWeights.at(i).track;
+      int addedOK(1);
 
-      int addedOK;
-      Particle particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
-      addedOK = kFit.addParticle(&particle);
+      if (!m_useTruthInFit) {
+        const TrackFitResult* trackRes(NULL);
+        trackRes = trackAndWeights.at(i).track;
+        Particle particle(dummyIndex, trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
+        addedOK = kFit.addParticle(&particle);
+      }
+
+      if (!m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
+        addedOK = 1;
+        cout << "SALUT: FAILED TO ADD A TRUE TRACK IN KFIT" << endl;
+      }
+
+      if (!m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
+        TrackFitResult trackRes(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
+        Particle particle(dummyIndex, &trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
+        addedOK = kFit.addParticle(&particle);
+      }
 
       if (addedOK != 0) {
         B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
@@ -1491,6 +1549,26 @@ namespace Belle2 {
       rsg.updateDaughters();
     } else {return false;}
     return true;
+  }
+
+  TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(TrackAndWeight const& taw)
+  {
+    if (!taw.mcParticle) {
+      B2ERROR("In TagVertexModule::getTrackWithTrueCoordinate: no MC particle set");
+      return TrackFitResult();
+    }
+
+    TVector3 truePoca(DistanceTools::poca(taw.mcParticle->getProductionVertex(),
+                                          taw.mcParticle->getMomentum(),
+                                          taw.track->getPosition()));
+
+    return TrackFitResult(truePoca,
+                          taw.mcParticle->getMomentum(),
+                          taw.track->getCovariance6(),
+                          taw.track->getChargeSign(),
+                          taw.track->getParticleType(),
+                          taw.track->getPValue(),
+                          m_Bfield, 0, 0);
   }
 
   //The following functions are just here to help printing stuff

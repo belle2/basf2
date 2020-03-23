@@ -718,6 +718,7 @@ def TagV(
     reqPXDHits=0,
     maskName='',
     fitAlgorithm='Rave',
+    useTruthInFit=False,
     path=None,
 ):
     """
@@ -749,6 +750,8 @@ def TagV(
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
+        useTruthInFit (bool): True when the tag vertex fit is performed with the true momentum
+        and position of the tracks (default is false)
         path (basf2.Path): modules are added to this path
 
     Warning:
@@ -767,6 +770,7 @@ def TagV(
     tvfit.param('askMCInformation', askMCInfo)
     tvfit.param('reqPXDHits', reqPXDHits)
     tvfit.param('fitAlgorithm', fitAlgorithm)
+    tvfit.param('useTruthInFit', useTruthInFit)
     path.add_module(tvfit)
 
 

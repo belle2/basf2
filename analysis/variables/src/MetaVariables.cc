@@ -1395,7 +1395,7 @@ namespace Belle2 {
 
         // get the final mask which summarize all the input masks
         int finalMask = 0;
-        for (int i = 1; i < arguments.size(); ++i) {
+        for (size_t i = 1; i < arguments.size(); ++i) {
           try {
             finalMask |= Belle2::convertString<int>(arguments[i]);
           } catch (boost::bad_lexical_cast&) {

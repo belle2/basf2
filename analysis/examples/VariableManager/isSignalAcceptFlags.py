@@ -12,7 +12,7 @@
 # >>> vu.make_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])
 #
 #
-# if you want to know the detial of make_isSignal_alias(), you could read the paragraph below then check the code
+# if you want to know the detail of make_isSignal_alias(), you could read the paragraph below then check the code
 # in analysis/scripts/variables/utils.py
 # The operation, setting certain bits in a variable to 0, is called "unmask", in contrast to "mask".
 # The function make_isSignal_alias() adds new isSignalAcceptSomething variable by unmasking the mcErrors
@@ -62,12 +62,12 @@ ma.matchMCTruth(list_name='D*+:Example', path=mypath)
 # declare what variables are needed
 basic_vars = vc.inv_mass + vc.kinematics + vc.mc_truth + vc.mc_variables
 
-# The following isSignalSomthing variables are predefined in Variable Manager,
+# The following isSignalSomething variables are predefined in Variable Manager,
 isSignalSomething_vars = ["isSignalAcceptWrongFSPs"]
 isSignalSomething_vars += ["isSignalAcceptMissingNeutrino", "isSignalAcceptMissingMassive"]
 isSignalSomething_vars += ["isSignalAcceptMissingGamma", "isSignalAcceptMissing", "mcParticleStatus"]
 
-# Try to defined your onw isSignalAcceptSomthing
+# Try to define your own isSignalAcceptSomething
 c_Correct = 0    # This Particle and all its daughters are perfectly reconstructed.
 c_MissFSR = 1    # A Final State Radiation (FSR) photon is not reconstructed (based
 # on MCParticle::c_IsFSRPhoton).
@@ -88,7 +88,8 @@ c_MissPHOTOS = 1024  # A photon created by PHOTOS was not reconstructed (based o
 c_AddedRecoBremsPhoton = 2048   # A photon added with the bremsstrahlung recovery tools (correctBrems or correctBremsBelle)
 # has no MC particle assigned, or it doesn't belong to the decay chain
 
-vu.make_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [c_MissGamma, c_MissNeutrino])
+# the indicated flags should be provided as an integer list
+vu.make_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
 isSignalSomething_vars += ["isSignalAcceptMissingGammaAndMissingNeutrino"]
 
 vu.make_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])

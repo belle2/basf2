@@ -515,6 +515,32 @@ def add_collection(list_of_variables, collection_name):
 
 
 def make_isSignal_alias(aliasName, flags):
+    """
+    Make a `VariableManager` alias for a customized :b2:var:`isSignal`, which accepts specified mc match errors.
+
+    .. seealso:: see :doc:`MCMatching` for a definition of the mc match error flags.
+
+    The following code defines a new variable ``isSignalAcceptMissingGammaAndMissingNeutrino``, which is same
+    as :b2:var:`isSignal`, but also accepts missing gamma and missing neutrino
+
+    >>> make_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
+
+    Logically, this
+    ``isSignalAcceptMissingGammaAndMissingNeutrino`` =
+    :b2:var:`isSignalAcceptMissingGamma` || :b2:var:`isSignalAcceptMissingNeutrino`.
+
+    In the example above, make_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
+    unmasking (setting bits to zero)
+    the `c_MissGamma` bit (16 or 0b00010000) and `c_MissNeutrino` bit (8 or 0b00001000) in mcErrors.
+
+    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
+    browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
+
+    Parameters:
+        aliasName (str): the name of the alias to be set
+        flags (list(int)): a list of the bits to unmask
+    """
+
     mask = 0
     for flag in flags:
         if isinstance(flag, int):

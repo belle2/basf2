@@ -517,15 +517,13 @@ namespace Belle2 {
 
     //get direction of B tag = opposite direction of B rec in CMF
 
-
-
     TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
 
     //if we want the true info, replace the 4vector by the true one
 
     if (m_useTruthInFit) {
       const MCParticle* mcBr = Breco->getRelated<MCParticle>();
-      if (!mcBr) cout << "SALUT failed to set the true BTube";
+      if (!mcBr) cout << "failed to set the true BTube";
       if (mcBr) {
         v4Final = mcBr->get4Vector();
       }
@@ -1367,12 +1365,13 @@ namespace Belle2 {
         addedOK = kFit.addParticle(&particle);
       }
 
-      if (!m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
+      if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
         addedOK = 1;
+        m_fitTruthStatus = 2;
         cout << "SALUT: FAILED TO ADD A TRUE TRACK IN KFIT" << endl;
       }
 
-      if (!m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
+      if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
         TrackFitResult trackRes(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
         Particle particle(dummyIndex, &trackRes, Const::ChargedStable(211), Const::ChargedStable(211));
         addedOK = kFit.addParticle(&particle);
@@ -1417,7 +1416,6 @@ namespace Belle2 {
     //if the fit is good, save the infos related to the vertex
 
     if (isGoodFit != 0) return false;
-
 
     m_tagV = CLHEPToROOT::getTVector3(kFit.getVertex());
 

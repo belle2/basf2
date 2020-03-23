@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-"""ECL timing calibration that performs the crate calibrations, one for each physics run."""
+"""ECL timing calibration that performs the crystal calibrations, one for  the whole set of runs."""
 
 from prompt import CalibrationSettings
-from reconstruction import prepare_cdst_analysis
+from reconstruction import *
+
 
 ##############################
 # REQUIRED VARIABLE #
@@ -16,7 +17,7 @@ from reconstruction import prepare_cdst_analysis
 #: Tells the automated system some details of this script.
 #     Default is to read in "hlt_bhabha" since we want to
 #     run over cdst hlt_bhabha skim files.
-settings = CalibrationSettings(name="ECL crate time calibrations",
+settings = CalibrationSettings(name="ECL crystal time calibrations",
                                expert_username="ehill",
                                description=__doc__,
                                input_data_formats=["cdst"],
@@ -61,10 +62,11 @@ def get_calibrations(input_data, **kwargs):
     # The input data should be the hlt bhabha skim
     file_to_iov_physics = input_data["hlt_bhabha"]
 
-    # We might have requested an enormous amount of data across a run range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 26
+    # Could remove this limit on the number of files per run but will just
+    # set to a large number in case we want to introduce it later.
+    # Also, keeping it allows the crystal calibrations code to look like the
+    # crates calibration code.
+    max_files_per_run = 1000
 
     # We filter addition files if there are more than [max_files_per_run] files per run.
     # The input data files are sorted alphabetically by b2caf-prompt-run
@@ -84,7 +86,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Collection
 
     ###################################################
-    # Collector setup
+    # Collector setup for ecl crystals
     root_input = register_module('RootInput')
     rec_path_bhabha = create_path()
     rec_path_bhabha.add_module(root_input)
@@ -93,7 +95,7 @@ def get_calibrations(input_data, **kwargs):
     if 'Geometry' not in rec_path_bhabha:
         rec_path_bhabha.add_module('Geometry', useDB=True)
 
-    prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
+    prepare_cdst_analysis(rec_path_bhabha)    # for new 2020 cdst format
 
     col_bhabha = register_module('ECLBhabhaTCollector')
     col_bhabha.param('timeAbsMax', 250)
@@ -107,44 +109,42 @@ def get_calibrations(input_data, **kwargs):
                          )
 
     ###################################################
-    # Algorithm setup
+    # Algorithm setup for crystals
 
-    eclTAlg = Belle2.ECL.eclBhabhaTAlgorithm()
+    eclTAlgCrystals = Belle2.ECL.eclBhabhaTAlgorithm()
 
     # Define the CAF algorithm arguments
-    # Set the cellIDLo to be larger than cellIDHi so that no crystal
+    # Set the crateIDLo to be larger than crateIDHi so that no crate
     #    calibrations will be performed.
-    eclTAlg.cellIDLo = 3
-    eclTAlg.cellIDHi = 2
-    eclTAlg.debugOutput = True
-    eclTAlg.meanCleanRebinFactor = 3
-    eclTAlg.meanCleanCutMinFactor = 0.3
-    eclTAlg.debugFilenameBase = "eclBhabhaTAlgorithm"
+    eclTAlgCrystals.crateIDLo = 3
+    eclTAlgCrystals.crateIDHi = 2
+    eclTAlgCrystals.debugOutput = True
+    eclTAlgCrystals.meanCleanRebinFactor = 3
+    eclTAlgCrystals.meanCleanCutMinFactor = 0.3
+    eclTAlgCrystals.debugFilenameBase = "eclBhabhaTAlgorithm"
 
     ###################################################
-    # Calibration setup
+    # Calibration setup base for crystals
 
     from caf.framework import Calibration
 
-    cal_test = Calibration("ECLcrateTimeCalibration_physics")
-    cal_test.add_collection(name="bhabha", collection=eclTCol)
-    cal_test.algorithms = [eclTAlg]
+    cal_crystals = Calibration("ECLcrystalTimeCalibration_physics")
+    cal_crystals.add_collection(name="bhabha", collection=eclTCol)
+    cal_crystals.algorithms = [eclTAlgCrystals]
 
     # Here we set the AlgorithmStrategy for our algorithm
-    from caf.strategies import SimpleRunByRun
+    from caf.strategies import SingleIOV
 
-    # The SimpleRunByRun strategy executes your algorithm over runs
-    # individually to give you payloads for each one (if successful)
-    # It will not do any merging of runs which didn't contain enough data.
-    # So failure is expected if your algorithm requires a large amount of data compared to run length.
-    # You should only use granularity='run' for the collector when using this strategy.
+    # The default value is SingleIOV, you don't have to set this, it is done automatically.
+    # SingleIOV just takes all of the runs as one big IoV and executes the algorithm once on all of their data.
+    # You can use granularity='run' or granularity='all' for the collector when using this strategy.
 
-    cal_test.strategies = SimpleRunByRun
+    cal_crystals.strategies = SingleIOV
 
-    # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
-    # So we don't bother setting them.
+    ###################################################
+    # Finalize all calibrations
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [cal_test]
+    return [cal_crystals]
 
 ##############################

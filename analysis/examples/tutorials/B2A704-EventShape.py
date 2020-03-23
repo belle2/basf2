@@ -27,19 +27,19 @@ ma.inputMdst(environmentType='default',
              path=my_path)
 
 
-# Creates a list of all the good tracks (using the pion mass hypothesis)
+# Creates a list of good tracks (using the pion mass hypothesis)
 # and good gammas with very minimal cuts
-ma.fillParticleList(decayString='pi+:all',
+ma.fillParticleList(decayString='pi+:goodtracks',
                     cut='pt> 0.1',
                     path=my_path)
-ma.fillParticleList(decayString='gamma:all',
+ma.fillParticleList(decayString='gamma:minimal',
                     cut='E > 0.1',
                     path=my_path)
 
 # Builds the event shape enabling explicitly ALL the variables.
 # Most of them are actually enabled by default, but here we prefer
 # to list explicitly all the flags
-ma.buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:minimal'],
                    allMoments=True,
                    foxWolfram=True,
                    harmonicMoments=True,

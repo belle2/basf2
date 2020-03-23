@@ -42,6 +42,10 @@ ma.printDataStore(path=my_path)
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
+#
+# note that you can give any name to your lists e.g. 'gamma:mycandidates',
+# except for the name 'all' which is the only name that is reseved for lists
+# with no cuts
 ma.fillParticleList(decayString='gamma:all', cut='', path=my_path)
 ma.fillParticleList(decayString='e-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='mu-:all', cut='', path=my_path)
@@ -65,7 +69,7 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(prioritiseV0=True, path=my_path)
 stdPi0s(listtype='looseFit', path=my_path)
-stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
+stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' us recommended at the moment
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore(path=my_path)
@@ -85,7 +89,7 @@ ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:merged', False, path=my_path)
 ma.printList('pi0:looseFit', False, path=my_path)
-ma.printList('K_L0:all', False, path=my_path)
+ma.printList('K_L0:allklm', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
@@ -147,7 +151,7 @@ ma.variablesToNtuple(decayString='gamma:all',
                      treename='phot',
                      filename=output_file,
                      path=my_path)
-ma.variablesToNtuple(decayString='K_L0:all',
+ma.variablesToNtuple(decayString='K_L0:allklm',
                      variables=K0l_variables,
                      treename='klong',
                      filename=output_file,

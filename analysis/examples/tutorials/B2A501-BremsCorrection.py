@@ -45,19 +45,19 @@ ma.inputMdst(environmentType='default',
 ma.fillParticleList(decayString='e+:uncorrected',
                     cut='electronID > 0.2 and dr < 2 and abs(dz) < 4',
                     path=my_path)
-ma.fillParticleList(decayString='gamma:all',
+ma.fillParticleList(decayString='gamma:bremsinput',
                     cut='E < 1.0',
                     path=my_path)
 
 # MC matching
 ma.matchMCTruth(list_name='e+:uncorrected', path=my_path)
-ma.matchMCTruth(list_name='gamma:all', path=my_path)
+ma.matchMCTruth(list_name='gamma:bremsinput', path=my_path)
 
 # correction of Bremsstrahlung
 # A new lepton is generated, with the old electron and, if found, a gamma as daughters.
 ma.correctBrems(outputList='e+:corrected',
                 inputList='e+:uncorrected',
-                gammaList='gamma:all',
+                gammaList='gamma:bremsinput',
                 path=my_path)
 ma.matchMCTruth(list_name='e+:corrected',
                 path=my_path)

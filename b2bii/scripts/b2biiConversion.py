@@ -72,7 +72,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   matchType2E9oE25Threshold=-1.1,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
-                                  enableRecTrg=False):
+                                  enableRecTrg=False, enableEvtcls=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -155,6 +155,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     convert.param("nisKsInfo", enableNisKsFinder)
     convert.param("RecTrg", enableRecTrg)
+    convert.param("convertEvtcls", enableEvtcls)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

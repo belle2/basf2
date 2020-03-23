@@ -145,7 +145,7 @@ namespace Belle2 {
 
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
-    bool m_convertRecTrg; /* Floag to switch on conversion of rectrg_summary3 */
+    bool m_convertRecTrg; /* Flag to switch on conversion of rectrg_summary3 */
 
     /**
      * E9/E25 threshold value
@@ -392,11 +392,8 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** Event classification flags */
-    StoreObjPtr<EventExtraInfo> m_evtCls;
-
-    /** Event classification flags */
-    StoreObjPtr<EventExtraInfo> m_recTrg;
+    /** Event Extra Info*/
+    StoreObjPtr<EventExtraInfo> m_evtInfo;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;

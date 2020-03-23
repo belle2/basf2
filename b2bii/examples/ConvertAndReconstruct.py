@@ -23,7 +23,7 @@ monitoring = False
 if len(sys.argv) == 1:
     basf2.B2WARNING("In the beginning of an analysis it is recommended to study the monitoring histograms.\n"
                     "These tell you if the conversion works as expected.\n"
-                    "If you want to create them, just provide any argument to this skript.")
+                    "If you want to create them, just provide any argument to this script.")
 else:
     monitoring = True
 

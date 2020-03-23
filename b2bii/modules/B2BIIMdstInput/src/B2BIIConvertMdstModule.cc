@@ -216,8 +216,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls) m_evtCls.registerInDataStore();
-  if (m_convertRecTrg) m_recTrg.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -1191,8 +1190,8 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 void B2BIIConvertMdstModule::convertEvtclsTable()
 {
   // Create StoreObj if it is not valid
-  if (not m_evtCls.isValid()) {
-    m_evtCls.create();
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
   }
   // Pull Evtcls_flag(2) from manager
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
@@ -1216,19 +1215,19 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
     std::string iVar = name + std::to_string(index);
     // 0-9 corresponding to evtcls_flag.flag(0-9)
     if (index < 10) {
-      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator).flag(index));
     } else {
       // 10-19 corresponding to evtcls_flag2.flag(0-9)
-      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
+      m_evtInfo->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
     }
-    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
   // Converting evtcls_hadronic_flag
   for (int index = 0; index < 6; ++index) {
     std::string iVar = name_had + std::to_string(index);
-    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
-    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    m_evtInfo->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
 }
@@ -1237,8 +1236,8 @@ void B2BIIConvertMdstModule::convertRecTrgTable()
 {
 
   // Create StoreObj if it is not valid
-  if (not m_recTrg.isValid()) {
-    m_recTrg.create();
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
   }
 
   // Pull rectrg_summary3 from manager
@@ -1251,8 +1250,8 @@ void B2BIIConvertMdstModule::convertRecTrgTable()
   // Converting m_final(3)
   for (int index = 0; index < 3; ++index) {
     std::string iVar = name + std::to_string(index);
-    m_recTrg->addExtraInfo(iVar, (*eflagIterator).final(index));
-    B2DEBUG(99, "m_final(" << index << ") = " << m_recTrg->getExtraInfo(iVar));
+    m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
+    B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
 }

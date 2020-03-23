@@ -1398,7 +1398,7 @@ namespace Belle2 {
         for (size_t i = 1; i < arguments.size(); ++i) {
           try {
             finalMask |= Belle2::convertString<int>(arguments[i]);
-          } catch (boost::bad_lexical_cast&) {
+          } catch (std::invalid_argument&) {
             B2FATAL("The input flags to meta function unmask() should be integer!");
             return nullptr;
           }
@@ -1420,7 +1420,7 @@ namespace Belle2 {
         return func;
 
       } else {
-        B2FATAL("Wrong number of arguments for meta function unmask");
+        B2FATAL("Meta function unmask needs at least two arguments!");
       }
     }
 

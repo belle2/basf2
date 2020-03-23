@@ -514,7 +514,7 @@ def add_collection(list_of_variables, collection_name):
     return collection_name
 
 
-def make_isSignal_alias(aliasName, flags):
+def create_isSignal_alias(aliasName, flags):
     """
     Make a `VariableManager` alias for a customized :b2:var:`isSignal`, which accepts specified mc match errors.
 
@@ -523,13 +523,13 @@ def make_isSignal_alias(aliasName, flags):
     The following code defines a new variable ``isSignalAcceptMissingGammaAndMissingNeutrino``, which is same
     as :b2:var:`isSignal`, but also accepts missing gamma and missing neutrino
 
-    >>> make_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
+    >>> create_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
 
     Logically, this
     ``isSignalAcceptMissingGammaAndMissingNeutrino`` =
     :b2:var:`isSignalAcceptMissingGamma` || :b2:var:`isSignalAcceptMissingNeutrino`.
 
-    In the example above, make_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
+    In the example above, create_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
     unmasking (setting bits to zero)
     the `c_MissGamma` bit (16 or 0b00010000) and `c_MissNeutrino` bit (8 or 0b00001000) in mcErrors.
 
@@ -546,7 +546,7 @@ def make_isSignal_alias(aliasName, flags):
         if isinstance(flag, int):
             mask |= flag
         else:
-            informationString = "The type of input flags of make_isSignal_alias() should be integer."
+            informationString = "The type of input flags of create_isSignal_alias() should be integer."
             informationString += "Now one of the input flags is " + str(int) + " ."
             raise ValueError(informationString)
 

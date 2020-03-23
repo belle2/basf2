@@ -100,7 +100,7 @@ Variables
    `EventKinematics` module. 
 
  * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
- * Added a new variable util ``make_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors. 
+ * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors. 
 
 Modules
 +++++++

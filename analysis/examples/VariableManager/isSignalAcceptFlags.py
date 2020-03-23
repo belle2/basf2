@@ -6,16 +6,16 @@
 # isSignalAcceptMissingGamma euqals to 1 when mcErrors == 0 or mcErrors == 16, which could be interpreted
 # as "After setting the MissGamma bit (the 5th bit, or 16 = 0b00010000) to 0, if mcErrors == 0, then
 # isSignalAcceptMissingGamma euqals to 1". A new isSignalAcceptSomething variables could be added conveniently
-# by make_isSignal_alias() in variable.utils:
+# by create_isSignal_alias() in variable.utils:
 # >>> c_MissGamma = 16
 # >>> c_DecayInFlight = 4
-# >>> vu.make_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])
+# >>> vu.create_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])
 #
 #
-# if you want to know the detail of make_isSignal_alias(), you could read the paragraph below then check the code
+# if you want to know the detail of create_isSignal_alias(), you could read the paragraph below then check the code
 # in analysis/scripts/variables/utils.py
 # The operation, setting certain bits in a variable to 0, is called "unmask", in contrast to "mask".
-# The function make_isSignal_alias() adds new isSignalAcceptSomething variable by unmasking the mcErrors
+# The function create_isSignal_alias() adds new isSignalAcceptSomething variable by unmasking the mcErrors
 # code using the meta function unmask() like:
 # >>> c_MissGamma = 16
 # >>> c_DecayInFlight = 4
@@ -89,13 +89,13 @@ c_AddedRecoBremsPhoton = 2048   # A photon added with the bremsstrahlung recover
 # has no MC particle assigned, or it doesn't belong to the decay chain
 
 # the indicated flags should be provided as an integer list
-vu.make_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
+vu.create_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
 isSignalSomething_vars += ["isSignalAcceptMissingGammaAndMissingNeutrino"]
 
-vu.make_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])
+vu.create_isSignal_alias("isSignalAcceptMissingGammaAndDecayInFlight", [c_MissGamma, c_DecayInFlight])
 isSignalSomething_vars += ["isSignalAcceptMissingGammaAndDecayInFlight"]
 
-# this line show how make_isSignal_alias() work, and is equivalent to the lines above
+# this line show how create_isSignal_alias() work, and is equivalent to the lines above
 vm.addAlias("isSignalAcceptMissingNeutrinoAndWrongFSP", "passesCut(unmask(mcErrors," +
             "%d) == %d)" % (c_MissGamma | c_MissMassiveParticle | c_MissKlong | c_MissKlong, c_Correct))
 isSignalSomething_vars += ["isSignalAcceptMissingNeutrinoAndWrongFSP"]

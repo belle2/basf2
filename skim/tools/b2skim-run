@@ -15,7 +15,7 @@ def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument("skim", choices=["LeptonicUntagged"])
-    parser.add_argument("-n", "--input-events", default=None, type=int)
+    parser.add_argument("-n", "--max-input-events", default=0)
     parser.add_argument(
         "-i",
         "--input-file-list",
@@ -28,29 +28,30 @@ def get_argument_parser():
     return parser
 
 
+def import_skim_module(SkimName):
+    # TODO: Write generalised method of finding modules
+    if SkimName == "LeptonicUntagged":
+        import_module("skim.leptonic")
+    else:
+        raise NotImplementedError
+
+
 def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    SkimName = args.skim
-
     path = b2.Path()
-
     ma.inputMdstList("default", args.InputFileList, path=path)
 
-    ParentModule = import_module("skim.leptonic")
-    SkimClass = getattr(ParentModule, SkimName)()
-    SkimClass.setup(path)
-    SkimLists = SkimClass.build_lists(path)
+    SkimModule = import_skim_module(args.skim)
+    Skim = getattr(SkimModule, args.skim)()
 
-    OutputFileName = args.OutputFileName or expert.encodeSkimName(SkimName)
-    expert.skimOutputUdst(OutputFileName, SkimLists, path=path)
+    Skim.set_skim_logging(path)
+    Skim.setup(path)
+    Skim.build_lists(path)
+    Skim.output_udst(path)
 
-    b2.set_log_level(b2.LogLevel.INFO)
-    expert.setSkimLogging(path=path)
-    ma.summaryOfLists(SkimLists, path=path)
-
-    b2.process(path)
+    b2.process(path, max_event=args.max_input_events)
 
 
 if __name__ == "__main__":

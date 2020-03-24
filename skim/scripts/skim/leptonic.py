@@ -86,8 +86,9 @@ class LeptonicUntagged(BaseSkim):
         * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
         * :math:`\\text{electronID} > 0.5`
         * :math:`\\text{muonID} > 0.5`
-        * :math:`n_{\\text{tracks}} \geq 3`
+        * :math:`n_{\\text{tracks}} \\geq 3`
     """
+    lists = ["B-:L0", "B-:L1"]
 
     def setup(self, path):
         from stdCharged import stdE, stdMu
@@ -115,4 +116,4 @@ class LeptonicUntagged(BaseSkim):
         ma.applyCuts("B-:L0", "nTracks>=3", path=path)
         ma.applyCuts("B-:L1", "nTracks>=3", path=path)
         lepList = ["B-:L0", "B-:L1"]
-        return lepList
+        self.lists = lepList

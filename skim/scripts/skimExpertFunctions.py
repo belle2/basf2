@@ -219,12 +219,43 @@ class BaseSkim:
     """Base class for skims. Initialises a skim name, and creates template functions
     required for each skim."""
 
-    def __init__(self):
+    NoisyModules = []
+    lists = []
+
+    def __init__(self, OutputFileName=None):
         self.name = self.__class__.__name__
+        self.OutputFileName = OutputFileName or encodeSkimName(self.name)
+
+    def __str__(self):
+        return self.name
+
+    def __name__(self):
+        return self.name
+
+    def __call__(self, path):
+        self.set_skim_logging(path)
+        self.setup(path)
+        self.build_lists(path)
+        self.output_udst(path)
+
+    def set_skim_logging(self, path):
+        """Turns the log level to ERROR for selected modules to decrease the total size
+        of the skim log files. Additional modules can be silenced by setting the attribute
+        `NoisyModules` for an individual skim.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+        """
+        b2.set_log_level(b2.LogLevel.INFO)
+
+        NoisyModules = ['ParticleLoader', 'ParticleVertexFitter'] + self.NoisyModules
+
+        for module in path.modules():
+            if module.type() in set(NoisyModules):
+                module.set_log_level(b2.LogLevel.ERROR)
 
     def setup(self, path):
-        """Perform any setup steps necessary before running the skim. This may
-        include:
+        """Perform any setup steps necessary before running the skim. This may include:
             * adding required particle lists to the path,
             * applying event-level cuts using `ifEventPasses`,
             * running the FEI.
@@ -235,13 +266,46 @@ class BaseSkim:
         pass
 
     def build_lists(self, path):
-        """Create the skim lists to be saved in the output uDST. This
-        function is where the main skim cuts should be applied.
+        """Create the skim lists to be saved in the output uDST. This function is where
+        the main skim cuts should be applied. At the end of this method, the attribute
+        `self.lists` should be set so it can be used by `output_udst()`.
 
         Args:
             path (basf2.Path): Skim path to be processed.
-
-        Returns:
-            SkimLists (list(str)): List of particle list names.
         """
         pass
+
+    def output_udst(self, path):
+        """"""
+        skimOutputUdst(self.OutputFileName, self.lists, path=path)
+        summaryOfLists(self.lists, path=path)
+
+
+class CombinedSkim:
+    """Class for creating combined skims which can be run using similar-looking methods
+    to `BaseSkim` objects."""
+
+    def __init__(self, *skims):
+        # Check that we were passed only BaseSkim objects
+        if not all([isinstance(skim, BaseSkim) for skim in skims]):
+            raise NotImplementedError(
+                "Must pass only `BaseSkim` type objects to `CombinedSkim`."
+            )
+        self.IndividualSkims = {skim.name: skim for skim in skims}
+        self.NoisySkims = list({})
+
+    def _check_duplicate_list_names(self):
+        """Check for duplicate particle list names"""
+        # NOTE: Relies on BaseSkim.lists being defined *before* build_lists() is run!
+        ParticleListLists = [skim.lists for skim in self.IndividualSkims.values()]
+        ParticleLists = [l for L in ParticleListLists for l in L]
+        DuplicatedParticleLists = {
+            ParticleList
+            for ParticleList in ParticleLists
+            if ParticleLists.count(ParticleList) > 1
+        }
+        if DuplicatedParticleLists:
+            raise ValueError(
+                f"Non-unique output particle list names in combined skim! "
+                ", ".join(DuplicatedParticleLists)
+            )

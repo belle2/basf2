@@ -7,7 +7,8 @@ __authors__ = [
     "Sam Cunliffe",
     "Michael De Nuccio",
     "Ilya Komarov",
-    "Giacomo De Pietro"
+    "Giacomo De Pietro",
+    "Miho Wakai",
 ]
 
 
@@ -57,6 +58,62 @@ def SinglePhotonDarkList(path):
     region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
     ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
     return ['gamma:singlePhoton']
+
+
+def GammaGammaControlKLMDarkList(path):
+    """
+    Gamma gamma skim list for study of the KLM efficiency as part of
+    the dark photon analysis
+
+    **Skim code**: 18020200
+
+    **Physics channel**: ee → γγ
+
+    **Skim category**: physics, dark sector, control-channel
+
+    Parameters:
+        path (basf2.Path): the path to add the skim
+
+    Returns:
+        list name of the skim candidates
+    """
+    __authors__ = ["Sam Cunliffe", "Miho Wakai"]
+
+    # no good (IP-originating) tracks in the event
+    good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.2'  # cm, cm, GeV/c
+    no_good_tracks = 'nCleanedTracks(' + good_tracks + ') < 1'
+
+    # get two most energetic photons in the event (must be at least 100 MeV
+    # and not more than 7 GeV)
+    ma.cutAndCopyList(
+        'gamma:controlKLM', 'gamma:all', '0.1 < clusterE < 7', path=path)
+    ma.rankByHighest('gamma:controlKLM', 'clusterE', numBest=2, path=path)
+
+    # will build pairwise candidates from the gamma:controlKLM list:
+    # vpho -> gamma gamma
+
+    # the more energetic must be at least 4.5 GeV
+    tag_daughter = 'daughterHighest(clusterE) > 4.5'
+    # note that sometimes the probe will also fulfill this criteria, but the
+    # candidate list will *not* be double-counted: these extra candidates need
+    # to be added back offline
+
+    # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
+    delta_phi_cut = 'daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065'
+
+    # sum theta in the cms 178 --> 182 degrees
+    sum_th = 'daughterSumOf(usingCMSFrame(theta))'
+    sum_th_cut = '3.1066860685499065 < ' + sum_th + ' < 3.1764992386296798'
+
+    # now build and return the candidates passing the AND of our cuts
+    cuts = '[ %s ]' % no_good_tracks
+    cuts += ' and [ %s ]' % tag_daughter
+    cuts += ' and [ %s ]' % delta_phi_cut
+    cuts += ' and [ %s ]' % sum_th_cut
+    ma.reconstructDecay(
+        'vpho:singlePhotonControlKLM -> gamma:controlKLM gamma:controlKLM',
+        cuts, path=path)
+    return ['vpho:singlePhotonControlKLM']
 
 
 def _addALPToPDG():

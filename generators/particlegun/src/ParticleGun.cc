@@ -126,7 +126,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   double vz = generateValue(m_params.zVertexDist, m_params.zVertexParams);
 
   // Time offset
-  double nTimeOffset = static_cast<double>(m_params.timeOffset) * Belle2::Unit::s;
+  double timeOffset = generateValue(m_params.timeDist, m_params.timeParams);
 
   //Determine number of tracks
   int nTracks = static_cast<int>(m_params.nTracks);
@@ -191,7 +191,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
     p.setDecayTime(numeric_limits<double>::infinity());
 
     // set time offset to check fit bias in e.g. the ECL waveform fits
-    p.setProductionTime(nTimeOffset);
+    p.setProductionTime(timeOffset);
 
     if (m_params.independentVertices) {
       //If we have independent vertices, generate new vertex for next particle
@@ -241,6 +241,7 @@ bool ParticleGun::setParameters(const Parameters& p)
     if (dist == "zVertex")  return p.zVertexDist;
     if (dist == "theta")    return p.thetaDist;
     if (dist == "phi")      return p.phiDist;
+    if (dist == "timeOffset")      return p.timeDist;
     throw std::runtime_error("wrong parameter");
   };
   //Small helper lambda to get the parameters by name
@@ -251,6 +252,7 @@ bool ParticleGun::setParameters(const Parameters& p)
     if (dist == "zVertex")  return p.zVertexParams;
     if (dist == "theta")    return p.thetaParams;
     if (dist == "phi")      return p.phiParams;
+    if (dist == "timeOffset")      return p.timeParams;
     throw std::runtime_error("wrong parameter");
   };
   //Small helper lambda to produce a nice error message and set the error flag
@@ -268,7 +270,7 @@ bool ParticleGun::setParameters(const Parameters& p)
     excludeDistribution(dist, c_normalCosDistribution);
     excludeDistribution(dist, c_polylineCosDistribution);
   }
-  for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta"}) {
+  for (auto dist : {"xVertex", "yVertex", "zVertex", "phi", "theta", "timeOffset"}) {
     excludeDistribution(dist, c_uniformPtDistribution);
     excludeDistribution(dist, c_uniformLogPtDistribution);
     excludeDistribution(dist, c_normalPtDistribution);
@@ -283,7 +285,7 @@ bool ParticleGun::setParameters(const Parameters& p)
   }
 
   //Check minimum numbers of parameters
-  for (auto par : {"momentum", "xVertex", "yVertex", "zVertex", "theta", "phi"}) {
+  for (auto par : {"momentum", "xVertex", "yVertex", "zVertex", "theta", "phi", "timeOffset"}) {
     const EDistribution dist = getDist(par);
     size_t minParams = (dist == c_fixedValue) ? 1 : 2;
     if (dist == c_polylineDistribution || dist == c_polylinePtDistribution || dist == c_polylineCosDistribution) minParams = 4;

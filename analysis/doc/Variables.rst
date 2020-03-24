@@ -349,8 +349,9 @@ For a detailed description of the event shape variables,  see `EventShape`
 Event Kinematics
 ~~~~~~~~~~~~~~~~
 
-These variables are available after adding the event kinematics modules.
+These variables are available after adding the event kinematics module.
 This can be done with the function `modularAnalysis.buildEventKinematics`.
+The variable collection ``event_kinematics`` allows to add all of them comfortably to your ntuple.
 
 .. b2-variables::
     :group: EventKinematics

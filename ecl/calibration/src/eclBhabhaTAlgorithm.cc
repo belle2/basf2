@@ -67,6 +67,15 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   // Make tool for mapping ecl crystal to other ecl objects
   //    e.g. crates, shapers, etc.
+  //    Need to load information about the event/run/experiment to get the right database information
+  int expNumberForCrates = -1;
+  int runNumberForCrates = -1;
+  int eventNumberForCrates = 1;
+  for (auto expRun : getRunList()) {
+    expNumberForCrates = expRun.first;
+    runNumberForCrates = expRun.second;
+  }
+  updateDBObjPtrs(eventNumberForCrates, runNumberForCrates, expNumberForCrates);
   unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
 

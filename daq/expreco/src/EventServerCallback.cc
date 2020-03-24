@@ -1,10 +1,9 @@
 #include "daq/expreco/EventServerCallback.h"
 
-#include <daq/slc/base/StringUtil.h>
-
 #include <unistd.h>
 
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 using namespace Belle2;
 using namespace std;

@@ -75,6 +75,7 @@ namespace Belle2 {
     std::string m_EKLMDigitsName; /**< name of EKLM collection to overlay with BG */
 
     std::string m_extensionName; /**< name added to default branch names */
+    std::string m_BackgroundInfoInstanceName = ""; /**< name BackgroundInfo name */
 
     /**
      * Register simulated and BG digits (both as optional input)

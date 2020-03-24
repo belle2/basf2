@@ -120,7 +120,7 @@ ma.buildContinuumSuppression(list_name='B0',
                              path=my_path)
 
 # Define the variables for training.
-#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  For details, please see the Continuum suppression section at https://software.belle2.org
 #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
 #  signal-B final state particles.
 trainVars = [

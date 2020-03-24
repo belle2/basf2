@@ -6,8 +6,6 @@
 #include <daq/slc/base/Serializable.h>
 
 #include <string>
-#include <vector>
-#include <map>
 #include <stdexcept>
 
 namespace Belle2 {

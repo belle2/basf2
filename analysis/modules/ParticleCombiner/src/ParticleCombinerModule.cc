@@ -50,7 +50,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("decayString", m_decayString,
-             "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
+             "Input DecayDescriptor string (see :ref:`DecayString`).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
              "Max. number of candidates reconstructed. By default, if the limit is reached no candidates will be produced.\n"
@@ -187,9 +187,8 @@ namespace Belle2 {
       }
 
       Particle* newParticle = particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
 
-      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+      outputList->addParticle(newParticle);
 
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);

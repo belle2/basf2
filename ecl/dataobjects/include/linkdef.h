@@ -13,6 +13,7 @@
 #pragma link C++ class Belle2::ECLDigit+;
 #pragma link C++ class Belle2::ECLCalDigit+;
 #pragma link C++ class Belle2::ECLDsp+;
+#pragma link C++ class Belle2::ECLDspWithExtraMCInfo+;
 #pragma link C++ class Belle2::ECLTrig+;
 #pragma link C++ class Belle2::ECLSimHit+;
 #pragma link C++ class Belle2::ECLHit+;

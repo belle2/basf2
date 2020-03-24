@@ -38,7 +38,8 @@ if feistate.stage <= 0:
             'analysis/mdstBelle1_exp65_charged.root',
             'validation',
             False),
-        applyHadronBJSkim=True,
+        applySkim=True,
+        enableNisKsFinder=False,
         path=path)
 else:
     ma.inputMdstList('Belle', [], path)

@@ -54,7 +54,11 @@ Uses ECLDigits, ECLDsps, ECLTrigs dataobjects
 
 class ShapeFitterModule(Module):
     def initialize(self):
+        '''
+        '''
+        #: Event number
         self.evtn = 0
+        #: Store array of ECLDigits
         self.digits = Belle2.PyStoreArray('ECLDigits')
 
     def event(self):
@@ -85,15 +89,14 @@ class ShapeFitterModule(Module):
             # == Call emulator
             result = Belle2.ECL.ECLDspUtilities.shapeFitter(cid, adc, trigger_time)
 
-            cid2 = result.getCellId()
-            amp2 = result.getAmp()
-            time2 = result.getTimeFit()
-            qual2 = result.getQuality()
+            amp2 = result.amp
+            time2 = result.time
+            qual2 = result.quality
 
             if amp != amp2 or time != time2 or qual != qual2:
                 print()
                 print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
-                print('Emulator: %4d %6d %6d %6d' % (cid2, amp2, time2, qual2))
+                print('Emulator: %4d %6d %6d %6d' % (cid, amp2, time2, qual2))
                 if VERBOSE:
                     print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
                     print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))

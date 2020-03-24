@@ -57,12 +57,34 @@ namespace Belle2 {
       return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
+    double isChargedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 521) return 1.0;
+      }
+      return 0.0;
+    }
+
+    double isUnmixedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      std::vector<int> bPDGs;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 511) bPDGs.push_back(pdg_no);
+      }
+      if (bPDGs.size() == 2) {
+        return bPDGs[0] * bPDGs[1] < 0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
-      if (!mcParticles) {
-        return 0.0;
-      }
       for (const MCParticle& mcp : mcParticles) {
         int pdg_no = mcp.getPDG();
         if (mcp.getMother() == nullptr &&
@@ -80,10 +102,6 @@ namespace Belle2 {
     double nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
-      if (!mcps)  {
-        B2DEBUG(19, "Cannot find MCParticles array.");
-        return 0.0;
-      }
       return mcps.getEntries();
     }
 
@@ -442,11 +460,17 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event");
 
-    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
+    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
                       "[Eventbased] 1.0 if event does contain an Y(4S) and therefore is not a continuum Event");
+
+    REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
+                      "[Eventbased] true if event contains a charged B-meson");
+    REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
+                      R"DOC([Eventbased] true if event contains opposite flavor neutral B-mesons,
+false in case of same flavor B-mesons and NaN if an event has no generated neutral B)DOC");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");

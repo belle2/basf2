@@ -48,7 +48,7 @@ further to ensure reproducibility of analyses: different processing iterations
 will use different globaltags. The only exceptions are the globaltag used online
 during data taking and for prompt processing of data directly after data taking:
 These two globaltags are flagged as running and information for new runs is
-constantly added to them as more data becomes available. 
+constantly added to them as more data becomes available.
 
 All globaltags to be used in analysis need to be fixed. Globaltags which are
 not fixed, i.e. "OPEN", cannot be used for data processing. Otherwise it is not
@@ -255,15 +255,15 @@ The configuration interface changed for release-04 and the old configuration
 functions now create warnings but should still work in most cases. Only expert
 settings like custom log levels and database parameters are no longer supported.
 
-* `reset_database()`: Not really needed anymore as the default settings will be
+* `basf2.reset_database()`: Not really needed anymore as the default settings will be
   more suitable for everyone. Still works but behaves slightly different as it
   will reset to default settings instead of completely empty settings
 
-* `use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
+* `basf2.use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
 
-* `use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
+* `basf2.use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
 
-* `use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
+* `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
 
 * the payloads in `localdb/database.txt` are no longer used by default, you have to explicitly enable that
   using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`

@@ -192,7 +192,17 @@ void EventProcessor::process(const PathPtr& startPath, long maxEvent)
   LogSystem::Instance().printErrorSummary();
 
   if (gSignalReceived == SIGINT) {
-    B2ERROR("Processing aborted via SIGINT, terminating. Output files have been closed safely and should be readable.");
+    const auto msg = R"(Processing aborted via SIGINT, terminating.
+    Output files have been closed safely and should be readable. However
+    processing was NOT COMPLETE. The output files do contain only events
+    processed until this point.)";
+    if (m_eventMetaDataPtr)
+      B2ERROR(msg
+              << LogVar("last_experiment", m_eventMetaDataPtr->getExperiment())
+              << LogVar("last_run", m_eventMetaDataPtr->getRun())
+              << LogVar("last_event", m_eventMetaDataPtr->getEvent()));
+    else
+      B2ERROR(msg);
     installSignalHandler(SIGINT, SIG_DFL);
     raise(SIGINT);
   }

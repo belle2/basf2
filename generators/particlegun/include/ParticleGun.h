@@ -70,10 +70,12 @@ namespace Belle2 {
       EDistribution thetaDist = c_fixedValue;
       /** Distribution to use for x vertex generation */
       EDistribution xVertexDist = c_fixedValue;
-      /** Distribution to use for x vertex generation */
+      /** Distribution to use for y vertex generation */
       EDistribution yVertexDist = c_fixedValue;
-      /** Distribution to use for x vertex generation */
+      /** Distribution to use for z vertex generation */
       EDistribution zVertexDist = c_fixedValue;
+      /** Distribution to use for time generation */
+      EDistribution timeDist = c_fixedValue;
       /** Number of tracks to generate per event */
       double nTracks;
       /** List of PDG particle codes to pick from when generating particles */
@@ -90,6 +92,9 @@ namespace Belle2 {
       std::vector<double> yVertexParams = {0};
       /** Parameters for the z vertex generation, meaning depends on chosen distribution */
       std::vector<double> zVertexParams = {0};
+      /** Parameters for the time generation, meaning depends on chosen distribution */
+      std::vector<double> timeParams = {0};
+
       /** If false, all particles of one event will have the same vertex, if
        * true the vertex of each particle will be generated independently
        */
@@ -101,8 +106,6 @@ namespace Belle2 {
        * distribution and assigns this momentum to all particles generated
        * for one event */
       bool fixedMomentumPerEvent = false;
-      /** Time offset from 0 */
-      double timeOffset;
 
     };
 

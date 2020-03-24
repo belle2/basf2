@@ -41,6 +41,9 @@ namespace Belle2 {
 
     /**
      * Load default electronics mapping.
+     *
+     * @param[in] isExperiment10
+     * Whether the map is created for experiment 10 or later.
      */
     void loadDefaultElectronicMapping(bool isExperiment10 = false);
 

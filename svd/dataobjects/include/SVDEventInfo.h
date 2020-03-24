@@ -74,6 +74,13 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_modeByte; }
 
+    /** returns the time shift between SVD reference
+     *  and FTSW (Trigger) reference:
+     *  time in FTSW reference = time in SVD reference + time shift
+     */
+    float getSVD2FTSWTimeShift() const
+    { return 7.8625 * (3 - SVDModeByte(m_modeByte).getTriggerBin()); }
+
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event
      */

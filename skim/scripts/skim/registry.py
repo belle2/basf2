@@ -73,7 +73,7 @@ skim_registry = [
     ('18360100', 'TauLFV'),
     ('13160100', 'TCPV'),
     ('18020100', 'SinglePhotonDark'),
-    ('18020200', 'GammaGammaControlKLMDarkList'),
+    ('18020200', 'GammaGammaControlKLMDark'),
     ('18020300', 'ALP3Gamma'),
     ('18520100', 'DimuonPlusMissingEnergy'),
     ('18520200', 'ElectronMuonPlusMissingEnergy'),
@@ -102,7 +102,8 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',  # 'DielectronPlusMissingEnergy'
+        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible',
+        'DimuonPlusMissingEnergy',  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'

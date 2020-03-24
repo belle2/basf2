@@ -102,7 +102,7 @@ def GammaGammaControlKLMDarkList(path):
     delta_phi_cut = 'daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065'
 
     # sum theta in the cms 178 --> 182 degrees
-    sum_th = 'daughterSumOf(usingCMSFrame(theta))'
+    sum_th = 'daughterSumOf(useCMSFrame(theta))'
     sum_th_cut = '3.1066860685499065 < ' + sum_th + ' < 3.1764992386296798'
 
     # now build and return the candidates passing the AND of our cuts

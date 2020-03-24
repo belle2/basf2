@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Doxygen should skip this script
+# @cond
+
 """
 This steering file fills an NTuple with the ChargedPidMVA score
 for charged particle identification. By default, global PID info is stored,
@@ -231,3 +234,5 @@ if __name__ == '__main__':
 
     # Print basf2 call statistics.
     print(basf2.statistics)
+
+# @endcond

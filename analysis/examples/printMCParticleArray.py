@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Doxygen should skip this script
+# @cond
+
 """
 This script loads specified ROOT file and prints the content of the MCParticle StoreArray
 for each event. To be used for debugging.
@@ -15,3 +18,5 @@ path = basf2.Path()
 path.add_module('RootInput')
 printMCParticles(path=path)
 basf2.process(path)
+
+# @endcond

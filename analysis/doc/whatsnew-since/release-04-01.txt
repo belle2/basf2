@@ -162,9 +162,13 @@ Modules
  * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
 
+ * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned 
+   off by setting ``allowChargeViolation=True``.
+
 Utilities and core objects
 ++++++++++++++++++++++++++
 
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+ * Added a function to retrieve electric charge of a particle based on its pdg code.

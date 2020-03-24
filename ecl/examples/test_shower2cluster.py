@@ -1,47 +1,55 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# basf2 test_shower2cluster.py
-# input file is /home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root
-# Output file is shower2cluster.root
+"""Shower to Cluster
+
+Input:
+    File with mdst format
+
+Output:
+    File named 'shower_to_cluster.root'
+
+Usage:
+    $ basf2 -i <input_file> -o <output_file>
+            -n <number_of_events> test_shower2cluster.py
+"""
 
 import basf2 as b2
 
-main = b2.create_path()
+__author__ = ['Vishal Bhardwaj', 'Abtin Narimani Charan']
+__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-# This is the module for ECLShower to ECLCluster
-showertocluster = b2.register_module('ECLShowertoCluster')
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
 
-# now both files below work
-inFileROOT = '/home/belle2/harat/MCsample/charged_e0001r0001_s00_BGx1.mdst.root'
-# inFileROOT = '/home/belle2/harat/MCsample/mixed_e0001r0001_s00_BGx1.mdst.root'
+# Register and add 'ECLShowertoCluster' module
+eclShowertoCluster = b2.register_module('ECLShowertoCluster')
+mainPath.add_module(eclShowertoCluster)
 
-rootinput = b2.register_module('RootInput')
-rootinput.param('inputFileName', inFileROOT)
-main.add_module(rootinput)
-main.add_module(showertocluster)
+# Register and add 'RootInput' module
+rootInput = b2.register_module('RootInput')
+mainPath.add_module(rootInput)
 
+# Register and add 'ParticleLoader' module
 particleLoader = b2.register_module('ParticleLoader')
-main.add_module(particleLoader)
+mainPath.add_module(particleLoader)
 
-# Save ECLCluster in rootfile
-output = b2.register_module('RootOutput')
-outFileROOT = 'shower2cluster.root'
-output.param('outputFileName', outFileROOT)
+"""Register and add 'RootOutput' module.
+This saves ECLCluster in a root file.
+"""
+rootOutput = b2.register_module('RootOutput')
+rootOutput.param('outputFileName', 'shower_to_cluster.root')
+rootOutput.param('branchNames', ['ECLShowers',
+                                 'ECLClusters',
+                                 'ECLClustersToTracks',
+                                 'ECLClustersToMCParticles',
+                                 'MCParticles',
+                                 'Tracks'])
+mainPath.add_module(rootOutput)
 
-branches = ['ECLShowers',
-            'ECLClusters',
-            'ECLClustersToTracks',
-            'ECLClustersToMCParticles']
-
-branches += ['MCParticles',
-             'Tracks']
-
-output.param('branchNames', branches)
-main.add_module(output)
-
-# Start processing of modules
-b2.process(main)
-
-# Print call statistics
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
 print(b2.statistics)

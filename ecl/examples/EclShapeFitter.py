@@ -1,72 +1,63 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# --------------------------------------------------------------------------
-# Performs shape fit and compares emulator fit results with fit results
-# received from ShaperDSP module.
-# --------------------------------------------------------------------------
+"""Performs shape fit and compares emulator fit results with fit
+   results received from ShaperDSP module.
+"""
 
+import glob
 import basf2 as b2
 from ROOT import Belle2, gSystem, gInterpreter
-import glob
-
 from ROOT import TFile, TTree
 from array import array
 
+__author__ = 'Mikhail Remnev'
+__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__maintainer__ = 'Mikhail Remnev'
+__email__ = 'mikhail.a.remnev@gmail.com'
+
 env = Belle2.Environment.Instance()
 
-
-################################################
 # PARAMETERS
-################################################
 
-# Name of input files (accepts glob expressions)
-FILE_LIST = []
-FILE_LIST = sorted(glob.glob('/group/belle2/dataprod/Data/Raw/e0008/r03480/sub00/*.root'))
+inputFile_list = []
+outputFileName = 'out.root'
+inputFile_list = sorted(glob.glob('/group/belle2/dataprod/Data/Raw/e0008/r03480/sub00/*.root'))
 
 # Override if "-i file.root" argument was sent to basf2.
 input_arg = env.getInputFilesOverride()
 if len(input_arg) > 0:
-    FILE_LIST = [str(x) for x in input_arg]
-print(FILE_LIST)
+    inputFile_list = [str(x) for x in input_arg]
+print(inputFile_list)
 
-# Output file name
-OUTPUT = "out.root"
-# Override output if "-o file.root" argument was sent to basf2.
+# Override output if '-o file.root' argument was sent to basf2.
 output_arg = env.getOutputFileOverride()
 if len(output_arg) > 0:
-    OUTPUT = output_arg
+    outputFileName = output_arg
 
-VERBOSE = False
-
-################################################
-# BASF2 PATH GENERATION
-################################################
-
-
-'''
-Module that prints ShaperDSP emulator discrepancies
-for ECL data.
-
-Uses ECLDigits, ECLDsps, ECLTrigs dataobjects
-'''
+verbose = False
 
 
 class ShapeFitterModule(Module):
 
+    """Module that prints ShaperDSP emulator discrepancies
+       for ECL data.
+
+    Uses ECLDigits, ECLDsps, ECLTrigs dataobjects
+    """
+
     def initialize(self):
-        '''
-        '''
-        #: Event number
-        self.evtn = 0
-        #: Store array of ECLDigits
+        """Initialize
+        """
+        self.eventNumber = 0
+        # Store array of ECLDigits
         self.digits = Belle2.PyStoreArray('ECLDigits')
 
     def event(self):
-        '''
-        Check for discrepancy between real ShaperDSP data and shapeFitter function
-        from ecl/utility/src/ECLDspUtilities.cc
-        '''
+        """Check for discrepancy between real ShaperDSP
+           data and shapeFitter function from
+           ecl/utility/src/ECLDspUtilities.cc .
+        """
 
         for digit in self.digits:
             waveform = digit.getRelated('ECLDsps')
@@ -82,60 +73,67 @@ class ShapeFitterModule(Module):
             # Waveform data
             adc = waveform.getDspA()
 
-            cid = digit.getCellId()
-            amp = digit.getAmp()
-            time = digit.getTimeFit()
-            qual = digit.getQuality()
+            cellID = digit.getCellId()
+            amplitude = digit.getAmp()
+            timeFit = digit.getTimeFit()
+            quality = digit.getQuality()
 
-            # == Call emulator
-            result = Belle2.ECL.ECLDspUtilities.shapeFitter(cid, adc, trigger_time)
+            # Call emulator
+            result = Belle2.ECL.ECLDspUtilities.shapeFitter(cellID,
+                                                            adc,
+                                                            trigger_time)
+            cellID2 = result.getCellId()
+            amplitude2 = result.getAmp()
+            timeFit2 = result.getTimeFit()
+            quality2 = result.getQuality()
 
-            cid2 = result.getCellId()
-            amp2 = result.getAmp()
-            time2 = result.getTimeFit()
-            qual2 = result.getQuality()
+            if amplitude != amplitude2 or timeFit != timeFit2 or quality != quality2:
 
-            if amp != amp2 or time != time2 or qual != qual2:
-                print()
-                print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
-                print('Emulator: %4d %6d %6d %6d' % (cid2, amp2, time2, qual2))
-                if VERBOSE:
-                    print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
-                    print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))
+                print('\nRealData: %4d %6d %6d %6d' % (cellID, amplitude,
+                                                       timeFit, quality))
+                print('Emulator: %4d %6d %6d %6d' % (cellID2, amplitude2,
+                                                     timeFit2, quality2))
+                if verbose:
+
+                    print('Event: %d Trigger time: %d' % (self.eventNumber, trigger_time))
+                    print('CellID: %d AmpData: %d' % (cellID, amplitude))
+                    print('TimeData: %d QualityData: %d' % (timeFit, quality))
                     print(' '.join([str(x) for x in adc]), end='')
                     print(' ')
-                    self.evtn += 1
 
+                    self.eventNumber += 1
 
 b2.set_log_level(b2.LogLevel.ERROR)
 
-# Create path
-main = b2.create_path()
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
 
-# (Seq)Root input
-if FILE_LIST[0].endswith('sroot'):
-    main.add_module('SeqRootInput', inputFileName="", inputFileNames=FILE_LIST)
+# Add '(Seq)RootInput' module
+if file_list[0].endswith('sroot'):
+    mainPath.add_module('SeqRootInput',
+                        inputFileName='',
+                        inputFileNames=inputFile_list)
 else:
-    main.add_module('RootInput', inputFileName="", inputFileNames=FILE_LIST)
+    mainPath.add_module('RootInput',
+                        inputFileName='',
+                        inputFileNames=inputFile_list)
 
-# if FILE_LIST[0].endswith('sroot') or 'Raw' in FILE_LIST[0]:
-main.add_module('ECLUnpacker', storeTrigTime=True)
+# if inputFile_list[0].endswith('sroot') or 'Raw' in inputFile_list[0]:
+mainPath.add_module('ECLUnpacker', storeTrigTime=True)
 
 # Do shape fitting of ECLDsps
-main.add_module(ShapeFitterModule())
-
-main.add_module('Progress')
+mainPath.add_module(ShapeFitterModule())
 
 b2.reset_database()
 b2.use_database_chain()
 b2.use_central_database('data_reprocessing_prompt', b2.LogLevel.WARNING)
 b2.use_central_database('online', b2.LogLevel.WARNING)
-b2.use_local_database("localdb/database.txt")
+b2.use_local_database('localdb/database.txt')
 
 # For exp9 data
 b2.conditions.override_globaltags()
 
-# Process events
-b2.process(main)
-
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
 print(b2.statistics)

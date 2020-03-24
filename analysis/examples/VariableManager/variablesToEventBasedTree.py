@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToEventBasedTree module saves variables from the VariableManager
 # to an event-based TTree

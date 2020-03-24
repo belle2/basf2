@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 # run 'pydoc3 vertex' for general documentation of vertexing stuff

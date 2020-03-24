@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 This script loads specified ROOT file and prints the content of the MCParticle StoreArray

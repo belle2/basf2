@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToNtuple (and VariablesToTree) module support collections of variables.
 # You specify a collection instead of a variable name, and the collection will be automatically

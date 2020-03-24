@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToNtuple module saves variables from the VariableManager
 # to a candidate-based (or event-based) TTree

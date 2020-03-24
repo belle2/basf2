@@ -71,6 +71,7 @@ namespace Belle2 {
       }
 
       if (not m_resultsWithWeight.empty()) {
+        // sort results so that 'std::max' below picks path with highest weight if multiple paths have same size
         std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
 
         const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), m_param_useBestNInSeed);

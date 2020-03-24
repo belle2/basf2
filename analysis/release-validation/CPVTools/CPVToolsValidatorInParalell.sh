@@ -54,7 +54,7 @@ if [ ${testDecayChannel} = "JPsiKs" ]
 processID=''
 TeachingProcessID='zampano'
 
-for ((level = 4 ; level < 5; level++))
+for ((level = 1 ; level < 5; level++))
     # Level 1 samples and trains the Event Level, 
     # Level 2 samples and trains the Kaon-Pion category (Event Level), 
     # Level 3 samples and trains the combiner,

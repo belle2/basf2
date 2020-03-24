@@ -71,11 +71,9 @@ namespace Belle2 {
       }
 
       if (not m_resultsWithWeight.empty()) {
-        const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), m_param_useBestNInSeed);
-        if (useBestNResults < m_resultsWithWeight.size()) {
-          std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
-        }
+        std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
 
+        const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), m_param_useBestNInSeed);
         const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);
         const auto& longestElement = *(std::max_element(m_resultsWithWeight.begin(), lastItemToUse,
                                                         TrackFindingCDC::LessOf<NumberOfHitsGetter>()));

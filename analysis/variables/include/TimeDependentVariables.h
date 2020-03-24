@@ -426,6 +426,9 @@ namespace Belle2 {
 
     /**
      * return the status of the fit performed with the true track parameters.
+     * 0 fit performed with measured parameters
+     * 1 fit performed with true parameters
+     * 2 unable to recover truth parameters
      *
      */
     int fitTruthStatus(const Particle* part);

@@ -26,8 +26,8 @@ clsTimeDeltaT = 30  # NOT USED
 clsTimeNSigma = 10  # NOT USED
 
 # time difference U-V
-clsTimeDiff = 100  # default
-# clsTimeDiff = int(sys.argv[1])
+clsTimeDiff = 999  # default for DATA and exp 1003, 1002
+# clsTimeDiff = 10  # default for exp 0
 
 # cls cuts
 clsSeedSNR = 5
@@ -63,7 +63,7 @@ class defaultSVDClusterCalibrationImporter(basf2.Module):
         # cluster time difference
         hitTimeSelection.setMaxUVTimeDifference(clsTimeDiff)
         time_payload = Belle2.SVDClusterCalibrations.t_time_payload(
-            hitTimeSelection, "HitTimeSelection_TEST_" + str(now.isoformat()) +
+            hitTimeSelection, "HitTimeSelection_default_" + str(now.isoformat()) +
             "_INFO:_tmin="+str(clsTimeMin)+"_tDiff="+str(clsTimeDiff))
 
         # cluster reconstruction & position error

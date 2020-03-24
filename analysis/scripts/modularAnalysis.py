@@ -980,7 +980,8 @@ def reconstructDecay(decayString,
                      writeOut=False,
                      path=None,
                      candidate_limit=None,
-                     ignoreIfTooManyCandidates=True):
+                     ignoreIfTooManyCandidates=True,
+                     allowChargeViolation=False):
     r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
@@ -1025,6 +1026,7 @@ def reconstructDecay(decayString,
     @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
                        candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1036,6 +1038,7 @@ def reconstructDecay(decayString,
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
+    pmake.param("allowChargeViolation", allowChargeViolation)
     path.add_module(pmake)
 
 

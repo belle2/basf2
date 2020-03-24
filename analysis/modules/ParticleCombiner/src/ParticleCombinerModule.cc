@@ -22,6 +22,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <memory>
@@ -73,6 +74,8 @@ namespace Belle2 {
              "  b) recoilParticleType = 2: \n\n"
              "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
              "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
+    addParam("allowChargeViolation", m_allowChargeViolation,
+             "If true the decay string does not have to conserve electric charge", false);
 
     // initializing the rest of private memebers
     m_pdgCode   = 0;
@@ -102,11 +105,18 @@ namespace Belle2 {
 
     // Daughters
     int nProducts = m_decaydescriptor.getNDaughters();
+    int daughtersNetCharge = 0;
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      int daughterPDGCode = daughter->getPDGCode();
+      daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
     }
+
+    if (!m_allowChargeViolation && daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode))
+      B2WARNING("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "You can turn off this warning by setting the argument 'allowChargeViolation' to True.");
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 

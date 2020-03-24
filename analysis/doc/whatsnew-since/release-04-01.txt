@@ -109,7 +109,6 @@ Variables
  * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
  * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those created at analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
-
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
    `EventKinematics` module. 
 
@@ -161,7 +160,6 @@ Modules
  * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
  * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
-
  * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned 
    off by setting ``allowChargeViolation=True``.
 

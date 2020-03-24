@@ -11,9 +11,7 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
-import variables
 import variables.collections  # collections of variables
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 from variables import variables as vm  # shorthand name for the VariableManager instance

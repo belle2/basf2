@@ -32,7 +32,6 @@ import variables.utils as vu
 import vertex as vx
 import stdCharged as stdc
 import variables as va
-from stdPi0s import stdPi0s
 
 # create path
 my_path = b2.create_path()

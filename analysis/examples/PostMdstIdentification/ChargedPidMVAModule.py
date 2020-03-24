@@ -21,8 +21,6 @@ __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 
 
-import os
-import sys
 import argparse
 
 

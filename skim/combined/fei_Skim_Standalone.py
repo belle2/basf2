@@ -12,8 +12,8 @@ __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"
 
 ######################################################
 #
-# This script reconstructs hadronic Btags using
-# generically trained FEI.
+# This script reconstructs hadronic and SL Btags
+# using generically trained FEI
 #
 # FEIv4_2018_MC11_release_03_00_00
 #

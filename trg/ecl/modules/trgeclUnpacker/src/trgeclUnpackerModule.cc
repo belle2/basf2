@@ -17,6 +17,7 @@
 // 3.02 : 2019/06/24 : 20GeV ECL BST bit
 // 3.03 : 2019/10/07 : New Lowmulti (12 & 13) bit
 // 4.00 : 2019/10/11 : Summary totally change
+// 4.01 : 2020/03/13 : Bug fixed. (Bug : SumStore always save only one TRG info. in latest window)
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
@@ -29,7 +30,7 @@ REG_MODULE(TRGECLUnpacker);
 
 string TRGECLUnpackerModule::version() const
 {
-  return string("4.00");
+  return string("4.01");
 }
 
 TRGECLUnpackerModule::TRGECLUnpackerModule()
@@ -262,6 +263,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   // <---- Unpacking
 
   // Summary
+  int sum_num_ord  = 0;
   int sum_num      = 0;
   int sum_revo     = 0;
   int cl_theta[6]  = {0};
@@ -360,78 +362,85 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
         cl_bha[k]  = (sum_info[j][12] >> (k + 12)) & 0x1;
       }
       ncl          = (sum_info[j][13]) & 0x7;
-    }
 
-    m_TRGECLSumArray.appendNew();
-    m_sumNum = m_TRGECLSumArray.getEntries() - 1;
-    m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
-    m_TRGECLSumArray[m_sumNum]->setSumNum(sum_num);
-    m_TRGECLSumArray[m_sumNum]->setSumRevo(sum_revo);
-    m_TRGECLSumArray[m_sumNum]->setCLTheta(cl_theta);
-    m_TRGECLSumArray[m_sumNum]->setCLPhi(cl_phi);
-    m_TRGECLSumArray[m_sumNum]->setCLTime(cl_time);
-    m_TRGECLSumArray[m_sumNum]->setCLEnergy(cl_energy);
-    m_TRGECLSumArray[m_sumNum]->setCLF1GeV(cl_1gev);
-    m_TRGECLSumArray[m_sumNum]->setCLF2GeV(cl_2gev);
-    m_TRGECLSumArray[m_sumNum]->setCLFBha(cl_bha);
-    m_TRGECLSumArray[m_sumNum]->setNCL(ncl);
-    m_TRGECLSumArray[m_sumNum]->setICN(icn);
-    m_TRGECLSumArray[m_sumNum]->setICNOver(icn_over);
-    m_TRGECLSumArray[m_sumNum]->setLowMulti(low_multi);
-    m_TRGECLSumArray[m_sumNum]->set3DBhabhaV(b2bhabha_v);
-    m_TRGECLSumArray[m_sumNum]->set3DBhabhaS(b2bhabha_s);
-    m_TRGECLSumArray[m_sumNum]->setMumu(mumu);
-    m_TRGECLSumArray[m_sumNum]->setPrescale(prescale);
-    m_TRGECLSumArray[m_sumNum]->set2DBhabha(b1bhabha);
-    m_TRGECLSumArray[m_sumNum]->setBhabhaType(b1_type);
-    m_TRGECLSumArray[m_sumNum]->setPhysics(physics);
-    m_TRGECLSumArray[m_sumNum]->setBG(bg_veto);
-    m_TRGECLSumArray[m_sumNum]->setEtot(etot);
-    m_TRGECLSumArray[m_sumNum]->setEtotType(etot_type);
-    m_TRGECLSumArray[m_sumNum]->setECLBST(ecl_bst);
-    m_TRGECLSumArray[m_sumNum]->setTime(time);
-    m_TRGECLSumArray[m_sumNum]->setTimeType(time_type);
+      m_TRGECLSumArray.appendNew();
+      m_sumNum = m_TRGECLSumArray.getEntries() - 1;
+      m_TRGECLSumArray[m_sumNum]->setEventId(n_basf2evt);
+      m_TRGECLSumArray[m_sumNum]->setSumNum(sum_num);
+      m_TRGECLSumArray[m_sumNum]->setSumRevo(sum_revo);
+      m_TRGECLSumArray[m_sumNum]->setCLTheta(cl_theta);
+      m_TRGECLSumArray[m_sumNum]->setCLPhi(cl_phi);
+      m_TRGECLSumArray[m_sumNum]->setCLTime(cl_time);
+      m_TRGECLSumArray[m_sumNum]->setCLEnergy(cl_energy);
+      m_TRGECLSumArray[m_sumNum]->setCLF1GeV(cl_1gev);
+      m_TRGECLSumArray[m_sumNum]->setCLF2GeV(cl_2gev);
+      m_TRGECLSumArray[m_sumNum]->setCLFBha(cl_bha);
+      m_TRGECLSumArray[m_sumNum]->setNCL(ncl);
+      m_TRGECLSumArray[m_sumNum]->setICN(icn);
+      m_TRGECLSumArray[m_sumNum]->setICNOver(icn_over);
+      m_TRGECLSumArray[m_sumNum]->setLowMulti(low_multi);
+      m_TRGECLSumArray[m_sumNum]->set3DBhabhaV(b2bhabha_v);
+      m_TRGECLSumArray[m_sumNum]->set3DBhabhaS(b2bhabha_s);
+      m_TRGECLSumArray[m_sumNum]->setMumu(mumu);
+      m_TRGECLSumArray[m_sumNum]->setPrescale(prescale);
+      m_TRGECLSumArray[m_sumNum]->set2DBhabha(b1bhabha);
+      m_TRGECLSumArray[m_sumNum]->setBhabhaType(b1_type);
+      m_TRGECLSumArray[m_sumNum]->setPhysics(physics);
+      m_TRGECLSumArray[m_sumNum]->setBG(bg_veto);
+      m_TRGECLSumArray[m_sumNum]->setEtot(etot);
+      m_TRGECLSumArray[m_sumNum]->setEtotType(etot_type);
+      m_TRGECLSumArray[m_sumNum]->setECLBST(ecl_bst);
+      m_TRGECLSumArray[m_sumNum]->setTime(time);
+      m_TRGECLSumArray[m_sumNum]->setTimeType(time_type);
 
-    for (int k = 0; k < 6; k++) {
-      cl_1d.push_back(cl_theta[k]);
-      cl_1d.push_back(cl_phi[k]);
-      cl_1d.push_back(cl_time[k]);
-      cl_1d.push_back(cl_energy[k]);
-      cl_1d.push_back(cl_1gev[k]);
-      cl_1d.push_back(cl_2gev[k]);
-      cl_1d.push_back(cl_bha[k]);
-      cl_2d.push_back(cl_1d);
-      cl_1d.clear();
-    }
-    sort(cl_2d.begin(), cl_2d.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[3] > aa2[3];});
-
-    evt_1d_vector.push_back(abs(sum_num - 3));
-    evt_1d_vector.push_back(sum_revo);
-    evt_1d_vector.push_back(sum_num);
-    evt_1d_vector.push_back(time);
-    for (int k = 0; k < 6; k++) {
-      for (int l = 0; l < 7; l++) {
-        evt_1d_vector.push_back(cl_2d[k][l]);
+      for (int k = 0; k < 6; k++) {
+        cl_1d.push_back(cl_theta[k]);
+        cl_1d.push_back(cl_phi[k]);
+        cl_1d.push_back(cl_time[k]);
+        cl_1d.push_back(cl_energy[k]);
+        cl_1d.push_back(cl_1gev[k]);
+        cl_1d.push_back(cl_2gev[k]);
+        cl_1d.push_back(cl_bha[k]);
+        cl_2d.push_back(cl_1d);
+        cl_1d.clear();
       }
+      sort(cl_2d.begin(), cl_2d.end(),
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[3] > aa2[3];});
+
+      if (sum_num == -9999) {
+        sum_num_ord = -9999;
+      } else if (sum_num <= 3) {
+        sum_num_ord = 2 * abs(sum_num - 3);
+      } else {
+        sum_num_ord = (sum_num * 2) - 7;
+      }
+      evt_1d_vector.push_back(sum_num_ord);
+      evt_1d_vector.push_back(sum_revo);
+      evt_1d_vector.push_back(sum_num);
+      evt_1d_vector.push_back(time);
+      for (int k = 0; k < 6; k++) {
+        for (int l = 0; l < 7; l++) {
+          evt_1d_vector.push_back(cl_2d[k][l]);
+        }
+      }
+      evt_1d_vector.push_back(ncl);
+      evt_1d_vector.push_back(low_multi);
+      evt_1d_vector.push_back(b2bhabha_v);
+      evt_1d_vector.push_back(b2bhabha_s);
+      evt_1d_vector.push_back(mumu);
+      evt_1d_vector.push_back(prescale);
+      evt_1d_vector.push_back(icn);
+      evt_1d_vector.push_back(icn_over);
+      evt_1d_vector.push_back(etot_type);
+      evt_1d_vector.push_back(etot);
+      evt_1d_vector.push_back(ecl_bst);
+      evt_1d_vector.push_back(b1_type);
+      evt_1d_vector.push_back(b1bhabha);
+      evt_1d_vector.push_back(physics);
+      evt_1d_vector.push_back(time_type);
+      evt_2d_vector.push_back(evt_1d_vector);
+      evt_1d_vector.clear();
     }
-    evt_1d_vector.push_back(ncl);
-    evt_1d_vector.push_back(low_multi);
-    evt_1d_vector.push_back(b2bhabha_v);
-    evt_1d_vector.push_back(b2bhabha_s);
-    evt_1d_vector.push_back(mumu);
-    evt_1d_vector.push_back(prescale);
-    evt_1d_vector.push_back(icn);
-    evt_1d_vector.push_back(icn_over);
-    evt_1d_vector.push_back(etot_type);
-    evt_1d_vector.push_back(etot);
-    evt_1d_vector.push_back(ecl_bst);
-    evt_1d_vector.push_back(b1_type);
-    evt_1d_vector.push_back(b1bhabha);
-    evt_1d_vector.push_back(physics);
-    evt_1d_vector.push_back(time_type);
-    evt_2d_vector.push_back(evt_1d_vector);
-    evt_1d_vector.clear();
   } else {
     for (int k = 0; k < 6; k++) {
       cl_theta[k]   = 0;
@@ -510,7 +519,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int evt_ntc          = 0;
   int evt_revo         = -9999;
   int evt_win          = 0;
-  int evt_timing       = -9999;
+  int evt_timing       = -9999; // most energetic
   int evt_cl_theta[6]  = {0};
   int evt_cl_phi[6]    = {0};
   int evt_cl_time[6]   = { -9999};
@@ -557,7 +566,7 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
     if (evt_v_size == 0) {
       // Find most energetic TC timing
       sort(tc_info.begin(), tc_info.end(),
-      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] >= aa2[2];});
       evt_revo         = win3_revo;
       evt_win          = tc_info[0][3];
       evt_timing       = tc_info[0][1];

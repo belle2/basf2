@@ -33,6 +33,10 @@ Changes since release-04
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
 
+.. Changes for b2bii here.
+
+.. include:: b2bii/doc/whatsnew-since/release-04-01.txt
+
 Changes since release-03
 ========================
 

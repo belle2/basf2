@@ -45,5 +45,5 @@ std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, const std::string&
 
 double Belle2::EvtPDLUtil::charge(int pdgCode)
 {
-  return 3.0 * TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge();
+  return TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() / 3.0;
 }

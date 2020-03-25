@@ -70,14 +70,7 @@ namespace Belle2 {
 
 
   private:
-    /** helper functions to do some of the calculations*/
-    /* returns the space point in local coordinates where the track hits the sensor:
-      sensorInfo: info of the sensor under investigation
-      aTrack: the track to be tested
-      isgood: flag which is false if some error occured (do not use the point if false)
-      du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
-     */
-    TVector3 getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    /* helper functions to do some of the calculations*/
     /** find the closest cluster*/
     int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
     /** is it close to the border*/

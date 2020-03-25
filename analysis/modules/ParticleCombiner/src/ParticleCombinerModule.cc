@@ -114,9 +114,15 @@ namespace Belle2 {
       daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
     }
 
-    if (!m_allowChargeViolation && daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode))
+    if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+      if (!m_allowChargeViolation) {
+        B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"
+                "modularAnalysis.reconstructDecay(" << m_decayString << ", your_cuts, allowChargeViolation=True, path=mypath)");
+      }
       B2WARNING("Your decay string " << m_decayString << " violates electric charge conservation!\n"
-                "You can turn off this warning by setting the argument 'allowChargeViolation' to True.");
+                "Processing is continued assuming that you allowed this deliberately, e.g. for systematic studies etc.");
+    }
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 

@@ -222,7 +222,7 @@ void SVDDQMHitTimeModule::event()
     double time = cluster.getClsTime();
 
     //if svd time is shown in SVD time reference we need to desynchronize (eventT0 is, instead, synchronized, see a few lines above
-    if (m_desynchSVDTime)
+    if (m_desynchSVDTime && m_svdEventInfo.isValid())
       time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
 
     // Fill the plots that used the ECL trigger as the L1 timing source

@@ -318,7 +318,7 @@ void SVDDQMClustersOnTrackModule::event()
       int iLayer = svdClustersTrack[cl]->getSensorID().getLayerNumber();
 
       float time = svdClustersTrack[cl]->getClsTime();
-      if (m_desynchSVDTime)
+      if (m_desynchSVDTime && m_svdEventInfo.isValid())
         time = time - m_svdEventInfo->getSVD2FTSWTimeShift(svdClustersTrack[cl]->getFirstFrame());
 
       if (svdClustersTrack[cl]->isUCluster()) {

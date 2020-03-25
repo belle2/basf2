@@ -772,7 +772,7 @@ void SVDDQMExpressRecoModule::event()
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
 
     float time = cluster.getClsTime();
-    if (m_desynchSVDTime)
+    if (m_desynchSVDTime && m_svdEventInfo.isValid())
       time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
 
     if (cluster.isUCluster()) {

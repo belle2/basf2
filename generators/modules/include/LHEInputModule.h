@@ -46,12 +46,12 @@ namespace Belle2 {
 
   protected:
 
-    std::vector <std::string>  m_inputFileNames; /**< The list of filenames of input LHEfile. */
+    std::vector<std::string>  m_inputFileNames; /**< The list of filenames of input LHEfile. */
     std::string m_inputFileName;     /**< The Name of the current input LHE file. */
     uint m_iFile;                    /**< Index of the current LHE input file. */
     int m_skipEventNumber;           /**< The number of events which should be skipped at the start of reading. */
-    int m_nInitial;                  /**< The number of particles in each event that should be made initial */
-    int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
+    int m_nInitial;              /**< The number of particles in each event that should be flagges with c_Initial */
+    int m_nVirtual;              /**< The number of particles in each event that should be flagged with c_IsVirtual */
     LHEReader m_lhe;                 /**< An instance of the LHE reader. */
     MCParticleGraph mpg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */

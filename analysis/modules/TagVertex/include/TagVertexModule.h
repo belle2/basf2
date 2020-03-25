@@ -86,7 +86,7 @@ namespace Belle2 {
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
     //std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     std::string m_constraintType;   /**< Choose constraint: noConstraint, IP, tube, boost, (breco) */
-    std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD, singleTrack, singleTrack_PXD */
+    std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD */
     int m_reqPXDHits;                /**< N of PXD hits for a track to be used */
     std::string m_roeMaskName;      /**< ROE particles from this mask will be used for vertex fitting */
     double m_Bfield;              /**< magnetic field from data base */
@@ -166,10 +166,6 @@ namespace Belle2 {
     /** performs the fit using the standard algorithm - using all tracks in RoE
     The user can specify a request on the PXD hits left by the tracks*/
     bool getTagTracks_standardAlgorithm(Particle* Breco, int nPXDHits);
-
-    /** performs the vertex fit using only one track
-    The user can specify a request on the PXD hits left by the tracks*/
-    bool getTagTracks_singleTrackAlgorithm(Particle* Breco, int nPXDHits);
 
     /** eliminates an invalid track from a track list **/
     void eliminateTrack(std::vector<int>& listTracks, int trackPosition);

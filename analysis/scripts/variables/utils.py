@@ -5,7 +5,7 @@ import collections
 import re
 from variables import variables as _variablemanager
 from variables import std_vector as _std_vector
-from typing import Iterable, Union, List, Tuple
+from typing import Iterable, Union, List, Tuple, Optional
 
 
 def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) -> List[str]:
@@ -292,7 +292,7 @@ class DecayParticleNode:
 def create_aliases_for_selected(
         list_of_variables: List[str],
         decay_string: str,
-        prefix=None,
+        prefix: Optional[Union[str, List[str]]] = None,
         *,
         use_names=True,
         always_include_indices=False,

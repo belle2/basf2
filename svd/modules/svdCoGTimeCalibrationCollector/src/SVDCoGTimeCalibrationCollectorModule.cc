@@ -124,8 +124,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
     float clTime = m_svdCls[cl]->getClsTime();
 
     //remove firstFrame and triggerBin correction applied in the clusterizer
-    constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
-    clTime = clTime - (- eventinfo->getSVD2FTSWTimeShift() + stepSize * m_svdCls[cl]->getFirstFrame());
+    clTime = clTime - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
 
     //get cluster side
     int side = m_svdCls[cl]->isUCluster();
@@ -138,7 +137,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
     if (m_eventT0->hasEventT0()) {
 
       float eventT0 = m_eventT0->getEventT0();
-      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift() + m_svdCls[cl]->getFirstFrame();
+      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
 
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);

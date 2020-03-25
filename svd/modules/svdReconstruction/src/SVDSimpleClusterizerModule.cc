@@ -266,8 +266,7 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   // last step:
   // shift cluster time by TB time AND by FirstFrame ( FF = 0 for the 6-sample CoG Time)
   // NOTE: this shift is removed in the SVDCogTimeCalibrationCollector in the CAF
-  constexpr auto stepSize = 16000. / 509; //APV25 clock period = 31.4 ns
-  time = caltime - eventinfo->getSVD2FTSWTimeShift() + stepSize * firstFrame;
+  time = caltime + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
   //  Store Cluster into Datastore
   m_storeClusters.appendNew(SVDCluster(

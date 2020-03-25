@@ -301,7 +301,10 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      B2WARNING("decayAngle used to return the cosine of the decay angle, but now returns the angle as suggested by the variable name. Please check the impact of this change on your analysis.");
+      if (daughters.size() == 1)
+        B2WARNING("decayAngle used to return the cosine of the decay angle, but now returns the angle as suggested by the variable name."
+                  " Please check the impact of this change on your analysis."
+                  " You can deactivate this warning by providing a second argument 'decayAngle(i, 0)'.");
 
       double result = 0.0;
 
@@ -325,7 +328,10 @@ namespace Belle2 {
       if (!particle)
         return std::numeric_limits<float>::quiet_NaN();
 
-      B2WARNING("pointingAngle(i) used to return the cosine of an angle, but now returns an angle as suggested by the variable name. Please check the impact of this change on your analysis.");
+      if (daughters.size() == 1)
+        B2WARNING("pointingAngle used to return the cosine of an angle, but now returns an angle as suggested by the variable name."
+                  " Please check the impact of this change on your analysis."
+                  " You can deactivate this warning by providing a second argument 'pointingAngle(i, 0)'.");
 
       long daughter = std::lround(daughters[0]);
       if (daughter >= static_cast<int>(particle->getNDaughters()))
@@ -478,9 +484,9 @@ namespace Belle2 {
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
-    REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
+    REGISTER_VARIABLE("decayAngle(i[, bool])", particleDecayAngle,
                       "Angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
-    REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
+    REGISTER_VARIABLE("pointingAngle(i[, bool])", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(

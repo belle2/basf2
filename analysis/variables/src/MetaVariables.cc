@@ -1200,9 +1200,16 @@ namespace Belle2 {
 
     Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2 || arguments.size() == 3) {
+      if (arguments.size() >= 2 && arguments.size() <= 4) {
 
-        auto func = [arguments](const Particle * particle) -> double {
+        auto indices = arguments;
+        bool show_warning = true;
+        if (indices.back() == "False") {
+          show_warning = false;
+          indices.pop_back();
+        }
+
+        auto func = [show_warning, indices](const Particle * particle) -> double {
           if (particle == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
 
@@ -1210,7 +1217,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          for (auto& generalizedIndex : indices)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1221,8 +1228,12 @@ namespace Belle2 {
             }
           }
 
-          B2WARNING("daughterAngle(i,j) used to return the cosine of an angle, but now returns an angle as suggested by the"
-                    "variable name. Please check the impact of this change on your analysis.");
+          if (show_warning)
+          {
+            B2WARNING("daughterAngle(i,j) used to return the cosine of an angle, but now returns an angle as suggested by the"
+                      " variable name. Please check the impact of this change on your analysis."
+                      " You can deactivate this warning by appending 'False' as additional argument.");
+          }
 
           // Calculates the angle between the selected particles
           if (pDaus.size() == 2)

@@ -36,6 +36,11 @@ mypath.add_module('VariablesToNtuple',
                   variables=['kinematics', 'mc_truth', 'MyCollection'],
                   fileName='CollectionVariables.root')
 
+# Important note: In order to specify variable collections by string, e.g.
+# "kinematics", "mc_truth", etc. you need to import variables.collections, even
+# if you do not explicitly use any of its symbols (importing
+# variables.collections sets up some default collections).
+
 # you might also like to uncomment the following, and read the help for the
 # convenient wrapper function:
 # print(help(ma.variablesToNtuple))

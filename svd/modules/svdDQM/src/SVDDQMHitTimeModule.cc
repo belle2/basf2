@@ -201,9 +201,6 @@ void SVDDQMHitTimeModule::event()
         eventT0 = m_eventT0->getEventT0();
 
 
-  // eventT0 is synchronized with SVD reference frame
-  eventT0 = eventT0 - 7.8625 * (3 - m_svdEventInfo->getModeByte().getTriggerBin());
-
   //loop on clusters
   for (const SVDCluster& cluster : m_clusters) {
 

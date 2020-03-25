@@ -57,6 +57,8 @@ namespace Belle2 {
 
   private:
 
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = true;
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 

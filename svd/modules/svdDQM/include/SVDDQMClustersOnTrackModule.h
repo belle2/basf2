@@ -18,6 +18,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -48,6 +49,11 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = true;
+
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;

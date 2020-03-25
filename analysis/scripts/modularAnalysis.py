@@ -1128,7 +1128,8 @@ def reconstructRecoil(decayString,
                       dmID=0,
                       writeOut=False,
                       path=None,
-                      candidate_limit=None):
+                      candidate_limit=None,
+                      allowChargeViolation=False):
     """
     Creates new Particles that recoil against the input particles.
 
@@ -1152,6 +1153,7 @@ def reconstructRecoil(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1163,6 +1165,7 @@ def reconstructRecoil(decayString,
     pmake.param('recoilParticleType', 1)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -1171,7 +1174,8 @@ def reconstructRecoilDaughter(decayString,
                               dmID=0,
                               writeOut=False,
                               path=None,
-                              candidate_limit=None):
+                              candidate_limit=None,
+                              allowChargeViolation=False):
     """
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
@@ -1195,6 +1199,8 @@ def reconstructRecoilDaughter(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge taking into account that the first
+                       daughter is actually the mother
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1206,6 +1212,7 @@ def reconstructRecoilDaughter(decayString,
     pmake.param('recoilParticleType', 2)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 

@@ -111,7 +111,11 @@ namespace Belle2 {
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
       int daughterPDGCode = daughter->getPDGCode();
-      daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
+      if (m_recoilParticleType == 2 && i == 0) {
+        daughtersNetCharge -= EvtPDLUtil::charge(daughterPDGCode);
+      } else {
+        daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
+      }
     }
 
     if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {

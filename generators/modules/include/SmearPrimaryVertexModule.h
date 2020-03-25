@@ -8,15 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SMEARPRIMARYVERTEXMODULE_H
-#define SMEARPRIMARYVERTEXMODULE_H
+#pragma once
 
+/* Belle II headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/BeamParameters.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-#include <framework/core/Module.h>
-
+/* ROOT headers. */
 #include <TVector3.h>
 
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -69,16 +72,6 @@ namespace Belle2 {
     std::string m_MCParticlesName;
 
     /**
-     * BeamParameters database object pointer.
-     */
-    DBObjPtr<BeamParameters> m_BeamParameters;
-
-    /**
-     * Initial particle used by BeamParameters class.
-     */
-    InitialParticleGeneration m_Initial;
-
-    /**
      * Position of old primary vertex (before smearing).
      */
     TVector3 m_OldPrimaryVertex;
@@ -88,8 +81,16 @@ namespace Belle2 {
      */
     TVector3 m_NewPrimaryVertex;
 
+    /**
+     * Initial particle generation.
+     */
+    InitialParticleGeneration m_Initial;
+
+    /**
+     * Beam parameters.
+     */
+    DBObjPtr<BeamParameters> m_BeamParameters;
+
   };
 
-} // end namespace Belle2
-
-#endif // SMEARPRIMARYVERTEXMODULE_H
+}

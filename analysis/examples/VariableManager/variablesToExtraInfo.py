@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToExtraInfo module saves variables at some stage in the
 # processing chain for recovery later. In this example it saves the invariant

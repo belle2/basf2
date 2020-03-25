@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToHistogram module saves variables from the VariableManager
 # to TH1F and TH2F here is an example of how to use it.

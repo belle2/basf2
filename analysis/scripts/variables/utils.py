@@ -5,6 +5,7 @@ import collections
 import re
 from variables import variables as _variablemanager
 from variables import std_vector as _std_vector
+from typing import Iterable, Union
 
 
 def create_aliases(list_of_variables, wrapper, prefix):
@@ -91,12 +92,16 @@ def get_hierarchy_of_decay(decay_string):
     return selected_particles
 
 
-def create_daughter_aliases(list_of_variables, indices, prefix="", include_indices=True):
+def create_daughter_aliases(
+        list_of_variables: Iterable[str],
+        indices: Union[int, Iterable[int]],
+        prefix="", include_indices=True
+):
     """Create Aliases for all variables for a given daughter hierarchy
 
     Arguments:
         list_of_variables (list(str)): list of variables to create aliases for
-        indices (int): index of the daughter, grand-daughter, grand-grand-daughter,
+        indices (int or list(int)): index of the daughter, grand-daughter, grand-grand-daughter,
             and so forth
         prefix (str): optional prefix to prepend to the aliases
         include_indices(bool): if set to True (default) the aliases will contain

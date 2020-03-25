@@ -300,7 +300,7 @@ def WhichCategories(categories=[
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
-KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
+KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 

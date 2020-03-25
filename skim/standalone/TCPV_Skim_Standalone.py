@@ -35,8 +35,11 @@ fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=path)
 
 ma.fillParticleList('K+:1%',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01", path=path)
-ma.fillParticleList('e+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
-ma.fillParticleList('mu+:all',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+ma.fillParticleList('e+:withCuts',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
+ma.fillParticleList(decayString='gamma:e+', cut="E < 1.0", path=path)
+ma.correctBrems(outputList='e+:bremCorr', inputList='e+:withCuts', gammaList='gamma:e+', multiplePhotons=False,
+                usePhotonOnlyOnce=True, writeOut=True, path=path)
+ma.fillParticleList('mu+:withCuts',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
 stdPi0s('loose', path=path)

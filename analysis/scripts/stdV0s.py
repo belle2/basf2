@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import B2WARNING, B2ERROR
+from basf2 import B2ERROR
 import modularAnalysis as ma
 from stdCharged import stdPi, stdPr
 import vertex
@@ -51,24 +51,6 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
         ma.copyLists('K_S0:merged', ['K_S0:V0', 'K_S0:RD'], False, path=path)
     else:
         ma.copyLists('K_S0:merged', ['K_S0:RD', 'K_S0:V0'], False, path=path)
-
-
-def mergedKshorts(prioritiseV0=True, path=None):
-    """
-    Load a combined list of the Kshorts list from V0 objects merged with
-    a list of particles combined using the analysis ParticleCombiner module.
-
-    WARNING:
-      The mergedKshorts() list is now deprecated. Use instead the stdKshorts() list.
-      See that docstring for more information. For instance with
-
-    ::
-
-       from stdV0s import stdKshorts
-       help(stdKshorts)
-    """
-    B2WARNING("The mergedKshorts() list is now deprecated. Please use instead stdKshorts() list.")
-    stdKshorts(prioritiseV0, path=path)
 
 
 def goodBelleKshort(path):
@@ -136,21 +118,3 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
         ma.copyLists('Lambda0:merged', ['Lambda0:V0', 'Lambda0:RD'], False, path=path)
     else:
         ma.copyLists('Lambda0:merged', ['Lambda0:RD', 'Lambda0:V0'], False, path=path)
-
-
-def mergedLambdas(prioritiseV0=True, path=None):
-    """
-    Load a combined list of the Lambdas list from V0 objects merged with
-    a list of particles combined using the analysis ParticleCombiner module.
-
-    WARNING:
-      The mergedLambdas() list is now deprecated. Use instead the stdLambdas() list.
-      See that docstring for more information. For instance with
-
-    ::
-
-        from stdV0s import stdLambdas
-        help(stdLambdas)
-    """
-    B2WARNING("The mergedLambdas() list is now deprecated. Please use instead stdLambdas() list.")
-    stdLambdas(prioritiseV0, path=path)

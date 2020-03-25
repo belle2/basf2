@@ -40,12 +40,15 @@ Many are defined for convenience and can be recreated logically from :b2:var:`mc
 Some extra variables are provided externally, for example :b2:var:`isCloneTrack` from the tracking-level MC matching.
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
-~~~~~~~~~~~~~~~
-The error flags
-~~~~~~~~~~~~~~~
+
+.. _Error_flags:
+
+~~~~~~~~~~~
+Error flags
+~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 

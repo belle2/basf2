@@ -99,6 +99,9 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         # Peel function to get hit purity of subdetectors
         subdetector_hit_purity_crops = peelers.peel_subdetector_hit_purity(reco_track, mc_reco_track)
 
+        # Information on TrackFinders
+        trackfinder_crops = peelers.peel_trackfinder(reco_track)
+
         # Basic peel function to get Quality Indicators
         qualityindicator_crops = peelers.peel_quality_indicators(reco_track)
 
@@ -118,6 +121,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             **hit_content_crops,
             **pr_to_mc_match_info_crops,
             **subdetector_hit_purity_crops,  # Custom
+            **trackfinder_crops,
             **qualityindicator_crops,
             **seed_fit_crops,
             **fit_crops,
@@ -192,6 +196,38 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         select=["is_clone"],
         aggregation=np.mean,
         filter_on="is_clone_or_match",
+    )
+
+    #: Make profile of the clone rate versus seed tan(lambda)
+    #: Rename the quantities to names that display nicely by root latex translation
+    save_clone_rate_by_seed_tan_lambda_profile = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_tan_lambda_estimate': 'seed tan #lambda',
+        },
+        y='clone rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+        bins=50
+    )
+
+    #: Make profile of the clone rate versus seed transverse momentum
+    #: Rename the quantities to names that display nicely by root latex translation
+    save_clone_rate_by_seed_pt_profile = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='clone rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+        bins=50
     )
 
     #: Save RecoTrack fake-rate information

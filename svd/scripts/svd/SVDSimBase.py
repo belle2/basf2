@@ -29,7 +29,8 @@ wexp_default_tau = 55  # ns
 
 
 def wexp(t, tau=wexp_default_tau):
-    '''Gamma waveform
+    '''
+    Gamma waveform
     wexp(t, tau) = t/tau * exp(1-t/tau) if t > 0 else 0,
     normalized to peak value 1.
     t - nummpy vector of times
@@ -170,35 +171,44 @@ class tau_encoder:
     '''
 
     def __init__(self, amp_range, tau_range):
+        """
+        creates the class
+        """
         self.amp_min, self.amp_max = amp_range
         self.tau_min, self.tau_max = tau_range
         self.at_ratio = (self.amp_max - self.amp_min) / (self.tau_max - self.tau_min)
 
     def encode(self, tau):
+        """
+        encoder of tau values for network training
+        """
         return (self.amp_min + self.at_ratio * (tau - self.tau_min))
 
     def decode(self, etau):
+        """
+        decoder of tau values for network training
+        """
         return (self.tau_min + 1.0 / self.at_ratio * (etau - self.amp_min))
 
 
 class SampleGenerator:
-    # ------------------------------------------------------------------------------
-    '''
+    """
     This class generates a Pandas dataframe with a random sample of SVD strip signals with specified size and parameters.
     NB:
     1. We generate time bins from quantiles, do we want a regular grid?
     2. Have to think of possible irregular grid.
-    '''
+    """
 
     def __init__(self, t0_bounds, tau_bounds, amplitude_bounds, sigma_bounds, tau_sigma, bin_size, wf=betaprime_wave):
-        '''
+        """
         The constructor takes the following parameters:
         t0_bounds is a tuple, (t0_min, t0_max)
         tau_bounds is a tuple (tau_min, tau_max)
         amplitude_bounds is a tuple (amp_min, amp_max)
         sigma_bounds is a tuple (sigma_min, sigma_max)
         bin_size is the % fraction of t0_min, t0_max interval corresponding to a single output t0 bin.
-        '''
+        """
+
         self.t0_min, self.t0_max = t0_bounds
         self.tau_min, self.tau_max = tau_bounds
         self.amp_min, self.amp_max = amplitude_bounds
@@ -275,10 +285,12 @@ class SampleGenerator:
         # This is where the data are generated
         self.stockdata[['s' + str(i) for i in range(1, 7)]] = self.stockdata.apply(lambda row: pd.Series(
             gen_signal(row.amplitude, row.t0, row.tau, row.sigma, tau_sigma=self.tau_sigma, w=self.wf)), axis=1)
+        #: undocumented variable
         self.t0_bins = np.percentile(self.stockdata.t0, np.arange(0, 101, self.bin_size))
         self.t0_bins[0] = self.t0_bins[0] - 0.1
         self.t0_bins[-1] = self.t0_bins[-1] + 0.1
         self.stockdata['t0_bin'] = np.digitize(self.stockdata.t0, self.t0_bins)
+        #: undocumented variable
         self.t0_bin_times = self.stockdata['t0'].groupby(self.stockdata.t0_bin).aggregate(np.mean)
         abins = np.arange(self.amp_min, self.amp_max + 1, 1)
         self.stockdata['abin'] = np.digitize(self.stockdata.amplitude, abins)

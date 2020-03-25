@@ -73,16 +73,16 @@ void DQMHistAnalysisPXDCMModule::initialize()
   /// FIXME were to put the lines depends ...
   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
   m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
-  m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
+//   m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
   m_line1->SetHorizontal(true);
   m_line1->SetLineColor(3);// Green
   m_line1->SetLineWidth(3);
   m_line2->SetHorizontal(true);
   m_line2->SetLineColor(1);// Black
   m_line2->SetLineWidth(3);
-  m_line3->SetHorizontal(true);
-  m_line3->SetLineColor(1);
-  m_line3->SetLineWidth(3);
+//   m_line3->SetHorizontal(true);
+//   m_line3->SetLineColor(1);
+//   m_line3->SetLineWidth(3);
 
 
 #ifdef _BELLE2_EPICS
@@ -175,7 +175,7 @@ void DQMHistAnalysisPXDCMModule::event()
     m_hCommonMode->Draw("colz");
     m_line1->Draw();
     m_line2->Draw();
-    m_line3->Draw();
+//     m_line3->Draw();
   }
 
   auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");

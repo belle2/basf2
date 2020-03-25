@@ -256,6 +256,7 @@ namespace Belle2 {
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
     int m_properties; /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    std::vector<int> m_daughterProperties; /**< Daughter's particle properties. */
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

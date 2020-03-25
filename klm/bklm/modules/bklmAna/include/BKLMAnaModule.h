@@ -45,6 +45,7 @@ namespace Belle2 {
     //! Do any needed actions at the start of a simulation run
     virtual void beginRun() override;
 
+    //! This method is called for each event
     virtual void event() override;
 
     //! Do any needed actions at the end of a simulation run

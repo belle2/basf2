@@ -1,5 +1,7 @@
 /* hltout_roi_pass.c */
 
+#include <arpa/inet.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -8,11 +10,12 @@
 #include <fcntl.h>
 #include <time.h>
 #include <signal.h>
-#include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <mqueue.h>
+
+#include <cstdlib>
 
 #include "daq/roisend/util.h"
 #include "daq/roisend/b2_socket.h"

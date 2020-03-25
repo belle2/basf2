@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
      * Returns a positive integer if daughter at position particle->daughter(i)->daughter(j)... is an ancestor of the related MC particle, 0 otherwise.
      * Positive integer represents the number of steps needed to get from final MC daughter to ancestor.
-     * If any particle or MCparticle is a nullptr, -999 is returned. If MC relations of any particle doesn't exist, -1.0 is returned.
+     * If any particle or MCparticle is a nullptr, NaN is returned. If MC relations of any particle doesn't exist, -1.0 is returned.
      */
     double isAncestorOf(const Particle* part, const std::vector<double>& daughterIDs);
 
@@ -33,7 +33,7 @@ namespace Belle2 {
      * Returns a positive integer if an ancestor with the given PDG code is found, 0 otherwise.
      * The integer is the level where the ancestor was found, 1: first mother, 2: grandmother, etc.
      * Second argument is optional, 1 means that the sign of the PDG code is taken into account, default is 0.
-     * If there is no MC relations found, -1 is returned. In case of nullptr particle, -999 is returned.
+     * If there is no MC relations found, -1 is returned. In case of nullptr particle, NaN is returned.
      */
     double hasAncestor(const Particle* part, const std::vector<double>& args);
 

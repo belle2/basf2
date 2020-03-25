@@ -9,9 +9,10 @@
  **************************************************************************/
 #include <daq/rfarm/event/hltsocket/HLTMainLoop.h>
 
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 #include <chrono>
+#include <csignal>
 #include <thread>
 
 using namespace std::chrono_literals;

@@ -36,6 +36,9 @@ class DQMModes(Enum):
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 
+#: Definition of an EventOfDoom
+DOOM_NCDCHITSMAX = 6000
+DOOM_NSVDSHAPERDIGITSMAX = 70000
 
 #: Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]

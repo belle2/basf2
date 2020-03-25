@@ -80,6 +80,9 @@ namespace Belle2 {
 
     private:
 
+      /** flag to dump data base map **/
+      bool m_print_dbmap;
+
       /** flag to select board search mode **/
       bool m_trgReadoutBoardSearch;
 

@@ -106,13 +106,9 @@ void EventT0DQMModule::defineHisto()
 void EventT0DQMModule::initialize()
 {
 
-  if (!m_eventT0.isOptional()) {
-    B2WARNING("Missing event t0 module, EventT0DQM is skipped.");
-    return;
-  }
+  m_TrgResult.isOptional();
+  m_eventT0.isOptional();
 
-  m_TrgResult.isRequired();
-  m_eventT0.isRequired();
   REG_HISTOGRAM
 
 }
@@ -122,8 +118,13 @@ void EventT0DQMModule::initialize()
 //---------------------------------
 void EventT0DQMModule::beginRun()
 {
-  if (!m_eventT0.isOptional()) {
+  if (!m_eventT0.isValid()) {
     B2WARNING("Missing event t0, EventT0DQM is skipped.");
+    return;
+  }
+
+  if (!m_TrgResult.isValid()) {
+    B2WARNING("Missing SoftwareTriggerResult, EventT0DQM is skipped.");
     return;
   }
 

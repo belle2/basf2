@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
@@ -15,7 +25,6 @@
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <set>
 #include <utility>
@@ -69,16 +78,13 @@ bool DecayDescriptor::init(const DecayString& s)
     }
 
     // Identify arrow type
-    if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons ;
-      m_properties |= Particle::PropertyFlags::c_isIgnoreIntermediate;
-      if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-        B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
-      }
+    if (d->m_strArrow == "->") {
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons ;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
     } else if (d->m_strArrow == "=norad=>") {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreIntermediate;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
     } else if (d->m_strArrow == "=direct=>") {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons;
     } else if (d->m_strArrow == "=exact=>") {
       // do nothing
     } else {
@@ -106,19 +112,19 @@ bool DecayDescriptor::init(const DecayString& s)
     // Initialise list of keywords
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreNeutrino;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreNeutrino;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreGamma;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreGamma;
     }
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreMassive;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreMassive;
     }
     // For brems photons
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?addbrems")) != d->m_keywords.end()) {
-      m_properties |= Particle::PropertyFlags::c_isIgnoreBrems;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreBrems;
     }
 
     return true;
@@ -369,7 +375,7 @@ vector<string> DecayDescriptor::getSelectionNames()
       // stop, if nothing found
       if (itOccurrence == strNames.end()) break;
       // create new particle name by attaching a number
-      string strNameNew = strNameOld + boost::lexical_cast<string>(iOccurrence);
+      string strNameNew = strNameOld + std::to_string(iOccurrence);
       // ceck if the new particle name exists already, if not, then it is OK to use it
       if (count(strNames.begin(), strNames.end(), strNameNew) == 0) {
         *itOccurrence = strNameNew;

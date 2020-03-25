@@ -35,9 +35,10 @@ fillParticleList('e-:minimumE', 'clusterE > 0.1', path=mypath)  # track matched 
 
 # reconstruct a pseudo particles with different combinations (implicit charge conjugation)
 reconstructDecay('vpho:1 -> gamma:minimumE gamma:minimumE', '', 1, path=mypath)  # two neutral '00'
-reconstructDecay('vpho:2 -> gamma:minimumE e-:minimumE', '', 2, path=mypath)  # neutral and charged '0+' and '0-'
+reconstructDecay('vpho:2 -> gamma:minimumE e-:minimumE', '', 2, path=mypath,
+                 allowChargeViolation=True)  # neutral and charged '0+' and '0-'
 reconstructDecay('vpho:3 -> e-:minimumE e+:minimumE', '', 3, path=mypath)  # different charge '+-' and '-+'
-reconstructDecay('vpho:4 -> e-:minimumE e-:minimumE', '', 4, path=mypath)  # same charge '++' and '--'
+reconstructDecay('vpho:4 -> e-:minimumE e-:minimumE', '', 4, path=mypath, allowChargeViolation=True)  # same charge '++' and '--'
 copyLists('vpho:bhabha', ['vpho:1', 'vpho:2', 'vpho:3', 'vpho:4'], path=mypath)
 
 # aliases to make output better readable

@@ -56,17 +56,17 @@ void SmearPrimaryVertexModule::event()
   bool primaryVertexFound = false;
   for (MCParticle& mcParticle : mcParticles) {
     /* Skip an MCParticle if it is flagged as c_Initial or c_IsVirtual. */
-    if (not(mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual))
-        continue;
+    if (not(mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual)))
+      continue;
     if (not primaryVertexFound) {
       /* Save the previous primary vertex. */
       m_OldPrimaryVertex = mcParticle.getProductionVertex();
-        primaryVertexFound = true;
-      }
+      primaryVertexFound = true;
+    }
     /* Shift the production vertex. */
     mcParticle.setProductionVertex(getShiftedVertex(mcParticle.getProductionVertex()));
     /* Shift also the decay vertex only if the MCParticle has a daughter. */
     if (mcParticle.getNDaughters() > 0)
-    mcParticle.setDecayVertex(getShiftedVertex(mcParticle.getDecayVertex()));
+      mcParticle.setDecayVertex(getShiftedVertex(mcParticle.getDecayVertex()));
   }
 }

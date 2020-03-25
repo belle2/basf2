@@ -34,7 +34,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_UVTimeDiff',
-    cut=cut_oneTH,
+    cut='',
     descr='time difference between opposite sides of clusters belonging to the same layer',
     check='peak around 0',
     isShifter=True)
@@ -51,7 +51,7 @@ ploter(
     granules=granulesTD,
     tree=tree,
     expr='cluster_UUTimeDiff',
-    cut=cut_oneTH+cut_U,
+    cut=cut_U,
     descr='time difference between clusters belonging to the neighbour layers',
     check='peak around 0',
     isShifter=True)
@@ -67,7 +67,7 @@ ploter(
     granules=granulesTD,
     tree=tree,
     expr='cluster_VVTimeDiff',
-    cut=cut_oneTH+cut_V,
+    cut=cut_V,
     descr='time difference between clusters belonging to the neighbour layers',
     check='peak around 0',
     isShifter=True)
@@ -75,7 +75,7 @@ ploter(
 
 plotRegions(
     name='ClusterizationPurity_U',
-    title='Purity of clusterization for U side',
+    title='Purity of clusters from tracks for U side',
     x_label='SVD regions',
     y_label='Purity',
     granules=granulesLayersTypes,
@@ -91,7 +91,7 @@ plotRegions(
 
 plotRegions(
     name='ClusterizationPurity_V',
-    title='Purity of clusterization for V side',
+    title='Purity of clusters from tracks for V side',
     x_label='SVD regions',
     y_label='Purity',
     granules=granulesLayersTypes,
@@ -112,7 +112,7 @@ ploter(
     xmax=13,
     x_label='Number of clusters in one track',
     y_label='counts',
-    granules=granulesL3,
+    granules=granulesL3456,
     tree=tree,
     expr='clusters_number',
     cut=cut_U,

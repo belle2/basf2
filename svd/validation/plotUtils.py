@@ -64,7 +64,7 @@ granulesTD = ((cut_L3, 'L3-L4'),
               (cut_L4, 'L4-L5'),
               (cut_L5, 'L5-L6'))
 
-granulesL3 = ((cut_L3, 'L3'),)
+granulesL3456 = ((cut_L3, 'L3456'),)  # characteristic of track saved in 3rd layer cluster
 
 
 def ploter(name, title, nbins, xmin, xmax, x_label, y_label,

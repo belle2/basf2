@@ -90,7 +90,7 @@ class SVDValidationTTreeRecoTrack(Module):
                              'sensor_type': sensor_type_U,
                              'strip_dir': 0,
                              'cluster_truehits_number': len(cluster_U_truehits),
-                             'cluster_clsTime': c_U.getClsTime(),
+                             'cluster_clsTime': c_U.getClsTime() if len(cluster_U_truehits) == 1 else -128,
                              'cluster_UVTimeDiff': -128,
                              'cluster_UUTimeDiff': -128,
                              'cluster_VVTimeDiff': -128,
@@ -112,8 +112,9 @@ class SVDValidationTTreeRecoTrack(Module):
                              'sensor_type': sensor_type_V,
                              'strip_dir': 1,
                              'cluster_truehits_number': len(cluster_V_truehits),
-                             'cluster_clsTime': c_V.getClsTime(),
-                             'cluster_UVTimeDiff': c_U.getClsTime() - c_V.getClsTime(),
+                             'cluster_clsTime': c_V.getClsTime() if len(cluster_V_truehits) == 1 else -128,
+                             'cluster_UVTimeDiff': c_U.getClsTime() - c_V.getClsTime()
+                             if (len(cluster_U_truehits) == 1) and (len(cluster_V_truehits) == 1) else -128,
                              'cluster_UUTimeDiff': -128,
                              'cluster_VVTimeDiff': -128,
                              'clusters_number': clusters_number}

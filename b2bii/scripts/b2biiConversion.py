@@ -92,6 +92,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
+        enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library

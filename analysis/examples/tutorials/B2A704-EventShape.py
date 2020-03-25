@@ -16,6 +16,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
+import variables.collections as vc
 
 # create path
 my_path = b2.create_path()
@@ -50,19 +51,27 @@ ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:minimal'],
                    checkForDuplicates=False,
                    path=my_path)
 
-# Here we use the predefined collection 'event_shape', that contains
-# thrust, sphericity, aplanarity, FW ratios up to 4, harmonic moments w/respect to
-# the thrust axis up to 4 and all the cleo cones w/respect to the thrust axis.
-# In addition, we will save also the forward and backward hemisphere (or "jet") energies,
-# and the 2nd order harmonic moment calculated with respect to the collision axis (i.e. the z axis)
-ma.variablesToNtuple('',
-                     variables=['event_shape',
-                                'backwardHemisphereEnergy',
-                                'forwardHemisphereEnergy',
-                                'harmonicMoment(2, collision)'],
-                     filename='B2A704-EventShape.root',
-                     path=my_path)
+# Here we use the predefined collection 'event_shape', that contains thrust,
+# sphericity, aplanarity, FW ratios up to 4, harmonic moments w/respect to
+# the thrust axis up to 4 and all the cleo cones w/respect to the thrust
+# axis. In addition, we will save also the forward and backward hemisphere (
+# or "jet") energies, and the 2nd order harmonic moment calculated with
+# respect to the collision axis (i.e. the z axis)
+ma.variablesToNtuple(
+    '',
+    variables=[
+        *vc.event_shape,  # [1] see below
+        'backwardHemisphereEnergy',
+        'forwardHemisphereEnergy',
+        'harmonicMoment(2, collision)'
+    ],
+    filename='B2A704-EventShape.root',
+    path=my_path
+)
 
+# [1] Note: The * operator "unpacks" the list of variables provided by the
+# variable collection (because we don't want to get a list in a list, but just
+# add the elements): ```[*[1, 2, 3], 4] == [1, 2, 3, 4])```
 
 # Process the events
 b2.process(my_path)

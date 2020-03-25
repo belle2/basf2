@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LHEREADER_H
-#define LHEREADER_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -146,5 +145,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif //LHEREADER_H

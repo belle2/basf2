@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LHEINPUTMODULE_H
-#define LHEINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -21,9 +20,9 @@
 
 namespace Belle2 {
 
-  /** The LHEInput module.
-   * Loads events from a LHE file and stores the content
-   * into the MCParticle class.
+  /**
+   * The LHEInput module.
+   * Loads events from a LHE file and stores the content into the MCParticle class.
    */
   class LHEInputModule : public Module {
 
@@ -71,6 +70,4 @@ namespace Belle2 {
 
   };
 
-} // end namespace Belle2
-
-#endif // HEPEVTINPUTMODULE_H
+}

@@ -88,7 +88,17 @@ vu.create_aliases_for_selected(
 # d0_d0_... (using daughter indices). For this, add use_names=False to the
 # options.
 # Take a look at the documentation for create_aliases_for_selected for more
-# options!
+# options and details regarding the naming convention!
+
+# Now the last example is not much shorter than what we did above with
+# create_daughter_aliases. But that changes, because we can actually select
+# more than one particle:
+vu.create_aliases_for_selected(
+    list_of_variables=["x", "y", "z"],
+    decay_string="B0 -> [^D0 -> pi+ ^K-] ^pi0",
+)
+# This automatically created simple aliases for the cooredinates in the
+# remaining particles in the decay!
 
 # Finally let's print all of our alias
 vm.printAliases()

@@ -7,8 +7,8 @@
 #
 # This tutorial demonstrates how to load generated final
 # state particles (MCParticle objects) as Particles and
-# create ParticleLists for each final state particle
-# type: gamma/e/mu/pi/K/proton/K_L.
+# create ParticleLists for each final state particl type:
+# gamma/e/mu/pi/K/proton/K_L.
 #
 # All analysis modules and tools (e.g. making combinations, ...)
 # have interfaces for ParticleLists so this step is

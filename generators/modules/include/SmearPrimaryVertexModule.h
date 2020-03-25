@@ -11,6 +11,8 @@
 #ifndef SMEARPRIMARYVERTEXMODULE_H
 #define SMEARPRIMARYVERTEXMODULE_H
 
+#include <generators/utilities/InitialParticleGeneration.h>
+
 #include <framework/core/Module.h>
 
 #include <TVector3.h>
@@ -20,10 +22,9 @@
 namespace Belle2 {
 
   /**
-   * The SmearPrimaryVertex module moves the Primary Vertex (e+e- collision point) to
-   * to a new point defined by user. In addition smearing is applied randomly on event
-   * by event basis. Module loops over all MCParticles and shiftes their decay and
-   * production vertices.
+   * This module smears the primary vertex (the interaction point) according to the values stored in BeamParameters.
+   * The smearing is applied randomly on event by event basis. The module loops over all the MCParticles and smears
+   * their production vertices; if an MCParticle has no daughters, the decay vertex is also smeared.
    */
   class SmearPrimaryVertexModule : public Module {
 
@@ -31,72 +32,62 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * Sets the module parameters.
      */
     SmearPrimaryVertexModule();
 
-    /** Destructor. */
-    virtual ~SmearPrimaryVertexModule() {}
+    /**
+     * Destructor.
+     */
+    virtual ~SmearPrimaryVertexModule();
 
-    virtual void initialize() override; /**< initialize the module */
-    virtual void terminate() override;  /**< terminate the module */
+    /**
+     * Initialize the module.
+     */
+    virtual void initialize() override;
 
-    /** Method is called for each run. */
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
 
-    /** Method is called for each event. */
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
 
   private:
 
-    // Module parameters for the user interface
-
-    // new nominal interaction point (cm)
-    double m_new_ip_x; /**< New nominal position of Primary Vertex in x (cm) */
-    double m_new_ip_y; /**< New nominal position of Primary Vertex in y (cm) */
-    double m_new_ip_z; /**< New nominal position of Primary Vertex in z (cm) */
-
-    // new spread (standard deviation) for interaction point (cm)
-    double m_sigma_ip_x; /**< Spread (standard deviation) of Primary Vertex in x (cm) */
-    double m_sigma_ip_y; /**< Spread (standard deviation) of Primary Vertex in y (cm) */
-    double m_sigma_ip_z; /**< Spread (standard deviation) of Primary Vertex in z (cm) */
-
-    // new angle of beam profile (rad)
-    double m_new_angle_ip_xy; /**< Angle of rotation of Primary Vertex Profile wrt. z-axis (in xy-plane) in (rad) */
-    double m_new_angle_ip_yz; /**< Angle of rotation of Primary Vertex Profile wrt. x-axis (in yz-plane) in (rad) */
-    double m_new_angle_ip_zx; /**< Angle of rotation of Primary Vertex Profile wrt. y-axis (in zx-plane) in (rad) */
-
-    // new nominal ip point and sigma (cm)
-    TVector3 m_new_nominal_ip; /**< New nominal position of Primary Vertex in (cm) */
-    TVector3 m_sigma_ip;       /**< Spread (standard deviation) of Primary Vertex in (cm) */
-    TVector3 m_new_angle_ip;   /**< Angle of rotation of Primary Vertex Profile */
-
-    // new and old ip (smeared) (cm)
-    TVector3 old_ip;    /**< Old Primary Vertex position (before smearing) */
-    TVector3 m_new_ip;  /**< New Primery Vertex position (after smearing) */
+    /**
+     * Returns the shifted vertex (given by vertex + (m_NewPrimaryVertex - m_OldPrimaryVertex)).
+     * @params[in] vertex  Vertex to be shifted.
+     */
+    TVector3 getShiftedVertex(TVector3 vertex) { return vertex + (m_NewPrimaryVertex - m_OldPrimaryVertex); }
 
     /**
-     * Returns the shifted vertex given as an input.
-     * @param oldVertex to be shifted
-     * @return shifted vertex (given by  oldVertex + (newIP - oldIP))
+     * Name of the MCParticles StoreArray.
      */
-    TVector3 getShiftedVertex(TVector3 oldVertex);
-
+    std::string m_MCParticlesName;
 
     /**
-     * Determines the new Primary Vertex for this event from the primary vertex specified by the user and
-     * random shift given by the user specified spread.
+     * BeamParameters database object pointer.
      */
-    void setNewPrimaryVertex(void);
+    DBObjPtr<BeamParameters> m_BeamParameters;
 
     /**
-     * Old primary vertex is taken to be the production vertex of the first MCParticle in the MCParticles array.
+     * Initial particle used by BeamParameters class.
      */
-    void setOldPrimaryVertex(void);
+    InitialParticleGeneration m_Initial;
 
-    std::string m_particleList; /**< The name of the MCParticle collection. */
+    /**
+     * Position of old primary vertex (before smearing).
+     */
+    TVector3 m_OldPrimaryVertex;
 
-    bool m_useDB; /**< Use values from the Database. */
+    /**
+     * Position of new primary vertex (after smearing).
+     */
+    TVector3 m_NewPrimaryVertex;
+
   };
 
 } // end namespace Belle2

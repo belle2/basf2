@@ -13,8 +13,9 @@
 
 #include <framework/datastore/StoreArray.h>
 
-//TODO: use framework random number generator --> done
-#include <TRandom3.h>
+#include <framework/dataobjects/MCInitialParticles.h>
+
+#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,117 +29,50 @@ REG_MODULE(SmearPrimaryVertex)
 //                 Implementation
 //-----------------------------------------------------------------
 
-SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module()
+SmearPrimaryVertexModule::SmearPrimaryVertexModule() : Module(),
+  m_Initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
-  setDescription("Smears primary vertex and all subsequent vertices in a MCParticle Collection");
+  setDescription("Smears primary vertex and all subsequent vertices of all the MCParticles using the informations stored in BeamParameters.");
 
   //Parameter definition
-  addParam("MCParticleCollectionName", m_particleList, "Collection to print", string(""));
+  addParam("MCParticlesStoreArrayName", m_MCParticlesName, "Name of the MCParticles StoreArray.", std::string(""));
+}
 
-  addParam("fromDataBase", m_useDB, "Use values from Database", false);
-
-  addParam("pvx", m_new_ip_x, "New nominal position of Primary Vertex in x (cm)", 0.0);
-  addParam("pvy", m_new_ip_y, "New nominal position of Primary Vertex in y (cm)", 0.0);
-  addParam("pvz", m_new_ip_z, "New nominal position of Primary Vertex in z (cm)", 0.0);
-
-  addParam("sigma_pvx", m_sigma_ip_x, "Apply spread (standard deviation) of Primary Vertex in x (cm)", 0.0110);
-  addParam("sigma_pvy", m_sigma_ip_y, "Apply spread (standard deviation) of Primary Vertex in y (cm)", 0.0015);
-  addParam("sigma_pvz", m_sigma_ip_z, "Apply spread (standard deviation) of Primary Vertex in z (cm)", 0.6000);
-
-  addParam("angle_pv_yz", m_new_angle_ip_yz, "Angle of rotation of Primary Vertex Profile wrt. x-axis (yz-plane) in (rad)", 0.000);
-  addParam("angle_pv_zx", m_new_angle_ip_zx, "Angle of rotation of Primary Vertex Profile wrt. y-axis (zx-plane) in (rad)", 0.000);
-  addParam("angle_pv_xy", m_new_angle_ip_xy, "Angle of rotation of Primary Vertex Profile wrt. z-axis (xy-plane) in (rad)", 0.000);
+SmearPrimaryVertexModule::~SmearPrimaryVertexModule()
+{
 }
 
 void SmearPrimaryVertexModule::initialize()
 {
+  StoreArray<MCParticle> mcParticles(m_MCParticlesName);
+  mcParticles.isRequired(m_MCParticlesName);
+  m_Initial.initialize();
 }
-
-void SmearPrimaryVertexModule::terminate()
-{
-}
-
 
 void SmearPrimaryVertexModule::beginRun()
 {
-  if (m_useDB) {
-    // TODO: obtain values from Database
-  } else {
-    // use user specified values
-
-    // set TVector3 of new nominal pv
-    m_new_nominal_ip = TVector3(m_new_ip_x,
-                                m_new_ip_y,
-                                m_new_ip_z);
-
-    // set TVector3 of new spread for pv
-    m_sigma_ip = TVector3(m_sigma_ip_x,
-                          m_sigma_ip_y,
-                          m_sigma_ip_z);
-
-    // set TVector3 of new rotation angle
-    m_new_angle_ip = TVector3(m_new_angle_ip_yz,
-                              m_new_angle_ip_zx,
-                              m_new_angle_ip_xy);
-  }
+  if (not m_BeamParameters.isValid())
+    B2FATAL("Beam Parameters data are not available.");
 }
 
 void SmearPrimaryVertexModule::event()
 {
-  StoreArray<MCParticle> MCParticles(m_particleList);
-
-  if (MCParticles.getEntries() < 1) {
-    B2WARNING("MCParticle array has no entry. Skiping event...");
-    return;
-  }
-
-  setNewPrimaryVertex();
-  setOldPrimaryVertex();
-
-  //Loop over the primary particles (no mother particle exists)
-  for (int i = 0; i < MCParticles.getEntries(); i++) {
-    MCParticle* mc = MCParticles[i];
-
-    // shift production vertex
-    mc->setProductionVertex(getShiftedVertex(mc->getVertex()));
-    // shift decay vertex
-    mc->setDecayVertex(getShiftedVertex(mc->getDecayVertex()));
+  StoreArray<MCParticle> mcParticles(m_MCParticlesName);
+  MCInitialParticles& initial = m_Initial.generate();
+  m_NewPrimaryVertex = initial.getVertex();
+  bool primaryVertexFound = false;
+  for (MCParticle& mcParticle : mcParticles) {
+    if (mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual))
+      continue;
+    if (not primaryVertexFound) {
+      m_OldPrimaryVertex = mcParticle.getProductionVertex();
+      primaryVertexFound = true;
+    }
+    /* Shift the production vertex. */
+    mcParticle.setProductionVertex(getShiftedVertex(mcParticle.getProductionVertex()));
+    /* Shift also the decay vertex only if the MCParticle has a daughter. */
+    if (mcParticle.getNDaughters() > 0)
+      mcParticle.setDecayVertex(getShiftedVertex(mcParticle.getDecayVertex()));
   }
 }
-
-TVector3 SmearPrimaryVertexModule::getShiftedVertex(TVector3 oldVertex)
-{
-  return oldVertex + (m_new_ip - old_ip);
-}
-
-void SmearPrimaryVertexModule::setNewPrimaryVertex(void)
-{
-  // randomly smear around nominal vertex position
-  //TH TRandom3 rndm(0);
-
-  // obtain random shift from nominal position
-  // TODO: use framework random number generator --> done
-  TVector3 randomShift(gRandom->Gaus(0.0, m_sigma_ip.X()),
-                       gRandom->Gaus(0.0, m_sigma_ip.Y()),
-                       gRandom->Gaus(0.0, m_sigma_ip.Z()));
-
-  // rotate
-  randomShift.RotateX(m_new_angle_ip.X());
-  randomShift.RotateY(m_new_angle_ip.Y());
-  randomShift.RotateZ(m_new_angle_ip.Z());
-
-  m_new_ip = m_new_nominal_ip + randomShift;
-}
-
-void SmearPrimaryVertexModule::setOldPrimaryVertex(void)
-{
-
-  // set current primary vertex position
-  StoreArray<MCParticle> MCParticles(m_particleList);
-  MCParticle* mc = MCParticles[0];
-  old_ip = mc->getVertex();
-
-
-}
-

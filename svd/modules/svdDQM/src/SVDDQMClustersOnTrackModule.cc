@@ -198,6 +198,22 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_histoList->Add(m_clsTrkTimeV456);
 
   //----------------------------------------------------------------
+  // EventT0 vs Time of clusters for U and V sides
+  //----------------------------------------------------------------
+  name = "SVDTRK_ClusterTimeUvsEventT0";
+  title = Form("SVD U-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
+  m_clsTrkTimeUEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
+  m_clsTrkTimeUEvtT0->GetXaxis()->SetTitle("clusters time [ns]");
+  m_clsTrkTimeUEvtT0->GetYaxis()->SetTitle("EventT0 [ns]");
+  m_histoList->Add(m_clsTrkTimeUEvtT0);
+  name = "SVDTRK_ClusterTimeVvsEventT0";
+  title = Form("SVD V-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
+  m_clsTrkTimeVEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
+  m_clsTrkTimeVEvtT0->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clsTrkTimeVEvtT0->GetYaxis()->SetTitle("EventT0 [n]");
+  m_histoList->Add(m_clsTrkTimeVEvtT0);
+
+  //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
   //----------------------------------------------------------------
   name = "SVDTRK_StripMaxBinUAll";
@@ -230,7 +246,7 @@ void SVDDQMClustersOnTrackModule::initialize()
 
     storeTracks.isOptional();
     m_svdEventInfo.isOptional();
-
+    m_eventT0.isOptional();
   }
 }
 
@@ -261,6 +277,17 @@ void SVDDQMClustersOnTrackModule::event()
   if (m_tb != -1)
     if (evt->getModeByte().getTriggerBin() != m_tb)
       return;
+
+  // get EventT0 if present and valid
+  double eventT0 = -1000;
+  if (m_eventT0.isOptional())
+    if (m_eventT0.isValid())
+      if (m_eventT0->hasEventT0())
+        eventT0 = m_eventT0->getEventT0();
+
+  // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
+  if (m_desynchSVDTime)
+    eventT0 = eventT0 - m_svdEventInfo->getSVD2FTSWTimeShift(0);
 
   //check HLT decision and increase number of events only if the event has been accepted
 
@@ -296,6 +323,8 @@ void SVDDQMClustersOnTrackModule::event()
 
       if (svdClustersTrack[cl]->isUCluster()) {
 
+        m_clsTrkTimeUEvtT0->Fill(time, eventT0);
+
         if (iLayer == 3) {
           if (m_clsTrkChargeU3 != NULL) m_clsTrkChargeU3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
           if (m_clsTrkSNRU3 != NULL) m_clsTrkSNRU3->Fill(svdClustersTrack[cl]->getSNR());
@@ -318,6 +347,7 @@ void SVDDQMClustersOnTrackModule::event()
 
       } else {
 
+        m_clsTrkTimeVEvtT0->Fill(time, eventT0);
 
         if (iLayer == 3) {
           if (m_clsTrkChargeV3 != NULL) m_clsTrkChargeV3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons

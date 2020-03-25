@@ -148,6 +148,9 @@ namespace Belle2 {
      */
     bool m_eklmCheckSegmentIntersection;
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
 

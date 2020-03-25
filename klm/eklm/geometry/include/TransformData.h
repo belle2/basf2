@@ -206,6 +206,9 @@ namespace Belle2 {
        */
       void transformsToGlobal();
 
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
+
       /** Geometry data. */
       const GeometryData* m_GeoDat;
 

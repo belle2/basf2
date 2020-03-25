@@ -46,7 +46,7 @@ KLMDigitizerModule::KLMDigitizerModule() : Module(),
            "Debug mode (generates additional output files with histograms).",
            false);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
   m_Fitter = nullptr;
 }
 

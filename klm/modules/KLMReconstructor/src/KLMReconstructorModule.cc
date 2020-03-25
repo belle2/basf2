@@ -14,7 +14,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/Module.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
@@ -31,8 +31,8 @@ REG_MODULE(KLMReconstructor)
 static bool compareSector(KLMDigit* d1, KLMDigit* d2)
 {
   int s1, s2;
-  static const EKLM::ElementNumbersSingleton& elementNumbers =
-    EKLM::ElementNumbersSingleton::Instance();
+  static const EKLMElementNumbers& elementNumbers =
+    EKLMElementNumbers::Instance();
   s1 = elementNumbers.sectorNumber(d1->getSection(), d1->getLayer(),
                                    d1->getSector());
   s2 = elementNumbers.sectorNumber(d2->getSection(), d2->getLayer(),
@@ -101,6 +101,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()
@@ -126,7 +127,7 @@ void KLMReconstructorModule::initialize()
   m_eklmGeoDat = &(EKLM::GeometryData::Instance());
   if (m_eklmGeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
-  m_eklmNStrip = m_eklmGeoDat->getMaximalStripGlobalNumber();
+  m_eklmNStrip = m_eklmElementNumbers->getMaximalStripGlobalNumber();
   m_eklmTimeCalibrationData = new const EKLMTimeCalibrationData*[m_eklmNStrip];
 }
 
@@ -248,8 +249,9 @@ bool KLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
 double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
 {
   int strip;
-  strip = m_eklmGeoDat->stripNumber(d->getSection(), d->getLayer(), d->getSector(),
-                                    d->getPlane(), d->getStrip()) - 1;
+  strip = m_eklmElementNumbers->stripNumber(
+            d->getSection(), d->getLayer(), d->getSector(),
+            d->getPlane(), d->getStrip()) - 1;
   return d->getTime() -
          (dist / m_eklmTimeCalibration->getEffectiveLightSpeed() +
           m_eklmTimeCalibrationData[strip]->getTimeShift());

@@ -73,6 +73,8 @@ Variables
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
+   functionality of the latter.
 
 Modules
 +++++++

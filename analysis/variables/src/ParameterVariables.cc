@@ -320,26 +320,6 @@ namespace Belle2 {
       return result;
     }
 
-    double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters)
-    {
-      if (!particle)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      B2WARNING("daughterAngle(i,j) used to return the cosine of an angle, but now returns an angle as suggested by the variable name. Please check the impact of this change on your analysis.");
-
-      int nDaughters = static_cast<int>(particle->getNDaughters());
-
-      long daughter1 = std::lround(daughters[0]);
-      long daughter2 = std::lround(daughters[1]);
-      if (daughter1 >= nDaughters || daughter2 >= nDaughters)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 a = frame.getMomentum(particle->getDaughter(daughter1)).Vect();
-      TVector3 b = frame.getMomentum(particle->getDaughter(daughter2)).Vect();
-      return a.Angle(b);
-    }
-
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
@@ -500,7 +480,6 @@ namespace Belle2 {
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "Angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
-    REGISTER_VARIABLE("daughterAngle(i,j)", particleDaughterAngle, "Angle between i-th and j-th daughters");
     REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");

@@ -212,7 +212,7 @@ namespace Belle2 {
      * which is the sum of the first two daughter momenta.
      * The arguments in the argument vector must be generalized daughter indices.
      */
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.

@@ -70,11 +70,6 @@ namespace Belle2 {
     double massDifferenceSignificance(const Particle* particle, const std::vector<double>& daughter_index);
 
     /**
-     * return cosine of the angle between the i-th and j-th daughters
-     */
-    double particleDaughterAngle(const Particle* particle, const std::vector<double>& daughters);
-
-    /**
      * return cosine of the angle between i-th daughter momentum vector and vector connecting production and decay vertex of i-th daughter
      */
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters);

@@ -86,14 +86,14 @@ def GammaGammaControlKLMDarkList(path):
     # get two most energetic photons in the event (must be at least 100 MeV
     # and not more than 7 GeV)
     ma.cutAndCopyList(
-        'gamma:controlKLM', 'gamma:all', '0.1 < clusterE < 7', path=path)
-    ma.rankByHighest('gamma:controlKLM', 'clusterE', numBest=2, path=path)
+        'gamma:controlKLM', 'gamma:all', '0.1 < useCMSFrame(clusterE) < 7', path=path)
+    ma.rankByHighest('gamma:controlKLM', 'useCMSFrame(clusterE)', numBest=2, path=path)
 
     # will build pairwise candidates from the gamma:controlKLM list:
     # vpho -> gamma gamma
 
     # the more energetic must be at least 4.5 GeV
-    tag_daughter = 'daughterHighest(clusterE) > 4.5'
+    tag_daughter = 'daughterHighest(useCMSFrame(clusterE)) > 4.5'
     # note that sometimes the probe will also fulfill this criteria, but the
     # candidate list will *not* be double-counted: these extra candidates need
     # to be added back offline

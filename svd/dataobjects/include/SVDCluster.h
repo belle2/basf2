@@ -162,7 +162,7 @@ namespace Belle2 {
     /** Get firstFrame of the MaxSum algorithm.
      * @return firstFrame of the MaxSum algorithm
      */
-    float getFirstFrame() const { return m_firstFrame; }
+    int getFirstFrame() const { return m_firstFrame; }
 
     /** Get cluster quality indicator
     * @return probability that cluster is generated from signal hit.

@@ -50,16 +50,16 @@ namespace Belle2 {
     auto* lk = ecl_likelihoods.appendNew();
 
     lk->setLogLikelihood(Const::electron, 0.12);
+    lk->setLogLikelihood(Const::muon, 0.58);
     lk->setLogLikelihood(Const::pion, 0.28);
     lk->setLogLikelihood(Const::kaon, 0.38);
     lk->setLogLikelihood(Const::proton, 0.48);
-    lk->setLogLikelihood(Const::muon, 0.58);
 
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::electron), 0.12);
+    EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::muon), 0.58);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::pion), 0.28);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::kaon), 0.38);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::proton), 0.48);
-    EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::muon), 0.58);
 
   } // Testcases for ECLPidLikelihood setters and getters.
 
@@ -69,8 +69,8 @@ namespace Belle2 {
 
     ECLChargedPidPDFs eclPdfs;
 
-    float pmin_vals[]     = {300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0, 5500.0};
-    float thetamin_vals[] = {0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0, 180.0};
+    float pmin_vals[]     = {0.2, 0.6, 1.0, 100.0};
+    float thetamin_vals[] = {0.21, 0.56, 2.24, 2.70};
 
     TH2F histgrid("binsgrid",
                   "bins grid",
@@ -79,10 +79,10 @@ namespace Belle2 {
                   sizeof(pmin_vals) / sizeof(float) - 1,
                   pmin_vals);
 
-    eclPdfs.setEnergyUnit(Unit::MeV);
-    eclPdfs.setAngularUnit(Unit::deg);
+    eclPdfs.setEnergyUnit(Unit::GeV);
+    eclPdfs.setAngularUnit(Unit::rad);
 
-    std::vector<int> pdgIds = {11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212};
+    std::vector<int> pdgIds = {11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212, 1000010020, -1000010020};
 
     eclPdfs.setPdfCategories(&histgrid);
 
@@ -102,6 +102,9 @@ namespace Belle2 {
     TF1 pdf_p("pdf_p", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.6);
     TF1 pdf_panti("pdf_panti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
 
+    TF1 pdf_d("pdf_d", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.6);
+    TF1 pdf_danti("pdf_danti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+
     std::map<int, TF1*> pdfs = {
       {11, &pdf_el},
       { -11, &pdf_elanti},
@@ -112,7 +115,9 @@ namespace Belle2 {
       {321, &pdf_k},
       { -321, &pdf_kanti},
       {2212, &pdf_p},
-      { -2212, &pdf_panti}
+      { -2212, &pdf_panti},
+      {1000010020, &pdf_d},
+      { -1000010020, &pdf_danti}
     };
 
     // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
@@ -120,8 +125,8 @@ namespace Belle2 {
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
     // Choose an arbitrary set of (clusterTheta, p), and of E/p.
-    double theta =  60.0; //1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
-    double p     = 850.0; //0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
+    double theta = 1.047; // (X) --> theta [rad] = 60 [deg]
+    double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV]
     double eop   = 0.87;
 
     std::vector<ECLChargedPidPDFs::InputVar> varids = {ECLChargedPidPDFs::InputVar::c_EoP};

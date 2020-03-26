@@ -58,11 +58,11 @@ namespace Belle2 {
 
 
       /** Histo for last LER injected bunches */
-      TH1F* hBunchInjLER;
+      TH1F* hBunchInjLER = nullptr;
       /** Histo for last HER injected bunches */
-      TH1F* hBunchInjHER;
+      TH1F* hBunchInjHER = nullptr;
       /** Histo for triggered bunches */
-      TH1F* hBunchTrg;
+      TH1F* hBunchTrg = nullptr;
 
       std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapLER; /**< Histogram Occupancy after LER injection */
       std::map<std::pair<VxdID, int>, TH2F*> hGatedModeMapHER; /**< Histogram Occupancy after HER injection */

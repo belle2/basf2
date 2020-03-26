@@ -1,10 +1,8 @@
+#!/usr/bin/env python3
+
 import basf2
 import modularAnalysis as ma
 from variables import variables
-from ROOT import Belle2
-import glob
-import os
-import sys
 
 
 outputfilename = 'B2CAL901-cDSTECLTRG'

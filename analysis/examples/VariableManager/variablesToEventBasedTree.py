@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToEventBasedTree module saves variables from the VariableManager
 # to an event-based TTree
@@ -9,7 +8,6 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 

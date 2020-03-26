@@ -27,6 +27,20 @@ Vertex Fitting
 Standard Particle Lists
 +++++++++++++++++++++++
 
+ * The list label ``"all"`` is now forbidden from use with cuts. This can introduce some very subtle bugs in user scripts.
+   The following code will no longer work:
+
+   .. code-block:: python
+
+	fillParticleList("gamma:all", "clusterE > 0.02", path=mypath)
+
+   Instead you should replace it with a meaningful name of your choice. For example:
+
+   .. code-block:: python
+
+	fillParticleList("gamma:myMinimumThresholdList", "clusterE > 0.02", path=mypath)
+
+
  * Added stdHyperons.py, this analysis script reconstructs the standard hyperons Xi-, Xi0, and Omega-.
    	 
    * New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`

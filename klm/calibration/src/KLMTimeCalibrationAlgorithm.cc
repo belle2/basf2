@@ -12,9 +12,7 @@
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
 
 /* KLM headers. */
-#include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/bklm/BKLMStatus.h>
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>
@@ -24,10 +22,7 @@
 /* External headers. */
 #include <TFile.h>
 #include <TTree.h>
-#include <TCanvas.h>
 #include <TVector3.h>
-#include <TString.h>
-#include <TGraph.h>
 #include <TFitResult.h>
 #include <TString.h>
 

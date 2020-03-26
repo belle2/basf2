@@ -10,13 +10,8 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <cstdint>
-#include <map>
-
 /* External headers. */
 #include <TObject.h>
-
 
 namespace Belle2 {
 

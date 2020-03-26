@@ -12,7 +12,6 @@
 
 /* KLM headers. */
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
-#include <klm/bklm/geometry/Module.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -22,21 +21,16 @@
 /* Belle2 headers */
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/dataobjects/EventT0.h>
 #include <calibration/CalibrationCollectorModule.h>
 
 /* ROOT headers */
-#include <TFile.h>
 #include <TTree.h>
 #include <TH1I.h>
-#include <TH2I.h>
 #include <TH1D.h>
 #include <TH2D.h>
-
 
 namespace Belle2 {
   /** Collect hit information for BKLM time calibration with CAF */

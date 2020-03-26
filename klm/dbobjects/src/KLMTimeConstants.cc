@@ -11,9 +11,6 @@
 /* Own headers. */
 #include <klm/dbobjects/KLMTimeConstants.h>
 
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 KLMTimeConstants::KLMTimeConstants() :

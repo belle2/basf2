@@ -15,28 +15,19 @@
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/logging/LogSystem.h>
 #include <framework/dataobjects/EventT0.h>
 
 /* ROOT headers. */
-#include <TFile.h>
 #include <TTree.h>
-#include <TH1D.h>
-#include <TH1I.h>
-#include <TH2D.h>
 
 /* C++ STL headers. */
 #include  <utility>

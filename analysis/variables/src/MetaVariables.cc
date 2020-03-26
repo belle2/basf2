@@ -1247,6 +1247,47 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (!particle)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          unsigned daughterIndex, grandDaughterIndex;
+          try {
+            daughterIndex = Belle2::convertString<int>(arguments[0]);
+            grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
+          } catch (std::invalid_argument&)
+          {
+            B2FATAL("The arguments of grandDaughterDecayAngle have to be integers!");
+          }
+
+          if (daughterIndex >= particle->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          const Particle* daughter = particle->getDaughter(daughterIndex);
+
+          if (grandDaughterIndex >= daughter->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          TVector3  boost = - (daughter->get4Vector().BoostVector());
+
+          TLorentzVector motherMomentum = - particle->get4Vector();
+          motherMomentum.Boost(boost);
+
+          TLorentzVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+          grandDaughterMomentum.Boost(boost);
+
+          return motherMomentum.Angle(grandDaughterMomentum.Vect());
+        };
+        return func;
+      } else {
+        B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
+      }
+    }
+
     Manager::FunctionPtr daughterClusterAngleInBetween(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
@@ -2790,6 +2831,10 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
+    REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
+                      "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
+                      "It is calculated with respect to the reverted momentum vector of the particle.\n"
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."

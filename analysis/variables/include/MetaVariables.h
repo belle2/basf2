@@ -221,6 +221,13 @@ namespace Belle2 {
     Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the angle between the granddaughter particle's
+     * and the reverted particle's momentum vector in the daughter particle's rest frame.
+     * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
+     */
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the angle between clusters associated to the two daughters.
      * If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters.
      * If three indices given: returns the angle between the momentum of the third particle's cluster and a vector

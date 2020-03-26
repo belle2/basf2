@@ -742,14 +742,15 @@ def TagV(
         trackFindingType (str): choose how to look for tag tracks. Can be set to
 
           * standard: all tracks except from Kshorts;
-          * standard_PXD: **default**, same as above but consider only tracks with at least 1 PXD hit;
+          * standard_PXD: **default**, same as above but consider only tracks with at least 1 PXD hit.
+              If the fit fails, attempt again with the standard option;
 
         fitAlgorithm (str):     Fitter used for the tag vertex fit: Rave (default) or KFit
         askMCInfo (bool): True when requesting MC Information from the tracks performing the vertex fit
         reqPXDHits (int): minimum N PXD hits for a track (default is 0)
         maskName (str): get particles from a specified ROE mask
         useTruthInFit (bool): True when the tag vertex fit is performed with the true momentum and
-            position of the tracks (default is false). The variable :b2:var:``TagVFitTruthStatus`` is set to 1
+            position of the tracks (default is false). The variable :b2:var:`TagVFitTruthStatus` is set to 1
             if the truth-matching succeeds and 2 otherwise.
         path (basf2.Path): modules are added to this path
 

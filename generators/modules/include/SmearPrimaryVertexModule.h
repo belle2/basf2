@@ -14,9 +14,6 @@
 #include <framework/core/Module.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
-/* ROOT headers. */
-#include <TVector3.h>
-
 /* C++ headers. */
 #include <string>
 
@@ -54,25 +51,9 @@ namespace Belle2 {
   private:
 
     /**
-     * Returns the shifted vertex (given by vertex + (m_NewPrimaryVertex - m_OldPrimaryVertex)).
-     * @params[in] vertex  Vertex to be shifted.
-     */
-    TVector3 getShiftedVertex(TVector3 vertex) { return vertex + (m_NewPrimaryVertex - m_OldPrimaryVertex); }
-
-    /**
      * Name of the MCParticles StoreArray.
      */
     std::string m_MCParticlesName;
-
-    /**
-     * Position of old primary vertex (before smearing).
-     */
-    TVector3 m_OldPrimaryVertex;
-
-    /**
-     * Position of new primary vertex (after smearing).
-     */
-    TVector3 m_NewPrimaryVertex;
 
     /**
      * Initial particle generation.

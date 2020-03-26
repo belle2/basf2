@@ -17,6 +17,9 @@
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+/* ROOT headers. */
+#include <TVector3.h>
+
 using namespace Belle2;
 
 REG_MODULE(SmearPrimaryVertex)
@@ -46,7 +49,7 @@ void SmearPrimaryVertexModule::event()
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
   /* Generate the primary beams. */
   MCInitialParticles& initial = m_Initial.generate();
-  m_NewPrimaryVertex = initial.getVertex();
+  TVector3 shift;
   bool primaryVertexFound = false;
   for (MCParticle& mcParticle : mcParticles) {
     /* Skip an MCParticle if it is flagged as c_Initial or c_IsVirtual. */
@@ -54,13 +57,13 @@ void SmearPrimaryVertexModule::event()
       continue;
     if (not primaryVertexFound) {
       /* Save the previous primary vertex. */
-      m_OldPrimaryVertex = mcParticle.getProductionVertex();
+      shift = initial.getVertex() - mcParticle.getProductionVertex();
       primaryVertexFound = true;
     }
     /* Shift the production vertex. */
-    mcParticle.setProductionVertex(getShiftedVertex(mcParticle.getProductionVertex()));
+    mcParticle.setProductionVertex(mcParticle.getProductionVertex() + shift);
     /* Shift also the decay vertex only if the MCParticle has a daughter. */
     if (mcParticle.getNDaughters() > 0)
-      mcParticle.setDecayVertex(getShiftedVertex(mcParticle.getDecayVertex()));
+      mcParticle.setDecayVertex(mcParticle.getDecayVertex() + shift);
   }
 }

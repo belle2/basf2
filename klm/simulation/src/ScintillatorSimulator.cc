@@ -16,6 +16,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
+#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -24,7 +25,6 @@
 /* ROOT headers. */
 #include <TFile.h>
 #include <TH1D.h>
-#include <TRandom.h>
 
 /* C++ headers. */
 #include <string>

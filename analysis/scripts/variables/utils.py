@@ -5,9 +5,10 @@ import collections
 import re
 from variables import variables as _variablemanager
 from variables import std_vector as _std_vector
+from typing import Iterable, Union, List, Tuple, Optional
 
 
-def create_aliases(list_of_variables, wrapper, prefix):
+def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) -> List[str]:
     """
     The function creates aliases for variables from the variables list with given wrapper
     and returns list of the aliases.
@@ -50,7 +51,7 @@ def create_aliases(list_of_variables, wrapper, prefix):
     return aliases
 
 
-def get_hierarchy_of_decay(decay_string):
+def get_hierarchy_of_decay(decay_string: str) -> List[List[Tuple[int, str]]]:
     """
     This function returns paths of the particles selected in decay string. For
     each selected particle return a list of (index, name) tuples which indicate
@@ -91,16 +92,23 @@ def get_hierarchy_of_decay(decay_string):
     return selected_particles
 
 
-def create_daughter_aliases(list_of_variables, indices, prefix="", include_indices=True):
+def create_daughter_aliases(
+        list_of_variables: Iterable[str],
+        indices: Union[int, Iterable[int]],
+        prefix="", include_indices=True
+) -> List[str]:
     """Create Aliases for all variables for a given daughter hierarchy
 
     Arguments:
         list_of_variables (list(str)): list of variables to create aliases for
-        indices (int): index of the daughter, grand-daughter, grand-grand-daughter,
+        indices (int or list(int)): index of the daughter, grand-daughter, grand-grand-daughter,
             and so forth
         prefix (str): optional prefix to prepend to the aliases
         include_indices(bool): if set to True (default) the aliases will contain
             the daughter indices as dX_dY_dZ...
+
+    Returns:
+        list(str): new variables list
 
     * create aliases for the second daughter as "d1_E", "d1_M" (daughters start at 0)
 
@@ -281,9 +289,15 @@ class DecayParticleNode:
         return top
 
 
-def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
-                                use_names=True, always_include_indices=False,
-                                use_relative_indices=False):
+def create_aliases_for_selected(
+        list_of_variables: List[str],
+        decay_string: str,
+        prefix: Optional[Union[str, List[str]]] = None,
+        *,
+        use_names=True,
+        always_include_indices=False,
+        use_relative_indices=False
+) -> List[str]:
     """
     The function creates list of aliases for given variables so that they are calculated for
     particles selected in decay string. That is for each particle selected in
@@ -463,7 +477,10 @@ def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
     return alias_list
 
 
-def create_mctruth_aliases(list_of_variables, prefix="mc"):
+def create_mctruth_aliases(
+        list_of_variables: Iterable[str],
+        prefix="mc"
+) -> List[str]:
     """
     The function wraps variables from the list with 'matchedMC()'.
 
@@ -488,7 +505,7 @@ def create_mctruth_aliases(list_of_variables, prefix="mc"):
     return create_aliases(list_of_variables, 'matchedMC({variable})', prefix)
 
 
-def add_collection(list_of_variables, collection_name):
+def add_collection(list_of_variables: Iterable[str], collection_name: str) -> str:
     """
     The function creates variable collection from the given list of variables
     It wraps the `VariableManager.addCollection` method which is not particularly user-friendly.

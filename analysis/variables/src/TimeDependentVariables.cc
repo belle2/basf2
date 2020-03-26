@@ -943,7 +943,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty");
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
-    REGISTER_VARIABLE("TagVType", particleTagVType, "Fit type of the tag vertex");
+    REGISTER_VARIABLE("TagVType", particleTagVType,
+                      R"DOC(Type of algo for the tag vertex. -1: failed (1,2: single track, deprecated), 3: standard, 4: standard_PXD, 5: no constraint)DOC");
     REGISTER_VARIABLE("TagVNDF", particleTagVNDF, "Number of degrees of freedom in the tag vertex fit");
     REGISTER_VARIABLE("TagVChi2", particleTagVChi2, "chi2 value of the tag vertex fit");
     REGISTER_VARIABLE("TagVChi2IP", particleTagVChi2IP, "IP component of chi2 value of the tag vertex fit");
@@ -1058,7 +1059,7 @@ namespace Belle2 {
                       "return the Z component of the true origin of the MC particle corresponding to the ith tag vtx track.")
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
-                      "Returns the status of the fit performed with the truth info.")
+                      "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
   }
 }
 

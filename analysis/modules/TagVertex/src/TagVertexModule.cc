@@ -743,12 +743,6 @@ namespace Belle2 {
     std::vector<const Particle*> fitParticles;
 
     for (auto& ROEParticle : ROEParticles) {
-      // TODO: this will always return something (so not nullptr) contrary to the previous method
-      // used here. This line can be removed as soon as the multi hypothesis fitting method
-      // has been properly established
-      if (!ROEParticle->getTrackFitResult()) {
-        continue;
-      }
       HitPatternVXD roeTrackPattern = ROEParticle->getTrackFitResult()->getHitPatternVXD();
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
@@ -1174,20 +1168,20 @@ namespace Belle2 {
 
     double quietNaN(std::numeric_limits<double>::quiet_NaN());
 
-    TMatrixDSym nanMatrix(3, 3);
+    TMatrixDSym nanMatrix(3);
     for (int i(0); i < 3; ++i)
       for (int j(0); j < 3; ++j) nanMatrix(i, j) = quietNaN;
 
     m_fitPval = quietNaN;
     m_tagV = TVector3(quietNaN, quietNaN, quietNaN);
-    m_tagVErrMatrix.ResizeTo(3, 3);
+    m_tagVErrMatrix.ResizeTo(nanMatrix);
     m_tagVErrMatrix = nanMatrix;
     m_MCtagV = TVector3(quietNaN, quietNaN, quietNaN);
     m_MCVertReco = TVector3(quietNaN, quietNaN, quietNaN);
     m_deltaT = quietNaN;
     m_deltaTErr = quietNaN;
     m_MCdeltaT = quietNaN;
-    m_constraintCov.ResizeTo(3, 3);
+    m_constraintCov.ResizeTo(nanMatrix);
     m_constraintCov = nanMatrix;
     m_constraintCenter = TVector3(quietNaN, quietNaN, quietNaN);
     m_tagVl = quietNaN;
@@ -1199,7 +1193,7 @@ namespace Belle2 {
     m_tagVNDF = quietNaN;
     m_tagVChi2 = quietNaN;
     m_tagVChi2IP = quietNaN;
-    m_pvCov.ResizeTo(3, 3);
+    m_pvCov.ResizeTo(nanMatrix);
     m_pvCov = nanMatrix;
     m_tagMomentum = TLorentzVector(quietNaN, quietNaN, quietNaN, quietNaN);
 

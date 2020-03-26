@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Markus Prim                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -73,7 +73,7 @@ void ZMQROIOutput::addTrailer(char* buffer)
 
 ZMQDataAndROIOutput::ZMQDataAndROIOutput(const std::string& dataAddress, const std::string& roiAddress,
                                          bool addEventSize, const std::shared_ptr<ZMQParent>& parent) :
-  m_dataOutput(dataAddress, addEventSize, parent), m_roiOutput(roiAddress, parent) {}
+  m_dataOutput(dataAddress, addEventSize, parent), m_roiOutput(roiAddress, false, parent) {}
 
 void ZMQDataAndROIOutput::handleEvent(std::unique_ptr<ZMQNoIdMessage> message)
 {

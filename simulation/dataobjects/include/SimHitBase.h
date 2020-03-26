@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/datastore/RelationsObject.h>
 
 
@@ -25,38 +26,9 @@ namespace Belle2 {
   class SimHitBase : public RelationsObject {
   public:
     /**
-     * Enum for background tags.
-     */
-    enum BG_TAG { bg_none             = 0,  /**< No background */
-                  bg_Coulomb_LER      = 1,  /**< Coulomb LER */
-                  bg_Coulomb_HER      = 2,  /**< Coulomb HER */
-                  bg_RBB_LER          = 3,  /**< Radiative Bhabha LER */
-                  bg_RBB_HER          = 4,  /**< Radiative Bhabha HER */
-                  bg_Touschek_LER     = 5,  /**< Touschek LER */
-                  bg_Touschek_HER     = 6,  /**< Touschek HER */
-                  bg_twoPhoton        = 7,  /**< 2-photon */
-                  bg_RBB_gamma        = 8,  /**< Gammas from radiative Bhabha */
-                  bg_RBB_LER_far      = 9,  /**< Radiative Bhabha far LER */
-                  bg_RBB_HER_far      = 10, /**< Radiative Bhabha far HER */
-                  bg_Touschek_LER_far = 11, /**< Touschek far LER */
-                  bg_Touschek_HER_far = 12, /**< Touschek far HER */
-                  bg_SynchRad_LER     = 13, /**< Synchrotron radiation LER */
-                  bg_SynchRad_HER     = 14, /**< Synchrotron radiation HER */
-                  bg_BHWide_LER       = 15, /**< Wide angle radiative Bhabha LER */
-                  bg_BHWide_HER       = 16, /**< Wide angle radiative Bhabha HER */
-                  bg_RBB              = 17, /**< Radiative Bhabha */
-                  bg_BHWide           = 18, /**< Wide angle radiative Bhabha */
-                  bg_BHWideLargeAngle = 19, /**< Large angle radiative Bhabha */
-                  bg_InjectionLER     = 21, /**< injection background LER */
-                  bg_InjectionHER     = 22, /**< injection background HER */
-                  bg_Brems_LER        = 23, /**< bremsstrahlung LER */
-                  bg_Brems_HER        = 24, /**< bremsstrahlung HER */
-                  bg_other            = 99  /**< Other type of background */
-                };
-    /**
      * Constructor
      */
-    SimHitBase(): m_backgroundTag(bg_none) {}
+    SimHitBase(): m_backgroundTag(BackgroundMetaData::bg_none) {}
 
     /**
      * Set background tag.

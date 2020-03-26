@@ -40,12 +40,15 @@ Many are defined for convenience and can be recreated logically from :b2:var:`mc
 Some extra variables are provided externally, for example :b2:var:`isCloneTrack` from the tracking-level MC matching.
 
 .. b2-variables::
-        :variables: isSignal,isExtendedSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
+        :variables: isSignal,isSignalAcceptWrongFSPs,isSignalAcceptMissingNeutrino,isSignalAcceptMissingMassive,isSignalAcceptMissingGamma,isSignalAcceptMissing,isWrongCharge,isMisidentified,isCloneTrack,isOrHasCloneTrack,genNStepsToDaughter(i),genNMissingDaughter(PDG)
         :noindex:
 
-~~~~~~~~~~~~~~~
-The error flags
-~~~~~~~~~~~~~~~
+
+.. _Error_flags:
+
+~~~~~~~~~~~
+Error flags
+~~~~~~~~~~~
 
 The error flag :b2:var:`mcErrors` is a bit set where each bit flag describes
  a different kind of discrepancy between reconstruction and ``MCParticle``. 
@@ -122,9 +125,79 @@ assuming you have reconstructed :code:`X -> Y Z` :
         from modularAnalysis import applyCuts
         applyCuts('X:myCandidates', 'isSignal==1')
 
+-------------------------------------------------------
+MC decay finder module :b2:mod:`ParticleCombinerFromMC`
+-------------------------------------------------------
+
+Analysis module to reconstruct a given decay using the list of generated particles ``MCParticle``. Only signal particles with `isSignal` equal to 1 are stored.
+
+The module can be used for:
+
+* Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
+* Matched MC decays as input for a truth matching module.
+ 
+.. code-block:: python
+
+  import basf2
+  
+  # Create main path
+  main = basf2.create_path()
+  
+  # Modules to generate events, etc.
+  ...
+
+  import modularAnalysis as ma
+
+  # Load particles from MCParticle at first
+  ma.fillParticleListFromMC('K+:MC',    '', path=main)
+  ma.fillParticleListFromMC('pi+:MC',   '', path=main)
+  ma.fillParticleListFromMC('e+:MC',    '', path=main)
+  ma.fillParticleListFromMC('nu_e:MC',  '', path=main)
+  ma.fillParticleListFromMC('gamma:MC', '', path=main)
+
+  """
+  Example 1
+  Search for B+ decaying to anti-D0* e+ nu_e, where anti-D0* decays to [anti-D0 -> K+ pi- pi0] and pi0.
+  Additional photons emitted are ignored. Charge conjugated decays are matched, too.
+  """
+  # Reconstruct pi0 from gamma gamma at fist for convenience. Then reconstruct B+ with pi0:gg.
+  ma.reconstructMCDecay('pi0:gg =direct=> gamma:MC gamma:MC', '', path=main)
+  ma.reconstructMCDecay(
+    'B+:DstENu =direct=> [anti-D*0:D0pi0 =direct=> [anti-D0:Kpipi0 =direct=> K+:MC pi-:MC pi0:gg] pi0:gg ] e+:MC nu_e:MC ',
+    '',
+    path=main)
+
+  # One can directly reconstruct pi0:gg in same decay string. 
+  # But in this case, one have to write sub-decay of pi0:gg only once. Otherwise same particles are registered twice.
+  # ma.reconstructMCDecay(
+  #     'B+:DstENu =direct=>\
+  #      [anti-D*0:D0pi0 =direct=> [anti-D0:Kpipi0 =direct=> K+:MC pi-:MC [pi0:gg =direct=> gamma:MC gamma:MC]] pi0:gg ]\
+  #      e+:MC nu_e:MC ',
+  #     '',
+  #     path=main)
+
+
+  """
+  Example 2
+  Search for B+ decaying to anti-D0 + anything, where the anti-D0 decays to K+ pi-.
+  Ignore additional photons emitted in the anti-D0 decay. Charge conjugated decays
+  are matched, too. If there is a match found, save to ParticleList 'B+:testB'
+  """
+  # Reconstruct B+ from [anti-D0 =direct=> K+ pi-] accepting missing daughters
+  ma.reconstructMCDecay('B+:D0Kpi =direct=> [anti-D0:Kpi =direct=> K+:MC pi-:MC] ... ?gamma ?nu', '', path=main)  
+  
+
+  ...
+ 
+
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
+
+
 ----------------------------------------------
 MC decay finder module :b2:mod:`MCDecayFinder`
 ----------------------------------------------
+.. warning:: 
+  This module is not fully tested and maintained. Please consider to use :b2:mod:`ParticleCombinerFromMC`
 
 Analysis module to search for a given decay in the list of generated particles ``MCParticle``.
 
@@ -132,10 +205,6 @@ The module can be used for:
 
 * Determination of the number of generated decays for efficiency studies, especially in the case of inclusive decays (e.g.: What's the generated number of :math:`B \to D^0 X` decays?).
 * Matched MC decays as input for a truth matching module.
-
-~~~~~~~~~~~~~~~~~~~~~
-Steering file snippet
-~~~~~~~~~~~~~~~~~~~~~
  
 .. code-block:: python
 
@@ -157,11 +226,14 @@ Steering file snippet
   ...
  
 
-~~~~~~
-Status
-~~~~~~
+.. warning:: 
+  `isSignal` of output particle, ``'B+:testB'`` in above case, is not related to given decay string for now.
+  For example, even if one uses ``...``, ``?gamma``, or ``?nu``, `isSignal` will be 0.
+  So please use a specific isSignal* variable, `isSignalAcceptMissing` in this case.
 
-Skipping of intermediate states in decay chain not supported yet, e.g. :math:`B \to \pi \pi K`.
+For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
+
+.. _MCDecayString:
 
 ---------------
 MC decay string
@@ -191,6 +263,8 @@ This will produce a file with all of the decay strings in it, along with the dec
 The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
 
 Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
+
+.. _TauDecayMCModes:
 
 ------------------
 Tau decay MC modes

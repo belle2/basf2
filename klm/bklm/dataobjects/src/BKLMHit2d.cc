@@ -17,9 +17,6 @@
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
-/* CLHEP headers. */
-#include <CLHEP/Vector/ThreeVector.h>
-
 using namespace Belle2;
 
 // empty constructor for ROOT - do not use this

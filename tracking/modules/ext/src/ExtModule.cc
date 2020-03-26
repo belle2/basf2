@@ -8,16 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <tracking/modules/ext/ExtModule.h>
+
+/* Tracking headers. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 #include <simulation/kernel/ExtManager.h>
 
-#include <vector>
-
+/* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
+/* Geant4 headers. */
 #include <G4UImanager.hh>
+
+/* C++ headers. */
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -26,9 +34,6 @@ REG_MODULE(Ext)
 
 ExtModule::ExtModule() :
   Module(),
-  m_TracksColName(""),
-  m_RecoTracksColName(""),
-  m_ExtHitsColName(""),
   m_MinPt(0.0),
   m_MinKE(0.0),
   m_MaxStep(0.0),
@@ -45,9 +50,6 @@ ExtModule::ExtModule() :
   setDescription("Extrapolates tracks from CDC to outer detectors using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_PDGCodes, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCodes);
-  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("RecoTracksColName", m_RecoTracksColName, "Name of collection holding the reconstructed tracks (RecoTrack)", string(""));
-  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the ExtHits from the extrapolation", string(""));
   addParam("MinPt", m_MinPt, "[GeV/c] Minimum transverse momentum of a particle that will be extrapolated (default 0.1)",
            double(0.1));
   addParam("MinKE", m_MinKE, "[GeV] Minimum kinetic energy of a particle to continue extrapolation (default 0.002)", double(0.002));
@@ -123,10 +125,7 @@ void ExtModule::initialize()
   }
 
   // Initialize the extrapolator engine for EXT (vs MUID)
-  // *NOTE* that MinPt, MinKE, TracksColName, RecoTracksColName and ExtHitsColName are shared by MUID and EXT; only last caller wins
-  m_Extrapolator->setTracksColName(m_TracksColName);
-  m_Extrapolator->setRecoTracksColName(m_RecoTracksColName);
-  m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
+  // *NOTE* that MinPt and MinKE are shared by MUID and EXT; only last caller wins
   m_Extrapolator->initialize(m_MinPt, m_MinKE, m_Hypotheses);
 }
 
@@ -137,7 +136,6 @@ void ExtModule::beginRun()
 
 void ExtModule::event()
 {
-  //m_Extrapolator->event(false);
   m_Extrapolator->event(false);
 }
 

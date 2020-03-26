@@ -26,13 +26,12 @@
 namespace Belle2 {
 
 
-  /* Calculates the probability of a cluster originating from signal hit */
-
+  /** Calculates the probability of a cluster originating from signal hit */
   class SVDClusterQualityEstimatorModule : public Module {
 
   public:
 
-    /* Constructor */
+    /** Constructor */
     SVDClusterQualityEstimatorModule();
 
     /** Init the module.*/

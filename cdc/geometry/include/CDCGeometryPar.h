@@ -214,12 +214,12 @@ namespace Belle2 {
        */
       void calcMeanT0();
 
-      /**
-       * Read bad-wires (from a file).
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void readBadWire(const GearDir, int mode = 0);
+      //      /**
+      //       * Read bad-wires (from a file).
+      //       * @param GearDir Gear Dir.
+      //       * @param mode 0: read simulation file, 1: read reconstruction file.
+      //       */
+      //      void readBadWire(const GearDir, int mode = 0);
 
       /**
        * Set bad-wires (from DB)
@@ -808,12 +808,33 @@ namespace Belle2 {
       }
 
       /**
-       * Inquire if the wire is bad
+       * Inquire if the wire is totally-dead
        */
       inline bool isBadWire(const WireID& wid)
       {
-        std::vector<unsigned short>::iterator it = std::find(m_badWire.begin(), m_badWire.end(), wid.getEWire());
-        bool torf = (it != m_badWire.end()) ? true : false;
+        //        std::map<unsigned short, float>::iterator it = m_badWire.find(wid.getEWire());
+        //        bool torf = (it != m_badWire.end()) ? true : false;
+        //        return torf;
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isBadWire(wid) : false;
+        return torf;
+
+      }
+
+      /**
+       * Inquire if the wire is dead
+       */
+      inline bool isDeadWire(const WireID& wid, double& eff)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isDeadWire(wid, eff) : false;
+        return torf;
+      }
+
+      /**
+       * Inquire if the wire is hot
+       */
+      inline bool isHotWire(const WireID& wid)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isHotWire(wid) : false;
         return torf;
       }
 
@@ -1101,7 +1122,7 @@ namespace Belle2 {
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
 
-      std::vector<unsigned short> m_badWire;  /*!< list of bad-wires. */
+      //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 
       unsigned short m_tdcOffset;  /*!< Not used; to be removed later. */
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */

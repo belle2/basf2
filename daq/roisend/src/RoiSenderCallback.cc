@@ -1,6 +1,11 @@
 
 #include <daq/roisend/RoiSenderCallback.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <csignal>
 
 using namespace Belle2;
 using namespace std;
@@ -77,23 +82,31 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
   }
 }
 
-void RoiSenderCallback::start()
+void RoiSenderCallback::start(int /*expno*/, int /*runno*/)
 {
-  // do nothing
+  if (m_pid_merger != 0) {
+    int pid = m_pid_merger;
+    kill(pid, SIGUSR1);
+    LogFile::info("Send SIGUSR1 to (pid=%d)", pid);// attention, race condition!
+  }
 }
 
-void RoiSenderCallback::stop()
+void RoiSenderCallback::stop(void)
 {
-  // do nothing
+  if (m_pid_merger != 0) {
+    int pid = m_pid_merger;
+    kill(pid, SIGUSR2);
+    LogFile::info("Send SIGUSR2 to (pid=%d)", pid);// attention, race condition!
+  }
 }
 
-void RoiSenderCallback::abort()
+void RoiSenderCallback::abort(void)
 {
   // Kill processes
   if (m_pid_merger != 0) {
     int pid = m_pid_merger;
     kill(pid, SIGINT);
-    LogFile::info("kill merger (pid=%d)", pid);// attention, race condition!
+    LogFile::info("kill merger (pid=%d) with SIGINT ", pid);// attention, race condition!
   }
   // wait until
   for (int i = 0; m_pid_merger; i++) {

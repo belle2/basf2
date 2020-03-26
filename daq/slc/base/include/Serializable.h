@@ -1,8 +1,6 @@
 #ifndef _Belle2_Serializable_hh
 #define _Belle2_Serializable_hh
 
-#include "daq/slc/base/IOException.h"
-
 namespace Belle2 {
 
   class Reader;

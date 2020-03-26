@@ -69,6 +69,9 @@ namespace Belle2 {
     /** name for StoreObjPtr<DirectedNodeNetwork> which contains the networks needed */
     std::string m_PARAMNetworkName;
 
+    /// Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding)
+    std::string m_PARAMEventLevelTrackingInfoName;
+
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;
 

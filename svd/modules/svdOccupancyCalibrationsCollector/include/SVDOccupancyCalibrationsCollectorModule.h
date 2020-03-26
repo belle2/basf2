@@ -88,33 +88,26 @@ namespace Belle2 {
 
 
     /** Tree */
-    std::string m_tree;
-    TTree* m_histogramTree = NULL;
+    std::string m_tree = "tree";
+    TTree* m_histogramTree = nullptr; /**<tree containing as events the histograms per layer, ladder, sensor, side*/
 
-    TH1F* m_hnevents = NULL;
-    TH1F* m_hist = NULL;
-    int m_layer = 0;
-    int m_ladder = 0;
-    int m_sensor = 0;
-    int m_side = 0;
+    TH1F* m_hnevents = nullptr; /**<first bin of the histogram is counting the processed events*/
+    TH1F* m_hist = nullptr; /**<pointer to occupancy histogram*/
+    int m_layer = 0;  /**<SVD layer identifier*/
+    int m_ladder = 0;/**<SVD ladder identifier*/
+    int m_sensor = 0;/**<SVD sensor identifier*/
+    int m_side = 0;/**<SVD side identifier*/
 
   private:
 
 
-    static const int m_nLayers = 4;// to avoid empty layers we start from 0
-    static const int m_nLadders = 16;
-    static const int m_nSensors = 5;
     static const int m_nSides = 2;
-
-    const int nBins = 1500;
-
-    unsigned int sensorsOnLayer[4];
 
 
     //list of functions to create histograms:
-    TH1F* createHistogram1D(const char* name, const char* title,
-                            Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
+    //    TH1F* createHistogram1D(const char* name, const char* title,
+    //                            Int_t nbins, Double_t min, Double_t max,
+    //                            const char* xtitle, TList* histoList = nullptr);  /**< thf */
 
   };
 

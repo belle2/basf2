@@ -19,6 +19,7 @@
 
 #include <string>
 #include <regex>
+#include <set>
 
 using namespace Belle2;
 
@@ -31,8 +32,15 @@ Variable::Manager& Variable::Manager::Instance()
 
 const Variable::Manager::Var* Variable::Manager::getVariable(std::string name)
 {
-  auto aliasIter = m_alias.find(name);
-  if (aliasIter != m_alias.end()) {
+  // resolve aliases. Aliases might point to other aliases so we need to keep a
+  // set of what we have seen so far to avoid running into infinite loops
+  std::set<std::string> aliasesSeen;
+  for (auto aliasIter = m_alias.find(name); aliasIter != m_alias.end(); aliasIter = m_alias.find(name)) {
+    const auto [it, added] = aliasesSeen.insert(name);
+    if (!added) {
+      B2FATAL("Encountered a loop in the alias definitions between the aliases "
+              << boost::algorithm::join(aliasesSeen, ", "));
+    }
     name = aliasIter->second;
   }
   auto mapIter = m_variables.find(name);
@@ -193,7 +201,7 @@ bool Variable::Manager::createVariable(const std::string& name)
       std::vector<double> arguments;
       for (auto& arg : functionArguments) {
         double number = 0;
-        number = Belle2::convertString<float>(arg);
+        number = Belle2::convertString<double>(arg);
         arguments.push_back(number);
       }
       auto pfunc = parameterIter->second->function;

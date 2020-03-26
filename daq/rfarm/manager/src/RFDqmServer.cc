@@ -9,6 +9,13 @@
 
 #include "daq/rfarm/manager/RFDqmServer.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <cstring>
+
 using namespace Belle2;
 using namespace std;
 

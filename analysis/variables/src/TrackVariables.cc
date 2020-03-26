@@ -34,23 +34,22 @@
 
 using namespace std;
 
-namespace {
-
-  Belle2::TrackFitResult const* getTrackFitResultFromParticle(Belle2::Particle const* particle)
-  {
-    const Belle2::Track* track = particle->getTrack();
-    if (!track) {
-      return nullptr;
-    }
-
-    const Belle2::TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(abs(
-                                               particle->getPDGCode())));
-    return trackFit;
-  }
-}
-
 namespace Belle2 {
   namespace Variable {
+
+    // An helper function to get track fit results
+    // Not registered in variable mananger
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) {
+        return nullptr;
+      }
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         particle->getPDGCode())));
+      return trackFit;
+    }
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {

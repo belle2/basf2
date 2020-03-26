@@ -9,8 +9,6 @@
 #ifndef DESSERPREPC_H
 #define DESSERPREPC_H
 #include <daq/rawdata/DesSer.h>
-#include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-
 
 ////////////////////////////////////////////
 // From Serializer.cc

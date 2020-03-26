@@ -9,25 +9,23 @@
 # Last updated 21 Nov 2018
 #######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from skim.standardlists.lightmesons import *
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
+import basf2 as b2
+import modularAnalysis as ma
+from skim.standardlists.lightmesons import loadStdLightMesons
+from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s, loadStdSkimPi0
 from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import skimExpertFunctions as expert
 gb2_setuprel = "release-04-00-00"
 
 # Create skim path
-charmless3skimpath = Path()
+charmless3skimpath = b2.Path()
 
 # Retrieve skim code
-skimCode = encodeSkimName("CharmlessHad3Body")
-fileList = get_test_file("MC12_mixedBGx1")
-inputMdstList('default', fileList, path=charmless3skimpath)
+skimCode = expert.encodeSkimName("CharmlessHad3Body")
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=charmless3skimpath)
 
 # Load particle lists
 stdPhotons('loose', path=charmless3skimpath)
@@ -42,11 +40,11 @@ loadStdLightMesons(path=charmless3skimpath)
 # Import skim decay mode lists and perform skim
 from skim.btocharmless import CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
 Had3BodyList = CharmlessHad3BodyB0List(path=charmless3skimpath) + CharmlessHad3BodyBmList(path=charmless3skimpath)
-skimOutputUdst(skimCode, Had3BodyList, path=charmless3skimpath)
-summaryOfLists(Had3BodyList, path=charmless3skimpath)
+expert.skimOutputUdst(skimCode, Had3BodyList, path=charmless3skimpath)
+ma.summaryOfLists(Had3BodyList, path=charmless3skimpath)
 
-setSkimLogging(path=charmless3skimpath)
-process(charmless3skimpath)
+expert.setSkimLogging(path=charmless3skimpath)
+b2.process(charmless3skimpath)
 
 # Print summary statistics
-print(statistics)
+print(b2.statistics)

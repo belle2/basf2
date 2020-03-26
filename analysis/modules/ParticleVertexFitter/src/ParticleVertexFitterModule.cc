@@ -72,6 +72,7 @@ namespace Belle2 {
              string(""));
     addParam("decayString", m_decayString, "specifies which daughter particles are included in the kinematic fit", string(""));
     addParam("updateDaughters", m_updateDaughters, "true: update the daughters after the vertex fit", false);
+    addParam("smearing", m_smearing, "smear IP tube width by given length", 0.002);
   }
 
   void ParticleVertexFitterModule::initialize()
@@ -120,7 +121,13 @@ namespace Belle2 {
     m_beamSpotCov.ResizeTo(3, 3);
     TMatrixDSym beamSpotCov(3);
     if (m_withConstraint == "ipprofile") m_beamSpotCov = m_beamSpotDB->getCovVertex();
-    if (m_withConstraint == "iptube") ParticleVertexFitterModule::findConstraintBoost(2.);
+    if (m_withConstraint == "iptube") {
+      if (m_smearing > 0 && m_vertexFitter == "kfitter") {
+        ParticleVertexFitterModule::smearBeamSpot(m_smearing);
+      } else {
+        ParticleVertexFitterModule::findConstraintBoost(2.);
+      }
+    }
     if (m_withConstraint == "iptubecut") {  // for development purpose only
       m_BeamSpotCenter = TVector3(0.001, 0., .013);
       findConstraintBoost(0.03);
@@ -128,7 +135,6 @@ namespace Belle2 {
     if ((m_vertexFitter == "rave") && (m_withConstraint == "ipprofile" || m_withConstraint == "iptube"
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
-
     std::vector<unsigned int> toRemove;
     unsigned int n = plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
@@ -279,6 +285,11 @@ namespace Belle2 {
       // if decayString is empty, just use all primary daughters
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
         const Particle* child = mother->getDaughter(ichild);
+        // This if allows to skip the daughters, which cannot be used in the fits, particularly K_L0 from KLM.
+        // Useful for fully-inclusive particles.
+        if (mother->getProperty() == Particle::PropertyFlags::c_IsUnspecified and child->getPValue() < 0) {
+          continue;
+        }
         fitChildren.push_back(child);
       }
     } else {
@@ -357,7 +368,11 @@ namespace Belle2 {
       return false;
     }
 
+    // The update of the daughters is disabled for the pi0 mass fit.
+    bool updateDaughters = m_updateDaughters;
+    m_updateDaughters = false;
     bool ok = makeKMassMother(km, pi0Temp);
+    m_updateDaughters = updateDaughters;
 
     return ok;
   }
@@ -1049,15 +1064,8 @@ namespace Belle2 {
       }
     }
 
-    //Hardcoded: half of the crossing angle, taken from BeamParameters.
-    //Belle II crossing angle is 0.083, but since this constraint is mostly useful for Belle,
-    //we use the Belle crossing angle.
-    double rotationangle = 0.022 / 2;
-
-    TLorentzVector iptube_mom(0., 0., 1e10, 1e10);
-    iptube_mom.RotateX(0.);
-    iptube_mom.RotateY(rotationangle);
-    iptube_mom.RotateZ(0.);
+    PCmsLabTransform T;
+    TLorentzVector iptube_mom = T.getBeamFourMomentum();
 
     kv.setIpTubeProfile(
       ROOTToCLHEP::getHepLorentzVector(iptube_mom),
@@ -1101,5 +1109,14 @@ namespace Belle2 {
     m_beamSpotCov(0, 0) = Tube(0, 0);  m_beamSpotCov(0, 1) = Tube(0, 1);  m_beamSpotCov(0, 2) = Tube(0, 2);
     m_beamSpotCov(1, 0) = Tube(1, 0);  m_beamSpotCov(1, 1) = Tube(1, 1);  m_beamSpotCov(1, 2) = Tube(1, 2);
     m_beamSpotCov(2, 0) = Tube(2, 0);  m_beamSpotCov(2, 1) = Tube(2, 1);  m_beamSpotCov(2, 2) = Tube(2, 2);
+  }
+
+  void ParticleVertexFitterModule::smearBeamSpot(double width)
+  {
+    TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
+    for (int i = 0; i < 3; i++)
+      beamSpotCov(i, i) += width * width;
+
+    m_beamSpotCov = beamSpotCov;
   }
 } // end Belle2 namespace

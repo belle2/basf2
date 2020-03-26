@@ -10,8 +10,7 @@ __authors__ = [
     "Phil Grace"
 ]
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 
 def SemileptonicList(path):
@@ -41,9 +40,10 @@ def SemileptonicList(path):
     >>> stdMu('all', path=path)
     >>> stdPi('all', path=path)
     >>> stdPi('loose', path=path)
+    >>> stdPi0s('skim', path=path)
     >>> stdPi0s('loose', path=path)
     >>> stdPhotons('loose', path=path)
-    >>> stdK('loose', path=path)
+    >>> stdK('all', path=path)
     >>> stdKshorts(path=path)
     >>> loadStdD0(path)
     >>> loadStdDplus(path)
@@ -85,8 +85,8 @@ def SemileptonicList(path):
         "Racha Cheaib"
     ]
 
-    cutAndCopyList('e+:SLB', 'e+:all', 'p>0.35', True, path=path)
-    cutAndCopyList('mu+:SLB', 'mu+:all', 'p>0.35', True, path=path)
+    ma.cutAndCopyList('e+:SLB', 'e+:all', 'p>0.35', True, path=path)
+    ma.cutAndCopyList('mu+:SLB', 'mu+:all', 'p>0.35', True, path=path)
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     BplusChannels = ['anti-D0:all e+:SLB',
@@ -103,14 +103,14 @@ def SemileptonicList(path):
 
     bplusList = []
     for chID, channel in enumerate(BplusChannels):
-        reconstructDecay('B+:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B+:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
         bplusList.append('B+:SL' + str(chID))
 
     b0List = []
     for chID, channel in enumerate(B0Channels):
-        reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
+        ma.reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        ma.applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
         b0List.append('B0:SL' + str(chID))
 
     SLLists = b0List + bplusList
@@ -144,37 +144,37 @@ def PRList(path):
         "Romulus Godang"
     ]
 
-    fillParticleList(decayString='pi+:eventShapeForSkims',
-                     cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:eventShapeForSkims',
-                     cut='E > 0.1', path=path)
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims',
+                        cut='pt> 0.1', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims',
+                        cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
-                    allMoments=False,
-                    foxWolfram=True,
-                    harmonicMoments=False,
-                    cleoCones=False,
-                    thrust=False,
-                    collisionAxis=False,
-                    jets=False,
-                    sphericity=False,
-                    checkForDuplicates=False,
-                    path=path)
+    ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                       allMoments=False,
+                       foxWolfram=True,
+                       harmonicMoments=False,
+                       cleoCones=False,
+                       thrust=False,
+                       collisionAxis=False,
+                       jets=False,
+                       sphericity=False,
+                       checkForDuplicates=False,
+                       path=path)
 
-    applyEventCuts('foxWolframR2<0.5 and nTracks>4', path=path)
+    ma.applyEventCuts('foxWolframR2<0.5 and nTracks>4', path=path)
 
-    cutAndCopyList('e+:PR1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR1', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path)
+    ma.cutAndCopyList('e+:PR1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
+    ma.cutAndCopyList('mu+:PR1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
+    ma.cutAndCopyList('pi-:PR1', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path)
 
-    cutAndCopyList('e+:PR2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
+    ma.cutAndCopyList('e+:PR2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path)
+    ma.cutAndCopyList('mu+:PR2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
+    ma.cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
 
-    reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path)
-    reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path)
-    reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path)
-    reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path)
+    ma.reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path)
+    ma.reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path)
+    ma.reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path)
+    ma.reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path)
 
     PRList = ['B0:L1', 'B0:L2']
 

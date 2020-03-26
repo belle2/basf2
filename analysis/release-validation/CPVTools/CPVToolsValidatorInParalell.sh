@@ -30,7 +30,7 @@ mkdir -p ${workingDirectory}
 mkdir -p ${savingDirectory}
 
 # Queue where we will run the jobs
-jobQueue="s"
+jobQueue="l"
 
 # Ids needed to identify the jobs 
 trainID=''
@@ -70,6 +70,8 @@ for ((level = 1 ; level < 5; level++))
 
     eventLimit=''
 
+    fileEnding='.root'
+
     if ((level > 1))
         then
         sampleNumber=$((level - 1))
@@ -88,8 +90,10 @@ for ((level = 1 ; level < 5; level++))
     if [ ${BelleOrBelle2} = "Belle" ] && [ ${MCType} = "BGx1" ]
         then
         # *** The three samples of converted B2BII MC (level 0, 1 for training and level 2 for testing) are saved under 
-        sampleFilesForAsym='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleMCConv_'${decayChannel}'/sample-01/'
-        sample='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleMCConv_'${decayChannel}'/sample-0'${sampleNumber}'/'
+        jobQueue="s"
+        fileEnding=".mdst"
+        sampleFilesForAsym='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleMC_'${decayChannel}'/sample-01/'
+        sample='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleMC_'${decayChannel}'/sample-0'${sampleNumber}'/'
         # eventLimit='-n 2500'
         processID='11'
         fi
@@ -98,8 +102,8 @@ for ((level = 1 ; level < 5; level++))
     if [ ${BelleOrBelle2} = "Belle2" ] && [ ${MCType} = "BGx1" ]
         then
         # *** The three samples of Belle II MC with machine background (level 0, 1 for training and level 2 for testing) are saved under
-        sampleFilesForAsym='/gpfs/fs02/belle2/users/abudinen/dstFiles/MC11/Bd_'${decayChannel}'_BGx1/sample-01/'
-        sample='/gpfs/fs02/belle2/users/abudinen/dstFiles/MC11/Bd_'${decayChannel}'_BGx1/sample-0'${sampleNumber}'/'
+        sampleFilesForAsym='/gpfs/fs02/belle2/users/abudinen/dstFiles/MC13a/Bd_'${decayChannel}'_BGx1/sample-01/'
+        sample='/gpfs/fs02/belle2/users/abudinen/dstFiles/MC13a/Bd_'${decayChannel}'_BGx1/sample-0'${sampleNumber}'/'
         # eventLimit='-n 2500'
         processID='21'
         fi
@@ -129,9 +133,11 @@ for ((level = 1 ; level < 5; level++))
         done
 
     fileNumber=0
+
+    echo ${sample}
  
     # Samples or tests the given events in the sample
-    for i in `find ${sample} -name '*.root' -printf "%f\n"`
+    for i in `find ${sample} -name '*'${fileEnding} -printf "%f\n"`
         do
     
         fileNumber=$((fileNumber + 1)) 
@@ -183,7 +189,7 @@ for ((level = 1 ; level < 5; level++))
         then
         
         echo Test with Belle Data
-        belleDataSample='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleDataConv_JpsiKs/'
+        belleDataSample='/gpfs/fs02/belle2/users/abudinen/dstFiles/BelleData_JpsiKs/'
         fileNumber=0
         doVertex='False'
         for i in `ls -1 ${belleDataSample}`

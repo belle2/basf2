@@ -43,5 +43,7 @@ namespace Belle2 {
     int write(DecayTree<MCParticle>* decay);
     /** Recursively gather all MC daughters of gen **/
     void appendParticles(const MCParticle* gen, std::vector<const MCParticle*>& children);
+    /** Recursively get number of daughters of given DecayDescriptor **/
+    int getNDaughtersRecursive(const DecayDescriptor* d);
   };
 }

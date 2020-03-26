@@ -1,28 +1,24 @@
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
-from reconstruction import *
-from ROOT import Belle2
-import glob
-import os
-import sys
+#!/usr/bin/env python3
 
-# set correct global tag (this is for prod 4)
-from basf2 import use_central_database
-use_central_database('data_reprocessing_prod4', LogLevel.WARNING)
+import basf2
+import modularAnalysis as ma
+from variables import variables
+
 
 outputfilename = 'B2CAL901-cDSTECLTRG'
 
-main_path = create_path()
+main_path = basf2.create_path()
 
-inputMdstList(
+# TODO: A cdst input file is needed!
+
+ma.inputMdstList(
     'default',
     '',
     path=main_path)
 main_path.add_module('Progress')
 
 # get ECL trigger information
-main_path.add_module('ECLTRGInformation', logLevel=LogLevel.INFO, debugLevel=29)
+main_path.add_module('ECLTRGInformation', logLevel=basf2.LogLevel.INFO, debugLevel=29)
 
 
 def getL1Variables(n_trigs=80):
@@ -67,19 +63,18 @@ variables.addAlias('eclEnergySumTCECLCalDigit_2_15_0', 'eclEnergySumTCECLCalDigi
 variables.addAlias('eclEnergySumTCECLCalDigit_2_15_1', 'eclEnergySumTCECLCalDigit(2, 15, 1)')
 
 # dont vertex the leptons
-variablesToNtuple('',
-                  variables=['evtNum', 'runNum', 'expNum',
-                             'eclEnergySumTC_2_15', 'eclEnergySumTCECLCalDigit_2_15_0', 'eclEnergySumTCECLCalDigit_2_15_1'] +
-                  listL1PSNM +
-                  eclEnergyTC +
-                  eclEnergyTCECLCalDigit,
-                  treename='event',
-                  filename=outputfilename + '_event.root',
-                  path=main_path)
+ma.variablesToNtuple('',
+                     variables=['eclEnergySumTC_2_15', 'eclEnergySumTCECLCalDigit_2_15_0', 'eclEnergySumTCECLCalDigit_2_15_1'] +
+                     listL1PSNM +
+                     eclEnergyTC +
+                     eclEnergyTCECLCalDigit,
+                     treename='event',
+                     filename=outputfilename + '_event.root',
+                     path=main_path)
 
 
 # process the events
-process(path=main_path)
+basf2.process(path=main_path)
 
 # print out the summary
-print(statistics)
+print(basf2.statistics)

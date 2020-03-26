@@ -8,32 +8,32 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
+from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
-import os
-import sys
-import glob
-skimCode = encodeSkimName('SLUntagged')
+skimCode = expert.encodeSkimName('SLUntagged')
 
-SLpath = Path()
-fileList = get_test_file("MC12_mixedBGx1")
-inputMdstList('default', fileList, path=SLpath)
+SLpath = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=SLpath)
 
 stdPi('loose', path=SLpath)
-stdK('loose', path=SLpath)
+stdK('all', path=SLpath)
 stdPi('all', path=SLpath)
 stdE('all', path=SLpath)
 stdMu('all', path=SLpath)
 
-stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
+loadStdPi0ForBToHadrons(path=SLpath)  # For skim.standardlists.charm lists
+stdPi0s('loose', path=SLpath)
 stdPhotons('loose', path=SLpath)
 stdKshorts(path=SLpath)
 
@@ -45,13 +45,13 @@ loadStdDstarPlus(path=SLpath)
 # SL Skim
 from skim.semileptonic import SemileptonicList
 SLList = SemileptonicList(SLpath)
-skimOutputUdst(skimCode, SLList, path=SLpath)
+expert.skimOutputUdst(skimCode, SLList, path=SLpath)
 
-summaryOfLists(SLList, path=SLpath)
+ma.summaryOfLists(SLList, path=SLpath)
 
 
-setSkimLogging(path=SLpath)
-process(SLpath)
+expert.setSkimLogging(path=SLpath)
+b2.process(SLpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

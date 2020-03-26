@@ -12,16 +12,11 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/pcore/MsgHandler.h>
 
 #include <rawdata/dataobjects/RawPXD.h>
 
-#include <daq/slc/base/StringUtil.h>
-#include <daq/slc/system/Time.h>
-
-#include <TSystem.h>
-
-#include <cstdlib>
-#include <unistd.h>
+#include <iostream>
 
 using namespace Belle2;
 

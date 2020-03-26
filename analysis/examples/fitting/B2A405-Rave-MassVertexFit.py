@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -29,8 +28,8 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import vertexRave
-from modularAnalysis import massVertexRave
+from vertex import vertexRave
+from vertex import massVertexRave
 from modularAnalysis import variablesToExtraInfo
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
@@ -83,17 +82,17 @@ reconstructDecay('D*+:1 -> D0:kpi pi+:all',
 reconstructDecay('D*+:2 -> D0:kpi_mass pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
+# perform MC matching (MC truth association)
+matchMCTruth('D*+:1', path=my_path)
+matchMCTruth('D*+:2', path=my_path)
+
 # perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D*+:1', 0.0, path=my_path)
 
-# perform D*+ kinematic beam spot constrined vertex fit using the D0 and the pi+
+# perform D*+ kinematic beam spot constrained vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 vertexRave('D*+:2', 0.0, '', 'ipprofile', path=my_path)
-
-# perform MC matching (MC truth asociation)
-matchMCTruth('D*+:1', path=my_path)
-matchMCTruth('D*+:2', path=my_path)
 
 
 # Select variables that we want to store to ntuple

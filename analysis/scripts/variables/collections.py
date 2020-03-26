@@ -105,9 +105,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -148,7 +148,7 @@ flight_info = [
 ]
 
 #: MC true flight info variables
-mc_flight_info = utils.create_mctruth_aliases(flight_info)
+mc_flight_info = ['mcFlightTime', 'mcFlightDistance']
 
 #: Replacement for Vertex tuple tool
 vertex = [
@@ -177,14 +177,14 @@ vertex = [
 
 #: Replacement for MCVertex tuple tool
 mc_vertex = [
-    'mcX',
-    'mcY',
-    'mcZ',
-    'mcDistance',
-    'mcRho',
-    'mcProdVertexX',
-    'mcProdVertexY',
-    'mcProdVertexZ'
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
+    'mcDecayVertexFromIPDistance',
+    'mcDecayVertexRho',
+    'mcProductionVertexX',
+    'mcProductionVertexY',
+    'mcProductionVertexZ'
 ]
 
 #: CPV and Tag-side related variables
@@ -282,6 +282,24 @@ event_shape = [
     "aplanarity",
     "thrust",
     "thrustAxisCosTheta",
+]
+
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
 ]
 
 # now register all the variables declared in this file as collections

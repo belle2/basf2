@@ -41,7 +41,7 @@ localdb = sys.argv[1]
 filename = sys.argv[2]
 run = sys.argv[3]
 exp = sys.argv[4]
-branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0']
+branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0', 'SVDEventInfo']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
 nSVD = 6
@@ -68,7 +68,7 @@ else:
 
 conditions.globaltags = [
     # 'svd_NOCoGCorrections',
-    'data_reprocessing_prompt_rel4_patchb'
+    'klm_alignment_testing'
 ]
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",

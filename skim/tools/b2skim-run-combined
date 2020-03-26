@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""General steering file for running skims."""
+"""General steering file for running combined skims."""
 
 import argparse
 from importlib import import_module
 
 import basf2 as b2
 import modularAnalysis as ma
-import skimExpertFunctions as expert
+from skimExpertFunctions import CombinedSkim, get_test_file
 
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument("skim", choices=["LeptonicUntagged"])
+    parser.add_argument("skims", nargs="+", default=[], choices=["LeptonicUntagged"])
     parser.add_argument("-n", "--max-input-events", default=0)
     parser.add_argument(
         "-i",
         "--input-file-list",
         dest="InputFileList",
         nargs="+",
-        default=[expert.get_test_file("MC12_mixedBGx1")],
+        default=[get_test_file("MC12_mixedBGx1")],
     )
     parser.add_argument("-o", "--output-udst-name", dest="OutputFileName")
 
@@ -36,6 +36,11 @@ def import_skim_module(SkimName):
         raise NotImplementedError
 
 
+def construct_skim_object(SkimName):
+    SkimModule = import_skim_module(SkimName)
+    return getattr(SkimModule, SkimName)()
+
+
 def main():
     parser = get_argument_parser()
     args = parser.parse_args()
@@ -43,13 +48,12 @@ def main():
     path = b2.Path()
     ma.inputMdstList("default", args.InputFileList, path=path)
 
-    SkimModule = import_skim_module(args.skim)
-    Skim = getattr(SkimModule, args.skim)()
-
-    Skim.set_skim_logging(path)
-    Skim.setup(path)
-    Skim.build_lists(path)
-    Skim.output_udst(path)
+    SkimObjects = [construct_skim_object(skim) for skim in args.skims]
+    SkimObject = CombinedSkim(*SkimObjects)
+    SkimObject.set_skim_logging(path)
+    SkimObject.setup(path)
+    SkimObject.build_lists(path)
+    SkimObject.output_udst(path)
 
     b2.process(path, max_event=args.max_input_events)
 

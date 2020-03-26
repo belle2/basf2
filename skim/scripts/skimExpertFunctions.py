@@ -291,8 +291,8 @@ class CombinedSkim:
             raise NotImplementedError(
                 "Must pass only `BaseSkim` type objects to `CombinedSkim`."
             )
-        self.IndividualSkims = {skim.name: skim for skim in skims}
-        self.NoisySkims = list({})
+        self.Skims = {skim.name: skim for skim in skims}
+        self.NoisyModules = list({skim.NoisyModules for skim in self.Skims})
 
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names"""
@@ -309,3 +309,42 @@ class CombinedSkim:
                 f"Non-unique output particle list names in combined skim! "
                 ", ".join(DuplicatedParticleLists)
             )
+
+    def set_skim_logging(self, path):
+        """Turns the log level to ERROR for selected modules to decrease the total size
+        of the skim log files. Additional modules can be silenced by setting the attribute
+        `NoisyModules` for an individual skim.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+        """
+        b2.set_log_level(b2.LogLevel.INFO)
+
+        NoisyModules = ['ParticleLoader', 'ParticleVertexFitter'] + self.NoisyModules
+
+        for module in path.modules():
+            if module.type() in set(NoisyModules):
+                module.set_log_level(b2.LogLevel.ERROR)
+
+    def setup(self, path):
+        """Run all of the setup functions for each skim.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+        """
+        for skim in self.Skims:
+            skim.setup(path)
+
+    def build_lists(self, path):
+        """Run all the build_lists functions for each skim.
+
+        Args:
+            path (basf2.Path): Skim path to be processed.
+        """
+        pass
+
+    def output_udst(self, path):
+        """Write uDST output files for each skim."""
+        for skim in self.Skims:
+            skimOutputUdst(skim.OutputFileName, skim.lists, path=path)
+            summaryOfLists(skim.lists, path=path)

@@ -83,9 +83,9 @@ void plot_triggers(void)
                 triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
     for (auto& it : triggers) {
-      ERR_FPRINTF(stderr, "Miss trig %u\n", it);
-      if (i++ == 20) {
-        ERR_FPRINTF(stderr, "... too many missing to report\n");
+      ERR_FPRINTF(stderr, "[INFO] Miss trig %u\n", it);
+      if (i++ == 100) {
+        ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
         break;
       }
     }
@@ -132,7 +132,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
       return -1;
 
     case  0:
-      ERR_FPRINTF(stderr, "merger_merge: connect(): Connection timed out\n");
+      ERR_FPRINTF(stderr, "[ERROR] merger_merge: connect() to ONSEN: Connection timed out\n");
       return -1;
 
     case  1: {
@@ -146,7 +146,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
         return -1;
       }
       if (connection_error) {
-        ERR_FPRINTF(stderr, "merger_merge: connect(): %s\n", strerror(errno));
+        ERR_FPRINTF(stderr, "[ERROR] merger_merge: connect() to ONSEN: %s\n", strerror(errno));
         return -1;
       }
 
@@ -154,7 +154,7 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
     }
 
     default:
-      ERR_FPRINTF(stderr, "merger_merge: poll(): Unexpected error\n");
+      ERR_FPRINTF(stderr, "[ERROR] merger_merge: poll() connect to ONSEN: Unexpected error\n");
       return -1;
   }
 
@@ -177,7 +177,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   // struct pollfd fds;
 
 
-  LOG_FPRINTF(stderr, "hltout2merger: Waiting for connection on %d\n", port);
+  LOG_FPRINTF(stderr, "[INFO] merger_merge: Waiting for connection from hltout2merger on port %d\n", port);
 
   sd = b2_create_accept_socket(port);
   if (sd == -1) {
@@ -186,7 +186,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   }
 
   ret = b2_timed_blocking_io(sd,
-                             1);// This means, if the socket blocks longer than Xs, it will return a EAGAIN or EWOULDBLOCK (immediately)
+                             1); // This means, if the socket blocks longer than Xs, it will return a EAGAIN or EWOULDBLOCK (immediately)
   if (ret == -1) {
     ERROR(b2_timed_blocking_io);
     return -1;
@@ -261,30 +261,29 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
 static int
 MM_get_packet(const int sd_acc, unsigned char* buf)
 {
-  int ret;
-  size_t n_words_from_hltout;
-  size_t n_bytes_from_hltout;
+  int ret = {};
+  unsigned int header[2] = {}; // length is second word, thus read two
+  size_t n_bytes_from_hltout{};
 
-  ret = recv(sd_acc, &n_words_from_hltout, sizeof(unsigned int), MSG_PEEK);
+  ret = recv(sd_acc, &header, sizeof(unsigned int) * 2, MSG_PEEK);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
-  if (ret != sizeof(unsigned int)) {
-    ERR_FPRINTF(stderr, "merger_merge: recv(): Unexpected return value (%d)\n", ret);
+  if (ret != sizeof(unsigned int) * 2) {
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Unexpected return value (%d)\n", ret);
     return -2;
   }
 
-  n_words_from_hltout = ntohl(n_words_from_hltout);
-  n_bytes_from_hltout = n_words_from_hltout * sizeof(unsigned int);
+  n_bytes_from_hltout = ntohl(header[1]);// OFFSET_LENGTH = 1
 
   ret = b2_recv(sd_acc, buf, n_bytes_from_hltout);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
   if (size_t(ret) != n_bytes_from_hltout) {
-    ERR_FPRINTF(stderr, "merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
     return -2;
   }
 
@@ -301,15 +300,15 @@ MM_term_connect_to_onsen(const int sd)
 
 void print_stat(void)
 {
-  ERR_FPRINTF(stderr, "--- STAT START ---\n");
+  ERR_FPRINTF(stderr, "[INFO] --- STAT START ---\n");
   unsigned int sum = 0;
   for (auto& it : mycount) {
-    ERR_FPRINTF(stderr, "(%s): %d\n", myconn[it.first].c_str(), it.second);
+    ERR_FPRINTF(stderr, "[INFO] (%s): %d\n", myconn[it.first].c_str(), it.second);
     if (it.first != 0) sum += it.second;
   }
-  ERR_FPRINTF(stderr, "sum %u out %u diff %d\n", sum, mycount[0], (int)(mycount[0] - sum));
+  ERR_FPRINTF(stderr, "[INFO] sum %u out %u diff %d\n", sum, mycount[0], (int)(mycount[0] - sum));
   plot_triggers();
-  ERR_FPRINTF(stderr, "--- STAT END ---\n");
+  ERR_FPRINTF(stderr, "[INFO] --- STAT END ---\n");
 }
 
 // Main
@@ -340,7 +339,7 @@ main(int argc, char* argv[])
   char shmname[1024];
   int shmid;
 
-  LOG_FPRINTF(stderr, "merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
+  LOG_FPRINTF(stderr, "[INFO] merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
   if (argc < 4) {
     ERR_FPRINTF(stderr, "[ERROR] merger_merge: Usage: merger_merge onsen-host onsen-port client-port#1[:client-port#2[:...]]\n");
@@ -376,17 +375,15 @@ main(int argc, char* argv[])
 
   /* Create a port to accept connections*/
   sd_acc = MM_init_accept_from_hltout2merger(accept_port);
-  LOG_FPRINTF(stderr, "merger_merge: port to accept connections from HLTOUT [%d]\n", sd_acc);
+  LOG_FPRINTF(stderr, "[INFO] merger_merge: port to accept connections from HLTOUT [%d]\n", sd_acc);
 
 
   /* RoI transmission loop */
   // RoI packets
-  const size_t n_bytes_header  = sizeof(struct h2m_header_t);
-  const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
   size_t n_bytes_from_hltout;
   size_t n_bytes_to_onsen;
 
-  unsigned char* buf = (unsigned char*)valloc(n_bytes_header + ROI_MAX_PACKET_SIZE + n_bytes_footer);
+  unsigned char* buf = (unsigned char*)valloc(ROI_MAX_PACKET_SIZE);
   if (!buf) {
     ERROR(valloc);
     exit(1);
@@ -409,12 +406,12 @@ main(int argc, char* argv[])
           /* connected: move to the recv->send loop */
           need_reconnection_to_onsen = 0;
           event_count = 0;
-          LOG_FPRINTF(stderr, "merger_merge: MM_init_connect_to_onsen(): Connected to ONSEN\n");
+          LOG_FPRINTF(stderr, "[INFO] merger_merge: MM_init_connect_to_onsen(): Connected to ONSEN\n");
           connected = true;
           break;
         }
 
-        ERR_FPRINTF(stderr, "merger_merge: connection to onsen failed: reconnect in %d second(s)\n", sleep_sec);
+        ERR_FPRINTF(stderr, "[WARNING] merger_merge: connection to onsen failed: reconnect in %d second(s)\n", sleep_sec);
         sleep(sleep_sec);
 
         /* retry connection */
@@ -425,7 +422,7 @@ main(int argc, char* argv[])
 
   // Preparation for select()
 
-  printf("Starting select() loop\n") ;
+  // printf("Starting select() loop\n") ;
   fflush(stderr);
   fflush(stdout);
 
@@ -451,26 +448,26 @@ main(int argc, char* argv[])
     //    printf ( "Select(): returned with %d,  rset = %8.8x\n", rc, rset );
     if (got_sigusr1) {
       got_sigusr1 = false;
-      ERR_FPRINTF(stderr, "Got SIGUSR1, Run START\n");
+      ERR_FPRINTF(stderr, "[INFO] Got SIGUSR1, Run START\n");
       print_stat();
     }
     if (got_sigusr2) {
       got_sigusr2 = false;
-      ERR_FPRINTF(stderr, "Got SIGUSR2, Run STOP\n");
+      ERR_FPRINTF(stderr, "[INFO] Got SIGUSR2, Run STOP\n");
       print_stat();
     }
     if (got_sigint) {
       got_sigint = false;
-      ERR_FPRINTF(stderr, "Got SIGINT, ABORT\n");
+      ERR_FPRINTF(stderr, "[INFO] Got SIGINT, ABORT\n");
       print_stat();
     }
     if (got_sigpipe) {
       got_sigpipe = false;
-      ERR_FPRINTF(stderr, "Got SIGPIPE\n");
+      ERR_FPRINTF(stderr, "[INFO] Got SIGPIPE\n");
     }
     if (got_sigterm) {
       got_sigterm = false;
-      ERR_FPRINTF(stderr, "Got SIGTERM\n");
+      ERR_FPRINTF(stderr, "[INFO] Got SIGTERM\n");
     }
     if (rc < 0) {
       perror("select");
@@ -486,15 +483,15 @@ main(int argc, char* argv[])
       if ((t =::accept(sd_acc, (struct sockaddr*)&isa, &i)) < 0) {
         //      m_errno = errno;
         ERR_FPRINTF(stderr, "[ERROR] Error on accepting new connection\n");
-        ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+        ERR_FPRINTF(stderr, "[ERROR] %s terminated\n", argv[0]);
         return (-1);
       }
-      printf("New socket connection t=%d\n", t);
+      LOG_FPRINTF(stderr, "[INFO] New socket connection t=%d\n", t);
       char address[INET_ADDRSTRLEN];
       inet_ntop(AF_INET, &isa.sin_addr, address, sizeof(address));
       connected_hlts++;
 
-      printf("%d is IP <%s>\n", t, address);
+      LOG_FPRINTF(stderr, "[INFO] %d is IP <%s>\n", t, address);
       myconn[t] = address;
 
       fflush(stdout);
@@ -512,9 +509,9 @@ main(int argc, char* argv[])
           ret = MM_get_packet(fd, buf);
           if (ret < 0) { // -2 will not have a errno set
             if (ret == -1) {
-              ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
+              ERR_FPRINTF(stderr, "[ERROR] merger_merge: MM_get_packet()[%d]: %s\n", fd, strerror(errno));
             } else {
-              ERR_FPRINTF(stderr, "merger_merge: MM_get_packet()[%d]\n", fd);
+              ERR_FPRINTF(stderr, "[ERROR] merger_merge: MM_get_packet()[%d]\n", fd);
             }
             ERR_FPRINTF(stderr, "[ERROR] Connection from HLT was closed on HLT side (hltout2merge) from %s\n",
                         myconn[fd].c_str());
@@ -534,9 +531,9 @@ main(int argc, char* argv[])
           //    printf ( "RoI received : Event count = % d\n", event_count );
           if (ret > 0) {
             mycount[fd]++;
-            if (event_count < 5  /*|| event_count % 100000 == 0*/) {
-              LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] received event from ROI transmitter\n", event_count);
-              LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
+            if (0 /*event_count < 5 || event_count % 100000 == 0*/) {
+              LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] received event from ROI transmitter\n", event_count);
+              LOG_FPRINTF(stderr, "[INFO] merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
               dump_binary(stderr, buf, n_bytes_from_hltout);
             }
           }
@@ -545,7 +542,7 @@ main(int argc, char* argv[])
         /* send packet */
         if (n_bytes_from_hltout > 0) {
           int ret;
-          unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+          unsigned char* ptr_head_to_onsen = buf;
 
           // extract trigger number, run+exp nr and fill it in a table.
 
@@ -581,7 +578,7 @@ main(int argc, char* argv[])
             check_event_nr(eventnr);
           }
 
-          n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
+          n_bytes_to_onsen = n_bytes_from_hltout;
           while (1) {
             ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
             if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -596,17 +593,17 @@ main(int argc, char* argv[])
             event_count = 0;
             ERR_FPRINTF(stderr, "[ERROR] merger_merge: error to send to ONSEN : %s\n", strerror(errno));
             free(buf);
-            ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+            ERR_FPRINTF(stderr, "[ERROR] %s terminated\n", argv[0]);
             print_stat();
             exit(1);
           }
           if (ret == 0) {
-            ERR_FPRINTF(stderr, "merger_merge: b2_send(): Connection closed\n");
+            ERR_FPRINTF(stderr, "[ERROR] merger_merge: b2_send(): Connection closed\n");
             need_reconnection_to_onsen = 1;
             event_count = 0;
             free(buf);
             ERR_FPRINTF(stderr, "[ERROR] Connection to ONSEN was closed on ONSEN side\n");
-            ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+            ERR_FPRINTF(stderr, "[ERROR] %s terminated\n", argv[0]);
             print_stat();
             exit(1);
           }
@@ -614,14 +611,14 @@ main(int argc, char* argv[])
           flstat->log(n_bytes_to_onsen);
 
           mycount[0]++;
-          if (event_count < 5 /*|| event_count % 10000 == 0*/) {
-            LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
+          if (0 /*event_count < 5 || event_count % 10000 == 0*/) {
+            LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }
         }
       }
       event_count++;
-      if (event_count % 1000000 == 0) {
+      if (event_count % 10000 == 0) {
         ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
                     *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
       }
@@ -633,10 +630,10 @@ main(int argc, char* argv[])
   MM_term_connect_to_onsen(sd_con);
 
   if (connected_hlts == 0) {
-    ERR_FPRINTF(stderr, "Stopped because all HLTs closed connection\n");
+    ERR_FPRINTF(stderr, "[RESULT] Stopped because all HLTs closed connection\n");
   }
   print_stat();
-  ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+  ERR_FPRINTF(stderr, "[RESULT] %s terminated\n", argv[0]);
   return 0;
 }
 

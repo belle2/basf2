@@ -8,24 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Own headers. */
+/* Own header. */
 #include <klm/calibration/KLMTimeCalibrationAlgorithm.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/Environment.h>
 
-/* External headers. */
+/* ROOT headers. */
 #include <TFile.h>
-#include <TTree.h>
-#include <TVector3.h>
 #include <TFitResult.h>
 #include <TString.h>
-
+#include <TTree.h>
+#include <TVector3.h>
 
 using namespace Belle2;
 

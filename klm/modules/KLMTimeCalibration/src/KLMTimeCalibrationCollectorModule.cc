@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Own headers. */
+/* Own header. */
 #include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
 
 /* KLM headers. */
@@ -17,21 +17,20 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-/* Belle2 headers. */
-#include <mdst/dataobjects/Track.h>
+/* Belle 2 headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <tracking/dataobjects/ExtHit.h>
+#include <framework/dataobjects/EventT0.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/dataobjects/EventT0.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 /* ROOT headers. */
 #include <TTree.h>
 
-/* C++ STL headers. */
+/* C++ headers. */
 #include  <utility>
-
 
 using namespace Belle2;
 using namespace Belle2::bklm;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Own headers. */
+/* Own header. */
 #include <klm/dbobjects/KLMTimeConstants.h>
 
 using namespace Belle2;

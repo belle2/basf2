@@ -95,13 +95,6 @@ namespace Belle2 {
      */
     double getTime(KLMDigit* d, double dist);
 
-    /**
-     * Check whether hit has too small time.
-     * @param[in] pos  Hit position.
-     * @param[in] time HIt time.
-     */
-    bool fastHit(HepGeom::Point3D<double>& pos, double time);
-
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 

@@ -239,13 +239,6 @@ void KLMReconstructorModule::reconstructBKLMHits()
   }
 }
 
-bool KLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
-                                     double time)
-{
-  return time < pos.mag() / Const::speedOfLight -
-         2.0 * m_eklmRecPar->getTimeResolution();
-}
-
 double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
 {
   int strip;

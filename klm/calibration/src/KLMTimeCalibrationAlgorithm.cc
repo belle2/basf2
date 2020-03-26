@@ -13,8 +13,8 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMStatus.h>
 
 /* Belle2 headers. */
 #include <framework/logging/Logger.h>

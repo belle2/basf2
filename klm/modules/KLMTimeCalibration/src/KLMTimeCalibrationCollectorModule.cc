@@ -12,12 +12,11 @@
 #include <klm/modules/KLMTimeCalibration/KLMTimeCalibrationCollectorModule.h>
 
 /* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 /* Belle2 headers. */
 #include <mdst/dataobjects/Track.h>
@@ -248,15 +247,15 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
   for (unsigned i = 0; i < hit2ds.size(); ++i) {
     EKLMHit2d* hit2d = hit2ds[i];
 
-    RelationVector<EKLMDigit> digits = hit2d->getRelationsTo<EKLMDigit>();
+    RelationVector<KLMDigit> digits = hit2d->getRelationsTo<KLMDigit>();
     unsigned nDigit = digits.size();
     if (nDigit != 2)
-      B2FATAL("Wrong number of related EKLMDigits.");
-    if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0) continue;
+      B2FATAL("Wrong number of related KLMDigits.");
+    if (digits[0]->getNPhotoelectrons() == 0 || digits[1]->getNPhotoelectrons() == 0) continue;
     if (!digits[0]->isGood() || !digits[1]->isGood()) continue;
 
     for (unsigned j = 0; j < nDigit; ++j) {
-      EKLMDigit* digitHit = digits[j];
+      KLMDigit* digitHit = digits[j];
       unsigned int localID = digitHit->getUniqueChannelID();
       m_ev.channelId = m_elementNum->channelNumberEKLM(localID);
       m_ev.inRPC = 0;
@@ -269,7 +268,7 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
 
       TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
-      TVector3 positionGlobal_digit = digitHit->getPosition();
+      TVector3 positionGlobal_digit = hit2d->getPosition();
       TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_digit;
 
       storeDistDiff(positionGlobal_diff);
@@ -284,7 +283,7 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       m_ev.dist = 0.5 * l - hitLocal_extHit.x() / CLHEP::mm * Unit::mm;
       m_ev.recTime = digitHit->getTime();
       m_ev.eDep = digitHit->getCharge();
-      m_ev.nPE = digitHit->getNPE();
+      m_ev.nPE = digitHit->getNPhotoelectrons();
 
       getObjectPtr<TH2D>("m_HfTime_end")->Fill(m_ev.flyTime, digitHit->getLayer());
       getObjectPtr<TTree>("time_calibration_data")->Fill();
@@ -309,13 +308,13 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
     stripWidtm_HPhi = corMod->getPhiStripWidth();
     for (unsigned iH1 = 0; iH1 < bklmHit1ds.size(); ++iH1) {
       BKLMHit1d* hit1d = bklmHit1ds[iH1];
-      RelationVector<BKLMDigit> digits = hit1d->getRelationsTo<BKLMDigit>();
+      RelationVector<KLMDigit> digits = hit1d->getRelationsTo<KLMDigit>();
       getObjectPtr<TH1I>("m_HnDigit_scint")->Fill(digits.size());
       if (digits.size() > 5) continue;
 
       for (unsigned iHd = 0; iHd < digits.size(); ++iHd) {
-        BKLMDigit* digitHit = digits[iHd];
-        if (digitHit->inRPC() || !digitHit->isAboveThreshold()) continue;
+        KLMDigit* digitHit = digits[iHd];
+        if (digitHit->inRPC() || !digitHit->isGood()) continue;
 
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
                                      digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
@@ -346,8 +345,8 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         m_ev.isFlipped = corMod->isFlipped();
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;
-        m_ev.eDep = digitHit->getEDep();
-        m_ev.nPE = digitHit->getNPixel();
+        m_ev.eDep = digitHit->getEnergyDeposit();
+        m_ev.nPE = digitHit->getNPhotoelectrons();
         m_ev.channelId = channelId_digit;
 
         getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, digitHit->getLayer());
@@ -375,12 +374,12 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
     double stripWidtm_HPhi = corMod->getPhiStripWidth();
     for (unsigned iH1 = 0; iH1 < bklmHit1ds.size(); ++iH1) {
       BKLMHit1d* hit1d = bklmHit1ds[iH1];
-      RelationVector<BKLMDigit> digits = hit1d->getRelationsTo<BKLMDigit>();
+      RelationVector<KLMDigit> digits = hit1d->getRelationsTo<KLMDigit>();
       getObjectPtr<TH1I>("m_HnDigit_rpc")->Fill(digits.size());
       if (digits.size() > 5) continue;
 
       for (unsigned iHd = 0; iHd < digits.size(); ++iHd) {
-        BKLMDigit* digitHit = digits[iHd];
+        KLMDigit* digitHit = digits[iHd];
 
         m_ev.inRPC = digitHit->inRPC();
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
@@ -418,8 +417,8 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
         m_ev.isFlipped = corMod->isFlipped();
         m_ev.recTime = digitHit->getTime();
         m_ev.dist = propaLength;
-        m_ev.eDep = digitHit->getEDep();
-        m_ev.nPE = digitHit->getNPixel();
+        m_ev.eDep = digitHit->getEnergyDeposit();
+        m_ev.nPE = digitHit->getNPhotoelectrons();
         m_ev.channelId = channelId_digit;
 
         getObjectPtr<TH2D>("m_HfTime")->Fill(m_ev.flyTime, digitHit->getLayer());

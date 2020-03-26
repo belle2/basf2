@@ -16,8 +16,8 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 
 /* Belle2 headers */
 #include <mdst/dataobjects/Track.h>

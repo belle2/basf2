@@ -249,8 +249,13 @@ namespace Belle2 {
     // recover beam spot info
 
     m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
+    //cout << "RADEK: beamSpotCenter= " << m_BeamSpotCenter << endl;
     m_BeamSpotCov.ResizeTo(3, 3);
     m_BeamSpotCov = m_beamSpotDB->getCovVertex();
+
+    cout << "RADEK is here " << __LINE__ << endl;
+    //m_BeamSpotCov.Print(); //RADEK
+
 
     //make the beam spot bigger for the standard constraint
 
@@ -258,6 +263,7 @@ namespace Belle2 {
     TVector3 boost = T.getBoostVector();
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 
+    //TODO: What's the origin of these numbers?
     double cut = 8.717575e-02 * bg;
 
     m_shiftZ = 4.184436e+02 * bg *  0.0001;
@@ -349,6 +355,34 @@ namespace Belle2 {
 
   }
 
+
+  //  Rz(phi) * Ry(theta)
+  static TMatrixD getRotationMatrix(double theta, double phi)
+  {
+    //double thetar = v4Final.Theta();
+    //double phir = v4Final.Phi();
+
+    double str = TMath::Sin(-theta);
+    double ctr = TMath::Cos(-theta);
+    double spr = TMath::Sin(-phi);
+    double cpr = TMath::Cos(-phi);
+
+    TMatrix r1z(3, 3);  r1z(2, 2) = 1;
+    r1z(0, 0) =  cpr; r1z(0, 1) =  spr;
+    r1z(1, 0) = -spr; r1z(1, 1) =  cpr;
+
+    TMatrix r1y(3, 3);  r1y(1, 1) = 1;
+    r1y(0, 0) =  ctr; r1y(0, 2) = -str;
+    r1y(2, 0) =  str; r1y(2, 2) =  ctr;
+
+    TMatrix r1(3, 3);  r1.Mult(r1z, r1y);
+    return r1;
+  }
+
+
+
+
+
   bool TagVertexModule::findConstraint(Particle* Breco, double cut)
   {
     if (Breco->getPValue() < 0.) return false;
@@ -413,59 +447,22 @@ namespace Belle2 {
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
 
-    double thetar = v4Final.Theta();
-    double phir = v4Final.Phi();
-
-    double str = TMath::Sin(-1 * thetar);
-    double ctr = TMath::Cos(-1 * thetar);
-    double spr = TMath::Sin(-1 * phir);
-    double cpr = TMath::Cos(-1 * phir);
-
-    TMatrix r1z(3, 3);  r1z(2, 2) = 1;
-    r1z(0, 0) = cpr; r1z(0, 1) = spr;
-    r1z(1, 0) = -1 * spr; r1z(1, 1) = cpr;
-
-    TMatrix r1y(3, 3);  r1y(1, 1) = 1;
-    r1y(0, 0) = ctr; r1y(0, 2) = -1 * str;
-    r1y(2, 0) = str; r1y(2, 2) = ctr;
-
-
-    TMatrix r1(3, 3);  r1.Mult(r1z, r1y);
-    TMatrix r1t(3, 3); r1t.Transpose(r1);
-
-    TMatrix TubeZPart(3, 3);  TubeZPart.Mult(r1t, errFinal);
-    TMatrix TubeZ(3, 3); TubeZ.Mult(TubeZPart, r1);
+    TMatrixD r1 = getRotationMatrix(v4Final.Theta(), v4Final.Phi());
+    TMatrixD r1t = r1; r1t.T();
+    TMatrixD TubeZ = r1t * errFinal * r1;
 
     TubeZ(2, 2) = cut;
     TubeZ(2, 0) = 0; TubeZ(0, 2) = 0;
     TubeZ(2, 1) = 0; TubeZ(1, 2) = 0;
 
-    vec.SetX(-1 * vec.X());
-    vec.SetY(-1 * vec.Y());
-    vec.SetZ(-1 * vec.Z());
+    vec.SetX(-vec.X());
+    vec.SetY(-vec.Y());
+    vec.SetZ(-vec.Z());
 
     TLorentzVector vecLab = T.rotateCmsToLab() * vec;
-    double theta = vecLab.Theta();
-    double phi = vecLab.Phi();
-
-    double st = TMath::Sin(theta);
-    double ct = TMath::Cos(theta);
-    double sp = TMath::Sin(phi);
-    double cp = TMath::Cos(phi);
-
-    TMatrix r2z(3, 3);  r2z(2, 2) = 1;
-    r2z(0, 0) = cp; r2z(0, 1) = sp;
-    r2z(1, 0) = -1 * sp; r2z(1, 1) = cp;
-
-    TMatrix r2y(3, 3);  r2y(1, 1) = 1;
-    r2y(0, 0) = ct; r2y(0, 2) = -1 * st;
-    r2y(2, 0) = st; r2y(2, 2) = ct;
-
-    TMatrix r2(3, 3);  r2.Mult(r2y, r2z);
-    TMatrix r2t(3, 3); r2t.Transpose(r2);
-
-    TMatrix TubePart(3, 3);  TubePart.Mult(r2t, TubeZ);
-    TMatrix Tube(3, 3); Tube.Mult(TubePart, r2);
+    TMatrixD r2 = getRotationMatrix(vecLab.Theta(), vecLab.Phi()); r2.T(); //inverse rotation
+    TMatrixD r2t = r2; r2t.T();
+    TMatrixD Tube = r2t * TubeZ * r2;
 
     m_constraintCov.ResizeTo(3, 3);
 
@@ -519,6 +516,8 @@ namespace Belle2 {
     TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
     //print some stuff if wanted
+    cout << "RADEK is here " << __LINE__ << endl;
+    printMatrix(m_BeamSpotCov); //RADEK
 
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
@@ -554,6 +553,7 @@ namespace Belle2 {
     r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
 
     TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
+    //TMatrix r2My = getRotationMatrix(v4FinalNew.Theta(), v4FinalNew.Phi()); RADEK
     TMatrix r2t(3, 3); r2t.Transpose(r2);
 
 
@@ -617,19 +617,27 @@ namespace Belle2 {
     double cpb = TMath::Cos(phib);
 
 
-    TMatrix rz(3, 3);  rz(2, 2) = 1;
+    TMatrixD rz(3, 3);  rz(2, 2) = 1;
     rz(0, 0) = cpb; rz(0, 1) = spb;
     rz(1, 0) = -1 * spb; rz(1, 1) = cpb;
 
-    TMatrix ry(3, 3);  ry(1, 1) = 1;
+    TMatrixD ry(3, 3);  ry(1, 1) = 1;
     ry(0, 0) = ctb; ry(0, 2) = -1 * stb;
     ry(2, 0) = stb; ry(2, 2) = ctb;
 
-    TMatrix r(3, 3);  r.Mult(rz, ry);
-    TMatrix rt(3, 3); rt.Transpose(r);
+    TMatrixD r(3, 3);  r.Mult(rz, ry);
+    TMatrixD rMy = getRotationMatrix(-boostDir.Theta(), -boostDir.Phi()); //RADEK
+    rMy.Print();
+    r.Print();
+    for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
+        cout << i << " " << j << " : " << rMy(i, j) - r(i, j) << endl;
 
-    TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
-    TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
+    assert(rMy == r);
+    TMatrixD rt(3, 3); rt.Transpose(r);
+
+    TMatrixD TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
+    TMatrixD Tube(3, 3); Tube.Mult(TubePart, r);
 
     m_constraintCov.ResizeTo(3, 3);
 
@@ -1500,6 +1508,10 @@ namespace Belle2 {
   {
     //Here rave is used to find the upsilon(4S) vtx as the intersection
     //between the mother B trajectory and the beam spot
+
+
+    cout << "RADEK is here " << __LINE__ << endl;
+    printMatrix(m_BeamSpotCov); //RADEK
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
 

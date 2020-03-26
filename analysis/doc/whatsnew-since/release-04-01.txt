@@ -162,6 +162,7 @@ Modules
  * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
  * In :b2:mod:`TagV` module, added the possibility to use the truth information from the tag particles in the vertex fit. The option :code:`useTruthInFit = True` switches that on. 
+ * In :b2:mod:`TagV` module, implemented an internal change: tag particles are loaded as ``Particle`` object from the ``ROE`` and not anymore as ``TrackFitResult``. This should have no effect to users.
 
 Utilities and core objects
 ++++++++++++++++++++++++++

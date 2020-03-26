@@ -122,10 +122,10 @@ namespace Belle2 {
     particles.registerRelationTo(verArray);
     //check if the fitting algorithm name  is set correctly
     if (m_fitAlgo != "Rave" && m_fitAlgo != "KFit")
-      B2ERROR("TagVertexModule: invalid fitting algorithm (must be set to either Rave or KFit).");
+      B2FATAL("TagVertexModule: invalid fitting algorithm (must be set to either Rave or KFit).");
     //temporary while the one track fit is broken
     if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD")
-      B2ERROR("TagVertexModule : the singleTrack option is temporarily broken.");
+      B2FATAL("TagVertexModule : the singleTrack option is temporarily broken.");
   }
 
   void TagVertexModule::beginRun()
@@ -272,9 +272,12 @@ namespace Belle2 {
 
     //tube length here set to 20 * 2 * c tau beta gamma ~= 0.5 cm, should be enough to not bias the decay
     //time but should still help getting rid of some pions from kshorts
+    if (m_constraintType == "IP") ok = findConstraintBoost(cut);
     if (m_constraintType == "tube") ok = findConstraintBTube(Breco, 1000 * cut);
     if (m_constraintType == "boost") ok = findConstraintBoost(cut * 200000.);
     if (m_constraintType == "noConstraint") ok = true;
+    if (m_constraintType == "breco") ok = findConstraint(Breco, cut * 2000.);
+
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -775,7 +778,7 @@ namespace Belle2 {
     const Particle* particle1;
     const Particle* particle2;
     const double mks(Const::K0Mass);
-    double mass(0.0);
+    double mass;
 
     // remove tracks from KS
     for (unsigned int i(0); i < tagParticles.size(); ++i) {

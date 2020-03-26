@@ -306,7 +306,8 @@ namespace Belle2 {
                   " Please check the impact of this change on your analysis."
                   " You can deactivate this warning by providing a second argument 'decayAngle(i, 0)'.");
 
-      double result = 0.0;
+      PCmsLabTransform T;
+      TLorentzVector m = - T.getBeamFourMomentum();
 
       TLorentzVector motherMomentum = particle->get4Vector();
       TVector3       motherBoost    = -(motherMomentum.BoostVector());
@@ -318,9 +319,9 @@ namespace Belle2 {
       TLorentzVector daugMomentum = particle->getDaughter(daughter)->get4Vector();
       daugMomentum.Boost(motherBoost);
 
-      result = daugMomentum.Angle(motherMomentum.Vect());
+      m.Boost(motherBoost);
 
-      return result;
+      return daugMomentum.Angle(m.Vect());
     }
 
     double pointingAngle(const Particle* particle, const std::vector<double>& daughters)
@@ -485,7 +486,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i[, bool])", particleDecayAngle,
-                      "Angle between the mother momentum vector and the direction of the i-th daughter in the mother's rest frame");
+                      "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
     REGISTER_VARIABLE("pointingAngle(i[, bool])", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");

@@ -12,8 +12,6 @@
 
 /* Belle II headers. */
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/dbobjects/BeamParameters.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
 /* ROOT headers. */
@@ -49,11 +47,6 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     */
-    virtual void beginRun() override;
-
-    /**
      * This method is called for each event.
      */
     virtual void event() override;
@@ -85,11 +78,6 @@ namespace Belle2 {
      * Initial particle generation.
      */
     InitialParticleGeneration m_Initial;
-
-    /**
-     * Beam parameters.
-     */
-    DBObjPtr<BeamParameters> m_BeamParameters;
 
   };
 

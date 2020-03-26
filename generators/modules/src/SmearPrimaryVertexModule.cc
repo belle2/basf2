@@ -41,12 +41,6 @@ void SmearPrimaryVertexModule::initialize()
   m_Initial.initialize();
 }
 
-void SmearPrimaryVertexModule::beginRun()
-{
-  if (not m_BeamParameters.isValid())
-    B2FATAL("Beam Parameters data are not available.");
-}
-
 void SmearPrimaryVertexModule::event()
 {
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);

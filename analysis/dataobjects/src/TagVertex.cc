@@ -29,14 +29,14 @@ float TagVertex::getTagVertexPval()
   return m_tagVertexPval;
 }
 
-const TrackFitResult* TagVertex::getVtxFitTrackResultPtr(unsigned int trackIndex)
+const Particle* TagVertex::getVtxFitParticle(unsigned int trackIndex)
 {
-  if (trackIndex >= m_vtxFitTracks.size())
+  if (trackIndex >= m_vtxFitParticles.size())
     return 0;
-  return m_vtxFitTracks.at(trackIndex);
+  return m_vtxFitParticles.at(trackIndex);
 }
 
-const MCParticle* TagVertex::getVtxFitTrackMCParticle(unsigned int trackIndex)
+const MCParticle* TagVertex::getVtxFitMCParticle(unsigned int trackIndex)
 {
   if (trackIndex >= m_vtxFitMCParticles.size())
     return 0;
@@ -148,40 +148,40 @@ float TagVertex::getTagVChi2IP()
 
 TVector3 TagVertex::getVtxFitTrackPosition(unsigned int trackIndex)
 {
-  if (m_vtxFitTracks.size() <= trackIndex)
+  if (m_vtxFitParticles.size() <= trackIndex)
     return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
                     std::numeric_limits<float>::quiet_NaN());
-  return m_vtxFitTracks.at(trackIndex) -> getPosition();
+  return m_vtxFitParticles.at(trackIndex) -> getTrackFitResult() -> getPosition();
 }
 
 
 TVector3 TagVertex::getVtxFitTrackP(unsigned int trackIndex)
 {
-  if (m_vtxFitTracks.size() <= trackIndex)
+  if (m_vtxFitParticles.size() <= trackIndex)
     return TVector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
                     std::numeric_limits<float>::quiet_NaN());
-  return m_vtxFitTracks.at(trackIndex) -> getMomentum();
+  return m_vtxFitParticles.at(trackIndex) -> getMomentum();
 }
 
 double TagVertex::getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component)
 {
-  if (m_vtxFitTracks.size() <= trackIndex || component > 2)
+  if (m_vtxFitParticles.size() <= trackIndex || component > 2)
     return std::numeric_limits<float>::quiet_NaN();;
-  return m_vtxFitTracks.at(trackIndex) -> getMomentum()[component];
+  return m_vtxFitParticles.at(trackIndex) -> getMomentum()[component];
 }
 
 double TagVertex::getVtxFitTrackZ0(unsigned int trackIndex)
 {
-  if (m_vtxFitTracks.size() <= trackIndex)
+  if (m_vtxFitParticles.size() <= trackIndex)
     return std::numeric_limits<float>::quiet_NaN();;
-  return m_vtxFitTracks.at(trackIndex) -> getZ0();
+  return m_vtxFitParticles.at(trackIndex) -> getTrackFitResult() -> getZ0();
 }
 
 double TagVertex::getVtxFitTrackD0(unsigned int trackIndex)
 {
-  if (m_vtxFitTracks.size() <= trackIndex)
+  if (m_vtxFitParticles.size() <= trackIndex)
     return std::numeric_limits<float>::quiet_NaN();;
-  return m_vtxFitTracks.at(trackIndex) -> getD0();
+  return m_vtxFitParticles.at(trackIndex) -> getTrackFitResult() -> getD0();
 }
 
 double TagVertex::getRaveWeight(unsigned int trackIndex)
@@ -291,10 +291,10 @@ void TagVertex::setTagVChi2IP(float TagVChi2IP)
   m_tagVChi2IP = TagVChi2IP;
 }
 
-void TagVertex::setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks)
+void TagVertex::setVertexFitParticles(std::vector<const Particle*> const& vtxFitParticles)
 {
-  m_vtxFitTracks = vtxFitTracks;
-  m_NFitTracks = vtxFitTracks.size();
+  m_vtxFitParticles = vtxFitParticles;
+  m_NFitTracks = vtxFitParticles.size();
 }
 
 void TagVertex::setVertexFitMCParticles(std::vector<const MCParticle*> const& vtxFitMCParticles)

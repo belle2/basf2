@@ -152,6 +152,7 @@ namespace Belle2 {
     std::vector<unsigned int> toRemove;
 
     for (unsigned i = 0; i < plist->getListSize(); i++) {
+      resetReturnParams();
 
       Particle* particle =  plist->getParticle(i);
       if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
@@ -177,7 +178,7 @@ namespace Belle2 {
           ver->setMCTagBFlavor(m_mcPDG);
           ver->setMCDeltaT(m_MCdeltaT);
           ver->setFitType(m_FitType);
-          ver->setNTracks(m_tagTracks.size());
+          ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
           ver->setTruthTagVl(m_truthTagVl);
           ver->setTagVlErr(m_tagVlErr);
@@ -187,8 +188,8 @@ namespace Belle2 {
           ver->setTagVNDF(m_tagVNDF);
           ver->setTagVChi2(m_tagVChi2);
           ver->setTagVChi2IP(m_tagVChi2IP);
-          ver->setVertexFitTracks(m_raveTracks);
-          ver->setVertexFitMCParticles(m_raveTracksMCParticles);
+          ver->setVertexFitParticles(m_raveParticles);
+          ver->setVertexFitMCParticles(m_raveMCParticles);
           ver->setRaveWeights(m_raveWeights);
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
@@ -203,7 +204,7 @@ namespace Belle2 {
           ver->setMCTagBFlavor(0.);
           ver->setMCDeltaT(m_MCdeltaT);
           ver->setFitType(m_FitType);
-          ver->setNTracks(m_tagTracks.size());
+          ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
           ver->setTruthTagVl(m_truthTagVl);
           ver->setTagVlErr(m_tagVlErr);
@@ -213,8 +214,8 @@ namespace Belle2 {
           ver->setTagVNDF(-1111.);
           ver->setTagVChi2(-1111.);
           ver->setTagVChi2IP(-1111.);
-          ver->setVertexFitTracks(m_raveTracks);
-          ver->setVertexFitMCParticles(m_raveTracksMCParticles);
+          ver->setVertexFitParticles(m_raveParticles);
+          ver->setVertexFitMCParticles(m_raveMCParticles);
           ver->setRaveWeights(m_raveWeights);
           ver->setConstraintType(m_constraintType);
           ver->setConstraintCenter(m_constraintCenter);
@@ -227,6 +228,7 @@ namespace Belle2 {
     plist->removeParticles(toRemove);
 
     //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
+    //
     analysis::RaveSetup::getInstance()->reset();
 
   }
@@ -287,7 +289,7 @@ namespace Belle2 {
     double minPVal(0.001);
     if (m_fitAlgo == "KFit") minPVal = 0.;
 
-    if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "standard_PXD") {
+    if (m_trackFindingType == "standard_PXD") {
       ok = getTagTracks_standardAlgorithm(Breco, 1);
       if (ok) {
         ok = makeGeneralFit();
@@ -295,6 +297,7 @@ namespace Belle2 {
 
       }
     }
+
     if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "standard") {
       ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
       if (ok) {
@@ -576,7 +579,6 @@ namespace Belle2 {
 
     m_tagMomentum = v4FinalNew;
 
-
     m_pvCov.ResizeTo(pv);
     m_pvCov = pv;
 
@@ -736,85 +738,78 @@ namespace Belle2 {
   {
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return false;
-    std::vector<const Track*> ROETracks = roe->getTracks(m_roeMaskName);
-    if (ROETracks.size() == 0) return false;
-    std::vector<const Track*> fitTracks;
+    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, Const::pion.getPDGCode(), false);
+    if (ROEParticles.size() == 0) return false;
+    std::vector<const Particle*> fitParticles;
 
-    cout << "SALUT GROS CUL: " << ROETracks.size() << " ROE tracks " << (roe->getChargedParticles(m_roeMaskName,
-         Const::pion.getPDGCode(), false)).size() << " ROE pions" << endl;
-
-    for (auto& ROETrack : ROETracks) {
+    for (auto& ROEParticle : ROEParticles) {
       // TODO: this will always return something (so not nullptr) contrary to the previous method
       // used here. This line can be removed as soon as the multi hypothesis fitting method
       // has been properly established
-      if (!ROETrack->getTrackFitResultWithClosestMass(Const::pion)) {
+      if (!ROEParticle->getTrackFitResult()) {
         continue;
       }
-      HitPatternVXD roeTrackPattern = ROETrack->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternVXD();
+      HitPatternVXD roeTrackPattern = ROEParticle->getTrackFitResult()->getHitPatternVXD();
 
       if (roeTrackPattern.getNPXDHits() >= reqPXDHits) {
-        fitTracks.push_back(ROETrack);
+        fitParticles.push_back(ROEParticle);
 
       }
     }
-    if (fitTracks.size() == 0) return false;
-    m_tagTracks = fitTracks;
+    if (fitParticles.size() == 0) return false;
+    m_tagParticles = fitParticles;
 
     return true;
   }
 
-  bool TagVertexModule::getTracksWithoutKS(vector<const Track*> const&  tagTracks, vector<TrackAndWeight>& trackAndWeights)
+  bool TagVertexModule::getParticlesWithoutKS(vector<const Particle*> const&  tagParticles,
+                                              vector<ParticleAndWeight>& particleAndWeights,
+                                              double massWindowWidth)
   {
     //clear the vector
-    if (trackAndWeights.size() > 0)
-      B2WARNING("In TagVertexModule::getTracksWithoutKS, trackAndWeights has non-zero size, risk of memory leak.");
-    trackAndWeights.clear();
+    if (particleAndWeights.size() > 0)
+      B2WARNING("In TagVertexModule::getParticlesWithoutKS, particleAndWeights has non-zero size, risk of memory leak.");
+    particleAndWeights.clear();
 
-    TrackAndWeight trackAndWeight;
-    trackAndWeight.mcParticle = 0;
-    trackAndWeight.weight = -1111.;
+    ParticleAndWeight particleAndWeight;
+    particleAndWeight.mcParticle = 0;
+    particleAndWeight.weight = -1111.;
 
-    // Mpi &&  MKs
-    const double mpi = Const::pionMass;
-    const double mks = Const::K0Mass;
-    double Mass = 0.0;
+
+    TLorentzVector mom1;
+    TLorentzVector mom2;
+    const Particle* particle1;
+    const Particle* particle2;
+    const double mks(Const::K0Mass);
+    double mass(0.0);
+
     // remove tracks from KS
-    for (unsigned int i = 0; i < tagTracks.size(); i++) {
-      const Track* trak1 = tagTracks[i];
-      const TrackFitResult* trak1Res = nullptr;
-      if (trak1) trak1Res = trak1->getTrackFitResultWithClosestMass(Const::pion);
-      TVector3 mom1;
-      if (trak1Res) mom1 = trak1Res->getMomentum();
-      if (std::isinf(mom1.Mag2()) or std::isnan(mom1.Mag2())) continue;
-      if (!trak1Res) continue;
+    for (unsigned int i(0); i < tagParticles.size(); ++i) {
+      particle1 = tagParticles.at(i);
 
-      bool isKsDau = false;
-      for (unsigned int j = 0; j < tagTracks.size() && !isKsDau; j++) {
-        if (i != j) {
-          const Track* trak2 = tagTracks[j];
-          const TrackFitResult* trak2Res = nullptr;
+      if (particle1) mom1 = particle1->get4Vector();
+      if (particle1 && !std::isinf(mom1.Mag2()) && !std::isnan(mom1.Mag2())) {
 
-          if (trak2) trak2Res = trak2->getTrackFitResultWithClosestMass(Const::pion);
+        bool isKsDau = false;
+        for (unsigned int j(0); j < tagParticles.size() && !isKsDau; ++j) {
+          if (i != j) {
+            particle2 = tagParticles.at(j);
 
-          TVector3 mom2;
-          if (trak2Res) mom2 = trak2Res->getMomentum();
-          if (std::isinf(mom2.Mag2()) or std::isnan(mom2.Mag2())) continue;
-          if (!trak2Res) continue;
-
-          double Mass2 = TMath::Power(TMath::Sqrt(mom1.Mag2() + mpi * mpi) + TMath::Sqrt(mom2.Mag2() + mpi * mpi), 2)
-                         - (mom1 + mom2).Mag2();
-          Mass = TMath::Sqrt(Mass2);
-          if (TMath::Abs(Mass - mks) < 0.01) isKsDau = true;
+            if (particle2) mom2 = particle2->get4Vector();
+            if (particle2 && !std::isinf(mom2.Mag2()) && !std::isnan(mom2.Mag2())) {
+              mass = (mom1 + mom2).M();
+              if (TMath::Abs(mass - mks) < massWindowWidth) isKsDau = true;
+            }
+          }
         }
+        if (!isKsDau) {
+          particleAndWeight.particle = particle1;
 
-      }
-      if (!isKsDau) {
-        trackAndWeight.track = trak1Res;
+          if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
+            particleAndWeight.mcParticle = particle1->getRelatedTo<MCParticle>();
 
-        if (m_useMCassociation == "breco" || m_useMCassociation == "internal")
-          trackAndWeight.mcParticle = trak1->getRelatedTo<MCParticle>();
-
-        trackAndWeights.push_back(trackAndWeight);
+          particleAndWeights.push_back(particleAndWeight);
+        }
       }
     }
 
@@ -823,7 +818,7 @@ namespace Belle2 {
 
   bool TagVertexModule::makeGeneralFit()
   {
-    if (m_fitAlgo == "Rave") return  makeGeneralFitRave();
+    if (m_fitAlgo == "Rave") return makeGeneralFitRave();
     if (m_fitAlgo == "KFit") return makeGeneralFitKFit();
 
     return false;
@@ -838,17 +833,17 @@ namespace Belle2 {
 
     //feed rave with tracks without Kshorts
 
-    vector<TrackAndWeight> trackAndWeights;
-    getTracksWithoutKS(m_tagTracks, trackAndWeights);
+    vector<ParticleAndWeight> particleAndWeights;
+    getParticlesWithoutKS(m_tagParticles, particleAndWeights);
 
-    for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
+    for (unsigned int i(0); i < particleAndWeights.size(); ++i) {
       try {
         if (!m_useTruthInFit)
-          rFit.addTrack(trackAndWeights.at(i).track);
-        if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle)
+          rFit.addTrack(particleAndWeights.at(i).particle->getTrackFitResult());
+        if (m_useTruthInFit && !particleAndWeights.at(i).mcParticle)
           m_fitTruthStatus = 2;
-        if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
-          TrackFitResult tfr(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
+        if (m_useTruthInFit && particleAndWeights.at(i).mcParticle) {
+          TrackFitResult tfr(getTrackWithTrueCoordinates(particleAndWeights.at(i)));
           rFit.addTrack(&tfr);
         }
       } catch (const rave::CheckedFloatException&) {
@@ -869,21 +864,20 @@ namespace Belle2 {
     //save the track info for later use
     //Tracks are sorted from highest rave weight to lowest
 
-    unsigned int n(trackAndWeights.size());
+    unsigned int n(particleAndWeights.size());
     for (unsigned int i(0); i < n && isGoodFit >= 1; ++i)
-      trackAndWeights.at(i).weight = rFit.getWeight(i);
+      particleAndWeights.at(i).weight = rFit.getWeight(i);
 
+    sort(particleAndWeights.begin(), particleAndWeights.end(), compare);
 
-    sort(trackAndWeights.begin(), trackAndWeights.end(), compare);
-
-    m_raveTracks.resize(n);
+    m_raveParticles.resize(n);
     m_raveWeights.resize(n);
-    m_raveTracksMCParticles.resize(n);
+    m_raveMCParticles.resize(n);
 
     for (unsigned int i(0); i < n; ++i) {
-      m_raveTracks.at(i) = trackAndWeights.at(i).track;
-      m_raveTracksMCParticles.at(i) = trackAndWeights.at(i).mcParticle;
-      m_raveWeights.at(i) = trackAndWeights.at(i).weight;
+      m_raveParticles.at(i) = particleAndWeights.at(i).particle;
+      m_raveMCParticles.at(i) = particleAndWeights.at(i).mcParticle;
+      m_raveWeights.at(i) = particleAndWeights.at(i).weight;
     }
 
     //if the fit is good, save the infos related to the vertex
@@ -942,43 +936,40 @@ namespace Belle2 {
     }
 
     //feed KFit with tracks without Kshorts
-    //For this, we need to construct a particle from the trackfit result as
-    //KFit needs the complete 7X7 cov matrix (maybe there is a nicer solution)
 
-    vector<TrackAndWeight> trackAndWeights;
-    getTracksWithoutKS(m_tagTracks, trackAndWeights);
-    const int dummyIndex(0);
+    vector<ParticleAndWeight> particleAndWeights;
+    getParticlesWithoutKS(m_tagParticles, particleAndWeights);
     int nTracksAdded(0);
 
-    for (unsigned int i(0); i < trackAndWeights.size(); ++i) {
+    for (unsigned int i(0); i < particleAndWeights.size(); ++i) {
       int addedOK(1);
 
-      if (!m_useTruthInFit) {
-        const TrackFitResult* trackRes(NULL);
-        trackRes = trackAndWeights.at(i).track;
-        Particle particle(dummyIndex, trackRes, Const::ChargedStable(211));
-        addedOK = kFit.addParticle(&particle);
-      }
+      ParticleAndWeight pawi(particleAndWeights.at(i));
 
-      if (m_useTruthInFit && !trackAndWeights.at(i).mcParticle) {
+      if (!m_useTruthInFit)
+        addedOK = kFit.addParticle(pawi.particle);
+
+      if (m_useTruthInFit && !pawi.mcParticle) {
         addedOK = 1;
         m_fitTruthStatus = 2;
       }
 
-      if (m_useTruthInFit && trackAndWeights.at(i).mcParticle) {
-        TrackFitResult trackRes(getTrackWithTrueCoordinates(trackAndWeights.at(i)));
-        Particle particle(dummyIndex, &trackRes, Const::ChargedStable(211));
-        addedOK = kFit.addParticle(&particle);
+      if (m_useTruthInFit && pawi.mcParticle) {
+        addedOK = kFit.addTrack(
+                    ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
+                    ROOTToCLHEP::getPoint3D(getTruePoca(pawi)),
+                    ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
+                    pawi.particle->getCharge());
       }
 
       if (addedOK != 0) {
         B2WARNING("TagVertexModule::makeGeneralFitKFit: failed to add a track");
-        trackAndWeights.at(i).weight = 0.;
+        particleAndWeights.at(i).weight = 0.;
       }
 
       if (addedOK == 0) {
         nTracksAdded++;
-        trackAndWeights.at(i).weight = 1.;
+        particleAndWeights.at(i).weight = 1.;
       }
     }
 
@@ -994,17 +985,17 @@ namespace Belle2 {
     //save the track info for later use
     //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list
 
-    unsigned int n(trackAndWeights.size());
-    sort(trackAndWeights.begin(), trackAndWeights.end(), compare);
+    unsigned int n(particleAndWeights.size());
+    sort(particleAndWeights.begin(), particleAndWeights.end(), compare);
 
-    m_raveTracks.resize(n);
+    m_raveParticles.resize(n);
     m_raveWeights.resize(n);
-    m_raveTracksMCParticles.resize(n);
+    m_raveMCParticles.resize(n);
 
     for (unsigned int i(0); i < n; ++i) {
-      m_raveTracks.at(i) = trackAndWeights.at(i).track;
-      m_raveTracksMCParticles.at(i) = trackAndWeights.at(i).mcParticle;
-      m_raveWeights.at(i) = trackAndWeights.at(i).weight;
+      m_raveParticles.at(i) = particleAndWeights.at(i).particle;
+      m_raveMCParticles.at(i) = particleAndWeights.at(i).mcParticle;
+      m_raveWeights.at(i) = particleAndWeights.at(i).weight;
     }
 
     //if the fit is good, save the infos related to the vertex
@@ -1143,24 +1134,76 @@ namespace Belle2 {
     return true;
   }
 
-  TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(TrackAndWeight const& taw)
+  TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(ParticleAndWeight const& paw)
   {
-    if (!taw.mcParticle) {
+    if (!paw.mcParticle) {
       B2ERROR("In TagVertexModule::getTrackWithTrueCoordinate: no MC particle set");
       return TrackFitResult();
     }
 
-    TVector3 truePoca(DistanceTools::poca(taw.mcParticle->getProductionVertex(),
-                                          taw.mcParticle->getMomentum(),
-                                          taw.track->getPosition()));
+    const TrackFitResult* tfr(paw.particle->getTrackFitResult());
 
-    return TrackFitResult(truePoca,
-                          taw.mcParticle->getMomentum(),
-                          taw.track->getCovariance6(),
-                          taw.track->getChargeSign(),
-                          taw.track->getParticleType(),
-                          taw.track->getPValue(),
+    return TrackFitResult(getTruePoca(paw),
+                          paw.mcParticle->getMomentum(),
+                          tfr->getCovariance6(),
+                          tfr->getChargeSign(),
+                          tfr->getParticleType(),
+                          tfr->getPValue(),
                           m_Bfield, 0, 0);
+  }
+
+  TVector3 TagVertexModule::getTruePoca(ParticleAndWeight const& paw)
+  {
+    if (!paw.mcParticle) {
+      B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
+      return TVector3(0., 0., 0.);
+    }
+
+    return DistanceTools::poca(paw.mcParticle->getProductionVertex(),
+                               paw.mcParticle->getMomentum(),
+                               paw.particle->getTrackFitResult()->getPosition());
+
+  }
+
+  void TagVertexModule::resetReturnParams()
+  {
+    m_raveParticles.resize(0);
+    m_raveMCParticles.resize(0);
+    m_tagParticles.resize(0);
+    m_raveWeights.resize(0);
+
+    double quietNaN(std::numeric_limits<double>::quiet_NaN());
+
+    TMatrixDSym nanMatrix(3, 3);
+    for (int i(0); i < 3; ++i)
+      for (int j(0); j < 3; ++j) nanMatrix(i, j) = quietNaN;
+
+    m_fitPval = quietNaN;
+    m_tagV = TVector3(quietNaN, quietNaN, quietNaN);
+    m_tagVErrMatrix.ResizeTo(3, 3);
+    m_tagVErrMatrix = nanMatrix;
+    m_MCtagV = TVector3(quietNaN, quietNaN, quietNaN);
+    m_MCVertReco = TVector3(quietNaN, quietNaN, quietNaN);
+    m_deltaT = quietNaN;
+    m_deltaTErr = quietNaN;
+    m_MCdeltaT = quietNaN;
+    m_constraintCov.ResizeTo(3, 3);
+    m_constraintCov = nanMatrix;
+    m_constraintCenter = TVector3(quietNaN, quietNaN, quietNaN);
+    m_tagVl = quietNaN;
+    m_truthTagVl = quietNaN;
+    m_tagVlErr = quietNaN;
+    m_tagVol = quietNaN;
+    m_truthTagVol = quietNaN;
+    m_tagVolErr = quietNaN;
+    m_tagVNDF = quietNaN;
+    m_tagVChi2 = quietNaN;
+    m_tagVChi2IP = quietNaN;
+    m_pvCov.ResizeTo(3, 3);
+    m_pvCov = nanMatrix;
+    m_tagMomentum = TLorentzVector(quietNaN, quietNaN, quietNaN, quietNaN);
+
+
   }
 
   //The following functions are just here to help printing stuff

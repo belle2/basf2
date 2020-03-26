@@ -19,6 +19,7 @@
 // DataObjects
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
 
@@ -81,14 +82,14 @@ namespace Belle2 {
     float getTagVertexPval();
 
     /**
-     * Returns a ptr to the tag vtx track indexed by trackIndex
+     * Returns a ptr to the particle constructed from the tag vtx track indexed by trackIndex
      */
-    const TrackFitResult* getVtxFitTrackResultPtr(unsigned int trackIndex);
+    const Particle* getVtxFitParticle(unsigned int trackIndex);
 
     /**
      * Returns a ptr to the MC particle matched to the tag vtx track indexed by trackIndex
      */
-    const MCParticle* getVtxFitTrackMCParticle(unsigned int trackIndex);
+    const MCParticle* getVtxFitMCParticle(unsigned int trackIndex);
 
     /**
      * Returns DeltaT
@@ -334,7 +335,7 @@ namespace Belle2 {
     /**
      * Set a vector of pointers to the tracks used in the tag vtx fit
      */
-    void setVertexFitTracks(std::vector<const TrackFitResult*> const& vtxFitTracks);
+    void setVertexFitParticles(std::vector<const Particle*> const& vtxFitParticles);
 
     /**
      * Set a vector of pointers to the MC p'cles corresponding to the tracks in the tag vtx fit
@@ -389,7 +390,7 @@ namespace Belle2 {
     float m_tagVNDF;                    /**< Number of degrees of freedom in the tag vertex fit */
     float m_tagVChi2;                   /**< chi^2 value of the tag vertex fit result */
     float m_tagVChi2IP;                 /**< IP component of chi^2 value of the tag vertex fit result */
-    std::vector<const TrackFitResult*> m_vtxFitTracks; /**< pointers to the tracks used by rave to fit the vertex */
+    std::vector<const Particle*> m_vtxFitParticles; /**< pointers to the tracks used by rave to fit the vertex */
     std::vector<const MCParticle*> m_vtxFitMCParticles; /**< pointers to the MC p'cles corresponding to the tracks in the tag vtx fit */
     int m_NFitTracks;                   /**< Number of tracks used by Rave to fit the vertex */
     std::vector<double> m_raveWeights;  /**< weights of each track in the Rave tag vtx fit */

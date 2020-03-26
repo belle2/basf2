@@ -208,4 +208,23 @@ namespace {
       }
     }
   }
+
+  /** Test the functionality of the valid flag. */
+  TEST_F(InitialParticleGenerationTests, TestValidFlag)
+  {
+    beamparams.setGenerationFlags(BeamParameters::c_smearVertex);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+    // Generate a first event
+    MCInitialParticles& firstEvent = generator.generate();
+    // Generate a second event without forcing an update: it must not differ from the first one
+    MCInitialParticles& secondEvent = generator.generate();
+    EXPECT_EQ(firstEvent.getHER(), secondEvent.getHER());
+    EXPECT_EQ(firstEvent.getLER(), secondEvent.getLER());
+    EXPECT_EQ(firstEvent.getVertex(), secondEvent.getVertex());
+    // Generate a third event forcing an update: now it must be different
+    MCInitialParticles& thirdEvent = generator.generate(true);
+    EXPECT_NE(firstEvent.getHER(), thirdEvent.getHER());
+    EXPECT_NE(firstEvent.getLER(), thirdEvent.getLER());
+    EXPECT_NE(firstEvent.getVertex(), thirdEvent.getVertex());
+  }
 }

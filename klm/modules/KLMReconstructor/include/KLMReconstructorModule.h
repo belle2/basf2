@@ -12,16 +12,15 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dbobjects/EKLMReconstructionParameters.h>
-#include <klm/eklm/dbobjects/EKLMTimeCalibration.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMDigit.h>
+#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
+#include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
+#include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
@@ -90,19 +89,25 @@ namespace Belle2 {
     /* EKLM methods. */
 
     /**
-     * Get 2d hit time corresponding to EKLMDigit.
-     * @param[in] d    EKLMDigit.
+     * Get 2d hit time corresponding to EKLM digit.
+     * @param[in] d    EKLM Digit.
      * @param[in] dist Distance from 2d hit to SiPM.
      */
-    double getTime(EKLMDigit* d, double dist);
+    double getTime(KLMDigit* d, double dist);
+
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /* BKLM parameters. */
 
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
 
-    /** Half-width time coincidence window between adjacent BKLMDigits or orthogonal BKLMHit1ds (ns). */
-    double m_bklmCoincidenceWindow;
+    /**
+     * Half-width of time coincidence window for KLMDigits used to create
+     * EKLMHit2ds or BKLMHit1ds and BKLMHit1ds used to create BKLMHit2ds (ns).
+     */
+    double m_CoincidenceWindow;
 
     /** Nominal time of prompt BKLMHit2ds (ns). */
     double m_bklmPromptTime;
@@ -122,9 +127,6 @@ namespace Belle2 {
     /** BKLM time window. */
     DBObjPtr<BKLMTimeWindow> m_bklmTiming;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
-
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_bklmHit1ds;
 
@@ -138,6 +140,9 @@ namespace Belle2 {
      * necessary to turn this check off for debugging.
      */
     bool m_eklmCheckSegmentIntersection;
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
@@ -159,9 +164,6 @@ namespace Belle2 {
 
     /** Default time calibration data. */
     EKLMTimeCalibrationData m_eklmDefaultTimeCalibrationData;
-
-    /** Digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;

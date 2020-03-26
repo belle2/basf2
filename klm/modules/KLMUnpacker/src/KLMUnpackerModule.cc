@@ -12,7 +12,7 @@
 #include <klm/modules/KLMUnpacker/KLMUnpackerModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/rawdata/RawData.h>
 
@@ -30,24 +30,26 @@ REG_MODULE(KLMUnpacker)
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
   m_triggerCTimeOfPreviousEvent(0)
 {
-  setDescription("KLM unpacker (creates BKLMDigits and EKLMDigits "
-                 "from RawKLM).");
+  setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("outputBKLMDigitsName", m_outputBKLMDigitsName,
-           "Name of BKLMDigit store array.", string(""));
-  addParam("outputEKLMDigitsName", m_outputEKLMDigitsName,
-           "Name of EKLMDigit store array.", string(""));
+  addParam("outputKLMDigitsName", m_outputKLMDigitsName,
+           "Name of KLMDigit store array.", string(""));
   addParam("WriteDigitRaws", m_WriteDigitRaws,
            "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
            "Record wrong hits (e.g. for debugging).", false);
+  addParam("DebugElectronicsMap", m_DebugElectronicsMap,
+           "Debug electronics map (record DAQ channel instead of strip).",
+           false);
+  addParam("DAQChannelBKLMScintillators", m_DAQChannelBKLMScintillators,
+           "Record DAQ channel for BKLM scintillators.", false);
+  addParam("DAQChannelModule", m_DAQChannelModule,
+           "Record DAQ channel for specific module.", -1);
   addParam("IgnoreWrongHits", m_IgnoreWrongHits,
            "Ignore wrong hits (i.e. no B2ERROR).", false);
   addParam("IgnoreStrip0", m_IgnoreStrip0,
            "Ignore hits with strip = 0 (normally expected for certain firmware "
            "versions).", true);
-  addParam("DebugBKLMScintillators", m_DebugBKLMScintillators,
-           "Debug BKLM scintillators.", false);
   addParam("keepEvenPackages", m_keepEvenPackages,
            "Keep packages that have even length normally indicating that "
            "data was corrupted ", false);
@@ -56,7 +58,8 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "marked as bad.", double(140.0));
   addParam("loadThresholdFromDB", m_loadThresholdFromDB,
            "Load threshold from database (true) or not (false)", true);
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMUnpackerModule::~KLMUnpackerModule()
@@ -67,33 +70,28 @@ void KLMUnpackerModule::initialize()
 {
   m_RawKLMs.isRequired();
   /* Digits. */
-  m_bklmDigits.registerInDataStore(m_outputBKLMDigitsName);
-  m_bklmDigitOutOfRanges.registerInDataStore();
-  m_eklmDigits.registerInDataStore(m_outputEKLMDigitsName);
+  m_Digits.registerInDataStore(m_outputKLMDigitsName);
+  m_bklmDigitsOutOfRange.registerInDataStore("BKLMDigitsOutOfRange");
   /* Event information. */
   m_DigitEventInfos.registerInDataStore();
-  m_bklmDigits.registerRelationTo(m_DigitEventInfos);
-  m_bklmDigitOutOfRanges.registerRelationTo(m_DigitEventInfos);
-  m_eklmDigits.registerRelationTo(m_DigitEventInfos);
+  m_Digits.registerRelationTo(m_DigitEventInfos);
+  m_bklmDigitsOutOfRange.registerRelationTo(m_DigitEventInfos);
   /* Raw data in dataobject format. */
   if (m_WriteDigitRaws) {
     m_klmDigitRaws.registerInDataStore();
-    m_bklmDigits.registerRelationTo(m_klmDigitRaws);
-    m_bklmDigitOutOfRanges.registerRelationTo(m_klmDigitRaws);
-    m_eklmDigits.registerRelationTo(m_klmDigitRaws);
+    m_Digits.registerRelationTo(m_klmDigitRaws);
+    m_bklmDigitsOutOfRange.registerRelationTo(m_klmDigitRaws);
   }
 }
 
 void KLMUnpackerModule::beginRun()
 {
-  if (!m_eklmElectronicsMap.isValid())
-    B2FATAL("EKLM electronics map is not available.");
+  if (!m_ElectronicsMap.isValid())
+    B2FATAL("KLM electronics map is not available.");
   if (!m_TimeConversion.isValid())
     B2FATAL("EKLM time conversion parameters are not available.");
   if (!m_eklmChannels.isValid())
     B2FATAL("EKLM channel data are not available.");
-  if (!m_bklmElectronicsMap.isValid())
-    B2FATAL("BKLM electronics map is not available.");
   if (m_loadThresholdFromDB) {
     if (!m_bklmADCParams.isValid())
       B2FATAL("BKLM ADC threshold paramenters are not available.");
@@ -103,78 +101,61 @@ void KLMUnpackerModule::beginRun()
 }
 
 void KLMUnpackerModule::unpackEKLMDigit(
-  const int* rawData, int copper, int hslb, EKLMDataConcentratorLane* lane,
+  const int* rawData, int copper, int hslb,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
-  int section, layer, sector, strip = 0;
+  int subdetector, section, sector, layer, plane, strip;
   KLM::RawData raw;
   KLMDigitRaw* klmDigitRaw;
   KLM::unpackRawData(copper, hslb + 1, rawData, &raw, &m_klmDigitRaws,
                      &klmDigitRaw, m_WriteDigitRaws);
+  const uint16_t* detectorChannel;
+  KLMElectronicsChannel electronicsChannel(
+    copper, hslb + 1, raw.lane, raw.axis, raw.channel);
+  detectorChannel =
+    m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
   if ((raw.triggerBits & 0x10) != 0)
     return;
-  /**
-   * The possible values of the strip number in the raw data are
-   * from 0 to 127, while the actual range of strip numbers is from
-   * 1 to 75. A check is required. The unpacker continues to work
-   * with B2ERROR because otherwise debugging is not possible.
-   */
-  bool correctHit = m_ElementNumbers->checkStrip(raw.channel, false);
-  if (!correctHit) {
-    if (!(m_IgnoreWrongHits ||
-          (raw.channel == 0 && m_IgnoreStrip0))) {
-      B2ERROR("Incorrect strip number in raw data."
-              << LogVar("Strip number", raw.channel));
-    }
-    if (!m_WriteWrongHits)
-      return;
-    strip = raw.channel;
-  } else {
-    strip = m_ElementNumbers->getStripSoftwareByFirmware(
-              raw.channel);
-  }
-  uint16_t plane = raw.axis + 1;
-  /*
-   * The possible values of the plane number in the raw data are from
-   * 1 to 2. The range is the same as in the detector geometry.
-   * Consequently, a check of the plane number is useless: it is
-   * always correct.
-   */
-  lane->setLane(raw.lane);
-  const int* sectorGlobal = m_eklmElectronicsMap->getSectorByLane(lane);
-  if (sectorGlobal == nullptr) {
+  bool correctHit = true;
+  if (detectorChannel == nullptr) {
     if (!m_IgnoreWrongHits) {
-      B2ERROR("Lane does not exist in the EKLM electronics map."
-              << LogVar("Copper", lane->getCopper())
-              << LogVar("Data concentrator", lane->getDataConcentrator())
-              << LogVar("Lane", lane->getLane()));
+      B2ERROR("Channel does not exist in the KLM electronics map."
+              << LogVar("Copper", electronicsChannel.getCopper())
+              << LogVar("Slot", electronicsChannel.getSlot())
+              << LogVar("Lane", electronicsChannel.getLane())
+              << LogVar("Axis", electronicsChannel.getAxis())
+              << LogVar("Channel", electronicsChannel.getChannel()));
     }
     if (!m_WriteWrongHits)
       return;
     section = 0;
-    layer = 0;
     sector = 0;
+    layer = 0;
+    plane = 0;
+    strip = 0;
     correctHit = false;
   } else {
-    m_ElementNumbers->sectorNumberToElementNumbers(
-      *sectorGlobal, &section, &layer, &sector);
+    m_ElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
   }
-  EKLMDigit* eklmDigit = m_eklmDigits.appendNew();
+  KLMDigit* eklmDigit = m_Digits.appendNew();
   eklmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
     eklmDigit->addRelationTo(klmDigitRaw);
-  eklmDigit->setCTime(raw.ctime);
-  eklmDigit->setTDC(raw.tdc);
   eklmDigit->setTime(
     m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
+  eklmDigit->setSubdetector(KLMElementNumbers::c_EKLM);
   eklmDigit->setSection(section);
   eklmDigit->setLayer(layer);
   eklmDigit->setSector(sector);
   eklmDigit->setPlane(plane);
   eklmDigit->setStrip(strip);
   eklmDigit->setCharge(raw.charge);
+  eklmDigit->setCTime(raw.ctime);
+  eklmDigit->setTDC(raw.tdc);
   if (correctHit) {
-    int stripGlobal = m_ElementNumbers->stripNumber(
+    int stripGlobal = m_eklmElementNumbers->stripNumber(
                         section, layer, sector, plane, strip);
     const EKLMChannelData* channelData =
       m_eklmChannels->getChannelData(stripGlobal);
@@ -196,39 +177,50 @@ void KLMUnpackerModule::unpackBKLMDigit(
   KLM::unpackRawData(copper, hslb + 1, rawData, &raw,
                      &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
-  int moduleId, layer;
-  BKLMElectronicsChannel electronicsChannel(
+  int subdetector, section, sector, layer, plane, strip;
+  KLMElectronicsChannel electronicsChannel(
     copper, hslb + 1, raw.lane, raw.axis, raw.channel);
   detectorChannel =
-    m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+    m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
   if (detectorChannel == nullptr) {
-    B2DEBUG(20, "KLMUnpackerModule:: could not find in mapping"
-            << LogVar("Copper", copper)
-            << LogVar("Finesse", hslb + 1)
-            << LogVar("Lane", raw.lane)
-            << LogVar("Axis", raw.axis));
-    if (!(m_WriteWrongHits || m_DebugBKLMScintillators))
+    B2DEBUG(20, "Channel does not exist in the KLM electronics map."
+            << LogVar("Copper", electronicsChannel.getCopper())
+            << LogVar("Slot", electronicsChannel.getSlot())
+            << LogVar("Lane", electronicsChannel.getLane())
+            << LogVar("Axis", electronicsChannel.getAxis())
+            << LogVar("Channel", electronicsChannel.getChannel()));
+    if (!(m_WriteWrongHits || m_DebugElectronicsMap))
       return;
     /*
      * Try to find channel from the same plane.
      * Phi-plane channels may start from 3 or 5.
      */
     electronicsChannel.setChannel(5);
-    detectorChannel = m_bklmElectronicsMap->getDetectorChannel(&electronicsChannel);
+    detectorChannel = m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
     if (detectorChannel == nullptr)
       return;
-    moduleId = *detectorChannel;
+    m_ElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
     if (m_WriteWrongHits) {
       // increase by 1 the event-counter of outOfRange-flagged hits
       klmDigitEventInfo->increaseOutOfRangeHits();
 
       // store the digit in the appropriate dataobject
-      BKLMDigitOutOfRange* bklmDigitOutOfRange =
-        m_bklmDigitOutOfRanges.appendNew(
-          moduleId, raw.ctime, raw.tdc, raw.charge);
+      KLMDigit* bklmDigitOutOfRange =
+        m_bklmDigitsOutOfRange.appendNew();
+      bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
       if (m_WriteDigitRaws)
         bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-      bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
+      bklmDigitOutOfRange->setSubdetector(KLMElementNumbers::c_BKLM);
+      bklmDigitOutOfRange->setSection(section);
+      bklmDigitOutOfRange->setLayer(layer);
+      bklmDigitOutOfRange->setSector(sector);
+      bklmDigitOutOfRange->setPlane(plane);
+      bklmDigitOutOfRange->setStrip(strip);
+      bklmDigitOutOfRange->setCharge(raw.charge);
+      bklmDigitOutOfRange->setCTime(raw.ctime);
+      bklmDigitOutOfRange->setTDC(raw.tdc);
 
       std::string message = "channel number is out of range";
       m_rejected[message] += 1;
@@ -237,19 +229,37 @@ void KLMUnpackerModule::unpackBKLMDigit(
               << LogVar("Channel", raw.channel));
       return;
     }
-    layer = BKLMElementNumbers::getLayerByModule(moduleId);
-    if (layer >= BKLMElementNumbers::c_FirstRPCLayer)
-      return;
-    /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
-    if (raw.channel > 0)
-      BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
-  } else {
-    moduleId = *detectorChannel;
-    layer = BKLMElementNumbers::getLayerByModule(moduleId);
-    if (m_DebugBKLMScintillators) {
+    bool recordDebugHit = false;
+    if (m_DAQChannelBKLMScintillators) {
       /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
-      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
-        BKLMElementNumbers::setStripInModule(moduleId, raw.channel);
+      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0) {
+        strip = raw.channel;
+        recordDebugHit = true;
+      }
+    }
+    if (m_DAQChannelModule) {
+      uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+      if (klmModule == m_DAQChannelModule && raw.channel > 0) {
+        strip = raw.channel;
+        recordDebugHit = true;
+      }
+    }
+    if (!recordDebugHit)
+      return;
+  } else {
+    m_ElementNumbers->channelNumberToElementNumbers(
+      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
+      &strip);
+    if (m_DebugElectronicsMap) {
+      if (m_DAQChannelBKLMScintillators) {
+        if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
+          strip = raw.channel;
+      }
+      if (m_DAQChannelModule) {
+        uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+        if (klmModule == m_DAQChannelModule && raw.channel > 0)
+          strip = raw.channel;
+      }
     }
   }
 
@@ -261,7 +271,7 @@ void KLMUnpackerModule::unpackBKLMDigit(
     return;
   }
 
-  BKLMDigit* bklmDigit;
+  KLMDigit* bklmDigit;
   if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
     klmDigitEventInfo->increaseRPCHits();
     // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
@@ -270,20 +280,31 @@ void KLMUnpackerModule::unpackBKLMDigit(
     // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
     std::pair<int, double> rpcTimes = m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
-    bklmDigit = m_bklmDigits.appendNew(moduleId, rpcTimes.first, raw.tdc, raw.charge);
+    bklmDigit = m_Digits.appendNew();
     bklmDigit->setTime(rpcTimes.second);
   } else {
     klmDigitEventInfo->increaseSciHits();
     // For scintillator hits, store the ctime relative to the event header's trigger ctime
-    bklmDigit = m_bklmDigits.appendNew(moduleId, raw.ctime, raw.tdc, raw.charge);
+    bklmDigit = m_Digits.appendNew();
     bklmDigit->setTime(
       m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
     if (raw.charge < m_scintThreshold)
-      bklmDigit->isAboveThreshold(true);
+      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+    else
+      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
   }
   bklmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
     bklmDigit->addRelationTo(klmDigitRaw);
+  bklmDigit->setSubdetector(KLMElementNumbers::c_BKLM);
+  bklmDigit->setSection(section);
+  bklmDigit->setLayer(layer);
+  bklmDigit->setSector(sector);
+  bklmDigit->setPlane(plane);
+  bklmDigit->setStrip(strip);
+  bklmDigit->setCharge(raw.charge);
+  bklmDigit->setCTime(raw.ctime);
+  bklmDigit->setTDC(raw.tdc);
 }
 
 void KLMUnpackerModule::event()
@@ -293,7 +314,6 @@ void KLMUnpackerModule::event()
    * detector buffer.
    */
   const int hitLength = 2;
-  EKLMDataConcentratorLane lane;
   for (int i = 0; i < m_RawKLMs.getEntries(); i++) {
     if (m_RawKLMs[i]->GetNumEvents() != 1) {
       B2ERROR("RawKLM a wrong number of entries (should be 1)."
@@ -312,8 +332,6 @@ void KLMUnpackerModule::event()
         eklmHit = true;
       else if (!((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4)))
         continue;
-      uint16_t copperN = copperId - EKLM_ID;
-      lane.setCopper(copperN);
       m_RawKLMs[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         KLMDigitEventInfo* klmDigitEventInfo =
@@ -324,7 +342,6 @@ void KLMUnpackerModule::event()
         int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
         int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
         int numHits = numDetNwords / hitLength;
-        lane.setDataConcentrator(finesse_num);
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."
                   << LogVar("Number of data words", numDetNwords));
@@ -347,7 +364,7 @@ void KLMUnpackerModule::event()
         for (int iHit = 0; iHit < numHits; iHit++) {
           if (eklmHit) {
             unpackEKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
-                            &lane, klmDigitEventInfo);
+                            klmDigitEventInfo);
           } else {
             unpackBKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
                             klmDigitEventInfo);

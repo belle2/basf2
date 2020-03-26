@@ -249,12 +249,8 @@ namespace Belle2 {
     // recover beam spot info
 
     m_BeamSpotCenter = m_beamSpotDB->getIPPosition();
-    //cout << "RADEK: beamSpotCenter= " << m_BeamSpotCenter << endl;
     m_BeamSpotCov.ResizeTo(3, 3);
     m_BeamSpotCov = m_beamSpotDB->getCovVertex();
-
-    cout << "RADEK is here " << __LINE__ << endl;
-    //m_BeamSpotCov.Print(); //RADEK
 
 
     //make the beam spot bigger for the standard constraint
@@ -362,25 +358,32 @@ namespace Belle2 {
     //double thetar = v4Final.Theta();
     //double phir = v4Final.Phi();
 
-    double str = TMath::Sin(-theta);
-    double ctr = TMath::Cos(-theta);
-    double spr = TMath::Sin(-phi);
-    double cpr = TMath::Cos(-phi);
+    double str = sin(-theta);
+    double ctr = cos(-theta);
+    double spr = sin(-phi);
+    double cpr = cos(-phi);
 
-    TMatrix r1z(3, 3);  r1z(2, 2) = 1;
+    TMatrixD r1z(3, 3);  r1z(2, 2) = 1;
     r1z(0, 0) =  cpr; r1z(0, 1) =  spr;
     r1z(1, 0) = -spr; r1z(1, 1) =  cpr;
 
-    TMatrix r1y(3, 3);  r1y(1, 1) = 1;
+    TMatrixD r1y(3, 3);  r1y(1, 1) = 1;
     r1y(0, 0) =  ctr; r1y(0, 2) = -str;
     r1y(2, 0) =  str; r1y(2, 2) =  ctr;
 
-    TMatrix r1(3, 3);  r1.Mult(r1z, r1y);
+    TMatrixD r1(3, 3);  r1.Mult(r1z, r1y);
     return r1;
   }
 
-
-
+  static TMatrixDSym toSymMatrix(const TMatrixD& m)
+  {
+    TMatrixDSym mS(m.GetNrows());
+    for (int i = 0; i < m.GetNrows(); ++i)
+      for (int j = 0; j < m.GetNcols(); ++j) { //m.GetNcols()
+        mS(i, j) = (m(i, j) + m(j, i)) / 2;
+      }
+    return mS;
+  }
 
 
   bool TagVertexModule::findConstraint(Particle* Breco, double cut)
@@ -455,9 +458,7 @@ namespace Belle2 {
     TubeZ(2, 0) = 0; TubeZ(0, 2) = 0;
     TubeZ(2, 1) = 0; TubeZ(1, 2) = 0;
 
-    vec.SetX(-vec.X());
-    vec.SetY(-vec.Y());
-    vec.SetZ(-vec.Z());
+    vec.SetVect(-vec.Vect());
 
     TLorentzVector vecLab = T.rotateCmsToLab() * vec;
     TMatrixD r2 = getRotationMatrix(vecLab.Theta(), vecLab.Phi()); r2.T(); //inverse rotation
@@ -465,11 +466,7 @@ namespace Belle2 {
     TMatrixD Tube = r2t * TubeZ * r2;
 
     m_constraintCov.ResizeTo(3, 3);
-
-    m_constraintCov(0, 0) = Tube(0, 0);  m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
-    m_constraintCov(1, 0) = Tube(1, 0);  m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
-    m_constraintCov(2, 0) = Tube(2, 0);  m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
-
+    m_constraintCov = toSymMatrix(Tube);
     m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
 
     return true;
@@ -506,7 +503,7 @@ namespace Belle2 {
     TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
-    TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
+    TLorentzVector vecNew(-vec.Vect(), vec.E());
     TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
 
 
@@ -516,9 +513,6 @@ namespace Belle2 {
     TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
     //print some stuff if wanted
-    cout << "RADEK is here " << __LINE__ << endl;
-    printMatrix(m_BeamSpotCov); //RADEK
-
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
       B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy.getVertex()));
@@ -535,51 +529,23 @@ namespace Belle2 {
 
 
     // make rotation matrix from z axis to BTag line of flight
-
-    double theta = v4FinalNew.Theta();
-    double phi = v4FinalNew.Phi();
-
-    double st = TMath::Sin(theta);
-    double ct = TMath::Cos(theta);
-    double sp = TMath::Sin(phi);
-    double cp = TMath::Cos(phi);
-
-    TMatrix r2z(3, 3);  r2z(2, 2) = 1;
-    r2z(0, 0) = cp; r2z(0, 1) = -1 * sp;
-    r2z(1, 0) = sp; r2z(1, 1) = cp;
-
-    TMatrix r2y(3, 3);  r2y(1, 1) = 1;
-    r2y(0, 0) = ct; r2y(0, 2) = st;
-    r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
-
-    TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
-    //TMatrix r2My = getRotationMatrix(v4FinalNew.Theta(), v4FinalNew.Phi()); RADEK
-    TMatrix r2t(3, 3); r2t.Transpose(r2);
+    TMatrixD r2 = getRotationMatrix(v4FinalNew.Theta(), v4FinalNew.Phi());
+    TMatrixD r2t = r2; r2t.T();
 
 
     //make a long error matrix along BTag direction
-
-    TMatrix longerror(3, 3); longerror(2, 2) = cut * cut;
-    TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
-    TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
+    TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
+    TMatrixD longerrorRotated = r2 * longerror * r2t;
 
     //pvNew will correspond to the covariance matrix of the B tube
-
-    TMatrix pvNew(3, 3);
+    TMatrixD pvNew = longerrorRotated;
     pvNew += pv;
-    pvNew += longerrorRotated;
 
     //set the constraint
 
     m_constraintCenter = tubecreatorBCopy.getVertex();
-
     m_constraintCov.ResizeTo(3, 3);
-
-    for (int i(0); i < 3; ++i) {
-      for (int j(0); j < 3; ++j) {
-        m_constraintCov(i, j) = pvNew(i, j);
-      }
-    }
+    m_constraintCov = toSymMatrix(pvNew);
 
     if (m_verbose) {
       B2DEBUG(10, "IPTube covariance: " << printMatrix(m_constraintCov));
@@ -607,54 +573,24 @@ namespace Belle2 {
 
     TMatrixDSym beamSpotCov(3);
     beamSpotCov = m_beamSpotDB->getCovVertex();
-    beamSpotCov(2, 2) = cut * cut;
-    double thetab = boostDir.Theta();
-    double phib = boostDir.Phi();
+    beamSpotCov(2, 2) = cut * cut; //cut on z-BeamSpot Cov
 
-    double stb = TMath::Sin(thetab);
-    double ctb = TMath::Cos(thetab);
-    double spb = TMath::Sin(phib);
-    double cpb = TMath::Cos(phib);
+    TMatrixD r = getRotationMatrix(-boostDir.Theta(), -boostDir.Phi());
+    TMatrixD rt = r; rt.T();
 
+    TMatrixD Tube = rt * beamSpotCov * r; //BeamSpot in CMS
 
-    TMatrixD rz(3, 3);  rz(2, 2) = 1;
-    rz(0, 0) = cpb; rz(0, 1) = spb;
-    rz(1, 0) = -1 * spb; rz(1, 1) = cpb;
-
-    TMatrixD ry(3, 3);  ry(1, 1) = 1;
-    ry(0, 0) = ctb; ry(0, 2) = -1 * stb;
-    ry(2, 0) = stb; ry(2, 2) = ctb;
-
-    TMatrixD r(3, 3);  r.Mult(rz, ry);
-    TMatrixD rMy = getRotationMatrix(-boostDir.Theta(), -boostDir.Phi()); //RADEK
-    rMy.Print();
-    r.Print();
-    for (int i = 0; i < 3; ++i)
-      for (int j = 0; j < 3; ++j)
-        cout << i << " " << j << " : " << rMy(i, j) - r(i, j) << endl;
-
-    assert(rMy == r);
-    TMatrixD rt(3, 3); rt.Transpose(r);
-
-    TMatrixD TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
-    TMatrixD Tube(3, 3); Tube.Mult(TubePart, r);
 
     m_constraintCov.ResizeTo(3, 3);
-
-    m_constraintCov(0, 0) = Tube(0, 0); m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
-    m_constraintCov(1, 0) = Tube(1, 0); m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
-    m_constraintCov(2, 0) = Tube(2, 0); m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
-
-
+    m_constraintCov = toSymMatrix(Tube);
     m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
 
     if (shiftAlongBoost > -1000) {
-      float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
-
+      double boostAngle = atan(boostDir[0] / boostDir[2]); // boost angle with respect from Z
       m_constraintCenter = m_BeamSpotCenter +
-                           TVector3(shiftAlongBoost * TMath::Sin(boostAngle), 0., shiftAlongBoost * TMath::Cos(boostAngle)); // boost in the XZ plane
+                           TVector3(shiftAlongBoost * sin(boostAngle), 0., shiftAlongBoost * cos(boostAngle)); // boost in the XZ plane
     }
 
     return true;
@@ -1420,7 +1356,7 @@ namespace Belle2 {
 
     TVector3 boost = T.getBoostVector();
 
-    double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+    double bg = boost.Mag() / sqrt(1 - boost.Mag2());
 
     double c = Const::speedOfLight / 1000.; // cm ps-1
 
@@ -1443,9 +1379,10 @@ namespace Belle2 {
 
     // Calculate Delta t error
 
-    double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-    double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-    double cx = TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X()) / boost.Mag();
+    double zxB = sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
+    double cy = boost.Z() / zxB;
+    double sy = boost.X() / zxB;
+    double cx = zxB / boost.Mag();
     double sx = boost.Y() / boost.Mag();
 
     TMatrixD RotY(3, 3);
@@ -1459,12 +1396,11 @@ namespace Belle2 {
     RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
 
     TMatrixD Rot = RotY * RotX;
-    TMatrixD RotCopy = Rot;
-    TMatrixD RotInv = Rot.Invert();
+    TMatrixD RotT = Rot; RotT.T();
 
-    TMatrixD RotErr = RotInv * m_tagVErrMatrix * RotCopy;
+    TMatrixD RotErr = RotT * m_tagVErrMatrix * Rot;
     TMatrixD RR = (TMatrixD)Breco->getVertexErrorMatrix();
-    TMatrixD RotErrBreco = RotInv * RR * RotCopy;
+    TMatrixD RotErrBreco = RotT * RR * Rot;
 
     double dtErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
 
@@ -1476,10 +1412,11 @@ namespace Belle2 {
 
     // calculate tagV component and error in the direction orthogonal to the boost
 
-    TVector3 oboost(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
-    double ocy = oboost.Z() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
-    double osy = oboost.X() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
-    double ocx = TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X()) / oboost.Mag();
+    TVector3 oboost(boostDir.Z(), boostDir.Y(), -boostDir.X());
+    double zxOB = sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
+    double ocy = oboost.Z() / zxOB;
+    double osy = oboost.X() / zxOB;
+    double ocx = zxOB / oboost.Mag();
     double osx = oboost.Y() / oboost.Mag();
 
     TMatrixD oRotY(3, 3);
@@ -1493,10 +1430,9 @@ namespace Belle2 {
     oRotX(2, 0) = 0;   oRotX(2, 1) = osx;  oRotX(2, 2) = ocx;
 
     TMatrixD oRot = oRotY * oRotX;
-    TMatrixD oRotCopy = oRot;
-    TMatrixD oRotInv = oRot.Invert();
+    TMatrixD oRotT = oRot; oRotT.T();
 
-    TMatrixD oRotErr = oRotInv * m_tagVErrMatrix * oRotCopy;
+    TMatrixD oRotErr = oRotT * m_tagVErrMatrix * oRot;
 
     m_tagVol = m_tagV.Dot(oboost);
     m_truthTagVol = m_MCtagV.Dot(oboost);
@@ -1508,10 +1444,6 @@ namespace Belle2 {
   {
     //Here rave is used to find the upsilon(4S) vtx as the intersection
     //between the mother B trajectory and the beam spot
-
-
-    cout << "RADEK is here " << __LINE__ << endl;
-    printMatrix(m_BeamSpotCov); //RADEK
 
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
 

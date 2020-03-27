@@ -279,9 +279,6 @@ namespace Belle2 {
           Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
     }
 
-
-
-
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;

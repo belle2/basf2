@@ -11,6 +11,8 @@
 #pragma once
 
 #include<vector>
+#include<string>
+#include <analysis/VariableManager/Manager.h>
 #include "TVector3.h"
 
 namespace Belle2 {
@@ -257,6 +259,11 @@ namespace Belle2 {
      */
     double particleInternalTagVMCFlavor(const Particle*);
 
+    /**
+     * Return the norm of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentum(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * Return the X component of the momentum of the tag track indexed by trackIndex
@@ -315,6 +322,14 @@ namespace Belle2 {
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
+     * returns the significance of the distance between the centre of the constraint and
+     * the tag track indexed by track index (computed as distance / uncertainty)
+     *
+     */
+    double tagTrackDistanceToConstraintSignificance(const Particle* part, const std::vector<double>& trackIndex);
+
+
+    /**
      * returns the distance between the centre of the constraint and the tag vtx
      *
      */
@@ -326,6 +341,12 @@ namespace Belle2 {
      *
      */
     double tagVDistanceToConstraintErr(const Particle* part);
+
+    /**
+     * returns the significance of the distance between the tag vtx and the centre of the constraint
+     * (computed as distance / uncertainty)
+     */
+    double tagVDistanceToConstraintSignificance(const Particle* part);
 
 
     /**
@@ -340,6 +361,13 @@ namespace Belle2 {
      *
      */
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex
+     * (computed as distance / uncertainty)
+     *
+     */
+    double tagTrackDistanceToTagVSignificance(const Particle* part, const std::vector<double>& trackIndex);
 
     /**
      * returns the true distance between the true B Tag decay vertex and the particle
@@ -425,6 +453,70 @@ namespace Belle2 {
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex);
 
 
+    //**********************************
+    //Meta variables
+    //**********************************
+
+    /**
+     * This a pointer to the various functions that compute information related to the tag tracks
+     *
+     */
+    typedef double (*TagTrFPtr)(const Particle*, const std::vector<double>&);
+
+    /**
+     * returns a pointer to a function from its name. This is useful to combine the individual information
+     * related to each tag track into average, min, max, etc.
+     *
+     */
+    TagTrFPtr getTagTrackFunctionFromName(std::string const& name);
+
+    /**
+     * returns the average over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable);
+
+    /**
+     * returns the maximum over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackMax(const std::vector<std::string>& variable);
+
+    /**
+     * returns the minimum over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackMin(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the square of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackAverageSquares(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the variable given in argument, weighted
+     * by the weights of the tag vertex fitter
+     * The variable is one of the tagTrack... variables.
+     *
+     */
+    Manager::FunctionPtr tagTrackWeightedAverage(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the square of the variable given in argument, weighted
+     * by the weights of the tag vertex fitter
+     * The variable is one of the tagTrack... variables.
+     *
+     */
+    Manager::FunctionPtr tagTrackWeightedAverageSquares(const std::vector<std::string>& variable);
 
   }
 }

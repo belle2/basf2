@@ -486,6 +486,31 @@ namespace Belle2 {
      */
     Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable);
 
+    //**********************************
+    //Meta variables
+    //**********************************
+
+    /**
+     * This a pointer to the various functions that compute information related to the tag tracks
+     *
+     */
+    typedef double (*TagTrFPtr)(const Particle*, const std::vector<double>&);
+
+    /**
+     * returns a pointer to a function from its name. This is useful to combine the individual information
+     * related to each tag track into average, min, max, etc.
+     *
+     */
+    TagTrFPtr getTagTrackFunctionFromName(std::string const& name);
+
+    /**
+     * returns the average over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable);
+
     /**
      * returns the maximum over the tag tracks of the variable given in argument.
      * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0

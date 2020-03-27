@@ -543,6 +543,21 @@ namespace Belle2 {
       return result;
     }
 
+    double tagTrackMomentum(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double result(std::numeric_limits<float>::quiet_NaN());
+      if (trackIndex.size() != 1) return result;
+      unsigned int trackIndexInt(trackIndex.at(0));
+
+      auto* vert = part->getRelatedTo<TagVertex>();
+
+      if (vert)
+        result = (vert->getVtxFitTrackP(trackIndexInt)).Mag();
+
+      return result;
+    }
+
+
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
       double result(std::numeric_limits<float>::quiet_NaN());
@@ -674,6 +689,16 @@ namespace Belle2 {
 
     }
 
+    double tagTrackDistanceToConstraintSignificance(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double val(tagTrackDistanceToConstraint(part, trackIndex));
+      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      double err(tagTrackDistanceToConstraintErr(part, trackIndex));
+      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+
+      return val / err;
+    }
+
     double tagVDistanceToConstraint(const Particle* part)
     {
       double result(std::numeric_limits<float>::quiet_NaN());
@@ -708,6 +733,16 @@ namespace Belle2 {
                                               emptyMat);
 
       return result;
+    }
+
+    double tagVDistanceToConstraintSignificance(const Particle* part)
+    {
+      double val(tagVDistanceToConstraint(part));
+      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      double err(tagVDistanceToConstraintErr(part));
+      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+
+      return val / err;
     }
 
     double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
@@ -760,6 +795,16 @@ namespace Belle2 {
                                                 emptyMat);
 
       return result;
+    }
+
+    double tagTrackDistanceToTagVSignificance(const Particle* part, const std::vector<double>& trackIndex)
+    {
+      double val(tagTrackDistanceToTagV(part, trackIndex));
+      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      double err(tagTrackDistanceToTagVErr(part, trackIndex));
+      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+
+      return val / err;
     }
 
     double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
@@ -930,6 +975,269 @@ namespace Belle2 {
       return vert->getFitTruthStatus();
     }
 
+    //**********************************
+    //Meta variables
+    //**********************************
+
+
+    TagTrFPtr getTagTrackFunctionFromName(string const& name)
+    {
+      if (name == "TagTrackMomentum") return tagTrackMomentum;
+      if (name == "TagTrackMomentumX") return tagTrackMomentumX;
+      if (name == "TagTrackMomentumY") return tagTrackMomentumY;
+      if (name == "TagTrackMomentumZ") return tagTrackMomentumZ;
+      if (name == "TagTrackZ0") return tagTrackZ0;
+      if (name == "TagTrackD0") return tagTrackD0;
+      if (name == "TagTrackRaveWeight") return tagTrackRaveWeight;
+      if (name == "TagTrackDistanceToConstraint") return tagTrackDistanceToConstraint;
+      if (name == "TagTrackDistanceToConstraintErr") return tagTrackDistanceToConstraintErr;
+      if (name == "TagTrackDistanceToConstraintSignificance") return tagTrackDistanceToConstraintSignificance;
+      if (name == "TagTrackDistanceToTagV") return tagTrackDistanceToTagV;
+      if (name == "TagTrackDistanceToTagVErr") return tagTrackDistanceToTagVErr;
+      if (name == "TagTrackDistanceToTagVSignificance") return tagTrackDistanceToTagVSignificance;
+      if (name == "TagTrackTrueDistanceToTagV") return tagTrackTrueDistanceToTagV;
+      if (name == "TagTrackTrueVecToTagVX") return tagTrackTrueVecToTagVX;
+      if (name == "TagTrackTrueVecToTagVY") return tagTrackTrueVecToTagVY;
+      if (name == "TagTrackTrueVecToTagVZ") return tagTrackTrueVecToTagVZ;
+      if (name == "TagTrackTrueMomentumX") return tagTrackTrueMomentumX;
+      if (name == "TagTrackTrueMomentumY") return tagTrackTrueMomentumY;
+      if (name == "TagTrackTrueMomentumZ") return tagTrackTrueMomentumZ;
+      if (name == "TagTrackTrueOriginX") return tagTrackTrueOriginX;
+      if (name == "TagTrackTrueOriginY") return tagTrackTrueOriginY;
+      if (name == "TagTrackTrueOriginZ") return tagTrackTrueOriginZ;
+
+      B2ERROR("From TimeDependentVariables: Trying to access unknown tagTrack function");
+      return NULL;
+    }
+
+    Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double sum(0.);
+          int tot(0);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              sum += (*fptr)(part, vector<double>(1, 1.*i));
+              ++tot;
+            }
+          }
+
+          if (tot > 0)
+            return sum / (1.*tot);
+
+          return std::numeric_limits<float>::quiet_NaN();
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackAverage");
+      return NULL;
+    }
+
+    Manager::FunctionPtr tagTrackAverageSquares(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double sum(0.);
+          double term;
+          int tot(0);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              term = (*fptr)(part, vector<double>(1, 1.*i));
+              sum += term * term;
+              ++tot;
+            }
+          }
+
+          if (tot > 0)
+            return sum / (1.*tot);
+
+          return std::numeric_limits<float>::quiet_NaN();
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackAverageSquares");
+      return NULL;
+    }
+
+    Manager::FunctionPtr tagTrackMax(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double max(-DBL_MAX);
+          double val;
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              val = (*fptr)(part, vector<double>(1, 1.*i));
+              if (val > max) max = val;
+            }
+          }
+
+          if (max > -DBL_MAX)
+            return max;
+
+          return std::numeric_limits<float>::quiet_NaN();
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackMax");
+      return NULL;
+    }
+
+    Manager::FunctionPtr tagTrackMin(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double min(DBL_MAX);
+          double val;
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              val = (*fptr)(part, vector<double>(1, 1.*i));
+              if (val < min) min = val;
+            }
+          }
+
+          if (min < DBL_MAX)
+            return min;
+
+          return std::numeric_limits<float>::quiet_NaN();
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackMin");
+      return NULL;
+    }
+
+
+    Manager::FunctionPtr tagTrackWeightedAverage(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double sum(0.);
+          double sumW(0.);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            double w(tagTrackRaveWeight(part, vector<double>(1, 1.*i)));
+            sum += w * (*fptr)(part, vector<double>(1, 1.*i));
+            sumW += w;
+          }
+
+          return sum / sumW;
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverage");
+      return NULL;
+    }
+
+    Manager::FunctionPtr tagTrackWeightedAverageSquares(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<float>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the average over tag tracks
+
+          double sum(0.);
+          double sumW(0.);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            double w(tagTrackRaveWeight(part, vector<double>(1, 1.*i)));
+            double term((*fptr)(part, vector<double>(1, 1.*i)));
+            sum += w * term * term;
+            sumW += w;
+          }
+
+          return sum / sumW;
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverageSquares");
+      return NULL;
+    }
+
+    //**********************************
+    //VARIABLE REGISTRATION
+    //**********************************
+
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
@@ -993,6 +1301,8 @@ namespace Belle2 {
                       "[Expert] [Debugging] This variable is only for internal checks of the TagV module by developers. \n"
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
 
+    REGISTER_VARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
+                      "return the norm of the momentum of the ith track used in the tag vtx fit.");
     REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
                       "return the X component of the momentum of the ith track used in the tag vtx fit.");
     REGISTER_VARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
@@ -1015,6 +1325,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagTrackDistanceToConstraintErr(i)", tagTrackDistanceToConstraintErr,
                       "returns the estimated error on the distance between the ith tag track and the centre of the constraint.");
 
+    REGISTER_VARIABLE("TagTrackDistanceToConstraintSignificance(i)", tagTrackDistanceToConstraintSignificance,
+                      "returns the significance of the distance between the centre of the constraint and the tag track indexed by track index (computed as distance / uncertainty)");
+
 
     REGISTER_VARIABLE("TagVDistanceToConstraint", tagVDistanceToConstraint,
                       "returns the measured distance between the tag vtx and the centre of the constraint.");
@@ -1022,11 +1335,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVDistanceToConstraintErr", tagVDistanceToConstraintErr,
                       "returns the estimated error on the distance between the tag vtx and the centre of the constraint.");
 
+    REGISTER_VARIABLE("TagVDistanceToConstraintSignificance", tagVDistanceToConstraintSignificance,
+                      "returns the significance of the distance between the tag vtx and the centre of the constraint (computed as distance / uncertainty)");
+
     REGISTER_VARIABLE("TagTrackDistanceToTagV(i)", tagTrackDistanceToTagV,
                       "returns the measured distance between the ith tag track and the tag vtx.");
 
     REGISTER_VARIABLE("TagTrackDistanceToTagVErr(i)", tagTrackDistanceToTagVErr,
                       "returns the estimated error on the distance between the ith tag track and the tag vtx. Warning: only the uncertainties on the track position parameters are taken into account.");
+
+    REGISTER_VARIABLE("TagTrackDistanceToTagVSignificance(i)", tagTrackDistanceToTagVSignificance,
+                      "returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex (computed as distance / uncertainty)");
 
     REGISTER_VARIABLE("TagTrackTrueDistanceToTagV(i)", tagTrackTrueDistanceToTagV,
                       "return the true distance between the true B Tag decay vertex and the p'cle corresponding to the ith tag vtx track.")
@@ -1060,6 +1379,27 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
+
+    REGISTER_VARIABLE("TagTrackMax(var)", tagTrackMax,
+                      "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackMax(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+
+    REGISTER_VARIABLE("TagTrackMin(var)", tagTrackMin,
+                      "return the minimum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackMin(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+
+    REGISTER_VARIABLE("TagTrackAverage(var)", tagTrackAverage,
+                      "return the average over the tag tracks of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackAverage(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+
+    REGISTER_VARIABLE("TagTrackAverageSquares(var)", tagTrackAverageSquares,
+                      "return the average over the tag tracks of the square of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackAverageSquares(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+
+    REGISTER_VARIABLE("TagTrackWeightedAverage(var)", tagTrackWeightedAverage,
+                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackWeightedAverage(TagTrackDistanceToConstraint)`.")
+
+    REGISTER_VARIABLE("TagTrackWeightedAverageSquares(var)", tagTrackWeightedAverageSquares,
+                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackWeightedAverageSquares(TagTrackDistanceToConstraint)`.")
   }
 }
+
+
+
 

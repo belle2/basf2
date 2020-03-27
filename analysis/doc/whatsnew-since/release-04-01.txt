@@ -95,7 +95,8 @@ Variables
    :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
-   :b2:var:`TagTrackTrueDistanceToTagV`
+   :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
+   of these variables, e.g. by doing :b2:var:`TagTrackAverage(TagTrackTrueDistanceToTagV)` 
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables

@@ -119,8 +119,8 @@ def GammaGammaControlKLMDarkList(path, prescale_high=1, prescale_low=1):
     # to be added back offline
 
     # apply prescales to the less energetic daughter: compare to the eventwise random number
-    probe_high = '[daughterLowest(clusterE) > 4.5] and [eventRandom < %s]' % prescale_high
-    probe_low = '[daughterLowest(clusterE) < 4.5] and [eventRandom < %s]' % prescale_low
+    probe_high = '[daughterLowest(useCMSFrame(clusterE)) > 4.5] and [eventRandom < %s]' % prescale_high
+    probe_low = '[daughterLowest(useCMSFrame(clusterE)) < 4.5] and [eventRandom < %s]' % prescale_low
     prescale = '[ %s ] or [ %s ]' % (probe_high, probe_low)
 
     # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)

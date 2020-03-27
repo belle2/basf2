@@ -905,6 +905,8 @@ NeuroTrigger::load(const string& filename, const string& arrayname)
     }
     B2DEBUG(2, "Loaded Neurotrigger MLP weights from database: " +  m_cdctriggerneuroconfig->getNNName());
     B2DEBUG(100, "loaded " << m_MLPs.size() << " networks from database");
+    // load some values from the geometry that will be needed for the input
+    setConstants();
     return true;
   } else {
     TFile datafile(filename.c_str(), "READ");

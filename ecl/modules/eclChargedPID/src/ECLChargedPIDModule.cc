@@ -157,19 +157,29 @@ void ECLChargedPIDModule::event()
       // get the pdf value.
       if (mostEnergeticShower && showerReg && std::abs(charge)) {
 
-        // Get the transformed input variables.
-        // If no transformation parameters are stored in the payload, this will be just a copy of the input variable list.
-        auto variables_transfo = transfoGaussDecorr(signedhypo, p, showerTheta);
+        // Retrieve the list of enum ids for the input variables from the payload.
+        auto varids = m_pdfs->getVars(signedhypo, p, showerTheta);
+
+        // Fill the vector w/ the values taken from the module map.
+        std::vector<double> variables;
+        for (const auto& varid : *varids) {
+          variables.push_back(m_variables.at(varid));
+        }
+
+        // Transform the input variables only if necessary.
+        if (m_pdfs->doVarsTransfo()) {
+          transfoGaussDecorr(signedhypo, p, showerTheta, variables);
+        }
 
         // Get the PDF templates for the various observables, and multiply the PDF values for this candidate.
         // This assumes observables aren't correlated
         // (or at least linear correlations have been removed by suitably transforming the inputs...).
         double prod(1.0);
         double ipdfval;
-        for (unsigned int idx(0); idx < variables_transfo.size(); idx++) {
+        for (unsigned int idx(0); idx < variables.size(); idx++) {
 
-          auto var   = variables_transfo.at(idx);
-          auto varid = m_pdfs->getVars(signedhypo, p, showerTheta)->at(idx);
+          auto var   = variables.at(idx);
+          auto varid = varids->at(idx);
 
           const TF1* pdf = m_pdfs->getPdf(signedhypo, p, showerTheta, varid);
           if (pdf) {
@@ -218,43 +228,33 @@ double ECLChargedPIDModule::getPdfVal(const double& x, const TF1* pdf)
   return (y) ? y : 1e-9; // Do not return exactly 0, otherwise deltaLogL might be biased...
 }
 
-std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const double& p, const double& theta)
+void ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const double& p, const double& theta, std::vector<double>& variables)
 {
 
-  // Retrieve the list of enum ids for the input variables from the payload.
-  auto varids = m_pdfs->getVars(pdg, p, theta);
-
-  // Fill the vector w/ the values taken from the module map.
-  std::vector<double> vtransfo_gauss;
-  for (const auto& varid : *varids) {
-    vtransfo_gauss.push_back(m_variables.at(varid));
-  }
-
-  unsigned int nvars = varids->size();
+  unsigned int nvars = variables.size();
 
   // Get the variable transformation settings for this hypo pdg, p, theta.
   auto vts = m_pdfs->getVTS(pdg, p, theta);
-
-  // Transform the input variables only if necessary.
-  if (!vts->doTransfo) {
-    return vtransfo_gauss; // Just a copy of the original vars at this stage!
-  }
 
   B2DEBUG(30, "");
   B2DEBUG(30, "\tclass path: " << vts->classPath);
   B2DEBUG(30, "\tgbin = " << vts->gbin << ", (theta,p) = (" << vts->jth << "," << vts->ip << ")");
   B2DEBUG(30, "\tnvars: " << nvars);
 
+  auto varids = m_pdfs->getVars(pdg, p, theta);
+
   for (unsigned int ivar(0); ivar < nvars; ivar++) {
     unsigned int ndivs = vts->nDivisions[ivar];
-    B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(ivar)) << " = " << vtransfo_gauss.at(
-              ivar) << ", nsteps = " << ndivs);
+    B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(ivar)) << " = " << variables.at(ivar) << ", nsteps = " << ndivs);
     for (unsigned int jdiv(0); jdiv < ndivs; jdiv++) {
       auto ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
       B2DEBUG(30, "\t\tx[" << ivar << "][" << jdiv << "] = x[" << ij << "] = " << vts->x[ij]);
       B2DEBUG(30, "\t\tcumulDist[" << ivar << "][" << jdiv << "] = cumulDist[" << ij << "] = " << vts->cumulDist[ij]);
     }
   }
+
+  std::vector<double> vtransfo_gauss;
+  vtransfo_gauss.reserve(nvars);
 
   double cumulant;
   for (unsigned int ivar(0); ivar < nvars; ivar++) {
@@ -263,7 +263,7 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
 
     int jdiv = 0;
     auto ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
-    while (vtransfo_gauss.at(ivar) > vts->x[ij]) {
+    while (variables.at(ivar) > vts->x[ij]) {
       jdiv++;
       ij = linIndex(ivar, jdiv, vts->nDivisionsMax);
     }
@@ -271,7 +271,7 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
     if (jdiv < 0) { jdiv = 0; }
     if (jdiv >= ndivs) { jdiv = ndivs - 1; }
     int jnextdiv = jdiv;
-    if ((vtransfo_gauss.at(ivar) > vts->x[ij] && jdiv != ndivs - 1) || jdiv == 0) {
+    if ((variables.at(ivar) > vts->x[ij] && jdiv != ndivs - 1) || jdiv == 0) {
       jnextdiv++;
     } else {
       jnextdiv--;
@@ -280,7 +280,7 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
 
     double dx = vts->x[ij] - vts->x[ijnext];
     double dy = vts->cumulDist[ij] - vts->cumulDist[ijnext];
-    cumulant  = vts->cumulDist[ij] + (vtransfo_gauss.at(ivar) - vts->x[ijnext]) * dy / dx;
+    cumulant  = vts->cumulDist[ij] + (variables.at(ivar) - vts->x[ijnext]) * dy / dx;
 
     cumulant = std::min(cumulant, 1.0 - 10e-10);
     cumulant = std::max(cumulant, 10e-10);
@@ -294,7 +294,6 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
     vtransfo_gauss.at(ivar) = c_sqrt2 * TMath::ErfInverse(arg);
 
   }
-
   B2DEBUG(30, "\tSHOWER properties (Gaussian-transformed):");
   for (unsigned int idx(0); idx < nvars; idx++) {
     B2DEBUG(30, "\tvarid: " << static_cast<unsigned int>(varids->at(idx)) << " = " << vtransfo_gauss.at(idx));
@@ -319,7 +318,10 @@ std::vector<double> ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const
   }
   B2DEBUG(30,  "\t-------------------------------");
 
-  return vtransfo_decorr;
+  // Now modify the input variables vector.
+  for (unsigned int i(0); i < nvars; i++) {
+    variables[i] = vtransfo_decorr.at(i);
+  }
 
 }
 

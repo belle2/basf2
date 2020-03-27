@@ -227,7 +227,7 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
         dataDescription = {}
 
     dataDescription.setdefault("skimDecayMode", skimDecayMode)
-    add_mdst_output(outputFile, path)
+    add_mdst_output(skim_path, filename=outputFile)
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 

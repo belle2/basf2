@@ -132,7 +132,7 @@ namespace Belle2 {
   private:
 
     /** Class version. */
-    ClassDef(Belle2::EKLMHitBase, 3);
+    ClassDef(Belle2::EKLMHitBase, 4);
 
   };
 

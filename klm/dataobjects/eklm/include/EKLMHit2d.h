@@ -63,7 +63,7 @@ namespace Belle2 {
     float m_ChiSq;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMHit2d, 4);
+    ClassDef(Belle2::EKLMHit2d, 5);
 
   };
 

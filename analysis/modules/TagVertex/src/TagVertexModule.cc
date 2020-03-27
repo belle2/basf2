@@ -47,6 +47,7 @@
 #include <framework/geometry/BFieldManager.h>
 
 #include <TVector.h>
+#include <TRotation.h>
 
 
 using namespace std;
@@ -66,7 +67,8 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
+    m_Bfield(0), m_fitPval(0), m_MCtagLifeTime(-1), m_mcPDG(0), m_MCLifeTimeReco(-1),
+    m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
     m_shiftZ(0), m_FitType(0), m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
     m_verbose(true)
@@ -352,34 +354,38 @@ namespace Belle2 {
   }
 
 
-  //  Rz(phi) * Ry(theta)
-  static TMatrixD getRotationMatrix(double theta, double phi)
+  static TMatrixD toMatrix(TRotation r)
   {
-    //double thetar = v4Final.Theta();
-    //double phir = v4Final.Phi();
+    TMatrixD rM(3, 3);
+    for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
+        rM(i, j) = r(i, j);
+    return rM;
+  }
 
-    double str = sin(-theta);
-    double ctr = cos(-theta);
-    double spr = sin(-phi);
-    double cpr = cos(-phi);
+  //  Rz * Ry
+  static TMatrixD getRotationMatrixYZ(double angleY, double angleZ)
+  {
+    TRotation r;
+    r.RotateY(angleY);
+    r.RotateZ(angleZ);
+    return toMatrix(r);
+  }
 
-    TMatrixD r1z(3, 3);  r1z(2, 2) = 1;
-    r1z(0, 0) =  cpr; r1z(0, 1) =  spr;
-    r1z(1, 0) = -spr; r1z(1, 1) =  cpr;
-
-    TMatrixD r1y(3, 3);  r1y(1, 1) = 1;
-    r1y(0, 0) =  ctr; r1y(0, 2) = -str;
-    r1y(2, 0) =  str; r1y(2, 2) =  ctr;
-
-    TMatrixD r1(3, 3);  r1.Mult(r1z, r1y);
-    return r1;
+  //  Ry * Rx
+  static TMatrixD getRotationMatrixXY(double angleX, double angleY)
+  {
+    TRotation r;
+    r.RotateX(angleX);
+    r.RotateY(angleY);
+    return toMatrix(r);
   }
 
   static TMatrixDSym toSymMatrix(const TMatrixD& m)
   {
     TMatrixDSym mS(m.GetNrows());
     for (int i = 0; i < m.GetNrows(); ++i)
-      for (int j = 0; j < m.GetNcols(); ++j) { //m.GetNcols()
+      for (int j = 0; j < m.GetNcols(); ++j) {
         mS(i, j) = (m(i, j) + m(j, i)) / 2;
       }
     return mS;
@@ -439,7 +445,7 @@ namespace Belle2 {
     // simpler version of momentum
 
     TVector3 pFinal = Breco->getVertex() - pos;
-    TMatrixDSym errFinal(3); errFinal += Breco->getVertexErrorMatrix(); errFinal += RerrMatrix;
+    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix()) + RerrMatrix;
 
     // end simpler version
 
@@ -450,7 +456,7 @@ namespace Belle2 {
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
 
-    TMatrixD r1 = getRotationMatrix(v4Final.Theta(), v4Final.Phi());
+    TMatrixD r1 = getRotationMatrixYZ(v4Final.Theta(), v4Final.Phi());
     TMatrixD r1t = r1; r1t.T();
     TMatrixD TubeZ = r1t * errFinal * r1;
 
@@ -461,7 +467,7 @@ namespace Belle2 {
     vec.SetVect(-vec.Vect());
 
     TLorentzVector vecLab = T.rotateCmsToLab() * vec;
-    TMatrixD r2 = getRotationMatrix(vecLab.Theta(), vecLab.Phi()); r2.T(); //inverse rotation
+    TMatrixD r2 = getRotationMatrixYZ(vecLab.Theta(), vecLab.Phi()); r2.T(); //inverse rotation
     TMatrixD r2t = r2; r2t.T();
     TMatrixD Tube = r2t * TubeZ * r2;
 
@@ -529,7 +535,7 @@ namespace Belle2 {
 
 
     // make rotation matrix from z axis to BTag line of flight
-    TMatrixD r2 = getRotationMatrix(v4FinalNew.Theta(), v4FinalNew.Phi());
+    TMatrixD r2 = getRotationMatrixYZ(v4FinalNew.Theta(), v4FinalNew.Phi());
     TMatrixD r2t = r2; r2t.T();
 
 
@@ -538,11 +544,9 @@ namespace Belle2 {
     TMatrixD longerrorRotated = r2 * longerror * r2t;
 
     //pvNew will correspond to the covariance matrix of the B tube
-    TMatrixD pvNew = longerrorRotated;
-    pvNew += pv;
+    TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
 
     //set the constraint
-
     m_constraintCenter = tubecreatorBCopy.getVertex();
     m_constraintCov.ResizeTo(3, 3);
     m_constraintCov = toSymMatrix(pvNew);
@@ -575,7 +579,7 @@ namespace Belle2 {
     beamSpotCov = m_beamSpotDB->getCovVertex();
     beamSpotCov(2, 2) = cut * cut; //cut on z-BeamSpot Cov
 
-    TMatrixD r = getRotationMatrix(-boostDir.Theta(), -boostDir.Phi());
+    TMatrixD r = getRotationMatrixYZ(-boostDir.Theta(), -boostDir.Phi());
     TMatrixD rt = r; rt.T();
 
     TMatrixD Tube = rt * beamSpotCov * r; //BeamSpot in CMS
@@ -588,7 +592,7 @@ namespace Belle2 {
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
 
     if (shiftAlongBoost > -1000) {
-      double boostAngle = atan(boostDir[0] / boostDir[2]); // boost angle with respect from Z
+      double boostAngle = atan2(boostDir[0] , boostDir[2]); // boost angle with respect from Z
       m_constraintCenter = m_BeamSpotCenter +
                            TVector3(shiftAlongBoost * sin(boostAngle), 0., shiftAlongBoost * cos(boostAngle)); // boost in the XZ plane
     }
@@ -1201,7 +1205,7 @@ namespace Belle2 {
     m_raveWeights.resize(n);
     m_raveTracksMCParticles.resize(n);
 
-    for (unsigned int i(0); i < n; ++i) {
+    for (unsigned i = 0; i < n; ++i) {
       m_raveTracks.at(i) = trackAndWeights.at(i).track;
       m_raveTracksMCParticles.at(i) = trackAndWeights.at(i).mcParticle;
       m_raveWeights.at(i) = trackAndWeights.at(i).weight;
@@ -1377,25 +1381,12 @@ namespace Belle2 {
     if (m_MCLifeTimeReco  == -1 || m_MCtagLifeTime == -1)
       m_MCdeltaT =  std::numeric_limits<double>::quiet_NaN();
 
+
     // Calculate Delta t error
-
     double zxB = sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-    double cy = boost.Z() / zxB;
-    double sy = boost.X() / zxB;
-    double cx = zxB / boost.Mag();
-    double sx = boost.Y() / boost.Mag();
-
-    TMatrixD RotY(3, 3);
-    RotY(0, 0) = cy;  RotY(0, 1) = 0;   RotY(0, 2) = -sy;
-    RotY(1, 0) = 0;   RotY(1, 1) = 1;   RotY(1, 2) = 0;
-    RotY(2, 0) = sy;  RotY(2, 1) = 0;   RotY(2, 2) = cy;
-
-    TMatrixD RotX(3, 3);
-    RotX(0, 0) = 1;   RotX(0, 1) = 0;   RotX(0, 2) = 0;
-    RotX(1, 0) = 0;   RotX(1, 1) = cx;  RotX(1, 2) = -sx;
-    RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
-
-    TMatrixD Rot = RotY * RotX;
+    double angleY = atan2(boost.X(), boost.Z());
+    double angleX = atan2(boost.Y(), zxB);
+    TMatrixD Rot = getRotationMatrixXY(angleX, -angleY);
     TMatrixD RotT = Rot; RotT.T();
 
     TMatrixD RotErr = RotT * m_tagVErrMatrix * Rot;
@@ -1414,22 +1405,9 @@ namespace Belle2 {
 
     TVector3 oboost(boostDir.Z(), boostDir.Y(), -boostDir.X());
     double zxOB = sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
-    double ocy = oboost.Z() / zxOB;
-    double osy = oboost.X() / zxOB;
-    double ocx = zxOB / oboost.Mag();
-    double osx = oboost.Y() / oboost.Mag();
-
-    TMatrixD oRotY(3, 3);
-    oRotY(0, 0) = ocy;  oRotY(0, 1) = 0;   oRotY(0, 2) = -osy;
-    oRotY(1, 0) = 0;    oRotY(1, 1) = 1;   oRotY(1, 2) = 0;
-    oRotY(2, 0) = osy;  oRotY(2, 1) = 0;   oRotY(2, 2) = ocy;
-
-    TMatrixD oRotX(3, 3);
-    oRotX(0, 0) = 1;   oRotX(0, 1) = 0;    oRotX(0, 2) = 0;
-    oRotX(1, 0) = 0;   oRotX(1, 1) = ocx;  oRotX(1, 2) = -osx;
-    oRotX(2, 0) = 0;   oRotX(2, 1) = osx;  oRotX(2, 2) = ocx;
-
-    TMatrixD oRot = oRotY * oRotX;
+    double angleOY = atan2(oboost.X(), oboost.Z());
+    double angleOX = atan2(oboost.Y(), zxOB);
+    TMatrixD oRot = getRotationMatrixXY(angleOX, -angleOY);
     TMatrixD oRotT = oRot; oRotT.T();
 
     TMatrixD oRotErr = oRotT * m_tagVErrMatrix * oRot;

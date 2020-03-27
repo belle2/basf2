@@ -273,9 +273,8 @@ void SVDDQMClustersOnTrackModule::beginRun()
 
 void SVDDQMClustersOnTrackModule::event()
 {
-  StoreObjPtr<SVDEventInfo> evt;
-  if (m_tb != -1)
-    if (evt->getModeByte().getTriggerBin() != m_tb)
+  if ((m_tb != -1) && (m_svdEventInfo.isValid()))
+    if (m_svdEventInfo->getModeByte().getTriggerBin() != m_tb)
       return;
 
   // get EventT0 if present and valid
@@ -286,7 +285,7 @@ void SVDDQMClustersOnTrackModule::event()
         eventT0 = m_eventT0->getEventT0();
 
   // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
-  if (m_desynchSVDTime)
+  if (m_desynchSVDTime && m_svdEventInfo.isValid())
     eventT0 = eventT0 - m_svdEventInfo->getSVD2FTSWTimeShift(0);
 
   //check HLT decision and increase number of events only if the event has been accepted

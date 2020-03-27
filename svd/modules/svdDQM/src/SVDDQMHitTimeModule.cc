@@ -208,7 +208,7 @@ void SVDDQMHitTimeModule::event()
         eventT0 = m_eventT0->getEventT0();
 
   // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
-  if (m_desynchSVDTime)
+  if (m_desynchSVDTime && m_svdEventInfo.isValid())
     eventT0 = eventT0 - m_svdEventInfo->getSVD2FTSWTimeShift(0);
 
   //loop on clusters

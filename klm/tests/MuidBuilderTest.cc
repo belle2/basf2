@@ -19,7 +19,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 /* C++ headers. */
 #include <bitset>
@@ -81,8 +80,7 @@ namespace Belle2 {
     int pdg = 13;
     std::bitset<30> bitExtPattern(std::string("11111111111111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
-    std::bitset<30> bitHitPattern(std::string("11111111111111"));
-    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
+    unsigned int hitPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     bool isForward = true;
     bool escaped = false;
     int lastBarrelLayer = 13;
@@ -119,7 +117,7 @@ namespace Belle2 {
     }
   }
 
-  /** Test for a muon with some discrepancies in hit and ext. patterns. */
+  /** Test for a muon with some discrepancies between hit and ext. patterns. */
   TEST_F(MuidBuilderTest, MuidBuilder02)
   {
     StoreArray<KLMMuidLikelihood> muids;
@@ -154,7 +152,7 @@ namespace Belle2 {
     }
   }
 
-  /** Test for a muon with large discrepancies in hit and ext. patterns. */
+  /** Test for a muon with large discrepancies between hit and ext. patterns. */
   TEST_F(MuidBuilderTest, MuidBuilder03)
   {
     StoreArray<KLMMuidLikelihood> muids;
@@ -194,17 +192,17 @@ namespace Belle2 {
   {
     StoreArray<KLMMuidLikelihood> muids;
     int pdg = 13;
-    std::bitset<30> bitExtPattern(std::string("1111100000000000000000111"));
+    std::bitset<30> bitExtPattern(std::string("1111111000000000000111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
-    std::bitset<30> bitHitPattern = std::bitset<30>(std::string("1111100000000000000000111"));
-    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
+    unsigned int hitPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
+    /* Test the forward endcap. */
     bool isForward = true;
     bool escaped = false;
     int lastBarrelLayer = 2;
-    int lastEndcapLayer = 9;
+    int lastEndcapLayer = 6;
     unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
-    double chiSquared = 16.5;
-    int degreesOfFreedom = 16;
+    double chiSquared = 19.5;
+    int degreesOfFreedom = 20;
     m_muid = muids.appendNew();
     m_muid->setPDGCode(pdg);
     m_muid->setExtLayerPattern(extPattern);
@@ -215,7 +213,20 @@ namespace Belle2 {
     m_muid->setOutcome(outcome);
     m_muid->setChiSquared(chiSquared);
     m_muid->setDegreesOfFreedom(degreesOfFreedom);
-    std::vector<float> logLVector = { -18.3899, -0.303499, -5.48054, -6.21227, -7.09687, -9.839};
+    std::vector<float> logLVector = { -44.4325, -0.746618, -17.3903, -18.7434, -25.4178, -34.7886};
+    for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
+      m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
+      float logL = std::log(m_muidBuilder->getPDF(m_muid));
+      EXPECT_LT(std::abs(logL - logLVector.at(i)), 10E-4);
+      delete m_muidBuilder;
+    }
+    logLVector.clear();
+    /* Test the backward endcap. */
+    isForward = false;
+    outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
+    m_muid->setIsForward(isForward);
+    m_muid->setOutcome(outcome);
+    logLVector = { -50.7005, -1.11268, -18.3302, -20.7392, -26.5815, -33.6206};
     for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
       m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));

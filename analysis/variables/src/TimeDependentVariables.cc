@@ -770,7 +770,8 @@ namespace Belle2 {
      * returns a pointer to a function from its name. This is useful to combine the individual information
      * related to each tag track into average, min, max, etc.
      *
-     *                     */
+     */
+
     TagTrFPtr getTagTrackFunctionFromName(string const& name)
     {
       if (name == "TagTrackMomentum") return tagTrackMomentum;
@@ -889,6 +890,7 @@ namespace Belle2 {
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
             return realNaN;
+
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks

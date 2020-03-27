@@ -708,8 +708,8 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
     return true;
   //If we compare here a reconstructed Particle to a generated MCParticle
   //it means that something went horribly wrong and we must stop
-  if (this->getParticleType() == EParticleType::c_MCParticle
-      and oParticle->getParticleType() != EParticleType::c_MCParticle) {
+  if ((this->getParticleType() == EParticleType::c_MCParticle and oParticle->getParticleType() != EParticleType::c_MCParticle)
+      or (this->getParticleType() != EParticleType::c_MCParticle and oParticle->getParticleType() == EParticleType::c_MCParticle)) {
     B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
   }
   if (this->getParticleType() == EParticleType::c_MCParticle
@@ -718,6 +718,9 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
   }
   if (this->getParticleType() != oParticle->getParticleType()) {
     return false;
+  }
+  if (this->getMdstSource() == oParticle->getMdstSource()) {
+    return true;
   }
   if (this->getTrack() && oParticle->getTrack() &&
       this->getTrack()->getArrayIndex() != oParticle->getTrack()->getArrayIndex()) {

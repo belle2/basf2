@@ -130,19 +130,19 @@ def PRList(path):
 
     Event-level cuts:
 
-    * :math:`\\text{foxWolframR2} > 0.5` constructed using all tracks with
-          :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`\\text{foxWolframR2} > 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
     * :math:`n_{\\text{tracks}} > 4`
 
     Cuts on electrons:
 
     * :math:`\\text{electronID} > 0.5`
-    * :math:`p_e > 1.5\\,\\text{GeV}`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
-    * :math:`p_{\\mu} > 1.5\\,\\text{GeV}`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
     Cuts on pions:
 

@@ -14,10 +14,10 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 

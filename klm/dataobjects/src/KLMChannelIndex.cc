@@ -12,8 +12,8 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 using namespace Belle2;
 

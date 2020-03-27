@@ -12,7 +12,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>

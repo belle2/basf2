@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 
 namespace Belle2 {
 

@@ -11,13 +11,13 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>

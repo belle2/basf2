@@ -10,20 +10,22 @@
 
 #pragma once
 
-/* External headers. */
+/* DQM headers. */
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
+
+/* ROOT headers. */
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
-
-/* Belle2 headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/dbobjects/KLMElectronicsMap.h>
-#include <framework/database/DBObjPtr.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
 
 namespace Belle2 {
 

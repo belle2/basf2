@@ -11,10 +11,10 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>

@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFitter.h>
 
 /* C++ headers. */

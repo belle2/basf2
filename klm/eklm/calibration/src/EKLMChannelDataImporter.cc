@@ -12,10 +12,10 @@
 #include <klm/eklm/calibration/EKLMChannelDataImporter.h>
 
 /* KLM headers. */
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */

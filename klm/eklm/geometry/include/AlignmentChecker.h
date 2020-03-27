@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/Arc2D.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/LineSegment2D.h>

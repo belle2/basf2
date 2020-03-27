@@ -10,7 +10,9 @@ __authors__ = [
     "Phil Grace"
 ]
 
+from basf2 import Path
 import modularAnalysis as ma
+from skimExpertFunctions import ifEventPasses
 
 
 def SemileptonicList(path):
@@ -176,25 +178,26 @@ def PRList(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2<0.5 and nTracks>4', path=path)
+    path2 = Path()
+    ifEventPasses('foxWolframR2<0.5 and nTracks>4', conditional_path=path2, path=path)
 
-    ma.cutAndCopyList('e+:PRSemileptonic_1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
-    ma.cutAndCopyList('mu+:PRSemileptonic_1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
+    ma.cutAndCopyList('e+:PRSemileptonic_1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path2)
+    ma.cutAndCopyList('mu+:PRSemileptonic_1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path2)
     ma.cutAndCopyList('pi-:PRSemileptonic_1', 'pi-:all',
-                      'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path)
+                      'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path2)
 
-    ma.cutAndCopyList('e+:PRSemileptonic_2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path)
-    ma.cutAndCopyList('mu+:PRSemileptonic_2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
-    ma.cutAndCopyList('pi-:PRSemileptonic_2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
+    ma.cutAndCopyList('e+:PRSemileptonic_2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path2)
+    ma.cutAndCopyList('mu+:PRSemileptonic_2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path2)
+    ma.cutAndCopyList('pi-:PRSemileptonic_2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path2)
 
     ma.reconstructDecay('B0:PRSemileptonic_1 ->  pi-:PRSemileptonic_1 e+:PRSemileptonic_1',
-                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_2 ->  pi-:PRSemileptonic_1 mu+:PRSemileptonic_1',
-                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_3 ->  pi-:PRSemileptonic_2 e+:PRSemileptonic_2',
-                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_4 ->  pi-:PRSemileptonic_2 mu+:PRSemileptonic_2',
-                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path2)
 
     PRList = ['B0:PRSemileptonic_1', 'B0:PRSemileptonic_2']
 

@@ -96,7 +96,7 @@ def B0Hadronic(path):
     Cuts applied
        This skim uses the following track and cluster definitions.
 
-       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`|d_0| < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
          and :math:`p_T > 0.1\\,\\text{GeV}`
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
@@ -105,7 +105,6 @@ def B0Hadronic(path):
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
@@ -204,7 +203,7 @@ def BplusHadronic(path):
     Cuts applied
        This skim uses the following track and cluster definitions.
 
-       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`|d_0| < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
          and :math:`p_T > 0.1\\,\\text{GeV}`
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
@@ -213,7 +212,6 @@ def BplusHadronic(path):
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
@@ -291,7 +289,7 @@ def runFEIforB0Hadronic(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
 
@@ -352,7 +350,7 @@ def runFEIforBplusHadronic(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -420,7 +418,7 @@ def runFEIforHadronicCombined(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -478,7 +476,7 @@ def B0SL(path):
     Cuts applied
        This skim uses the following track and cluster definitions.
 
-       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`|d_0| < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
          and :math:`p_T > 0.1\\,\\text{GeV}`
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
@@ -487,7 +485,6 @@ def B0SL(path):
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
@@ -563,7 +560,7 @@ def BplusSL(path):
     Cuts applied
        This skim uses the following track and cluster definitions.
 
-       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
+       * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`|d_0| < 0.5\\,\\text{cm}`, :math:`|z_0| < 2\\,\\text{cm}\\,`,
          and :math:`p_T > 0.1\\,\\text{GeV}`
        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta < 2.61799`,
          and :math:`E>0.1\\,\\text{GeV}`
@@ -572,7 +569,6 @@ def BplusSL(path):
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from
           `modularAnalysis.buildEventShape`, calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
@@ -655,7 +651,7 @@ def runFEIforB0SL(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -720,7 +716,7 @@ def runFEIforBplusSL(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -790,7 +786,7 @@ def runFEIforSLCombined(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -863,7 +859,7 @@ def runFEIforSkimCombined(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
+    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
 

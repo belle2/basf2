@@ -20,20 +20,23 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/TestHelpers.h>
 
 /* C++ headers. */
 #include <bitset>
 #include <string>
 
+/* Google Test headers. */
+#include <gtest/gtest.h>
+
 using namespace std;
 
 namespace Belle2 {
 
-  /** Test class for the MuidBuilder class, using the payloads in the default (master) Global Tag. */
+  /** Test for the MuidBuilder class, using the payloads in the default Global Tag. */
   class MuidBuilderTest : public ::testing::Test {
 
   protected:
+
     /** Register the necessary objects in the DataStore and setup the Database. */
     void SetUp() override
     {
@@ -51,7 +54,7 @@ namespace Belle2 {
       dbStore.updateEvent();
     }
 
-    /** Clear the DataStore */
+    /** Clear the DataStore and reset the Database. */
     void TearDown() override
     {
       DataStore::Instance().reset();

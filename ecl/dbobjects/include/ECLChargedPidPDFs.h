@@ -81,8 +81,6 @@ namespace Belle2 {
       VarTransfoSettings() {}; /** Constructor */
       ~VarTransfoSettings() {}; /** Destructor */
 
-      bool doTransfo = false; /** To be toggled on if the class instance will be effectively configured
-          (e.g., it won't be done if classifier is univariate in a given category). */
       int nVars; /** Number of variables. */
       std::string classPath; /** Path of the class used to get the variables transfo. Useful for debugging. */
       std::vector<int> nDivisions; /** Number of steps in which each variable range is sub-divided. */
@@ -212,12 +210,10 @@ namespace Belle2 {
     void add(const int pdg, const unsigned int i, const unsigned int j, const InputVar varid, TF1* pdf)
     {
 
-      m_pdfs_byvariable[varid] = pdf;
-
       auto ji = m_categories->GetBin(j, i);
-      m_pdfsmap_bycategory[ji] = m_pdfs_byvariable;
 
-      m_pdfsmap[pdg] = m_pdfsmap_bycategory;
+      m_pdfsmap[pdg][ji][varid] = pdf;
+
     }
 
     /**
@@ -248,6 +244,11 @@ namespace Belle2 {
     }
 
     /**
+     * Check whether variables transformation is applied.
+     */
+    inline bool doVarsTransfo() const { return m_do_varstransform; }
+
+    /**
      * Setup the variable transformations for a given hypothesis in a category (p, clusterTheta), needed to build a multi-dimensional likelihood.
      @param pdg the particle hypothesis' signed pdgId.
      @param i the index along the 2D grid Y axis (rows) --> p.
@@ -268,9 +269,10 @@ namespace Belle2 {
                                   const std::vector<double>& covMatrix = std::vector<double>())
     {
 
+      m_do_varstransform = true;
+
       VarTransfoSettings vts;
 
-      vts.doTransfo = (nVars > 1); /** No transformation will be attempted if univariate! */
       vts.nVars = nVars;
       vts.classPath = classPath;
       vts.nDivisionsMax = (!nDivisions.empty()) ? *(std::max_element(std::begin(nDivisions), std::end(nDivisions))) : 0;

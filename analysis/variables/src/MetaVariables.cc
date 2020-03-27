@@ -2331,6 +2331,33 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
+          int nParticles = listOfParticles->getListSize();
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxOpeningAngle = 0;
+          for (int i = 0; i < nParticles; i++)
+          {
+            TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            for (int j = i + 1; j < nParticles; j++) {
+              TVector3 v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
+              const double angle = v1.Angle(v2);
+              if (angle > maxOpeningAngle) maxOpeningAngle = angle;
+            }
+          }
+          return maxOpeningAngle;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxOpeningAngleInList");
+      }
+    }
 
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments)
     {
@@ -2891,6 +2918,8 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
+                      "Returns maximum opening angle in the given particle List.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
 

@@ -28,12 +28,14 @@ def SetTauGenericSkimVariables(path):
     * ``invMS1/invMS2``: invariant mass of particles in each hemisphere
     * ``maxPt``: maximum Pt amoung good tracks
     * ``E_ECLtrk``: total ECL energy of good tracks
+    * ``maxOp``: maximum opening angle in CM among good tracks
 
     """
     __author__ = "Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = 'pt > 0.1 and abs(d0) < 1 and abs(z0) < 5'
+    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    # trackCuts = 'pt > 0.1 and abs(d0) < 1 and abs(z0) < 5'
     # trackCuts += ' and -0.8660 < cosTheta < 0.9563'
     gammaCuts = 'E > 0.15'
     gammaCuts += ' and -0.8660 < cosTheta < 0.9563'
@@ -61,6 +63,7 @@ def SetTauGenericSkimVariables(path):
     # vm.addAlias('Evis', 'visibleEnergyOfEventCMS')
     vm.addAlias('maxPt', 'maxPtInList(pi+:tauskim)')
     vm.addAlias('E_ECLtrk', 'formula(totalECLEnergyOfParticlesInList(pi+:tauskim))')
+    vm.addAlias('maxOp', 'useCMSFrame(maxOpeningAngleInList(pi+:tauskim))')
 
 
 def TauList(path):
@@ -91,25 +94,33 @@ def TauList(path):
 
     SetTauGenericSkimVariables(path=path)
 
-    ma.reconstructDecay('tau+:S1 -> pi+:S1', '', path=path)
-    eventParticle = ['tau+:S1']
+    # reconstruct with each Ntrk case
+    ma.reconstructDecay('tau+:g2 -> pi+:S1', 'nGoodTracks == 2 and -2 < netCharge <2', path=path)
+    ma.reconstructDecay('tau+:g34 -> pi+:S1', '[nGoodTracks == 3 or nGoodTracks == 4] and -2 < netCharge <2', path=path)
+    ma.reconstructDecay('tau+:g56 -> pi+:S1', '[nGoodTracks == 5 or nGoodTracks == 6] and -2 < netCharge <2', path=path)
 
     # Selection criteria
-    ma.applyCuts('tau+:S1', '1 < nGoodTracks < 7', path=path)  # cut1
-    ma.applyCuts('tau+:S1', '-2 < netCharge < 2', path=path)  # cut2
-
-    # ma.applyCuts('tau+:S1',
-    #          '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 ] or '
-    #          '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 ]', path=path)  # cut3+cut5
-    ma.applyCuts('tau+:S1',
+    # Ntrk=2
+    ma.applyCuts('tau+:g2', 'visibleEnergyOfEventCMS < 10', path=path)
+    ma.applyCuts('tau+:g2', 'E_ECLtrk < 6', path=path)
+    ma.applyCuts('tau+:g2', 'missingMomentumOfEvent_theta < 2.6180', path=path)
+    ma.applyCuts('tau+:g2', 'visibleEnergyOfEventCMS > 3 or maxPt > 1', path=path)
+    ma.applyCuts('tau+:g2', 'maxOp < 3.106686', path=path)
+    # Ntrk=3,4
+    ma.applyCuts('tau+:g34', 'visibleEnergyOfEventCMS < 10.5', path=path)
+    ma.applyCuts('tau+:g34', 'E_ECLtrk < 6', path=path)
+    ma.applyCuts('tau+:g34', 'visibleEnergyOfEventCMS > 3 or maxPt > 1', path=path)
+    ma.applyCuts('tau+:g34', 'maxOp < 3.106686', path=path)
+    ma.applyCuts('tau+:g34',
                  '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 and invMS2 < 2.3 ] or '
-                 '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)  # cut3+cut5+cut8
-
-    ma.applyCuts('tau+:S1', 'visibleEnergyOfEventCMS < 10 and E_ECLtrk < 6', path=path)  # cut4
-    ma.applyCuts('tau+:S1', 'visibleEnergyOfEventCMS > 3 or maxPt > 1', path=path)  # cut6
-    ma.applyCuts('tau+:S1', 'missingMomentumOfEvent_theta < 2.6180', path=path)  # cut7
+                 '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)
+    # Ntrk=5,6
+    ma.applyCuts('tau+:g56',
+                 '[[ nTracksS1 == 1 or nTracksS1 == 3 ] and invMS1 < 1.8 and invMS2 < 2.3 ] or '
+                 '[[ nTracksS2 == 1 or nTracksS2 == 3 ] and invMS2 < 1.8 and invMS1 < 2.3 ]', path=path)
 
     # For skimming, the important thing is if the final particleList is empty or not.
+    eventParticle = ['tau+:g2', 'tau+:g34', 'tau+:g56']
     return eventParticle
 
 

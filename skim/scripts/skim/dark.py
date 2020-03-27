@@ -60,7 +60,7 @@ def SinglePhotonDarkList(path):
     return ['gamma:singlePhoton']
 
 
-def GammaGammaControlKLMDarkList(path):
+def GammaGammaControlKLMDarkList(path, prescale_high=1, prescale_low=1):
     """
     Gamma gamma skim list for study of the KLM efficiency as part of
     the dark photon analysis
@@ -71,13 +71,33 @@ def GammaGammaControlKLMDarkList(path):
 
     **Skim category**: physics, dark sector, control-channel
 
+    Info:
+        This skim can retain a lot of γγ events.
+        In case this becomes unacceptable, we provide prescale parameters.
+        Prescales are given in standard trigger convention (reciprocal),
+        so prescale of 100 is 1% of events kept, etc.
+
+    Example:
+        To prescale the higher-energy probe photons by 10%:
+
+        >>> GammaGammaControlKLMDarkList(path=mypath, prescale_high=10)
+
     Parameters:
         path (basf2.Path): the path to add the skim
+        prescale_high (int): the prescale for more energetic probe photon
+        prescale_low (int): the prescale for a less energetic probe photon
 
     Returns:
         list name of the skim candidates
     """
     __authors__ = ["Sam Cunliffe", "Miho Wakai"]
+
+    # unpack prescales and convert from trigger convention to a number we can
+    # compare with a float
+    if (prescale_high, prescale_low) is not (1, 1):
+        b2.B2INFO('GammaGammaControlKLMDarkList is prescaled. prescale_high=%i, prescale_low=%i' % (prescale_high, prescale_low))
+    prescale_high = str(float(1.0 / prescale_high))
+    prescale_low = str(float(1.0 / prescale_low))
 
     # no good (IP-originating) tracks in the event
     good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.2'  # cm, cm, GeV/c
@@ -98,6 +118,11 @@ def GammaGammaControlKLMDarkList(path):
     # candidate list will *not* be double-counted: these extra candidates need
     # to be added back offline
 
+    # apply prescales to the less energetic daughter: compare to the eventwise random number
+    probe_high = '[daughterLowest(clusterE) > 4.5] and [eventRandom < %s]' % prescale_high
+    probe_low = '[daughterLowest(clusterE) < 4.5] and [eventRandom < %s]' % prescale_low
+    prescale = '[ %s ] or [ %s ]' % (probe_high, probe_low)
+
     # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
     delta_phi_cut = 'daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065'
 
@@ -108,6 +133,7 @@ def GammaGammaControlKLMDarkList(path):
     # now build and return the candidates passing the AND of our cuts
     cuts = '[ %s ]' % no_good_tracks
     cuts += ' and [ %s ]' % tag_daughter
+    cuts += ' and [ %s ]' % prescale
     cuts += ' and [ %s ]' % delta_phi_cut
     cuts += ' and [ %s ]' % sum_th_cut
     ma.reconstructDecay(

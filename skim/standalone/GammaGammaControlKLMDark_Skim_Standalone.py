@@ -20,6 +20,9 @@ stdPhotons('all', path=darkskimpath)
 # run the skim
 from skim.dark import GammaGammaControlKLMDarkList
 darklist = GammaGammaControlKLMDarkList(path=darkskimpath)
+# this skim list can be prescaled with trigger-like prescale arguments
+# darklist = GammaGammaControlKLMDarkList(path=darkskimpath,
+#                                         prescale_high=10, prescale_low=1)
 skimCode = expert.encodeSkimName('GammaGammaControlKLMDark')
 print("Gamma gamma control channel skim:", skimCode)
 expert.skimOutputUdst(skimCode, darklist, path=darkskimpath)

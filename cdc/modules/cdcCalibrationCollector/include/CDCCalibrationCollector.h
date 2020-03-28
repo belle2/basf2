@@ -10,10 +10,17 @@
 
 #pragma once
 
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <calibration/CalibrationCollectorModule.h>
 
+#include <mdst/dataobjects/Track.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFindingCDC/topology/CDCWire.h>
+
 #include <framework/dataobjects/EventT0.h>
+
+#include <TVector3.h>
 #include <string>
 
 namespace Belle2 {
@@ -60,14 +67,31 @@ namespace Belle2 {
        * collect hit information of fitted track.
        */
       void harvest(Belle2::RecoTrack* track);
+      /**
+      * fills efficiency objects
+      */
+      void buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit);
+      /**
+       * returns the number of wires in a given layer
+       */
+      int getWiresInLayer(int layerN);
+
+      /**
+       * returns the number of wires in a given layer
+       */
+      const TrackFindingCDC::CDCWire& getIntersectingWire(const TVector3& xyz, const TrackFindingCDC::CDCWireLayer& layer,
+                                                          const Helix& helixFit) const;
 
       StoreObjPtr<EventT0> m_eventTimeStoreObject; /**<Event t0 object */
+      std::string m_cdcTracks;                /**< Belle2::CDCTrackVector */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
-      std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
+      std::string m_cdcHitArrayName;          /**< Belle2::CDCHit StoreArray name*/
+      std::string m_cdcTrackVectorName;       /**< Belle2::CDCTrack vectorpointer name*/
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */
       std::string m_treeName;                 /**< Name of tree for the output file. */
+      std::string m_effTreeName;              /**< Name of efficiency tree for the output file. */
 
       float weight;            /**<  Weight of hit.*/
       float alpha;             /**< Entrance Azimuthal angle of hit (degree). */
@@ -95,6 +119,11 @@ namespace Belle2 {
       bool m_storeTrackParams = true;          /**< Store Track parameter or not. */
       bool m_eventT0Extraction = true;         /**< use Event T0 extract t0 or not. */
       bool m_isCosmic = false;                 /**< true when we process cosmic events, else false (collision). */
+
+      unsigned short wireID;                   /** wireID for hit-level wire monitoring*/
+      unsigned short layerID;                  /** layerID for hit-level wire monitoring*/
+      float z;                                /** z of hit fot hit-level wire monitoring*/
+      bool isFound;
     };
   }
 }

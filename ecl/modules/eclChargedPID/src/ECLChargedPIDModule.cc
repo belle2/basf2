@@ -198,7 +198,7 @@ void ECLChargedPIDModule::event()
 
       }
 
-      likelihoods[hypo_idx] = (std::isnormal(pdfval)) ? log(pdfval) : c_dummyLogL;
+      likelihoods[hypo_idx] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : c_dummyLogL;
 
       B2DEBUG(20, "\tlog(L(" << hypo.getPDGCode() << ")) = " << likelihoods[hypo_idx]);
     }

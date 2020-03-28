@@ -78,14 +78,27 @@ def TauList(path):
 
     **Criteria**:
 
-    1. ``1 < No. good tracks < 7``
-    2. ``net charge < 2``
-    3. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
-    4. ``visibleEnergyOfEventCMS < 10 GeV and E_ECLtrk < 6 GeV``
-    5. ``M_tag < 1.8 GeV``
-    6. ``visibleEnergyOfEventCMS > 3 GeV or max P_t > 1 GeV``
-    7. ``theta_miss < 150``
-    8. ``M_sig < 2.3 GeV``
+    Ntrk = 2
+
+    1. Number of good tracks = 2, net charge < 2
+    2. ``visibleEnergyOfEventCMS < 10 GeV and E_ECLtrk < 6 GeV`` and ``theta_miss < 150``
+    3. ``visibleEnergyOfEventCMS > 3 GeV or max P_t > 1 GeV``
+    4. max. opening angle < 178 deg.
+
+    Ntrk = 3,4
+
+    1. Number of good tracks = 3 or 4, net charge < 2
+    2. ``visibleEnergyOfEventCMS < 10.5 GeV and E_ECLtrk < 6 GeV``
+    3. ``visibleEnergyOfEventCMS > 3 GeV or max P_t > 1 GeV``
+    4. max. opening angle < 178 deg.
+    5. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
+    6. ``M_tag < 1.8 GeV`` and ``M_sig < 2.3 GeV``
+
+    Ntrk = 5,6
+
+    1. Number of good tracks = 5 or 6, net charge < 2
+    2. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
+    3. ``M_tag < 1.8 GeV`` and ``M_sig < 2.3 GeV``
 
     Returns:
         list name of the TauGeneric skim candidates
@@ -134,7 +147,13 @@ def TauLFVList(flag=1, path=None):
 
     **Skim category**: physics, tau
 
-    **Criteria**: :math:`1.58 < M < 1.98` GeV, :math:`|\Delta E|<1` GeV
+    **Input particle lists**: `e+:all`, `mu+:all`, `pi+:all`, `K+:all`, `p+:all`, `gamma:all`
+
+    **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
+    ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv, f_0:taulfv``,
+    ``rho0:taulfv, K*0:taulfv, phi:taulfv, omega:taulfv``
+
+    **Criteria**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
 
     Returns:
         list name of the TauLFV skim candidates
@@ -142,70 +161,107 @@ def TauLFVList(flag=1, path=None):
         only return list of names
         (such as tau+:LFV_lgamma0, tau+:LFV_lgamma1, tau+:LFV_lll0, ...)
     """
-    __author__ = "P. Urquijo, K. Inami"
+    __author__ = "K. Inami"
 
-    tauLFVCuts = '1.58 < M < 1.98 and abs(deltaE) < 1.0'
+    # particle selection
+    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    ma.cutAndCopyList('e+:taulfv', 'e+:all', trackCuts, path=path)
+    ma.cutAndCopyList('mu+:taulfv', 'mu+:all', trackCuts, path=path)
+    ma.cutAndCopyList('pi+:taulfv', 'pi+:all', trackCuts, path=path)
+    ma.cutAndCopyList('K+:taulfv', 'K+:all', trackCuts, path=path)
+    ma.cutAndCopyList('p+:taulfv', 'p+:all', trackCuts, path=path)
 
-    tau_lgamma_Channels = ['e+:loose gamma:loose',
-                           'mu+:loose gamma:loose'
+    ma.reconstructDecay('K_S0:taulfv -> pi+:all pi-:all', '0.3 < M < 0.7', path=path)
+
+    gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
+    ma.cutAndCopyList('gamma:taulfv', 'gamma:all', gammaCuts, path=path)
+
+    gammaLooseCuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
+    ma.cutAndCopyLists('gamma:taulfvloose', 'gamma:all', gammaLooseCuts, path=path)
+    # pi0
+    ma.reconstructDecay('pi0:taulfv -> gamma:taulfvloose gamma:taulfvloose', '0.115 < M < 0.152', path=path)
+    # eta
+    ma.reconstructDecay('eta:taulfv1 -> gamma:taulfvloose gamma:taulfvloose', '0.4 < M < 0.6', path=path)
+    ma.reconstructDecay('eta:taulfv2 -> pi0:taulfv pi-:all pi+:all', '0.4 < M < 0.6', path=path)
+    ma.copyLists('eta:taulfv', ['eta:taulfv1', 'eta:taulfv2'], path=path)
+    # eta'
+    ma.reconstructDecay('eta\':taulfv1 -> pi+:all pi-:all gamma:taulfvloose', '0.8 < M < 1.1', path=path)
+    ma.reconstructDecay('eta\':taulfv2 -> pi+:all pi-:all eta:taulfv', '0.8 < M < 1.1', path=path)
+    ma.copyLists('eta\':taulfv', ['eta\':taulfv1', 'eta\':taulfv2'], path=path)
+    # f_0
+    ma.reconstructDecay('f_0:taulfv -> pi+:all pi-:all', '0.78 < M < 1.18', path=path)
+    # rho0
+    ma.reconstructDecay('rho0:taulfv -> pi-:all pi+:all', '0.47 < M < 1.07', path=path)
+    # K*0
+    ma.reconstructDecay('K*0:taulfv -> pi-:all K+:all', '0.74 < M < 1.04', path=path)
+    # phi
+    ma.reconstructDecay('phi:taulfv -> K+:all K-:all', '0.97 < M < 1.1', path=path)
+    # omega
+    ma.reconstructDecay('omega:taulfv -> pi0:taulfv pi-:all pi+:all', '0.73 < M < 0.83', path=path)
+
+    # event selection
+    tauLFVCuts = 'nParticlesInList(pi+:taulfv) < 5 and 1.0 < M < 2.0 and -1.5 < deltaE < 0.5'
+
+    tau_lgamma_Channels = ['e+:taulfv gamma:taulfv',
+                           'mu+:taulfv gamma:taulfv'
                            ]
 
-    tau_lll_Channels = ['e-:loose e-:loose e+:loose',
-                        'mu-:loose mu-:loose mu+:loose',
-                        'mu-:loose e-:loose e+:loose',
-                        'e-:loose mu-:loose mu+:loose',
-                        'e-:loose e-:loose mu+:loose',
-                        'mu-:loose mu-:loose e+:loose'
+    tau_lll_Channels = ['e-:taulfv e-:taulfv e+:taulfv',
+                        'mu-:taulfv mu-:taulfv mu+:taulfv',
+                        'mu-:taulfv e-:taulfv e+:taulfv',
+                        'e-:taulfv mu-:taulfv mu+:taulfv',
+                        'e-:taulfv e-:taulfv mu+:taulfv',
+                        'mu-:taulfv mu-:taulfv e+:taulfv'
                         ]
 
-    tau_lP0_Channels = ['e+:loose pi0:skim',
-                        'mu+:loose pi0:skim',
-                        'e+:loose eta:loose',
-                        'mu+:loose eta:loose',
-                        'e+:loose eta\':loose',
-                        'mu+:loose eta\':loose',
-                        'e+:loose K_S0:merged',
-                        'mu+:loose K_S0:merged'
+    tau_lP0_Channels = ['e+:taulfv pi0:taulfv',
+                        'mu+:taulfv pi0:taulfv',
+                        'e+:taulfv eta:taulfv',
+                        'mu+:taulfv eta:taulfv',
+                        'e+:taulfv eta\':taulfv',
+                        'mu+:taulfv eta\':taulfv',
+                        'e+:taulfv K_S0:taulfv',
+                        'mu+:taulfv K_S0:taulfv'
                         ]
 
-    tau_lS0_Channels = ['e+:loose f_0:loose',
-                        'mu+:loose f_0:loose'
+    tau_lS0_Channels = ['e+:taulfv f_0:taulfv',
+                        'mu+:taulfv f_0:taulfv'
                         ]
 
-    tau_lV0_Channels = ['e+:loose rho0:loose',
-                        'mu+:loose rho0:loose',
-                        'e+:loose K*0:loose',
-                        'mu+:loose K*0:loose',
-                        'e+:loose anti-K*0:loose',
-                        'mu+:loose anti-K*0:loose',
-                        'e+:loose phi:loose',
-                        'mu+:loose phi:loose',
-                        'e+:loose omega:loose',
-                        'mu+:loose omega:loose'
+    tau_lV0_Channels = ['e+:taulfv rho0:taulfv',
+                        'mu+:taulfv rho0:taulfv',
+                        'e+:taulfv K*0:taulfv',
+                        'mu+:taulfv K*0:taulfv',
+                        'e+:taulfv anti-K*0:taulfv',
+                        'mu+:taulfv anti-K*0:taulfv',
+                        'e+:taulfv phi:taulfv',
+                        'mu+:taulfv phi:taulfv',
+                        'e+:taulfv omega:taulfv',
+                        'mu+:taulfv omega:taulfv'
                         ]
 
-    tau_lhh_Channels = ['e+:loose pi-:loose pi+:loose',
-                        'mu+:loose pi-:loose pi+:loose',
-                        'e-:loose pi+:loose pi+:loose',
-                        'mu-:loose pi+:loose pi+:loose',
-                        'e+:loose K-:loose K+:loose',
-                        'mu+:loose K-:loose K+:loose',
-                        'e-:loose K+:loose K+:loose',
-                        'mu-:loose K+:loose K+:loose',
-                        'e+:loose K-:loose pi+:loose',
-                        'mu+:loose K-:loose pi+:loose',
-                        'e-:loose K+:loose pi+:loose',
-                        'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:merged K_S0:merged',
-                        'mu-:loose K_S0:merged K_S0:merged'
+    tau_lhh_Channels = ['e+:taulfv pi-:taulfv pi+:taulfv',
+                        'mu+:taulfv pi-:taulfv pi+:taulfv',
+                        'e-:taulfv pi+:taulfv pi+:taulfv',
+                        'mu-:taulfv pi+:taulfv pi+:taulfv',
+                        'e+:taulfv K-:taulfv K+:taulfv',
+                        'mu+:taulfv K-:taulfv K+:taulfv',
+                        'e-:taulfv K+:taulfv K+:taulfv',
+                        'mu-:taulfv K+:taulfv K+:taulfv',
+                        'e+:taulfv K-:taulfv pi+:taulfv',
+                        'mu+:taulfv K-:taulfv pi+:taulfv',
+                        'e-:taulfv K+:taulfv pi+:taulfv',
+                        'mu-:taulfv K+:taulfv pi+:taulfv',
+                        'e-:taulfv K_S0:taulfv K_S0:taulfv',
+                        'mu-:taulfv K_S0:taulfv K_S0:taulfv'
                         ]
 
-    tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
-                        'mu-:loose mu+:loose p+:loose',
-                        'anti-p-:loose pi+:loose pi+:loose',
-                        'p+:loose pi-:loose pi+:loose',
-                        'anti-p-:loose pi+:loose K+:loose',
-                        'p+:loose pi-:loose K+:loose'
+    tau_bnv_Channels = ['mu+:taulfv mu+:taulfv anti-p-:taulfv',
+                        'mu-:taulfv mu+:taulfv p+:taulfv',
+                        'anti-p-:taulfv pi+:taulfv pi+:taulfv',
+                        'p+:taulfv pi-:taulfv pi+:taulfv',
+                        'anti-p-:taulfv pi+:taulfv K+:taulfv',
+                        'p+:taulfv pi-:taulfv K+:taulfv'
                         ]
 
     tau_lgamma_list = []

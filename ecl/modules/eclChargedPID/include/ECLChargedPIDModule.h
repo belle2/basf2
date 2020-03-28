@@ -111,10 +111,10 @@ namespace Belle2 {
     DBObjPtr<ECLChargedPidPDFs> m_pdfs;
 
     /**
-     * Minimum value of Log Likelihood for a particle hypothesis.
-     * Used when the pdf value is not positive or subnormal.
+     * Dummy value of Log Likelihood for a particle hypothesis.
+     * Used when the pdf value is (0 | subnormal | inf | NaN).
     */
-    static constexpr double c_minLogLike = -700;
+    static constexpr double c_dummyLogL = std::numeric_limits<float>::quiet_NaN();
 
     /**
      * Apply cluster timing selection.
@@ -122,9 +122,9 @@ namespace Belle2 {
     bool m_applyClusterTimingSel;
 
     /**
-     * Map to contain shower shape values.
+     * Map to contain ECL shower observables.
      * Updated for each shower candidate processed.
-     * The keys are enum identifiers defined in the DB representation class.
+     * The keys are enum identifiers defined in the `ECLChargedPidPDFs` DB representation class.
      *
      * When performing transformations of the input variables based on the info stored in the payload,
      * it is crucial to respect the order of the variable names as they appear in the payload itself.
@@ -170,7 +170,7 @@ namespace Belle2 {
     }
 
     /**
-     * Transform input variables:
+     * Transform input variables according to:
      *
      * -) gaussianisation via integration of cumulative distribution function and erf inversion.
      * -) decorrelation via inverse square-root covariance matrix.

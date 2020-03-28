@@ -128,6 +128,7 @@ void ECLChargedPIDModule::event()
 
     float likelihoods[Const::ChargedStable::c_SetSize];
     // Initialise PDF value.
+    // This will correspond to a LogL = NaN if unchanged.
     double pdfval(0.0);
 
     // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
@@ -136,18 +137,12 @@ void ECLChargedPIDModule::event()
 
       hypo_idx = hypo.getIndex();
 
-      // For now, skip deuteron...
-      if (hypo.getPDGCode() == 1000010020) {
-        likelihoods[hypo_idx] = c_minLogLike;
-        continue;
-      }
-
       auto signedhypo = hypo.getPDGCode() * charge;
 
       B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << hypo.getPDGCode()
               << ", signedhypo[" << hypo_idx << "] = " << signedhypo);
 
-      // For the moment, do not split by charge
+      // TMP: For the moment, do not split by charge
       signedhypo = fabs(signedhypo);
 
       // For tracks w/:
@@ -166,7 +161,7 @@ void ECLChargedPIDModule::event()
           variables.push_back(m_variables.at(varid));
         }
 
-        // Transform the input variables only if necessary.
+        // Transform the input variables via gaussianisation+decorrelation only if necessary.
         if (m_pdfs->doVarsTransfo()) {
           transfoGaussDecorr(signedhypo, p, showerTheta, variables);
         }
@@ -203,7 +198,7 @@ void ECLChargedPIDModule::event()
 
       }
 
-      likelihoods[hypo_idx] = (std::isnormal(pdfval)) ? log(pdfval) : c_minLogLike;
+      likelihoods[hypo_idx] = (std::isnormal(pdfval)) ? log(pdfval) : c_dummyLogL;
 
       B2DEBUG(20, "\tlog(L(" << hypo.getPDGCode() << ")) = " << likelihoods[hypo_idx]);
     }
@@ -225,7 +220,7 @@ double ECLChargedPIDModule::getPdfVal(const double& x, const TF1* pdf)
   else if (x >= xmax) { y = pdf->Eval(xmax - 1e-9); }
   else                { y = pdf->Eval(x); }
 
-  return (y) ? y : 1e-9; // Do not return exactly 0, otherwise deltaLogL might be biased...
+  return (y) ? y : 1e-9; // Shall we allow for 0? That translates in LogL = NaN...
 }
 
 void ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const double& p, const double& theta, std::vector<double>& variables)

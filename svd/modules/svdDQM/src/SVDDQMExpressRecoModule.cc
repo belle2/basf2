@@ -59,6 +59,8 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (as default): svdTime back in SVD time reference", bool(true));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,
            "cut for accepting to hitmap histogram, using strips only", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
@@ -176,9 +178,13 @@ void SVDDQMExpressRecoModule::defineHisto()
   float ChargeMax = 80;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 180;
-  float TimeMin = -40;
+  int TimeBins = 200;
+  float TimeMin = -60;
   float TimeMax = 140;
+  if (m_isSVDTimeCalibrated) {
+    TimeMin = -100 ;
+    TimeMax =  100 ;
+  }
 
   int MaxBinBins = 6;
   int MaxBinMax = 6;

@@ -22,6 +22,8 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
   setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
 
 }
 
@@ -36,9 +38,13 @@ void SVDDQMHitTimeModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("SVDHitTime")->cd();
 
-  int nBins = 180 ;
-  double minT0 = -40 ;
+  int nBins = 200 ;
+  double minT0 = -60 ;
   double maxT0 =  140 ;
+  if (m_isSVDTimeCalibrated) {
+    minT0 = -100 ;
+    maxT0 =  100 ;
+  }
 
   TString refFrame = "in FTSW reference";
   if (m_desynchSVDTime)

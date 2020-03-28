@@ -61,6 +61,8 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
            "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
 
 
   m_histoList = new TList();
@@ -97,9 +99,13 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   float ChargeMax = 160;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 180;
-  float TimeMin = -40;
+  int TimeBins = 200;
+  float TimeMin = -60;
   float TimeMax = 140;
+  if (m_isSVDTimeCalibrated) {
+    TimeMin = -100 ;
+    TimeMax =  100 ;
+  }
 
   int MaxBinBins = 6;
   int MaxBinMax = 6;

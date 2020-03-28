@@ -180,26 +180,26 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   name = "SVDTRK_ClusterTimeU3";
   title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors", refFrame.Data());
   m_clsTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clsTrkTimeU3->GetXaxis()->SetTitle("clusters time [ns]");
+  m_clsTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeU3);
   name = "SVDTRK_ClusterTimeV3";
   title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors", refFrame.Data());
   m_clsTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clsTrkTimeV3->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clsTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV3);
 
   name = "SVDTRK_ClusterTimeU456";
   title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
   m_clsTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clsTrkTimeU456->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clsTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeU456);
   name = "SVDTRK_ClusterTimeV456";
   title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors", refFrame.Data());
   m_clsTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clsTrkTimeV456->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clsTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clsTrkTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clsTrkTimeV456);
 
@@ -209,14 +209,14 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   name = "SVDTRK_ClusterTimeUvsEventT0";
   title = Form("SVD U-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
   m_clsTrkTimeUEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
-  m_clsTrkTimeUEvtT0->GetXaxis()->SetTitle("clusters time [ns]");
-  m_clsTrkTimeUEvtT0->GetYaxis()->SetTitle("EventT0 [ns]");
+  m_clsTrkTimeUEvtT0->GetXaxis()->SetTitle("clusters time (ns)");
+  m_clsTrkTimeUEvtT0->GetYaxis()->SetTitle("EventT0 (ns)");
   m_histoList->Add(m_clsTrkTimeUEvtT0);
   name = "SVDTRK_ClusterTimeVvsEventT0";
   title = Form("SVD V-Cluster-on-Track Time vs EventT0 %s for layer 3 sensors", refFrame.Data());
   m_clsTrkTimeVEvtT0 = new TH2F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax, 100, -50, 50);
-  m_clsTrkTimeVEvtT0->GetXaxis()->SetTitle("cluster time [ns]");
-  m_clsTrkTimeVEvtT0->GetYaxis()->SetTitle("EventT0 [n]");
+  m_clsTrkTimeVEvtT0->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clsTrkTimeVEvtT0->GetYaxis()->SetTitle("EventT0 (ns)");
   m_histoList->Add(m_clsTrkTimeVEvtT0);
 
   //----------------------------------------------------------------

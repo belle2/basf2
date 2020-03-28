@@ -288,13 +288,13 @@ void SVDDQMExpressRecoModule::defineHisto()
   TString Name = "SVDDQM_ClusterTimeUAll";
   TString Title = Form("SVD U-Cluster Time %s for all sensors", refFrame.Data());
   m_clusterTimeUAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeUAll);
   Name = "SVDDQM_ClusterTimeVAll";
   Title = Form("SVD V-Cluster Time %s for all sensors", refFrame.Data());
   m_clusterTimeVAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeVAll);
   //----------------------------------------------------------------
@@ -303,26 +303,26 @@ void SVDDQMExpressRecoModule::defineHisto()
   Name = "SVDDQM_ClusterTimeU3";
   Title = Form("SVD U-Cluster Time %s for layer 3 sensors", refFrame.Data());
   m_clusterTimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeU3->GetXaxis()->SetTitle("clusters time [ns]");
+  m_clusterTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU3);
   name = str(format("SVDDQM_ClusterTimeV3"));
   title = str(format("SVD V-Cluster Time for layer 3 sensors"));
   m_clusterTimeV3 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeV3->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clusterTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV3);
 
   name = str(format("SVDDQM_ClusterTimeU456"));
   Title = Form("SVD U-Cluster Time  %sfor layers 4,5,6 sensors", refFrame.Data());
   m_clusterTimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeU456->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clusterTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU456);
   name = str(format("SVDDQM_ClusterTimeV456"));
   Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
   m_clusterTimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeV456->GetXaxis()->SetTitle("cluster time [ns]");
+  m_clusterTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV456);
 
@@ -502,13 +502,13 @@ void SVDDQMExpressRecoModule::defineHisto()
     name = str(format("SVDDQM_%1%_ClusterTimeU") % sensorDescr);
     Title = Form("SVD Sensor %s U-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
     m_clusterTimeU[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeU[i]->GetXaxis()->SetTitle("time [ns]");
+    m_clusterTimeU[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeU[i]);
     name = str(format("SVDDQM_%1%_ClusterTimeV") % sensorDescr);
     Title = Form("SVD Sensor %s V-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
     m_clusterTimeV[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeV[i]->GetXaxis()->SetTitle("time [ns]");
+    m_clusterTimeV[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeV[i]);
   }

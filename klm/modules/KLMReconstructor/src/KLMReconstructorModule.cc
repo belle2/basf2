@@ -14,7 +14,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/Module.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/Const.h>

@@ -11,17 +11,16 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -83,11 +82,9 @@ namespace Belle2 {
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.
      * @param[in] hslb              HSLB number.
-     * @param[in] lane              Lane.
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
     void unpackEKLMDigit(const int* rawData, int copper, int hslb,
-                         EKLMDataConcentratorLane* lane,
                          KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
@@ -131,6 +128,15 @@ namespace Belle2 {
     /** Record wrong hits (for debugging). */
     bool m_WriteWrongHits;
 
+    /** Debug electronics map (record DAQ channel instead of strip). */
+    bool m_DebugElectronicsMap;
+
+    /** Record DAQ channel for BKLM scintillators. */
+    bool m_DAQChannelBKLMScintillators;
+
+    /** Record DAQ channel for specific module. */
+    int m_DAQChannelModule;
+
     /* EKLM parameters. */
 
     /**
@@ -147,9 +153,6 @@ namespace Belle2 {
 
     /* BKLM parameters. */
 
-    /** Debug BKLM scintillators. */
-    bool m_DebugBKLMScintillators;
-
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;
 
@@ -160,6 +163,9 @@ namespace Belle2 {
     double m_scintThreshold = 140;
 
     /* Common database objects. */
+
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;
@@ -172,9 +178,6 @@ namespace Belle2 {
 
     /* EKLM database objects. */
 
-    /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
-
     /** Channels. */
     DBObjPtr<EKLMChannels> m_eklmChannels;
 
@@ -183,22 +186,22 @@ namespace Belle2 {
 
     /* BKLM database objects. */
 
-    /** Electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
-
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /** BKLM digits. */
     StoreArray<BKLMDigit> m_bklmDigits;
 
+    /** Out-of-range digits. */
+    StoreArray<BKLMDigit> m_bklmDigitsOutOfRange;
+
     /** Raw digits. */
     StoreArray<KLMDigitRaw> m_klmDigitRaws;
 
-    /** Out-of-range digits. */
-    StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
-
     /* Other common variables. */
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Trigger ctime of the previous event. */
     unsigned int m_triggerCTimeOfPreviousEvent;
@@ -206,7 +209,7 @@ namespace Belle2 {
     /* Other EKLM variables. */
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
 
     /* Other BKLM variables. */
 

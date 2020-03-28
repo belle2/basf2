@@ -148,7 +148,7 @@ namespace Belle2 {
 
     std::vector<unsigned int> toRemove;
 
-    for (unsigned i = 0; i < plist->getListSize(); i++) {
+    for (unsigned i = 0; i < plist->getListSize(); ++i) {
 
       Particle* particle =  plist->getParticle(i);
       if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
@@ -516,7 +516,7 @@ namespace Belle2 {
     //To creat the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
 
-    TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
+    TMatrixDSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
     //print some stuff if wanted
     if (m_verbose) {
@@ -1458,7 +1458,7 @@ namespace Belle2 {
     return oss.str();
   }
 
-  std::string TagVertexModule::printMatrix(TMatrixFSym const& mat)
+  std::string TagVertexModule::printMatrix(TMatrixDSym const& mat)
   {
     std::ostringstream oss;
     int w(14);

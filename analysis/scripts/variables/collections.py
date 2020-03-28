@@ -213,8 +213,9 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
-    'MCDeltaTapprox',
+    'mcDeltaT',
+    'mcDeltaTapprox',
+    'mcDeltaL',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',

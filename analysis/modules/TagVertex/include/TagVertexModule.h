@@ -219,7 +219,7 @@ namespace Belle2 {
     /**
      * Print a TMatrixFSym (useful for debugging)
      */
-    std::string printMatrix(TMatrixFSym const& mat);
+    std::string printMatrix(TMatrixDSym const& mat);
   };
 
   /**

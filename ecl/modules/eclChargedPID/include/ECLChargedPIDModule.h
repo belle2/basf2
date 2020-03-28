@@ -27,7 +27,6 @@
 
 //ECL
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPidPDFs.h>
 
@@ -36,9 +35,11 @@ namespace Belle2 {
 
   /**
    * The module implements charged particle identification using ECL-related observables.
-   * The baseline method include several shower shape variables along with cluster energy and E/p.
    * For each Track matched with a suitable ECLShower, likelihoods for each particle
-   * hypothesis are obtained from pdfs stored in a conditions database payload, and get stored in an ECLPidLikelihood object.
+   * hypothesis are obtained from pdfs stored in a conditions database payload, and then get stored in an ECLPidLikelihood object.
+   * The dimensionality of the likelihood depends on how many variables are stored in the payload.
+   * The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantitites (e.g. shower shape variables, w/ proper decorrelation).
+   *
    */
   class ECLChargedPIDModule : public Module {
 

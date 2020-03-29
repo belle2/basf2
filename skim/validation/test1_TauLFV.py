@@ -17,25 +17,18 @@ import modularAnalysis as ma
 import skimExpertFunctions as expert
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
-from stdPi0s import stdPi0s, loadStdSkimPi0
-from stdV0s import stdKshorts
-from skim.standardlists.lightmesons import loadStdLightMesons
 
 taulfvskim = b2.Path()
 
 fileList = ['../TauLFV.dst.root']
 ma.inputMdstList('default', fileList, path=taulfvskim)
 
-stdPi('loose', path=taulfvskim)
-stdK('loose', path=taulfvskim)
-stdPr('loose', path=taulfvskim)
-stdE('loose', path=taulfvskim)
-stdMu('loose', path=taulfvskim)
-stdPhotons('loose', path=taulfvskim)
-stdPi0s('loose', path=taulfvskim)
-loadStdSkimPi0(path=taulfvskim)
-stdKshorts(path=taulfvskim)
-loadStdLightMesons(path=taulfvskim)
+stdE('all', path=taulfvskim)
+stdMu('all', path=taulfvskim)
+stdPi('all', path=taulfvskim)
+stdK('all', path=taulfvskim)
+stdPr('all', path=taulfvskim)
+stdPhotons('all', path=taulfvskim)
 
 # TauLFV skim
 from skim.taupair import TauLFVList

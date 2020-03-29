@@ -1141,7 +1141,7 @@ void AlignDQMModule::event()
         bool isNotFirstHit = false;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : theRC[0]->getRecoHitInformations(true)) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;

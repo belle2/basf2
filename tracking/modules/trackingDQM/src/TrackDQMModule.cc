@@ -556,7 +556,7 @@ void TrackDQMModule::event()
         bool isNotFirstHit = false;
 
         int IsSVDU = -1;
-        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : recoTrack[0]->getRecoHitInformations(true)) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(20, "No genfit::pxd recoHitInfo is missing.");
             continue;

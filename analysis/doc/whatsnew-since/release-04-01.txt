@@ -63,6 +63,7 @@ Variables
  * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
  * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
+ * Renamed ``MCDeltaT` to :b2:var:`mcDeltaT`
  * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
  * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
  * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level
@@ -96,6 +97,12 @@ Variables
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`
+
+ * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
+ * vertexes in the in the Y(4S) boost directions
+ * Added :b2:var:`mcDeltaTapprox` to get :b2:var`mcDeltaT` in the kinematic
+ * approximation, i.e. based on :b2:var:`mcDeltaL` variable
+
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
@@ -170,3 +177,4 @@ Utilities and core objects
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+ * Added a ``RotationTools.h`` file with few functions related to rotation

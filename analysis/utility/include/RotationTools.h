@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018  Belle II Collaboration                              *
+ * Copyright(C) 2020  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Radek Zlebcik
@@ -64,7 +64,7 @@ namespace Belle2 {
 
 
     /**
-     * Convert squared matrix to symmetric matric
+     * Convert squared matrix to symmetric matrix
      * as S = (A + At) / 2
      * the "asymmetric component" is not calculated
      * @param[in] m Original matrix

@@ -99,7 +99,7 @@ Variables
    :b2:var:`TagTrackTrueDistanceToTagV`
 
  * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
-   vertexes in the in the Y(4S) boost directions
+   vertexes in the Y(4S) boost direction
  * Added :b2:var:`mcDeltaTapprox` to get :b2:var`mcDeltaT` in the kinematic
    approximation, i.e. based on :b2:var:`mcDeltaL` variable
 

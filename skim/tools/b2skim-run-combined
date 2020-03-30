@@ -14,8 +14,8 @@ from skimExpertFunctions import CombinedSkim, get_test_file
 def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
 
-    parser.add_argument("skims", nargs="+", default=[], choices=["LeptonicUntagged"])
-    parser.add_argument("-n", "--max-input-events", default=0)
+    parser.add_argument("skims", nargs="+", default=[], choices=["LeptonicUntagged", "SinglePhotonDark"])
+    parser.add_argument("-n", "--max-input-events", type=int, default=0)
     parser.add_argument(
         "-i",
         "--input-file-list",
@@ -32,6 +32,8 @@ def get_skim_function(SkimName):
     # TODO: Write generalised method of finding modules, using registry.py
     if SkimName == "LeptonicUntagged":
         SkimModule = import_module("skim.leptonic")
+    elif SkimName == "SinglePhotonDark":
+        SkimModule = import_module("skim.dark")
     else:
         raise NotImplementedError
     return getattr(SkimModule, SkimName)

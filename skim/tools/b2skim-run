@@ -15,7 +15,7 @@ def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument("skim", choices=["LeptonicUntagged", "SinglePhotonDark"])
-    parser.add_argument("-n", "--max-input-events", default=0)
+    parser.add_argument("-n", "--max-input-events", type=int, default=0)
     parser.add_argument(
         "-i",
         "--input-file-list",

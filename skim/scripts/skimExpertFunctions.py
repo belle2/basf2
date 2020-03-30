@@ -258,6 +258,9 @@ class BaseSkim:
         skim = MyDefinedSkim()
         skim(path)
         path.process()
+
+    You may also want to set the __author__ attribute, so users know who to contact
+    about a particular skim.
     """
 
     NoisyModules = []
@@ -378,8 +381,10 @@ class BaseSkim:
     def load_particle_lists(self, path):
         """Load the required particle lists for a skim, using the specified modules and
         functions in the attribute `RequiredParticleLists`.
-        """
 
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
         for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
             module = __import__(ModuleName)
 
@@ -396,7 +401,13 @@ class BaseSkim:
                     ListLoader(path=path)
 
     def output_udst(self, path):
-        """"""
+        """Write the skim particle lists to an output uDST and print a summary of the
+        skim list statistics.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
             b2.B2ERROR(
@@ -472,7 +483,11 @@ class CombinedSkim(BaseSkim):
             skim.build_lists(path)
 
     def output_udst(self, path):
-        """Write uDST output files for each skim."""
+        """Write uDST output files for each skim.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
         for skim in self.Skims:
             skim.output_udst(path)
 

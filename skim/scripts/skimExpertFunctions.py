@@ -274,7 +274,8 @@ class BaseSkim:
                 defaults to eight-number skim code.
         """
         self.name = self.__class__.__name__
-        self.OutputFileName = OutputFileName or encodeSkimName(self.name)
+        self.code = encodeSkimName(self.name)
+        self.OutputFileName = OutputFileName or self.code
         self.SkimLists = []
 
     def setup(self, path):
@@ -304,9 +305,22 @@ class BaseSkim:
         """
         b2.B2FATAL(f"No `build_lists` method defined for skim {self}!")
 
+    def validation(self, path):
+        """Create validation histograms for the skim.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        # TODO: Figure out how this will work
+        pass
+
     # Everything beyond this point can remain as-is when defining a skim
     def __call__(self, path):
-        """Produce the skim particle lists and write uDST file."""
+        """Produce the skim particle lists and write uDST file.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
         self.set_skim_logging(path)
         self.load_particle_lists(path)
         self.setup(path)
@@ -445,7 +459,7 @@ class CombinedSkim(BaseSkim):
             skim._validate_required_particle_lists()
 
         self.RequiredParticleLists = self._merge_nested_dicts(
-            skim.RequiredParticleLists for skim in skims
+            [skim.RequiredParticleLists for skim in skims]
         )
 
     def __str__(self):
@@ -497,7 +511,7 @@ class CombinedSkim(BaseSkim):
         Skims cannot be relied on to define their particle list names in advance, so
         this function can only be run after the build_lists() functions are run.
         """
-        ParticleListLists = [skim.lists for skim in self.IndividualSkims.values()]
+        ParticleListLists = [skim.SkimLists for skim in self.Skims]
         ParticleLists = [l for L in ParticleListLists for l in L]
         DuplicatedParticleLists = {
             ParticleList
@@ -510,7 +524,7 @@ class CombinedSkim(BaseSkim):
                 ", ".join(DuplicatedParticleLists)
             )
 
-    def _merge_nested_dicts(self, *dicts):
+    def _merge_nested_dicts(self, dicts):
         """Merge any number of dicts recursively. Utility function for merging
         RequiredParticleLists values from differnt skims."""
         MergedDict = dicts[0]

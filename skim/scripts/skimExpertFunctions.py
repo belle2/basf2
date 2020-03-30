@@ -223,48 +223,63 @@ class BaseSkim:
 
     1. Define an object which inherits from `BaseSkim`.
 
-    2. List all required particle lists in the attribute `RequiredParticleLists`. If we
-       require the following lists to be loaded,
+    2. Specify all required particle lists in the attribute `RequiredParticleLists`. See
+       documentation of this attribute for instructions on how to do this for your skim.
 
-           >>> from stdCharged import stdK, stdPi
-           >>> stdK("all", path=path)
-           >>> stdK("loose", path=path)
-           >>> stdPi("all", path=path)
-
-       then `BaseSkim` will run run this code for us if `RequiredParticleLists` has the
-       following value:
-
-           {"stdCharged": {"stdK": ["all", "loose"], "stdPi": ["all"]}}
-
-    3. If any further setup is required, then overwrite the `setup` method. This is not
-       a mandatory step.
+    3. If any further setup is required, then overwrite the `additional_setup` method.
+       This is not a mandatory step.
 
     4. Define all cuts by overwriting `build_lists`. This step is mandatory. Before the
-       end of the `build_lists` method, the attribute `self.SkimLists` must be
+       end of the `build_lists` method, the attribute `SkimLists` must be set at
+       the end of this method.
 
     5. If any modules are producing too much noise, then overwrite the attribute
        `NoisyModules` as a list of those modules.
 
+    6. Define some validation histograms by overwriting `validation_histograms`.
+
     Calling an instance of a skim class will run the particle list loaders, setup
     function, list builder function, and uDST output function. So a minimal skim
     steering file might consist of the following:
+
+    .. code-block:: python
 
         import basf2 as b2
         import modularAnalysis as ma
         from skim.foo import MyDefinedSkim
 
         path = b2.Path()
-        ma.inputMdstList("default", InputFiles, path=path)
+        ma.inputMdstList("default", [], path=path)
         skim = MyDefinedSkim()
         skim(path)
         path.process()
 
-    You may also want to set the __author__ attribute, so users know who to contact
+    You may also want to set the ``__author__`` attribute, so users know who to contact
     about a particular skim.
     """
 
     NoisyModules = []
+    """A list of modules which to be silenced for this skim. This may be necessary to
+    set in order to keep log file sizes small."""
+
     RequiredParticleLists = {"": {"": [""]}}
+    """Data structure specifying the standard particle lists to be loaded in before
+    constructing the skim list. Must have the form ``dict(str -> dict(str ->
+    list(str)))``.
+
+    If we require the following lists to be loaded,
+
+           >>> from stdCharged import stdK, stdPi
+           >>> stdK("all", path=path)
+           >>> stdK("loose", path=path)
+           >>> stdPi("all", path=path)
+
+    then `BaseSkim` will run run this code for us if we set `RequiredParticleLists` to
+    the following value:
+
+    .. code-block:: python
+
+        {"stdCharged": {"stdK": ["all", "loose"], "stdPi": ["all"]}}"""
 
     def __init__(self, OutputFileName=None):
         """Initialise the BaseSkim class.
@@ -278,15 +293,18 @@ class BaseSkim:
         self.OutputFileName = OutputFileName or self.code
         self.SkimLists = []
 
-    def setup(self, path):
+    def additional_setup(self, path):
         """Perform any setup steps necessary before running the skim. This may include:
-            * applying event-level cuts using `ifEventPasses`,
-            * adding the `MCMatcherParticles` module to the path,
-            * running the FEI.
+
+                * applying event-level cuts using `ifEventPasses`,
+
+                * adding the `MCMatcherParticles` module to the path,
+
+                * running the FEI.
 
         Warning:
             Particle lists should *not* be loaded in here. This should be done by
-            setting the RequiredParticleLists attribute of an individual skim. This is
+            setting the `RequiredParticleLists` attribute of an individual skim. This is
             crucial for avoiding loading lists twice when combining skims for
             production.
 
@@ -298,14 +316,14 @@ class BaseSkim:
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
         the main skim cuts should be applied. At the end of this method, the attribute
-        `self.SkimLists` must be set so it can be used by `output_udst()`.
+        `SkimLists` must be set so it can be used by `output_udst`.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
         b2.B2FATAL(f"No `build_lists` method defined for skim {self}!")
 
-    def validation(self, path):
+    def validation_histograms(self, path):
         """Create validation histograms for the skim.
 
         Parameters:
@@ -323,7 +341,7 @@ class BaseSkim:
         """
         self.set_skim_logging(path)
         self.load_particle_lists(path)
-        self.setup(path)
+        self.additional_setup(path)
         self.build_lists(path)
         self.output_udst(path)
 
@@ -345,6 +363,8 @@ class BaseSkim:
 
         We can achieve this using the BaseSkim class using the following value for
         RequiredParticleLists:
+
+        .. code-block:: python
 
             RequiredParticleLists = {
                 "stdCharged": {
@@ -443,6 +463,7 @@ class CombinedSkim(BaseSkim):
     >>> path = b2.Path()
     >>> skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
     >>> skims(path)  # Create all skim lists and save to uDST
+    >>> path.process()
     """
 
     def __init__(self, *skims):
@@ -473,19 +494,19 @@ class CombinedSkim(BaseSkim):
     def __call__(self, path):
         self.set_skim_logging(path)
         self.load_particle_lists(path)
-        self.setup(path)
+        self.additional_setup(path)
         self.build_lists(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
 
-    def setup(self, path):
+    def additional_setup(self, path):
         """Run all of the setup functions for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self.Skims:
-            skim.setup(path)
+            skim.additional_setup(path)
 
     def build_lists(self, path):
         """Run all the build_lists functions for each skim.

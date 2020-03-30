@@ -36,6 +36,7 @@
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/RotationTools.h>
 
 // vertex fitting
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
@@ -55,8 +56,10 @@ using namespace std;
 
 namespace Belle2 {
 
-
-
+  // import tools from RotationTools.h
+  using RotationTools::getRotationMatrixYZ;
+  using RotationTools::getRotationMatrixXY;
+  using RotationTools::toSymMatrix;
 
   //-----------------------------------------------------------------
   //                 Register the Module
@@ -326,44 +329,6 @@ namespace Belle2 {
 
     return ok;
 
-  }
-
-
-  static TMatrixD toMatrix(TRotation r)
-  {
-    TMatrixD rM(3, 3);
-    for (int i = 0; i < 3; ++i)
-      for (int j = 0; j < 3; ++j)
-        rM(i, j) = r(i, j);
-    return rM;
-  }
-
-  //  Rz * Ry
-  static TMatrixD getRotationMatrixYZ(double angleY, double angleZ)
-  {
-    TRotation r;
-    r.RotateY(angleY);
-    r.RotateZ(angleZ);
-    return toMatrix(r);
-  }
-
-  //  Ry * Rx
-  static TMatrixD getRotationMatrixXY(double angleX, double angleY)
-  {
-    TRotation r;
-    r.RotateX(angleX);
-    r.RotateY(angleY);
-    return toMatrix(r);
-  }
-
-  static TMatrixDSym toSymMatrix(const TMatrixD& m)
-  {
-    TMatrixDSym mS(m.GetNrows());
-    for (int i = 0; i < m.GetNrows(); ++i)
-      for (int j = 0; j < m.GetNcols(); ++j) {
-        mS(i, j) = (m(i, j) + m(j, i)) / 2;
-      }
-    return mS;
   }
 
 

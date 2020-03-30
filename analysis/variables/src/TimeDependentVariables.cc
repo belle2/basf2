@@ -22,6 +22,7 @@
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/RotationTools.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -37,6 +38,9 @@ using namespace std;
 
 namespace Belle2 {
   namespace Variable {
+
+    // from RotationTools.h
+    using RotationTools::getRotationMatrixXY;
 
     static const TVector3 vecNaN(std::numeric_limits<float>::quiet_NaN(),
                                  std::numeric_limits<float>::quiet_NaN(),
@@ -299,26 +303,6 @@ namespace Belle2 {
       if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);
-    }
-
-
-    //TODO : unify with implementation in analysis/modules/TagVertex/src/TagVertexModule.cc
-    static TMatrixD toMatrix(TRotation r)
-    {
-      TMatrixD rM(3, 3);
-      for (int i = 0; i < 3; ++i)
-        for (int j = 0; j < 3; ++j)
-          rM(i, j) = r(i, j);
-      return rM;
-    }
-
-    //  Ry * Rx
-    static TMatrixD getRotationMatrixXY(double angleX, double angleY)
-    {
-      TRotation r;
-      r.RotateX(angleX);
-      r.RotateY(angleY);
-      return toMatrix(r);
     }
 
 

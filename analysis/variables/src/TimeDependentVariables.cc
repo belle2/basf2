@@ -744,7 +744,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,
-                      R"DOC(Generated proper decay time difference (in z-difference approximation):math:`\Delta t` in ps)DOC");
+                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaL", particleMCDeltaL,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");

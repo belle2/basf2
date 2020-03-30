@@ -496,9 +496,10 @@ namespace Belle2 {
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return realNaN;
 
-      return  DistanceTools::trackToVtxDist(tagParticle->getTrackFitResult() -> getPosition(),
-                                            tagParticle->getMomentum(),
-                                            vert->getConstraintCenter());
+      return  DistanceTools::trackToVtxDist(tagParticle -> getTrackFitResult() -> getPosition(),
+                                            tagParticle -> getMomentum(),
+                                            vert -> getConstraintCenter());
+
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
@@ -517,11 +518,11 @@ namespace Belle2 {
 
       TMatrixDSym trackPosCovMat(tagParticle->getVertexErrorMatrix());
 
-      return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult() -> getPosition(),
-                                              tagParticle->getMomentum(),
-                                              vert->getConstraintCenter(),
-                                              trackPosCovMat,
-                                              vert->getConstraintCov());
+      return  DistanceTools::trackToVtxDistErr(tagParticle -> getTrackFitResult() -> getPosition(),
+                                               tagParticle -> getMomentum(),
+                                               vert -> getConstraintCenter(),
+                                               trackPosCovMat,
+                                               vert -> getConstraintCov());
 
 
     }
@@ -563,12 +564,14 @@ namespace Belle2 {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
 
+      if (!vert) return realNaN;
+
       const Particle* particle(vert->getVtxFitParticle(trackIndexInt));
       if (!particle) return realNaN;
 
-      return DistanceTools::trackToVtxDist(particle -> getTrackFitResult() -> getPosition(),
-                                           particle -> getMomentum(),
-                                           vert -> getTagVertex());
+      return  DistanceTools::trackToVtxDist(particle -> getTrackFitResult() -> getPosition(),
+                                            particle -> getMomentum(),
+                                            vert -> getTagVertex());
     }
 
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
@@ -592,9 +595,9 @@ namespace Belle2 {
 
       TMatrixDSym emptyMat(3);
 
-      return  DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
-                                               tagParticle->getMomentum(),
-                                               vert->getTagVertex(),
+      return  DistanceTools::trackToVtxDistErr(tagParticle-> getTrackFitResult() -> getPosition(),
+                                               tagParticle -> getMomentum(),
+                                               vert -> getTagVertex(),
                                                trackPosCovMat,
                                                emptyMat);
 

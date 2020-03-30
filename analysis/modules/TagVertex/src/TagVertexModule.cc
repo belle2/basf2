@@ -751,14 +751,14 @@ namespace Belle2 {
       if (particle1 && !std::isinf(mom1.Mag2()) && !std::isnan(mom1.Mag2())) {
 
         bool isKsDau = false;
-        for (unsigned int j(0); j < tagParticles.size() && !isKsDau; ++j) {
+        for (unsigned j = 0; j < tagParticles.size() && !isKsDau; ++j) {
           if (i != j) {
             particle2 = tagParticles.at(j);
 
             if (particle2) mom2 = particle2->get4Vector();
             if (particle2 && !std::isinf(mom2.Mag2()) && !std::isnan(mom2.Mag2())) {
               mass = (mom1 + mom2).M();
-              if (TMath::Abs(mass - mks) < massWindowWidth) isKsDau = true;
+              if (abs(mass - mks) < massWindowWidth) isKsDau = true;
             }
           }
         }

@@ -18,6 +18,7 @@
 // 3.03 : 2019/10/07 : New Lowmulti (12 & 13) bit
 // 4.00 : 2019/10/11 : Summary totally change
 // 4.01 : 2020/03/13 : Bug fixed. (Bug : SumStore always save only one TRG info. in latest window)
+// 4.02 : 2020/03/30 : Bug fixed. (Bug : vector sorting does not support '>=' => '>')
 //---------------------------------------------------------------
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
@@ -30,7 +31,7 @@ REG_MODULE(TRGECLUnpacker);
 
 string TRGECLUnpackerModule::version() const
 {
-  return string("4.01");
+  return string("4.02");
 }
 
 TRGECLUnpackerModule::TRGECLUnpackerModule()
@@ -559,14 +560,14 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   if (evt_v_size != 0) {
     // Sort window : 3 => 4 => 2 => 5 => 1 => 6 => 7
     sort(evt_2d_vector.begin(), evt_2d_vector.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] <= aa2[0];});
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
   }
 
   if (tot_ntc != 0 && flag_checksum == 0 && nnn > 7) {
     if (evt_v_size == 0) {
       // Find most energetic TC timing
       sort(tc_info.begin(), tc_info.end(),
-      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] >= aa2[2];});
+      [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[2] > aa2[2];});
       evt_revo         = win3_revo;
       evt_win          = tc_info[0][3];
       evt_timing       = tc_info[0][1];
@@ -1280,7 +1281,7 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   if (evt_v_size != 0) {
     // Sort window : 3 => 4 => 2 => 5 => 1 => 6 => 7
     sort(evt_2d_vector.begin(), evt_2d_vector.end(),
-    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] <= aa2[0];});
+    [](const vector<int>& aa1, const vector<int>& aa2) {return aa1[0] < aa2[0];});
   }
 
   if (tot_ntc != 0 && flag_checksum == 0 && nnn > 7) {

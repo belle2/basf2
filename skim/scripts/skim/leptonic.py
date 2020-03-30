@@ -88,13 +88,13 @@ class LeptonicUntagged(BaseSkim):
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
-    lists = ["B-:L0", "B-:L1"]
-
-    def setup(self, path):
-        from stdCharged import stdE, stdMu
-
-        stdE("all", path=path)
-        stdMu("all", path=path)
+    RequiredParticleLists = {
+        "stdCharged":
+        {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+        }
+    }
 
     def build_lists(self, path):
         ma.cutAndCopyList(
@@ -116,4 +116,4 @@ class LeptonicUntagged(BaseSkim):
         ma.applyCuts("B-:L0", "nTracks>=3", path=path)
         ma.applyCuts("B-:L1", "nTracks>=3", path=path)
         lepList = ["B-:L0", "B-:L1"]
-        self.lists = lepList
+        self.SkimLists = lepList

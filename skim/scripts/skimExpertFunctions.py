@@ -250,9 +250,11 @@ class BaseSkim:
     steering file might consist of the following:
 
         import basf2 as b2
+        import modularAnalysis as ma
         from skim.foo import MyDefinedSkim
 
         path = b2.Path()
+        ma.inputMdstList("default", InputFiles, path=path)
         skim = MyDefinedSkim()
         skim(path)
         path.process()

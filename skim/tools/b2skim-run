@@ -28,12 +28,13 @@ def get_argument_parser():
     return parser
 
 
-def import_skim_module(SkimName):
-    # TODO: Write generalised method of finding modules
+def get_skim_function(SkimName):
+    # TODO: Write generalised method of finding modules, using registry.py
     if SkimName == "LeptonicUntagged":
-        return import_module("skim.leptonic")
+        SkimModule = import_module("skim.leptonic")
     else:
         raise NotImplementedError
+    return getattr(SkimModule, SkimName)
 
 
 def main():
@@ -43,15 +44,12 @@ def main():
     path = b2.Path()
     ma.inputMdstList("default", args.InputFileList, path=path)
 
-    SkimModule = import_skim_module(args.skim)
-    Skim = getattr(SkimModule, args.skim)()
-
-    Skim.set_skim_logging(path)
-    Skim.setup(path)
-    Skim.build_lists(path)
-    Skim.output_udst(path)
+    SkimFunction = get_skim_function(args.skim)
+    Skim = SkimFunction()
+    Skim(path)
 
     b2.process(path, max_event=args.max_input_events)
+    print(b2.statistics())
 
 
 if __name__ == "__main__":

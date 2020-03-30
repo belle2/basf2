@@ -147,6 +147,8 @@ void SoftwareTriggerHLTDQMModule::event()
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
         // check if the cutResult is in the list, be graceful when not available
+        // Create results object instead of calling .find() on a temporary object. This will cause undefined behaviour
+        // when checking again the .end() pointer, when the .end() pointer is also created from a temporary object.
         const auto results = m_triggerResult->getResults();
         auto const cutEntry = results.find(fullCutIdentifier);
 

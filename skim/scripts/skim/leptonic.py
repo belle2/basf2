@@ -88,6 +88,8 @@ class LeptonicUntagged(BaseSkim):
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
+    __authors__ = ["Phillip Urquijo"]
+
     RequiredParticleLists = {
         "stdCharged":
         {

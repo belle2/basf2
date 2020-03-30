@@ -344,7 +344,7 @@ class SinglePhotonDark(BaseSkim):
     Skim list contains single photon candidates for the dark photon to invisible final
     state analysis.
     """
-    __author__ = "Sam Cunliffe"
+    __authors__ = ["Sam Cunliffe"]
 
     RequiredParticleLists = {
         "stdCharged": {

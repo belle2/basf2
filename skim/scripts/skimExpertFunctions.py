@@ -8,6 +8,7 @@ Expert functions
 Some helper functions to do common tasks relating to skims.
 Like testing, and for skim name encoding(decoding).
 """
+from abc import ABC, abstractmethod
 import subprocess
 import json
 
@@ -215,28 +216,40 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
-class BaseSkim:
+class BaseSkim(ABC):
     """Base class for skims. Initialises a skim name, and creates template functions
     required for each skim.
 
     To write a skim using this class:
 
-    1. Define an object which inherits from `BaseSkim`.
+    1. Define a class which inherits from `BaseSkim` and give it the name of your skim.
+       For example, for a skim ``DarkSinglePhoton``,
+
+       .. code-block:: python
+
+           class DarkSinglePhoton(BaseSkim):
+               # docstring here describing your skim, and explaining cuts.
+
+    2. Set the ``__authors__`` property to a list of skim authors, so users know who to
+       contact about your skim. `BaseSkim` requires you to set this attribute in each
+       subclass.
 
     2. Specify all required particle lists in the attribute `RequiredParticleLists`. See
        documentation of this attribute for instructions on how to do this for your skim.
+       This step is mandatory.
 
     3. If any further setup is required, then overwrite the `additional_setup` method.
-       This is not a mandatory step.
+       This step is not mandatory.
 
-    4. Define all cuts by overwriting `build_lists`. This step is mandatory. Before the
-       end of the `build_lists` method, the attribute `SkimLists` must be set at
-       the end of this method.
+    4. Define all cuts by overwriting `build_lists`. Before the end of the `build_lists`
+       method, the attribute `SkimLists` must be set at the end of this method. This
+       step is mandatory.
 
     5. If any modules are producing too much noise, then overwrite the attribute
-       `NoisyModules` as a list of those modules.
+       `NoisyModules` as a list of those modules. This step is not mandatory.
 
-    6. Define some validation histograms by overwriting `validation_histograms`.
+    6. Define validation histograms for your skim by overwriting
+       `validation_histograms`.
 
     Calling an instance of a skim class will run the particle list loaders, setup
     function, list builder function, and uDST output function. So a minimal skim
@@ -253,44 +266,49 @@ class BaseSkim:
         skim = MyDefinedSkim()
         skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
         path.process()
-
-    You may also want to set the ``__author__`` attribute, so users know who to contact
-    about a particular skim.
     """
 
     NoisyModules = []
     """A list of modules which to be silenced for this skim. This may be necessary to
     set in order to keep log file sizes small."""
 
-    RequiredParticleLists = {"": {"": [""]}}
-    """Data structure specifying the standard particle lists to be loaded in before
-    constructing the skim list. Must have the form ``dict(str -> dict(str ->
-    list(str)))``.
+    # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
+    @property
+    @abstractmethod
+    def RequiredParticleLists(self):
+        """Data structure specifying the standard particle lists to be loaded in before
+        constructing the skim list. Must have the form ``dict(str -> dict(str ->
+        list(str)))``.
 
-    If we require the following lists to be loaded,
+        If we require the following lists to be loaded,
 
-           >>> from stdCharged import stdK, stdPi
-           >>> from skim.standardlists.lightmesons import loadStdLightMesons
-           >>> stdK("all", path=path)
-           >>> stdK("loose", path=path)
-           >>> stdPi("all", path=path)
-           >>> loadStdLightMesons(path=path)
+               >>> from stdCharged import stdK, stdPi
+               >>> from skim.standardlists.lightmesons import loadStdLightMesons
+               >>> stdK("all", path=path)
+               >>> stdK("loose", path=path)
+               >>> stdPi("all", path=path)
+               >>> loadStdLightMesons(path=path)
 
-    then `BaseSkim` will run run this code for us if we set `RequiredParticleLists` to
-    the following value:
+        then `BaseSkim` will run run this code for us if we set `RequiredParticleLists` to
+        the following value:
 
-    .. code-block:: python
+        .. code-block:: python
 
-        {
-            "stdCharged": {
-                "stdK": ["all", "loose"],
-                "stdPi": ["all"],
-            },
-            "skim.standardlists.lightmesons": {
-                  "loadStdLightMesons": [],
-            },
-        }
-    """
+            {
+                "stdCharged": {
+                    "stdK": ["all", "loose"],
+                    "stdPi": ["all"],
+                },
+                "skim.standardlists.lightmesons": {
+                      "loadStdLightMesons": [],
+                },
+            }
+        """
+
+    @property
+    @abstractmethod
+    def __authors__(self):
+        pass
 
     def __init__(self, OutputFileName=None):
         """Initialise the BaseSkim class.
@@ -324,6 +342,8 @@ class BaseSkim:
         """
         pass
 
+    # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
+    @abstractmethod
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
         the main skim cuts should be applied. At the end of this method, the attribute
@@ -341,7 +361,7 @@ class BaseSkim:
             path (basf2.Path): Skim path to be processed.
         """
         # TODO: Figure out how this will work
-        pass
+        print(f"No validation histograms defined for {self} skim.")
 
     # Everything beyond this point can remain as-is when defining a skim
     def __call__(self, path):
@@ -451,20 +471,24 @@ class CombinedSkim(BaseSkim):
     """Class for creating combined skims which can be run using similar-looking methods
     to `BaseSkim` objects.
 
-    Skims may be combined in this class in the following way:
+    A steering file which combines skims can be as simple as the following:
 
-    >>> import basf2 as b2
-    >>> from skim.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
-    >>> path = b2.Path()
-    >>> skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
-    >>> # __call__ method loads standard lists, creates skim lists, and saves to uDST
-    >>> skims(path)
-    >>> path.process()
+    .. code-block:: python
+
+        import basf2 as b2
+        import modularAnalysis as ma
+        from skim.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
+
+        path = b2.Path()
+        ma.inputMdstList("default", [], path=path)
+        skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
+        skims(path)  # load standard lists, create skim lists, and save to uDST
+        path.process()
 
     When skims are combined using this class, the `NoisyModules` lists of each skim are
-    combined, and the `RequiredParticleLists` objects are merged, removing duplicates.
-    This way, `load_particle_lists` will load all the required lists of each skim,
-    without accidentally loading a list twice.
+    combined and all silenced, and the `RequiredParticleLists` objects are
+    merged, removing duplicates. This way, `load_particle_lists` will load all the
+    required lists of each skim, without accidentally loading a list twice.
 
     The heavy-lifting functions `additional_setup`, `build_lists` and `output_udst` are
     modified to loop over the corresponding functions of each invididual skim. Calling
@@ -472,6 +496,14 @@ class CombinedSkim(BaseSkim):
     then run all the setup steps, then the list building functions, and then all the
     output steps.
     """
+
+    __authors__ = ["Phil Grace"]
+
+    RequiredParticleLists = None
+    """`BaseSkim.RequiredParticleLists` attribute initialised to `None` to get around
+    abstract property restriction. Overwritten as merged
+    `BaseSkim.RequiredParticleLists` object during initialisation of `CombinedSkim`
+    instance."""
 
     def __init__(self, *skims):
         # Check that we were passed only BaseSkim objects

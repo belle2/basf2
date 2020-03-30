@@ -14,7 +14,6 @@
 import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
-from modularAnalysis import printDataStore
 from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
 from modularAnalysis import variablesToNtuple

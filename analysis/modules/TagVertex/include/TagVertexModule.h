@@ -39,7 +39,7 @@
 namespace Belle2 {
 
   class Particle;
-  struct TrackAndWeight;
+  struct ParticleAndWeight;
 
   /**
    * Tag side Vertex Fitter module for modular analysis
@@ -86,17 +86,20 @@ namespace Belle2 {
     std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
     //std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     std::string m_constraintType;   /**< Choose constraint: noConstraint, IP, tube, boost, (breco) */
-    std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD, singleTrack, singleTrack_PXD */
+    std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD */
     int m_reqPXDHits;                /**< N of PXD hits for a track to be used */
     std::string m_roeMaskName;      /**< ROE particles from this mask will be used for vertex fitting */
     double m_Bfield;              /**< magnetic field from data base */
-    std::vector<const Track*> m_tagTracks;  /**< tracks of the rest of the event */
-    std::vector<const TrackFitResult*> m_raveTracks; /**< tracks given to rave for the track fit (after removing Kshorts */
+    std::vector<const Particle*> m_tagParticles;  /**< tracks of the rest of the event */
+    std::vector<const Particle*> m_raveParticles; /**< tracks given to rave for the track fit (after removing Kshorts */
     std::vector<double> m_raveWeights; /**< Store the weights used by Rave in the vtx fit so that they can be accessed later */
     std::vector<const MCParticle*>
-    m_raveTracksMCParticles; /**< Store the MC particles corresponding to each track used by Rave in the vtx fit */
-    //std::vector<int> m_raveTracksMatchStatus; /**< stor the MC match status related to each track used by rave:
-    //                                           * 0: no match, 1: match to good track (direct from tag B) 2: match to bad track */
+    m_raveMCParticles; /**< Store the MC particles corresponding to each track used by Rave in the vtx fit */
+    bool m_useTruthInFit;  /**< Set to true if the tag fit is to be made with the TRUE tag track momentum and position */
+    int m_fitTruthStatus; /**< Store info about whether the fit was performed with the truth info
+                           * 0 fit performed with measured parameters
+                           * 1 fit performed with true parameters
+                           * 2 unable to recover truth parameters */
     double m_fitPval;             /**< P value of the tag side fit result */
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
@@ -151,26 +154,17 @@ namespace Belle2 {
     /** compare Breco with the two MC B particles */
     bool compBrecoBgen(Particle* Breco, MCParticle* Bgen);
 
-    /** asks for the MC information of the tracks performing the vertex fit *
-     *  returns a list of pointers to the MC particles and their kinds, ie
-     *  1 for good particle coming directly from the tag B and 2 otherwise
-     */
-    std::vector< std::pair<const MCParticle*, int> > FlavorTaggerInfoMCMatch(Particle* Breco);
-
-
     /** performs the fit using the standard algorithm - using all tracks in RoE
     The user can specify a request on the PXD hits left by the tracks*/
     bool getTagTracks_standardAlgorithm(Particle* Breco, int nPXDHits);
 
-    /** performs the vertex fit using only one track
-    The user can specify a request on the PXD hits left by the tracks*/
-    bool getTagTracks_singleTrackAlgorithm(Particle* Breco, int nPXDHits);
-
-    /** eliminates an invalid track from a track list **/
-    void eliminateTrack(std::vector<int>& listTracks, int trackPosition);
-
-    /** Get a list of track results from a list of tracks removing the Kshorts **/
-    bool getTracksWithoutKS(std::vector<const Track*> const&  tagTracks, std::vector<TrackAndWeight>& trackAndWeights);
+    /**
+     * Get a list of pions from a list of pions removing the Kshorts
+     * Warning: this assumes all the particles are pions, which is fine are all the particles
+     * are reconstructed as pions in the TagV module.
+     */
+    bool getParticlesWithoutKS(std::vector<const Particle*> const&  tagParticles, std::vector<ParticleAndWeight>& particleAndWeights,
+                               double massWindowWidth = 0.01);
 
     /** TO DO: tag side vertex fit in the case of semileptonic tag side decay */
     //bool makeSemileptonicFit(Particle *Breco);
@@ -204,6 +198,12 @@ namespace Belle2 {
     void deltaT(Particle* Breco);
 
     /**
+     * Reset all parameters that are computed in each event and then used to compute
+     * tuple variables
+     */
+    void resetReturnParams();
+
+    /**
      * Print a TVector3 (useful for debugging)
      */
     std::string printVector(TVector3 const& vec);
@@ -217,14 +217,27 @@ namespace Belle2 {
      * Print a TMatrixFSym (useful for debugging)
      */
     std::string printMatrix(TMatrixFSym const& mat);
+
+    /**
+     * If the fit has to be done with the truth info, Rave is fed with a track
+     * where the momentum is replaced by the true momentum and the position replaced
+     * by the point on the true particle trajectory closest to the measured track position
+     * The function below takes care of that.
+     */
+    TrackFitResult getTrackWithTrueCoordinates(ParticleAndWeight const& paw);
+
+    /**
+     * This finds the point on the true particle trajectory closest to the measured track position
+     */
+    TVector3 getTruePoca(ParticleAndWeight const& paw);
   };
 
   /**
    * this struct is used to store and sort the tag tracks
    */
-  struct TrackAndWeight {
+  struct ParticleAndWeight {
     double weight; /**< rave weight associated to the track, for sorting purposes*/
-    const TrackFitResult* track;  /**< tag track fit result, for sorting purposes */
+    const Particle* particle;  /**< tag track fit result with pion mass hypo, for sorting purposes */
     const MCParticle* mcParticle;  /**< mc particle matched to the tag track, for sorting purposes*/
   };
 
@@ -232,5 +245,5 @@ namespace Belle2 {
    * This is used to sort the tag tracks by rave weight, to have the tracks having the
    * most significance contribution to the tag vertex fit appearing first
    */
-  bool compare(TrackAndWeight& a, TrackAndWeight& b) { return a.weight > b.weight; }
+  bool compare(ParticleAndWeight& a, ParticleAndWeight& b) { return a.weight > b.weight; }
 }

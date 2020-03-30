@@ -112,6 +112,9 @@ combined_skims = {
     'feiSLCombined': [
         'feiSLB0', 'feiSLBplus'
     ],
+    'fei': [
+        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
+    ],
     'TCPV': [
         'TCPV',
     ],

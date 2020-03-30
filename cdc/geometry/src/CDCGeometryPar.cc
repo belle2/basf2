@@ -1511,6 +1511,9 @@ void CDCGeometryPar::setChMap()
     const int iBd = cm.getBoardID();
     const WireID wID(isl, il, iw);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
+    const int iCh = cm.getBoardChannel();
+    m_wireToChannel.insert(pair<WireID, unsigned short>(wID, iCh));
+    m_boardAndChannelToWire[iBd][iCh] = wID.getEWire();
   }
 }
 

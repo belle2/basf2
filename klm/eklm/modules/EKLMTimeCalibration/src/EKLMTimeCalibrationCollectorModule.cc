@@ -12,7 +12,7 @@
 #include <klm/eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationCollectorModule.h>
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/Unit.h>

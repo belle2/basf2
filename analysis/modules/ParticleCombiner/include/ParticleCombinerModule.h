@@ -72,6 +72,8 @@ namespace Belle2 {
 
     bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
 
+    bool m_allowChargeViolation; /**< switch to turn on and off the requirement of electric charge conservation */
+
   };
 
 } // Belle2 namespace

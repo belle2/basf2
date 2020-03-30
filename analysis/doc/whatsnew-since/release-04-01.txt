@@ -109,7 +109,6 @@ Variables
  * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
  * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those created at analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
-
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
    `EventKinematics` module. 
 
@@ -163,6 +162,8 @@ Modules
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
  * In :b2:mod:`TagVertex` module, added the possibility to use the truth information from the tag particles in the vertex fit. The option :code:`useTruthInFit = True` switches that on. 
  * In :b2:mod:`TagVertex` module, implemented an internal change: tag particles are loaded as ``Particle`` object from the ``ROE`` and not anymore as ``TrackFitResult``. This should have no effect to users.
+ * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned 
+   off by setting ``allowChargeViolation=True``.
 
 Utilities and core objects
 ++++++++++++++++++++++++++
@@ -170,3 +171,4 @@ Utilities and core objects
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+ * Added a function to retrieve electric charge of a particle based on its pdg code.

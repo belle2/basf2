@@ -137,13 +137,9 @@ void ECLChargedPIDModule::event()
 
       hypo_idx = hypo.getIndex();
 
-      auto signedhypo = hypo.getPDGCode() * charge;
+      auto pdgId = hypo.getPDGCode();
 
-      B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << hypo.getPDGCode()
-              << ", signedhypo[" << hypo_idx << "] = " << signedhypo);
-
-      // TMP: For the moment, do not split by charge
-      signedhypo = fabs(signedhypo);
+      B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << pdgId << ", hypo[" << hypo_idx << "] * reco_charge = " << pdgId * charge);
 
       // For tracks w/:
       // -) A matched shower
@@ -153,7 +149,7 @@ void ECLChargedPIDModule::event()
       if (mostEnergeticShower && showerReg && std::abs(charge)) {
 
         // Retrieve the list of enum ids for the input variables from the payload.
-        auto varids = m_pdfs->getVars(signedhypo, p, showerTheta);
+        auto varids = m_pdfs->getVars(pdgId, charge, p, showerTheta);
 
         // Fill the vector w/ the values taken from the module map.
         std::vector<double> variables;
@@ -163,7 +159,7 @@ void ECLChargedPIDModule::event()
 
         // Transform the input variables via gaussianisation+decorrelation only if necessary.
         if (m_pdfs->doVarsTransfo()) {
-          transfoGaussDecorr(signedhypo, p, showerTheta, variables);
+          transfoGaussDecorr(pdgId, charge, p, showerTheta, variables);
         }
 
         // Get the PDF templates for the various observables, and multiply the PDF values for this candidate.
@@ -176,12 +172,12 @@ void ECLChargedPIDModule::event()
           auto var   = variables.at(idx);
           auto varid = varids->at(idx);
 
-          const TF1* pdf = m_pdfs->getPdf(signedhypo, p, showerTheta, varid);
+          const TF1* pdf = m_pdfs->getPdf(pdgId, charge, p, showerTheta, varid);
           if (pdf) {
 
             ipdfval = getPdfVal(var, pdf);
 
-            B2DEBUG(30, "\t\tL(" << hypo.getPDGCode() << ") = " << prod
+            B2DEBUG(30, "\t\tL(" << pdgId * charge << ") = " << prod
                     << " * pdf(varid: " << static_cast<unsigned int>(varid) << ") = "
                     << prod << " * " << ipdfval
                     << " = " << prod * ipdfval);
@@ -194,13 +190,13 @@ void ECLChargedPIDModule::event()
           pdfval = prod;
         }
 
-        B2DEBUG(20, "\tL(" << hypo.getPDGCode() << ") = " << pdfval);
+        B2DEBUG(20, "\tL(" << pdgId * charge << ") = " << pdfval);
 
       }
 
       likelihoods[hypo_idx] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : c_dummyLogL;
 
-      B2DEBUG(20, "\tlog(L(" << hypo.getPDGCode() << ")) = " << likelihoods[hypo_idx]);
+      B2DEBUG(20, "\tlog(L(" << pdgId * charge << ")) = " << likelihoods[hypo_idx]);
     }
 
     const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods);
@@ -223,20 +219,21 @@ double ECLChargedPIDModule::getPdfVal(const double& x, const TF1* pdf)
   return (y) ? y : 1e-9; // Shall we allow for 0? That translates in LogL = NaN...
 }
 
-void ECLChargedPIDModule::transfoGaussDecorr(const int pdg, const double& p, const double& theta, std::vector<double>& variables)
+void ECLChargedPIDModule::transfoGaussDecorr(const unsigned int pdg, const int charge, const double& p, const double& theta,
+                                             std::vector<double>& variables)
 {
 
   unsigned int nvars = variables.size();
 
   // Get the variable transformation settings for this hypo pdg, p, theta.
-  auto vts = m_pdfs->getVTS(pdg, p, theta);
+  auto vts = m_pdfs->getVTS(pdg, charge, p, theta);
 
   B2DEBUG(30, "");
   B2DEBUG(30, "\tclass path: " << vts->classPath);
   B2DEBUG(30, "\tgbin = " << vts->gbin << ", (theta,p) = (" << vts->jth << "," << vts->ip << ")");
   B2DEBUG(30, "\tnvars: " << nvars);
 
-  auto varids = m_pdfs->getVars(pdg, p, theta);
+  auto varids = m_pdfs->getVars(pdg, charge, p, theta);
 
   for (unsigned int ivar(0); ivar < nvars; ivar++) {
     unsigned int ndivs = vts->nDivisions[ivar];

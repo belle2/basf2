@@ -24,7 +24,9 @@
 
 namespace Belle2 {
 
-  /** Class representing the DB payload w/ information about ECL PDF parameters for a set of particle hypotheses signed pdgId values. */
+  /** Class representing the DB payload w/ information about ECL PDF parameters
+   * for a set of particle hypotheses 'signed pdgId' values, i.e. abs(pdgId) x true_charge.
+   */
   class ECLChargedPidPDFs: public TObject {
 
   public:
@@ -72,7 +74,8 @@ namespace Belle2 {
     };
 
     /**
-     * Class to hold parameters needed to perform pre-processing of input variables (e.g., gaussianisation, decorrelation) to build a multi-dimensional likelihood model.
+     * Class to hold parameters needed to perform pre-processing of input variables
+     * (e.g., gaussianisation, decorrelation) to build a multi-dimensional likelihood model.
      * All matrices are stored in a linearised form, as vectors.
      */
     class VarTransfoSettings {
@@ -105,46 +108,56 @@ namespace Belle2 {
 
     /**
      * Set the names of the input variables for which PDFs are stored for a given hypothesis and category (p, clusterTheta).
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param true_charge the particle's true charge sign (+1 or -1).
      @param i the index along the 2D grid Y axis (rows) --> p.
      @param j the index along the 2D grid X axis (cols) --> clusterTheta.
      @param vars the list of variables. The variable ID is not a string, but an enum code integer as defined in InputVar.
      */
-    void setVars(const int pdg, const unsigned int i, const unsigned int j,
+    void setVars(const unsigned int pdg, const int true_charge, const unsigned int i, const unsigned int j,
                  const std::vector<InputVar>& vars)
     {
       auto ji = m_categories->GetBin(j, i);
 
       m_variablesmap_bycategory[ji] = vars;
 
-      m_variablesmap[pdg] = m_variablesmap_bycategory;
+      const int signed_pdg = pdg * true_charge / std::abs(true_charge);
+
+      m_variablesmap[signed_pdg] = m_variablesmap_bycategory;
 
     }
 
     /**
      * Getter for list of input variables (enums) for which PDFs are stored for a given hypothesis and category (p, clusterTheta).
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param charge the particle's reconstructed charge sign (+1 or -1).
      @param p the reconstructed momentum of the particle's track.
      @param theta the reconstructed polar angle of the particle's cluster.
      */
-    const std::vector<InputVar>* getVars(const int pdg, const double& p, const double& theta) const
+    const std::vector<InputVar>* getVars(const unsigned int pdg,  const int charge, const double& p, const double& theta) const
     {
 
       auto gbin = findBin(m_categories, theta, p);
 
-      return &(m_variablesmap.at(pdg).at(gbin));
+      const int signed_pdg = pdg * charge / std::abs(charge);
+
+      return &(m_variablesmap.at(signed_pdg).at(gbin));
 
     }
 
     /**
      * Print out the content of the internal 'matrioska' maps. Useful for debugging.
      */
-    void printPdfMap(const int pdg = 0, const double& p = -1.0, const double& theta = -999.0,
+    void printPdfMap(const unsigned int pdg = 0,
+                     const double& p = -1.0, const double& theta = -999.0,
+                     const int true_charge = 1,
                      const InputVar varid = InputVar::c_NONE) const
     {
 
+      const int signed_pdg = pdg * true_charge / std::abs(true_charge);
+
       std::cout << "Printing PDF info: " << std::endl;
-      if (pdg) std::cout << "-) pdgId = " << pdg << std::endl;
+      if (pdg) std::cout << "-) |pdgId| * true_charge = " << signed_pdg << std::endl;
       if (p != -1.0) std::cout << "-) p = " << p << " [GeV/c]" << std::endl;
       if (theta != -999.0) std::cout << "-) clusterTheta = " << theta << " [rad]" << std::endl;
       if (varid != InputVar::c_NONE) std::cout << "-) varid = " << static_cast<unsigned int>(varid) << std::endl;
@@ -152,7 +165,7 @@ namespace Belle2 {
       int x, y, z;
       for (const auto& pair0 : m_pdfsmap) {
 
-        if (pdg && pdg != pair0.first) continue;
+        if (signed_pdg && signed_pdg != pair0.first) continue;
 
         for (const auto& pair1 : pair0.second) {
 
@@ -201,30 +214,36 @@ namespace Belle2 {
 
     /**
      * Fills the internal maps for a given hypothesis and category (clusterTheta, p).
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param true_charge the particle's true charge sign (+1 or -1).
      @param i the index along the 2D grid Y axis (rows) --> p.
      @param j the index along the 2D grid X axis (cols) --> clusterTheta.
      @param varid the observable's enum identifier.
      @param pdf the pdf object.
     */
-    void add(const int pdg, const unsigned int i, const unsigned int j, const InputVar varid, TF1* pdf)
+    void add(const unsigned int pdg, const int true_charge, const unsigned int i, const unsigned int j, const InputVar varid, TF1* pdf)
     {
 
       auto ji = m_categories->GetBin(j, i);
 
-      m_pdfsmap[pdg][ji][varid] = pdf;
+      const int signed_pdg = pdg * true_charge / std::abs(true_charge);
+
+      m_pdfsmap[signed_pdg][ji][varid] = pdf;
 
     }
 
     /**
      * Return the PDF of this observable for this candidate's reconstructed (p, clusterTheta), under the given particle hypothesis.
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param charge the particle's reconstructed charge sign (+1 or -1).
      @param p the reconstructed momentum of the candidate's track.
      @param theta the reconstructed polar angle of the candidate's cluster.
      @param varid the observable's enum identifier.
     */
-    const TF1* getPdf(const int pdg, const double& p, const double& theta, const InputVar varid) const
+    const TF1* getPdf(const unsigned int pdg, const int charge, const double& p, const double& theta, const InputVar varid) const
     {
+
+      const int signed_pdg = pdg * charge / std::abs(charge);
 
       double pp = p / m_energy_unit.GetVal();
       double th = TMath::Abs(theta) / m_ang_unit.GetVal();
@@ -236,11 +255,11 @@ namespace Belle2 {
 
       B2DEBUG(30, "\t\tAngular unit: " <<  m_ang_unit.GetVal());
       B2DEBUG(30, "\t\tEnergy unit: " << m_energy_unit.GetVal());
-      B2DEBUG(30, "\t\tpdgId = " << pdg << ", clusterTheta = " << th << ", p = " << pp);
+      B2DEBUG(30, "\t\t|pdgId| * reco_charge = " << signed_pdg << ", clusterTheta = " << th << ", p = " << pp);
       B2DEBUG(30, "\t\tgbin = " << gbin << ", x,y = (" << x << "," << y << ")");
       B2DEBUG(30, "\t\tvariable id = " << static_cast<unsigned int>(varid));
 
-      return m_pdfsmap.at(pdg).at(gbin).at(varid);
+      return m_pdfsmap.at(signed_pdg).at(gbin).at(varid);
     }
 
     /**
@@ -250,7 +269,8 @@ namespace Belle2 {
 
     /**
      * Setup the variable transformations for a given hypothesis in a category (p, clusterTheta), needed to build a multi-dimensional likelihood.
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param true_charge the particle's true charge sign (+1 or -1).
      @param i the index along the 2D grid Y axis (rows) --> p.
      @param j the index along the 2D grid X axis (cols) --> clusterTheta.
      @param nvars the number of input variables used to build the model.
@@ -260,7 +280,9 @@ namespace Belle2 {
      @param nDivisions the number of divisions (steps) of the variable's range.
      @param covMatrix the variables' inverse square-root covariance matrix.
     */
-    void storeVarsTransfoSettings(const int pdg, const unsigned int i, const unsigned int j,
+    void storeVarsTransfoSettings(const unsigned int pdg,
+                                  const int true_charge,
+                                  const unsigned int i, const unsigned int j,
                                   const int nVars,
                                   const std::string& classPath = "",
                                   const std::vector<int>& nDivisions = std::vector<int>(),
@@ -268,6 +290,8 @@ namespace Belle2 {
                                   const std::vector<double>& x = std::vector<double>(),
                                   const std::vector<double>& covMatrix = std::vector<double>())
     {
+
+      const int signed_pdg = pdg * true_charge / std::abs(true_charge);
 
       m_do_varstransform = true;
 
@@ -288,22 +312,25 @@ namespace Belle2 {
 
       m_vtsmap_bycategory[ji] = vts;
 
-      m_vtsmap[pdg] = m_vtsmap_bycategory;
+      m_vtsmap[signed_pdg] = m_vtsmap_bycategory;
 
     }
 
     /**
      * Getter for variable transformation settings.
-     @param pdg the particle hypothesis' signed pdgId.
+     @param pdg the particle hypothesis' abs(pdgId).
+     @param charge the particle's reconstructed charge sign (+1 or -1).
      @param p the reconstructed momentum of the candidate's track.
      @param theta the reconstructed polar angle of the candidate's cluster.
      */
-    const VarTransfoSettings* getVTS(const int pdg, const double& p, const double& theta) const
+    const VarTransfoSettings* getVTS(const unsigned int pdg, const int charge, const double& p, const double& theta) const
     {
+
+      const int signed_pdg = pdg * charge / std::abs(charge);
 
       auto gbin = findBin(m_categories, theta, p);
 
-      return &(m_vtsmap.at(pdg).at(gbin));
+      return &(m_vtsmap.at(signed_pdg).at(gbin));
 
     }
 
@@ -368,7 +395,7 @@ namespace Belle2 {
 
     /**
      * To be toggled on if input variables have been transformed
-     * (i.e., if storeVarsTransfoSettings() was called when creating the payload).
+     * (i.e., if `storeVarsTransfoSettings()` was called when creating the payload).
      */
     bool m_do_varstransform = false;
 

@@ -178,7 +178,8 @@ namespace Belle2 {
      *
      * Implemented as in TMVA (see TMVA version 4.3.0 for ROOT >= 6.12/00, August 8, 2018 user guide, sec. 4.1.2, 4.1.4).
     */
-    void transfoGaussDecorr(const int pdg, const double& p, const double& theta, std::vector<double>& variables);
+    void transfoGaussDecorr(const unsigned int pdg, const int charge, const double& p, const double& theta,
+                            std::vector<double>& variables);
 
     /**
      * Extract the PDF value for a given variable from the TF1 object.

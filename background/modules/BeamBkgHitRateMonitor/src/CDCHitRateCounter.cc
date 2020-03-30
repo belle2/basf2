@@ -105,6 +105,7 @@ namespace Belle2 {
         const int iLayer         = hit.getICLayer();
         const int iSuperLayer    = hit.getISuperLayer();
         const unsigned short adc = hit.getADCCount();
+        const short tdc          = hit.getTDCCount();
 
         if (m_enableBackgroundHitFilter) {
           if (CDCHitToBackgroundFlag[&hit]) {
@@ -120,6 +121,10 @@ namespace Belle2 {
           if (iSuperLayer != 0 && adc < 18)
             continue;
         }
+
+        if (not isInTimeWindow(iSuperLayer, tdc))
+          continue;
+
 
         rates.layerHitRate[iLayer] += 1;
         rates.superLayerHitRate[iSuperLayer] += 1;

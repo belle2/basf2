@@ -64,9 +64,17 @@ namespace Belle2 {
        * @param enableBadWireTreatment flag to enable the bad wire treatment
        * @param enableBackgroundHitFilter flag to enable the CDC background hit (crosstakl, noise) filter
        */
-      CDCHitRateCounter(const bool enableBadWireTreatment,
+      CDCHitRateCounter(const int  timeWindowLowerEdge_smallCell,
+                        const int  timeWindowUpperEdge_smallCell,
+                        const int  timeWindowLowerEdge_normalCell,
+                        const int  timeWindowUpperEdge_normalCell,
+                        const bool enableBadWireTreatment,
                         const bool enableBackgroundHitFilter,
                         const bool enableMarkBackgroundHit):
+        m_timeWindowLowerEdge_smallCell(timeWindowLowerEdge_smallCell),
+        m_timeWindowUpperEdge_smallCell(timeWindowUpperEdge_smallCell),
+        m_timeWindowLowerEdge_normalCell(timeWindowLowerEdge_normalCell),
+        m_timeWindowUpperEdge_normalCell(timeWindowUpperEdge_normalCell),
         m_enableBadWireTreatment(enableBadWireTreatment),
         m_enableBackgroundHitFilter(enableBackgroundHitFilter),
         m_enableMarkBackgroundHit(enableMarkBackgroundHit)
@@ -107,6 +115,21 @@ namespace Belle2 {
 
       // collections
       StoreArray<CDCHit> m_digits;  /**< collection of digits */
+
+      ///// time window
+      const int m_timeWindowLowerEdge_smallCell; /**< lower edge of the time window for small cells [tdc count = ns] */
+      const int m_timeWindowUpperEdge_smallCell; /**< upper edge of the time window for small cells [tdc count = ns] */
+      const int m_timeWindowLowerEdge_normalCell; /**< lower edge of the time window for normal cells [tdc count = ns] */
+      const int m_timeWindowUpperEdge_normalCell; /**< upper edge of the time window for normal cells [tdc count = ns] */
+
+      bool isInTimeWindow(const int SL, const short tdc)
+      {
+        if (SL == 0) {
+          return (m_timeWindowLowerEdge_smallCell < tdc && tdc <= m_timeWindowUpperEdge_smallCell);
+        } else {
+          return (m_timeWindowLowerEdge_normalCell < tdc && tdc <= m_timeWindowUpperEdge_normalCell);
+        }
+      }
 
       // DB payloads
 

@@ -38,8 +38,8 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
            m_param_cutResultIdentifiers);
 
   addParam("cutResultIdentifiersIgnored", m_param_cutResultIdentifiersIgnored,
-           "Which cuts should be ignored? This will display cleaner trigger lines, e.g. to clear them from bhabha contamination.
-           Vetoes on skims do not apply in filter plot and vice versa.",
+           "Which cuts should be ignored? This will display cleaner trigger lines, e.g. to clear them from bhabha contamination. "
+           "Vetoes on skims do not apply in filter plot and vice versa.",
            m_param_cutResultIdentifiersIgnored);
 
   addParam("variableIdentifiers", m_param_variableIdentifiers,

@@ -299,7 +299,7 @@ class BaseSkim:
         """
         b2.B2ERROR(f"No `build_lists` method defined for skim {self}!")
 
-    # Everything beyond this point can remain as it is when defining a skim
+    # Everything beyond this point can remain as-is when defining a skim
     def __str__(self):
         return self.name
 
@@ -335,18 +335,26 @@ class BaseSkim:
         """
         try:
             for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
-                if not (isinstance(ModuleName, str) and isinstance(FunctionsAndLabels, dict)):
-                    raise ValueError(f"Expected str -> dict for {ModuleName} -> {FunctionsAndLabels}")
+                if not (
+                    isinstance(ModuleName, str) and isinstance(FunctionsAndLabels, dict)
+                ):
+                    raise ValueError(
+                        f"Expected str -> dict for {ModuleName} -> {FunctionsAndLabels}"
+                    )
 
                 for FunctionName, labels in FunctionsAndLabels.items():
                     if not (isinstance(FunctionName, str) and isinstance(labels, list)):
-                        raise ValueError(f"Expected str -> list for {FunctionName} -> {labels}")
+                        raise ValueError(
+                            f"Expected str -> list for {FunctionName} -> {labels}"
+                        )
 
                     if not all(isinstance(label, str) for label in labels):
                         raise ValueError(f"Expected {labels} to be a list of str.")
         except ValueError as e:
-            b2.B2ERROR(f"Invalid format of RequiredParticleLists in {str(self)} skim. "
-                       "Expected dict(str -> dict(str -> list(str))).")
+            b2.B2ERROR(
+                f"Invalid format of RequiredParticleLists in {str(self)} skim. "
+                "Expected dict(str -> dict(str -> list(str)))."
+            )
             raise e
 
     def set_skim_logging(self, path):
@@ -359,7 +367,7 @@ class BaseSkim:
         """
         b2.set_log_level(b2.LogLevel.INFO)
 
-        NoisyModules = ['ParticleLoader', 'ParticleVertexFitter'] + self.NoisyModules
+        NoisyModules = ["ParticleLoader", "ParticleVertexFitter"] + self.NoisyModules
 
         for module in path.modules():
             if module.type() in set(NoisyModules):
@@ -389,7 +397,9 @@ class BaseSkim:
         """"""
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
-            b2.B2ERROR(f"No skim list names defined in self.SkimLists for {self} skim! ")
+            b2.B2ERROR(
+                f"No skim list names defined in self.SkimLists for {self} skim! "
+            )
 
         skimOutputUdst(self.OutputFileName, self.SkimLists, path=path)
         summaryOfLists(self.SkimLists, path=path)
@@ -416,6 +426,24 @@ class CombinedSkim:
             )
         self.Skims = {skim.name: skim for skim in skims}
         self.NoisyModules = list({skim.NoisyModules for skim in self.Skims})
+        self.RequiredParticleLists = self._merge_nested_dicts(
+            skim.RequiredParticleLists for skim in self.Skims
+        )
+
+    def __str__(self):
+        # TODO: come up with a __str__ method
+        pass
+
+    def __name__(self):
+        # TODO: come up with a __name__ method
+        pass
+
+    def __call__(self, path):
+        self.set_skim_logging(path)
+        self.load_particle_lists(path)
+        self.setup(path)
+        self.build_lists(path)
+        self.output_udst(path)
 
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names.
@@ -436,17 +464,15 @@ class CombinedSkim:
                 ", ".join(DuplicatedParticleLists)
             )
 
-    @classmethod
-    def _merge_nested_dicts(cls, *dicts):
+    def _merge_nested_dicts(self, *dicts):
         """Merge any number of dicts recursively. Utility function for merging
         RequiredParticleLists values from differnt skims."""
         MergedDict = dicts[0]
         for d in dicts[1:]:
-            MergedDict = cls._merge_two_nested_dicts(MergedDict, d)
+            MergedDict = self._merge_two_nested_dicts(MergedDict, d)
         return MergedDict
 
-    @classmethod
-    def _merge_two_nested_dicts(cls, d1, d2):
+    def _merge_two_nested_dicts(self, d1, d2):
         """Merge two dicts recursively.
 
         Input dicts must have the same data structure, and the innermost values must be
@@ -456,17 +482,21 @@ class CombinedSkim:
             if k in d1 and k in d2:
                 if isinstance(d1[k], dict) and isinstance(d2[k], dict):
                     # If we are looking at two dicts, call this function again.
-                    d1[k] = cls._merge_two_nested_dicts(d1[k], d2[k])
+                    d1[k] = self._merge_two_nested_dicts(d1[k], d2[k])
                 elif isinstance(d1[k], list) and isinstance(d2[k], list):
                     # If we are looking at two lists, return a list with duplicates removed.
                     # Raise a warning if one list is empty and the other is not.
                     if len(d1[k]) == 0 ^ len(d2[k]) == 0:
-                        b2.B2WARNING("Merging empty list into non-empty list. "
-                                     "Some particle lists may not be loaded.")
+                        b2.B2WARNING(
+                            "Merging empty list into non-empty list. "
+                            "Some particle lists may not be loaded."
+                        )
                     d1[k] = sorted({*d1[k], *d2[k]})
                 else:
-                    raise b2.B2ERROR("Something went wrong while merging dicts. Please "
-                                     "check the input dicts have the same structure.")
+                    raise b2.B2ERROR(
+                        "Something went wrong while merging dicts. Please "
+                        "check the input dicts have the same structure."
+                    )
             elif k in d2:
                 d1[k] = d2[k]
 
@@ -482,7 +512,7 @@ class CombinedSkim:
         """
         b2.set_log_level(b2.LogLevel.INFO)
 
-        NoisyModules = ['ParticleLoader', 'ParticleVertexFitter'] + self.NoisyModules
+        NoisyModules = ["ParticleLoader", "ParticleVertexFitter"] + self.NoisyModules
 
         for module in path.modules():
             if module.type() in set(NoisyModules):
@@ -503,7 +533,8 @@ class CombinedSkim:
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        pass
+        for skim in self.Skims:
+            pass
 
     def output_udst(self, path):
         """Write uDST output files for each skim."""

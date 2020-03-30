@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Chunhua Li, Thomas Hauth, Nils Braun                     *
+ * Contributors: Chunhua Li, Thomas Hauth, Nils Braun, Markus Prim        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -36,6 +36,11 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
   addParam("cutResultIdentifiers", m_param_cutResultIdentifiers,
            "Which cuts should be reported? Please remember to include the total_result also, if wanted.",
            m_param_cutResultIdentifiers);
+
+  addParam("cutResultIdentifiersIgnored", m_param_cutResultIdentifiersIgnored,
+           "Which cuts should be ignored? This will display cleaner trigger lines, e.g. to clear them from bhabha contamination.
+           Vetoes on skims do not apply in filter plot and vice versa.",
+           m_param_cutResultIdentifiersIgnored);
 
   addParam("variableIdentifiers", m_param_variableIdentifiers,
            "Which variables should be reported?",
@@ -142,6 +147,22 @@ void SoftwareTriggerHLTDQMModule::event()
       const std::string& baseIdentifier = cutIdentifier.first;
       const auto& cuts = cutIdentifier.second;
 
+      // check if we want to ignore it
+      bool skip = false;
+      const auto& cutsIgnored = m_param_cutResultIdentifiersIgnored[baseIdentifier];
+
+      for (const std::string& cutTitleIgnored : cutsIgnored) {
+        const std::string& cutNameIgnored = cutTitleIgnored.substr(0, cutTitleIgnored.find("\\"));
+        const std::string& fullCutIdentifierIgnored = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutNameIgnored);
+
+        const auto resultsIgnored = m_triggerResult->getResults();
+        auto const cutEntryIgnored = resultsIgnored.find(fullCutIdentifierIgnored);
+
+        if (cutEntryIgnored != resultsIgnored.end()) {
+          if (cutEntryIgnored->second > 0) skip = true;
+        }
+      }
+
       for (const std::string& cutTitle : cuts) {
         const std::string& cutName = cutTitle.substr(0, cutTitle.find("\\"));
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
@@ -152,7 +173,7 @@ void SoftwareTriggerHLTDQMModule::event()
 
         if (cutEntry != results.end()) {
           const int cutResult = cutEntry->second;
-          m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0);
+          m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0 and not skip);
         }
       }
 

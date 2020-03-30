@@ -251,7 +251,7 @@ class BaseSkim:
         path = b2.Path()
         ma.inputMdstList("default", [], path=path)
         skim = MyDefinedSkim()
-        skim(path)
+        skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
         path.process()
 
     You may also want to set the ``__author__`` attribute, so users know who to contact
@@ -270,16 +270,27 @@ class BaseSkim:
     If we require the following lists to be loaded,
 
            >>> from stdCharged import stdK, stdPi
+           >>> from skim.standardlists.lightmesons import loadStdLightMesons
            >>> stdK("all", path=path)
            >>> stdK("loose", path=path)
            >>> stdPi("all", path=path)
+           >>> loadStdLightMesons(path=path)
 
     then `BaseSkim` will run run this code for us if we set `RequiredParticleLists` to
     the following value:
 
     .. code-block:: python
 
-        {"stdCharged": {"stdK": ["all", "loose"], "stdPi": ["all"]}}"""
+        {
+            "stdCharged": {
+                "stdK": ["all", "loose"],
+                "stdPi": ["all"],
+            },
+            "skim.standardlists.lightmesons": {
+                  "loadStdLightMesons": [],
+            },
+        }
+    """
 
     def __init__(self, OutputFileName=None):
         """Initialise the BaseSkim class.
@@ -352,25 +363,9 @@ class BaseSkim:
         return self.name
 
     def _validate_required_particle_lists(self):
-        """Verify that the RequiredParticleLists value is in the expected format.
+        """Verify that the `RequiredParticleLists` value is in the expected format.
 
-        The expected format is dict(str -> dict(str -> list(str))). For example, suppose
-        we wished to load in charged kaons with the following call:
-
-            >>> from stdCharged import stdK
-            >>> stdK("all", path=path)
-            >>> stdK("loose", path=path)
-
-        We can achieve this using the BaseSkim class using the following value for
-        RequiredParticleLists:
-
-        .. code-block:: python
-
-            RequiredParticleLists = {
-                "stdCharged": {
-                    "stdK": ["all", "loose"]
-                }
-            }
+        The expected format is ``dict(str -> dict(str -> list(str)))``.
         """
         try:
             for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
@@ -445,7 +440,7 @@ class BaseSkim:
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
             b2.B2ERROR(
-                f"No skim list names defined in self.SkimLists for {self} skim! "
+                f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
         skimOutputUdst(self.OutputFileName, self.SkimLists, path=path)
@@ -462,8 +457,20 @@ class CombinedSkim(BaseSkim):
     >>> from skim.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
     >>> path = b2.Path()
     >>> skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
-    >>> skims(path)  # Create all skim lists and save to uDST
+    >>> # __call__ method loads standard lists, creates skim lists, and saves to uDST
+    >>> skims(path)
     >>> path.process()
+
+    When skims are combined using this class, the `NoisyModules` lists of each skim are
+    combined, and the `RequiredParticleLists` objects are merged, removing duplicates.
+    This way, `load_particle_lists` will load all the required lists of each skim,
+    without accidentally loading a list twice.
+
+    The heavy-lifting functions `additional_setup`, `build_lists` and `output_udst` are
+    modified to loop over the corresponding functions of each invididual skim. Calling
+    an instance of the `CombinedSkim` class will load all the required particle lists,
+    then run all the setup steps, then the list building functions, and then all the
+    output steps.
     """
 
     def __init__(self, *skims):
@@ -500,7 +507,7 @@ class CombinedSkim(BaseSkim):
         self.output_udst(path)
 
     def additional_setup(self, path):
-        """Run all of the setup functions for each skim.
+        """Run the `BaseSkim.additional_setup` functions for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -509,7 +516,7 @@ class CombinedSkim(BaseSkim):
             skim.additional_setup(path)
 
     def build_lists(self, path):
-        """Run all the build_lists functions for each skim.
+        """Run the `BaseSkim.additional_setup` functions for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -518,7 +525,7 @@ class CombinedSkim(BaseSkim):
             skim.build_lists(path)
 
     def output_udst(self, path):
-        """Write uDST output files for each skim.
+        """Run the `BaseSkim.output_udst` functions for each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -529,8 +536,10 @@ class CombinedSkim(BaseSkim):
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names.
 
-        Skims cannot be relied on to define their particle list names in advance, so
-        this function can only be run after the build_lists() functions are run.
+        .. Note::
+
+            Skims cannot be relied on to define their particle list names in advance, so
+            this function can only be run after `build_lists` is run.
         """
         ParticleListLists = [skim.SkimLists for skim in self.Skims]
         ParticleLists = [l for L in ParticleListLists for l in L]
@@ -546,8 +555,17 @@ class CombinedSkim(BaseSkim):
             )
 
     def _merge_nested_dicts(self, dicts):
-        """Merge any number of dicts recursively. Utility function for merging
-        RequiredParticleLists values from differnt skims."""
+        """Merge any number of dicts recursively.
+
+        Utility function for merging `RequiredParticleLists` values from differnt
+        skims.
+
+        Parameters:
+            dicts (list(dict)): Dictionaries to be merged.
+
+        Returns:
+            MergedDict (dict): Merged dictionary without duplicates.
+        """
         MergedDict = dicts[0]
         for d in dicts[1:]:
             MergedDict = self._merge_two_nested_dicts(MergedDict, d)

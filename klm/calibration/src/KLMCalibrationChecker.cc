@@ -12,9 +12,10 @@
 #include <klm/calibration/KLMCalibrationChecker.h>
 
 /* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -144,7 +145,7 @@ void KLMCalibrationChecker::checkStripEfficiency()
       }
       hist->SetTitle(title.Data());
       hist->GetXaxis()->SetTitle("(Layer - 1) * 2 + plane");
-      const EKLM::ElementNumbersSingleton* elementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+      const EKLMElementNumbers* elementNumbersEKLM = &(EKLMElementNumbers::Instance());
       for (int layer = 1; layer <= elementNumbersEKLM->getMaximalDetectorLayerNumber(section); layer++) {
         for (int plane = 1; plane <= EKLMElementNumbers::getMaximalPlaneNumber(); plane++) {
           int bin = (layer - 1) * 2 + plane;

@@ -20,6 +20,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -50,6 +51,7 @@ Particle::Particle() :
   resetErrorMatrix();
 }
 
+
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -58,6 +60,7 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -74,6 +77,7 @@ Particle::Particle(const TLorentzVector& momentum,
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -97,6 +101,9 @@ Particle::Particle(const TLorentzVector& momentum,
     m_particleType    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
   }
 }
@@ -126,33 +133,66 @@ Particle::Particle(const TLorentzVector& momentum,
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
+  }
+}
+
+
+Particle::Particle(const TLorentzVector& momentum,
+                   const int pdgCode,
+                   EFlavorType flavorType,
+                   const std::vector<int>& daughterIndices,
+                   const int properties,
+                   const std::vector<int>& daughterProperties,
+                   TClonesArray* arrayPointer) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1),
+  m_daughterIndices(daughterIndices),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_daughterProperties(daughterProperties),
+  m_arrayPointer(arrayPointer)
+{
+  m_pdgCode = pdgCode;
+  m_flavorType = flavorType;
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
+  set4Vector(momentum);
+  resetErrorMatrix();
+  m_properties = properties;
+
+  if (!daughterIndices.empty()) {
+    m_particleType    = c_Composite;
+    if (getArrayPointer() == nullptr) {
+      B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
   }
 }
 
 
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
+  Particle(track ? track->getArrayIndex() : 0, track ? track->getTrackFitResultWithClosestMass(chargedStable) : nullptr,
+           chargedStable)
+{
+}
+
+Particle::Particle(const int trackArrayIndex,
+                   const TrackFitResult* trackFit,
+                   const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
-  if (!track) return;
-
-  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-  if (closestMassFitResult == nullptr) return;
-
-  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
-  const auto trackFit = closestMassFitResult;
+  if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  setMdstArrayIndex(track->getArrayIndex());
+  setMdstArrayIndex(trackArrayIndex);
 
-  // set PDG code TODO: ask Anze why this procedure is needed?
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  m_pdgCodeUsedForFit = trackFit->getParticleType().getPDGCode();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -163,6 +203,7 @@ Particle::Particle(const Track* track,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
+//FIXME: Deprecated, to be removed after release-05
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable,
@@ -178,10 +219,7 @@ Particle::Particle(const int trackArrayIndex,
   setMdstArrayIndex(trackArrayIndex);
 
   m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -191,6 +229,7 @@ Particle::Particle(const int trackArrayIndex,
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
 }
+
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -227,6 +266,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   storeErrorMatrix(clustercovmat);
 }
 
+
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -251,6 +291,7 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   resetErrorMatrix();
   //storeErrorMatrix(klmCluster->getErrorMatrix());
 }
+
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -597,6 +638,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
+  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
 void Particle::removeDaughter(const Particle* daughter)
@@ -607,6 +649,7 @@ void Particle::removeDaughter(const Particle* daughter)
   for (unsigned i = 0; i < getNDaughters(); i++) {
     if (m_daughterIndices[i] == daughter->getArrayIndex()) {
       m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterProperties.erase(m_daughterProperties.begin() + i);
       i--;
     }
   }
@@ -673,6 +716,23 @@ const Track* Particle::getTrack() const
     return nullptr;
 }
 
+const TrackFitResult* Particle::getTrackFitResult() const
+{
+  // if the particle is related to a TrackFitResult then return this
+  auto* selfrelated = this->getRelatedTo<TrackFitResult>();
+  if (selfrelated)
+    return selfrelated;
+
+  // if not get the TFR with closest mass to this particle
+  auto* selftrack = this->getTrack();
+  if (selftrack)
+    return selftrack->getTrackFitResultWithClosestMass(
+             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+
+  // otherwise we're probably not a track based particle
+  return nullptr;
+}
+
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
   if (m_particleType == c_Track) {
@@ -680,6 +740,16 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
     return nullptr;
+}
+
+const V0* Particle::getV0() const
+{
+  if (m_particleType == c_V0) {
+    StoreArray<V0> v0s;
+    return v0s[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
 }
 
 
@@ -770,7 +840,7 @@ const Particle* Particle::getParticleFromGeneralizedIndexString(const std::strin
     int dauIndex = 0;
     try {
       dauIndex = Belle2::convertString<int>(indexString);
-    } catch (boost::bad_lexical_cast&) {
+    } catch (std::invalid_argument&) {
       B2WARNING("Found the string " << indexString << "instead of a daughter index.");
       return nullptr;
     }
@@ -1136,4 +1206,11 @@ bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& funct
   return false;
 }
 
-
+int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::ChargedStable& chargedStable)
+{
+  int absPDGCode = chargedStable.getPDGCode();
+  int PDGCode = absPDGCode * chargeSign;
+  // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
+  if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
+  return PDGCode;
+}

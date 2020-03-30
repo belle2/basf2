@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # You can access the Variable Manager directly in Python
 # This is useful either in PythonModules,

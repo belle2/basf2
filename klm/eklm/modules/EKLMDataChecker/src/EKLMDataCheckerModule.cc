@@ -21,6 +21,7 @@ REG_MODULE(EKLMDataChecker)
 EKLMDataCheckerModule::EKLMDataCheckerModule() : Module()
 {
   setDescription("EKLM data checker module.");
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_GeoDat = nullptr;
 }
 
@@ -47,8 +48,10 @@ void EKLMDataCheckerModule::event()
   StripData data;
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    EKLMDigit* eklmDigit = m_Digits[i];
-    strip = m_GeoDat->stripNumber(
+    KLMDigit* eklmDigit = m_Digits[i];
+    if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
+    strip = m_ElementNumbers->stripNumber(
               eklmDigit->getSection(), eklmDigit->getLayer(),
               eklmDigit->getSector(), eklmDigit->getPlane(),
               eklmDigit->getStrip());
@@ -106,8 +109,8 @@ void EKLMDataCheckerModule::terminate()
     }
     sort(it2, it3, compareStripNumber);
     for (it4 = it2; it4 != it3; ++it4) {
-      m_GeoDat->stripNumberToElementNumbers(it4->strip, &section, &layer,
-                                            &sector, &plane, &strip);
+      m_ElementNumbers->stripNumberToElementNumbers(
+        it4->strip, &section, &layer, &sector, &plane, &strip);
       printf("Section %d, layer %d, sector %d, plane %d, strip %d: %.1f%% "
              "(%d/%d)\n",
              section, layer, sector, plane, strip,
@@ -122,8 +125,8 @@ void EKLMDataCheckerModule::terminate()
       for (sector = 1; sector <= m_GeoDat->getNSectors(); sector++) {
         for (plane = 1; plane <= m_GeoDat->getNPlanes(); plane++) {
           for (strip = 1; strip <= m_GeoDat->getNStrips(); strip++) {
-            stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane,
-                                                strip);
+            stripGlobal = m_ElementNumbers->stripNumber(
+                            section, layer, sector, plane, strip);
             it = m_StripDataMap.find(stripGlobal);
             if (it == m_StripDataMap.end()) {
               printf("Section %d, layer %d, sector %d, plane %d, strip %d.\n",

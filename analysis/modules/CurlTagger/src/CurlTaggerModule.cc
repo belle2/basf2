@@ -208,4 +208,5 @@ void CurlTaggerModule::endRun()
 void CurlTaggerModule::terminate()
 {
   m_Selector->finalize();
+  delete m_Selector;
 }

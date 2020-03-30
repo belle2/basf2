@@ -489,7 +489,7 @@ namespace Belle2 {
 
                       Useful to identify intermediate resonances in a decay, which weren't reconstructed explicitly.
 
-                      Returns -999 if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
     REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,

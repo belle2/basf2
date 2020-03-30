@@ -331,7 +331,6 @@ class KLMK0LPlotModule(Module):
         self.hist_corrmat.SetBinError(9, corr_mat_err[2][3])
         self.hist_corrmat.SetBinError(10, corr_mat_err[3][3])
         self.output_file.cd()
-        self.output_file.cd()
         self.hist_nkl.Write()
         self.hist_xres.Write()
         self.hist_yres.Write()

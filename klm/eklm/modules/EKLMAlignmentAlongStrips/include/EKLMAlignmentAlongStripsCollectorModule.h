@@ -69,6 +69,9 @@ namespace Belle2 {
 
   private:
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
@@ -76,7 +79,7 @@ namespace Belle2 {
     EKLM::TransformData* m_TransformData;
 
     /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EKLMDigits;
+    StoreArray<KLMDigit> m_KLMDigits;
 
     /** Tracks. */
     StoreArray<Track> m_Tracks;

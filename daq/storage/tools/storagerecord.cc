@@ -1,38 +1,27 @@
 #include <unistd.h>
 #include <cstdlib>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/SeqFile.h>
+#include <framework/pcore/EvtMessage.h>
 
-#include <daq/storage/BinData.h>
 #include <daq/storage/SharedEventBuffer.h>
 
 #include <daq/slc/psql/PostgreSQLInterface.h>
 
-#include <daq/slc/database/DBObject.h>
-#include <daq/slc/database/DBObjectLoader.h>
+#include <daq/slc/database/DBHandlerException.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 
-#include <daq/slc/system/TCPSocket.h>
-#include <daq/slc/system/TCPSocketReader.h>
-#include <daq/slc/system/Time.h>
-#include <daq/slc/system/PThread.h>
-#include <daq/slc/system/Mutex.h>
-#include <daq/slc/system/Cond.h>
-
 #include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/base/Date.h>
 #include <daq/slc/base/StringUtil.h>
-
-#include <fstream>
-#include <queue>
 
 #include <cstdio>
 #include <cstring>
+#include <fstream>
+#include <iostream>
 #include <signal.h>
 #include <sys/statvfs.h>
 #include <zlib.h>

@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
@@ -22,9 +22,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
-
-/* C++ headers. */
-#include <string>
 
 namespace Belle2 {
 
@@ -65,6 +62,9 @@ namespace Belle2 {
 
     /** Use enent T0 or not. */
     bool m_UseEventT0;
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
 
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;

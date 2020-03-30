@@ -8,6 +8,8 @@
 
 #include "daq/expreco/EventSampler.h"
 
+#include <unistd.h>
+
 using namespace Belle2;
 using namespace std;
 

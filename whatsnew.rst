@@ -33,6 +33,10 @@ Changes since release-04
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
 
+.. Changes for b2bii here.
+
+.. include:: b2bii/doc/whatsnew-since/release-04-01.txt
+
 Changes since release-03
 ========================
 
@@ -97,7 +101,7 @@ If you have a physics analysis sensitive to this change: please discuss with the
 .. note::
         As a consequence of this, there is now a **difference** between the variables
         ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
-        and similarly for variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  compared to ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
+        and similarly for variables ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ` )  compared to ( :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY` and :b2:var:`mcDecayVertexFromIPZ` ).
 
 .. rubric:: Redesign of the Conditions Database Interface
 

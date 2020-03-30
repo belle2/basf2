@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -9,7 +8,7 @@
 # mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
 # and writes out flat NTuples containing all variables used in the deep continuum
 # suppression training + the (transformed) network output distribution.
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # This module requires the weightfile produced in B2A712 (Deep_Feed_Forward.xml).

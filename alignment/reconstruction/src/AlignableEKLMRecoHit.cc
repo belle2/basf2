@@ -13,11 +13,11 @@
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
@@ -41,26 +41,26 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   CLHEP::Hep3Vector v(0, 1, 0);
   B2Vector3D origin2, u2, v2;
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
+  const EKLMElementNumbers* eklmElementNumbers =
+    &(EKLMElementNumbers::Instance());
   const EKLM::TransformDataGlobalAligned* transformData =
     &(EKLM::TransformDataGlobalAligned::Instance());
   RelationVector<EKLMHit2d> hit2ds = hit->getRelationsTo<EKLMHit2d>();
   if (hit2ds.size() != 1)
     B2FATAL("Incorrect number of related EKLMHit2ds.");
-  RelationVector<EKLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<EKLMDigit>();
+  RelationVector<KLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<KLMDigit>();
   if (eklmDigits.size() != 2)
-    B2FATAL("Incorrect number of related EKLMDigits.");
+    B2FATAL("Incorrect number of related KLMDigits.");
   digit = hit->getDigitIdentifier();
   m_Section = eklmDigits[digit]->getSection();
   m_Layer = eklmDigits[digit]->getLayer();
   m_Sector = eklmDigits[digit]->getSector();
   plane = eklmDigits[digit]->getPlane();
-  segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
-            + 1;
-  strip = (segment - 1) * geoDat->getNStripsSegment() + 1;
-  const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
+  segment = (eklmDigits[digit]->getStrip() - 1) /
+            eklmElementNumbers->getNStripsSegment() + 1;
+  strip = (segment - 1) * eklmElementNumbers->getNStripsSegment() + 1;
   m_KLMModule = elementNumbers->moduleNumberEKLM(m_Section, m_Sector, m_Layer);
-  const EKLM::ElementNumbersSingleton* eklmElementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
   m_Segment = eklmElementNumbers->segmentNumber(
                 m_Section, m_Layer, m_Sector, plane, segment);
   t = transformData->getStripTransform(
@@ -87,7 +87,7 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   setPlane(detPlane, m_Segment);
   rawHitCoords_[0] = geoDat->getStripGeometry()->getWidth() *
                      ((eklmDigits[digit]->getStrip() - 1) %
-                      geoDat->getNStripsSegment()) / CLHEP::cm * Unit::cm;
+                      eklmElementNumbers->getNStripsSegment()) / CLHEP::cm * Unit::cm;
   rawHitCov_[0][0] = pow(geoDat->getStripGeometry()->getWidth() /
                          CLHEP::cm * Unit::cm, 2) / 12;
   setStripV();

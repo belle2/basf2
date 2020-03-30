@@ -21,7 +21,6 @@
 #include <TVectorF.h>
 #include <TVector3.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {

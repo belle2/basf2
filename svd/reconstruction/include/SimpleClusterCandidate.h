@@ -28,6 +28,7 @@ namespace Belle2 {
       float noise; /**<strip noise*/
       int cellID; /**<strip cellID*/
       float time; /**<strip time*/
+      float timeError; /**<strip time error*/
     };
 
     /**
@@ -89,7 +90,7 @@ namespace Belle2 {
       float getTime() const { return m_time; }
 
       /**
-       * return the error on the time of the cluster, not implemented yet
+       * return the error on the time of the cluster
        */
       float getTimeError() const { return m_timeError; }
 

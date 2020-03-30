@@ -68,14 +68,18 @@ namespace Belle2 {
              "if true, use module T0 calibration", true);
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration", true);
+    addParam("useTimeWalkCalibration", m_useTimeWalkCalibration,
+             "if true, use time-walk calibration", true);
     addParam("pedestalRMS", m_pedestalRMS,
              "r.m.s of pedestals [ADC counts], "
              "if positive, timeError will be estimated from FE data. "
-             "This is the default value used if r.m.s is not available from DB.", 9.0);
+             "This is the default value used if r.m.s is not available from DB.", 9.7);
     addParam("minPulseWidth", m_minPulseWidth,
              "minimal pulse width [ns] to flag digit as good", 1.0);
     addParam("maxPulseWidth", m_maxPulseWidth,
              "maximal pulse width [ns] to flag digit as good", 10.0);
+    addParam("minWidthXheight", m_minWidthXheight,
+             "minimal product of width and height [ns * ADC counts]", 100.0);
     addParam("storageDepth", m_storageDepth,
              "ASIC analog storage depth of Interim FE format (ignored in other formats)",
              (unsigned) 508);
@@ -94,6 +98,10 @@ namespace Belle2 {
              "calpulse selection: minimal height [ADC counts]", 0);
     addParam("calpulseHeightMax", m_calpulseHeightMax,
              "calpulse selection: maximal height [ADC counts]", 0);
+    addParam("calpulseTimeMin", m_calpulseTimeMin,
+             "calpulse selection (ON if max > min): minimal time [ns]", 0.0);
+    addParam("calpulseTimeMax", m_calpulseTimeMax,
+             "calpulse selection (ON if max > min): maximal time [ns]", 0.0);
   }
 
 
@@ -162,8 +170,14 @@ namespace Belle2 {
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
+    if (not m_timeWalk.isValid()) {
+      // B2FATAL("Time-walk calibration is not available for run "
+      B2WARNING("Time-walk calibration is not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+    }
     if (m_pedestalRMS > 0 and not m_noises.isValid()) {
-      B2FATAL("Channel noise levels not available for run "
+      B2FATAL("Channel noise levels are not available for run "
               << evtMetaData->getRun()
               << " of experiment " << evtMetaData->getExperiment());
     }
@@ -347,34 +361,41 @@ namespace Belle2 {
       double time = sampleTimes->getTime(window, rawTimeLeading) - timeOffset;
       double width = sampleTimes->getDeltaTime(window, rawTimeFalling, rawTimeLeading);
 
-      // determine time uncertainty
-
+      // default time uncertainty
       double timeError = geo->getNominalTDC().getTimeJitter();
-      if (m_pedestalRMS > 0) {
-        double rmsNoise = m_pedestalRMS;
-        if (m_noises->isCalibrated(moduleID, channel)) {
-          rmsNoise = m_noises->getNoise(moduleID, channel);
+
+      if (rawDigit.getDataType() == TOPRawDigit::c_MC) {
+        // MC with simplified digitization
+        time -= geo->getNominalTDC().getOffset();
+        statusBits |= TOPDigit::c_OffsetSubtracted;
+      } else {
+        // data and MC with full waveform digitization
+        if (m_pedestalRMS > 0) {
+          double rmsNoise = m_pedestalRMS;
+          if (m_noises->isCalibrated(moduleID, channel)) {
+            rmsNoise = m_noises->getNoise(moduleID, channel);
+          }
+          double rawErr = rawDigit.getCFDLeadingTimeError(rmsNoise); // in [samples]
+          int sample = static_cast<int>(rawTimeLeading);
+          if (rawTimeLeading < 0) sample--;
+          timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
         }
-        double rawErr = rawDigit.getCFDLeadingTimeError(rmsNoise); // in [samples]
-        int sample = static_cast<int>(rawTimeLeading);
-        if (rawTimeLeading < 0) sample--;
-        timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
-      }
 
-      // is Monte Carlo with simplified digitization ?
+        auto pulseHeight = rawDigit.getValuePeak();
+        double timeErrorSq = timeError * timeError;
+        if (m_timeWalk.isValid()) timeErrorSq += m_timeWalk->getSigmaSq(pulseHeight);
 
-      bool isMC = (rawDigit.getDataType() == TOPRawDigit::c_MC);
-
-      // apply T0 calibration or subtract offset - depending on data (MC) or simplified MC
-
-      double calErrorSq = 0;
-      if (not isMC) { // data: apply T0 calibration
+        if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
+          if (m_timeWalk->isCalibrated()) {
+            time -= m_timeWalk->getTimeWalk(pulseHeight);
+          }
+        }
         if (m_useChannelT0Calibration) {
           const auto& cal = m_channelT0;
           if (cal->isCalibrated(moduleID, channel)) {
             time -= cal->getT0(moduleID, channel);
             double err = cal->getT0Error(moduleID, channel);
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
           }
         }
@@ -389,7 +410,7 @@ namespace Belle2 {
           if (cal->isCalibrated(moduleID)) {
             time -= cal->getT0(moduleID);
             double err = cal->getT0Error(moduleID);
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_ModuleT0Calibrated;
           }
         }
@@ -398,18 +419,12 @@ namespace Belle2 {
           if (cal->isCalibrated()) {
             time -= cal->getT0();
             double err = cal->getT0Error();
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_CommonT0Calibrated;
           }
         }
-      } else { // MC: subtract offset
-        time -= geo->getNominalTDC().getOffset();
-        statusBits |= TOPDigit::c_OffsetSubtracted;
+        timeError = sqrt(timeErrorSq);
       }
-
-      // include T0 calibration uncertainties into time uncertainty
-
-      if (calErrorSq > 0) timeError = sqrt(timeError * timeError + calErrorSq);
 
       // append new TOPDigit and set it
 
@@ -429,7 +444,8 @@ namespace Belle2 {
       if (rawDigit.isAtWindowDiscontinuity(storageDepth))
         digit->setHitQuality(TOPDigit::c_Junk);
       if (digit->getPulseWidth() < m_minPulseWidth or
-          digit->getPulseWidth() > m_maxPulseWidth)
+          digit->getPulseWidth() > m_maxPulseWidth or
+          digit->getPulseWidth() * digit->getPulseHeight() < m_minWidthXheight)
         digit->setHitQuality(TOPDigit::c_Junk);
     }
 
@@ -444,6 +460,10 @@ namespace Belle2 {
         if (digit.getPulseHeight() > m_calpulseHeightMax) continue;
         if (digit.getPulseWidth() < m_calpulseWidthMin) continue;
         if (digit.getPulseWidth() > m_calpulseWidthMax) continue;
+        if (m_calpulseTimeMax > m_calpulseTimeMin) {
+          if (digit.getTime() < m_calpulseTimeMin) continue;
+          if (digit.getTime() > m_calpulseTimeMax) continue;
+        }
         digit.setHitQuality(TOPDigit::c_CalPulse);
       }
     }

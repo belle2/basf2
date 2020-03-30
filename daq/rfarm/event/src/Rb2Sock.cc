@@ -8,6 +8,8 @@
 
 #include "daq/rfarm/event/Rb2Sock.h"
 
+#include <unistd.h>
+
 using namespace std;
 using namespace Belle2;
 

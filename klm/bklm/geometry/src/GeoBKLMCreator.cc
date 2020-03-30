@@ -12,9 +12,9 @@
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/simulation/SensitiveDetector.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
 /* Belle 2 headers. */
 #include <geometry/Materials.h>

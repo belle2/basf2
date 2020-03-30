@@ -9,25 +9,9 @@
 #ifndef TRACKANAMODULE_H
 #define TRACKANAMODULE_H
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
 #include <framework/core/HistoModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-// dataobjects
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-
 #include "TH1F.h"
-#include "TH2F.h"
-#include "TLorentzVector.h"
 
 namespace Belle2 {
 

@@ -14,7 +14,7 @@ __authors__ = [
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
-from skimExpertFunctions import ifEventPasses
+from skimExpertFunctions import ifEventPasses, BaseSkim
 
 
 def SinglePhotonDarkList(path):
@@ -329,3 +329,52 @@ def DielectronPlusMissingEnergyList(path):
     # And return the dielectron list
     dielectron_list.append(dielectron_name)
     return dielectron_list
+
+
+class SinglePhotonDark(BaseSkim):
+    """
+    Single photon skim list for the dark photon analysis
+
+    **Skim code**: 18020100
+
+    **Physics channel**: ee → A'γ; A' → invisible
+
+    **Skim category**: physics, dark sector
+
+    Skim list contains single photon candidates for the dark photon to invisible final
+    state analysis.
+    """
+    __author__ = "Sam Cunliffe"
+
+    RequiredParticleLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+        # no good tracks in the event
+        cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+
+        # no other photon above 100 MeV
+        angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
+        minimum = 'E > 0.1'  # GeV
+        ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
+        path2 = b2.Path()
+        ifEventPasses(
+            f'0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1',
+            conditional_path=path2, path=path)
+
+        # all remaining single photon events (== candidates) with region
+        # dependent minimum energy in GeV
+        region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel
+        region_dependent += '[clusterReg ==  1 and useCMSFrame(E) > 2.0] or '  # fwd
+        region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
+        region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
+        region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
+        ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
+        self.SkimLists = ['gamma:singlePhoton']

@@ -299,15 +299,9 @@ class BaseSkim:
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        b2.B2ERROR(f"No `build_lists` method defined for skim {self}!")
+        b2.B2FATAL(f"No `build_lists` method defined for skim {self}!")
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __str__(self):
-        return self.name
-
-    def __name__(self):
-        return self.name
-
     def __call__(self, path):
         """Produce the skim particle lists and write uDST file."""
         self.set_skim_logging(path)
@@ -315,6 +309,12 @@ class BaseSkim:
         self.setup(path)
         self.build_lists(path)
         self.output_udst(path)
+
+    def __str__(self):
+        return self.name
+
+    def __name__(self):
+        return self.name
 
     def _validate_required_particle_lists(self):
         """Verify that the RequiredParticleLists value is in the expected format.
@@ -377,7 +377,7 @@ class BaseSkim:
 
     def load_particle_lists(self, path):
         """Load the required particle lists for a skim, using the specified modules and
-        functions in the attribute
+        functions in the attribute `RequiredParticleLists`.
         """
 
         for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
@@ -407,16 +407,16 @@ class BaseSkim:
         summaryOfLists(self.SkimLists, path=path)
 
 
-class CombinedSkim:
+class CombinedSkim(BaseSkim):
     """Class for creating combined skims which can be run using similar-looking methods
     to `BaseSkim` objects.
 
     Skims may be combined in this class in the following way:
 
     >>> import basf2 as b2
-    >>> from skim.foo import MySkim, MyOtherSkim, SomeoneElsesSkim
+    >>> from skim.foo import OneSkim, TwoSkim, RedSkim, BlueSkim
     >>> path = b2.Path()
-    >>> skims = CombinedSkim(MySkim(), MyOtherSkim(), SomeoneElsesSkim())
+    >>> skims = CombinedSkim(OneSkim(), TwoSkim(), RedSkim(), BlueSkim())
     >>> skims(path)  # Create all skim lists and save to uDST
     """
 
@@ -426,10 +426,15 @@ class CombinedSkim:
             raise NotImplementedError(
                 "Must pass only `BaseSkim` type objects to `CombinedSkim`."
             )
-        self.Skims = {skim.name: skim for skim in skims}
-        self.NoisyModules = list({skim.NoisyModules for skim in self.Skims})
+
+        self.Skims = skims
+        self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules})
+
+        for skim in skims:
+            skim._validate_required_particle_lists()
+
         self.RequiredParticleLists = self._merge_nested_dicts(
-            skim.RequiredParticleLists for skim in self.Skims
+            skim.RequiredParticleLists for skim in skims
         )
 
     def __str__(self):
@@ -445,7 +450,31 @@ class CombinedSkim:
         self.load_particle_lists(path)
         self.setup(path)
         self.build_lists(path)
+        self._check_duplicate_list_names()
         self.output_udst(path)
+
+    def setup(self, path):
+        """Run all of the setup functions for each skim.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        for skim in self.Skims:
+            skim.setup(path)
+
+    def build_lists(self, path):
+        """Run all the build_lists functions for each skim.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        for skim in self.Skims:
+            skim.build_lists(path)
+
+    def output_udst(self, path):
+        """Write uDST output files for each skim."""
+        for skim in self.Skims:
+            skim.output_udst(path)
 
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names.
@@ -503,43 +532,3 @@ class CombinedSkim:
                 d1[k] = d2[k]
 
         return d1
-
-    def set_skim_logging(self, path):
-        """Turns the log level to ERROR for selected modules to decrease the total size
-        of the skim log files. Additional modules can be silenced by setting the attribute
-        `NoisyModules` for an individual skim.
-
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-        """
-        b2.set_log_level(b2.LogLevel.INFO)
-
-        NoisyModules = ["ParticleLoader", "ParticleVertexFitter"] + self.NoisyModules
-
-        for module in path.modules():
-            if module.type() in set(NoisyModules):
-                module.set_log_level(b2.LogLevel.ERROR)
-
-    def setup(self, path):
-        """Run all of the setup functions for each skim.
-
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-        """
-        for skim in self.Skims:
-            skim.setup(path)
-
-    def build_lists(self, path):
-        """Run all the build_lists functions for each skim.
-
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-        """
-        for skim in self.Skims:
-            pass
-
-    def output_udst(self, path):
-        """Write uDST output files for each skim."""
-        for skim in self.Skims:
-            skimOutputUdst(skim.OutputFileName, skim.lists, path=path)
-            summaryOfLists(skim.lists, path=path)

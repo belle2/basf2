@@ -47,16 +47,21 @@ namespace Belle2 {
     void setGlobalTag(const std::string& GlobalTagName);
 
     /**
-     * Prepare the database.
-     */
-    void prepareDatabase();
-
-    /**
      * Check strip efficiency.
      */
     void checkStripEfficiency();
 
   private:
+
+    /**
+     * Initialize the database.
+     */
+    void initializeDatabase();
+
+    /**
+     * Reset the database.
+     */
+    void resetDatabase();
 
     /**
      * Experiment number.

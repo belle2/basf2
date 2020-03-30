@@ -17,6 +17,7 @@
 #include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle II headers. */
+#include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
@@ -60,7 +61,7 @@ void KLMCalibrationChecker::setGlobalTag(const std::string& GlobalTagName)
   m_GlobalTagName = GlobalTagName;
 }
 
-void KLMCalibrationChecker::prepareDatabase()
+void KLMCalibrationChecker::initializeDatabase()
 {
   /* Mimic a module initialization. */
   StoreObjPtr<EventMetaData> eventMetaData;
@@ -81,10 +82,17 @@ void KLMCalibrationChecker::prepareDatabase()
     B2FATAL("Setting both testing payload and Global Tag or setting no one of them.");
 }
 
+void KLMCalibrationChecker::resetDatabase()
+{
+  /* Reset both DataStore and Database. */
+  DataStore::Instance().reset();
+  Database::reset();
+}
+
 void KLMCalibrationChecker::checkStripEfficiency()
 {
-  /* Prepare the database. */
-  prepareDatabase();
+  /* Initialize the database. */
+  initializeDatabase();
   /* Now we can read the payload. */
   DBObjPtr<KLMStripEfficiency> stripEfficiency;
   if (not stripEfficiency.isValid())
@@ -155,4 +163,6 @@ void KLMCalibrationChecker::checkStripEfficiency()
     delete hist;
     delete canvas;
   }
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
 }

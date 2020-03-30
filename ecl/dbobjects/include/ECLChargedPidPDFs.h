@@ -435,11 +435,11 @@ namespace Belle2 {
      */
     VTSMapByCategory m_vtsmap_bycategory;
 
-    ClassDef(ECLChargedPidPDFs, 8); /**< ClassDef */
-    /**< 8: removed dependency on pdgId of category histograms */
-    /**< 7: added enum InputVar */
-    /**< 6: added m_variablesmap_bycategory */
-    /**< 5: added m_do_varstransform */
-    /**< 4: added m_variables */
+    ClassDef(ECLChargedPidPDFs, 2); /**< ClassDef */
+    /**< 2: removed dependency on pdgId of category histograms */
+    /**<    added enum InputVar */
+    /**<    added m_variablesmap_bycategory */
+    /**<    added m_do_varstransform */
+    /**<    added m_variables */
   };
 } // end namespace Belle2

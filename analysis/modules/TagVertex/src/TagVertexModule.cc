@@ -744,7 +744,7 @@ namespace Belle2 {
     double mass;
 
     // remove tracks from KS
-    for (unsigned int i(0); i < tagParticles.size(); ++i) {
+    for (unsigned i = 0; i < tagParticles.size(); ++i) {
       particle1 = tagParticles.at(i);
 
       if (particle1) mom1 = particle1->get4Vector();

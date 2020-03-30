@@ -35,9 +35,12 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-        float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate */
-        float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate */
-        float averageRate = 0; /**< total detector average hit rate */
+        float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate in kHz*/
+        float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate in kHz */
+        float averageRate = 0; /**< total detector average hit rate in KHz */
+        int   timeWindowForSmallCell  = -1;/**< time window for the small cells in ns */
+        int   timeWindowForNormalCell = -1;/**< time window for the normal cells in ns */
+
         int   nActiveWireInLayer[f_nLayer] = {0}; /**<  number of wires used in this analysis in each layer */
         int   nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**<  number of wires used in this analysis in each super layer*/
         int   nActiveWireInTotal = 0; /**<  number of wires used in this analysis in the whole CDC*/
@@ -45,17 +48,26 @@ namespace Belle2 {
         bool  valid = false;  /**< status: true = rates valid */
 
         /**
-         * normalize accumulated hits to single event
+         * normalize accumulated hits to hit rate in kHz
          */
         void normalize()
         {
           if (numEvents == 0) return;
-          averageRate /= numEvents;
+          averageRate /= (numEvents * timeWindowForNormalCell * 1e-6);
 
-          for (auto& superLayerRate : superLayerHitRate)
-            superLayerRate /= numEvents;
-          for (auto& layerRate : layerHitRate)
-            layerRate /= numEvents;
+          for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL) {
+            if (iSL == 0)
+              superLayerHitRate[iSL] /= (numEvents * timeWindowForSmallCell * 1e-6);
+            else
+              superLayerHitRate[iSL] /= (numEvents * timeWindowForNormalCell * 1e-6);
+          }
+
+          for (int iL = 0 ; iL < f_nLayer ; ++iL) {
+            if (0 <= iL && iL <= 7) ///// SL0
+              layerHitRate[iL] /= (numEvents * timeWindowForSmallCell * 1e-6);
+            else
+              layerHitRate[iL] /= (numEvents * timeWindowForNormalCell * 1e-6);
+          }
         }
       };
 
@@ -78,8 +90,12 @@ namespace Belle2 {
         m_enableBadWireTreatment(enableBadWireTreatment),
         m_enableBackgroundHitFilter(enableBackgroundHitFilter),
         m_enableMarkBackgroundHit(enableMarkBackgroundHit)
-      {}
-
+      {
+        if (m_timeWindowUpperEdge_smallCell  - m_timeWindowLowerEdge_smallCell  <= 0 ||
+            m_timeWindowUpperEdge_normalCell - m_timeWindowLowerEdge_normalCell <= 0) {
+          B2FATAL("invalid seting of CDC time window");
+        }
+      }
       /**
        * Class initializer: set branch addresses and other staf
        * @param tree a valid TTree pointer

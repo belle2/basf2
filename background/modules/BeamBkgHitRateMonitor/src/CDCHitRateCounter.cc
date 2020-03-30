@@ -43,6 +43,8 @@ namespace Belle2 {
           << "layerHitRate[" << f_nLayer << "]/F:"
           << "superLayerHitRate[" << f_nSuperLayer << "]/F:"
           << "averageRate/F:"
+          << "timeWindowForSmallCell/I"
+          << "timeWindowForNormalCell/I"
           << "nActiveWireInLayer[" << f_nLayer << "]/I:"
           << "nActiveWireInSuperLayer[" << f_nSuperLayer << "]/I:"
           << "nActiveWireInTotal/I:"
@@ -142,25 +144,27 @@ namespace Belle2 {
 
       if (not m_rates.valid) return;
 
-      // normalize : nhit / nEvent in a second(time stamp) => # of hit in a event
+      m_rates.timeWindowForSmallCell  = m_timeWindowUpperEdge_smallCell  - m_timeWindowLowerEdge_smallCell;
+      m_rates.timeWindowForNormalCell = m_timeWindowUpperEdge_normalCell - m_timeWindowLowerEdge_normalCell;
+
+      // normalize : hit rate in the time stamp in kHz
       m_rates.normalize();
 
-      // optionally: convert to MHz, correct for the masked-out channels etc.
-      ///// (# of hit in a event) / nActiveWire => occupancy in an event
-      ///// Total occupancy
+      /////  / nActiveWire => hit rate [kHz] per wire
+      ///// average hit rate per wire [kHz] in all wires
       if (m_nActiveWireInTotal == 0) {
         m_rates.averageRate = 0;
       } else {
         m_rates.averageRate /= m_nActiveWireInTotal;
       }
-      ///// SuperLayer occupancy
+      ///// average hit rate per wire [kHz] in SulerLayer
       for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL)
         if (m_nActiveWireInSuperLayer[iSL] == 0) {
           m_rates.superLayerHitRate[iSL] = 0;
         } else {
           m_rates.superLayerHitRate[iSL] /= m_nActiveWireInSuperLayer[iSL];
         }
-      ///// Layer occupancy
+      ///// average hit rate per wire [kHz] in Layer
       for (int iLayer = 0 ; iLayer < f_nLayer ; ++iLayer)
         if (m_nActiveWireInLayer[iLayer] == 0) {
           m_rates.layerHitRate[iLayer] = 0;

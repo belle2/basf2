@@ -45,7 +45,7 @@ class _Registry:
 
         # --- WG4: Charmed B decays ---
         ("14120300", "btocharm", "BtoD0h_Kspi0"),
-        ("14120400", "botcharm", "BtoD0h_Kspipipi0"),
+        ("14120400", "btocharm", "BtoD0h_Kspipipi0"),
         # B0 -> D-(k+ ""- pi-)pi+ # ("14140500", "", "BtoD0h_Kspi0pi0"),
         # Add when skim script is ready
         ("14120600", "btocharm", "B0toDpi_Kpipi"),
@@ -63,7 +63,7 @@ class _Registry:
         ("14140101", "btocharm", "BtoD0h_Kpi"),
         # B+ -> anti-D0/anti-D0* (K- pi+ pi+ pi-, K- ""+ pi0) h+
         ("14140102", "btocharm", "BtoD0h_Kpipipi_Kpipi0"),
-        ("14140200", "btcharm", "BtoD0h_Kshh"),
+        ("14140200", "btocharm", "BtoD0h_Kshh"),
         ("14141000", "btocharm", "BtoD0rho_Kpi"),
         ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
 
@@ -114,10 +114,19 @@ class _Registry:
     ]
 
     codes = [code for code, _, _ in registry]
+    modules = list({module for _, module, _ in registry})
     names = [names for _, _, names in registry]
 
     def get_skim_module(self, SkimName):
-        """Re"""
+        """Retrieve the skim module name from the registry which contains the given
+        skim.
+
+        Parameters:
+            SkimName (str): Name of the skim as it appears in `skim.registry.Registry`.
+
+        Returns:
+            SkimModule (str): The name of the skim module which contains the skim.
+        """
         lookup = {name: module for _, module, name in self.registry}
         try:
             return lookup[SkimName]
@@ -126,7 +135,30 @@ class _Registry:
                 f"Unrecognised skim name {SkimName}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
-            raise LookupError
+            raise LookupError(SkimName)
+
+    def get_expected_skims_in_module(self, SkimModule):
+        """Retrieve a list of the skims listed in the registry as existing in
+        the given skim module.
+
+        Parameters:
+            SkimModule (str): The name of the module, *e.g.* ``btocharmless`` (not
+                ``skim.btocharmless`` or ``btocharmless.py``).
+
+        Returns:
+            ExpectedSkims (list(str)): The skims listed in the registry as belonging to
+                ``SkimModule``.
+        """
+        if SkimModule not in self.modules:
+            B2ERROR(f"Unrecognised skim module {SkimModule}.")
+            raise LookupError(SkimModule)
+
+        ModuleLookup = {name: module for _, module, name in self.registry}
+        NameLookup = {
+            module: [name for name in self.names if ModuleLookup[name] == module]
+            for module in self.modules
+        }
+        return NameLookup[SkimModule]
 
     def encode_skim_name(self, SkimName):
         """Find the 8 digit skim code assigned to the skim with the provided name.
@@ -145,7 +177,7 @@ class _Registry:
                 f"Unrecognised skim name {SkimName}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
-            raise LookupError
+            raise LookupError(SkimName)
 
     def decode_skim_code(self, SkimCode):
         """Find the name of the skim which corresponds to the provided skim code.
@@ -168,7 +200,7 @@ class _Registry:
                 f"Unrecognised skim code {SkimCode}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
-            raise LookupError
+            raise LookupError(SkimCode)
 
 
 # Make a publicly accessible Registry instance

@@ -94,7 +94,7 @@ void ROIPayloadAssemblerModule::event()
       ROIrawID roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
       int layer = (iROI.getSensorID()).getLayerNumber() - 1;
-      int ladder = (iROI.getSensorID()).getLadderNumber(); FATAL
+      int ladder = (iROI.getSensorID()).getLadderNumber();
       int sensor = (iROI.getSensorID()).getSensorNumber() - 1;
 
       roiraw.setSystemFlag(0);// System 0 is HLT, 1 would be DATCON

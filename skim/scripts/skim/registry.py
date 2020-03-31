@@ -126,6 +126,7 @@ class _Registry:
                 f"Unrecognised skim name {SkimName}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
+            raise LookupError
 
     def encode_skim_name(self, SkimName):
         """Find the 8 digit skim code assigned to the skim with the provided name.
@@ -144,6 +145,7 @@ class _Registry:
                 f"Unrecognised skim name {SkimName}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
+            raise LookupError
 
     def decode_skim_code(self, SkimCode):
         """Find the name of the skim which corresponds to the provided skim code.
@@ -158,7 +160,7 @@ class _Registry:
             SkimName (str): Name of the corresponding skim as it appears in
             `skim.registry.Registry`.
         """
-        lookup = {code: name for code, _, nname in self.registry}
+        lookup = {code: name for code, _, name in self.registry}
         try:
             return lookup[SkimCode]
         except KeyError:
@@ -166,6 +168,7 @@ class _Registry:
                 f"Unrecognised skim code {SkimCode}. "
                 "Please add your skim to `skim.registry.Registry`."
             )
+            raise LookupError
 
 
 # Make a publicly accessible Registry instance

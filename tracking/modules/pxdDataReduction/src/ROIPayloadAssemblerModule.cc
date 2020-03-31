@@ -75,9 +75,12 @@ void ROIPayloadAssemblerModule::event()
   if (!mAcceptAll) {
     StoreObjPtr<SoftwareTriggerResult> result;
     if (!result.isValid()) {
-      B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+      /// Events rejected by the EventOfDoomBuster will NOT contain SoftwareTriggerResult
+      B2INFO("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+      accepted = false;
+    } else {
+      accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
     }
-    accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
   }
 
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;
@@ -91,7 +94,7 @@ void ROIPayloadAssemblerModule::event()
       ROIrawID roiraw; /**< 64 bit union containing a single ROI info to be sent to ONSEN*/
 
       int layer = (iROI.getSensorID()).getLayerNumber() - 1;
-      int ladder = (iROI.getSensorID()).getLadderNumber();
+      int ladder = (iROI.getSensorID()).getLadderNumber(); FATAL
       int sensor = (iROI.getSensorID()).getSensorNumber() - 1;
 
       roiraw.setSystemFlag(0);// System 0 is HLT, 1 would be DATCON

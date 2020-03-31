@@ -216,6 +216,35 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
+def fancy_skim_header(SkimClass):
+    """Decorator to generate a fancy header to skim documentation and prepend it to the
+    docstring. Add this just above the definition of a skim.
+
+    .. code-block:: python
+
+        @fancy_skim_header
+        class MySkimName(BaseSkim):
+            # docstring here describing your skim, and explaining cuts.
+    """
+    SkimName = SkimClass.__name__
+    SkimCode = encodeSkimName(SkimName)
+    authors = SkimClass.__authors__
+    WG = SkimClass.__WorkingGroup__
+    description = SkimClass.__SkimDescription__
+
+    header = f""".. Note::
+        * **Skim description**: {description}
+        * **Skim LFN code**: {SkimCode}
+        * **Working Group**: {WG}
+        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
+    if SkimClass.__doc__ is None:
+        return None
+    else:
+        SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
+
+    return SkimClass
+
+
 class BaseSkim(ABC):
     """Base class for skims. Initialises a skim name, and creates template functions
     required for each skim.
@@ -230,25 +259,39 @@ class BaseSkim(ABC):
            class DarkSinglePhoton(BaseSkim):
                # docstring here describing your skim, and explaining cuts.
 
-    2. Set the ``__authors__`` property to a list of skim authors, so users know who to
-       contact about your skim. `BaseSkim` requires you to set this attribute in each
-       subclass.
+    2. Tell us about your skim by setting the following attributes:
 
-    2. Specify all required particle lists in the attribute `RequiredParticleLists`. See
+       * ``__SkimDescription__``: one-line summary describing the purpose of your skim.
+       * ``__WorkingGroup__``: the name of the working group this skim is designed for.
+       * ``__authors__``: list of skim authors, so users know who to contact
+         about your skim.
+
+       `BaseSkim` requires you to set these attributes in each subclass. If these are
+       all set, then Sphinx will produce a lovely header to document your skim. Once
+       these are set, we can we add a lovely auto-generated header to the documentation
+       of the skim by using the `fancy_skim_header` decorator.
+
+       .. code-block:: python
+
+           @fancy_skim_header
+           class DarkSinglePhoton(BaseSkim):
+               # docstring here describing your skim, and explaining cuts.
+
+    3. Specify all required particle lists in the attribute `RequiredParticleLists`. See
        documentation of this attribute for instructions on how to do this for your skim.
        This step is mandatory.
 
-    3. If any further setup is required, then overwrite the `additional_setup` method.
+    4. If any further setup is required, then overwrite the `additional_setup` method.
        This step is not mandatory.
 
-    4. Define all cuts by overwriting `build_lists`. Before the end of the `build_lists`
+    5. Define all cuts by overwriting `build_lists`. Before the end of the `build_lists`
        method, the attribute `SkimLists` must be set at the end of this method. This
        step is mandatory.
 
-    5. If any modules are producing too much noise, then overwrite the attribute
+    6. If any modules are producing too much noise, then overwrite the attribute
        `NoisyModules` as a list of those modules. This step is not mandatory.
 
-    6. Define validation histograms for your skim by overwriting
+    7. Define validation histograms for your skim by overwriting
        `validation_histograms`.
 
     Calling an instance of a skim class will run the particle list loaders, setup
@@ -266,6 +309,21 @@ class BaseSkim(ABC):
         skim = MyDefinedSkim()
         skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
         path.process()
+
+
+    .. Tip::
+
+        If your skim does not define ``__SkimDescription__``, ``__WorkingGroup__``,
+        ``__authors__``, `RequiredParticleLists` or `build_lists`, then you will see an
+        error message like:
+
+        .. code-block:: bash
+
+            TypeError: Can't instantiate abstract class SinglePhotonDark with abstract \
+methods __authors__
+
+        This can be fixed by defining these required attributes and methods.
+
     """
 
     NoisyModules = []
@@ -304,6 +362,16 @@ class BaseSkim(ABC):
                 },
             }
         """
+
+    @property
+    @abstractmethod
+    def __SkimDescription__(self):
+        pass
+
+    @property
+    @abstractmethod
+    def __WorkingGroup__(self):
+        pass
 
     @property
     @abstractmethod

@@ -12,7 +12,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
 def LeptonicList(path):
@@ -69,15 +69,9 @@ def LeptonicList(path):
     return lepList
 
 
+@fancy_skim_header
 class LeptonicUntagged(BaseSkim):
     """
-    Note:
-        * **Skim description**: Skim for leptonic analyses,
-          :math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`.
-        * **Skim LFN code**: 11130300
-        * **Working Group**: (Semi-)Leptonic and Missing Energy
-          Working Group (WG1)
-
     Reconstructed decays
         * :math:`B^- \\to e^-`
         * :math:`B^- \\to \\mu^-`
@@ -88,7 +82,13 @@ class LeptonicUntagged(BaseSkim):
         * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
+
     __authors__ = ["Phillip Urquijo"]
+    __SkimDescription__ = (
+        "Skim for leptonic analyses, "
+        ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"
+    )
+    __WorkingGroup__ = "Semileptonic and Missing Energy Working Group (WG1)"
 
     RequiredParticleLists = {
         "stdCharged":
@@ -99,6 +99,7 @@ class LeptonicUntagged(BaseSkim):
     }
 
     def build_lists(self, path):
+        """Build skim list for LeptonicUntagged skim."""
         ma.cutAndCopyList(
             "e-:highP",
             "e-:all",

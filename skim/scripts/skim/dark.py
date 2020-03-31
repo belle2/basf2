@@ -14,7 +14,7 @@ __authors__ = [
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
-from skimExpertFunctions import ifEventPasses, BaseSkim
+from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header
 
 
 def SinglePhotonDarkList(path):
@@ -331,12 +331,9 @@ def DielectronPlusMissingEnergyList(path):
     return dielectron_list
 
 
+@fancy_skim_header
 class SinglePhotonDark(BaseSkim):
     """
-    Single photon skim list for the dark photon analysis
-
-    **Skim code**: 18020100
-
     **Physics channel**: ee → A'γ; A' → invisible
 
     **Skim category**: physics, dark sector
@@ -345,18 +342,17 @@ class SinglePhotonDark(BaseSkim):
     state analysis.
     """
     __authors__ = ["Sam Cunliffe"]
+    __SkimDescription__ = "Single photon skim list for the dark photon analysis."
+    __WorkingGroup__ = "Dark group"
 
     RequiredParticleLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-        },
         "stdPhotons": {
             "stdPhotons": ["all"],
         },
     }
 
     def build_lists(self, path):
+        """Build skim list for SinglePhotonDark skim."""
         # no good tracks in the event
         cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
 

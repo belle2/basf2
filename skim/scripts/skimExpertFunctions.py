@@ -14,39 +14,35 @@ import json
 
 import basf2 as b2
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
-from skim.registry import skim_registry
+from skim.registry import Registry
 import skimTestFilesInfo
 # For channels in fei skim
 # from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
 
 
-_all_skims = [name for _, name in skim_registry]
+_all_skims = Registry.names
 
 
-def encodeSkimName(skimScriptName):
+def encodeSkimName(SkimName):
     """
     Returns the appropriate 8 digit skim code that will be used as the output uDST
     file name for any give name of a skimming script.
 
-    :param str skimScriptName: Name of the skim.
+    :param str SkimName: Name of the skim.
     """
-    lookup_dict = {n: c for c, n in skim_registry}
-    if skimScriptName not in lookup_dict:
-        b2.B2ERROR("Skim Unknown. Please add your skim to skimExpertFunctions.py.")
-    return lookup_dict[skimScriptName]
+    # TODO: delete `encodeSkimName` and use `Registry.encode_skim_name` in its place
+    return Registry.encode_skim_name(SkimName)
 
 
-def decodeSkimName(skimCode):
+def decodeSkimName(SkimCode):
     """
     Returns the appropriate name of the skim given a specific skim code. This is useful to determine the skim script used
     to produce a specific uDST file, given the 8-digit code  name of the file itself.
 
     :param str code:
     """
-    lookup_dict = {c: n for c, n in skim_registry}
-    if skimCode not in lookup_dict:
-        b2.B2ERROR("Code Unknown. Please add your skim to skimExpertFunctions.py")
-    return lookup_dict[skimCode]
+    # TODO: delete `decodeSkimName` and use `Registry.decode_skim_code` in its place
+    return Registry.decode_skim_code(SkimCode)
 
 
 def get_test_file(sampleName):
@@ -105,7 +101,7 @@ def add_skim(label, lists, path):
         path (basf2.Path): modules are added to this path
 
     """
-    skimCode = encodeSkimName(label)
+    skimCode = Registry.encode_skim_name(label)
     skimOutputUdst(skimCode, lists, path=path)
     summaryOfLists(lists, path=path)
 
@@ -227,7 +223,7 @@ def fancy_skim_header(SkimClass):
             # docstring here describing your skim, and explaining cuts.
     """
     SkimName = SkimClass.__name__
-    SkimCode = encodeSkimName(SkimName)
+    SkimCode = Registry.encode_skim_name(SkimName)
     authors = SkimClass.__authors__
     WG = SkimClass.__WorkingGroup__
     description = SkimClass.__SkimDescription__
@@ -386,7 +382,7 @@ methods __authors__
                 defaults to eight-number skim code.
         """
         self.name = self.__class__.__name__
-        self.code = encodeSkimName(self.name)
+        self.code = Registry.encode_skim_name(self.name)
         self.OutputFileName = OutputFileName or self.code
         self.SkimLists = []
 
@@ -566,6 +562,8 @@ class CombinedSkim(BaseSkim):
     """
 
     __authors__ = ["Phil Grace"]
+    __WorkingGroup__ = None
+    __SkimDescription__ = None
 
     RequiredParticleLists = None
     """`BaseSkim.RequiredParticleLists` attribute initialised to `None` to get around

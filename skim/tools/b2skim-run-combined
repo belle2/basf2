@@ -14,33 +14,76 @@ from importlib import import_module
 import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import CombinedSkim, get_test_file
+from skim.registry import Registry
+
+
+class CustomHelpFormatter(argparse.HelpFormatter):
+    """Custom formatter for argparse which prints the valid choices for an
+    argument in the help string.
+    """
+
+    def _get_help_string(self, action):
+        if action.choices:
+            return (
+                action.help + " Valid options are: " + ", ".join(action.choices) + "."
+            )
+        else:
+            return action.help
 
 
 def get_argument_parser():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=CustomHelpFormatter,
+    )
 
-    parser.add_argument("skims", nargs="+", default=[], choices=["LeptonicUntagged", "SinglePhotonDark"])
-    parser.add_argument("-n", "--max-input-events", type=int, default=0)
+    parser.add_argument(
+        "skims",
+        choices=Registry.names,
+        nargs="+",
+        default=[],
+        metavar="Skim",
+        help="Skims to be run.",
+    )
+    parser.add_argument(
+        "-n",
+        "--max-input-events",
+        dest="MaxInputEvents",
+        metavar="MaxInputEvents",
+        type=int,
+        default=0,
+        help="Maximum number of input events to process.",
+    )
     parser.add_argument(
         "-i",
         "--input-file-list",
         dest="InputFileList",
+        metavar="InputFileList",
         nargs="+",
         default=[get_test_file("MC12_mixedBGx1")],
+        help="Input file list",
     )
-    parser.add_argument("-o", "--output-udst-name", dest="OutputFileName")
 
     return parser
 
 
 def get_skim_function(SkimName):
-    # TODO: Write generalised method of finding modules, using registry.py
-    if SkimName == "LeptonicUntagged":
-        SkimModule = import_module("skim.leptonic")
-    elif SkimName == "SinglePhotonDark":
-        SkimModule = import_module("skim.dark")
-    else:
+    """Get the skim class constructor for the given skim.
+
+    This is achieved by importing the module listed alongside the skim name in the
+    `skim.registry.Registry`.
+
+    Parameters:
+        SkimName (str): Name of the skim to be found.
+
+    Returns:
+        SkimFunction: The class constructor for the given skim.
+    """
+    # TODO: Delete this `if` statement once everything is implemented
+    if SkimName not in ["LeptonicUntagged", "SinglePhotonDark"]:
         raise NotImplementedError
+
+    ModuleName = Registry.get_skim_module(SkimName)
+    SkimModule = import_module(f"skim.{ModuleName}")
     return getattr(SkimModule, SkimName)
 
 
@@ -55,7 +98,7 @@ def main():
     SkimObject = CombinedSkim(*SkimObjects)
     SkimObject(path)
 
-    b2.process(path, max_event=args.max_input_events)
+    b2.process(path, max_event=args.MaxInputEvents)
     print(b2.statistics())
 
 

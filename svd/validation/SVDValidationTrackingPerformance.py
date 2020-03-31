@@ -34,7 +34,7 @@ ploter(
     granules=granulesD,
     tree=tree,
     expr='cluster_UVTimeDiff',
-    cut='',
+    cut=cut_oneTH,
     descr='time difference between opposite sides of clusters belonging to the same layer',
     check='peak around 0',
     isShifter=True)
@@ -51,7 +51,7 @@ ploter(
     granules=granulesTD,
     tree=tree,
     expr='cluster_UUTimeDiff',
-    cut=cut_U,
+    cut=cut_U+cut_oneTH,
     descr='time difference between clusters belonging to the neighbour layers',
     check='peak around 0',
     isShifter=True)
@@ -67,7 +67,7 @@ ploter(
     granules=granulesTD,
     tree=tree,
     expr='cluster_VVTimeDiff',
-    cut=cut_V,
+    cut=cut_V+cut_oneTH,
     descr='time difference between clusters belonging to the neighbour layers',
     check='peak around 0',
     isShifter=True)

@@ -107,8 +107,6 @@ ECLUnpackerModule::ECLUnpackerModule() :
   addParam("storeTrigTime", m_storeTrigTime,         "Store trigger time",              false);
   addParam("storeUnmapped", m_storeUnmapped,         "Store ECLDsp for channels that don't "
            "exist in ECL mapping", false);
-
-  m_localEvtNum = 0;
 }
 
 ECLUnpackerModule::~ECLUnpackerModule()

@@ -58,7 +58,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~Results() {}
+      ~Results() { delete m_Efficiency; delete m_ExtHitsPlane; }
 
       /**
        * Get achieved precision of efficiency measurement (the worst one).

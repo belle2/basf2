@@ -207,6 +207,7 @@ class _Registry:
 Registry = _Registry()
 
 #: A dict listing which standalone skims are included the combined skim scripts
+# DELETE: Will be made obselete by CombinedSkim class & autogeneration of combined skims
 combined_skims = {
     'BtoCharm1': [
         'BtoD0h_Kshh', 'BtoD0h_hh', 'BtoD0h_Kspi0', 'BtoD0h_Kspipipi0'

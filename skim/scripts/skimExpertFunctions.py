@@ -228,6 +228,9 @@ def fancy_skim_header(SkimClass):
     WG = SkimClass.__WorkingGroup__
     description = SkimClass.__SkimDescription__
 
+    if isinstance(authors, str):
+        authors = authors.split(", ")
+
     header = f""".. Note::
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}

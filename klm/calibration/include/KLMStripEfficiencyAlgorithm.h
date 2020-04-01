@@ -51,6 +51,16 @@ namespace Belle2 {
     public:
 
       /**
+       * Constructor.
+       */
+      Results() {}
+
+      /**
+       * Destructor.
+       */
+      ~Results() {}
+
+      /**
        * Get achieved precision of efficiency measurement (the worst one).
        */
       float getAchievedPrecision() const
@@ -111,13 +121,13 @@ namespace Belle2 {
       int m_MatchedDigits = 0;
 
       /** Efficiency. */
-      float* m_Efficiency;
+      float* m_Efficiency = nullptr;
 
       /** Number of ExtHits (overall). */
       int m_ExtHits = 0;
 
       /** Number of ExtHits per plane. */
-      int* m_ExtHitsPlane;
+      int* m_ExtHitsPlane = nullptr;
 
     };
 

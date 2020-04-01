@@ -5,9 +5,10 @@
 
 from importlib import import_module
 
+from b2test_utils import clean_working_directory, require_file
 import basf2 as b2
 import modularAnalysis as ma
-from skimExpertFunctions import CombinedSkim, get_test_file
+from skimExpertFunctions import CombinedSkim
 from skim.registry import Registry
 
 __authors__ = ["Phil Grace"]
@@ -47,7 +48,7 @@ def get_skim_object(SkimName):
 
 def main():
     path = b2.Path()
-    ma.inputMdstList("default", get_test_file("MC12_mixedBGx0"), path=path)
+    ma.inputMdstList("default", require_file("mdst12.root", "validation"), path=path)
 
     skim = CombinedSkim(*[get_skim_object(skim) for skim in Registry.names])
     skim(path)
@@ -56,4 +57,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    with clean_working_directory():
+        main()

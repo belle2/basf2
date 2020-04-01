@@ -46,8 +46,8 @@ Standard Particle Lists
    * New functions include `stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`, and `goodOmega`
    * All documentation for this optimization and usage can be found at `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/1337/files/BELLE2-NOTE-PH-2019-011.pdf>`_
 
- * The default vertex fitter for the V0 lists `stdKshorts` and `stdLambdas` has been changed from `vertexRave` to `treeFit`.
-   However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `vertexRave` or to `KFit`.
+ * The default vertex fitter for the V0 lists `stdKshorts` and `stdLambdas` has been changed from `Rave` to `treeFit`.
+   However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `Rave` or to `KFit`.
  * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under their most likely hypothesis.
 
  * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.

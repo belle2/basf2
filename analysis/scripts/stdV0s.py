@@ -16,7 +16,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     candidates with an invariant mass in the range :math:`0.450 < M < 0.550~GeV`,
     and for which the vertex fit did not fail, are kept.
 
-    The vertex fitter can be selected among `treeFit`, `KFit`, and `vertexRave`.
+    The vertex fitter can be selected among `treeFit`, `KFit`, and `Rave`.
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
@@ -31,7 +31,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     elif fitter == 'KFit':
         vertex.KFit('K_S0:V0', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.vertexRave('K_S0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.Rave('K_S0:V0', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('K_S0:V0', '0.450 < M < 0.550', path=path)
@@ -44,7 +44,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     elif fitter == 'KFit':
         vertex.KFit('K_S0:RD', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.vertexRave('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.Rave('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
     if prioritiseV0:
@@ -77,7 +77,7 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     candidates with an invariant mass in the range :math:`1.10 < M < 1.13~GeV`,
     and for which the vertex fit did not fail, are kept.
 
-    The vertex fitter can be selected among `treeFit`, `KFit`, and `vertexRave`.
+    The vertex fitter can be selected among `treeFit`, `KFit`, and `Rave`.
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
@@ -92,7 +92,7 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     elif fitter == 'KFit':
         vertex.KFit('Lambda0:V0', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.vertexRave('Lambda0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.Rave('Lambda0:V0', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Lambdas are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('Lambda0:V0', '1.10 < M < 1.13', path=path)
@@ -109,7 +109,7 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     elif fitter == 'KFit':
         vertex.KFit('Lambda0:RD', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.vertexRave('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.Rave('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('Lambda0:RD', '1.10 < M < 1.13', path=path)
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)

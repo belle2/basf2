@@ -26,7 +26,7 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import vertexRaveDaughtersUpdate
+from vertex import Rave
 from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
@@ -50,7 +50,7 @@ reconstructDecay("A:sel -> mu-:sel mu+:sel", "", path=my_path)
 reconstructDecay("A:selvertex -> mu-:sel mu+:sel", "", path=my_path)
 
 # Perform four momentum constraint fit using RaveFit and update the Daughters
-vertexRaveDaughtersUpdate("A:selvertex", -1.0, constraint="iptube", path=my_path)
+Rave("A:selvertex", -1.0, constraint="iptube", daughtersUpdate=True, path=my_path)
 
 pdg.add_particle('beam', 9000009, 999., 999., 0, 0)  # name, PDG, mass, width, charge, spin
 reconstructDecay("beam:sel -> A:sel gamma:sel", "", path=my_path)

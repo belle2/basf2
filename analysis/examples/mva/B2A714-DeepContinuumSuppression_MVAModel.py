@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -13,7 +12,7 @@
 # Additional examples with keras can be found in the folder:
 # mva/examples/keras
 #
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Contributors: D. Weyland (November 2017), P. Goldenzweig (October 2016)

@@ -39,8 +39,7 @@ namespace Belle2 {
         this->m_aDBObjPtr -> get_uniqueID()); });
     }
 
-    /** Return the charge (number of electrons/holes) collected on a specific
-     * strip, given the number of ADC counts.
+    /** Return the strip time, given the raw strip time
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -64,6 +63,36 @@ namespace Belle2 {
                               sensorID.getSensorNumber(),
                               m_aDBObjPtr->sideIndex(isU),
                               strip).calibratedValue(raw_time, bin);
+
+    }
+
+    /** Return the strip time error, given the raw strip time,
+     * and tje raw time error
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number - NOT USED
+     * @param raw_time : raw CoG time in ns
+     * @param raw_timeErr : raw CoG time in ns
+     * @param bin : trigger bin (0,1,2,3)
+     *
+     * Output: double corresponding to the corrected time [ns]
+     */
+    inline double getCorrectedTimeError(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned short& strip,
+      const double& raw_time,
+      const double& raw_timeErr,
+      const int& bin
+    ) const
+    {
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(),
+                              sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(),
+                              m_aDBObjPtr->sideIndex(isU),
+                              strip).calibratedValueError(raw_time, raw_timeErr, bin);
 
     }
 

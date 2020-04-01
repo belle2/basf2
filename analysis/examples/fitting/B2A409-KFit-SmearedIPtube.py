@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -31,7 +30,6 @@ from stdCharged import stdMu
 from stdV0s import stdKshorts
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
-import variables.utils as vu
 
 # create path
 my_path = b2.create_path()

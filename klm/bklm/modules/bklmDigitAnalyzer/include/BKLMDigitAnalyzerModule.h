@@ -11,8 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
@@ -51,14 +50,29 @@ namespace Belle2 {
      */
     virtual ~BKLMDigitAnalyzerModule() override;
 
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
 
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
 
 
@@ -74,7 +88,7 @@ namespace Belle2 {
     StoreArray<KLMDigitRaw> m_digitRaw;
 
     //!  Input BKLMDigits whose time is out of range
-    StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;
+    StoreArray<BKLMDigit> m_digitOutOfRange;
 
     //! Output data array of analyzed BKLMDigit information
     StoreArray<KLMDigitEventInfo> m_digitEventInfo;
@@ -111,8 +125,6 @@ namespace Belle2 {
 
     //! Pointer to TDC-difference 1D histogram of each channel for each sector and view
     TH1F* m_histoCTimeDiff[2][8][2];
-
-    //TH2F* m_histoCharge[2][8][2][2];
 
     //! Convert a number of type T into a string
     template <typename T>

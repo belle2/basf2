@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 # run 'pydoc3 vertex' for general documentation of vertexing stuff
@@ -29,8 +28,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables.collections as vc
-import variables.utils as vu
 import vertex as vx
 from stdPi0s import stdPi0s
 
@@ -46,7 +43,7 @@ ma.inputMdst(environmentType='default',
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
+# see Standard Particles section at https://software.belle2.org/
 stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay

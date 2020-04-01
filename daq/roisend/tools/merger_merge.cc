@@ -6,9 +6,9 @@
 #include <string.h>
 #include <poll.h>
 #include <signal.h>
-#include <sys/types.h>
 #include <netinet/in.h>
 #include <map>
+#include <set>
 #include <arpa/inet.h>
 
 #include "daq/roisend/util.h"
@@ -17,6 +17,7 @@
 #include "daq/roisend/h2m.h"
 
 #include "daq/rfarm/manager/RFFlowStat.h"
+#include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
 
@@ -27,6 +28,86 @@ using namespace std;
 #define ERR_FPRINTF (fprintf)
 
 std::map<int, std::string> myconn;
+std::map<int, unsigned int> mycount;
+
+std::set<int> triggers;
+unsigned int event_number_max = 0;
+
+bool got_sigusr1 = false;
+bool got_sigusr2 = false;
+bool got_sigint = false;
+bool got_sigpipe = false;
+bool got_sigterm = false;
+
+static void catch_usr1_function(int /*signo*/)
+{
+//     puts("SIGUSR1 caught\n");
+  got_sigusr1 = true;
+}
+
+static void catch_usr2_function(int /*signo*/)
+{
+//     puts("SIGUSR2 caught\n");
+  got_sigusr2 = true;
+}
+
+static void catch_int_function(int /*signo*/)
+{
+//     puts("SIGINT caught\n");
+  got_sigint = true;
+}
+
+static void catch_term_function(int /*signo*/)
+{
+//     puts("SIGTERM caught\n");
+  got_sigterm = true;
+}
+
+static void catch_pipe_function(int /*signo*/)
+{
+//     puts("SIGPIPE caught\n");
+  got_sigpipe = true;
+}
+
+void clear_triggers(void)
+{
+  triggers.clear();
+  event_number_max = 0;
+}
+
+void plot_triggers(void)
+{
+  if (!triggers.empty()) {
+    ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
+                *(--triggers.end()),
+                triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
+    int i = 0;
+    for (auto& it : triggers) {
+      ERR_FPRINTF(stderr, "Miss trig %u\n", it);
+      if (i++ == 20) {
+        ERR_FPRINTF(stderr, "... too many missing to report\n");
+        break;
+      }
+    }
+  } else {
+    ERR_FPRINTF(stderr, "[RESULT] merger_merge: missing triggers 0\n");
+  }
+}
+
+void check_event_nr(unsigned int event_number)
+{
+  // this code might not detect missing trigger nr 0
+  // it is assumed, that run number change has been checked and handled before
+  if (event_number_max < event_number) {
+    for (uint32_t e = event_number_max + 1; e < event_number; e ++) {
+      triggers.insert(e);
+    }
+    event_number_max = event_number;
+  } else {
+    // we dont fill event_number in the if above, thus we dont have to remove it
+    triggers.erase(event_number);
+  }
+}
 
 static int
 MM_init_connect_to_onsen(const char* host, const unsigned int port)
@@ -184,7 +265,6 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
   size_t n_words_from_hltout;
   size_t n_bytes_from_hltout;
 
-
   ret = recv(sd_acc, &n_words_from_hltout, sizeof(unsigned int), MSG_PEEK);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     ERR_FPRINTF(stderr, "merger_merge: recv(): Packet receive timed out\n");
@@ -219,39 +299,17 @@ MM_term_connect_to_onsen(const int sd)
   return close(sd);
 }
 
-
-// static int
-// MM_term_accept_from_hltout2merger(const int sd)
-// {
-//   close(sd);
-// }
-
-
-size_t
-perl_split_uint16t(char d, const char* string, unsigned short ret[])
+void print_stat(void)
 {
-  char* buf, *p, delim[2];
-  size_t len;
-  size_t count = 0;
-
-
-  len = strlen(string);
-  buf = (char*)malloc(len);
-  strcpy(buf, string);
-
-  delim[0] = d;
-  delim[1] = 0;
-
-  p = strtok(buf, delim);
-  if (!p) return 0;
-  ret[count++] = atoi(p);
-
-  while ((p = strtok(NULL, delim))) ret[count++] = atoi(p);
-
-  free(buf);
-
-
-  return count;
+  ERR_FPRINTF(stderr, "--- STAT START ---\n");
+  unsigned int sum = 0;
+  for (auto& it : mycount) {
+    ERR_FPRINTF(stderr, "(%s): %d\n", myconn[it.first].c_str(), it.second);
+    if (it.first != 0) sum += it.second;
+  }
+  ERR_FPRINTF(stderr, "sum %u out %u diff %d\n", sum, mycount[0], (int)(mycount[0] - sum));
+  plot_triggers();
+  ERR_FPRINTF(stderr, "--- STAT END ---\n");
 }
 
 // Main
@@ -259,11 +317,14 @@ perl_split_uint16t(char d, const char* string, unsigned short ret[])
 int
 main(int argc, char* argv[])
 {
+  int current_runnr = -1; // problem: handover without abort
   // int n_hltout = 0;
   int sd_acc = -1;
   int sd_con = -1;
   int need_reconnection_to_onsen = 1;
   int event_count = 0;
+  int connected_hlts = 0;
+  bool stop_running = false;
 
   char onsen_host[1024];
   unsigned short onsen_port;
@@ -302,14 +363,18 @@ main(int argc, char* argv[])
   onsen_port = atoi(p);
 
   p = argv[5];
-  //    n_hltout = perl_split_uint16t(':', p, accept_port);
   accept_port = atoi(p);
 
   /* Flow monitor */
   Belle2::RFFlowStat* flstat = new Belle2::RFFlowStat(shmname, shmid, NULL);
 
+  signal(SIGPIPE, catch_pipe_function);
+  signal(SIGTERM, catch_term_function);
+  signal(SIGINT, catch_int_function);
+  signal(SIGUSR1, catch_usr1_function);
+  signal(SIGUSR2, catch_usr2_function);
+
   /* Create a port to accept connections*/
-  signal(SIGPIPE, SIG_IGN);
   sd_acc = MM_init_accept_from_hltout2merger(accept_port);
   LOG_FPRINTF(stderr, "merger_merge: port to accept connections from HLTOUT [%d]\n", sd_acc);
 
@@ -364,6 +429,8 @@ main(int argc, char* argv[])
   fflush(stderr);
   fflush(stdout);
 
+  clear_triggers();
+
   fd_set allset;
   FD_ZERO(&allset);
   FD_SET(sd_acc, &allset);
@@ -372,7 +439,7 @@ main(int argc, char* argv[])
   fd_set rset;//, wset;
 
   // Handle Obtain ROI and send it to ONSEN
-  for (;;) {
+  while (!stop_running) {
     memcpy(&rset, &allset, sizeof(rset));
     // memcpy(&wset, &allset, sizeof(wset));
 
@@ -382,6 +449,29 @@ main(int argc, char* argv[])
     //    printf ( "Select(): maxfd = %d, start select...; rset=%x, wset=%x\n", maxfd, rset, wset);
     int rc = select(maxfd + 1, &rset, NULL, NULL, NULL);
     //    printf ( "Select(): returned with %d,  rset = %8.8x\n", rc, rset );
+    if (got_sigusr1) {
+      got_sigusr1 = false;
+      ERR_FPRINTF(stderr, "Got SIGUSR1, Run START\n");
+      print_stat();
+    }
+    if (got_sigusr2) {
+      got_sigusr2 = false;
+      ERR_FPRINTF(stderr, "Got SIGUSR2, Run STOP\n");
+      print_stat();
+    }
+    if (got_sigint) {
+      got_sigint = false;
+      ERR_FPRINTF(stderr, "Got SIGINT, ABORT\n");
+      print_stat();
+    }
+    if (got_sigpipe) {
+      got_sigpipe = false;
+      ERR_FPRINTF(stderr, "Got SIGPIPE\n");
+    }
+    if (got_sigterm) {
+      got_sigterm = false;
+      ERR_FPRINTF(stderr, "Got SIGTERM\n");
+    }
     if (rc < 0) {
       perror("select");
       continue;
@@ -400,11 +490,12 @@ main(int argc, char* argv[])
         return (-1);
       }
       printf("New socket connection t=%d\n", t);
-
       char address[INET_ADDRSTRLEN];
       inet_ntop(AF_INET, &isa.sin_addr, address, sizeof(address));
+      connected_hlts++;
 
-      myconn[sd_acc] = address;
+      printf("%d is IP <%s>\n", t, address);
+      myconn[t] = address;
 
       fflush(stdout);
       FD_SET(t, &allset);
@@ -432,16 +523,22 @@ main(int argc, char* argv[])
             // rethink if we dont exit but process these to limit loss of events.
             // ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
             // exit(1);
+            close(fd);
+            FD_CLR(fd, &allset); //opposite of FD_SET
+            connected_hlts--;
+            if (connected_hlts == 0) stop_running = true;
             ret = 0;
           }
           n_bytes_from_hltout = ret;
 
           //    printf ( "RoI received : Event count = % d\n", event_count );
-
-          if (ret > 0 && (event_count < 40 || event_count % 10000 == 0)) {
-            LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] received event from ROI transmitter\n", event_count);
-            LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned % ld\n", n_bytes_from_hltout);
-            dump_binary(stderr, buf, n_bytes_from_hltout);
+          if (ret > 0) {
+            mycount[fd]++;
+            if (event_count < 5  /*|| event_count % 100000 == 0*/) {
+              LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] received event from ROI transmitter\n", event_count);
+              LOG_FPRINTF(stderr, "merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
+              dump_binary(stderr, buf, n_bytes_from_hltout);
+            }
           }
         }
 
@@ -449,6 +546,40 @@ main(int argc, char* argv[])
         if (n_bytes_from_hltout > 0) {
           int ret;
           unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+
+          // extract trigger number, run+exp nr and fill it in a table.
+
+          int runnr = 0;
+          int eventnr = 0;
+
+          // From ROIpayload.h
+          //     enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
+          //    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
+
+          if (n_bytes_from_hltout >= 5 * 4) {
+            boost::spirit::endian::ubig32_t* iptr = (boost::spirit::endian::ubig32_t*)ptr_head_to_onsen;
+            eventnr = iptr[3];
+            runnr = (iptr[4] & 0x3FFF00) >> 8;
+//             ERR_FPRINTF(stderr, "%08X %08X %08X %08X %08X -> %08X %08X \n",
+//                         (unsigned int)iptr[0],(unsigned int) iptr[1],(unsigned int) iptr[2],(unsigned int) iptr[3],(unsigned int) iptr[4], eventnr, runnr);
+          } else {
+            LOG_FPRINTF(stderr, "[ERROR] merger_merge: packet to small to hold useful header (%ld)\n", n_bytes_from_hltout);
+          }
+
+          if (runnr > current_runnr) {
+            print_stat();
+            clear_triggers();
+            current_runnr = runnr;
+          } else if (runnr < current_runnr) {
+            // got some event from old run
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: Got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
+                        eventnr);
+          }
+
+          if (runnr == current_runnr) {
+            // seperate if, as we might set it in the if above
+            check_event_nr(eventnr);
+          }
 
           n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
           while (1) {
@@ -466,6 +597,7 @@ main(int argc, char* argv[])
             ERR_FPRINTF(stderr, "[ERROR] merger_merge: error to send to ONSEN : %s\n", strerror(errno));
             free(buf);
             ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+            print_stat();
             exit(1);
           }
           if (ret == 0) {
@@ -475,18 +607,24 @@ main(int argc, char* argv[])
             free(buf);
             ERR_FPRINTF(stderr, "[ERROR] Connection to ONSEN was closed on ONSEN side\n");
             ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
+            print_stat();
             exit(1);
           }
 
           flstat->log(n_bytes_to_onsen);
 
-          if (event_count < 10 /*|| event_count % 10000 == 0*/) {
-            LOG_FPRINTF(stderr, "merger_merge: ---- [ % d] sent event to ONSEN\n", event_count);
+          mycount[0]++;
+          if (event_count < 5 /*|| event_count % 10000 == 0*/) {
+            LOG_FPRINTF(stderr, "merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }
         }
       }
       event_count++;
+      if (event_count % 1000000 == 0) {
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
+                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
+      }
     }
   }
 
@@ -494,6 +632,10 @@ main(int argc, char* argv[])
   /* termination: never reached */
   MM_term_connect_to_onsen(sd_con);
 
+  if (connected_hlts == 0) {
+    ERR_FPRINTF(stderr, "Stopped because all HLTs closed connection\n");
+  }
+  print_stat();
   ERR_FPRINTF(stderr, "%s terminated\n", argv[0]);
   return 0;
 }

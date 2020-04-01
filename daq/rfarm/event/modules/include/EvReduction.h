@@ -10,36 +10,17 @@
 #define EVREDUCTION_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/RingBuffer.h>
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-
-#include <daq/rawdata/modules/DAQConsts.h>
-//#include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
 #include <rawdata/dataobjects/RawARICH.h>
 #include <rawdata/dataobjects/RawTOP.h>
 #include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawTRG.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-//#include <rawdata/dataobjects/RawHeader.h>
-//#include <rawdata/dataobjects/RawTrailer.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
-
-
-#include <framework/dataobjects/EventMetaData.h>
 
 #define RBUFSIZE   100000000
 #define MAXEVTSIZE  10000000

@@ -113,17 +113,13 @@ namespace Belle2 {
     bool valid = decaydescriptor.init(decayString);
     if (!valid)
       B2ERROR("Invalid input DecayString: " << decayString);
-    m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
-    m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();
-    m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
-    m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
-    m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
 
+    m_properties = decaydescriptor.getProperty();
 
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    m_isUnspecified = mother->isUnspecified();
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -134,6 +130,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -170,17 +169,12 @@ namespace Belle2 {
     if (!valid)
       B2ERROR("Given decaydescriptor failed to initialized");
 
-    m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
-    m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();
-    m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
-    m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
-    m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
-
+    m_properties = decaydescriptor.getProperty();
 
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    m_isUnspecified = mother->isUnspecified();
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -191,6 +185,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -442,23 +439,15 @@ namespace Belle2 {
     }
     const TLorentzVector vec(px, py, pz, E);
 
-    int property = Particle::PropertyFlags::c_Ordinary;
-    if (m_isUnspecified) property |= Particle::PropertyFlags::c_IsUnspecified;
-    if (m_isIgnoreRadiatedPhotons) property |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
-    if (m_isIgnoreIntermediate) property |= Particle::PropertyFlags::c_isIgnoreIntermediate;
-    if (m_isIgnoreMassive) property |= Particle::PropertyFlags::c_isIgnoreMassive;
-    if (m_isIgnoreNeutrino) property |= Particle::PropertyFlags::c_isIgnoreNeutrino;
-    if (m_isIgnoreGamma) property |= Particle::PropertyFlags::c_isIgnoreGamma;
-
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }

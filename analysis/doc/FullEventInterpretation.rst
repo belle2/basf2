@@ -1,3 +1,5 @@
+.. _FullEventInterpretation:
+
 Full event interpretation
 =========================
 

@@ -25,8 +25,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <arich/dataobjects/ARICHDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <framework/dataobjects/BackgroundInfo.h>
 
 using namespace std;
@@ -51,6 +51,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
     addParam("PXDDigitsName", m_PXDDigitsName,
              "name of PXD collection to overlay with BG", string(""));
     addParam("SVDShaperDigitsName", m_SVDShaperDigitsName,
@@ -75,7 +76,7 @@ namespace Belle2 {
   void BGOverlayExecutorModule::initialize()
   {
     // get name of extension that is used in BGOverlayInput for BG collections
-    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    StoreObjPtr<BackgroundInfo> bkgInfo(m_BackgroundInfoInstanceName, DataStore::c_Persistent);
     if (bkgInfo.isValid()) {
       if (bkgInfo->getMethod() == BackgroundInfo::c_Overlay) {
         m_extensionName = bkgInfo->getExtensionName();

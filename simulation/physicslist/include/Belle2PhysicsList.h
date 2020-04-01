@@ -77,12 +77,12 @@ namespace Belle2 {
       /** Secondary production thresholds */
       G4double m_globalCutValue;
 
-      G4double m_pxdCutValue;
-      G4double m_svdCutValue;
-      G4double m_cdcCutValue;
-      G4double m_arichtopCutValue;
-      G4double m_eclCutValue;
-      G4double m_klmCutValue;
+      G4double m_pxdCutValue;       /**< threshold for PXD */
+      G4double m_svdCutValue;       /**< threshold for SVD */
+      G4double m_cdcCutValue;       /**< threshold for CDC */
+      G4double m_arichtopCutValue;  /**< threshold for ARICH and TOP */
+      G4double m_eclCutValue;       /**< threshold for ECL */
+      G4double m_klmCutValue;       /**< threshold for BKLM and EKLM */
     };
 
   } // end of namespace Simulation

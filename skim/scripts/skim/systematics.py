@@ -373,8 +373,8 @@ def PiKFromDstarList(path):
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
-        ma.reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
-        DstarList.append('D*-:syst' + str(chID))
+        ma.reconstructDecay('D*+:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
+        DstarList.append('D*+:syst' + str(chID))
         ma.matchMCTruth('D*+:syst0', path=path)
 
     return DstarList
@@ -419,7 +419,7 @@ def DstarToD0PiPartList(path):
 
 # D-
     DminusCuts = '1.0 < M < 1.75'
-    DminusChannel = ['pi+:fromks pi+:loose pi-:loose']
+    DminusChannel = ['pi-:fromks pi+:loose pi-:loose']
 
     for chID, channel in enumerate(DminusChannel):
         resonanceName = 'D-:loose' + str(chID)

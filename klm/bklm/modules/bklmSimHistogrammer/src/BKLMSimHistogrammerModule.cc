@@ -12,8 +12,8 @@
 #include <klm/bklm/modules/bklmSimHistogrammer/BKLMSimHistogrammerModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>

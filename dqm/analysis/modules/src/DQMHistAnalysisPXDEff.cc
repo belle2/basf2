@@ -229,10 +229,11 @@ void DQMHistAnalysisPXDEffModule::event()
 
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-      error_flag |= (nhit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.85); // error if upper error value is below limit
-      warn_flag |= (nhit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // (and not only the actual eff value)
+
+      error_flag |= (ihit > 10)
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // error if upper error value is below limit
+      warn_flag |= (ihit > 10)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.92); // (and not only the actual eff value)
     }
   }
 
@@ -241,18 +242,26 @@ void DQMHistAnalysisPXDEffModule::event()
 
   auto gr = m_hEffAll->GetPaintedGraph();
   if (gr) {
+    double scale_min = 1.0;
     for (int i = 0; i < gr->GetN(); i++) {
       gr->SetPointEXhigh(i, 0.);
       gr->SetPointEXlow(i, 0.);
       // this has to be done first, as it will recalc Min/Max and destroy axis
       Double_t x, y;
       gr->GetPoint(i, x, y);
-      gr->SetPoint(i, x - 0.01, y);
+      gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
+      auto val = y - gr->GetErrorYlow(i); // Error is relative to value
+      if (i != 5) { // exclude 1.3.2
+        /// check for val > 0.0) { would exclude all zero efficient modules!!!
+        if (scale_min > val) scale_min = val;
+      }
     }
+    if (scale_min == 1.0) scale_min = 0.0;
+    if (scale_min > 0.9) scale_min = 0.9;
     gr->SetMinimum(0);
     gr->SetMaximum(m_PXDModules.size());
     auto ay = gr->GetYaxis();
-    if (ay) ay->SetRangeUser(0, 1.0);
+    if (ay) ay->SetRangeUser(scale_min, 1.0);
     auto ax = gr->GetXaxis();
     if (ax) {
       ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
@@ -271,7 +280,7 @@ void DQMHistAnalysisPXDEffModule::event()
     gr->Draw("AP");
     m_cEffAll->cd(0);
 
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

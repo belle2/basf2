@@ -63,6 +63,9 @@ namespace Belle2 {
     //! Get magic number for data corruption check
     virtual unsigned int GetMagicTrailer(int n) = 0;
 
+    //! Get stored information of getimeofday in a PC
+    virtual void GetPCTimeVal(int n, struct timeval* tv);
+
 
 
     //! check the data contents

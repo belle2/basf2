@@ -8,9 +8,11 @@
 //         9 - Dec - 2013, Modification for DAQ use
 //-
 
-
 #include <daq/storage/modules/StorageSerializer.h>
-#include <daq/storage/modules/StorageDeserializer.h>
+
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <iostream>
 #include <TList.h>

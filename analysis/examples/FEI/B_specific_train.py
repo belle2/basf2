@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # William Sutcliffe 2019
 #
@@ -68,8 +67,8 @@ skimfilter.if_value('=0', empty_path, b2.AfterConditionPath.END)
 path.add_module(skimfilter)
 
 # Prepare list for the training.
-path.add_module('MCDecayFinder', decayString='B+ ==> e+ nu_e gamma', listName='B+:FEIMC_e', writeOut=True)
-path.add_module('MCDecayFinder', decayString='B+ ==> mu+ nu_mu gamma', listName='B+:FEIMC_mu', writeOut=True)
+path.add_module('MCDecayFinder', decayString='B+ -> e+ nu_e gamma', listName='B+:FEIMC_e', writeOut=True)
+path.add_module('MCDecayFinder', decayString='B+ -> mu+ nu_mu gamma', listName='B+:FEIMC_mu', writeOut=True)
 ma.copyLists('B+:FEIMC', ['B+:FEIMC_e', 'B+:FEIMC_mu'], writeOut=True, path=path)
 
 

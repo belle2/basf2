@@ -36,7 +36,9 @@ stdKshorts(path=path)
 
 
 # Kshh skim
-from skim.btocharm import loadD0_Kshh_loose, BsigToD0hToKshhList
+from skim.btocharm import BsigToD0hToKshhList
+from skim.standardlists.charm import loadD0_Kshh_loose
+
 loadD0_Kshh_loose(path=path)
 BtoDhList = BsigToD0hToKshhList(path=path)
 expert.skimOutputUdst(skimCode, BtoDhList, path=path)

@@ -2,6 +2,7 @@
 
 #include "daq/slc/readout/ProcessListener.h"
 #include "daq/slc/readout/LogListener.h"
+#include "daq/slc/runcontrol/RCHandlerException.h"
 
 #include "daq/slc/system/Executor.h"
 #include "daq/slc/system/PThread.h"
@@ -10,7 +11,6 @@
 #include "daq/slc/base/StringUtil.h"
 #include <daq/slc/system/LockGuard.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
 

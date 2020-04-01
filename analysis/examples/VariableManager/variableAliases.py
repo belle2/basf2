@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 # Tired of using long names like ``genUpsilon4S(daughter(0, daughter(0, PDG)))``
-# (which become even less readable in its ROOT compatible form as demonstrated in
-# variableManager.py)?
+# (which become even less readable in its ROOT compatible form as demonstrated
+# in variableManager.py)?
 # Well, despair no longer! With so called "aliases", you can define handy short
 # names for your complicated variables.
 #
@@ -20,28 +20,29 @@ import variables.utils as vu
 
 
 # Let's start small and explicitly define alias for some simple variables:
-# Let clusterECMS_{i} be the shorthand of daughter({i}, useCMSFrame(clusterE))
+# 'd0_x' is now shorthand for 'daugher(0, x)', etc.
 vm.addAlias('d0_x', 'daughter(0, x)')
 vm.addAlias('d0_y', 'daughter(0, y)')
 vm.addAlias('d0_z', 'daughter(0, z)')
 
 # Now as you see, we have a clear naming convention in our head, but typing it
-# all out will quickly become cumbersome (there's lot's of variables and lot's
-# of daughters after all).
-# Let's do the same thing with the momenta, but in just one line:
+# all out will quickly become cumbersome if we have lots of variables for lots
+# of daughters.
+# Let's define similar variables for the momenta, but with just one expression:
 vu.create_aliases(
     list_of_variables=["px", "py", "pz"],
     wrapper="daughter(0, {variable})",
-    prefix="d0_",
+    prefix="d0",  # (an underscore is automatically appended to the prefix)
 )
 # {variable} is replaced by the name of each variable, so we just defined
 # the aliases d0_px, d0_py, ...
+# Adding more variables to the first daughter is now much easier, because we
+# only have to add them to list_of_variables.
 
-
-# But in fact, this can be done even easier, because the variable utils provide
-# as with a dedicated convenience function just to define aliases for
-# daughter(.., ..) variables (it's very common after all)
-# Let's create aliases for the second daughter
+# But in fact, this can be done even more conveniently, because the variable
+# utils provide us with a dedicated convenience function just to define
+# aliases for daughter(.., ..) variables (it's very common after all) Let's
+# create aliases for the second daughter
 
 vu.create_daughter_aliases(
     list_of_variables=["x", "y", "z", "px", "py", "pz"],
@@ -97,7 +98,7 @@ vu.create_aliases_for_selected(
     list_of_variables=["x", "y", "z"],
     decay_string="B0 -> [^D0 -> pi+ ^K-] ^pi0",
 )
-# This automatically created simple aliases for the cooredinates in the
+# This automatically creates simple aliases for the coordinates in the
 # remaining particles in the decay!
 
 # Finally let's print all of our alias

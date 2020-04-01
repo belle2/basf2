@@ -285,21 +285,6 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
   }//end of for tp
 }//end of func
 
-int CDCCalibrationCollectorModule::getWiresInLayer(int layerN)
-{
-  int wiresInLayer[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                          160, 160, 160, 160, 160, 160,
-                          192, 192, 192, 192, 192, 192,
-                          224, 224, 224, 224, 224, 224,
-                          256, 256, 256, 256, 256, 256,
-                          288, 288, 288, 288, 288, 288,
-                          320, 320, 320, 320, 320, 320,
-                          352, 352, 352, 352, 352, 352,
-                          384, 384, 384, 384, 384, 384
-                         };
-  return wiresInLayer[layerN];
-}
-
 const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
     const Helix& helixFit) const
 {
@@ -321,7 +306,7 @@ const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3
 
 void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
 {
-  const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
     const double radiusofLayer = wireLayer.getRefCylindricalR();
     //simple extrapolation of fit

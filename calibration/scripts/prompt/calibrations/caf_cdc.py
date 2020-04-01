@@ -100,6 +100,12 @@ def get_calibrations(input_data, **kwargs):
                           max_iterations=4,
                           dependencies=[cal4]
                           )
+    # wire efficiency
+    cal6 = CDCCalibration(name='wire_eff',
+                          algorithms=[wire_algo()],
+                          input_file_dict=input_file_dict,
+                          max_iterations=4
+                          )
 
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
@@ -116,7 +122,7 @@ def get_calibrations(input_data, **kwargs):
     for algorithm in cal5.algorithms:
         algorithm.params = {"apply_iov": output_iov}
 
-    return [cal0, cal1, cal2, cal3, cal4, cal5]
+    return [cal0, cal1, cal2, cal3, cal4, cal5, cal6]
 
 
 #################################################
@@ -235,6 +241,22 @@ def sr_algo():
     """
     from ROOT import Belle2
     algo = Belle2.CDC.SpaceResolutionCalibrationAlgorithm()
+    algo.setStoreHisto(True)
+    algo.setThreshold(0.4)
+    return algo
+
+
+def wireeff_algo():
+    """
+    Create wire efficiency plots.
+    Parameters:
+        prefix : prefixed name for algorithm,
+                 which should be consistent with one of collector..
+    Returns:
+        algo : Wire efficiency algorithm
+    """
+    from ROOT import Belle2
+    algo = Belle2.CDC.WireEfficiencyAlgorithm()
     algo.setStoreHisto(True)
     algo.setThreshold(0.4)
     return algo

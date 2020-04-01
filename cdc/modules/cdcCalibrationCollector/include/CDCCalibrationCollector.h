@@ -72,12 +72,7 @@ namespace Belle2 {
       */
       void buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit);
       /**
-       * returns the number of wires in a given layer
-       */
-      int getWiresInLayer(int layerN);
-
-      /**
-       * returns the number of wires in a given layer
+       * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
       const TrackFindingCDC::CDCWire& getIntersectingWire(const TVector3& xyz, const TrackFindingCDC::CDCWireLayer& layer,
                                                           const Helix& helixFit) const;

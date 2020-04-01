@@ -13,6 +13,8 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from variables import variables as vm
+from validation_tools.metadata import create_validation_histograms
 
 
 def LeptonicList(path):
@@ -91,10 +93,9 @@ class LeptonicUntagged(BaseSkim):
     __WorkingGroup__ = "Semileptonic and Missing Energy Working Group (WG1)"
 
     RequiredParticleLists = {
-        "stdCharged":
-        {
+        "stdCharged": {
             "stdE": ["all"],
-            "stdMu": ["all"],
+            "stdMu": ["all"]
         }
     }
 
@@ -120,3 +121,46 @@ class LeptonicUntagged(BaseSkim):
         ma.applyCuts("B-:L1", "nTracks>=3", path=path)
         lepList = ["B-:L0", "B-:L1"]
         self.SkimLists = lepList
+
+    def validation_histograms(self, path):
+        """Produce validation histograms for LeptonicUntagged skim."""
+        ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:L0", "B-:L1"], "", path=path)
+
+        ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)
+        ma.appendROEMask(
+            "B-:LeptonicUntagged",
+            "basic",
+            "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
+            "E>0.05",
+            path=path,
+        )
+        ma.buildContinuumSuppression("B-:LeptonicUntagged", "basic", path=path)
+
+        vm.addAlias("d0_p", "daughter(0,p)")
+        vm.addAlias("d0_electronID", "daughter(0,electronID)")
+        vm.addAlias("d0_muonID", "daughter(0,muonID)")
+        vm.addAlias("MissP", "weMissP(basic,0)")
+
+        histogramFilename = "LeptonicUntagged_Validation.root"
+        contact = "Phil Grace <philip.grace@adelaide.edu.au>"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B-:LeptonicUntagged",
+            variables_1d=[
+                ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
+                ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
+                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
+                 contact, "", ""),
+                ("d0_muonID", 100, 0, 1, "electronID of signal-side lepton", contact,
+                 "", ""),
+                ("R2", 100, 0, 1, "R2", contact, "", ""),
+                ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
+                 "", ""),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", contact,
+                 "", "")
+            ],
+            path=path,
+        )

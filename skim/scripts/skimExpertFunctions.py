@@ -419,7 +419,7 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        b2.B2FATAL(f"No `build_lists` method defined for skim {self}!")
+        pass
 
     def validation_histograms(self, path):
         """Create validation histograms for the skim.
@@ -427,8 +427,7 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        # TODO: Figure out how this will work
-        print(f"No validation histograms defined for {self} skim.")
+        pass
 
     # Everything beyond this point can remain as-is when defining a skim
     def __call__(self, path):
@@ -442,6 +441,39 @@ methods __authors__
         self.additional_setup(path)
         self.build_lists(path)
         self.output_udst(path)
+
+    def _method_unchanged(self, method):
+        """Check if the method of the class is the same as in its parent class, or if it has
+        been overriden.
+
+        Useful for determining if *e.g.* `validation_histograms` has been defined for a
+        particular skim.
+        """
+        cls = self.__class__
+        parent_cls = cls.__mro__[1]
+
+        if hasattr(cls, method) and hasattr(parent_cls, method):
+            return getattr(cls, method) == getattr(parent_cls, method)
+        else:
+            return False
+
+    def do_validation(self, path):
+        """Produce the skim particle lists and write uDST file.
+
+        If `validation_histograms` has not been overridden in the subclass, then this
+        this function will print a warning and do nothing.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        if self._method_unchanged("validation_histograms"):
+            b2.B2WARNING(f"No validation histograms defined for {self} skim.")
+            return
+        self.set_skim_logging(path)
+        self.load_particle_lists(path)
+        self.additional_setup(path)
+        self.build_lists(path)
+        self.validation_histograms(path)
 
     def __str__(self):
         return self.name
@@ -486,6 +518,7 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
+
         b2.set_log_level(b2.LogLevel.INFO)
 
         NoisyModules = ["ParticleLoader", "ParticleVertexFitter"] + self.NoisyModules
@@ -501,6 +534,7 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
+
         for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
             module = __import__(ModuleName)
 
@@ -526,7 +560,7 @@ methods __authors__
 
         # Make a fuss if self.SkimLists is empty
         if len(self.SkimLists) == 0:
-            b2.B2ERROR(
+            b2.B2FATAL(
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 

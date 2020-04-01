@@ -44,7 +44,7 @@ ma.printDataStore(path=my_path)
 # second argument are the selection criteria: '' means no cut, take all
 #
 # note that you can give any name to your lists e.g. 'gamma:mycandidates',
-# except for the name 'all' which is the only name that is reseved for lists
+# except for the name 'all' which is the only name that is reserved for lists
 # with no cuts
 ma.fillParticleList(decayString='gamma:all', cut='', path=my_path)
 ma.fillParticleList(decayString='e-:all', cut='', path=my_path)

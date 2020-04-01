@@ -96,8 +96,8 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
 
 unsigned int KLMDigit::getUniqueChannelID() const
 {
-  return m_ElementNumbers->channelNumber(m_Subdetector, m_Section, m_Layer,
-                                         m_Sector, m_Plane, m_Strip);
+  return m_ElementNumbers->channelNumber(m_Subdetector, m_Section, m_Sector,
+                                         m_Layer, m_Plane, m_Strip);
 }
 
 DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)

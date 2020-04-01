@@ -18,8 +18,8 @@
 
 /* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <framework/database/DBObjPtr.h>

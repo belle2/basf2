@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToExtraInfo module saves variables at some stage in the
 # processing chain for recovery later. In this example it saves the invariant
@@ -12,7 +11,6 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 from vertex import KFit

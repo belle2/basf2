@@ -981,7 +981,8 @@ def reconstructDecay(decayString,
                      path=None,
                      candidate_limit=None,
                      ignoreIfTooManyCandidates=True,
-                     chargeConjugation=True):
+                     chargeConjugation=True,
+                     allowChargeViolation=False):
     r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via their specified
     decay mode, e.g. in form of a :ref:`DecayString`: :code:`D0 -> K- pi+` or :code:`B+ -> anti-D0 pi+`, ... All possible
@@ -1027,6 +1028,7 @@ def reconstructDecay(decayString,
                        candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
     @param chargeConjugation boolean to decide whether charge conjugated mode should be reconstructed as well (on by default)
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1039,6 +1041,7 @@ def reconstructDecay(decayString,
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     pmake.param('chargeConjugation', chargeConjugation)
+    pmake.param("allowChargeViolation", allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -1128,7 +1131,8 @@ def reconstructRecoil(decayString,
                       dmID=0,
                       writeOut=False,
                       path=None,
-                      candidate_limit=None):
+                      candidate_limit=None,
+                      allowChargeViolation=False):
     """
     Creates new Particles that recoil against the input particles.
 
@@ -1152,6 +1156,7 @@ def reconstructRecoil(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1163,6 +1168,7 @@ def reconstructRecoil(decayString,
     pmake.param('recoilParticleType', 1)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -1171,7 +1177,8 @@ def reconstructRecoilDaughter(decayString,
                               dmID=0,
                               writeOut=False,
                               path=None,
-                              candidate_limit=None):
+                              candidate_limit=None,
+                              allowChargeViolation=False):
     """
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
@@ -1195,6 +1202,8 @@ def reconstructRecoilDaughter(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge taking into account that the first
+                       daughter is actually the mother
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1206,6 +1215,7 @@ def reconstructRecoilDaughter(decayString,
     pmake.param('recoilParticleType', 2)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 

@@ -1387,6 +1387,44 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        // get the function pointer of variable to be unmasked
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        // get the final mask which summarize all the input masks
+        int finalMask = 0;
+        for (size_t i = 1; i < arguments.size(); ++i) {
+          try {
+            finalMask |= Belle2::convertString<int>(arguments[i]);
+          } catch (std::invalid_argument&) {
+            B2FATAL("The input flags to meta function unmask() should be integer!");
+            return nullptr;
+          }
+        }
+
+        // unmask the variable
+        auto func = [var, finalMask](const Particle * particle) -> double {
+          int value = int(var->function(particle));
+
+          // judge if the value is nan before unmasking
+          if (std::isnan(value))
+            return std::numeric_limits<double>::quiet_NaN();
+
+          // apply the final mask
+          value &= (~finalMask);
+
+          return value;
+        };
+        return func;
+
+      } else {
+        B2FATAL("Meta function unmask needs at least two arguments!");
+      }
+    }
+
+
     Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -2820,6 +2858,11 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
+                      "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
+                      "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
+                      "unmask(variable, 2, 8, 16) or unmask(variable, 26).\n"
+                      "");
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");

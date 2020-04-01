@@ -74,6 +74,8 @@ namespace Belle2 {
 
     bool m_chargeConjugation; /**< boolean to control whether charge conjugated decay should be reconstructed as well */
 
+    bool m_allowChargeViolation; /**< switch to turn on and off the requirement of electric charge conservation */
+
   };
 
 } // Belle2 namespace

@@ -714,7 +714,7 @@ def CharmSemileptonic(path):
 
     antiD0List = []
     for chID, channel in enumerate(DstarSLRecoilChannels):
-        ma.reconstructRecoil(decayString='D*-:SL' + str(chID) + ' -> ' + channel,
+        ma.reconstructRecoil(decayString='D*+:SL' + str(chID) + ' -> ' + channel,
                              cut=DstarSLcuts, dmID=chID, path=path)
         ma.reconstructRecoilDaughter(decayString='anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
                                      ' pi-:95eff', cut=antiD0SLcuts, dmID=chID, path=path)

@@ -22,6 +22,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/PCmsLabTransform.h>
 
 #include <memory>
@@ -75,6 +76,8 @@ namespace Belle2 {
              "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
     addParam("chargeConjugation", m_chargeConjugation,
              "If true, the charge-conjugated mode will be reconstructed as well", true);
+    addParam("allowChargeViolation", m_allowChargeViolation,
+             "If true the decay string does not have to conserve electric charge", false);
 
     // initializing the rest of private members
     m_pdgCode   = 0;
@@ -104,10 +107,27 @@ namespace Belle2 {
 
     // Daughters
     int nProducts = m_decaydescriptor.getNDaughters();
+    int daughtersNetCharge = 0;
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      int daughterPDGCode = daughter->getPDGCode();
+      if (m_recoilParticleType == 2 && i == 0) {
+        daughtersNetCharge -= EvtPDLUtil::charge(daughterPDGCode);
+      } else {
+        daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
+      }
+    }
+
+    if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+      if (!m_allowChargeViolation) {
+        B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"
+                "modularAnalysis.reconstructDecay(" << m_decayString << ", your_cuts, allowChargeViolation=True, path=mypath)");
+      }
+      B2WARNING("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "Processing is continued assuming that you allowed this deliberately, e.g. for systematic studies etc.");
     }
 
     m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);

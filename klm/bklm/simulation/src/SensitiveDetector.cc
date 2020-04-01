@@ -12,12 +12,12 @@
 #include <klm/bklm/simulation/SensitiveDetector.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
+#include <klm/dataobjects/bklm/BKLMStatus.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>

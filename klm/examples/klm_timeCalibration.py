@@ -52,10 +52,10 @@ def main(argv):
 
     print('Add pre_collector_path')
     gearbox = register_module('Gearbox')
-    # geobuilder = register_module('Geometry')
+    geobuilder = register_module('Geometry')
     pre_path = create_path()
     pre_path.add_module(gearbox)
-    # pre_path.add_module(geobuilder)
+    pre_path.add_module(geobuilder)
     # pre_path.add_module('Progress')
 
     # =====================================================

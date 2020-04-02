@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily, Mikhail Remnev                          *
+ * Contributors: Vasily Shebalin, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

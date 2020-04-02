@@ -16,7 +16,6 @@
 
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
 
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
@@ -380,7 +379,6 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
           if (!isDSPValid(cellID, iCrate, iShaper, iChannel, dspAmplitude, dspTime, dspQualityFlag)) continue;
-          // if (cellID < 1) continue; // channel is not connected to crystal
 
           // fill eclDigits data object
           B2DEBUG_eclunpacker(23, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<

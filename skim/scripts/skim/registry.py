@@ -229,7 +229,7 @@ combined_skims = {
     ],
     'Dark': [
         'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
-        # 'DielectronPlusMissingEnergy'
+        'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'

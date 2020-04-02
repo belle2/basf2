@@ -127,7 +127,7 @@ def UpsilonList(path):
 
     # reconstruct the decay channel
     for chID, channel in enumerate(Upsilon_Channels):
-        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path)
+        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path, allowChargeViolation=True)
         UpsilonList.append('junction:all' + str(chID))
 
     # reture the list

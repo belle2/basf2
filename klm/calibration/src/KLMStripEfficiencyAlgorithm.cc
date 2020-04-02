@@ -26,15 +26,15 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorith
   m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
   m_StripEfficiency = new KLMStripEfficiency();
   int nPlanes = m_PlaneArrayIndex->getNElements();
-  m_Efficiency = new float[nPlanes];
-  m_ExtHitsPlane = new int[nPlanes];
+  m_Results.m_Efficiency = new float[nPlanes];
+  m_Results.m_ExtHitsPlane = new int[nPlanes];
 }
 
 KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
   delete m_StripEfficiency;
-  delete[] m_Efficiency;
-  delete[] m_ExtHitsPlane;
+  delete[] m_Results.m_Efficiency;
+  delete[] m_Results.m_ExtHitsPlane;
 }
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
@@ -46,16 +46,16 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
              nPlanes, -0.5, double(nPlanes) - 0.5);
   std::shared_ptr<TH1F> matchedDigitsInPlane;
   matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
-  m_MatchedDigits = matchedDigitsInPlane->Integral();
+  m_Results.m_MatchedDigits = matchedDigitsInPlane->Integral();
   std::shared_ptr<TH1F> allExtHitsInPlane;
   allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
-  m_ExtHits = allExtHitsInPlane->Integral();
+  m_Results.m_ExtHits = allExtHitsInPlane->Integral();
   matchedDigitsInPlane.get()->Sumw2();
   allExtHitsInPlane.get()->Sumw2();
   efficiencyHistogram->Divide(matchedDigitsInPlane.get(), allExtHitsInPlane.get(), 1, 1, "B");
   for (int i = 0; i < nPlanes; ++i) {
-    m_Efficiency[i] = efficiencyHistogram->GetBinContent(i + 1);
-    m_ExtHitsPlane[i] = allExtHitsInPlane->GetBinContent(i + 1);
+    m_Results.m_Efficiency[i] = efficiencyHistogram->GetBinContent(i + 1);
+    m_Results.m_ExtHitsPlane[i] = allExtHitsInPlane->GetBinContent(i + 1);
   }
   bool notEnoughData = false;
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
@@ -64,8 +64,8 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
     uint16_t planeIndex = m_PlaneArrayIndex->getIndex(plane);
     int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
     float efficiencyError = efficiencyHistogram->GetBinError(planeIndex + 1);
-    if (efficiencyError > m_AchievedPrecision)
-      m_AchievedPrecision = efficiencyError;
+    if (efficiencyError > m_Results.m_AchievedPrecision)
+      m_Results.m_AchievedPrecision = efficiencyError;
     /*
      * No hits is not considered as "not enough data", because this can
      * happen in case KLM is excluded.
@@ -121,20 +121,24 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   return CalibrationAlgorithm::c_OK;
 }
 
-int KLMStripEfficiencyAlgorithm::newMeasuredPlanes(float* efficiency) const
+int KLMStripEfficiencyAlgorithm::Results::newMeasuredPlanes(
+  float* efficiency) const
 {
+  const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;
-  for (int i = 0; i < m_PlaneArrayIndex->getNElements(); ++i) {
+  for (int i = 0; i < nPlanes; ++i) {
     if (m_Efficiency[i] > 0 && efficiency[i] == 0)
       newPlanes++;
   }
   return newPlanes;
 }
 
-int KLMStripEfficiencyAlgorithm::newExtHitsPlanes(int* extHitsPlane) const
+int KLMStripEfficiencyAlgorithm::Results::newExtHitsPlanes(
+  int* extHitsPlane) const
 {
+  const int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
   int newPlanes = 0;
-  for (int i = 0; i < m_PlaneArrayIndex->getNElements(); ++i) {
+  for (int i = 0; i < nPlanes; ++i) {
     if (m_ExtHitsPlane[i] > 0 && extHitsPlane[i] == 0)
       newPlanes++;
   }

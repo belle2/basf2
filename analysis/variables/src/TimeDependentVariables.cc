@@ -22,6 +22,7 @@
 
 //utilities
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/RotationTools.h>
 
 // framework aux
 #include <framework/gearbox/Const.h>
@@ -38,6 +39,14 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
+    // from RotationTools.h
+    using RotationTools::getRotationMatrixXY;
+
+    static const TVector3 vecNaN(std::numeric_limits<float>::quiet_NaN(),
+                                 std::numeric_limits<float>::quiet_NaN(),
+                                 std::numeric_limits<float>::quiet_NaN());
+    static const double realNaN = std::numeric_limits<float>::quiet_NaN();
+
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
 
@@ -45,175 +54,117 @@ namespace Belle2 {
 
     double particleTagVx(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVertex().X();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVertex().X();
     }
 
     double particleTagVy(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Y();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVertex().Y();
     }
 
     double particleTagVz(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVertex().Z();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVertex().Z();
     }
 
     double particleTruthTagVx(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getMCTagVertex().X();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getMCTagVertex().X();
     }
 
     double particleTruthTagVy(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getMCTagVertex().Y();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getMCTagVertex().Y();
     }
 
     double particleTruthTagVz(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getMCTagVertex().Z();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getMCTagVertex().Z();
     }
 
     double particleTagVxErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert) {
-        TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = sqrt(TagVErr(0, 0));
-      }
-
-      return result;
+      TMatrixDSym TagVErr = vert->getTagVertexErrMatrix();
+      return sqrt(TagVErr(0, 0));
     }
 
     double particleTagVyErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert) {
-        TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = sqrt(TagVErr(1, 1));
-      }
-
-      return result;
+      if (!vert) return realNaN;
+      TMatrixDSym TagVErr = vert->getTagVertexErrMatrix();
+      return sqrt(TagVErr(1, 1));
     }
 
     double particleTagVzErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert) {
-        TMatrixFSym TagVErr = vert->getTagVertexErrMatrix();
-        result = sqrt(TagVErr(2, 2));
-      }
-
-      return result;
+      if (!vert) return realNaN;
+      TMatrixDSym TagVErr = vert->getTagVertexErrMatrix();
+      return sqrt(TagVErr(2, 2));
     }
 
     double particleTagVpVal(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVertexPval();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVertexPval();
     }
 
     double particleTagVNTracks(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getNTracks();
     }
 
     double particleTagVNFitTracks(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getNFitTracks();
     }
 
     double particleTagVType(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getFitType();
     }
 
     double particleTagVNDF(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getTagVNDF();
     }
 
     double particleTagVChi2(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getTagVChi2();
     }
 
     double particleTagVChi2IP(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+      if (!vert) return realNaN;
       return vert->getTagVChi2IP();
     }
 
@@ -222,97 +173,87 @@ namespace Belle2 {
 
     double particleDeltaT(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getDeltaT();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getDeltaT();
     }
 
     double particleDeltaTErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getDeltaTErr();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getDeltaTErr();
     }
 
     double particleMCDeltaT(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getMCDeltaT();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getMCDeltaT();
     }
+
+    double particleMCDeltaTapprox(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+      return vert->getMCDeltaTapprox();
+    }
+
+    double particleMCDeltaL(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+
+      PCmsLabTransform T;
+      TVector3 boost = T.getBoostVector();
+      double bg = boost.Mag() / sqrt(1 - boost.Mag2());
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+      return vert->getMCDeltaTapprox() * bg * c;
+    }
+
 
     double particleDeltaZ(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = particle->getZ() - vert->getTagVertex().Z();
-
-      return result;
+      if (!vert) return realNaN;
+      return particle->getZ() - vert->getTagVertex().Z();
     }
 
     double particleDeltaZErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert) {
-        double zVariance = particle->getVertexErrorMatrix()(2, 2);
-        double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
-        result = sqrt(zVariance + TagVZVariance);
-        if (std::isnan(result) or std::isinf(result)) result = std::numeric_limits<float>::quiet_NaN();
-      }
+      double zVariance = particle->getVertexErrorMatrix()(2, 2);
+      double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
+      double result = sqrt(zVariance + TagVZVariance);
+      if (std::isnan(result) || std::isinf(result)) return realNaN;
+
       return result;
     }
 
     double particleDeltaB(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaT() * bg * c;
-      }
-      return result;
+      PCmsLabTransform T;
+      TVector3 boost = T.getBoostVector();
+      double bg = boost.Mag() / sqrt(1 - boost.Mag2());
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+      return vert->getDeltaT() * bg * c;
     }
 
     double particleDeltaBErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert) {
-        PCmsLabTransform T;
-        TVector3 boost = T.getBoostVector();
-        double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
-        double c = Const::speedOfLight / 1000.; // cm ps-1
-        result = vert->getDeltaTErr() * bg * c;
-      }
-      return result;
+      PCmsLabTransform T;
+      TVector3 boost = T.getBoostVector();
+      double bg = boost.Mag() / sqrt(1 - boost.Mag2());
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+      return vert->getDeltaTErr() * bg * c;
     }
 
     // Vertex boost direction
@@ -320,44 +261,33 @@ namespace Belle2 {
     double vertexBoostDirection(const Particle* part)
     {
       PCmsLabTransform T;
-
-      TVector3 boost = T.getBoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boostDir = T.getBoostVector().Unit();
 
       TVector3 pos = part->getVertex();
-      double l = pos.Dot(boostDir);
-
-      return l;
+      return pos.Dot(boostDir);
     }
 
     double vertexOrthogonalBoostDirection(const Particle* part)
     {
       PCmsLabTransform T;
-
       TVector3 boost = T.getBoostVector();
 
-      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoost(boost.Z(), 0, -boost.X());
       TVector3 orthBoostDir = orthBoost.Unit();
 
       TVector3 pos = part->getVertex();
-      double l = pos.Dot(orthBoostDir);
-
-      return l;
+      return pos.Dot(orthBoostDir);
     }
 
     double vertexTruthBoostDirection(const Particle* part)
     {
       PCmsLabTransform T;
-
-      TVector3 boost = T.getBoostVector();
-      TVector3 boostDir = boost.Unit();
+      TVector3 boostDir = T.getBoostVector().Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
+      if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
-      double l = pos.Dot(boostDir);
-
-      return l;
+      return pos.Dot(boostDir);
     }
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
@@ -366,50 +296,31 @@ namespace Belle2 {
       TLorentzVector trueBeamEnergy = beamParamsDB->getHER() + beamParamsDB->getLER();
       TVector3 boost = trueBeamEnergy.BoostVector();
 
-      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoost(boost.Z(), 0, -boost.X());
       TVector3 orthBoostDir = orthBoost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
+      if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
-      double l = pos.Dot(orthBoostDir);
-
-      return l;
+      return pos.Dot(orthBoostDir);
     }
 
 
     double vertexErrBoostDirection(const Particle* part)
     {
       PCmsLabTransform T;
-
       TVector3 boost = T.getBoostVector();
 
-      double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-      double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-      double cx = TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X()) / boost.Mag();
-      double sx = boost.Y() / boost.Mag();
-
-      TMatrixD RotY(3, 3);
-      RotY(0, 0) = cy;  RotY(0, 1) = 0;   RotY(0, 2) = -sy;
-      RotY(1, 0) = 0;   RotY(1, 1) = 1;   RotY(1, 2) = 0;
-      RotY(2, 0) = sy;  RotY(2, 1) = 0;   RotY(2, 2) = cy;
-
-      TMatrixD RotX(3, 3);
-      RotX(0, 0) = 1;   RotX(0, 1) = 0;   RotX(0, 2) = 0;
-      RotX(1, 0) = 0;   RotX(1, 1) = cx;  RotX(1, 2) = -sx;
-      RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
-
-      TMatrixD Rot = RotY * RotX;
-      TMatrixD RotCopy = Rot;
-      TMatrixD RotInv = Rot.Invert();
+      double zxD = sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
+      double angleY = atan2(boost.X(), boost.Z());
+      double angleX = atan2(boost.Y(), zxD);
+      TMatrixD Rot = getRotationMatrixXY(angleX, -angleY);
+      TMatrixD RotT = Rot; RotT.T();
 
       TMatrixD RR = (TMatrixD)part->getVertexErrorMatrix();
-      TMatrixD RotErr = RotInv * RR * RotCopy;
+      TMatrixD RotErr = RotT * RR * Rot;
 
-      double VbErr = sqrt(RotErr(2, 2));
-
-
-      return VbErr;
+      return sqrt(RotErr(2, 2));
     }
 
 
@@ -418,35 +329,19 @@ namespace Belle2 {
       PCmsLabTransform T;
 
       TVector3 boost = T.getBoostVector();
-      TVector3 orthBoost(boost.Z(), 0, -1 * boost.X());
+      TVector3 orthBoost(boost.Z(), 0, -boost.X());
       TVector3 orthBoostDir = orthBoost.Unit();
 
-      double cy = orthBoostDir.Z() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
-      double sy = orthBoostDir.X() / TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
-      double cx = TMath::Sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X()) / orthBoostDir.Mag();
-      double sx = orthBoostDir.Y() / orthBoostDir.Mag();
-
-      TMatrixD RotY(3, 3);
-      RotY(0, 0) = cy;  RotY(0, 1) = 0;   RotY(0, 2) = -sy;
-      RotY(1, 0) = 0;   RotY(1, 1) = 1;   RotY(1, 2) = 0;
-      RotY(2, 0) = sy;  RotY(2, 1) = 0;   RotY(2, 2) = cy;
-
-      TMatrixD RotX(3, 3);
-      RotX(0, 0) = 1;   RotX(0, 1) = 0;   RotX(0, 2) = 0;
-      RotX(1, 0) = 0;   RotX(1, 1) = cx;  RotX(1, 2) = -sx;
-      RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
-
-      TMatrixD Rot = RotY * RotX;
-      TMatrixD RotCopy = Rot;
-      TMatrixD RotInv = Rot.Invert();
+      double zxD = sqrt(orthBoostDir.Z() * orthBoostDir.Z() + orthBoostDir.X() * orthBoostDir.X());
+      double angleY = atan2(orthBoostDir.X(), orthBoostDir.Z());
+      double angleX = atan2(orthBoostDir.Y(), zxD);
+      TMatrixD Rot = getRotationMatrixXY(angleX, -angleY);
+      TMatrixD RotT = Rot; RotT.T();
 
       TMatrixD RR = (TMatrixD)part->getVertexErrorMatrix();
-      TMatrixD RotErr = RotInv * RR * RotCopy;
+      TMatrixD RotErr = RotT * RR * Rot;
 
-      double VbErr = sqrt(RotErr(2, 2));
-
-
-      return VbErr;
+      return sqrt(RotErr(2, 2));
     }
 
 
@@ -456,292 +351,221 @@ namespace Belle2 {
 
     double tagVBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVl();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVl();
     }
 
 
     double tagVOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVol();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVol();
     }
 
 
     double tagVTruthBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTruthTagVl();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTruthTagVl();
     }
 
 
     double tagVTruthOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTruthTagVol();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTruthTagVol();
     }
 
     double tagVErrBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVlErr();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVlErr();
     }
 
 
     double tagVErrOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getTagVolErr();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getTagVolErr();
     }
 
 
     double particleInternalTagVMCFlavor(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
-
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (vert)
-        result = vert->getMCTagBFlavor();
-
-      return result;
+      if (!vert) return realNaN;
+      return vert->getMCTagBFlavor();
     }
 
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getVtxFitTrackPComponent(trackIndexInt, 0);
-
-      return result;
+      return vert->getVtxFitTrackPComponent(trackIndexInt, 0);
     }
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getVtxFitTrackPComponent(trackIndexInt, 1);
-
-      return result;
+      return vert->getVtxFitTrackPComponent(trackIndexInt, 1);
     }
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getVtxFitTrackPComponent(trackIndexInt, 2);
-
-      return result;
+      return vert->getVtxFitTrackPComponent(trackIndexInt, 2);
     }
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getVtxFitTrackZ0(trackIndexInt);
-
-      return result;
+      return vert->getVtxFitTrackZ0(trackIndexInt);
     }
 
     double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getVtxFitTrackD0(trackIndexInt);
-
-      return result;
+      return vert->getVtxFitTrackD0(trackIndexInt);
     }
 
     double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = vert->getRaveWeight(trackIndexInt);
-
-      return result;
+      return vert->getRaveWeight(trackIndexInt);
     }
 
     double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (!vert) return result;
-      if (vert->getConstraintType() == "noConstraint") return result;
+      if (!vert) return realNaN;
+      if (vert->getConstraintType() == "noConstraint") return realNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
-      if (!tagParticle) return result;
+      if (!tagParticle) return realNaN;
 
-      result =  DistanceTools::trackToVtxDist(tagParticle -> getTrackFitResult() -> getPosition(),
-                                              tagParticle -> getMomentum(),
-                                              vert -> getConstraintCenter());
+      return DistanceTools::trackToVtxDist(tagParticle->getTrackFitResult()->getPosition(),
+                                           tagParticle->getMomentum(),
+                                           vert->getConstraintCenter());
 
-      return result;
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
-      if (!vert) return result;
-      if (vert->getConstraintType() == "noConstraint") return result;
+      if (!vert) return realNaN;
+      if (vert->getConstraintType() == "noConstraint") return realNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
-      if (!tagParticle) return result;
+      if (!tagParticle) return realNaN;
 
       //recover the covariance matrix associated to the position of the tag track
 
       TMatrixDSym trackPosCovMat(tagParticle->getVertexErrorMatrix());
 
-      result = DistanceTools::trackToVtxDistErr(tagParticle -> getTrackFitResult() -> getPosition(),
-                                                tagParticle -> getMomentum(),
-                                                vert -> getConstraintCenter(),
-                                                trackPosCovMat,
-                                                vert -> getConstraintCov());
+      return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
+                                              tagParticle->getMomentum(),
+                                              vert->getConstraintCenter(),
+                                              trackPosCovMat,
+                                              vert->getConstraintCov());
 
-      return result;
 
     }
 
     double tagVDistanceToConstraint(const Particle* part)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (!vert) return result;
-      if (vert->getConstraintType() == "noConstraint") return result;
+      if (vert->getConstraintType() == "noConstraint") return realNaN;
 
-      result =  DistanceTools::vtxToVtxDist(vert -> getConstraintCenter(),
-                                            vert -> getTagVertex());
-      return result;
+      return DistanceTools::vtxToVtxDist(vert->getConstraintCenter(),
+                                         vert->getTagVertex());
     }
 
     double tagVDistanceToConstraintErr(const Particle* part)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (!vert) return result;
-      if (vert->getConstraintType() == "noConstraint") return result;
+      if (vert->getConstraintType() == "noConstraint") return realNaN;
 
       //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
       //The error computed is the the one used  in the chi2.
       //To change that, emptyMat has to be replaced by m_TagVertexErrMatrix
       TMatrixDSym emptyMat(3);
 
-      result = DistanceTools::vtxToVtxDistErr(vert -> getConstraintCenter(),
-                                              vert -> getTagVertex(),
-                                              vert -> getConstraintCov(),
-                                              emptyMat);
-
-      return result;
+      return DistanceTools::vtxToVtxDistErr(vert->getConstraintCenter(),
+                                            vert->getTagVertex(),
+                                            vert->getConstraintCov(),
+                                            emptyMat);
     }
 
     double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (!vert) return result;
+      if (!vert) return realNaN;
 
       const Particle* particle(vert->getVtxFitParticle(trackIndexInt));
-      if (!particle) return result;
+      if (!particle) return realNaN;
 
-      result = DistanceTools::trackToVtxDist(particle -> getTrackFitResult() -> getPosition(),
-                                             particle -> getMomentum(),
-                                             vert -> getTagVertex());
-
-
-      return result;
+      return DistanceTools::trackToVtxDist(particle->getTrackFitResult()->getPosition(),
+                                           particle->getMomentum(),
+                                           vert->getTagVertex());
     }
 
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return realNaN;
 
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
-      if (!tagParticle) return result;
+      if (!tagParticle) return realNaN;
 
       //recover the covariance matrix associated to the position of the tag track
 
@@ -753,173 +577,137 @@ namespace Belle2 {
 
       TMatrixDSym emptyMat(3);
 
-      result = DistanceTools::trackToVtxDistErr(tagParticle-> getTrackFitResult() -> getPosition(),
-                                                tagParticle -> getMomentum(),
-                                                vert -> getTagVertex(),
-                                                trackPosCovMat,
-                                                emptyMat);
+      return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
+                                              tagParticle->getMomentum(),
+                                              vert->getTagVertex(),
+                                              trackPosCovMat,
+                                              emptyMat);
 
-      return result;
     }
 
     double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return realNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return realNaN;
 
-      const MCParticle* mcParticle(vert -> getVtxFitMCParticle(trackIndexInt));
-      if (!mcParticle) return result;
+      const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
+      if (!mcParticle) return realNaN;
 
       TVector3 mcTagV(vert->getMCTagVertex());
 
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return std::numeric_limits<float>::quiet_NaN();
-      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN()) return std::numeric_limits<float>::quiet_NaN();
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return std::numeric_limits<float>::quiet_NaN();
+      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return realNaN;
+      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN())        return realNaN;
+      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
 
-      result = DistanceTools::trackToVtxDist(mcParticle -> getProductionVertex(),
-                                             mcParticle -> getMomentum(),
-                                             mcTagV);
-
-      return result;
+      return DistanceTools::trackToVtxDist(mcParticle->getProductionVertex(),
+                                           mcParticle->getMomentum(),
+                                           mcTagV);
     }
 
     TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
-
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return vecNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return vecNaN;
 
-      const MCParticle* mcParticle(vert -> getVtxFitMCParticle(trackIndexInt));
-      if (!mcParticle) return result;
+      const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
+      if (!mcParticle) return vecNaN;
 
       TVector3 mcTagV(vert->getMCTagVertex());
 
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return result;
-      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN()) return result;
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return result;
+      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return vecNaN;
+      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN())        return vecNaN;
+      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
 
-      result = DistanceTools::trackToVtxVec(mcParticle -> getProductionVertex(),
-                                            mcParticle -> getMomentum(),
-                                            mcTagV);
-
-      return result;
+      return DistanceTools::trackToVtxVec(mcParticle->getProductionVertex(),
+                                          mcParticle->getMomentum(),
+                                          mcTagV);
     }
 
     double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueVecToTagV(part, trackIndex);
-
+      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(0);
     }
 
     double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueVecToTagV(part, trackIndex);
-
+      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(1);
     }
 
     double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueVecToTagV(part, trackIndex);
-
+      TVector3 result = tagTrackTrueVecToTagV(part, trackIndex);
       return result(2);
     }
 
     TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
-
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return vecNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return vecNaN;
 
-      const MCParticle* mcParticle(vert -> getVtxFitMCParticle(trackIndexInt));
-      if (!mcParticle) return result;
+      const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
+      if (!mcParticle) return vecNaN;
 
-      return mcParticle -> getMomentum();
+      return mcParticle->getMomentum();
     }
 
     double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueMomentum(part, trackIndex);
-
+      TVector3 result = tagTrackTrueMomentum(part, trackIndex);
       return result(0);
     }
 
     double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueMomentum(part, trackIndex);
-
+      TVector3 result = tagTrackTrueMomentum(part, trackIndex);
       return result(1);
     }
 
     double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueMomentum(part, trackIndex);
-
+      TVector3 result = tagTrackTrueMomentum(part, trackIndex);
       return result(2);
     }
 
     TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
-
-      if (trackIndex.size() != 1) return result;
+      if (trackIndex.size() != 1) return vecNaN;
       unsigned int trackIndexInt(trackIndex.at(0));
 
       auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return result;
+      if (!vert) return vecNaN;
 
-      const MCParticle* mcParticle(vert -> getVtxFitMCParticle(trackIndexInt));
-      if (!mcParticle) return result;
+      const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
+      if (!mcParticle) return vecNaN;
 
-      return mcParticle -> getProductionVertex();
+      return mcParticle->getProductionVertex();
     }
 
     double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueOrigin(part, trackIndex);
-
+      TVector3 result = tagTrackTrueOrigin(part, trackIndex);
       return result(0);
     }
 
     double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueOrigin(part, trackIndex);
-
+      TVector3 result = tagTrackTrueOrigin(part, trackIndex);
       return result(1);
     }
 
     double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result;
-      result = tagTrackTrueOrigin(part, trackIndex);
-
+      TVector3 result = tagTrackTrueOrigin(part, trackIndex);
       return result(2);
     }
 
@@ -953,8 +741,13 @@ namespace Belle2 {
                       R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
                       R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
-    REGISTER_VARIABLE("MCDeltaT", particleMCDeltaT,
+    REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,
+                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
+    REGISTER_VARIABLE("mcDeltaL", particleMCDeltaL,
+                      R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
+:math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
                       R"DOC(Difference of decay vertex longitudinal components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta z = z(B_{rec}) - z(B_{tag})`)DOC");

@@ -183,14 +183,14 @@ def LFVZpVisibleList(path):
     LFVZpVisChannel = 'e+:lfvzp e+:lfvzp e-:lfvzp'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 3'
 
-    ma.reconstructDecay('vpho:3tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
+    ma.reconstructDecay('vpho:3tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
 
     lfvzp_list.append('vpho:3tr_vislfvzp')
 
     # Z' to lfv: two same-sign tracks
     LFVZpVisChannel = 'e+:lfvzp e+:lfvzp'
     Event_cuts_vis = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
-    ma.reconstructDecay('vpho:2tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path)
+    ma.reconstructDecay('vpho:2tr_vislfvzp -> ' + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
 
     lfvzp_list.append('vpho:2tr_vislfvzp')
 

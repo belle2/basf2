@@ -65,6 +65,7 @@ Variables
  * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
  * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
  * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
+ * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
  * Added :b2:var:`varForFirstMCAncestorOfType` variable that returns requested variable of the first gen-level
    ancestor of the given type.   
  * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
@@ -96,6 +97,12 @@ Variables
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`
+
+ * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
+   vertexes in the Y(4S) boost direction
+ * Added :b2:var:`mcDeltaTapprox` to get :b2:var:`mcDeltaT` in the kinematic
+   approximation, i.e. based on :b2:var:`mcDeltaL` variable
+
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
@@ -109,9 +116,11 @@ Variables
  * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
  * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those created at analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
-
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
    `EventKinematics` module. 
+
+ * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
+ * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors. 
 
 Modules
 +++++++
@@ -163,6 +172,8 @@ Modules
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
  * In :b2:mod:`TagVertex` module, added the possibility to use the truth information from the tag particles in the vertex fit. The option :code:`useTruthInFit = True` switches that on. 
  * In :b2:mod:`TagVertex` module, implemented an internal change: tag particles are loaded as ``Particle`` object from the ``ROE`` and not anymore as ``TrackFitResult``. This should have no effect to users.
+ * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned 
+   off by setting ``allowChargeViolation=True``.
 
 Utilities and core objects
 ++++++++++++++++++++++++++
@@ -170,3 +181,5 @@ Utilities and core objects
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+ * Added a function to retrieve electric charge of a particle based on its pdg code.
+ * Added a ``RotationTools.h`` file with few functions related to rotation

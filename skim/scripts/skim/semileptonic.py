@@ -110,7 +110,7 @@ def SemileptonicList(path):
     b0List = []
     for chID, channel in enumerate(B0Channels):
         ma.reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        ma.applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
+        ma.applyCuts('B0:SL' + str(chID), 'nTracks>4', path=path)
         b0List.append('B0:SL' + str(chID))
 
     SLLists = b0List + bplusList

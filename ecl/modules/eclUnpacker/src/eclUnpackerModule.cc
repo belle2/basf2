@@ -16,6 +16,7 @@
 
 //Framework
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/DBObjPtr.h>
 
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
@@ -24,7 +25,8 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include "ecl/utility/ECLChannelMapper.h"
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/utility/ECLDspUtilities.h>
 
 using namespace std;
 using namespace Belle2;
@@ -92,6 +94,7 @@ ECLUnpackerModule::ECLUnpackerModule() :
   m_tagsReportedMask(0),
   m_phasesReportedMask(0),
   m_badHeaderReportedMask(0),
+  m_unpackingParams("ECLUnpackingParameters"),
   m_eclDigits("", DataStore::c_Event),
   m_debugLevel(0)
 {
@@ -376,7 +379,8 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
           cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-          if (cellID < 1) continue; // channel is not connected to crystal
+          if (!isDSPValid(cellID, iCrate, iShaper, iChannel, dspAmplitude, dspTime, dspQualityFlag)) continue;
+          // if (cellID < 1) continue; // channel is not connected to crystal
 
           // fill eclDigits data object
           B2DEBUG_eclunpacker(23, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
@@ -455,9 +459,41 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (cellID > 0 || m_storeUnmapped) {
               ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+
+              if (m_unpackingParams.isValid()) {
+                auto params = m_unpackingParams->get(iCrate, iShaper, iChannel);
+                if (params & ECL_OFFLINE_ADC_FIT) {
+                  auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
+                  if (result.quality == 2) result.time = 0;
+
+                  bool found = false;
+                  for (auto& newEclDigit : m_eclDigits) {
+                    if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
+                      newEclDigit.setAmp(result.amp);
+                      newEclDigit.setTimeFit(result.time);
+                      newEclDigit.setQuality(result.quality);
+                      newEclDigit.setChi(result.chi2);
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (!found) {
+                    ECLDigit* newEclDigit = m_eclDigits.appendNew();
+                    newEclDigit->setCellId(cellID);
+                    newEclDigit->setAmp(result.amp);
+                    newEclDigit->setTimeFit(result.time);
+                    newEclDigit->setQuality(result.quality);
+                    newEclDigit->setChi(result.chi2);
+                    if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
+                  }
+                }
+              }
               // Add relation from ECLDigit to ECLDsp
               for (auto& newEclDigit : m_eclDigits) {
-                if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);
+                if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
+                  newEclDigit.addRelationTo(newEclDsp);
+                  break;
+                }
               }
             }
 
@@ -499,8 +535,26 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       B2ERROR("Corrupted data from ECL collector");
     }
 
-  }// loop ove FINESSes
+  }// loop over FINESSEs
 
+}
+
+bool ECLUnpackerModule::isDSPValid(int cellID, int crate, int shaper, int channel, int, int, int quality)
+{
+  // Channel is not connected to crystal
+  if (cellID < 1) return false;
+
+  if (m_unpackingParams.isValid()) {
+    auto params = m_unpackingParams->get(crate, shaper, channel);
+    if (params & ECL_DISCARD_DSP_DATA) {
+      if (params & ECL_KEEP_GOOD_DSP_DATA) {
+        if (quality == 0) return true;
+      }
+      return false;
+    }
+  }
+
+  return true;
 }
 
 void ECLUnpackerModule::doEvtNumReport(unsigned int iCrate, int tag, int evt_number)

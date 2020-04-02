@@ -18,6 +18,7 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <arich/dbobjects/ARICHModulesInfo.h>
+#include <arich/dbobjects/ARICHGeoMergerCooling.h>
 
 #include <G4AssemblyVolume.hh>
 
@@ -100,6 +101,9 @@ namespace Belle2 {
       //! build the merger PCB logical volume
       G4LogicalVolume* buildMerger(const ARICHGeoMerger& mergerGeo);
 
+      //! build single merger and merger cooling body envelope logical volume
+      G4LogicalVolume* buildMergerEnvelope(const ARICHGeoMerger& mergerGeo, int type);
+
       //! build the cables envelop with effective material describing cables
       G4LogicalVolume* buildCables(const ARICHGeoCablesEnvelope& cablesGeo);
 
@@ -123,6 +127,12 @@ namespace Belle2 {
 
       //! build cooling test plates
       G4LogicalVolume* buildCoolingTestPlate(const ARICHGeoCooling& coolingGeo);
+
+      //! build FEB cooling bodies (cooling system update after phase 2)
+      G4LogicalVolume* buildFEBCoolingBody(const ARICHGeoFEBCooling& coolingv2Geo);
+
+      //! build merger cooling bodies (cooling system update after phase 2)
+      G4LogicalVolume* buildMergerCooling(unsigned iType);
 
       //! build aerogel plane
       G4LogicalVolume* buildAerogelPlane(const ARICHGeometryConfig& detectorGeo);
@@ -158,6 +168,7 @@ namespace Belle2 {
       int m_isBeamBkgStudy;
 
       DBObjPtr<ARICHModulesInfo> m_modInfo; /**< information on installed modules from the DB */
+      OptionalDBObjPtr<ARICHGeoMergerCooling> m_mergerCooling; /**< merger cooling bodies geometry from the DB */
     };
 
   }

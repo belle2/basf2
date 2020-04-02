@@ -407,7 +407,6 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        pass
 
     # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
     @abstractmethod
@@ -419,7 +418,6 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        pass
 
     def validation_histograms(self, path):
         """Create validation histograms for the skim.
@@ -427,7 +425,6 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
-        pass
 
     # Everything beyond this point can remain as-is when defining a skim
     def __call__(self, path):

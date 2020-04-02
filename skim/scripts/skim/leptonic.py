@@ -92,7 +92,7 @@ class LeptonicUntagged(BaseSkim):
     )
     __WorkingGroup__ = "Semileptonic and Missing Energy Working Group (WG1)"
 
-    RequiredParticleLists = {
+    RequiredStandardLists = {
         "stdCharged": {
             "stdE": ["all"],
             "stdMu": ["all"]

@@ -900,7 +900,7 @@ class BtoD0h_Kspi0(BaseSkim):
     # stdKshorts(path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -921,7 +921,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     # stdKshorts(path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -940,7 +940,7 @@ class B0toDpi_Kpipi(BaseSkim):
     # stdK('all', path=mypath)
     # stdPi('all', path=mypath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -962,7 +962,7 @@ class B0toDpi_Kspi(BaseSkim):
     # stdKshorts(path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -982,7 +982,7 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     # stdK('all', path=mypath)
     # stdPi('all', path=mypath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1007,7 +1007,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     # stdK('all', path=mypath)
     # stdPi('all', path=mypath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1029,7 +1029,7 @@ class B0toDrho_Kpipi(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1052,7 +1052,7 @@ class B0toDrho_Kspi(BaseSkim):
     # stdKshorts(path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1075,7 +1075,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1099,7 +1099,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1116,7 +1116,7 @@ class BtoD0h_hh(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1135,7 +1135,7 @@ class BtoD0h_Kpi(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1160,7 +1160,7 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1179,7 +1179,7 @@ class BtoD0h_Kshh(BaseSkim):
     # stdKshorts(path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1202,7 +1202,7 @@ class BtoD0rho_Kpi(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1226,7 +1226,7 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     # stdK('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

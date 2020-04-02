@@ -364,7 +364,7 @@ class TauLFV(BaseSkim):
     # stdPi0s('loose', path=taulfvskim)
     # stdPr('loose', path=taulfvskim)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -382,7 +382,7 @@ class TauGeneric(BaseSkim):
     # stdPhotons('all', path=taugenericskim)
     # stdPi('all', path=taugenericskim)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -400,7 +400,7 @@ class TauThrust(BaseSkim):
     # stdPhotons('all', path=tauthrustskim)
     # stdPi('all', path=tauthrustskim)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

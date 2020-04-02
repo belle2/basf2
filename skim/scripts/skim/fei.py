@@ -887,7 +887,7 @@ class feiHadronicB0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -899,7 +899,7 @@ class feiHadronicBplus(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -911,7 +911,7 @@ class feiSLB0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -923,7 +923,7 @@ class feiSLBplus(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

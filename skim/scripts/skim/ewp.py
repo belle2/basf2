@@ -155,7 +155,7 @@ class BtoXgamma(BaseSkim):
     # stdPhotons('loose', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -175,7 +175,7 @@ class BtoXll(BaseSkim):
     # stdPhotons('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -195,7 +195,7 @@ class BtoXll_LFV(BaseSkim):
     # stdPhotons('all', path=path)
     # stdPi('all', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

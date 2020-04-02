@@ -553,7 +553,7 @@ class BtoPi0Pi0(BaseSkim):
     # from stdPi0s import loadStdSkimPi0
     # loadStdSkimPi0(path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -580,7 +580,7 @@ class CharmlessHad2Body(BaseSkim):
     # stdPi0s('all', path=charmless2skimpath)
     # stdPi0s('loose', path=charmless2skimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -607,7 +607,7 @@ class CharmlessHad3Body(BaseSkim):
     # stdPi0s('all', path=charmless3skimpath)
     # stdPi0s('loose', path=charmless3skimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

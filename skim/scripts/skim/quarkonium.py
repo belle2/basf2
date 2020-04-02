@@ -201,7 +201,7 @@ class BottomoniumEtabExclusive(BaseSkim):
     # from stdPhotons import stdPhotons
     # stdPhotons('loose', path=BottomoniumEtabskimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -221,7 +221,7 @@ class BottomoniumUpsilon(BaseSkim):
     # stdPhotons('loose', path=BottomoniumUpsilonskimpath)
     # stdPi('loose', path=BottomoniumUpsilonskimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -244,7 +244,7 @@ class ISRpipicc(BaseSkim):
     # stdPi('all', path=ISRskimpath)
     # stdPi('loose', path=ISRskimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

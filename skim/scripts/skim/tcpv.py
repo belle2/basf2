@@ -189,7 +189,7 @@ class TCPV(BaseSkim):
     # stdPi('loose', path=path)
     # stdPi0s('loose', path=path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

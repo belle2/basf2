@@ -345,7 +345,7 @@ class SinglePhotonDark(BaseSkim):
     __SkimDescription__ = "Single photon skim list for the dark photon analysis."
     __WorkingGroup__ = "Dark group"
 
-    RequiredParticleLists = {
+    RequiredStandardLists = {
         "stdPhotons": {
             "stdPhotons": ["all"],
         },
@@ -385,7 +385,7 @@ class ALP3Gamma(BaseSkim):
 
     # No lists added in standalone file
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -401,7 +401,7 @@ class DimuonPlusMissingEnergy(BaseSkim):
     # charged.stdMu('all', path=dimuon_path)
     # import stdCharged as charged
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -418,7 +418,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     # charged.stdMu('all', path=emu_path)
     # import stdCharged as charged
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -441,7 +441,7 @@ class LFVZpVisible(BaseSkim):
     # stdPi('all', path=lfvzppath)
     # stdPi('loose', path=lfvzppath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

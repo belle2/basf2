@@ -816,7 +816,7 @@ class XToD0_D0ToHpJm(BaseSkim):
 
     # No standard lists required
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -839,7 +839,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
     # stdPi('all', path=c2bndpath)
     # stdPi('loose', path=c2bndpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -861,7 +861,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     # stdMu('loose', path=crpath)
     # stdPi('loose', path=crpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -880,7 +880,7 @@ class XToDp_DpToKsHp(BaseSkim):
     # stdKshorts(path=ckshppath)
     # stdPi('all', path=ckshppath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -893,7 +893,7 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -920,7 +920,7 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     # stdPi('all', path=c3bhpath)
     # stdPi('loose', path=c3bhpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -947,7 +947,7 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     # stdPi('all', path=c3bh1path)
     # stdPi('loose', path=c3bh1path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -970,7 +970,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     # stdMu('loose', path=c2bn2path)
     # stdPi('loose', path=c2bn2path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -999,7 +999,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     # stdPi('all', path=c3bh3path)
     # stdPi('loose', path=c3bh3path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1026,7 +1026,7 @@ class DstToD0Pi_D0ToNeutrals(BaseSkim):
     # stdPi('all', path=c2bnpath)
     # stdPi('loose', path=c2bnpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1045,7 +1045,7 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
     # stdPi('all', path=c3bh2path)
     # stdV0s.stdKshorts(path=c3bh2path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1072,7 +1072,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     # stdPi('all', path=c3bhpath)
     # stdPi('loose', path=c3bhpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1099,7 +1099,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     # stdPi('all', path=c3bh1path)
     # stdPi('loose', path=c3bh1path)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -1120,7 +1120,7 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
     # stdMu('95eff', path=cslpath)
     # stdPi('95eff', path=cslpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

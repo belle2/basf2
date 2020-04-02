@@ -521,7 +521,7 @@ class Systematics(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    RequiredParticleLists = {
+    RequiredStandardLists = {
         "stdCharged": {
             "stdE": ["all", "loose"],
             "stdK": ["all"],
@@ -546,7 +546,7 @@ class SystematicsTracking(BaseSkim):
     # stdPi('loose', path=skimpath)
     # stdPi0s('loose', path=skimpath)
 
-    RequiredParticleLists = {
+    RequiredStandardLists = {
         "stdCharged": {
             "stdK": ["loose"],
             "stdPi": ["loose"],
@@ -574,7 +574,7 @@ class Resonance(BaseSkim):
     # stdPi0s('looseFit', path=syspath)
     # stdPr('loose', path=syspath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """Build particle lists for  skim"""
@@ -589,7 +589,7 @@ class SystematicsRadMuMu(BaseSkim):
     # from stdCharged import stdMu
     # stdMu('all', path=skimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -605,7 +605,7 @@ class SystematicsEELL(BaseSkim):
     # stdE('all', path=skimpath)
     # stdMu('all', path=skimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -620,7 +620,7 @@ class SystematicsRadEE(BaseSkim):
     # from stdCharged import stdE
     # stdE('all', path=skimpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -634,7 +634,7 @@ class SystematicsLambda(BaseSkim):
 
     # No loading in. Strange.
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

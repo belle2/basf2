@@ -194,7 +194,7 @@ class PRsemileptonicUntagged(BaseSkim):
     # stdMu('all', path=PRSLpath)
     # stdPi('all', path=PRSLpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""
@@ -227,7 +227,7 @@ class SLUntagged(BaseSkim):
     # stdPi('loose', path=SLpath)
     # stdPi0s('loose', path=SLpath)
 
-    RequiredParticleLists = None
+    RequiredStandardLists = None
 
     def build_lists(self, path):
         """"""

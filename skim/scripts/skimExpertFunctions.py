@@ -276,7 +276,7 @@ class BaseSkim(ABC):
            class DarkSinglePhoton(BaseSkim):
                # docstring here describing your skim, and explaining cuts.
 
-    3. Specify all required particle lists in the attribute `RequiredParticleLists`. See
+    3. Specify all required particle lists in the attribute `RequiredStandardLists`. See
        documentation of this attribute for instructions on how to do this for your skim.
        This step is mandatory.
 
@@ -313,7 +313,7 @@ class BaseSkim(ABC):
     .. Tip::
 
         If your skim does not define ``__SkimDescription__``, ``__WorkingGroup__``,
-        ``__authors__``, `RequiredParticleLists` or `build_lists`, then you will see an
+        ``__authors__``, `RequiredStandardLists` or `build_lists`, then you will see an
         error message like:
 
         .. code-block:: bash
@@ -332,7 +332,7 @@ methods __authors__
     # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
     @property
     @abstractmethod
-    def RequiredParticleLists(self):
+    def RequiredStandardLists(self):
         """Data structure specifying the standard particle lists to be loaded in before
         constructing the skim list. Must have the form ``dict(str -> dict(str ->
         list(str)))``.
@@ -346,7 +346,7 @@ methods __authors__
                >>> stdPi("all", path=path)
                >>> loadStdLightMesons(path=path)
 
-        then `BaseSkim` will run run this code for us if we set `RequiredParticleLists` to
+        then `BaseSkim` will run run this code for us if we set `RequiredStandardLists` to
         the following value:
 
         .. code-block:: python
@@ -400,7 +400,7 @@ methods __authors__
 
         Warning:
             Particle lists should *not* be loaded in here. This should be done by
-            setting the `RequiredParticleLists` attribute of an individual skim. This is
+            setting the `RequiredStandardLists` attribute of an individual skim. This is
             crucial for avoiding loading lists twice when combining skims for
             production.
 
@@ -482,12 +482,12 @@ methods __authors__
         return self.name
 
     def _validate_required_particle_lists(self):
-        """Verify that the `RequiredParticleLists` value is in the expected format.
+        """Verify that the `RequiredStandardLists` value is in the expected format.
 
         The expected format is ``dict(str -> dict(str -> list(str)))``.
         """
         try:
-            for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
+            for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
                 if not (
                     isinstance(ModuleName, str) and isinstance(FunctionsAndLabels, dict)
                 ):
@@ -505,7 +505,7 @@ methods __authors__
                         raise ValueError(f"Expected {labels} to be a list of str.")
         except ValueError as e:
             b2.B2ERROR(
-                f"Invalid format of RequiredParticleLists in {str(self)} skim. "
+                f"Invalid format of RequiredStandardLists in {str(self)} skim. "
                 "Expected dict(str -> dict(str -> list(str)))."
             )
             raise e
@@ -529,13 +529,13 @@ methods __authors__
 
     def load_particle_lists(self, path):
         """Load the required particle lists for a skim, using the specified modules and
-        functions in the attribute `RequiredParticleLists`.
+        functions in the attribute `RequiredStandardLists`.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
 
-        for ModuleName, FunctionsAndLabels in self.RequiredParticleLists.items():
+        for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
             module = __import__(ModuleName)
 
             for FunctionName, labels in FunctionsAndLabels.items():
@@ -587,7 +587,7 @@ class CombinedSkim(BaseSkim):
         path.process()
 
     When skims are combined using this class, the `NoisyModules` lists of each skim are
-    combined and all silenced, and the `RequiredParticleLists` objects are
+    combined and all silenced, and the `RequiredStandardLists` objects are
     merged, removing duplicates. This way, `load_particle_lists` will load all the
     required lists of each skim, without accidentally loading a list twice.
 
@@ -602,10 +602,10 @@ class CombinedSkim(BaseSkim):
     __WorkingGroup__ = None
     __SkimDescription__ = None
 
-    RequiredParticleLists = None
-    """`BaseSkim.RequiredParticleLists` attribute initialised to `None` to get around
+    RequiredStandardLists = None
+    """`BaseSkim.RequiredStandardLists` attribute initialised to `None` to get around
     abstract property restriction. Overwritten as merged
-    `BaseSkim.RequiredParticleLists` object during initialisation of `CombinedSkim`
+    `BaseSkim.RequiredStandardLists` object during initialisation of `CombinedSkim`
     instance."""
 
     def __init__(self, *skims):
@@ -621,8 +621,8 @@ class CombinedSkim(BaseSkim):
         for skim in skims:
             skim._validate_required_particle_lists()
 
-        self.RequiredParticleLists = self._merge_nested_dicts(
-            skim.RequiredParticleLists for skim in skims
+        self.RequiredStandardLists = self._merge_nested_dicts(
+            skim.RequiredStandardLists for skim in skims
         )
 
     def __str__(self):
@@ -692,7 +692,7 @@ class CombinedSkim(BaseSkim):
     def _merge_nested_dicts(self, *dicts):
         """Merge any number of dicts recursively.
 
-        Utility function for merging `RequiredParticleLists` values from differnt
+        Utility function for merging `RequiredStandardLists` values from differnt
         skims.
 
         Parameters:

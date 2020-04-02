@@ -16,28 +16,37 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
+import glob as glob
 
 set_random_seed(12345)
+
+exp = '8'
+run = '*'
+bgfile = '/group/belle2/users/jbennett/BGOverlayFromData/e000' + exp + \
+    '/release-04-01-00/data_reprocessing_proc10/BGOverlay.physics.e000' + exp + '.r0' + run + '.root'
+bg = glob.glob(bgfile)
+
 
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[0])
+main.add_module('EventInfoSetter', evtNumList=[5000], runList=[1], expList=[1003])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
 
 # detector simulation
-add_simulation(main, bkgfiles=get_background_files())
+# add_simulation(main, bkgfiles=get_background_files())
+add_simulation(main, bkgfiles=bg)
 
 # trigger simulation
-add_tsim(main)
+# add_tsim(main)
 
 # memory profile
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', outputFileName='../EvtGenSim.root')
+main.add_module('RootOutput', outputFileName='../EvtGenSim_5k_exp1003_run1.root')
 
 process(main)
 

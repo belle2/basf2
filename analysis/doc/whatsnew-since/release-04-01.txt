@@ -109,9 +109,11 @@ Variables
  * Extended functionality of recoil kinematics variables (`pxRecoil`, `pyRecoil`, ...) to be usable with any requested frame.
  * Added :b2:var:`isFromV0` to identify particles that come from tracking-level V0's (as opposed to those created at analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
-
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
    `EventKinematics` module. 
+
+ * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
+ * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors. 
 
 Modules
 +++++++
@@ -150,7 +152,7 @@ Modules
    by ``constraintType`` (which can be set to ``tube``) and ``trackFindingType``. All computations done in the module are now using double precision.
    The module is also updated to allow for the computations of new variables related to the tracks used in the tag vertex fit.
  * Added a :b2:mod:`InclusiveDstarReconstruction` to inclusively reconstruct D* mesons by estimating the four vector using slow pions.
- * In `TagV` module, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
+ * In the `TagV` function, added the possibility to use KFitter instead of Rave to perform the tag vertex fit.
  * Both flavor taggers support ROE masks. Added new maskName argument.
  * Added new :ref:`DecayString` grammar for ``c_AddedRecoBremsPhoton``, ``c_DecayInFlight``, and ``c_MisID``. If one uses ``?addbrems`` in own DecayString, ``c_AddedRecoBremsPhoton`` is ignored, thus :b2:var:`isSignal` works as :b2:var:`isSignalAcceptBremsPhotons`.
    One can add ``(decay)`` and/or ``(misID)`` to the beginning of the particle name to accept ``c_DecayInFlight`` and/or ``c_MisID``. 
@@ -161,6 +163,10 @@ Modules
  * Added feature to add multiple TTrees to the same output file via the :b2:mod:`VariablesToEventBasedTree` module.
  * Rest Of Event can be created using MCParticles using `modularAnalysis.buildRestOfEventFromMC`
  * Removed ``-->``, ``=>``, and ``==>`` from the list of allowed arrow types for the `DecayString`.
+ * In :b2:mod:`TagVertex` module, added the possibility to use the truth information from the tag particles in the vertex fit. The option :code:`useTruthInFit = True` switches that on. 
+ * In :b2:mod:`TagVertex` module, implemented an internal change: tag particles are loaded as ``Particle`` object from the ``ROE`` and not anymore as ``TrackFitResult``. This should have no effect to users.
+ * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned 
+   off by setting ``allowChargeViolation=True``.
 
 Utilities and core objects
 ++++++++++++++++++++++++++
@@ -168,3 +174,4 @@ Utilities and core objects
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+ * Added a function to retrieve electric charge of a particle based on its pdg code.

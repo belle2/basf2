@@ -374,3 +374,74 @@ class SinglePhotonDark(BaseSkim):
         region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
         ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
         self.SkimLists = ['gamma:singlePhoton']
+
+
+@fancy_skim_header
+class ALP3Gamma(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # No lists added in standalone file
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DimuonPlusMissingEnergy(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # charged.stdMu('all', path=dimuon_path)
+    # import stdCharged as charged
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class ElectronMuonPlusMissingEnergy(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # charged.stdE('all', path=emu_path)
+    # charged.stdMu('all', path=emu_path)
+    # import stdCharged as charged
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class LFVZpVisible(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # stdE('all', path=lfvzppath)
+    # stdE('loose', path=lfvzppath)
+    # stdK('all', path=lfvzppath)
+    # stdK('loose', path=lfvzppath)
+    # stdMu('all', path=lfvzppath)
+    # stdMu('loose', path=lfvzppath)
+    # stdPi('all', path=lfvzppath)
+    # stdPi('loose', path=lfvzppath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

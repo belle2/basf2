@@ -14,6 +14,7 @@ __authors__ = [
 import basf2 as b2
 import fei
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 from variables import variables as vm
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
@@ -878,3 +879,51 @@ def runFEIforSkimCombined(path):
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
     path.add_path(feistate.path)
+
+
+class feiHadronicB0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class feiHadronicBplus(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class feiSLB0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class feiSLBplus(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

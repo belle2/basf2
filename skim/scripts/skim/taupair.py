@@ -9,6 +9,7 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
@@ -338,3 +339,68 @@ def TauThrustList(path):
 
     # For skimming, the important thing is if the final particleList is empty or not.
     return eventParticle
+
+
+@fancy_skim_header
+class TauLFV(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from skim.standardlists.lightmesons import loadStdLightMesons
+    # from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+    # from stdPhotons import stdPhotons
+    # from stdPi0s import stdPi0s, loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdLightMesons(path=taulfvskim)
+    # loadStdSkimPi0(path=taulfvskim)
+    # stdE('loose', path=taulfvskim)
+    # stdK('loose', path=taulfvskim)
+    # stdKshorts(path=taulfvskim)
+    # stdMu('loose', path=taulfvskim)
+    # stdPhotons('loose', path=taulfvskim)
+    # stdPi('loose', path=taulfvskim)
+    # stdPi0s('loose', path=taulfvskim)
+    # stdPr('loose', path=taulfvskim)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class TauGeneric(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdPi
+    # from stdPhotons import stdPhotons
+    # stdPhotons('all', path=taugenericskim)
+    # stdPi('all', path=taugenericskim)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class TauThrust(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdPi
+    # from stdPhotons import stdPhotons
+    # stdPhotons('all', path=tauthrustskim)
+    # stdPi('all', path=tauthrustskim)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

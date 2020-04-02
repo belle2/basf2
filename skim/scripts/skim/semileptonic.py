@@ -11,6 +11,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
 def SemileptonicList(path):
@@ -179,3 +180,54 @@ def PRList(path):
     PRList = ['B0:L1', 'B0:L2']
 
     return PRList
+
+
+@fancy_skim_header
+class PRsemileptonicUntagged(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu, stdPi
+    # stdE('all', path=PRSLpath)
+    # stdMu('all', path=PRSLpath)
+    # stdPi('all', path=PRSLpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class SLUntagged(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
+    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import stdPhotons
+    # from stdPi0s import stdPi0s
+    # from stdV0s import stdKshorts
+    # loadStdD0(path=SLpath)
+    # loadStdDplus(path=SLpath)
+    # loadStdDstar0(path=SLpath)
+    # loadStdDstarPlus(path=SLpath)
+    # loadStdPi0ForBToHadrons(path=SLpath)  # For skim.standardlists.charm lists
+    # stdE('all', path=SLpath)
+    # stdK('all', path=SLpath)
+    # stdKshorts(path=SLpath)
+    # stdMu('all', path=SLpath)
+    # stdPhotons('loose', path=SLpath)
+    # stdPi('all', path=SLpath)
+    # stdPi('loose', path=SLpath)
+    # stdPi0s('loose', path=SLpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

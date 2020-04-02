@@ -13,6 +13,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
 def B2XgammaList(path):
@@ -139,3 +140,62 @@ def B2XllListLFV(path):
     BtoXllListLFV = ['B+:lfv']
 
     return BtoXllListLFV
+
+
+@fancy_skim_header
+class BtoXgamma(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdPi
+    # from stdPhotons import stdPhotons
+    # stdPhotons('all', path=path)
+    # stdPhotons('loose', path=path)
+    # stdPi('all', path=path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class BtoXll(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu, stdPi
+    # from stdPhotons import stdPhotons
+    # stdE('all', path=path)
+    # stdMu('all', path=path)
+    # stdPhotons('all', path=path)
+    # stdPi('all', path=path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class BtoXll_LFV(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu, stdPi
+    # from stdPhotons import stdPhotons
+    # stdE('all', path=path)
+    # stdMu('all', path=path)
+    # stdPhotons('all', path=path)
+    # stdPi('all', path=path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

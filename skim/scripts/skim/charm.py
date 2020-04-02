@@ -19,7 +19,9 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 import vertex
+
 
 haveRunD0ToHpJm = 0
 haveRunD0ToNeutrals = 0
@@ -803,3 +805,322 @@ def DpToKsHp(path):
 
     Lists = DpList
     return Lists
+
+
+@fancy_skim_header
+class XToD0_D0ToHpJm(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # No standard lists required
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class XToD0_D0ToNeutrals(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdK, stdPi
+    # from stdPi0s import loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdSkimPi0(path=c2bndpath)
+    # stdK('all', path=c2bndpath)
+    # stdK('loose', path=c2bndpath)
+    # stdKshorts(path=c2bndpath)
+    # stdPi('all', path=c2bndpath)
+    # stdPi('loose', path=c2bndpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToRare(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPhoton(path=crpath)
+    # loadStdSkimPi0(path=crpath)
+    # stdE('loose', path=crpath)
+    # stdMu('loose', path=crpath)
+    # stdPi('loose', path=crpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class XToDp_DpToKsHp(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdK, stdPi
+    # from stdV0s import stdKshorts
+    # stdK('all', path=ckshppath)
+    # stdKshorts(path=ckshppath)
+    # stdPi('all', path=ckshppath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpJm(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPhoton(path=c3bhpath)
+    # loadStdSkimPi0(path=c3bhpath)
+    # stdE('all', path=c3bhpath)
+    # stdE('loose', path=c3bhpath)
+    # stdK('all', path=c3bhpath)
+    # stdK('loose', path=c3bhpath)
+    # stdMu('all', path=c3bhpath)
+    # stdMu('loose', path=c3bhpath)
+    # stdPi('all', path=c3bhpath)
+    # stdPi('loose', path=c3bhpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPhoton(path=c3bh1path)
+    # loadStdSkimPi0(path=c3bh1path)
+    # stdE('all', path=c3bh1path)
+    # stdE('loose', path=c3bh1path)
+    # stdK('all', path=c3bh1path)
+    # stdK('loose', path=c3bh1path)
+    # stdMu('all', path=c3bh1path)
+    # stdMu('loose', path=c3bh1path)
+    # stdPi('all', path=c3bh1path)
+    # stdPi('loose', path=c3bh1path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToKsOmega(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPi0s import loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdSkimPi0(path=c2bn2path)
+    # stdE('loose', path=c2bn2path)
+    # stdK('loose', path=c2bn2path)
+    # stdKshorts(path=c2bn2path)
+    # stdMu('loose', path=c2bn2path)
+    # stdPi('loose', path=c2bn2path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpJmEta(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdSkimPhoton(path=c3bh3path)
+    # loadStdSkimPi0(path=c3bh3path)
+    # stdE('all', path=c3bh3path)
+    # stdE('loose', path=c3bh3path)
+    # stdK('all', path=c3bh3path)
+    # stdK('loose', path=c3bh3path)
+    # stdKshorts(path=c3bh3path)
+    # stdMu('all', path=c3bh3path)
+    # stdMu('loose', path=c3bh3path)
+    # stdPi('all', path=c3bh3path)
+    # stdPi('loose', path=c3bh3path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToNeutrals(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPi0s import loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdSkimPi0(path=c2bnpath)
+    # stdE('all', path=c2bnpath)
+    # stdE('loose', path=c2bnpath)
+    # stdK('all', path=c2bnpath)
+    # stdK('loose', path=c2bnpath)
+    # stdKshorts(path=c2bnpath)
+    # stdMu('all', path=c2bnpath)
+    # stdMu('loose', path=c2bnpath)
+    # stdPi('all', path=c2bnpath)
+    # stdPi('loose', path=c2bnpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpHmKs(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # import stdV0s
+    # stdK('all', path=c3bh2path)
+    # stdPi('all', path=c3bh2path)
+    # stdV0s.stdKshorts(path=c3bh2path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPhoton(path=c3bhpath)
+    # loadStdSkimPi0(path=c3bhpath)
+    # stdE('all', path=c3bhpath)
+    # stdE('loose', path=c3bhpath)
+    # stdK('all', path=c3bhpath)
+    # stdK('loose', path=c3bhpath)
+    # stdMu('all', path=c3bhpath)
+    # stdMu('loose', path=c3bhpath)
+    # stdPi('all', path=c3bhpath)
+    # stdPi('loose', path=c3bhpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import loadStdSkimPhoton
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPhoton(path=c3bh1path)
+    # loadStdSkimPi0(path=c3bh1path)
+    # stdE('all', path=c3bh1path)
+    # stdE('loose', path=c3bh1path)
+    # stdK('all', path=c3bh1path)
+    # stdK('loose', path=c3bh1path)
+    # stdMu('all', path=c3bh1path)
+    # stdMu('loose', path=c3bh1path)
+    # stdPi('all', path=c3bh1path)
+    # stdPi('loose', path=c3bh1path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToSemileptonic(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPi0s import loadStdSkimPi0
+    # loadStdSkimPi0(path=cslpath)
+    # stdE('95eff', path=cslpath)
+    # stdK('95eff', path=cslpath)
+    # stdMu('95eff', path=cslpath)
+    # stdPi('95eff', path=cslpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

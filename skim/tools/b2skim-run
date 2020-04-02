@@ -75,10 +75,6 @@ def get_skim_function(SkimName):
     Returns:
         SkimFunction: The class constructor for the given skim.
     """
-    # TODO: Delete this `if` statement once everything is implemented
-    if SkimName not in ["LeptonicUntagged", "SinglePhotonDark"]:
-        raise NotImplementedError
-
     ModuleName = Registry.get_skim_module(SkimName)
     SkimModule = import_module(f"skim.{ModuleName}")
     return getattr(SkimModule, SkimName)

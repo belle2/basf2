@@ -11,6 +11,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 import vertex
 
 
@@ -512,3 +513,128 @@ def XiList(path):
         XiList.append('Xi-:syst' + str(chID))
 
     return XiList
+
+
+class Systematics(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    RequiredParticleLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+        """"""
+
+
+class SystematicsTracking(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdK, stdPi
+    # from stdPi0s import stdPi0s
+    # stdK('loose', path=skimpath)
+    # stdPi('loose', path=skimpath)
+    # stdPi0s('loose', path=skimpath)
+
+    RequiredParticleLists = {
+        "stdCharged": {
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["loose"]
+        }
+    }
+
+    def build_lists(self, path):
+        """Build particle lists for  skim"""
+
+
+class Resonance(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdK, stdMu, stdPi, stdPr
+    # from stdPi0s import stdPi0s
+    # stdK('loose', path=syspath)
+    # stdMu('loose', path=syspath)
+    # stdPi('loose', path=syspath)
+    # stdPi0s('looseFit', path=syspath)
+    # stdPr('loose', path=syspath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """Build particle lists for  skim"""
+
+
+class SystematicsRadMuMu(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdMu
+    # stdMu('all', path=skimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class SystematicsEELL(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu
+    # stdE('all', path=skimpath)
+    # stdMu('all', path=skimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class SystematicsRadEE(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE
+    # stdE('all', path=skimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+class SystematicsLambda(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # No loading in. Strange.
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

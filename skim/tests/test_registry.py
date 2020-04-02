@@ -79,16 +79,23 @@ class TestSkimCodes(unittest.TestCase):
         for ModuleName in Registry.modules:
             SkimModule = import_module(f"skim.{ModuleName}")
             for SkimName in Registry.get_expected_skims_in_module(ModuleName):
-                # TODO: remove this `if` statement when all skims are fully implemented
-                if SkimName not in ["LeptonicUntagged", "SinglePhotonDark"]:
-                    continue
-
                 # Check the skim is defined in the module
-                self.assertIn(SkimName, SkimModule.__dict__.keys())
+                self.assertIn(
+                    SkimName,
+                    SkimModule.__dict__.keys(),
+                    (
+                        f"Registry lists {SkimName} as existing in skim.{ModuleName}, "
+                        "but no such skim found!"
+                    )
+                )
 
                 # Check that it is defined as a subclass of BaseSkim
                 SkimClass = getattr(SkimModule, SkimName)
-                self.assertIsSubclass(SkimClass, expert.BaseSkim)
+                self.assertIsSubclass(
+                    SkimClass,
+                    expert.BaseSkim,
+                    f"Skim {SkimName} must be defined as a subclass of BaseSkim."
+                )
 
     def test_undocumented_skims(self):
         """Check that every skim defined in a module is listed in the registry.

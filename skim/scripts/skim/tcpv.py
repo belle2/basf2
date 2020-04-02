@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
@@ -154,3 +155,41 @@ def TCPVList(path):
 
     tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + bMinustoJPsiK_List + bMinustoD_List
     return tcpvLists
+
+
+@fancy_skim_header
+class TCPV(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from skim.standardlists.charm import loadStdD0_Kpi, loadStdD0_Kpipipi
+    # from skim.standardlists.dileptons import loadStdDiLeptons, loadStdJpsiToee, loadStdJpsiTomumu
+    # from skim.standardlists.lightmesons import loadStdLightMesons
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # from stdPhotons import stdPhotons, loadStdSkimPhoton
+    # from stdPi0s import stdPi0s, loadStdSkimPi0
+    # from stdV0s import stdKshorts
+    # loadStdD0_Kpi(path=path)
+    # loadStdD0_Kpipipi(path=path)
+    # loadStdDiLeptons(True, path=path)
+    # loadStdJpsiToee(path=path)
+    # loadStdJpsiTomumu(path=path)
+    # loadStdLightMesons(path=path)
+    # loadStdSkimPhoton(path=path)
+    # loadStdSkimPi0(path=path)
+    # stdE('loose', path=path)
+    # stdK('all', path=path)
+    # stdK('loose', path=path)
+    # stdKshorts(path=path)
+    # stdMu('loose', path=path)
+    # stdPhotons('loose', path=path)
+    # stdPi('all', path=path)
+    # stdPi('loose', path=path)
+    # stdPi0s('loose', path=path)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

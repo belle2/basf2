@@ -231,7 +231,7 @@ def fancy_skim_header(SkimClass):
     if isinstance(authors, str):
         authors = authors.split(", ")
 
-    header = f""".. Note::
+    header = f"""Note:
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}

@@ -10,6 +10,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
 def EtabList(path):
@@ -188,3 +189,62 @@ def ISRpipiccList(path):
 
     # return the ISR process list
     return vphoList
+
+
+@fancy_skim_header
+class BottomoniumEtabExclusive(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdPhotons import stdPhotons
+    # stdPhotons('loose', path=BottomoniumEtabskimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class BottomoniumUpsilon(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdMu, stdPi
+    # from stdPhotons import stdPhotons
+    # stdE('loose', path=BottomoniumUpsilonskimpath)
+    # stdMu('loose', path=BottomoniumUpsilonskimpath)
+    # stdPhotons('loose', path=BottomoniumUpsilonskimpath)
+    # stdPi('loose', path=BottomoniumUpsilonskimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""
+
+
+@fancy_skim_header
+class ISRpipicc(BaseSkim):
+    """"""
+    __authors__ = []
+    __WorkingGroup__ = ""
+    __SkimDescription__ = ""
+
+    # from stdCharged import stdE, stdK, stdMu, stdPi
+    # stdE('all', path=ISRskimpath)
+    # stdE('loose', path=ISRskimpath)
+    # stdK('all', path=ISRskimpath)
+    # stdK('loose', path=ISRskimpath)
+    # stdMu('all', path=ISRskimpath)
+    # stdMu('loose', path=ISRskimpath)
+    # stdPi('all', path=ISRskimpath)
+    # stdPi('loose', path=ISRskimpath)
+
+    RequiredParticleLists = None
+
+    def build_lists(self, path):
+        """"""

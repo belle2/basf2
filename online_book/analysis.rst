@@ -1,0 +1,4 @@
+.. _analysis:
+
+Offline analysis
+================

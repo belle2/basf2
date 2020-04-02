@@ -28,6 +28,7 @@ Belle 2 Software or for additional information, please
    framework/doc/index*
    */doc/index*
    framework/doc/atend*
+   online_book/index*
 
 .. only:: format_html
 

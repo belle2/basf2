@@ -622,7 +622,7 @@ class CombinedSkim(BaseSkim):
             skim._validate_required_particle_lists()
 
         self.RequiredParticleLists = self._merge_nested_dicts(
-            [skim.RequiredParticleLists for skim in skims]
+            skim.RequiredParticleLists for skim in skims
         )
 
     def __str__(self):
@@ -689,18 +689,19 @@ class CombinedSkim(BaseSkim):
                 ", ".join(DuplicatedParticleLists)
             )
 
-    def _merge_nested_dicts(self, dicts):
+    def _merge_nested_dicts(self, *dicts):
         """Merge any number of dicts recursively.
 
         Utility function for merging `RequiredParticleLists` values from differnt
         skims.
 
         Parameters:
-            dicts (list(dict)): Dictionaries to be merged.
+            dicts (dict): Any number of dictionaries to be merged.
 
         Returns:
             MergedDict (dict): Merged dictionary without duplicates.
         """
+        dicts = list(*dicts)
         MergedDict = dicts[0]
         for d in dicts[1:]:
             MergedDict = self._merge_two_nested_dicts(MergedDict, d)

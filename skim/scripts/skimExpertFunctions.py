@@ -399,9 +399,9 @@ methods __authors__
                 * running the FEI.
 
         Warning:
-            Particle lists should *not* be loaded in here. This should be done by
-            setting the `RequiredStandardLists` attribute of an individual skim. This is
-            crucial for avoiding loading lists twice when combining skims for
+            Standard particle lists should *not* be loaded in here. This should be done
+            by setting the `RequiredStandardLists` attribute of an individual skim. This
+            is crucial for avoiding loading lists twice when combining skims for
             production.
 
         Parameters:
@@ -622,7 +622,7 @@ class CombinedSkim(BaseSkim):
             skim._validate_required_particle_lists()
 
         self.RequiredStandardLists = self._merge_nested_dicts(
-            skim.RequiredStandardLists for skim in skims
+            filter(None, [skim.RequiredStandardLists for skim in skims])
         )
 
     def __str__(self):

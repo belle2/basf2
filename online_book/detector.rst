@@ -10,4 +10,6 @@ This chapter contains key information about the subsystems of the detector.
    :maxdepth: 2
    :numbered: 3
 
-   detector/*
+   detector/tracking
+   detector/pid
+   detector/trigger

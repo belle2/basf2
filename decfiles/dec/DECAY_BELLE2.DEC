@@ -59,13 +59,15 @@
 #   https://stash.desy.de/projects/B2/repos/software/pull-requests/3721/overview
 #
 # March 2020, E. R. Oxford (emma.oxford@desy.de)
-#	Substantial updates to charm decays, such as:
-#		Updated D0/anti-D0 decay tables
-#		Updated D+/D- decay tables
-#		Updated D_s+/D_s- decay tables
-#		Updated charmed baryon decay tables
-#	Added ModelAliases for SLPOLE and SLBKPOLE models now used in D semi-leptonic decays
-#	Added two new "fake" resonances, phiR and f_2R, and improved documentation for K*0R and K*BR "fake" resonances
+# **All changes are documented in BELLE2-NOTE-PH-2020-008 on the Belle II Document Server**
+#   Substantial updates to charm decays, such as:
+#      Updated D0/anti-D0 decay tables
+#      Updated D+/D- decay tables
+#      Updated D_s+/D_s- decay tables
+#      Updated charmed baryon decay tables
+#   Added ModelAliases for SLPOLE and SLBKPOLE models now used in D semi-leptonic decays
+#   Added two new "fake" resonances, phiR and f_2R, and improved documentation for K*0R and K*BR "fake" resonances
+#   Added decay table for sigma_0 particle (f_0(500) in the PDG)
 
 
 

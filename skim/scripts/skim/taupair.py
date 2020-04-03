@@ -153,7 +153,9 @@ def TauLFVList(flag=1, path=None):
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv, f_0:taulfv``,
     ``rho0:taulfv, K*0:taulfv, phi:taulfv, omega:taulfv``
 
-    **Criteria**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
+    **Criteria for 1 prong final states **: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
+
+    **Criteria for >1 prong final states **: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \Delta E < 0.5` GeV
 
     Returns:
         list name of the TauLFV skim candidates
@@ -200,7 +202,9 @@ def TauLFVList(flag=1, path=None):
     ma.reconstructDecay('omega:taulfv -> pi0:taulfv pi-:all pi+:all', '0.73 < M < 0.83', path=path)
 
     # event selection
-    tauLFVCuts = 'nParticlesInList(pi+:taulfv) < 5 and 1.0 < M < 2.0 and -1.5 < deltaE < 0.5'
+    vm.addAlias('netChargeLFV', 'formula(countInList(pi+:taulfv, charge == 1) - countInList(pi+:taulfv, charge == -1))')
+    tauLFVCuts1 = 'nParticlesInList(pi+:taulfv) < 5 and 1.0 < M < 2.0 and -1.5 < deltaE < 0.5'
+    tauLFVCuts3 = 'nParticlesInList(pi+:taulfv) < 7 and 1.4 < M < 2.0 and -1.0 < deltaE < 0.5'
 
     tau_lgamma_Channels = ['e+:taulfv gamma:taulfv',
                            'mu+:taulfv gamma:taulfv'
@@ -214,15 +218,18 @@ def TauLFVList(flag=1, path=None):
                         'mu-:taulfv mu-:taulfv e+:taulfv'
                         ]
 
-    tau_lP0_Channels = ['e+:taulfv pi0:taulfv',
-                        'mu+:taulfv pi0:taulfv',
-                        'e+:taulfv eta:taulfv',
-                        'mu+:taulfv eta:taulfv',
-                        'e+:taulfv eta\':taulfv',
-                        'mu+:taulfv eta\':taulfv',
-                        'e+:taulfv K_S0:taulfv',
-                        'mu+:taulfv K_S0:taulfv'
-                        ]
+    tau_lP01_Channels = ['e+:taulfv pi0:taulfv',
+                         'mu+:taulfv pi0:taulfv',
+                         'e+:taulfv eta:taulfv1',
+                         'mu+:taulfv eta:taulfv1'
+                         ]
+    tau_lP03_Channels = ['e+:taulfv eta:taulfv2',
+                         'mu+:taulfv eta:taulfv2',
+                         'e+:taulfv eta\':taulfv',
+                         'mu+:taulfv eta\':taulfv',
+                         'e+:taulfv K_S0:taulfv',
+                         'mu+:taulfv K_S0:taulfv'
+                         ]
 
     tau_lS0_Channels = ['e+:taulfv f_0:taulfv',
                         'mu+:taulfv f_0:taulfv'
@@ -267,43 +274,47 @@ def TauLFVList(flag=1, path=None):
     tau_lgamma_list = []
     for chID, channel in enumerate(tau_lgamma_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lgamma' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_lgamma' + str(chID) + ' -> ' + channel, tauLFVCuts1, chID, path=path)
         tau_lgamma_list.append('tau+:LFV_lgamma' + str(chID))
 
     tau_lll_list = []
     for chID, channel in enumerate(tau_lll_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
         tau_lll_list.append('tau+:LFV_lll' + str(chID))
 
     tau_lP0_list = []
-    for chID, channel in enumerate(tau_lP0_Channels):
+    for chID, channel in enumerate(tau_lP01_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lP0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
-        tau_lP0_list.append('tau+:LFV_lP0' + str(chID))
+            ma.reconstructDecay('tau+:LFV_lP01' + str(chID) + ' -> ' + channel, tauLFVCuts1, chID, path=path)
+        tau_lP0_list.append('tau+:LFV_lP01' + str(chID))
+    for chID, channel in enumerate(tau_lP03_Channels):
+        if(flag):
+            ma.reconstructDecay('tau+:LFV_lP03' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
+        tau_lP0_list.append('tau+:LFV_lP03' + str(chID))
 
     tau_lS0_list = []
     for chID, channel in enumerate(tau_lS0_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lS0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_lS0' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
         tau_lS0_list.append('tau+:LFV_lS0' + str(chID))
 
     tau_lV0_list = []
     for chID, channel in enumerate(tau_lV0_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lV0' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_lV0' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
         tau_lV0_list.append('tau+:LFV_lV0' + str(chID))
 
     tau_lhh_list = []
     for chID, channel in enumerate(tau_lhh_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lhh' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_lhh' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
         tau_lhh_list.append('tau+:LFV_lhh' + str(chID))
 
     tau_bnv_list = []
     for chID, channel in enumerate(tau_bnv_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_bnv' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay('tau+:LFV_bnv' + str(chID) + ' -> ' + channel, tauLFVCuts3, chID, path=path)
         tau_bnv_list.append('tau+:LFV_bnv' + str(chID))
 
     tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list

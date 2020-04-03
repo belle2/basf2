@@ -63,6 +63,34 @@ namespace Belle2 {
     }
 
 
+
+    /**
+     * Rotate tensor orgMat, where the rotation is described by a transofrmation
+     * which transform vector (0,0,1) -> vTo
+     * @param[in] vTo  vector defining rotation
+     * @param[in] orgMat tensor before rotation
+     */
+    inline TMatrixD rotateTensor(const TVector3& vTo, const TMatrixD& orgMat)
+    {
+      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD rT = r; rT.T();
+      return r * orgMat * rT;
+    }
+
+    /**
+     * Rotate tensor orgMat, where the rotation is described by a transofrmation
+     * which transform vector vTo -> (0,0,1)
+     * @param[in] vTo  vector defining rotation
+     * @param[in] orgMat tensor before rotation
+     */
+    inline TMatrixD rotateTensorInv(const TVector3& vTo, const TMatrixD& orgMat)
+    {
+      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD rT = r; rT.T();
+      return rT * orgMat * r;
+    }
+
+
     /**
      * Convert squared matrix to symmetric matrix
      * as S = (A + At) / 2

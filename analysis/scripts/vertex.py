@@ -9,7 +9,7 @@ def fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='kfitter',
+    fitter='KFit',
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
@@ -21,7 +21,7 @@ def fitVertex(
 
     Info:
         Direct use of `fitVertex` is not recommended unless you know what you are doing.
-        If you're unsure, you probably want to use `treeFit` or `KFit`.
+        If you're unsure, you probably want to use `treeFit` or `kFit`.
 
     Parameters:
         list_name (str):        name of the input ParticleList
@@ -29,17 +29,17 @@ def fitVertex(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
-        fitter (str):           rave or kfitter
+        fitter (str):           Rave or KFit
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
-        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
     warning = (
         "Direct use of fitVertex is not recommended unless you know what you are doing.\n"
-        "Please use treeFit or KFit.\n"
+        "Please use treeFit or kFit.\n"
         "See documentation at https://software.belle2.org"
     )
 
@@ -52,7 +52,7 @@ def _fitVertex(
     list_name,
     conf_level,
     decay_string='',
-    fitter='kfitter',
+    fitter='KFit',
     fit_type='vertex',
     constraint='',
     daughtersUpdate=False,
@@ -71,11 +71,11 @@ def _fitVertex(
             Setting this parameter to -1 selects all particle candidates.
             The value of 0 rejects the particle candidates with failed fit.
         decay_string (str):     select particles used for the vertex fit
-        fitter (str):           rave or kfitter
+        fitter (str):           Rave or KFit
         fit_type (str):         type of the kinematic fit (valid options are vertex/massvertex/mass/fourC)
         constraint (str):       add aditional constraint to the fit (valid options are empty string/ipprofile/iptube/mother)
         daughtersUpdate (bool): make copy of the daughters and update them after the vertex fit
-        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'kfitter/vertex/iptube' option.
+        smearing (float) :      IP tube width is smeared by this value (cm). meaningful only with 'KFit/vertex/iptube' option.
         path (basf2.Path):      modules are added to this path
     """
 
@@ -92,7 +92,7 @@ def _fitVertex(
     path.add_module(pvfit)
 
 
-def KFit(list_name,
+def kFit(list_name,
          conf_level,
          fit_type='vertex',
          constraint='',
@@ -122,10 +122,10 @@ def KFit(list_name,
         path (basf2.Path):      modules are added to this path
     """
 
-    _fitVertex(list_name, conf_level, decay_string, 'kfitter', fit_type, constraint, daughtersUpdate, smearing, path)
+    _fitVertex(list_name, conf_level, decay_string, 'KFit', fit_type, constraint, daughtersUpdate, smearing, path)
 
 
-def Rave(
+def raveFit(
     list_name,
     conf_level,
     fit_type='vertex',
@@ -142,7 +142,7 @@ def Rave(
     Warning:
         `RAVE <https://github.com/rave-package>`_ is deprecated since it is not maintained.
         Whilst we will not remove RAVE, it is not recommended for analysis use, other than benchmarking or legacy studies.
-        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.KFit`.
+        Instead, we recommend :doc:`TreeFitter` (`vertex.treeFit`) or `vertex.kFit`.
 
     Parameters:
         list_name (str):    name of the input ParticleList
@@ -185,7 +185,7 @@ def Rave(
     if not silence_warning:
         B2WARNING(message_a + message_if + message_b)
 
-    _fitVertex(list_name, conf_level, decay_string, 'rave', fit_type, constraint, daughtersUpdate, 0, path)
+    _fitVertex(list_name, conf_level, decay_string, 'Rave', fit_type, constraint, daughtersUpdate, 0, path)
 
 
 def treeFit(

@@ -176,8 +176,8 @@ ma.rankByHighest(particleList='B0:sig',
                  path=cp_val_path)
 
 # Fit vertex of the B0 on the signal side
-vx.Rave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-        constraint='', path=cp_val_path)
+vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+           constraint='', path=cp_val_path)
 
 
 # Fit Vertex of the B0 on the tag side

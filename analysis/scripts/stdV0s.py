@@ -29,9 +29,9 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:V0', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.KFit('K_S0:V0', conf_level=0.0, path=path)
+        vertex.kFit('K_S0:V0', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.Rave('K_S0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('K_S0:V0', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Kshorts are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('K_S0:V0', '0.450 < M < 0.550', path=path)
@@ -42,9 +42,9 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:RD', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.KFit('K_S0:RD', conf_level=0.0, path=path)
+        vertex.kFit('K_S0:RD', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.Rave('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('K_S0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('K_S0:RD', '0.450 < M < 0.550', path=path)
     # Create merged list based on provided priority
     if prioritiseV0:
@@ -64,7 +64,7 @@ def goodBelleKshort(path):
         path (basf2.Path): the path to load the modules
     """
     ma.fillParticleList('K_S0:legacyGoodKS -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-    vertex.KFit('K_S0:legacyGoodKS', conf_level=0.0, path=path)
+    vertex.kFit('K_S0:legacyGoodKS', conf_level=0.0, path=path)
     ma.applyCuts('K_S0:legacyGoodKS', '0.468 < M < 0.528 and goodBelleKshort==1', path=path)
 
 
@@ -90,9 +90,9 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     if fitter == 'TreeFit':
         vertex.treeFit('Lambda0:V0', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.KFit('Lambda0:V0', conf_level=0.0, path=path)
+        vertex.kFit('Lambda0:V0', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.Rave('Lambda0:V0', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('Lambda0:V0', conf_level=0.0, path=path, silence_warning=True)
     else:
         B2ERROR("Valid fitter options for Lambdas are 'TreeFit', 'KFit', and 'Rave'. However, the latter is not recommended.")
     ma.applyCuts('Lambda0:V0', '1.10 < M < 1.13', path=path)
@@ -107,9 +107,9 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     if fitter == 'TreeFit':
         vertex.treeFit('Lambda0:RD', conf_level=0.0, path=path)
     elif fitter == 'KFit':
-        vertex.KFit('Lambda0:RD', conf_level=0.0, path=path)
+        vertex.kFit('Lambda0:RD', conf_level=0.0, path=path)
     elif fitter == 'Rave':
-        vertex.Rave('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True)
+        vertex.raveFit('Lambda0:RD', conf_level=0.0, path=path, silence_warning=True)
     ma.applyCuts('Lambda0:RD', '1.10 < M < 1.13', path=path)
     # Find RD duplicate with better vertex fit quality
     ma.markDuplicate('Lambda0:RD', False, path=path)

@@ -210,7 +210,7 @@ def getDstarList(path):
     DplusList = []
     for chID, channel in enumerate(DplusChannel):
         ma.reconstructDecay('D+:resonance' + str(chID) + ' -> ' + channel, DplusCuts, chID, path=path)
-        vertex.Rave('D+:resonance' + str(chID), 0.0, path=path)
+        vertex.raveFit('D+:resonance' + str(chID), 0.0, path=path)
         DplusList.append('D+:resonance' + str(chID))
 
     DstarChannel = []
@@ -234,7 +234,7 @@ def getSigmacList(path):
     LambdacList = []
     for chID, channel in enumerate(LambdacChannel):
         ma.reconstructDecay('Lambda_c+:resonance' + str(chID) + ' -> ' + channel, LambdacCuts, chID, path=path)
-        vertex.Rave('Lambda_c+:resonance' + str(chID), 0.0, path=path)
+        vertex.raveFit('Lambda_c+:resonance' + str(chID), 0.0, path=path)
         LambdacList.append('Lambda_c+:resonance' + str(chID))
 
     SigmacList = []
@@ -272,7 +272,7 @@ def getmumugList(path):
         ma.reconstructDecay('vpho:resonance' + str(chID) + ' -> ' + channel, vphocuts, chID, path=path)
         ma.applyCuts(resonanceName, 'nTracks == 2 and M < formula(Ecms*0.9877)', path=path)
         ma.matchMCTruth(resonanceName, path=path)
-        vertex.Rave(resonanceName, 0.0, path=path)
+        vertex.raveFit(resonanceName, 0.0, path=path)
         ma.applyCuts(resonanceName, 'M < formula(Ecms*0.9877)', path=path)
         vphoList.append(resonanceName)
 
@@ -287,7 +287,7 @@ def getBPlusList(path):
     for chID, channel in enumerate(antiDZeroChannel):
         resonanceName = 'anti-D0:resonance' + str(chID)
         ma.reconstructDecay(resonanceName + ' -> ' + channel, antiDZeroCut, chID, path=path)
-        vertex.Rave(resonanceName, 0.0, path=path)
+        vertex.raveFit(resonanceName, 0.0, path=path)
         antiDZeroList.append(resonanceName)
 
     BPlusChannel = []
@@ -328,7 +328,7 @@ def SystematicsLambdaList(path):
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
         ma.reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID, path=path)
-        vertex.KFit('Lambda0:syst' + str(chID), 0.002, path=path)
+        vertex.kFit('Lambda0:syst' + str(chID), 0.002, path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), '1.10<M<1.13', path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), 'formula(x*x+y*y)>0.0225', path=path)
         ma.applyCuts('Lambda0:syst' + str(chID), 'formula(x*px+y*py)>0', path=path)
@@ -364,7 +364,7 @@ def PiKFromDstarList(path):
     D0List = []
     for chID, channel in enumerate(D0Channel):
         ma.reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
-        vertex.Rave('D0:syst' + str(chID), 0.0, path=path)
+        vertex.raveFit('D0:syst' + str(chID), 0.0, path=path)
         D0List.append('D0:syst' + str(chID))
 
     DstarChannel = []
@@ -454,7 +454,7 @@ def BtoDStarPiList(path):
     for chID, channel in enumerate(D0Channel):
         resonanceName = 'anti-D0:loose' + str(chID)
         ma.reconstructDecay(resonanceName + ' -> ' + channel, D0Cuts, chID, path=path)
-#        vertex.Rave(resonanceName, 0.0, path=path)
+#        vertex.raveFit(resonanceName, 0.0, path=path)
         ma.matchMCTruth(resonanceName, path=path)
     ma.copyLists('anti-D0:loose', ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
     D0List.append('anti-D0:loose')
@@ -468,7 +468,7 @@ def BtoDStarPiList(path):
     for chID, channel in enumerate(DstarChannel):
         resonanceName = 'D*-:loose' + str(chID)
         ma.reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
-#        vertex.Rave(resonanceName, 0.0, path=path)
+#        vertex.raveFit(resonanceName, 0.0, path=path)
         DstarList.append(resonanceName)
         ma.matchMCTruth(resonanceName, path=path)
 
@@ -483,7 +483,7 @@ def BtoDStarPiList(path):
         resonanceName = 'B0:sys' + str(chID)
         ma.reconstructDecay(resonanceName + ' -> ' + channel, B0Cuts, chID, path=path)
         B0List.append(resonanceName)
-#        vertex.Rave(resonanceName, 0.0, path=path)
+#        vertex.raveFit(resonanceName, 0.0, path=path)
         ma.matchMCTruth(resonanceName, path=path)
 
     return B0List
@@ -499,7 +499,7 @@ def XiList(path):
     LambdaList = []
     for chID, channel in enumerate(LambdaChannel):
         ma.reconstructDecay('Lambda0:syst' + str(chID) + ' -> ' + channel, LambdaCuts, chID, path=path)
-        vertex.Rave('Lambda0:syst' + str(chID), 0.001, fit_type='massvertex', path=path)
+        vertex.raveFit('Lambda0:syst' + str(chID), 0.001, fit_type='massvertex', path=path)
         LambdaList.append('Lambda0:syst' + str(chID))
 
     XiChannel = []

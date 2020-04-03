@@ -324,16 +324,25 @@ namespace Belle2 {
   {
 
     bool loadedNext = false;
+    /**
+     * Three cases are distinguished:
+     * First, particles matching the flavor specified in the decay string are used to form combinations.
+     * Secondly, the anti-particles of flavored particles are used, but only if requested.
+     * Lastly, self-conjugated particles are handled specifically.
+     */
     while (true) {
-      if (m_iParticleType == 0) loadedNext = loadNextParticle(false);
-      else if (m_iParticleType == 1) {
-        if (loadAntiParticle) loadedNext = loadNextParticle(true);
-      } else if (m_iParticleType == 2) loadedNext = loadNextSelfConjugatedParticle();
-      else return false;
+      if (m_iParticleType == 0) {
+        loadedNext = loadNextParticle(false);
+      } else if (m_iParticleType == 1 and loadAntiParticle) {
+        loadedNext = loadNextParticle(true);
+      } else if (m_iParticleType == 2) {
+        loadedNext = loadNextSelfConjugatedParticle();
+      } else {
+        return false;
+      }
 
-      if (loadedNext)
-        return true;
-      ++m_iParticleType;
+      if (loadedNext) return true;
+      else ++m_iParticleType;
 
       if (m_iParticleType == 2) {
         std::vector<unsigned int> sizes(m_numberOfLists);

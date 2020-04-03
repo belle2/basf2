@@ -1108,8 +1108,6 @@ class feiHadronicB0(BaseFEISkim):
     """
     All available FEI :math:`B^0` hadronic tags are reconstructed.
 
-    <CHANNELS>
-
     From `Thomas Keck's thesis
     <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_, "the
     channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not
@@ -1121,6 +1119,8 @@ class feiHadronicB0(BaseFEISkim):
     * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
     * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23)
+
+    <CHANNELS>
     """
     __SkimDescription__ = ""
 
@@ -1155,13 +1155,13 @@ class feiHadronicBplus(BaseFEISkim):
     """
     All available FEI :math:`B^+` hadronic tags are reconstructed.
 
-    <CHANNELS>
-
     Tag side :math:`B` cuts:
 
     * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
     * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25)
+
+    <CHANNELS>
     """
     __SkimDescription__ = ""
 
@@ -1198,14 +1198,14 @@ class feiSLB0(BaseFEISkim):
     SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
     reconstructed.
 
-    <CHANNELS>
-
     Tag side :math:`B` cuts:
 
     * :math:`-4 < \\cos\\theta_{BY} < 3`
     * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
     * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
     * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
+
+    <CHANNELS>
     """
     __SkimDescription__ = ""
 
@@ -1242,8 +1242,6 @@ class feiSLBplus(BaseFEISkim):
     SL :math:`B^+` tags are reconstructed. Hadronic :math:`B^+` with SL :math:`D` are
     not reconstructed.
 
-    <CHANNELS>
-
     Tag side :math:`B` cuts:
 
     * :math:`-4 < \\cos\\theta_{BY} < 3`
@@ -1252,6 +1250,8 @@ class feiSLBplus(BaseFEISkim):
     * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
       (``daughter(1,p)>1.0`` or ``daughter(2,p)>1.0``, depending
       on decay mode ID)
+
+    <CHANNELS>
     """
     __SkimDescription__ = ""
 

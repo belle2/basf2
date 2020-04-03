@@ -121,6 +121,8 @@ def get_calibrations(input_data, **kwargs):
         algorithm.params = {"apply_iov": output_iov}
     for algorithm in cal5.algorithms:
         algorithm.params = {"apply_iov": output_iov}
+    for algorithm in cal6.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
 
     return [cal0, cal1, cal2, cal3, cal4, cal5, cal6]
 

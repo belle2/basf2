@@ -3,9 +3,17 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-
+#include <cdc/dbobjects/CDCBadWires.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
+
+#include <TH2F.h>
+#include <TFitResult.h>
+#include <TH1F.h>
+#include <TF1.h>
+#include <TGraphAsymmErrors.h>
+#include <TMath.h>
+#include <math.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -64,6 +72,113 @@ void WireEfficiencyAlgorithm::buildEfficiencies()
   B2INFO("TEfficiencies successfully filled.");
 }
 
+void WireEfficiencyAlgorithm::detectBadWires()
+{
+  static const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
+    unsigned short layerNo = wireLayer.getICLayer();
+    auto passed = (TH2F*)m_efficiencyInLayer[layerNo]->GetPassedHistogram();
+    auto total = (TH2F*)m_efficiencyInLayer[layerNo]->GetTotalHistogram();
+
+    // Ignoring layers that have no hits at all
+    if (!total->GetEntries()) continue;
+
+    double minFitRange = wireLayer.getBackwardZ() + 30;
+    double maxFitRange = wireLayer.getForwardZ() - 30;
+    // prepare fitting functions
+
+    TF1* f2 = new TF1("f2", "pol0", minFitRange, maxFitRange);
+
+    // Estimate average efficiency of the layer as function of z
+    auto passedProjectedX = passed->ProjectionX("projectionx1");
+    auto totalProjectedX = total->ProjectionX("projectionx2");
+    TEfficiency* efficiencyProjectedX = new TEfficiency(*passedProjectedX, *totalProjectedX);
+
+    unsigned short minFitBin = passedProjectedX->FindBin(minFitRange) + 1;
+    unsigned short maxFitBin = passedProjectedX->FindBin(maxFitRange) - 1;
+
+    // Estimate average efficiency of each wire in the layer
+    auto passedProjectedY = passed->ProjectionY("projectiony1", minFitRange, maxFitRange);
+    auto totalProjectedY = total->ProjectionY("projectiony2", minFitRange, maxFitRange);
+    TEfficiency* efficiencyProjectedY = new TEfficiency(*passedProjectedY, *totalProjectedY);
+
+    // Estimate average efficiency of the whole layer by summing up averages of individual wires
+    float totalAverage = 0;
+    int nonZeroWires = 0;
+    for (int i = 0; i <= passedProjectedY->GetNbinsX(); ++i) {
+      float efficiencyAtBin = efficiencyProjectedY->GetEfficiency(i);
+      if (efficiencyAtBin > 0.4) {
+        totalAverage += efficiencyAtBin;
+        nonZeroWires++;
+      }
+    }
+    nonZeroWires > 0 ? totalAverage /= nonZeroWires : totalAverage == 0;
+
+    TGraphAsymmErrors* graphEfficiencyProjected = efficiencyProjectedX->CreateGraph();
+
+//    TFitResultPtr fitResults = graphEfficiencyProjected->Fit("f1","SQR");
+//    double averageEfficiencyFromFit = fitResults.Get().Value(0);
+//    double upErrorFromFit = fitResults.Get().UpperError(0);
+
+    // Due to the way histograms are binned, every bin center should correspond a wire ID.
+    for (int i = 0; i <= passed->GetNbinsY(); ++i) {
+
+      //project out 1 wire
+      auto singleWirePassed = passed->ProjectionX("single wire projection passed", i, i);
+      auto singleWireTotal = total->ProjectionX("single wire projection total", i, i);
+
+      if (!singleWirePassed->Integral(minFitBin, maxFitBin)) continue;
+
+      TEfficiency* singleWireEfficiency = new TEfficiency(*singleWirePassed, *singleWireTotal);
+      TGraphAsymmErrors* graphSingleWireEfficiency = singleWireEfficiency->CreateGraph();
+
+      TFitResultPtr singleWireFitResults = graphSingleWireEfficiency->Fit(f2, "SQR");
+      double singleWireEfficiencyFromFit = (singleWireFitResults.Get())->Value(0);
+      double singleWireUpErrorFromFit = (singleWireFitResults.Get())->UpperError(0);
+
+      float p_value = chiTest(graphSingleWireEfficiency, graphEfficiencyProjected, minFitRange, maxFitRange);
+      bool averageCondition = (0.95 * totalAverage) > (singleWireEfficiencyFromFit + 5 * singleWireUpErrorFromFit);
+      bool pvalueCondition = p_value < 0.01;
+      bool generalCondition = singleWireEfficiencyFromFit < 0.4;
+      if (generalCondition || (averageCondition && pvalueCondition)) {
+        double wireID = passed->GetYaxis()->GetBinCenter(i);
+        m_badWireList->setWire(layerNo, round(wireID), singleWireEfficiencyFromFit);
+      }
+    }
+  }
+}
+
+double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minValue, double maxValue)
+{
+
+  // Vars to perform the chi test
+  double chi = 0;
+  unsigned short ndof = 0;
+
+
+  int numOfEntries1 = graph1->GetN();
+  int numOfEntries2 = graph2->GetN();
+
+  // loop over entries in both graphs, index by index.
+
+  for (int index1 = 0; index1 < numOfEntries1; ++index1) {
+    // TGraph values are usually not listed in increasing order. Need to check that they are within min/max range for comparison.
+    if (graph1->GetX()[index1] < minValue) continue;
+    if (graph1->GetX()[index1] > maxValue) continue;
+    for (int index2 = 0; index2 < numOfEntries2; ++index2) {
+      if (graph1->GetX()[index1] == graph2->GetX()[index2]) {
+        // this is broken up just for readability
+        double chiNumerator = pow(graph1->GetY()[index1] - graph2->GetY()[index2], 2);
+        double chiDenominator = pow(graph1->GetErrorYhigh(index1), 2) + pow(graph1->GetErrorYlow(index1), 2);
+        chi += chiNumerator / chiDenominator;
+        ndof++;
+        continue;
+      }
+    }
+  }
+  return TMath::Prob(chi, ndof);
+}
+
 CalibrationAlgorithm::EResult WireEfficiencyAlgorithm::calibrate()
 {
   const auto exprun = getRunList()[0];
@@ -74,6 +189,8 @@ CalibrationAlgorithm::EResult WireEfficiencyAlgorithm::calibrate()
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   buildEfficiencies();
+
+  detectBadWires();
 
   return c_OK;
 }

@@ -66,16 +66,19 @@ class TestParticleCombiner(unittest.TestCase):
         self.assertFalse(ntuple.GetEntries() == 0, "Ntuple is empty.")
 
         # sum of D0s and D0bars should be equal to all D0s
-        self.assertFalse(ntuple.GetEntries() != ntuple.GetEntries("nDs == nD0s + nAntiD0s"),
-                         "Number of D0s does not agree with sum of both flavors!")
+        if (ntuple.GetEntries() != ntuple.GetEntries("nDs == nD0s + nAntiD0s")):
+            ntuple.Scan("nDs:nD0s:nAntiD0s:nPositiveFlavourDs:nNegativeFlavourDs", "", "", 10)
+            self.assertFalse(True, "Number of D0s does not agree with sum of both flavors!")
 
         # D0s should be combinations of K- and pi+ only
-        self.assertFalse(ntuple.GetEntries() != ntuple.GetEntries("nD0s == nPositiveFlavourDs"),
-                         "Number of D0s does not agree with number of K- pi+ combinations!")
+        if (ntuple.GetEntries() != ntuple.GetEntries("nD0s == nPositiveFlavourDs")):
+            ntuple.Scan("nDs:nD0s:nAntiD0s:nPositiveFlavourDs:nNegativeFlavourDs", "", "", 10)
+            self.assertFalse(True, "Number of D0s does not agree with number of K- pi+ combinations!")
 
         # D0bars should be combinations of K+ and pi- only
-        self.assertFalse(ntuple.GetEntries() != ntuple.GetEntries("nAntiD0s == nNegativeFlavourDs"),
-                         "Number of anti D0s does not agree with number of K+ pi- combinations!")
+        if (ntuple.GetEntries() != ntuple.GetEntries("nAntiD0s == nNegativeFlavourDs")):
+            ntuple.Scan("nDs:nD0s:nAntiD0s:nPositiveFlavourDs:nNegativeFlavourDs", "", "", 10)
+            self.assertFalse(True, "Number of anti D0s does not agree with number of K+ pi- combinations!")
 
         print("Test passed, cleaning up.")
 

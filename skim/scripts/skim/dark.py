@@ -401,7 +401,11 @@ class DimuonPlusMissingEnergy(BaseSkim):
     # charged.stdMu('all', path=dimuon_path)
     # import stdCharged as charged
 
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdMu": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -414,11 +418,12 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # charged.stdE('all', path=emu_path)
-    # charged.stdMu('all', path=emu_path)
-    # import stdCharged as charged
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -431,17 +436,14 @@ class LFVZpVisible(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # stdE('all', path=lfvzppath)
-    # stdE('loose', path=lfvzppath)
-    # stdK('all', path=lfvzppath)
-    # stdK('loose', path=lfvzppath)
-    # stdMu('all', path=lfvzppath)
-    # stdMu('loose', path=lfvzppath)
-    # stdPi('all', path=lfvzppath)
-    # stdPi('loose', path=lfvzppath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+    }
 
     def build_lists(self, path):
         """"""

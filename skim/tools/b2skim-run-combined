@@ -36,14 +36,24 @@ def get_argument_parser():
         description=__doc__, formatter_class=CustomHelpFormatter,
     )
 
-    parser.add_argument(
-        "skims",
+    SkimGroup = parser.add_mutually_exclusive_group(required=True)
+    SkimGroup.add_argument(
+        "-s",
+        "--skims",
         choices=Registry.names,
         nargs="+",
         default=[],
         metavar="Skim",
         help="Skims to be run.",
     )
+    SkimGroup.add_argument(
+        "-m",
+        "--module",
+        choices=Registry.modules,
+        metavar="Module",
+        help="Module to run all skims for.",
+    )
+
     parser.add_argument(
         "-n",
         "--max-input-events",
@@ -90,7 +100,14 @@ def main():
     path = b2.Path()
     ma.inputMdstList("default", args.InputFileList, path=path)
 
-    SkimObjects = [get_skim_function(skim)() for skim in args.skims]
+    if args.skims:
+        SkimObjects = [get_skim_function(skim)() for skim in args.skims]
+    elif args.module:
+        SkimObjects = [
+            get_skim_function(skim)()
+            for skim in Registry.get_skims_in_module(args.module)
+        ]
+
     SkimObject = CombinedSkim(*SkimObjects)
     SkimObject(path)
 

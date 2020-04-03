@@ -78,7 +78,7 @@ class TestSkimCodes(unittest.TestCase):
         """
         for ModuleName in Registry.modules:
             SkimModule = import_module(f"skim.{ModuleName}")
-            for SkimName in Registry.get_expected_skims_in_module(ModuleName):
+            for SkimName in Registry.get_skims_in_module(ModuleName):
                 # Check the skim is defined in the module
                 self.assertIn(
                     SkimName,

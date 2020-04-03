@@ -198,10 +198,11 @@ class BottomoniumEtabExclusive(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdPhotons import stdPhotons
-    # stdPhotons('loose', path=BottomoniumEtabskimpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -214,14 +215,16 @@ class BottomoniumUpsilon(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdMu, stdPi
-    # from stdPhotons import stdPhotons
-    # stdE('loose', path=BottomoniumUpsilonskimpath)
-    # stdMu('loose', path=BottomoniumUpsilonskimpath)
-    # stdPhotons('loose', path=BottomoniumUpsilonskimpath)
-    # stdPi('loose', path=BottomoniumUpsilonskimpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["loose"],
+            "stdMu": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -234,17 +237,14 @@ class ISRpipicc(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # stdE('all', path=ISRskimpath)
-    # stdE('loose', path=ISRskimpath)
-    # stdK('all', path=ISRskimpath)
-    # stdK('loose', path=ISRskimpath)
-    # stdMu('all', path=ISRskimpath)
-    # stdMu('loose', path=ISRskimpath)
-    # stdPi('all', path=ISRskimpath)
-    # stdPi('loose', path=ISRskimpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+    }
 
     def build_lists(self, path):
         """"""

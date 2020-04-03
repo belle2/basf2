@@ -892,15 +892,18 @@ class BtoD0h_Kspi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdK, stdPi
-    # from stdV0s import stdKshorts
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdKshorts(path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -913,15 +916,18 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdK, stdPi
-    # from stdV0s import stdKshorts
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdKshorts(path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -934,13 +940,15 @@ class B0toDpi_Kpipi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdDplus_Kpipi
-    # from stdCharged import stdPi, stdK
-    # loadStdDplus_Kpipi(path=mypath)
-    # stdK('all', path=mypath)
-    # stdPi('all', path=mypath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdDplus_Kpipi": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -953,16 +961,20 @@ class B0toDpi_Kspi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdDplus_Kspi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdPi
-    # from stdV0s import stdKshorts
-    # loadStdDplus_Kspi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdKshorts(path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdDplus_Kpipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -975,14 +987,20 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpi, loadStdDstarPlus_D0pi_Kpi
     # from stdCharged import stdPi, stdK
-    # loadStdD0_Kpi(path=mypath)
-    # loadStdDstarPlus_D0pi_Kpi(path=mypath)
     # stdK('all', path=mypath)
     # stdPi('all', path=mypath)
 
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpi": [],
+            "loadStdDstarPlus_D0pi_Kpi": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -995,19 +1013,21 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpipi0, loadStdDstarPlus_D0pi_Kpipi0
-    # from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdDstarPlus_D0pi_Kpipipi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdPi, stdK
-    # loadStdD0_Kpipi0(path=mypath)
-    # loadStdD0_Kpipipi(path=mypath)
-    # loadStdDstarPlus_D0pi_Kpipi0(path=mypath)
-    # loadStdDstarPlus_D0pi_Kpipipi(path=mypath)
-    # loadStdPi0ForBToHadrons(path=mypath)
-    # stdK('all', path=mypath)
-    # stdPi('all', path=mypath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpipi0": [],
+            "loadStdDstarPlus_D0pi_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstarPlus_D0pi_Kpipipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1020,16 +1040,19 @@ class B0toDrho_Kpipi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdDplus_Kpipi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi, stdK
-    # loadStdAllRhoPlus(path=path)
-    # loadStdDplus_Kpipi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdDplus_Kpipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1042,17 +1065,21 @@ class B0toDrho_Kspi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdDplus_Kspi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi
-    # from stdV0s import stdKshorts
-    # loadStdAllRhoPlus(path=path)
-    # loadStdDplus_Kspi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdKshorts(path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdDplus_Kspi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": []
+        }
+    }
 
     def build_lists(self, path):
         """"""
@@ -1065,17 +1092,20 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpi, loadStdDstarPlus_D0pi_Kpi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi, stdK
-    # loadStdAllRhoPlus(path=path)
-    # loadStdD0_Kpi(path=path)
-    # loadStdDstarPlus_D0pi_Kpi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpi": [],
+            "loadStdDstarPlus_D0pi_Kpi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1088,18 +1118,22 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi, stdK
-    # loadStdAllRhoPlus(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # ssc.loadStdD0_Kpipi0(path=path)
-    # ssc.loadStdD0_Kpipipi(path=path)
-    # ssc.loadStdDstarPlus_D0pi_Kpipi0(path=path)
-    # ssc.loadStdDstarPlus_D0pi_Kpipipi(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstarPlus_D0pi_Kpipi0": [],
+            "loadStdDstarPlus_D0pi_Kpipipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1112,11 +1146,12 @@ class BtoD0h_hh(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdK, stdPi
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1129,13 +1164,19 @@ class BtoD0h_Kpi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpi
-    # from stdCharged import stdPi, stdK
-    # loadStdD0_Kpi(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1148,19 +1189,21 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpipipi, loadStdD0_Kpipi0
-    # from skim.standardlists.charm import loadStdDstar0_D0pi0_Kpipipi, loadStdDstar0_D0pi0_Kpipi0
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdPi, stdK
-    # loadStdD0_Kpipi0(path=path)
-    # loadStdD0_Kpipipi(path=path)
-    # loadStdDstar0_D0pi0_Kpipi0(path=path)
-    # loadStdDstar0_D0pi0_Kpipipi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipi0": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1173,13 +1216,15 @@ class BtoD0h_Kshh(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdK, stdPi
-    # from stdV0s import stdKshorts
-    # stdK('all', path=path)
-    # stdKshorts(path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+            "stdK": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": []
+        }
+    }
 
     def build_lists(self, path):
         """"""
@@ -1192,17 +1237,20 @@ class BtoD0rho_Kpi(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0_Kpi, loadStdDstar0_D0pi0_Kpi
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi, stdK
-    # loadStdAllRhoPlus(path=path)
-    # loadStdD0_Kpi(path=path)
-    # loadStdDstar0_D0pi0_Kpi(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpi": [],
+            "loadStdDstar0_D0pi0_Kpi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1215,18 +1263,22 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons, loadStdAllRhoPlus
-    # from stdCharged import stdPi, stdK
-    # loadStdAllRhoPlus(path=path)
-    # loadStdPi0ForBToHadrons(path=path)
-    # ssc.loadStdD0_Kpipi0(path=path)
-    # ssc.loadStdD0_Kpipipi(path=path)
-    # ssc.loadStdDstar0_D0pi0_Kpipi0(path=path)
-    # ssc.loadStdDstar0_D0pi0_Kpipipi(path=path)
-    # stdK('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipi0": [],
+            "loadStdDstar0_D0pi0_Kpipipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""

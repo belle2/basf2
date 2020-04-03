@@ -10,7 +10,9 @@ Like testing, and for skim name encoding(decoding).
 """
 from abc import ABC, abstractmethod
 import subprocess
+from importlib import import_module
 import json
+import re
 
 import basf2 as b2
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
@@ -229,15 +231,23 @@ def fancy_skim_header(SkimClass):
     description = SkimClass.__SkimDescription__
 
     if isinstance(authors, str):
-        authors = authors.split(", ")
+        # If we were given a string, split it up at: commas, "and", "&", and newlines
+        authors = re.split(r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", authors)
+        # Strip any remaining whitespace either side of an author's name
+        authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
 
-    header = f"""Note:
+    header = f""".. Note:
+
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
+
     if SkimClass.__doc__ is None:
         return None
+    elif not SkimClass.__doc__:
+        # TODO: loses vital indentation in this case
+        SkimClass.__doc__ = header
     else:
         SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
 
@@ -483,6 +493,9 @@ methods __authors__
 
         The expected format is ``dict(str -> dict(str -> list(str)))``.
         """
+        if self.RequiredStandardLists is None:
+            return
+
         try:
             for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
                 if not (
@@ -531,9 +544,19 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
+        # Reorder RequiredStandardLists so skim.standardlists modules are loaded *last*
+        StandardLists = {
+            k: v for (k, v) in self.RequiredStandardLists.items()
+            if not k.startswith("skim.standardlists.")
+        }
+        StandardSkimLists = {
+            k: v for (k, v) in self.RequiredStandardLists.items()
+            if k.startswith("skim.standardlists.")
+        }
+        self.RequiredStandardLists = {**StandardLists, **StandardSkimLists}
 
         for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
-            module = __import__(ModuleName)
+            module = import_module(ModuleName)
 
             for FunctionName, labels in FunctionsAndLabels.items():
                 ListLoader = getattr(module, FunctionName)
@@ -639,7 +662,7 @@ class CombinedSkim(BaseSkim):
         self.output_udst(path)
 
     def additional_setup(self, path):
-        """Run the `BaseSkim.additional_setup` functions for each skim.
+        """Run the `BaseSkim.additional_setup` function of each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -648,7 +671,7 @@ class CombinedSkim(BaseSkim):
             skim.additional_setup(path)
 
     def build_lists(self, path):
-        """Run the `BaseSkim.additional_setup` functions for each skim.
+        """Run the `BaseSkim.build_lists` function of each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -657,7 +680,7 @@ class CombinedSkim(BaseSkim):
             skim.build_lists(path)
 
     def output_udst(self, path):
-        """Run the `BaseSkim.output_udst` functions for each skim.
+        """Run the `BaseSkim.output_udst` function of each skim.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -719,10 +742,12 @@ class CombinedSkim(BaseSkim):
                     # If we are looking at two lists, return a list with duplicates removed.
                     # Raise a warning if one list is empty and the other is not.
                     if len(d1[k]) == 0 ^ len(d2[k]) == 0:
-                        b2.B2WARNING(
-                            "Merging empty list into non-empty list. "
-                            "Some particle lists may not be loaded."
-                        )
+                        # TODO: remove this warning and replace with proper handling
+                        # b2.B2WARNING(
+                        #     "Merging empty list into non-empty list. "
+                        #     "Some particle lists may not be loaded."
+                        # )
+                        pass
                     d1[k] = sorted({*d1[k], *d2[k]})
                 else:
                     raise b2.B2ERROR(

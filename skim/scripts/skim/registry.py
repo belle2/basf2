@@ -137,7 +137,7 @@ class _Registry:
             )
             raise LookupError(SkimName)
 
-    def get_expected_skims_in_module(self, SkimModule):
+    def get_skims_in_module(self, SkimModule):
         """Retrieve a list of the skims listed in the registry as existing in
         the given skim module.
 

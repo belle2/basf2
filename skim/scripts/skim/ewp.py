@@ -149,13 +149,14 @@ class BtoXgamma(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdPi
-    # from stdPhotons import stdPhotons
-    # stdPhotons('all', path=path)
-    # stdPhotons('loose', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all", "loose"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -168,14 +169,16 @@ class BtoXll(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdMu, stdPi
-    # from stdPhotons import stdPhotons
-    # stdE('all', path=path)
-    # stdMu('all', path=path)
-    # stdPhotons('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -188,14 +191,16 @@ class BtoXll_LFV(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdMu, stdPi
-    # from stdPhotons import stdPhotons
-    # stdE('all', path=path)
-    # stdMu('all', path=path)
-    # stdPhotons('all', path=path)
-    # stdPi('all', path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""

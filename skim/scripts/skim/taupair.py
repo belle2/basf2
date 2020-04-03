@@ -348,23 +348,28 @@ class TauLFV(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdLightMesons
-    # from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
-    # from stdPhotons import stdPhotons
-    # from stdPi0s import stdPi0s, loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdLightMesons(path=taulfvskim)
-    # loadStdSkimPi0(path=taulfvskim)
-    # stdE('loose', path=taulfvskim)
-    # stdK('loose', path=taulfvskim)
-    # stdKshorts(path=taulfvskim)
-    # stdMu('loose', path=taulfvskim)
-    # stdPhotons('loose', path=taulfvskim)
-    # stdPi('loose', path=taulfvskim)
-    # stdPi0s('loose', path=taulfvskim)
-    # stdPr('loose', path=taulfvskim)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdLightMesons": [],
+        },
+        "stdCharged": {
+            "stdE": ["loose"],
+            "stdK": ["loose"],
+            "stdMu": ["loose"],
+            "stdPi": ["loose"],
+            "stdPr": ["loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["loose"],
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -377,12 +382,14 @@ class TauGeneric(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdPi
-    # from stdPhotons import stdPhotons
-    # stdPhotons('all', path=taugenericskim)
-    # stdPi('all', path=taugenericskim)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -395,12 +402,14 @@ class TauThrust(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdPi
-    # from stdPhotons import stdPhotons
-    # stdPhotons('all', path=tauthrustskim)
-    # stdPi('all', path=tauthrustskim)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""

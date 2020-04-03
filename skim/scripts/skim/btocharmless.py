@@ -550,10 +550,11 @@ class BtoPi0Pi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPi0(path=path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -566,21 +567,25 @@ class CharmlessHad2Body(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdLightMesons
-    # from stdCharged import stdK, stdPi
-    # from stdPhotons import stdPhotons
-    # from stdPi0s import stdPi0s, loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdLightMesons(path=charmless2skimpath)
-    # loadStdSkimPi0(path=charmless2skimpath)
-    # stdK('loose', path=charmless2skimpath)
-    # stdKshorts(path=charmless2skimpath)
-    # stdPhotons('loose', path=charmless2skimpath)
-    # stdPi('loose', path=charmless2skimpath)
-    # stdPi0s('all', path=charmless2skimpath)
-    # stdPi0s('loose', path=charmless2skimpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdLightMesons": [],
+        },
+        "stdCharged": {
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["all", "loose"],
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -593,21 +598,25 @@ class CharmlessHad3Body(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.lightmesons import loadStdLightMesons
-    # from stdCharged import stdK, stdPi
-    # from stdPhotons import stdPhotons
-    # from stdPi0s import stdPi0s, loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdLightMesons(path=charmless3skimpath)
-    # loadStdSkimPi0(path=charmless3skimpath)
-    # stdK('loose', path=charmless3skimpath)
-    # stdKshorts(path=charmless3skimpath)
-    # stdPhotons('loose', path=charmless3skimpath)
-    # stdPi('loose', path=charmless3skimpath)
-    # stdPi0s('all', path=charmless3skimpath)
-    # stdPi0s('loose', path=charmless3skimpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdLightMesons": [],
+        },
+        "stdCharged": {
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["all", "loose"],
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""

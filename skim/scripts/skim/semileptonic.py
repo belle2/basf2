@@ -189,12 +189,13 @@ class PRsemileptonicUntagged(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdMu, stdPi
-    # stdE('all', path=PRSLpath)
-    # stdMu('all', path=PRSLpath)
-    # stdPi('all', path=PRSLpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -207,27 +208,32 @@ class SLUntagged(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
-    # from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import stdPhotons
-    # from stdPi0s import stdPi0s
-    # from stdV0s import stdKshorts
-    # loadStdD0(path=SLpath)
-    # loadStdDplus(path=SLpath)
-    # loadStdDstar0(path=SLpath)
-    # loadStdDstarPlus(path=SLpath)
-    # loadStdPi0ForBToHadrons(path=SLpath)  # For skim.standardlists.charm lists
-    # stdE('all', path=SLpath)
-    # stdK('all', path=SLpath)
-    # stdKshorts(path=SLpath)
-    # stdMu('all', path=SLpath)
-    # stdPhotons('loose', path=SLpath)
-    # stdPi('all', path=SLpath)
-    # stdPi('loose', path=SLpath)
-    # stdPi0s('loose', path=SLpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadStdD0": [],
+            "loadStdDstar0": [],
+            "loadStdDplus": [],
+            "loadStdDstarPlus": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdK": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["loose"],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""

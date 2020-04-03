@@ -814,8 +814,6 @@ class XToD0_D0ToHpJm(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # No standard lists required
-
     RequiredStandardLists = None
 
     def build_lists(self, path):
@@ -829,17 +827,18 @@ class XToD0_D0ToNeutrals(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdK, stdPi
-    # from stdPi0s import loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdSkimPi0(path=c2bndpath)
-    # stdK('all', path=c2bndpath)
-    # stdK('loose', path=c2bndpath)
-    # stdKshorts(path=c2bndpath)
-    # stdPi('all', path=c2bndpath)
-    # stdPi('loose', path=c2bndpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -852,16 +851,22 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPhoton(path=crpath)
-    # loadStdSkimPi0(path=crpath)
-    # stdE('loose', path=crpath)
-    # stdMu('loose', path=crpath)
-    # stdPi('loose', path=crpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["loose"],
+            "stdMu": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -874,13 +879,15 @@ class XToDp_DpToKsHp(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdK, stdPi
-    # from stdV0s import stdKshorts
-    # stdK('all', path=ckshppath)
-    # stdKshorts(path=ckshppath)
-    # stdPi('all', path=ckshppath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -906,21 +913,20 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPhoton(path=c3bhpath)
-    # loadStdSkimPi0(path=c3bhpath)
-    # stdE('all', path=c3bhpath)
-    # stdE('loose', path=c3bhpath)
-    # stdK('all', path=c3bhpath)
-    # stdK('loose', path=c3bhpath)
-    # stdMu('all', path=c3bhpath)
-    # stdMu('loose', path=c3bhpath)
-    # stdPi('all', path=c3bhpath)
-    # stdPi('loose', path=c3bhpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -933,21 +939,20 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPhoton(path=c3bh1path)
-    # loadStdSkimPi0(path=c3bh1path)
-    # stdE('all', path=c3bh1path)
-    # stdE('loose', path=c3bh1path)
-    # stdK('all', path=c3bh1path)
-    # stdK('loose', path=c3bh1path)
-    # stdMu('all', path=c3bh1path)
-    # stdMu('loose', path=c3bh1path)
-    # stdPi('all', path=c3bh1path)
-    # stdPi('loose', path=c3bh1path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -960,17 +965,20 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPi0s import loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdSkimPi0(path=c2bn2path)
-    # stdE('loose', path=c2bn2path)
-    # stdK('loose', path=c2bn2path)
-    # stdKshorts(path=c2bn2path)
-    # stdMu('loose', path=c2bn2path)
-    # stdPi('loose', path=c2bn2path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["loose"],
+            "stdK": ["loose"],
+            "stdMu": ["loose"],
+            "stdPi": ["loose"],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -983,23 +991,23 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdSkimPhoton(path=c3bh3path)
-    # loadStdSkimPi0(path=c3bh3path)
-    # stdE('all', path=c3bh3path)
-    # stdE('loose', path=c3bh3path)
-    # stdK('all', path=c3bh3path)
-    # stdK('loose', path=c3bh3path)
-    # stdKshorts(path=c3bh3path)
-    # stdMu('all', path=c3bh3path)
-    # stdMu('loose', path=c3bh3path)
-    # stdPi('all', path=c3bh3path)
-    # stdPi('loose', path=c3bh3path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1012,21 +1020,20 @@ class DstToD0Pi_D0ToNeutrals(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPi0s import loadStdSkimPi0
-    # from stdV0s import stdKshorts
-    # loadStdSkimPi0(path=c2bnpath)
-    # stdE('all', path=c2bnpath)
-    # stdE('loose', path=c2bnpath)
-    # stdK('all', path=c2bnpath)
-    # stdK('loose', path=c2bnpath)
-    # stdKshorts(path=c2bnpath)
-    # stdMu('all', path=c2bnpath)
-    # stdMu('loose', path=c2bnpath)
-    # stdPi('all', path=c2bnpath)
-    # stdPi('loose', path=c2bnpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1039,13 +1046,15 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # import stdV0s
-    # stdK('all', path=c3bh2path)
-    # stdPi('all', path=c3bh2path)
-    # stdV0s.stdKshorts(path=c3bh2path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": []
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1058,21 +1067,20 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPhoton(path=c3bhpath)
-    # loadStdSkimPi0(path=c3bhpath)
-    # stdE('all', path=c3bhpath)
-    # stdE('loose', path=c3bhpath)
-    # stdK('all', path=c3bhpath)
-    # stdK('loose', path=c3bhpath)
-    # stdMu('all', path=c3bhpath)
-    # stdMu('loose', path=c3bhpath)
-    # stdPi('all', path=c3bhpath)
-    # stdPi('loose', path=c3bhpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1085,21 +1093,20 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPhotons import loadStdSkimPhoton
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPhoton(path=c3bh1path)
-    # loadStdSkimPi0(path=c3bh1path)
-    # stdE('all', path=c3bh1path)
-    # stdE('loose', path=c3bh1path)
-    # stdK('all', path=c3bh1path)
-    # stdK('loose', path=c3bh1path)
-    # stdMu('all', path=c3bh1path)
-    # stdMu('loose', path=c3bh1path)
-    # stdPi('all', path=c3bh1path)
-    # stdPi('loose', path=c3bh1path)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all", "loose"],
+            "stdK": ["all", "loose"],
+            "stdMu": ["all", "loose"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "loadStdSkimPhoton": [],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""
@@ -1112,15 +1119,17 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
 
-    # from stdCharged import stdE, stdK, stdMu, stdPi
-    # from stdPi0s import loadStdSkimPi0
-    # loadStdSkimPi0(path=cslpath)
-    # stdE('95eff', path=cslpath)
-    # stdK('95eff', path=cslpath)
-    # stdMu('95eff', path=cslpath)
-    # stdPi('95eff', path=cslpath)
-
-    RequiredStandardLists = None
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["95eff"],
+            "stdK": ["95eff"],
+            "stdMu": ["95eff"],
+            "stdPi": ["95eff"],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
 
     def build_lists(self, path):
         """"""

@@ -19,6 +19,6 @@ def add_IP_dqm(path):
     vx.kFit('Upsilon(4S):IPDQM', conf_level=0, path=path)
 
     dqm = basf2.register_module('IPDQMExpressReco')
-    dqm.set_log_level(LogLevel.INFO)
+    dqm.set_log_level(basf2.LogLevel.INFO)
     dqm.param('Y4SPListName', 'Upsilon(4S):IPDQM')
     path.add_module(dqm)

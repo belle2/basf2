@@ -244,7 +244,7 @@ def fancy_skim_header(SkimClass):
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
 
     if SkimClass.__doc__ is None:
-        return None
+        return SkimClass
     elif not SkimClass.__doc__:
         # TODO: loses vital indentation in this case
         SkimClass.__doc__ = header
@@ -544,6 +544,9 @@ methods __authors__
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
+        if self.RequiredStandardLists is None:
+            return
+
         # Reorder RequiredStandardLists so skim.standardlists modules are loaded *last*
         StandardLists = {
             k: v for (k, v) in self.RequiredStandardLists.items()

@@ -16,7 +16,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None):
     candidates with an invariant mass in the range :math:`0.450 < M < 0.550~GeV`,
     and for which the vertex fit did not fail, are kept.
 
-    The vertex fitter can be selected among `treeFit`, `KFit`, and `Rave`.
+    The vertex fitter can be selected among ``TreeFit``, ``KFit``, and ``Rave``.
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?
@@ -77,7 +77,7 @@ def stdLambdas(prioritiseV0=True, fitter='TreeFit', path=None):
     candidates with an invariant mass in the range :math:`1.10 < M < 1.13~GeV`,
     and for which the vertex fit did not fail, are kept.
 
-    The vertex fitter can be selected among `treeFit`, `KFit`, and `Rave`.
+    The vertex fitter can be selected among ``TreeFit``, ``KFit``, and ``Rave``.
 
     Parameters:
         prioritiseV0 (bool): should the V0 mdst objects be prioritised when merging?

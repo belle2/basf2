@@ -196,7 +196,7 @@ Modules
   ParticleList of composite particles (and only this one) was always added to
   the ROE.
 
-* The module :b2:mod:`VertexFitUpdateDaughters` now always updates
+* The module ``VertexFitUpdateDaughters`` now always updates
   the daughters (as advertised).
 
 

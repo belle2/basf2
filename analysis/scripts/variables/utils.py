@@ -548,7 +548,7 @@ def create_isSignal_alias(aliasName, flags):
 
     In the example above, create_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
     unmasking (setting bits to zero)
-    the `c_MissGamma` bit (16 or 0b00010000) and `c_MissNeutrino` bit (8 or 0b00001000) in mcErrors.
+    the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
 
     For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
     browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.

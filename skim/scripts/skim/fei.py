@@ -91,7 +91,7 @@ def B0Hadronic(path):
         From `Thomas Keck's thesis <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_,
         "the channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used
         by the FR, but is not yet used in the FEI due to unexpected
-        technical restrictions in the KFitter algorithm".
+        technical restrictions in the KFit algorithm".
 
     Cuts applied
        This skim uses the following track and cluster definitions.

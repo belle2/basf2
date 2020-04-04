@@ -90,9 +90,6 @@ ECLUnpackerModule::ECLUnpackerModule() :
   m_bitPos(0),
   m_storeTrigTime(0),
   m_storeUnmapped(0),
-  m_tagsReportedMask(0),
-  m_phasesReportedMask(0),
-  m_badHeaderReportedMask(0),
   m_unpackingParams("ECLUnpackingParameters"),
   m_eclDigits("", DataStore::c_Event),
   m_debugLevel(0)
@@ -139,6 +136,7 @@ void ECLUnpackerModule::initialize()
 
 void ECLUnpackerModule::beginRun()
 {
+  m_evtNumReportedMask    = 0;
   m_tagsReportedMask      = 0;
   m_phasesReportedMask    = 0;
   m_badHeaderReportedMask = 0;

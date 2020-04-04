@@ -87,13 +87,13 @@ namespace Belle2 {
     bool m_storeUnmapped;
 
     /** report only once per crate about inconsistency between trg tag and evt number */
-    long m_evtNumReportedMask;
+    long m_evtNumReportedMask = 0;
     /** report only once per crate about problem with different trg tags */
-    long m_tagsReportedMask;
+    long m_tagsReportedMask = 0;
     /** report only once per crate about problem with different trg phases */
-    long m_phasesReportedMask;
+    long m_phasesReportedMask = 0;
     /** report only once per crate about problem with shaper header */
-    long m_badHeaderReportedMask;
+    long m_badHeaderReportedMask = 0;
 
     /**
      * Report the problem with inconsistency between trg tag and evt number.

@@ -73,8 +73,10 @@ KLMReconstructorModule::KLMReconstructorModule() :
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
-  addParam("CoincidenceWindow", m_bklmCoincidenceWindow,
-           "Half-width time coincidence window between adjacent KLMDigits or orthogonal BKLMHit1ds (ns).",
+  addParam("CoincidenceWindow", m_CoincidenceWindow,
+           "Half-width of time coincidence window for KLMDigits used to create "
+           "EKLMHit2ds or BKLMHit1ds and BKLMHit1ds used to create "
+           "BKLMHit2ds (ns).",
            double(50.0));
   // MC 1 GeV/c muons: mean prompt time is 0.43 ns
   addParam("PromptTime", m_bklmPromptTime,
@@ -134,7 +136,7 @@ void KLMReconstructorModule::beginRun()
   if (m_bklmLoadTimingFromDB) {
     if (!m_bklmTiming.isValid())
       B2FATAL("BKLM time window data are not available.");
-    m_bklmCoincidenceWindow = m_bklmTiming->getCoincidenceWindow();
+    m_CoincidenceWindow = m_bklmTiming->getCoincidenceWindow();
     m_bklmPromptTime = m_bklmTiming->getPromptTime();
     /* Not use the promt window value from database
      * until the time calibration is ready. */
@@ -193,7 +195,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
   for (std::map<uint16_t, int>::iterator it = channelDigitMap.begin(); it != channelDigitMap.end(); ++it) {
     const KLMDigit* digit = m_Digits[it->second];
     double digitTime = digit->getTime();
-    if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_bklmCoincidenceWindow)) {
+    if ((it->first > previousChannel + 1) || (std::fabs(digitTime - averageTime) > m_CoincidenceWindow)) {
       m_bklmHit1ds.appendNew(digitCluster); // Also sets relation BKLMHit1d -> KLMDigit
       digitCluster.clear();
     }
@@ -224,7 +226,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       CLHEP::Hep3Vector propagationTimes = m->getPropagationTimes(local);
       double phiTime = phiHit->getTime() - propagationTimes.y();
       double zTime = zHit->getTime() - propagationTimes.z();
-      if (std::fabs(phiTime - zTime) > m_bklmCoincidenceWindow)
+      if (std::fabs(phiTime - zTime) > m_CoincidenceWindow)
         continue;
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
@@ -355,6 +357,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
           for (it9 = it6; it9 != it7; ++it9) {
             t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
             t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
+            if (std::fabs(t1 - t2) > m_CoincidenceWindow)
+              continue;
             t = (t1 + t2) / 2;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() + (*it9)->getEnergyDeposit());

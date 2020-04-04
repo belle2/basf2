@@ -103,8 +103,11 @@ namespace Belle2 {
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
 
-    /** Half-width time coincidence window between adjacent KLMDigits or orthogonal BKLMHit1ds (ns). */
-    double m_bklmCoincidenceWindow;
+    /**
+     * Half-width of time coincidence window for KLMDigits used to create
+     * EKLMHit2ds or BKLMHit1ds and BKLMHit1ds used to create BKLMHit2ds (ns).
+     */
+    double m_CoincidenceWindow;
 
     /** Nominal time of prompt BKLMHit2ds (ns). */
     double m_bklmPromptTime;

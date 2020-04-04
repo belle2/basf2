@@ -13,10 +13,10 @@
 #include <alignment/GlobalDerivatives.h>
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMDigit.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
@@ -46,9 +46,9 @@ AlignableEKLMRecoHit::AlignableEKLMRecoHit(
   RelationVector<EKLMHit2d> hit2ds = hit->getRelationsTo<EKLMHit2d>();
   if (hit2ds.size() != 1)
     B2FATAL("Incorrect number of related EKLMHit2ds.");
-  RelationVector<EKLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<EKLMDigit>();
+  RelationVector<KLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<KLMDigit>();
   if (eklmDigits.size() != 2)
-    B2FATAL("Incorrect number of related EKLMDigits.");
+    B2FATAL("Incorrect number of related KLMDigits.");
   digit = hit->getDigitIdentifier();
   m_Section = eklmDigits[digit]->getSection();
   m_Layer = eklmDigits[digit]->getLayer();

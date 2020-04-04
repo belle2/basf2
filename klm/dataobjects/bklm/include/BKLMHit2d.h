@@ -157,7 +157,7 @@ namespace Belle2 {
 
     //! Get reconstructed energy deposition
     //! @return reconstructed energy deposition (MeV), the sum of the 2 projections
-    float getEDep() const { return m_EDep; }
+    float getEnergyDeposit() const { return m_EnergyDeposit; }
 
     //! Determine whether the two BKLMHit2ds are in the same module
     //! @return whether the two BKLMHit2ds are in the same module (true) or not (false)
@@ -207,10 +207,10 @@ namespace Belle2 {
     float m_Time;
 
     //! reconstructed pulse height (MeV)
-    float m_EDep;
+    float m_EnergyDeposit;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit2d, 5)
+    ClassDef(BKLMHit2d, 6)
 
   };
 

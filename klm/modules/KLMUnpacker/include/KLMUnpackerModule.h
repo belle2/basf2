@@ -11,9 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
@@ -116,11 +115,8 @@ namespace Belle2 {
 
     /* Module parameters. */
 
-    /** Name of BKLMDigit store array. */
-    std::string m_outputBKLMDigitsName;
-
-    /** Name of EKLMDigit store array. */
-    std::string m_outputEKLMDigitsName;
+    /** Name of KLMDigit store array. */
+    std::string m_outputKLMDigitsName;
 
     /** Record raw data in dataobject format (for debugging). */
     bool m_WriteDigitRaws;
@@ -159,7 +155,7 @@ namespace Belle2 {
     /** Load threshold from DataBase (true) or not (false). */
     bool m_loadThresholdFromDB = true;
 
-    /** Threshold for the scintillator NPE .*/
+    /** Threshold for the scintillator NPhotoelectrons .*/
     double m_scintThreshold = 140;
 
     /* Common database objects. */
@@ -173,6 +169,9 @@ namespace Belle2 {
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;
 
+    /** Digits. */
+    StoreArray<KLMDigit> m_Digits;
+
     /** Event information. */
     StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
@@ -181,19 +180,13 @@ namespace Belle2 {
     /** Channels. */
     DBObjPtr<EKLMChannels> m_eklmChannels;
 
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
-
     /* BKLM database objects. */
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
-
     /** Out-of-range digits. */
-    StoreArray<BKLMDigit> m_bklmDigitsOutOfRange;
+    StoreArray<KLMDigit> m_bklmDigitsOutOfRange;
 
     /** Raw digits. */
     StoreArray<KLMDigitRaw> m_klmDigitRaws;

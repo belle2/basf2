@@ -11,9 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMStatus.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/RelationsObject.h>
@@ -32,8 +32,8 @@ namespace Belle2 {
     BKLMHit1d();
 
     //! Constructor with initial values
-    //! @param digits vector of contiguous BKLMDigits
-    explicit BKLMHit1d(const std::vector<const BKLMDigit*>& digits);
+    //! @param digits vector of contiguous KLMDigits
+    explicit BKLMHit1d(const std::vector<const KLMDigit*>& digits);
 
     //! Copy constructor
     BKLMHit1d(const BKLMHit1d&);
@@ -119,7 +119,7 @@ namespace Belle2 {
 
     //! Get energy deposition
     //! @return energy deposition (MeV)
-    float getEDep() const { return m_EDep; }
+    float getEnergyDeposit() const { return m_EnergyDeposit; }
 
   private:
 
@@ -131,10 +131,10 @@ namespace Belle2 {
     float m_Time;
 
     //! reconstructed pulse height (MeV)
-    float m_EDep;
+    float m_EnergyDeposit;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit1d, 3)
+    ClassDef(BKLMHit1d, 4)
 
   };
 

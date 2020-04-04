@@ -16,8 +16,7 @@
 #include <background/modules/BeamBkgHitRateMonitor/TOPHitRateCounter.h>
 #include <background/modules/BeamBkgHitRateMonitor/ARICHHitRateCounter.h>
 #include <background/modules/BeamBkgHitRateMonitor/ECLHitRateCounter.h>
-#include <background/modules/BeamBkgHitRateMonitor/BKLMHitRateCounter.h>
-#include <background/modules/BeamBkgHitRateMonitor/EKLMHitRateCounter.h>
+#include <background/modules/BeamBkgHitRateMonitor/KLMHitRateCounter.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -118,10 +117,8 @@ namespace Belle2 {
     m_monitors.push_back(arich);
     auto* ecl = new Background::ECLHitRateCounter();
     m_monitors.push_back(ecl);
-    auto* bklm = new Background::BKLMHitRateCounter();
-    m_monitors.push_back(bklm);
-    auto* eklm = new Background::EKLMHitRateCounter();
-    m_monitors.push_back(eklm);
+    auto* klm = new Background::KLMHitRateCounter();
+    m_monitors.push_back(klm);
 
     // open output root file
     m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");

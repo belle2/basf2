@@ -95,12 +95,12 @@ namespace Belle2 {
       /**
        * Get number of photoelectrons (fit result).
        */
-      double getNPE();
+      double getNPhotoelectrons();
 
       /**
        * Get generated number of photoelectrons.
        */
-      int getGeneratedNPE();
+      int getNGeneratedPhotoelectrons();
 
       /**
        * Get total energy deposited in the strip (sum over ssimulation hits).

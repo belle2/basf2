@@ -404,7 +404,7 @@ void ECLDQMModule::event()
       if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       else if (id == "logic" && m_iEvent % 1000 != 999) continue;
       else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||

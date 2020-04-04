@@ -249,7 +249,7 @@ void ECLDQMModule::initialize()
   m_ECLDsps.isOptional();
   m_l1Trigger.isOptional();
 
-  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  if (!mapper.initFromDB()) B2FATAL("ECL DQM: Can't initialize eclChannelMapper");
 
   ecltot.resize(m_TotalEnergyThresholds.size());
   nhits.resize(m_HitNumberUpperLimits.size());
@@ -289,7 +289,6 @@ void ECLDQMModule::beginRun()
 void ECLDQMModule::event()
 {
   int trigtag1 = 0;
-  int flagtag = 1;
   int NDigits = 0;
   for (auto& value : ecltot) value = 0;
   for (auto& value : nhits) value = 0;
@@ -332,6 +331,7 @@ void ECLDQMModule::event()
   }
 
   if (m_ECLTrigs.getEntries() > 0) {
+    int flagtag = 1;
     trigtag1 /= m_ECLTrigs.getEntries();
     int compar = (65535 & m_iEvent);
     if (compar == trigtag1) flagtag = 0;

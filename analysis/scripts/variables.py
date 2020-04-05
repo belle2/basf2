@@ -13,7 +13,8 @@ if __name__ == "__main__":
     args = getCommandLineOptions()
 
     warning = (
-        "The following variables have been renamed since release-04-01:\n"
+        "The following variables have been renamed since release-04:\n"
+        "old: mcFlavorOfOtherB0 --> new: mcFlavorOfOtherB\n"
         "old: mdstSource --> new: uniqueParticleIdentifier\n"
         "old: MCDeltaT --> new mcDeltaT\n"
         "old: mc{X, Y, Z} --> new: mcDecayVertex{X, Y, Z}\n"

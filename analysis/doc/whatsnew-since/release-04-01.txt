@@ -64,16 +64,9 @@ Variables
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
  * Rename ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
- * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
- * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
- * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
- * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
- * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
  * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
- * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
-   :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
-   :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
+   :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.
  * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`,
    :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
  * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`,
@@ -101,9 +94,8 @@ Variables
    only. The variable gives access to the signal B rest frame in semi-leptonic decays, where the four momentum
    of the signal B can not be entirely reconstructed due to the presence of neutrinos in the decay.
  * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to
-   count 
-   specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the
-   mean value of a variable.
+   count specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs
+   the mean value of a variable.
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and
    :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
@@ -113,13 +105,10 @@ Variables
    :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`
-
  * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
    vertexes in the Y(4S) boost direction
  * Added :b2:var:`mcDeltaTapprox` to get :b2:var:`mcDeltaT` in the kinematic
    approximation, i.e. based on :b2:var:`mcDeltaL` variable
-
- * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
@@ -137,13 +126,10 @@ Variables
    analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
-   `EventKinematics` module. 
-
+   `EventKinematics` module.
  * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
  * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors.
  * Removed the previously deprecated variable ``clusterHypothesis``.
- * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match
-   errors.
 
 Modules
 +++++++

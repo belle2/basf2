@@ -18,6 +18,7 @@ KLMDigit::KLMDigit() :
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
+  m_Time(0),
   m_EnergyDeposit(0),
   m_NPhotoelectrons(0),
   m_NGeneratedPhotoelectrons(0),

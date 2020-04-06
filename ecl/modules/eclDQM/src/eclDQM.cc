@@ -301,7 +301,7 @@ void ECLDQMModule::event()
       if (id == "rand" && m_l1Trigger.isValid() &&
           m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
       if (id == "dphy" && m_l1Trigger.isValid() &&
-          m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) h_evtot_dphy->Fill(0);
+          m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
     }
   } else m_iEvent = -1;
 
@@ -314,7 +314,7 @@ void ECLDQMModule::event()
       if (id != "psd") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
@@ -410,10 +410,10 @@ void ECLDQMModule::event()
       else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
                                 m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
       else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_DPHY)) continue;
+                                m_l1Trigger->testInput("bha_delay"))) continue;
       else if (id == "other" && (m_iEvent % 1000 == 999 ||
                                  (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                                 (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                                 (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                  (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
       if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());

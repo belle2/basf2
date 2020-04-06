@@ -20,10 +20,14 @@ import variables.utils as vu
 
 
 # Let's start small and explicitly define alias for some simple variables:
-# 'd0_x' is now shorthand for 'daugher(0, x)', etc.
+# 'd0_x' is now shorthand for 'daughter(0, x)', etc.
 vm.addAlias('d0_x', 'daughter(0, x)')
 vm.addAlias('d0_y', 'daughter(0, y)')
 vm.addAlias('d0_z', 'daughter(0, z)')
+
+# After each step, you can use vm.printAliases() to print a list of all
+# aliases currently defined. In this tutorial we only do it once at the end
+# to avoid cluttering the output.
 
 # Now as you see, we have a clear naming convention in our head, but typing it
 # all out will quickly become cumbersome if we have lots of variables for lots
@@ -101,5 +105,22 @@ vu.create_aliases_for_selected(
 # This automatically creates simple aliases for the coordinates in the
 # remaining particles in the decay!
 
-# Finally let's print all of our alias
+# As a final word of warning, keep in mind that aliases are defined globally
+# and are not associated with particle lists. Disregarding this often leads to
+# clashing aliases and confusion.
+# Let's consider a practical example. Say you're considering D0 candidates from
+# D0 -> K- pi+ and define
+vm.addAlias("K_px", "daughter(0, px)")
+# But later (after reconstructing your B meson), you're looking
+# at the list of B candidates with B+ -> [D0 -> K- pi+] and define
+vm.addAlias("K_px", "daughter(0, daughter(0, px))")
+# This last definition will supersede the previous one!
+# At least basf2 is nice enough to warn you about this and displays
+# "[WARNING] An alias with the name 'K_px' exists and is set to
+# 'daughter(0, px)', setting it to 'daughter(0, daughter(0, px))'.
+# Be aware: only the last alias defined before processing the events will be
+# used!"
+
+
+# Let's print all of our alias
 vm.printAliases()

@@ -12,7 +12,8 @@
 # Anything unclear? Ask questions at https://questions.belle2.org
 #
 
-# vm is our shorthand name for the VariableManager instance
+# vm is our shorthand name for the VariableManager instance. The VariableManager
+# is responsible for the bookkeeping of our alias definitions.
 from variables import variables as vm
 
 # More utilities for managing variables

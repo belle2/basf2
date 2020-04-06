@@ -410,7 +410,7 @@ void ECLDQMModule::event()
       else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
                                 m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
       else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                m_l1Trigger->testInput("bha_delay"))) continue;
+                                !m_l1Trigger->testInput("bha_delay"))) continue;
       else if (id == "other" && (m_iEvent % 1000 == 999 ||
                                  (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
                                  (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||

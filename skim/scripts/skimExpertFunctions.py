@@ -236,8 +236,7 @@ def fancy_skim_header(SkimClass):
         # Strip any remaining whitespace either side of an author's name
         authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
 
-    header = f""".. Note:
-
+    header = f"""Note:
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}

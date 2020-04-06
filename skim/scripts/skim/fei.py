@@ -915,12 +915,12 @@ def _sphinxify_decay(decay_string):
         decay_string (str): A decay descriptor.
 
     Returns:
-        sphinxed (str: LaTeX version of the decay descriptor.
+        sphinxed_string (str): LaTeX version of the decay descriptor.
     """
 
-    decay_string = re.sub("^(B.):generic", "\\1_{\\\\mathrm{had}}", decay_string)
+    decay_string = re.sub("^(B.):generic", "\\1_{\\\\text{had}}", decay_string)
     decay_string = decay_string.replace(":generic", "")
-    decay_string = decay_string.replace(":semileptonic", "_{\\mathrm{SL}}")
+    decay_string = decay_string.replace(":semileptonic", "_{\\text{SL}}")
     decay_string = decay_string.replace(":FSP", "_{FSP}")
     decay_string = decay_string.replace(":V0", "_{V0}")
     decay_string = re.sub("_[0-9]+", "", decay_string)
@@ -1010,16 +1010,16 @@ class BaseFEISkim(BaseSkim):
         * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
-        * :math:`\\text{Visible energy of event (CMS frame)}>4\\,\\text{GeV}`
-        * :math:`2\\,\\text{GeV}<E_{\\text{cleaned tracks & clusters in
-          ECL}}<7\\,\\text{GeV}`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
+        * :math:`2~{\\rm GeV}<E_{\\text{cleaned tracks & clusters in
+          ECL}}<7~{\\rm GeV}`
 
         We define "cleaned" tracks and clusters as:
 
-        * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5\\,\\text{cm}`,
-          :math:`|z_0| < 2\\,\\text{cm}\\,`, and :math:`p_T > 0.1\\,\\text{GeV}`
+        * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5~{\\rm cm}`,
+          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
         * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta
-           < 2.61799`, and :math:`E>0.1\\,\\text{GeV}`
+          < 2.61799`, and :math:`E>0.1~{\\rm GeV}`
 
         Parameters:
             path (`basf2.Path`): The skim path to be processed.
@@ -1068,8 +1068,8 @@ class BaseFEISkim(BaseSkim):
 
 
 def FEI_skim_header(ParticleName):
-    """Decorator factory for add the `fancy_skim_header` header and replace <CHANNELS>
-    in the class docstring with a list of FEI channels.
+    """Decorator factory for applying the `fancy_skim_header` header and replacing
+    <CHANNELS> in the class docstring with a list of FEI channels.
 
     The list is numbered with all of the corresponding decay mode IDs, and the decay
     modes are formatted in beautiful LaTeX.
@@ -1116,8 +1116,8 @@ class feiHadronicB0(BaseFEISkim):
 
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
-    * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
+    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23)
 
     <CHANNELS>
@@ -1157,8 +1157,8 @@ class feiHadronicBplus(BaseFEISkim):
 
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.24\\,\\text{GeV}`
-    * :math:`|\\Delta E| < 0.2\\,\\text{GeV}`
+    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25)
 
     <CHANNELS>
@@ -1203,7 +1203,7 @@ class feiSLB0(BaseFEISkim):
     * :math:`-4 < \\cos\\theta_{BY} < 3`
     * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
     * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
-    * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
+    * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
 
     <CHANNELS>
     """
@@ -1247,7 +1247,7 @@ class feiSLBplus(BaseFEISkim):
     * :math:`-4 < \\cos\\theta_{BY} < 3`
     * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
     * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
-    * :math:`p_{\\ell}^{*} > 1.0\\,\\text{GeV}` in CMS frame
+    * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
       (``daughter(1,p)>1.0`` or ``daughter(2,p)>1.0``, depending
       on decay mode ID)
 

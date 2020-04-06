@@ -45,7 +45,7 @@ namespace Belle2 {
 
     double particleTagVx(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -57,7 +57,7 @@ namespace Belle2 {
 
     double particleTagVy(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -69,7 +69,7 @@ namespace Belle2 {
 
     double particleTagVz(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -81,7 +81,7 @@ namespace Belle2 {
 
     double particleTruthTagVx(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     double particleTruthTagVy(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -105,7 +105,7 @@ namespace Belle2 {
 
     double particleTruthTagVz(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -117,7 +117,7 @@ namespace Belle2 {
 
     double particleTagVxErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -131,7 +131,7 @@ namespace Belle2 {
 
     double particleTagVyErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -145,7 +145,7 @@ namespace Belle2 {
 
     double particleTagVzErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -159,7 +159,7 @@ namespace Belle2 {
 
     double particleTagVpVal(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -173,7 +173,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getNTracks();
     }
 
@@ -181,7 +181,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getNFitTracks();
     }
 
@@ -189,7 +189,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getFitType();
     }
 
@@ -197,7 +197,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getTagVNDF();
     }
 
@@ -205,7 +205,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getTagVChi2();
     }
 
@@ -213,7 +213,7 @@ namespace Belle2 {
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert)
-        return std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       return vert->getTagVChi2IP();
     }
 
@@ -222,7 +222,7 @@ namespace Belle2 {
 
     double particleDeltaT(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -234,7 +234,7 @@ namespace Belle2 {
 
     double particleDeltaTErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -246,7 +246,7 @@ namespace Belle2 {
 
     double particleMCDeltaT(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -258,7 +258,7 @@ namespace Belle2 {
 
     double particleDeltaZ(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -270,7 +270,7 @@ namespace Belle2 {
 
     double particleDeltaZErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -278,14 +278,14 @@ namespace Belle2 {
         double zVariance = particle->getVertexErrorMatrix()(2, 2);
         double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
         result = sqrt(zVariance + TagVZVariance);
-        if (std::isnan(result) or std::isinf(result)) result = std::numeric_limits<float>::quiet_NaN();
+        if (std::isnan(result) or std::isinf(result)) result = std::numeric_limits<double>::quiet_NaN();
       }
       return result;
     }
 
     double particleDeltaB(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -301,7 +301,7 @@ namespace Belle2 {
 
     double particleDeltaBErr(const Particle* particle)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = particle->getRelatedTo<TagVertex>();
 
@@ -353,7 +353,7 @@ namespace Belle2 {
       TVector3 boostDir = boost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
+      if (mcPart == nullptr) return std::numeric_limits<double>::quiet_NaN();
       TVector3 pos = mcPart->getDecayVertex();
       double l = pos.Dot(boostDir);
 
@@ -370,7 +370,7 @@ namespace Belle2 {
       TVector3 orthBoostDir = orthBoost.Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
-      if (mcPart == nullptr) return std::numeric_limits<float>::quiet_NaN();
+      if (mcPart == nullptr) return std::numeric_limits<double>::quiet_NaN();
       TVector3 pos = mcPart->getDecayVertex();
       double l = pos.Dot(orthBoostDir);
 
@@ -456,7 +456,7 @@ namespace Belle2 {
 
     double tagVBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -469,7 +469,7 @@ namespace Belle2 {
 
     double tagVOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -482,7 +482,7 @@ namespace Belle2 {
 
     double tagVTruthBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -495,7 +495,7 @@ namespace Belle2 {
 
     double tagVTruthOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -507,7 +507,7 @@ namespace Belle2 {
 
     double tagVErrBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -520,7 +520,7 @@ namespace Belle2 {
 
     double tagVErrOrthogonalBoostDirection(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -533,7 +533,7 @@ namespace Belle2 {
 
     double particleInternalTagVMCFlavor(const Particle* part)
     {
-      double result = std::numeric_limits<float>::quiet_NaN();
+      double result = std::numeric_limits<double>::quiet_NaN();
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -545,7 +545,7 @@ namespace Belle2 {
 
     double tagTrackMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -560,7 +560,7 @@ namespace Belle2 {
 
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -574,7 +574,7 @@ namespace Belle2 {
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -588,7 +588,7 @@ namespace Belle2 {
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -602,7 +602,7 @@ namespace Belle2 {
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -616,7 +616,7 @@ namespace Belle2 {
 
     double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -630,7 +630,7 @@ namespace Belle2 {
 
     double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -644,7 +644,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -664,7 +664,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -692,16 +692,16 @@ namespace Belle2 {
     double tagTrackDistanceToConstraintSignificance(const Particle* part, const std::vector<double>& trackIndex)
     {
       double val(tagTrackDistanceToConstraint(part, trackIndex));
-      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(val) || isnan(val)) return std::numeric_limits<double>::quiet_NaN();
       double err(tagTrackDistanceToConstraintErr(part, trackIndex));
-      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(err) || isnan(err)) return std::numeric_limits<double>::quiet_NaN();
 
       return val / err;
     }
 
     double tagVDistanceToConstraint(const Particle* part)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -715,7 +715,7 @@ namespace Belle2 {
 
     double tagVDistanceToConstraintErr(const Particle* part)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
 
       auto* vert = part->getRelatedTo<TagVertex>();
 
@@ -738,16 +738,16 @@ namespace Belle2 {
     double tagVDistanceToConstraintSignificance(const Particle* part)
     {
       double val(tagVDistanceToConstraint(part));
-      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(val) || isnan(val)) return std::numeric_limits<double>::quiet_NaN();
       double err(tagVDistanceToConstraintErr(part));
-      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(err) || isnan(err)) return std::numeric_limits<double>::quiet_NaN();
 
       return val / err;
     }
 
     double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -768,7 +768,7 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -800,16 +800,16 @@ namespace Belle2 {
     double tagTrackDistanceToTagVSignificance(const Particle* part, const std::vector<double>& trackIndex)
     {
       double val(tagTrackDistanceToTagV(part, trackIndex));
-      if (isinf(val) || isnan(val)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(val) || isnan(val)) return std::numeric_limits<double>::quiet_NaN();
       double err(tagTrackDistanceToTagVErr(part, trackIndex));
-      if (isinf(err) || isnan(err)) return std::numeric_limits<float>::quiet_NaN();
+      if (isinf(err) || isnan(err)) return std::numeric_limits<double>::quiet_NaN();
 
       return val / err;
     }
 
     double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(std::numeric_limits<float>::quiet_NaN());
+      double result(std::numeric_limits<double>::quiet_NaN());
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
 
@@ -821,9 +821,9 @@ namespace Belle2 {
 
       TVector3 mcTagV(vert->getMCTagVertex());
 
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return std::numeric_limits<float>::quiet_NaN();
-      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN()) return std::numeric_limits<float>::quiet_NaN();
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return std::numeric_limits<float>::quiet_NaN();
+      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return std::numeric_limits<double>::quiet_NaN();
+      if (mcTagV(0)  == std::numeric_limits<double>::quiet_NaN()) return std::numeric_limits<double>::quiet_NaN();
+      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return std::numeric_limits<double>::quiet_NaN();
 
       result = DistanceTools::trackToVtxDist(mcParticle -> getProductionVertex(),
                                              mcParticle -> getMomentum(),
@@ -834,9 +834,9 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
+      TVector3 result(std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN());
 
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
@@ -850,7 +850,7 @@ namespace Belle2 {
       TVector3 mcTagV(vert->getMCTagVertex());
 
       if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return result;
-      if (mcTagV(0)  == std::numeric_limits<float>::quiet_NaN()) return result;
+      if (mcTagV(0)  == std::numeric_limits<double>::quiet_NaN()) return result;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0) return result;
 
       result = DistanceTools::trackToVtxVec(mcParticle -> getProductionVertex(),
@@ -886,9 +886,9 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
+      TVector3 result(std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN());
 
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
@@ -928,9 +928,9 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
-      TVector3 result(std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN(),
-                      std::numeric_limits<float>::quiet_NaN());
+      TVector3 result(std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN(),
+                      std::numeric_limits<double>::quiet_NaN());
 
       if (trackIndex.size() != 1) return result;
       unsigned int trackIndexInt(trackIndex.at(0));
@@ -980,6 +980,11 @@ namespace Belle2 {
     //**********************************
 
 
+    /**
+     * returns a pointer to a function from its name. This is useful to combine the individual information
+     * related to each tag track into average, min, max, etc.
+     *
+     *                     */
     TagTrFPtr getTagTrackFunctionFromName(string const& name)
     {
       if (name == "TagTrackMomentum") return tagTrackMomentum;
@@ -1019,7 +1024,7 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks
@@ -1038,7 +1043,7 @@ namespace Belle2 {
           if (tot > 0)
             return sum / (1.*tot);
 
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
 
         return func;
@@ -1057,7 +1062,7 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks
@@ -1078,7 +1083,7 @@ namespace Belle2 {
           if (tot > 0)
             return sum / (1.*tot);
 
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
 
         return func;
@@ -1097,7 +1102,7 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks
@@ -1116,7 +1121,7 @@ namespace Belle2 {
           if (max > -DBL_MAX)
             return max;
 
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
 
         return func;
@@ -1135,10 +1140,10 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
-          //compute the average over tag tracks
+          //compute the minimum value over tag tracks
 
           double min(DBL_MAX);
           double val;
@@ -1154,7 +1159,7 @@ namespace Belle2 {
           if (min < DBL_MAX)
             return min;
 
-          return std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<double>::quiet_NaN();
         };
 
         return func;
@@ -1174,7 +1179,7 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks
@@ -1208,7 +1213,7 @@ namespace Belle2 {
 
           auto* vert = part->getRelatedTo<TagVertex>();
           if (!vert)
-            return std::numeric_limits<float>::quiet_NaN();
+            return std::numeric_limits<double>::quiet_NaN();
           int nTracks(vert->getNFitTracks());
 
           //compute the average over tag tracks
@@ -1233,6 +1238,40 @@ namespace Belle2 {
       B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverageSquares");
       return NULL;
     }
+
+    Manager::FunctionPtr tagTrackSum(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<double>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the sum over tag tracks
+
+          double sum(0.);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              sum += (*fptr)(part, vector<double>(1, 1.*i));
+            }
+          }
+
+          return sum;
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackSum");
+      return NULL;
+    }
+
 
     //**********************************
     //VARIABLE REGISTRATION

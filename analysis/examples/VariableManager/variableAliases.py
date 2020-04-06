@@ -123,5 +123,5 @@ vm.addAlias("K_px", "daughter(0, daughter(0, px))")
 # used!"
 
 
-# Let's print all of our alias
+# Let's print all of our aliases
 vm.printAliases()

@@ -90,7 +90,7 @@ ECLUnpackerModule::ECLUnpackerModule() :
   m_bitPos(0),
   m_storeTrigTime(0),
   m_storeUnmapped(0),
-  m_unpackingParams("ECLUnpackingParameters"),
+  m_unpackingParams("ECLUnpackingParameters", false),
   m_eclDigits("", DataStore::c_Event),
   m_debugLevel(0)
 {
@@ -145,6 +145,9 @@ void ECLUnpackerModule::beginRun()
   if (!m_eclMapper.initFromDB()) {
     B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
   }
+  if (!m_unpackingParams.isValid()) {
+    B2ERROR("ECL Unpacker: Can't access ECLUnpackingParameters payload");
+  }
 }
 
 void ECLUnpackerModule::event()
@@ -176,7 +179,6 @@ void ECLUnpackerModule::event()
 
 void ECLUnpackerModule::endRun()
 {
-  //TODO
 }
 
 void ECLUnpackerModule::terminate()
@@ -456,32 +458,31 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
             if (cellID > 0 || m_storeUnmapped) {
               ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
 
-              if (m_unpackingParams.isValid()) {
-                auto params = m_unpackingParams->get(iCrate, iShaper, iChannel);
-                if (params & ECL_OFFLINE_ADC_FIT) {
-                  auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
-                  if (result.quality == 2) result.time = 0;
+              // Check run-dependent unpacking parameters
+              auto params = m_unpackingParams->get(iCrate, iShaper, iChannel);
+              if (params & ECL_OFFLINE_ADC_FIT) {
+                auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
+                if (result.quality == 2) result.time = 0;
 
-                  bool found = false;
-                  for (auto& newEclDigit : m_eclDigits) {
-                    if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
-                      newEclDigit.setAmp(result.amp);
-                      newEclDigit.setTimeFit(result.time);
-                      newEclDigit.setQuality(result.quality);
-                      newEclDigit.setChi(result.chi2);
-                      found = true;
-                      break;
-                    }
+                bool found = false;
+                for (auto& newEclDigit : m_eclDigits) {
+                  if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
+                    newEclDigit.setAmp(result.amp);
+                    newEclDigit.setTimeFit(result.time);
+                    newEclDigit.setQuality(result.quality);
+                    newEclDigit.setChi(result.chi2);
+                    found = true;
+                    break;
                   }
-                  if (!found) {
-                    ECLDigit* newEclDigit = m_eclDigits.appendNew();
-                    newEclDigit->setCellId(cellID);
-                    newEclDigit->setAmp(result.amp);
-                    newEclDigit->setTimeFit(result.time);
-                    newEclDigit->setQuality(result.quality);
-                    newEclDigit->setChi(result.chi2);
-                    if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
-                  }
+                }
+                if (!found) {
+                  ECLDigit* newEclDigit = m_eclDigits.appendNew();
+                  newEclDigit->setCellId(cellID);
+                  newEclDigit->setAmp(result.amp);
+                  newEclDigit->setTimeFit(result.time);
+                  newEclDigit->setQuality(result.quality);
+                  newEclDigit->setChi(result.chi2);
+                  if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
                 }
               }
               // Add relation from ECLDigit to ECLDsp
@@ -540,14 +541,13 @@ bool ECLUnpackerModule::isDSPValid(int cellID, int crate, int shaper, int channe
   // Channel is not connected to crystal
   if (cellID < 1) return false;
 
-  if (m_unpackingParams.isValid()) {
-    auto params = m_unpackingParams->get(crate, shaper, channel);
-    if (params & ECL_DISCARD_DSP_DATA) {
-      if (params & ECL_KEEP_GOOD_DSP_DATA) {
-        if (quality == 0) return true;
-      }
-      return false;
+  // Check if data for this channel should be discarded in current run.
+  auto params = m_unpackingParams->get(crate, shaper, channel);
+  if (params & ECL_DISCARD_DSP_DATA) {
+    if (params & ECL_KEEP_GOOD_DSP_DATA) {
+      if (quality == 0) return true;
     }
+    return false;
   }
 
   return true;

@@ -649,7 +649,7 @@ class CombinedSkim(BaseSkim):
             skim._validate_required_particle_lists()
 
         self.RequiredStandardLists = self._merge_nested_dicts(
-            filter(None, [skim.RequiredStandardLists for skim in skims])
+            skim.RequiredStandardLists for skim in skims
         )
 
     def __str__(self):
@@ -728,7 +728,11 @@ class CombinedSkim(BaseSkim):
         Returns:
             MergedDict (dict): Merged dictionary without duplicates.
         """
-        dicts = list(*dicts)
+        # Convert dicts from a generator expression into a list with None values removed
+        dicts = list(filter(None, list(*dicts)))
+        if not dicts:
+            return None
+
         MergedDict = dicts[0]
         for d in dicts[1:]:
             MergedDict = self._merge_two_nested_dicts(MergedDict, d)

@@ -168,3 +168,8 @@ Utilities and core objects
  * A set of functions ``DistanceTools`` has been added to compute distances between (straight) tracks and vertices.
  * Added a relation between Track-based Particles and TrackFitResults.
  * Added a ``getTrackFitResult`` method to Particle.
+
+Tutorials and Examples
+++++++++++++++++++++++
+
+ * Added a tutorial about creating aliases (``examples/VariableManager/variableAliases.py``)

@@ -391,7 +391,7 @@ methods __authors__
     def __authors__(self):
         pass
 
-    def __init__(self, OutputFileName=None):
+    def __init__(self, *, OutputFileName=None):
         """Initialise the BaseSkim class.
 
         Parameters:

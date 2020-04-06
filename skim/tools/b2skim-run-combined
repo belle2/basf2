@@ -99,7 +99,8 @@ def main():
     path = b2.Path()
 
     if args.skims:
-        SkimObjects = [get_skim_function(skim)() for skim in args.skims]
+        skims = list(set(args.skims))
+        SkimObjects = [get_skim_function(skim)() for skim in skims]
     elif args.module:
         SkimObjects = [
             get_skim_function(skim)()

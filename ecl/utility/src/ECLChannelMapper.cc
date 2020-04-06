@@ -13,7 +13,7 @@ using namespace ECL;
 
 ECLChannelMapper::ECLChannelMapper()
 {
-  int i = 0, j = 0;
+  int i, j;
   for (i = 0; i < ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
     convertArrayBarrel[i] = 0;
   for (i = 0; i < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
@@ -238,7 +238,7 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
   //          37 - 44  -- Forward
   //          45 - 52  -- Backward
   int cellID = 0;
-  int arrayIndex = 0;
+  int arrayIndex;
 
   if (iCrate   < 1 || iCrate   > 52) return -1;
   if (iShaper  < 1 || iShaper  > 12) return -1;

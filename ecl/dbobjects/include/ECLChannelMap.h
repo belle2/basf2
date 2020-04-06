@@ -60,7 +60,7 @@ namespace Belle2 {
     {
       using namespace ECL;
 
-      int id = 0;
+      int id;
       if (crate <= ECL_BARREL_CRATES) {
         id = (crate - 1) * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
              + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);

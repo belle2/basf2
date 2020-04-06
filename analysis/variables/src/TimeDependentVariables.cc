@@ -643,7 +643,7 @@ namespace Belle2 {
       TVector3 mcTagV(vert->getMCTagVertex());
 
       if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return realNaN;
-      if (mcTagV(0)  == realNaN)        return realNaN;
+      if (mcTagV(0)  == realNaN)                                        return realNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
 
       return DistanceTools::trackToVtxDist(mcParticle->getProductionVertex(),
@@ -666,7 +666,6 @@ namespace Belle2 {
 
       if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return vecNaN;
       if (mcTagV(0)  == realNaN)        return vecNaN;
-      if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
 
       return DistanceTools::trackToVtxVec(mcParticle->getProductionVertex(),
                                           mcParticle->getMomentum(),
@@ -767,6 +766,11 @@ namespace Belle2 {
     //**********************************
 
 
+    /**
+     * returns a pointer to a function from its name. This is useful to combine the individual information
+     * related to each tag track into average, min, max, etc.
+     *
+     *                     */
     TagTrFPtr getTagTrackFunctionFromName(string const& name)
     {
       if (name == "TagTrackMomentum") return tagTrackMomentum;
@@ -925,7 +929,7 @@ namespace Belle2 {
             return realNaN;
           int nTracks(vert->getNFitTracks());
 
-          //compute the average over tag tracks
+          //compute the minimum value over tag tracks
 
           double min(DBL_MAX);
           double val;
@@ -1020,6 +1024,40 @@ namespace Belle2 {
       B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverageSquares");
       return NULL;
     }
+
+    Manager::FunctionPtr tagTrackSum(const std::vector<std::string>& variable)
+    {
+      if (variable.size() == 1) {
+        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+        auto func = [fptr](const Particle * part) -> double {
+          //recover number of tracks
+
+          auto* vert = part->getRelatedTo<TagVertex>();
+          if (!vert)
+            return std::numeric_limits<double>::quiet_NaN();
+          int nTracks(vert->getNFitTracks());
+
+          //compute the sum over tag tracks
+
+          double sum(0.);
+
+          for (int i(0); i < nTracks; ++i)
+          {
+            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
+              sum += (*fptr)(part, vector<double>(1, 1.*i));
+            }
+          }
+
+          return sum;
+        };
+
+        return func;
+      }
+
+      B2FATAL("Wrong number of arguments for meta function tagTrackSum");
+      return NULL;
+    }
+
 
     //**********************************
     //VARIABLE REGISTRATION

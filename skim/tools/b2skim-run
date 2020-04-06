@@ -49,7 +49,6 @@ def get_argument_parser():
         dest="InputFileList",
         metavar="InputFileList",
         nargs="+",
-        default=[expert.get_test_file("MC12_mixedBGx1")],
         help="Input file list",
     )
     parser.add_argument(
@@ -85,10 +84,13 @@ def main():
     args = parser.parse_args()
 
     path = b2.Path()
-    ma.inputMdstList("default", args.InputFileList, path=path)
 
     SkimFunction = get_skim_function(args.skim)
     Skim = SkimFunction(args.OutputFileName)
+
+    InputFileList = args.InputFileList or [Skim.TestFile]
+
+    ma.inputMdstList("default", InputFileList, path=path)
     Skim(path)
 
     b2.process(path, max_event=args.MaxInputEvents)

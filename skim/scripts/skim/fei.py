@@ -17,8 +17,8 @@ import basf2 as b2
 import fei
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-
 from variables import variables as vm
+
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
 vm.addAlias('dmID', 'extraInfo(decayModeID)')
@@ -987,19 +987,17 @@ class BaseFEISkim(BaseSkim):
     """Prefix label for the FEI training used in the FEI skims."""
 
     FEIChannelArgs = {}
-    """Dict of ``keyword: boolean`` pairs to be passed to `fei.get_default_channels`.
-    When inheriting from `BaseFEISkim`, override this value to run the FEI for only
-    *e.g.* SL charged :math:`B`'s."""
+    """Dict of ``str -> bool`` pairs to be passed to `fei.get_default_channels`. When
+    inheriting from `BaseFEISkim`, override this value to apply the FEI for only *e.g.*
+    SL charged :math:`B`'s."""
 
     RequiredStandardLists = None
     __WorkingGroup__ = "Semileptonic and Missing Energy decays (WG1)"
 
     def additional_setup(self, path):
         """Reconstruct hadronic and semileptonic :math:`B^0` and :math:`B^+` tags using
-        the generically trained FEI. Skim pre-cuts are applied before running the FEI
-        (the pre-cuts are the same for all FEI skims, and are documented in their
-        respective list functions). SL FEI is run with ``removeSLD=True`` flag to
-        deactivate rare but time-intensive SL :math:`D` channels in skim.
+        the generically trained FEI. Skim pre-cuts are applied before running the FEI,
+        to reduce computation time.
 
         This setup function is run by all FEI skims, so they all have the save
         event-level pre-cuts:
@@ -1066,8 +1064,17 @@ class BaseFEISkim(BaseSkim):
         feistate = fei.get_path(particles, configuration)
         path.add_path(feistate.path)
 
+        # Add some aliases to be used later
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('dmID', 'extraInfo(decayModeID)')
+        vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+        vm.addAlias('cosThetaBY', 'cosThetaBetweenParticleAndNominalB')
+        vm.addAlias('d1_p_CMSframe', 'useCMSFrame(daughter(1,p))')
+        vm.addAlias('d2_p_CMSframe', 'useCMSFrame(daughter(2,p))')
 
-def FEI_skim_header(ParticleName):
+
+def _FEI_skim_header(ParticleName):
     """Decorator factory for applying the `fancy_skim_header` header and replacing
     <CHANNELS> in the class docstring with a list of FEI channels.
 
@@ -1103,26 +1110,28 @@ def FEI_skim_header(ParticleName):
     return decorator
 
 
-@FEI_skim_header("B0")
+@_FEI_skim_header("B0")
 class feiHadronicB0(BaseFEISkim):
     """
-    All available FEI :math:`B^0` hadronic tags are reconstructed.
-
-    From `Thomas Keck's thesis
-    <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_, "the
-    channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not
-    yet used in the FEI due to unexpected technical restrictions in the KFitter
-    algorithm".
-
     Tag side :math:`B` cuts:
 
     * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
     * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23)
 
+    All available FEI :math:`B^0` hadronic tags are reconstructed. From `Thomas Keck's
+    thesis <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_,
+    "the channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not
+    yet used in the FEI due to unexpected technical restrictions in the KFitter
+    algorithm".
+
     <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and
+        `BaseFEISkim.additional_setup` for cuts made before applying the FEI.
     """
-    __SkimDescription__ = ""
+    __SkimDescription__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -1150,20 +1159,24 @@ class feiHadronicB0(BaseFEISkim):
         self.SkimLists = ["B0:generic"]
 
 
-@FEI_skim_header("B+")
+@_FEI_skim_header("B+")
 class feiHadronicBplus(BaseFEISkim):
     """
-    All available FEI :math:`B^+` hadronic tags are reconstructed.
-
     Tag side :math:`B` cuts:
 
     * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
     * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 25)
 
+    All available FEI :math:`B^+` hadronic tags are reconstructed.
+
     <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and
+        `BaseFEISkim.additional_setup` for cuts made before applying the FEI.
     """
-    __SkimDescription__ = ""
+    __SkimDescription__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
 
     FEIChannelArgs = {
         "neutralB": False,
@@ -1192,22 +1205,25 @@ class feiHadronicBplus(BaseFEISkim):
         self.SkimLists = ["B+:generic"]
 
 
-@FEI_skim_header("B0")
+@_FEI_skim_header("B0")
 class feiSLB0(BaseFEISkim):
     """
-    SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
-    reconstructed.
-
     Tag side :math:`B` cuts:
 
     * :math:`-4 < \\cos\\theta_{BY} < 3`
-    * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
     * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
     * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
 
+    SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
+    reconstructed, as these are rare and time-intensive.
+
     <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and
+        `BaseFEISkim.additional_setup` for cuts made before applying the FEI.
     """
-    __SkimDescription__ = ""
+    __SkimDescription__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -1236,24 +1252,25 @@ class feiSLB0(BaseFEISkim):
         self.SkimLists = ['B0:semileptonic']
 
 
-@FEI_skim_header("B+")
+@_FEI_skim_header("B+")
 class feiSLBplus(BaseFEISkim):
     """
     SL :math:`B^+` tags are reconstructed. Hadronic :math:`B^+` with SL :math:`D` are
-    not reconstructed.
+    not reconstructed, as these are rare and time-intensive.
 
     Tag side :math:`B` cuts:
 
     * :math:`-4 < \\cos\\theta_{BY} < 3`
-    * :math:`\\text{Decay mode ID} < 8` (no SL :math:`D` channels)
     * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
     * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
-      (``daughter(1,p)>1.0`` or ``daughter(2,p)>1.0``, depending
-      on decay mode ID)
 
     <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and
+        `BaseFEISkim.additional_setup` for cuts made before applying the FEI.
     """
-    __SkimDescription__ = ""
+    __SkimDescription__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
 
     FEIChannelArgs = {
         "neutralB": False,

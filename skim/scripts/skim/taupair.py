@@ -211,12 +211,12 @@ def TauLFVList(flag=1, path=None):
                            'mu+:taulfv gamma:taulfv'
                            ]
 
-    tau_lll_Channels = ['e-:taulfv e-:taulfv e+:taulfv',
-                        'mu-:taulfv mu-:taulfv mu+:taulfv',
-                        'mu-:taulfv e-:taulfv e+:taulfv',
-                        'e-:taulfv mu-:taulfv mu+:taulfv',
-                        'e-:taulfv e-:taulfv mu+:taulfv',
-                        'mu-:taulfv mu-:taulfv e+:taulfv'
+    tau_lll_Channels = ['e+:taulfv e+:taulfv e-:taulfv',
+                        'mu+:taulfv mu+:taulfv mu-:taulfv',
+                        'mu+:taulfv e+:taulfv e-:taulfv',
+                        'e+:taulfv mu+:taulfv mu-:taulfv',
+                        'e+:taulfv e+:taulfv mu-:taulfv',
+                        'mu+:taulfv mu+:taulfv e-:taulfv'
                         ]
 
     tau_lP01_Channels = ['e+:taulfv pi0:taulfv',
@@ -260,8 +260,8 @@ def TauLFVList(flag=1, path=None):
                         'mu+:taulfv K-:taulfv pi+:taulfv',
                         'e-:taulfv K+:taulfv pi+:taulfv',
                         'mu-:taulfv K+:taulfv pi+:taulfv',
-                        'e-:taulfv K_S0:taulfv K_S0:taulfv',
-                        'mu-:taulfv K_S0:taulfv K_S0:taulfv'
+                        'e+:taulfv K_S0:taulfv K_S0:taulfv',
+                        'mu+:taulfv K_S0:taulfv K_S0:taulfv'
                         ]
 
     tau_bnv_Channels = ['mu+:taulfv mu+:taulfv anti-p-:taulfv',

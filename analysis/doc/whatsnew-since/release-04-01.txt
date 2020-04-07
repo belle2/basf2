@@ -218,3 +218,8 @@ Utilities and core objects
  * Added a ``getTrackFitResult`` method to Particle.
  * Added a function to retrieve electric charge of a particle based on its pdg code.
  * Added a ``RotationTools.h`` file with few functions related to rotation
+
+Tutorials and Examples
+++++++++++++++++++++++
+
+ * Added a tutorial about creating aliases (``examples/VariableManager/variableAliases.py``)

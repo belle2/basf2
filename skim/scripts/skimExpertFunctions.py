@@ -236,19 +236,19 @@ def fancy_skim_header(SkimClass):
         # Strip any remaining whitespace either side of an author's name
         authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
 
-    header = f"""Note:
+    header = f"""
+    Note:
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
 
-    if SkimClass.__doc__ is None:
-        return SkimClass
-    elif not SkimClass.__doc__:
+    if SkimClass.__doc__:
+        SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
+    else:
+        # Handle case where docstring is empty, or was not redefined
         # TODO: loses vital indentation in this case
         SkimClass.__doc__ = header
-    else:
-        SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
 
     return SkimClass
 

@@ -351,8 +351,8 @@ def DstToD0PiD0ToHpJmEta(path):
     vertex.treeFit('D0:HpJmEta', 0.001, path=path)
     ma.reconstructDecay('D*+:HpJmEtaRS -> D0:HpJmEta pi+:all', Dstcuts, path=path)
     ma.reconstructDecay('D*-:HpJmEtaWS -> D0:HpJmEta pi-:all', Dstcuts, path=path)
-    vertex.KFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
-    vertex.KFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
+    vertex.kFit('D*+:HpJmEtaRS', conf_level=0.001, path=path)
+    vertex.kFit('D*+:HpJmEtaWS', conf_level=0.001, path=path)
     DstList.append('D*+:HpJmEtaRS')
     DstList.append('D*+:HpJmEtaWS')
 
@@ -714,7 +714,7 @@ def CharmSemileptonic(path):
 
     antiD0List = []
     for chID, channel in enumerate(DstarSLRecoilChannels):
-        ma.reconstructRecoil(decayString='D*-:SL' + str(chID) + ' -> ' + channel,
+        ma.reconstructRecoil(decayString='D*+:SL' + str(chID) + ' -> ' + channel,
                              cut=DstarSLcuts, dmID=chID, path=path)
         ma.reconstructRecoilDaughter(decayString='anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
                                      ' pi-:95eff', cut=antiD0SLcuts, dmID=chID, path=path)

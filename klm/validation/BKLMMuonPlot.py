@@ -203,8 +203,8 @@ def draw_bklmhists(file_chain):
 
     # Expert plots
 
-    edep = TH1F('EDep', 'Energy deposition for BKLMHit2ds', 50, 0.0, 25.0)
-    file_chain.Draw('BKLMHit2ds.getEDep()*1000.0>>EDep', '')
+    edep = TH1F('EnergyDeposit', 'Energy deposition for BKLMHit2ds', 50, 0.0, 25.0)
+    file_chain.Draw('BKLMHit2ds.getEnergyDeposit()*1000.0>>EnergyDeposit', '')
     edep.GetXaxis().SetTitle('E (keV)')
     edep.GetListOfFunctions().Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))
     edep.GetListOfFunctions().Add(TNamed('Check', 'Peak near 3 keV'))

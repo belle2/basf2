@@ -102,8 +102,8 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible',
-        'DimuonPlusMissingEnergy',  # 'DielectronPlusMissingEnergy'
+        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
+        'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'
@@ -113,6 +113,9 @@ combined_skims = {
     ],
     'feiSLCombined': [
         'feiSLB0', 'feiSLBplus'
+    ],
+    'fei': [
+        'feiHadronicB0', 'feiHadronicBplus', 'feiSLB0', 'feiSLBplus'
     ],
     'TCPV': [
         'TCPV',

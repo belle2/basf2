@@ -98,8 +98,8 @@ def TCPVList(path):
     bPlustoJPsiK_Channel = ['J/psi:mumu K+:1%',
                             'J/psi:ee K+:1%']
 
-    btoD_Channels = ['D0:Kpipipi pi+:all',
-                     'D0:Kpi pi+:all',
+    btoD_Channels = ['anti-D0:Kpipipi pi+:all',
+                     'anti-D0:Kpi pi+:all',
                      ]
 
     bd_qqs_List = []

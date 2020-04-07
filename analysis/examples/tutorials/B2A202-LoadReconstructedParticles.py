@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -44,7 +43,7 @@ ma.printDataStore(path=my_path)
 # second argument are the selection criteria: '' means no cut, take all
 #
 # note that you can give any name to your lists e.g. 'gamma:mycandidates',
-# except for the name 'all' which is the only name that is reseved for lists
+# except for the name 'all' which is the only name that is reserved for lists
 # with no cuts
 ma.fillParticleList(decayString='gamma:all', cut='', path=my_path)
 ma.fillParticleList(decayString='e-:all', cut='', path=my_path)
@@ -93,8 +92,13 @@ ma.printList('K_L0:allklm', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
-# You can either use preselected variable groups from variableCollections:
-# Or use your own lists. Both options are shown here.
+# You can either use preselected variable groups from variableCollections
+# or use your own lists. Both options are shown here.
+# For more information on the VariableManager, VariableCollections, etc.,
+# please refer to the dedicated VariableManager examples.
+
+# Note: vc.<collection> is a list (of variables); multiple lists are
+# concatenated with the + operator.
 
 charged_particle_variables = vc.reco_stats + \
     vc.kinematics + \

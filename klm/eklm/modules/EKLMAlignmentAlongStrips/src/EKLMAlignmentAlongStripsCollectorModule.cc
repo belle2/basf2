@@ -44,7 +44,7 @@ void EKLMAlignmentAlongStripsCollectorModule::prepare()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_TransformData =
     new EKLM::TransformData(true, EKLM::TransformData::c_Alignment);
-  m_EKLMDigits.isRequired();
+  m_KLMDigits.isRequired();
   m_Tracks.isRequired();
   StoreArray<ExtHit> extHits;
   m_Tracks.requireRelationTo(extHits);
@@ -81,12 +81,14 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
     }
   }
   /* Create set of strips with signal. */
-  n = m_EKLMDigits.getEntries();
+  n = m_KLMDigits.getEntries();
   for (i = 0; i < n; i++) {
+    if (m_KLMDigits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     vol = m_GeoDat->stripNumber(
-            m_EKLMDigits[i]->getSection(), m_EKLMDigits[i]->getLayer(),
-            m_EKLMDigits[i]->getSector(), m_EKLMDigits[i]->getPlane(),
-            m_EKLMDigits[i]->getStrip());
+            m_KLMDigits[i]->getSection(), m_KLMDigits[i]->getLayer(),
+            m_KLMDigits[i]->getSector(), m_KLMDigits[i]->getPlane(),
+            m_KLMDigits[i]->getStrip());
     digitVolumes.insert(vol);
   }
   /* Search for strips with extHits, but without signal. */

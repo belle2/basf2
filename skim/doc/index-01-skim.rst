@@ -96,6 +96,28 @@ Tau-pair skims
     :members:
 
 
+Standard skim lists
+-------------------
+
+Charm lists
+~~~~~~~~~~~
+
+.. automodule:: skim.standardlists.charm
+    :members:
+
+Dilepton lists
+~~~~~~~~~~~~~~
+
+.. automodule:: skim.standardlists.dilepton
+    :members:
+
+Light meson lists
+~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.standardlists.lightmesons
+    :members:
+
+
 For skim liaisons and developers
 --------------------------------
 

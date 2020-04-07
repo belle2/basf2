@@ -501,7 +501,7 @@ def XiList(path):
 @fancy_skim_header
 class Systematics(BaseSkim):
     """
-    Lists in this skim are those defined in `JpsimumuTagProbe, `JpsieeTagProbe`, and
+    Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`, and
     `PiKFromDstarList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
@@ -528,6 +528,7 @@ class Systematics(BaseSkim):
         self.SkimLists = [s for l in lists for s in l]
 
     def JpsimumuTagProbe(path):
+        """Build JpsimumuTagProbe lists for systematics skims."""
         #   Cuts = '2.8 < M < 3.4'
         Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
         Channel = 'mu+:all mu-:loose'
@@ -539,6 +540,7 @@ class Systematics(BaseSkim):
         return jpsiList
 
     def JpsieeTagProbe(path):
+        """Build JpsieeTagProbe lists for systematics skims."""
         #   Cuts = '2.7 < M < 3.4'
         Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
         Channel = 'e+:all e-:loose'
@@ -550,6 +552,7 @@ class Systematics(BaseSkim):
         return jpsiList
 
     def PiKFromDstarList(path):
+        """Build PiKFromDstarList lists for systematics skims."""
         D0Cuts = '1.81 < M < 1.91'
         # DstarCuts = 'massDifference(0)<0.16'
         DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
@@ -605,6 +608,7 @@ class SystematicsTracking(BaseSkim):
         self.SkimLists = [s for l in lists for s in l]
 
     def BtoDStarPiList(path):
+        """Build BtoDStarPiList lists for systematics skims."""
         D0Cuts = '1.835 < M < 1.895'
         DstarCuts = 'massDifference(0)<0.16'
         B0Cuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
@@ -635,7 +639,6 @@ class SystematicsTracking(BaseSkim):
             ma.matchMCTruth(resonanceName, path=path)
 
         # B0
-
         B0Channel = []
         for channel in DstarList:
             B0Channel.append(channel + ' pi+:loose')
@@ -651,6 +654,7 @@ class SystematicsTracking(BaseSkim):
         return B0List
 
     def DstarToD0PiPartList(path):
+        """Build DstarToD0PiPartList lists for systematics skims."""
         ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
 
         # D-
@@ -712,6 +716,7 @@ class Resonance(BaseSkim):
         self.SkimLists = [s for l in lists for s in l]
 
     def getDsList(path):
+        """Build Ds list for systematics skims."""
         DsCuts = "1.90 < M < 2.04"
 
         ma.reconstructDecay("phi:res -> K+:loose K-:loose", "1.01 < M < 1.03", path=path)
@@ -728,6 +733,7 @@ class Resonance(BaseSkim):
         return DsList
 
     def getDstarList(path):
+        """Build Dstar list for systematics skims."""
         DplusCuts = "1.8 < M < 1.93"
         DstarCuts = "massDifference(0)<0.16 and useCMSFrame(p)>2.0"
 
@@ -752,6 +758,7 @@ class Resonance(BaseSkim):
         return DstarList
 
     def getSigmacList(path):
+        """Build Sigmac list for systematics skims."""
         LambdacCuts = "2.24 < M < 2.33"
         SigmacCuts = "massDifference(0)<0.28 and useCMSFrame(p) > 2.5"
 
@@ -764,7 +771,7 @@ class Resonance(BaseSkim):
 
         SigmacList = []
         SigmacPlusChannel = []
-    # Sigma_c++
+        # Sigma_c++
         for channel in LambdacList:
             SigmacPlusChannel.append(channel + " pi+:loose")
 
@@ -773,7 +780,7 @@ class Resonance(BaseSkim):
             SigmacList.append("Sigma_c++:resonance" + str(chID))
             ma.matchMCTruth("Sigma_c++:resonance0", path=path)
 
-    # Sigma_c0
+        # Sigma_c0
         Sigmac0Channel = []
         for channel in LambdacList:
             Sigmac0Channel.append(channel + " pi-:loose")
@@ -787,7 +794,7 @@ class Resonance(BaseSkim):
         return SigmacList
 
     def getmumugList(path):
-
+        """Build mumug list for systematics skims."""
         vphoChannel = ["mu+:loose mu-:loose"]
         vphocuts = ""
         vphoList = []
@@ -803,6 +810,7 @@ class Resonance(BaseSkim):
         return vphoList
 
     def getBZeroList(path):
+        """Build BZero list for systematics skims."""
         BZeroCuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
         BZeroChannel = ["D-:resonance0 pi+:loose"]
         BZeroList = []
@@ -816,6 +824,7 @@ class Resonance(BaseSkim):
         return BZeroList
 
     def getBPlusList(path):
+        """Build Bplus list for systematics skims."""
         antiDZeroCut = "1.82 < M < 1.90"
         antiDZeroChannel = ["K+:loose pi-:loose"]
         antiDZeroList = []

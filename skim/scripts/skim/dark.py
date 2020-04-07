@@ -352,7 +352,6 @@ class SinglePhotonDark(BaseSkim):
     }
 
     def build_lists(self, path):
-        """Build skim list for SinglePhotonDark skim."""
         # no good tracks in the event
         cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
 

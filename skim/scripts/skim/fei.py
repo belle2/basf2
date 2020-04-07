@@ -1110,7 +1110,8 @@ class BaseFEISkim(BaseSkim):
         This function passes `FEIChannelArgs` to the cached function `run_fei_for_skims`
         to avoid applying the FEI twice.
 
-        See also: `run_fei_for_skims` for event-level cut definitions.
+        See also:
+            `run_fei_for_skims` for event-level cut definitions.
         """
         self.run_fei_for_skims(self.FEIPrefix, path=path)
 
@@ -1185,12 +1186,6 @@ class feiHadronicB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        """Apply cuts to the FEI-reconstructed hadronic :math:`B` tag candidates in list
-        ``B0:generic``.
-
-        Parameters:
-            path (`basf2.Path`): The skim path to be processed.
-        """
         ma.applyCuts("B0:generic", "Mbc>5.24", path=path)
         ma.applyCuts("B0:generic", "abs(deltaE)<0.200", path=path)
         ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
@@ -1274,13 +1269,6 @@ class feiHadronicBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        """
-        Apply cuts to the FEI-reconstructed hadronic :math:`B` tag
-        candidates in list ``B+:generic``.
-
-        Parameters:
-            path (`basf2.Path`): The skim path to be processed.
-        """
         ma.applyCuts("B+:generic", "Mbc>5.24", path=path)
         ma.applyCuts("B+:generic", "abs(deltaE)<0.200", path=path)
         ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
@@ -1366,12 +1354,6 @@ class feiSLB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        """Apply cuts to the FEI-reconstructed SL :math:`B` tag candidates in list
-        ``B0:semileptonic``.
-
-        Parameters:
-            path (`basf2.Path`): The skim path to be processed.
-        """
         ma.applyCuts("B0:semileptonic", "dmID<8", path=path)
         ma.applyCuts("B0:semileptonic", "log10(sigProb)>-2.4", path=path)
         ma.applyCuts("B0:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
@@ -1456,12 +1438,6 @@ class feiSLBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        """Apply cuts to the FEI-reconstructed SL :math:`B` tag candidates in list
-        ``B+:semileptonic``.
-
-        Parameters:
-            path (`basf2.Path`): The skim path to be processed.
-        """
         ma.applyCuts("B+:semileptonic", "dmID<8", path=path)
         ma.applyCuts("B+:semileptonic", "log10_sigProb>-2.4", path=path)
         ma.applyCuts("B+:semileptonic", "-4.0<cosThetaBY<3.0", path=path)

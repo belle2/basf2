@@ -888,12 +888,12 @@ def DoubleCharmList(path):
 @fancy_skim_header
 class BtoD0h_Kspi0(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) K^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.5 < M_D0 < 2.2``
     * ``5.2 < Mbc``
@@ -939,12 +939,12 @@ class BtoD0h_Kspi0(BaseSkim):
 @fancy_skim_header
 class BtoD0h_Kspipipi0(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) K^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.8 < M_D0 < 1.9``
     * ``5.25 < Mbc``
@@ -992,10 +992,12 @@ class BtoD0h_Kspipipi0(BaseSkim):
 @fancy_skim_header
 class B0toDpi_Kpipi(BaseSkim):
     """
-    **Decay Mode**:
+    Reconstructed decay modes:
+
     * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
 
-    **Additional Cuts**:
+    Cuts applied:
+
     * ``Mbc > 5.2``
     * ``abs(deltaE) < 0.3``
 
@@ -1035,10 +1037,12 @@ class B0toDpi_Kpipi(BaseSkim):
 @fancy_skim_header
 class B0toDpi_Kspi(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
+
     * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\pi^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
+
     * ``1.8 < M_D < 1.9``
     * ``Mbc > 5.2``
     * ``abs(deltaE) < 0.3``
@@ -1082,11 +1086,11 @@ class B0toDpi_Kspi(BaseSkim):
 @fancy_skim_header
 class B0toDstarPi_D0pi_Kpi(BaseSkim):
     """
-    **Decay Mode**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) \\pi^+`
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``Mbc > 5.2``
     * ``abs(deltaE) < 0.3``
@@ -1128,12 +1132,12 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
 @fancy_skim_header
 class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     """
-    **Decay Mode**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
       (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``Mbc > 5.2``
     * ``abs(deltaE) < 0.3``
@@ -1184,11 +1188,11 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
 @fancy_skim_header
 class B0toDrho_Kpipi(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\rho^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.8 < M_D < 1.9``
     * ``0.47 < M_rho < 1.07``
@@ -1235,12 +1239,11 @@ class B0toDrho_Kpipi(BaseSkim):
 @fancy_skim_header
 class B0toDrho_Kspi(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\rho^+`,
 
-
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.8 < M_D < 1.9``
     * ``0.47 < M_rho < 1.07``
@@ -1288,11 +1291,11 @@ class B0toDrho_Kspi(BaseSkim):
 @fancy_skim_header
 class B0toDstarRho_D0pi_Kpi(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\rho^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D < 2.0``
     * ``0.47 < M_rho < 1.07``
@@ -1342,12 +1345,12 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
 @fancy_skim_header
 class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0}
       (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^-) \\rho^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D < 2.0``
     * ``0.47 < M_rho < 1.07``
@@ -1408,7 +1411,7 @@ class BtoD0h_hh(BaseSkim):
     """
     Skim list definitions for all charged B to charm 2 body decays.
 
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
@@ -1419,7 +1422,7 @@ class BtoD0h_hh(BaseSkim):
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.5 < M_D0 < 2.2``
     * ``5.2 < Mbc``
@@ -1460,12 +1463,12 @@ class BtoD0h_Kpi(BaseSkim):
     """
     Skim list definitions for all charged B to charm 3 body decays.
 
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D0 < 2.0``
     * ``Mbc > 5.2``
@@ -1517,16 +1520,16 @@ class BtoD0h_Kpi(BaseSkim):
 @fancy_skim_header
 class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
     * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\pi^+`
+      \\pi^0) \\pi^+`
     * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\K^+`
+      \\pi^0) \\K^+`
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D0 < 2.0``
     * ``Mbc > 5.2``
@@ -1593,7 +1596,7 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
 @fancy_skim_header
 class BtoD0h_Kshh(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) \\pi^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) \\pi^+`,
@@ -1604,7 +1607,7 @@ class BtoD0h_Kshh(BaseSkim):
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) K^+`,
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) K^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.5 < M_D0 < 2.2``
     * ``5.2 < Mbc``
@@ -1649,12 +1652,12 @@ class BtoD0h_Kshh(BaseSkim):
 @fancy_skim_header
 class BtoD0rho_Kpi(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
     * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\rho^+`,
     * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^0) \\rho^+`,
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D0 < 2.0``
     * ``0.47 < M_rho < 1.07``
@@ -1709,13 +1712,13 @@ class BtoD0rho_Kpi(BaseSkim):
 @fancy_skim_header
 class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     """
-    **Decay Modes**:
+    Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
-    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2 \\pi^-
+      \\pi^+, K^+\\pi^-\\pi^0) \\pi^0) \\rho^+`
 
-    **Additional Cuts**:
+    Cuts applied:
 
     * ``1.7 < M_D0 < 2.0``
     * ``DM_Dstar_D < 0.16``
@@ -1729,8 +1732,9 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
         where :math:`D^0` channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
 
     Warning:
-       This skim saves only three randomly-chosen :math:`B^{+}` candidates in a "B+:BtoD0rho_merged" list,
-       since the candidate multiplicity of this skim is very high.
+       This skim saves only three randomly-chosen :math:`B^{+}` candidates in a
+       ``B+:BtoD0rho_merged`` list, since the candidate multiplicity of this skim is
+       very high.
     """
     __authors__ = ["Fernando Abudinen"]
     __WorkingGroup__ = "Charm :math:`B` decays (WG4)"

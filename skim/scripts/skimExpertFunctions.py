@@ -218,6 +218,9 @@ def fancy_skim_header(SkimClass):
     """Decorator to generate a fancy header to skim documentation and prepend it to the
     docstring. Add this just above the definition of a skim.
 
+    Also ensures the documentation of the template functions like `BaseSkim.build_lists`
+    is not repeated in every skim documentation.
+
     .. code-block:: python
 
         @fancy_skim_header
@@ -239,6 +242,7 @@ def fancy_skim_header(SkimClass):
     header = f"""
     Note:
         * **Skim description**: {description}
+        * **Skim name**: ``{SkimName}``
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
@@ -248,6 +252,10 @@ def fancy_skim_header(SkimClass):
     else:
         # Handle case where docstring is empty, or was not redefined
         SkimClass.__doc__ = header
+
+    SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
+    SkimClass.validation_histograms.__doc__ = SkimClass.validation_histograms.__doc__ or ""
+    SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
 
     return SkimClass
 

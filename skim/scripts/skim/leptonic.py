@@ -100,7 +100,6 @@ class LeptonicUntagged(BaseSkim):
     }
 
     def build_lists(self, path):
-        """Build skim list for LeptonicUntagged skim."""
         ma.cutAndCopyList(
             "e-:highP",
             "e-:all",
@@ -123,7 +122,6 @@ class LeptonicUntagged(BaseSkim):
         self.SkimLists = lepList
 
     def validation_histograms(self, path):
-        """Produce validation histograms for LeptonicUntagged skim."""
         ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:L0", "B-:L1"], "", path=path)
 
         ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)

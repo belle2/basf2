@@ -210,8 +210,11 @@ void KLMUnpackerModule::unpackKLMDigit(
   if (!isRPC && ((raw.triggerBits & 0x10) != 0))
     return;
   /* Create KLM digit. */
-  KLMDigit* klmDigit;
-  if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
+  KLMDigit* klmDigit = m_Digits.appendNew();
+  klmDigit->addRelationTo(klmDigitEventInfo);
+  if (m_WriteDigitRaws)
+    klmDigit->addRelationTo(klmDigitRaw);
+  if (isRPC) {
     /*
      * For RPC hits, digitize both the coarse (ctime) and fine (tdc) times
      * relative to the revo9 trigger time rather than the event header's
@@ -223,7 +226,6 @@ void KLMUnpackerModule::unpackKLMDigit(
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
     std::pair<int, double> rpcTimes =
       m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
-    klmDigit = m_Digits.appendNew();
     klmDigit->setTime(rpcTimes.second);
   } else {
     /*
@@ -231,7 +233,6 @@ void KLMUnpackerModule::unpackKLMDigit(
      * trigger ctime.
      */
     klmDigitEventInfo->increaseSciHits();
-    klmDigit = m_Digits.appendNew();
     double time = m_TimeConversion->getScintillatorTime(
                     raw.ctime, klmDigitEventInfo->getTriggerCTime());
     klmDigit->setTime(time);
@@ -253,9 +254,6 @@ void KLMUnpackerModule::unpackKLMDigit(
         klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
     }
   }
-  klmDigit->addRelationTo(klmDigitEventInfo);
-  if (m_WriteDigitRaws)
-    klmDigit->addRelationTo(klmDigitRaw);
   klmDigit->setSubdetector(subdetector);
   klmDigit->setSection(section);
   klmDigit->setLayer(layer);
@@ -290,7 +288,7 @@ void KLMUnpackerModule::event()
       int subdetector;
       if ((copperId >= EKLM_ID) && (copperId <= EKLM_ID + 4))
         subdetector = KLMElementNumbers::c_EKLM;
-      else if (!((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4)))
+      else if ((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4))
         subdetector = KLMElementNumbers::c_BKLM;
       else
         continue;

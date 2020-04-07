@@ -50,6 +50,14 @@ SoftwareTriggerHLTDQMModule::SoftwareTriggerHLTDQMModule() : HistoModule()
            "Which l1 identifiers to report?",
            m_param_l1Identifiers);
 
+  addParam("createTotalResultHistograms", m_param_create_total_result_histograms,
+           "Create total result histogram?",
+           true);
+
+  addParam("createExpRunEventHistograms", m_param_create_exp_run_event_histograms,
+           "Create exp/run/event histograms?",
+           true);
+
   addParam("histogramDirectoryName", m_param_histogramDirectoryName,
            "SoftwareTrigger DQM histograms will be put into this directory", m_param_histogramDirectoryName);
 }
@@ -85,12 +93,14 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   // We add one for the total result
-  m_cutResultHistograms.emplace("total_result",
-                                new TH1F("total_result", "Total Result of HLT (absolute numbers)", 1, 0, 0));
-  m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
-  m_cutResultHistograms["total_result"]->SetOption("bar");
-  m_cutResultHistograms["total_result"]->SetFillStyle(0);
-  m_cutResultHistograms["total_result"]->SetStats(false);
+  if (m_param_create_total_result_histograms) {
+    m_cutResultHistograms.emplace("total_result",
+                                  new TH1F("total_result", "Total Result of HLT (absolute numbers)", 1, 0, 0));
+    m_cutResultHistograms["total_result"]->SetXTitle("Total Cut Result");
+    m_cutResultHistograms["total_result"]->SetOption("bar");
+    m_cutResultHistograms["total_result"]->SetFillStyle(0);
+    m_cutResultHistograms["total_result"]->SetStats(false);
+  }
 
   for (const std::string& trigger : m_param_l1Identifiers) {
     m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
@@ -101,16 +111,20 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
   }
 
   // And also one for the total numbers
-  m_l1Histograms.emplace("l1_total_result",
-                         new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
-  m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
-  m_l1Histograms["l1_total_result"]->SetOption("bar");
-  m_l1Histograms["l1_total_result"]->SetFillStyle(0);
-  m_l1Histograms["l1_total_result"]->SetStats(false);
+  if (m_param_create_total_result_histograms) {
+    m_l1Histograms.emplace("l1_total_result",
+                           new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
+    m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");
+    m_l1Histograms["l1_total_result"]->SetOption("bar");
+    m_l1Histograms["l1_total_result"]->SetFillStyle(0);
+    m_l1Histograms["l1_total_result"]->SetStats(false);
+  }
 
-  m_runInfoHistograms.emplace("run_number", new TH1F("run_number", "Run Number", 100, 0, 10000));
-  m_runInfoHistograms.emplace("event_number", new TH1F("event_number", "Event Number", 100, 0, 1'000'000));
-  m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
+  if (m_param_create_exp_run_event_histograms) {
+    m_runInfoHistograms.emplace("run_number", new TH1F("run_number", "Run Number", 100, 0, 10000));
+    m_runInfoHistograms.emplace("event_number", new TH1F("event_number", "Event Number", 100, 0, 1'000'000));
+    m_runInfoHistograms.emplace("experiment_number", new TH1F("experiment_number", "Experiment Number", 50, 0, 50));
+  }
 
   if (oldDirectory) {
     oldDirectory->cd();
@@ -177,14 +191,18 @@ void SoftwareTriggerHLTDQMModule::event()
         }
       }
 
-      const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
-      const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
+      if (m_param_create_total_result_histograms) {
+        const std::string& totalCutIdentifier = SoftwareTriggerDBHandler::makeTotalResultName(baseIdentifier);
+        const int cutResult = static_cast<int>(m_triggerResult->getResult(totalCutIdentifier));
 
-      m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+        m_cutResultHistograms["total_result"]->Fill(totalCutIdentifier.c_str(), cutResult > 0);
+      }
     }
 
-    const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
-    m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
+    if (m_param_create_total_result_histograms) {
+      const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
+      m_cutResultHistograms["total_result"]->Fill("total_result", totalResult > 0);
+    }
   }
 
   if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid() and m_triggerResult.isValid()) {
@@ -195,7 +213,9 @@ void SoftwareTriggerHLTDQMModule::event()
         continue;
       }
       const bool triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
-      m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
+      if (m_param_create_total_result_histograms) {
+        m_l1Histograms["l1_total_result"]->Fill(l1Trigger.c_str(), triggerResult);
+      }
 
       if (not triggerResult) {
         continue;
@@ -225,7 +245,7 @@ void SoftwareTriggerHLTDQMModule::event()
     }
   }
 
-  if (m_eventMetaData.isValid()) {
+  if (m_eventMetaData.isValid() and m_param_create_exp_run_event_histograms) {
     m_runInfoHistograms["run_number"]->Fill(m_eventMetaData->getRun());
     m_runInfoHistograms["event_number"]->Fill(m_eventMetaData->getEvent());
     m_runInfoHistograms["experiment_number"]->Fill(m_eventMetaData->getExperiment());

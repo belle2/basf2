@@ -54,6 +54,10 @@ namespace Belle2 {
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
+      /// Create total result histogram?
+      bool m_param_create_total_result_histograms;
+      /// Create exp/run/event number histograms?
+      bool m_param_create_exp_run_event_histograms;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;

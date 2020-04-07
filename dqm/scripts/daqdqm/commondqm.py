@@ -115,17 +115,17 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(
            "SoftwareTriggerHLTDQM",
            cutResultIdentifiers={
-               "filter": [],
                "skim": hlt_skim_lines_in_plot,
            },
            cutResultIdentifiersIgnored={
-               "filter": [],
                "skim": [
                    "accept_bhabha",
                    "accept_bhabhaecl",
                    ]
            },
-           histogramDirectoryName="softwaretrigger_skim_nobhabha"
+           createTotalResultHistograms=False,
+           createExpRunEventHistograms=False,
+           histogramDirectoryName="softwaretrigger_skim_nobhabha",
         )
         path.add_module("StatisticsTimingHLTDQM")
 

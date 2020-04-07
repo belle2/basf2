@@ -21,6 +21,9 @@ now = datetime.datetime.now()
 
 
 class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
+    """ default importer for the first order polynomial, TB dependent
+    for the 3-sample CoG calibration payload
+    """
 
     def beginRun(self):
 
@@ -39,6 +42,9 @@ class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
 
 
 class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
+    """ default importer for the third order polynomial, TB independent
+    for the 3-sample CoG calibration payload
+    """
 
     def beginRun(self):
 

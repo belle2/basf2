@@ -107,20 +107,21 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
 bool SVD3SampleCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
-  auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
-  float meanEventT0 = eventT0Hist->GetMean();
-  if (!m_previousEventT0) {
+  auto rawCoGTimeL3VHist = getObjectPtr<TH1F>("hRawCoGTimeL3V");
+  float meanRawCoG = rawCoGTimeL3VHist->GetMean();
+  if (!m_previousRawCoG) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousEventT0.emplace(meanEventT0);
+    m_previousRawCoG.emplace(meanRawCoG);
     return true;
-  }
-  if (abs(meanEventT0 - m_previousEventT0.value()) > m_allowedT0Shift) {
-    B2INFO("Histogram mean has shifted from " << m_previousEventT0.value()
-           << " to " << meanEventT0 << ". We are requesting a new payload boundary for ("
-           << currentRun.first << "," << currentRun.second << ")");
-    m_previousEventT0.emplace(meanEventT0);
-    return true;
+  } else {
+    if (abs(meanRawCoG - m_previousRawCoG.value()) > m_allowedTimeShift) {
+      B2INFO("Histogram mean has shifted from " << m_previousRawCoG.value()
+             << " to " << meanRawCoG << ". We are requesting a new payload boundary for ("
+             << currentRun.first << "," << currentRun.second << ")");
+      m_previousRawCoG.emplace(meanRawCoG);
+      return true;
+    }
   }
   return false;
 }

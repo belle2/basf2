@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Registry
+Skim registry
 ~~~~~~~~
 
 All skims must be registered and encoded by the relevant skim liaison.

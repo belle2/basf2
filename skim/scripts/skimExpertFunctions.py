@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Expert functions
+Utility functions for skim experts
 ~~~~~~~~~~~~~~~~
 
 Some helper functions to do common tasks relating to skims.
 Like testing, and for skim name encoding(decoding).
 """
+
 from abc import ABC, abstractmethod
 import subprocess
 from importlib import import_module

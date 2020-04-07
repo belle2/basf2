@@ -12,7 +12,7 @@
 #include <klm/eklm/geometry/AlignmentChecker.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/Polygon2D.h>
 
 /* Belle 2 headers. */

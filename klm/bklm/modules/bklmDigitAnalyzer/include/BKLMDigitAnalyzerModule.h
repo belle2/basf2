@@ -11,8 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
@@ -82,16 +81,16 @@ namespace Belle2 {
     //! Run number of the current data set
     int m_runNumber;
 
-    //! Input BKLMDigits
-    StoreArray<BKLMDigit> m_digit;
+    //! Input KLMDigits
+    StoreArray<KLMDigit> m_digit;
 
-    //! Input raw BKLMDigits
+    //! Input raw BLMDigits
     StoreArray<KLMDigitRaw> m_digitRaw;
 
     //!  Input BKLMDigits whose time is out of range
-    StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;
+    StoreArray<KLMDigit> m_digitOutOfRange;
 
-    //! Output data array of analyzed BKLMDigit information
+    //! Output data array of analyzed KLMDigit information
     StoreArray<KLMDigitEventInfo> m_digitEventInfo;
 
     //! Output filename

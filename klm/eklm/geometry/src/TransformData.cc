@@ -12,8 +12,8 @@
 #include <klm/eklm/geometry/TransformData.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
@@ -325,14 +325,14 @@ getStripTransform(int section, int layer, int sector, int plane, int strip) cons
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripLocalToGlobal(EKLMDigit* hit) const
+EKLM::TransformData::getStripLocalToGlobal(KLMDigit* hit) const
 {
   return &(m_Strip[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
+EKLM::TransformData::getStripGlobalToLocal(KLMDigit* hit) const
 {
   return &(m_StripInverse[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
@@ -346,7 +346,7 @@ EKLM::TransformData::getStripGlobalToLocal(int section, int layer, int sector,
            [strip - 1]);
 }
 
-bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+bool EKLM::TransformData::intersection(KLMDigit* hit1, KLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
                                        double* d1, double* d2, double* sd,
                                        bool segments) const

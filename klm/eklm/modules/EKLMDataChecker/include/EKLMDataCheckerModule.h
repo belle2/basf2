@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
@@ -80,7 +80,7 @@ namespace Belle2 {
     const EKLM::GeometryData* m_GeoDat;
 
     /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    StoreArray<KLMDigit> m_Digits;
 
     /** Map of strip data information. */
     std::map<int, struct StripData> m_StripDataMap;

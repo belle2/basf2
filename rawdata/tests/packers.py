@@ -33,12 +33,11 @@ def create_digits():
     child_path.add_module('RootOutput',
                           outputFileName='${BELLE2_LOCAL_DIR}/' + path_to_output,
                           branchNames=['ARICHDigits',
-                                       'BKLMDigits',
                                        'CDCHits',
                                        'ECLDigits',
-                                       'EKLMDigits',
+                                       'KLMDigits',
                                        'PXDDigits',
-                                       'SVDEventInfo',
+                                       'SVDEventInfoSim',
                                        'SVDShaperDigits',
                                        'TOPRawDigits'])
     child_path.add_module('Progress')
@@ -60,9 +59,6 @@ main_path = b2.create_path()
 main_path.add_module('RootInput',
                      inputFileNames=Belle2.FileSystem.findFile(path_to_output))
 raw.add_packers(path=main_path)
-for module in main_path.modules():
-    if module.name() in ['SVDPacker']:
-        module.param('SVDEventInfo', 'SVDEventInfo')
 main_path.add_module('Progress')
 b2.process(main_path)
 print(b2.statistics)

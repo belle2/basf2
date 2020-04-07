@@ -196,20 +196,6 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
 
-    /* Other BKLM variables. */
-
-    /**
-     * Counter for channels that were rejected due to unreasonable
-     * channel number.
-     */
-    long m_rejectedCount = 0;
-
-    /**
-     * Warning message: number of channels rejected due to unreasonable
-     * channel number.
-     */
-    std::map<std::string, long> m_rejected;
-
   };
 
 }

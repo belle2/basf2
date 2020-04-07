@@ -247,7 +247,6 @@ def fancy_skim_header(SkimClass):
         SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
     else:
         # Handle case where docstring is empty, or was not redefined
-        # TODO: loses vital indentation in this case
         SkimClass.__doc__ = header
 
     return SkimClass

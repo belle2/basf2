@@ -18,8 +18,8 @@ import basf2 as b2
 import fei
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
+from variables import variables as vm
 
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')

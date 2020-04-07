@@ -226,9 +226,9 @@ def fancy_skim_header(SkimClass):
     """
     SkimName = SkimClass.__name__
     SkimCode = Registry.encode_skim_name(SkimName)
-    authors = SkimClass.__authors__
-    WG = SkimClass.__WorkingGroup__
-    description = SkimClass.__SkimDescription__
+    authors = SkimClass.__authors__ or ["(no authors listed)"]
+    WG = SkimClass.__WorkingGroup__ or "(no working group listed)"
+    description = SkimClass.__SkimDescription__ or "(no description)"
 
     if isinstance(authors, str):
         # If we were given a string, split it up at: commas, "and", "&", and newlines

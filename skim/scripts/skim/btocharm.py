@@ -125,7 +125,7 @@ def BsigToD0hToKshhList(path):
         3. ``abs(deltaE) < 0.3``
 
     Note:
-      This skim uses ``loadD0_Kshh_loose()``  from the ``charm.py`` script where D0 channels are defined.
+      This skim uses ``loadD0_Kshh_loose()``  from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
     __author__ = "M. Nayak"
@@ -518,7 +518,7 @@ def BtoD0rho_KpiList(path):
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstar0_D0pi0_Kpi() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
 
@@ -577,7 +577,7 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
 
     Note:
     This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
    .. Warning::
        This skim saves only three randomly-chosen :math:`B^{+}` candidates in a 'B+:BtoD0rho_merged' list,
@@ -640,7 +640,7 @@ def B0toDrho_KpipiList(path):
 
     Note:
     This skim uses loadStdDplus_Kpipi() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
 
@@ -684,7 +684,7 @@ def B0toDrho_KspiList(path):
 
     Note:
     This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
 
@@ -730,7 +730,7 @@ def B0toDstarRho_KpiList(path):
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstarPlus_D0pi_Kpi() from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
 
@@ -778,7 +778,7 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
 
     Note:
     This skim uses loadStdD0 and loadStdDstarPlus_D0pi functions from the ``charm.py`` script,
-    where D0 channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
 
     """
 
@@ -828,7 +828,7 @@ def B0toDpi_KspiList(path):
 
     Note:
     This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
-    where D0 channels are defined.
+    where :math:`D^0` channels are defined.
 
     """
 
@@ -887,14 +887,32 @@ def DoubleCharmList(path):
 
 @fancy_skim_header
 class BtoD0h_Kspi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) K^+`,
+
+    **Additional Cuts**:
+
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_Kspi0_loose`, where :math:`D^0`
+        channels are defined.
+    """
+    __authors__ = ["Minakshi Nayak"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
             "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadD0_Kspi0_loose": [],
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -906,19 +924,47 @@ class BtoD0h_Kspi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kspi0 pi+:all",
+                        "anti-D0:Kspi0 K+:all"]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kspi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kspi0" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0h_Kspipipi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) K^+`,
+
+    **Additional Cuts**:
+
+    * ``1.8 < M_D0 < 1.9``
+    * ``5.25 < Mbc``
+    * ``abs(deltaE) < 0.2``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_Kspipipi0`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Niharika Rout"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
             "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadD0_Kspi0_loose": [],
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -930,14 +976,36 @@ class BtoD0h_Kspipipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.2"
+
+        BsigChannels = ["anti-D0:Kspipipi0 pi+:all",
+                        "anti-D0:Kspipipi0 K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kspipipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kspipipi0" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class B0toDpi_Kpipi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Mode**:
+    * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
+
+    **Additional Cuts**:
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^-`
+        channel is defined.
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -951,14 +1019,37 @@ class B0toDpi_Kpipi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:Dpi_Kpipi -> D-:Kpipi pi+:all", Bcuts, 0, path=path)
+
+        self.SkimLists = ["B0:Dpi_Kpipi"]
 
 
 @fancy_skim_header
 class B0toDpi_Kspi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+    * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\pi^+`,
+
+    **Additional Cuts**:
+    * ``1.8 < M_D < 1.9``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `stdV0s.stdKshorts` and
+        `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^0` channels are defined.
+    """
+
+    __authors__ = ["Fernando Abudinen", "Chiara La Licata"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -977,19 +1068,37 @@ class B0toDpi_Kspi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:B0toDpi_Kspi -> D-:Kspi pi+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:B0toDpi_Kspi"]
 
 
 @fancy_skim_header
 class B0toDstarPi_D0pi_Kpi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
+    """
+    **Decay Mode**:
 
-    # from stdCharged import stdPi, stdK
-    # stdK('all', path=mypath)
-    # stdPi('all', path=mypath)
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) \\pi^+`
+
+    **Additional Cuts**:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi`, where the
+        :math:`D^{*-}` channel is defined.
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
+    __SkimDescription__ = ""
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1003,14 +1112,35 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:all", Bcuts, 0, path=path)
+
+        self.SkimLists = ["B0:Dstarpi_Kpi"]
 
 
 @fancy_skim_header
 class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Mode**:
+
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
+      (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
+
+    **Additional Cuts**:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1030,14 +1160,48 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+
+        BsigChannels = [
+                        "D*-:D0_Kpipipi pi+:all",
+                        "D*-:D0_Kpipi0 pi+:all"
+                        ]
+
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class B0toDrho_Kpipi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{0}\\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\rho^+`,
+
+    **Additional Cuts**:
+
+    * ``1.8 < M_D < 1.9``
+    * ``0.47 < M_rho < 1.07``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^0` channels
+        are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1055,14 +1219,42 @@ class B0toDrho_Kpipi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:B0toDrho_Kpipi -> D-:Kpipi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:B0toDrho_Kpipi"]
 
 
 @fancy_skim_header
 class B0toDrho_Kspi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\rho^+`,
+
+
+    **Additional Cuts**:
+
+    * ``1.8 < M_D < 1.9``
+    * ``0.47 < M_rho < 1.07``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `stdV0s.stdKshorts` and
+        `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^0` channels are defined, and
+        `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1082,14 +1274,40 @@ class B0toDrho_Kspi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:B0toDrho_Kspi -> D-:Kspi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:B0toDrho_Kspi"]
 
 
 @fancy_skim_header
 class B0toDstarRho_D0pi_Kpi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\rho^+`,
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi` where :math:`D^0` channels are
+        defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1108,14 +1326,43 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:BtoDstarRho_D0pi_Kpi -> D*-:D0_Kpi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:BtoDstarRho_D0pi_Kpi"]
 
 
 @fancy_skim_header
 class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0}
+      (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^-) \\rho^+`,
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0` and
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi` where :math:`D^0` channels are
+        defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1136,14 +1383,55 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = [
+                        "D*-:D0_Kpipipi rho+:all",
+                        "D*-:D0_Kpipi0 rho+:all",
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0rho" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0rho" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0h_hh(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    Skim list definitions for all charged B to charm 2 body decays.
+
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
+
+    **Additional Cuts**:
+
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_hh_loose`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Hulya Atmacan"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1154,14 +1442,42 @@ class BtoD0h_hh(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:hh pi+:all",
+                        "anti-D0:hh K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_hh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_hh" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0h_Kpi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    Skim list definitions for all charged B to charm 3 body decays.
+
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.5``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Niharika Rout"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1179,14 +1495,51 @@ class BtoD0h_Kpi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.5"
+
+        BsigChannels = ["anti-D0:Kpi pi+:all",
+                        "anti-D0:Kpi K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kpi" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\pi^+`
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\K^+`
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipipi` and
+        `skim.standardlists.charm.loadStdD0_Kpipi0`, where :math:`D^0` channels are
+        defined.
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1206,17 +1559,70 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kpipipi pi+:all",
+                        "anti-D0:Kpipipi K+:all",
+                        "anti-D0:Kpipi0 pi+:all",
+                        "anti-D0:Kpipi0 K+:all",
+                        "anti-D*0:D0_Kpipipi pi+:all",
+                        "anti-D*0:D0_Kpipipi K+:all",
+                        "anti-D*0:D0_Kpipi0 pi+:all",
+                        "anti-D*0:D0_Kpipi0 K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Khh_Khpi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Khh_Khpi0" + str(chID))
+
+        ma.copyLists(outputListName="B+:BtoD0h_merged", inputListNames=BsigList, path=path)
+
+        # Select only three random candidates
+        ma.rankByHighest(particleList="B+:BtoD0h_merged", variable="cos(mdstIndex)", numBest=3,
+                         outputVariable="cosMdstIndex_rank", path=path)
+
+        self.SkimLists = ["B+:BtoD0h_merged"]
 
 
 @fancy_skim_header
 class BtoD0h_Kshh(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) K^+`,
+
+    **Additional Cuts**:
+
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_Kshh_loose`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Minakshi Nayak"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadD0_Kspi0_loose": [],
+        },
         "stdCharged": {
             "stdPi": ["all"],
             "stdK": ["all"],
@@ -1227,14 +1633,43 @@ class BtoD0h_Kshh(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kshh pi+:all",
+                        "anti-D0:Kshh K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kshh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kshh" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0rho_Kpi(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^0) \\rho^+`,
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpi`, where :math:`D^0` channels
+        are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1253,14 +1688,52 @@ class BtoD0rho_Kpi(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kpi rho+:all",
+                        "anti-D*0:D0_Kpi rho+:all"]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0rho_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0rho_Kpi" + str(chID))
+
+        self.SkimLists = BsigList
 
 
 @fancy_skim_header
 class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
-    """"""
-    __authors__ = []
-    __WorkingGroup__ = ""
+    """
+    **Decay Modes**:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\rho^+`,
+
+    **Additional Cuts**:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``DM_Dstar_D < 0.16``
+    * ``0.6 < M_rho < 0.9``
+    * ``cosHel_rho < 0.90``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0` and `skim.standardlists.charm.loadStdDstar0_D0pi0`,
+        where :math:`D^0` channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+
+    Warning:
+       This skim saves only three randomly-chosen :math:`B^{+}` candidates in a "B+:BtoD0rho_merged" list,
+       since the candidate multiplicity of this skim is very high.
+    """
+    __authors__ = ["Fernando Abudinen"]
+    __WorkingGroup__ = "Charm :math:`B` decays (WG4)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -1281,4 +1754,29 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
+        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
+                     path=path)
+
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9 and 0.6 <= daughter(1,M) <= 0.9"
+
+        BsigChannels = [
+                        "anti-D0:Kpipipi rho+:all",
+                        "anti-D0:Kpipi0 rho+:all",
+                        "anti-D*0:D0_Kpipipi rho+:all",
+                        "anti-D*0:D0_Kpipi0 rho+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0rho_merged" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0rho_merged" + str(chID))
+
+        ma.copyLists(outputListName="B+:BtoD0rho_merged", inputListNames=BsigList, path=path)
+
+        # Select only three random candidates to save them as these channels have high multiplicity.
+        ma.rankByHighest(particleList="B+:BtoD0rho_merged", variable="cos(mdstIndex)", numBest=3,
+                         outputVariable="cosMdstIndex_rank", path=path)
+
+        self.SkimLists = ["B+:BtoD0rho_merged"]

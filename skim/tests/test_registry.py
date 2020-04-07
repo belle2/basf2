@@ -48,6 +48,17 @@ class TestSkimCodes(unittest.TestCase):
             len(Registry.names), len(set(Registry.names)), "Duplicated skim name"
         )
 
+    def test_invalid_names(self):
+        """Check that that no registered skims have invalid names."""
+        for name in Registry.names:
+            self.assertFalse(
+                name.startswith("Base"),
+                (
+                    f"Invalid skim name in registry: {name}. Registed skim names cannot"
+                    " begin with 'Base'; this word is reserved for subclassing purposes."
+                )
+            )
+
     def test_encode(self):
         """Check that we raise a LookupError if the skim name doesn't exist."""
         with self.assertRaises(LookupError):
@@ -114,6 +125,8 @@ class TestSkimCodes(unittest.TestCase):
                     issubclass(obj[1], expert.BaseSkim)
                     and obj[1] is not expert.BaseSkim
                     and obj[0] != "CombinedSkim"
+                    # Allow "Base" at beginning of skims, for subclassing
+                    and not obj[0].startswith("Base")
                 )
             ]
 

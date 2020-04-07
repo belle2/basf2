@@ -89,7 +89,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
     # algorithm setup
     algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
     algorithm.setMinEntries(100)
-    algorithm.setAllowedT0Shift(2.)
+    algorithm.setAllowedTimeShift(2.)
 
     # calibration setup
     calibration = Calibration('SVDCoGTime',

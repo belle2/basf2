@@ -71,16 +71,16 @@ void KLMUnpackerModule::initialize()
   m_RawKLMs.isRequired();
   /* Digits. */
   m_Digits.registerInDataStore(m_outputKLMDigitsName);
-  m_bklmDigitsOutOfRange.registerInDataStore("BKLMDigitsOutOfRange");
+  m_klmDigitsOutOfRange.registerInDataStore("KLMDigitsOutOfRange");
   /* Event information. */
   m_DigitEventInfos.registerInDataStore();
   m_Digits.registerRelationTo(m_DigitEventInfos);
-  m_bklmDigitsOutOfRange.registerRelationTo(m_DigitEventInfos);
+  m_klmDigitsOutOfRange.registerRelationTo(m_DigitEventInfos);
   /* Raw data in dataobject format. */
   if (m_WriteDigitRaws) {
     m_klmDigitRaws.registerInDataStore();
     m_Digits.registerRelationTo(m_klmDigitRaws);
-    m_bklmDigitsOutOfRange.registerRelationTo(m_klmDigitRaws);
+    m_klmDigitsOutOfRange.registerRelationTo(m_klmDigitRaws);
   }
 }
 
@@ -100,76 +100,8 @@ void KLMUnpackerModule::beginRun()
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
-void KLMUnpackerModule::unpackEKLMDigit(
-  const int* rawData, int copper, int hslb,
-  KLMDigitEventInfo* klmDigitEventInfo)
-{
-  int subdetector, section, sector, layer, plane, strip;
-  KLM::RawData raw;
-  KLMDigitRaw* klmDigitRaw;
-  KLM::unpackRawData(copper, hslb + 1, rawData, &raw, &m_klmDigitRaws,
-                     &klmDigitRaw, m_WriteDigitRaws);
-  const uint16_t* detectorChannel;
-  KLMElectronicsChannel electronicsChannel(
-    copper, hslb + 1, raw.lane, raw.axis, raw.channel);
-  detectorChannel =
-    m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
-  if ((raw.triggerBits & 0x10) != 0)
-    return;
-  bool correctHit = true;
-  if (detectorChannel == nullptr) {
-    if (!m_IgnoreWrongHits) {
-      B2ERROR("Channel does not exist in the KLM electronics map."
-              << LogVar("Copper", electronicsChannel.getCopper())
-              << LogVar("Slot", electronicsChannel.getSlot())
-              << LogVar("Lane", electronicsChannel.getLane())
-              << LogVar("Axis", electronicsChannel.getAxis())
-              << LogVar("Channel", electronicsChannel.getChannel()));
-    }
-    if (!m_WriteWrongHits)
-      return;
-    section = 0;
-    sector = 0;
-    layer = 0;
-    plane = 0;
-    strip = 0;
-    correctHit = false;
-  } else {
-    m_ElementNumbers->channelNumberToElementNumbers(
-      *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
-      &strip);
-  }
-  KLMDigit* eklmDigit = m_Digits.appendNew();
-  eklmDigit->addRelationTo(klmDigitEventInfo);
-  if (m_WriteDigitRaws)
-    eklmDigit->addRelationTo(klmDigitRaw);
-  eklmDigit->setTime(
-    m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
-  eklmDigit->setSubdetector(KLMElementNumbers::c_EKLM);
-  eklmDigit->setSection(section);
-  eklmDigit->setLayer(layer);
-  eklmDigit->setSector(sector);
-  eklmDigit->setPlane(plane);
-  eklmDigit->setStrip(strip);
-  eklmDigit->setCharge(raw.charge);
-  eklmDigit->setCTime(raw.ctime);
-  eklmDigit->setTDC(raw.tdc);
-  if (correctHit) {
-    int stripGlobal = m_eklmElementNumbers->stripNumber(
-                        section, layer, sector, plane, strip);
-    const EKLMChannelData* channelData =
-      m_eklmChannels->getChannelData(stripGlobal);
-    if (channelData == nullptr)
-      B2FATAL("Incomplete EKLM channel data.");
-    if (raw.charge < channelData->getThreshold())
-      eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-    else
-      eklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-  }
-}
-
-void KLMUnpackerModule::unpackBKLMDigit(
-  const int* rawData, int copper, int hslb,
+void KLMUnpackerModule::unpackKLMDigit(
+  const int* rawData, int copper, int hslb, int daqSubdetector,
   KLMDigitEventInfo* klmDigitEventInfo)
 {
   KLM::RawData raw;
@@ -183,63 +115,69 @@ void KLMUnpackerModule::unpackBKLMDigit(
   detectorChannel =
     m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
   if (detectorChannel == nullptr) {
-    B2DEBUG(20, "Channel does not exist in the KLM electronics map."
-            << LogVar("Copper", electronicsChannel.getCopper())
-            << LogVar("Slot", electronicsChannel.getSlot())
-            << LogVar("Lane", electronicsChannel.getLane())
-            << LogVar("Axis", electronicsChannel.getAxis())
-            << LogVar("Channel", electronicsChannel.getChannel()));
+    /* The channel is not found, print error message. */
+    if (!(m_IgnoreWrongHits || (raw.channel == 0 && m_IgnoreStrip0))) {
+      if (daqSubdetector == KLMElementNumbers::c_BKLM) {
+        B2DEBUG(20, "Channel does not exist in the KLM electronics map."
+                << LogVar("Copper", electronicsChannel.getCopper())
+                << LogVar("Slot", electronicsChannel.getSlot())
+                << LogVar("Lane", electronicsChannel.getLane())
+                << LogVar("Axis", electronicsChannel.getAxis())
+                << LogVar("Channel", electronicsChannel.getChannel()));
+      } else {
+        B2ERROR("Channel does not exist in the KLM electronics map."
+                << LogVar("Copper", electronicsChannel.getCopper())
+                << LogVar("Slot", electronicsChannel.getSlot())
+                << LogVar("Lane", electronicsChannel.getLane())
+                << LogVar("Axis", electronicsChannel.getAxis())
+                << LogVar("Channel", electronicsChannel.getChannel()));
+      }
+    }
     if (!(m_WriteWrongHits || m_DebugElectronicsMap))
       return;
     /*
      * Try to find channel from the same plane.
-     * Phi-plane channels may start from 3 or 5.
+     * BKLM phi-plane channels may start from 3 or 5.
      */
     electronicsChannel.setChannel(5);
     detectorChannel = m_ElectronicsMap->getDetectorChannel(&electronicsChannel);
     if (detectorChannel == nullptr)
       return;
+    /* The channel is found, store out-of-range digit. */
     m_ElementNumbers->channelNumberToElementNumbers(
       *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
       &strip);
     if (m_WriteWrongHits) {
-      // increase by 1 the event-counter of outOfRange-flagged hits
       klmDigitEventInfo->increaseOutOfRangeHits();
-
-      // store the digit in the appropriate dataobject
-      KLMDigit* bklmDigitOutOfRange =
-        m_bklmDigitsOutOfRange.appendNew();
-      bklmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
+      KLMDigit* klmDigitOutOfRange =
+        m_klmDigitsOutOfRange.appendNew();
+      klmDigitOutOfRange->addRelationTo(klmDigitEventInfo);
       if (m_WriteDigitRaws)
-        bklmDigitOutOfRange->addRelationTo(klmDigitRaw);
-      bklmDigitOutOfRange->setSubdetector(KLMElementNumbers::c_BKLM);
-      bklmDigitOutOfRange->setSection(section);
-      bklmDigitOutOfRange->setLayer(layer);
-      bklmDigitOutOfRange->setSector(sector);
-      bklmDigitOutOfRange->setPlane(plane);
-      bklmDigitOutOfRange->setStrip(strip);
-      bklmDigitOutOfRange->setCharge(raw.charge);
-      bklmDigitOutOfRange->setCTime(raw.ctime);
-      bklmDigitOutOfRange->setTDC(raw.tdc);
-
-      std::string message = "channel number is out of range";
-      m_rejected[message] += 1;
-      m_rejectedCount++;
-      B2DEBUG(21, "KLMUnpackerModule:: raw channel number is out of range"
-              << LogVar("Channel", raw.channel));
+        klmDigitOutOfRange->addRelationTo(klmDigitRaw);
+      klmDigitOutOfRange->setSubdetector(KLMElementNumbers::c_BKLM);
+      klmDigitOutOfRange->setSection(section);
+      klmDigitOutOfRange->setLayer(layer);
+      klmDigitOutOfRange->setSector(sector);
+      klmDigitOutOfRange->setPlane(plane);
+      klmDigitOutOfRange->setStrip(strip);
+      klmDigitOutOfRange->setCharge(raw.charge);
+      klmDigitOutOfRange->setCTime(raw.ctime);
+      klmDigitOutOfRange->setTDC(raw.tdc);
       return;
     }
+    /* Debug mode: write raw channel number to strip number. */
     bool recordDebugHit = false;
     if (m_DAQChannelBKLMScintillators) {
-      /* The strip is 1-based, but stored as 0-based. Do not set channel to 0. */
-      if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0) {
+      if ((subdetector == KLMElementNumbers::c_BKLM) &&
+          (layer < BKLMElementNumbers::c_FirstRPCLayer)) {
         strip = raw.channel;
         recordDebugHit = true;
       }
     }
-    if (m_DAQChannelModule) {
-      uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
-      if (klmModule == m_DAQChannelModule && raw.channel > 0) {
+    if (m_DAQChannelModule >= 0) {
+      uint16_t klmModule =
+        m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+      if (klmModule == m_DAQChannelModule) {
         strip = raw.channel;
         recordDebugHit = true;
       }
@@ -247,64 +185,86 @@ void KLMUnpackerModule::unpackBKLMDigit(
     if (!recordDebugHit)
       return;
   } else {
+    /* The channel is found, get element numbers. */
     m_ElementNumbers->channelNumberToElementNumbers(
       *detectorChannel, &subdetector, &section, &sector, &layer, &plane,
       &strip);
+    /* Debug mode: write raw channel number to strip number. */
     if (m_DebugElectronicsMap) {
       if (m_DAQChannelBKLMScintillators) {
-        if (layer < BKLMElementNumbers::c_FirstRPCLayer && raw.channel > 0)
+        if ((subdetector == KLMElementNumbers::c_BKLM) &&
+            (layer < BKLMElementNumbers::c_FirstRPCLayer))
           strip = raw.channel;
       }
-      if (m_DAQChannelModule) {
-        uint16_t klmModule = m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
-        if (klmModule == m_DAQChannelModule && raw.channel > 0)
+      if (m_DAQChannelModule >= 0) {
+        uint16_t klmModule =
+          m_ElementNumbers->moduleNumberByChannel(*detectorChannel);
+        if (klmModule == m_DAQChannelModule)
           strip = raw.channel;
       }
     }
   }
-
-  if ((layer < BKLMElementNumbers::c_FirstRPCLayer) && ((raw.triggerBits & 0x10) != 0))
+  /* Ignore multi-strip scintillator hits. */
+  bool isRPC = (subdetector == KLMElementNumbers::c_BKLM) &&
+               (layer >= BKLMElementNumbers::c_FirstRPCLayer);
+  if (!isRPC && ((raw.triggerBits & 0x10) != 0))
     return;
-  if (layer > BKLMElementNumbers::getMaximalLayerNumber()) {
-    B2DEBUG(20, "KLMUnpackerModule:: strange that the layer number is larger than 15 "
-            << LogVar("Layer", layer));
-    return;
-  }
-
-  KLMDigit* bklmDigit;
+  /* Create KLM digit. */
+  KLMDigit* klmDigit;
   if (layer >= BKLMElementNumbers::c_FirstRPCLayer) {
+    /*
+     * For RPC hits, digitize both the coarse (ctime) and fine (tdc) times
+     * relative to the revo9 trigger time rather than the event header's
+     * TriggerCTime. For the fine-time (tdc) measurement (11 bits), shift
+     * the revo9Trig time by 10 ticks to align the new prompt-time peak
+     * with the TriggerCtime-relative peak.
+     */
     klmDigitEventInfo->increaseRPCHits();
-    // For RPC hits, digitize both the coarse (ctime) and fine (tdc) times relative
-    // to the revo9 trigger time rather than the event header's TriggerCTime.
-    // For the fine-time (tdc) measurement (11 bits), shift the revo9Trig time by
-    // 10 ticks to align the new prompt-time peak with the TriggerCtime-relative peak.
     float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
-    std::pair<int, double> rpcTimes = m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
-    bklmDigit = m_Digits.appendNew();
-    bklmDigit->setTime(rpcTimes.second);
+    std::pair<int, double> rpcTimes =
+      m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
+    klmDigit = m_Digits.appendNew();
+    klmDigit->setTime(rpcTimes.second);
   } else {
+    /*
+     * For scintillator hits, store the ctime relative to the event header's
+     * trigger ctime.
+     */
     klmDigitEventInfo->increaseSciHits();
-    // For scintillator hits, store the ctime relative to the event header's trigger ctime
-    bklmDigit = m_Digits.appendNew();
-    bklmDigit->setTime(
-      m_TimeConversion->getScintillatorTime(raw.ctime, klmDigitEventInfo->getTriggerCTime()));
-    if (raw.charge < m_scintThreshold)
-      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-    else
-      bklmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+    klmDigit = m_Digits.appendNew();
+    double time = m_TimeConversion->getScintillatorTime(
+                    raw.ctime, klmDigitEventInfo->getTriggerCTime());
+    klmDigit->setTime(time);
+    if (subdetector == KLMElementNumbers::c_BKLM) {
+      if (raw.charge < m_scintThreshold)
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+      else
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+    } else {
+      int stripGlobal = m_eklmElementNumbers->stripNumber(
+                          section, layer, sector, plane, strip);
+      const EKLMChannelData* channelData =
+        m_eklmChannels->getChannelData(stripGlobal);
+      if (channelData == nullptr)
+        B2FATAL("Incomplete EKLM channel data.");
+      if (raw.charge < channelData->getThreshold())
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+      else
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+    }
   }
-  bklmDigit->addRelationTo(klmDigitEventInfo);
+  klmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
-    bklmDigit->addRelationTo(klmDigitRaw);
-  bklmDigit->setSubdetector(KLMElementNumbers::c_BKLM);
-  bklmDigit->setSection(section);
-  bklmDigit->setLayer(layer);
-  bklmDigit->setSector(sector);
-  bklmDigit->setPlane(plane);
-  bklmDigit->setStrip(strip);
-  bklmDigit->setCharge(raw.charge);
-  bklmDigit->setCTime(raw.ctime);
-  bklmDigit->setTDC(raw.tdc);
+    klmDigit->addRelationTo(klmDigitRaw);
+  klmDigit->setSubdetector(subdetector);
+  klmDigit->setSection(section);
+  klmDigit->setLayer(layer);
+  klmDigit->setSector(sector);
+  klmDigit->setPlane(plane);
+  klmDigit->setStrip(strip);
+  klmDigit->setCharge(raw.charge);
+  klmDigit->setCTime(raw.ctime);
+  klmDigit->setTDC(raw.tdc);
 }
 
 void KLMUnpackerModule::event()
@@ -327,10 +287,12 @@ void KLMUnpackerModule::event()
      */
     for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
       unsigned int copperId = m_RawKLMs[i]->GetNodeID(j);
-      bool eklmHit = false;
+      int subdetector;
       if ((copperId >= EKLM_ID) && (copperId <= EKLM_ID + 4))
-        eklmHit = true;
+        subdetector = KLMElementNumbers::c_EKLM;
       else if (!((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4)))
+        subdetector = KLMElementNumbers::c_BKLM;
+      else
         continue;
       m_RawKLMs[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
@@ -362,13 +324,8 @@ void KLMUnpackerModule::event()
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          if (eklmHit) {
-            unpackEKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
-                            klmDigitEventInfo);
-          } else {
-            unpackBKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
-                            klmDigitEventInfo);
-          }
+          unpackKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
+                         subdetector, klmDigitEventInfo);
         }
       }
     }

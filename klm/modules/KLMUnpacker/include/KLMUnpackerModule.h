@@ -77,24 +77,16 @@ namespace Belle2 {
   private:
 
     /**
-     * Unpack one EKLM digit.
+     * Unpack KLM digit.
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.
      * @param[in] hslb              HSLB number.
+     * @param[in] daqSubdetector    Subdetector (as determied from DAQ data).
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
-                         KLMDigitEventInfo* klmDigitEventInfo);
-
-    /**
-     * Unpack one BKLM digit.
-     * @param[in] rawData           Data to be unpacked.
-     * @param[in] copper            Copper identifier.
-     * @param[in] hslb              HSLB number.
-     * @param[in] klmDigitEventInfo KLMDigitEventInfo.
-     */
-    void unpackBKLMDigit(const int* rawData, int copper, int hslb,
-                         KLMDigitEventInfo* klmDigitEventInfo);
+    void unpackKLMDigit(const int* rawData, int copper, int hslb,
+                        int daqSubdetector,
+                        KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
      * To be used to map electronics address to module id.
@@ -175,6 +167,12 @@ namespace Belle2 {
     /** Event information. */
     StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
+    /** Out-of-range digits. */
+    StoreArray<KLMDigit> m_klmDigitsOutOfRange;
+
+    /** Raw digits. */
+    StoreArray<KLMDigitRaw> m_klmDigitRaws;
+
     /* EKLM database objects. */
 
     /** Channels. */
@@ -184,12 +182,6 @@ namespace Belle2 {
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
-
-    /** Out-of-range digits. */
-    StoreArray<KLMDigit> m_bklmDigitsOutOfRange;
-
-    /** Raw digits. */
-    StoreArray<KLMDigitRaw> m_klmDigitRaws;
 
     /* Other common variables. */
 

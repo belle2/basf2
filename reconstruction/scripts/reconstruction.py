@@ -66,6 +66,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     empty_path = create_path()
     doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
     doom.if_true(empty_path, AfterConditionPath.END)
+    empty_path.add_module("EventErrorFlag", errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,

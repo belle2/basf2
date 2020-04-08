@@ -4,7 +4,6 @@
 """General steering file for running combined skims."""
 
 import argparse
-from importlib import import_module
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -69,23 +68,6 @@ def get_argument_parser():
     return parser
 
 
-def get_skim_function(SkimName):
-    """Get the skim class constructor for the given skim.
-
-    This is achieved by importing the module listed alongside the skim name in the
-    `skim.registry.Registry`.
-
-    Parameters:
-        SkimName (str): Name of the skim to be found.
-
-    Returns:
-        SkimFunction: The class constructor for the given skim.
-    """
-    ModuleName = Registry.get_skim_module(SkimName)
-    SkimModule = import_module(f"skim.{ModuleName}")
-    return getattr(SkimModule, SkimName)
-
-
 def main():
     parser = get_argument_parser()
     args = parser.parse_args()
@@ -94,10 +76,10 @@ def main():
 
     if args.skims:
         skims = list(set(args.skims))
-        SkimObjects = [get_skim_function(skim)() for skim in skims]
+        SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
     elif args.module:
         SkimObjects = [
-            get_skim_function(skim)()
+            Registry.get_skim_function(skim)()
             for skim in Registry.get_skims_in_module(args.module)
         ]
 

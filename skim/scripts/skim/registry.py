@@ -3,6 +3,8 @@
 
 """"""
 
+from importlib import import_module
+
 from basf2 import B2ERROR
 
 
@@ -174,6 +176,22 @@ class SkimRegistry:
             for module in self.modules
         }
         return NameLookup[SkimModule]
+
+    def get_skim_function(SkimName):
+        """Get the skim class constructor for the given skim.
+
+        This is achieved by importing the module listed alongside the skim name in the
+        `skim.registry.Registry`.
+
+        Parameters:
+            SkimName (str): Name of the skim to be found.
+
+        Returns:
+            SkimFunction: The class constructor for the given skim.
+        """
+        ModuleName = Registry.get_skim_module(SkimName)
+        SkimModule = import_module(f"skim.{ModuleName}")
+        return getattr(SkimModule, SkimName)
 
     def encode_skim_name(self, SkimName):
         """Find the 8 digit skim code assigned to the skim with the provided name.

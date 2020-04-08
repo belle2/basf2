@@ -377,38 +377,64 @@ class SinglePhotonDark(BaseSkim):
 
 @fancy_skim_header
 class ALP3Gamma(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
-
-    # No lists added in standalone file
+    __authors__ = ["Michael De Nuccio"]
+    __WorkingGroup__ = "Dark group"
+    __SkimDescription__ = (
+        "Neutral dark sector skim list for the ALP 3-photon analysis: "
+        ":math:`ee\\to a(\\to\\gamma\\gamma)\\gamma`"
+    )
 
     RequiredStandardLists = None
 
-    def build_lists(self, path):
+    def addALPToPDG():
+        """ Adds the ALP codes to the basf2 pdg instance """
+        pdg.add_particle('beam', 55, 999., 999., 0, 0)
+        pdg.add_particle('ALP', 9000006, 999., 999., 0, 0)
+
+    def initialALP(path):
         """
-        Neutral dark sector skim list for the ALP 3-photon analysis.
-
-        **Skim code**: 18020300
-
-        **Physics channel**: ee → aγ; a → γγ
-
-        **Skim category**: physics, dark sector
+        An list builder function for the ALP decays. Part of the
+        `ALP3GammaList` skim functions.
 
         Parameters:
-            path (basf2.Path): the path to add the skim list builders
+            path (basf2.Path): the path to add the skim
 
         Returns:
-            list name of the skim candidates
+            list name of the ALP decays candidates
         """
-        __author__ = "Michael De Nuccio"
+        # no cuts applied on ALP
+        ALPcuts = ''
 
-        _addALPToPDG()
+        # applying a lab frame energy cut to the daughter photons
+        ma.fillParticleList(
+            'gamma:cdcAndMinimumEnergy',
+            'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
+            True, path=path
+        )
 
+        # defining the decay string
+        ALPchannels = ['gamma:cdcAndMinimumEnergy  gamma:cdcAndMinimumEnergy']
+        ALPList = []
+
+        # creating an ALP from the daughter photons
+        for chID, channel in enumerate(ALPchannels):
+            mode = 'ALP:' + str(chID) + ' -> ' + channel
+            print(mode)
+            ma.reconstructDecay(mode, ALPcuts, chID, path=path)
+
+            ALPList.append('ALP:' + str(chID))
+
+        Lists = ALPList
+        return Lists
+
+    def additional_setup(self, path):
+        self.addALPToPDG()
+
+    def build_lists(self, path):
         # applying invariant mass cut on the beam particle
         beamcuts = "InvM >= formula(0.8 * Ecms) and InvM <= formula(1.05 * Ecms) and maxWeightedDistanceFromAverageECLTime <= 2"
 
-        ALPList = _initialALP(path=path)
+        ALPList = self.initialALP(path=path)
 
         # applying a lab frame energy cut to the recoil photon
         ma.fillParticleList("gamma:minimumEnergy", "E >= 0.1", True, path=path)
@@ -421,17 +447,20 @@ class ALP3Gamma(BaseSkim):
             print(mode)
             ma.reconstructDecay(mode, beamcuts, chID, path=path)
             beamList.append("beam:" + str(chID))
-        return beamList
+        self.SkimLists = beamList
 
 
 @fancy_skim_header
 class DimuonPlusMissingEnergy(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
-
-    # charged.stdMu('all', path=dimuon_path)
-    # import stdCharged as charged
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy.
+    """
+    __authors__ = ["Giacomo De Pietro"]
+    __WorkingGroup__ = "Dark group"
+    __SkimDescription__ = (
+        "Dimuon + missing energy skim, needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-}"
+        "Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches."
+    )
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -440,24 +469,6 @@ class DimuonPlusMissingEnergy(BaseSkim):
     }
 
     def build_lists(self, path):
-        """
-        Dimuon + missing energy skim,
-        needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-
-        **Skim code**: 18520100
-
-        **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
-
-        **Skim category**: physics, dark sector
-
-        Parameters:
-            path (basf2.Path): the path to add the skim
-
-        Returns:
-            list containing the candidate names
-        """
-        __author__ = "Giacomo De Pietro"
-
         dimuon_list = []
         skim_label = "forDimuonMissingEnergySkim"
         dimuon_name = "Z0:" + skim_label
@@ -476,14 +487,18 @@ class DimuonPlusMissingEnergy(BaseSkim):
 
         # And return the dimuon list
         dimuon_list.append(dimuon_name)
-        return dimuon_list
+        self.SkimLists = dimuon_list
 
 
 @fancy_skim_header
 class ElectronMuonPlusMissingEnergy(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
+    __authors__ = ["Giacomo De Pietro"]
+    __WorkingGroup__ = "Dark group"
+    __SkimDescription__ = (
+        "Electron-muon pair + missing energy skim, needed for :math:`e^{+}e^{-} \\to "
+        "e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other "
+        "searches."
+    )
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -494,23 +509,8 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
     def build_lists(self, path):
         """
-        Electron-muon pair + missing energy skim,
-        needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
-
-        **Skim code**: 18520200
-
         **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
-
-        **Skim category**: physics, dark sector
-
-        Parameters:
-            path (basf2.Path): the path to add the skim
-
-        Returns:
-            list containing the candidate names
         """
-        __author__ = "Giacomo De Pietro"
-
         emu_list = []
         skim_label = "forElectronMuonMissingEnergySkim"
         emu_name = "Z0:" + skim_label
@@ -533,14 +533,14 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
         # And return the dimuon list
         emu_list.append(emu_name)
-        return emu_list
+        self.SkimLists = emu_list
 
 
 @fancy_skim_header
 class LFVZpVisible(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
+    __authors__ = ["Ilya Komarov"]
+    __WorkingGroup__ = "Dark group"
+    __SkimDescription__ = "Lepton flavour violating Z' skim, Z' to visible FS."
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -553,24 +553,8 @@ class LFVZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        Lepton flavour violating Z' skim, Z' to visible FS
-
-        **Skim code**: 18520400
-
         **Physics channel**: ee --> e mu Z'; Z' --> e mu
-
-        **Skim category**: physics, dark sector
-
-        The skim list for the LFV Z' to visible final state search
-
-        Parameters:
-            path (basf2.Path): the path to add the skim list builders
-
-        Returns:
-            list containing the candidate names
         """
-        __author__ = "Ilya Komarov"
-
         lfvzp_list = []
 
         # Here we just want four gpood tracks to be reconstructed
@@ -601,4 +585,4 @@ class LFVZpVisible(BaseSkim):
 
         lfvzp_list.append("vpho:2tr_vislfvzp")
 
-        return lfvzp_list
+        self.SkimLists = lfvzp_list

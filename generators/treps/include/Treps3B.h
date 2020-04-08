@@ -162,7 +162,7 @@ namespace Belle2 {
     // private member functions
     double tpgetd(int, double, double, double,  double);
     double tpgetz(int);
-    double tpgetq(double, double, double);
+    double tpgetq(double, double);
     void tpgetm(Part_cont*, int);
 
     // private const member functions

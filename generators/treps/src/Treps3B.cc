@@ -193,28 +193,28 @@ namespace Belle2 {
     if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
-      double w; // W [GeV]
+      double W; // W [GeV]
       double diffCrossSection; // Number of events for given W
 
       double previousW = 0.;
       double previousDCS = 0.; // Diff(erential) Cross Section
-      while (infile >> w >> diffCrossSection) {
-        if (w > 9000. || w < 0.) continue;
-        diffCrossSectionOfW[w] = diffCrossSection;
+      while (infile >> W >> diffCrossSection) {
+        if (W > 9000. || W < 0.) continue;
+        diffCrossSectionOfW[W] = diffCrossSection;
 
         // Calculate total cross section up to the bin.
         // This will be used for importance sampling. NOT CORRECT cross section
         if (diffCrossSection > previousDCS and previousDCS != 0) {
           // If current diffCrossSection is higher than previous and not first time, use diffCrossSection
-          totalCrossSectionForMC += (w - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
+          totalCrossSectionForMC += (W - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
         } else {
           // If previous diffCrossSection is higher than current or first time, use previousDCS
-          totalCrossSectionForMC += (w - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
+          totalCrossSectionForMC += (W - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
         }
-        // Store current cross section with w
-        WOfCrossSectionForMC[totalCrossSectionForMC] = w;
+        // Store current cross section with W
+        WOfCrossSectionForMC[totalCrossSectionForMC] = W;
 
-        previousW = w;
+        previousW = W;
         previousDCS = diffCrossSection;
       }
 
@@ -282,7 +282,7 @@ namespace Belle2 {
         B2DEBUG(20, wthead[0] << " " << wtcond[0]);
         B2DEBUG(20, " wtable mode=0  loaded");
       }
-      return 0.0 ;
+      return 0.0;
     } else if (mode == 1) {
       // Get W
       int i = 0;
@@ -295,6 +295,7 @@ namespace Belle2 {
 
       return prew;
     }
+    return 0.0;
   }
 
 
@@ -318,7 +319,8 @@ namespace Belle2 {
     // added by S.U on Sep.29,1997
     imode = 0;
 
-    double xxx = tpgetd(0, rs, dmin, dmax, q2max);
+    // Unused variable, gives a compilation warning
+    //double xxx = tpgetd(0, rs, dmin, dmax, q2max);
     tpgetz(0);
 
     B2DEBUG(20, "In Treps, W has been set to be " << std::setprecision(5) <<
@@ -418,8 +420,8 @@ namespace Belle2 {
 
       do {
         do {
-          q2p = tpgetq(s, z, q2max) ;
-          q2m = tpgetq(s, z, q2max) ;
+          q2p = tpgetq(z, q2max) ;
+          q2m = tpgetq(z, q2max) ;
           q2min = me * me * pow(w, 4) / s / (s - w * w);
           sf = ((s * s + (s - w * w) * (s - w * w)) / 2. / s / s - (s - w * w) * q2min / s / q2p)
                * ((s * s + (s - w * w) * (s - w * w)) / 2. / s / s - (s - w * w) * q2min / s / q2m);
@@ -651,7 +653,7 @@ namespace Belle2 {
     return 1;
   }
 
-  double TrepsB::tpgetq(double _s, double z, double _q2max)
+  double TrepsB::tpgetq(double z, double _q2max)
   {
     // get one Q2 value
     double q2min = me * me * z * z / (1. - z);
@@ -763,7 +765,8 @@ namespace Belle2 {
 
   double TrepsB::tpxint(double r, double _rs, double _q2max) const
   {
-    const double alpppi = 0.002322816 ;
+    // Unused variable, gives a compilation warning
+    //const double alpppi = 0.002322816 ;
 
     double y = sqrt(r * _rs);
     double z = sqrt(_rs / r);
@@ -828,13 +831,13 @@ namespace Belle2 {
   double TrepsB::tpform(double _q2, double _w) const
   {
     //form factor effect
-    double dis = 1.0 ;
-    return dis ;
+    double dis = 1.0;
+    return dis;
   }
 
   double TrepsB::tpangd(double _z, double _w)
   {
-    double c = 1.0 ;
+    double c = 1.0;
     return c;
   }
 

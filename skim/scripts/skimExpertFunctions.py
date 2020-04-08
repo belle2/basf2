@@ -412,13 +412,12 @@ methods __authors__
         self.SkimLists = []
 
     def additional_setup(self, path):
-        """Perform any setup steps necessary before running the skim. This may include:
+        """
+        Perform any setup steps necessary before running the skim. This may include:
 
-                * applying event-level cuts using `ifEventPasses`,
-
-                * adding the `MCMatcherParticles` module to the path,
-
-                * running the FEI.
+        * applying event-level cuts using `ifEventPasses`,
+        * adding the `MCMatcherParticles` module to the path,
+        * running the FEI.
 
         Warning:
             Standard particle lists should *not* be loaded in here. This should be done

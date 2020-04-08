@@ -356,28 +356,27 @@ class SinglePhotonDark(BaseSkim):
         cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
 
         # no other photon above 100 MeV
-        angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
-        minimum = 'E > 0.1'  # GeV
-        ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
+        angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
+        minimum = "E > 0.1"  # GeV
+        ma.cutAndCopyList("gamma:100", "gamma:all", minimum + " and " + angle, path=path)
         path2 = b2.Path()
         ifEventPasses(
-            f'0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1',
+            f"0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1",
             conditional_path=path2, path=path)
 
         # all remaining single photon events (== candidates) with region
         # dependent minimum energy in GeV
-        region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel
-        region_dependent += '[clusterReg ==  1 and useCMSFrame(E) > 2.0] or '  # fwd
-        region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
-        region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
-        region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
-        ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
-        self.SkimLists = ['gamma:singlePhoton']
+        region_dependent = " [clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
+        region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
+        region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
+        region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
+        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
+        ma.cutAndCopyList("gamma:singlePhoton", "gamma:100", region_dependent, path=path2)
+        self.SkimLists = ["gamma:singlePhoton"]
 
 
 @fancy_skim_header
 class ALP3Gamma(BaseSkim):
-    """"""
     __authors__ = []
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
@@ -387,12 +386,46 @@ class ALP3Gamma(BaseSkim):
     RequiredStandardLists = None
 
     def build_lists(self, path):
-        """"""
+        """
+        Neutral dark sector skim list for the ALP 3-photon analysis.
+
+        **Skim code**: 18020300
+
+        **Physics channel**: ee → aγ; a → γγ
+
+        **Skim category**: physics, dark sector
+
+        Parameters:
+            path (basf2.Path): the path to add the skim list builders
+
+        Returns:
+            list name of the skim candidates
+        """
+        __author__ = "Michael De Nuccio"
+
+        _addALPToPDG()
+
+        # applying invariant mass cut on the beam particle
+        beamcuts = "InvM >= formula(0.8 * Ecms) and InvM <= formula(1.05 * Ecms) and maxWeightedDistanceFromAverageECLTime <= 2"
+
+        ALPList = _initialALP(path=path)
+
+        # applying a lab frame energy cut to the recoil photon
+        ma.fillParticleList("gamma:minimumEnergy", "E >= 0.1", True, path=path)
+        beamList = []
+
+        # reconstructing decay using the reconstructed ALP
+        # from previous function and adding the recoil photon
+        for chID, channel in enumerate(ALPList):
+            mode = "beam:" + str(chID) + " -> gamma:minimumEnergy " + channel
+            print(mode)
+            ma.reconstructDecay(mode, beamcuts, chID, path=path)
+            beamList.append("beam:" + str(chID))
+        return beamList
 
 
 @fancy_skim_header
 class DimuonPlusMissingEnergy(BaseSkim):
-    """"""
     __authors__ = []
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
@@ -407,12 +440,47 @@ class DimuonPlusMissingEnergy(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        """
+        Dimuon + missing energy skim,
+        needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+        **Skim code**: 18520100
+
+        **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
+
+        **Skim category**: physics, dark sector
+
+        Parameters:
+            path (basf2.Path): the path to add the skim
+
+        Returns:
+            list containing the candidate names
+        """
+        __author__ = "Giacomo De Pietro"
+
+        dimuon_list = []
+        skim_label = "forDimuonMissingEnergySkim"
+        dimuon_name = "Z0:" + skim_label
+
+        # Define some cuts
+        fromIP_cut = "[abs(dz) < 5.0] and [abs(dr) < 2.0]"
+        muonID_cut = "[muonID > 0.3]"
+        # We want exactly 2 tracks from IP
+        dimuon_cut = "[nCleanedTracks(" + fromIP_cut + ") < 4]"
+        # And the pair must have pt > 200 MeV in CMS frame
+        dimuon_cut += " and [useCMSFrame(pt) > 0.2]"
+
+        # Reconstruct the dimuon candidate
+        ma.cutAndCopyList("mu+:" + skim_label, "mu+:all", fromIP_cut + " and " + muonID_cut, path=path)
+        ma.reconstructDecay(dimuon_name + " -> mu+:" + skim_label + " mu-:" + skim_label, dimuon_cut, path=path)
+
+        # And return the dimuon list
+        dimuon_list.append(dimuon_name)
+        return dimuon_list
 
 
 @fancy_skim_header
 class ElectronMuonPlusMissingEnergy(BaseSkim):
-    """"""
     __authors__ = []
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
@@ -425,12 +493,51 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        """
+        Electron-muon pair + missing energy skim,
+        needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+
+        **Skim code**: 18520200
+
+        **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+
+        **Skim category**: physics, dark sector
+
+        Parameters:
+            path (basf2.Path): the path to add the skim
+
+        Returns:
+            list containing the candidate names
+        """
+        __author__ = "Giacomo De Pietro"
+
+        emu_list = []
+        skim_label = "forElectronMuonMissingEnergySkim"
+        emu_name = "Z0:" + skim_label
+
+        # Define some basic cuts
+        fromIP_cut = "[abs(dz) < 5.0] and [abs(dr) < 2.0]"
+        electronID_cut = "[electronID > 0.3]"
+        muonID_cut = "[muonID > 0.3]"
+        # We require that the electron points to the barrel ECL + 10 degrees
+        theta_cut = "[0.387 < theta < 2.421]"
+        # We want exactly 2 tracks from IP
+        emu_cut = "[nCleanedTracks(" + fromIP_cut + ") < 4]"
+        # And the pair must have pt > 200 MeV in CMS frame
+        emu_cut += " and [useCMSFrame(pt) > 0.2]"
+
+        # Reconstruct the dimuon candidate
+        ma.cutAndCopyList("e+:" + skim_label, "e+:all", fromIP_cut + " and " + electronID_cut + " and " + theta_cut, path=path)
+        ma.cutAndCopyList("mu+:" + skim_label, "mu+:all", fromIP_cut + " and " + muonID_cut, path=path)
+        ma.reconstructDecay(emu_name + " -> e+:" + skim_label + " mu-:" + skim_label, emu_cut, path=path)
+
+        # And return the dimuon list
+        emu_list.append(emu_name)
+        return emu_list
 
 
 @fancy_skim_header
 class LFVZpVisible(BaseSkim):
-    """"""
     __authors__ = []
     __WorkingGroup__ = ""
     __SkimDescription__ = ""
@@ -445,4 +552,53 @@ class LFVZpVisible(BaseSkim):
     }
 
     def build_lists(self, path):
-        """"""
+        """
+        Lepton flavour violating Z' skim, Z' to visible FS
+
+        **Skim code**: 18520400
+
+        **Physics channel**: ee --> e mu Z'; Z' --> e mu
+
+        **Skim category**: physics, dark sector
+
+        The skim list for the LFV Z' to visible final state search
+
+        Parameters:
+            path (basf2.Path): the path to add the skim list builders
+
+        Returns:
+            list containing the candidate names
+        """
+        __author__ = "Ilya Komarov"
+
+        lfvzp_list = []
+
+        # Here we just want four gpood tracks to be reconstructed
+        track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
+        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 4"
+
+        ma.cutAndCopyList("e+:lfvzp", "e+:all", track_cuts, path=path)
+
+        # Z' to lfv: fully reconstructed
+        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp e-:lfvzp"
+
+        ma.reconstructDecay("vpho:vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path)
+
+        lfvzp_list.append("vpho:vislfvzp")
+
+        # Z' to lfv: part reco
+        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp"
+        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 3"
+
+        ma.reconstructDecay("vpho:3tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path)
+
+        lfvzp_list.append("vpho:3tr_vislfvzp")
+
+        # Z' to lfv: two same-sign tracks
+        LFVZpVisChannel = "e+:lfvzp e+:lfvzp"
+        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2"
+        ma.reconstructDecay("vpho:2tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path)
+
+        lfvzp_list.append("vpho:2tr_vislfvzp")
+
+        return lfvzp_list

@@ -9,6 +9,7 @@ __authors__ = [
     "Ilya Komarov",
     "Giacomo De Pietro",
     "Miho Wakai",
+    "Xing-Yu Zhou"
 ]
 
 
@@ -16,6 +17,7 @@ import basf2 as b2
 import pdg
 import modularAnalysis as ma
 from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header, get_test_file
+import stdCharged
 
 
 def SinglePhotonDarkList(path):
@@ -412,6 +414,92 @@ def DielectronPlusMissingEnergyList(path):
     # And return the dielectron list
     dielectron_list.append(dielectron_name)
     return dielectron_list
+
+
+def TwoTrackEEMuMuList(path):
+    """
+    Skim list for two track (e+e- to e+e- and e+e- to mu+mu-) events.
+
+    **Skim code**: 18530100
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and `e^{+}e^{-} \\to \mu^{+}\mu^{-}`
+
+    **Skim category**: physics, dark sector
+
+    Parameters:
+        path (basf2.Path): path to add the skim
+
+    Returns:
+        list name of the skim candidates
+    """
+    __author__ = 'Xing-Yu Zhou'
+
+    two_track_list = []
+    skim_label = 'TwoTrackEEMuMu'
+
+    # Tracks from IP
+    IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    # Tracks of momenta greater than 2 GeV in the CMS frame
+    p_cut = '[useCMSFrame(p) > 2.0]'
+    # Tracks points to the barrel ECL + 10 degrees
+    theta_cut = '[0.387 < theta < 2.421]'
+    single_track_cut = IP_cut + ' and ' + p_cut + ' and ' + theta_cut
+
+    # Exactly 2 tracks from IP
+    nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
+    # Acollinearity angle in the theta dimension less than 10 degrees in the CMS frame
+    deltaTheta_cut = '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
+    two_track_cut = nTracks_cut + ' and ' + deltaTheta_cut
+
+    # Reconstruct the two track event candidate
+    stdCharged.stdE('all', path=path)
+    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut, path=path)
+    ma.reconstructDecay('vpho:' + skim_label + ' -> e+:' + skim_label + ' e-:' + skim_label, two_track_cut, path=path)
+
+    two_track_list.append('vpho:' + skim_label)
+    return two_track_list
+
+
+def TwoTrackPiPiList(path):
+    """
+    Skim list for two track (e+e- to pi+pi-) events.
+
+    **Skim code**: 18520500
+
+    **Physics channel**: :math:`e^{+}e^{-} \\to \pi^{+}\pi^{-}`
+
+    **Skim category**: physics, dark sector
+
+    Parameters:
+        path (basf2.Path): path to add the skim
+
+    Returns:
+        list name of the skim candidates
+    """
+    __author__ = 'Xing-Yu Zhou'
+
+    two_track_list = []
+    skim_label = 'TwoTrackPiPi'
+
+    # Tracks from IP
+    IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+    # Tracks points to the barrel ECL + 10 degrees
+    theta_cut = '[0.387 < theta < 2.421]'
+    single_track_cut = IP_cut + ' and ' + theta_cut
+
+    # Exactly 2 tracks
+    nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
+    # Invariant mass of pi+pi- system less than 2 GeV
+    M_cut = 'M < 1.5'
+    two_track_cut = nTracks_cut + ' and ' + M_cut
+
+    # Reconstruct the two track event candidate
+    stdCharged.stdPi('all', path=path)
+    ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut, path=path)
+    ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
+
+    two_track_list.append('vpho:' + skim_label)
+    return two_track_list
 
 
 @fancy_skim_header

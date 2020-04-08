@@ -30,11 +30,11 @@ variables.addAlias('delta_theta_cms', 'abs(formula('
                    + 'daughter(1, useCMSFrame(theta))*180/3.1415927 - 180))')
 
 variablesHist = [
-                  ('ep_p_cms', 100, 1, 6),
-                  ('em_p_cms', 100, 1, 6),
+                  ('ep_p_cms', 100, 4, 6),
+                  ('em_p_cms', 100, 4, 6),
                   ('ep_theta_lab', 90, 0, 180),
                   ('em_theta_lab', 90, 0, 180),
-                  ('delta_theta_cms', 100, 0, 10)
+                  ('delta_theta_cms', 100, 0, 2)
                 ]
 
 # Output the variables to a ntuple

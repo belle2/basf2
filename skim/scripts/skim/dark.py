@@ -370,7 +370,7 @@ def TwoTrackEEMuMuList(path):
 
     # Reconstruct the two track event candidate
     stdCharged.stdE('all', path=path)
-    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut, path=path)
+    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> e+:' + skim_label + ' e-:' + skim_label, two_track_cut, path=path)
 
     two_track_list.append('vpho:' + skim_label)
@@ -412,7 +412,7 @@ def TwoTrackPiPiList(path):
 
     # Reconstruct the two track event candidate
     stdCharged.stdPi('all', path=path)
-    ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut, path=path)
+    ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
 
     two_track_list.append('vpho:' + skim_label)

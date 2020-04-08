@@ -51,7 +51,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
     graph.addParticle();
   }
 
-  double r = 0, x = 0, y = 0, z = 0, t = 0;
+  double r, x = 0, y = 0, z = 0, t = 0;
   //Read particles from file
   for (int i = 0; i < nparticles; ++i) {
     MCParticleGraph::GraphParticle& p = graph[first + i];

@@ -343,7 +343,7 @@ class ISRpipicc(BaseSkim):
 
     Selection criteria:
 
-    * Standard `e/mu/pi ParticleLists`
+    * Standard ``e/mu/pi ParticleLists``
     * Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
     * Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
     """

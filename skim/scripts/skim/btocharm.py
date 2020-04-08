@@ -951,7 +951,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     * ``abs(deltaE) < 0.2``
 
     Note:
-        This skim uses `skim.standardlists.charm.loadD0_Kspipipi0`, where :math:`D^0`
+        This skim uses `skim.standardlists.charm.loadD0_Kspi0_loose`, where :math:`D^0`
         channels are defined.
     """
 
@@ -1049,7 +1049,7 @@ class B0toDpi_Kspi(BaseSkim):
 
     Note:
         This skim uses `stdV0s.stdKshorts` and
-        `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^0` channels are defined.
+        `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^0` channels are defined.
     """
 
     __authors__ = ["Fernando Abudinen", "Chiara La Licata"]
@@ -1359,9 +1359,11 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     * ``abs(deltaE) < 0.3``
 
     Note:
-        This skim uses `skim.standardlists.charm.loadStdD0` and
-        `skim.standardlists.charm.loadStdDstarPlus_D0pi` where :math:`D^0` channels are
-        defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`,
+        `skim.standardlists.charm.loadStdD0_Kpipipi`,
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipi0` and
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipipi` where :math:`D^0`
+        channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
     """
 
     __authors__ = ["Fernando Abudinen"]

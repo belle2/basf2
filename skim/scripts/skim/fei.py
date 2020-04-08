@@ -1026,7 +1026,7 @@ class BaseFEISkim(BaseSkim):
           < 2.61799`, and :math:`E>0.1~{\\rm GeV}`
 
         Parameters:
-            FEIChannelArgs (dict(str -> bool)): A dict of keyword-boolean pairs to be
+            FEIChannelArgs (dict(str, bool)): A dict of keyword-boolean pairs to be
                 passed to `fei.get_default_channels`.
             FEIPrefix (str): Prefix label for the FEI training used in the FEI skims.
             path (`basf2.Path`): The skim path to be processed.

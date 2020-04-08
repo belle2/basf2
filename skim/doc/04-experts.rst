@@ -48,19 +48,19 @@ To write a new skim, please follow these steps:
        If your skim does not define ``__SkimDescription__``, ``__WorkingGroup__``, ``__authors__``,
        ``RequiredStandardLists`` or ``build_lists``, then you will see an error message like:
 
-       .. code-block:: bash
+       ::
 
            TypeError: Can't instantiate abstract class SinglePhotonDark with abstract methods __authors__
 
        This can be fixed by defining these required attributes and methods.
 
-3. [Mandatory] Specify all required particle lists in the attribute `RequiredStandardLists`. If you don't require any standard lists, then you can set this to ``None``. See the documentation of this attribute for instructions on how to do this for your skim.
+3. [Mandatory] Specify all required particle lists in the attribute ``RequiredStandardLists``. If you don't require any standard lists, then you can set this to ``None``. See the documentation of this attribute for instructions on how to do this for your skim.
 
-4. If any further setup is required, then override the `additional_setup` method.   
+4. If any further setup is required, then override the ``additional_setup`` method.   
 
-5. [Mandatory] Define all cuts by overriding `build_lists`. Before the end of the `build_lists` method, the attribute `SkimLists` must be set to a list of skim list names.
+5. [Mandatory] Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
 
-6. If any modules are producing too much noise, then override the attribute `NoisyModules` as a list of those modules, and their output will be set to only print error-level messages.
+6. If any modules are producing too much noise, then override the attribute ``NoisyModules`` as a list of those modules, and their output will be set to only print error-level messages.
 
 7. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
@@ -142,7 +142,9 @@ Skim registry
 
 All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in `skim.registry.RegisteredSkims` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
-The skim numbering convention is defined on `the Confluence skim page<https://confluence.desy.de/x/URdYBQ>`.
+The skim numbering convention is defined on the `Confluence skim page`_.
+
+.. _Confluence skim page: https://confluence.desy.de/x/URdYBQ
 
 .. automodule:: skim.registry
     :members:
@@ -166,7 +168,7 @@ Testing skim performance
 
 When skims are developed, it is important to test the performance of the skim on a data and on a
 range of background MC samples. Two command-line tools are provided in the skim package to aid in
-this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling `b2setup`. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
+this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
 First run ``b2skim-stats-submit``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 

@@ -9,8 +9,8 @@ Skims
 
 
 The skim package is a collection of high-level analysis scripts that reduce the data set to a manageable size by applying a simple selection.
-The input to a skim are `mdst` files of processed data. The output is a so-called udst (micro-dst) which actually contains more information but fewer events.
-That is: a udst file contains the same as an `mdst` but with the addition of `ParticleList`_ s of candidates build using the `modularAnalysis` tools.
+The input to a skim are MDST files of processed data. The output is a so-called uDST (micro-DST) which actually contains more information but fewer events.
+That is, a uDST file contains the same as an MDST but with the addition of `ParticleList`_ objects of candidates build using the `modularAnalysis` tools.
 
 .. _ParticleList: https://b2-master.belle2.org/software/development/classBelle2_1_1ParticleList.html
 

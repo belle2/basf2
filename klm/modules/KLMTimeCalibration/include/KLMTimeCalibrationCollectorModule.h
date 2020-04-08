@@ -33,7 +33,7 @@
 #include <TTree.h>
 
 namespace Belle2 {
-  /** Collect hit information for BKLM time calibration with CAF */
+  /** Collect hit information for KLM time calibration with CAF */
   class KLMTimeCalibrationCollectorModule : public CalibrationCollectorModule {
 
   public:

@@ -62,7 +62,7 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("debug", m_Debug, "debug mode.", false);
-  addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu:cali"));
+  addParam("inputParticleList", m_inputListName, "input particle list.", std::string("mu+:cali"));
   addParam("useEventT0", m_useEvtT0, "Use event T0 or not.", true);
 
   m_elementNum = &(KLMElementNumbers::Instance());
@@ -70,21 +70,26 @@ KLMTimeCalibrationCollectorModule::KLMTimeCalibrationCollectorModule() :
 
 KLMTimeCalibrationCollectorModule::~KLMTimeCalibrationCollectorModule()
 {
+  B2INFO("Destructor done..");
 }
+
 
 void KLMTimeCalibrationCollectorModule::prepare()
 {
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
 
   /* Initialize geometry. */
+  B2INFO("prepare :: Initialize geometry..");
   m_geoParB = bklm::GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   /* Require input dataobjects. */
+  B2INFO("prepare :: Require input dataobjects..");
   if (m_useEvtT0) m_eventT0.isRequired("EventT0");
   m_tracks.isRequired();
 
+  B2INFO("prepare :: Initialize outTree..");
   m_outTree = new TTree("time_calibration_data", "");
   m_outTree->Branch("t0",        &m_ev.t0,        "t0/D");
   m_outTree->Branch("flyTime",   &m_ev.flyTime,   "flyTime/D");
@@ -101,6 +106,7 @@ void KLMTimeCalibrationCollectorModule::prepare()
 
   registerObject<TTree>("time_calibration_data", m_outTree);
 
+  B2DEBUG(20, "prepare :: Initialize histgrams..");
   m_HeventT0_0 = new TH1D("m_HeventT0_0", "collision time before track number request;t0[ns]", 200, -100, 100);
   m_HeventT0_1 = new TH1D("m_HeventT0_1", "collision time after track number request;t0[ns]", 200, -100, 100);
   m_HnumTrack = new TH1I("m_HnnumTrack", "Number of Track;nTrack", 30, 0, 30);
@@ -173,7 +179,7 @@ void KLMTimeCalibrationCollectorModule::collect()
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);
 
   /* Here begins the ext track sequence */
-  B2DEBUG(20, "Track loop begins");
+  B2INFO("Collect :: Track loop begins.");
 
   /* Main loop */
   for (unsigned iT = 0; iT < n_track; ++iT) {
@@ -186,8 +192,8 @@ void KLMTimeCalibrationCollectorModule::collect()
     RelationVector<BKLMHit2d> bklmHit2ds = track->getRelationsTo<BKLMHit2d>();
     RelationVector<EKLMHit2d> eklmHit2ds = track->getRelationsTo<EKLMHit2d>();
 
-    getObjectPtr<TH1I>("m_HnHit2d_bklm")->Fill(int(bklmHit2ds.size()));
-    getObjectPtr<TH1I>("m_HnHit2d_eklm")->Fill(int(eklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
+    getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
 
     B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
@@ -205,6 +211,9 @@ void KLMTimeCalibrationCollectorModule::collect()
 
       int copyId = extHit->getCopyID();
       int tSub, tFor, tSec, tLay;
+
+      B2INFO("Collect :: Assign elementNum based on copyId for extHits.");
+
       m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
       bool crossed = false; // should be only once ?
       KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
@@ -219,6 +228,7 @@ void KLMTimeCalibrationCollectorModule::collect()
     B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())
             << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (m_mapExtHits.size() < 2) continue;
+    B2INFO("Collect :: Map of extHits creation done.");
 
     collectRPC(bklmHit2ds);
     collectScint(bklmHit2ds);

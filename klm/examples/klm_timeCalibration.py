@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-set_log_level(LogLevel.INFO)
-# add time stamp to all INFO messages
-# currentInfo = logging.get_info(LogLevel.INFO)
-# logging.set_info(LogLevel.INFO, currentInfo | LogInfo.TIMESTAMP)
-
 import os
 import sys
+
+import basf2 as b2
+import modularAnalysis as ma
 
 import ROOT
 from ROOT import Belle2
@@ -20,6 +17,9 @@ from caf.utils import CentralDatabase
 from caf.utils import ExpRun
 
 
+b2.set_log_level(b2.LogLevel.INFO)
+
+
 def main(argv):
 
     if len(argv) == 2:
@@ -28,7 +28,7 @@ def main(argv):
     else:
         sys.exit('Usage: basf2 klm_tc.py <expNum[07,08]> <output directory>')
 
-    set_debug_level(20)
+    b2.set_debug_level(20)
     print(argv)
     # =====================================================
     # Input Data
@@ -51,16 +51,18 @@ def main(argv):
         input_files.append(os.path.join(os.path.abspath(data_dir), 'cdst.physics.*.root'))
 
     print('Add pre_collector_path')
-    gearbox = register_module('Gearbox')
-    geobuilder = register_module('Geometry')
-    pre_path = create_path()
+    gearbox = b2.register_module('Gearbox')
+    geobuilder = b2.register_module('Geometry')
+    pre_path = b2.create_path()
     pre_path.add_module(gearbox)
     pre_path.add_module(geobuilder)
     # pre_path.add_module('Progress')
+    print('Add Gearbox and Geometry to pre_collector_path. Done.')
 
     # =====================================================
     # Calibration ingredients setup
-    coll = register_module('KLMTimeCalibrationCollector')
+    ma.fillParticleList('mu+:cali', '1 < p and p < 11', path=pre_path)
+    coll = b2.register_module('KLMTimeCalibrationCollector')
 
     algo = Belle2.KLMTimeCalibrationAlgorithm()
     # algo.useFit()
@@ -70,9 +72,12 @@ def main(argv):
 
     cal = Calibration('KLMTimeCalibration', coll, algo, input_files)
     cal.reset_database()
+    # With use_central_database, the last GT has highest priority
     # cal.use_central_database('master_2019-04-10')  # Used for MC test
     cal.use_central_database('data_reprocessing_proc10')  # New calibrations
-    cal.use_central_database('online_proc10')
+    # cal.use_central_database('online_proc10')
+    # cal.use_central_database('data_reprocessing_prompt_rel4_patchb')
+    cal.use_central_database('klm_alignment_testing')  # To avoid errors from alignment
     cal.pre_collector_path = pre_path
     # =====================================================
     # Setup file number in each of the subjob
@@ -86,7 +91,6 @@ def main(argv):
     # =====================================================
     # Creat a CAF instance and add calibreation.
     cal_fw = CAF()
-
     cal_fw.add_calibration(cal)
 
     # =====================================================

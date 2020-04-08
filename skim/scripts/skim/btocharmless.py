@@ -545,8 +545,8 @@ def CharmlessHad3BodyBmList(path):
 
 @fancy_skim_header
 class BtoPi0Pi0(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
+    __authors__ = ["Kim Smith"]
+    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
     __SkimDescription__ = ""
 
     RequiredStandardLists = {
@@ -571,9 +571,17 @@ class BtoPi0Pi0(BaseSkim):
 
 @fancy_skim_header
 class CharmlessHad2Body(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
+    """
+    **Particle Lists**:
+
+    * Standard loose lists for all light mesons.
+    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    """
+
+    __authors__ = ["Kim Smith"]
+    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
+    __SkimDescription__ = "Skim list for all neutral and charged :math:`B` to charmless 2 body modes."
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -598,16 +606,6 @@ class CharmlessHad2Body(BaseSkim):
     def CharmlessHad2BodyB0List(path):
         """
         Skim list definitions for all neutral B to charmless 2 body modes.
-
-        **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
-
-        **Skim Name**: CharmlessHad2Body
-
-        **Skim Category**: physics, hadronic B to charmless
-
-        **Skim Code**: 19130100
-
-        **Working Group**: BtoCharmless (WG9)
 
         **Decay Modes**:
 
@@ -651,12 +649,6 @@ class CharmlessHad2Body(BaseSkim):
         * ``B0 -> K*0 f_0``
         * ``B0 -> f_0 f_0``
 
-        **Particle Lists**:
-
-        * Standard loose lists for all light mesons.
-        * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-        * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
-
         **Additional Cuts**:
 
         * ``R2 < 0.5``
@@ -665,9 +657,8 @@ class CharmlessHad2Body(BaseSkim):
         * ``abs(deltaE) < 0.5``
 
         Note:
-          Does not include decay modes involving eta prime at the current time.
+            Does not include decay modes involving eta prime at the current time.
         """
-        __author__ = "Kim Smith"
 
         ma.applyEventCuts("nTracks >= 2", path=path)
 
@@ -766,16 +757,6 @@ class CharmlessHad2Body(BaseSkim):
         """
         Skim list definitions for all charged B to charmless 2 body modes.
 
-        **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
-
-        **Skim Name**: CharmlessHad2Body
-
-        **Skim Category**: physics, hadronic B to charmless
-
-        **Skim Code**: 19130100
-
-        **Working Group**: BtoCharmless (WG9)
-
         **Decay Modes**:
 
         * ``B- -> pi- pi0``
@@ -806,12 +787,6 @@ class CharmlessHad2Body(BaseSkim):
         * ``B- -> rho- f_0``
         * ``B- -> K*- f_0``
 
-        **Particle Lists**:
-
-        * Standard loose lists for all light mesons.
-        * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-        * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
-
         **Additional Cuts**:
 
         * ``R2 < 0.5``
@@ -820,9 +795,8 @@ class CharmlessHad2Body(BaseSkim):
         * ``abs(deltaE) < 0.5``
 
         Note:
-          Does not include decay modes involving eta prime at the current time.
+            Does not include decay modes involving eta prime at the current time.
         """
-        __author__ = "Kim Smith"
 
         ma.applyEventCuts("nTracks >= 2", path=path)
 
@@ -900,15 +874,23 @@ class CharmlessHad2Body(BaseSkim):
         return List
 
     def build_lists(self, path):
-        # TODO: Two lists: CharmlessHad2BodyB0List, CharmlessHad2BodyBmList
-        pass
+        """Build lists defined in `CharmlessHad2BodyB0List` and `CharmlessHad2BodyBmList`."""
+        self.SkimLists = CharmlessHad2BodyB0List(path) + CharmlessHad2BodyBmList(path)
 
 
 @fancy_skim_header
 class CharmlessHad3Body(BaseSkim):
-    __authors__ = []
-    __WorkingGroup__ = ""
-    __SkimDescription__ = ""
+    """
+    **Particle Lists**:
+
+    * Standard loose lists for all light mesons.
+    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    """
+
+    __authors__ = ["Kim Smith"]
+    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
+    __SkimDescription__ = "Skim list for all neutral and charged :math:`B` to charmless 3 body modes."
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -933,16 +915,6 @@ class CharmlessHad3Body(BaseSkim):
     def CharmlessHad2BodyB0List(path):
         """
         Skim list definitions for all neutral B to charmless 2 body modes.
-
-        **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
-
-        **Skim Name**: CharmlessHad2Body
-
-        **Skim Category**: physics, hadronic B to charmless
-
-        **Skim Code**: 19130100
-
-        **Working Group**: BtoCharmless (WG9)
 
         **Decay Modes**:
 
@@ -986,12 +958,6 @@ class CharmlessHad3Body(BaseSkim):
         * ``B0 -> K*0 f_0``
         * ``B0 -> f_0 f_0``
 
-        **Particle Lists**:
-
-        * Standard loose lists for all light mesons.
-        * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-        * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
-
         **Additional Cuts**:
 
         * ``R2 < 0.5``
@@ -1000,9 +966,8 @@ class CharmlessHad3Body(BaseSkim):
         * ``abs(deltaE) < 0.5``
 
         Note:
-          Does not include decay modes involving eta prime at the current time.
+            Does not include decay modes involving eta prime at the current time.
         """
-        __author__ = "Kim Smith"
 
         ma.applyEventCuts("nTracks >= 2", path=path)
 
@@ -1101,16 +1066,6 @@ class CharmlessHad3Body(BaseSkim):
         """
         Skim list definitions for all charged B to charmless 2 body modes.
 
-        **Skim Author**: Kim Smith (khsmith@student.unimelb.edu.au)
-
-        **Skim Name**: CharmlessHad2Body
-
-        **Skim Category**: physics, hadronic B to charmless
-
-        **Skim Code**: 19130100
-
-        **Working Group**: BtoCharmless (WG9)
-
         **Decay Modes**:
 
         * ``B- -> pi- pi0``
@@ -1141,12 +1096,6 @@ class CharmlessHad3Body(BaseSkim):
         * ``B- -> rho- f_0``
         * ``B- -> K*- f_0``
 
-        **Particle Lists**:
-
-        * Standard loose lists for all light mesons.
-        * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-        * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
-
         **Additional Cuts**:
 
         * ``R2 < 0.5``
@@ -1155,9 +1104,8 @@ class CharmlessHad3Body(BaseSkim):
         * ``abs(deltaE) < 0.5``
 
         Note:
-          Does not include decay modes involving eta prime at the current time.
+            Does not include decay modes involving eta prime at the current time.
         """
-        __author__ = "Kim Smith"
 
         ma.applyEventCuts("nTracks >= 2", path=path)
 
@@ -1235,5 +1183,5 @@ class CharmlessHad3Body(BaseSkim):
         return List
 
     def build_lists(self, path):
-        # TODO: Two lists: CharmlessHad3BodyB0List, CharmlessHad3BodyBmList
-        pass
+        """Build lists defined in `CharmlessHad3BodyB0List` and `CharmlessHad3BodyBmList`."""
+        self.SkimLists = CharmlessHad3BodyB0List(path) + CharmlessHad3BodyBmList(path)

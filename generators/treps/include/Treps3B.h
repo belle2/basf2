@@ -22,11 +22,11 @@
 #ifndef PACKAGE_TREPS3B_H_INCLUDED
 #define PACKAGE_TREPS3B_H_INCLUDED
 
-#include<TVector3.h>
-#include<TLorentzVector.h>
-#include<TH1F.h>
-#include<TTree.h>
-#include<TString.h>
+#include <TVector3.h>
+#include <TLorentzVector.h>
+#include <TH1F.h>
+#include <TTree.h>
+#include <TString.h>
 #include <generators/treps/Sutool.h>
 #include <generators/treps/Particle_array.h>
 
@@ -117,7 +117,9 @@ namespace Belle2 {
       }
     }
 
-
+    /** initialization of parametrization of pi+pi- partial waves */
+    void initg() ;
+    Interps b00, b20, b22; // Parameter sets
 
     void initp(void); // initialize the generator. read parameterFile and load the parameters
     void wtable(); // read diffcrosssectionFile and load W-DifferentialCrossSection table.
@@ -140,20 +142,19 @@ namespace Belle2 {
                 double&, double&, double&, TVector3&,
                 TVector3&, TVector3&, double&) ;
 
-    // This will be overwritten in UtrepsB.h
-    virtual int tpuser(TLorentzVector, TLorentzVector,
-                       Part_gen*, int);
+    // Returns 1: this will be overwritten in UtrepsB.h
+    int tpuser(Part_gen*, int);
 
     // const member functions
     void terminate(void) const ;
     void print_event(void) const ; // print event information at B2DEBUG(10)
 
-    // returns form factor effect, actually always returns 1. This will be overwritten in UtrepsB.h
-    virtual double tpform(double, double) const ;
-    // always returns 1. This will be overwritten in UtrepsB.h
-    virtual double tpangd(double, double) ;
+    // Returns 1: this will be overwritten in UtrepsB.h
+    double tpform(double, double) const ;
+    // Returns 1: this will be overwritten in UtrepsB.h
+    double tpangd(double, double) ;
 
-    void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
+    //void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
 
 
 
@@ -176,6 +177,8 @@ namespace Belle2 {
     double simpsnz(double, double, double, int) const ;
     double tpdfy(double, double) const;
     double tpdfz(double, double) const;
+    double d2func(double) const;
+    double qfunc(double, double) const;
 
     // data members
     std::string parameterFile; // filename for parameter input

@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/trepsinput/TrepsInputModule.h>
-#include <generators/treps/Sutool.h>
-#include <generators/treps/UtrepsB.h>
 #include <string.h>
 #include <string>
 #include <boost/filesystem.hpp>

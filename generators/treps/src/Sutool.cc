@@ -18,9 +18,6 @@
 // Modofied to be suitable to Belle II style
 // $Log$
 
-using namespace std;
-
-
 // system include files
 #include <iostream>
 #include <fstream>
@@ -32,6 +29,8 @@ using namespace std;
 
 // user include files
 #include <generators/treps/Sutool.h>
+
+using namespace std;
 
 namespace Belle2 {
 

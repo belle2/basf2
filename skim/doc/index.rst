@@ -20,36 +20,24 @@ To get information about existing skim, ask the current skim group liaison.
 Systematics skims
 -----------------
 
-.. toctree::
-    :maxdepth: 2
-    :glob:
+.. toctree:: 01-systematics
 
-    01-systematics.rst
 
 Physics skims
 -------------
 
-.. toctree::
-    :maxdepth: 3
-    :glob:
-
-    02-physics.rst
+.. toctree:: 02-physics
+    
 
 Standard skim lists
 -------------------
 
-.. toctree::
-    :maxdepth: 2
-    :glob:
+.. toctree:: 03-lists
+    
 
-    03-lists.rst
+Information for skim experts
+----------------------------
 
-Writing, testing, and running skims
------------------------------------
-
-.. toctree::
-    :maxdepth: 2
-    :glob:
-
-    04-experts.rst
+.. toctree:: 04-experts
+    
 

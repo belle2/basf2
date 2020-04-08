@@ -193,7 +193,18 @@ def ISRpipiccList(path):
 
 @fancy_skim_header
 class BottomoniumEtabExclusive(BaseSkim):
-    """"""
+    """
+    Reconstructed decay modes:
+
+    * ``eta_b -> gamma gamma``
+
+    Selection criteria:
+
+    * ``2 std photon with E > 3.5 GeV``
+    * ``7 < M(eta_b) < 10 GeV/c^2``
+    * ``foxWolframR2 < 0.995``
+    """
+
     __authors__ = ["Stefano Spataro", "Sen Jia"]
     __WorkingGroup__ = "Bottomonium"
     __SkimDescription__ = ""
@@ -205,16 +216,6 @@ class BottomoniumEtabExclusive(BaseSkim):
     }
 
     def build_lists(self, path):
-        """
-        Reconstructed decay modes:
-        * ``eta_b -> gamma gamma``
-
-        Selection criteria:
-        * ``2 std photon with E > 3.5 GeV``
-        * ``7 < M(eta_b) < 10 GeV/c^2``
-        * ``foxWolframR2 < 0.995``
-        """
-
         # create and fill hard photon
         ma.fillParticleList(decayString="pi+:eventShapeForSkims", cut="pt > 0.1", path=path)
         ma.fillParticleList(decayString="gamma:eventShapeForSkims", cut="E > 0.1", path=path)
@@ -255,9 +256,11 @@ class BottomoniumEtabExclusive(BaseSkim):
 class BottomoniumUpsilon(BaseSkim):
     """
     Reconstructed decay modes:
+
     * Y(1S,2S) -> l^+ l^{-} (l = e or mu)
 
     Selection criteria:
+
     * 2 tracks with momentum ranging between ``3.5 < p < 15``
     * At least 1 track ``p < 1.5`` or 1 std photon with ``E > 150 MeV``
     * ``M(Y(1S,2S)) > 8 GeV/c^2``
@@ -332,12 +335,14 @@ class BottomoniumUpsilon(BaseSkim):
 class ISRpipicc(BaseSkim):
     """
     Reconstructed decay modes:
+
     * ``e+e- -> pi+ pi- J/psi -> e+e-``
     * ``e+e- -> pi+ pi- J/psi -> mu+mu-``
     * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-``
     * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-``
 
     Selection criteria:
+
     * Standard `e/mu/pi ParticleLists`
     * Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
     * Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events

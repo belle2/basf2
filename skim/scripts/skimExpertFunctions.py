@@ -1,14 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Utility functions for skim experts
-~~~~~~~~~~~~~~~~
-
-Some helper functions to do common tasks relating to skims.
-Like testing, and for skim name encoding(decoding).
-"""
-
 from abc import ABC, abstractmethod
 import subprocess
 from importlib import import_module
@@ -254,6 +246,7 @@ def fancy_skim_header(SkimClass):
         # Handle case where docstring is empty, or was not redefined
         SkimClass.__doc__ = header
 
+    # If documentation of template functions not redefined, make sure BaseSkim docstring is not repeated
     SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
     SkimClass.validation_histograms.__doc__ = SkimClass.validation_histograms.__doc__ or ""
     SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
@@ -265,81 +258,7 @@ class BaseSkim(ABC):
     """Base class for skims. Initialises a skim name, and creates template functions
     required for each skim.
 
-    To write a skim using this class:
-
-    1. Define a class which inherits from `BaseSkim` and give it the name of your skim.
-       For example, for a skim ``DarkSinglePhoton``,
-
-       .. code-block:: python
-
-           class DarkSinglePhoton(BaseSkim):
-               # docstring here describing your skim, and explaining cuts.
-
-    2. Tell us about your skim by setting the following attributes:
-
-       * ``__SkimDescription__``: one-line summary describing the purpose of your skim.
-       * ``__WorkingGroup__``: the name of the working group this skim is designed for.
-       * ``__authors__``: list of skim authors, so users know who to contact
-         about your skim.
-
-       `BaseSkim` requires you to set these attributes in each subclass. If these are
-       all set, then Sphinx will produce a lovely header to document your skim. Once
-       these are set, we can we add a lovely auto-generated header to the documentation
-       of the skim by using the `fancy_skim_header` decorator.
-
-       .. code-block:: python
-
-           @fancy_skim_header
-           class DarkSinglePhoton(BaseSkim):
-               # docstring here describing your skim, and explaining cuts.
-
-    3. Specify all required particle lists in the attribute `RequiredStandardLists`. See
-       documentation of this attribute for instructions on how to do this for your skim.
-       This step is mandatory.
-
-    4. If any further setup is required, then overwrite the `additional_setup` method.
-       This step is not mandatory.
-
-    5. Define all cuts by overwriting `build_lists`. Before the end of the `build_lists`
-       method, the attribute `SkimLists` must be set at the end of this method. This
-       step is mandatory.
-
-    6. If any modules are producing too much noise, then overwrite the attribute
-       `NoisyModules` as a list of those modules. This step is not mandatory.
-
-    7. Define validation histograms for your skim by overwriting
-       `validation_histograms`.
-
-    Calling an instance of a skim class will run the particle list loaders, setup
-    function, list builder function, and uDST output function. So a minimal skim
-    steering file might consist of the following:
-
-    .. code-block:: python
-
-        import basf2 as b2
-        import modularAnalysis as ma
-        from skim.foo import MyDefinedSkim
-
-        path = b2.Path()
-        ma.inputMdstList("default", [], path=path)
-        skim = MyDefinedSkim()
-        skim(path)  # __call__ method loads standard lists, creates skim lists, and saves to uDST
-        path.process()
-
-
-    .. Tip::
-
-        If your skim does not define ``__SkimDescription__``, ``__WorkingGroup__``,
-        ``__authors__``, `RequiredStandardLists` or `build_lists`, then you will see an
-        error message like:
-
-        .. code-block:: bash
-
-            TypeError: Can't instantiate abstract class SinglePhotonDark with abstract \
-methods __authors__
-
-        This can be fixed by defining these required attributes and methods.
-
+    See `writing-skims` for information on how to use this to define a new skim.
     """
 
     NoisyModules = []
@@ -348,10 +267,11 @@ methods __authors__
 
     TestFile = get_test_file("MC12_mixedBGx1")
     """Location of an MDST file to test the skim on. Defaults to an MC12 mixed BGx1
-    sample.
+    sample. If you want to use a different test file for your skim, set it using
+    `get_test_file`.
     """
 
-    # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
+    # Abstract method to ensure that it is overriden whenever `BaseSkim` is inherited
     @property
     @abstractmethod
     def RequiredStandardLists(self):
@@ -429,7 +349,7 @@ methods __authors__
             path (basf2.Path): Skim path to be processed.
         """
 
-    # Abstract method to ensure that it is overwritten whenever `BaseSkim` is inherited
+    # Abstract method to ensure that it is overriden whenever `BaseSkim` is inherited
     @abstractmethod
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
@@ -638,7 +558,7 @@ class CombinedSkim(BaseSkim):
 
     RequiredStandardLists = None
     """`BaseSkim.RequiredStandardLists` attribute initialised to `None` to get around
-    abstract property restriction. Overwritten as merged
+    abstract property restriction. Overriden as merged
     `BaseSkim.RequiredStandardLists` object during initialisation of `CombinedSkim`
     instance."""
 

@@ -42,6 +42,7 @@ PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : Calibration
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("clustersName", m_storeClustersName, "Name of the collection to use for PXDClusters", string(""));
+  addParam("mcParticlesName", m_storeMCParticlesName, "Name of the collection to use for MCParticles", string("MCParticles"));
   addParam("minClusterCharge", m_minClusterCharge, "Minimum cluster charge cut", int(0));
   addParam("minClusterSize", m_minClusterSize, "Minimum cluster size cut ", int(2));
   addParam("maxClusterSize", m_maxClusterSize, "Maximum cluster size cut ", int(6));
@@ -52,6 +53,7 @@ PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : Calibration
   addParam("fillChargeHistogram", m_fillChargeHistogram, "Flag to fill Charge histograms", bool(false));
   addParam("matchTrack", m_matchTrack,
            "Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)", int(0));
+  addParam("mcSamples", m_mcSamples, "Flag to deal with MC samples", bool(false));
 }
 
 void PXDClusterChargeCollectorModule::prepare() // Do your initialise() stuff here
@@ -59,6 +61,12 @@ void PXDClusterChargeCollectorModule::prepare() // Do your initialise() stuff he
   m_pxdClusters.isRequired(m_storeClustersName);
   m_tracks.isOptional(); //m_storeTracksName);
   m_recoTracks.isOptional(); //m_storeRecoTracksName);
+
+  if (m_mcSamples && m_matchTrack > 0) {
+    m_mcParticles.isRequired(m_storeMCParticlesName);
+  } else {
+    m_mcParticles.isOptional();
+  }
 
   if (m_nBinsU == 0) {
     B2WARNING("Number of bins along u side incremented from 0->1");
@@ -156,10 +164,17 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
 
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
 
-  if (!m_matchTrack) { // all clusters
+  if (!m_matchTrack || m_mcSamples) { // all clusters for data
 
     for (auto& cluster :  m_pxdClusters) {
-
+      double correction = 1.0;
+      if (m_matchTrack > 0) { // mc samples
+        RelationVector<MCParticle> mcParticlesPXD = DataStore::getRelationsWithObj<MCParticle>(&cluster, m_storeMCParticlesName);
+        if (!mcParticlesPXD.size()) continue;
+        if (m_matchTrack == 2) {
+          correction = sin(mcParticlesPXD[0]->getMomentum().Theta());
+        }
+      }
       // Apply cluster selection cuts
       if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {
 
@@ -182,7 +197,8 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
         // Increment the counter & store charge (optional)
         getObjectPtr<TH1I>("PXDClusterCounter")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin);
         if (m_fillChargeHistogram)
-          getObjectPtr<TH2I>("PXDClusterCharge")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin, cluster.getCharge());
+          getObjectPtr<TH2I>("PXDClusterCharge")->Fill(iSensor * m_nBinsU * m_nBinsV + uBin * m_nBinsV + vBin,
+                                                       cluster.getCharge()*correction);
       }
 
     }

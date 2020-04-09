@@ -14,6 +14,7 @@
    - running on Belle 1 MC/data (convertedFromBelle = True)
    - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
    - run without semileptonic D channels (removeSLD = True )
+   - B mesons with a strange quark in Y(5S) runs (strangeB = True)
 
  Another interesting configuration is given by get_fr_channels,
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle

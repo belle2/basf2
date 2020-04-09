@@ -28,7 +28,7 @@ REG_MODULE(HepMCInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_initial(0)
+HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_maxEvent(INT_MAX), m_totalEvents(-1), m_initial(0)
 {
   //Set module properties
   setDescription("HepMC file input. This module loads an event record from HEPMC2 format and store the content into the MCParticle collection. HEPMC format is used by for example pythia8.");

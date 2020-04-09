@@ -64,7 +64,7 @@ namespace Belle2 {
     int m_minEvent;                    /**< Start at event number x. */
     int m_maxEvent;                    /**< Stop after processing n events. */
     int m_totalEvents;                    /**< totla number of events to read */
-    int m_skipNEvents;                    /**< skip events in the file */
+    //int m_skipNEvents;                    /**< skip events in the file */
     DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
   private:
     InitialParticleGeneration m_initial; /**< initial particle used by BeamParameter class */

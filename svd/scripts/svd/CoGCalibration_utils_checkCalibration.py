@@ -1,14 +1,12 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
 #
 # util module to check SVD CoG Calibration stored in a localDB
 #
 # called by SVDCoGTimeCalibrationCheck script in
 # svd/scripts/caf/SVDCoGTimeCalibrationCheck.py
 #
-#################################################################################
 
 
 from basf2 import *

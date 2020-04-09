@@ -79,8 +79,6 @@ namespace Belle2 {
     std::string m_chargeName;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
-    /** Flag to read MC cluster charge from DB*/
-    bool m_mcFromDB;
     /** Flag to fill cluster charge histograms*/
     bool m_fillChargeHistogram;
     /** Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)*/

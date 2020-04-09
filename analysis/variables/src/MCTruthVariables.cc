@@ -836,7 +836,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
-
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,

@@ -78,6 +78,8 @@ namespace Belle2 {
     unsigned int m_param_minimalHitRequirement = 1;
     /// Cut away tracks without SVD hits or not
     bool m_param_onlyUseTracksWithSVD = true;
+    /// Reverse the seed
+    bool m_param_reverseSeed = false;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out

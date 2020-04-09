@@ -41,6 +41,27 @@ whitespace, comma or semi-colon -->
 	<wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 
+<!--Far BWD Tunnel-->
+<Active>
+	<Material>HE3TUBE-Material</Material>
+	<MaterialTube>StainlessSteel304</MaterialTube>
+	<MaterialGas>HE3TUBE-Material</MaterialGas>
+	<x_he3tube unit="cm">-2</x_he3tube>
+	<y_he3tube unit="cm">-150</y_he3tube>
+	<z_he3tube unit="cm">-1930</z_he3tube>
+	<AngleX unit="deg">180.0</AngleX>
+	<AngleY unit="deg">0.0</AngleY>
+	<AngleZ unit="deg">0.0</AngleZ>
+	<tube_innerRadius unit="cm">2.069</tube_innerRadius>
+	<tube_outerRadius unit="cm">2.54</tube_outerRadius>
+	<tube_hz unit="cm">10.19</tube_hz>
+	<endcap_hz unit="cm">0.47</endcap_hz>
+	<gas_outerRadius unit="cm">2.0</gas_outerRadius>
+	<gas_hz unit="cm">7.62</gas_hz>
+	<SV_offset_inZ unit="cm">0.6096</SV_offset_inZ>
+	<wire_diameter unit="mm">0.030</wire_diameter>
+</Active>
+
 <!--FWD Tunnel-->
 <Active>
 	<Material>HE3TUBE-Material</Material>

@@ -791,8 +791,8 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
+        ma.reconstructDecay('B0:B0toDstarRho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B0:B0toDstarRho' + str(chID))
 
     Lists = BsigList
     return Lists

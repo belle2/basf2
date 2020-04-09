@@ -9,31 +9,32 @@
  **************************************************************************/
 
 /* Belle2 headers. */
-#include <background/modules/BeamBkgHitRateMonitor/EKLMHitRateCounter.h>
+#include <background/modules/BeamBkgHitRateMonitor/KLMHitRateCounter.h>
 
 using namespace Belle2::Background;
 
-void EKLMHitRateCounter::initialize(TTree* tree)
+void KLMHitRateCounter::initialize(TTree* tree)
 {
   // register collection(s) as optional, your detector might be excluded in DAQ
   m_digits.isOptional();
-  m_ElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
+  m_ModuleArrayIndex = &(KLMModuleArrayIndex::Instance());
 
   // set branch address
   std::string branches;
   branches =
-    "sectorRates[" +
-    std::to_string(EKLMElementNumbers::getMaximalSectorGlobalNumber()) +
+    "moduleRates[" +
+    std::to_string(KLMElementNumbers::getTotalModuleNumber()) +
     "]/F:averageRate/F:numEvents/I:valid/O";
-  tree->Branch("eklm", &m_rates, branches.c_str());
+  tree->Branch("klm", &m_rates, branches.c_str());
 }
 
-void EKLMHitRateCounter::clear()
+void KLMHitRateCounter::clear()
 {
   m_buffer.clear();
 }
 
-void EKLMHitRateCounter::accumulate(unsigned timeStamp)
+void KLMHitRateCounter::accumulate(unsigned timeStamp)
 {
   // check if data are available
   if (not m_digits.isValid())
@@ -46,17 +47,19 @@ void EKLMHitRateCounter::accumulate(unsigned timeStamp)
   rates.numEvents++;
 
   // accumulate hits
-  for (const EKLMDigit& eklmDigit : m_digits) {
-    if (!eklmDigit.isGood())
+  for (const KLMDigit& klmDigit : m_digits) {
+    if (!klmDigit.inRPC() && !klmDigit.isGood())
       continue;
-    int sector = m_ElementNumbers->sectorNumber(
-                   eklmDigit.getSection(), eklmDigit.getLayer(),
-                   eklmDigit.getSector()) - 1;
-    if (sector >= 0 and sector < EKLMElementNumbers::getMaximalSectorGlobalNumber()) {
-      rates.sectorRates[sector] += 1;
+    uint16_t moduleNumber =
+      m_ElementNumbers->moduleNumber(
+        klmDigit.getSubdetector(), klmDigit.getSection(), klmDigit.getLayer(),
+        klmDigit.getSector());
+    int module = m_ModuleArrayIndex->getIndex(moduleNumber);
+    if (module >= 0 and module < KLMElementNumbers::getTotalModuleNumber()) {
+      rates.moduleRates[module] += 1;
     } else {
-      B2ERROR("EKLMHitRateCounter: sector number out of range"
-              << LogVar("sector", sector));
+      B2ERROR("KLMHitRateCounter: module number out of range"
+              << LogVar("module", module));
     }
     rates.averageRate += 1;
   }
@@ -65,7 +68,7 @@ void EKLMHitRateCounter::accumulate(unsigned timeStamp)
   rates.valid = true;
 }
 
-void EKLMHitRateCounter::normalize(unsigned timeStamp)
+void KLMHitRateCounter::normalize(unsigned timeStamp)
 {
   // copy buffer element
   m_rates = m_buffer[timeStamp];
@@ -76,11 +79,12 @@ void EKLMHitRateCounter::normalize(unsigned timeStamp)
   m_rates.normalize();
 
   /* Normalize the hit rate per 1 strip. */
-  for (int i = 0; i < EKLMElementNumbers::getMaximalSectorGlobalNumber(); ++i) {
-    int activeStrips = m_ChannelStatus->getActiveStripsEKLMSector(i + 1);
+  for (int i = 0; i < KLMElementNumbers::getTotalModuleNumber(); ++i) {
+    uint16_t module = m_ModuleArrayIndex->getNumber(i);
+    int activeStrips = m_ChannelStatus->getActiveStripsInModule(module);
     if (activeStrips == 0)
-      m_rates.sectorRates[i] = 0;
+      m_rates.moduleRates[i] = 0;
     else
-      m_rates.sectorRates[i] /= activeStrips;
+      m_rates.moduleRates[i] /= activeStrips;
   }
 }

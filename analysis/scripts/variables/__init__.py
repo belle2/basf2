@@ -36,11 +36,13 @@ def getCommandLineOptions():
     return args
 
 
-def printVars():
+def printVars(changedVariableNames=None):
     """
     Print list of all available variables.
     """
 
+    if changedVariableNames:
+        print(changedVariableNames)
     print('Available variables in Variable::Manager:')
     allVars = variables.getVariables()
     vars = []

@@ -76,7 +76,7 @@ namespace Belle2 {
     EKLM::TransformData* m_TransformData;
 
     /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EKLMDigits;
+    StoreArray<KLMDigit> m_KLMDigits;
 
     /** Tracks. */
     StoreArray<Track> m_Tracks;

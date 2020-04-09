@@ -48,7 +48,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_EKLMHit2ds.isRequired();
   m_Tracks.isRequired();
-  StoreArray<EKLMDigit> eklmDigits;
+  StoreArray<KLMDigit> eklmDigits;
   m_EKLMHit2ds.requireRelationTo(eklmDigits);
   StoreArray<ExtHit> extHits;
   m_Tracks.requireRelationTo(extHits);
@@ -97,15 +97,15 @@ void EKLMTimeCalibrationCollectorModule::collect()
   }
   n = m_EKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<EKLMDigit> digits =
-      m_EKLMHit2ds[i]->getRelationsTo<EKLMDigit>();
+    RelationVector<KLMDigit> digits =
+      m_EKLMHit2ds[i]->getRelationsTo<KLMDigit>();
     if (digits.size() != 2)
-      B2FATAL("Wrong number of related EKLMDigits.");
+      B2FATAL("Wrong number of related KLMDigits.");
     /*
      * This is possible if the threshold was crossed, but the pedestal level
      * has been estimated incorrectly.
      */
-    if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0)
+    if (digits[0]->getNPhotoelectrons() == 0 || digits[1]->getNPhotoelectrons() == 0)
       continue;
     for (j = 0; j < 2; j++) {
       entryHit[j] = nullptr;
@@ -157,7 +157,7 @@ void EKLMTimeCalibrationCollectorModule::collect()
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
-      m_ev.npe = digits[j]->getNPE();
+      m_ev.npe = digits[j]->getNPhotoelectrons();
       m_Strip =
         m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
                               digits[j]->getSector(), digits[j]->getPlane(),

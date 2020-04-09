@@ -147,9 +147,12 @@ void SoftwareTriggerHLTDQMModule::event()
         const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
         // check if the cutResult is in the list, be graceful when not available
-        auto const cutEntry = m_triggerResult->getResults().find(fullCutIdentifier);
+        // Create results object instead of calling .find() on a temporary object. This will cause undefined behaviour
+        // when checking again the .end() pointer, when the .end() pointer is also created from a temporary object.
+        const auto results = m_triggerResult->getResults();
+        auto const cutEntry = results.find(fullCutIdentifier);
 
-        if (cutEntry != m_triggerResult->getResults().end()) {
+        if (cutEntry != results.end()) {
           const int cutResult = cutEntry->second;
           m_cutResultHistograms[baseIdentifier]->Fill(cutTitle.c_str(), cutResult > 0);
         }
@@ -188,9 +191,10 @@ void SoftwareTriggerHLTDQMModule::event()
           const std::string& fullCutIdentifier = SoftwareTriggerDBHandler::makeFullCutName(baseIdentifier, cutName);
 
           // check if the cutResult is in the list, be graceful when not available
-          auto const cutEntry = m_triggerResult->getResults().find(fullCutIdentifier);
+          const auto results = m_triggerResult->getResults();
+          auto const cutEntry = results.find(fullCutIdentifier);
 
-          if (cutEntry != m_triggerResult->getResults().end()) {
+          if (cutEntry != results.end()) {
             const int cutResult = cutEntry->second;
             m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
           }

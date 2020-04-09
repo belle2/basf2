@@ -36,7 +36,7 @@ class EventDisplayer(basf2.Module):
     #: bit position for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_BIT = 11
     #: bit position for section [0..1]; forward is 0
-    BKLM_END_BIT = 14
+    BKLM_SECTION_BIT = 14
     #: bit position for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_BIT = 15
     #: bit mask for strip-1 [0..47]
@@ -48,11 +48,11 @@ class EventDisplayer(basf2.Module):
     #: bit mask for sector-1 [0..7]; 0 is on the +x axis and 2 is on the +y axis
     BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT)
     #: bit mask for section [0..1]; forward is 0
-    BKLM_END_MASK = (1 << BKLM_END_BIT)
+    BKLM_SECTION_MASK = (1 << BKLM_SECTION_BIT)
     #: bit mask for maxStrip-1 [0..47]
     BKLM_MAXSTRIP_MASK = (63 << BKLM_MAXSTRIP_BIT)
     #: bit mask for unique module identifier (end, sector, layer)
-    BKLM_MODULEID_MASK = (BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
+    BKLM_MODULEID_MASK = (BKLM_SECTION_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK)
 
     def __init__(self, exp, run, eventPdfName, maxDisplays, minRPCHits, minMuidHits):
         """Constructor
@@ -376,7 +376,7 @@ class EventDisplayer(basf2.Module):
                         electId = (channel << 12) | (axis << 11) | (lane << 6) | (finesse << 4) | nodeID
                         if electId in self.electIdToModuleId:
                             moduleId = self.electIdToModuleId[electId]
-                            fb = (moduleId & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+                            fb = (moduleId & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
                             sector = (moduleId & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
                             layer = (moduleId & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
                             plane = (moduleId & self.BKLM_PLANE_MASK) >> self.BKLM_PLANE_BIT
@@ -528,7 +528,7 @@ class EventDisplayer(basf2.Module):
             key = hit2d.getModuleID()
             layer = (key & self.BKLM_LAYER_MASK) >> self.BKLM_LAYER_BIT
             sector = (key & self.BKLM_SECTOR_MASK) >> self.BKLM_SECTOR_BIT
-            fb = (key & self.BKLM_END_MASK) >> self.BKLM_END_BIT
+            fb = (key & self.BKLM_SECTION_MASK) >> self.BKLM_SECTION_BIT
             phiStripMin = hit2d.getPhiStripMin() - 1
             phiStripMax = hit2d.getPhiStripMax() - 1
             zStripMin = hit2d.getZStripMin() - 1

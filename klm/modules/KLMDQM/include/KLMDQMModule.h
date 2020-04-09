@@ -11,12 +11,11 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
@@ -100,17 +99,14 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLM::ElementNumbersSingleton* m_Elements;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_BklmHit1ds;
 
     /** BKLM 2d hits. */
     StoreArray<BKLMHit2d> m_BklmHit2ds;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
 
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;

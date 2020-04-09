@@ -26,7 +26,7 @@ if exp == 10:
                   'ECL/ncev', 'ECL/ncev_Thr10MeV']
                   
 elif exp > 10:
-	histos = ['ECL/cid_Thr0Mev', 'ECL/cid_Thr5MeV', 'ECL/cid_Thr10MeV', 'ECL/cid_Thr50MeV', 
+	histos = ['ECL/cid_Thr50MeV',
                   'ECL/quality', 'ECL/quality_other', 'ECL/trigtag1', 'ECL/adc_hits', 
                   'ECL/edep_Thr0MeV', 'ECL/edep_Thr5MeV', 'ECL/edep_Thr7MeV', 
                   'ECL/time_barrel_Thr50MeV', 'ECL/time_endcaps_Thr50MeV',    
@@ -47,5 +47,4 @@ for h, hist in zip(histos,histobjs):
 	hist.SetName(spl[1])
 	hist.Write()
 outputHistFile.Close()
-  
 

@@ -341,3 +341,15 @@ class TCPV(BaseSkim):
 
         tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + bMinustoJPsiK_List + bMinustoD_List
         return tcpvLists
+
+    def validation_histograms(self, path):
+        Kres = 'K_10'
+        ma.applyCuts('gamma:loose', '1.4 < E < 4', path=path)
+
+        ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
+        ma.reconstructDecay("B0:signal -> " + Kres + ":all gamma:loose",
+                            "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+        ma.matchMCTruth('B0:signal', path=path)
+
+        variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
+        ma.variablesToHistogram('B0:signal', variableshisto, filename='TCPV_Validation.root', path=path)

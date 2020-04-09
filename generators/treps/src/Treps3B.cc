@@ -38,8 +38,6 @@
 
 #include <framework/logging/Logger.h>
 
-using namespace std;
-
 namespace Belle2 {
 
 
@@ -125,7 +123,7 @@ namespace Belle2 {
     parts = new Part_cont [20];
     pppp = new TLorentzVector [30];
 
-    ifstream infile(parameterFile);
+    std::ifstream infile(parameterFile);
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
@@ -245,7 +243,7 @@ namespace Belle2 {
     totalCrossSectionForMC = 0.;
 
     // Load Differential Cross Section table
-    ifstream infile(diffcrosssectionFile);
+    std::ifstream infile(diffcrosssectionFile);
     if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
@@ -294,7 +292,7 @@ namespace Belle2 {
 
       // Load Wlist_table
 
-      ifstream infile(wlistFile);
+      std::ifstream infile(wlistFile);
       if (!infile) {
         B2FATAL("Can't open W-list input file") ;
       } else {

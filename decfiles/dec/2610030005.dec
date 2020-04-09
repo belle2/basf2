@@ -1,10 +1,10 @@
-# EventType: 2610030002 (previously 2610030001)
-# Descriptor: [ccbar Dstarp2D0Pip D02KpKm]
-# NickName: DstpToD0Pip_D0ToKpKm
+# EventType: 2610030005 (previously 26110030002)
+# Descriptor: [ccbar Dstarm2D0barPim D0bar2PipPim]
+# NickName: DstmToD0barPim_D0bar2PipPim
 # Cuts: None
 # Documentation: Potential charm signal request
-# Tested: No
 # PhysicsWG: Charm
+# Tested: No
 # Responsible: Emma Oxford
 # Email: emma.oxford@desy.de
 # Date: 20200409 (YYYYMMDD)
@@ -49,12 +49,12 @@ Decay vpho
 1.000 c anti-c PYTHIA 32;
 Enddecay
 
-Decay D*+
-1.0000 D0sig   pi+     VSS;
+Decay D*-
+1.0000 anti-D0sig pi-     VSS;
 Enddecay
 
-Decay D0sig
-1.0000 K+      K-      PHSP;
+Decay anti-D0sig
+1.0000 pi+        pi-     PHSP;
 Enddecay
 
 End

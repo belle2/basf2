@@ -7,6 +7,7 @@ import argparse
 
 import basf2 as b2
 import modularAnalysis as ma
+from skimExpertFunctions import CombinedSkim
 from skim.registry import Registry
 
 
@@ -30,9 +31,6 @@ def get_argument_parser():
     )
 
     parser.add_argument(
-        "skim", choices=Registry.names, metavar="Skim", help="Skim to be run"
-    )
-    parser.add_argument(
         "-n",
         "--max-input-events",
         dest="MaxInputEvents",
@@ -48,12 +46,40 @@ def get_argument_parser():
         nargs="+",
         help="Input file list",
     )
-    parser.add_argument(
+
+    single = parser.add_subparser("single", "Run a single skim.")
+
+    single.add_argument(
+        "skim", nargs="+", choices=Registry.names, metavar="Skim", help="Skim to run.",
+    )
+
+    single.add_argument(
         "-o",
         "--output-udst-name",
-        dest="OutputFileName",
-        metavar="OutputFileName",
+        dest="OutputFilename",
+        metavar="Output uDST location",
         help="Location of output uDST file.",
+    )
+
+    combined = parser.add_subparser(
+        "combined", "Run a set of skims as a combined steering file."
+    )
+
+    combined.add_argument(
+        "skims",
+        nargs="+",
+        choices=Registry.names,
+        metavar="Skim",
+        help="List of skims to run.",
+    )
+
+    module = parser.add_subparser("module", "Run all skims in a module.")
+
+    module.add_argument(
+        "module",
+        choices=Registry.modules,
+        metavar="Module",
+        help="Skim module to run all skims for as combined steering file.",
     )
 
     return parser
@@ -65,16 +91,29 @@ def main():
 
     path = b2.Path()
 
-    SkimFunction = Registry.get_skim_function(args.skim)
-    Skim = SkimFunction(OutputFileName=args.OutputFileName)
+    # Get the list of skims to run from the argument parsers
+    if args.single:
+        SkimFunction = Registry.get_skim_function(args.skim)
+        Skim = SkimFunction(OutputFileName=args.single.OutputFilename)
+    elif args.combined:
+        skims = list({*args.combined.skims})
+        SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
+        Skim = CombinedSkim(*SkimObjects)
+    elif args.module:
+        SkimObjects = [
+            Registry.get_skim_function(skim)()
+            for skim in Registry.get_skims_in_module(args.module)
+        ]
+        Skim = CombinedSkim(*SkimObjects)
 
+    # Now proceed like a regular steering file
     InputFileList = args.InputFileList or [Skim.TestFile]
 
     ma.inputMdstList("default", InputFileList, path=path)
     Skim(path)
 
-    args.MaxInputEvents = args.MaxInputEvents or 0
-    b2.process(path, max_event=args.MaxInputEvents)
+    MaxInputEvents = args.MaxInputEvents or 0
+    b2.process(path, max_event=MaxInputEvents)
     print(b2.statistics())
 
 

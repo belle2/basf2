@@ -173,7 +173,7 @@ void KLMTimeCalibrationCollectorModule::collect()
     return;
   }  // track existence
 
-  B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
+  B2INFO("debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
   getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_ev.t0);
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);
@@ -195,8 +195,8 @@ void KLMTimeCalibrationCollectorModule::collect()
     getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
     getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
 
-    B2DEBUG(20, "Track" << LogVar("exthits", extHits.size())
-            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
+    B2INFO("Track" << LogVar("exthits", extHits.size())
+           << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2) continue;
     if (extHits.size() < 2) continue;
 
@@ -210,23 +210,32 @@ void KLMTimeCalibrationCollectorModule::collect()
       if (!bklmCover && !eklmCover) continue;
 
       int copyId = extHit->getCopyID();
-      int tSub, tFor, tSec, tLay;
+      int tSub, tFor, tSec, tLay, tPla, tStr;
 
       B2INFO("Collect :: Assign elementNum based on copyId for extHits.");
 
-      m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
+      //m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
+      m_elementNum->channelNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay, &tPla, &tStr);
+      B2INFO("Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber", tSub) << LogVar("bklmCover",
+             bklmCover) << LogVar("eklmCover", eklmCover));
+
       bool crossed = false; // should be only once ?
       KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
-      if (tSub == KLMElementNumbers::c_BKLM)
+      if (tSub == KLMElementNumbers::c_BKLM && bklmCover) {
+        B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed for BKLM" << LogVar("Layer", tLay));
         crossed = muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1);
-      else
+      }
+      if (tSub == KLMElementNumbers::c_EKLM && eklmCover) {
+        B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed for EKLM" << LogVar("Layer", tLay));
         crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay);
+      }
+      B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed" << LogVar("crossed", crossed));
       if (crossed)
         m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
     }
 
-    B2DEBUG(20, "In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())
-            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
+    B2INFO("In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())
+           << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (m_mapExtHits.size() < 2) continue;
     B2INFO("Collect :: Map of extHits creation done.");
 

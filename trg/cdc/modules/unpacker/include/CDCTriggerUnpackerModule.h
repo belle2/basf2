@@ -99,7 +99,7 @@ namespace Belle2 {
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
-    virtual void reserve(int, std::array<int, nFinesse>) override {};
+    virtual void reserve(int, std::array<int, nFinesse>) {};
 
     /**
      *  Unpack the Belle2Link data and fill the Bitstream
@@ -112,7 +112,7 @@ namespace Belle2 {
      */
     virtual void unpack(int,
                         std::array<int*, nFinesse>,
-                        std::array<int, nFinesse>) override {};
+                        std::array<int, nFinesse>) {};
 
     /**
      *  Get the Belle2Link header information

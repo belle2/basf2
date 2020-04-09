@@ -15,17 +15,18 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
 
 /* ROOT include. */
 #include <TCanvas.h>
@@ -52,14 +53,21 @@ void KLMCalibrationChecker::setExperimentRun(int experiment, int run)
   m_run = run;
 }
 
-void KLMCalibrationChecker::setTestingPayload(const std::string& testingPayloadName)
+void KLMCalibrationChecker::setTestingPayload(
+  const std::string& testingPayloadName)
 {
   m_testingPayloadName = testingPayloadName;
 }
 
-void KLMCalibrationChecker::setGlobalTag(const std::string& GlobalTagName)
+void KLMCalibrationChecker::setGlobalTag(const std::string& globalTagName)
 {
-  m_GlobalTagName = GlobalTagName;
+  m_GlobalTagName = globalTagName;
+}
+
+void  KLMCalibrationChecker::setAlignmentResultsFile(
+  const std::string& alignmentResultsFile)
+{
+  m_AlignmentResultsFile = alignmentResultsFile;
 }
 
 void KLMCalibrationChecker::initializeDatabase()
@@ -90,6 +98,203 @@ void KLMCalibrationChecker::resetDatabase()
   Database::reset();
 }
 
+void KLMCalibrationChecker::checkAlignment()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<BKLMAlignment> bklmAlignment;
+  DBObjPtr<EKLMAlignment> eklmAlignment;
+  DBObjPtr<EKLMSegmentAlignment> eklmSegmentAlignment;
+  DBObjPtr<BKLMAlignment> bklmAlignmentErrors("BKLMAlignment_ERRORS");
+  DBObjPtr<EKLMAlignment> eklmAlignmentErrors("EKLMAlignment_ERRORS");
+  DBObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentErrors("EKLMSegmentAlignment_ERRORS");
+  DBObjPtr<BKLMAlignment> bklmAlignmentCorrections("BKLMAlignment_CORRECTIONS");
+  DBObjPtr<EKLMAlignment> eklmAlignmentCorrections("EKLMAlignment_CORRECTIONS");
+  DBObjPtr<EKLMSegmentAlignment> eklmSegmentAlignmentCorrections("EKLMSegmentAlignment_CORRECTIONS");
+  if (!bklmAlignment.isValid() ||
+      !eklmAlignment.isValid() ||
+      !eklmSegmentAlignment.isValid() ||
+      !bklmAlignmentErrors.isValid() ||
+      !eklmAlignmentErrors.isValid() ||
+      !eklmSegmentAlignmentErrors.isValid() ||
+      !bklmAlignmentCorrections.isValid() ||
+      !eklmAlignmentCorrections.isValid() ||
+      !eklmSegmentAlignmentCorrections.isValid())
+    B2FATAL("Alignment data are not valid.");
+  if (m_GlobalTagName != "") {
+    printPayloadInformation(bklmAlignment);
+    printPayloadInformation(eklmAlignment);
+    printPayloadInformation(eklmSegmentAlignment);
+    printPayloadInformation(bklmAlignmentErrors);
+    printPayloadInformation(eklmAlignmentErrors);
+    printPayloadInformation(eklmSegmentAlignmentErrors);
+    printPayloadInformation(bklmAlignmentCorrections);
+    printPayloadInformation(eklmAlignmentCorrections);
+    printPayloadInformation(eklmSegmentAlignmentCorrections);
+  }
+  /* Create trees with alignment results. */
+  int section, sector, layer, plane, segment, param;
+  float value, correction, error;
+  TFile* alignmentResults = new TFile(m_AlignmentResultsFile.c_str(),
+                                      "recreate");
+  TTree* bklmModuleTree = new TTree("bklm_module",
+                                    "BKLM module alignment data.");
+  bklmModuleTree->Branch("section", &section, "section/I");
+  bklmModuleTree->Branch("sector", &sector, "sector/I");
+  bklmModuleTree->Branch("layer", &layer, "layer/I");
+  bklmModuleTree->Branch("param", &param, "param/I");
+  bklmModuleTree->Branch("value", &value, "value/F");
+  bklmModuleTree->Branch("correction", &correction, "correction/F");
+  bklmModuleTree->Branch("error", &error, "error/F");
+  TTree* eklmModuleTree = new TTree("eklm_module",
+                                    "EKLM module alignment data.");
+  eklmModuleTree->Branch("section", &section, "section/I");
+  eklmModuleTree->Branch("sector", &sector, "sector/I");
+  eklmModuleTree->Branch("layer", &layer, "layer/I");
+  eklmModuleTree->Branch("param", &param, "param/I");
+  eklmModuleTree->Branch("value", &value, "value/F");
+  eklmModuleTree->Branch("correction", &correction, "correction/F");
+  eklmModuleTree->Branch("error", &error, "error/F");
+  TTree* eklmSegmentTree = new TTree("eklm_segment",
+                                     "EKLM segment alignment data.");
+  eklmSegmentTree->Branch("section", &section, "section/I");
+  eklmSegmentTree->Branch("sector", &sector, "sector/I");
+  eklmSegmentTree->Branch("layer", &layer, "layer/I");
+  eklmSegmentTree->Branch("plane", &plane, "plane/I");
+  eklmSegmentTree->Branch("segment", &segment, "segment/I");
+  eklmSegmentTree->Branch("param", &param, "param/I");
+  eklmSegmentTree->Branch("value", &value, "value/F");
+  eklmSegmentTree->Branch("correction", &correction, "correction/F");
+  eklmSegmentTree->Branch("error", &error, "error/F");
+  const KLMAlignmentData* alignment, *alignmentError, *alignmentCorrection;
+  KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
+  for (KLMChannelIndex& klmModule : klmModules) {
+    uint16_t module = klmModule.getKLMModuleNumber();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM) {
+      alignment = bklmAlignment->getModuleAlignment(module);
+      alignmentError = bklmAlignmentErrors->getModuleAlignment(module);
+      alignmentCorrection =
+        bklmAlignmentCorrections->getModuleAlignment(module);
+    } else {
+      alignment = eklmAlignment->getModuleAlignment(module);
+      alignmentError = eklmAlignmentErrors->getModuleAlignment(module);
+      alignmentCorrection =
+        eklmAlignmentCorrections->getModuleAlignment(module);
+    }
+    if (alignment == nullptr || alignmentError == nullptr ||
+        alignmentCorrection == nullptr)
+      B2FATAL("Incomplete KLM alignment data.");
+    section = klmModule.getSection();
+    sector = klmModule.getSector();
+    layer = klmModule.getLayer();
+    param = KLMAlignmentData::c_DeltaU;
+    value = alignment->getDeltaU();
+    error = alignmentError->getDeltaU();
+    correction = alignmentCorrection->getDeltaU();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+    param = KLMAlignmentData::c_DeltaV;
+    value = alignment->getDeltaV();
+    error = alignmentError->getDeltaV();
+    correction = alignmentCorrection->getDeltaV();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+    param = KLMAlignmentData::c_DeltaW;
+    value = alignment->getDeltaW();
+    error = alignmentError->getDeltaW();
+    correction = alignmentCorrection->getDeltaW();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+    param = KLMAlignmentData::c_DeltaAlpha;
+    value = alignment->getDeltaAlpha();
+    error = alignmentError->getDeltaAlpha();
+    correction = alignmentCorrection->getDeltaAlpha();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+    param = KLMAlignmentData::c_DeltaBeta;
+    value = alignment->getDeltaBeta();
+    error = alignmentError->getDeltaBeta();
+    correction = alignmentCorrection->getDeltaBeta();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+    param = KLMAlignmentData::c_DeltaGamma;
+    value = alignment->getDeltaGamma();
+    error = alignmentError->getDeltaGamma();
+    correction = alignmentCorrection->getDeltaGamma();
+    if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
+      bklmModuleTree->Fill();
+    else
+      eklmModuleTree->Fill();
+  }
+  KLMChannelIndex eklmSegments(KLMChannelIndex::c_IndexLevelStrip);
+  eklmSegments.useEKLMSegments();
+  for (KLMChannelIndex eklmSegment = eklmSegments.beginEKLM();
+       eklmSegment != eklmSegments.endEKLM(); ++eklmSegment) {
+    int eklmSegmentNumber = eklmSegment.getEKLMSegmentNumber();
+    alignment = eklmSegmentAlignment->getSegmentAlignment(eklmSegmentNumber);
+    alignmentError =
+      eklmSegmentAlignmentErrors->getSegmentAlignment(eklmSegmentNumber);
+    alignmentCorrection =
+      eklmSegmentAlignmentCorrections->getSegmentAlignment(eklmSegmentNumber);
+    if (alignment == nullptr || alignmentError == nullptr ||
+        alignmentCorrection == nullptr)
+      B2FATAL("Incomplete KLM alignment data.");
+    section = eklmSegment.getSection();
+    sector = eklmSegment.getSector();
+    layer = eklmSegment.getLayer();
+    plane = eklmSegment.getPlane();
+    segment = eklmSegment.getStrip();
+    param = KLMAlignmentData::c_DeltaU;
+    value = alignment->getDeltaU();
+    error = alignmentError->getDeltaU();
+    correction = alignmentCorrection->getDeltaU();
+    eklmSegmentTree->Fill();
+    param = KLMAlignmentData::c_DeltaV;
+    value = alignment->getDeltaV();
+    error = alignmentError->getDeltaV();
+    correction = alignmentCorrection->getDeltaV();
+    eklmSegmentTree->Fill();
+    param = KLMAlignmentData::c_DeltaW;
+    value = alignment->getDeltaW();
+    error = alignmentError->getDeltaW();
+    correction = alignmentCorrection->getDeltaW();
+    eklmSegmentTree->Fill();
+    param = KLMAlignmentData::c_DeltaAlpha;
+    value = alignment->getDeltaAlpha();
+    error = alignmentError->getDeltaAlpha();
+    correction = alignmentCorrection->getDeltaAlpha();
+    eklmSegmentTree->Fill();
+    param = KLMAlignmentData::c_DeltaBeta;
+    value = alignment->getDeltaBeta();
+    error = alignmentError->getDeltaBeta();
+    correction = alignmentCorrection->getDeltaBeta();
+    eklmSegmentTree->Fill();
+    param = KLMAlignmentData::c_DeltaGamma;
+    value = alignment->getDeltaGamma();
+    error = alignmentError->getDeltaGamma();
+    correction = alignmentCorrection->getDeltaGamma();
+    eklmSegmentTree->Fill();
+  }
+  bklmModuleTree->Write();
+  eklmModuleTree->Write();
+  eklmSegmentTree->Write();
+  delete bklmModuleTree;
+  delete eklmModuleTree;
+  delete eklmSegmentTree;
+  delete alignmentResults;
+}
+
 void KLMCalibrationChecker::checkStripEfficiency()
 {
   /* Initialize the database. */
@@ -99,11 +304,7 @@ void KLMCalibrationChecker::checkStripEfficiency()
   if (not stripEfficiency.isValid())
     B2FATAL("Strip efficiency data are not valid.");
   if (m_GlobalTagName != "")
-    B2INFO("Analyzing the following payload:"
-           << LogVar("Global Tag", m_GlobalTagName.c_str())
-           << LogVar("Name", stripEfficiency.getName())
-           << LogVar("Revision", stripEfficiency.getRevision())
-           << LogVar("IoV", stripEfficiency.getIoV()));
+    printPayloadInformation(stripEfficiency);
   /* Finally, loop over KLM sectors to check the efficiency. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmSectors) {

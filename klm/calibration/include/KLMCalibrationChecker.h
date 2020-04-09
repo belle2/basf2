@@ -10,6 +10,11 @@
 
 #pragma once
 
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -44,7 +49,17 @@ namespace Belle2 {
     /**
      * Set Global Tag name.
      */
-    void setGlobalTag(const std::string& GlobalTagName);
+    void setGlobalTag(const std::string& globalTagName);
+
+    /**
+     * Set alignment results file.
+     */
+    void setAlignmentResultsFile(const std::string& alignmentResultsFile);
+
+    /**
+     * Check alignment.
+     */
+    void checkAlignment();
 
     /**
      * Check strip efficiency.
@@ -64,24 +79,31 @@ namespace Belle2 {
     void resetDatabase();
 
     /**
-     * Experiment number.
+     * Print payload information.
      */
+    template<class T> void printPayloadInformation(DBObjPtr<T>& dbObject)
+    {
+      B2INFO("Analyzing the following payload:"
+             << LogVar("Global Tag", m_GlobalTagName.c_str())
+             << LogVar("Name", dbObject.getName())
+             << LogVar("Revision", dbObject.getRevision())
+             << LogVar("IoV", dbObject.getIoV()));
+    }
+
+    /** Experiment number. */
     int m_experiment;
 
-    /**
-     * Run number.
-     */
+    /** Run number. */
     int m_run;
 
-    /**
-     * Testing payload location.
-     */
+    /** Testing payload location. */
     std::string m_testingPayloadName = "";
 
-    /**
-     * Global Tag name.
-     */
+    /** Global Tag name. */
     std::string m_GlobalTagName = "";
+
+    /** Output file for alignment results. */
+    std::string m_AlignmentResultsFile = "alignment.root";
 
   };
 

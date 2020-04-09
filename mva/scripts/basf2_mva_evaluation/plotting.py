@@ -22,6 +22,7 @@ import matplotlib.gridspec
 import matplotlib.colors
 import matplotlib.patches
 import matplotlib.ticker
+import pandas
 
 from . import histogram
 

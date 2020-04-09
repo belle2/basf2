@@ -14,6 +14,7 @@
    - running on Belle 1 MC/data (convertedFromBelle = True)
    - running a specific FEI which is optimized for a signal selection and uses ROEs (specific = True)
    - run without semileptonic D channels (removeSLD = True )
+   - B mesons with a strange quark in Y(5S) runs (strangeB = True)
 
  Another interesting configuration is given by get_fr_channels,
  which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
@@ -124,17 +125,6 @@ def get_default_channels(
                                             bestCandidateCut=15),
                         PostCutConfiguration(bestCandidateCut=10, value=0.01))
     electron.addChannel(['e+:FSP'])
-
-    # Too many electrons might make SL FEI slow but too few break J/psi channels
-    electronSLD = Particle('e+:semileptonic',
-                           MVAConfiguration(variables=chargedVariables,
-                                            target='isPrimarySignal'),
-                           PreCutConfiguration(userCut=charged_user_cut,
-                                               bestCandidateMode='highest',
-                                               bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
-                                               bestCandidateCut=10),
-                           PostCutConfiguration(bestCandidateCut=5, value=0.01))
-    electronSLD.addChannel(['e+:FSP'])
 
     muon = Particle('mu+',
                     MVAConfiguration(variables=chargedVariables,
@@ -383,11 +373,11 @@ def get_default_channels(
                                              bestCandidateCut=20),
                          PostCutConfiguration(bestCandidateCut=10, value=0.001))
 
-        D0_SL.addChannel(['K-', 'e+:semileptonic'])
+        D0_SL.addChannel(['K-', 'e+'])
         D0_SL.addChannel(['K-', 'mu+'])
-        D0_SL.addChannel(['K-', 'pi0', 'e+:semileptonic'])
+        D0_SL.addChannel(['K-', 'pi0', 'e+'])
         D0_SL.addChannel(['K-', 'pi0', 'mu+'])
-        D0_SL.addChannel(['K_S0', 'pi-', 'e+:semileptonic'])
+        D0_SL.addChannel(['K_S0', 'pi-', 'e+'])
         D0_SL.addChannel(['K_S0', 'pi-', 'mu+'])
 
     if KLong:
@@ -435,9 +425,9 @@ def get_default_channels(
                                              bestCandidateCut=20),
                          PostCutConfiguration(bestCandidateCut=10, value=0.001))
 
-        DP_SL.addChannel(['K_S0', 'e+:semileptonic'])
+        DP_SL.addChannel(['K_S0', 'e+'])
         DP_SL.addChannel(['K_S0', 'mu+'])
-        DP_SL.addChannel(['K-', 'pi+', 'e+:semileptonic'])
+        DP_SL.addChannel(['K-', 'pi+', 'e+'])
         DP_SL.addChannel(['K-', 'pi+', 'mu+'])
 
     if KLong:
@@ -669,13 +659,13 @@ def get_default_channels(
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),
                      PostCutConfiguration(bestCandidateCut=20))
-    BP_SL.addChannel(['anti-D0', 'e+:semileptonic'])
+    BP_SL.addChannel(['anti-D0', 'e+'])
     BP_SL.addChannel(['anti-D0', 'mu+'])
-    BP_SL.addChannel(['anti-D*0', 'e+:semileptonic'])
+    BP_SL.addChannel(['anti-D*0', 'e+'])
     BP_SL.addChannel(['anti-D*0', 'mu+'])
-    BP_SL.addChannel(['D-', 'pi+', 'e+:semileptonic'])
+    BP_SL.addChannel(['D-', 'pi+', 'e+'])
     BP_SL.addChannel(['D-', 'pi+', 'mu+'])
-    BP_SL.addChannel(['D*-', 'pi+', 'e+:semileptonic'])
+    BP_SL.addChannel(['D*-', 'pi+', 'e+'])
     BP_SL.addChannel(['D*-', 'pi+', 'mu+'])
 
     if not removeSLD:
@@ -816,13 +806,13 @@ def get_default_channels(
                                          bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                          bestCandidateCut=20),
                      PostCutConfiguration(bestCandidateCut=20))
-    B0_SL.addChannel(['D-', 'e+:semileptonic'])
+    B0_SL.addChannel(['D-', 'e+'])
     B0_SL.addChannel(['D-', 'mu+'])
-    B0_SL.addChannel(['D*-', 'e+:semileptonic'])
+    B0_SL.addChannel(['D*-', 'e+'])
     B0_SL.addChannel(['D*-', 'mu+'])
-    B0_SL.addChannel(['anti-D0', 'pi-', 'e+:semileptonic'])
+    B0_SL.addChannel(['anti-D0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D0', 'pi-', 'mu+'])
-    B0_SL.addChannel(['anti-D*0', 'pi-', 'e+:semileptonic'])
+    B0_SL.addChannel(['anti-D*0', 'pi-', 'e+'])
     B0_SL.addChannel(['anti-D*0', 'pi-', 'mu+'])
 
     if not removeSLD:

@@ -9,9 +9,9 @@ added exactly once and the relative order of events from the same input file
 will be the same but they will be mixed between files.
 
 The EventMetaData of the events will be modified so that the output file will
-have continously numbered events starting at 1. The experiment and run number
-will be set to the same value for all events and can be chosen using the
---exp/--run parameter.
+have continously numbered events starting at 1 (or at --start-event=N). The
+experiment and run number will be set to the same value for all events and can
+be chosen using the --exp/--run parameter.
 
 The random seed can be specified to have a fixed order for the output events. To
 allow reproducing this process the lfn of all input files is added to the
@@ -48,6 +48,7 @@ def create_argumentparser():
     parser.add_argument("--seed", type=str, default=None,
                         help="Random seed to use for shuffling, can be used to "
                         "reproduce the event order from a previous run")
+    parser.add_argument("--start-event", type=int, default=1, help="Event number of the first event in the final file. Other events will be numbered sequentially")
     return parser
 
 
@@ -163,7 +164,7 @@ if __name__ == "__main__":
         meta = output_tree.EventMetaData
         meta.setExperiment(args.exp)
         meta.setRun(args.run)
-        meta.setEvent(evtNr+1)
+        meta.setEvent(evtNr+args.start_event)
         meta.setSubrun(0)
         # make sure parent Lfn is not set since we modify the event meta parent
         # reading would not work

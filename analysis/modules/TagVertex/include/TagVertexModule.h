@@ -15,12 +15,12 @@
 // DataStore
 #include <framework/database/DBObjPtr.h>
 
-// rave
+// Rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
-// kFitter
+// KFit
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
@@ -83,7 +83,7 @@ namespace Belle2 {
     //std::string m_EventType;      /**< Btag decay type */
     std::string m_listName;         /**< Breco particle list name */
     double m_confidenceLevel;       /**< required fit confidence level */
-    std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
+    std::string m_useMCassociation; /**< No MC association or standard Breco particle or internal MCparticle association */
     //std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     std::string m_constraintType;   /**< Choose constraint: noConstraint, IP, tube, boost, (breco) */
     std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD */
@@ -104,11 +104,14 @@ namespace Belle2 {
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
     TVector3 m_MCtagV;            /**< generated tag side vertex */
+    double   m_MCtagLifeTime;     /**< generated tag side life time of B-decay */
     int m_mcPDG;                  /**< generated tag side B flavor */
     TVector3 m_MCVertReco;        /**< generated Breco decay vertex */
+    double m_MCLifeTimeReco;      /**< generated Breco life time */
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
     double m_MCdeltaT;            /**< generated DeltaT */
+    double m_MCdeltaTapprox;      /**< generated DeltaT with z-coordinate approximation */
     TMatrixDSym m_constraintCov;  /**< constraint to be used in the tag vertex fit */
     TVector3 m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
@@ -128,7 +131,7 @@ namespace Belle2 {
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
     bool m_verbose;               /**< choose if you want to print extra infos */
-    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter) */
+    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and KFit) */
     TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
 
 
@@ -216,7 +219,7 @@ namespace Belle2 {
     /**
      * Print a TMatrixFSym (useful for debugging)
      */
-    std::string printMatrix(TMatrixFSym const& mat);
+    std::string printMatrix(TMatrixDSym const& mat);
 
     /**
      * If the fit has to be done with the truth info, Rave is fed with a track

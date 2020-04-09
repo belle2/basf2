@@ -168,6 +168,7 @@ class DecayParticleNode:
     For each node of the tree we safe the name of the particle, whether it is
     selected and a dictionary of all children (as mapping decayIndex -> Node)
     """
+
     def __init__(self, name):
         """Just set default values"""
         #: name of the particle
@@ -528,3 +529,42 @@ def add_collection(list_of_variables: Iterable[str], collection_name: str) -> st
 
     _variablemanager.addCollection(collection_name, _std_vector(*tuple(list_of_variables)))
     return collection_name
+
+
+def create_isSignal_alias(aliasName, flags):
+    """
+    Make a `VariableManager` alias for a customized :b2:var:`isSignal`, which accepts specified mc match errors.
+
+    .. seealso:: see :doc:`MCMatching` for a definition of the mc match error flags.
+
+    The following code defines a new variable ``isSignalAcceptMissingGammaAndMissingNeutrino``, which is same
+    as :b2:var:`isSignal`, but also accepts missing gamma and missing neutrino
+
+    >>> create_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
+
+    Logically, this
+    ``isSignalAcceptMissingGammaAndMissingNeutrino`` =
+    :b2:var:`isSignalAcceptMissingGamma` || :b2:var:`isSignalAcceptMissingNeutrino`.
+
+    In the example above, create_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
+    unmasking (setting bits to zero)
+    the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
+
+    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
+    browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
+
+    Parameters:
+        aliasName (str): the name of the alias to be set
+        flags (list(int)): a list of the bits to unmask
+    """
+
+    mask = 0
+    for flag in flags:
+        if isinstance(flag, int):
+            mask |= flag
+        else:
+            informationString = "The type of input flags of create_isSignal_alias() should be integer."
+            informationString += "Now one of the input flags is " + str(int) + " ."
+            raise ValueError(informationString)
+
+    _variablemanager.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))

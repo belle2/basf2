@@ -42,7 +42,6 @@ void EKLMDataCheckerModule::beginRun()
 void EKLMDataCheckerModule::event()
 {
   const uint16_t c_ChargeError = 0x0FFF;
-  /* cppcheck-suppress variableScope */
   int i, n, strip;
   std::map<int, StripData>::iterator it;
   StripData data;

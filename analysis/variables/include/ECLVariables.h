@@ -190,11 +190,6 @@ namespace Belle2 {
     double eclClusterId(const Particle* particle);
 
     /**
-     * [deprecated] return the Hypothesis ID of this cluster
-     */
-    double eclClusterHypothesisId(const Particle* particle);
-
-    /**
      * Returns 1.0 if the cluster has the 'N photons' hypothesis (historically
      * called 'N1'), 0.0 if not, and NaN if no cluster is associated to the
      * particle.

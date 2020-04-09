@@ -213,8 +213,6 @@ void BBBrem::calcOutgoingLeptonsAndWeight()
     double sgam = sqrt(vgam * (2 - vgam));
 
     //Generate azimuthal angles
-    // cppcheck does not understand that gRandom->Uniform() will return two different values, this is a false positive
-    // cppcheck-suppress duplicateAssignExpression
     double phi  = twopi * gRandom->Uniform();
     double phig = twopi * gRandom->Uniform();
 

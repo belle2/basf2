@@ -238,6 +238,7 @@ int main(int argc, char* argv[])
   }
 
   // R and polarization data
+  /* cppcheck-suppress duplicateCondition */
   if (!calcROnly) {
     std::ofstream ofile3("r_pol.dat");
     ofile3 << "# rgamd rgamds ptaud ptauds pds" << std::endl;

@@ -49,8 +49,8 @@ TLorentzRotation getBoost(double Eher, double Eler, double cross_angle, double a
 
 
 // boost lab e- and e+ to properly rotated CMS system
-  TLorentzVector vlEleCmsR = lab2cmsBoostRotZ * vlHer;
-  TLorentzVector vlPosCmsR = lab2cmsBoostRotZ * vlLer;
+  TLorentzVector vlEleCmsR;
+  TLorentzVector vlPosCmsR;
 
 // obtain the backward transformation
   TLorentzRotation cms2labBoostRotZ = lab2cmsBoostRotZ.Inverse();

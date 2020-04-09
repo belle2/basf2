@@ -142,7 +142,7 @@ namespace Belle2 {
     double erho, prho, costl;
 
     double maxfoundprob = 0.0;
-    double prob = -10.0;
+    double prob;
     int massiter;
 
     for (massiter = 0; massiter < 3; massiter++) {

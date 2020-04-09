@@ -134,7 +134,7 @@ namespace Belle2 {
     float m_EnergyDeposit;
 
     //! Needed to make the ROOT object storable
-    ClassDef(BKLMHit1d, 3)
+    ClassDef(BKLMHit1d, 4)
 
   };
 

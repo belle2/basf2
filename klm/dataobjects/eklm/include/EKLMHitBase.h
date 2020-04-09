@@ -118,7 +118,7 @@ namespace Belle2 {
     float m_Time;
 
     /** Energy deposition. */
-    float m_EnergyDeposit;
+    float m_EDep;
 
     /** Number of section. */
     int m_Section;

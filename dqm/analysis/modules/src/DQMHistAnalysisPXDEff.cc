@@ -213,9 +213,9 @@ void DQMHistAnalysisPXDEffModule::event()
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
       error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.85); // error if upper error value is below limit
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // error if upper error value is below limit
       warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // (and not only the actual eff value)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.92); // (and not only the actual eff value)
     }
   }
 
@@ -231,8 +231,8 @@ void DQMHistAnalysisPXDEffModule::event()
       // this has to be done first, as it will recalc Min/Max and destroy axis
       Double_t x, y;
       gr->GetPoint(i, x, y);
-      gr->SetPoint(i, x - 0.01, y);
-      auto val = gr->GetErrorYlow(i);
+      gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
+      auto val = y - gr->GetErrorYlow(i); // Error is relative to value
       if (i != 5) { // exclude 1.3.2
         /// check for val > 0.0) { would exclude all zero efficient modules!!!
         if (scale_min > val) scale_min = val;
@@ -262,7 +262,7 @@ void DQMHistAnalysisPXDEffModule::event()
     gr->Draw("AP");
     m_cEffAll->cd(0);
 
-    auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered
     tt->Draw();

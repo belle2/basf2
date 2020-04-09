@@ -49,6 +49,7 @@ gROOT.ProcessLine('struct EventData {\
     float truehit_interstripPosition;\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
+    float truehit_time;\
     };')
 
 from ROOT import EventData
@@ -177,6 +178,7 @@ class SVDValidationTTree(Module):
                 self.data.truehit_interstripPosition = truehit_interstripPosition
                 self.data.truehit_deposEnergy = truehit.getEnergyDep()
                 self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
+                self.data.truehit_time = truehit.getGlobalTime()
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

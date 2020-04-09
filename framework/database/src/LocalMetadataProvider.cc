@@ -23,7 +23,7 @@ namespace Belle2::Conditions {
           firstExp, firstRun, finalExp, finalRun, revision
         FROM iov_payloads
         WHERE globalTagName=:globaltag AND firstExp<=:exp AND firstRun<=:run AND
-          (finalExp<0 OR (finalRun<0 AND finalExp>=:exp) OR (finalExp>=:exp AND finalRun>=:run));
+          (finalExp<0 OR (finalRun<0 AND finalExp>=:exp) OR (finalExp>:exp OR (finalExp==:exp AND finalRun>=:run)));
       )SQL", true}
   {}
 

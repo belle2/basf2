@@ -38,7 +38,7 @@ namespace Belle2 {
      * Constructor for EKLM simulation.
      * @param[in] simHit EKLM simulation hit.
      */
-    KLMDigit(const EKLMSimHit* simHit);
+    explicit KLMDigit(const EKLMSimHit* simHit);
 
     /**
      * Constructor for BKLM RPC simulation.
@@ -51,7 +51,7 @@ namespace Belle2 {
      * Constructor for BKLM RPC simulation.
      * @param[in] simHit BKLM simulation hit.
      */
-    KLMDigit(const BKLMSimHit* simHit);
+    explicit KLMDigit(const BKLMSimHit* simHit);
 
     /**
      * Destructor.

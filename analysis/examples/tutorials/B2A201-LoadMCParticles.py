@@ -6,16 +6,16 @@
 #
 # This tutorial demonstrates how to load generated final
 # state particles (MCParticle objects) as Particles and
-# create ParticleLists for each final state particle
-# type: gamma/e/mu/pi/K/proton/K_L.
+# create ParticleLists for each final state particle type:
+# gamma/e/mu/pi/K/proton/K_L.
 #
 # All analysis modules and tools (e.g. making combinations, ...)
 # have interfaces for ParticleLists so this step is
-# neccessary if analysis tools are to be used.
+# necessary if analysis tools are to be used.
 #
 # Contributors: A. Zupanc (June 2014) I.Komarov(Sep 2018)
 #
-######################################################
+#######################################################
 
 import basf2 as b2
 import modularAnalysis as ma

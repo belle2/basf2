@@ -104,7 +104,6 @@ def set_FlavorTagger_pid_aliases():
     utils._variablemanager.addAlias('Kid_ARICH', 'ifNANgiveX(pidPairProbabilityExpert(321, 211, ARICH), 0.5)')
 
     if getBelleOrBelle2() == "Belle":
-        utils._variablemanager.addAlias('kIDBelle', 'ifNANgiveX(atcPIDBelle(3,2), 0.5)')
         utils._variablemanager.addAlias('eid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(11, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('muid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(13, 211, CDC, SVD), 0.5)')
         utils._variablemanager.addAlias('piid_dEdx', 'ifNANgiveX(pidPairProbabilityExpert(211, 321, CDC, SVD), 0.5)')
@@ -301,7 +300,7 @@ def WhichCategories(categories=[
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
-KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
+KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
@@ -564,7 +563,7 @@ def FillParticleLists(mode='Expert', maskName='', path=None):
     Fills the particle Lists for all categories.
     """
 
-    from vertex import KFit
+    from vertex import kFit
     readyParticleLists = []
 
     for (particleList, category) in trackLevelParticleLists:
@@ -592,7 +591,7 @@ def FillParticleLists(mode='Expert', maskName='', path=None):
                     ma.cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
                 else:
                     ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    KFit('K_S0:inRoe', 0.01, path=path)
+                    kFit('K_S0:inRoe', 0.01, path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
@@ -608,7 +607,7 @@ def FillParticleLists(mode='Expert', maskName='', path=None):
                     'p+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
                                 'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                KFit(particleList, 0.01, path=path)
+                kFit(particleList, 0.01, path=path)
                 # if mode != 'Expert':
                 ma.matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)

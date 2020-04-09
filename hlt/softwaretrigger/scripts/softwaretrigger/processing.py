@@ -73,6 +73,9 @@ def setup_basf2_and_db(zmq=False):
 
     # Logging
     basf2.set_log_level(basf2.LogLevel.ERROR)
+    # And because reasons we want every log message to be only one line,
+    # otherwise the LogFilter in daq_slc throws away the other lines
+    basf2.logging.enable_escape_newlines = True
 
     return args
 

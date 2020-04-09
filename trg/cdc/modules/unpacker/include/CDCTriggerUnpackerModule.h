@@ -99,7 +99,7 @@ namespace Belle2 {
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
-    virtual void reserve(int, std::array<int, nFinesse>) {};
+    virtual void reserve(int, std::array<int, nFinesse>) override {};
 
     /**
      *  Unpack the Belle2Link data and fill the Bitstream
@@ -112,7 +112,7 @@ namespace Belle2 {
      */
     virtual void unpack(int,
                         std::array<int*, nFinesse>,
-                        std::array<int, nFinesse>) {};
+                        std::array<int, nFinesse>) override {};
 
     /**
      *  Get the Belle2Link header information
@@ -235,13 +235,13 @@ namespace Belle2 {
     CDCTriggerUnpackerModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Delete dynamically allocated variables */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** convert raw data (in B2L buffer to bitstream) */
-    virtual void event();
+    virtual void event() override;
 
     /** data width of a single merger unit */
     /** number of merger unit in each super layers */

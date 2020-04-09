@@ -247,28 +247,28 @@ namespace Belle2 {
     if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
-      double W; // W [GeV]
+      double i_w; // W [GeV]
       double diffCrossSection; // Number of events for given W
 
       double previousW = 0.;
       double previousDCS = 0.; // Diff(erential) Cross Section
-      while (infile >> W >> diffCrossSection) {
-        if (W > 9000. || W < 0.) continue;
-        diffCrossSectionOfW[W] = diffCrossSection;
+      while (infile >> i_w >> diffCrossSection) {
+        if (i_w > 9000. || i_w < 0.) continue;
+        diffCrossSectionOfW[i_w] = diffCrossSection;
 
         // Calculate total cross section up to the bin.
         // This will be used for importance sampling. NOT CORRECT cross section
         if (diffCrossSection > previousDCS and previousDCS != 0) {
           // If current diffCrossSection is higher than previous and not first time, use diffCrossSection
-          totalCrossSectionForMC += (W - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
+          totalCrossSectionForMC += (i_w - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
         } else {
           // If previous diffCrossSection is higher than current or first time, use previousDCS
-          totalCrossSectionForMC += (W - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
+          totalCrossSectionForMC += (i_w - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
         }
-        // Store current cross section with W
-        WOfCrossSectionForMC[totalCrossSectionForMC] = W;
+        // Store current cross section with w
+        WOfCrossSectionForMC[totalCrossSectionForMC] = i_w;
 
-        previousW = W;
+        previousW = i_w;
         previousDCS = diffCrossSection;
       }
 
@@ -348,6 +348,8 @@ namespace Belle2 {
 
 
       return prew;
+    } else {
+      B2FATAL("Undefined mode for wtable. Can be 1 or 0. Called with  " << mode) ;
     }
     return 0.0;
   }

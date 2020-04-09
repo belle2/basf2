@@ -47,8 +47,17 @@ namespace Belle2 {
   // constructor
   //
 
-  TrepsB::TrepsB(void) : sutool()
+  TrepsB::TrepsB(void) :
+    sutool(), w(0.), ntot(0), nsave(0), ebeam(0.), q2max(0.), cost_cut(0.), pt_cut(0.), cost_flag(0), pt_flag(0),
+    qzmin(0.), qptmin(0.), parti(nullptr), parts(nullptr), ephi(0.), etheta(0.), s(0.), imode(0), dmin(0.), dmax(0.),
+    ffmax(0.), rs(0.), vmax(0.), pppp(nullptr), wf(0.), inmode(0), wtcount(0), totalCrossSectionForMC(0.), ndecay(0),
+    pmodel(0), fmodel(0), ievent(0), treh1(nullptr), treh2(nullptr), treh3(nullptr), treh4(nullptr), treh5(nullptr),
+    treh6(nullptr), npart(0), partgen(nullptr), zdis(nullptr), zpdis(nullptr), zsdis(nullptr)
   {
+    for (int i = 0; i < 5000; ++i) {
+      wtcond[i] = 0.;
+      wthead[i] = 0;
+    }
   }
 
   //
@@ -57,59 +66,49 @@ namespace Belle2 {
   void TrepsB::initg(void)
   {
     B2DEBUG(20, " UtrepsB initg  Pmodel " << TrepsB::pmodel);
-
     //parametrization of pi+pi- partial waves
-
-    static double data001[21] = { 20., 15., 9., 8., 8., 7., 5.3, 5.2,
-                                  5.2, 5.2, 5.2, 4., 3., 2., 2.,
-                                  2., 2., 2., 1., 0., 0.
-                                };
-    static double data201[21] = { 1., 5., 5, 5., 4., 4., 4., 4.,
-                                  3., 3., 3., 2., 1., 1., 1.,
-                                  1., 0., 0., 0., 1., 1.
-                                };
-    static double data221[21] = { 1., 5., 5., 6., 7., 7.18, 6.68, 6.27,
-                                  5.91, 5.61, 5., 5., 4., 3., 2.,
-                                  2., 2., 1., 0., 0., 0.
-                                };
-
-    static double data002[15] = { 2., 2., 2., 2., 2., 2., 3., 4.,
-                                  4.5, 5., 5., 5., 4.5, 4.5, 4.3
-                                };
-    static double data202[15] = { 1., 2., 3., 4., 5., 5., 5., 5.,
-                                  5., 5., 5., 4., 3.0, 2.2, 1.
-                                };
-    static double data222[15] = { 0., 0., 0., 0., 0., 0., -1., -3.,
-                                  -3., -3., -3., -4., -3.5, -3., -2.5
-                                };
-
-    static double data003[9] = { 2.3, 2.3, 7.26, 7.94, 8.53, 7.38, 3.25, 1.98, 2.30};
-    static double data203[9] = { 9.63, 9.63, 10.73, 8.02, 6.18, 3.37, 0.63, 0.10, 0.66};
-    static double data223[9] = { 1.48, 1.48, -4.62, -6.12, -6.78, -5.35, -1.82, -1.02, -1.63};
-
-
     if (TrepsB::pmodel == 251) {
       // pi+pi-
+      static double data001[21] = { 20., 15., 9., 8., 8., 7., 5.3, 5.2,
+                                    5.2, 5.2, 5.2, 4., 3., 2., 2.,
+                                    2., 2., 2., 1., 0., 0.
+                                  };
+      static double data201[21] = { 1., 5., 5, 5., 4., 4., 4., 4.,
+                                    3., 3., 3., 2., 1., 1., 1.,
+                                    1., 0., 0., 0., 1., 1.
+                                  };
+      static double data221[21] = { 1., 5., 5., 6., 7., 7.18, 6.68, 6.27,
+                                    5.91, 5.61, 5., 5., 4., 3., 2.,
+                                    2., 2., 1., 0., 0., 0.
+                                  };
       b00 = Interps(0.3, 2.3, 20, data001);
       b20 = Interps(0.3, 2.3, 20, data201);
       b22 = Interps(0.3, 2.3, 20, data221);
     }
-
     if (TrepsB::pmodel == 252) {
       // K+K-
+      static double data002[15] = { 2., 2., 2., 2., 2., 2., 3., 4.,
+                                    4.5, 5., 5., 5., 4.5, 4.5, 4.3
+                                  };
+      static double data202[15] = { 1., 2., 3., 4., 5., 5., 5., 5.,
+                                    5., 5., 5., 4., 3.0, 2.2, 1.
+                                  };
+      static double data222[15] = { 0., 0., 0., 0., 0., 0., -1., -3.,
+                                    -3., -3., -3., -4., -3.5, -3., -2.5
+                                  };
       b00 = Interps(1.0, 2.4, 14, data002);
       b20 = Interps(1.0, 2.4, 14, data202);
       b22 = Interps(1.0, 2.4, 14, data222);
     }
-
     if (TrepsB::pmodel == 253) {
       // ppbar
+      static double data003[9] = { 2.3, 2.3, 7.26, 7.94, 8.53, 7.38, 3.25, 1.98, 2.30};
+      static double data203[9] = { 9.63, 9.63, 10.73, 8.02, 6.18, 3.37, 0.63, 0.10, 0.66};
+      static double data223[9] = { 1.48, 1.48, -4.62, -6.12, -6.78, -5.35, -1.82, -1.02, -1.63};
       b00 = Interps(2.05, 2.85, 8, data003);
       b20 = Interps(2.05, 2.85, 8, data203);
       b22 = Interps(2.05, 2.85, 8, data223);
     }
-
-
     return;
   }
 
@@ -485,6 +484,7 @@ namespace Belle2 {
         } while (gRandom->Uniform() > sf);
       } while (gRandom->Uniform() > tpform(q2p, w)*tpform(q2m, w));
 
+      /* cppcheck-suppress variableScope */
       double q2;
       int ivirt = 0;
 
@@ -931,10 +931,7 @@ namespace Belle2 {
       double sr = 3.62;
       double ggg = 2.62e-6;
       double phas = 22.8 / 180.*3.14159;
-      double mr0 = 0.98;
       double gtot0 = 0.03;
-      double speak = 18.3;
-      double mm = 0.1396;
 
       double v00 = 0., v20 = 0., v22 = 0. ;
 
@@ -949,6 +946,9 @@ namespace Belle2 {
       double dcs2 = 0.;
 
       if (ww < 2.3) {
+        double mr0 = 0.98;
+        double speak = 18.3;
+        double mm = 0.1396;
         double gf = pow(qfunc(ww * ww, mm) / qfunc(mr * mr, mm), 5) *
                     d2func(qfunc(ww * ww, mm) * sr) / d2func(qfunc(mr * mr, mm) * sr);
         std::complex<double> imagu(0.0, 1.0);
@@ -975,10 +975,7 @@ namespace Belle2 {
       double br = 0.45;
       double sr = 3.62;
       double ggg = 0.081e-6;
-      double mrfa = 1.29;
       double gtotfa = 0.13;
-      double speak = 40.;
-      double mm = 0.4937;
 
       double s00 = 0., s20 = 0., s22 = 0. ;
 
@@ -993,6 +990,9 @@ namespace Belle2 {
       double dcs2 = 0.;
 
       if (ww < 2.4) {
+        double mrfa = 1.29;
+        double speak = 40.;
+        double mm = 0.4937;
         double gf = pow(qfunc(ww * ww, mm) / qfunc(mr * mr, mm), 5) *
                     d2func(qfunc(ww * ww, mm) * sr) / d2func(qfunc(mr * mr, mm) * sr);
         std::complex<double> imagu(0.0, 1.0);
@@ -1108,6 +1108,7 @@ namespace Belle2 {
         wei = pow(3.*zp * zp - 1., 2);
         weimax = 2.;
       }
+      /* cppcheck-suppress duplicateCondition */
       if (TrepsB::pmodel == 307) {
         // 2- -> VP -> 3P
         wei = z * zp - 0.5 * u * up * cos(phip);

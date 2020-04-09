@@ -43,22 +43,23 @@ namespace Belle2 {
     ~TrepsB() {};
 
     // constants, enums and typedefs
+    Sutool sutool; //calculation tool kit by S.U
     double w;      // invariant mass of two-photon system
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved
-    Sutool sutool; //calculation tool kit by S.U
-
 
     // member functions
-    void setParameterFile(std::string file)
+    void setParameterFile(const std::string& file)
     {
       parameterFile = file;
     }
-    void setWlistFile(std::string file)
+
+    void setWlistFile(const std::string& file)
     {
       wlistFile = file;
     }
-    void setDiffcrosssectionFile(std::string file)
+
+    void setDiffcrosssectionFile(const std::string& file)
     {
       diffcrosssectionFile = file;
     }
@@ -67,18 +68,22 @@ namespace Belle2 {
     {
       ebeam = energy;
     }
+
     void setElectronMomentum(TVector3 p)
     {
       pfeb = p;
     }
+
     void setPositronMomentum(TVector3 p)
     {
       pfpb = p;
     }
+
     TVector3 getElectronMomentum()
     {
       return pfeb;
     }
+
     TVector3 getPositronMomentum()
     {
       return pfpb;
@@ -88,10 +93,12 @@ namespace Belle2 {
     {
       q2max = q2;
     }
+
     void setMaximalAbsCosTheta(double cost)
     {
       cost_cut = cost;
     }
+
     void applyCosThetaCutCharged(bool apply)
     {
       if (apply) {
@@ -102,10 +109,12 @@ namespace Belle2 {
         qzmin = -0.1;
       }
     }
+
     void setMinimalTransverseMomentum(double pt)
     {
       pt_cut = pt;
     }
+
     void applyTransverseMomentumCutCharged(bool apply)
     {
       if (apply) {
@@ -155,8 +164,6 @@ namespace Belle2 {
     double tpangd(double, double) ;
 
     //void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
-
-
 
   private:
 

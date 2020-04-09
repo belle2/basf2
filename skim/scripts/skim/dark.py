@@ -489,7 +489,7 @@ def TwoTrackPiPiList(path):
 
     # Exactly 2 tracks
     nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
-    # Invariant mass of pi+pi- system less than 2 GeV
+    # Invariant mass of pi+pi- system less than 1.5 GeV
     M_cut = 'M < 1.5'
     two_track_cut = nTracks_cut + ' and ' + M_cut
 

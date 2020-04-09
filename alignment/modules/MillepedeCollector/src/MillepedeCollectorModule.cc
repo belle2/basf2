@@ -1176,7 +1176,11 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
     genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
     B2Vector3D vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
     B2Vector3D vertexZDir(0, 0, vertexPos[2]);
-    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    //FIXME: This causes problem to current GBL version in genfit -> needs update of GBL to re-enable
+    // genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    //This works instead fine:
+    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexMom));
+
     vertexSOP.setPlane(vertexPlane);
     vertexSOP.setPosMom(vertexPos, vertexMom);
     TMatrixDSym vertexCov(5);
@@ -1405,9 +1409,12 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
                                        sign * c1 * sin(theta) * cos(phi),
                                        0.);
 
-    B2Vector3D dpdM = R * B2Vector3D(0.,
-                                     0.,
-                                     0.5 * sign * M / (2. * c2) * cos(phi));
+    double dc1dM = m * M / (2. * sqrt(M * M - 4. * m * m));
+    double dc2dM = M * (4. * m * m * p * p + pow(M, 4)) / (2 * M * M * M * sqrt((M * M - 4. * m * m) * (p * p + M * M)));
+
+    B2Vector3D dpdM = R * B2Vector3D(sign * sin(theta) * cos(phi) * dc1dM,
+                                     sign * sin(theta) * sin(phi) * dc1dM,
+                                     sign * cos(theta) * dc2dM);
 
     TMatrixD dpdz(3, 6);
     dpdz(0, 0) = dpdpx(0); dpdz(0, 1) = dpdpy(0); dpdz(0, 2) = dpdpz(0); dpdz(0, 3) = dpdtheta(0); dpdz(0, 4) = dpdphi(0);

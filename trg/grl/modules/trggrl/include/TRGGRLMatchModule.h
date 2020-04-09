@@ -90,7 +90,7 @@ namespace Belle2 {
     /** Short tracking logic*/
     void short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, std::vector<bool>  map_veto, std::vector<bool>  phimap_i,
                         std::vector< std::vector<int> >& pattern_base0, std::vector< std::vector<int> >& pattern_base2,
-                        StoreArray<TRGGRLShortTrack> grlst, StoreArray<TRGGRLShortTrack> grlst_tmp,
+                        StoreArray<TRGGRLShortTrack> grlst,
                         StoreObjPtr<TRGGRLInfo> trgInfo);
 
     /** Short track extrapolation (to endcap) function*/

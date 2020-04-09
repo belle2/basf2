@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -42,6 +41,10 @@ ma.printDataStore(path=my_path)
 
 # create and fill gamma/e/mu/pi/K/p ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
+#
+# note that you can give any name to your lists e.g. 'gamma:mycandidates',
+# except for the name 'all' which is the only name that is reserved for lists
+# with no cuts
 ma.fillParticleList(decayString='gamma:all', cut='', path=my_path)
 ma.fillParticleList(decayString='e-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='mu-:all', cut='', path=my_path)
@@ -65,7 +68,7 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(prioritiseV0=True, path=my_path)
 stdPi0s(listtype='looseFit', path=my_path)
-stdKlongs(listtype='all', path=my_path)  # only create the 'all' list with no cuts
+stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' us recommended at the moment
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore(path=my_path)
@@ -85,12 +88,17 @@ ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:merged', False, path=my_path)
 ma.printList('pi0:looseFit', False, path=my_path)
-ma.printList('K_L0:all', False, path=my_path)
+ma.printList('K_L0:allklm', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
-# You can either use preselected variable groups from variableCollections:
-# Or use your own lists. Both options are shown here.
+# You can either use preselected variable groups from variableCollections
+# or use your own lists. Both options are shown here.
+# For more information on the VariableManager, VariableCollections, etc.,
+# please refer to the dedicated VariableManager examples.
+
+# Note: vc.<collection> is a list (of variables); multiple lists are
+# concatenated with the + operator.
 
 charged_particle_variables = vc.reco_stats + \
     vc.kinematics + \
@@ -147,7 +155,7 @@ ma.variablesToNtuple(decayString='gamma:all',
                      treename='phot',
                      filename=output_file,
                      path=my_path)
-ma.variablesToNtuple(decayString='K_L0:all',
+ma.variablesToNtuple(decayString='K_L0:allklm',
                      variables=K0l_variables,
                      treename='klong',
                      filename=output_file,

@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
 #
 # evaluates the CoG corrections, create a localDB
 # with the corrections and a root file to check
@@ -14,7 +13,6 @@
 # this script can be launched with launch_calibration_cog.sh in the
 # B2SVD project, svd_CoGHitTime_calibration repository
 #
-#################################################################################
 
 
 from basf2 import *

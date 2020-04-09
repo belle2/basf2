@@ -27,8 +27,8 @@ variables.addAlias('pim_theta_lab', 'formula(daughter(1, theta)*180/3.1415927)')
 variables.addAlias('Mpipi', 'M')
 
 variablesHist = [
-                  ('pip_p_cms', 100, 1, 6),
-                  ('pim_p_cms', 100, 1, 6),
+                  ('pip_p_cms', 60, 0, 6),
+                  ('pim_p_cms', 60, 0, 6),
                   ('pip_theta_lab', 90, 0, 180),
                   ('pim_theta_lab', 90, 0, 180),
                   ('Mpipi', 80, 0., 2.)

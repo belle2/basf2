@@ -49,10 +49,10 @@ TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_sme
            "and final electron or positron momenta. Negative means no cut.",
            -1.0);
   addParam("MaximalAbsCosTheta", m_maximalAbsCosTheta,
-           "Maximal |cos(theta)|, where theta is the final-state particle "
+           "Maximal abs[cos(theta)], where theta is the final-state particle "
            "polar angle.", 1.01);
   addParam("ApplyCosThetaCutCharged", m_applyCosThetaCutCharged,
-           "Whether to apply cut on |cos(theta)| for charged particles only.",
+           "Whether to apply cut on abs[cos(theta)] for charged particles only.",
            true);
   addParam("MinimalTransverseMomentum", m_minimalTransverseMomentum,
            "Minimal transverse momentum of the final-state particles.", 0.0);

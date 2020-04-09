@@ -241,12 +241,11 @@ void PXDReadRawBonnDAQMatchedModule::event()
   if (offset == 0) offset = m_last_offset;
   fseek(fh, offset, SEEK_SET);
   // Get a record from file
-  int stat;
   auto tnr = triggernr;
   do {
     // Search for triggernr
     tnr = triggernr; // set again as it is the return value
-    stat = readOneEvent(tnr);
+    int stat = readOneEvent(tnr);
     if (stat <= 0) {
       // End of File
       break;

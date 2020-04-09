@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# Doxygen should skip this script
+# @cond
 
 """
 This steering file fills an NTuple with the ChargedPidMVA score
@@ -21,8 +23,6 @@ __author__ = "Marco Milesi"
 __email__ = "marco.milesi@unimelb.edu.au"
 
 
-import os
-import sys
 import argparse
 
 
@@ -232,3 +232,5 @@ if __name__ == '__main__':
 
     # Print basf2 call statistics.
     print(basf2.statistics)
+
+# @endcond

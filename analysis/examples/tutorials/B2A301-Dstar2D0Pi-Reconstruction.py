@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -56,6 +55,17 @@ ma.matchMCTruth(list_name='D*+', path=my_path)
 # Select variables that we want to store to ntuple
 dstar_vars = vc.inv_mass + vc.mc_truth
 
+# We now want to select variables for all of the final state hadrons in the
+# decay products, that is, the K- and the two pi+.
+# You already know how to define these variables with the help of the
+# ``daughter`` metavariable: If we consider D^* -> D0 pi+, then we could access
+# information about the pion as daughter(1, variable).
+# Creating aliases for all of these variables would fill the next 100 lines
+# though, so we instead use the ``create_aliases_for_selected`` helper function:
+# We specify a list of variables and then a decay string, with particles
+# selected with a leading ``^``.
+# Again, for more information on how to create aliases, head over to
+# VariableManager/variableAliases.py.
 fs_hadron_vars = vu.create_aliases_for_selected(
     list_of_variables=vc.pid + vc.track + vc.mc_truth,
     decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')

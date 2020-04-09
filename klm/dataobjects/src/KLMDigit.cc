@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Kirill Chilikin                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 /* Own header. */
 #include <klm/dataobjects/KLMDigit.h>
@@ -18,6 +27,7 @@ KLMDigit::KLMDigit() :
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
+  m_Time(0),
   m_EnergyDeposit(0),
   m_NPhotoelectrons(0),
   m_NGeneratedPhotoelectrons(0),
@@ -96,8 +106,8 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
 
 unsigned int KLMDigit::getUniqueChannelID() const
 {
-  return m_ElementNumbers->channelNumber(m_Subdetector, m_Section, m_Layer,
-                                         m_Sector, m_Plane, m_Strip);
+  return m_ElementNumbers->channelNumber(m_Subdetector, m_Section, m_Sector,
+                                         m_Layer, m_Plane, m_Strip);
 }
 
 DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)

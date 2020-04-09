@@ -34,7 +34,8 @@ def get_default_channels(
         neutralB=True,
         convertedFromBelle=False,
         specific=False,
-        removeSLD=False):
+        removeSLD=False,
+        strangeB=False):
     """
     returns list of Particle objects with all default channels for running
     FEI on Upsilon(4S). For a training with analysis-specific signal selection,
@@ -48,12 +49,12 @@ def get_default_channels(
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
     @param specific if True, this adds isInRestOfEvent cut to all FSP
     @param removeSLD if True, removes semileptonic D modes from semileptonic B lists (default is False)
-    @param upsilon5S if True, reconstruct Bs mesons (default is False)
+    @param strangeB if True, reconstruct B_s mesons in Upsilon5S decays (default is False)
     """
-    if upsilon5S is True:
+    if strangeB is True:
         B2INFO('Running 5S FEI')
-    if chargedB is False and neutralB is False and upsilon5S is False:
-        B2FATAL('No B-Mesons will be recombined, since chargedB==False and neutralB==False and upsilon5S==False was selected!'
+    if chargedB is False and neutralB is False and strangeB is False:
+        B2FATAL('No B-Mesons will be recombined, since chargedB==False and neutralB==False and strangeB==False was selected!'
                 ' Please reconfigure the arguments of get_default_channels() accordingly')
     if hadronic is False and semileptonic is False:
         if KLong is False:
@@ -896,10 +897,6 @@ def get_default_channels(
         B0_KL.addChannel(['J/psi', 'K_L0'])
         B0_KL.addChannel(['J/psi', 'K_L0', 'pi+', 'pi-'])
 
-    """
-    BEGIN B_s0 RECO:
-    """
-
     # Use this instead of deltaE since Bs has three peaks in deltaE
     Bs_vars = ['formula(deltaE+Mbc-5.3669)' if x == 'deltaE' else x for x in B_vars]
 
@@ -915,7 +912,6 @@ def get_default_channels(
                                       bestCandidateCut=20),
                   PostCutConfiguration(bestCandidateCut=20))
 
-    # FT - D_s & D*
     BS.addChannel(['D_s-', 'D_s+'])
     BS.addChannel(['D_s*+', 'D_s-'])
     BS.addChannel(['D_s*-', 'D_s*+'])
@@ -924,17 +920,14 @@ def get_default_channels(
     BS.addChannel(['D_s*+', 'D-'])
     BS.addChannel(['D_s*+', 'D*-'])
 
-    # FT - D_s
     BS.addChannel(['D_s-', 'K+'])
     BS.addChannel(['D_s-', 'pi+'])
 
-    # FT - D_s*
     BS.addChannel(['D_s*-', 'K+'])
     BS.addChannel(['D_s*-', 'pi+'])
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
 
-    # SW - D_s
     BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'])
     BS.addChannel(['D_s-', 'D0', 'K+'])
     BS.addChannel(['D_s-', 'D+', 'K_S0'])
@@ -943,7 +936,6 @@ def get_default_channels(
     BS.addChannel(['D_s-', 'D0', 'K_S0', 'pi+'])    # K*+
     BS.addChannel(['D_s-', 'D+', 'K+', 'pi-'])      # K*0
     BS.addChannel(['D_s-', 'D+', 'K_S0', 'pi0'])    # K*0
-    # SW - D_s & D*
     BS.addChannel(['D_s-', 'D*0', 'K+'])
     BS.addChannel(['D_s-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s-', 'D*0', 'K+', 'pi0'])     # K*+
@@ -951,14 +943,12 @@ def get_default_channels(
     BS.addChannel(['D_s-', 'D*+', 'K+', 'pi-'])     # K*0
     BS.addChannel(['D_s-', 'D*+', 'K_S0', 'pi0'])   # K*0
 
-    # SW - D_s*
     BS.addChannel(['D_s*-', 'D0', 'K+'])
     BS.addChannel(['D_s*-', 'D+', 'K_S0'])
     BS.addChannel(['D_s*-', 'D*0', 'K+'])
     BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'])
 
-    # These are from belle decfile
     BS.addChannel(['D_s*-', 'pi+', 'pi0'])          # rho+
     BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'])     # K*+
     BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
@@ -969,10 +959,13 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D*+', 'K+', 'pi-'])    # K*0
     BS.addChannel(['D_s*-', 'D*+', 'K_S0', 'pi0'])  # K*0
 
-    # SW J/Psi
-    BS.addChannel(['J/psi', 'pi0'])
+    BS.addChannel(['J/psi', 'K_S0'])
     BS.addChannel(['J/psi', 'pi+', 'pi-'])
     BS.addChannel(['J/psi', 'K+', 'K-']),
+    BS.addChannel(['J/psi', 'K_S0', 'K-', 'pi+']),
+    BS.addChannel(['J/psi', 'K-', 'K+', 'pi0']),
+    BS.addChannel(['J/psi', 'pi-', 'pi+', 'pi0'])  # Eta
+    BS.addChannel(['J/psi', 'pi+', 'pi-', 'pi-', 'pi+', 'pi0'])  # Etaprime
 
     particles = []
     particles.append(pion)
@@ -1031,7 +1024,7 @@ def get_default_channels(
         if chargedB:
             particles.append(BP_SL)
 
-    if upsilon5S:
+    if strangeB:
         particles.append(BS)
 
     return particles

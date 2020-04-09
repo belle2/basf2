@@ -177,7 +177,7 @@ class SkimRegistry:
         }
         return NameLookup[SkimModule]
 
-    def get_skim_function(SkimName):
+    def get_skim_function(self, SkimName):
         """Get the skim class constructor for the given skim.
 
         This is achieved by importing the module listed alongside the skim name in the
@@ -189,7 +189,7 @@ class SkimRegistry:
         Returns:
             SkimFunction: The class constructor for the given skim.
         """
-        ModuleName = Registry.get_skim_module(SkimName)
+        ModuleName = self.get_skim_module(SkimName)
         SkimModule = import_module(f"skim.{ModuleName}")
         return getattr(SkimModule, SkimName)
 

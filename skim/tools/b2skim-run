@@ -30,6 +30,10 @@ def get_argument_parser():
         description=__doc__, formatter_class=CustomHelpFormatter,
     )
 
+    subparsers = parser.add_subparsers(
+        help="Run just one skim, or multiple skims at once.", dest="action"
+    )
+
     parser.add_argument(
         "-n",
         "--max-input-events",
@@ -47,10 +51,10 @@ def get_argument_parser():
         help="Input file list",
     )
 
-    single = parser.add_subparser("single", "Run a single skim.")
+    single = subparsers.add_parser("single", help="Run a single skim.")
 
     single.add_argument(
-        "skim", nargs="+", choices=Registry.names, metavar="Skim", help="Skim to run.",
+        "skim", choices=Registry.names, metavar="Skim", help="Skim to run.",
     )
 
     single.add_argument(
@@ -61,8 +65,8 @@ def get_argument_parser():
         help="Location of output uDST file.",
     )
 
-    combined = parser.add_subparser(
-        "combined", "Run a set of skims as a combined steering file."
+    combined = subparsers.add_parser(
+        "combined", help="Run several skims as a combined steering file.",
     )
 
     combined.add_argument(
@@ -73,12 +77,12 @@ def get_argument_parser():
         help="List of skims to run.",
     )
 
-    module = parser.add_subparser("module", "Run all skims in a module.")
+    module = subparsers.add_parser("module", help="Run all skims in a module.")
 
     module.add_argument(
         "module",
         choices=Registry.modules,
-        metavar="Module",
+        metavar="module",
         help="Skim module to run all skims for as combined steering file.",
     )
 
@@ -92,14 +96,14 @@ def main():
     path = b2.Path()
 
     # Get the list of skims to run from the argument parsers
-    if args.single:
+    if args.action == "single":
         SkimFunction = Registry.get_skim_function(args.skim)
-        Skim = SkimFunction(OutputFileName=args.single.OutputFilename)
-    elif args.combined:
+        Skim = SkimFunction(OutputFileName=args.OutputFilename)
+    elif args.action == "combined":
         skims = list({*args.combined.skims})
         SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
         Skim = CombinedSkim(*SkimObjects)
-    elif args.module:
+    elif args.action == "module":
         SkimObjects = [
             Registry.get_skim_function(skim)()
             for skim in Registry.get_skims_in_module(args.module)

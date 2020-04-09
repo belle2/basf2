@@ -96,8 +96,7 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
 Running a skim
 ~~~~~~~~~~~~~~
 
-There are two tools available for running skims, documented below. These take a skim name as a
-command line argument, and run the code defined in the corresponding subclass of `BaseSkim`.
+In the skim package, there is a command-line tool available for running skims, documented below. These take a skim name as a command line argument, and run the code defined in the corresponding subclass of `BaseSkim`.
 
 .. tip::
    These tools completely supplant the ``<SkimName>_Skim_Standalone.py`` steering files from
@@ -113,19 +112,6 @@ command line argument, and run the code defined in the corresponding subclass of
    :filename: skim/tools/b2skim-run
    :func: get_argument_parser
    :prog: b2skim-run
-   :nodefaultconst:
-   :nogroupsections:
-
-
-.. _b2skim-run-combined:
-
-``b2skim-run-combined``: Run multiple skims at once
-...................................................
-
-.. argparse::
-   :filename: skim/tools/b2skim-run-combined
-   :func: get_argument_parser
-   :prog: b2skim-run-combined
    :nodefaultconst:
    :nogroupsections:
 

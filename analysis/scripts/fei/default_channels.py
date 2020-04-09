@@ -902,12 +902,18 @@ def get_default_channels(
     BEGIN B_s0 RECO:
     """
 
-    # Use this instead of deltaE since Bs has three peaks in deltaE
+    # Use deltaE + Mbc - m_(B_s) instead of deltaE since Bs has only one peak here (vs. 3 in deltaE)
     Bs_vars = ['formula(deltaE+Mbc-5.3669)' if x == 'deltaE' else x for x in B_vars]
 
-    hadronic_bs_user_cut = 'Mbc > 5.3 and abs(deltaE) < 0.5'
+    hadronic_bs_user_cut = 'Mbc > 5.3 and abs(formula(deltaE+Mbc-5.3669)) < 0.5'
     if B_extra_cut is not None:
         hadronic_bs_user_cut += ' and [' + B_extra_cut + ']'
+
+    tight_precut = PreCutConfiguration(userCut=hadronic_bs_user_cut + 'and abs(formula(deltaE+Mbc-5.3669)) < 0.1',
+                                       bestCandidateMode='highest',
+                                       bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
+                                       bestCandidateCut=20),
+
     BS = Particle('B_s0',
                   MVAConfiguration(variables=Bs_vars,
                                    target='isSignal'),
@@ -918,12 +924,12 @@ def get_default_channels(
                   PostCutConfiguration(bestCandidateCut=20))
 
     # D_s & D*
-    BS.addChannel(['D_s-', 'D_s+'])
-    BS.addChannel(['D_s*+', 'D_s-'])
-    BS.addChannel(['D_s*-', 'D_s*+'])
-    BS.addChannel(['D_s+', 'D-'])
-    BS.addChannel(['D*-', 'D_s+'])
-    BS.addChannel(['D_s*+', 'D-'])
+    BS.addChannel(['D_s-', 'D_s+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s*+', 'D_s-'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s*-', 'D_s*+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s+', 'D-'], preCutConfig=tight_precut)
+    BS.addChannel(['D*-', 'D_s+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s*+', 'D-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D*-'])
 
     BS.addChannel(['D_s-', 'K+'])
@@ -944,34 +950,30 @@ def get_default_channels(
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
 
-    #  D_s
-    BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'])
-    BS.addChannel(['D_s-', 'D0', 'K+'])
+    BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s-', 'D0', 'K+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s-', 'D+', 'K_S0'])
-    BS.addChannel(['D_s-', 'pi+', 'pi0'])           # rho+
-    BS.addChannel(['D_s-', 'D0', 'K+', 'pi0'])      # K*+
+    BS.addChannel(['D_s-', 'pi+', 'pi0'], preCutConfig=tight_precut)           # rho+
+    BS.addChannel(['D_s-', 'D0', 'K+', 'pi0'], preCutConfig=tight_precut)      # K*+
     BS.addChannel(['D_s-', 'D0', 'K_S0', 'pi+'])    # K*+
     BS.addChannel(['D_s-', 'D+', 'K+', 'pi-'])      # K*0
     BS.addChannel(['D_s-', 'D+', 'K_S0', 'pi0'])    # K*0
-
-    # D_s & D*
-    BS.addChannel(['D_s-', 'D*0', 'K+'])
+    BS.addChannel(['D_s-', 'D*0', 'K+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s-', 'D*0', 'K+', 'pi0'])     # K*+
     BS.addChannel(['D_s-', 'D*0', 'K_S0', 'pi+'])   # K*+
     BS.addChannel(['D_s-', 'D*+', 'K+', 'pi-'])     # K*0
     BS.addChannel(['D_s-', 'D*+', 'K_S0', 'pi0'])   # K*0
 
-    # D_s*
-    BS.addChannel(['D_s*-', 'D0', 'K+'])
+    BS.addChannel(['D_s*-', 'D0', 'K+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*-', 'D+', 'K_S0'])
-    BS.addChannel(['D_s*-', 'D*0', 'K+'])
+    BS.addChannel(['D_s*-', 'D*0', 'K+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
-    BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'])
+    BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'], preCutConfig=tight_precut)
 
     # These are from belle decfile
-    BS.addChannel(['D_s*-', 'pi+', 'pi0'])          # rho+
-    BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'])     # K*+
+    BS.addChannel(['D_s*-', 'pi+', 'pi0'], preCutConfig=tight_precut)          # rho+
+    BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'], preCutConfig=tight_precut)     # K*+
     BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
     BS.addChannel(['D_s*-', 'D+', 'K+', 'pi-'])     # K*0
     BS.addChannel(['D_s*-', 'D+', 'K_S0', 'pi0'])   # K*0

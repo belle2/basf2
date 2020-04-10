@@ -81,7 +81,7 @@ namespace Belle2 {
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.
      * @param[in] hslb              HSLB number.
-     * @param[in] daqSubdetector    Subdetector (as determied from DAQ data).
+     * @param[in] daqSubdetector    Subdetector (as determined from DAQ data).
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
     void unpackKLMDigit(const int* rawData, int copper, int hslb,

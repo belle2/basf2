@@ -53,7 +53,7 @@ void SmearPrimaryVertexModule::event()
   bool primaryVertexFound = false;
   for (MCParticle& mcParticle : mcParticles) {
     /* Skip an MCParticle if it is flagged as c_Initial or c_IsVirtual. */
-    if (not(mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual)))
+    if (mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual))
       continue;
     if (not primaryVertexFound) {
       /* Save the previous primary vertex. */

@@ -114,6 +114,9 @@ bool ECLChannelMapper::initFromDB()
     B2FATAL("ECLChannelMapper:: Could not get ECLChannelMap from the database.");
   }
 
+  B2INFO("ECLChannelMapper:: loaded ECLChannelMap from the database"
+         << LogVar("IoV", channelMap.getIoV()));
+
   const auto& mappingBAR = channelMap->getMappingBAR();
   const auto& mappingFWD = channelMap->getMappingFWD();
   const auto& mappingBWD = channelMap->getMappingBWD();

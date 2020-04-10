@@ -293,14 +293,14 @@ void KLMUnpackerModule::event()
       else
         continue;
       m_RawKLMs[i]->GetBuffer(j);
-      for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
+      for (int hslb = 0; hslb < 4; hslb++) {
         KLMDigitEventInfo* klmDigitEventInfo =
           m_DigitEventInfos.appendNew(m_RawKLMs[i], j);
         klmDigitEventInfo->setPreviousEventTriggerCTime(
           m_triggerCTimeOfPreviousEvent);
         m_triggerCTimeOfPreviousEvent = klmDigitEventInfo->getTriggerCTime();
-        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, finesse_num);
-        int* buf_slot    = m_RawKLMs[i]->GetDetectorBuffer(j, finesse_num);
+        int numDetNwords = m_RawKLMs[i]->GetDetectorNwords(j, hslb);
+        int* hslbBuffer = m_RawKLMs[i]->GetDetectorBuffer(j, hslb);
         int numHits = numDetNwords / hitLength;
         if (numDetNwords % hitLength != 1 && numDetNwords != 0) {
           B2ERROR("Incorrect number of data words."
@@ -313,16 +313,17 @@ void KLMUnpackerModule::event()
            * In the last word there are the revo9 trigger word
            * and the the user word (both from DCs).
            */
-          unsigned int revo9TriggerWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
+          unsigned int revo9TriggerWord =
+            (hslbBuffer[numDetNwords - 1] >> 16) & 0xFFFF;
           klmDigitEventInfo->setRevo9TriggerWord(revo9TriggerWord);
-          unsigned int userWord = buf_slot[numDetNwords - 1] & 0xFFFF;
+          unsigned int userWord = hslbBuffer[numDetNwords - 1] & 0xFFFF;
           klmDigitEventInfo->setUserWord(userWord);
         } else {
           klmDigitEventInfo->setRevo9TriggerWord(0);
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          unpackKLMDigit(&buf_slot[iHit * hitLength], copperId, finesse_num,
+          unpackKLMDigit(&hslbBuffer[iHit * hitLength], copperId, hslb,
                          subdetector, klmDigitEventInfo);
         }
       }

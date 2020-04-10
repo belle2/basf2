@@ -311,7 +311,7 @@ void KLMUnpackerModule::event()
         if (numDetNwords > 0) {
           /*
            * In the last word there are the revo9 trigger word
-          * and the the user word (both from DCs).
+           * and the the user word (both from DCs).
            */
           unsigned int revo9TriggerWord = (buf_slot[numDetNwords - 1] >> 16) & 0xFFFF;
           klmDigitEventInfo->setRevo9TriggerWord(revo9TriggerWord);

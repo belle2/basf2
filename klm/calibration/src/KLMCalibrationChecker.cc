@@ -24,9 +24,7 @@
 #include <framework/database/Database.h>
 #include <framework/database/DBStore.h>
 #include <framework/database/Configuration.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 /* ROOT include. */
 #include <TCanvas.h>
@@ -51,6 +49,10 @@ void KLMCalibrationChecker::setExperimentRun(int experiment, int run)
 {
   m_experiment = experiment;
   m_run = run;
+  if (m_EventMetaData.isValid()) {
+    m_EventMetaData->setExperiment(experiment);
+    m_EventMetaData->setRun(run);
+  }
 }
 
 void KLMCalibrationChecker::setTestingPayload(
@@ -75,9 +77,10 @@ void KLMCalibrationChecker::initializeDatabase()
   /* Mimic a module initialization. */
   StoreObjPtr<EventMetaData> eventMetaData;
   DataStore::Instance().setInitializeActive(true);
-  eventMetaData.registerInDataStore();
+  m_EventMetaData.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  eventMetaData.construct(1, m_run, m_experiment);
+  if (!m_EventMetaData.isValid())
+    m_EventMetaData.construct(1, m_run, m_experiment);
   /* Database instance and configuration. */
   DBStore& dbStore = DBStore::Instance();
   dbStore.update();

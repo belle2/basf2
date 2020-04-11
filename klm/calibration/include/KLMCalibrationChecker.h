@@ -12,6 +12,8 @@
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */
@@ -104,6 +106,9 @@ namespace Belle2 {
 
     /** Output file for alignment results. */
     std::string m_AlignmentResultsFile = "alignment.root";
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
   };
 

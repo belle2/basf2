@@ -168,6 +168,7 @@ void KLMCalibrationChecker::checkAlignment()
   eklmSegmentTree->Branch("correction", &correction, "correction/F");
   eklmSegmentTree->Branch("error", &error, "error/F");
   const KLMAlignmentData* alignment, *alignmentError, *alignmentCorrection;
+  KLMAlignmentData zeroAlignment(0, 0, 0, 0, 0, 0);
   KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
   for (KLMChannelIndex& klmModule : klmModules) {
     uint16_t module = klmModule.getKLMModuleNumber();
@@ -182,9 +183,17 @@ void KLMCalibrationChecker::checkAlignment()
       alignmentCorrection =
         eklmAlignmentCorrections->getModuleAlignment(module);
     }
-    if (alignment == nullptr || alignmentError == nullptr ||
-        alignmentCorrection == nullptr)
+    if (alignment == nullptr)
       B2FATAL("Incomplete KLM alignment data.");
+    if ((alignmentError == nullptr) && (alignmentCorrection == nullptr)) {
+      B2WARNING("Alignment is not determined for KLM module."
+                << LogVar("Module", module));
+      alignmentError = &zeroAlignment;
+      alignmentCorrection = &zeroAlignment;
+    } else if ((alignmentError == nullptr) ||
+               (alignmentCorrection == nullptr)) {
+      B2FATAL("Inconsistent undtermined parameters.");
+    }
     section = klmModule.getSection();
     sector = klmModule.getSector();
     layer = klmModule.getLayer();
@@ -238,18 +247,29 @@ void KLMCalibrationChecker::checkAlignment()
       eklmModuleTree->Fill();
   }
   KLMChannelIndex eklmSegments(KLMChannelIndex::c_IndexLevelStrip);
-  eklmSegments.useEKLMSegments();
-  for (KLMChannelIndex eklmSegment = eklmSegments.beginEKLM();
-       eklmSegment != eklmSegments.endEKLM(); ++eklmSegment) {
+  KLMChannelIndex eklmSegment(KLMChannelIndex::c_IndexLevelStrip);
+  eklmSegment = eklmSegments.beginEKLM();
+  eklmSegment.useEKLMSegments();
+  for (; eklmSegment != eklmSegments.endEKLM(); ++eklmSegment) {
     int eklmSegmentNumber = eklmSegment.getEKLMSegmentNumber();
     alignment = eklmSegmentAlignment->getSegmentAlignment(eklmSegmentNumber);
     alignmentError =
       eklmSegmentAlignmentErrors->getSegmentAlignment(eklmSegmentNumber);
     alignmentCorrection =
       eklmSegmentAlignmentCorrections->getSegmentAlignment(eklmSegmentNumber);
-    if (alignment == nullptr || alignmentError == nullptr ||
-        alignmentCorrection == nullptr)
+    if (alignment == nullptr)
       B2FATAL("Incomplete KLM alignment data.");
+    if ((alignmentError == nullptr) && (alignmentCorrection == nullptr)) {
+      /*
+       * The segment alignment is not determined now.
+       * TODO: If it will be turned on in the future, add a warning here.
+       */
+      alignmentError = &zeroAlignment;
+      alignmentCorrection = &zeroAlignment;
+    } else if ((alignmentError == nullptr) ||
+               (alignmentCorrection == nullptr)) {
+      B2FATAL("Inconsistent undtermined parameters.");
+    }
     section = eklmSegment.getSection();
     sector = eklmSegment.getSector();
     layer = eklmSegment.getLayer();

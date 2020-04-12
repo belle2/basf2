@@ -62,7 +62,15 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   }
   m_monObj = getMonitoringObject("cdc");
   //  m_cMain = new TCanvas("main", "main", 1300, 1000);
-  m_cMain = new TCanvas("main", "main", 650, 500);
+
+  gStyle->SetOptStat(0);
+  gStyle->SetPalette(kViridis);
+  gStyle->SetPadTopMargin(0.1);
+  gStyle->SetPadRightMargin(0.05);
+  gStyle->SetPadBottomMargin(0.1);
+  gStyle->SetPadLeftMargin(0.15);
+
+  m_cMain = new TCanvas("main", "main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
   B2DEBUG(20, "DQMHistAnalysisCDCMonObj: initialized.");
 
@@ -90,18 +98,17 @@ void DQMHistAnalysisCDCMonObjModule::event()
 void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
 {
   m_badChannels.clear();
-  for (int i = 0; i < 56; ++i) {
-    const int layer = i;
-    const auto h = m_hHit[layer];
-    const int nbins = h->GetNbinsX();
-    for (int j = 0; j < nbins; ++j) {
-      const int wire = i;
-      const int y = h->GetBinContent(j + 1);
+  for (int il = 0; il < 56; ++il) {
+    const int nbins = m_hHit[il]->GetNbinsX();
+    for (int iw = 0; iw < nbins; ++iw) {
+      const int y = m_hHit[il]->GetBinContent(iw + 1);
       if (y == 0) {
-        m_badChannels.push_back(std::make_pair(layer, wire));
+        //B2INFO("l " << layer << " w " << wire);
+        m_badChannels.push_back(std::make_pair(il, iw));
       }
     }
   }
+  B2INFO("num bad wires " << m_badChannels.size());
 }
 
 float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1F* h)
@@ -116,7 +123,7 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 {
   const WireID w(layer, wire);
   decltype(m_chMap)::iterator it = m_chMap.find(w);
-  if (it != m_chMap.end()) { // 見つかった
+  if (it != m_chMap.end()) {
     return it->second;
   } else {
     B2ERROR("no corresponding board/channel found layer "  << layer << " wire " << wire);
@@ -148,7 +155,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   // ADC related
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
-  TH1F* hADCMean = new TH1F("hADCMean", "ADC mean", 300, 0, 300);
+  TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
   for (int i = 0; i < 300; ++i) {
     if (m_hADC[i]->GetEntries() == 0) {
       nDeadADC += 1;
@@ -156,7 +163,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       float n = static_cast<float>(m_hADC[i]->GetEntries());
       float n0 = static_cast<float>(m_hADC[i]->GetBinContent(1));
       if (n0 / n > 0.1) {
-        B2INFO("bad adc bid " << i << " " << n0 << " " << n);
+        B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
       float m = getHistMean(m_hADC[i]);
@@ -168,8 +175,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   // TDC related
   int nDeadTDC = 1; // bid 0 always empty
-  TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge", 300, 0, 300);
-  TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope", 300, 0, 300);
+  TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
+  TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
   for (int i = 0; i < 300; ++i) {
     if (m_hTDC[i]->GetEntries() == 0 || m_hTDC[i] == nullptr) {
       nDeadTDC += 1;
@@ -195,21 +202,32 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   // Bad wires relasted
-  TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 55);
+  TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
+  for (int i = 0; i < 400; ++i) {
+    for (int j = 0; j < 56; ++j) {
+      hBadChannel->Fill(i, j, -1);
+    }
+  }
   TH2F* hBadChannelBC = new TH2F("hbadchBC", "bad channel map per board/channel;board;channel", 300, 0, 300, 48, 0, 48);
+  for (int i = 0; i < 300; ++i) {
+    for (int j = 0; j < 48; ++j) {
+      hBadChannelBC->Fill(i, j, -1);
+    }
+  }
   makeBadChannelList();
   for (const auto& lw : m_badChannels) {
     const int l = lw.first;
     const int w = lw.second;
-    hBadChannel->SetBinContent(w + 1, l + 1, 8);
+    B2DEBUG(99, "l " << l << " w " << w);
+    hBadChannel->Fill(w, l);
     std::pair<int, int> bc = getBoardChannel(l, w);
-    hBadChannelBC->SetBinContent(bc.first + 1, bc.second + 1, 8);
+    hBadChannelBC->Fill(bc.first, bc.second);
   }
 
 
 
   // Hit related
-  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer", 56, 0, 56);
+  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
 
   for (int i = 0; i < 56; ++i) {
     int nhitSumL = 0;
@@ -222,22 +240,32 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
 
-  gStyle->SetOptStat(0);
-  gStyle->SetPalette(kViridis);
 
-  m_cMain->SetLeftMargin(0.);
   m_cMain->Divide(3, 2);
+
   m_cMain->cd(1);
+  hADCMean->SetMinimum(0);
+  hADCMean->SetMaximum(200);
   hADCMean->Draw();
+
   m_cMain->cd(2);
+  hTDCEdge->SetMinimum(4800);
+  hTDCEdge->SetMaximum(5000);
   hTDCEdge->Draw();
+
   m_cMain->cd(3);
+  hTDCSlope->SetMinimum(0);
+  hTDCSlope->SetMaximum(50);
   hTDCSlope->Draw();
+
   m_cMain->cd(4);
-  //hBadChannel->SetMaximum(2);
-  //hBadChannel->SetMinimum(-1);
+  // hBadChannel->SetMaximum(2);
+  // hBadChannel->SetMinimum(-1);
   hBadChannel->Draw("col");
+
   m_cMain->cd(5);
+  // hBadChannelBC->SetMaximum(2);
+  // hBadChannelBC->SetMinimum(-1);
   hBadChannelBC->Draw("col");
   m_cMain->cd(6);
   hHitPerLayer->Draw();

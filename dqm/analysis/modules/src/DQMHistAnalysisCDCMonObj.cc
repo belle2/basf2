@@ -29,6 +29,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 using namespace std;
 using namespace Belle2;
@@ -94,7 +95,6 @@ void DQMHistAnalysisCDCMonObjModule::event()
 }
 
 
-
 void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
 {
   m_badChannels.clear();
@@ -144,6 +144,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     fitFunc[i]->SetParLimits(0, 0, 100);
     fitFunc[i]->SetParLimits(6, 0, 0.1);
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
+    fitFunc[i]->SetParLimits(5, 0, 50.0);
   }
 
   for (int i = 0; i < 56; ++i) {
@@ -156,18 +157,20 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
+  std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
     if (m_hADC[i]->GetEntries() == 0) {
       nDeadADC += 1;
     } else {
       float n = static_cast<float>(m_hADC[i]->GetEntries());
       float n0 = static_cast<float>(m_hADC[i]->GetBinContent(1));
-      if (n0 / n > 0.1) {
+      if (n0 / n > 0.9) {
         B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
       float m = getHistMean(m_hADC[i]);
       //B2INFO(i << " " << m );
+      means.push_back(m);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
     }
@@ -177,6 +180,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   int nDeadTDC = 1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
+  std::vector<float> tdcEdges = {};
+  std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
     if (m_hTDC[i]->GetEntries() == 0 || m_hTDC[i] == nullptr) {
       nDeadTDC += 1;
@@ -197,6 +202,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         hTDCEdge->SetBinError(i + 1, 0);
         hTDCSlope->SetBinContent(i + 1, p5);
         hTDCSlope->SetBinError(i + 1, 0);
+        tdcEdges.push_back(p4);
+        tdcSlopes.push_back(p5);
       }
     }
   }
@@ -229,6 +236,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   // Hit related
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
 
+  int nHits = 0;
   for (int i = 0; i < 56; ++i) {
     int nhitSumL = 0;
     const int nBins = m_hHit[i]->GetNbinsX();
@@ -237,6 +245,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     }
     hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
     hHitPerLayer->SetBinError(i + 1, 0);
+    nHits += nhitSumL;
   }
 
 
@@ -269,6 +278,18 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hBadChannelBC->Draw("col");
   m_cMain->cd(6);
   hHitPerLayer->Draw();
+
+  std::string comment = "";
+  m_monObj->setVariable("comment", comment); // tentative
+  m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0) / means.size());
+  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0) / tdcEdges.size());
+  m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0) / tdcSlopes.size());
+  m_monObj->setVariable("nEvents", neve);
+  m_monObj->setVariable("nDeadADC", nDeadADC);
+  m_monObj->setVariable("nDeadTDC", nDeadTDC);
+  m_monObj->setVariable("nHits", nHits / neve);
+  m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC);
+  m_monObj->setVariable("nBadWires", m_badChannels.size());
 
   TString fname;
   if (m_filename.length()) fname = m_filename;

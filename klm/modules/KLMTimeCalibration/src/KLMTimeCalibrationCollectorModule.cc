@@ -228,7 +228,7 @@ void KLMTimeCalibrationCollectorModule::collect()
       }
       if (tSub == KLMElementNumbers::c_EKLM && eklmCover) {
         B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed for EKLM" << LogVar("Layer", tLay));
-        crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay);
+        crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1);
       }
       B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed" << LogVar("crossed", crossed));
       if (crossed)

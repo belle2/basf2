@@ -89,6 +89,7 @@ namespace Belle2 {
     //! print a PXD event
     virtual void printPXDEvent(RawPXD* raw_pxd);
 
+    //! Called if the current run ends
     virtual void endRun() override;
 
   protected :

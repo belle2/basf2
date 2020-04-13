@@ -128,7 +128,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   //
   // Show newly added variables for ver.2 format
   //
-  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %d FrameCnt %d \n",
+  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %u FrameCnt %u \n",
          rawftsw.GetIsHER(n),
          rawftsw.GetTimeSinceLastInjection(n),
          rawftsw.GetTimeSincePrevTrigger(n),
@@ -167,6 +167,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
 
   unsigned int frame_cnt = buf[ 11 ];
   unsigned int time_prevtrg = buf[ 12 ];
+  /* cppcheck-suppress shiftTooManyBitsSigned */
   int is_her = buf[ 13 ] >> 31;
   unsigned int time_lastinj = buf[ 13 ] & 0x7fffffff;
   unsigned int bunch_num = buf[ 14 ] & 0x7ff;

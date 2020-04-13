@@ -62,6 +62,7 @@ namespace Belle2 {
     //
 
     //! set buffer ( delete_flag : m_buffer is freeed( = 0 )/ not freeed( = 1 ) in Destructer )
+    /* cppcheck-suppress missingOverride */
     void SetBuffer(int* bufin, int nwords, int delete_flag, int num_events, int num_nodes) OVERRIDE_CPP17;
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +101,7 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
+    /* cppcheck-suppress missingOverride */
     virtual int GetBufferPos(int n) OVERRIDE_CPP17;
 
     //! get buffer pointer of rawcopper header(Currently same as GetBufferPos)

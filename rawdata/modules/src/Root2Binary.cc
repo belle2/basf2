@@ -153,15 +153,15 @@ void Root2BinaryModule::event()
   int epid_pos = 0;
   int klm_pos = 0;
 
-  unsigned int dblk_eve = 0;
-  unsigned int ftsw_eve = 0;
-  unsigned int copper_eve = 0;
-  unsigned int svd_eve = 0;
-  unsigned int cdc_eve = 0;
-  unsigned int ecl_eve = 0;
-  unsigned int bpid_eve = 0;
-  unsigned int epid_eve = 0;
-  unsigned int klm_eve = 0;
+  unsigned int dblk_eve;// = 0;
+  unsigned int ftsw_eve;// = 0;
+  unsigned int copper_eve;// = 0;
+  unsigned int svd_eve;// = 0;
+  unsigned int cdc_eve;// = 0;
+  unsigned int ecl_eve;// = 0;
+  unsigned int bpid_eve;// = 0;
+  unsigned int epid_eve;// = 0;
+  unsigned int klm_eve;// = 0;
 
 
 

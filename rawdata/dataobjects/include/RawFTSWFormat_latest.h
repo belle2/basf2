@@ -31,75 +31,98 @@ namespace Belle2 {
     /*     int GetNwords(int n); */
 
     //! Get # of words of header
+    /* cppcheck-suppress missingOverride */
     int GetNwordsHeader(int n) OVERRIDE_CPP17;
 
     //! Get Node # ( should be "TTD " )
+    /* cppcheck-suppress missingOverride */
     unsigned int GetFTSWNodeID(int n) OVERRIDE_CPP17;
 
     //! Get event #
+    /* cppcheck-suppress missingOverride */
     unsigned int GetEveNo(int n) OVERRIDE_CPP17;
 
     //! Get a word containing ctime and trigger type info
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTTCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! get unixtime of the trigger
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTTUtime(int n) OVERRIDE_CPP17;
 
     //! Get ctime of the trigger
+    /* cppcheck-suppress missingOverride */
     int GetTTCtime(int n) OVERRIDE_CPP17;
 
     //! Get trgtype
+    /* cppcheck-suppress missingOverride */
     int GetTRGType(int n) OVERRIDE_CPP17;
 
     //! Get timeval from ctime and utime
+    /* cppcheck-suppress missingOverride */
     void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! Get timespec from ctime and utime
+    /* cppcheck-suppress missingOverride */
     void GetTTTimeSpec(int n, struct timespec* ts) OVERRIDE_CPP17;
 
     //! Get time in ns since epoch from ctime and utime
+    /* cppcheck-suppress missingOverride */
     unsigned long long int GetTTTimeNs(int n) OVERRIDE_CPP17;
 
     //! Get magic number for data corruption check
+    /* cppcheck-suppress missingOverride */
     unsigned int GetMagicTrailer(int n) OVERRIDE_CPP17;
 
     //! Get stored information of getimeofday in a PC
+    /* cppcheck-suppress missingOverride */
     void GetPCTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! check the data contents
+    /* cppcheck-suppress missingOverride */
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! Exp# (10bit) run# (14bit) restart # (8bit)
+    /* cppcheck-suppress missingOverride */
     unsigned int GetExpRunSubrun(int n) OVERRIDE_CPP17;
 
     //! Get run #
+    /* cppcheck-suppress missingOverride */
     int GetRunNo(int n) OVERRIDE_CPP17;
 
 
     //! Get subrun #
+    /* cppcheck-suppress missingOverride */
     int GetSubRunNo(int n) OVERRIDE_CPP17;
 
     //! get a word cotaining run # and subrun #
+    /* cppcheck-suppress missingOverride */
     int GetRunNoSubRunNo(int n) OVERRIDE_CPP17;
 
     //! Get Exp #
+    /* cppcheck-suppress missingOverride */
     int GetExpNo(int n) OVERRIDE_CPP17;
 
     //! HER injection = 1 or LER injection = 0
+    /* cppcheck-suppress missingOverride */
     int GetIsHER(int n) OVERRIDE_CPP17;
 
     //! Get time since the last injection
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTimeSinceLastInjection(int n) OVERRIDE_CPP17;
 
     //! Get time since the previous trigger
+    /* cppcheck-suppress missingOverride */
     unsigned int GetTimeSincePrevTrigger(int n) OVERRIDE_CPP17;
 
     //! Get a bunch number
+    /* cppcheck-suppress missingOverride */
     unsigned int GetBunchNumber(int n) OVERRIDE_CPP17;
 
     //! Get a frame count
+    /* cppcheck-suppress missingOverride */
     unsigned int GetFrameCount(int n) OVERRIDE_CPP17;
 
     //!header format

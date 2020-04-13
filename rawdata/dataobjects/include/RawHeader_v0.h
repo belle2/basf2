@@ -35,7 +35,7 @@ namespace Belle2 {
     RawHeader_v0();
 
     //! Constructor using existing pointer to raw data buffer
-    RawHeader_v0(int*);
+    explicit RawHeader_v0(int*);
 
     //! Destructor
     ~RawHeader_v0();
@@ -291,6 +291,7 @@ namespace Belle2 {
   inline void RawHeader_v0::SetTruncMask(int trunc_mask)
   {
     CheckSetBuffer();
+    /* cppcheck-suppress shiftTooManyBitsSigned */
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] = (trunc_mask << 31) | (m_buffer[ POS_TRUNC_MASK_DATATYPE ] & 0x7FFFFFFF);
   }
 

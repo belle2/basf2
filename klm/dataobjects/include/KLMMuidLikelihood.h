@@ -395,12 +395,14 @@ namespace Belle2 {
     void setExtEKLMEfficiencyValue(int layer, float efficiency) { m_ExtEKLMEfficiencyValue[layer] = efficiency; }
 
     /**
-     * Check whether the given BKLM layer is crossed during extrapolation
+     * Check whether the given BKLM layer is crossed during extrapolation.
+     * @param[in] layer  BKLM layer (0-based).
      */
     bool isExtrapolatedBarrelLayerCrossed(int layer) const;
 
     /**
-     * Check whether the given EKLM layer is crossed during extrapolation
+     * Check whether the given EKLM layer is crossed during extrapolation.
+     * @param[in] layer  EKLM layer (0-based).
      */
     bool isExtrapolatedEndcapLayerCrossed(int layer) const;
 

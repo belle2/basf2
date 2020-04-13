@@ -84,14 +84,14 @@ unsigned int KLMMuidLikelihood::getTotalEndcapHits() const
 
 bool KLMMuidLikelihood::isExtrapolatedBarrelLayerCrossed(int layer) const
 {
-  if (layer >= BKLMElementNumbers::getMaximalLayerNumber())
+  if ((layer < 0) || (layer >= BKLMElementNumbers::getMaximalLayerNumber()))
     return false;
   return m_ExtLayerPattern & (1 << layer);
 };
 
 bool KLMMuidLikelihood::isExtrapolatedEndcapLayerCrossed(int layer) const
 {
-  if (layer >= EKLMElementNumbers::getMaximalLayerNumber())
+  if ((layer < 0) || (layer >= EKLMElementNumbers::getMaximalLayerNumber()))
     return false;
   return m_ExtLayerPattern & (1 << (BKLMElementNumbers::getMaximalLayerNumber() + layer));
 };

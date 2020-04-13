@@ -216,7 +216,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
     B2FATAL("utime " << utime << " != " <<  rawftsw->GetTTUtime(i));
   }
 
-  if (ctime != (int)rawftsw->GetTTCtime(i)) {
+  if (ctime != (unsigned int)rawftsw->GetTTCtime(i)) {
     B2FATAL("ctime " << ctime << " != " <<  rawftsw->GetTTCtime(i));
   }
 

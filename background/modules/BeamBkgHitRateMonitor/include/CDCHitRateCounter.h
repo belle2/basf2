@@ -26,8 +26,8 @@ namespace Belle2 {
     class CDCHitRateCounter: public HitRateBase {
 
     private:
-      static const int f_nLayer = 56;
-      static const int f_nSuperLayer = 9;
+      static const int f_nLayer = 56; /**< the number of layers*/
+      static const int f_nSuperLayer = 9; /**< the number of super layers*/
 
     public:
 
@@ -73,8 +73,13 @@ namespace Belle2 {
 
       /**
        * Constructor
-       * @param enableBadWireTreatment flag to enable the bad wire treatment
-       * @param enableBackgroundHitFilter flag to enable the CDC background hit (crosstakl, noise) filter
+       * @param timeWindowLowerEdge_smallCell lower edge of the timing window for the layers with small cells (SL0)
+       * @param timeWindowUpperEdge_smallCell upper edge of the timing window for the layers with small cells (SL0)
+       * @param timeWindowLowerEdge_normalCell lower edge of the timing window for the layers with normal cells (SL1-8)
+       * @param timeWindowUpperEdge_normalCell upper edge of the timing window for the layers with normal cells (SL1-8)
+       * @param enableBadWireTreatment flag to enable the bad wire treatment. default: true
+       * @param enableBackgroundHitFilter flag to enable the CDC background hit (crosstakl, noise) filter. default: true
+       * @param enableMarkBackgroundHit flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false
        */
       CDCHitRateCounter(const int  timeWindowLowerEdge_smallCell,
                         const int  timeWindowUpperEdge_smallCell,
@@ -133,11 +138,16 @@ namespace Belle2 {
       StoreArray<CDCHit> m_digits;  /**< collection of digits */
 
       ///// time window
-      const int m_timeWindowLowerEdge_smallCell; /**< lower edge of the time window for small cells [tdc count = ns] */
-      const int m_timeWindowUpperEdge_smallCell; /**< upper edge of the time window for small cells [tdc count = ns] */
+      const int m_timeWindowLowerEdge_smallCell;  /**< lower edge of the time window for small cells [tdc count = ns] */
+      const int m_timeWindowUpperEdge_smallCell;  /**< upper edge of the time window for small cells [tdc count = ns] */
       const int m_timeWindowLowerEdge_normalCell; /**< lower edge of the time window for normal cells [tdc count = ns] */
       const int m_timeWindowUpperEdge_normalCell; /**< upper edge of the time window for normal cells [tdc count = ns] */
 
+      /**
+       * return true if the hit is in the given time window
+       * @param SL super layer ID which the wire of the hit belongs to
+       * @param tdc TDC value of the hit
+       */
       bool isInTimeWindow(const int SL, const short tdc)
       {
         if (SL == 0) {
@@ -150,19 +160,27 @@ namespace Belle2 {
       // DB payloads
 
       // other
-      const bool m_enableBadWireTreatment; /**< flag to enable the bad wire treatment. default: true */
+      const bool m_enableBadWireTreatment;    /**< flag to enable the bad wire treatment. default: true */
       const bool m_enableBackgroundHitFilter; /**< flag to enable the CDC background hit (crosstakl, noise) filter. default: true */
       const bool
-      m_enableMarkBackgroundHit;/**< flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false */
+      m_enableMarkBackgroundHit;   /**< flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false */
 
-      int m_nActiveWireInTotal = 0;
-      int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};
-      int m_nActiveWireInLayer[f_nLayer] = {0};
+      int m_nActiveWireInTotal = 0;                       /**< the number of wires used in this hit-rate calculation in the whole CDC */
+      int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**< the number of wires used in this hit-rate calculation in each suler layer */
+      int m_nActiveWireInLayer[f_nLayer] = {0};           /**< the number of wires used in this hit-rate calculation in each layer */
+
       /**
        * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].
        * called in initialize function.
+       * count the number of all the wires including dead wires (bad channels).
        */
       void countActiveWires_countAll();
+
+      /**
+       * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].
+       * called in initialize function.
+       * count the number of wires excluding dead wires (bad channels).
+       */
       void countActiveWires();
 
 

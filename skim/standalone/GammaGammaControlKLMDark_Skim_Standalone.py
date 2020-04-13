@@ -7,13 +7,12 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
-gb2_setuprel = 'release-04-00-00'
 
 # create a path
 darkskimpath = b2.Path()
 
 # test input file
-fileList = expert.get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=darkskimpath)
 stdPhotons('all', path=darkskimpath)
 

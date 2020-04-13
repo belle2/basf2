@@ -202,6 +202,7 @@ void KLMTimeCalibrationCollectorModule::collect()
 
     // Loop for extroplate hits
     m_mapExtHits.clear();
+    B2INFO("Collect :: extHits loop begins.");
     for (unsigned iE = 0; iE < extHits.size(); ++iE) {
       ExtHit* extHit = extHits[iE];
       // Select extHits in the KLM range

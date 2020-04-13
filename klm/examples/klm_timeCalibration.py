@@ -38,7 +38,7 @@ def main(argv):
 
     # Exp07 input (proc10)
     if expN == '07':
-        data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/e0007/4S/GoodRuns/r0??01/skim/hlt_mumu_2trk/cdst/sub00/'
+        data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/e0007/4S/GoodRuns/r03322/skim/hlt_mumu_2trk/cdst/sub00/'
         input_files.append(os.path.join(os.path.abspath(data_dir), 'cdst.physics.*.root'))
 
     # Exp08 input (proc10)

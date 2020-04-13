@@ -98,8 +98,8 @@ void KLMCalibrationChecker::resetDatabase()
 {
   /* Reset both DataStore and Database. */
   DataStore::Instance().reset();
-  Database::Instance.reset(false);
-  DBStore::Instance.reset(false);
+  Database::Instance().reset(false);
+  DBStore::Instance().reset(false);
 }
 
 void KLMCalibrationChecker::checkAlignment()

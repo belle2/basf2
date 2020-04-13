@@ -6,7 +6,7 @@ Changes in the decfiles package since release-04-02
 Changes to DECAY_BELLE2.DEC
 ++++++++++++++++++++++++++
 
-  .. note:: All changes listed below are documented in BELLE2-NOTE-PH-2020 - please refer to this note for a more detailed and specific description of updates.
+  .. note:: All changes listed below are documented in BELLE2-NOTE-PH-2020-008 - please refer to this note for a more detailed and specific description of updates.
 
  * Updates to charm hadron decays
 

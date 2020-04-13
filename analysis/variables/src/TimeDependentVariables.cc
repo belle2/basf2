@@ -718,6 +718,13 @@ namespace Belle2 {
       return vert->getFitTruthStatus();
     }
 
+    int rollbackStatus(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return std::numeric_limits<int>::quiet_NaN();
+      return vert->getRollBackStatus();
+    }
+
     VARIABLE_GROUP("Time Dependent CPV Analysis Variables");
 
     REGISTER_VARIABLE("TagVx", particleTagVx, "Tag vertex X component");
@@ -853,6 +860,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
+
+    REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus,
+                      "Returns the status of the fit performed with rolled back tracks.")
   }
 }
 

@@ -448,7 +448,14 @@ namespace Belle2 {
      */
     int fitTruthStatus(const Particle* part);
 
-
+    /**
+     * return the status of the fit performed with the rolled back postion of tracks.
+     * 0 fit performed with measured parameters
+     * 1 fit performed with rolled back tracks
+     * 2 unable to recover truth parameters
+     *
+     */
+    int rollbackStatus(const Particle* part);
   }
 }
 

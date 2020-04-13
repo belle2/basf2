@@ -71,7 +71,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitTruthStatus(0), m_fitPval(0), m_MCtagLifeTime(-1), m_mcPDG(0), m_MCLifeTimeReco(-1),
+    m_Bfield(0), m_rollbackStatus(0), m_fitTruthStatus(0), m_fitPval(0), m_MCtagLifeTime(-1), m_mcPDG(0), m_MCLifeTimeReco(-1),
     m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
     m_shiftZ(0), m_FitType(0), m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
@@ -103,6 +103,8 @@ namespace Belle2 {
              "Fitter used for the tag vertex fit: Rave or KFit", string("Rave"));
     addParam("useTruthInFit", m_useTruthInFit,
              "Use the true track parameters in the vertex fit", false);
+    addParam("useRollBack", m_useRollBack,
+             "Use rolled back non-primary tracks", false);
 
 
   }
@@ -116,6 +118,8 @@ namespace Belle2 {
     B2INFO("TagVertexModule : magnetic field = " << m_Bfield);
     // truth fit status will be set to 2 only if the MC info cannot be recovered
     if (m_useTruthInFit) m_fitTruthStatus = 1;
+    // roll back status will be set to 2 only if the MC info cannot be recovered
+    if (m_useRollBack) m_rollbackStatus = 1;
 
     //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
     //input
@@ -201,6 +205,7 @@ namespace Belle2 {
           ver->setConstraintCenter(m_constraintCenter);
           ver->setConstraintCov(m_constraintCov);
           ver->setFitTruthStatus(m_fitTruthStatus);
+          ver->setRollBackStatus(m_rollbackStatus);
         } else {
           ver->setTagVertex(m_tagV);
           ver->setTagVertexPval(-1.);
@@ -228,6 +233,7 @@ namespace Belle2 {
           ver->setConstraintCenter(m_constraintCenter);
           ver->setConstraintCov(m_constraintCov);
           ver->setFitTruthStatus(m_fitTruthStatus);
+          ver->setRollBackStatus(m_rollbackStatus);
         }
       }
 
@@ -245,6 +251,10 @@ namespace Belle2 {
     //reset the fit truth status in case it was set to 2 in a previous fit
 
     if (m_useTruthInFit) m_fitTruthStatus = 1;
+
+    //reset the roll back status in case it was set to 2 in a previous fit
+
+    if (m_useRollBack) m_rollbackStatus = 1;
 
     //set constraint type, reset pVal and B field
 
@@ -763,12 +773,18 @@ namespace Belle2 {
 
     for (unsigned int i(0); i < particleAndWeights.size(); ++i) {
       try {
-        if (!m_useTruthInFit)
+        if (!m_useTruthInFit && !m_useRollBack)
           rFit.addTrack(particleAndWeights.at(i).particle->getTrackFitResult());
         if (m_useTruthInFit && !particleAndWeights.at(i).mcParticle)
           m_fitTruthStatus = 2;
+        if (m_useRollBack && !particleAndWeights.at(i).mcParticle)
+          m_rollbackStatus = 2;
         if (m_useTruthInFit && particleAndWeights.at(i).mcParticle) {
           TrackFitResult tfr(getTrackWithTrueCoordinates(particleAndWeights.at(i)));
+          rFit.addTrack(&tfr);
+        }
+        if (m_useRollBack && !m_useTruthInFit && particleAndWeights.at(i).mcParticle) {
+          TrackFitResult tfr(getTrackWithRollBackCoordinates(particleAndWeights.at(i)));
           rFit.addTrack(&tfr);
         }
       } catch (const rave::CheckedFloatException&) {
@@ -871,7 +887,7 @@ namespace Belle2 {
 
       ParticleAndWeight pawi(particleAndWeights.at(i));
 
-      if (!m_useTruthInFit)
+      if (!m_useTruthInFit && !m_useRollBack)
         addedOK = kFit.addParticle(pawi.particle);
 
       if (m_useTruthInFit && !pawi.mcParticle) {
@@ -879,10 +895,23 @@ namespace Belle2 {
         m_fitTruthStatus = 2;
       }
 
+      if (m_useRollBack && !pawi.mcParticle) {
+        addedOK = 1;
+        m_rollbackStatus = 2;
+      }
+
       if (m_useTruthInFit && pawi.mcParticle) {
         addedOK = kFit.addTrack(
                     ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
                     ROOTToCLHEP::getPoint3D(getTruePoca(pawi)),
+                    ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
+                    pawi.particle->getCharge());
+      }
+
+      if (m_useRollBack && !m_useTruthInFit && pawi.mcParticle) {
+        addedOK = kFit.addTrack(
+                    ROOTToCLHEP::getHepLorentzVector(pawi.mcParticle->get4Vector()),
+                    ROOTToCLHEP::getPoint3D(getRollBackPoca(pawi)),
                     ROOTToCLHEP::getHepSymMatrix(pawi.particle->getMomentumVertexErrorMatrix()),
                     pawi.particle->getCharge());
       }
@@ -1066,6 +1095,30 @@ namespace Belle2 {
     return DistanceTools::poca(paw.mcParticle->getProductionVertex(),
                                paw.mcParticle->getMomentum(),
                                paw.particle->getTrackFitResult()->getPosition());
+
+  }
+
+  TrackFitResult TagVertexModule::getTrackWithRollBackCoordinates(ParticleAndWeight const& paw)
+  {
+    const TrackFitResult* tfr(paw.particle->getTrackFitResult());
+
+    return TrackFitResult(getRollBackPoca(paw),
+                          tfr->getMomentum(),
+                          tfr->getCovariance6(),
+                          tfr->getChargeSign(),
+                          tfr->getParticleType(),
+                          tfr->getPValue(),
+                          m_Bfield, 0, 0);
+  }
+
+  TVector3 TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)
+  {
+    if (!paw.mcParticle) {
+      B2ERROR("In TagVertexModule::getTruePoca: no MC particle set");
+      return TVector3(0., 0., 0.);
+    }
+
+    return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + m_MCtagV;
 
   }
 

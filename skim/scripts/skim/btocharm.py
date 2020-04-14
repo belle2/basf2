@@ -906,7 +906,7 @@ class BtoD0h_Kspi0(BaseSkim):
     __authors__ = ["Minakshi Nayak"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -959,7 +959,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __authors__ = ["Niharika Rout"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -1011,7 +1011,7 @@ class B0toDpi_Kpipi(BaseSkim):
     __authors__ = ["Chiara La Licata"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1058,7 +1058,7 @@ class B0toDpi_Kspi(BaseSkim):
     __authors__ = ["Fernando Abudinen", "Chiara La Licata"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1107,7 +1107,7 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __authors__ = ["Chiara La Licata"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1151,7 +1151,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __authors__ = ["Chiara La Licata"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1213,7 +1213,7 @@ class B0toDrho_Kpipi(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1266,7 +1266,7 @@ class B0toDrho_Kspi(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1320,7 +1320,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1378,7 +1378,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1448,7 +1448,7 @@ class BtoD0h_hh(BaseSkim):
     __authors__ = ["Hulya Atmacan"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1495,7 +1495,7 @@ class BtoD0h_Kpi(BaseSkim):
     __authors__ = ["Niharika Rout"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1558,7 +1558,7 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     __authors__ = ["Chiara La Licata"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1636,7 +1636,7 @@ class BtoD0h_Kshh(BaseSkim):
     __authors__ = ["Minakshi Nayak"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1690,7 +1690,7 @@ class BtoD0rho_Kpi(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {
@@ -1756,7 +1756,7 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     __authors__ = ["Fernando Abudinen"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, hadronic B to charm"
+    __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {

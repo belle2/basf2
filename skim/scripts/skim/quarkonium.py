@@ -208,7 +208,7 @@ class BottomoniumEtabExclusive(BaseSkim):
     __authors__ = ["Stefano Spataro", "Sen Jia"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, quarkonium"
+    __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdPhotons": {
@@ -270,7 +270,7 @@ class BottomoniumUpsilon(BaseSkim):
     __authors__ = ["Stefano Spataro", "Sen Jia"]
     __description__ = ""
     __contact__ = ""
-    __category = "physics, quarkonium"
+    __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -352,7 +352,7 @@ class ISRpipicc(BaseSkim):
     __authors__ = []
     __description__ = ""
     __contact__ = ""
-    __category = "physics, quarkonium"
+    __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdCharged": {

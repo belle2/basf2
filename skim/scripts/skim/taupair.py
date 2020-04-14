@@ -351,7 +351,7 @@ class TauLFV(BaseSkim):
     __authors__ = ["Phillip Urquijo", "Kenji Inami"]
     __description__ = "Skim for Tau LFV decays."
     __contact__ = ""
-    __category = "physics, tau"
+    __category__ = "physics, tau"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -479,6 +479,18 @@ class TauLFV(BaseSkim):
         tau_lfv_lists = tau_lgamma_list + tau_lll_list + tau_lP0_list + tau_lS0_list + tau_lV0_list + tau_lhh_list + tau_bnv_list
         self.SkimLists = tau_lfv_lists
 
+    def validation_histograms(self, path):
+        ma.copyLists('tau+:LFV', self.SkimLists, path=path)
+
+        # the variables that are printed out are: M, deltaE
+        ma.variablesToHistogram(
+            filename='TauLFV_Validation.root',
+            decayString='tau+:LFV',
+            variables=[('M', 100, 1.50, 2.00), ('deltaE', 120, -1.1, 1.1)],
+            variables_2d=[('M', 50, 1.50, 2.00, 'deltaE', 60, -1.1, 1.1)],
+            path=path
+        )
+
 
 @fancy_skim_header
 class TauGeneric(BaseSkim):
@@ -499,7 +511,7 @@ class TauGeneric(BaseSkim):
     __authors__ = ["Kenji Inami"]
     __description__ = "Skim for Tau generic decays."
     __contact__ = ""
-    __category = "physics, tau"
+    __category__ = "physics, tau"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -577,6 +589,32 @@ class TauGeneric(BaseSkim):
 
         self.SkimLists = eventParticle
 
+    def validation_histograms(self, path):
+        self.additional_setup(path)
+
+        vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+
+        # contact = "kenji@hepl.phys.nagoya-u.ac.jp"
+
+        # TODO: change this to use
+        #       validation_tools.metadata.create_validation_histograms, to add contact
+        #       info without reopening and closing ROOT file and add 'shifter' flag
+
+        ma.variablesToHistogram(
+            filename='TauGeneric_Validation.root',
+            decayString='',
+            variables=[('nGoodTracks', 7, 1, 8),
+                       ('visibleEnergyOfEventCMS', 60, 0, 12),
+                       ('E_ECLtrk', 70, 0, 7),
+                       ('maxPt', 60, 0, 6),
+                       ('invMS1', 60, 0, 3),
+                       ('invMS2', 60, 0, 3),
+                       ('Theta_miss', 60, 0, 180)],
+            variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
+            path=path
+        )
+        b2.process(path)
+
 
 @fancy_skim_header
 class TauThrust(BaseSkim):
@@ -595,7 +633,7 @@ class TauThrust(BaseSkim):
     __authors__ = ["Ami Rostomyan", "Kenji Inami"]
     __description__ = "Skim for Tau decays using thrust."
     __contact__ = ""
-    __category = "physics, tau"
+    __category__ = "physics, tau"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -671,3 +709,19 @@ class TauThrust(BaseSkim):
         sigThrustModule.if_value("== 2", oneProngPath, b2.AfterConditionPath.CONTINUE)
 
         self.SkimLists = eventParticle
+
+    def validation_histograms(self, path):
+        self.additional_setup(path)
+
+        # TODO: change this to use
+        #       validation_tools.metadata.create_validation_histograms, to add contact
+        #       info without reopening and closing ROOT file and add 'shifter' flag
+
+        ma.variablesToHistogram(
+            filename='TauThrust_Validation.root',
+            decayString='',
+            variables=[('nGoodTracksThrust', 7, 1, 8),
+                       ('visibleEnergyOfEventCMS', 60, 0, 12),
+                       ('thrust', 50, 0.75, 1)],
+            path=path
+        )

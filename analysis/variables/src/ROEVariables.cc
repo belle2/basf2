@@ -2096,7 +2096,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
                       "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
                       "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
-                      "E.g. useROERecoilFrame(E) returns the energy of a particle in the ROE recoil frame.");
+                      "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.");
 
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
@@ -2105,12 +2105,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
                       "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
                       "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                       "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
@@ -2134,7 +2134,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
                       "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
                       "Second argument is a PDG code to count only one charged particle species, independently of charge. "
-                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'. "
+                      "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
                       "PDG code 0 is used to count all charged particles");
 
     REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
@@ -2157,19 +2157,19 @@ namespace Belle2 {
                       "Returns true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
 
     REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
@@ -2194,50 +2194,50 @@ namespace Belle2 {
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
     REGISTER_VARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with Use***Frame() function.");
+                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeE(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns energy of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeM(maskName)", ROE_M,
                       "Returns invariant mass of unused tracks and clusters in ROE");
 
     REGISTER_VARIABLE("roeP(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roePt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roePx(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roePy(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roePz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roePTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``Use***Frame()`` function.");
 
     REGISTER_VARIABLE("roeDeltae(maskName)", ROE_DeltaE,
-                      "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
+                      "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\mathrm{cms}/2`.");
 
     REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
-                      "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
+                      "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\mathrm{cms}/2`.");
 
     REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
-                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
+                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\mathrm{cms}/2`.");
 
     REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
-                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
+                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\mathrm{cms}/2`.");
 
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
                       "Returns the invariant mass squared of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
+                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\nu = p_B - p_\mathrm{had} - p_\mathrm{lep}`");
 
     REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
                       "Returns the polar angle of the missing momentum (see possible weMissE options)");
@@ -2287,21 +2287,21 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 )DOC");
 
     REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
-                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \rightarrow H_1 ... H_n \ell \nu_\ell`.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
-                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+                      "Returns the momentum transfer squared, q^2, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \rightarrow H_1 ... H_n \ell \nu_\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
+                      "Returns the momentum transfer squared, q^2, calculated in LAB as :math:`q^2 = (p_l + p_\nu)^2`, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
 
     REGISTER_VARIABLE("weQ2lnu(maskName)", WE_q2lnu,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
+                      "Returns the momentum transfer squared, q^2, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
@@ -2317,19 +2317,19 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
-                      "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
     REGISTER_VARIABLE("etaProb(mode)", etaProb,
                       "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
-                      "standard: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "tight: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "cluster: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "both: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
   }

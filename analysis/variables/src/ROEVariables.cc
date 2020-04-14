@@ -2255,15 +2255,15 @@ namespace Belle2 {
                       "Returns the z component of the missing momentum (see weMissE possible options)");
 
     REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
-                      R"DOC(Returns the energy of the missing momentum, possible options are the following:
-opt = 0: CMS, use energy and momentum of charged particles and photons; 
-opt = 1: CMS, same as 0, fix Emiss = pmiss; 
-opt = 2: CMS, same as 0, fix Eroe = Ecms/2; 
-opt = 3: CMS, use only energy and momentum of signal side; 
-opt = 4: CMS, same as 3, update with direction of ROE momentum; 
-opt = 5: LAB, use energy and momentum of charged particles and photons from whole event; 
-opt = 6: LAB, same as 5, fix Emiss = pmiss; 
-opt = 7: CMS, correct pmiss 3-momentum vector with factor alpha so that dE = 0 (used for Mbc calculation).)DOC");
+                      R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
+ - ``0``: CMS, use energy and momentum of charged particles and photons
+ - ``1``: CMS, same as 0, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
+ - ``2``: CMS, same as 0, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
+ - ``3``: CMS, use only energy and momentum of signal side
+ - ``4``: CMS, same as 3, update with direction of ROE momentum
+ - ``5``: LAB, use energy and momentum of charged particles and photons from whole event
+ - ``6``: LAB, same as 5, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``;
+ - ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC");
 
     REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
@@ -2317,19 +2317,19 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
-                      "``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      " - ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      " - ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      " - ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      " - ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
     REGISTER_VARIABLE("etaProb(mode)", etaProb,
                       "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
                       "The following strings are available. \n"
-                      "``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      "``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      "``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      " - ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      " - ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      " - ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      " - ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
   }

@@ -2,12 +2,16 @@ import basf2
 from ROOT import Belle2
 import neurotrigger
 import reconstruction
+import sys
+import os
+import rawdata
+
 ################################################################################
 # Setting global tags in case Raw data is unpacked: ###
 
-# basf2.conditions.override_globaltags()
+basf2.conditions.override_globaltags()
+# basf2.conditions.append_globaltag('neurotrigger')  # should not be needed
 # basf2.conditions.append_globaltag('online')
-# basf2.conditions.append_globaltag('neurotrigger') # should not be needed
 
 ################################################################################
 # Start path: ###
@@ -47,31 +51,34 @@ main.add_module('Geometry')
 # show progress at least every 10^maxN events: ###
 main.add_module('Progress', maxN=3)
 
-# add unpacker function from the neurotrigger script: ###
-neurotrigger.add_neuro_2d_unpackers(main, sim13dt=False)
+# add unpacker function from the rawdata script or the neurotrigger script: ###
+if ending == ".sroot":
+    rawdata.add_unpackers(main)
+else:
+    neurotrigger.add_neuro_2d_unpackers(main)
 
 # add filter to just use events with trg information present: ###
-main.add_module(neurotrigger.filterTRG(branchname="CDCTriggerNNInput2DFinderTracks"))
+main.add_module(neurotrigger.filterTRG())  # branchname="CDCTriggerNNInput2DFinderTracks"))
 
-# adding neurotrigger simulations for various cases: ###
-neurotrigger.add_neurotrigger_sim(main)
+# adding neurotrigger simulations for one hwsim and one swsim case: ###
+# neurotrigger.add_neurotrigger_sim(main)
 neurotrigger.add_neurotrigger_hw(main)
-neurotrigger.add_neuro_simulation_swts(main)
+neurotrigger.add_neuro_simulation(main)
 
 # add reconstruction in case .sroot files were used: ###
+#    main.add_module('CDCUnpacker')
 if ending == ".sroot":
-    main.add_module('CDCUnpacker')
     reconstruction.add_reconstruction(main)
 
 # add matcher modules to match trigger tracks to reco tracks: ###
 main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
                 hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
-main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks_sim,
-                hitCollectionName=neurotrigger.hwneuroinputsetmenthits, axialOnly=True)
+main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
+                hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
 main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
                 hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
 main.add_module('CDCTriggerRecoHitMatcher', hitCollectionName=neurotrigger.simsegmenthits)
-main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=simneurotracks_swtssw2d,
+main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.simneurotracks_swtssw2d,
                 hitCollectionName=neurotrigger.simsegmenthits, axialOnly=True)
 main.add_module('SetupGenfitExtrapolation')
 
@@ -79,8 +86,8 @@ main.add_module('SetupGenfitExtrapolation')
 main.add_module('HistoManager',
                 histoFileName=outputfile)
 main.add_module('CDCTriggerNeuroDQM',
-                simNeuroTracksName=neurotrigger.hwneurotracks_sim,
-                unpackedNeuroInput2dTracksName=hwneurotracks,
+                simNeuroTracksName=neurotrigger.hwsimneurotracks,
+                unpackedNeuroInput2dTracksName=neurotrigger.hwneuroinput2dfindertracks,
                 showRecoTracks=True,
                 skipWithoutHWTS=True,
                 maxRecoZDist=-1,

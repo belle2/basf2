@@ -132,8 +132,6 @@ class LeptonicUntagged(BaseSkim):
             "E>0.05",
             path=path,
         )
-        ma.buildContinuumSuppression("B-:LeptonicUntagged", "basic", path=path)
-
         vm.addAlias("d0_p", "daughter(0,p)")
         vm.addAlias("d0_electronID", "daughter(0,electronID)")
         vm.addAlias("d0_muonID", "daughter(0,muonID)")

@@ -457,24 +457,6 @@ methods __authors__
         else:
             return False
 
-    def do_validation(self, path):
-        """Produce the skim particle lists and write uDST file.
-
-        If `validation_histograms` has not been overridden in the subclass, then this
-        this function will print a warning and do nothing.
-
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-        """
-        if self._method_unchanged("validation_histograms"):
-            b2.B2WARNING(f"No validation histograms defined for {self} skim.")
-            return
-        self.set_skim_logging(path)
-        self.load_particle_lists(path)
-        self.additional_setup(path)
-        self.build_lists(path)
-        self.validation_histograms(path)
-
     def __str__(self):
         return self.name
 

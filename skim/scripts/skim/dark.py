@@ -336,14 +336,14 @@ class SinglePhotonDark(BaseSkim):
     """
     **Physics channel**: ee → A'γ; A' → invisible
 
-    **Skim category**: physics, dark sector
-
     Skim list contains single photon candidates for the dark photon to invisible final
     state analysis.
     """
     __authors__ = ["Sam Cunliffe"]
+    __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
     __SkimDescription__ = "Single photon skim list for the dark photon analysis."
     __WorkingGroup__ = "Dark group"
+    __category__ = "physics, dark sector"
 
     RequiredParticleLists = {
         "stdPhotons": {

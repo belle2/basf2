@@ -86,11 +86,13 @@ class LeptonicUntagged(BaseSkim):
     """
 
     __authors__ = ["Phillip Urquijo"]
+    __contact__ = ""
     __SkimDescription__ = (
         "Skim for leptonic analyses, "
         ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"
     )
     __WorkingGroup__ = "Semileptonic and Missing Energy Working Group (WG1)"
+    __category__ = "physics, leptonic"
 
     RequiredParticleLists = {
         "stdCharged": {

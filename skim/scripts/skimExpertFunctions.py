@@ -225,6 +225,8 @@ def fancy_skim_header(SkimClass):
     SkimName = SkimClass.__name__
     SkimCode = Registry.encode_skim_name(SkimName)
     authors = SkimClass.__authors__
+    contact = SkimClass.__contact__
+    category = SkimClass.__category__
     WG = SkimClass.__WorkingGroup__
     description = SkimClass.__SkimDescription__
 
@@ -235,7 +237,10 @@ def fancy_skim_header(SkimClass):
         * **Skim description**: {description}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}
-        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
+        * **Category**: {category}
+        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
+        * **Contact**: {contact}
+    """
     if SkimClass.__doc__ is None:
         return None
     else:

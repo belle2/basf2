@@ -350,7 +350,6 @@ def TwoTrackEEMuMuList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    two_track_list = []
     skim_label = 'TwoTrackEEMuMu'
 
     # Tracks from IP
@@ -374,8 +373,7 @@ def TwoTrackEEMuMuList(path):
     ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> e+:' + skim_label + ' e-:' + skim_label, two_track_cut, path=path)
 
-    two_track_list.append('vpho:' + skim_label)
-    return two_track_list
+    return ['vpho:' + skim_label]
 
 
 def TwoTrackPiPiList(path):
@@ -396,7 +394,6 @@ def TwoTrackPiPiList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    two_track_list = []
     skim_label = 'TwoTrackPiPi'
 
     # Tracks from IP
@@ -416,5 +413,4 @@ def TwoTrackPiPiList(path):
     ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
 
-    two_track_list.append('vpho:' + skim_label)
-    return two_track_list
+    return ['vpho:' + skim_label]

@@ -140,7 +140,7 @@ class SkimRegistry:
         skim.
 
         Parameters:
-            SkimName (str): Name of the skim as it appears in `skim.registry.Registry`.
+            SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
             SkimModule (str): The name of the skim module which contains the skim.
@@ -151,7 +151,7 @@ class SkimRegistry:
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim name {SkimName}. "
-                "Please add your skim to `skim.registry.Registry`."
+                "Please add your skim to `skim.registry.RegisteredSkims`."
             )
             raise LookupError(SkimName)
 
@@ -181,7 +181,7 @@ class SkimRegistry:
         """Get the skim class constructor for the given skim.
 
         This is achieved by importing the module listed alongside the skim name in the
-        `skim.registry.Registry`.
+        `skim.registry.RegisteredSkims`.
 
         Parameters:
             SkimName (str): Name of the skim to be found.
@@ -197,7 +197,7 @@ class SkimRegistry:
         """Find the 8 digit skim code assigned to the skim with the provided name.
 
         Parameters:
-            SkimName (str): Name of the skim as it appears in `skim.registry.Registry`.
+            SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
             SkimCode (str): 8 digit skim code assigned to the given skim.
@@ -208,7 +208,7 @@ class SkimRegistry:
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim name {SkimName}. "
-                "Please add your skim to `skim.registry.Registry`."
+                "Please add your skim to `skim.registry.RegisteredSkims`."
             )
             raise LookupError(SkimName)
 
@@ -223,7 +223,7 @@ class SkimRegistry:
 
         Returns:
             SkimName (str): Name of the corresponding skim as it appears in
-            `skim.registry.Registry`.
+            `skim.registry.RegisteredSkims`.
         """
         lookup = {code: name for code, _, name in self.registry}
         try:
@@ -231,7 +231,7 @@ class SkimRegistry:
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim code {SkimCode}. "
-                "Please add your skim to `skim.registry.Registry`."
+                "Please add your skim to `skim.registry.RegisteredSkims`."
             )
             raise LookupError(SkimCode)
 

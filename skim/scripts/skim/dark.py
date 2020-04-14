@@ -341,8 +341,7 @@ class SinglePhotonDark(BaseSkim):
     """
     __authors__ = ["Sam Cunliffe"]
     __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
-    __SkimDescription__ = "Single photon skim list for the dark photon analysis."
-    __WorkingGroup__ = "Dark group"
+    __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
@@ -378,20 +377,21 @@ class SinglePhotonDark(BaseSkim):
 @fancy_skim_header
 class ALP3Gamma(BaseSkim):
     __authors__ = ["Michael De Nuccio"]
-    __WorkingGroup__ = "Dark group"
-    __SkimDescription__ = (
+    __description__ = (
         "Neutral dark sector skim list for the ALP 3-photon analysis: "
         ":math:`ee\\to a(\\to\\gamma\\gamma)\\gamma`"
     )
+    __contact__ = ""
+    __category__ = "physics, dark sector"
 
     RequiredStandardLists = None
 
-    def addALPToPDG():
+    def addALPToPDG(self):
         """ Adds the ALP codes to the basf2 pdg instance """
         pdg.add_particle('beam', 55, 999., 999., 0, 0)
         pdg.add_particle('ALP', 9000006, 999., 999., 0, 0)
 
-    def initialALP(path):
+    def initialALP(self, path):
         """
         An list builder function for the ALP decays. Part of the
         `ALP3GammaList` skim functions.
@@ -456,11 +456,12 @@ class DimuonPlusMissingEnergy(BaseSkim):
     **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy.
     """
     __authors__ = ["Giacomo De Pietro"]
-    __WorkingGroup__ = "Dark group"
-    __SkimDescription__ = (
+    __description__ = (
         "Dimuon + missing energy skim, needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-}"
         "Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches."
     )
+    __contact__ = ""
+    __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -493,12 +494,13 @@ class DimuonPlusMissingEnergy(BaseSkim):
 @fancy_skim_header
 class ElectronMuonPlusMissingEnergy(BaseSkim):
     __authors__ = ["Giacomo De Pietro"]
-    __WorkingGroup__ = "Dark group"
-    __SkimDescription__ = (
+    __description__ = (
         "Electron-muon pair + missing energy skim, needed for :math:`e^{+}e^{-} \\to "
         "e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other "
         "searches."
     )
+    __contact__ = ""
+    __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -539,8 +541,9 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 @fancy_skim_header
 class LFVZpVisible(BaseSkim):
     __authors__ = ["Ilya Komarov"]
-    __WorkingGroup__ = "Dark group"
-    __SkimDescription__ = "Lepton flavour violating Z' skim, Z' to visible FS."
+    __description__ = "Lepton flavour violating Z' skim, Z' to visible FS."
+    __contact__ = ""
+    __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
         "stdCharged": {

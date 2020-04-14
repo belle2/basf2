@@ -505,8 +505,9 @@ class Systematics(BaseSkim):
     `PiKFromDstarList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
-    __SkimDescription__ = ""
-    __WorkingGroup__ = "Systematics"
+    __description__ = ""
+    __contact__ = ""
+    __category__ = "systematics"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -585,8 +586,9 @@ class SystematicsTracking(BaseSkim):
     Lists in this skim are those defined in `BtoDStarPiList` and `DstarToD0PiPartList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
-    __SkimDescription__ = ""
-    __WorkingGroup__ = "Systematics"
+    __description__ = ""
+    __contact__ = ""
+    __category__ = "systematics"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -687,8 +689,9 @@ class Resonance(BaseSkim):
     `getSigmacList`, `getmumugList`, `getBZeroList`, and `getBPlusList`.
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
-    __SkimDescription__ = ""
-    __WorkingGroup__ = "Systematics"
+    __description__ = ""
+    __contact__ = ""
+    __category__ = "systematics"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -856,11 +859,12 @@ class SystematicsRadMuMu(BaseSkim):
     cluster). No selection on the photon as the sample must be unbiased.
     """
     __authors__ = ["Torben Ferber"]
-    __SkimDescription__ = (
+    __description__ = (
         "Skim of radiative muon pairs (:math:`ee\\to\\mu\\mu(\\gamma)`) "
         "for photon systematics."
     )
-    __WorkingGroup__ = "Systematics"
+    __contact__ = ""
+    __category__ = "systematics, photon calibration"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -904,8 +908,9 @@ class SystematicsRadMuMu(BaseSkim):
 @fancy_skim_header
 class SystematicsEELL(BaseSkim):
     __authors__ = ["Ilya Komarov"]
-    __SkimDescription__ = "Systematics skim of :math:`ee\\to ee\\ell\\ell`"
-    __WorkingGroup__ = "Systematics"
+    __description__ = "Systematics skim of :math:`ee\\to ee\\ell\\ell`"
+    __contact__ = ""
+    __category__ = "systematics, lepton ID"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -950,8 +955,9 @@ class SystematicsRadEE(BaseSkim):
     """
 
     __authors__ = ["Sam Cunliffe"]
-    __SkimDescription__ = "Radiative electron pairs for photon systematics"
-    __WorkingGroup__ = "Systematics"
+    __description__ = "Radiative electron pairs for photon systematics"
+    __contact__ = ""
+    __category__ = "systematics, photon calibration"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1027,8 +1033,9 @@ class SystematicsRadEE(BaseSkim):
 @fancy_skim_header
 class SystematicsLambda(BaseSkim):
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
-    __SkimDescription__ = ""
-    __WorkingGroup__ = "Systematics"
+    __description__ = ""
+    __contact__ = ""
+    __category__ = "systematics"
 
     RequiredStandardLists = None
 

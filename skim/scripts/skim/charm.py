@@ -825,8 +825,9 @@ class XToD0_D0ToHpJm(BaseSkim):
     """
 
     __authors__ = ["Giulia Casarosa"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D0 to two charged FSPs."
+    __description__ = "Skim list for D0 to two charged FSPs."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = None
 
@@ -877,8 +878,9 @@ class XToD0_D0ToNeutrals(BaseSkim):
     """
 
     __authors__ = ["Giulia Casarosa"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D0 to neutral FSPs."
+    __description__ = "Skim list for D0 to neutral FSPs."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -934,8 +936,9 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     """
 
     __authors__ = ["Doris Yangsoo Kim", "Jaeyeon Kim"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D*+ to pi+ D0, D0 to rare decay."
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to rare decay."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -990,8 +993,9 @@ class XToDp_DpToKsHp(BaseSkim):
     """
 
     __authors__ = ["Guanda Gong"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D+ to Ks h+."
+    __description__ = "Skim list for D+ to Ks h+."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1045,12 +1049,13 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = (
+    __description__ = (
         "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds"
         "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
         "also included."
     )
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = None
 
@@ -1089,12 +1094,13 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
 
     __authors__ = ["Emma Oxford"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = (
+    __description__ = (
         "Skim list for D*+ to pi+ D0, D0 to pi0 and two charged FSPs, where the kinds"
         "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
         "also included."
     )
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1142,8 +1148,9 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
 
     __authors__ = ["Emma Oxford"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D*+ to pi+ D0, D0 to pi0 and two conjugate charged FSPs."
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to pi0 and two conjugate charged FSPs."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1198,8 +1205,9 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D*+ to pi+ D0, D0 to Ks pi+ pi- pi0."
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to Ks pi+ pi- pi0."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1251,12 +1259,13 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = (
+    __description__ = (
         "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds"
         "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
         "also included."
     )
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1313,8 +1322,9 @@ class DstToD0Pi_D0ToNeutrals(BaseSkim):
     """
 
     __authors__ = ["Giulia Casarosa", "Emma Oxford"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Same as `D0ToNeutrals`, but requiring that the D0 is from D* decay."
+    __description__ = "Same as `D0ToNeutrals`, but requiring that the D0 is from D* decay."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1362,8 +1372,9 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
     """
 
     __authors__ = ["Yeqi Chen"]
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D*+ to pi+ D0, D0 to Ks and two conjugate charged FSPs."
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to Ks and two conjugate charged FSPs."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1406,8 +1417,9 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "An special version of `DstToD0PiD0ToHpJmPi0` to deal with Early Data."
+    __description__ = "An special version of `DstToD0PiD0ToHpJmPi0` to deal with Early Data."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1456,8 +1468,9 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "A special version of `DstToD0PiD0ToHpHmPi0` to deal with Early Data."
+    __description__ = "A special version of `DstToD0PiD0ToHpHmPi0` to deal with Early Data."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -1523,8 +1536,9 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
     """
 
     __authors__ = []
-    __WorkingGroup__ = "Charm (WG7)"
-    __SkimDescription__ = "Skim list for D*+ to pi+ D0, D0 to semileptonic decay."
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to semileptonic decay."
+    __contact__ = ""
+    __category = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {

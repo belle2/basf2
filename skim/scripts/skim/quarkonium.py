@@ -206,8 +206,9 @@ class BottomoniumEtabExclusive(BaseSkim):
     """
 
     __authors__ = ["Stefano Spataro", "Sen Jia"]
-    __WorkingGroup__ = "Bottomonium"
-    __SkimDescription__ = ""
+    __description__ = ""
+    __contact__ = ""
+    __category = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdPhotons": {
@@ -267,8 +268,9 @@ class BottomoniumUpsilon(BaseSkim):
     * ``foxWolframR2 < 0.995``
     """
     __authors__ = ["Stefano Spataro", "Sen Jia"]
-    __WorkingGroup__ = "Bottomonium"
-    __SkimDescription__ = ""
+    __description__ = ""
+    __contact__ = ""
+    __category = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -348,8 +350,9 @@ class ISRpipicc(BaseSkim):
     * Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
     """
     __authors__ = []
-    __WorkingGroup__ = "Charmonium"
-    __SkimDescription__ = ""
+    __description__ = ""
+    __contact__ = ""
+    __category = "physics, quarkonium"
 
     RequiredStandardLists = {
         "stdCharged": {

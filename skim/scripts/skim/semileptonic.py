@@ -200,8 +200,9 @@ class PRsemileptonicUntagged(BaseSkim):
     """
 
     __authors__ = ["Lucien Cremaldi", "Racha Cheaib", "Romulus Godang"]
-    __WorkingGroup__ = "Semileptonic and Missing Energy decays (WG1)"
-    __SkimDescription__ = "Skim for partial reconstruction analysis in leptonic group."
+    __description__ = "Skim for partial reconstruction analysis in leptonic group."
+    __contact__ = ""
+    __category__ = "physics, semileptonic"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -297,11 +298,12 @@ class SLUntagged(BaseSkim):
     """
 
     __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
-    __WorkingGroup__ = "Semileptonic and Missing Energy decays (WG1)"
-    __SkimDescription__ = (
+    __description__ = (
         "Skim for semileptonic decays, :math:`B: decays "
         "(:math:`B \\to D \\ell\\nu,` where :math:`\\ell=e,\\mu`)"
     )
+    __contact__ = ""
+    __category__ = "physics, semileptonic"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {

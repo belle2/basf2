@@ -984,6 +984,8 @@ class BaseFEISkim(BaseSkim):
     """Base class for FEI skims. Applies event-level pre-cuts and applies the FEI."""
 
     __authors__ = ["Racha Cheaib", "Hannah Wakeling", "Phil Grace"]
+    __contact__ = ""
+    __category__ = "physics, Full Event Interpretation"
 
     FEIPrefix = "FEIv4_2020_MC13_release_04_01_01"
     """Prefix label for the FEI training used in the FEI skims."""
@@ -994,7 +996,6 @@ class BaseFEISkim(BaseSkim):
     SL charged :math:`B`'s."""
 
     RequiredStandardLists = None
-    __WorkingGroup__ = "Semileptonic and Missing Energy decays (WG1)"
 
     # This is a cached static method so that we can avoid adding FEI path twice.
     # In combined skims, FEIChannelArgs must be combined across skims first, so that all
@@ -1174,7 +1175,7 @@ class feiHadronicB0(BaseFEISkim):
         `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
         FEI.
     """
-    __SkimDescription__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
+    __description__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -1257,7 +1258,7 @@ class feiHadronicBplus(BaseFEISkim):
         `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
         FEI.
     """
-    __SkimDescription__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
+    __description__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
 
     FEIChannelArgs = {
         "neutralB": False,
@@ -1341,7 +1342,7 @@ class feiSLB0(BaseFEISkim):
         `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
         FEI.
     """
-    __SkimDescription__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
+    __description__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
 
     FEIChannelArgs = {
         "neutralB": True,
@@ -1425,7 +1426,7 @@ class feiSLBplus(BaseFEISkim):
         `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
         FEI.
     """
-    __SkimDescription__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
+    __description__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
 
     FEIChannelArgs = {
         "neutralB": False,

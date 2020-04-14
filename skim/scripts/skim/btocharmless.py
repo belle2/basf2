@@ -546,8 +546,9 @@ def CharmlessHad3BodyBmList(path):
 @fancy_skim_header
 class BtoPi0Pi0(BaseSkim):
     __authors__ = ["Kim Smith"]
-    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
-    __SkimDescription__ = ""
+    __description__ = ""
+    __contact__ = ""
+    __category__ = "physics, hadronic B to charmless"
 
     RequiredStandardLists = {
         "stdPi0s": {
@@ -580,8 +581,9 @@ class CharmlessHad2Body(BaseSkim):
     """
 
     __authors__ = ["Kim Smith"]
-    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
-    __SkimDescription__ = "Skim list for all neutral and charged :math:`B` to charmless 2 body modes."
+    __description__ = "Skim list for all neutral and charged :math:`B` to charmless 2 body modes."
+    __contact__ = ""
+    __category__ = "physics, hadronic B to charmless"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -889,8 +891,9 @@ class CharmlessHad3Body(BaseSkim):
     """
 
     __authors__ = ["Kim Smith"]
-    __WorkingGroup__ = "Charmless :math:`B` decays (WG9)"
-    __SkimDescription__ = "Skim list for all neutral and charged :math:`B` to charmless 3 body modes."
+    __description__ = "Skim list for all neutral and charged :math:`B` to charmless 3 body modes."
+    __contact__ = ""
+    __category__ = "physics, hadronic B to charmless"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {

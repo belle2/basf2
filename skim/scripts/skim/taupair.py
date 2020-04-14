@@ -349,8 +349,9 @@ class TauLFV(BaseSkim):
     **Criteria**: :math:`1.58 < M < 1.98` GeV, :math:`|\Delta E|<1` GeV
     """
     __authors__ = ["Phillip Urquijo", "Kenji Inami"]
-    __WorkingGroup__ = "Tau-pair"
-    __SkimDescription__ = "Skim for Tau LFV decays."
+    __description__ = "Skim for Tau LFV decays."
+    __contact__ = ""
+    __category = "physics, tau"
 
     RequiredStandardLists = {
         "skim.standardlists.lightmesons": {
@@ -496,8 +497,9 @@ class TauGeneric(BaseSkim):
     * ``M_sig < 2.3 GeV``
     """
     __authors__ = ["Kenji Inami"]
-    __WorkingGroup__ = "Tau-pair"
-    __SkimDescription__ = "Skim for Tau generic decays."
+    __description__ = "Skim for Tau generic decays."
+    __contact__ = ""
+    __category = "physics, tau"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -591,8 +593,9 @@ class TauThrust(BaseSkim):
     * For 1x1 topology, ``thrust < 0.99``
     """
     __authors__ = ["Ami Rostomyan", "Kenji Inami"]
-    __WorkingGroup__ = "Tau-pair"
-    __SkimDescription__ = "Skim for Tau decays using thrust."
+    __description__ = "Skim for Tau decays using thrust."
+    __contact__ = ""
+    __category = "physics, tau"
 
     RequiredStandardLists = {
         "stdCharged": {

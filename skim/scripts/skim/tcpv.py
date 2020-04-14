@@ -211,8 +211,9 @@ class TCPV(BaseSkim):
     """
 
     __authors__ = ["Reem Rasheed"]
-    __WorkingGroup__ = "Time-dependent CP violation"
-    __SkimDescription__ = "Skim for time-dependent CP violation analysis."
+    __description__ = "Skim for time-dependent CP violation analysis."
+    __contact__ = ""
+    __category__ = "physics, TCPV"
 
     RequiredStandardLists = {
         "skim.standardlists.charm": {

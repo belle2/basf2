@@ -146,8 +146,9 @@ def B2XllListLFV(path):
 class BtoXgamma(BaseSkim):
     """"""
     __authors__ = ["Trevor Shillington"]
-    __WorkingGroup__ = "Radiative and electroweak penguins (WG2)"
-    __SkimDescription__ = ":math:`B\\to X\\gamma` inclusive skim."
+    __description__ = ":math:`B\\to X\\gamma` inclusive skim."
+    __contact__ = ""
+    __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -190,8 +191,9 @@ class BtoXgamma(BaseSkim):
 @fancy_skim_header
 class BtoXll(BaseSkim):
     __authors__ = ["Trevor Shillington"]
-    __WorkingGroup__ = "Radiative and electroweak penguins (WG2)"
-    __SkimDescription__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
+    __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
+    __contact__ = ""
+    __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
         "stdCharged": {
@@ -252,8 +254,9 @@ class BtoXll(BaseSkim):
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
     __authors__ = ["Trevor Shillington"]
-    __WorkingGroup__ = "Radiative and electroweak penguins (WG2)"
-    __SkimDescription__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
+    __description__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
+    __contact__ = ""
+    __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
         "stdCharged": {

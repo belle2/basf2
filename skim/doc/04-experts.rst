@@ -9,8 +9,7 @@ Writing a skim
 In the skim package, skims are defined via the `BaseSkim` class. The skim package is organised around this for the following reasons:
 
 * this keeps the package organised, with every skim being defined in a predictable way,
-* this allows the skims to be located by standard helper tools such as b2skim-run_
-  and b2skim-stats-print_, and
+* this allows the skims to be located by standard helper tools such as b2skim-run_ and b2skim-stats-print_, and
 * skims must be combined with other skims to reduce the number of grid job submissions, and the `CombinedSkim` class is written to combined objects of type `BaseSkim`.
 
 To write a new skim, please follow these steps:
@@ -22,15 +21,14 @@ To write a new skim, please follow these steps:
        class DarkSinglePhoton(BaseSkim):
            # docstring here explaining reconstructed decay modes and applied cuts.
 
-2. [Mandatory] Tell us about your skim by setting the following attributes:
+2. *[Mandatory]* Tell us about your skim by setting the following attributes:
 
-   * ``__SkimDescription__``: one-line summary describing the purpose of your skim.
-   * ``__WorkingGroup__``: the name of the working group this skim is designed for.
-   * ``__authors__``: list of skim authors, so users know who to contact about your skim.
+   * ``__description__``: one-line summary describing the purpose of your skim.
+   * ``__category__``: a list of category keywords.
+   * ``__authors__``: list of skim authors.
+   * ``__contact__``: the name and contact email of the skim liaison responsible for this skim.
 
-   `BaseSkim` requires you to set these attributes in each subclass. Once these are set, we can we
-   add a lovely auto-generated header to the documentation of the skim by using the
-   `fancy_skim_header` decorator.
+   `BaseSkim` requires you to set these attributes in each subclass. Once these are set, we can we add a lovely auto-generated header to the documentation of the skim by using the `fancy_skim_header` decorator.
 
    .. code-block:: python
 
@@ -38,15 +36,13 @@ To write a new skim, please follow these steps:
        class DarkSinglePhoton(BaseSkim):
            # docstring here describing your skim, and explaining cuts.
 
-   This header will appear as a "Note" block at the top of your skim class on Sphinx, and will also
-   appear at the top of the help function in an interactive Python session:
+   This header will appear as a "Note" block at the top of your skim class on Sphinx, and will also appear at the top of the help function in an interactive Python session:
 
        >>> from skim.foo import MySkim
        >>> help(MySkim)
 
    .. tip::
-       If your skim does not define ``__SkimDescription__``, ``__WorkingGroup__``, ``__authors__``,
-       ``RequiredStandardLists`` or ``build_lists``, then you will see an error message like:
+       If your skim does not define ``__description__``, ``__category__``, ``__authors__``, ``__contact__``, ``RequiredStandardLists`` or ``build_lists``, then you will see an error message like:
 
        ::
 
@@ -54,27 +50,23 @@ To write a new skim, please follow these steps:
 
        This can be fixed by defining these required attributes and methods.
 
-3. [Mandatory] Specify all required particle lists in the attribute ``RequiredStandardLists``. If you don't require any standard lists, then you can set this to ``None``. See the documentation of this attribute for instructions on how to do this for your skim.
+3. *[Mandatory]* Specify all required particle lists in the attribute ``RequiredStandardLists``. If you don't require any standard lists, then you can set this to ``None``. See the documentation of this attribute for instructions on how to do this for your skim.
 
 4. If any further setup is required, then override the ``additional_setup`` method.   
 
-5. [Mandatory] Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
+5. *[Mandatory]* Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
 
 6. If any modules are producing too much noise, then override the attribute ``NoisyModules`` as a list of those modules, and their output will be set to only print error-level messages.
 
 7. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
-With all of these steps followed, you will now be able to run your skim using the :ref:`skim command
-line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put
-into production, please also complete the following steps:
+With all of these steps followed, you will now be able to run your skim using the :ref:`skim command line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put into production, please also complete the following steps:
 
 8. Test your skim! The primary point of skims is to be run on the grid, so you want to be sure that the retention rate and processing time are low enough to make this process smooth.
 
-   The skim package contains a set of tools to make this straightforward for you. See `Testing skim
-   performance`_ for more details.
+   The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
-9. Define validation histograms for your skim by overriding the method ``validation_histograms``.
-   Please see the source code of various skims for examples of how to do this.
+9. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -152,9 +144,7 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
 Testing skim performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When skims are developed, it is important to test the performance of the skim on a data and on a
-range of background MC samples. Two command-line tools are provided in the skim package to aid in
-this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
+When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
 First run ``b2skim-stats-submit``, which will submit small skim jobs on test files of MC and data using ``bsub``. For example,
 
@@ -172,21 +162,11 @@ This will read the output files of the test jobs, and produce tables of statisti
 
 * A subset of the statistics printed to the screen per-skim. This output is for display only.
 
-* If the ``-M`` flag is provided, a Markdown table will be written to ``skimStats.md``. This table
-  is in a format that can be copied into the comment fields of pull requests (where BitBucket will
-  format the table nicely for you). Use this flag when asked to produce a table of stats in a pull
-  request.
+* If the ``-M`` flag is provided, a Markdown table will be written to ``skimStats.md``. This table is in a format that can be copied into the comment fields of pull requests (where BitBucket will format the table nicely for you). Use this flag when asked to produce a table of stats in a pull request.
 
-* If the ``-J`` flag is provided, a text file ``confluenceTables.txt`` is written, in which the
-  statistics are formatted as Confluence wiki markup tables. These tables can be copied directly
-  onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar,
-  selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into
-  the markup editor which appears. Confluence will then format the tables and headings. The markup
-  editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
+* If the ``-J`` flag is provided, a text file ``confluenceTables.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 
-* If the ``-J`` flag is provided, then all statistics produced are printed to a JSON file
-  ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid
-  production tools.
+* If the ``-J`` flag is provided, then all statistics produced are printed to a JSON file ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid production tools.
 
 .. tip::
    To test your own newly-developed skim, make sure you have followed all the instructions in

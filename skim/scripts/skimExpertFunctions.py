@@ -223,8 +223,7 @@ def fancy_skim_header(SkimClass):
     SkimName = SkimClass.__name__
     SkimCode = Registry.encode_skim_name(SkimName)
     authors = SkimClass.__authors__ or ["(no authors listed)"]
-    WG = SkimClass.__WorkingGroup__ or "(no working group listed)"
-    description = SkimClass.__SkimDescription__ or "(no description)"
+    description = SkimClass.__description__ or "(no description)"
     contact = SkimClass.__contact__ or "(no contact listed)"
     category = SkimClass.__category__ or "(no category listed)"
 
@@ -234,12 +233,20 @@ def fancy_skim_header(SkimClass):
         # Strip any remaining whitespace either side of an author's name
         authors = [re.sub(r"^\s+|\s+$", "", author) for author in authors]
 
+    if isinstance(category, list):
+        category = ", ".join(category)
+
+    # If the contact is of the form "NAME <EMAIL>" or "NAME (EMAIL)", then make it a link
+    match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
+    if match:
+        name, email = match[1], match[2]
+        contact = f"`{name} <mailto:{email}>`_"
+
     header = f"""
     Note:
         * **Skim description**: {description}
         * **Skim name**: {SkimName}
         * **Skim LFN code**: {SkimCode}
-        * **Working Group**: {WG}
         * **Category**: {category}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
         * **Contact**: {contact}
@@ -311,17 +318,22 @@ class BaseSkim(ABC):
 
     @property
     @abstractmethod
-    def __SkimDescription__(self):
+    def __description__(self):
         pass
 
     @property
     @abstractmethod
-    def __WorkingGroup__(self):
+    def __category__(self):
         pass
 
     @property
     @abstractmethod
     def __authors__(self):
+        pass
+
+    @property
+    @abstractmethod
+    def __contact__(self):
         pass
 
     def __init__(self, *, OutputFileName=None):
@@ -359,7 +371,7 @@ class BaseSkim(ABC):
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
         the main skim cuts should be applied. At the end of this method, the attribute
-        `SkimLists` must be set so it can be used by `output_udst`.
+        ``SkimLists`` must be set so it can be used by `output_udst`.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -541,7 +553,7 @@ class CombinedSkim(BaseSkim):
 
     __authors__ = ["Phil Grace"]
     __WorkingGroup__ = None
-    __SkimDescription__ = None
+    __description__ = None
 
     RequiredStandardLists = None
     """`BaseSkim.RequiredStandardLists` attribute initialised to `None` to get around

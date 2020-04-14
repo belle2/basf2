@@ -2293,17 +2293,17 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "The B meson momentum in CMS is assumed to be 0.");
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
-                      "Returns the momentum transfer squared, q^:math:`q^2`2, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
-                      "Returns the momentum transfer squared, q:math:`q^2`^2, calculated in LAB as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
-                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in LAB as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
+                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter.");
 
     REGISTER_VARIABLE("weQ2lnu(maskName)", WE_q2lnu,
-                      "Returns the momentum transfer squared, q:math:`q^2`^2, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
-                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
+                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
     REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,

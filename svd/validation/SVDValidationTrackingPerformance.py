@@ -25,9 +25,10 @@ treeSP = inputSP.Get("tree")
 
 histsTP = R.TFile.Open("SVDTrackingPerformance.root", "recreate")
 
+
 ploter(
     name='SpacePointTime_U',
-    title='SpacePoint time in U side',
+    title='SpacePoint time on U side',
     nbins=200,
     xmin=-100,
     xmax=100,
@@ -41,9 +42,10 @@ ploter(
     check='Distributions between -20 and 20 ns.',
     isShifter=True)
 
+
 ploter(
     name='SpacePointTime_V',
-    title='SpacePoint time in V side',
+    title='SpacePoint time on V side',
     nbins=200,
     xmin=-100,
     xmax=100,
@@ -57,6 +59,7 @@ ploter(
     check='Distributions between -20 and 20 ns.',
     isShifter=True)
 
+
 ploter(
     name='cluster_UVTimeDiff',
     title='U-V time difference',
@@ -65,13 +68,14 @@ ploter(
     xmax=20,
     x_label='Cluster time difference (ns)',
     y_label='counts',
-    granules=gD,
+    granules=gD2,
     tree=treeRT,
     expr='cluster_UVTimeDiff',
     cut=cut_oneTH,
     descr='Time difference between opposite sides of clusters belonging to the same layer.',
     check='Distributions peak around 0.',
     isShifter=True)
+
 
 ploter(
     name='cluster_UUTimeDiff',
@@ -89,6 +93,7 @@ ploter(
     check='Distributions peak around 0.',
     isShifter=True)
 
+
 ploter(
     name='cluster_VVTimeDiff',
     title='V-V time difference',
@@ -105,6 +110,7 @@ ploter(
     check='Distributions peak around 0.',
     isShifter=True)
 
+
 plotRegions(
     name='ClusterizationPurity_U',
     title='Purity of clusters from tracks for U side',
@@ -119,6 +125,7 @@ plotRegions(
     Evaluates the fraction of signal cluster over the total number of clusters.',
     check='Should be close to 1 in all bins',
     isShifter=True)
+
 
 plotRegions(
     name='ClusterizationPurity_V',
@@ -135,6 +142,7 @@ plotRegions(
     check='Should be close to 1 in all bins.',
     isShifter=True)
 
+
 ploter(
     name='clusters_number',
     title='Number of clusters in one track',
@@ -149,5 +157,5 @@ ploter(
     cut=cut_U,
     descr='Number of clusters in one track.',
     check='Maximum is expected for 8, i.e. each cluster for one of 4 layers,\
-    separately for U and V side',
+    separately for U and V side.',
     isShifter=True)

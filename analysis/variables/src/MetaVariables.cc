@@ -2704,14 +2704,14 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       "or if the i-th MC daughter does not exist.\n"
                       "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
+                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
                       "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
                       "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: mcMother(mcMother(PDG)).");
+                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2745,7 +2745,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
-                      "E.g. u``seRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
@@ -2754,32 +2754,32 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in :math:`\phi` between the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\phi_j - \phi_i`.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in :math:`\phi` between the first daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\phi_j - \phi_i`.\n");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\phi` between the ECLClusters of two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in :math:`\phi` between the ECLClusters of the daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in :math:`\phi` between the two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns :math:`\phi_j - \phi_i`.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in :math:`\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns phi_j - phi_i.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
@@ -2814,7 +2814,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
+                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"

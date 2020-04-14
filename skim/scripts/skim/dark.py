@@ -423,7 +423,7 @@ def TwoTrackEEMuMuList(path):
 
     **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and `e^{+}e^{-} \\to \mu^{+}\mu^{-}`
 
-    **Skim category**: physics, dark sector
+    **Skim category**: physics, luminosity
 
     Parameters:
         path (basf2.Path): path to add the skim

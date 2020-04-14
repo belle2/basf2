@@ -286,7 +286,7 @@ NeuroTrigger::selectMLPs(float phi0, float invpt, float theta)
 
 
 int
-NeuroTrigger::selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern)
+NeuroTrigger::selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern, const bool neurotrackinputmode)
 {
   if (MLPs.size() == 0) {
     return -1;
@@ -311,7 +311,12 @@ NeuroTrigger::selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern)
   }
 
   if (bestIndex < 0) {
-    B2DEBUG(150, "No sector found to match pattern " << pattern << ".");
+    if (neurotrackinputmode) {
+      B2DEBUG(150, "No sector found to match pattern, using sector 0" << pattern << ".");
+      bestIndex = 0;
+    } else {
+      B2DEBUG(150, "No sector found to match pattern " << pattern << ".");
+    }
   }
   return bestIndex;
 }
@@ -343,6 +348,7 @@ NeuroTrigger::updateTrackFix(const CDCTriggerTrack& track)
 
   double omega = track.getOmega();
   long phi = round(track.getPhi0() * (1 << precisionPhi));
+
   for (int iSL = 0; iSL < 9; ++iSL) {
     for (int priority = 0; priority < 2; ++priority) {
       // LUT, calculated on the fly here
@@ -368,6 +374,7 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 {
   int iSL = hit.getISuperLayer();
   int priority = hit.getPriorityPosition();
+  // (((priority >> 1) & 1) - (priority & 1)) is 0, -1, 1, 0 for priority = 0, 1, 2, 3
   double relId = hit.getSegmentID() + 0.5 * (((priority >> 1) & 1) - (priority & 1))
                  - m_TSoffset[iSL] - m_idRef[iSL][int(priority < 3)];
   relId = remainder(relId, (m_TSoffset[iSL + 1] - m_TSoffset[iSL]));
@@ -375,7 +382,7 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 }
 
 void
-NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option)
+NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option, const bool neuroinputmode = false)
 {
   if (et_option != m_MLPs[isector].get_et_option()) {
     B2WARNING("Used event time option is different to the one set in the MLP"
@@ -405,16 +412,18 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
           m_T0 = axialHits[ihit]->priorityTime();
         }
       }
-      // find shortest time of relevant stereo hits
-      StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-      for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
-        unsigned short iSL = hits[ihit]->getISuperLayer();
-        // skip axial hits
-        if (iSL % 2 == 0) continue;
-        // get shortest time of relevant hits
-        double relId = getRelId(*hits[ihit]);
-        if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
-          m_T0 = hits[ihit]->priorityTime();
+      if (!neuroinputmode) {
+        // find shortest time of relevant stereo hits
+        StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+        for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+          unsigned short iSL = hits[ihit]->getISuperLayer();
+          // skip axial hits
+          if (iSL % 2 == 0) continue;
+          // get shortest time of relevant hits
+          double relId = getRelId(*hits[ihit]);
+          if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
+            m_T0 = hits[ihit]->priorityTime();
+          }
         }
       }
       if (m_T0 < 9999) {
@@ -455,10 +464,12 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       }
     }
   } else if (et_option == "fastestpriority") {
+    B2DEBUG(200, "et_option is 'fastestpriority'");
     m_T0 = 9999;
     // find shortest time of related and relevant axial hits
     RelationVector<CDCTriggerSegmentHit> axialHits =
       track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+    B2DEBUG(200, "looping over axials:");
     for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
       // skip hits with negative relation weight (not selected in finder)
       if (axialHits.weight(ihit) < 0) continue;
@@ -466,22 +477,33 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       // skip stereo hits (should not be related to track, but check anyway)
       if (iSL % 2 == 1) continue;
       // get shortest time of relevant hits
+      B2DEBUG(200, "  check drifttime: SL" + std::to_string(iSL) + ",ID = " + std::to_string(axialHits[ihit]->getSegmentID()) + ", t = " +
+              std::to_string(axialHits[ihit]->priorityTime()));
       double relId = getRelId(*axialHits[ihit]);
       if (m_MLPs[isector].isRelevant(relId, iSL) &&
           axialHits[ihit]->priorityTime() < m_T0) {
         m_T0 = axialHits[ihit]->priorityTime();
+        B2DEBUG(200, "    new t0: " << std::to_string(m_T0));
       }
     }
-    // find shortest time of relevant stereo hits
-    StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
-    for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
-      unsigned short iSL = hits[ihit]->getISuperLayer();
-      // skip axial hits
-      if (iSL % 2 == 0) continue;
-      // get shortest time of relevant hits
-      double relId = getRelId(*hits[ihit]);
-      if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
-        m_T0 = hits[ihit]->priorityTime();
+    // TODO: do not execute this when using neurotracks as input!!
+    //
+    if (!neuroinputmode) {
+      // find shortest time of relevant stereo hits
+      StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);
+      B2DEBUG(200, "looping over stereos:");
+      for (int ihit = 0; ihit < hits.getEntries(); ++ihit) {
+        unsigned short iSL = hits[ihit]->getISuperLayer();
+        // skip axial hits
+        if (iSL % 2 == 0) continue;
+        // get shortest time of relevant hits
+        B2DEBUG(200, "  check drifttime: SL" + std::to_string(iSL) + ",ID = " + std::to_string(hits[ihit]->getSegmentID()) + ", t = " +
+                std::to_string(hits[ihit]->priorityTime()));
+        double relId = getRelId(*hits[ihit]);
+        if (m_MLPs[isector].isRelevant(relId, iSL) && hits[ihit]->priorityTime() < m_T0) {
+          m_T0 = hits[ihit]->priorityTime();
+          B2DEBUG(200, "    new t0: " << std::to_string(m_T0));
+        }
       }
     }
     if (m_T0 < 9999) {
@@ -559,7 +581,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track)
 
 
 unsigned long
-NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
+NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode)
 {
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
@@ -570,10 +592,12 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
     track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
   for (unsigned ihit = 0; ihit < axialHits.size(); ++ ihit) {
     // skip hits with negative relation weight (not selected in finder)
-    if (axialHits.weight(ihit) < 0) continue;
+    if (axialHits.weight(ihit) < 0) {
+      continue;
+    }
     unsigned short iSL = axialHits[ihit]->getISuperLayer();
-    // skip stereo hits (should not be related to track, but check anyway)
-    if (iSL % 2 == 1) continue;
+    // // skip stereo hits (should not be related to track, but check anyway)
+    if ((!neurotrackinputmode) && (iSL % 2 == 1)) continue;
     // get priority time
     int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
     if (t < 0) {
@@ -582,6 +606,7 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
       t = expert.getTMax();
     }
     double relId = getRelId(*axialHits[ihit]);
+
     if (expert.isRelevant(relId, iSL)) {
       if (nHits[iSL] < expert.getMaxHitsPerSL()) {
         hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
@@ -592,33 +617,110 @@ NeuroTrigger::getInputPattern(unsigned isector, const CDCTriggerTrack& track)
       B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
     }
   }
-  // loop over stereo hits
-  for (int ihit = 0; ihit < m_segmentHits.getEntries(); ++ ihit) {
-    unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
-    // skip axial hits
-    if (iSL % 2 == 0) continue;
-    // get priority time
-    int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
-    if (t < 0) {
-      t = 0;
-    } else if (t > expert.getTMax()) {
-      t = expert.getTMax();
-    }
-    double relId = getRelId(*m_segmentHits[ihit]);
-    if (expert.isRelevant(relId, iSL)) {
-      if (nHits[iSL] < expert.getMaxHitsPerSL()) {
-        hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
-        ++nHits[iSL];
+  if (!neurotrackinputmode) {
+    // loop over stereo hits
+    for (int ihit = 0; ihit < m_segmentHits.getEntries(); ++ ihit) {
+      unsigned short iSL = m_segmentHits[ihit]->getISuperLayer();
+      // skip axial hits
+      if (iSL % 2 == 0) continue;
+      // get priority time
+      int t = (m_hasT0) ? m_segmentHits[ihit]->priorityTime() - m_T0 : 0;
+      if (t < 0) {
+        t = 0;
+      } else if (t > expert.getTMax()) {
+        t = expert.getTMax();
       }
-      B2DEBUG(250, "hit in SL " << iSL);
-    } else {
-      B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
+      double relId = getRelId(*m_segmentHits[ihit]);
+      if (expert.isRelevant(relId, iSL)) {
+        if (nHits[iSL] < expert.getMaxHitsPerSL()) {
+          hitPattern |= 1 << (iSL + 9 * nHits[iSL]);
+          ++nHits[iSL];
+        }
+        B2DEBUG(250, "hit in SL " << iSL);
+      } else {
+        B2DEBUG(250, "hit in SL " << iSL << " not relevant (relId = " << relId << ")");
+      }
     }
   }
   B2DEBUG(250, "hitPattern " << hitPattern);
   return hitPattern & expert.getSLpatternMask();
 }
 
+vector<unsigned>
+NeuroTrigger::selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track)
+{
+  CDCTriggerMLP& expert = m_MLPs[isector];
+  vector<unsigned> selectedHitIds = {};
+  // prepare vectors to keep best drift times, left/right and selected hit IDs
+  vector<int> tMin;
+  tMin.assign(expert.nNodesLayer(0), expert.getTMax());
+  vector<bool> LRknown;
+  LRknown.assign(expert.nNodesLayer(0), false);
+  vector<int> hitIds;
+  hitIds.assign(expert.nNodesLayer(0), -1);
+  vector<unsigned> nHits;
+  nHits.assign(9, 0);
+
+  // loop over all hits related to input track
+  RelationVector<CDCTriggerSegmentHit> allHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
+  B2DEBUG(250, "start hit loop over all related hits");
+  for (unsigned ihit = 0; ihit < allHits.size(); ++ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (allHits.weight(ihit) < 0) continue;
+    unsigned short iSL = allHits[ihit]->getISuperLayer();
+    if (expert.getSLpatternUnmasked() != 0 &&
+        !((expert.getSLpatternUnmasked() >> iSL) & 1)) {
+      B2DEBUG(250, "skipping hit in SL " << iSL);
+      continue;
+    }
+    // get priority time and apply time window cut
+    int t = (m_hasT0) ? allHits[ihit]->priorityTime() - m_T0 : 0;
+    if (t < 0) {
+      t = 0;
+    } else if (t > expert.getTMax()) {
+      t = expert.getTMax();
+    }
+    double relId = getRelId(*allHits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      // get reference hit (worst of existing hits)
+      unsigned short iRef = iSL;
+      if (expert.getMaxHitsPerSL() > 1) {
+        if (nHits[iSL] < expert.getMaxHitsPerSL() &&
+            (expert.getSLpatternUnmasked() >> (iSL + 9 * nHits[iSL])) & 1) {
+          iRef += 9 * nHits[iSL];
+          ++nHits[iSL];
+        } else {
+          for (unsigned compare = iSL; compare < iSL + 9 * nHits[iSL]; compare += 9) {
+            if ((LRknown[iRef] && !LRknown[compare]) ||
+                (LRknown[iRef] == LRknown[compare] && tMin[iRef] < tMin[compare]))
+              iRef = compare;
+          }
+        }
+      }
+      // choose best hit (LR known before LR unknown, then shortest drift time)
+      bool useHit = false;
+      if (LRknown[iRef]) {
+        useHit = (allHits[ihit]->LRknown() && t <= tMin[iRef]);
+      } else {
+        useHit = (allHits[ihit]->LRknown() || t <= tMin[iRef]);
+      }
+      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << allHits[ihit]->getLeftRight()
+              << " t " << t << " iRef " << iRef << " useHit " << useHit);
+      if (useHit) {
+        // keep drift time and LR
+        LRknown[iRef] = allHits[ihit]->LRknown();
+        tMin[iRef] = t;
+        hitIds[iRef] = allHits[ihit]->getArrayIndex();
+      }
+    }
+  }
+  // save selected hit Ids
+  for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
+    if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+  }
+  return selectedHitIds;
+}
 vector<unsigned>
 NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
                          bool returnAllRelevant)
@@ -651,6 +753,7 @@ NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
       continue;
     }
     // get priority time and apply time window cut
+
     int t = (m_hasT0) ? axialHits[ihit]->priorityTime() - m_T0 : 0;
     if (t < 0) {
       t = 0;

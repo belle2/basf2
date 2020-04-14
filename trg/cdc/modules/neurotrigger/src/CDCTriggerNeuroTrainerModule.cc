@@ -200,6 +200,9 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
   addParam("repeatTrain", m_repeatTrain,
            "If >1, training is repeated several times with different start weights. "
            "The weights which give the best resolution on the test samples are kept.", 1);
+  addParam("NeuroTrackInputMode", m_neuroTrackInputMode,
+           "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger",
+           false);
 }
 
 
@@ -424,9 +427,9 @@ CDCTriggerNeuroTrainerModule::event()
           continue;
         }
         // read out or determine event time
-        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_parameters.et_option);
+        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_parameters.et_option, m_neuroTrackInputMode);
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack]);
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
@@ -434,7 +437,12 @@ CDCTriggerNeuroTrainerModule::event()
           continue;
         }
         // get training data
-        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
+        vector<unsigned> hitIds;
+        if (m_neuroTrackInputMode) {
+          hitIds = m_NeuroTrigger.selectHitsHWSim(isector, *m_tracks[itrack]);
+        } else {
+          hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
+        }
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(phi0Target);

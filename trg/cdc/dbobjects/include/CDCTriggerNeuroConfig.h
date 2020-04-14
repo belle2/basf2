@@ -32,7 +32,7 @@ namespace Belle2 {
     virtual ~CDCTriggerNeuroConfig() {};
 
     struct B2FormatLine {
-      B2FormatLine() : start(0), end(0), offset(0) {}
+      B2FormatLine() : start(0), end(0), offset(0), name("None") {}
       /** start bit number in B2Link */
       int start;
       /** end bit number in B2Link */
@@ -180,7 +180,7 @@ namespace Belle2 {
     /** Short comment on Firmware **/
     std::string m_NNTFirmwareComment;
 
-    ClassDef(CDCTriggerNeuroConfig, 2); /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCTriggerNeuroConfig, 3); /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

@@ -520,31 +520,14 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
            "number of words (number of bits / 32) of the B2L header", 3);
   addParam("alignFoundTime", m_alignFoundTime,
            "Whether to align out-of-sync Belle2Link data between different sub-modules", true);
-
-  std::vector<float> defaultOutputScale = { }; //  -50., 50., 0, M_PI};
-  addParam("NNOutputScale", m_NNOutputScale,
-           "Scaling factors to be applied onto the NN Output."
-           "Leave it empty to load values from the Conditions DB",
-           defaultOutputScale);
   addParam("useDB", m_useDB,
            "Use values stored in the payload of the ConditionsDB."
-           "Currently this affects the output scaling of the Neurotrigger as well as the"
-           "bit configuration of its unpacker.",
-           false);
+           "This affects the output scaling of the Neurotrigger as well as the"
+           "bit configuration of its unpacker. If false, an old unpacker version with fixed scalings and old bit adresses is used.",
+           true);
   addParam("sim13dt", m_sim13dt,
            "Simulate 13 bit drift time by using 2d clock counter value.",
-           true);
-
-
-}
-std::vector<float> CDCTriggerUnpackerModule::unscaleNNOutput(std::vector<float> input) const
-{
-  std::vector<float> unscaled;
-  unscaled.assign(input.size(), 0.);
-  for (unsigned i = 0; i < input.size(); ++i) {
-    unscaled[i] = (input[i] + 1.) * (m_NNOutputScale[2 * i + 1] - m_NNOutputScale[2 * i]) / 2. + m_NNOutputScale[2 * i];
-  }
-  return unscaled;
+           false);
 }
 
 void CDCTriggerUnpackerModule::initialize()
@@ -630,23 +613,10 @@ void CDCTriggerUnpackerModule::initialize()
     }
   }
   if (m_useDB == true) {
-    B2DEBUG(2, "Load unscaling weights for Neurotrigger from network in database: " << m_cdctriggerneuroconfig->getNNName());
-    m_mlp_scale = m_cdctriggerneuroconfig->getMLPs()[0];
-  } else {
-    std::vector<unsigned short> nodes = {27, 27, 2};
-    unsigned short targets = 2.;
-    std::vector<float> outputscale = m_NNOutputScale;
-    std::vector<float>  phirange = {0., 2. * M_PI};
-    std::vector<float> invptrange = { -5., 5.};
-    std::vector<float> thetarange = {0., M_PI};
-    unsigned short maxHits = 1;
-    unsigned long pattern = 0;
-    unsigned long patternMask = 0;
-    unsigned short tmax = 256;
-    bool calcT0 = false;
-    std::string etoption = "etf_or_fastestpriority";
-    m_mlp_scale = CDCTriggerMLP(nodes, targets, outputscale, phirange, invptrange, thetarange, maxHits, pattern, patternMask, tmax,
-                                calcT0, etoption);
+    B2DEBUG(2, "Load Neurotrigger configuration for network " << m_cdctriggerneuroconfig->getNNName() << " from database ");
+    for (auto x : m_cdctriggerneuroconfig->getB2Format()) {
+      B2DEBUG(10, x.name << ",  " << x.start << "  " << x.end);
+    }
   }
 }
 
@@ -765,9 +735,10 @@ void CDCTriggerUnpackerModule::event()
   B2DEBUG(99, "now unpack neuro ");
   if (m_decodeNeuro) {
     if (m_useDB == true) {
-      decodeNNIO2(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs,
-                  m_delayNNOutput,
-                  m_delayNNSelect, m_cdctriggerneuroconfig, m_sim13dt);
+      decodeNNIO(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NNInputTSHitsAll, &m_NeuroInputs,
+                 m_cdctriggerneuroconfig, m_sim13dt);
+    } else {
+      decodeNNIO_old(&m_bitsNN, &m_NNInput2DFinderTracks, &m_NeuroTracks, &m_NNInputTSHits, &m_NeuroInputs);
     }
   }
   B2DEBUG(99, " all is unpacked ##### ");

@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>../TwoTrackPiPi.udst.root</input>
-  <output>../TwoTrackPiPi_Validation.root</output>
+  <input>../TwoTrackPions.udst.root</input>
+  <output>../TwoTrackPions_Validation.root</output>
   <contact>zhouxy@buaa.edu.cn</contact>
 </header>
 """
@@ -15,10 +15,10 @@ from skim import dark
 from variables import variables
 from modularAnalysis import variablesToHistogram
 
-TwoTrackPiPi_path = basf2.Path()
+TwoTrackPions_path = basf2.Path()
 
 # load input ROOT file
-inputMdst('default', '../TwoTrackPiPi.udst.root', path=TwoTrackPiPi_path)
+inputMdst('default', '../TwoTrackPions.udst.root', path=TwoTrackPions_path)
 
 variables.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
 variables.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
@@ -35,10 +35,10 @@ variablesHist = [
                 ]
 
 # Output the variables to a ntuple
-variablesToHistogram('vpho:TwoTrackPiPi', variablesHist, filename='../TwoTrackPiPi_Validation.root', path=TwoTrackPiPi_path)
+variablesToHistogram('vpho:TwoTrackPions', variablesHist, filename='../TwoTrackPions_Validation.root', path=TwoTrackPions_path)
 
 # Process the events
-basf2.process(TwoTrackPiPi_path)
+basf2.process(TwoTrackPions_path)
 
 # print out the summary
 print(basf2.statistics)

@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Giacomo De Pietro                          *
+ * Contributors: Marko Staric, Kirill Chilikin                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,21 +18,21 @@
 
 /* Belle2 headers. */
 #include <background/modules/BeamBkgHitRateMonitor/HitRateBase.h>
-#include <klm/dataobjects/bklm/BKLMDigit.h>
-#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dataobjects/KLMModuleArrayIndex.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 
 namespace Belle2 {
 
   namespace Background {
 
     /**
-     * Class for monitoring beam background hit rates of BKLM.
+     * Class for monitoring beam background hit rates of EKLM.
      */
-    class BKLMHitRateCounter: public HitRateBase {
+    class KLMHitRateCounter: public HitRateBase {
 
     public:
 
@@ -41,8 +41,8 @@ namespace Belle2 {
        */
       struct TreeStruct {
 
-        /** Hit rates in each layer. */
-        float layerRates[BKLMElementNumbers::getMaximalLayerGlobalNumber()] = {0};
+        /** Hit rates in each module. */
+        float moduleRates[KLMElementNumbers::getTotalModuleNumber()] = {0};
 
         /** Total detector average hit rate. */
         float averageRate = 0;
@@ -60,8 +60,8 @@ namespace Belle2 {
         {
           if (numEvents == 0)
             return;
-          for (int i = 0; i < m_maxGlobalLayer; ++i)
-            layerRates[i] /= numEvents;
+          for (int i = 0; i < KLMElementNumbers::getTotalModuleNumber(); ++i)
+            moduleRates[i] /= numEvents;
           averageRate /= numEvents;
         }
 
@@ -70,7 +70,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      BKLMHitRateCounter();
+      KLMHitRateCounter() {};
 
       /**
        * Class initializer.
@@ -95,12 +95,6 @@ namespace Belle2 {
        */
       virtual void normalize(unsigned timeStamp) override;
 
-      /**
-       * Get number of active strips in the specified BKLM global layer.
-       * @param[in] layerGlobal Layer global number.
-       */
-      int getActiveStripsBKLMLayer(int layerGlobal) const;
-
     private:
 
       /** Tree data. */
@@ -109,17 +103,18 @@ namespace Belle2 {
       /** Buffer. */
       std::map<unsigned, TreeStruct> m_buffer;
 
-      /** Total number of layers. */
-      static constexpr int m_maxGlobalLayer = BKLMElementNumbers::getMaximalLayerGlobalNumber();
+      /** KLM digits. */
+      StoreArray<KLMDigit> m_digits;
 
       /** KLM element numbers. */
-      const KLMElementNumbers* m_klmElementNumbers;
+      const KLMElementNumbers* m_ElementNumbers = nullptr;
+
+      /** KLM module array index. */
+      const KLMModuleArrayIndex* m_ModuleArrayIndex = nullptr;
 
       /** KLM channel status. */
       DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
-      /** BKLM digits. */
-      StoreArray<BKLMDigit> m_digits;
     };
 
   }

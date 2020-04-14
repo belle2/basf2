@@ -77,19 +77,13 @@ namespace Belle2 {
      * Get energy deposit.
      * @return Energy deposit.
      */
-    float getEDep() const;
+    float getEnergyDeposit() const;
 
     /**
-     * Set EDep.
+     * Set EnergyDeposit.
      * @param[in] eDep Energy deposit.
      */
-    void setEDep(float eDep);
-
-    /**
-     * Increase energy deposit.
-     * @param[in] eDep Energy deposit.
-     */
-    void increaseEDep(float deltaEDep);
+    void setEnergyDeposit(float eDep);
 
     /**
      * Get hit time.

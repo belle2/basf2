@@ -10,7 +10,7 @@ from modularAnalysis import copyList
 from modularAnalysis import cutAndCopyLists
 from modularAnalysis import matchMCTruth
 
-from vertex import KFit
+from vertex import kFit
 
 
 def addBeamParamsConversionMonitors(outputRootFile='b2biiBeamParamsConversionMonitors.root', path=None):
@@ -82,7 +82,7 @@ def addKshortConversionMonitors(outputRootFile='b2biiKshortConversionMonitors.ro
     """
     # copy KShorts from 'K_S0:mdst' list. We don't want to mess with them.
     copyParticles('K_S0:b2bii_monitor', 'K_S0:mdst', False, path)
-    KFit('K_S0:b2bii_monitor', -1, path=path)
+    kFit('K_S0:b2bii_monitor', -1, path=path)
     matchMCTruth('K_S0:b2bii_monitor', path)
 
     # register VariablesToHistogram and fill it with monitored variables
@@ -254,7 +254,7 @@ def addLambda0ConversionMonitors(outputRootFile='b2biiLambda0ConversionMonitors.
     """
 
     copyParticles('Lambda0:b2bii_monitor', 'Lambda0:mdst', False, path)
-    KFit('Lambda0:b2bii_monitor', -1, path=path)
+    kFit('Lambda0:b2bii_monitor', -1, path=path)
     matchMCTruth('Lambda0:b2bii_monitor', path)
 
     # register VariablesToHistogram and fill it with monitored variables
@@ -378,7 +378,7 @@ def addConvertedPhotonConversionMonitors(outputRootFile='b2biiConvertedPhotonCon
     """
 
     copyParticles('gamma:v0_b2bii_monitor', 'gamma:v0mdst', False, path)
-    KFit('gamma:v0_b2bii_monitor', -1, path=path)
+    kFit('gamma:v0_b2bii_monitor', -1, path=path)
     matchMCTruth('gamma:v0_b2bii_monitor', path)
 
     # register VariablesTohistogram and fill it with monitored variables
@@ -591,7 +591,7 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     # load gammas and pi0, copy pi0s from 'pi0:mdst' list. We don't want to mess with them.
     copyList('gamma:b2bii_monitor', 'gamma:mdst', False, path)
     copyParticles('pi0:b2bii_monitor', 'pi0:mdst', False, path)
-    KFit('pi0:b2bii_monitor', -1, 'mass', path=path)
+    kFit('pi0:b2bii_monitor', -1, 'mass', path=path)
     matchMCTruth('gamma:b2bii_monitor', path)
     matchMCTruth('pi0:b2bii_monitor', path)
 

@@ -11,11 +11,10 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
 #include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
@@ -179,11 +178,8 @@ namespace Belle2 {
     /** EKLM simulation hits. */
     StoreArray<EKLMSimHit> m_eklmSimHits;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /** FPGA fits. */
     StoreArray<KLMScintillatorFirmwareFitResult> m_FPGAFits;

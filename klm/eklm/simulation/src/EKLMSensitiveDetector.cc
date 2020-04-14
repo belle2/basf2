@@ -89,7 +89,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setPosition(gpos.x() / CLHEP::mm * Unit::mm,
                    gpos.y() / CLHEP::mm * Unit::mm,
                    gpos.z() / CLHEP::mm * Unit::mm);
-  hit->setEDep(eDep);
+  hit->setEnergyDeposit(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
   hit->setStrip(strip);

@@ -231,6 +231,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get total number of modules.
+     */
+    static constexpr int getTotalModuleNumber()
+    {
+      return EKLMElementNumbers::getMaximalSectorNumber() +
+             BKLMElementNumbers::getMaximalLayerGlobalNumber();
+    }
+
+    /**
      * Get minimal plane number.
      * @param[in] subdetector Subdetector.
      */

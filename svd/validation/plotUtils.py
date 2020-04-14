@@ -52,6 +52,10 @@ gD = ((cut_L3+cut_b+cut_U, 'L3_barrel_U_side'),
       (cut_L456+cut_s+cut_U, 'L456_slanted_U_side'),
       (cut_L456+cut_s+cut_V, 'L456_slanted_V_side'))
 
+gD2 = ((cut_L3+cut_b, 'L3_barrel'),
+       (cut_L456+cut_b, 'L456_barrel'),
+       (cut_L456+cut_s, 'L456_slanted'))
+
 # granurality taking into account layers and type of sensor;
 granulesLayersTypes = ((cut_L3+cut_b, 'L3_barrel'),
                        (cut_L4+cut_b, 'L4_barrel'),

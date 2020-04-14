@@ -225,6 +225,8 @@ def fancy_skim_header(SkimClass):
     authors = SkimClass.__authors__ or ["(no authors listed)"]
     WG = SkimClass.__WorkingGroup__ or "(no working group listed)"
     description = SkimClass.__SkimDescription__ or "(no description)"
+    contact = SkimClass.__contact__ or "(no contact listed)"
+    category = SkimClass.__category__ or "(no category listed)"
 
     if isinstance(authors, str):
         # If we were given a string, split it up at: commas, "and", "&", and newlines
@@ -235,10 +237,13 @@ def fancy_skim_header(SkimClass):
     header = f"""
     Note:
         * **Skim description**: {description}
-        * **Skim name**: ``{SkimName}``
+        * **Skim name**: {SkimName}
         * **Skim LFN code**: {SkimCode}
         * **Working Group**: {WG}
-        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}"""
+        * **Category**: {category}
+        * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
+        * **Contact**: {contact}
+    """
 
     if SkimClass.__doc__:
         SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")

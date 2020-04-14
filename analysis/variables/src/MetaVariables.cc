@@ -2612,10 +2612,10 @@ arguments. Operator precedence is taken into account. For example ::
 )DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
-                      "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
+                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame");
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
-                      "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
+                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
 Returns the value of ``variable`` in the *lab* frame.
 
@@ -2647,7 +2647,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
-                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
+                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
@@ -2872,7 +2872,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
-                      "around the neutral Pion mass (e.g. 0.130 < M < 0.140). \n"
+                      "around the neutral Pion mass (e.g. :math:`0.130 < M < 0.140`). \n"
                       "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"

@@ -447,6 +447,8 @@ def TwoTrackEEMuMuList(path):
     # Exactly 2 tracks from IP
     nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
     # Acollinearity angle in the theta dimension less than 10 degrees in the CMS frame
+    # candidates are : vpho -> e+ e-
+    # daughter indices are:    0  1
     deltaTheta_cut = '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
     two_track_cut = nTracks_cut + ' and ' + deltaTheta_cut
 

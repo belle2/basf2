@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: e+e- --> mu+mu-(ISR)
+# Descriptor: e+e- --> e+e-(ISR)
 
 """
 <header>
-  <output>../TwoTrackMuMu.dst.root</output>
+  <output>../TwoTrackElectronsForLuminosity.dst.root</output>
   <contact>zhouxy@buaa.edu.cn</contact>
 </header>
 """
@@ -26,7 +26,7 @@ babayaganlo = basf2.register_module('BabayagaNLOInput')
 # Set the logging level for the BABAYAGA.NLO module to INFO
 babayaganlo.set_log_level(basf2.LogLevel.INFO)
 
-babayaganlo.param('FinalState', 'mm')  # ee, gg, mm
+babayaganlo.param('FinalState', 'ee')  # ee, gg, mm
 babayaganlo.param('DebugEnergySpread', 5.e-3)
 babayaganlo.param('ScatteringAngleRange', [35.0, 145.0])
 babayaganlo.param('MinEnergy', 0.01)
@@ -61,7 +61,7 @@ add_simulation(main)
 add_reconstruction(main)
 
 # Finally add mdst output
-output_filename = "../TwoTrackMuMu.dst.root"
+output_filename = "../TwoTrackElectronsForLuminosity.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # generate events

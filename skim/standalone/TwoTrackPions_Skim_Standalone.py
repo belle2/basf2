@@ -16,19 +16,19 @@ from skim import dark
 b2.set_log_level(b2.LogLevel.INFO)
 gb2_setuprel = 'release-04-00-00'
 
-TwoTrackEEMuMu_path = b2.Path()
+TwoTrackPions_path = b2.Path()
 
 fileList = expert.get_test_file("MC12_mixedBGx1")
-ma.inputMdstList('default', fileList, path=TwoTrackEEMuMu_path)
+ma.inputMdstList('default', fileList, path=TwoTrackPions_path)
 
-TwoTrackEEMuMu_code = expert.encodeSkimName('TwoTrackEEMuMu')
-TwoTrackEEMuMu_list = dark.TwoTrackEEMuMuList(path=TwoTrackEEMuMu_path)
-expert.skimOutputUdst(TwoTrackEEMuMu_code, TwoTrackEEMuMu_list, path=TwoTrackEEMuMu_path)
+TwoTrackPions_code = expert.encodeSkimName('TwoTrackPions')
+TwoTrackPions_list = dark.TwoTrackPionsList(path=TwoTrackPions_path)
+expert.skimOutputUdst(TwoTrackPions_code, TwoTrackPions_list, path=TwoTrackPions_path)
 
-ma.summaryOfLists(TwoTrackEEMuMu_list, path=TwoTrackEEMuMu_path)
+ma.summaryOfLists(TwoTrackPions_list, path=TwoTrackPions_path)
 
-expert.setSkimLogging(path=TwoTrackEEMuMu_path)
+expert.setSkimLogging(path=TwoTrackPions_path)
 
-b2.process(TwoTrackEEMuMu_path)
+b2.process(TwoTrackPions_path)
 
 print(b2.statistics)

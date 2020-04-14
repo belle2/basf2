@@ -332,7 +332,7 @@ def DielectronPlusMissingEnergyList(path):
     return dielectron_list
 
 
-def TwoTrackEEMuMuList(path):
+def TwoTrackLeptonsForLuminosityList(path):
     """
     Skim list for two track (e+e- to e+e- and e+e- to mu+mu-) events.
 
@@ -350,7 +350,7 @@ def TwoTrackEEMuMuList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    skim_label = 'TwoTrackEEMuMu'
+    skim_label = 'TwoTrackLeptonsForLuminosity'
 
     # Tracks from IP
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
@@ -376,7 +376,7 @@ def TwoTrackEEMuMuList(path):
     return ['vpho:' + skim_label]
 
 
-def TwoTrackPiPiList(path):
+def TwoTrackPionsList(path):
     """
     Skim list for two track (e+e- to pi+pi-) events.
 
@@ -394,7 +394,7 @@ def TwoTrackPiPiList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    skim_label = 'TwoTrackPiPi'
+    skim_label = 'TwoTrackPions'
 
     # Tracks from IP
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'

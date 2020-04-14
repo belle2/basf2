@@ -29,8 +29,8 @@ expert.add_skim('LFVZpVisible', dark.LFVZpVisibleList(path=darkskimpath), path=d
 expert.add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
-expert.add_skim('TwoTrackEEMuMu', dark.TwoTrackEEMuMuList(path=darkskimpath), path=darkskimpath)
-expert.add_skim('TwoTrackPiPi', dark.TwoTrackPiPiList(path=darkskimpath), path=darkskimpath)
+expert.add_skim('TwoTrackLeptonsForLuminosity', dark.TwoTrackLeptonsForLuminosityList(path=darkskimpath), path=darkskimpath)
+expert.add_skim('TwoTrackPions', dark.TwoTrackPionsList(path=darkskimpath), path=darkskimpath)
 
 expert.setSkimLogging(darkskimpath, ['ParticleCombiner'])
 b2.process(darkskimpath)

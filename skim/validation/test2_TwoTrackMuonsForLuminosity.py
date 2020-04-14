@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>../TwoTrackMuMu.udst.root</input>
-  <output>../TwoTrackMuMu_Validation.root</output>
+  <input>../TwoTrackMuonsForLuminosity.udst.root</input>
+  <output>../TwoTrackMuonsForLuminosity_Validation.root</output>
   <contact>zhouxy@buaa.edu.cn</contact>
 </header>
 """
@@ -16,10 +16,10 @@ from variables import variables
 from modularAnalysis import variablesToHistogram
 
 
-TwoTrackEEMuMu_path = basf2.Path()
+TwoTrackLeptonsForLuminosity_path = basf2.Path()
 
 # load input ROOT file
-inputMdst('default', '../TwoTrackMuMu.udst.root', path=TwoTrackEEMuMu_path)
+inputMdst('default', '../TwoTrackMuonsForLuminosity.udst.root', path=TwoTrackLeptonsForLuminosity_path)
 
 variables.addAlias('mup_p_cms', 'daughter(0, useCMSFrame(p))')
 variables.addAlias('mum_p_cms', 'daughter(1, useCMSFrame(p))')
@@ -38,10 +38,14 @@ variablesHist = [
                 ]
 
 # Output the variables to a ntuple
-variablesToHistogram('vpho:TwoTrackEEMuMu', variablesHist, filename='../TwoTrackMuMu_Validation.root', path=TwoTrackEEMuMu_path)
+variablesToHistogram(
+    'vpho:TwoTrackLeptonsForLuminosity',
+    variablesHist,
+    filename='../TwoTrackMuonsForLuminosity_Validation.root',
+    path=TwoTrackLeptonsForLuminosity_path)
 
 # Process the events
-basf2.process(TwoTrackEEMuMu_path)
+basf2.process(TwoTrackLeptonsForLuminosity_path)
 
 # print out the summary
 print(basf2.statistics)

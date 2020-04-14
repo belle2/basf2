@@ -2233,37 +2233,38 @@ namespace Belle2 {
                       "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.");
 
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see weMissE possible options)");
+                      "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
                       "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`");
 
     REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible weMissE options)");
+                      "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)");
 
     REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible weMissE options)");
+                      "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options)");
 
     REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see weMissE possible options)");
+                      "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
     REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see weMissE possible options)");
+                      "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
     REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see weMissE possible options)");
+                      "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
     REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
                       R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
- - ``0``: CMS, use energy and momentum of charged particles and photons
- - ``1``: CMS, same as 0, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
- - ``2``: CMS, same as 0, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
- - ``3``: CMS, use only energy and momentum of signal side
- - ``4``: CMS, same as 3, update with direction of ROE momentum
- - ``5``: LAB, use energy and momentum of charged particles and photons from whole event
- - ``6``: LAB, same as 5, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``;
- - ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC");
+
+- ``0``: CMS, use energy and momentum of charged particles and photons
+- ``1``: CMS, same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
+- ``2``: CMS, same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
+- ``3``: CMS, use only energy and momentum of signal side
+- ``4``: CMS, same as ``3``, update with direction of ROE momentum
+- ``5``: LAB, use energy and momentum of charged particles and photons from whole event
+- ``6``: LAB, same as ``5``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``
+- ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC");
 
     REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
@@ -2292,16 +2293,16 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "The B meson momentum in CMS is assumed to be 0.");
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
-                      "Returns the momentum transfer squared, q^2, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "Returns the momentum transfer squared, q^:math:`q^2`2, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
+                      "Returns the momentum transfer squared, q:math:`q^2`^2, calculated in LAB as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
 
     REGISTER_VARIABLE("weQ2lnu(maskName)", WE_q2lnu,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
+                      "Returns the momentum transfer squared, q:math:`q^2`^2, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
                       "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
 
@@ -2316,20 +2317,20 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 
     REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
                       "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
-                      "The following strings are available. \n"
-                      " - ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      " - ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      " - ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      " - ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "The following strings are available. \n\n"
+                      "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
     REGISTER_VARIABLE("etaProb(mode)", etaProb,
                       "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
-                      "The following strings are available. \n"
-                      " - ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
-                      " - ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
-                      " - ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
-                      " - ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n"
+                      "The following strings are available. \n\n"
+                      "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
                       "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
 
   }

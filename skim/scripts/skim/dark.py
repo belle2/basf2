@@ -17,7 +17,6 @@ import basf2 as b2
 import pdg
 import modularAnalysis as ma
 from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header, get_test_file
-import stdCharged
 
 
 def SinglePhotonDarkList(path):
@@ -452,7 +451,7 @@ def TwoTrackEEMuMuList(path):
     two_track_cut = nTracks_cut + ' and ' + deltaTheta_cut
 
     # Reconstruct the two track event candidate
-    stdCharged.stdE('all', path=path)
+    ma.fillParticleList('e+:all', '', path=path)
     ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> e+:' + skim_label + ' e-:' + skim_label, two_track_cut, path=path)
 
@@ -494,7 +493,7 @@ def TwoTrackPiPiList(path):
     two_track_cut = nTracks_cut + ' and ' + M_cut
 
     # Reconstruct the two track event candidate
-    stdCharged.stdPi('all', path=path)
+    ma.fillParticleList('pi+:all', '', path=path)
     ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
 

@@ -30,10 +30,10 @@ ploter(
     xmax=10,
     x_label='dE/dx (MeV/cm)',
     y_label='counts',
-    granules=gD,
+    granules=gD2,
     tree=treeSim,
     expr='simhit_dEdx*1000',
     cut='',
     descr='Simulated dE/dx for SimHits.',
     check='Distribution should peak around 2.8 MeV/cm.',
-    isShifter=True)
+    isShifter=False)

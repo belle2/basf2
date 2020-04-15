@@ -31,16 +31,16 @@ KLMDigitizerModule::KLMDigitizerModule() : Module(),
   m_ChannelSpecificSimulation(false),
   m_EfficiencyMode(c_Plane)
 {
-  setDescription("KLM digitization module");
+  setDescription("KLM digitization module: create KLMDigits from BKLMSimHits and EKLMSimHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SimulationMode", m_SimulationMode,
-           "Simulation mode (\"Generic\" or \"ChannelSpecific\")",
+           "Simulation mode (\"Generic\" or \"ChannelSpecific\").",
            std::string("Generic"));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
-  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
+  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data and set a relation with KLMDigits.", false);
   addParam("Efficiency", m_Efficiency,
-           "Efficiency determination mode (\"Strip\" or \"Plane\")",
+           "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
@@ -189,6 +189,12 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->setFitStatus(simulator.getFitStatus());
       bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
       bklmDigit->setEnergyDeposit(simulator.getEnergy());
+      if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
+          m_SaveFPGAFit) {
+        KLMScintillatorFirmwareFitResult* fit =
+          m_FPGAFits.appendNew(*simulator.getFPGAFit());
+        bklmDigit->addRelationTo(fit);
+      }
     }
   }
 }

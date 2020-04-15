@@ -76,6 +76,9 @@ namespace Belle2 {
           auto energies = property.getEnergies();
           auto values = property.getValues();
           if (energies.size() < 2) return 0;
+          if (energy < energies[0] or energy > energies.back()) {
+            B2WARNING("TOPGeoBase::getReflectivity: photon energy out of range - return value not reliable");
+          }
           auto spline = TSpline3("tmp", energies.data(), values.data(), energies.size());
           return spline.Eval(energy);
         }

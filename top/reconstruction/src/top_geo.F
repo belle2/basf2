@@ -473,7 +473,8 @@ c-- internal functions --------------------------------------------------
 
       INTEGER I, K
       LOGICAL FOCTOP
-
+      REAL MIRROR_REFL,SURFACE_REFL
+      
       FOCTOP=.FALSE.
       DO I=0,NUM_MOD-1
          IF(QBAR_LSIDE(I).EQ.3) FOCTOP=.TRUE.
@@ -549,6 +550,14 @@ c-- internal functions --------------------------------------------------
  101  FORMAT(I3,2I4,8F8.2)
       PRINT*
 
+      PRINT*,'Mirror and surface reflectivity:'
+      PRINT*,'ID  mirror surface'
+      DO I=0, NUM_MOD-1
+         PRINT 102,I,MIRROR_REFL(I),SURFACE_REFL(I)
+      ENDDO
+ 102  FORMAT(I3,F8.4,F8.5)
+      PRINT*
+      
 c      CALL PRINT_PMT_TYPES
 c      call print_refind(1.4, 4.0, 0.01) ! xml format
 
@@ -674,7 +683,7 @@ c     print refractive index in xml format
 
       END
 
-***** quartz refractive index, absorption length
+***** quartz refractive index
 
       REAL FUNCTION PHIND_LAMBDA(LAM)
 
@@ -762,7 +771,8 @@ C      PHIND_LAMBDA=1.44+8.20/(LAM-126.) ! T. Ijima (6-jul-2004)
 
       END
 
-
+***** bulk absorption length [cm]
+      
       REAL FUNCTION ABSPT_LENG(E)
 
       IMPLICIT NONE
@@ -778,16 +788,74 @@ cc      ABSPT_LENG=50000.*(LAM/442)**4 ! J. Va'vra (7-jul-2004)
 
 ***** mirror reflectivity
 
-      REAL FUNCTION MIRROR_REFL(E)
+      REAL FUNCTION MIRROR_REFL(M)
       
       IMPLICIT NONE
-      REAL E                    ! photon energy (eV)
+      INTEGER M                 ! module number
 
-      MIRROR_REFL=0.90
-
+      integer NSIZ_MOD
+      PARAMETER (NSIZ_MOD=16)
+      REAL REFL(0:NSIZ_MOD-1)
+      COMMON /TOP_MREFL/ REFL
+      DATA REFL /NSIZ_MOD*0.855/
+      
+      MIRROR_REFL=0.855
+      IF(M.LT.0.OR.M.GE.NSIZ_MOD) RETURN
+      MIRROR_REFL=REFL(M)
+      
       END
 
+      SUBROUTINE SET_MIRROR_REFL(M,VAL)
+      
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+      REAL VAL                  ! reflectivity value
+      
+      integer NSIZ_MOD
+      PARAMETER (NSIZ_MOD=16)
+      REAL REFL(0:NSIZ_MOD-1)
+      COMMON /TOP_MREFL/ REFL
+      
+      IF(M.LT.0.OR.M.GE.NSIZ_MOD) RETURN
+      REFL(M)=VAL
+      
+      END
 
+***** surface reflectivity at total internal reflection
+
+      REAL FUNCTION SURFACE_REFL(M)
+
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+
+      integer NSIZ_MOD
+      PARAMETER (NSIZ_MOD=16)
+      REAL REFL(0:NSIZ_MOD-1)
+      COMMON /TOP_SREFL/ REFL
+      DATA REFL /NSIZ_MOD*0.9994/
+
+      SURFACE_REFL=0.9994
+      IF(M.LT.0.OR.M.GE.NSIZ_MOD) RETURN
+      SURFACE_REFL=REFL(M)
+
+      END
+      
+      SUBROUTINE SET_SURFACE_REFL(M,VAL)
+
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+      REAL VAL                  ! reflectivity value
+      
+      integer NSIZ_MOD
+      PARAMETER (NSIZ_MOD=16)
+      REAL REFL(0:NSIZ_MOD-1)
+      COMMON /TOP_SREFL/ REFL
+
+      IF(M.LT.0.OR.M.GE.NSIZ_MOD) RETURN
+      REFL(M)=VAL
+
+      END
+      
 c-- utility functions (moved from top_mcgen.F + new) -------------------
 
       SUBROUTINE TO_MODULE(RF,DIR,MODULE,OK)

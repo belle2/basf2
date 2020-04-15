@@ -2726,7 +2726,7 @@ void CDCTriggerNeuroDQMModule::event()
                   + padto(std::to_string(xhit.getIWire()), 5) + ", "
                   + padto(std::to_string(xhit.getPriorityPosition()), 2) + ", "
                   + padto(std::to_string(xhit.getLeftRight()), 2) + ", "
-                  + padto(std::to_string(xhit.priorityTime()), 3) + ", "
+                  + padto(std::to_string(xhit.priorityTime()), 4) + ", "
                   + padto(std::to_string(xhit.foundTime()), 3) + ", "
                   + padto(std::to_string(tsIDInTracker), 4) + ") | ";
       unsigned count2d = 0;
@@ -2818,7 +2818,7 @@ void CDCTriggerNeuroDQMModule::event()
                   + padto(std::to_string(xhit.getIWire()), 5) + ", "
                   + padto(std::to_string(xhit.getPriorityPosition()), 2) + ", "
                   + padto(std::to_string(xhit.getLeftRight()), 2) + ", "
-                  + padto(std::to_string(xhit.priorityTime()), 3) + ", "
+                  + padto(std::to_string(xhit.priorityTime()), 4) + ", "
                   + padto(std::to_string(xhit.foundTime()), 3) + ", "
                   + padto(std::to_string(tsIDInTracker), 4) + ") ";
       unsigned count2d = 0;

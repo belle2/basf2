@@ -9,9 +9,16 @@ import rawdata
 ################################################################################
 # Setting global tags in case Raw data is unpacked: ###
 
-basf2.conditions.override_globaltags()
+# basf2.conditions.override_globaltags()
+# basf2.conditions.append_globaltag('klm_alignment_testing')
 # basf2.conditions.append_globaltag('neurotrigger')  # should not be needed
 # basf2.conditions.append_globaltag('online')
+
+################################################################################
+# Optional Log Output:
+basf2.set_log_level(basf2.LogLevel.DEBUG)
+basf2.set_debug_level(20)
+
 
 ################################################################################
 # Start path: ###
@@ -63,7 +70,9 @@ main.add_module(neurotrigger.filterTRG())  # branchname="CDCTriggerNNInput2DFind
 # adding neurotrigger simulations for one hwsim and one swsim case: ###
 # neurotrigger.add_neurotrigger_sim(main)
 neurotrigger.add_neurotrigger_hw(main)
-neurotrigger.add_neuro_simulation(main)
+
+# adding software neurotrigger simulation from CDCHits on:
+# neurotrigger.add_neuro_simulation(main)
 
 # add reconstruction in case .sroot files were used: ###
 #    main.add_module('CDCUnpacker')
@@ -88,6 +97,9 @@ main.add_module('HistoManager',
 main.add_module('CDCTriggerNeuroDQM',
                 simNeuroTracksName=neurotrigger.hwsimneurotracks,
                 unpackedNeuroInput2dTracksName=neurotrigger.hwneuroinput2dfindertracks,
+                # simNeuroTracksSWTSSW2DName=neurotrigger.simneurotracks_swtssw2d,
+                # sim2DTracksSWTSName=neurotrigger.sim2dtracks_swts,
+                # simSegmentHitsName=neurotrigger.simsegmenthits,
                 showRecoTracks=True,
                 skipWithoutHWTS=True,
                 maxRecoZDist=-1,

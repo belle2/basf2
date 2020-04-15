@@ -22,7 +22,7 @@ hwsimneurotracks = 'TSimNeuroTracks'
 # from real CDCHITs. Also simulated track segments and 2dtracks are needed therefore.
 simneurotracks_swtssw2d = 'TRGCDCNeuroTracks'
 simsegmenthits = 'SimSegmentHits'
-sim2dtracks_swts = 'TRGCDC2DTracks'
+sim2dtracks_swts = 'TRGCDC2DFinderTracks'
 
 ################################################################################
 # Defining a filter for skipping trigger suppressed events in realdata:
@@ -148,25 +148,6 @@ def add_neurotrigger_hw(path, nntweightfile=None, debug_level=4, debugout=False,
     if debugout:
         nnt.logging.log_level = LogLevel.DEBUG
         nnt.logging.debug_level = debug_level
-    path.add_module(nnt)
-
-
-def add_default_neurotrigger(path, **kwargs):
-    nnt = basf2.register_module('CDCTriggerNeuro')
-    if 'inputCollectionName' in kwargs:
-        nnt.param('inputCollectionName', kwargs['inputCollectionName'])
-    else:
-        nnt.param('inputCollectionName', sim2dtracks_swts)
-    if 'outputCollectionName' in kwargs:
-        nnt.param('outputCollectionName', kwargs['outputCollectionName'])
-    else:
-        nnt.param('outputCollectionName', simneurotracks_swtssw2d)
-    if 'hitCollectionName' in kwargs:
-        nnt.param('hitCollectionName', kwargs['hitCollectionName'])
-    else:
-        nnt.param('hitCollectionName', simsegmenthits)
-    nnt.param('writeMLPinput', True)
-    nnt.param('fixedPoint', True)
     path.add_module(nnt)
 
 

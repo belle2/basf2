@@ -51,12 +51,10 @@ main.add_module('CDCTrigger2DFinder',
 main.add_module('CDCTriggerETF',
                 hitCollectionName='CDCTriggerSegmentHits')
 main.add_module('CDCTriggerNeuro',
-                filename=Belle2.FileSystem.findFile("trg/cdc/data/Background2.0_20161207.root"),
-                # et_option='fastestpriority',
-                et_option='fastestpriority',
                 hitCollectionName='CDCTriggerSegmentHits',
                 outputCollectionName='CDCTriggerNeuroTracks',
                 inputCollectionName='CDCTrigger2DFinderTracks',
+                fixedPoint=True,
                 writeMLPinput=True)
 add_reconstruction(main)
 

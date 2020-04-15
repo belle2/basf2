@@ -35,6 +35,7 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
   // setPropertyFlags(c_ParallelProcessingCertified);// for ntuple not certified!!!
 
   // Parameter definitions
+  addParam("ntupleName", m_ntupleName, "name of ntuple file", std::string("test.root"));
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
   addParam("recoTracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
@@ -72,7 +73,7 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
-  m_file = new TFile("test.root", "recreate");
+  m_file = new TFile(m_ntupleName.data(), "recreate");
   if (m_file) m_file->cd();
   m_tuple = new TNtuple("effcontrol", "effcontrol",
                         "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge:phi:costheta");

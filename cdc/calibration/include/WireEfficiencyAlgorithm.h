@@ -31,6 +31,8 @@ namespace Belle2 {
       /// Destructor.
       ~WireEfficiencyAlgorithm() {}
 
+      /// Set name for histogram output
+      void setHistFileName(const std::string& name) {m_outputFileName = "histWireEff_" + name + ".root";}
     protected:
       /// Run algo on data.
       EResult calibrate() override;

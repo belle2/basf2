@@ -14,11 +14,10 @@ import skimExpertFunctions as expert
 from skim import dark
 
 b2.set_log_level(b2.LogLevel.INFO)
-gb2_setuprel = 'release-04-00-00'
 
 TwoTrackPions_path = b2.Path()
 
-fileList = expert.get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=TwoTrackPions_path)
 
 TwoTrackPions_code = expert.encodeSkimName('TwoTrackPions')

@@ -45,10 +45,10 @@ namespace Belle2 {
       void event() override final;
 
     private:
-      //the geometry
-      VXD::GeoCache& m_vxdGeometry;
 
-      std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
+      VXD::GeoCache& m_vxdGeometry; /**< the geometry */
+
+      std::string m_storeRawHitsName; /**< PXDRawHits StoreArray name */
       bool m_gateModeFlag{false}; /**< Flag for creating extra GM plots */
 
       StoreObjPtr<EventMetaData> m_eventMetaData;/**< Event Metadata StorePtr */
@@ -62,15 +62,14 @@ namespace Belle2 {
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
 
-      TCanvas* m_c{};
-      std::map <VxdID, TH2F*> m_histos;
-      std::map <VxdID, TH2F*> m_histos_gm;
-      std::map <VxdID, TH2F*> m_histos_gm2;
+      TCanvas* m_c{};  /**< list of canvases */
+      std::map <VxdID, TH2F*> m_histos; /**< map for plots per modules */
+      std::map <VxdID, TH2F*> m_histos_gm; /**< map for plots per modules with gm+ */
+      std::map <VxdID, TH2F*> m_histos_gm2; /**< map for plots per modules with gm- */
 
-      TLine* m_l1{}, *m_l2{}, *m_l3{};
+      TLine* m_l1{}, *m_l2{}, *m_l3{}; /**< Lines to guide the eye in plots/canvases */
 
     };//end class declaration
-
 
   } //end PXD namespace;
 } // end namespace Belle2

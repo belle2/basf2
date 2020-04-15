@@ -34,6 +34,7 @@ PXDEventPlotModule::PXDEventPlotModule() : Module(), m_vxdGeometry(VXD::GeoCache
   setDescription("Plot Events on PXD Hit/Charge Maps and write pictures");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("PXDRawHitsName", m_storeRawHitsName, "The name of the StoreArray of PXDRawHits to be processed", string(""));
+  addParam("GatedMode", m_gateModeFlag, "Extra histograms for gated mode", false);
 }
 
 void PXDEventPlotModule::initialize()
@@ -47,8 +48,16 @@ void PXDEventPlotModule::initialize()
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
 
     m_histos[avxdid] = new TH2F("Chargemap for " + TString((std::string)avxdid),
-                                "PXD Module Chargemap for" + TString((std::string)avxdid) + " ;VCell;UCell", 768, 0, 768, 250, 0, 256);
+                                "PXD Module Chargemap for " + TString((std::string)avxdid) + " ;VCell;UCell", 768, 0, 768, 250, 0, 256);
     m_histos[avxdid]->SetContour(100);
+    if (m_gateModeFlag) {
+      m_histos_gm[avxdid] = new TH2F("Chargemap for " + TString((std::string)avxdid),
+                                     "PXD Module Chargemap for GM " + TString((std::string)avxdid) + " ;VCell-GM;UCell", 768, 0, 768, 250, 0, 256);
+      m_histos_gm[avxdid]->SetContour(100);
+      m_histos_gm2[avxdid] = new TH2F("Chargemap for " + TString((std::string)avxdid),
+                                      "PXD Module Chargemap for GM2 " + TString((std::string)avxdid) + " ;VCell+GM;UCell", 768, 0, 768, 250, 0, 256);
+      m_histos_gm2[avxdid]->SetContour(100);
+    }
   }
   m_c = new TCanvas("c1", "c1", 4000, 3000);
   m_l1 = new TLine(0, 62, 768, 62);
@@ -87,32 +96,13 @@ void PXDEventPlotModule::event()
 
 //  if( !cm_flag ) return;
 
-  for (auto& pix : m_storeRawHits) {
-    if (m_histos[pix.getSensorID()]) m_histos[pix.getSensorID()]->Fill(pix.getRow(), pix.getColumn(), pix.getCharge());
-  }
-
-  gStyle->SetPalette(55);
-  gStyle->SetOptStat(0);
-  m_c->Clear();
-  m_c->Divide(4, 5);
-  m_c->cd(0);
-  if (cm_flag) {
-    m_c->Pad()->SetFrameLineColor(kRed);
-    m_c->Pad()->SetFrameBorderSize(4);
-    m_c->Pad()->SetFrameBorderMode(4);
-    m_c->SetFrameLineColor(kRed);
-    m_c->SetFrameBorderSize(4);
-    m_c->SetFrameBorderMode(4);
-  }
-  int i = 1;
-
   int tinj = -1, rgate = -1;
   for (auto& it : m_rawTTD) {
     // get last injection time
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      auto isher = it.GetIsHER(0);
+      /// auto isher = it.GetIsHER(0);// TODO, differentiate HER and LER GM
       float diff2 = difference / (508.877 / 4.); //  127MHz clock ticks to us, inexact rounding
       int bunch_trg = it.GetBunchNumber(0);
       int time_inj  = it.GetTimeSinceLastInjection(0);
@@ -124,40 +114,175 @@ void PXDEventPlotModule::event()
     break;
   }
 
-  string canvasname;
-  canvasname = std::string(Form("Run_%d_Evt_%d", evtRun, evtNr));
-  for (auto h : m_histos) {
-    m_c->cd(i++);
-    if (h.second) {
-      string abc = string(h.first);
-      auto dhe = (*m_storeDAQEvtStats).findDHE(h.first);
-      if (dhe) {
-
-        auto tg = dhe->getTriggerGate();
-        auto fn = dhe->getFrameNr();
-        auto err = dhe->getEndErrorInfo();
-
-        abc += Form(" ERR: $%X TG: %d FN: %d IN: %d GA: %d", err, tg, fn, tinj, rgate);
-        for (auto itdhp = dhe->cbegin(); itdhp != dhe->cend(); ++itdhp) {
-          abc += Form("(%d) %d ", itdhp->getChipID(), itdhp->getFrameNr());
-        }
-        if (err != 0) {
-          m_c->Pad()->SetFillColor(kYellow);
-        }
-        if (cm_map[h.first]) {
-          m_c->Pad()->SetFillColor(kRed);
-          m_c->Pad()->SetFrameFillColor(kWhite);
-        }
+  for (auto& pix : m_storeRawHits) {
+    if (m_histos[pix.getSensorID()]) {
+      m_histos[pix.getSensorID()]->Fill(pix.getRow(), pix.getColumn(), pix.getCharge());
+    }
+    if (m_gateModeFlag) {
+      if (m_histos_gm[pix.getSensorID()]) {
+        int v = int(pix.getVCellID())  - rgate * 4;
+        if (v < 0) v += 768; // work only for inner modules
+        m_histos_gm[pix.getSensorID()]->Fill(v, pix.getColumn(), pix.getCharge());
       }
-      h.second->SetTitle(abc.data());
-      h.second->Draw("colz");
-      m_l1->Draw();
-      m_l2->Draw();
-      m_l3->Draw();
+      if (m_histos_gm2[pix.getSensorID()]) {
+        int v = int(pix.getVCellID()) + rgate * 4;
+        if (v >= 768) v -= 768; // work only for outer modules
+        m_histos_gm2[pix.getSensorID()]->Fill(v, pix.getColumn(), pix.getCharge());
+      }
     }
   }
-  m_c->cd(0);
-  m_c->Print((canvasname + ".png").data());
-  m_c->Print((canvasname + ".pdf").data());
-  m_c->Print((canvasname + ".root").data());
+
+  string canvasname;
+  canvasname = std::string(Form("Run_%d_Evt_%d", evtRun, evtNr));
+
+  gStyle->SetPalette(55);
+  gStyle->SetOptStat(0);
+
+  {
+    m_c->Clear();
+    m_c->Divide(4, 5);
+    m_c->cd(0);
+    if (cm_flag) {
+      m_c->Pad()->SetFrameLineColor(kRed);
+      m_c->Pad()->SetFrameBorderSize(4);
+      m_c->Pad()->SetFrameBorderMode(4);
+      m_c->SetFrameLineColor(kRed);
+      m_c->SetFrameBorderSize(4);
+      m_c->SetFrameBorderMode(4);
+    }
+    int i = 1;
+
+    for (auto h : m_histos) {
+      m_c->cd(i++);
+      if (h.second) {
+        string abc = string(h.first);
+        auto dhe = (*m_storeDAQEvtStats).findDHE(h.first);
+        if (dhe) {
+
+          auto tg = dhe->getTriggerGate();
+          auto fn = dhe->getFrameNr();
+          auto err = dhe->getEndErrorInfo();
+
+          abc += Form(" ERR: $%X TG: %d FN: %d IN: %d GA: %d", err, tg, fn, tinj, rgate);
+          for (auto itdhp = dhe->cbegin(); itdhp != dhe->cend(); ++itdhp) {
+            abc += Form("(%d) %d ", itdhp->getChipID(), itdhp->getFrameNr());
+          }
+          if (err != 0) {
+            m_c->Pad()->SetFillColor(kYellow);
+          }
+          if (cm_map[h.first]) {
+            m_c->Pad()->SetFillColor(kRed);
+            m_c->Pad()->SetFrameFillColor(kWhite);
+          }
+        }
+        h.second->SetTitle(abc.data());
+        h.second->Draw("colz");
+        m_l1->Draw();
+        m_l2->Draw();
+        m_l3->Draw();
+      }
+    }
+    m_c->cd(0);
+    m_c->Print((canvasname + ".png").data());
+    m_c->Print((canvasname + ".pdf").data());
+    m_c->Print((canvasname + ".root").data());
+  }
+  if (m_gateModeFlag) {
+    m_c->Clear();
+    m_c->Divide(4, 5);
+    m_c->cd(0);
+    if (cm_flag) {
+      m_c->Pad()->SetFrameLineColor(kRed);
+      m_c->Pad()->SetFrameBorderSize(4);
+      m_c->Pad()->SetFrameBorderMode(4);
+      m_c->SetFrameLineColor(kRed);
+      m_c->SetFrameBorderSize(4);
+      m_c->SetFrameBorderMode(4);
+    }
+    int i = 1;
+
+    for (auto h : m_histos_gm) {
+      m_c->cd(i++);
+      if (h.second) {
+        string abc = string(h.first);
+        auto dhe = (*m_storeDAQEvtStats).findDHE(h.first);
+        if (dhe) {
+
+          auto tg = dhe->getTriggerGate();
+          auto fn = dhe->getFrameNr();
+          auto err = dhe->getEndErrorInfo();
+
+          abc += Form(" ERR: $%X TG: %d FN: %d IN: %d GA: %d", err, tg, fn, tinj, rgate);
+          for (auto itdhp = dhe->cbegin(); itdhp != dhe->cend(); ++itdhp) {
+            abc += Form("(%d) %d ", itdhp->getChipID(), itdhp->getFrameNr());
+          }
+          if (err != 0) {
+            m_c->Pad()->SetFillColor(kYellow);
+          }
+          if (cm_map[h.first]) {
+            m_c->Pad()->SetFillColor(kRed);
+            m_c->Pad()->SetFrameFillColor(kWhite);
+          }
+        }
+        h.second->SetTitle(abc.data());
+        h.second->Draw("colz");
+        m_l1->Draw();
+        m_l2->Draw();
+        m_l3->Draw();
+      }
+    }
+    m_c->cd(0);
+    m_c->Print((canvasname + "_gm.png").data());
+    m_c->Print((canvasname + "_gm.pdf").data());
+    m_c->Print((canvasname + "_gm.root").data());
+  }
+  if (m_gateModeFlag) {
+    m_c->Clear();
+    m_c->Divide(4, 5);
+    m_c->cd(0);
+    if (cm_flag) {
+      m_c->Pad()->SetFrameLineColor(kRed);
+      m_c->Pad()->SetFrameBorderSize(4);
+      m_c->Pad()->SetFrameBorderMode(4);
+      m_c->SetFrameLineColor(kRed);
+      m_c->SetFrameBorderSize(4);
+      m_c->SetFrameBorderMode(4);
+    }
+    int i = 1;
+
+    for (auto h : m_histos_gm2) {
+      m_c->cd(i++);
+      if (h.second) {
+        string abc = string(h.first);
+        auto dhe = (*m_storeDAQEvtStats).findDHE(h.first);
+        if (dhe) {
+
+          auto tg = dhe->getTriggerGate();
+          auto fn = dhe->getFrameNr();
+          auto err = dhe->getEndErrorInfo();
+
+          abc += Form(" ERR: $%X TG: %d FN: %d IN: %d GA: %d", err, tg, fn, tinj, rgate);
+          for (auto itdhp = dhe->cbegin(); itdhp != dhe->cend(); ++itdhp) {
+            abc += Form("(%d) %d ", itdhp->getChipID(), itdhp->getFrameNr());
+          }
+          if (err != 0) {
+            m_c->Pad()->SetFillColor(kYellow);
+          }
+          if (cm_map[h.first]) {
+            m_c->Pad()->SetFillColor(kRed);
+            m_c->Pad()->SetFrameFillColor(kWhite);
+          }
+        }
+        h.second->SetTitle(abc.data());
+        h.second->Draw("colz");
+        m_l1->Draw();
+        m_l2->Draw();
+        m_l3->Draw();
+      }
+    }
+    m_c->cd(0);
+    m_c->Print((canvasname + "_gm2.png").data());
+    m_c->Print((canvasname + "_gm2.pdf").data());
+    m_c->Print((canvasname + "_gm2.root").data());
+  }
 }

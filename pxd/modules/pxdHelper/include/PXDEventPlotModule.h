@@ -49,6 +49,7 @@ namespace Belle2 {
       VXD::GeoCache& m_vxdGeometry;
 
       std::string m_storeRawHitsName;             /**< PXDRawHits StoreArray name */
+      bool m_gateModeFlag{false}; /**< Flag for creating extra GM plots */
 
       StoreObjPtr<EventMetaData> m_eventMetaData;/**< Event Metadata StorePtr */
 
@@ -63,6 +64,8 @@ namespace Belle2 {
 
       TCanvas* m_c{};
       std::map <VxdID, TH2F*> m_histos;
+      std::map <VxdID, TH2F*> m_histos_gm;
+      std::map <VxdID, TH2F*> m_histos_gm2;
 
       TLine* m_l1{}, *m_l2{}, *m_l3{};
 

@@ -1,10 +1,10 @@
-# EventType: 2610030002 (previously 2610030001)
-# Descriptor: [ccbar Dstarp2D0Pip D02KpKm]
-# NickName: DstpToD0Pip_D0ToKpKm
+# EventType: 2210022101
+# Descriptor: [ccbar D0bar2KS0Pi0]
+# NickName: D0barToKS0Pi0
 # Cuts: None
-# Documentation: Potential charm signal request
-# Tested: No
+# Documentation: Validation mode
 # PhysicsWG: Charm
+# Tested: Yes
 # Responsible: Emma Oxford
 # Email: emma.oxford@desy.de
 # Date: 20200409 (YYYYMMDD)
@@ -43,18 +43,24 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
+Alias KS0sig K_S0
+Alias pi0sig pi0
+
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
 1.000 c anti-c PYTHIA 32;
 Enddecay
 
-Decay D*+
-1.0000 D0sig   pi+     VSS;
+Decay anti-D0
+1.0000 KS0sig  pi0sig  PHSP;
 Enddecay
 
-Decay D0sig
-1.0000 K+      K-      PHSP;
+Decay KS0sig
+1.0000 pi+     pi-     PHSP;
 Enddecay
+
+Decay pi0sig
+1.0000 gamma   gamma   PHSP;
 
 End

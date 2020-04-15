@@ -31,7 +31,7 @@ def encodeSkimName(skimScriptName):
     """
     lookup_dict = {n: c for c, n in skim_registry}
     if skimScriptName not in lookup_dict:
-        b2.B2ERROR("Skim Unknown. Please add your skim to skim/registry.py.")
+        b2.B2ERROR("Skim named \"%s\" is unknown. Please add your skim to skim/scripts/skim/registry.py." % skimScriptName)
     return lookup_dict[skimScriptName]
 
 
@@ -44,7 +44,7 @@ def decodeSkimName(skimCode):
     """
     lookup_dict = {c: n for c, n in skim_registry}
     if skimCode not in lookup_dict:
-        b2.B2ERROR("Code Unknown. Please add your skim to skim/registry.py.")
+        b2.B2ERROR("Code \"%s\" is unknown. Please add your skim to skim/scripts/skim/registry.py." % skimCode)
     return lookup_dict[skimCode]
 
 

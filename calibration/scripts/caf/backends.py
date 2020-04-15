@@ -695,12 +695,15 @@ class Batch(Backend):
         # Make sure the output directory of the job is created
         job_output_path = pathlib.Path(job.output_dir)
         job_output_path.mkdir(parents=True, exist_ok=True)
+        B2INFO("1st checkpoint")
         # Make sure the working directory of the job is created
         job_wd_path = pathlib.Path(job.working_dir)
         job_wd_path.mkdir(parents=True, exist_ok=True)
-
+        B2INFO("2nd checkpoint")
         if isinstance(job, Job):
+            B2INFO("3rd checkpoint")
             if 'queue' not in job.backend_args:
+                B2INFO("4th checkpoint")
                 job.backend_args['queue'] = self.config[self.default_config_section]["Queue"]
                 B2INFO('Setting Job queue {}'.format(job.backend_args['queue']))
 
@@ -709,16 +712,21 @@ class Batch(Backend):
 
             # Check if we have any valid input files
             existing_input_files = set()
+            B2INFO("5th checkpoint")
             for input_file_pattern in job.input_files:
                 if input_file_pattern[:7] != "root://":
+                    B2INFO("6th checkpoint")
                     input_files = glob.glob(input_file_pattern)
                     if not input_files:
                         B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
                     else:
+                        B2INFO("7th checkpoint")
                         for file_path in input_files:
+                            B2INFO("8th checkpoint")
                             file_path = os.path.abspath(file_path)
                             if os.path.isfile(file_path):
                                 existing_input_files.add(file_path)
+                            B2INFO("9th checkpoint")
                 else:
                     B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
                             " before collector submission.".format(input_file_pattern)))
@@ -728,21 +736,27 @@ class Batch(Backend):
                 B2INFO("No valid input file paths found for job {0}".format(job.name))
 
             if job.max_files_per_subjob > 0 and existing_input_files:
+                B2INFO("10th checkpoint")
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
                     subjob = job.create_subjob(i)
                     subjob.input_files = subjob_input_files
-
+                B2INFO("11th checkpoint")
             if not job.subjobs:
+                B2INFO("12th checkpoint")
                 # Get all of the requested files for the input sandbox and copy them to the working directory
                 for file_pattern in job.input_sandbox_files:
                     input_files = glob.glob(file_pattern)
+                    B2INFO("13th checkpoint")
                     for file_path in input_files:
                         if os.path.isdir(file_path):
+                            B2INFO("14th checkpoint")
                             shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
                         else:
+                            B2INFO("15th checkpoint")
                             shutil.copy(file_path, job.working_dir)
 
                 self._dump_input_data(job)
+                B2INFO("16th checkpoint")
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_batch_directives(job, batch_file)
                     self._add_setup(job, batch_file)
@@ -752,32 +766,43 @@ class Batch(Backend):
                 script_path = os.path.join(job.working_dir, self.submit_script)
                 cmd = self._create_cmd(script_path)
                 output = self._submit_to_batch(cmd)
+                B2INFO("17th checkpoint")
                 self._create_job_result(job, output)
                 job.status = "submitted"
             else:
+                B2INFO("18th checkpoint")
                 self.submit(list(job.subjobs.values()))
 
         elif isinstance(job, Job.SubJob):
+            B2INFO("19th checkpoint")
             # Get all of the requested files for the input sandbox and copy them to the working directory
             for file_pattern in job.input_sandbox_files:
+                B2INFO("20th checkpoint")
                 input_files = glob.glob(file_pattern)
                 for file_path in input_files:
+                    B2INFO("21st checkpoint")
                     if os.path.isdir(file_path):
+                        B2INFO("22nd checkpoint")
                         shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
                     else:
+                        B2INFO("23rd checkpoint")
                         shutil.copy(file_path, job.working_dir)
-
+            B2INFO("24th checkpoint")
             self._dump_input_data(job)
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
+                B2INFO("25th checkpoint")
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
+            B2INFO("26th checkpoint")
             B2INFO("Submitting SubJob({})".format(job.name))
             script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
+            B2INFO("27th checkpoint")
             self._create_job_result(job, output)
             job.status = "submitted"
+            B2INFO("28th checkpoint")
 
     @submit.register(list)
     def _(self, jobs):

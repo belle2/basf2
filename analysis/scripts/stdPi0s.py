@@ -14,12 +14,11 @@ from stdPhotons import stdPhotons
 from vertex import KFit
 
 
-def stdPi0s(listtype='veryLoose', path=None):
+def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     """
     Function to prepare one of several standardized types of pi0 lists:
 
     - 'pi0:all' using gamma:all
-    - 'pi0:veryLoose' gamma:pi0, mass range selection
     - 'pi0:eff10_Jan2020' gamma:pi0eff10_Jan2020, mass range selection, 10% pi0 efficiency list, optimized in January 2020
     - 'pi0:eff20_Jan2020' gamma:pi0eff20_Jan2020, mass range selection, 20% pi0 efficiency list, optimized in January 2020
     - 'pi0:eff30_Jan2020' gamma:pi0eff30_Jan2020, mass range selection, 30% pi0 efficiency list, optimized in January 2020
@@ -42,42 +41,52 @@ def stdPi0s(listtype='veryLoose', path=None):
     elif 'eff10_Jan2020' == listtype:
         stdPhotons('pi0eff10_Jan2020', path)
         ma.reconstructDecay('pi0:eff10_Jan2020 -> gamma:pi0eff10_Jan2020 gamma:pi0eff10_Jan2020',
-                            '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngleInBetween(0,1)<0.8', True, path)
+                            '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngleInBetween(0,1)<0.8',
+                            1,
+                            True,
+                            path)
         ma.matchMCTruth('pi0:eff10_Jan2020', path)
     elif 'eff20_Jan2020' == listtype:
         stdPhotons('pi0eff20_Jan2020', path)
         ma.reconstructDecay('pi0:eff20_Jan2020 -> gamma:pi0eff20_Jan2020 gamma:pi0eff20_Jan2020',
-                            '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngleInBetween(0,1)<0.9', True, path)
+                            '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngleInBetween(0,1)<0.9',
+                            1,
+                            True,
+                            path)
         ma.matchMCTruth('pi0:eff20_Jan2020', path)
     elif 'eff30_Jan2020' == listtype:
         stdPhotons('pi0eff30_Jan2020', path)
         ma.reconstructDecay('pi0:eff30_Jan2020 -> gamma:pi0eff30_Jan2020 gamma:pi0eff30_Jan2020',
-                            '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngleInBetween(0,1)<1.4', True, path)
+                            '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngleInBetween(0,1)<1.4',
+                            1,
+                            True,
+                            path)
         ma.matchMCTruth('pi0:eff30_Jan2020', path)
     elif 'eff40_Jan2020' == listtype:
         stdPhotons('pi0eff40_Jan2020', path)
-        ma.reconstructDecay('pi0:eff40_Jan2020 -> gamma:pi0eff40_Jan2020 gamma:pi0eff40_Jan2020', '0.120<InvM<0.145', True, path)
+        ma.reconstructDecay('pi0:eff40_Jan2020 -> gamma:pi0eff40_Jan2020 gamma:pi0eff40_Jan2020', '0.120<InvM<0.145', 1, True, path)
         ma.matchMCTruth('pi0:eff40_Jan2020', path)
-    elif 'eff50_Jan2020' == listtype:
-        stdPhotons('pi0eff50_Jan2020', path)
-        ma.reconstructDecay('pi0:eff50_Jan2020 -> gamma:pi0eff50_Jan2020 gamma:pi0eff50_Jan2020', '0.105<InvM<0.150', True, path)
-        ma.matchMCTruth('pi0:eff50_Jan2020', path)
     elif 'eff50_Jan2020_nomcmatch' == listtype:
-        stdPhotons('pi0eff50_Jan2020_nomcmatch', path)
+        stdPhotons('pi0eff50_Jan2020', path)
         ma.reconstructDecay(
             'pi0:eff50_Jan2020_nomcmatch -> gamma:pi0eff50_Jan2020 gamma:pi0eff50_Jan2020',
             '0.105<InvM<0.150',
+            1,
             True,
             path)
+    elif 'eff50_Jan2020' == listtype:
+        stdPi0s('eff50_Jan2020_nomcmatch', path)
+        ma.cutAndCopyList('pi0:eff50_Jan2020', 'pi0:eff50_Jan2020_nomcmatch', '', True, path)
+        ma.matchMCTruth('pi0:eff50_Jan2020', path)
     elif 'eff60_Jan2020' == listtype:
         stdPhotons('pi0eff60_Jan2020', path)
-        ma.reconstructDecay('pi0:eff60_Jan2020 -> gamma:pi0eff60_Jan2020 gamma:pi0eff60_Jan2020', '0.03<InvM', True, path)
+        ma.reconstructDecay('pi0:eff60_Jan2020 -> gamma:pi0eff60_Jan2020 gamma:pi0eff60_Jan2020', '0.03<InvM', 1, True, path)
         ma.matchMCTruth('pi0:eff60_Jan2020', path)
 
     # skim list(s)
     elif listtype == 'skim':
-        stdPi0s('eff50_nomcmatch', path)
-        ma.cutAndCopyList('pi0:skim', 'pi0:eff50_nomcmatch', '', True, path)
+        stdPi0s('eff50_Jan2020_nomcmatch', path)
+        ma.cutAndCopyList('pi0:skim', 'pi0:eff50_Jan2020_nomcmatch', '', True, path)
         KFit('pi0:skim', 0.0, 'mass', path=path)
 
     # same lists with, but with  mass constraints fits

@@ -475,9 +475,9 @@ namespace Belle2 {
                       Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).)DOC");
     REGISTER_VARIABLE("daughterMCInvariantMass(i, j, ...)", daughterMCInvariantMass ,
                       "Returns true invariant mass of the given daughter particles, same behaviour as daughterInvariantMass variable.");
-    REGISTER_VARIABLE("decayAngle(i[, bool])", particleDecayAngle,
+    REGISTER_VARIABLE("decayAngle(i)", particleDecayAngle,
                       "Angle in the mother's rest frame between the reverted CMS momentum vector and the direction of the i-th daughter");
-    REGISTER_VARIABLE("pointingAngle(i[, bool])", pointingAngle, R"DOC(
+    REGISTER_VARIABLE("pointingAngle(i)", pointingAngle, R"DOC(
                       Angle between i-th daughter's momentum vector and vector connecting production and decay vertex of i-th daughter.
                       This makes only sense if the i-th daughter has itself daughter particles and therefore a properly defined vertex.)DOC");
     REGISTER_VARIABLE("azimuthalAngleInDecayPlane(i, j)", azimuthalAngleInDecayPlane, R"DOC(

@@ -45,10 +45,16 @@ cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
 
 
 # default granurality
-granulesD = ((cut_L3+cut_b, 'L3_barrel'),
-             (cut_L456+cut_b, 'L456_barrel'),
-             (cut_L456+cut_s, 'L456_slanted'))
+gD = ((cut_L3+cut_b+cut_U, 'L3_barrel_U_side'),
+      (cut_L3+cut_b+cut_V, 'L3_barrel_V_side'),
+      (cut_L456+cut_b+cut_U, 'L456_barrel_U_side'),
+      (cut_L456+cut_b+cut_V, 'L456_barrel_V_side'),
+      (cut_L456+cut_s+cut_U, 'L456_slanted_U_side'),
+      (cut_L456+cut_s+cut_V, 'L456_slanted_V_side'))
 
+gD2 = ((cut_L3+cut_b, 'L3_barrel'),
+       (cut_L456+cut_b, 'L456_barrel'),
+       (cut_L456+cut_s, 'L456_slanted'))
 
 # granurality taking into account layers and type of sensor;
 granulesLayersTypes = ((cut_L3+cut_b, 'L3_barrel'),

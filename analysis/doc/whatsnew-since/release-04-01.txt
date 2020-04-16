@@ -65,12 +65,8 @@ Variables
 
  .. warning:: The variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and :b2:var:`pointingAngle` now return an angle instead of a cosine.
 
- * Rename ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
- * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
- * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
- * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
- * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
- * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
+ * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
+   :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
  * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
@@ -123,7 +119,6 @@ Variables
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
  * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
    functionality of the latter.
- * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a pseudo-significance.
  * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a
    pseudo-significance.
 

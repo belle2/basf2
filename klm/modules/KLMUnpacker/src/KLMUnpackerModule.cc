@@ -59,7 +59,7 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   addParam("loadThresholdFromDB", m_loadThresholdFromDB,
            "Load threshold from database (true) or not (false)", true);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMUnpackerModule::~KLMUnpackerModule()

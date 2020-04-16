@@ -52,6 +52,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
+     * Set certain bits in a variable to zero
+     */
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns 1 if the same mdst source object was used to create a particle in
      * the list (0 if not and -1 for non-mdst source based particles
      */

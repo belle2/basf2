@@ -1,13 +1,13 @@
 # EventType: 2210022100
-# Descriptor: [ccbar D02KsPiz]
-# NickName: 
+# Descriptor: [ccbar D02KS0Pi0]
+# NickName: D0ToKS0Pi0
 # Cuts: None
-# Documentation: 
+# Documentation: Validation mode
 # PhysicsWG: Charm
-# Tested: No
-# Responsible: Giulia Casarosa
-# Email: giulia.casarosa@pi.infn.it
-# Date: 20170420
+# Tested: Yes
+# Responsible: Emma Oxford
+# Email: emma.oxford@desy.de
+# Date: 20200409 (YYYYMMDD)
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -43,6 +43,9 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
+Alias KS0sig K_S0
+Alias pi0sig pi0
+
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
@@ -50,8 +53,14 @@ Decay vpho
 Enddecay
 
 Decay D0
-1.0 K_S0 pi0  PHSP;
+1.0000 KS0sig  pi0sig  PHSP;
 Enddecay
-CDecay anti-D0
+
+Decay KS0sig
+1.0000 pi+     pi-     PHSP;
+Enddecay
+
+Decay pi0sig
+1.0000 gamma   gamma   PHSP;
 
 End

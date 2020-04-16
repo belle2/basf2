@@ -282,18 +282,14 @@ namespace {
     // grab variables for testing
     const Manager::Var* vHasNPhotons = Manager::Instance().getVariable("clusterHasNPhotons");
     const Manager::Var* vHasNeutHadr = Manager::Instance().getVariable("clusterHasNeutralHadron");
-    const Manager::Var* vHypothsisID = Manager::Instance().getVariable("clusterHypothesis");
-    // TODO: remove hypothesis id after release-04 (should be gone by -05)
 
     // check that the hypotheses are correcltly propagated to the VM.
     for (size_t i = 0; i < gammalist->getListSize(); ++i) {
       EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
       if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 56.0);
       } else {
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 5.0);
       }
     } // end loop over test list
   }

@@ -118,7 +118,7 @@ main.add_module('KLMDigitizer')
 
 # Output: digitized hits only
 branches = ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-            'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits']
+            'ARICHDigits', 'ECLWaveforms', 'KLMDigits']
 if gatedMode:
     branches += ['PXDInjectionBGTiming']
 main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=branches)

@@ -59,6 +59,7 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   m_LogVol.groove = nullptr;
   m_LogVol.scint = nullptr;
   m_LogVol.segmentsup = nullptr;
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_Sensitive = nullptr;
 }
 
@@ -1037,7 +1038,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
     m_GeoDat->getPlasticSheetGeometry();
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
-  nStrip = m_GeoDat->getNStripsSegment();
+  nStrip = m_ElementNumbers->getNStripsSegment();
   elements = new G4VSolid*[nStrip];
   t = new HepGeom::Transform3D[nStrip];
   /* Transformations. */
@@ -1086,7 +1087,7 @@ void EKLM::GeoEKLMCreator::createStripSegmentLogicalVolume(int iSegment)
   char name[128];
   G4VSolid** strips;
   HepGeom::Transform3D* t;
-  nStrip = m_GeoDat->getNStripsSegment();
+  nStrip = m_ElementNumbers->getNStripsSegment();
   strips = new G4VSolid*[nStrip];
   t = new HepGeom::Transform3D[nStrip];
   for (i = 0; i < nStrip; i++) {
@@ -1881,8 +1882,8 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     createScintillator(i);
   }
   for (i = 0; i < m_GeoDat->getNSegments(); i++) {
-    imin = i * m_GeoDat->getNStripsSegment();
-    imax = (i + 1) * m_GeoDat->getNStripsSegment();
+    imin = i * m_ElementNumbers->getNStripsSegment();
+    imax = (i + 1) * m_ElementNumbers->getNStripsSegment();
     for (m_CurVol.strip = imin + 1; m_CurVol.strip <= imax; m_CurVol.strip++)
       createStrip(m_LogVol.stripSegment[i]);
   }

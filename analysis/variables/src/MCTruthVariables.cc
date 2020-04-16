@@ -836,7 +836,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
-
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
@@ -911,32 +910,32 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
                       "Returns status bits of related MCParticle or NaN if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
+                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle, "
                       "NaN if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
-                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle,"
+                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle, "
                       "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
-                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle,"
+                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle, "
                       "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcISR", particleMCISRParticle,
-                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle,"
+                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle, "
                       "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
-                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle,"
+                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle ,"
                       "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
-                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
+                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle, "
                       "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
                       "[Eventbased] Returns the event weight produced by the event generator")
 
     REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
-                      "Returns number of steps to i-th daughter from the particle at generator level."
-                      "NaN if no MCParticle is associated to the particle or i-th daughter."
+                      "Returns number of steps to i-th daughter from the particle at generator level. "
+                      "NaN if no MCParticle is associated to the particle or i-th daughter. "
                       "NaN if i-th daughter does not exist.");
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
-                      "Returns the number of missing daughters having assigned PDG codes."
+                      "Returns the number of missing daughters having assigned PDG codes. "
                       "NaN if no MCParticle is associated to the particle.")
     REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
 [Eventbased] The nominal HER energy used by the generator.

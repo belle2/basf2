@@ -12,8 +12,8 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 using namespace Belle2;
 
@@ -28,7 +28,7 @@ KLMChannelIndex::KLMChannelIndex(enum IndexLevel indexLevel) :
 {
   setNStripsPlane();
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMChannelIndex::KLMChannelIndex(
@@ -44,7 +44,7 @@ KLMChannelIndex::KLMChannelIndex(
 {
   setNStripsPlane();
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMChannelIndex::~KLMChannelIndex()
@@ -135,7 +135,7 @@ void KLMChannelIndex::setKLMModule(uint16_t module)
 
 void KLMChannelIndex::setEKLMSegment(int segment)
 {
-  m_ElementNumbersEKLM->segmentNumberToElementNumbers(
+  m_eklmElementNumbers->segmentNumberToElementNumbers(
     segment, &m_Section, &m_Sector, &m_Layer, &m_Plane, &m_Strip);
   m_Subdetector = KLMElementNumbers::c_EKLM;
   useEKLMSegments();
@@ -182,7 +182,7 @@ uint16_t KLMChannelIndex::getKLMSectorNumber() const
 
 int KLMChannelIndex::getEKLMSegmentNumber() const
 {
-  return m_ElementNumbersEKLM->segmentNumber(
+  return m_eklmElementNumbers->segmentNumber(
            m_Section, m_Layer, m_Sector, m_Plane, m_Strip);
 }
 
@@ -281,7 +281,7 @@ void KLMChannelIndex::increment(enum IndexLevel indexLevel)
         break;
       case c_IndexLevelLayer:
         m_Layer++;
-        if (m_Layer > m_ElementNumbersEKLM->getMaximalDetectorLayerNumber(m_Section)) {
+        if (m_Layer > m_eklmElementNumbers->getMaximalDetectorLayerNumber(m_Section)) {
           m_Layer = 1;
           increment(c_IndexLevelSector);
         }

@@ -41,37 +41,37 @@ def stdPi0s(listtype='veryLoose', path=None):
         ma.matchMCTruth('pi0:all', path)
     elif 'eff10_Jan2020' == listtype:
         stdPhotons('pi0eff10_Jan2020', path)
-        ma.reconstructDecay('pi0:eff10_Jan2020 -> gamma:eff10_Jan2020 gamma:eff10_Jan2020',
+        ma.reconstructDecay('pi0:eff10_Jan2020 -> gamma:pi0eff10_Jan2020 gamma:pi0eff10_Jan2020',
                             '0.127<InvM<0.139 and -0.9<daughterDiffOfPhi(0,1)<0.9 and daughterAngleInBetween(0,1)<0.8', True, path)
         ma.matchMCTruth('pi0:eff10_Jan2020', path)
     elif 'eff20_Jan2020' == listtype:
         stdPhotons('pi0eff20_Jan2020', path)
-        ma.reconstructDecay('pi0:eff20_Jan2020 -> gamma:eff20_Jan2020 gamma:eff20_Jan2020',
+        ma.reconstructDecay('pi0:eff20_Jan2020 -> gamma:pi0eff20_Jan2020 gamma:pi0eff20_Jan2020',
                             '0.121<InvM<0.142 and -1.0<daughterDiffOfPhi(0,1)<1.0 and daughterAngleInBetween(0,1)<0.9', True, path)
         ma.matchMCTruth('pi0:eff20_Jan2020', path)
     elif 'eff30_Jan2020' == listtype:
         stdPhotons('pi0eff30_Jan2020', path)
-        ma.reconstructDecay('pi0:eff30_Jan2020 -> gamma:eff30_Jan2020 gamma:eff30_Jan2020',
+        ma.reconstructDecay('pi0:eff30_Jan2020 -> gamma:pi0eff30_Jan2020 gamma:pi0eff30_Jan2020',
                             '0.120<InvM<0.145 and -1.5<daughterDiffOfPhi(0,1)<1.5 and daughterAngleInBetween(0,1)<1.4', True, path)
         ma.matchMCTruth('pi0:eff30_Jan2020', path)
     elif 'eff40_Jan2020' == listtype:
         stdPhotons('pi0eff40_Jan2020', path)
-        ma.reconstructDecay('pi0:eff40_Jan2020 -> gamma:eff40_Jan2020 gamma:eff40_Jan2020', '0.120<InvM<0.145', True, path)
+        ma.reconstructDecay('pi0:eff40_Jan2020 -> gamma:pi0eff40_Jan2020 gamma:pi0eff40_Jan2020', '0.120<InvM<0.145', True, path)
         ma.matchMCTruth('pi0:eff40_Jan2020', path)
     elif 'eff50_Jan2020' == listtype:
         stdPhotons('pi0eff50_Jan2020', path)
-        ma.reconstructDecay('pi0:eff50_Jan2020 -> gamma:eff50_Jan2020 gamma:eff50_Jan2020', '0.105<InvM<0.150', True, path)
+        ma.reconstructDecay('pi0:eff50_Jan2020 -> gamma:pi0eff50_Jan2020 gamma:pi0eff50_Jan2020', '0.105<InvM<0.150', True, path)
         ma.matchMCTruth('pi0:eff50_Jan2020', path)
     elif 'eff50_Jan2020_nomcmatch' == listtype:
         stdPhotons('pi0eff50_Jan2020_nomcmatch', path)
         ma.reconstructDecay(
-            'pi0:eff50_Jan2020_nomcmatch -> gamma:eff50_Jan2020 gamma:eff50_Jan2020',
+            'pi0:eff50_Jan2020_nomcmatch -> gamma:pi0eff50_Jan2020 gamma:pi0eff50_Jan2020',
             '0.105<InvM<0.150',
             True,
             path)
     elif 'eff60_Jan2020' == listtype:
         stdPhotons('pi0eff60_Jan2020', path)
-        ma.reconstructDecay('pi0:eff60_Jan2020 -> gamma:eff60_Jan2020 gamma:eff60_Jan2020', '0.03<InvM', True, path)
+        ma.reconstructDecay('pi0:eff60_Jan2020 -> gamma:pi0eff60_Jan2020 gamma:pi0eff60_Jan2020', '0.03<InvM', True, path)
         ma.matchMCTruth('pi0:eff60_Jan2020', path)
 
     # skim list(s)

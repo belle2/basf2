@@ -34,7 +34,7 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
   const double E  = cluster->getEnergy(hypo);
   double p = sqrt(E * E - mass * mass);
   if (std::isnan(p)) // then the cluster was less energetic than the mass provided
-    p = std::numeric_limits<double>::quiet_NaN();
+    p = std::numeric_limits<double>::quiet_NaN(); // TODO should this revert to massless particle?
   const double px = p * sin(direction.Theta()) * cos(direction.Phi());
   const double py = p * sin(direction.Theta()) * sin(direction.Phi());
   const double pz = p * cos(direction.Theta());

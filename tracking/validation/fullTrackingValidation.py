@@ -10,7 +10,7 @@
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'FullTrackingValidationTest_with_CDCQI_e1003_r2_CDC08_cut_deleteTracksTrue_resetFlagTrue.root'
+VALIDATION_OUTPUT_FILE = 'ftv_e1003_r2_AllQI_CDC08_dTTrue_rFTrue.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -30,12 +30,12 @@ class Full(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     #: no background overlay
-    root_input_file = '../EvtGenSim_1k_exp1003_run2.root'
+    root_input_file = '../EvtGenSim_1k_exp1003_run2_new.root'
     #: use the complete track-reconstruction chain
     #: finder_module = staticmethod(tracking.add_tracking_reconstruction)
 
     def finder_module(self, path):
-        tracking.add_tracking_reconstruction(path, add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False)
+        tracking.add_tracking_reconstruction(path, add_cdcTrack_QI=True, add_vxdTrack_QI=True, add_recoTrack_QI=True)
     #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': [],  # Include all particles, also secondaries

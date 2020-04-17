@@ -580,7 +580,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         path.add_module("Gearbox")
 
         # First add tracking reconstruction with default quality estimation modules
-        tracking.add_tracking_reconstruction(path, add_mva_quality_indicator=True)
+        tracking.add_tracking_reconstruction(path, add_cdcTrack_QI=True, add_vxdTrack_QI=True, add_recoTrack_QI=True)
 
         # Replace weightfile identifiers from defaults (CDB payloads) to new
         # weightfiles created by this b2luigi script
@@ -1030,7 +1030,9 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         # add tracking recontonstruction with quality estimator modules added
         tracking.add_tracking_reconstruction(
             path,
-            add_mva_quality_indicator=True,
+            add_cdcTrack_QI=True,
+            add_vxdTrack_QI=True,
+            add_recoTrack_QI=True,
             skipGeometryAdding=True,
             skipHitPreparerAdding=False,
         )
@@ -1154,6 +1156,14 @@ class TrackQEEvaluationBaseTask(Task):
 
         # Prepare log files
         log_file_dir = get_log_file_dir(self)
+        # check if directory already exists, if not, create it. I think this is necessary as this task does not
+        # inherit properly from b2luigi and thus does not do it automatically??
+        try:
+            os.makedirs(log_file_dir, exist_ok=True)
+        # the following should be unnecessary as exist_ok=True should take care that no FileExistError rises. I
+        # might ask about a permission error...
+        except FileExistsError:
+            print('Directory ' + log_file_dir + 'already exists.')
         stderr_log_file_path = log_file_dir + "stderr"
         stdout_log_file_path = log_file_dir + "stdout"
         with open(stdout_log_file_path, "w") as stdout_file:

@@ -17,6 +17,7 @@ from L1trigger import add_tsim
 from validation import statistics_plots, event_timing_plot
 from background import get_background_files
 import glob as glob
+import os
 
 set_random_seed(12345)
 
@@ -26,11 +27,19 @@ bgfile = '/group/belle2/users/jbennett/BGOverlayFromData/e000' + exp + \
     '/release-04-01-00/data_reprocessing_proc10/BGOverlay.physics.e000' + exp + '.r0' + run + '.root'
 bg = glob.glob(bgfile)
 
+# define the settings for the generator (?!)
+usedExp = 1003  # 1003 is the incomplete detector due to some missing parts in the PXD. 0 would be the complete detector
+runNo = 1
+events = 5000
+postfix = ''
+OUTPUT_FILE_NAME = 'EvtGenSim_' + str(int(round(events / 1000, 0))) + 'k_exp' + \
+                                      str(usedExp) + '_run' + str(runNo) + postfix + '.root'
+
 
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[5000], runList=[1], expList=[1003])
+main.add_module('EventInfoSetter', evtNumList=[events], runList=[runNo], expList=[usedExp])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
@@ -46,7 +55,7 @@ add_simulation(main, bkgfiles=bg)
 main.add_module('Profile')
 
 # output
-main.add_module('RootOutput', outputFileName='../EvtGenSim_5k_exp1003_run1.root')
+main.add_module('RootOutput', outputFileName=OUTPUT_FILE_NAME)
 
 process(main)
 
@@ -54,14 +63,14 @@ process(main)
 print(statistics)
 
 statistics_plots(
-    'EvtGenSim_statistics.root',
+    os.path.splitext(OUTPUT_FILE_NAME)[0] + '_statistics.root',
     contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with generic EvtGen events',
-    prefix='EvtGenSim'
+    prefix=os.path.splitext(OUTPUT_FILE_NAME)[0]
 )
 event_timing_plot(
-    '../EvtGenSim.root', 'EvtGenSim_statistics.root',
+    OUTPUT_FILE_NAME, os.path.splitext(OUTPUT_FILE_NAME)[0] + '_statistics.root',
     contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with generic EvtGen events',
-    prefix='EvtGenSim'
+    prefix=os.path.splitext(OUTPUT_FILE_NAME)[0]
 )

@@ -1,3 +1,8 @@
+# Hardcoded selected files and folders by Henrik Junkerkalefeld #
+# ############################################################# #
+tracking/scripts/tracking/train/logs/
+tracking/scripts/tracking/train/output/
+
 # Weight and geometry files #
 # ######################### #
 *.xml

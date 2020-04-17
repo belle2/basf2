@@ -215,7 +215,7 @@ def getDstarList(path):
 
     DstarChannel = []
     for channel in DplusList:
-        DstarChannel.append(channel + ' pi0:loose')
+        DstarChannel.append(channel + ' pi0:eff40_Jan2020')
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
@@ -448,7 +448,7 @@ def BtoDStarPiList(path):
 
 # D0
 
-    D0Channel = ['K+:loose pi-:loose', 'K+:loose pi-:loose pi-:loose pi+:loose', 'K+:loose pi-:loose pi0:loose']
+    D0Channel = ['K+:loose pi-:loose', 'K+:loose pi-:loose pi-:loose pi+:loose', 'K+:loose pi-:loose pi0:eff40_Jan2020']
 
     D0List = []
     for chID, channel in enumerate(D0Channel):

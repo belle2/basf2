@@ -33,7 +33,7 @@ stdK('loose', path=path)
 stdPi('all', path=path)
 stdE('all', path=path)
 stdMu('all', path=path)
-stdPi0s('loose', path=path)  # for stdCharm.py
+stdPi0s('eff40_Jan2020', path=path)  # for stdCharm.py
 stdPhotons('loose', path=path)
 
 # Leptonic skim

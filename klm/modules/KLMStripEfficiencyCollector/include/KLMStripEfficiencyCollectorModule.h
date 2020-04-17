@@ -11,10 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
@@ -77,11 +76,8 @@ namespace Belle2 {
       /** Extrapolation hit. */
       const ExtHit* hit;
 
-      /** EKLM digit. */
-      const EKLMDigit* eklmDigit;
-
-      /** BKLM digit. */
-      const BKLMDigit* bklmDigit;
+      /** Digit. */
+      const KLMDigit* digit;
 
     };
 
@@ -151,7 +147,7 @@ namespace Belle2 {
 
     /**
      * Maximal distance in the units of strip number from ExtHit to
-     * matching (B|E)KLMDigit.
+     * matching KLMDigit.
      */
     double m_AllowedDistance1D;
 
@@ -170,11 +166,8 @@ namespace Belle2 {
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
-
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /** Tracks. */
     StoreArray<Track> m_tracks;
@@ -189,7 +182,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;

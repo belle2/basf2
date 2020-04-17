@@ -277,7 +277,7 @@ namespace Belle2 {
      */
     static int getSectionByModule(int module)
     {
-      return (module & BKLM_END_MASK) >> BKLM_END_BIT;
+      return (module & BKLM_SECTION_MASK) >> BKLM_SECTION_BIT;
     }
 
     /**
@@ -313,7 +313,39 @@ namespace Belle2 {
     }
 
     /**
+     * Set section number in module identifier.
+     * @param[in,out] module  Module identifier.
+     * @param[in]     section Section.
+     */
+    static void setSectionInModule(int& module, int section)
+    {
+      module = (module & (~BKLM_SECTION_MASK)) | (section << BKLM_SECTION_BIT);
+    }
+
+    /**
+     * Set sector number in module identifier.
+     * @param[in,out] module Module identifier.
+     * @param[in]     sector Sector.
+     */
+    static void setSectorInModule(int& module, int sector)
+    {
+      module = (module & (~BKLM_SECTOR_MASK)) | ((sector - 1) << BKLM_SECTOR_BIT);
+    }
+
+    /**
+     * Set layer number in module identifier.
+     * @param[in,out] module Module identifier.
+     * @param[in]     layer  Layer identifier.
+     */
+    static void setLayerInModule(int& module, int layer)
+    {
+      module = (module & (~BKLM_LAYER_MASK)) | ((layer - 1) << BKLM_LAYER_BIT);
+    }
+
+    /**
      * Set plane number in module identifier.
+     * @param[in,out] module Module identifier.
+     * @param[in]     plane  Plane.
      */
     static void setPlaneInModule(int& module, int plane)
     {
@@ -322,6 +354,8 @@ namespace Belle2 {
 
     /**
      * Set strip number in module identifier.
+     * @param[in,out] module Module identifier.
+     * @param[in]     strip  Strip.
      */
     static void setStripInModule(int& module, int strip)
     {
@@ -403,7 +437,7 @@ namespace Belle2 {
     static constexpr int BKLM_SECTOR_BIT = 11;
 
     /** Bit position for detector end [0..1]; forward is 0. */
-    static constexpr int BKLM_END_BIT = 14;
+    static constexpr int BKLM_SECTION_BIT = 14;
 
     /** Bit mask for strip-1 [0..47]. */
     static constexpr int BKLM_STRIP_MASK = (63 << BKLM_STRIP_BIT);
@@ -421,15 +455,15 @@ namespace Belle2 {
     static constexpr int BKLM_SECTOR_MASK = (7 << BKLM_SECTOR_BIT);
 
     /** Bit mask for detector end [0..1]; forward is 0. */
-    static constexpr int BKLM_END_MASK = (1 << BKLM_END_BIT);
+    static constexpr int BKLM_SECTION_MASK = (1 << BKLM_SECTION_BIT);
 
     /** Bit mask for module identifier. */
     static constexpr int BKLM_MODULEID_MASK =
-      BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK;
+      BKLM_SECTION_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK;
 
     /** Bit mask for module-and-strip identifier. */
     static constexpr int BKLM_MODULESTRIPID_MASK =
-      BKLM_END_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK | BKLM_PLANE_MASK |
+      BKLM_SECTION_MASK | BKLM_SECTOR_MASK | BKLM_LAYER_MASK | BKLM_PLANE_MASK |
       BKLM_STRIP_MASK;
 
   };

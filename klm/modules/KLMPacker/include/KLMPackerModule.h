@@ -11,8 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/bklm/BKLMDigit.h>
-#include <klm/dataobjects/eklm/EKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
 
@@ -104,15 +103,8 @@ namespace Belle2 {
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
 
-    /* BKLM objects. */
-
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
-
-    /* EKLM objects. */
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
   };
 

@@ -10,9 +10,6 @@
 
 #pragma once
 
-/* Belle 2 headers. */
-#include <framework/database/DBImportObjPtr.h>
-
 namespace Belle2 {
 
   /**

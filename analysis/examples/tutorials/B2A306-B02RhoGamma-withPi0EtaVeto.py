@@ -39,7 +39,7 @@ import variables.utils as vu
 # create path
 my_path = b2.create_path()
 
-b2.conditions.prepend_globaltag('analysis_tools_release-04')
+b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',

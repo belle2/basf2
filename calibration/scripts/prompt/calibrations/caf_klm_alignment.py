@@ -138,6 +138,7 @@ def get_calibrations(input_data, **kwargs):
                 segment, ipar)
         index.increment()
 
+    cal_klm = millepede.create('KLMAlignment', [])
     millepede.algo.setMinEntries(500000)
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
@@ -146,8 +147,6 @@ def get_calibrations(input_data, **kwargs):
     # Calibration setup
 
     from caf.framework import Calibration, Collection
-
-    cal_klm = Calibration("KLMAlignment")
 
     ########
     # Collect on multiple input data types for one calibration

@@ -15,9 +15,6 @@
 /* Geant stage. */
 #pragma link C++ class Belle2::EKLMSimHit+;
 
-/* Digitization stage. */
-#pragma link C++ class Belle2::EKLMDigit+;
-
 /* Reconstuction stage. */
 #pragma link C++ class Belle2::EKLMHit2d+;
 

@@ -2612,10 +2612,10 @@ arguments. Operator precedence is taken into account. For example ::
 )DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
-                      "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
+                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame");
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
-                      "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
+                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
 Returns the value of ``variable`` in the *lab* frame.
 
@@ -2643,15 +2643,15 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
-                      "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
-                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
+                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
-                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
+                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
@@ -2695,23 +2695,23 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
                       "Returns value of variable for the i-th daughter. E.g.\n"
-                      "  - daughter(0, p) returns the total momentum of the first daughter.\n"
-                      "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
+                      "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
+                      "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
                       "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the i-th MC daughter does not exist.\n"
-                      "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
+                      "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
+                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
                       "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
-                      "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
+                      "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: mcMother(mcMother(PDG)).");
+                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2733,66 +2733,66 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 )DOC");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
-                      "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");
+                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
                       "Returns sum of a variable over all daughters.\n"
-                      "E.g. daughterSumOf(nDaughters) returns the number of grand-daughters.");
+                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.");
     REGISTER_VARIABLE("daughterLowest(variable)", daughterLowest,
                       "Returns the lowest value of the given variable among all daughters.\n"
-                      "E.g. useCMSFrame(daughterLowest(p)) returns the lowest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterHighest(variable)", daughterHighest,
                       "Returns the highest value of the given variable among all daughters.\n"
-                      "E.g. useCMSFrame(daughterHighest(p)) returns the highest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
-                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns p_j - p_i)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+                      "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns :math:`p_j - p_i`)\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
-                      "E.g. useRestFrame(grandDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns p_j - p_i)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the 'grandDaughterDiffOfPhi' function.");
+                      "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns :math:`p_j - p_i`)\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in phi between the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in phi between the first daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in phi between the ECLClusters of the daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in phi between the two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in phi between the ECLClusters of two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i``.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
-                      "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
                       "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. useRestFrame(daughterMotherDiffOf(0, p)) returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
     REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
+                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", daughterAngleInBetween, R"DOC(
 Returns the angle in between any pair of particles belonging to the same decay tree. 
 The particles are identified via generalized daughter indexes, which are simply colon-separated lists of daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply identifies the second daughter of the root particle. 
@@ -2814,11 +2814,11 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");
+                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"
-                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the MVAExpert module.\n"
+                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the ``MVAExpert`` module.\n"
                       "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
                       "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
@@ -2861,7 +2861,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
                       "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
                       "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
-                      "unmask(variable, 2, 8, 16) or unmask(variable, 26).\n"
+                      "``unmask(variable, 2, 8, 16)`` or ``unmask(variable, 26)``.\n"
                       "");
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
@@ -2872,17 +2872,17 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
-                      "around the neutral Pion mass (e.g. 0.130 < M < 0.140). \n"
+                      "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
                       "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
-                      "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
+                      "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.");
     REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
-                      "E.g. countInList(e+, isSignal == 1) returns the number of correctly reconstructed electrons in the event.\n"
+                      "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.");
     REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
                       Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.

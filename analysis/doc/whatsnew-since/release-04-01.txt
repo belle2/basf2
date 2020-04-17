@@ -195,6 +195,8 @@ Modules
    and not anymore as ``TrackFitResult``. This should have no effect to users.
  * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned
    off by setting ``allowChargeViolation=True``.
+ * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
+   charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
 
 Utilities and core objects
 ++++++++++++++++++++++++++

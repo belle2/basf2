@@ -57,7 +57,7 @@ CDCTriggerNeuroDQMModule::CDCTriggerNeuroDQMModule() : HistoModule()
            string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Name of the directory where histograms will be placed",
-           string("cdctriggerneuro"));
+           string("TRGCDCTNN"));
   addParam("simSegmentHitsName", m_simSegmentHitsName,
            "StoreArray name for simulated TS hits", string(""));
   addParam("sim2DTracksSWTSName", m_sim2DTracksSWTSName,

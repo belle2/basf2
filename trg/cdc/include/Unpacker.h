@@ -272,9 +272,12 @@ namespace Belle2 {
         unsigned iTracker,
         const CDCTriggerNeuroConfig::B2FormatLine b2line)
       {
-        NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
-        data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
-
+        if ((b2line.offset + foundtime >= 0) && (b2line.offset + foundtime <= bitsNN->getEntries())) {
+          NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
+          data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
+        } else {
+          data = "";
+        }
 
         // std::cout << "new datafield: " << b2line.name << ": " << b2line.start << ", " << b2line.end << ", " << data << std::endl;
 
@@ -499,6 +502,10 @@ namespace Belle2 {
         globalPhi0 -= pi() * 2;
       }
       trackout.phi0 = globalPhi0;
+      B2DEBUG(20, "Unpacking 2DTrack in Tracker: " << iTracker);
+      B2DEBUG(20, "    Omega: " << std::to_string(omega) << ", Omegafirm: " << std::to_string(omegafirm) << ", converted to: " <<
+              std::to_string(trackout.omega));
+      B2DEBUG(20, "    Phi:   " << std::to_string(phi) << ", converted to: " << std::to_string(trackout.phi0));
       return trackout;
 
     }
@@ -1014,8 +1021,8 @@ namespace Belle2 {
       bool sim13dt)
     {
       for (unsigned iTracker = 0; iTracker < nTrackers; ++iTracker) {
-        B2DEBUG(10, "----------------------------------------------------------------------------------------------------");
-        B2DEBUG(10, padright("  Unpacking Tracker: " + std::to_string(iTracker), 100));
+        B2DEBUG(21, "----------------------------------------------------------------------------------------------------");
+        B2DEBUG(21, padright("  Unpacking Tracker: " + std::to_string(iTracker), 100));
         // loop over boards belonging to geometrical sectors
 
         for (short iclock = 0; iclock < bitsNN->getEntries(); ++iclock) {
@@ -1027,9 +1034,9 @@ namespace Belle2 {
           B2LDataField p_nnenable(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("NNEnable"));
 
           if (p_nnenable.data == "1") {
-            B2DEBUG(10, padright("----UnpackerClock: " + std::to_string(iclock) + "    NNENABLE SET!", 100));
+            B2DEBUG(10, padright("Tracker: " + std::to_string(iTracker) + ", Clock: " + std::to_string(iclock) + " : NNEnable set!", 100));
           } else {
-            B2DEBUG(14, padright("    UnpackerClock: " + std::to_string(iclock), 100));
+            B2DEBUG(21, padright("    UnpackerClock: " + std::to_string(iclock), 100));
           }
 
 
@@ -1039,39 +1046,162 @@ namespace Belle2 {
           nnall.offset = 0;
           nnall.name = "nnall";
           B2LDataField p_nnall(bitsNN, iclock, iTracker, nnall);
-          B2DEBUG(20, padright("      all bits: ", 100));
-          B2DEBUG(20, padright("        " + p_nnall.data, 100));
+          B2DEBUG(22, padright("      all bits: ", 100));
+          B2DEBUG(22, padright("        " + p_nnall.data, 100));
           // define variables to fill from the bitstream, B2LDataField holds just the string, not the unpacked data yet
           B2LDataField p_driftthreshold(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("DriftThreshold"));
+          if ((p_driftthreshold.name != "None") && (p_driftthreshold.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_driftthreshold.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_valstereobit(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("ValStereoBit"));
+          if ((p_valstereobit.name != "None") && (p_valstereobit.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_valstereobit.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_foundoldtrack(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("FoundOldTrack"));
+          if ((p_foundoldtrack.name != "None") && (p_foundoldtrack.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_foundoldtrack.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_phi(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Phi"));
+          if ((p_phi.name != "None") && (p_phi.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_phi.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_omega(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Omega"));
+          if ((p_omega.name != "None") && (p_omega.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_omega.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_ts8(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS8"));
+          if ((p_ts8.name != "None") && (p_ts8.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_ts8.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_ts6(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS6"));
+          if ((p_ts6.name != "None") && (p_ts6.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_ts6.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_ts4(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS4"));
+          if ((p_ts4.name != "None") && (p_ts4.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_ts4.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_ts2(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS2"));
+          if ((p_ts2.name != "None") && (p_ts2.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_ts2.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_ts0(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TS0"));
+          if ((p_ts0.name != "None") && (p_ts0.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_ts0.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_tsf1(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF1"));
+          if ((p_tsf1.name != "None") && (p_tsf1.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_tsf1.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_tsf3(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF3"));
+          if ((p_tsf3.name != "None") && (p_tsf3.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_tsf3.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_tsf5(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF5"));
+          if ((p_tsf5.name != "None") && (p_tsf5.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_tsf5.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_tsf7(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSF7"));
+          if ((p_tsf7.name != "None") && (p_tsf7.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_tsf7.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_tsfsel(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("TSFsel"));
+          if ((p_tsfsel.name != "None") && (p_tsfsel.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_tsfsel.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_mlpin_alpha(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_alpha"));
+          if ((p_mlpin_alpha.name != "None") && (p_mlpin_alpha.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpin_alpha.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_mlpin_drifttime(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_driftt"));
+          if ((p_mlpin_drifttime.name != "None") && (p_mlpin_drifttime.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpin_drifttime.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_mlpin_id(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_id"));
+          if ((p_mlpin_id.name != "None") && (p_mlpin_id.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpin_id.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_netsel(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Netsel"));
+          if ((p_netsel.name != "None") && (p_netsel.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_netsel.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_mlpout_z(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOut_z"));
+          if ((p_mlpout_z.name != "None") && (p_mlpout_z.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpout_z.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_mlpout_theta(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPOut_theta"));
+          if ((p_mlpout_theta.name != "None") && (p_mlpout_theta.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpout_theta.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_2dcc(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("2dcc"));
+          if ((p_2dcc.name != "None") && (p_2dcc.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_2dcc.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
+            continue;
+          }
+
           B2LDataField p_extendedpts(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("extendedPriorityTimes"));
+          if ((p_extendedpts.name != "None") && (p_extendedpts.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_extendedpts.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
           // B2LDataField  (bitsNN, iclock, iTracker, neurodb->getB2FormatLine(""));
 
           CDCTriggerTrack* track2D = nullptr;
           // decode stereo hits
           if (true) { // (p_nnenable.data == "1") {
             unsigned sln = 0;
-            B2DEBUG(11, padright("      Stereos: ", 100));
+            B2DEBUG(21, padright("      Stereos: ", 100));
             for (auto stereolayer : {p_tsf1, p_tsf3, p_tsf5, p_tsf7}) {
               if (stereolayer.name == "None") {
                 B2ERROR("Error in CDCTriggerNeuroConfig Payload, position of stereo tsf could not be found!");
@@ -1087,11 +1217,11 @@ namespace Belle2 {
                   addTSHit(ts, sln * 2 + 1, iTracker, tsHitsAll, iclock);
                 }
               }
-              B2DEBUG(11, padright("        SL" + std::to_string(sln * 2 + 1) + tsstr, 100));
+              B2DEBUG(21, padright("        SL" + std::to_string(sln * 2 + 1) + tsstr, 100));
               ++sln;
             }
           }
-          B2DEBUG(10, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
+          B2DEBUG(21, padright("      2DCC: " + std::to_string(std::stoi(p_2dcc.data, 0, 2)) + ", (" + p_2dcc.data + ")", 100));
           if (p_nnenable.data == "1") {
             std::vector<bool> foundoldtrack;
             std::vector<bool> driftthreshold;
@@ -1123,7 +1253,7 @@ namespace Belle2 {
                                        p_2dcc.data,
                                        sim13dt);
             track2D = store2DTracks->appendNew(trk2D.phi0, trk2D.omega, 0., foundoldtrack, driftthreshold, valstereobit, iclock, iTracker);
-            B2DEBUG(10, padright("      2DTrack: (phi=" + std::to_string(trk2D.phi0) + ", omega=" + std::to_string(
+            B2DEBUG(12, padright("      2DTrack: (phi=" + std::to_string(trk2D.phi0) + ", omega=" + std::to_string(
                                    trk2D.omega) + ", update=" + std::to_string(foundoldtrack[1]) + ")", 100));
 
             // add axial hits and create relations
@@ -1139,7 +1269,7 @@ namespace Belle2 {
                 track2D->addRelationTo(hit);
               }
             }
-            B2DEBUG(10, padright("      2DTrack TS: " + tsstr, 100));
+            B2DEBUG(16, padright("      2DTrack TS: " + tsstr, 100));
 
 
             if (track2D) {
@@ -1157,7 +1287,7 @@ namespace Belle2 {
                                     p_extendedpts);
 
 
-              B2DEBUG(10, padright("      NNTrack: (z=" + std::to_string(trkNN.z) + ", theta=" + std::to_string(trkNN.theta) + ")", 100));
+              B2DEBUG(11, padright("      NNTrack: (z=" + std::to_string(trkNN.z) + ", theta=" + std::to_string(trkNN.theta) + ")", 100));
 
               double phi0 = track2D->getPhi0();
               double omega = track2D->getOmega();
@@ -1176,7 +1306,7 @@ namespace Belle2 {
                   tsstr += "( - ),\n";
                 }
               }
-              B2DEBUG(10, padright("      NNTrack TS: " + tsstr, 100));
+              B2DEBUG(15, padright("      NNTrack TS: " + tsstr, 100));
 
               CDCTriggerTrack* trackNN = storeNNTracks->appendNew(phi0, omega, 0.,
                                                                   trkNN.z, cos(trkNN.theta) / sin(trkNN.theta), 0., track2D->getFoundOldTrack(), track2D->getDriftThreshold(),

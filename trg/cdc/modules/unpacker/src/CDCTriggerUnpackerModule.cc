@@ -614,8 +614,10 @@ void CDCTriggerUnpackerModule::initialize()
   }
   if (m_useDB == true) {
     B2DEBUG(2, "Load Neurotrigger configuration for network " << m_cdctriggerneuroconfig->getNNName() << " from database ");
+    B2DEBUG(10, padright("Name", 50) << padright("start", 10) << padright("end", 10) << padright("offset", 10));
     for (auto x : m_cdctriggerneuroconfig->getB2Format()) {
-      B2DEBUG(10, x.name << ",  " << x.start << "  " << x.end);
+      B2DEBUG(10, padright(x.name, 48) << ": " << padright(std::to_string(x.start), 10) <<  padright(std::to_string(x.end),
+              10) << padright(std::to_string(x.offset), 10));
     }
   }
 }

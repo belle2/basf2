@@ -404,7 +404,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
         if (axialHits.weight(ihit) < 0) continue;
         unsigned short iSL = axialHits[ihit]->getISuperLayer();
         // skip stereo hits (should not be related to track, but check anyway)
-        if (iSL % 2 == 1) continue;
+        if ((iSL % 2 == 1) && !neuroinputmode)  continue;
         // get shortest time of relevant hits
         double relId = getRelId(*axialHits[ihit]);
         if (m_MLPs[isector].isRelevant(relId, iSL) &&
@@ -475,7 +475,7 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
       if (axialHits.weight(ihit) < 0) continue;
       unsigned short iSL = axialHits[ihit]->getISuperLayer();
       // skip stereo hits (should not be related to track, but check anyway)
-      if (iSL % 2 == 1) continue;
+      if ((iSL % 2 == 1) && !neuroinputmode)  continue;
       // get shortest time of relevant hits
       B2DEBUG(200, "  check drifttime: SL" + std::to_string(iSL) + ",ID = " + std::to_string(axialHits[ihit]->getSegmentID()) + ", t = " +
               std::to_string(axialHits[ihit]->priorityTime()));
@@ -486,8 +486,6 @@ NeuroTrigger::getEventTime(unsigned isector, const CDCTriggerTrack& track, std::
         B2DEBUG(200, "    new t0: " << std::to_string(m_T0));
       }
     }
-    // TODO: do not execute this when using neurotracks as input!!
-    //
     if (!neuroinputmode) {
       // find shortest time of relevant stereo hits
       StoreArray<CDCTriggerSegmentHit> hits(m_hitCollectionName);

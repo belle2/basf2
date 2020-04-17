@@ -54,11 +54,20 @@ PXDClusterChargeCollectorModule::PXDClusterChargeCollectorModule() : Calibration
   addParam("matchTrack", m_matchTrack,
            "Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)", int(0));
   addParam("mcSamples", m_mcSamples, "Flag to deal with MC samples", bool(false));
+  addParam("relationCheck", m_relationCheck, "Flag to check relations between PXDClusters and PXDClustersFromTracks", bool(false));
+
 }
 
 void PXDClusterChargeCollectorModule::prepare() // Do your initialise() stuff here
 {
   m_pxdClusters.isRequired(m_storeClustersName);
+  if (m_relationCheck) {
+    std::string storeClustersName2;
+    storeClustersName2 = (m_storeClustersName == "PXDClusters") ?
+                         "PXDClustersFromTracks" : "PXDClusters";
+    StoreArray<PXDCluster> pxdClusters2;
+    pxdClusters2.isRequired(storeClustersName2);
+  }
   m_tracks.isOptional(); //m_storeTracksName);
   m_recoTracks.isOptional(); //m_storeRecoTracksName);
 
@@ -167,6 +176,15 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
   if (!m_matchTrack || m_mcSamples) { // all clusters for data
 
     for (auto& cluster :  m_pxdClusters) {
+      if (m_relationCheck) {
+        if (m_storeClustersName == "PXDClusters") {
+          RelationVector<PXDCluster> relPXDClusters = cluster.getRelationsTo<PXDCluster>("PXDClustersFromTracks");
+          if (!relPXDClusters.size()) continue;
+        } else if (m_storeClustersName == "PXDClustersFromTracks") {
+          RelationVector<PXDCluster> relPXDClusters = DataStore::getRelationsWithObj<PXDCluster>(&cluster, "PXDClusters");
+          if (!relPXDClusters.size()) continue;
+        }
+      }
       double correction = 1.0;
       if (m_matchTrack > 0) { // mc samples
         RelationVector<MCParticle> mcParticlesPXD = DataStore::getRelationsWithObj<MCParticle>(&cluster, m_storeMCParticlesName);

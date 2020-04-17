@@ -88,6 +88,8 @@ namespace Belle2 {
     bool m_mcFromDB;
     /** Flag to deal with MC samples*/
     bool m_mcSamples;
+    /** Flag to check relations between PXDClusters and PXDClustersFromTracks*/
+    bool m_relationCheck;
     /** Flag to fill cluster charge histograms*/
     bool m_fillChargeHistogram;
     /** Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)*/

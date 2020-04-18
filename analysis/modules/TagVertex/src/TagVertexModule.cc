@@ -298,7 +298,8 @@ namespace Belle2 {
     double minPVal = (m_fitAlgo != "KFit") ? 0.001 : 0.;
 
     if (m_trackFindingType == "standard_PXD") {
-      ok = getTagTracks_standardAlgorithm(Breco, 1);
+      m_tagParticles = getTagTracks_standardAlgorithm(Breco, 1);
+      ok = (m_tagParticles.size() > 0);
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 3;
@@ -306,7 +307,8 @@ namespace Belle2 {
     }
 
     if ((ok == false || m_fitPval < minPVal) || m_trackFindingType == "standard") {
-      ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+      m_tagParticles = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+      ok = (m_tagParticles.size() > 0);
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 4;
@@ -315,7 +317,10 @@ namespace Belle2 {
 
     if ((ok == false || (m_fitPval <= 0. && m_fitAlgo == "Rave")) && m_constraintType != "noConstraint") {
       ok = findConstraintBoost(cut * 200000.);
-      if (ok) ok = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+      if (ok) {
+        m_tagParticles = getTagTracks_standardAlgorithm(Breco, m_reqPXDHits);
+        ok = (m_tagParticles.size() > 0);
+      }
       if (ok) {
         ok = makeGeneralFit();
         m_FitType = 5;
@@ -612,6 +617,7 @@ namespace Belle2 {
   }
 
 
+  // static
   bool TagVertexModule::compBrecoBgen(const Particle* Breco, const MCParticle* Bgen)
   {
 
@@ -642,13 +648,13 @@ namespace Belle2 {
   /* This algorithm basically takes all the tracks coming from the Rest Of Events and send them to perform a multi-track fit
    The option of requestion PXD hits for the tracks can be chosen by the user.
    */
-  bool TagVertexModule::getTagTracks_standardAlgorithm(const Particle* Breco, int reqPXDHits)
+  std::vector<const Particle*> TagVertexModule::getTagTracks_standardAlgorithm(const Particle* Breco, int reqPXDHits) const
   {
-    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
-    if (!roe) return false;
-    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, Const::pion.getPDGCode(), false);
-    if (ROEParticles.size() == 0) return false;
     std::vector<const Particle*> fitParticles;
+    const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
+    if (!roe) return fitParticles;
+    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, Const::pion.getPDGCode(), false);
+    if (ROEParticles.size() == 0) return fitParticles;
 
     for (auto& ROEParticle : ROEParticles) {
       HitPatternVXD roeTrackPattern = ROEParticle->getTrackFitResult()->getHitPatternVXD();
@@ -657,10 +663,10 @@ namespace Belle2 {
         fitParticles.push_back(ROEParticle);
       }
     }
-    if (fitParticles.size() == 0) return false;
-    m_tagParticles = fitParticles;
-
-    return true;
+    //if (fitParticles.size() == 0) return false;
+    //m_tagParticles = fitParticles;
+    return fitParticles;
+    //return true;
   }
 
   vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<const Particle*>& tagParticles,
@@ -746,22 +752,26 @@ namespace Belle2 {
 
     //perform fit
 
-    int isGoodFit(-1);
+    int isGoodFit = -1;
     try {
       isGoodFit = rFit.fit("avf");
     } catch (const rave::CheckedFloatException&) {
       B2ERROR("Exception caught in TagVertexModule::makeGeneralFitRave(): Invalid inputs (nan/inf)?");
       return false;
     }
+    // if problems
+    if (isGoodFit < 1) return false;
 
     //save the track info for later use
     //Tracks are sorted from highest rave weight to lowest
 
     unsigned n = particleAndWeights.size();
-    for (unsigned i = 0; i < n && isGoodFit >= 1; ++i)
+    for (unsigned i = 0; i < n; ++i)
       particleAndWeights.at(i).weight = rFit.getWeight(i);
 
-    sort(particleAndWeights.begin(), particleAndWeights.end(), compare);
+    // sort by weight
+    sort(particleAndWeights.begin(), particleAndWeights.end(),
+    [](ParticleAndWeight & a, ParticleAndWeight & b) { return a.weight > b.weight; });
 
     m_raveParticles.resize(n);
     m_raveWeights.resize(n);
@@ -774,8 +784,6 @@ namespace Belle2 {
     }
 
     //if the fit is good, save the infos related to the vertex
-
-    if (isGoodFit < 1) return false;
 
     if (m_constraintType != "noConstraint") {
       TMatrixDSym tubeInv = m_constraintCov;
@@ -875,7 +883,8 @@ namespace Belle2 {
     //Tracks are sorted by weight, ie pushing the tracks with 0 weight (from KS) to the end of the list
 
     unsigned n = particleAndWeights.size();
-    sort(particleAndWeights.begin(), particleAndWeights.end(), compare);
+    sort(particleAndWeights.begin(), particleAndWeights.end(),
+    [](ParticleAndWeight & a, ParticleAndWeight & b) { return a.weight > b.weight; });
 
     m_raveParticles.resize(n);
     m_raveWeights.resize(n);
@@ -921,23 +930,23 @@ namespace Belle2 {
   void TagVertexModule::deltaT(const Particle* Breco)
   {
 
-    // deltaT and Approximated MCdeltaT
-
     TVector3 boost = PCmsLabTransform().getBoostVector();
+    TVector3 boostDir = boost.Unit();
     double bg = boost.Mag() / sqrt(1 - boost.Mag2());
     double c = Const::speedOfLight / 1000.; // cm ps-1
 
-    TVector3 dVert = Breco->getVertex() - m_tagV;
-    TVector3 MCdVert = m_MCVertReco - m_MCtagV;
 
-    TVector3 boostDir = boost.Unit();
+
+    //Reconstructed DeltaL & DeltaT in the boost direction
+    TVector3 dVert = Breco->getVertex() - m_tagV; //reconstructed vtxReco - vtxTag
     double dl = dVert.Dot(boostDir);
-    double dt = dl / (bg * c);
-    double MCdl = MCdVert.Dot(boostDir);
-    double MCdt = MCdl / (bg * c);
+    m_deltaT  = dl / (bg * c);
 
-    m_deltaT = dt;
-    m_MCdeltaTapprox = MCdt;
+    //Truth DeltaL & approx DeltaT in the boost direction
+    TVector3 MCdVert = m_MCVertReco - m_MCtagV;   //truth vtxReco - vtxTag
+    double MCdl = MCdVert.Dot(boostDir);
+    m_MCdeltaTapprox = MCdl / (bg * c);
+
 
     // MCdeltaT=tauRec-tauTag
     m_MCdeltaT = m_MCLifeTimeReco - m_MCtagLifeTime;
@@ -947,26 +956,23 @@ namespace Belle2 {
 
     // Calculate Delta t error
     TMatrixD RotErr = rotateTensor(boostDir, m_tagVErrMatrix);
+    m_tagVlErr = sqrt(RotErr(2, 2));
 
     TMatrixD RR = (TMatrixD)Breco->getVertexErrorMatrix();
     TMatrixD RotErrBreco = rotateTensor(boostDir, RR);
-
-    double dtErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
+    m_deltaTErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
 
     m_tagVl = m_tagV.Dot(boostDir);
     m_truthTagVl = m_MCtagV.Dot(boostDir);
-    m_tagVlErr = sqrt(RotErr(2, 2));
-    m_deltaTErr = dtErr;
 
 
     // calculate tagV component and error in the direction orthogonal to the boost
-
     TVector3 oboost(boostDir.Z(), boostDir.Y(), -boostDir.X());
     TMatrixD oRotErr = rotateTensor(oboost, m_tagVErrMatrix);
+    m_tagVolErr = sqrt(oRotErr(2, 2));
 
     m_tagVol = m_tagV.Dot(oboost);
     m_truthTagVol = m_MCtagV.Dot(oboost);
-    m_tagVolErr = sqrt(oRotErr(2, 2));
 
   }
 

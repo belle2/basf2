@@ -159,7 +159,7 @@ namespace Belle2 {
 
     /** performs the fit using the standard algorithm - using all tracks in RoE
     The user can specify a request on the PXD hits left by the tracks*/
-    bool getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits);
+    std::vector<const Particle*> getTagTracks_standardAlgorithm(const Particle* Breco, int nPXDHits) const;
 
     /**
      * Get a list of pions from a list of pions removing the Kshorts
@@ -244,9 +244,4 @@ namespace Belle2 {
     const MCParticle* mcParticle;  /**< mc particle matched to the tag track, for sorting purposes*/
   };
 
-  /**
-   * This is used to sort the tag tracks by rave weight, to have the tracks having the
-   * most significance contribution to the tag vertex fit appearing first
-   */
-  inline bool compare(ParticleAndWeight& a, ParticleAndWeight& b) { return a.weight > b.weight; }
 }

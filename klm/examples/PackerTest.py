@@ -42,8 +42,7 @@ klm_packer = basf2.register_module('KLMPacker')
 
 # Unpacker
 klm_unpacker = basf2.register_module('KLMUnpacker')
-klm_unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')
-klm_unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
+klm_unpacker.param('outputKLMDigitsName', 'KLMDigitsUnpacked')
 
 # Reconstructor
 klm_reconstructor = basf2.register_module('KLMReconstructor')
@@ -65,8 +64,7 @@ main.add_module(g4sim)
 main.add_module(klm_digitizer)
 main.add_module(klm_packer)
 main.add_module(klm_unpacker)
-main.add_module(bklm_reconstructor)
-main.add_module(eklm_reconstructor)
+main.add_module(klm_reconstructor)
 
 main.add_module(output)
 

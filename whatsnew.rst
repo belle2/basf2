@@ -33,6 +33,10 @@ Changes since release-04
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
 
+.. Changes for decfiles package
+
+.. include:: decfiles/doc/whatsnew-since/release-04-02.txt
+
 .. Changes for b2bii here.
 
 .. include:: b2bii/doc/whatsnew-since/release-04-01.txt
@@ -140,11 +144,11 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.KFit`) for fast/simple fits, or TreeFitter (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
+Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 
-.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 
 
 .. rubric:: Tidy up and rename of Helicity variables.

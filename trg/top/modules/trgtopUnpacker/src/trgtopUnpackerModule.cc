@@ -36,7 +36,7 @@ string TRGTOPUnpackerModule::version() const
 //-----------------------------------------------------------------
 
 TRGTOPUnpackerModule::TRGTOPUnpackerModule()
-  : Module::Module(), m_eventNumber(0)
+  : Module::Module(), m_eventNumber(0), m_trigType(0), m_nodeId(0), m_nWords(0)
 {
   // Set module properties
 
@@ -170,6 +170,7 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   //  }
 
   // various test patterns will be used to check the data
+  /* cppcheck-suppress variableScope */
   unsigned int testPattern;
 
   int revoClockLast = -1;

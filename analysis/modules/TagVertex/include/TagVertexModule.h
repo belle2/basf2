@@ -15,12 +15,12 @@
 // DataStore
 #include <framework/database/DBObjPtr.h>
 
-// rave
+// Rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
 
-// kFitter
+// KFit
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
@@ -83,7 +83,7 @@ namespace Belle2 {
     //std::string m_EventType;      /**< Btag decay type */
     std::string m_listName;         /**< Breco particle list name */
     double m_confidenceLevel;       /**< required fit confidence level */
-    std::string m_useMCassociation; /**< No MC assication or standard Breco particle or internal MCparticle association */
+    std::string m_useMCassociation; /**< No MC association or standard Breco particle or internal MCparticle association */
     //std::string m_useFitAlgorithm;    /**< Choose constraint: from Breco or tube in the boost direction w/wo cut */
     std::string m_constraintType;   /**< Choose constraint: noConstraint, IP, tube, boost, (breco) */
     std::string m_trackFindingType;   /**< Choose how to find the tag tracks: standard, standard_PXD */
@@ -131,7 +131,7 @@ namespace Belle2 {
     double m_tagVChi2IP;          /**< IP component of the chi^2 of the tag vertex fit result */
     std::string m_fitAlgo;        /**< Algorithm used for the tag fit (Rave or KFit) */
     bool m_verbose;               /**< choose if you want to print extra infos */
-    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and kfitter) */
+    TMatrixDSym m_pvCov;          /**< covariance matrix of the PV (useful with tube and KFit) */
     TLorentzVector m_tagMomentum; /**< B tag momentum computed from fully reconstructed B sig */
 
 

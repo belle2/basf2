@@ -13,5 +13,6 @@
 #pragma link C++ class Belle2::KLMScintillatorDigitizationParameters+;
 #pragma link C++ class Belle2::KLMStripEfficiency+;
 #pragma link C++ class Belle2::KLMTimeConversion+;
+#pragma link C++ class Belle2::KLMTimeWindow+;
 
 #endif

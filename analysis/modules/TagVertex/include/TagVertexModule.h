@@ -189,13 +189,13 @@ namespace Belle2 {
     /**
      * Fill sorted list of particles into external variable
     */
-    void fillParticles(std::vector<ParticleAndWeight> particleAndWeights);
+    void fillParticles(std::vector<ParticleAndWeight>& particleAndWeights);
 
 
     /**
      * Fill tagV vertex info
     */
-    void fillTagVinfo(TVector3 tagVpos, TMatrixDSym tagVposErr);
+    void fillTagVinfo(const TVector3& tagVpos, const TMatrixDSym& tagVposErr);
 
     /**
      * make the vertex fit on the tag side:

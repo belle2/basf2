@@ -729,7 +729,7 @@ namespace Belle2 {
   }
 
 
-  void TagVertexModule::fillParticles(vector<ParticleAndWeight> particleAndWeights)
+  void TagVertexModule::fillParticles(vector<ParticleAndWeight>& particleAndWeights)
   {
     unsigned n = particleAndWeights.size();
     sort(particleAndWeights.begin(), particleAndWeights.end(),
@@ -746,7 +746,7 @@ namespace Belle2 {
     }
   }
 
-  void TagVertexModule::fillTagVinfo(TVector3 tagVpos, TMatrixDSym tagVposErr)
+  void TagVertexModule::fillTagVinfo(const TVector3& tagVpos, const TMatrixDSym& tagVposErr)
   {
     m_tagV = tagVpos;
 

@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>../TwoTrackPions.dst.root</output>
+  <output>../LowMassTwoTrackPions.dst.root</output>
   <contact>zhouxy@buaa.edu.cn</contact>
 </header>
 """
@@ -119,7 +119,7 @@ add_simulation(main)
 add_reconstruction(main)
 
 # Finally add mdst output
-output_filename = "../TwoTrackPions.dst.root"
+output_filename = "../LowMassTwoTrackPions.dst.root"
 add_mdst_output(main, filename=output_filename)
 
 # generate events

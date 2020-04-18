@@ -417,7 +417,7 @@ def DielectronPlusMissingEnergyList(path):
 
 def TwoTrackLeptonsForLuminosityList(path):
     """
-    Skim list for two track (e+e- to e+e- and e+e- to mu+mu-) events.
+    Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements.
 
     **Skim code**: 18530100
 
@@ -459,13 +459,13 @@ def TwoTrackLeptonsForLuminosityList(path):
     return ['vpho:' + skim_label]
 
 
-def TwoTrackPionsList(path):
+def LowMassTwoTrackList(path):
     """
-    Skim list for two track (e+e- to pi+pi-) events.
+    Skim list for low mass two track (e+e- to pi+pi- and e+e- to K+K-) events.
 
-    **Skim code**: 18520500
+    **Skim code**: 18530200
 
-    **Physics channel**: :math:`e^{+}e^{-} \\to \pi^{+}\pi^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to \pi^{+}\pi^{-}` and `e^{+}e^{-} \\to K^{+}K^{-}`
 
     **Skim category**: physics, dark sector
 
@@ -477,7 +477,7 @@ def TwoTrackPionsList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    skim_label = 'TwoTrackPions'
+    skim_label = 'LowMassTwoTrack'
 
     # Tracks from IP
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'

@@ -708,7 +708,7 @@ namespace Belle2 {
 
         // don't fill a neutron list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
-        if (listPdgCode == Const::neutron.getPDGCode()
+        if (abs(listPdgCode) == Const::neutron.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 

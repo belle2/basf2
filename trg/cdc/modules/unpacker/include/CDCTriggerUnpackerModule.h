@@ -238,13 +238,13 @@ namespace Belle2 {
     CDCTriggerUnpackerModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Delete dynamically allocated variables */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** convert raw data (in B2L buffer to bitstream) */
-    virtual void event();
+    virtual void event() override;
 
     /** small function to rescale the NN output from -1, 1 to output scale */
     std::vector<float> unscaleNNOutput(std::vector<float> input) const;

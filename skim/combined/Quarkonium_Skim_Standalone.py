@@ -28,13 +28,8 @@ ma.inputMdstList('default', fileList, path=skimpath)
 stdPhotons('loose', path=skimpath)
 
 stdPi('loose', path=skimpath)
-stdK('loose', path=skimpath)
 stdE('loose', path=skimpath)
 stdMu('loose', path=skimpath)
-stdPi('all', path=skimpath)
-stdK('all', path=skimpath)
-stdE('all', path=skimpath)
-stdMu('all', path=skimpath)
 
 # ISRpipicc Skim
 from skim.quarkonium import ISRpipiccList

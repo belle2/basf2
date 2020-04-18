@@ -43,7 +43,7 @@ TrgEclMapping::getTCIdFromXtalId(int XtalId)
   // 'XtalId' is Xtal ID
   // 'XtalId0' is 'XtalId' - 1
   int XtalId0 = XtalId - 1;
-  int e_o = 0; // tmporal variable showing even(0) or odd(1).
+  int e_o; // tmporal variable showing even(0) or odd(1).
   if (XtalId0 < 1152) {
     //
     // forward-endcap [Xtal=1-1152, TC=1-80(80)]

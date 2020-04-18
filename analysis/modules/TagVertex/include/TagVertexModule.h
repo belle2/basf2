@@ -142,14 +142,14 @@ namespace Belle2 {
     bool doVertexFitForBTube(const Particle* mother) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
-    bool findConstraint(const Particle* Breco, double cut);
+    std::pair<TVector3, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
 
     /** calculate the standard constraint for the vertex fit on the tag side*/
-    bool findConstraintBoost(double cut, double shiftAlongBoost = -2000.);
+    std::pair<TVector3, TMatrixDSym> findConstraintBoost(double cut, double shiftAlongBoost = -2000.) const;
 
     /** calculate constraint for the vertex fit on the tag side using the B tube (cylinder along
     the expected BTag line of flights */
-    bool findConstraintBTube(const Particle* Breco, double cut);
+    std::pair<TVector3, TMatrixDSym> findConstraintBTube(const Particle* Breco, double cut);
 
     /** get the vertex of the MC B particle associated to Btag. It works anly with signal MC */
     void BtagMCVertex(const Particle* Breco);
@@ -187,12 +187,24 @@ namespace Belle2 {
     bool makeGeneralFitRave();
 
     /**
+     * Fill sorted list of particles into external variable
+    */
+    void fillParticles(std::vector<ParticleAndWeight> particleAndWeights);
+
+
+    /**
+     * Fill tagV vertex info
+    */
+    void fillTagVinfo(TVector3 tagVpos, TMatrixDSym tagVposErr);
+
+    /**
      * make the vertex fit on the tag side:
      * KFit
      * tracks coming from Ks removed
      * all other tracks used
      */
     bool makeGeneralFitKFit();
+
 
     /**
      * calculate DeltaT and MC-DeltaT (rec - tag) in ps from Breco and Btag vertices

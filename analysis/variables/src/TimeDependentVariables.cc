@@ -44,10 +44,10 @@ namespace Belle2 {
     using RotationTools::rotateTensor;
     using RotationTools::rotateTensorInv;
 
-    static const TVector3 vecNaN(std::numeric_limits<float>::quiet_NaN(),
-                                 std::numeric_limits<float>::quiet_NaN(),
-                                 std::numeric_limits<float>::quiet_NaN());
-    static const double realNaN = std::numeric_limits<float>::quiet_NaN();
+    static const TVector3 vecNaN(std::numeric_limits<double>::quiet_NaN(),
+                                 std::numeric_limits<double>::quiet_NaN(),
+                                 std::numeric_limits<double>::quiet_NaN());
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 

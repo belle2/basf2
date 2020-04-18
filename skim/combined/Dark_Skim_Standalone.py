@@ -16,7 +16,7 @@ import skimExpertFunctions as expert
 
 darkskimpath = b2.Path()
 
-fileList = expert.get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=darkskimpath)
 
 charged.stdMu('all', path=darkskimpath)
@@ -31,7 +31,7 @@ expert.add_skim('GammaGammaControlKLMDark', dark.GammaGammaControlKLMDarkList(pa
 expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('TwoTrackLeptonsForLuminosity', dark.TwoTrackLeptonsForLuminosityList(path=darkskimpath), path=darkskimpath)
-expert.add_skim('TwoTrackPions', dark.TwoTrackPionsList(path=darkskimpath), path=darkskimpath)
+expert.add_skim('LowMassTwoTrack', dark.LowMassTwoTrackList(path=darkskimpath), path=darkskimpath)
 
 expert.setSkimLogging(darkskimpath, ['ParticleCombiner'])
 b2.process(darkskimpath)

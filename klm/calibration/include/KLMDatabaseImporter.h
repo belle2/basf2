@@ -16,6 +16,7 @@
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 
@@ -59,6 +60,12 @@ namespace Belle2 {
      * @param[in] timeConversion Time conversion parameters.
      */
     void importTimeConversion(const KLMTimeConversion* timeConversion);
+
+    /**
+     * Import KLM time window parameters into the database
+     * @param[in] timeWindow Time window parameters.
+     */
+    void importTimeWindow(KLMTimeWindow* inputWindow);
 
     /**
      * Load strip efficiencies.

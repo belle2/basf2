@@ -192,12 +192,18 @@ if (
 # Utility functions
 
 
+def create_fbdt_option_string(fast_bdt_option):
+    return "_nTrees" + str(fast_bdt_option[0]) + "_nCuts" + str(fast_bdt_option[1]) + "_nLevels" + \
+                           str(fast_bdt_option[2]) + "_shrin" + str(int(round(100*fast_bdt_option[3], 0)))
+
+
 def my_basf2_mva_teacher(
     records_files,
     tree_name,
     weightfile_identifier,
     target_variable="truth",
     exclude_variables=[],
+    fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
 ):
     """
     My custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
@@ -252,6 +258,10 @@ def my_basf2_mva_teacher(
     general_options.m_target_variable = target_variable
     fastbdt_options = basf2_mva.FastBDTOptions()
 
+    fastbdt_options.m_nTrees = fast_bdt_option[0]
+    fastbdt_options.m_nCuts = fast_bdt_option[1]
+    fastbdt_options.m_nLevels = fast_bdt_option[2]
+    fastbdt_options.m_shrinkage = fast_bdt_option[3]
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
 
@@ -642,6 +652,8 @@ class TrackQETeacherBaseTask(Basf2Task):
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
     exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
 
     @property
     def weightfile_identifier_basename(self):
@@ -653,12 +665,14 @@ class TrackQETeacherBaseTask(Basf2Task):
             "Teacher Task must define a static weightfile_identifier"
         )
 
-    def get_weightfile_xml_identifier(self):
+    def get_weightfile_xml_identifier(self, fbdt_option):
         """
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
         """
-        return self.weightfile_identifier_basename + ".weights.xml"
+
+        weightfile_details = create_fbdt_option_string(fbdt_option)
+        return self.weightfile_identifier_basename + weightfile_details + ".weights.xml"
 
     @property
     def tree_name(self):
@@ -688,23 +702,23 @@ class TrackQETeacherBaseTask(Basf2Task):
             "Teacher Task must define a data collection task to require "
         )
 
-    def requires(self):
-        """
-        Generate list of luigi Tasks that this Task depends on.
-        """
-        yield self.data_collection_task(
-            num_processes=MasterTask.num_processes,
-            n_events=self.n_events_training,
-            experiment_number=self.experiment_number,
-            random_seed=self.random_seed,
-        )
+    # def requires(self):
+    #    """
+    #    Generate list of luigi Tasks that this Task depends on.
+    #    """
+    #    yield self.data_collection_task(
+    #        num_processes=MasterTask.num_processes,
+    #        n_events=self.n_events_training,
+    #        experiment_number=self.experiment_number,
+    #        random_seed=self.random_seed,
+    #    )
 
     def output(self):
         """
         Generate list of output files that the task should produce.
         The task is considered finished iff the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_xml_identifier())
+        yield self.add_to_output(self.get_weightfile_xml_identifier(self.fast_bdt_option))
 
     def process(self):
         """
@@ -714,16 +728,19 @@ class TrackQETeacherBaseTask(Basf2Task):
         This is the main process that is dispatched by the ``run`` method that
         is inherited from ``Basf2Task``.
         """
-        records_files = self.get_input_file_names(
-            self.data_collection_task.records_file_name
-        )
+        # records_files = self.get_input_file_names(
+        #    self.data_collection_task.records_file_name
+        # )
+
+        records_files = ['datafiles/10k_events/cdc_qe_records.root']
 
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name=self.tree_name,
-            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier()),
+            weightfile_identifier=self.get_output_file_name(self.get_weightfile_xml_identifier(self.fast_bdt_option)),
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
 
@@ -1086,6 +1103,8 @@ class TrackQEEvaluationBaseTask(Task):
     experiment_number = b2luigi.IntParameter()
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter(default="truth")
+    #: Hyperparameter options for the FastBDT algorithm.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
 
     @property
     def teacher_task(self) -> TrackQETeacherBaseTask:
@@ -1114,20 +1133,22 @@ class TrackQEEvaluationBaseTask(Task):
             n_events_training=self.n_events_training,
             experiment_number=self.experiment_number,
             training_target=self.training_target,
+            fast_bdt_option=self.fast_bdt_option,
         )
-        yield self.data_collection_task(
-            num_processes=MasterTask.num_processes,
-            n_events=self.n_events_testing,
-            experiment_number=self.experiment_number,
-            random_seed="testdata_0",
-        )
+        # yield self.data_collection_task(
+        #    num_processes=MasterTask.num_processes,
+        #    n_events=self.n_events_testing,
+        #    experiment_number=self.experiment_number,
+        #    random_seed="testdata_0",
+        # )
 
     def output(self):
         """
         Generate list of output files that the task should produce.
         The task is considered finished iff the outputs all exist.
         """
-        evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + ".pdf"
+        weightfile_details = create_fbdt_option_string(self.fast_bdt_option)
+        evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".pdf"
         yield self.add_to_output(evaluation_pdf_output)
 
     @b2luigi.on_temporary_files
@@ -1138,16 +1159,22 @@ class TrackQEEvaluationBaseTask(Task):
         The MVA weight file created from training on the training data set is
         evaluated on separate test data.
         """
-        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier_basename + ".pdf"
+        weightfile_details = create_fbdt_option_string(self.fast_bdt_option)
+        evaluation_pdf_output_basename = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".pdf"
 
         evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
 
         cmd = [
             "basf2_mva_evaluate.py",
             "--identifiers",
-            self.get_input_file_names(self.teacher_task.get_weightfile_xml_identifier(self.teacher_task))[0],
+            self.get_input_file_names(
+                self.teacher_task.get_weightfile_xml_identifier(
+                    self.teacher_task,
+                    fbdt_option=self.fast_bdt_option))[0],
+            # self.get_input_file_names(self.teacher_task.get_weightfile_xml_identifier(self.teacher_task))[0],
             "--datafiles",
-            self.get_input_file_names(self.data_collection_task.records_file_name)[0],
+            # self.get_input_file_names(self.data_collection_task.records_file_name)[0],
+            "datafiles/1k_events/cdc_qe_records.root",
             "--treename",
             self.teacher_task.tree_name,
             "--outputfile",
@@ -1727,18 +1754,24 @@ class MasterTask(b2luigi.WrapperTask):
             # "truth_track_is_matched"  # treats clones as backround, only best matched CDC tracks are true
         ]
 
+        fast_bdt_options = []
+        for i in range(0, 300, 100):  # 1100, 100):
+            for j in range(0, 1):  # 5):
+                for k in range(0, 1):  # 4):
+                    fast_bdt_options.append([100 + i, 8, 3+j, 0.05+k*0.05])
+
         experiment_numbers = b2luigi.get_setting("experiment_numbers")
 
         # iterate over all possible combinations of parameters from the above defined parameter lists
-        for experiment_number, exclude_variables, cdc_training_target in itertools.product(
-                experiment_numbers, exclude_variables_combinations, cdc_training_targets
+        for experiment_number, exclude_variables, cdc_training_target, fast_bdt_option in itertools.product(
+                experiment_numbers, exclude_variables_combinations, cdc_training_targets, fast_bdt_options
         ):
-            yield QEWeightsLocalDBCreatorTask(
-                n_events_training=self.n_events_training,
-                experiment_number=experiment_number,
-                exclude_variables=exclude_variables,
-                cdc_training_target=cdc_training_target,
-            )
+            # yield QEWeightsLocalDBCreatorTask(
+            #    n_events_training=self.n_events_training,
+            #    experiment_number=experiment_number,
+            #    exclude_variables=exclude_variables,
+            #    cdc_training_target=cdc_training_target,
+            # )
 
             if b2luigi.get_setting("run_validation_tasks", default=True):
                 yield FullTrackQEValidationPlotsTask(
@@ -1763,24 +1796,25 @@ class MasterTask(b2luigi.WrapperTask):
             if b2luigi.get_setting("run_mva_evaluate", default=True):
                 # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
                 # requires a latex installation to work
-                yield FullTrackQEEvaluationTask(
-                    exclude_variables=exclude_variables,
-                    cdc_training_target=cdc_training_target,
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    experiment_number=experiment_number,
-                )
+                # yield FullTrackQEEvaluationTask(
+                #    exclude_variables=exclude_variables,
+                #    cdc_training_target=cdc_training_target,
+                #    n_events_training=self.n_events_training,
+                #    n_events_testing=self.n_events_testing,
+                #    experiment_number=experiment_number,
+                # )
                 yield CDCTrackQEEvaluationTask(
                     training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
+                    fast_bdt_option=fast_bdt_option,
                     experiment_number=experiment_number,
                 )
-                yield VXDTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    experiment_number=experiment_number,
-                )
+                # yield VXDTrackQEEvaluationTask(
+                #    n_events_training=self.n_events_training,
+                #    n_events_testing=self.n_events_testing,
+                #    experiment_number=experiment_number,
+                # )
 
 
 if __name__ == "__main__":

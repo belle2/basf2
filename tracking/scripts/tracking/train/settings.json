@@ -2,10 +2,10 @@
     "result_path": "output/",
     "n_events_training": 10000,
     "n_events_testing": 1000,
-    "workers": 1,
+    "workers": 500,
     "basf2_processes_per_worker": 0,
     "run_mva_evaluate": true,
-    "run_validation_tasks": true,
+    "run_validation_tasks": false,
     "experiment_numbers": [1003],
     "bkgfiles_by_exp": {
         "0": "/sw/belle2/bkg.rel4/",

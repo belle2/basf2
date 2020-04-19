@@ -548,7 +548,8 @@ namespace Belle2 {
 
   }
 
-  static double getProperLifeTime(const MCParticle* mc) //in ps
+  // proper life time, i.e. in the rest system (in ps)
+  static double getProperLifeTime(const MCParticle* mc)
   {
     double beta = mc->getMomentum().Mag() / mc->getEnergy();
     return 1e3 * mc->getLifetime() * sqrt(1 - pow(beta, 2));
@@ -663,10 +664,7 @@ namespace Belle2 {
         fitParticles.push_back(ROEParticle);
       }
     }
-    //if (fitParticles.size() == 0) return false;
-    //m_tagParticles = fitParticles;
     return fitParticles;
-    //return true;
   }
 
   vector<ParticleAndWeight> TagVertexModule::getParticlesWithoutKS(const vector<const Particle*>& tagParticles,

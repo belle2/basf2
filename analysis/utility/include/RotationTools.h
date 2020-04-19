@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
     /**
-     * Rotate tensor orgMat, where the rotation is described by a transofrmation
+     * Rotate tensor orgMat, where the rotation is described by a transformation
      * which transform vector (0,0,1) -> vTo
      * @param[in] vTo  vector defining rotation
      * @param[in] orgMat tensor before rotation
@@ -78,7 +78,7 @@ namespace Belle2 {
     }
 
     /**
-     * Rotate tensor orgMat, where the rotation is described by a transofrmation
+     * Rotate tensor orgMat, where the rotation is described by a transformation
      * which transform vector vTo -> (0,0,1)
      * @param[in] vTo  vector defining rotation
      * @param[in] orgMat tensor before rotation

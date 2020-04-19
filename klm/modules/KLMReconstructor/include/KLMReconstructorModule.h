@@ -95,19 +95,13 @@ namespace Belle2 {
      */
     double getTime(KLMDigit* d, double dist);
 
-    /**
-     * Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits.
-     */
+    /** Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits. */
     double m_CoincidenceWindow;
 
-    /**
-     * Nominal time of prompt BKLMHit2ds.
-     */
+    /** Nominal time of prompt BKLMHit2ds. */
     double m_PromptTime;
 
-    /**
-     * Half-width of the time window relative to the prompt time for BKLMHit2ds.
-     */
+    /** Half-width of the time window relative to the prompt time for BKLMHit2ds. */
     double m_PromptWindow;
 
     /** KLM time window. */

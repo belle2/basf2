@@ -62,10 +62,10 @@ namespace Belle2 {
     void importTimeConversion(const KLMTimeConversion* timeConversion);
 
     /**
-     * Import KLM time window parameters into the database
-     * @param[in] timeWindow Time window parameters.
+     * Import KLM time window parameters.
+     * @param[in] timeWindow Time window.
      */
-    void importTimeWindow(KLMTimeWindow* inputWindow);
+    void importTimeWindow(KLMTimeWindow* timeWindow);
 
     /**
      * Load strip efficiencies.

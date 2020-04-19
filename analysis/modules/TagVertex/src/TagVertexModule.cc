@@ -297,7 +297,11 @@ namespace Belle2 {
     else if (m_constraintType == "tube")  tie(m_constraintCenter, m_constraintCov) = findConstraintBTube(Breco, 1000 * cut);
     else if (m_constraintType == "boost") tie(m_constraintCenter, m_constraintCov) = findConstraintBoost(cut * 200000.);
     else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
-    //else if (m_constraintType == "noConstraint") ok = true;
+    else if (m_constraintType == "noConstraint") m_constraintCenter = TVector3(); //zero vector
+    else  {
+      B2ERROR("TagVertex: Not valid constraintType selected");
+      return false;
+    }
 
     if (m_constraintCenter == vecNaN) {
       B2ERROR("TagVertex: No correct fit constraint");
@@ -424,10 +428,7 @@ namespace Belle2 {
     TLorentzVector vecLab = PCmsLabTransform::cmsToLab(vec);
     TMatrixD Tube = rotateTensor(vecLab.Vect(), TubeZ);
 
-    //m_constraintCov.ResizeTo(3, 3);
-    //m_constraintCov = toSymMatrix(Tube);
-    //m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
-
+    // Standard algorithm needs no shift
     return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
 
   }
@@ -508,9 +509,6 @@ namespace Belle2 {
       }
     }
 
-    //m_constraintCov.ResizeTo(3, 3);
-    //m_constraintCov = toSymMatrix(pvNew);
-
     if (m_verbose) {
       B2DEBUG(10, "IPTube covariance: " << printMatrix(pvNew));
     }
@@ -536,8 +534,6 @@ namespace Belle2 {
 
     TMatrixD Tube = rotateTensor(boostDir, beamSpotCov); //BeamSpot in CMS
 
-    //m_constraintCov.ResizeTo(3, 3);
-    //m_constraintCov = toSymMatrix(Tube);
     TVector3 constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
@@ -549,8 +545,6 @@ namespace Belle2 {
     }
 
     return make_pair(constraintCenter,   toSymMatrix(Tube));
-    //return true;
-
 
   }
 

@@ -90,6 +90,7 @@ RegisteredSkims = [
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),
+    ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
@@ -249,13 +250,14 @@ An instance of the `SkimRegistry`, containing the information skims defined in
 #: A dict listing which standalone skims are included the combined skim scripts
 # DELETE: Will be made obselete by CombinedSkim class & autogeneration of combined skims
 combined_skims = {
-    'BtoCharm1': [
-        'BtoD0h_Kshh', 'BtoD0h_hh', 'BtoD0h_Kspi0', 'BtoD0h_Kspipipi0'
+    "BtoCharm1": [
+        "BtoD0h_hh", "BtoD0h_Kshh", "BtoD0h_Kspi0", "BtoD0h_Kspipipi0", "B0toDpi_Kspi",
+        "B0toDrho_Kspi", "B0toDpi_Kpipi", "B0toDrho_Kpipi",
     ],
-
-    'BtoCharm2': [
-        'BtoD0h_Kpi', 'BtoD0h_Kpipipi_Kpipi0', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi',
-        'B0toDstarPi_D0pi_Kpipipi_Kpipi0'
+    "BtoCharm2": [
+        "BtoD0h_Kpipipi_Kpipi0", "B0toDstarPi_D0pi_Kpipipi_Kpipi0",
+        "B0toDstarRho_D0pi_Kpipipi_Kpipi0", "BtoD0rho_Kpipipi_Kpipi0", "BtoD0h_Kpi",
+        "B0toDstarPi_D0pi_Kpi", "BtoD0rho_Kpi", "B0toDstarRho_D0pi_Kpi",
     ],
     'CharmHigh': [
         'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
@@ -268,7 +270,7 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
+        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
         'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [

@@ -235,12 +235,15 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
   //
   //
   int nBin = 8000 / (TimeWindow / 2) ; //8000/125
-  double WindowStart = 0;
-  double WindowEnd = 0;
+  /* cppcheck-suppress variableScope */
+  double WindowStart;
+  /* cppcheck-suppress variableScope */
+  double WindowEnd;
   double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
-
-  double check_window_start = 0;
-  double check_window_end = 0;
+  /* cppcheck-suppress variableScope */
+  double check_window_start;
+  /* cppcheck-suppress variableScope */
+  double check_window_end;
 
 
   for (int iBin = 0 ; iBin < nBin; iBin ++) {
@@ -675,9 +678,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   phiringsum.resize(17, 0);
   setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-  double E_br = 0;
-  double E_fwd = 0;
-  double E_bwd = 0;
+  double E_br;
+  double E_fwd;
+  double E_bwd;
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;

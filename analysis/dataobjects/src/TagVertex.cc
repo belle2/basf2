@@ -68,6 +68,11 @@ float TagVertex::getMCDeltaT()
   return m_MCdeltaT;
 }
 
+float TagVertex::getMCDeltaTapprox()
+{
+  return m_MCdeltaTapprox;
+}
+
 int TagVertex::getFitType()
 {
   return m_FitType;
@@ -234,6 +239,11 @@ void TagVertex::setMCTagBFlavor(int MCTagBFlavor)
 void TagVertex::setMCDeltaT(float MCDeltaT)
 {
   m_MCdeltaT = MCDeltaT;
+}
+
+void TagVertex::setMCDeltaTapprox(float MCDeltaTapprox)
+{
+  m_MCdeltaTapprox = MCDeltaTapprox;
 }
 
 void TagVertex::setFitType(float FitType)

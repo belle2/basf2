@@ -58,7 +58,7 @@ namespace Belle2 {
     /**
      * Useful constructor
      */
-    TOPAssociatedPDF(int PDG): m_PDG(PDG)
+    explicit TOPAssociatedPDF(int PDG): m_PDG(PDG)
     {}
 
     /**

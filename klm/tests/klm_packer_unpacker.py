@@ -16,7 +16,7 @@ class PackerUnpackerTest(basf2.Module):
     equal
     """
 
-    def sort_bklm_digits(self, unsortedPyStoreArray):
+    def sort_klm_digits(self, unsortedPyStoreArray):
         """
         Use some digit information to sort the digits
         Returns a python-list containing the sorted digits
@@ -29,28 +29,10 @@ class PackerUnpackerTest(basf2.Module):
         return sorted(
             py_list,
             key=lambda x: (
+                x.getSubdetector(),
                 x.getSection(),
                 x.getSector(),
                 x.getLayer(),
-                x.getStrip())
-        )
-
-    def sort_eklm_digits(self, unsortedPyStoreArray):
-        """
-        Use some digit information to sort the digits
-        Returns a python-list containing the sorted digits
-        """
-
-        # first convert to a python-list to be able to sort
-        py_list = [x for x in unsortedPyStoreArray]
-
-        # sort via a hierachy of sort keys
-        return sorted(
-            py_list,
-            key=lambda x: (
-                x.getSection(),
-                x.getLayer(),
-                x.getSector(),
                 x.getPlane(),
                 x.getStrip())
         )
@@ -61,63 +43,34 @@ class PackerUnpackerTest(basf2.Module):
         """
 
         # direct from simulation
-        bklm_digits = Belle2.PyStoreArray("BKLMDigits")
-        eklm_digits = Belle2.PyStoreArray("EKLMDigits")
+        klm_digits = Belle2.PyStoreArray("KLMDigits")
         # processed by packer and unpacker
-        bklm_digits_unpacked = Belle2.PyStoreArray("BKLMDigitsUnpacked")
-        eklm_digits_unpacked = Belle2.PyStoreArray("EKLMDigitsUnpacked")
+        klm_digits_unpacked = Belle2.PyStoreArray("KLMDigitsUnpacked")
 
         # sort digits
-        bklm_digits_sorted = self.sort_bklm_digits(bklm_digits)
-        bklm_digits_unpacked_sorted = self.sort_bklm_digits(bklm_digits_unpacked)
-        eklm_digits_sorted = self.sort_eklm_digits(eklm_digits)
-        eklm_digits_unpacked_sorted = self.sort_eklm_digits(eklm_digits_unpacked)
+        klm_digits_sorted = self.sort_klm_digits(klm_digits)
+        klm_digits_unpacked_sorted = self.sort_klm_digits(klm_digits_unpacked)
 
-        # check the sizes
-        if not len(bklm_digits_sorted) == len(bklm_digits_unpacked_sorted):
-            basf2.B2FATAL("BKLMDigits: size not equal after packing and unpacking")
-        if not len(eklm_digits_sorted) == len(eklm_digits_unpacked_sorted):
-            basf2.B2FATAL("EKLMDigits: size not equal after packing and unpacking")
-
+        # check the size
+        if not len(klm_digits_sorted) == len(klm_digits_unpacked_sorted):
+            basf2.B2FATAL("KLMDigits: size not equal after packing and unpacking")
         # check all quantities between the direct and the packed/unpacked
-        for i in range(len(bklm_digits_sorted)):
+        for i in range(len(klm_digits_sorted)):
 
-            digit = bklm_digits_sorted[i]
-            digit_unpacked = bklm_digits_unpacked_sorted[i]
+            digit = klm_digits_sorted[i]
+            digit_unpacked = klm_digits_unpacked_sorted[i]
 
             # check the content of the digit
-            # the following content is not consistent due to incomplete mapping file,  data/geometry/BKLMElectronicsMapping.xml
+            assert digit.getSubdetector() == digit_unpacked.getSubdetector()
             assert digit.getSection() == digit_unpacked.getSection()
             assert digit.getSector() == digit_unpacked.getSector()
             assert digit.getLayer() == digit_unpacked.getLayer()
-            assert digit.getStrip() == digit_unpacked.getStrip()
-            assert digit.isPhiReadout() == digit_unpacked.isPhiReadout()
-            assert digit.inRPC() == digit_unpacked.inRPC()
-            assert digit.getCTime() == digit_unpacked.getCTime()
-            assert digit.getCharge() == digit_unpacked.getCharge()
-            assert digit.isAboveThreshold() == digit_unpacked.isAboveThreshold()
-            # assert digit.getModuleID() == digit_unpacked.getModuleID()
-            # assert digit.getTime() == digit_unpacked.getTime()
-            # assert digit.getNPixel() == digit_unpacked.getNPixel()
-            # assert digit.getEDep() == digit_unpacked.getEDep()
-
-        for i in range(len(eklm_digits_sorted)):
-
-            digit = eklm_digits_sorted[i]
-            digit_unpacked = eklm_digits_unpacked_sorted[i]
-
-            # check the content of the digit
-            # From EKLMHitBase
-            assert digit.getSection() == digit_unpacked.getSection()
-            assert digit.getLayer() == digit_unpacked.getLayer()
-            assert digit.getSector() == digit_unpacked.getSector()
-            # assert digit.getEDep() == digit_unpacked.getEDep()
-            # assert digit.getTime() == digit_unpacked.getTime()
-            # From EKLMDigit
             assert digit.getPlane() == digit_unpacked.getPlane()
             assert digit.getStrip() == digit_unpacked.getStrip()
+            assert digit.inRPC() == digit_unpacked.inRPC()
             assert digit.getCharge() == digit_unpacked.getCharge()
             assert digit.getCTime() == digit_unpacked.getCTime()
+            assert digit.getTDC() == digit_unpacked.getTDC()
             assert digit.getFitStatus() == digit_unpacked.getFitStatus()
 
 
@@ -140,8 +93,7 @@ klm_packer = basf2.register_module('KLMPacker')
 main.add_module(klm_packer)
 
 unpacker = basf2.register_module('KLMUnpacker')
-unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')
-unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
+unpacker.param('outputKLMDigitsName', 'KLMDigitsUnpacked')
 main.add_module(unpacker)
 
 main.add_module(PackerUnpackerTest())

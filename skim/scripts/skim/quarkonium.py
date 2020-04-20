@@ -48,8 +48,7 @@ def EtabList(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5', path=path)
-    ma.applyCuts('gamma:hard', 'foxWolframR2 < 0.995', path=path)
+    ma.cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5 and foxWolframR2 < 0.995', path=path)
 
     # the requirement of 7 < M(eta_b) < 10 GeV/c2
     Etabcuts = 'M > 7 and M < 10'
@@ -99,7 +98,7 @@ def UpsilonList(path):
     # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
     ma.reconstructDecay('Upsilon:ee -> e+:loose e-:loose', 'M > 8', path=path)
     ma.reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', 'M > 8', path=path)
-    ma.copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
+    ma.copyLists('Upsilon:ll', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
 
     # require foxWolframR2 < 0.995
     ma.fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
@@ -117,7 +116,7 @@ def UpsilonList(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyCuts('Upsilon:all', 'foxWolframR2 < 0.995', path=path)
+    ma.cutAndCopyList('Upsilon:all', 'Upsilon:ll', 'foxWolframR2 < 0.995', path=path)
 
     # Y(1S,2S) with pi+ or photon are reconstructed
     Upsilon_Channels = ['Upsilon:all pi+:loose',
@@ -128,7 +127,7 @@ def UpsilonList(path):
 
     # reconstruct the decay channel
     for chID, channel in enumerate(Upsilon_Channels):
-        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path)
+        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path, allowChargeViolation=True)
         UpsilonList.append('junction:all' + str(chID))
 
     # reture the list

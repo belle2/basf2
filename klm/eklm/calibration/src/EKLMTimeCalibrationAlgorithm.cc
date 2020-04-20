@@ -12,7 +12,7 @@
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
 
 /* ROOT headers. */
@@ -62,8 +62,7 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   std::vector<struct Event>::iterator it;
   EKLMTimeCalibration* calibration = new EKLMTimeCalibration();
   EKLMTimeCalibrationData calibrationData;
-  const EKLM::ElementNumbersSingleton& elementNumbers =
-    EKLM::ElementNumbersSingleton::Instance();
+  const EKLMElementNumbers& elementNumbers = EKLMElementNumbers::Instance();
   maxStrip = elementNumbers.getMaximalStripGlobalNumber();
   bool* calibrateStrip;
   TH1F* h, *h2;

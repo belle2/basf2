@@ -112,7 +112,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[

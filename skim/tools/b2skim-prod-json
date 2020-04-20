@@ -676,7 +676,7 @@ def make_request_dict(
         "SteeringFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
-            {"SkimDecayMode": encodeSkimName(individualSkim), "DataLevel": "udst"}
+            {"": individualSkim, "SkimDecayMode": encodeSkimName(individualSkim), "DataLevel": "udst"}
             for individualSkim in individualSkims
         ],
     }

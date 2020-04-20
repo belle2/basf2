@@ -46,7 +46,7 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumu_2trk"));
+           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("MuPListName", m_muPListName, "Name of the muon particle list", std::string("mu+:physMiraBelle"));
 }
 

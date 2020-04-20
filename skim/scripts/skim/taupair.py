@@ -186,8 +186,8 @@ def TauLFVList(flag=1, path=None):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:merged K_S0:merged',
-                        'mu-:loose K_S0:merged K_S0:merged'
+                        'e+:loose K_S0:merged K_S0:merged',
+                        'mu+:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
@@ -207,7 +207,15 @@ def TauLFVList(flag=1, path=None):
     tau_lll_list = []
     for chID, channel in enumerate(tau_lll_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay(
+                'tau+:LFV_lll' +
+                str(chID) +
+                ' -> ' +
+                channel,
+                tauLFVCuts,
+                chID,
+                path=path,
+                allowChargeViolation=True)
         tau_lll_list.append('tau+:LFV_lll' + str(chID))
 
     tau_lP0_list = []

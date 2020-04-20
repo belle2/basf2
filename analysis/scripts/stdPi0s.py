@@ -13,6 +13,7 @@
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import KFit
+from basf2 import B2WARNING
 
 
 def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
@@ -35,6 +36,10 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
         listtype (str): name of standard list
         path (basf2.Path): modules are added to this path
     """
+
+    B2WARNING("stdPi0s is loading \"Jan2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
+              " page for most up-to-date pi0 recommendtions.")
+
     if listtype == 'all':
         stdPhotons('all', path)
         ma.reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, True, path)

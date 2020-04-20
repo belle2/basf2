@@ -80,6 +80,7 @@ namespace Belle2 {
     /// the geometry
     VXD::GeoCache& m_vxdGeometry;
 
+    std::string m_ntupleName; ///< name output file
     std::string m_pxdClustersName; ///< name of the store array of pxd clusters
     std::string m_tracksName; ///< name of the store array of tracks
     std::string m_recoTracksName; ///< name of the store array of recotracks

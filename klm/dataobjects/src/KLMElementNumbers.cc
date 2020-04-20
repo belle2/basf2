@@ -21,7 +21,7 @@ using namespace Belle2;
 
 KLMElementNumbers::KLMElementNumbers()
 {
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMElementNumbers::~KLMElementNumbers()
@@ -69,7 +69,7 @@ uint16_t KLMElementNumbers::channelNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  channel = m_ElementNumbersEKLM->stripNumber(
+  channel = m_eklmElementNumbers->stripNumber(
               section, layer, sector, plane, strip);
   return channel;
 }
@@ -120,7 +120,7 @@ void KLMElementNumbers::channelNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->stripNumberToElementNumbers(
+    m_eklmElementNumbers->stripNumberToElementNumbers(
       localChannel, section, layer, sector, plane, strip);
   }
 }
@@ -141,7 +141,7 @@ uint16_t KLMElementNumbers::planeNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  planeGlobal = m_ElementNumbersEKLM->planeNumber(
+  planeGlobal = m_eklmElementNumbers->planeNumber(
                   section, layer, sector, plane);
   return planeGlobal;
 }
@@ -171,7 +171,7 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  module = m_ElementNumbersEKLM->sectorNumber(section, layer, sector);
+  module = m_eklmElementNumbers->sectorNumber(section, layer, sector);
   return module;
 }
 
@@ -200,7 +200,7 @@ void KLMElementNumbers::moduleNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->sectorNumberToElementNumbers(
+    m_eklmElementNumbers->sectorNumberToElementNumbers(
       localModule, section, layer, sector);
   }
 }
@@ -229,7 +229,7 @@ uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
 uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
 {
   uint16_t sect;
-  sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(section, sector);
+  sect = m_eklmElementNumbers->sectorNumberKLMOrder(section, sector);
   return sect;
 }
 

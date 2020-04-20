@@ -3,7 +3,7 @@
 
 from basf2 import *
 from geometry import check_components
-from analysisDQM import add_analysis_dqm
+from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care"):
@@ -229,6 +229,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if dqm_mode in ["dont_care", "filtered"]:
         # PhysicsObjectsDQM
         add_analysis_dqm(path)
+        add_mirabelle_dqm(path)
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Upgrade of the cooling system have been done after phase 2 (in september - november 2018). -->
+<!-- This file contain information about FEB cooling bodies. -->
+<!-- More information one can find here : -->
+<!-- https://kds.kek.jp/indico/event/28886/session/2/contribution/7/material/slides/0.pdf -->
+<!-- 035_28.09.2018_ARICH_cooling_system_upgrade_01 -->
+<!-- https://kds.kek.jp/indico/event/29726/session/0/contribution/1/material/slides/0.pdf -->
+<!-- 046_07.12.2018_ARICH_cooling_system_simulation_BASF2_02_burmist -->
+<febcoolingv2 desc="FEB cooling parameters">
+  <smallSquareSize desc="Size of the small square" unit="mm">20.5</smallSquareSize>
+  <smallSquareThickness desc="Thickness of the small square" unit="mm">1</smallSquareThickness>
+  <bigSquareSize desc="Size of the big square" unit="mm">32.4</bigSquareSize>
+  <bigSquareThickness desc="Thickness of the big square" unit="mm">1</bigSquareThickness>
+  <rectangleL desc="Length of the rectangle" unit="mm">31.8</rectangleL>
+  <rectangleW desc="Width of the rectangle" unit="mm">14.2</rectangleW>
+  <rectangleThickness desc="Thickness of the rectangle" unit="mm">0.5</rectangleThickness>
+  <rectangleDistanceFromCenter desc="Distance from center of the rectangle" unit="mm">27.0</rectangleDistanceFromCenter>
+  <!-- Feb cooling configuration/geometry ID -->
+  <!-- 0 -> Not installed -->
+  <!-- 1 -> Default position -->
+  <!-- 2 -> Rotated by 90 degree -->
+  <febcoolingv2GeometryID>
+    1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 2 1 1 1 1 1 1 2
+    1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 2
+    1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 2
+    1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 2
+    1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 2
+    1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 2
+    2 0 1 0 1 1 1 1 1 1 0 0 2 0 0 1 1 1 1 1 1 1 0 0 0 2 1 1 1 0 0 1 1 1 0 0 1 1 2 0 0 1 0 0 1 1 1 1 0 0 0 2 1 1 0 0 1 1 1 1 1 0 0 1 2 1 0 0 1 1 1 1 1 1 0 2 1 2    
+  </febcoolingv2GeometryID>
+</febcoolingv2>

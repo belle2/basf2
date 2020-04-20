@@ -98,6 +98,7 @@ class _Registry:
 
         # --- WG8: Dark matter searches and tau physics ---
         ("18020100", "dark", "SinglePhotonDark"),
+        ("18020200", "dark", "GammaGammaControlKLMDark"),
         ("18020300", "dark", "ALP3Gamma"),
         ("18360100", "taupair", "TauLFV"),
         ("18520100", "dark", "DimuonPlusMissingEnergy"),
@@ -229,7 +230,7 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
+        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
         'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [

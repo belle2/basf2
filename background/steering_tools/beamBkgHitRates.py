@@ -100,13 +100,21 @@ main.add_module(
     SNthreshold=5,
     ShaperDigits='SVDShaperDigitsUnmasked',
     ShaperDigitsIN='SVDShaperDigitsZS5')
+main.add_module('TFCDC_WireHitPreparer',
+                wirePosition='aligned',
+                flightTimeEstimation='outwards',
+                filter='cuts_from_DB')
 
 # Beam background rate monitor: output to flat ntuple
 main.add_module(
     'BeamBkgHitRateMonitor',
     outputFileName=outputFile,
     trgTypes=trigTypes,
-    svdShaperDigitsName='SVDShaperDigitsZS5')
+    svdShaperDigitsName='SVDShaperDigitsZS5',
+    cdcTimeWindowLowerEdgeSmallCell=4720,
+    cdcTimeWindowUpperEdgeSmallCell=5020,
+    cdcTimeWindowLowerEdgeNormalCell=4720,
+    cdcTimeWindowUpperEdgeNormalCell=5020)
 
 # Process events
 basf2.process(main)

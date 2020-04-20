@@ -9,6 +9,8 @@
     <xi:include href="ARICH-Merger.xml"/>
     <xi:include href="ARICH-Cables.xml"/>
     <xi:include href="ARICH-Cooling.xml"/>
+    <xi:include href="ARICH-FEB-cooling_v2.xml"/>
+    <xi:include href="ARICH-Merger-cooling_v2.xml"/>
     <xi:include href="ARICH-Mirrors.xml"/>
     <xi:include href="ARICH-FrontEndMapping.xml"/>
     <xi:include href="ARICH-SupportStructure.xml"/>

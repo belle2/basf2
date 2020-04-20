@@ -34,17 +34,17 @@ namespace Belle2 {
     virtual ~CDCTriggerNeuroDQMModule();
 
     /** Module functions */
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
      * to be placed in this function.
     */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
     /** Fill a histogram only with non-zero values */

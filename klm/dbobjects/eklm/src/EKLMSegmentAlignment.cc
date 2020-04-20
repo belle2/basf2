@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 EKLMSegmentAlignment::EKLMSegmentAlignment()
@@ -61,10 +58,20 @@ void EKLMSegmentAlignment::setGlobalParam(double value, unsigned short element,
 {
   KLMAlignmentData* alignmentData =
     const_cast<KLMAlignmentData*>(getSegmentAlignment(element));
-  if (alignmentData == nullptr)
-    return;
-  alignmentData->setParameter(
-    static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+  /*
+   * Create alignment data if it does not exist.
+   * This is necessary for errors and corrections.
+   */
+  if (alignmentData == nullptr) {
+    KLMAlignmentData newAlignmentData(0, 0, 0, 0, 0, 0);
+    newAlignmentData.setParameter(
+      static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+    m_SegmentAlignment.insert(
+      std::pair<uint16_t, KLMAlignmentData>(element, newAlignmentData));
+  } else {
+    alignmentData->setParameter(
+      static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+  }
 }
 
 /* TODO: this function is not implemented. */

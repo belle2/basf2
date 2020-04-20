@@ -666,7 +666,7 @@ namespace {
       Particle p(cluster, Const::Klong);
       EXPECT_EQ(130, p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
-      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.497614 * 0.497614), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
       EXPECT_FLOAT_EQ(0.497614, p.getMass());
     }
@@ -680,7 +680,7 @@ namespace {
       Particle p(cluster, Const::neutron);
       EXPECT_EQ(2112, p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
-      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.93956536 * 0.93956536), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
       EXPECT_FLOAT_EQ(0.93956536, p.getMass());
     }

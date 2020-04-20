@@ -70,7 +70,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff10_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180 and clusterE1E9>0.5] ',
+            '[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180 and clusterE1E9>0.5]',
             True,
             path)
     elif listtype == 'pi0eff20_Jan2020':
@@ -78,7 +78,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff20_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080 and clusterE1E9>0.4] ',
+            '[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080 and clusterE1E9>0.4]',
             True,
             path)
     elif listtype == 'pi0eff30_Jan2020':
@@ -86,7 +86,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff30_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ] ',
+            '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]',
             True,
             path)
     elif listtype == 'pi0eff40_Jan2020':
@@ -94,7 +94,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff40_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060] ] ',
+            '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060]',
             True,
             path)
     elif listtype == 'pi0eff50_Jan2020':
@@ -102,7 +102,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff50_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040] ] ',
+            '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]',
             True,
             path)
     elif listtype == 'pi0eff60_Jan2020':
@@ -110,7 +110,7 @@ def stdPhotons(listtype='loose', path=None):
         cutAndCopyList(
             'gamma:pi0eff60_Jan2020',
             'gamma:all',
-            '[ [clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020] ] ',
+            '[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]',
             True,
             path)
 

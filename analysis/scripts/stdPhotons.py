@@ -4,6 +4,7 @@
 ########################################################
 #
 # Author(s): Torben Ferber (ferber@physics.ubc.ca)
+#            Savino Longo (savino.longo@desy.de)
 #
 ########################################################
 

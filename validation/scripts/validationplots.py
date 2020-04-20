@@ -9,6 +9,7 @@ import sys
 import queue
 from typing import Dict, Any, List, Union, Optional
 import collections
+from multiprocessing import Process, Queue
 
 # Load ROOT
 import ROOT
@@ -248,7 +249,7 @@ def get_tracked_reference_files() -> Dict[str, List[str]]:
 def generate_new_plots(
         revisions: List[str],
         work_folder: str,
-        process_queue=None,
+        process_queue: Optional[Queue] = None,
         root_error_ignore_level=ROOT.kWarning
 ) -> None:
     """
@@ -793,8 +794,12 @@ def rootobjects_from_file(
 ##############################################################################
 
 
-def create_plots(revisions=None, force=False, process_queue=None,
-                 work_folder="."):
+def create_plots(
+        revisions=None,
+        force=False,
+        process_queue: Optional[Queue] = None,
+        work_folder="."
+):
     """!
     This function generates the plots and html
     page for the requested revisions.

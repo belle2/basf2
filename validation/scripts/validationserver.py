@@ -1,25 +1,31 @@
-import cherrypy
+# std
+from typing import Dict, Any, List, Tuple
 from glob import glob
 import json
-import json_objects
+import functools
+import time
+import datetime
+from multiprocessing import Process, Queue
 import os.path
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
-import datetime
-from multiprocessing import Process, Queue
+
+# 3rd
+import cherrypy
+
+# ours
+import json_objects
 from validationplots import create_plots
 import validationfunctions
 import validationpath
-import functools
-import time
 
-g_plottingProcesses = {}
+g_plottingProcesses = {}  # type: Dict[str, Tuple[Process, Queue, Dict[str, Any]]]
 
 
-def get_revision_label_from_json_filename(json_filename):
+def get_revision_label_from_json_filename(json_filename: str) -> str:
     """
     Gets the label of a revision from the path to the revision.json file
     for example results/r121/revision.json
@@ -32,7 +38,7 @@ def get_revision_label_from_json_filename(json_filename):
     return last_folder
 
 
-def get_json_object_list(results_folder, json_file_name):
+def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
     """
     Searches one folder's sub-folder for json files of a
     specific name and returns a combined list of the
@@ -57,7 +63,7 @@ def get_json_object_list(results_folder, json_file_name):
     return found_rev_labels
 
 
-def deliver_json(file_name):
+def deliver_json(file_name: str):
     """
     Simply load & parse a json file and return the
     python objects
@@ -68,7 +74,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revision_key(revision_names):
+def create_revision_key(revision_names: List[str]) -> str:
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -76,7 +82,7 @@ def create_revision_key(revision_names):
     return functools.reduce(lambda x, y: x + "-" + y, revision_names, "")
 
 
-def check_plotting_status(progress_key):
+def check_plotting_status(progress_key: str):
     """
     Check the plotting status via the supplied progress_key
     """
@@ -84,7 +90,8 @@ def check_plotting_status(progress_key):
     if progress_key not in g_plottingProcesses:
         return None
 
-    process, qu, last_status = g_plottingProcesses[progress_key]
+    process, qu, last_status = \
+        g_plottingProcesses[progress_key]
 
     # read latest message
     try:
@@ -102,9 +109,12 @@ def check_plotting_status(progress_key):
 
 
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names, results_folder):
+def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
     """
     Start a new comparison between the supplied revisions
+
+    Returns:
+        revision key
     """
 
     rev_key = create_revision_key(revision_names)
@@ -126,7 +136,7 @@ def start_plotting_request(revision_names, results_folder):
             False,
             qu,
             # go one folder up, because this function
-            # expects the work dir, which then contains
+            # expects the work dir, which contains
             # the results folder
             os.path.dirname(results_folder)
         )
@@ -197,6 +207,7 @@ class ValidationRoot(object):
         :param args: For the request /plots/a/b/c, these will be the strings
             "a", "b", "c"
         """
+        # todo: display error message if len(args) < 3
         tag_folder = os.path.relpath(
             validationpath.get_html_plots_tag_comparison_folder(
                 self.working_folder, args[:-2]
@@ -341,6 +352,7 @@ class ValidationRoot(object):
         comparison
         """
 
+        # fixme: Since the path is given to deliver_json, it should NOT be relative to HTML folder
         path = os.path.join(
             os.path.relpath(
                 validationpath.get_html_plots_tag_comparison_folder(

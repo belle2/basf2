@@ -8,7 +8,7 @@ import unittest
 
 from basf2 import find_file
 from skim.registry import Registry, combined_skims
-import skimExpertFunctions as expert
+from skimExpertFunctions import BaseSkim
 
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
 
@@ -56,18 +56,18 @@ class TestSkimCodes(unittest.TestCase):
                 (
                     f"Invalid skim name in registry: {name}. Registed skim names cannot"
                     " begin with 'Base'; this word is reserved for subclassing purposes."
-                )
+                ),
             )
 
     def test_encode(self):
         """Check that we raise a LookupError if the skim name doesn't exist."""
         with self.assertRaises(LookupError):
-            expert.encodeSkimName("SomeNonExistentSkimName")
+            Registry.encode_skim_name("SomeNonExistentSkimName")
 
     def test_decode(self):
         """Check that we raise a LookupError if the skim code doesn't exist."""
         with self.assertRaises(LookupError):
-            expert.decodeSkimName("1337")
+            Registry.decode_skim_name("1337")
 
     def test_modules_exist(self):
         """Check that all modules listed in registry exist in skim/scripts/skim/."""
@@ -97,15 +97,15 @@ class TestSkimCodes(unittest.TestCase):
                     (
                         f"Registry lists {SkimName} as existing in skim.{ModuleName}, "
                         "but no such skim found!"
-                    )
+                    ),
                 )
 
                 # Check that it is defined as a subclass of BaseSkim
                 SkimClass = getattr(SkimModule, SkimName)
                 self.assertIsSubclass(
                     SkimClass,
-                    expert.BaseSkim,
-                    f"Skim {SkimName} must be defined as a subclass of BaseSkim."
+                    BaseSkim,
+                    f"Skim {SkimName} must be defined as a subclass of BaseSkim.",
                 )
 
     def test_undocumented_skims(self):
@@ -122,8 +122,8 @@ class TestSkimCodes(unittest.TestCase):
                 obj[0]
                 for obj in getmembers(SkimModule, isclass)
                 if (
-                    issubclass(obj[1], expert.BaseSkim)
-                    and obj[1] is not expert.BaseSkim
+                    issubclass(obj[1], BaseSkim)
+                    and obj[1] is not BaseSkim
                     and obj[0] != "CombinedSkim"
                     # Allow "Base" at beginning of skims, for subclassing
                     and not obj[0].startswith("Base")
@@ -160,7 +160,7 @@ class TestSkimCodes(unittest.TestCase):
             self.assertEqual(
                 len(skimlist),
                 len(set(skimlist)),
-                f"Duplicated skim in combined skim {CombinedName}."
+                f"Duplicated skim in combined skim {CombinedName}.",
             )
 
             # Check the combined skims only contain valid skim names
@@ -168,8 +168,10 @@ class TestSkimCodes(unittest.TestCase):
                 self.assertIn(
                     skim,
                     Registry.names,
-                    (f"Skim {skim} in combined skim {CombinedName} is not a "
-                     "registered skim.")
+                    (
+                        f"Skim {skim} in combined skim {CombinedName} is not a "
+                        "registered skim."
+                    ),
                 )
 
 

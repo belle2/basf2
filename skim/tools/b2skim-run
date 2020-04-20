@@ -101,6 +101,8 @@ def main():
         Skim = SkimFunction(OutputFileName=args.OutputFilename)
     elif args.action == "combined":
         skims = list({*args.combined.skims})
+        if sorted(skims) != sorted(args.combined.skims):
+            b2.B2FATAL("Attempting to run a skim twice!")
         SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
         Skim = CombinedSkim(*SkimObjects)
     elif args.action == "module":

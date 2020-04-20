@@ -458,17 +458,25 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path):
+    def __call__(self, path, *, validation=False):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
+            validation (bool): If True, build lists and write validation histograms
+                instead of writing uDSTs.
         """
         self.set_skim_logging(path)
         self.load_particle_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
-        self.output_udst(path)
+
+        if validation:
+            if self._method_unchanged("validation_histograms"):
+                b2.B2FATAL(f"No validation histograms defined for {self} skim.")
+            self.validation_histograms(path)
+        else:
+            self.output_udst(path)
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has

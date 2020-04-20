@@ -53,9 +53,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Results()
-      {
-      }
+      Results();
 
       /**
        * Copy constructor.
@@ -65,9 +63,7 @@ namespace Belle2 {
       /**
        * Destructor,
        */
-      ~Results()
-      {
-      }
+      ~Results();
 
       /**
        * Get achieved precision of efficiency measurement (the worst one).

@@ -13,6 +13,8 @@ import os
 import subprocess
 import sys
 import time
+from typing import Dict, Optional, List
+import logging
 
 # 3rd party
 import ROOT
@@ -149,7 +151,11 @@ def find_creator(outputfile, package, scripts, log):
     return results
 
 
-def get_validation_folders(location, basepaths, log):
+def get_validation_folders(
+        location: str,
+        basepaths: Dict[str, str],
+        log: logging.Logger
+):
     """!
     Collects the validation folders for all packages from the stated release
     directory (either local or central). Returns a dict with the following
@@ -199,7 +205,7 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def get_argument_parser(modes=None):
+def get_argument_parser(modes: Optional[List[str]] = None) -> argparse.ArgumentParser:
 
     if not modes:
         modes = ["local"]
@@ -211,8 +217,8 @@ def get_argument_parser(modes=None):
     parser.add_argument(
         "-d",
         "--dry",
-        help="Perform a dry run, i.e. run thevalidation module without "
-             "actually executing thesteering files (for debugging purposes).",
+        help="Perform a dry run, i.e. run the validation module without "
+             "actually executing the steering files (for debugging purposes).",
         action='store_true'
     )
     parser.add_argument(
@@ -327,7 +333,7 @@ def get_argument_parser(modes=None):
     return parser
 
 
-def parse_cmd_line_arguments(modes=None):
+def parse_cmd_line_arguments(modes: Optional[List[str]] = None) -> argparse.Namespace:
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -343,7 +349,7 @@ def parse_cmd_line_arguments(modes=None):
     return get_argument_parser(modes).parse_args()
 
 
-def scripts_in_dir(dirpath, log, ext='*'):
+def scripts_in_dir(dirpath: str, log: logging.Logger, ext='*') -> List[str]:
     """!
     Returns all the files in the given dir (and its subdirs) that have
     the extension 'ext', if an extension is given (default: all extensions)
@@ -389,7 +395,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
     return sorted(results)
 
 
-def strip_ext(path):
+def strip_ext(path: str) -> str:
     """
     Takes a path and returns only the name of the file, without the
     extension on the file name
@@ -397,7 +403,7 @@ def strip_ext(path):
     return os.path.splitext(os.path.split(path)[1])[0]
 
 
-def get_style(index, overall_item_count=1):
+def get_style(index: Optional[int], overall_item_count=1):
     """
     Takes an index and returns the corresponding line attributes,
     i.e. LineColor, LineWidth and LineStyle.
@@ -445,7 +451,7 @@ def get_style(index, overall_item_count=1):
     return ROOT.TAttLine(color, linestyle, linewidth)
 
 
-def index_from_revision(revision, work_folder):
+def index_from_revision(revision: str, work_folder: str) -> Optional[int]:
     """
     Takes the name of a revision and returns the corresponding index. Indices
     are used to ensure that the color and style of a revision in a plot are
@@ -466,7 +472,7 @@ def index_from_revision(revision, work_folder):
         return None
 
 
-def get_log_file_paths(logger):
+def get_log_file_paths(logger: logging.Logger) -> List[str]:
     """
     Returns list of paths that the FileHandlers of logger write to.
     :param logger: logging.logger object.
@@ -481,7 +487,7 @@ def get_log_file_paths(logger):
     return ret
 
 
-def get_terminal_width():
+def get_terminal_width() -> int:
     """
     Returns width of terminal in characters, or 80 if unknown.
 
@@ -492,8 +498,13 @@ def get_terminal_width():
     return get_terminal_size(fallback=(80, 24)).columns
 
 
-def congratulator(success=None, failure=None, total=None, just_comment=False,
-                  rate_name="Success rate"):
+def congratulator(
+        success: Optional[int] = None,
+        failure: Optional[int] = None,
+        total: Optional[int] = None,
+        just_comment=False,
+        rate_name="Success rate"
+) -> str:
     """ Keeping the morale up by commenting on success rates.
 
     Args:
@@ -572,7 +583,7 @@ def congratulator(success=None, failure=None, total=None, just_comment=False,
         )
 
 
-def terminal_title_line(title="", subtitle="", level=0):
+def terminal_title_line(title="", subtitle="", level=0) -> str:
     """ Print a title line in the terminal.
 
     Args:

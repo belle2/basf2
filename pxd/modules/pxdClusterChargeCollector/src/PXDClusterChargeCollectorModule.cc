@@ -237,6 +237,14 @@ void PXDClusterChargeCollectorModule::collect() // Do your event() stuff here
       if (tfr && m_matchTrack == 2) correction = sin(tfr->getMomentum().Theta());
 
       for (auto& cluster : pxdClustersTrack) {
+        if (m_relationCheck) {
+          if (m_storeClustersName == "PXDClustersFromTracks") {
+            RelationVector<PXDCluster> relPXDClusters = DataStore::getRelationsWithObj<PXDCluster>(&cluster, "PXDClusters");
+            if (!relPXDClusters.size()) continue;
+          } else {
+            B2WARNING("Relation check for data only works when clustersName is set to PXDClustersFromTracks");
+          }
+        }
 
         // Apply cluster selection cuts
         if (cluster.getCharge() >= m_minClusterCharge && cluster.getSize() >= m_minClusterSize && cluster.getSize() <= m_maxClusterSize) {

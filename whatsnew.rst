@@ -20,6 +20,13 @@ Changes since release-04
 
 .. .. rubric:: Some important feature
 
+.. rubric:: Neutral hadrons from ECLClusters get momentum from the cluster energy
+
+Since ``release-04`` it has been possible to load ECLClusters under the neutral hadron hypothesis.
+Previously we assumed a mass when calculating the particle momentum, however this leads to problems when, for example, a :math:`K_L^0` deposits less than it's mass energy in the ECL. This happens about 50% of the time.
+
+The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE`.
+
 
 .. Detailed changes for the analysis package first, that's
    what user will want to see

@@ -1036,7 +1036,7 @@ Note that this is context-dependent variable and can take different values depen
 - If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
 - If this particle is an MC particle then this is the mass of that particle.
 - If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
-- If this particle is composite and a *mass fit* has been performed then this will be updated by the fit.
+- If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
 
   * You will see a difference between this mass and the :b2:var:`InvM`.
   )DOC");

@@ -30,6 +30,8 @@ from numpy.linalg import det, norm, cond
 svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClustersFromTracks"
+svd_EventInfo = "SVDEventInfo"
+svd_EventMD = "EventMetaData"
 
 gROOT.SetBatch(True)
 
@@ -41,7 +43,8 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
     Python class used for checking SVD CoG Calibration stored in a localDB
     """
 
-    def fillLists(self, svdRecoDigitsFromTracks, svdClustersFromTracks):
+    # def fillLists(self, svdRecoDigitsFromTracks, svdClustersFromTracks):
+    def fillLists(self, svdClustersFromTracks):
         """
         Function that fill the lists needed for the check of the calibration
 
@@ -67,12 +70,13 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
         hasTimezero = self.cdcEventT0.hasEventT0()
         if hasTimezero:
-            TBClusters = svdRecoDigitsFromTracks.getModeByte().getTriggerBin()
-            TBIndex = ord(TBClusters)
+            # TBClusters = svdRecoDigitsFromTracks.getModeByte().getTriggerBin()
+            # TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             # tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            # tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 7.8625 * (3 - self.TB)
 
             # filling histograms
             resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex]
@@ -105,25 +109,25 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         #: set the name of the localDB used
         self.localdb = localDB
 
-    def set_run_number(self, run):
-        """
-        Function that allows to save the run number
+    # def set_run_number(self, run):
+    #     """
+    #     Function that allows to save the run number
 
-        parameters:
-             run (int): run number
-        """
-        #: set the run number
-        self.runnumber = run
+    #     parameters:
+    #          run (int): run number
+    #     """
+    #     #: set the run number
+    #     self.runnumber = run
 
-    def set_exp_number(self, exp):
-        """
-        Function that allows to save the experiment number
+    # def set_exp_number(self, exp):
+    #     """
+    #     Function that allows to save the experiment number
 
-        parameters:
-             exp (int): experiment number
-        """
-        #: set the experiment number
-        self.expnumber = exp
+    #     parameters:
+    #          exp (int): experiment number
+    #     """
+    #     #: set the experiment number
+    #     self.expnumber = exp
 
     def initialize(self):
         """
@@ -285,10 +289,17 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         # fill plots
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
+        svd_evtInfo = Belle2.PyStoreObj(svd_EventInfo)
+        clsTB = svd_evtInfo.getModeByte().getTriggerBin()
+        self.TB = ord(clsTB)
+        svd_evtMD = Belle2.PyStoreObj(svd_EventMD)
+        self.runnumber = svd_evtMD.getRun()
+        self.expnumber = svd_evtMD.getExperiment()
 
         for svdCluster in svdCluster_list:
-            svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
-            self.fillLists(svdRecoDigit, svdCluster)
+            # svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
+            # self.fillLists(svdRecoDigit, svdCluster)
+            self.fillLists(svdCluster)
 
     def terminate(self):
         """

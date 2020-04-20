@@ -11,7 +11,7 @@
     <Thickness unit="mm">20.06</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.073</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_2</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -24,7 +24,7 @@
     <Thickness unit="mm">20.06</Thickness>
     <ExitThickness unit="mm">51.08</ExitThickness>
     <Angle unit="deg">18.086</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_4</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -37,7 +37,7 @@
     <Thickness unit="mm">20.05</Thickness>
     <ExitThickness unit="mm">51.00</ExitThickness>
     <Angle unit="deg">18.089</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_1</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -50,7 +50,7 @@
     <Thickness unit="mm">19.99</Thickness>
     <ExitThickness unit="mm">51.02</ExitThickness>
     <Angle unit="deg">18.091</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_3</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -63,7 +63,7 @@
     <Thickness unit="mm">20.07</Thickness>
     <ExitThickness unit="mm">51.00</ExitThickness>
     <Angle unit="deg">18.069</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_5</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -76,7 +76,7 @@
     <Thickness unit="mm">20.09</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.055</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_7</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -89,7 +89,7 @@
     <Thickness unit="mm">19.99</Thickness>
     <ExitThickness unit="mm">51.01</ExitThickness>
     <Angle unit="deg">18.08</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_6</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -102,7 +102,7 @@
     <Thickness unit="mm">20.02</Thickness>
     <ExitThickness unit="mm">51.03</ExitThickness>
     <Angle unit="deg">18.069</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_10</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -115,7 +115,7 @@
     <Thickness unit="mm">20.06</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.058</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_8</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -128,7 +128,7 @@
     <Thickness unit="mm">20.04</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.082</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_11</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -141,7 +141,7 @@
     <Thickness unit="mm">20.04</Thickness>
     <ExitThickness unit="mm">51.03</ExitThickness>
     <Angle unit="deg">18.071</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_9</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -154,7 +154,7 @@
     <Thickness unit="mm">20.04</Thickness>
     <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.075</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_17</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -167,7 +167,7 @@
     <Thickness unit="mm">20.09</Thickness>
     <ExitThickness unit="mm">51.08</ExitThickness>
     <Angle unit="deg">18.08</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_13</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -180,7 +180,7 @@
     <Thickness unit="mm">20.06</Thickness>
     <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.077</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_16</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -193,7 +193,7 @@
     <Thickness unit="mm">20.07</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.077</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_14</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -206,7 +206,7 @@
     <Thickness unit="mm">20.04</Thickness>
     <ExitThickness unit="mm">51.05</ExitThickness>
     <Angle unit="deg">18.08</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_12</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 
@@ -219,7 +219,7 @@
     <Thickness unit="mm">20.06</Thickness>
     <ExitThickness unit="mm">51.06</ExitThickness>
     <Angle unit="deg">18.076</Angle>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_15</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
   </Prism>
 

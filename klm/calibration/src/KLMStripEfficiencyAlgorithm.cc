@@ -20,6 +20,18 @@
 
 using namespace Belle2;
 
+KLMStripEfficiencyAlgorithm::Results::Results(const Results& results)
+{
+  m_AchievedPrecision = results.m_AchievedPrecision;
+  m_MatchedDigits = results.m_MatchedDigits;
+  m_ExtHits = results.m_ExtHits;
+  int nPlanes = KLMPlaneArrayIndex::Instance().getNElements();
+  m_Efficiency = new float[nPlanes];
+  m_ExtHitsPlane = new int[nPlanes];
+  std::memcpy(m_Efficiency, results.m_Efficiency, nPlanes * sizeof(float));
+  std::memcpy(m_ExtHitsPlane, results.m_ExtHitsPlane, nPlanes * sizeof(int));
+}
+
 KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorithm("KLMStripEfficiencyCollector")
 {
   m_ElementNumbers = &(KLMElementNumbers::Instance());

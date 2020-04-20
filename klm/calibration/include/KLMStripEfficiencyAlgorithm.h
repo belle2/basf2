@@ -53,12 +53,21 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      Results() {}
+      Results()
+      {
+      }
 
       /**
-       * Destructor.
+       * Copy constructor.
        */
-      ~Results() { delete m_Efficiency; delete m_ExtHitsPlane; }
+      Results(const Results& results);
+
+      /**
+       * Destructor,
+       */
+      ~Results()
+      {
+      }
 
       /**
        * Get achieved precision of efficiency measurement (the worst one).

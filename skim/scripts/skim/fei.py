@@ -14,7 +14,7 @@ __authors__ = [
 import basf2 as b2
 import fei
 import modularAnalysis as ma
-
+from skimExpertFunctions import ifEventPasses
 from variables import variables as vm
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
@@ -271,11 +271,7 @@ def runFEIforB0Hadronic(path):
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -289,7 +285,14 @@ def runFEIforB0Hadronic(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
+
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
 
@@ -302,7 +305,8 @@ def runFEIforB0Hadronic(path):
         baryonic=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def runFEIforBplusHadronic(path):
@@ -333,11 +337,7 @@ def runFEIforBplusHadronic(path):
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -350,7 +350,13 @@ def runFEIforBplusHadronic(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -364,7 +370,8 @@ def runFEIforBplusHadronic(path):
         baryonic=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def runFEIforHadronicCombined(path):
@@ -390,10 +397,6 @@ def runFEIforHadronicCombined(path):
         pre-cuts applied.
     """
     # Pre-selection cuts
-
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
-
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
                         cut=' abs(d0)<0.5 and -2<z0<2 and pt>0.1', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
@@ -404,8 +407,6 @@ def runFEIforHadronicCombined(path):
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -418,7 +419,13 @@ def runFEIforHadronicCombined(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -432,7 +439,8 @@ def runFEIforHadronicCombined(path):
         baryonic=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def B0SL(path):
@@ -626,8 +634,6 @@ def runFEIforB0SL(path):
     """
     # Pre-selection cuts
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
     ma.fillParticleList(decayString='pi+:eventShapeForSkims',
                         cut='pt > 0.1 and abs(d0)<0.5 and -2<z0<2', path=path)
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
@@ -637,8 +643,6 @@ def runFEIforB0SL(path):
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -651,7 +655,13 @@ def runFEIforB0SL(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -666,7 +676,8 @@ def runFEIforB0SL(path):
         removeSLD=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def runFEIforBplusSL(path):
@@ -695,15 +706,10 @@ def runFEIforBplusSL(path):
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
-
     vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -716,7 +722,13 @@ def runFEIforBplusSL(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -731,7 +743,8 @@ def runFEIforBplusSL(path):
         removeSLD=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def runFEIforSLCombined(path):
@@ -764,16 +777,11 @@ def runFEIforSLCombined(path):
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
-
     vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
                        foxWolfram=True,
@@ -786,7 +794,13 @@ def runFEIforSLCombined(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
@@ -801,7 +815,8 @@ def runFEIforSLCombined(path):
         removeSLD=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2
 
 
 def runFEIforSkimCombined(path):
@@ -836,16 +851,11 @@ def runFEIforSkimCombined(path):
     ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                         cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-    ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
-    ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3', path=path)
-
     vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
     vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
     vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
     ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-    ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-    ma.applyEventCuts('2<E_ECL<7', path=path)
 
     ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
                        allMoments=False,
@@ -858,8 +868,14 @@ def runFEIforSkimCombined(path):
                        sphericity=False,
                        checkForDuplicates=False,
                        path=path)
+    path2 = b2.Path()
+    EventCuts = ['nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3',
+                 'nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3',
+                 'visibleEnergyOfEventCMS>4',
+                 '2<E_ECL<7',
+                 'foxWolframR2_maskedNaN<0.4']
+    ifEventPasses(" and ".join(EventCuts), conditional_path=path2, path=path)
 
-    ma.applyEventCuts('foxWolframR2_maskedNaN<0.4', path=path)
     # Run FEI
     b2.conditions.globaltags = ['analysis_tools_release-04']
 
@@ -873,4 +889,5 @@ def runFEIforSkimCombined(path):
         removeSLD=True)
     configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False)
     feistate = fei.get_path(particles, configuration)
-    path.add_path(feistate.path)
+    path2.add_path(feistate.path)
+    return path2

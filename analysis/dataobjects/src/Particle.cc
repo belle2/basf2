@@ -245,7 +245,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit(), m_mass);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();

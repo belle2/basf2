@@ -17,15 +17,15 @@ using namespace Belle2;
 ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass)
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
   // Use the default vertex from the beam parameters if none is given.
-  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo, mass);
+  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
 }
 
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                           ECLCluster::EHypothesisBit hypo, double mass)
+                                                           ECLCluster::EHypothesisBit hypo)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
@@ -76,8 +76,6 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
-  // FIXME propagate possibly massive particles through the Jacobian
-  //const double p      = sqrt(energy * energy - mass * mass); // momentum
 
   const double st  = sin(theta);
   const double ct  = cos(theta);

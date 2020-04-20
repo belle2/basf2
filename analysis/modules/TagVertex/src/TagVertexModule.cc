@@ -299,7 +299,7 @@ namespace Belle2 {
     else if (m_constraintType == "breco") tie(m_constraintCenter, m_constraintCov) = findConstraint(Breco, cut * 2000.);
     else if (m_constraintType == "noConstraint") m_constraintCenter = TVector3(); //zero vector
     else  {
-      B2ERROR("TagVertex: Not valid constraintType selected");
+      B2ERROR("TagVertex: Invalid constraintType selected");
       return false;
     }
 
@@ -557,64 +557,46 @@ namespace Belle2 {
 
   void TagVertexModule::BtagMCVertex(const Particle* Breco)
   {
-
-    bool isBreco = false;
-    int nReco = 0;
-
-    TVector3 MCTagVert = vecNaN;
-
-    int mcPDG = 0;
-    double mcTagLifeTime = -1;
-
-    // Array of MC particles
+    //fill vector with mcB (intended order: Reco, Tag)
     StoreArray<Belle2::MCParticle> mcParticles("");
-    for (int i = 0; i < mcParticles.getEntries(); ++i) {
-      const MCParticle* mc = mcParticles[i];
-      if (abs(mc->getPDG()) != abs(Breco->getPDGCode()))
-        continue;
+    vector<const MCParticle*> mcBs;
+    for (const MCParticle& mc : mcParticles) {
+      if (abs(mc.getPDG()) == abs(Breco->getPDGCode()))
+        mcBs.push_back(&mc);
+    }
+    //to few Bs
+    if (mcBs.size() < 2) return;
 
-      if (m_useMCassociation == "breco") {
-        const MCParticle* mcBr = Breco->getRelated<MCParticle>();
-        isBreco = (mcBr == mc) ? true : false;
-      } else if (m_useMCassociation == "internal") {
-        isBreco = compBrecoBgen(Breco, mc);
-      }
-
-      if (isBreco) {
-        m_MCVertReco = mc->getDecayVertex();
-        m_MCLifeTimeReco =  getProperLifeTime(mc);
-        ++nReco;
-      } else {
-        MCTagVert = mc->getDecayVertex();
-        mcTagLifeTime = getProperLifeTime(mc);
-        mcPDG = mc->getPDG();
-      }
-
+    if (mcBs.size() > 2) {
+      B2WARNING("TagVertexModule:: Too many Bs found in MC");
     }
 
+    auto isReco = [&](const MCParticle * mc) {
+      return (m_useMCassociation == "breco") ? (mc == Breco->getRelated<MCParticle>())
+             : compBrecoBgen(Breco, mc);  //internal association
+    };
 
-    if (nReco == 2) {
-      double dref = 1000;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        const MCParticle* mc = mcParticles[i];
-        if (abs(mc->getPDG()) != abs(Breco->getPDGCode()))
-          continue;
-        //TODO is it correct?
-        double dcalc = (mc->getDecayVertex() - Breco->getVertex()).Mag();
-        m_MCVertReco = mc->getDecayVertex();
-        m_MCLifeTimeReco  = getProperLifeTime(mc);
-        if (dcalc < dref) {
-          dref = dcalc;
-          MCTagVert = mc->getDecayVertex();
-          mcTagLifeTime = getProperLifeTime(mc);
-          mcPDG = mc->getPDG();
-        }
-      }
+    //nothing matched?
+    if (!isReco(mcBs[0]) && !isReco(mcBs[1]))
+      return;
+
+    //first is Tag, second Reco -> swap the order
+    if (!isReco(mcBs[0]) && isReco(mcBs[1]))
+      swap(mcBs[0], mcBs[1]);
+
+    //both matched -> use closest vertex dist as Reco
+    if (isReco(mcBs[0]) && isReco(mcBs[1])) {
+      double dist0 = (mcBs[0]->getDecayVertex() - Breco->getVertex()).Mag2();
+      double dist1 = (mcBs[1]->getDecayVertex() - Breco->getVertex()).Mag2();
+      if (dist0 > dist1)
+        swap(mcBs[0], mcBs[1]);
     }
 
-    m_MCtagV = MCTagVert;
-    m_MCtagLifeTime = mcTagLifeTime;
-    m_mcPDG = mcPDG;
+    m_MCVertReco = mcBs[0]->getDecayVertex();
+    m_MCLifeTimeReco  = getProperLifeTime(mcBs[0]);
+    m_MCtagV = mcBs[1]->getDecayVertex();
+    m_MCtagLifeTime = getProperLifeTime(mcBs[1]);
+    m_mcPDG = mcBs[1]->getPDG();
   }
 
 

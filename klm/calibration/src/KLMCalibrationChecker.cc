@@ -331,12 +331,12 @@ void KLMCalibrationChecker::checkStripEfficiency()
     printPayloadInformation(stripEfficiency);
   /* Finally, loop over KLM sectors to check the efficiency. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
+  TCanvas* canvas = new TCanvas();
   for (KLMChannelIndex& klmSector : klmSectors) {
     int subdetector = klmSector.getSubdetector();
     int section = klmSector.getSection();
     int sector = klmSector.getSector();
-    /* Setup the canvas and the histogram. */
-    TCanvas* canvas = new TCanvas();
+    /* Setup the histogram. */
     TH1F* hist = new TH1F("plane_histogram", "", 30, 0.5, 30.5);
     hist->GetYaxis()->SetTitle("Efficiency");
     hist->SetMinimum(0.4);
@@ -387,8 +387,8 @@ void KLMCalibrationChecker::checkStripEfficiency()
     canvas->Print(name.Data());
     canvas->Update();
     delete hist;
-    delete canvas;
   }
+  delete canvas;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
   resetDatabase();
 }

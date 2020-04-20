@@ -17,7 +17,7 @@ import re
 import basf2 as b2
 import fei
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skimExpertFunctions import BaseSkim, fancy_skim_header, _sphinxify_decay
 from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 
@@ -907,79 +907,6 @@ def _get_fei_channel_names(particleName, **kwargs):
     return channels
 
 
-def _sphinxify_decay(decay_string):
-    """Format the given decay string by using LaTeX commands instead of plain-text.
-    Formatted for use with Sphinx (ReStructured Text).
-
-    This is a utility function for autogenerating FEI skim documentation.
-
-    Parameters:
-        decay_string (str): A decay descriptor.
-
-    Returns:
-        sphinxed_string (str): LaTeX version of the decay descriptor.
-    """
-
-    decay_string = re.sub("^(B.):generic", "\\1_{\\\\text{had}}", decay_string)
-    decay_string = decay_string.replace(":generic", "")
-    decay_string = decay_string.replace(":semileptonic", "_{\\text{SL}}")
-    decay_string = decay_string.replace(":FSP", "_{FSP}")
-    decay_string = decay_string.replace(":V0", "_{V0}")
-    decay_string = re.sub("_[0-9]+", "", decay_string)
-    # Note: these are applied from top to bottom, so if you have
-    # both B0 and anti-B0, put anti-B0 first.
-    substitutes = [
-        ("==>", "\\to"),
-        ("->", "\\to"),
-        ("gamma", "\\gamma"),
-        ("p+", "p"),
-        ("anti-p-", "\\bar{p}"),
-        ("pi+", "\\pi^+"),
-        ("pi-", "\\pi^-"),
-        ("pi0", "\\pi^0"),
-        ("K_S0", "K^0_S"),
-        ("K_L0", "K^0_L"),
-        ("mu+", "\\mu^+"),
-        ("mu-", "\\mu^-"),
-        ("tau+", "\\tau^+"),
-        ("tau-", "\\tau^-"),
-        ("nu", "\\nu"),
-        ("K+", "K^+"),
-        ("K-", "K^-"),
-        ("e+", "e^+"),
-        ("e-", "e^-"),
-        ("J/psi", "J/\\psi"),
-        ("anti-Lambda_c-", "\\Lambda^{-}_{c}"),
-        ("anti-Sigma+", "\\overline{\\Sigma}^{+}"),
-        ("anti-Lambda0", "\\overline{\\Lambda}^{0}"),
-        ("anti-D0*", "\\overline{D}^{0*}"),
-        ("anti-D*0", "\\overline{D}^{0*}"),
-        ("anti-D0", "\\overline{D}^0"),
-        ("anti-B0", "\\overline{B}^0"),
-        ("Sigma+", "\\Sigma^{+}"),
-        ("Lambda_c+", "\\Lambda^{+}_{c}"),
-        ("Lambda0", "\\Lambda^{0}"),
-        ("D+", "D^+"),
-        ("D-", "D^-"),
-        ("D0", "D^0"),
-        ("D*+", "D^{+*}"),
-        ("D*-", "D^{-*}"),
-        ("D*0", "D^{0*}"),
-        ("D_s+", "D^+_s"),
-        ("D_s-", "D^-_s"),
-        ("D_s*+", "D^{+*}_s"),
-        ("D_s*-", "D^{-*}_s"),
-        ("B+", "B^+"),
-        ("B-", "B^-"),
-        ("B0", "B^0"),
-        ("B_s0", "B^0_s"),
-        ("K*0", "K^{0*}")]
-    tex_string = decay_string
-    for (key, value) in substitutes:
-        tex_string = tex_string.replace(key, value)
-    return f":math:`{tex_string}`"
-
-
 class BaseFEISkim(BaseSkim):
     """Base class for FEI skims. Applies event-level pre-cuts and applies the FEI."""
 
@@ -996,6 +923,8 @@ class BaseFEISkim(BaseSkim):
     SL charged :math:`B`'s."""
 
     RequiredStandardLists = None
+
+    NoisyModules = ["ParticleCombiner"]
 
     # This is a cached static method so that we can avoid adding FEI path twice.
     # In combined skims, FEIChannelArgs must be combined across skims first, so that all

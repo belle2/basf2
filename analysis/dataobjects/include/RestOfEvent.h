@@ -380,11 +380,6 @@ namespace Belle2 {
      */
     void print() const;
 
-    /**
-     * Compares particles. TODO: This doesn't belong here
-     */
-    static bool compareParticles(const Particle* roeParticle, const Particle* toAddParticle);
-
   private:
 
     // persistent data members

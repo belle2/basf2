@@ -207,7 +207,9 @@ class ValidationRoot(object):
         :param args: For the request /plots/a/b/c, these will be the strings
             "a", "b", "c"
         """
-        # todo: display error message if len(args) < 3
+        if len(args) < 3:
+            raise cherrypy.HTTPError(404)
+
         tag_folder = os.path.relpath(
             validationpath.get_html_plots_tag_comparison_folder(
                 self.working_folder, args[:-2]

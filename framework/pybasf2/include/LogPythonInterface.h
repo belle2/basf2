@@ -192,6 +192,16 @@ namespace Belle2 {
     bool getPythonLoggingEnabled() const;
 
     /**
+    * Set flag if newlines in log messages to console should be replaced by '\n'
+    */
+    void setEscapeNewlinesEnabled(bool enabled) const;
+
+    /**
+     * Get flag if newlines in log messages to console should be replaced by '\n'`
+     */
+    bool getEscapeNewlinesEnabled() const;
+
+    /**
      * Produce debug message
      *
      * @param args positional arguments, concatenated to form message

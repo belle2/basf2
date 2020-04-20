@@ -73,10 +73,11 @@ skim_registry = [
     ('18360100', 'TauLFV'),
     ('13160100', 'TCPV'),
     ('18020100', 'SinglePhotonDark'),
+    ('18020200', 'GammaGammaControlKLMDark'),
     ('18020300', 'ALP3Gamma'),
     ('18520100', 'DimuonPlusMissingEnergy'),
     ('18520200', 'ElectronMuonPlusMissingEnergy'),
-    ('18520300', 'DielectronPlusMissingEnergy'),
+    # ('18520300', 'DielectronPlusMissingEnergy'),
     ('18520400', 'LFVZpVisible'),
     ('18570600', 'TauGeneric'),
     ('18570700', 'TauThrust'),
@@ -84,12 +85,14 @@ skim_registry = [
 
 #: A dict listing which standalone skims are included the combined skim scripts
 combined_skims = {
-    'BtoCharm1': [
-        'BtoD0h_Kshh', 'BtoD0h_hh', 'BtoD0h_Kspi0', 'BtoD0h_Kspipipi0'
+    "BtoCharm1": [
+        "BtoD0h_hh", "BtoD0h_Kshh", "BtoD0h_Kspi0", "BtoD0h_Kspipipi0", "B0toDpi_Kspi",
+        "B0toDrho_Kspi", "B0toDpi_Kpipi", "B0toDrho_Kpipi",
     ],
-
-    'BtoCharm2': [
-        'BtoD0h_Kpi', 'BtoD0h_Kpipipi_Kpipi0', 'B0toDpi_Kpipi', 'B0toDstarPi_D0pi_Kpi', 'B0toDstarPi_D0pi_Kpipipi_Kpipi0'
+    "BtoCharm2": [
+        "BtoD0h_Kpipipi_Kpipi0", "B0toDstarPi_D0pi_Kpipipi_Kpipi0",
+        "B0toDstarRho_D0pi_Kpipipi_Kpipi0", "BtoD0rho_Kpipipi_Kpipi0", "BtoD0h_Kpi",
+        "B0toDstarPi_D0pi_Kpi", "BtoD0rho_Kpi", "B0toDstarRho_D0pi_Kpi",
     ],
     'CharmHigh': [
         'DstToD0Pi_D0ToHpJmPi0', 'XToD0_D0ToNeutrals', 'DstToD0Pi_D0ToHpHmPi0'
@@ -101,7 +104,8 @@ combined_skims = {
         'EarlyData_DstToD0Pi_D0ToHpJmPi0', 'EarlyData_DstToD0Pi_D0ToHpHmPi0'
     ],
     'Dark': [
-        'ALP3Gamma', 'SinglePhotonDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy', 'DielectronPlusMissingEnergy'
+        'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
+        'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
     ],
     'EWP': [
         'BtoXll', 'BtoXll_LFV', 'BtoXgamma'

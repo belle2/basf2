@@ -33,7 +33,7 @@ namespace Belle2 {
     }
 
     //! A Useful Constructor
-    TRGTOPSlotTiming(
+    explicit TRGTOPSlotTiming(
       int slotId
     )
     {

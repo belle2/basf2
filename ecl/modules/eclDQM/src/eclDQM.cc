@@ -249,7 +249,7 @@ void ECLDQMModule::initialize()
   m_ECLDsps.isOptional();
   m_l1Trigger.isOptional();
 
-  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  if (!mapper.initFromDB()) B2FATAL("ECL DQM: Can't initialize eclChannelMapper");
 
   ecltot.resize(m_TotalEnergyThresholds.size());
   nhits.resize(m_HitNumberUpperLimits.size());
@@ -289,7 +289,6 @@ void ECLDQMModule::beginRun()
 void ECLDQMModule::event()
 {
   int trigtag1 = 0;
-  int flagtag = 1;
   int NDigits = 0;
   for (auto& value : ecltot) value = 0;
   for (auto& value : nhits) value = 0;
@@ -302,7 +301,7 @@ void ECLDQMModule::event()
       if (id == "rand" && m_l1Trigger.isValid() &&
           m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
       if (id == "dphy" && m_l1Trigger.isValid() &&
-          m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) h_evtot_dphy->Fill(0);
+          m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
     }
   } else m_iEvent = -1;
 
@@ -315,7 +314,7 @@ void ECLDQMModule::event()
       if (id != "psd") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
@@ -331,11 +330,13 @@ void ECLDQMModule::event()
     h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Trigger tag flag #2 histogram filling.
   }
 
-  if (m_ECLTrigs.getEntries() > 0) trigtag1 /= m_ECLTrigs.getEntries();
-
-  int compar = (65535 & m_iEvent);
-  if (compar == trigtag1) flagtag = 0;
-  h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  if (m_ECLTrigs.getEntries() > 0) {
+    int flagtag = 1;
+    trigtag1 /= m_ECLTrigs.getEntries();
+    int compar = (65535 & m_iEvent);
+    if (compar == trigtag1) flagtag = 0;
+    h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  }
 
   for (auto& aECLCalDigit : m_ECLCalDigits) {
     int cid        = aECLCalDigit.getCellId();
@@ -403,16 +404,16 @@ void ECLDQMModule::event()
       if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
       else if (id == "psd" && (m_iEvent % 1000 == 999 ||
                                (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
       else if (id == "logic" && m_iEvent % 1000 != 999) continue;
       else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
                                 m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
       else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
-                                m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_DPHY)) continue;
+                                !m_l1Trigger->testInput("bha_delay"))) continue;
       else if (id == "other" && (m_iEvent % 1000 == 999 ||
                                  (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
-                                 (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_DPHY) ||
+                                 (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
                                  (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
       if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());

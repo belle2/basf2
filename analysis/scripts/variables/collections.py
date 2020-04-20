@@ -213,7 +213,9 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
+    'mcDeltaT',
+    'mcDeltaTapprox',
+    'mcDeltaL',
     'TagVmcLBoost',
     'TagVmcOBoost',
     'mcLBoost',
@@ -282,6 +284,24 @@ event_shape = [
     "aplanarity",
     "thrust",
     "thrustAxisCosTheta",
+]
+
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
 ]
 
 # now register all the variables declared in this file as collections

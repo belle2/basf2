@@ -427,26 +427,6 @@ def copyList(outputListName, inputListName, writeOut=False, path=None):
     copyLists(outputListName, [inputListName], writeOut, path)
 
 
-def correctFSR(outputListName,
-               inputListName,
-               gammaListName,
-               angleThreshold=5.0,
-               energyThreshold=1.0,
-               writeOut=False,
-               path=None):
-    """
-    WARNING:
-      The :b2:mod:`FSRCorrection` module is now deprecated.
-      Please use `modularAnalysis.correctBrems` or `modularAnalysis.correctBremsBelle` instead.
-      The latter resembles the previous principle of FSRCorrection but does no
-      longer contain the faulty first-come, first-served approach. For Belle II
-      data it is recommended to use correctBrems(), which should perform better.
-    """
-
-    B2WARNING("The correctFSR() module is now deprecated. Please use correctBrems() or correctBremsBelle() instead."
-              "When analysing Belle II data, it is recommended to use correctBrems().")
-
-
 def correctBremsBelle(outputListName,
                       inputListName,
                       gammaListName,
@@ -1000,7 +980,8 @@ def reconstructDecay(decayString,
                      writeOut=False,
                      path=None,
                      candidate_limit=None,
-                     ignoreIfTooManyCandidates=True):
+                     ignoreIfTooManyCandidates=True,
+                     allowChargeViolation=False):
     r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
     their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
@@ -1045,6 +1026,7 @@ def reconstructDecay(decayString,
     @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
                        candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1056,6 +1038,7 @@ def reconstructDecay(decayString,
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
+    pmake.param("allowChargeViolation", allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -1145,7 +1128,8 @@ def reconstructRecoil(decayString,
                       dmID=0,
                       writeOut=False,
                       path=None,
-                      candidate_limit=None):
+                      candidate_limit=None,
+                      allowChargeViolation=False):
     """
     Creates new Particles that recoil against the input particles.
 
@@ -1169,6 +1153,7 @@ def reconstructRecoil(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1180,6 +1165,7 @@ def reconstructRecoil(decayString,
     pmake.param('recoilParticleType', 1)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -1188,7 +1174,8 @@ def reconstructRecoilDaughter(decayString,
                               dmID=0,
                               writeOut=False,
                               path=None,
-                              candidate_limit=None):
+                              candidate_limit=None,
+                              allowChargeViolation=False):
     """
     Creates new Particles that are daughters of the particle reconstructed in the recoil (always assumed to be the first daughter).
 
@@ -1212,6 +1199,8 @@ def reconstructRecoilDaughter(decayString,
                        If no value is given the amount is limited to a sensible
                        default. A value <=0 will disable this limit and can
                        cause huge memory amounts so be careful.
+    @param allowChargeViolation whether the decay string needs to conserve the electric charge taking into account that the first
+                       daughter is actually the mother
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1223,6 +1212,7 @@ def reconstructRecoilDaughter(decayString,
     pmake.param('recoilParticleType', 2)
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
+    pmake.param('allowChargeViolation', allowChargeViolation)
     path.add_module(pmake)
 
 
@@ -2473,12 +2463,12 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
-    trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-    trackCuts += ' and -3.0 < dz < 3.0'
-    trackCuts += ' and -0.5 < dr < 0.5'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3'
+    trackCuts += ' and dr < 0.5'
 
     gammaCuts = 'E > 0.05'
-    gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+    gammaCuts += ' and thetaInCDCAcceptance'
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -2584,13 +2574,13 @@ def buildEventShape(inputListNames=[],
         if default_cleanup:
             B2INFO("Applying standard cuts")
             trackCuts = 'pt > 0.1'
-            trackCuts += ' and -0.8660 < cosTheta < 0.9535'
-            trackCuts += ' and -3.0 < dz < 3.0'
-            trackCuts += ' and -0.5 < dr < 0.5'
+            trackCuts += ' and thetaInCDCAcceptance'
+            trackCuts += ' and abs(dz) < 3.0'
+            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             gammaCuts = 'E > 0.05'
-            gammaCuts += ' and -0.8660 < cosTheta < 0.9535'
+            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")

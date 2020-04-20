@@ -21,13 +21,14 @@ import ROOT
 
 # ours
 import validationpath
+from validationscript import Script
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
 
 
-def get_timezone():
+def get_timezone() -> str:
     """
     Returns the correct timezone as short string
     """
@@ -41,7 +42,7 @@ def get_timezone():
         return tz_tuple[0]
 
 
-def get_compact_git_hash(repo_folder):
+def get_compact_git_hash(repo_folder: str) -> str:
     """
     Returns the compact git hash from a folder (or any of this folders parents)
     or None if none of theses folders is a git repository
@@ -67,8 +68,8 @@ def get_compact_git_hash(repo_folder):
     return current_git_commit
 
 
-def basf2_command_builder(steering_file, parameters,
-                          use_multi_processing=False):
+def basf2_command_builder(steering_file: str, parameters: List[str],
+                          use_multi_processing=False) -> List[str]:
     """
     This utility function takes the steering file name and other basf2
     parameters and returns a list which can be executed via the OS shell for
@@ -86,7 +87,7 @@ def basf2_command_builder(steering_file, parameters,
     return cmd_params
 
 
-def available_revisions(work_folder):
+def available_revisions(work_folder: str) -> List[str]:
     """
     Loops over the results folder and looks for revisions. It then returns an
     ordered list, with the most recent revision being the first element in the
@@ -106,7 +107,7 @@ def available_revisions(work_folder):
     return revisions
 
 
-def get_start_time():
+def get_start_time() -> float:
     """!
     The function returns the value g_start_time which contain the start time
     of the validation and is set just a few lines above.
@@ -116,7 +117,12 @@ def get_start_time():
     return g_start_time
 
 
-def find_creator(outputfile, package, scripts, log):
+def find_creator(
+        outputfile: str,
+        package: str,
+        scripts: List[Script],
+        log: logging.Logger
+) -> List[Script]:
     """!
     This function receives the name of a file and tries to find the file
     in the given package which produces this file, i.e. find the file in
@@ -155,7 +161,7 @@ def get_validation_folders(
         location: str,
         basepaths: Dict[str, str],
         log: logging.Logger
-):
+) -> Dict[str, str]:
     """!
     Collects the validation folders for all packages from the stated release
     directory (either local or central). Returns a dict with the following
@@ -205,7 +211,8 @@ def get_validation_folders(
     return results
 
 
-def get_argument_parser(modes: Optional[List[str]] = None) -> argparse.ArgumentParser:
+def get_argument_parser(modes: Optional[List[str]] = None) \
+        -> argparse.ArgumentParser:
 
     if not modes:
         modes = ["local"]
@@ -277,7 +284,7 @@ def get_argument_parser(modes: Optional[List[str]] = None) -> argparse.ArgumentP
         "--select-ignore-dependencies",
         help="The file name of one or more space separated validation "
              "scripts that should be executed exclusively. This will ignore "
-             "all depencies. This is useful if you modified a script that "
+             "all dependencies. This is useful if you modified a script that "
              "produces plots based on the output of its dependencies.",
         type=str,
         nargs='+'

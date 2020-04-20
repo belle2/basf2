@@ -33,6 +33,7 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
   addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
+  addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", std::string("SVDEventInfo"));
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()
@@ -66,6 +67,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
   m_svdRD.isRequired(m_svdRecoDigits);
+  m_svdEI.isRequired(m_svdEventInfo);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -108,26 +110,35 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
+  float TB = (m_svdEI->getModeByte()).getTriggerBin();
+  float eventT0 = 0;
+  float eventT0Sync = 0;
+  if (m_eventT0->hasEventT0()) {
+    eventT0 = m_eventT0->getEventT0();
+    eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+    getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
+    getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
+  }
   if (!m_svdCls.isValid()) {
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
     return;
   }
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
-    SVDCluster* cluster = m_svdCls[cl];
-    RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
+    // SVDCluster* cluster = m_svdCls[cl];
+    // RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
     float clTime = m_svdCls[cl]->getClsTime();
     int side = m_svdCls[cl]->isUCluster();
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
     short unsigned int layer = m_svdCls[cl]->getSensorID().getLayerNumber();
     if (m_eventT0->hasEventT0()) {
-      float eventT0 = m_eventT0->getEventT0();
-      float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
-      float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+      // float eventT0 = m_eventT0->getEventT0();
+      // float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
+      // float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
-      getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
+      // getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
+      // getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawCoGTimeL3V")->Fill(clTime);}
     }
   };

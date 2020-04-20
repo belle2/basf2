@@ -38,7 +38,7 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     """
 
     B2WARNING("stdPi0s is loading \"Jan2020\" pi0 recommendations. Please check Neutrals Performance Confluence"
-              " page for most up-to-date pi0 recommendtions.")
+              " page for most up-to-date pi0 recommendations.")
 
     if listtype == 'all':
         stdPhotons('all', path)

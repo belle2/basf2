@@ -191,13 +191,13 @@ def PRList(path):
     ma.cutAndCopyList('pi-:PRSemileptonic_2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path2)
 
     ma.reconstructDecay('B0:PRSemileptonic_1 ->  pi-:PRSemileptonic_1 e+:PRSemileptonic_1',
-                        'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path2)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_2 ->  pi-:PRSemileptonic_1 mu+:PRSemileptonic_1',
-                        'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path2)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_3 ->  pi-:PRSemileptonic_2 e+:PRSemileptonic_2',
-                        'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path2)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path2)
     ma.reconstructDecay('B0:PRSemileptonic_4 ->  pi-:PRSemileptonic_2 mu+:PRSemileptonic_2',
-                        'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path2)
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path2)
 
     PRList = ['B0:PRSemileptonic_1', 'B0:PRSemileptonic_2']
 

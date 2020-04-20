@@ -552,8 +552,9 @@ class CombinedSkim(BaseSkim):
     """
 
     __authors__ = ["Phil Grace"]
-    __WorkingGroup__ = None
     __description__ = None
+    __category__ = "combined"
+    __contact__ = None
 
     RequiredStandardLists = None
     """`BaseSkim.RequiredStandardLists` attribute initialised to `None` to get around

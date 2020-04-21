@@ -57,10 +57,8 @@ using namespace std;
 namespace Belle2 {
 
 
-  static const TVector3  vecNaN(std::numeric_limits<double>::quiet_NaN(),
-                                std::numeric_limits<double>::quiet_NaN(),
-                                std::numeric_limits<double>::quiet_NaN());
-  static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+  static const double    realNaN = std::numeric_limits<double>::quiet_NaN();
+  static const TVector3  vecNaN(realNaN, realNaN, realNaN);
 
   static const TMatrixDSym matNaN(3, (double [])
   {

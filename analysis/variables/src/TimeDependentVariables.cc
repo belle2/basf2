@@ -274,7 +274,8 @@ namespace Belle2 {
 
     double vertexTruthBoostDirection(const Particle* part)
     {
-      TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
       if (!mcPart) return realNaN;
@@ -284,9 +285,9 @@ namespace Belle2 {
 
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
-      TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoost(boost.Z(), boost.Y(), -boost.X());
-      TVector3 orthBoostDir = orthBoost.Unit();
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
+      TVector3 orthBoost(boostDir.Z(), boostDir.Y(), -boostDir.X());
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
       if (!mcPart) return realNaN;

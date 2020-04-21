@@ -12,7 +12,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from skim import dark
+from skim import lowMulti
 
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -20,7 +20,7 @@ TwoTrackLeptonsForLuminosity_path = b2.Path()
 
 ma.inputMdst('default', '../TwoTrackElectronsForLuminosity.dst.root', path=TwoTrackLeptonsForLuminosity_path)
 
-TwoTrackLeptonsForLuminosity_list = dark.TwoTrackLeptonsForLuminosityList(path=TwoTrackLeptonsForLuminosity_path)
+TwoTrackLeptonsForLuminosity_list = lowMulti.TwoTrackLeptonsForLuminosityList(path=TwoTrackLeptonsForLuminosity_path)
 expert.skimOutputUdst(
     '../TwoTrackElectronsForLuminosity.udst.root',
     TwoTrackLeptonsForLuminosity_list,

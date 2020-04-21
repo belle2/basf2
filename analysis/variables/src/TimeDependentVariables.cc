@@ -852,13 +852,12 @@ namespace Belle2 {
           //compute the average over tag tracks
 
           double sum(0.);
-          double term;
           int tot(0);
 
           for (int i(0); i < nTracks; ++i)
           {
             if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              term = (*fptr)(part, vector<double>(1, 1.*i));
+              double term((*fptr)(part, vector<double>(1, 1.*i)));
               sum += term * term;
               ++tot;
             }
@@ -892,12 +891,11 @@ namespace Belle2 {
           //compute the average over tag tracks
 
           double max(-DBL_MAX);
-          double val;
 
           for (int i(0); i < nTracks; ++i)
           {
             if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              val = (*fptr)(part, vector<double>(1, 1.*i));
+              double val((*fptr)(part, vector<double>(1, 1.*i)));
               if (val > max) max = val;
             }
           }
@@ -930,12 +928,11 @@ namespace Belle2 {
           //compute the minimum value over tag tracks
 
           double min(DBL_MAX);
-          double val;
 
           for (int i(0); i < nTracks; ++i)
           {
             if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              val = (*fptr)(part, vector<double>(1, 1.*i));
+              double val((*fptr)(part, vector<double>(1, 1.*i)));
               if (val < min) min = val;
             }
           }
@@ -1132,7 +1129,7 @@ namespace Belle2 {
                       "It returns the internal mc flavor information of the tag-side B provided by the TagV module.");
 
     REGISTER_VARIABLE("TagTrackMomentum(i) ", tagTrackMomentum,
-                      "return the norm of the momentum of the ith track used in the tag vtx fit.");
+                      "return the magnitude of the momentum of the ith track used in the tag vtx fit.");
     REGISTER_VARIABLE("TagTrackMomentumX(i) ", tagTrackMomentumX,
                       "return the X component of the momentum of the ith track used in the tag vtx fit.");
     REGISTER_VARIABLE("TagTrackMomentumY(i) ", tagTrackMomentumY,
@@ -1211,22 +1208,22 @@ namespace Belle2 {
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
 
     REGISTER_VARIABLE("TagTrackMax(var)", tagTrackMax,
-                      "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackMax(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+                      "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMax(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")
 
     REGISTER_VARIABLE("TagTrackMin(var)", tagTrackMin,
-                      "return the minimum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackMin(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+                      "return the minimum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMin(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")
 
     REGISTER_VARIABLE("TagTrackAverage(var)", tagTrackAverage,
-                      "return the average over the tag tracks of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackAverage(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+                      "return the average over the tag tracks of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackAverage(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")
 
     REGISTER_VARIABLE("TagTrackAverageSquares(var)", tagTrackAverageSquares,
-                      "return the average over the tag tracks of the square of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackAverageSquares(TagTrackDistanceToConstraint)`. The tracks that are assigned a zero weight are ignored.")
+                      "return the average over the tag tracks of the square of the variable ``var``. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackAverageSquares(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")
 
     REGISTER_VARIABLE("TagTrackWeightedAverage(var)", tagTrackWeightedAverage,
-                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackWeightedAverage(TagTrackDistanceToConstraint)`.")
+                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackWeightedAverage(TagTrackDistanceToConstraint)``.")
 
     REGISTER_VARIABLE("TagTrackWeightedAverageSquares(var)", tagTrackWeightedAverageSquares,
-                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: :b2:var:`TagTrackWeightedAverageSquares(TagTrackDistanceToConstraint)`.")
+                      "return the average over the tag tracks of the variable ``var``, weighted by weights of the tag vertex fitter. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackWeightedAverageSquares(TagTrackDistanceToConstraint)``.")
   }
 }
 

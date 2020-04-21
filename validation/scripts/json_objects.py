@@ -425,7 +425,7 @@ class ComparisonNTuple(NTuple):
         #: name of contact person
         self.contact = contact
         #: path to the json file which contains the individual numbers of
-        #: the ntuple
+        #: the ntuple (must be relative to html dir!)
         self.json_file_path = json_file_path
 
 

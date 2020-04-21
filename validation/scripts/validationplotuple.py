@@ -183,14 +183,11 @@ class Plotuple:
         #: The folder in which the plots will be found. Note that this should
         #: be relative to the ``html`` directory, because this is the string
         #: that will be used for the JavaScript queries to get the files
-        self._plot_folder = os.path.relpath(
-            os.path.join(
-                validationpath.get_html_plots_tag_comparison_folder(
-                    work_folder, tags=revisions
-                ),
-                self.package
+        self._plot_folder = os.path.join(
+            validationpath.get_html_plots_tag_comparison_folder(
+                work_folder, tags=revisions
             ),
-            validationpath.get_html_folder(work_folder),
+            self.package
         )
         os.makedirs(self._plot_folder, exist_ok=True)
 
@@ -815,7 +812,10 @@ class Plotuple:
                 contact=self._contact,
                 check=self._check,
                 is_expert=self.is_expert(),
-                json_file_path=self._file
+                json_file_path=os.path.relpath(
+                    self._file,
+                    validationpath.get_html_folder(self._work_folder)
+                ),
             )
         elif self.type == 'TNamed':
             return json_objects.ComparisonHtmlContent(

@@ -347,36 +347,34 @@ def SystematicsLambdaList(path):
 def SystematicsList(path):
 
     Lists = []
-    Lists += JpsimumuTagProbe(path)
-    Lists += JpsieeTagProbe(path)
+    # Lists = JpsimumuTagProbe(path)
+    # Lists = JpsieeTagProbe(path)
     Lists += PiKFromDstarList(path)
     return Lists
 
 
 def PiKFromDstarList(path):
     D0Cuts = '1.81 < M < 1.91'
-#   DstarCuts = 'massDifference(0)<0.16'
     DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
 
-    D0Channel = ['K-:all pi+:all'
-                 ]
+    ma.cutAndCopyList('K-:syst', 'K-:all', 'dr<2 and abs(dz)<4', path=path)
+    ma.cutAndCopyList('pi+:syst', 'pi+:all', 'dr<2 and abs(dz)<4', path=path)
+
+    D0Channel = ['K-:syst pi+:syst']
 
     D0List = []
     for chID, channel in enumerate(D0Channel):
         ma.reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
-        vertex.raveFit('D0:syst' + str(chID), 0.0, path=path)
         D0List.append('D0:syst' + str(chID))
 
     DstarChannel = []
     for channel in D0List:
-        DstarChannel.append(channel + ' pi+:all')
+        DstarChannel.append(channel + ' pi+:syst')
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         ma.reconstructDecay('D*+:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
         DstarList.append('D*+:syst' + str(chID))
-        ma.matchMCTruth('D*+:syst0', path=path)
-
     return DstarList
 
 

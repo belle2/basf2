@@ -63,6 +63,10 @@ Variables
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
+ .. warning:: The variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and :b2:var:`pointingAngle` now return an angle instead of a cosine.
+
+ * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
+   :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
  * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
@@ -113,6 +117,8 @@ Variables
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
+   functionality of the latter.
  * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a
    pseudo-significance.
 

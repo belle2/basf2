@@ -641,7 +641,6 @@ namespace Belle2 {
       if (!mcParticle) return realNaN;
 
       TVector3 mcTagV(vert->getMCTagVertex());
-
       if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return realNaN;
       if (mcTagV(0)  == realNaN)                                        return realNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
@@ -693,11 +692,10 @@ namespace Belle2 {
     TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
       if (trackIndex.size() != 1) return vecNaN;
-      unsigned int trackIndexInt(trackIndex.at(0));
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
 
+      unsigned int trackIndexInt(trackIndex.at(0));
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 

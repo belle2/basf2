@@ -409,10 +409,6 @@ class Plotuple:
             )
         )
 
-    # todo: not super elegant, this is why you should use os.path.join etc. /klieret
-    def get_plot_path(self):
-        return self._plot_folder + "/"
-
     def get_png_filename(self):
         return '{}_{}.png'.format(strip_ext(self.rootfile), self.key)
 
@@ -839,7 +835,10 @@ class Plotuple:
                 height=self._height,
                 width=self._width,
                 is_expert=self.is_expert(),
-                plot_path=self.get_plot_path(),
+                plot_path=os.path.relpath(
+                    self._plot_folder,
+                    validationpath.get_html_folder(self._work_folder)
+                ) + "/",
                 png_filename=self.get_png_filename(),
                 pdf_filename=self.get_pdf_filename(),
                 warnings=self.warnings

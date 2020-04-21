@@ -42,30 +42,23 @@ def get_timezone() -> str:
         return tz_tuple[0]
 
 
-def get_compact_git_hash(repo_folder: str) -> str:
+def get_compact_git_hash(repo_folder: str) -> Optional[str]:
     """
-    Returns the compact git hash from a folder (or any of this folders parents)
-    or None if none of theses folders is a git repository
+    Returns the compact git hash from a folder inside of a git repository
     """
-    cwd = os.getcwd()
-    os.chdir(repo_folder)
-    # todo: we want the short version here
     try:
-        current_git_commit = subprocess.check_output(
-            ["git", "show", "--oneline", "-s"]).decode().rstrip()
+        cmd_output = subprocess.check_output(
+            ["git", "show", "--oneline", "-s"], cwd=repo_folder
+        ).decode().rstrip()
         # the first word in this string will be the hash
-        current_git_commit = current_git_commit.split(" ")
-        if len(current_git_commit) > 1:
-            current_git_commit = current_git_commit[0]
+        cmd_output = cmd_output.split(" ")
+        if len(cmd_output) > 1:
+            return cmd_output[0]
         else:
-            # something went wrong, return None
-            current_git_commit = None
+            # something went wrong
+            return
     except subprocess.CalledProcessError:
-        current_git_commit = None
-    finally:
-        os.chdir(cwd)
-
-    return current_git_commit
+        return
 
 
 def basf2_command_builder(steering_file: str, parameters: List[str],

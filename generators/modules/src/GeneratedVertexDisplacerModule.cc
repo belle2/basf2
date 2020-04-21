@@ -89,7 +89,8 @@ void GeneratedVertexDisplacerModule::event()
                   param_index) << " and option: " << m_lifetimeOption);
         displace(mcp, m_lifetime.at(param_index));
         B2DEBUG(0, "new vertex (x,y,z) at:" << "(" << mcp.getDecayVertex().X() << "," << mcp.getDecayVertex().Y() << "," <<
-                mcp.getDecayVertex().Z() << ")");
+                mcp.getDecayVertex().Z() << ")" << " with decaylength=" << std::sqrt(std::pow(mcp.getDecayVertex().X(),
+                    2) + std::pow(mcp.getDecayVertex().Y(), 2) + std::pow(mcp.getDecayVertex().Z(), 2))) ;
       }
     }
   }
@@ -162,8 +163,6 @@ void GeneratedVertexDisplacerModule::getDisplacement(MCParticle& particle, float
   displacement.SetY(decayLength_mcp * fourVector_mcp.Y() / pMag);
   displacement.SetZ(decayLength_mcp * fourVector_mcp.Z() / pMag);
   displacement.SetT(decayLength_mcp / (Const::speedOfLight * fourVector_mcp.Beta()));
-
-
 }
 
 

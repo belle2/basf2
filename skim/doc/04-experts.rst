@@ -206,12 +206,12 @@ This will read the output files of the test jobs, and produce tables of statisti
 
 .. _b2skim-prod:
 
-``b2skim-prod-json``: Produce grid production requests
+``b2skim-prod``: Produce grid production requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. argparse::
-   :filename: skim/tools/b2skim-prod-json
+   :filename: skim/tools/b2skim-prod
    :func: get_argument_parser
-   :prog: b2skim-prod-json
+   :prog: b2skim-prod
    :nodefaultconst:
    :nogroupsections:

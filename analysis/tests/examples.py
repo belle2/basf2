@@ -55,11 +55,7 @@ class ExamplesTest(unittest.TestCase):
         Test supported FEI examples.
         """
 
-        if '/sw/belle/local/neurobayes-4.3.1/lib/' in os.getenv('LD_LIBRARY_PATH'):
-            self._test_examples_dir('analysis/examples/FEI/')
-        else:
-            skip_b2bii_examples = ['B_converted_apply.py', 'B_converted_train.py']
-            self._test_examples_dir('analysis/examples/FEI/', skip_b2bii_examples)
+        self._test_examples_dir('analysis/examples/FEI/')
 
     def test_fitting_examples(self):
         """
@@ -117,6 +113,13 @@ class ExamplesTest(unittest.TestCase):
         """
 
         self._test_examples_dir('analysis/examples/VariableManager/')
+
+    def test_postmdstidentification_examples(self):
+        """
+        Test supported PostMdstIdentification examples.
+        """
+
+        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
 
 
 if __name__ == '__main__':

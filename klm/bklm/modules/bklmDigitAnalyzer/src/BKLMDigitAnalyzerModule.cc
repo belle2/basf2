@@ -60,7 +60,7 @@ void BKLMDigitAnalyzerModule::initialize()
 {
   m_digit.isRequired();
   m_digitRaw.isRequired();
-  m_digitOutOfRange.isRequired();
+  m_digitOutOfRange.isRequired("KLMDigitsOutOfRange");
   m_digitEventInfo.isRequired();
 }
 
@@ -183,12 +183,14 @@ void BKLMDigitAnalyzerModule::event()
 
     KLMDigitEventInfo* digitEventInfo = m_digitEventInfo[i];
     // Some warnings (they should never appear, but it's better to be sure)
-    if ((digitEventInfo->getRPCHits() + digitEventInfo->getSciHits()) != (int)digitEventInfo->getRelationsTo<BKLMDigit>().size())
+    if ((digitEventInfo->getRPCHits() + digitEventInfo->getSciHits()) != (int)digitEventInfo->getRelationsFrom<KLMDigit>().size())
       B2WARNING("BKLMDigitAnalyzer:: the total number of BKLMDigit differs from the sum of RPC and scintillator hits stored in BKLMEventDigitDebug!");
-    if (digitEventInfo->getOutOfRangeHits() != (int)digitEventInfo->getRelationsTo<BKLMDigitOutOfRange>().size())
+    if (digitEventInfo->getOutOfRangeHits() != (int)digitEventInfo->getRelationsTo<KLMDigit>("BKLMDigitsOutOfRange").size())
       B2WARNING("BKLMDigitAnalyzer:: the total number of BKLMDigit differs from the number of outOfRange-flagged hits stored in BKLMEventDigitDebug!");
 
-    for (const BKLMDigit& digit : digitEventInfo->getRelationsTo<BKLMDigit>()) {
+    for (const KLMDigit& digit : digitEventInfo->getRelationsFrom<KLMDigit>()) {
+      if (digit.getSubdetector() != KLMElementNumbers::c_BKLM)
+        continue;
 
       KLMDigitRaw* digitRaw = digit.getRelatedTo<KLMDigitRaw>();
 
@@ -219,7 +221,7 @@ void BKLMDigitAnalyzerModule::endRun()
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   // Save the .root file
-  if (m_outputRootFile != NULL) {
+  if (m_outputRootFile != nullptr) {
     m_outputRootFile->cd();
 
     m_extraInfo->Write();

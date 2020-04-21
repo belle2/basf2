@@ -30,6 +30,7 @@ PXDClustersFromTracksModule::PXDClustersFromTracksModule() : Module()
   B2DEBUG(1, "Constructor");
   // Set module properties
   setDescription("PXDClustersFromTracks module for creating a new StoreArray of track matched PXDCluster.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("PXDClustersName", m_pxdClustersName, "StoreArray name of the input PXD clusters", std::string("PXDClusters"));

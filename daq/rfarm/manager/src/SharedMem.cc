@@ -8,6 +8,15 @@
 
 #include "daq/rfarm/manager/SharedMem.h"
 
+#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <cstring>
+
 using namespace Belle2;
 using namespace std;
 

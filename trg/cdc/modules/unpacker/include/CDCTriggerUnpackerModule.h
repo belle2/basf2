@@ -235,13 +235,13 @@ namespace Belle2 {
     CDCTriggerUnpackerModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Delete dynamically allocated variables */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** convert raw data (in B2L buffer to bitstream) */
-    virtual void event();
+    virtual void event() override;
 
     /** data width of a single merger unit */
     /** number of merger unit in each super layers */

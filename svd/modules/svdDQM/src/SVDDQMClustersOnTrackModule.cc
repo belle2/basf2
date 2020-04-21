@@ -18,13 +18,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
@@ -248,11 +245,11 @@ void SVDDQMClustersOnTrackModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
 
-    StoreArray<Track> storeTracks;
-
-    storeTracks.isOptional();
     m_svdEventInfo.isOptional();
     m_eventT0.isOptional();
+    m_storeTracks.isOptional();
+    m_resultStoreObjectPointer.isOptional();
+
   }
 }
 
@@ -279,9 +276,19 @@ void SVDDQMClustersOnTrackModule::beginRun()
 
 void SVDDQMClustersOnTrackModule::event()
 {
-  if ((m_tb != -1) && (m_svdEventInfo.isValid()))
-    if (m_svdEventInfo->getModeByte().getTriggerBin() != m_tb)
-      return;
+
+  if (!m_storeTracks.isValid()) {
+    B2WARNING("Missing Tracks StoreArray. Skipping SVDDQMClustersOnTrack");
+    return;
+  }
+
+  if (!m_svdEventInfo.isValid())
+    m_tb = -1;
+  else {
+    if (m_tb != -1)
+      if (m_svdEventInfo->getModeByte().getTriggerBin() != m_tb)
+        return;
+  }
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
@@ -304,13 +311,8 @@ void SVDDQMClustersOnTrackModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  StoreArray<Track> storeTracks;
 
-  if (!storeTracks || !storeTracks.getEntries()) {
-    return;
-  }
-
-  BOOST_FOREACH(Track & track, storeTracks) {
+  BOOST_FOREACH(Track & track, m_storeTracks) {
 
     const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
     if (!tfr) continue;

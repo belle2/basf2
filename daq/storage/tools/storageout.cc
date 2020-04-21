@@ -6,24 +6,18 @@
 // Date : 25 - Sep - 2013
 //-
 
-#include <stdio.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-
 #include <framework/logging/Logger.h>
 
-#include "daq/rfarm/event/RevRb2Sock.h"
-#include "daq/dataflow/REvtSocket.h"
-
-#include <daq/storage/BinData.h>
 #include <daq/storage/SharedEventBuffer.h>
 
+#include <daq/slc/base/IOException.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/slc/system/TCPServerSocket.h>
 #include <daq/slc/system/TCPSocketWriter.h>
 #include <daq/slc/system/LogFile.h>
-#include <daq/slc/system/Time.h>
+
+#include <arpa/inet.h>
 
 using namespace Belle2;
 

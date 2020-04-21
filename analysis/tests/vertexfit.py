@@ -6,7 +6,7 @@ import tempfile
 import basf2
 import b2test_utils
 import modularAnalysis as ma
-from vertex import KFit
+from vertex import kFit
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -43,12 +43,12 @@ ma.reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
 ma.matchMCTruth('pi0', path=main)
 
 # KFit
-KFit('pi0', 0.0, path=main)
+kFit('pi0', 0.0, path=main)
 
 ma.reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
 ma.matchMCTruth('D0', path=main)
 
-KFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
+kFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
 
 ntupler = basf2.register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)

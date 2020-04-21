@@ -79,7 +79,6 @@ namespace Belle2 {
     static std::string m_xmlFileName; /**< xml filename*/
     DBObjPtr<PayloadFile> m_mapping; /**< channel map payload*/
 
-    StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigits Store Arrra*/
     StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics; /**<SVDDAQDiagnostic StoreArray*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**<EvtMetaData StoreObjectPointer*/
 

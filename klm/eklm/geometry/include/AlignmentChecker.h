@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/Arc2D.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/LineSegment2D.h>
@@ -102,6 +102,9 @@ namespace Belle2 {
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;
+
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Sector support edge: corner 1 line. */
       LineSegment2D* m_LineCorner1;

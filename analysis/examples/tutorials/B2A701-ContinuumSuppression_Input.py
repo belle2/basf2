@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -20,7 +19,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import sys
-import glob
 import os
 
 
@@ -120,7 +118,7 @@ ma.buildContinuumSuppression(list_name='B0',
                              path=my_path)
 
 # Define the variables for training.
-#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  For details, please see the Continuum suppression section at https://software.belle2.org
 #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
 #  signal-B final state particles.
 trainVars = [

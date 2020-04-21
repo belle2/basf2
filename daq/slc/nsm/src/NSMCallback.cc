@@ -1,19 +1,14 @@
 #include "daq/slc/nsm/NSMCallback.h"
 
 #include "daq/slc/system/LogFile.h"
-#include "daq/slc/system/Time.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/nsm/NSMHandlerException.h"
 
-#include <signal.h>
-#include <string.h>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <unistd.h>
 #include <cstdarg>
-#include <cctype>
 
 using namespace Belle2;
 

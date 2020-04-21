@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/muid/MuidElementNumbers.h>
 
+/* Belle2 headers. */
+#include <framework/gearbox/Const.h>
+
 using namespace Belle2;
 
 MuidElementNumbers::MuidElementNumbers()
@@ -115,4 +118,57 @@ unsigned int MuidElementNumbers::calculateExtrapolationOutcome(bool isForward, b
     }
   }
   return outcome;
+}
+
+MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(int pdg)
+{
+  /* For leptons, the sign of the PDG code is opposite to the charge. */
+  if (pdg == Const::electron.getPDGCode())
+    return MuidElementNumbers::c_Electron;
+  if (pdg == -Const::electron.getPDGCode())
+    return MuidElementNumbers::c_Positron;
+  if (pdg == Const::muon.getPDGCode())
+    return MuidElementNumbers::c_MuonMinus;
+  if (pdg == -Const::muon.getPDGCode())
+    return MuidElementNumbers::c_MuonPlus;
+  /* For hadrons, the sign of the PDG code is equal to the charge. */
+  if (pdg == Const::deuteron.getPDGCode())
+    return MuidElementNumbers::c_Deuteron;
+  if (pdg == -Const::deuteron.getPDGCode())
+    return MuidElementNumbers::c_AntiDeuteron;
+  if (pdg == Const::proton.getPDGCode())
+    return MuidElementNumbers::c_Proton;
+  if (pdg == -Const::proton.getPDGCode())
+    return MuidElementNumbers::c_AntiProton;
+  if (pdg == Const::pion.getPDGCode())
+    return MuidElementNumbers::c_PionPlus;
+  if (pdg == -Const::pion.getPDGCode())
+    return MuidElementNumbers::c_PionMinus;
+  if (pdg == Const::kaon.getPDGCode())
+    return MuidElementNumbers::c_KaonPlus;
+  if (pdg == -Const::kaon.getPDGCode())
+    return MuidElementNumbers::c_KaonMinus;
+  /* Only charged final state particles are supported. */
+  return MuidElementNumbers::c_NotValid;
+}
+
+std::vector<int> MuidElementNumbers::getPDGVector(int charge)
+{
+  std::vector<int> pdgVector;
+  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+    if ((particle == Const::electron) || (particle == Const::muon))
+      pdgVector.push_back(-charge * particle.getPDGCode());
+    else
+      pdgVector.push_back(charge * particle.getPDGCode());
+  }
+  return pdgVector;
+}
+
+std::vector<int> MuidElementNumbers::getPDGVector()
+{
+  std::vector<int> pdgVector = getPDGVector(1);
+  std::vector<int> temp = getPDGVector(-1);
+  pdgVector.insert(pdgVector.end(), temp.begin(), temp.end());
+  std::sort(pdgVector.begin(), pdgVector.end());
+  return pdgVector;
 }

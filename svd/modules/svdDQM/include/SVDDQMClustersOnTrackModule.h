@@ -15,7 +15,10 @@
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -60,8 +63,12 @@ namespace Belle2 {
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
 
+    /** StoreArray of the Tracks*/
+    StoreArray<Track> m_storeTracks;
+
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
 

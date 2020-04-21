@@ -36,6 +36,10 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            m_payload_name,
            "The name of the database payload object with the MVA weights.",
            std::string("ChargedPidMVAWeights"));
+  addParam("useECLOnlyTraining",
+           m_ecl_only,
+           "Specify whether to use an ECL-only training of the MVA.",
+           bool(false));
 }
 
 
@@ -70,6 +74,13 @@ void ChargedPidMVAModule::beginRun()
 
   m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 
+  if (m_ecl_only) {
+    m_score_varname += "_" + std::to_string(Const::ECL);
+  } else {
+    for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
+      m_score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+    }
+  }
 }
 
 
@@ -183,6 +194,7 @@ void ChargedPidMVAModule::event()
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
 
       B2DEBUG(11, "\tMVA score = " << score);
+      B2DEBUG(12, "\tExtraInfo: " << m_score_varname);
 
       // Store the MVA score as a new particle object property.
       particle->writeExtraInfo(m_score_varname, score);

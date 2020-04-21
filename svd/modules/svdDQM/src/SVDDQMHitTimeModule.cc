@@ -113,19 +113,10 @@ void SVDDQMHitTimeModule::defineHisto()
 void SVDDQMHitTimeModule::initialize()
 {
 
-  if (!m_clusters.isOptional()) {
-    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
-    return;
-  }
-
-  if (!m_TrgResult.isOptional()) {
-    B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");
-    return;
-  }
-  m_TrgResult.isRequired();
+  m_TrgResult.isOptional();
   m_eventT0.isOptional();
   m_svdEventInfo.isOptional();
-  m_clusters.isRequired();
+  m_clusters.isOptional();
 
   REG_HISTOGRAM
 
@@ -136,10 +127,6 @@ void SVDDQMHitTimeModule::initialize()
 //---------------------------------
 void SVDDQMHitTimeModule::beginRun()
 {
-  if (!m_clusters.isOptional()) {
-    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
-    return;
-  }
 
   m_l3v_bhabha_L1_ECLTRG->Reset();
   m_l3vEvtT0_bhabha_L1_ECLTRG->Reset();
@@ -161,6 +148,22 @@ void SVDDQMHitTimeModule::beginRun()
 //---------------------------------
 void SVDDQMHitTimeModule::event()
 {
+
+  if (!m_TrgResult.isValid()) {
+    B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");
+    return;
+  }
+  if (!m_svdEventInfo.isValid()) {
+    B2WARNING("Missing SVDEventInfo, SVDDQMHitTime is skipped.");
+    return;
+  }
+
+  if (!m_clusters.isValid()) {
+    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
+    return;
+  }
+
+
   if (!m_objTrgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but required to indicate which detector provided the L1 trigger time");
     return;
@@ -217,10 +220,9 @@ void SVDDQMHitTimeModule::event()
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
-  if (m_eventT0.isOptional())
-    if (m_eventT0.isValid())
-      if (m_eventT0->hasEventT0())
-        eventT0 = m_eventT0->getEventT0();
+  if (m_eventT0.isValid())
+    if (m_eventT0->hasEventT0())
+      eventT0 = m_eventT0->getEventT0();
 
   // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
   if (m_desynchSVDTime && m_svdEventInfo.isValid())

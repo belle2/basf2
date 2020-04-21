@@ -9,8 +9,6 @@
 #include "daq/rawdata/modules/GenRawSend.h"
 
 #include <framework/datastore/StoreObjPtr.h>
-//#include <framework/datastore/StoreDefs.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #define HEADER_SIZE 23

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -39,7 +38,7 @@ ma.inputMdst(environmentType='default',
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
+# see Standard Particles section at https://software.belle2.org/
 stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay

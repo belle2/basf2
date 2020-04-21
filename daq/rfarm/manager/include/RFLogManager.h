@@ -8,22 +8,7 @@
 // Date : 12 - Jul - 2013
 //-
 
-#include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-
-#include <nsm2/nsm2.h>
-#include <nsm2/belle2nsm.h>
-
-#include "daq/rfarm/manager/RFNSM.h"
 
 namespace Belle2 {
   class RFLogManager {

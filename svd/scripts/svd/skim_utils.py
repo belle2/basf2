@@ -30,7 +30,10 @@ class skimOutRNDTrgModule(basf2.Module):
     """
 
     def event(self):
-
+        """
+        check RawFTSW to get the event type
+        """
+        #: StoreArray of RawFTSW
         rawFTSW = Belle2.PyStoreArray('RawFTSWs')
 
         if not rawFTSW.isValid():

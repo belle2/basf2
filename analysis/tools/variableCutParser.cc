@@ -21,7 +21,7 @@ int main()
 {
   std::string condition;
   std::cout <<
-            "This program allows you to test variable conditions (see https://confluence.desy.de/display/BI/Physics+VariableManager).\n";
+            "This program allows you to test variable conditions (see the VariableManager section at https://software.belle2.org/).\n";
   std::cout << "Please input a condition " << std::flush;
   std::getline(std::cin, condition);
 

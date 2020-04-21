@@ -119,6 +119,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -129,6 +130,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -170,6 +174,7 @@ namespace Belle2 {
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -180,6 +185,9 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -312,20 +320,29 @@ namespace Belle2 {
   }
 
 
-  bool ParticleGenerator::loadNext()
+  bool ParticleGenerator::loadNext(bool loadAntiParticle)
   {
 
     bool loadedNext = false;
+    /**
+     * Three cases are distinguished:
+     * First, particles matching the flavor specified in the decay string are used to form combinations.
+     * Secondly, the anti-particles of flavored particles are used, but only if requested.
+     * Lastly, self-conjugated particles are handled specifically.
+     */
     while (true) {
-      switch (m_iParticleType) {
-        case 0: loadedNext = loadNextParticle(false); break; //Particles
-        case 1: loadedNext = loadNextParticle(true); break; //Anti-Particles
-        case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
-        default: return false;
+      if (m_iParticleType == 0) {
+        loadedNext = loadNextParticle(false);
+      } else if (m_iParticleType == 1 and loadAntiParticle) {
+        loadedNext = loadNextParticle(true);
+      } else if (m_iParticleType == 2) {
+        loadedNext = loadNextSelfConjugatedParticle();
+      } else {
+        return false;
       }
-      if (loadedNext)
-        return true;
-      ++m_iParticleType;
+
+      if (loadedNext) return true;
+      else ++m_iParticleType;
 
       if (m_iParticleType == 2) {
         std::vector<unsigned int> sizes(m_numberOfLists);
@@ -433,13 +450,13 @@ namespace Belle2 {
 
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices,
-                                m_properties,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }

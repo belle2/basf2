@@ -603,6 +603,7 @@ void SVDDQMExpressRecoModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
+    StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
     StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
     StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
     m_storeSVDClustersName = storeSVDClusters.getName();
@@ -610,6 +611,7 @@ void SVDDQMExpressRecoModule::initialize()
     storeSVDClusters.isOptional();
     storeSVDShaperDigits.isOptional();
     m_svdEventInfo.isOptional();
+    storeNoZSSVDShaperDigits.isOptional();
 
     //Store names to speed up creation later
     m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
@@ -656,7 +658,7 @@ void SVDDQMExpressRecoModule::event()
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
 
-  if (!storeSVDShaperDigits || !storeSVDShaperDigits.getEntries()) {
+  if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
     return;
   }
 
@@ -749,20 +751,21 @@ void SVDDQMExpressRecoModule::event()
   }
 
   // Fired strips ONLINE ZS
-  for (const SVDShaperDigit& digitIn : storeNoZSSVDShaperDigits) {
-    int iLayer = digitIn.getSensorID().getLayerNumber();
-    if ((iLayer < firstSVDLayer) || (iLayer > lastSVDLayer)) continue;
-    int iLadder = digitIn.getSensorID().getLadderNumber();
-    int iSensor = digitIn.getSensorID().getSensorNumber();
-    VxdID sensorID(iLayer, iLadder, iSensor);
-    int index = gTools->getSVDSensorIndex(sensorID);
-    SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    if (digitIn.isUStrip()) {
-      if (m_onlineZSstripCountU[index] != NULL) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
-    } else {
-      if (m_onlineZSstripCountV[index] != NULL) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+  if (storeNoZSSVDShaperDigits.isValid())
+    for (const SVDShaperDigit& digitIn : storeNoZSSVDShaperDigits) {
+      int iLayer = digitIn.getSensorID().getLayerNumber();
+      if ((iLayer < firstSVDLayer) || (iLayer > lastSVDLayer)) continue;
+      int iLadder = digitIn.getSensorID().getLadderNumber();
+      int iSensor = digitIn.getSensorID().getSensorNumber();
+      VxdID sensorID(iLayer, iLadder, iSensor);
+      int index = gTools->getSVDSensorIndex(sensorID);
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      if (digitIn.isUStrip()) {
+        if (m_onlineZSstripCountU[index] != NULL) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
+      } else {
+        if (m_onlineZSstripCountV[index] != NULL) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+      }
     }
-  }
 
   vector< set<int> > countsU(nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > countsV(nSVDSensors);
@@ -806,7 +809,6 @@ void SVDDQMExpressRecoModule::event()
 
       if (m_ShowAllHistos == 1)
         if (m_hitMapUCl[index] != NULL) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
-
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
@@ -829,7 +831,6 @@ void SVDDQMExpressRecoModule::event()
         if (m_clusterSNRV456 != NULL) m_clusterSNRV456->Fill(cluster.getSNR());
         if (m_clusterTimeV456 != NULL) m_clusterTimeV456->Fill(time);
       }
-
       if (m_ShowAllHistos == 1)
         if (m_hitMapVCl[index] != NULL) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
 

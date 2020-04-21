@@ -132,6 +132,8 @@ namespace Belle2 {
     //check if the fitting algorithm name  is set correctly
     if (m_fitAlgo != "Rave" && m_fitAlgo != "KFit")
       B2FATAL("TagVertexModule: invalid fitting algorithm (must be set to either Rave or KFit).");
+    if (m_useRollBack && m_useTruthInFit)
+      B2FATAL("TagVertexModule: invalid fitting option (useRollBack and useTruthInFit cannot be simultaneously set to true).");
     //temporary while the one track fit is broken
     if (m_trackFindingType == "singleTrack" || m_trackFindingType == "singleTrack_PXD")
       B2FATAL("TagVertexModule : the singleTrack option is temporarily broken.");

@@ -4,6 +4,7 @@
 """General steering file for running skims."""
 
 import argparse
+import sys
 
 import basf2 as b2
 import modularAnalysis as ma
@@ -25,31 +26,26 @@ class CustomHelpFormatter(argparse.HelpFormatter):
             return action.help
 
 
+class CustomArgumentParser(argparse.ArgumentParser):
+    """Argument parser which propogates help formatter to all subparsers."""
+
+    def __init__(self, **kwargs):
+        kwargs["formatter_class"] = CustomHelpFormatter
+        super(CustomArgumentParser, self).__init__(**kwargs)
+
+    def error(self, message):
+        sys.stderr.write(f"Error: {message}\n")
+        self.print_help()
+        sys.exit(2)
+
+
 def get_argument_parser():
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=CustomHelpFormatter,
-    )
+    parser = CustomArgumentParser(description=__doc__)
 
     subparsers = parser.add_subparsers(
-        help="Run just one skim, or multiple skims at once.", dest="action"
+        dest="action", help="Run just one skim, or multiple skims at once.",
     )
-
-    parser.add_argument(
-        "-n",
-        "--max-input-events",
-        dest="MaxInputEvents",
-        metavar="MaxInputEvents",
-        type=int,
-        help="Maximum number of input events to process.",
-    )
-    parser.add_argument(
-        "-i",
-        "--input-file-list",
-        dest="InputFileList",
-        metavar="InputFileList",
-        nargs="+",
-        help="Input file list",
-    )
+    subparsers.required = True
 
     single = subparsers.add_parser("single", help="Run a single skim.")
 
@@ -85,6 +81,24 @@ def get_argument_parser():
         metavar="module",
         help="Skim module to run all skims for as combined steering file.",
     )
+
+    for subparser in [single, combined, module]:
+        subparser.add_argument(
+            "-n",
+            "--max-input-events",
+            dest="MaxInputEvents",
+            metavar="MaxInputEvents",
+            type=int,
+            help="Maximum number of input events to process.",
+        )
+        subparser.add_argument(
+            "-i",
+            "--input-file-list",
+            dest="InputFileList",
+            metavar="InputFileList",
+            nargs="+",
+            help="Input file list",
+        )
 
     return parser
 

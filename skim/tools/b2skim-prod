@@ -120,7 +120,8 @@ for producing a production request and combined steering file is as follows:
       $ b2skim-stats-print -c EWP Tau -J
 
 3. The output ``SkimStats.json`` can then be used to produce production JSON files for
-   the EWP and Tau combined skims.
+   the EWP and Tau combined skims, and will construct a steering files for the specified
+   combined skims.
 
 
 --epilog--

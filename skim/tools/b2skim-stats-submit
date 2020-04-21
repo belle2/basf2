@@ -93,13 +93,23 @@ class CustomHelpFormatter(argparse.HelpFormatter):
             return action.help
 
 
-def required_length(nMin):
+def required_length(*, min=None, max=None):
     """Custom action for argparse to enforce a minimum number of arguments to an option."""
+
     class RequiredLength(argparse.Action):
         def __call__(self, parser, args, values, option_string=None):
-            if len(values) < nMin:
-                msg = "Argument '{self.dest}' requires at least {nMin} arguments."
-                raise argparse.ArgumentTypeError(msg)
+            if min is not None and max is None:
+                if len(values) < min:
+                    msg = "Argument '{self.dest}' requires at least {min} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is None and max is not None:
+                if len(values) > max:
+                    msg = "Argument '{self.dest}' requires at most {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is not None and max is not None:
+                if len(values) < min or len(values) > max:
+                    msg = "Argument '{self.dest}' requires between {min} and {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
             setattr(args, self.dest, values)
 
     return RequiredLength
@@ -135,7 +145,7 @@ def getArgumentParser():
         "-c",
         "--combined",
         nargs="+",
-        action=required_length(2),
+        action=required_length(min=2),
         metavar=("YAMLFile", "CombinedSkim"),
         help=(
             "List of combined skims to run. This flag expects as its first argument "

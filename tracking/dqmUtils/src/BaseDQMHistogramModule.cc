@@ -612,18 +612,18 @@ void BaseDQMHistogramModule::ProcessHistogramParameterChange(string name, string
     }
 
   if (!found) {
-    printf("\nWarning: histogram %s not found", name.c_str());
+    B2WARNING(format("Histogram %1% not found, parameter change is skipped.") % name);
     return;
   }
 
   try {
     EditHistogramParameter(histogram, parameter, value);
   } catch (const invalid_argument& e) {
-    printf("\nWarning: value %s of parameter %s for histogram %s could not be parsed", value.c_str(), parameter.c_str(),
-           histogram->GetName());
+    B2WARNING(format("Value %1% of parameter %2% for histogram %3% could not be parsed, parameter change is skipped.") % value %
+              parameter % histogram->GetName());
   } catch (const out_of_range& e) {
-    printf("\nWarning: value %s of parameter %s for histogram %s is out of range", value.c_str(), parameter.c_str(),
-           histogram->GetName());
+    B2WARNING(format("Value %1% of parameter %2% for histogram %3% is out of range, parameter change is skipped.") % value % parameter %
+              histogram->GetName());
   }
 }
 
@@ -658,7 +658,7 @@ void BaseDQMHistogramModule::EditHistogramParameter(TH1* histogram, string param
   }
 
   if (dynamic_cast<TH2F*>(histogram) == nullptr) {
-    printf("\nWarning: parameter %s not found in histogram %s", parameter.c_str(), histogram->GetName());
+    B2WARNING(format("Parameter %1% not found in histogram %2%, parameter change is skipped.") % parameter % histogram->GetName());
     return;
   }
 
@@ -682,5 +682,6 @@ void BaseDQMHistogramModule::EditHistogramParameter(TH1* histogram, string param
     return;
   }
 
-  printf("\nWarning: parameter %s not found in histogram %s", parameter.c_str(), histogram->GetName());
+  B2WARNING(format("Parameter %1% not found in histogram %2%, parameter change is skipped.") % parameter.c_str() %
+            histogram->GetName());
 }

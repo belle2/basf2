@@ -433,30 +433,54 @@ def TwoTrackLeptonsForLuminosityList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
-    skim_label = 'TwoTrackLeptonsForLuminosity'
+    # Skim label for the case of two tracks
+    skim_label_2 = 'TwoTrackLeptonsForLuminosity2'
+    # Skim label for the case of one track plus one cluster
+    skim_label_1 = 'TwoTrackLeptonsForLuminosity1'
 
     # Tracks from IP
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
-    # Tracks of momenta greater than 2 GeV in the CMS frame
+    # Tracks or clusters of momenta greater than 2 GeV in the CMS frame
     p_cut = '[useCMSFrame(p) > 2.0]'
-    # Tracks points to the barrel ECL + 10 degrees
+    # Tracks pointing to or clusters locating in the barrel ECL + 10 degrees
     theta_cut = '[0.387 < theta < 2.421]'
+
     single_track_cut = IP_cut + ' and ' + p_cut + ' and ' + theta_cut
+    single_cluster_cut = p_cut + ' and ' + theta_cut
 
-    # Exactly 2 tracks from IP
-    nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
+    # Exactly 2 tracks
+    nTracks_cut_2 = '[nCleanedTracks(' + single_track_cut + ') == 2]'
+    # Exactly 1 track
+    nTracks_cut_1 = '[nCleanedTracks(' + single_track_cut + ') == 1]'
     # Acollinearity angle in the theta dimension less than 10 degrees in the CMS frame
-    # candidates are : vpho -> e+ e-
-    # daughter indices are:    0  1
+    # candidates are : vpho -> e+ e- or vpho -> e gamma
+    # daughter indices are:    0  1             0 1
     deltaTheta_cut = '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
-    two_track_cut = nTracks_cut + ' and ' + deltaTheta_cut
 
-    # Reconstruct the two track event candidate
+    two_track_cut = nTracks_cut_2 + ' and ' + deltaTheta_cut
+    track_cluster_cut = nTracks_cut_1 + ' and ' + deltaTheta_cut
+
+    # Reconstruct the event candidates with two tracks
     ma.fillParticleList('e+:all', '', path=path)
-    ma.cutAndCopyList('e+:' + skim_label, 'e+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
-    ma.reconstructDecay('vpho:' + skim_label + ' -> e+:' + skim_label + ' e-:' + skim_label, two_track_cut, path=path)
+    ma.cutAndCopyList('e+:' + skim_label_2, 'e+:all', single_track_cut + ' and ' + nTracks_cut_2, path=path)
+    ma.reconstructDecay('vpho:' + skim_label_2 + ' -> e+:' + skim_label_2 + ' e-:' + skim_label_2, two_track_cut, path=path)
 
-    return ['vpho:' + skim_label]
+    # Reconstruct the event candidates with one track plus one cluster
+    ma.cutAndCopyList('e+:' + skim_label_1, 'e+:all', single_track_cut + ' and ' + nTracks_cut_1, path=path)
+    ma.fillParticleList('gamma:all', '', path=path)
+    ma.cutAndCopyList('gamma:' + skim_label_1, 'gamma:all', single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
+    ma.reconstructDecay(
+        'vpho:' +
+        skim_label_1 +
+        ' -> e+:' +
+        skim_label_1 +
+        ' gamma:' +
+        skim_label_1,
+        track_cluster_cut,
+        allowChargeViolation=True,
+        path=path)
+
+    return ['vpho:' + skim_label_2, 'vpho:' + skim_label_1]
 
 
 def LowMassTwoTrackList(path):

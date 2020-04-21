@@ -40,10 +40,8 @@ def stdPhotons(listtype='loose', path=None):
     # all photons within the cdc tracking acceptance: remove un track-matched
     # electrons from outside the tracking acceptance
     elif listtype == 'cdc':
-        stdPhotons('all', path)
-        cutAndCopyList(
+        fillParticleList(
             'gamma:cdc',
-            'gamma:all',
             'theta > 0.296706 and theta < 2.61799',
             True,
             path)
@@ -67,42 +65,32 @@ def stdPhotons(listtype='loose', path=None):
             True,
             path)
     elif listtype == 'pi0eff10_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
+        fillParticleList(
             'gamma:pi0eff10_Jan2020',
-            'gamma:all',
             '[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180 and clusterE1E9>0.5]',
             True,
             path)
     elif listtype == 'pi0eff20_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
+        fillParticleList(
             'gamma:pi0eff20_Jan2020',
-            'gamma:all',
             '[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080 and clusterE1E9>0.4]',
             True,
             path)
     elif listtype == 'pi0eff30_Jan2020' or listtype == 'pi0eff40_Jan2020':
-            stdPhotons('all', path)
-            cutAndCopyList(
+            fillParticleList(
                 f'gamma:{listtype}',
-                'gamma:all',
                 '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]',
                 True,
                 path)
     elif listtype == 'pi0eff50_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
+        fillParticleList(
             'gamma:pi0eff50_Jan2020',
-            'gamma:all',
             '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]',
             True,
             path)
     elif listtype == 'pi0eff60_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
+        fillParticleList(
             'gamma:pi0eff60_Jan2020',
-            'gamma:all',
             '[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]',
             True,
             path)
@@ -142,5 +130,4 @@ def loadStdGoodBellePhoton(path):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
-    stdPhotons('all', path)
-    cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
+    fillParticleList('gamma:goodBelle', '0.5 < goodBelleGamma < 1.5', True, path)

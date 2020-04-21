@@ -109,25 +109,25 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         #: set the name of the localDB used
         self.localdb = localDB
 
-    # def set_run_number(self, run):
-    #     """
-    #     Function that allows to save the run number
+    def set_run_number(self, run):
+        """
+        Function that allows to save the run number
 
-    #     parameters:
-    #          run (int): run number
-    #     """
-    #     #: set the run number
-    #     self.runnumber = run
+        parameters:
+             run (int): run number
+        """
+        #: set the run number
+        self.runnumber = run
 
-    # def set_exp_number(self, exp):
-    #     """
-    #     Function that allows to save the experiment number
+    def set_exp_number(self, exp):
+        """
+        Function that allows to save the experiment number
 
-    #     parameters:
-    #          exp (int): experiment number
-    #     """
-    #     #: set the experiment number
-    #     self.expnumber = exp
+        parameters:
+             exp (int): experiment number
+        """
+        #: set the experiment number
+        self.expnumber = exp
 
     def initialize(self):
         """
@@ -135,7 +135,8 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         """
 
         #: name of the output file
-        self.outputFileName = "../caf/tree/SVDCoGCalibrationCheck_" + str(self.runnumber) + ".root"
+        self.outputFileName = "../caf/tree/SVDCoGCalibrationCheck_Exp" + \
+            str(self.expnumber) + "_Run" + str(self.runnumber) + ".root"
         #: lists used to create the histograms for each TB :
         #: residuals
         self.resList = []
@@ -292,9 +293,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         svd_evtInfo = Belle2.PyStoreObj(svd_EventInfo)
         clsTB = svd_evtInfo.getModeByte().getTriggerBin()
         self.TB = ord(clsTB)
-        svd_evtMD = Belle2.PyStoreObj(svd_EventMD)
-        self.runnumber = svd_evtMD.getRun()
-        self.expnumber = svd_evtMD.getExperiment()
+        # svd_evtMD = Belle2.PyStoreObj(svd_EventMD)
+        # self.runnumber = svd_evtMD.getRun()
+        # self.expnumber = svd_evtMD.getExperiment()
 
         for svdCluster in svdCluster_list:
             # svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)

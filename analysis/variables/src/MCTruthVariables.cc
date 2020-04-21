@@ -578,7 +578,7 @@ namespace Belle2 {
 
     double isReconstructible(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -594,7 +594,7 @@ namespace Belle2 {
 
     double seenInPXD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -604,7 +604,7 @@ namespace Belle2 {
 
     double seenInSVD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -614,7 +614,7 @@ namespace Belle2 {
 
     double seenInCDC(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -624,7 +624,7 @@ namespace Belle2 {
 
     double seenInTOP(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -634,7 +634,7 @@ namespace Belle2 {
 
     double seenInECL(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -644,7 +644,7 @@ namespace Belle2 {
 
     double seenInARICH(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
@@ -654,7 +654,7 @@ namespace Belle2 {
 
     double seenInKLM(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
         return -1.0;
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)

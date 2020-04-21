@@ -200,7 +200,7 @@ namespace Belle2 {
       int n_par_tracks = 0;
       const auto& daughters = particle->getFinalStateDaughters();
       for (const auto& daughter : daughters) {
-        if (daughter->getParticleType() == Particle::EParticleType::c_Track && roe->hasParticle(daughter, maskName)) {
+        if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Track && roe->hasParticle(daughter, maskName)) {
           n_par_tracks++;
         }
       }
@@ -2069,7 +2069,7 @@ namespace Belle2 {
 
     double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
-      if (particle->getParticleType() == Particle::c_Composite) {
+      if (particle->getParticleSource() == Particle::c_Composite) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (auto& i : fspDaug) {
           if (isInThisRestOfEvent(i, roe, maskName) == 0)

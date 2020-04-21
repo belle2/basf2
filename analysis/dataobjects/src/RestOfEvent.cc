@@ -71,7 +71,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     }
   }
   for (const int index : source) {
-    if (allParticles[index]->getParticleType() == Particle::EParticleType::c_Composite && unpackComposite) {
+    if (allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite && unpackComposite) {
       auto fsdaughters = allParticles[index]->getFinalStateDaughters();
       for (auto* daughter : fsdaughters) {
         result.push_back(daughter);
@@ -87,7 +87,7 @@ std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName
   auto particles = getParticles(maskName, unpackComposite);
   std::vector<const Particle*> photons;
   for (auto* particle : particles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
       photons.push_back(particle);
     }
   }
@@ -98,7 +98,7 @@ std::vector<const Particle*> RestOfEvent::getHadrons(const std::string& maskName
   auto particles = getParticles(maskName, unpackComposite);
   std::vector<const Particle*> hadrons;
   for (auto* particle : particles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
       hadrons.push_back(particle);
     }
   }
@@ -111,7 +111,7 @@ std::vector<const Particle*> RestOfEvent::getChargedParticles(const std::string&
   auto particles = getParticles(maskName, unpackComposite);
   std::vector<const Particle*> charged;
   for (auto* particle : particles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_Track) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
       if (pdg == 0 || pdg == abs(particle->getPDGCode())) {
         charged.push_back(particle);
       }
@@ -144,7 +144,7 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
 }
 
 void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particlesToUpdate,
-                                           Particle::EParticleType listType, bool discard)
+                                           Particle::EParticleSourceObject listType, bool discard)
 {
   Mask* mask = findMask(maskName);
   if (!mask) {
@@ -164,7 +164,7 @@ void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, std::vec
       }
     } else {
       // Keep all particles which has different type than provided list
-      if (listType != roeParticle->getParticleType()) {
+      if (listType != roeParticle->getParticleSource()) {
         toKeepinROE.push_back(roeParticle);
       } else if (discard) {
         // If keep particles option is off, take not equal particles
@@ -193,17 +193,17 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
   std::vector<const Particle*> maskedParticles;
   // First check particle type, then check cuts, if no cuts provided, take all particles of this type
   for (auto* particle : allROEParticles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_Track && (!trackCut || trackCut->check(particle))) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track && (!trackCut || trackCut->check(particle))) {
       maskedParticles.push_back(particle);
     }
-    if (particle->getParticleType() == Particle::EParticleType::c_ECLCluster && (!eclCut || eclCut->check(particle))) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster && (!eclCut || eclCut->check(particle))) {
       maskedParticles.push_back(particle);
     }
-    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster && (!klmCut || klmCut->check(particle))) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster && (!klmCut || klmCut->check(particle))) {
       maskedParticles.push_back(particle);
     }
     // don't lose a possible V0 particle
-    if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
       maskedParticles.push_back(particle);
     }
   }
@@ -253,12 +253,12 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
   if (!mask->isValid()) {
     return false; //We should have particles here!
   }
-  if (particleV0->getParticleType() != Particle::EParticleType::c_Composite) {
+  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite) {
     return false;
   }
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* daughter : daughtersV0) {
-    if (daughter->getParticleType() != Particle::EParticleType::c_Track) {
+    if (daughter->getParticleSource() != Particle::EParticleSourceObject::c_Track) {
       return false; // Non tracks are not supported yet
     }
   }
@@ -283,7 +283,7 @@ TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
     // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
-    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
       continue;
     }
     roe4Vector += particle->get4Vector();
@@ -307,7 +307,7 @@ std::vector<const Track*> RestOfEvent::getTracks(const std::string& maskName) co
   std::vector<const Track*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
   for (auto* particle : allParticles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_Track) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
       result.push_back(particle->getTrack());
     }
   }
@@ -331,7 +331,7 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& ma
   std::vector<const KLMCluster*> result;
   std::vector<const Particle*> allParticles = getParticles(maskName);
   for (auto* particle : allParticles) {
-    if (particle->getParticleType() == Particle::EParticleType::c_KLMCluster) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
       result.push_back(particle->getKLMCluster());
     }
   }

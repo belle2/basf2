@@ -447,9 +447,9 @@ namespace Belle2 {
 
         // this only makes sense for particles that are *not* composite and come
         // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
+        Particle::EParticleSourceObject particlesource = particle->getParticleSource();
+        if (particlesource == Particle::EParticleSourceObject::c_Composite
+        or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
@@ -458,7 +458,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particletype == iparticle->getParticleType())
+          if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
               return 1.0;
         }

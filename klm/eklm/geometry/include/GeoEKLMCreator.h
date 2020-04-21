@@ -655,6 +655,9 @@ namespace Belle2 {
       /** Current volumes. */
       struct VolumeNumbers m_CurVol;
 
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
+
       /** Transformation data. */
       TransformData* m_TransformData;
 

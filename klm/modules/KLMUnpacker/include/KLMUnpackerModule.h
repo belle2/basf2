@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
@@ -194,7 +194,7 @@ namespace Belle2 {
     /* Other EKLM variables. */
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

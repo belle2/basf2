@@ -48,7 +48,7 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
   m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
   m_MatchingHitData = {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr};
 }
@@ -234,7 +234,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
     if (hit.getDetectorID() == Const::EDetector::EKLM) {
       int stripGlobal = hit.getCopyID();
       hitData.subdetector = KLMElementNumbers::c_EKLM;
-      m_ElementNumbersEKLM->stripNumberToElementNumbers(
+      m_eklmElementNumbers->stripNumberToElementNumbers(
         stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
         &hitData.plane, &hitData.strip);
       channel = m_ElementNumbers->channelNumberEKLM(

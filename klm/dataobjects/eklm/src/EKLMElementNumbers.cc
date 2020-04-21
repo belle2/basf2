@@ -17,6 +17,12 @@
 
 using namespace Belle2;
 
+const EKLMElementNumbers& EKLMElementNumbers::Instance()
+{
+  static EKLMElementNumbers ens;
+  return ens;
+}
+
 EKLMElementNumbers::EKLMElementNumbers()
 {
 }

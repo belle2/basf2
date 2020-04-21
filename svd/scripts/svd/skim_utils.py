@@ -49,18 +49,18 @@ class skimOutRNDTrgModule(basf2.Module):
 
 class skimSVDBurstEventsModule(basf2.Module):
     """
-    returns True if the event is a Burst event (number of clusters > max number of clusters)
-    use set_nMaxStrips(nMaxStrips) to set the max number of strips iof a non-burst event, default is nMaxStrips=2000
+    returns True if the event is a Burst event (number of strips > max number of strips)
+    use set_nMaxStrips(nMaxStrips) to set the max number of strips iof a non-burst event, default is nMaxStrips=5000
     """
 
     def __init__(self):
         """constructor"""
 
         super().__init__()
-        self.nMaxStrips = 2000
+        self.nMaxStrips = 5000
 
-    def set_nMaxStrips(user_nMaxStrips):
-        "set the max strips, otherwise 2000"
+    def set_nMaxStrips(self, user_nMaxStrips):
+        """set the max strips, otherwise 5000"""
 
         self.nMaxStrips = user_nMaxStrips
 
@@ -79,6 +79,52 @@ class skimSVDBurstEventsModule(basf2.Module):
             self.return_value(1)
         else:
             self.return_value(0)
+
+
+"""
+class skimSVDBurstEventsDataSizeModule(basf2.Module):
+
+    returns True if the event is a Burst event (svd data size above limit))
+    use set_MaxDataSize(maxDataSize) to set the max data sieze of a non-burst event, default is maxDataSize=50kB
+
+
+    def __init__(self):
+
+        super().__init__()
+        self.maxDataSize = 50000
+
+    def set_maxDataSize(self,user_maxDataSize):
+        "set the max strips, otherwise 5000"
+
+        self.maxDataSize = user_maxDataSize
+
+    def event(self):
+
+        raw = Belle2.PyStoreArray('RawSVDs')
+
+        if not raw.isValid():
+            B2WARNING('No RawSVDs - event ignored')
+            self.return_value(0)
+
+            return
+
+        StoreArray<RawSVD> rawsvd;
+        int nsvd = rawsvd.getEntries();
+        int svdsize = 0;
+        for (int i = 0; i < nsvd; i++) { // Loop over COPPERs
+        int nbytes = rawsvd[i]->GetBlockNwords(0) * sizeof(unsigned int);
+        svdsize += nbytes;
+        }
+
+        svdSize = 0
+
+        for aRaw in raw:
+            svdSize+=aRaw.GetBlockNWords(0)*sizeof(unsigned int)
+        if raw.getEntries() > self.maxDataSize:
+            self.return_value(1)
+        else:
+            self.return_value(0)
+"""
 
 
 class skimSVDTriggerBinEventsModule(basf2.Module):

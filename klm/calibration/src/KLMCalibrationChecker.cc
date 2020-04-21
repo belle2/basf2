@@ -337,14 +337,13 @@ void KLMCalibrationChecker::checkStripEfficiency()
   if (m_GlobalTagName != "")
     printPayloadInformation(stripEfficiency);
   /* Create trees with strip efficiency measurement results. */
-  int experiment, run;
   int subdetector, section, sector, layer, plane;
   float efficiency, error;
   TFile* stripEfficiencyResults =
     new TFile(m_StripEfficiencyResultsFile.c_str(), "recreate");
   TTree* efficiencyTree = new TTree("efficiency", "KLM strip efficiency data.");
-  efficiencyTree->Branch("experiment", &experiment, "experiment/I");
-  efficiencyTree->Branch("run", &run, "run/I");
+  efficiencyTree->Branch("experiment", &m_experiment, "experiment/I");
+  efficiencyTree->Branch("run", &m_run, "run/I");
   efficiencyTree->Branch("subdetector", &subdetector, "subdetector/I");
   efficiencyTree->Branch("section", &section, "section/I");
   efficiencyTree->Branch("sector", &sector, "sector/I");

@@ -13,7 +13,7 @@ import os
 import subprocess
 import sys
 import time
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Union
 import logging
 
 # 3rd party
@@ -21,7 +21,6 @@ import ROOT
 
 # ours
 import validationpath
-from validationscript import Script
 
 ###############################################################################
 #                           Function definitions                              #
@@ -108,46 +107,6 @@ def get_start_time() -> float:
     @return: Time since the validation has been started
     """
     return g_start_time
-
-
-def find_creator(
-        outputfile: str,
-        package: str,
-        scripts: List[Script],
-        log: logging.Logger
-) -> List[Script]:
-    """!
-    This function receives the name of a file and tries to find the file
-    in the given package which produces this file, i.e. find the file in
-    whose header 'outputfile' is listed under <output></output>.
-    It then returns a list of all Scripts who claim to be creating 'outputfile'
-
-    @param outputfile: The file of which we want to know by which script is
-        created
-    @param package: The package in which we want to search for the creator
-    """
-
-    # Get a list of all Script objects for scripts in the given package as well
-    # as from the validation-folder
-    candidates = [script for script in scripts
-                  if script.package in [package, 'validation']]
-
-    # Reserve some space for the results we will return
-    results = []
-
-    # Loop over all candidates and check if they have 'outputfile' listed
-    # under their outputs
-    for candidate in candidates:
-        if candidate.header and \
-           outputfile in candidate.header.get('output', []):
-            results.append(candidate)
-
-    # Return our results and warn if there is more than one creator
-    if len(results) == 0:
-        return None
-    if len(results) > 1:
-        log.warning('Found multiple creators for' + outputfile)
-    return results
 
 
 def get_validation_folders(

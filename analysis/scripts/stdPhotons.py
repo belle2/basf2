@@ -82,22 +82,14 @@ def stdPhotons(listtype='loose', path=None):
             '[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080 and clusterE1E9>0.4]',
             True,
             path)
-    elif listtype == 'pi0eff30_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
-            'gamma:pi0eff30_Jan2020',
-            'gamma:all',
-            '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]',
-            True,
-            path)
-    elif listtype == 'pi0eff40_Jan2020':
-        stdPhotons('all', path)
-        cutAndCopyList(
-            'gamma:pi0eff40_Jan2020',
-            'gamma:all',
-            '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060]',
-            True,
-            path)
+    elif listtype == 'pi0eff30_Jan2020' or listtype == 'pi0eff40_Jan2020':
+            stdPhotons('all', path)
+            cutAndCopyList(
+                f'gamma:{listtype}',
+                'gamma:all',
+                '[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]',
+                True,
+                path)
     elif listtype == 'pi0eff50_Jan2020':
         stdPhotons('all', path)
         cutAndCopyList(

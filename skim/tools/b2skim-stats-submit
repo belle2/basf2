@@ -6,12 +6,17 @@ read by ``b2skim-stats-print``.
 """
 
 import argparse
+from datetime import datetime as dt
 from functools import lru_cache
+from getpass import getuser
+import json
+from os import getenv
 from pathlib import Path
 import re
 import subprocess
 import sys
 
+from git import Repo
 import yaml
 
 from b2test_utils import working_directory
@@ -171,6 +176,60 @@ def getArgumentParser():
     return parser
 
 
+def get_tag(repo):
+    """Get the current tag name by comparing commit hashes. If not at a tag, return None."""
+    def try_tag_commit(tag):
+        # try-except here to avoid weird issues that come up with some of the build-release tags
+        try:
+            return tag.commit
+        except UnicodeDecodeError:
+            pass
+    HEAD = repo.head.commit
+    tags = repo.tags
+    tag = next((tag for tag in tags if try_tag_commit(tag) == HEAD), None)
+    return tag
+
+
+def write_stats_metadata(logDirectory, CombinedSkimDefinitions={}):
+    """Write a short file containing details about when and how this test was run."""
+    UserInfo = {
+        "username": getuser(),
+        "datetime_UTC": str(dt.utcnow()),
+    }
+
+    ReleaseDirectory = getenv("BELLE2_RELEASE_DIR")
+    LocalDirectory = getenv("BELLE2_LOCAL_DIR")
+
+    GitInfo = {}
+    if ReleaseDirectory:
+        GitInfo["RunWith"] = "central release"
+        GitInfo["release"] = Path(ReleaseDirectory).stem
+
+    elif LocalDirectory:
+        GitInfo["RunWith"] = "local checkout"
+
+        # Get the status of the git repo
+        repo = Repo(LocalDirectory)
+        tag = get_tag(repo)
+        if repo.head.is_detached:
+            GitInfo["HeadDetached"] = True
+            if tag:
+                GitInfo["tag"] = str(tag)
+        else:
+            GitInfo["branch"] = str(repo.active_branch)
+
+        GitInfo["commit"] = str(repo.head.commit)
+        GitInfo["UncommitedLocalChanges"] = repo.is_dirty()
+
+    # Put it all together and write to file
+    metadata = {"WhoAndWhen": UserInfo, "GitInfo": GitInfo}
+    if CombinedSkimDefinitions:
+        metadata["CombinedSkims"] = CombinedSkimDefinitions
+
+    with open(logDirectory / "metadata.json", "w") as f:
+        json.dump(metadata, f, indent=2)
+
+
 def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
     """Get a list of samples to be tested, filtered by whether the ``mcOnly``
     or ``dataOnly`` flags are provided.
@@ -198,6 +257,13 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
 
 def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
     """Perform basic checks on combined skim definitions to catch issues early."""
+    # Check all the requested combined skims are defined in the YAML file
+    unrecognised = set(SkimsToRun).difference(CombinedSkimDefinitions)
+    if unrecognised:
+        raise ValueError(
+            f"Unrecognised combined skim name{'s'*(len(unrecognised)>1)}: {', '.join(unrecognised)}."
+        )
+
     for CombinedSkim, skims in CombinedSkimDefinitions.items():
         # Check input YAML file only contains skims listed in registry
         for skim in skims:
@@ -231,14 +297,12 @@ def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={})
     """
     if CombinedSkimDefinitions:
         logDirectory = Path("log", "combined").resolve()
-
-        # Save a copy of CombinedSkimDefinitions in the log directory
-        with open(logDirectory / "CombinedSkims.yaml") as f:
-            yaml.dump(CombinedSkimDefinitions, f)
     else:
         logDirectory = Path("log", "single").resolve()
 
     logDirectory.mkdir(parents=True, exist_ok=True)
+
+    write_stats_metadata(logDirectory, CombinedSkimDefinitions)
 
     # Set up a cache for the metadata query, to reduce number of calls
     get_cached_eventN = lru_cache()(get_eventN)
@@ -260,7 +324,7 @@ def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={})
 
             logFile = Path(logDirectory, f"{skim}_{sample}.out")
             errFile = Path(logDirectory, f"{skim}_{sample}.err")
-            jsonFile = Path(logDirectory, f"JobInformation_{skim}_{sample}.json")
+            jsonFile = Path(logDirectory, f"{skim}_{sample}.json")
 
             workingDirectory = Path(logDirectory, f"{skim}_{sample}")
             workingDirectory.mkdir(exist_ok=True)
@@ -319,10 +383,20 @@ if __name__ == "__main__":
 
     if args.single:
         skims = args.single
+        if skims == ["all"]:
+            skims = Registry.names
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
+
         submit_jobs(skims, samples, args.nEventsPerSample)
     else:
         with open(args.combined[0]) as YAMLFile:
             CombinedSkimDefinitions = yaml.safe_load(YAMLFile)
         skims = args.combined[1:]
+        if skims == ["all"]:
+            skims = CombinedSkimDefinitions.keys()
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
+
         verify_combined_skims(CombinedSkimDefinitions, skims)
         submit_jobs(skims, samples, args.nEventsPerSample, CombinedSkimDefinitions=CombinedSkimDefinitions)

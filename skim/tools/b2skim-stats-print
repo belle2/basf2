@@ -204,7 +204,7 @@ def getJsonFile(skim, sample):
             or the JSON file does not pass `testJsonFile`.
     """
     try:
-        jsonFileName = Path("log", f"JobInformation_{skim}_{sample}.json")
+        jsonFileName = Path("log", f"{skim}_{sample}.json")
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
@@ -422,7 +422,7 @@ def testJsonFile(jsonFileContents):
     the files were written successfully.
 
     Args:
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
+        jsonFileContents (dict): A dict read from the job information JSON output
             of a skim script.
 
     Raises:

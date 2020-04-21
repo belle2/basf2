@@ -9,7 +9,7 @@ Writing a skim
 In the skim package, skims are defined via the `BaseSkim` class. The skim package is organised around this for the following reasons:
 
 * this keeps the package organised, with every skim being defined in a predictable way,
-* this allows the skims to be located by standard helper tools such as b2skim-run_ and b2skim-stats-print_, and
+* this allows the skims to be located by standard helper tools such as :ref:`b2skim-run<skim-running>` and :ref:`b2skim-stats-print<b2skim-stats-print>`, and
 * skims must be combined with other skims to reduce the number of grid job submissions, and the `CombinedSkim` class is written to combined objects of type `BaseSkim`.
 
 To write a new skim, please follow these steps:
@@ -91,14 +91,9 @@ Running a skim
 In the skim package, there is a command-line tool available for running skims, documented below. These take a skim name as a command line argument, and run the code defined in the corresponding subclass of `BaseSkim`.
 
 .. tip::
-   These tools completely supplant the ``<SkimName>_Skim_Standalone.py`` steering files from
+   This tool completely supplants the ``<SkimName>_Skim_Standalone.py`` steering files from
    previous versions of basf2. The ``standalone/`` and ``combined/`` directories no longer exist in
    the skim package from version-05-00-00 onwards.
-
-.. _b2skim-run:
-
-``b2skim-run``: Run a single skim
-.................................
 
 .. argparse::
    :filename: skim/tools/b2skim-run

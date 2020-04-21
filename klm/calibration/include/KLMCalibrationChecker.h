@@ -10,6 +10,9 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementNumbers.h>
+
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -59,6 +62,12 @@ namespace Belle2 {
     void setAlignmentResultsFile(const std::string& alignmentResultsFile);
 
     /**
+     * Set strip efficiency results file.
+     */
+    void setStripEfficiencyResultsFile(
+      const std::string& stripEfficiencyResultsFile);
+
+    /**
      * Check alignment.
      */
     void checkAlignment();
@@ -67,6 +76,11 @@ namespace Belle2 {
      * Check strip efficiency.
      */
     void checkStripEfficiency();
+
+    /**
+     * Create strip efficiency histograms.
+     */
+    void createStripEfficiencyHistograms();
 
   private:
 
@@ -106,6 +120,12 @@ namespace Belle2 {
 
     /** Output file for alignment results. */
     std::string m_AlignmentResultsFile = "alignment.root";
+
+    /** Output file for alignment results. */
+    std::string m_StripEfficiencyResultsFile = "strip_efficiency.root";
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Event metadata. */
     StoreObjPtr<EventMetaData> m_EventMetaData;

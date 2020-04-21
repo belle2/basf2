@@ -39,6 +39,7 @@ KLMCalibrationChecker::KLMCalibrationChecker() :
   m_experiment(0),
   m_run(0)
 {
+  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMCalibrationChecker::~KLMCalibrationChecker()
@@ -66,10 +67,16 @@ void KLMCalibrationChecker::setGlobalTag(const std::string& globalTagName)
   m_GlobalTagName = globalTagName;
 }
 
-void  KLMCalibrationChecker::setAlignmentResultsFile(
+void KLMCalibrationChecker::setAlignmentResultsFile(
   const std::string& alignmentResultsFile)
 {
   m_AlignmentResultsFile = alignmentResultsFile;
+}
+
+void KLMCalibrationChecker::setStripEfficiencyResultsFile(
+  const std::string& stripEfficiencyResultsFile)
+{
+  m_StripEfficiencyResultsFile = stripEfficiencyResultsFile;
 }
 
 void KLMCalibrationChecker::initializeDatabase()
@@ -320,6 +327,50 @@ void KLMCalibrationChecker::checkAlignment()
 }
 
 void KLMCalibrationChecker::checkStripEfficiency()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<KLMStripEfficiency> stripEfficiency;
+  if (!stripEfficiency.isValid())
+    B2FATAL("Strip efficiency data are not valid.");
+  if (m_GlobalTagName != "")
+    printPayloadInformation(stripEfficiency);
+  /* Create trees with strip efficiency measurement results. */
+  int experiment, run;
+  int subdetector, section, sector, layer, plane;
+  float efficiency, error;
+  TFile* stripEfficiencyResults =
+    new TFile(m_StripEfficiencyResultsFile.c_str(), "recreate");
+  TTree* efficiencyTree = new TTree("efficiency", "KLM strip efficiency data.");
+  efficiencyTree->Branch("experiment", &experiment, "experiment/I");
+  efficiencyTree->Branch("run", &run, "run/I");
+  efficiencyTree->Branch("subdetector", &subdetector, "subdetector/I");
+  efficiencyTree->Branch("section", &section, "section/I");
+  efficiencyTree->Branch("sector", &sector, "sector/I");
+  efficiencyTree->Branch("layer", &layer, "layer/I");
+  efficiencyTree->Branch("plane", &plane, "plane/I");
+  efficiencyTree->Branch("efficiency", &efficiency, "efficiency/F");
+  efficiencyTree->Branch("error", &error, "error/F");
+  KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
+  for (KLMChannelIndex& klmPlane : klmPlanes) {
+    subdetector = klmPlane.getSubdetector();
+    section = klmPlane.getSection();
+    sector = klmPlane.getSector();
+    layer = klmPlane.getLayer();
+    plane = klmPlane.getPlane();
+    uint16_t channel = m_ElementNumbers->channelNumber(
+                         subdetector, section, sector, layer, plane, 1);
+    efficiency = stripEfficiency->getEfficiency(channel);
+    error = stripEfficiency->getEfficiencyError(channel);
+    efficiencyTree->Fill();
+  }
+  efficiencyTree->Write();
+  delete efficiencyTree;
+  delete stripEfficiencyResults;
+}
+
+void KLMCalibrationChecker::createStripEfficiencyHistograms()
 {
   /* Initialize the database. */
   initializeDatabase();

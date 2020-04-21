@@ -56,7 +56,7 @@ Standard Particle Lists
  * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the
    ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
  * Removed the functions ``mergedKshorts`` and ``mergedLambdas``, which returned the standard V0 lists anyway.
- * Removed the deprecated pi0 lists pi0:loose and pi0:veryloose
+ * Removed the deprecated pi0 lists ``pi0:loose`` and ``pi0:veryloose``
  * stdPi0s and stdPhotons updated to match Jan2020 recommendations.  Naming scheme updated to indicate date of optimization.
 
 Variables

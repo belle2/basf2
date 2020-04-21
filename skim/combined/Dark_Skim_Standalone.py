@@ -30,8 +30,6 @@ expert.add_skim('SinglePhotonDark', dark.SinglePhotonDarkList(path=darkskimpath)
 expert.add_skim('GammaGammaControlKLMDark', dark.GammaGammaControlKLMDarkList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('DimuonPlusMissingEnergy', dark.DimuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
 expert.add_skim('ElectronMuonPlusMissingEnergy', dark.ElectronMuonPlusMissingEnergyList(path=darkskimpath), path=darkskimpath)
-expert.add_skim('TwoTrackLeptonsForLuminosity', dark.TwoTrackLeptonsForLuminosityList(path=darkskimpath), path=darkskimpath)
-expert.add_skim('LowMassTwoTrack', dark.LowMassTwoTrackList(path=darkskimpath), path=darkskimpath)
 
 expert.setSkimLogging(darkskimpath, ['ParticleCombiner'])
 b2.process(darkskimpath)

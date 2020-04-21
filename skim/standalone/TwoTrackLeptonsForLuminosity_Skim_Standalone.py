@@ -11,7 +11,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from skim import dark
+from skim import lowMulti
 
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -21,7 +21,7 @@ fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=TwoTrackLeptonsForLuminosity_path)
 
 TwoTrackLeptonsForLuminosity_code = expert.encodeSkimName('TwoTrackLeptonsForLuminosity')
-TwoTrackLeptonsForLuminosity_list = dark.TwoTrackLeptonsForLuminosityList(path=TwoTrackLeptonsForLuminosity_path)
+TwoTrackLeptonsForLuminosity_list = lowMulti.TwoTrackLeptonsForLuminosityList(path=TwoTrackLeptonsForLuminosity_path)
 expert.skimOutputUdst(TwoTrackLeptonsForLuminosity_code, TwoTrackLeptonsForLuminosity_list, path=TwoTrackLeptonsForLuminosity_path)
 
 ma.summaryOfLists(TwoTrackLeptonsForLuminosity_list, path=TwoTrackLeptonsForLuminosity_path)

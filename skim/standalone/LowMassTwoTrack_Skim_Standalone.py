@@ -11,7 +11,7 @@
 import basf2 as b2
 import modularAnalysis as ma
 import skimExpertFunctions as expert
-from skim import dark
+from skim import lowMulti
 
 b2.set_log_level(b2.LogLevel.INFO)
 
@@ -21,7 +21,7 @@ fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=LowMassTwoTrack_path)
 
 LowMassTwoTrack_code = expert.encodeSkimName('LowMassTwoTrack')
-LowMassTwoTrack_list = dark.LowMassTwoTrackList(path=LowMassTwoTrack_path)
+LowMassTwoTrack_list = lowMulti.LowMassTwoTrackList(path=LowMassTwoTrack_path)
 expert.skimOutputUdst(LowMassTwoTrack_code, LowMassTwoTrack_list, path=LowMassTwoTrack_path)
 
 ma.summaryOfLists(LowMassTwoTrack_list, path=LowMassTwoTrack_path)

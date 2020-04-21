@@ -107,8 +107,8 @@ class _Registry:
         ("18520400", "dark", "LFVZpVisible"),
         ("18570600", "taupair", "TauGeneric"),
         ("18570700", "taupair", "TauThrust"),
-        ("18530100", "dark", "TwoTrackLeptonsForLuminosity"),
-        ("18520500", "dark", "LowMassTwoTrack"),
+        ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
+        ("18520500", "lowMulti", "LowMassTwoTrack"),
 
         # --- WG9: Charmless B decays ---
         ("14120500", "btocharmless", "BtoPi0Pi0"),  # Why is this skim code 14___ ???
@@ -233,7 +233,9 @@ combined_skims = {
     ],
     'Dark': [
         'ALP3Gamma', 'SinglePhotonDark', 'GammaGammaControlKLMDark', 'LFVZpVisible', 'DimuonPlusMissingEnergy',
-        'ElectronMuonPlusMissingEnergy',  # 'DielectronPlusMissingEnergy'
+        'ElectronMuonPlusMissingEnergy'  # 'DielectronPlusMissingEnergy'
+    ],
+    'LowMulti': [
         'TwoTrackLeptonsForLuminosity', 'LowMassTwoTrack'
     ],
     'EWP': [

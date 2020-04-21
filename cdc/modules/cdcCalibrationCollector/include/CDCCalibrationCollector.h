@@ -81,7 +81,7 @@ namespace Belle2 {
       std::string m_cdcTracks;                /**< Belle2::CDCTrackVector */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName;          /**< Belle2::CDCHit StoreArray name*/
-      std::string m_cdcTrackVectorName;       /**< Belle2::CDCTrack vectorpointer name*/
+      std::string m_cdcTrackVectorName = "CDCTrackVector";       /**< Belle2::CDCTrack vectorpointer name*/
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */
       std::string m_relRecoTrackTrackName;    /**< Relation between RecoTrack and Belle2:Track. */

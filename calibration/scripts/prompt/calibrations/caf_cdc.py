@@ -213,6 +213,11 @@ def pre_collector(max_events=None):
                        trackFitHypotheses=[211, 13],
                        pruneTracks=False)
 
+    for module in reco_path.modules():
+        if module.name() == "TFCDC_WireHitPreparer":
+            print("Enabling bad wires during reconstruction.")
+            module.param({"useBadWires": True})
+
     return reco_path
 
 
@@ -346,7 +351,6 @@ def wire_algo():
         algo : Wire efficiency algorithm
     """
     from ROOT import Belle2
-    # gInterpreter.ProcessLine("#include <calibration/include/WireEfficiencyAlgorithm.h>")
     algo = Belle2.CDC.WireEfficiencyAlgorithm()
     return algo
 

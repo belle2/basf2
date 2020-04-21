@@ -102,7 +102,7 @@ void CDCCalibrationCollectorModule::prepare()
     m_tree->Branch<float>("t_fit", &t_fit);
   }
 
-  auto m_efftree  = new TTree(m_effTreeName.c_str(), "tree for cdc wire efficiency");
+  auto m_efftree  = new TTree(m_effTreeName.c_str(), "tree for wire efficiency");
   m_efftree->Branch<unsigned short>("layerID", &layerID);
   m_efftree->Branch<unsigned short>("wireID", &wireID);
   m_efftree->Branch<float>("z", &z);
@@ -328,7 +328,7 @@ void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short
     wireID = wireIntersected.getIWire();
     layerID = wireIntersected.getICLayer();
     z = xyz.z();
-    getObjectPtr<TTree>("m_efftree")->Fill();
+    getObjectPtr<TTree>("efftree")->Fill();
   }
 }
 

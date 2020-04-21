@@ -130,6 +130,8 @@ Variables
  * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
  * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors.
  * Removed the previously deprecated variable ``clusterHypothesis``.
+ * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
+   particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
 
 Modules
 +++++++

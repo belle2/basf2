@@ -151,6 +151,8 @@ void KLMCalibrationChecker::checkAlignment()
                                       "recreate");
   TTree* bklmModuleTree = new TTree("bklm_module",
                                     "BKLM module alignment data.");
+  bklmModuleTree->Branch("experiment", &m_experiment, "experiment/I");
+  bklmModuleTree->Branch("run", &m_run, "run/I");
   bklmModuleTree->Branch("section", &section, "section/I");
   bklmModuleTree->Branch("sector", &sector, "sector/I");
   bklmModuleTree->Branch("layer", &layer, "layer/I");
@@ -160,6 +162,8 @@ void KLMCalibrationChecker::checkAlignment()
   bklmModuleTree->Branch("error", &error, "error/F");
   TTree* eklmModuleTree = new TTree("eklm_module",
                                     "EKLM module alignment data.");
+  eklmModuleTree->Branch("experiment", &m_experiment, "experiment/I");
+  eklmModuleTree->Branch("run", &m_run, "run/I");
   eklmModuleTree->Branch("section", &section, "section/I");
   eklmModuleTree->Branch("sector", &sector, "sector/I");
   eklmModuleTree->Branch("layer", &layer, "layer/I");
@@ -169,6 +173,8 @@ void KLMCalibrationChecker::checkAlignment()
   eklmModuleTree->Branch("error", &error, "error/F");
   TTree* eklmSegmentTree = new TTree("eklm_segment",
                                      "EKLM segment alignment data.");
+  eklmSegmentTree->Branch("experiment", &m_experiment, "experiment/I");
+  eklmSegmentTree->Branch("run", &m_run, "run/I");
   eklmSegmentTree->Branch("section", &section, "section/I");
   eklmSegmentTree->Branch("sector", &sector, "sector/I");
   eklmSegmentTree->Branch("layer", &layer, "layer/I");

@@ -68,6 +68,13 @@ namespace Belle2 {
   });
 
 
+  // Return unit vector orthogonal to eY & v
+  static TVector3 getUnitOrthogonal(TVector3 v)
+  {
+    return (TVector3(0, 1, 0).Cross(v)).Unit();
+  }
+
+
   // import tools from RotationTools.h
   using RotationTools::rotateTensor;
   using RotationTools::rotateTensorInv;
@@ -562,7 +569,7 @@ namespace Belle2 {
       if (abs(mc.getPDG()) == abs(Breco->getPDGCode()))
         mcBs.push_back(&mc);
     }
-    //to few Bs
+    //too few Bs
     if (mcBs.size() < 2) return;
 
     if (mcBs.size() > 2) {
@@ -911,7 +918,7 @@ namespace Belle2 {
 
 
     // calculate tagV component and error in the direction orthogonal to the boost
-    TVector3 oboost(boostDir.Z(), boostDir.Y(), -boostDir.X());
+    TVector3 oboost = getUnitOrthogonal(boostDir);
     TMatrixD oRotErr = rotateTensor(oboost, m_tagVErrMatrix);
     m_tagVolErr = sqrt(oRotErr(2, 2));
 

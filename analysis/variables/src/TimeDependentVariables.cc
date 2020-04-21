@@ -50,6 +50,11 @@ namespace Belle2 {
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
+    // Return unit vector orthogonal to eY & v
+    static TVector3 getUnitOrthogonal(TVector3 v)
+    {
+      return (TVector3(0, 1, 0).Cross(v)).Unit();
+    }
 
     // TagV x, y, z
 
@@ -265,8 +270,7 @@ namespace Belle2 {
     double vertexOrthogonalBoostDirection(const Particle* part)
     {
       TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoost(boost.Z(), boost.Y(), -boost.X());
-      TVector3 orthBoostDir = orthBoost.Unit();
+      TVector3 orthBoostDir = getUnitOrthogonal(boost);
 
       TVector3 pos = part->getVertex();
       return pos.Dot(orthBoostDir);
@@ -286,8 +290,8 @@ namespace Belle2 {
     double vertexTruthOrthogonalBoostDirection(const Particle* part)
     {
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
-      TVector3 orthBoost(boostDir.Z(), boostDir.Y(), -boostDir.X());
+      TVector3 boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector();
+      TVector3 orthBoostDir = getUnitOrthogonal(boost);
 
       const MCParticle* mcPart = part->getRelated<MCParticle>();
       if (!mcPart) return realNaN;
@@ -309,10 +313,10 @@ namespace Belle2 {
     double vertexErrOrthBoostDirection(const Particle* part)
     {
       TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoost(boost.Z(), boost.Y(), -boost.X());
+      TVector3 orthBoostDir = getUnitOrthogonal(boost);
 
       TMatrixD RR = (TMatrixD)part->getVertexErrorMatrix();
-      TMatrixD RotErr = rotateTensor(orthBoost, RR);
+      TMatrixD RotErr = rotateTensor(orthBoostDir, RR);
       return sqrt(RotErr(2, 2));
     }
 

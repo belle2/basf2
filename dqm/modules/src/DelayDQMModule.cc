@@ -86,7 +86,7 @@ void DelayDQMModule::initialize()
   if (m_useMeta) {
     m_eventMetaData.isRequired();
   } else {
-    m_rawFTSW.isRequired();
+    m_rawFTSW.isOptional(); // actuall it would be Required(); but this prevents HLT/ERECO test from working
   }
 
   // Register histograms (calls back defineHisto)

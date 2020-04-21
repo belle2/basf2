@@ -153,8 +153,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   delete efficiencyHistogram;
   delete outputFile;
   /* Set output status. */
-  if (notEnoughData &&
-      !((m_CalibrationStage == c_EfficiencyMeasurement) && m_ForcedCalibration))
+  if (notEnoughData && !m_ForcedCalibration)
     return CalibrationAlgorithm::c_NotEnoughData;
   return CalibrationAlgorithm::c_OK;
 }

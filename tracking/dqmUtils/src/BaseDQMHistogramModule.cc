@@ -50,6 +50,9 @@ BaseDQMHistogramModule::BaseDQMHistogramModule() : HistoModule()
            m_TracksStoreArrayName);
   addParam("RecoTracksStoreArrayName", m_RecoTracksStoreArrayName, "StoreArray name where the merged RecoTracks are written.",
            m_RecoTracksStoreArrayName);
+
+  addParam("HistogramParameterChanges", m_HistogramParameterChanges, "Changes of default parameters of histograms.",
+           vector<tuple<string, string, string>>());
 }
 
 BaseDQMHistogramModule::~BaseDQMHistogramModule()
@@ -594,4 +597,90 @@ void BaseDQMHistogramModule::ComputeMean(TH1F* output, TH2F* input, bool onX)
 
     output->SetBinContent(i, count != 0 ? sum / count : 0);
   }
+}
+
+void BaseDQMHistogramModule::ProcessHistogramParameterChange(string name, string parameter, string value)
+{
+  TH1* histogram;
+  bool found = false;
+
+  for (auto adept : histograms)
+    if (adept->GetName() == name) {
+      found = true;
+      histogram = adept;
+      break;
+    }
+
+  if (!found) {
+    printf("\nWarning: histogram %s not found", name.c_str());
+    return;
+  }
+
+  try {
+    EditHistogramParameter(histogram, parameter, value);
+  } catch (const invalid_argument& e) {
+    printf("\nWarning: value %s of parameter %s for histogram %s could not be parsed", value.c_str(), parameter.c_str(),
+           histogram->GetName());
+  } catch (const out_of_range& e) {
+    printf("\nWarning: value %s of parameter %s for histogram %s is out of range", value.c_str(), parameter.c_str(),
+           histogram->GetName());
+  }
+}
+
+void BaseDQMHistogramModule::EditHistogramParameter(TH1* histogram, string parameter, string value)
+{
+  if (parameter == "title") {
+    histogram->SetTitle(value.c_str());
+    return;
+  }
+  if (parameter == "nbinsx") {
+    auto axis = histogram->GetXaxis();
+    axis->Set(stoi(value), axis->GetXmin(), axis->GetXmax());
+    return;
+  }
+  if (parameter == "xlow") {
+    auto axis = histogram->GetXaxis();
+    axis->Set(axis->GetNbins(), stod(value), axis->GetXmax());
+    return;
+  }
+  if (parameter == "xup") {
+    auto axis = histogram->GetXaxis();
+    axis->Set(axis->GetNbins(), axis->GetXmin(), stod(value));
+    return;
+  }
+  if (parameter == "xTitle") {
+    histogram->GetXaxis()->SetTitle(value.c_str());
+    return;
+  }
+  if (parameter == "yTitle") {
+    histogram->GetYaxis()->SetTitle(value.c_str());
+    return;
+  }
+
+  if (dynamic_cast<TH2F*>(histogram) == nullptr) {
+    printf("\nWarning: parameter %s not found in histogram %s", parameter.c_str(), histogram->GetName());
+    return;
+  }
+
+  if (parameter == "nbinsy") {
+    auto axis = histogram->GetYaxis();
+    axis->Set(stoi(value), axis->GetXmin(), axis->GetXmax());
+    return;
+  }
+  if (parameter == "ylow") {
+    auto axis = histogram->GetYaxis();
+    axis->Set(axis->GetNbins(), stod(value), axis->GetXmax());
+    return;
+  }
+  if (parameter == "yup") {
+    auto axis = histogram->GetYaxis();
+    axis->Set(axis->GetNbins(), axis->GetXmin(), stod(value));
+    return;
+  }
+  if (parameter == "zTitle") {
+    histogram->GetZaxis()->SetTitle(value.c_str());
+    return;
+  }
+
+  printf("\nWarning: parameter %s not found in histogram %s", parameter.c_str(), histogram->GetName());
 }

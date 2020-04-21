@@ -11,6 +11,9 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
+// asi bude potřeba
+#include <framework/core/ModuleParam.templateDetails.h>
+
 using namespace std;
 
 namespace Belle2 {
@@ -82,13 +85,18 @@ namespace Belle2 {
 
     void ComputeMean(TH1F* output, TH2F* input, bool onX = true);
 
+    void ProcessHistogramParameterChange(string name, string parameter, string value);
+    void EditHistogramParameter(TH1* histogram, string parameter, string value);
+
     /** StoreArray name where Tracks are written. */
-    std::string m_TracksStoreArrayName;
+    string m_TracksStoreArrayName;
     /** StoreArray name where RecoTracks are written. */
-    std::string m_RecoTracksStoreArrayName;
+    string m_RecoTracksStoreArrayName;
 
     /// Acccess to the EventLevelTrackingInfo object in the datastore.
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
+
+    vector<tuple<string, string, string>> m_HistogramParameterChanges;
 
     /** p Value */
     TH1F* m_PValue = nullptr;

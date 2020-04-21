@@ -116,6 +116,9 @@ void TrackDQMModule::defineHisto()
   DefineSensors();
 
   originalDirectory->cd();
+
+  for (auto change : m_HistogramParameterChanges)
+    ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
 }
 
 void TrackDQMModule::event()

@@ -57,8 +57,6 @@ KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorith
 KLMStripEfficiencyAlgorithm::~KLMStripEfficiencyAlgorithm()
 {
   delete m_StripEfficiency;
-  delete[] m_Results.m_Efficiency;
-  delete[] m_Results.m_ExtHitsPlane;
 }
 
 CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()

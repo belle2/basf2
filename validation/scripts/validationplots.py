@@ -9,13 +9,13 @@ import sys
 import queue
 from typing import Dict, Any, List, Union, Optional
 import collections
-from multiprocessing import Process, Queue
+from multiprocessing import Queue
 
 # Load ROOT
 import ROOT
 # In case some ROOT files loaded by the validation scripts contain some
 # RooFit objects, ROOT will auto-load RooFit. Due to some (yet not
-# understood) tear down problem, this results in this errror:
+# understood) tear down problem, this results in this error:
 # Fatal in <TClass::SetUnloaded>: The TClass for map<TString,double> is being
 # unloaded when in state 3 To prevent this, we are loading RooFit here
 # before ROOT has a chance to do this
@@ -467,7 +467,7 @@ def generate_new_plots(
             color=line_color)
         )
 
-    # todo: refactor this information extracion -> json inside a specific
+    # todo: refactor this information extraction -> json inside a specific
     #  class / method after the plots have been created
     json_objects.dump(
         comparison_json_file,
@@ -477,14 +477,17 @@ def generate_new_plots(
     print_plotting_summary(all_plotuples)
 
 
-def print_plotting_summary(plotuples, warning_verbosity=1,
-                           chi2_verbosity=1) -> None:
+def print_plotting_summary(
+        plotuples: List[Plotuple],
+        warning_verbosity=1,
+        chi2_verbosity=1
+) -> None:
     """
     Print summary of all plotuples plotted, especially printing information
     about failed comparisons.
     :param plotuples: List of Plotuple objects
     :param warning_verbosity: 0: no information about warnings, 1: write out
-        number of warnins per category, 2: report offending scripts
+        number of warnings per category, 2: report offending scripts
     :param chi2_verbosity: As warning_verbosity but with the results of the
         chi2 comparisons
     :return: None
@@ -692,7 +695,7 @@ def rootobjects_from_file(
         package: str,
         revision: str,
         is_reference: bool,
-        work_folder
+        work_folder: str,
 ) -> Dict[str, List[RootObject]]:
     """
     Takes a root file, loops over its contents and creates the RootObjects

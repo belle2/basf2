@@ -499,9 +499,9 @@ def get_terminal_width() -> int:
 
 
 def congratulator(
-        success: Optional[int] = None,
-        failure: Optional[int] = None,
-        total: Optional[int] = None,
+        success: Optional[Union[int, float]] = None,
+        failure: Optional[Union[int, float]] = None,
+        total: Optional[Union[int, float]] = None,
         just_comment=False,
         rate_name="Success rate"
 ) -> str:

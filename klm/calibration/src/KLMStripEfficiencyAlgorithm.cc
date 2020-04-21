@@ -82,6 +82,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
     m_Results.m_ExtHitsPlane[i] = allExtHitsInPlane->GetBinContent(i + 1);
   }
   bool notEnoughData = false;
+  m_Results.m_AchievedPrecision = 0;
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
   for (KLMChannelIndex& klmPlane : klmPlanes) {
     uint16_t plane = klmPlane.getKLMPlaneNumber();

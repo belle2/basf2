@@ -44,8 +44,6 @@ if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
-# Token used to separate the package name from the plot name in strings
-PackageSeperatorToken = "__:__"
 
 ##############################################################################
 #                          Function definitions                              #

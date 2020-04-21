@@ -37,7 +37,7 @@ from textwrap import wrap
 
 from basf2 import B2WARNING, B2ERROR
 from basf2.utils import pretty_print_table
-from skim.registry import skim_registry, combined_skims
+from skim.registry import Registry, combined_skims
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
 
 
@@ -70,7 +70,7 @@ def getArgumentParser():
         parser (argparse.ArgumentParser): An argument parser which obtains its
             list of valid skim names from `skim.registry`.
     """
-    allStandaloneSkims = [skim for _, skim in sorted(skim_registry)]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(
@@ -494,7 +494,7 @@ def getSkimsToPrint(parser, standaloneList, combinedList):
     Returns:
         skims (list): A list of skim names to be tested.
     """
-    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = list(combined_skims.keys())
 
     if not (standaloneList or combinedList):

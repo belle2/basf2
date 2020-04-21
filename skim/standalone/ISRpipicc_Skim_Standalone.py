@@ -26,13 +26,8 @@ ma.inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=ISRskimpath)
-stdK('loose', path=ISRskimpath)
 stdE('loose', path=ISRskimpath)
 stdMu('loose', path=ISRskimpath)
-stdPi('all', path=ISRskimpath)
-stdK('all', path=ISRskimpath)
-stdE('all', path=ISRskimpath)
-stdMu('all', path=ISRskimpath)
 
 # importing the reconstructed events from the ISRpipicc_List file
 from skim.quarkonium import ISRpipiccList

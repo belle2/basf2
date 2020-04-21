@@ -492,6 +492,7 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_aliases_for_selected
 .. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_mctruth_aliases
+.. autofunction:: variables.utils.create_isSignal_alias
 
 Miscellaneous helpers for using variables
 =========================================

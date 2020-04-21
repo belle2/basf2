@@ -15,7 +15,7 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 #include <TDirectory.h>
 

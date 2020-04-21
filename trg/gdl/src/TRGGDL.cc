@@ -120,11 +120,11 @@ namespace Belle2 {
       _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
       _Phase(Phase),
+      _algFilePath(algFilePath),
       _clock(Belle2_GDL::GDLSystemClock),
       _offset(15.3),
       _isb(0),
       _osb(0),
-      _algFilePath(algFilePath),
       _algFromDB(algFromDB)
   {
 
@@ -409,7 +409,6 @@ namespace Belle2 {
 
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, algs[i]);
-          bool data = GDLResult->testFtdl(i);
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
@@ -954,7 +953,7 @@ namespace Belle2 {
   void
   TRGGDL::accumulateInp(TH1I* h)
   {
-    for (int i = 0; i < _inpBits.size(); i++) {
+    for (std::size_t i = 0; i < _inpBits.size(); i++) {
       if (_inpBits[i]) h->Fill(i);
     }
   }
@@ -962,7 +961,7 @@ namespace Belle2 {
   void
   TRGGDL::accumulateFtd(TH1I* h)
   {
-    for (int i = 0; i < _ftdBits.size(); i++) {
+    for (std::size_t i = 0; i < _ftdBits.size(); i++) {
       if (_ftdBits[i]) h->Fill(i);
     }
   }
@@ -970,7 +969,7 @@ namespace Belle2 {
   void
   TRGGDL::accumulatePsn(TH1I* h)
   {
-    for (int i = 0; i < _psnBits.size(); i++) {
+    for (std::size_t i = 0; i < _psnBits.size(); i++) {
       if (_psnBits[i]) h->Fill(i);
     }
   }

@@ -12,7 +12,7 @@
 
 import modularAnalysis as ma
 from stdPhotons import stdPhotons
-from vertex import KFit
+from vertex import kFit
 from basf2 import B2WARNING
 
 
@@ -93,37 +93,37 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
     elif listtype == 'skim':
         stdPi0s('eff50_Jan2020_nomcmatch', path)
         ma.cutAndCopyList('pi0:skim', 'pi0:eff50_Jan2020_nomcmatch', '', True, path)
-        KFit('pi0:skim', 0.0, 'mass', path=path)
+        kFit('pi0:skim', 0.0, 'mass', path=path)
 
     # same lists with, but with  mass constraints fits
     elif listtype == 'allFit':
         stdPi0s('all', path)
         ma.cutAndCopyList('pi0:allFit', 'pi0:all', '', True, path)
-        KFit('pi0:allFit', 0.0, 'mass', path=path)
+        kFit('pi0:allFit', 0.0, 'mass', path=path)
     elif listtype == 'eff10_Jan2020Fit':
         stdPi0s('eff10_Jan2020', path)
         ma.cutAndCopyList('pi0:eff10_Jan2020Fit', 'pi0:eff10_Jan2020', '', True, path)
-        KFit('pi0:eff10_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff10_Jan2020Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff20_Jan2020Fit':
         stdPi0s('eff20_Jan2020', path)
         ma.cutAndCopyList('pi0:eff20_Jan2020Fit', 'pi0:eff20_Jan2020', '', True, path)
-        KFit('pi0:eff20_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff20_Jan2020Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff30_Jan2020Fit':
         stdPi0s('eff30_Jan2020', path)
         ma.cutAndCopyList('pi0:eff30_Jan2020Fit', 'pi0:eff30_Jan2020', '', True, path)
-        KFit('pi0:eff30_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff30_Jan2020Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff40_Jan2020Fit':
         stdPi0s('eff40_Jan2020', path)
         ma.cutAndCopyList('pi0:eff40_Jan2020Fit', 'pi0:eff40_Jan2020', '', True, path)
-        KFit('pi0:eff40_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff40_Jan2020Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff50_Jan2020Fit':
         stdPi0s('eff50_Jan2020', path)
         ma.cutAndCopyList('pi0:eff50_Jan2020Fit', 'pi0:eff50_Jan2020', '', True, path)
-        KFit('pi0:eff50_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff50_Jan2020Fit', 0.0, 'mass', path=path)
     elif listtype == 'eff60_Jan2020Fit':
         stdPi0s('eff60_Jan2020', path)
         ma.cutAndCopyList('pi0:eff60_Jan2020Fit', 'pi0:eff60_Jan2020', '', True, path)
-        KFit('pi0:eff60_Jan2020Fit', 0.0, 'mass', path=path)
+        kFit('pi0:eff60_Jan2020Fit', 0.0, 'mass', path=path)
 
 # pi0 list for skims (and ONLY for skims)
 

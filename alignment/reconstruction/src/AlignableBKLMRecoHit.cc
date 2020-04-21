@@ -14,9 +14,9 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/Hierarchy.h>
 #include <framework/geometry/B2Vector3.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 #include <genfit/DetPlane.h>

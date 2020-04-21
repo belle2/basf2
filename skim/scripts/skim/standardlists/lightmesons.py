@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import modularAnalysis as ma
-from vertex import KFit
+from vertex import kFit
 from stdPi0s import stdPi0s
 
 # Creates list of neutral pions for hadronic B skims following the recommendations of the neutral group
@@ -15,7 +15,7 @@ def loadStdPi0ForBToHadrons(persistent=True, path=None):
     the neutral group (avoiding ECL timing cuts) for winter 2020. We require the energy of the photons
     to be larger than :math:`80~{\\rm MeV}` in the forward end cap, :math:`30~{\\rm MeV}` in the barrel,
     and :math:`60~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
-    :math:`105 < M < 150~{\\rm MeV}/c^2` and a massKFit to converge.
+    :math:`105 < M < 150~{\\rm MeV}/c^2` and a mass-constrained KFit to converge.
     """
     stdPi0s('all', path)
     ma.cutAndCopyList(outputListName='pi0:bth_skim', inputListName='pi0:all',
@@ -26,7 +26,7 @@ def loadStdPi0ForBToHadrons(persistent=True, path=None):
                       '[daughter(1, clusterReg) == 2 and daughter(1, E) > 0.030] or ' +
                       '[daughter(1, clusterReg) == 3 and daughter(1, E) > 0.060]] and ' +
                       'M > 0.105 and M < 0.150', path=path)
-    KFit('pi0:bth_skim', 0.0, 'mass', path=path)
+    kFit('pi0:bth_skim', 0.0, 'mass', path=path)
 
 
 # Call to build all light mesons. Not recommended to use this general function as it creates many candidates

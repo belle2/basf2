@@ -148,7 +148,7 @@ namespace Belle2 {
     /**
      * Loads the next combination. Returns false if there is no next combination
      */
-    bool loadNext();
+    bool loadNext(bool loadAntiParticle = true);
 
     /**
      * Returns the particle

@@ -20,7 +20,6 @@ from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
 from kinfit import UnmeasuredfitKinematic1C
 from modularAnalysis import variablesToNtuple
-import sys
 import variables.collections as vc
 import variables.utils as vu
 

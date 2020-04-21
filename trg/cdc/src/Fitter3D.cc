@@ -613,6 +613,7 @@ namespace Belle2 {
       int phiBitSize = 13;
       // pt = 0.3*1.5*rho*0.01;
       //double rhoMin = 48;
+      /* cppcheck-suppress variableScope */
       double rhoMin = 20;
       double rhoMax = 2500;
       //double rhoMax = 1600;

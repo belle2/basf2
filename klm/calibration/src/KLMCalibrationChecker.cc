@@ -324,6 +324,8 @@ void KLMCalibrationChecker::checkAlignment()
   delete eklmModuleTree;
   delete eklmSegmentTree;
   delete alignmentResults;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
 }
 
 void KLMCalibrationChecker::checkStripEfficiency()
@@ -367,6 +369,8 @@ void KLMCalibrationChecker::checkStripEfficiency()
   efficiencyTree->Write();
   delete efficiencyTree;
   delete stripEfficiencyResults;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
 }
 
 void KLMCalibrationChecker::createStripEfficiencyHistograms()

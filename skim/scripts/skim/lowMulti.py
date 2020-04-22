@@ -83,11 +83,11 @@ def TwoTrackLeptonsForLuminosityList(path):
 
 def LowMassTwoTrackList(path):
     """
-    Skim list for low mass two track (e+e- to pi+pi- and e+e- to K+K-) events.
+    Skim list for low mass two track events.
 
     **Skim code**: 18530200
 
-    **Physics channel**: :math:`e^{+}e^{-} \\to \pi^{+}\pi^{-}` and `e^{+}e^{-} \\to K^{+}K^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to \gamma h^{+}h^{-}`
 
     **Skim category**: physics, low multiplicity
 

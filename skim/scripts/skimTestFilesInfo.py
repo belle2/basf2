@@ -101,6 +101,7 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
 
     # generic MC13 BGx1
+    # TODO: replace these with a more permanent location for test samples
     ("MC13_ccbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009437_task10020000001.root"),
     ("MC13_chargedBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009435_task10020000001.root"),
     ("MC13_ddbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009438_task10020000001.root"),
@@ -110,6 +111,7 @@ kekcc_locations = [
     ("MC13_uubarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009436_task10020000001.root"),
 
     # low multiplicity MC13
+    # TODO: replace these with a more permanent location for test samples
     ('MC13_ggBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/3700001000_eph3_0.root'),
     # ('MC13_eeBGx1', 'FIXME')
     ('MC13_mumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/mumu_eph3_0.root'),
@@ -117,6 +119,7 @@ kekcc_locations = [
     ('MC13_eemumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/eemumu_eph3_0.root'),
 
     # generic MC13 BGx0
+    # TODO: replace these with a more permanent location for test samples
     ("MC13_ccbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009559_task10020000001.root"),
     ("MC13_chargedBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009551_task10020000001.root"),
     ("MC13_ddbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009555_task10020000001.root"),

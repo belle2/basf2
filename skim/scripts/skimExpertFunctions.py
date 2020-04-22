@@ -644,7 +644,7 @@ class CombinedSkim(BaseSkim):
     `BaseSkim.RequiredStandardLists` object during initialisation of `CombinedSkim`
     instance."""
 
-    def __init__(self, *skims):
+    def __init__(self, *skims, NoisyModules=[]):
         # Check that we were passed only BaseSkim objects
         if not all([isinstance(skim, BaseSkim) for skim in skims]):
             raise NotImplementedError(
@@ -652,7 +652,7 @@ class CombinedSkim(BaseSkim):
             )
 
         self.Skims = skims
-        self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules})
+        self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
 
         for skim in skims:
             skim._validate_required_particle_lists()

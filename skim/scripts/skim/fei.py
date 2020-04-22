@@ -930,8 +930,8 @@ class BaseFEISkim(BaseSkim):
     # In combined skims, FEIChannelArgs must be combined across skims first, so that all
     # the required particles are included in the FEI.
     @staticmethod
-    @lru_cache()
-    def run_fei_for_skims(FEIPrefix, *, path):
+    # @lru_cache()
+    def run_fei_for_skims(FEIChannelArgs, FEIPrefix, *, path):
         """Reconstruct hadronic and semileptonic :math:`B^0` and :math:`B^+` tags using
         the generically trained FEI. Skim pre-cuts are applied before running the FEI,
         to reduce computation time.
@@ -962,7 +962,7 @@ class BaseFEISkim(BaseSkim):
             path (`basf2.Path`): The skim path to be processed.
         """
         # TODO: figure out a way to get this to work with caching
-        FEIChannelArgs = {}
+        # FEIChannelArgs = {}
 
         # Pre-selection cuts
         ma.fillParticleList(decayString="pi+:eventShapeForSkims",
@@ -1043,7 +1043,7 @@ class BaseFEISkim(BaseSkim):
         See also:
             `run_fei_for_skims` for event-level cut definitions.
         """
-        self.run_fei_for_skims(self.FEIPrefix, path=path)
+        self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, path=path)
 
 
 def _FEI_skim_header(ParticleName):

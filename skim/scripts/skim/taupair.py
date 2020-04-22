@@ -403,8 +403,8 @@ class TauLFV(BaseSkim):
                             "mu+:loose pi0:skim",
                             "e+:loose eta:loose",
                             "mu+:loose eta:loose",
-                            "e+:loose eta\":loose",
-                            "mu+:loose eta\":loose",
+                            "e+:loose eta':loose",
+                            "mu+:loose eta':loose",
                             "e+:loose K_S0:merged",
                             "mu+:loose K_S0:merged"
                             ]
@@ -456,7 +456,8 @@ class TauLFV(BaseSkim):
 
         tau_lll_list = []
         for chID, channel in enumerate(tau_lll_Channels):
-            ma.reconstructDecay("tau+:LFV_lll" + str(chID) + " -> " + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay("tau+:LFV_lll" + str(chID) + " -> " + channel, tauLFVCuts, chID,
+                                path=path, allowChargeViolation=True)
             tau_lll_list.append("tau+:LFV_lll" + str(chID))
 
         tau_lP0_list = []
@@ -476,7 +477,8 @@ class TauLFV(BaseSkim):
 
         tau_lhh_list = []
         for chID, channel in enumerate(tau_lhh_Channels):
-            ma.reconstructDecay("tau+:LFV_lhh" + str(chID) + " -> " + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay("tau+:LFV_lhh" + str(chID) + " -> " + channel, tauLFVCuts, chID,
+                                path=path, allowChargeViolation=True)
             tau_lhh_list.append("tau+:LFV_lhh" + str(chID))
 
         tau_bnv_list = []

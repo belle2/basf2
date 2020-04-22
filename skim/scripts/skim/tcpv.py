@@ -341,7 +341,8 @@ class TCPV(BaseSkim):
             bMinustoD_List.append('B-:TCPV_bToD' + str(chID))
 
         tcpvLists = bd_qqs_List + bd_ccs_List + bPlustoJPsiK_List + bMinustoJPsiK_List + bMinustoD_List
-        return tcpvLists
+
+        self.SkimLists = tcpvLists
 
     def validation_histograms(self, path):
         Kres = 'K_10'

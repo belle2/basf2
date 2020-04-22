@@ -566,8 +566,7 @@ class BtoPi0Pi0(BaseSkim):
             ma.reconstructDecay("B0:Pi0Pi0" + " -> " + channel, Bcuts, chID, path=path)
             B0List.append("B0:Pi0Pi0")
 
-        Lists = B0List
-        return Lists
+        self.SkimLists = B0List
 
 
 @fancy_skim_header

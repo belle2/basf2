@@ -528,7 +528,7 @@ class Systematics(BaseSkim):
         # Flatten the list of lists
         self.SkimLists = [s for l in lists for s in l]
 
-    def JpsimumuTagProbe(path):
+    def JpsimumuTagProbe(self, path):
         """Build JpsimumuTagProbe lists for systematics skims."""
         #   Cuts = '2.8 < M < 3.4'
         Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
@@ -540,7 +540,7 @@ class Systematics(BaseSkim):
         ma.matchMCTruth('J/psi:mumutagprobe0', path=path)
         return jpsiList
 
-    def JpsieeTagProbe(path):
+    def JpsieeTagProbe(self, path):
         """Build JpsieeTagProbe lists for systematics skims."""
         #   Cuts = '2.7 < M < 3.4'
         Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
@@ -552,7 +552,7 @@ class Systematics(BaseSkim):
         ma.matchMCTruth('J/psi:eetagprobe0', path=path)
         return jpsiList
 
-    def PiKFromDstarList(path):
+    def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
         D0Cuts = '1.81 < M < 1.91'
         # DstarCuts = 'massDifference(0)<0.16'
@@ -564,7 +564,7 @@ class Systematics(BaseSkim):
         D0List = []
         for chID, channel in enumerate(D0Channel):
             ma.reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
-            vertex.vertexRave('D0:syst' + str(chID), 0.0, path=path)
+            vertex.raveFit('D0:syst' + str(chID), 0.0, path=path)
             D0List.append('D0:syst' + str(chID))
 
         DstarChannel = []
@@ -573,7 +573,7 @@ class Systematics(BaseSkim):
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
-            ma.reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
+            ma.reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path, allowChargeViolation=True)
             DstarList.append('D*-:syst' + str(chID))
             ma.matchMCTruth('D*+:syst0', path=path)
 
@@ -609,7 +609,7 @@ class SystematicsTracking(BaseSkim):
         # Flatten the list of lists
         self.SkimLists = [s for l in lists for s in l]
 
-    def BtoDStarPiList(path):
+    def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
         D0Cuts = '1.835 < M < 1.895'
         DstarCuts = 'massDifference(0)<0.16'
@@ -622,7 +622,7 @@ class SystematicsTracking(BaseSkim):
         for chID, channel in enumerate(D0Channel):
             resonanceName = 'anti-D0:loose' + str(chID)
             ma.reconstructDecay(resonanceName + ' -> ' + channel, D0Cuts, chID, path=path)
-            # vertex.vertexRave(resonanceName, 0.0, path=path)
+            # vertex.raveFit(resonanceName, 0.0, path=path)
             ma.matchMCTruth(resonanceName, path=path)
         ma.copyLists('anti-D0:loose', ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
         D0List.append('anti-D0:loose')
@@ -636,7 +636,7 @@ class SystematicsTracking(BaseSkim):
         for chID, channel in enumerate(DstarChannel):
             resonanceName = 'D*-:loose' + str(chID)
             ma.reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
-            # vertex.vertexRave(resonanceName, 0.0)
+            # vertex.raveFit(resonanceName, 0.0)
             DstarList.append(resonanceName)
             ma.matchMCTruth(resonanceName, path=path)
 
@@ -650,12 +650,12 @@ class SystematicsTracking(BaseSkim):
             resonanceName = 'B0:sys' + str(chID)
             ma.reconstructDecay(resonanceName + ' -> ' + channel, B0Cuts, chID, path=path)
             B0List.append(resonanceName)
-            # vertex.vertexRave(resonanceName, 0.0)
+            # vertex.raveFit(resonanceName, 0.0)
             ma.matchMCTruth(resonanceName, path=path)
 
         return B0List
 
-    def DstarToD0PiPartList(path):
+    def DstarToD0PiPartList(self, path):
         """Build DstarToD0PiPartList lists for systematics skims."""
         ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
 
@@ -665,7 +665,7 @@ class SystematicsTracking(BaseSkim):
 
         for chID, channel in enumerate(DminusChannel):
             resonanceName = 'D-:loose' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, DminusCuts, chID, path=path)
+            ma.reconstructDecay(resonanceName + ' -> ' + channel, DminusCuts, chID, path=path, allowChargeViolation=True)
 
         # Dstar
         DstarCuts = 'massDifference(0)<0.2 and useCMSFrame(p) > 2.0'
@@ -718,7 +718,7 @@ class Resonance(BaseSkim):
         # Flatten the list of lists
         self.SkimLists = [s for l in lists for s in l]
 
-    def getDsList(path):
+    def getDsList(self, path):
         """Build Ds list for systematics skims."""
         DsCuts = "1.90 < M < 2.04"
 
@@ -735,7 +735,7 @@ class Resonance(BaseSkim):
 
         return DsList
 
-    def getDstarList(path):
+    def getDstarList(self, path):
         """Build Dstar list for systematics skims."""
         DplusCuts = "1.8 < M < 1.93"
         DstarCuts = "massDifference(0)<0.16 and useCMSFrame(p)>2.0"
@@ -745,7 +745,7 @@ class Resonance(BaseSkim):
         DplusList = []
         for chID, channel in enumerate(DplusChannel):
             ma.reconstructDecay("D+:resonance" + str(chID) + " -> " + channel, DplusCuts, chID, path=path)
-            vertex.vertexRave("D+:resonance" + str(chID), 0.0, path=path)
+            vertex.raveFit("D+:resonance" + str(chID), 0.0, path=path)
             DplusList.append("D+:resonance" + str(chID))
 
         DstarChannel = []
@@ -760,7 +760,7 @@ class Resonance(BaseSkim):
 
         return DstarList
 
-    def getSigmacList(path):
+    def getSigmacList(self, path):
         """Build Sigmac list for systematics skims."""
         LambdacCuts = "2.24 < M < 2.33"
         SigmacCuts = "massDifference(0)<0.28 and useCMSFrame(p) > 2.5"
@@ -769,7 +769,7 @@ class Resonance(BaseSkim):
         LambdacList = []
         for chID, channel in enumerate(LambdacChannel):
             ma.reconstructDecay("Lambda_c+:resonance" + str(chID) + " -> " + channel, LambdacCuts, chID, path=path)
-            vertex.vertexRave("Lambda_c+:resonance" + str(chID), 0.0, path=path)
+            vertex.raveFit("Lambda_c+:resonance" + str(chID), 0.0, path=path)
             LambdacList.append("Lambda_c+:resonance" + str(chID))
 
         SigmacList = []
@@ -796,7 +796,7 @@ class Resonance(BaseSkim):
 
         return SigmacList
 
-    def getmumugList(path):
+    def getmumugList(self, path):
         """Build mumug list for systematics skims."""
         vphoChannel = ["mu+:loose mu-:loose"]
         vphocuts = ""
@@ -806,13 +806,13 @@ class Resonance(BaseSkim):
             ma.reconstructDecay("vpho:resonance" + str(chID) + " -> " + channel, vphocuts, chID, path=path)
             ma.applyCuts(resonanceName, "nTracks == 2 and M < formula(Ecms*0.9877)", path=path)
             ma.matchMCTruth(resonanceName, path=path)
-            vertex.vertexRave(resonanceName, 0.0, path=path)
+            vertex.raveFit(resonanceName, 0.0, path=path)
             ma.applyCuts(resonanceName, "M < formula(Ecms*0.9877)", path=path)
             vphoList.append(resonanceName)
 
         return vphoList
 
-    def getBZeroList(path):
+    def getBZeroList(self, path):
         """Build BZero list for systematics skims."""
         BZeroCuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
         BZeroChannel = ["D-:resonance0 pi+:loose"]
@@ -826,7 +826,7 @@ class Resonance(BaseSkim):
 
         return BZeroList
 
-    def getBPlusList(path):
+    def getBPlusList(self, path):
         """Build Bplus list for systematics skims."""
         antiDZeroCut = "1.82 < M < 1.90"
         antiDZeroChannel = ["K+:loose pi-:loose"]
@@ -835,7 +835,7 @@ class Resonance(BaseSkim):
         for chID, channel in enumerate(antiDZeroChannel):
             resonanceName = "anti-D0:resonance" + str(chID)
             ma.reconstructDecay(resonanceName + " -> " + channel, antiDZeroCut, chID, path=path)
-            vertex.vertexRave(resonanceName, 0.0, path=path)
+            vertex.raveFit(resonanceName, 0.0, path=path)
             antiDZeroList.append(resonanceName)
 
         BPlusChannel = []
@@ -1049,7 +1049,7 @@ class SystematicsLambda(BaseSkim):
         LambdaList = []
         for chID, channel in enumerate(LambdaChannel):
             ma.reconstructDecay("Lambda0:syst" + str(chID) + " -> " + channel, LambdaCuts, chID, path=path)
-            vertex.KFit("Lambda0:syst" + str(chID), 0.002, path=path)
+            vertex.kFit("Lambda0:syst" + str(chID), 0.002, path=path)
             ma.applyCuts("Lambda0:syst" + str(chID), "1.10<M<1.13", path=path)
             ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*x+y*y)>0.0225", path=path)
             ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*px+y*py)>0", path=path)

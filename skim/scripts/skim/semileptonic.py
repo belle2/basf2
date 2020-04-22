@@ -306,15 +306,6 @@ class SLUntagged(BaseSkim):
     __category__ = "physics, semileptonic"
 
     RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadStdD0": [],
-            "loadStdDstar0": [],
-            "loadStdDplus": [],
-            "loadStdDstarPlus": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
         "stdCharged": {
             "stdE": ["all"],
             "stdK": ["all"],
@@ -329,6 +320,15 @@ class SLUntagged(BaseSkim):
         },
         "stdV0s": {
             "stdKshorts": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadStdD0": [],
+            "loadStdDstar0": [],
+            "loadStdDplus": [],
+            "loadStdDstarPlus": [],
         },
     }
 

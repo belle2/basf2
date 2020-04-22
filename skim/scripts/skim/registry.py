@@ -90,7 +90,7 @@ RegisteredSkims = [
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),
-    ("18020200", "dark", "GammaGammaControlKLMDark"),
+    # ("18020200", "dark", "GammaGammaControlKLMDark"),  # TODO: uncomment when implemented
     ("18020300", "dark", "ALP3Gamma"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),

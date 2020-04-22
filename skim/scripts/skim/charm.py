@@ -1079,8 +1079,8 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
         vertex.treeFit("D0:HpJmEta", 0.001, path=path)
         ma.reconstructDecay("D*+:HpJmEtaRS -> D0:HpJmEta pi+:all", Dstcuts, path=path)
         ma.reconstructDecay("D*-:HpJmEtaWS -> D0:HpJmEta pi-:all", Dstcuts, path=path)
-        vertex.KFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
-        vertex.KFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
+        vertex.kFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
+        vertex.kFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
         DstList.append("D*+:HpJmEtaRS")
         DstList.append("D*+:HpJmEtaWS")
 
@@ -1356,8 +1356,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         vertex.treeFit("D0:HpJmEta", 0.001, path=path)
         ma.reconstructDecay("D*+:HpJmEtaRS -> D0:HpJmEta pi+:all", Dstcuts, path=path)
         ma.reconstructDecay("D*-:HpJmEtaWS -> D0:HpJmEta pi-:all", Dstcuts, path=path)
-        vertex.KFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
-        vertex.KFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
+        vertex.kFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
+        vertex.kFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
         DstList.append("D*+:HpJmEtaRS")
         DstList.append("D*+:HpJmEtaWS")
 
@@ -1616,7 +1616,7 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
     def additional_setup(self, path):
         # TODO: Copied from steering file; skim liaison *must* change K_S0:all name
         ma.reconstructDecay("K_S0:all -> pi-:95eff pi+:95eff", "0.4 < M < 0.6", 1, True, path=path)
-        vertex.KFit("K_S0:all", 0.0, path=path)
+        vertex.kFit("K_S0:all", 0.0, path=path)
         ma.applyCuts("K_S0:all", "0.477614 < M < 0.517614", path=path)
 
     def build_lists(self, path):
@@ -1642,7 +1642,7 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
         antiD0List = []
         for chID, channel in enumerate(DstarSLRecoilChannels):
             ma.reconstructRecoil(decayString="D*-:SL" + str(chID) + " -> " + channel,
-                                 cut=DstarSLcuts, dmID=chID, path=path)
+                                 cut=DstarSLcuts, dmID=chID, path=path, allowChargeViolation=True)
             ma.reconstructRecoilDaughter(decayString="anti-D0:SL" + str(chID) + " -> D*-:SL" + str(chID) +
                                          " pi-:95eff", cut=antiD0SLcuts, dmID=chID, path=path)
             antiD0List.append("anti-D0:SL" + str(chID))

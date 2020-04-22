@@ -39,10 +39,8 @@ namespace Belle2 {
      * Constructor.
      *
      * @param name Name of the neutral long-lived particle in GEANT4.
-     * @param mass Mass of the neutral long-lived particle.
-     * @param encoding PDG code of the neutral long-live particle.
      */
-    G4LongLivedNeutral(const G4String& name);
+    explicit G4LongLivedNeutral(const G4String& name);
 
 
   private:

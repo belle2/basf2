@@ -108,6 +108,13 @@ def check_plotting_status(progress_key: str):
     return last_status
 
 
+# todo: remove this, once we're certain that the bug was fixed!
+def warn_wrong_directory():
+    if not os.getcwd().endswith("html"):
+        print(f"ERROR: Expected to be in HTML directory, but my current "
+              f"working directory is {os.getcwd()}; abspath: {os.getcwd()}.")
+
+
 # todo: limit the number of running plotting requests and terminate hanging ones
 def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
     """
@@ -207,6 +214,9 @@ class ValidationRoot(object):
         :param args: For the request /plots/a/b/c, these will be the strings
             "a", "b", "c"
         """
+
+        warn_wrong_directory()
+
         if len(args) < 3:
             raise cherrypy.HTTPError(404)
 
@@ -354,7 +364,9 @@ class ValidationRoot(object):
         comparison
         """
 
-        # fixme: Since the path is given to deliver_json, it should NOT be relative to HTML folder
+        warn_wrong_directory()
+
+        # todo: Make this independent of our working directory!
         path = os.path.join(
             os.path.relpath(
                 validationpath.get_html_plots_tag_comparison_folder(
@@ -381,6 +393,9 @@ class ValidationRoot(object):
         Returns:
             JSON file containing git versions and time of last restart
         """
+
+        warn_wrong_directory()
+
         # note: for some reason %Z doesn't work like this, so we use
         # time.tzname for the time zone.
         return {

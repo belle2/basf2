@@ -174,7 +174,6 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
                                       G4GPILSelection* selection)
 {
   G4double geometryStepLength = -1.0, newSafety = -1.0;
-  fParticleIsLooping = false ;
 
   // Initial actions moved to  StartTrack()
   // --------------------------------------
@@ -197,7 +196,6 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   //
   const G4DynamicParticle*    pParticle    = track.GetDynamicParticle() ;
   const G4PrimaryParticle* primaryParticle = pParticle->GetPrimaryParticle();
-  const G4ParticleDefinition* pParticleDef = pParticle->GetDefinition() ;
   G4ThreeVector startMomentumDir = primaryParticle->GetMomentumDirection() ;
   G4ThreeVector startPosition    = track.GetPosition() ;
 
@@ -215,25 +213,13 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 
   // Is the particle charged or has it a magnetic moment?
   //
-  G4double       restMass = primaryParticle->GetMass() ;
   G4double particleCharge = 0 ;
-  G4double magneticMoment = 0 ;
 
   fGeometryLimitedStep = false ;
 
   // There is no need to locate the current volume. It is Done elsewhere:
   //   On track construction
   //   By the tracking, after all AlongStepDoIts, in "Relocation"
-
-  // Check if the particle has a force, EM or gravitational, exerted on it
-  //
-  G4FieldManager* fieldMgr = 0;
-  G4bool          fieldExertsForce = false ;
-
-  fieldMgr = fFieldPropagator->FindAndSetFieldManager(track.GetVolume());
-  G4bool eligibleEM = (particleCharge != 0.0)
-                      || ((magneticMoment != 0.0));
-  G4bool eligibleGrav = (restMass != 0.0) ;
 
   G4double linearStepLength ;
   if (fShortStepOptimisation && (currentMinimumStep <= currentSafety)) {
@@ -276,7 +262,6 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
     fTransportEndMomentumDir   = startMomentumDir ;
     fTransportEndKineticEnergy = primaryParticle->GetKineticEnergy() ;
     fTransportEndSpin          = track.GetPolarization();
-    fParticleIsLooping         = false ;
     fMomentumChanged           = false ;
     fEndGlobalTimeComputed     = false ;
   }
@@ -336,7 +321,6 @@ G4VParticleChange* G4LongLivedNeutralTransportation::AlongStepDoIt(const G4Track
     const G4Step&  stepData)
 {
   static G4ThreadLocal G4long noCallsASDI = 0;
-  const char* methodName = "AlongStepDoIt";
   noCallsASDI++;
 
   fParticleChange.Initialize(track) ;
@@ -367,7 +351,9 @@ G4VParticleChange* G4LongLivedNeutralTransportation::AlongStepDoIt(const G4Track
     //
 
     // use c*beta from primary particle, llp will not be slowed down anyways
-    // default was: stepData.GetPreStepPoint()->GetVelocity()
+    // default was: stepData.GetPreStepPoint()->GetVelocity();, but assumes wrong values from particle definition
+    B2DEBUG(0, "Velocity calculated from Step data: " << stepData.GetPreStepPoint()->GetVelocity());
+
     G4double initialVelocity = c_light * primaryParticle->GetTotalMomentum() / primaryParticle->GetTotalEnergy();
     G4double stepLength      = track.GetStepLength();
 
@@ -387,69 +373,6 @@ G4VParticleChange* G4LongLivedNeutralTransportation::AlongStepDoIt(const G4Track
 
   fParticleChange.ProposeProperTime(track.GetProperTime() + deltaProperTime) ;
   //fParticleChange.ProposeTrueStepLength( track.GetStepLength() ) ;
-
-  // If the particle is caught looping or is stuck (in very difficult
-  // boundaries) in a magnetic field (doing many steps) THEN can kill it ...
-  //
-  if (fParticleIsLooping) {
-    G4double endEnergy = fTransportEndKineticEnergy;
-    fNoLooperTrials ++;
-    auto particleType = track.GetDynamicParticle()->GetParticleDefinition();
-
-    G4bool stable = particleType->GetPDGStable();
-    G4bool candidateForEnd = (endEnergy < fThreshold_Important_Energy)
-                             || (fNoLooperTrials >= fThresholdTrials) ;
-    G4bool unstableAndKillable = !stable && (fAbandonUnstableTrials != 0);
-    G4bool unstableForEnd = (endEnergy < fThreshold_Important_Energy)
-                            && (fNoLooperTrials >= fAbandonUnstableTrials) ;
-    if ((candidateForEnd && stable) || (unstableAndKillable && unstableForEnd)) {
-      // Kill the looping particle
-      //
-      fParticleChange.ProposeTrackStatus(fStopAndKill)  ;
-      G4int particlePDG = particleType->GetPDGEncoding();
-      const G4int electronPDG = 11; // G4Electron::G4Electron()->GetPDGEncoding();
-
-      // Simple statistics
-      fSumEnergyKilled += endEnergy;
-      fSumEnerSqKilled = endEnergy * endEnergy;
-      fNumLoopersKilled++;
-
-      if (endEnergy > fMaxEnergyKilled) {
-        fMaxEnergyKilled = endEnergy;
-        fMaxEnergyKilledPDG = particlePDG;
-      }
-      if (particleType->GetPDGEncoding() != electronPDG) {
-        fSumEnergyKilled_NonElectron += endEnergy;
-        fSumEnerSqKilled_NonElectron += endEnergy * endEnergy;
-        fNumLoopersKilled_NonElectron++;
-
-        if (endEnergy > fMaxEnergyKilled_NonElectron) {
-          fMaxEnergyKilled_NonElectron = endEnergy;
-          fMaxEnergyKilled_NonElecPDG =  particlePDG;
-        }
-      }
-
-
-      fNoLooperTrials = 0;
-    } else {
-      fMaxEnergySaved = std::max(endEnergy, fMaxEnergySaved);
-      if (fNoLooperTrials == 1) {
-        fSumEnergySaved += endEnergy;
-        if (!stable)
-          fSumEnergyUnstableSaved += endEnergy;
-      }
-#ifdef G4VERBOSE
-      if (verboseLevel > 2 && ! fSilenceLooperWarnings) {
-        G4cout << "   " << methodName
-               << " Particle is looping but is saved ..."  << G4endl
-               << "   Number of trials = " << fNoLooperTrials << G4endl
-               << "   No of calls to  = " << noCallsASDI << G4endl;
-      }
-#endif
-    }
-  } else {
-    fNoLooperTrials = 0;
-  }
 
   // Another (sometimes better way) is to use a user-limit maximum Step size
   // to alleviate this problem ..

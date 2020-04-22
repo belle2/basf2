@@ -25,11 +25,6 @@ using namespace CLHEP;
 G4LongLivedNeutral::G4LongLivedNeutral(const G4String& name)
 //                                        G4double  mass,
 //                                        G4int     encoding)
-//   : G4ParticleDefinition(name, mass / Unit::MeV * CLHEP::MeV, 0.0 * MeV, 0,
-//                          0, 0, 0,
-//                          0, 0, 0,
-//                          "scalar", 0.0, 0, encoding,
-//                          false, 0, 0)
   : G4ParticleDefinition(name, 0, 0.0 * MeV, 0,
                          0, 0, 0,
                          0, 0, 0,

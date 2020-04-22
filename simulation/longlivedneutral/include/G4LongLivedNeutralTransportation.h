@@ -53,6 +53,7 @@
 #include "G4Step.hh"
 #include "G4ParticleChangeForTransport.hh"
 #include <framework/core/Module.h>
+#include <framework/logging/Logger.h>
 
 class G4SafetyHelper;
 class G4CoupledTransportation;
@@ -179,7 +180,6 @@ namespace Belle2 {
 
     G4bool        fAnyFieldExists = false;
 
-    G4bool fParticleIsLooping = false;
     G4bool fNewTrack = true;         // Flag from StartTracking
     G4bool fFirstStepInVolume = true;
     G4bool fLastStepInVolume = false; // Last step - almost same as next flag

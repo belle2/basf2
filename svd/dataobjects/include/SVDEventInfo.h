@@ -81,7 +81,7 @@ namespace Belle2 {
      *  used to improve the precision
      */
     float getSVD2FTSWTimeShift(int firstFrame) const
-    { return 16000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+    { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event

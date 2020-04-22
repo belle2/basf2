@@ -222,41 +222,61 @@ void KLMCalibrationChecker::checkAlignment()
       bklmModuleTree->Fill();
     else
       eklmModuleTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaV;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaV();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaV();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaV();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();
     else
       eklmModuleTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaW;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaW();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaW();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaW();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();
     else
       eklmModuleTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaAlpha;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaAlpha();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaAlpha();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaAlpha();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();
     else
       eklmModuleTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaBeta;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaBeta();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaBeta();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaBeta();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();
     else
       eklmModuleTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaGamma;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaGamma();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaGamma();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaGamma();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM)
       bklmModuleTree->Fill();
@@ -297,29 +317,49 @@ void KLMCalibrationChecker::checkAlignment()
     error = alignmentError->getDeltaU();
     correction = alignmentCorrection->getDeltaU();
     eklmSegmentTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaV;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaV();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaV();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaV();
     eklmSegmentTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaW;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaW();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaW();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaW();
     eklmSegmentTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaAlpha;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaAlpha();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaAlpha();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaAlpha();
     eklmSegmentTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaBeta;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaBeta();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaBeta();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaBeta();
     eklmSegmentTree->Fill();
+    /* cppcheck-suppress redundantAssignment */
     param = KLMAlignmentData::c_DeltaGamma;
+    /* cppcheck-suppress redundantAssignment */
     value = alignment->getDeltaGamma();
+    /* cppcheck-suppress redundantAssignment */
     error = alignmentError->getDeltaGamma();
+    /* cppcheck-suppress redundantAssignment */
     correction = alignmentCorrection->getDeltaGamma();
     eklmSegmentTree->Fill();
   }

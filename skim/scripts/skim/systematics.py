@@ -354,7 +354,7 @@ def SystematicsList(path):
 
 
 def PiKFromDstarList(path):
-    D0Cuts = '1.81 < M < 1.91'
+    D0Cuts = '1.75 < M < 2.0'
     DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
 
     ma.cutAndCopyList('K-:syst', 'K-:all', 'dr<2 and abs(dz)<4', path=path)

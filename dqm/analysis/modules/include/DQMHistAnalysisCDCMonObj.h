@@ -17,7 +17,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
-
+#include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
 
@@ -25,6 +25,7 @@
 #include <TLine.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2Poly.h>
 #include <TString.h>
 
 
@@ -99,9 +100,15 @@ namespace Belle2 {
      * Get board/channel from layer/wire.
      */
     std::pair<int, int> getBoardChannel(unsigned short layer, unsigned short wire);
+
+    /**
+     * Configure bins of TH2Poly.
+     */
+    void configureBins(TH2Poly* h);
   protected:
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
+    TCanvas* m_cBadWire = nullptr; /**< bad wire panel */
     std::string m_filename; /**< output file name */
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
@@ -112,7 +119,11 @@ namespace Belle2 {
     std::vector<std::pair<int, int>> m_badChannels = {}; /**< bad wires list */
     std::map<WireID, std::pair<int, int>> m_chMap = {}; /**< Channel map retrieved  */
     DBArray<CDCChannelMap>* m_channelMapFromDB; /**< Channel map retrieved from DB. */
-
+    float m_senseR[56] = {}; /**< Radius of sense (+field) layer.  */
+    float m_fieldR[57] = {}; /**< Radius of field layer.  */
+    float m_offset[56] = {}; /**< Offset of sense layer  */
+    int m_nSenseWires[56] = {}; /**< number of wires for each layer.  */
+    DBObjPtr<CDCGeometry>* m_cdcGeo = nullptr; /**< Geometry of CDC */
   };
 
 } // Belle2 namespace

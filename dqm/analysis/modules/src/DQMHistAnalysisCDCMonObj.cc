@@ -14,9 +14,13 @@
 //DQM
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
+// CDC geometry
+#include <cdc/geometry/CDCGeometryPar.h>
+
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2Poly.h>
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TLine.h>
@@ -61,8 +65,15 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   if (!(*m_channelMapFromDB).isValid()) {
     B2FATAL("Channel map is not valid");
   }
+
+  m_cdcGeo = new DBObjPtr<CDCGeometry>();
+  if (m_cdcGeo == nullptr) {
+    B2FATAL("CDCGeometryp is not valid");
+  }
+
+
+
   m_monObj = getMonitoringObject("cdc");
-  //  m_cMain = new TCanvas("main", "main", 1300, 1000);
 
   gStyle->SetOptStat(0);
   gStyle->SetPalette(kViridis);
@@ -73,6 +84,8 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
 
   m_cMain = new TCanvas("main", "main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
+  m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
+  m_monObj->addCanvas(m_cBadWire);
   B2DEBUG(20, "DQMHistAnalysisCDCMonObj: initialized.");
 
 }
@@ -88,10 +101,73 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
     const WireID  wireId(isl, il, iw);
     m_chMap.insert(std::make_pair(wireId, std::make_pair(iBoard, iCh)));
   }
+
+
+  const CDCGeometry& geom = **m_cdcGeo;
+
+  for (const auto& sense : geom.getSenseLayers()) {
+    int i = sense.getId();
+    if (i < 0 || i > 55) {
+      B2FATAL("no such sense layer");
+    }
+    m_senseR[i]  = sense.getR();
+    m_nSenseWires[i] = sense.getNWires();
+    m_offset[i] = sense.getOffset();
+  }
+
+  for (const auto& field : geom.getFieldLayers()) {
+    int i = field.getId();
+    if (i < 0 || i > 54) {
+      B2FATAL("no such sense layer");
+    }
+    m_fieldR[i + 1] = field.getR();
+  }
+  m_fieldR[56] = geom.getOuterWall(0).getRmin();
+  m_fieldR[0] = geom.getInnerWall(0).getRmax();
+
+  //    const double offset = m_offSet[L];
+  //...Offset modification to be aligned to axial at z=0...
+  //  const double phiSize = 2 * M_PI / double(m_nWires[L]);
+
+  //  const double phiF = phiSize * (double(C) + offset)
+  //                      + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
+
+
+  /*
+   * calculate cell geometry
+   */
+
 }
 
 void DQMHistAnalysisCDCMonObjModule::event()
 {
+}
+
+
+
+void DQMHistAnalysisCDCMonObjModule::configureBins(TH2Poly* h)
+{
+  for (int ilayer = 0; ilayer < 56; ++ilayer) {
+    float dPhi = float(2 * M_PI / m_nSenseWires[ilayer]);
+    float r1 = m_fieldR[ilayer];
+    float r2 = m_fieldR[ilayer + 1];
+    for (int iwire = 0; iwire < m_nSenseWires[ilayer]; ++iwire) {
+      float phi = dPhi * (iwire + m_offset[ilayer]);
+      float phi1 = phi - dPhi * 0.5;
+      float phi2 = phi + dPhi * 0.5;
+      Double_t x_pos[] = {r1* (sin(phi)*tan(phi - phi1) + cos(phi)),
+                          r2 * cos(phi1),
+                          r2 * cos(phi2),
+                          r1* (sin(phi)*tan(phi - phi2) + cos(phi))
+                         };
+      Double_t y_pos[]  = {r1* (-cos(phi)*tan(phi - phi1) + sin(phi)),
+                           r2 * sin(phi1),
+                           r2 * sin(phi2),
+                           r1* (-cos(phi)*tan(phi - phi2) + sin(phi))
+                          };
+      h->AddBin(4, x_pos, y_pos);
+    }
+  }
 }
 
 
@@ -118,6 +194,7 @@ float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1F* h)
   float m = hist->GetMean();
   return m;
 }
+
 
 std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned short layer, unsigned short wire)
 {
@@ -215,12 +292,19 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       hBadChannel->Fill(i, j, -1);
     }
   }
+
   TH2F* hBadChannelBC = new TH2F("hbadchBC", "bad channel map per board/channel;board;channel", 300, 0, 300, 48, 0, 48);
   for (int i = 0; i < 300; ++i) {
     for (int j = 0; j < 48; ++j) {
       hBadChannelBC->Fill(i, j, -1);
     }
   }
+
+  TH2Poly* h2p = new TH2Poly();
+  configureBins(h2p);
+  h2p->SetTitle("bad wires in xy view");
+  h2p->GetXaxis()->SetTitle("X [mm]");
+  h2p->GetYaxis()->SetTitle("Y [mm]");
   makeBadChannelList();
   for (const auto& lw : m_badChannels) {
     const int l = lw.first;
@@ -229,9 +313,27 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     hBadChannel->Fill(w, l);
     std::pair<int, int> bc = getBoardChannel(l, w);
     hBadChannelBC->Fill(bc.first, bc.second);
+    float r = m_senseR[l];
+    float dPhi = static_cast<float>(2.0 * M_PI / m_nSenseWires[l]);
+    float phi = dPhi * (w + m_offset[l]);
+    float x = r * cos(phi);
+    float y = r * sin(phi);
+    h2p->Fill(x, y, 1.1);
   }
 
+  /*
+    for row in dfCellGeom.itertuples():
+        x = np.array([row.p1x, row.p2x, row.p4x, row.p3x], dtype=float)
+        y = np.array([row.p1y, row.p2y, row.p4y, row.p3y], dtype=float)
+        h2p.AddBin(4, x, y)
 
+    for i in range(h2p.GetNumberOfBins()):
+        h2p.SetBinContent(i+1, -0.1)
+
+    for l, w in badChannels:
+        x, y = getWirePosition(l, w)
+        h2p.Fill(x, y, 1.1)
+  */
 
   // Hit related
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
@@ -278,7 +380,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hBadChannelBC->Draw("col");
   m_cMain->cd(6);
   hHitPerLayer->Draw();
-
+  m_cBadWire->cd();
+  h2p->Draw("col");
   std::string comment = "";
   m_monObj->setVariable("comment", comment); // tentative
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0) / means.size());

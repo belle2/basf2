@@ -13,13 +13,12 @@ from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
 b2.set_log_level(b2.LogLevel.INFO)
-gb2_setuprel = 'release-04-00-00'
 
 skimCode = expert.encodeSkimName('TauLFV')
 
 taulfvskim = b2.Path()
 
-fileList = expert.get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=taulfvskim)
 
 stdE('all', path=taulfvskim)

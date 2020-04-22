@@ -115,6 +115,7 @@ namespace Belle2 {
   {
     StoreObjPtr<EventMetaData> evtmetadata;
     StoreObjPtr<ARICHInfo> arichinfo;
+    if (!arichinfo->getthscan_mode()) return;
     double vth_thscan = arichinfo->getvth_thscan();
 
     //int runno = m_internalmode ? m_run_count : evtmetadata->getRun();

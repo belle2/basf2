@@ -14,15 +14,7 @@
 #include <alignment/modules/AlignDQM/AlignDQMEventProcessor.h>
 #include <tracking/dqmUtils/THFFactory.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-#include <vxd/geometry/GeoTools.h>
-#include <vxd/geometry/SensorInfoBase.h>
-
 #include <TDirectory.h>
-#include <TVectorD.h>
 
 using namespace Belle2;
 using namespace std;
@@ -87,7 +79,6 @@ void AlignDQMModule::defineHisto()
 
 void AlignDQMModule::event()
 {
-
   AlignDQMEventProcessor eventProcessor = AlignDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
 
   eventProcessor.Run();

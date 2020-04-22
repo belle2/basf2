@@ -15,14 +15,6 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
-
-#include <TH1F.h>
-#include <TH2F.h>
-
 using namespace std;
 
 namespace Belle2 {

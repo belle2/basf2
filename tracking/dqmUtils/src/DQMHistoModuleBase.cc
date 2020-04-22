@@ -14,14 +14,10 @@
 #include <tracking/dqmUtils/THFFactory.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <TDirectory.h>
-#include <TVectorD.h>
 
 using namespace Belle2;
 using namespace std;
@@ -33,11 +29,6 @@ using boost::format;
 
 DQMHistoModuleBase::DQMHistoModuleBase() : HistoModule()
 {
-  setDescription("DQM of finding tracks, their momentum, "
-                 "Number of hits in tracks, "
-                 "Number of tracks. "
-                );
-
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("tracksStoreArrayName", m_tracksStoreArrayName, "StoreArray name where the merged Tracks are written.",
@@ -60,13 +51,13 @@ void DQMHistoModuleBase::initialize()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   if (!recoTracks.isOptional()) {
-    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
+    B2WARNING("Missing recoTracks array, " + getName() + " is skipped.");
     return;
   }
 
   StoreArray<Track> Tracks(m_tracksStoreArrayName);
   if (!Tracks.isOptional()) {
-    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
+    B2WARNING("Missing Tracks array, " + getName() + " is skipped.");
     return;
   }
 
@@ -82,11 +73,15 @@ void DQMHistoModuleBase::defineHisto()
 void DQMHistoModuleBase::beginRun()
 {
   StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  if (!recoTracks.isOptional())
+  if (!recoTracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in beginRun() for " + getName());
     return;
-  StoreArray<Track> Tracks(m_tracksStoreArrayName);
-  if (!Tracks.isOptional())
+  }
+  StoreArray<Track> tracks(m_tracksStoreArrayName);
+  if (!tracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in beginRun() for " + getName());
     return;
+  }
 
   for (TH1* histogram : m_histograms)
     histogram->Reset();
@@ -212,8 +207,8 @@ TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
 void DQMHistoModuleBase::DefineGeneral()
 {
-  m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, -180, 180, "Mom Phi [deg]", "counts");
-  m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, 180, "Mom Theta [deg]", "counts");
+  m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, TMath::Pi(), TMath::Pi(), "Mom Phi", "counts");
+  m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, TMath::Pi(), "Mom Theta", "counts");
   m_MomCosTheta = Create("MomCosTheta", "Cos of Momentum Theta of fit", 100, -1, 1, "Mom CosTheta", "counts");
   m_PValue = Create("PValue", "P value of fit", 100, 0, 1, "p value", "counts");
   m_Chi2 = Create("Chi2", "Chi2 of fit", 200, 0, 150, "Chi2", "counts");
@@ -455,18 +450,13 @@ void DQMHistoModuleBase::FillMomentum(const TrackFitResult* tfr)
   float py = tfr->getMomentum().Py();
   float pz = tfr->getMomentum().Pz();
 
-  float Phi = atan2(py, px) * TMath::RadToDeg();
-
+  float Phi = atan2(py, px);
   float pxy = sqrt(px * px + py * py);
-
-  // TODO
-  // float Theta = atan2(pxy, pz) * TMath::RadToDeg(); // this line is from AlignDMQModule
-  float Theta = atan2(pxy, pz); // this line is from TrackDQMModule
+  float Theta = atan2(pxy, pz);
 
   m_MomPhi->Fill(Phi);
   m_MomTheta->Fill(Theta);
-  // m_MomCosTheta->Fill(cos(Theta - 90.0)); // this line is from AlignDQMModule
-  m_MomCosTheta->Fill(cos(Theta)); // this line is from TrackDQMModule
+  m_MomCosTheta->Fill(cos(Theta));
 }
 
 void DQMHistoModuleBase::FillTrackFitResult(const TrackFitResult* tfr)
@@ -602,18 +592,18 @@ void DQMHistoModuleBase::ProcessHistogramParameterChange(string name, string par
     }
 
   if (!found) {
-    B2WARNING(format("Histogram %1% not found, parameter change is skipped.") % name);
+    B2WARNING("Histogram " + name + " not found, parameter change is skipped in " + getName() + ".");
     return;
   }
 
   try {
     EditHistogramParameter(histogram, parameter, value);
   } catch (const invalid_argument& e) {
-    B2WARNING(format("Value %1% of parameter %2% for histogram %3% could not be parsed, parameter change is skipped.") % value %
-              parameter % histogram->GetName());
+    B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
+              " could not be parsed, parameter change is skipped in " + getName() + ".");
   } catch (const out_of_range& e) {
-    B2WARNING(format("Value %1% of parameter %2% for histogram %3% is out of range, parameter change is skipped.") % value % parameter %
-              histogram->GetName());
+    B2WARNING("Value " + value + " of parameter " + parameter + " for histogram " + histogram->GetName() +
+              " is out of range, parameter change is skipped in " + getName() + ".");
   }
 }
 
@@ -648,7 +638,8 @@ void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, string parameter
   }
 
   if (dynamic_cast<TH2F*>(histogram) == nullptr) {
-    B2WARNING(format("Parameter %1% not found in histogram %2%, parameter change is skipped.") % parameter % histogram->GetName());
+    B2WARNING("Parameter " + parameter + " not found in histogram " + histogram->GetName() + ", parameter change is skipped in " +
+              getName() + ".");
     return;
   }
 
@@ -672,6 +663,6 @@ void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, string parameter
     return;
   }
 
-  B2WARNING(format("Parameter %1% not found in histogram %2%, parameter change is skipped.") % parameter.c_str() %
-            histogram->GetName());
+  B2WARNING("Parameter " + parameter + " not found in histogram " + histogram->GetName() + ", parameter change is skipped in " +
+            getName() + ".");
 }

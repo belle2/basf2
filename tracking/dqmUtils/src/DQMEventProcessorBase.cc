@@ -2,21 +2,22 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
-#include <vxd/geometry/SensorInfoBase.h>
-
-#include <TVectorD.h>
 
 using namespace Belle2;
 
 void DQMEventProcessorBase::Run()
 {
-  StoreArray<Track> tracks(m_tracksStoreArrayName);
-  if (!tracks.isOptional() || !tracks.getEntries())
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
+  if (!recoTracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in event() for " + m_histoModule->getName() + " module.");
     return;
+  }
+  StoreArray<Track> tracks(m_tracksStoreArrayName);
+  if (!tracks.isOptional()) {
+    B2DEBUG(22, "Missing recoTracks array in event() for " + m_histoModule->getName() + " module.");
+    return;
+  }
 
   try {
     m_iTrack = 0;
@@ -30,9 +31,7 @@ void DQMEventProcessorBase::Run()
 
     m_histoModule->FillTracks(m_iTrack, m_iTrackVXD, m_iTrackCDC, m_iTrackVXDCDC);
   } catch (...) {
-    // TODO
-    // B2DEBUG(70, "Some problem in Alignment DQM module!"); // this line is from AlignDQMModule
-    B2DEBUG(20, "Some problem in Track DQM module!"); // this line is from TrackDQMModule
+    B2ERROR("Unhandled exception in " + m_histoModule->getName() + " module!");
   }
 }
 
@@ -57,10 +56,8 @@ void DQMEventProcessorBase::ProcessOneTrack(const Track& track)
     return;
 
   TString message = ConstructMessage();
+  B2DEBUG(20, message.Data());
 
-  // TODO
-  // B2DEBUG(230, message.Data()); // this line is from AlignDQMModule
-  B2DEBUG(20, message.Data()); // this line is from TrackDQMModule
   m_iTrack++;
 
   m_histoModule->FillMomentum(m_trackFitResult);
@@ -83,6 +80,20 @@ void DQMEventProcessorBase::ProcessOneTrack(const Track& track)
   m_histoModule->FillTrackFitResult(m_trackFitResult);
 }
 
+TString DQMEventProcessorBase::ConstructMessage()
+{
+  return Form("%s: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
+              m_histoModule->getName().c_str(),
+              m_iTrack,
+              (float)m_trackFitResult->getMomentum().Px(),
+              (float)m_trackFitResult->getMomentum().Py(),
+              (float)m_trackFitResult->getMomentum().Pz(),
+              (float)m_trackFitResult->getMomentum().Pt(),
+              (float)m_trackFitResult->getMomentum().Mag(),
+              m_nPXD, m_nSVD, m_nCDC, m_nPXD + m_nSVD + m_nCDC
+             );
+}
+
 bool DQMEventProcessorBase::ProcessSuccessfulFit()
 {
   if (!m_recoTrack->getTrackFitStatus())
@@ -102,9 +113,7 @@ bool DQMEventProcessorBase::ProcessSuccessfulFit()
 void DQMEventProcessorBase::ProcessOneRecoHit(RecoHitInformation* recoHitInfo)
 {
   if (!recoHitInfo) {
-    // TODO
-    // B2DEBUG(200, "No genfit::pxd recoHitInfo is missing."); // this line is from AlignDQMModule
-    B2DEBUG(20, "No genfit::pxd recoHitInfo is missing."); // this line is from TrackDQMModule
+    B2DEBUG(20, "Missing genfit::pxd recoHitInfo in event() for " + m_histoModule->getName() + " module.");
     return;
   }
 

@@ -1,17 +1,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
+#include <framework/core/ModuleParam.templateDetails.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
-
-// asi bude potřeba
-#include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace std;
 
@@ -73,7 +68,7 @@ namespace Belle2 {
     static void ComputeMean(TH1F* output, TH2F* input, bool onX = true);
 
     void ProcessHistogramParameterChange(string name, string parameter, string value);
-    static void EditHistogramParameter(TH1* histogram, string parameter, string value);
+    void EditHistogramParameter(TH1* histogram, string parameter, string value);
 
     virtual void DefineGeneral();
     virtual void DefineUBResiduals();

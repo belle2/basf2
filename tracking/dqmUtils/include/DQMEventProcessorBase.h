@@ -2,8 +2,6 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
@@ -25,7 +23,7 @@ namespace Belle2 {
 
   protected:
     virtual void ProcessOneTrack(const Track& track);
-    virtual TString ConstructMessage() = 0;
+    virtual TString ConstructMessage();
     virtual bool ProcessSuccessfulFit();
     virtual void ProcessOneRecoHit(RecoHitInformation* recoHitInfo);
     virtual void ProcessPXDRecoHit(RecoHitInformation* recoHitInfo);

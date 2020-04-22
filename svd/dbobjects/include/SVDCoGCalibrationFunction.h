@@ -196,10 +196,13 @@ namespace Belle2 {
       return m_par[0] + m_par[1] * raw_time + m_par[2] / (raw_time - m_par[3]);
     };
 
-    /** TEMPORARY returns error on raw time*/
+    /** implementation of els TB indep error*/
     double elsTBindepErr(double raw_time, double raw_timeErr, int) const
     {
-      return raw_timeErr;
+      if (raw_time > m_par[3] - sqrt(-m_par[2]) / 4)
+        return  std::numeric_limits<float>::quiet_NaN();
+
+      return raw_timeErr * (m_par[1] - m_par[2] / pow(raw_time - m_par[3], 2));
     };
 
     /** current function ID */

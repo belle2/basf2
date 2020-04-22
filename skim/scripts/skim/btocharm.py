@@ -1197,8 +1197,8 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
         },
         "skim.standardlists.charm": {
             "loadStdD0_Kpipi0": [],
-            "loadStdDstarPlus_D0pi_Kpipi0": [],
             "loadStdD0_Kpipipi": [],
+            "loadStdDstarPlus_D0pi_Kpipi0": [],
             "loadStdDstarPlus_D0pi_Kpipipi": [],
         },
     }

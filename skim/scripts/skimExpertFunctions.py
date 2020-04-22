@@ -567,6 +567,7 @@ class BaseSkim(ABC):
             k: v for (k, v) in self.RequiredStandardLists.items()
             if k.startswith("skim.standardlists.")
         }
+
         self.RequiredStandardLists = {**StandardLists, **StandardSkimLists}
 
         for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
@@ -721,7 +722,7 @@ class CombinedSkim(BaseSkim):
         if DuplicatedParticleLists:
             raise ValueError(
                 f"Non-unique output particle list names in combined skim! "
-                ", ".join(DuplicatedParticleLists)
+                f"{', '.join(DuplicatedParticleLists)}"
             )
 
     def _merge_nested_dicts(self, *dicts):
@@ -750,9 +751,13 @@ class CombinedSkim(BaseSkim):
         """Merge two dicts recursively.
 
         Input dicts must have the same data structure, and the innermost values must be
-        lists. Lists are merged with duplictes removed.
+        lists. Lists are merged with duplicates removed.
         """
-        for k in set(d1.keys()).union(d2.keys()):
+        # Make a list of unique keys in a way that preserves order
+        AllKeys = list(d1.keys()) + list(d2.keys())
+        UniqueKeys = list(dict.fromkeys(AllKeys))
+
+        for k in UniqueKeys:
             if k in d1 and k in d2:
                 if isinstance(d1[k], dict) and isinstance(d2[k], dict):
                     # If we are looking at two dicts, call this function again.
@@ -767,6 +772,7 @@ class CombinedSkim(BaseSkim):
                         #     "Some particle lists may not be loaded."
                         # )
                         pass
+
                     d1[k] = sorted({*d1[k], *d2[k]})
                 else:
                     raise b2.B2ERROR(

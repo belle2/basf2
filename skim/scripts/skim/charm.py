@@ -719,7 +719,7 @@ def CharmSemileptonic(path):
     antiD0List = []
     for chID, channel in enumerate(DstarSLRecoilChannels):
         ma.reconstructRecoil(decayString='D*+:SL' + str(chID) + ' -> ' + channel,
-                             cut=DstarSLcuts, dmID=chID, path=path)
+                             cut=DstarSLcuts, dmID=chID, path=path, allowChargeViolation=True)
         ma.reconstructRecoilDaughter(decayString='anti-D0:SL' + str(chID) + ' -> D*-:SL' + str(chID) +
                                      ' pi-:95eff', cut=antiD0SLcuts, dmID=chID, path=path)
         antiD0List.append('anti-D0:SL' + str(chID))
@@ -1184,11 +1184,12 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         ma.cutAndCopyList("pi0:myskim", "pi0:skim", "", path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
 
         DstList = []
-        ma.reconstructDecay("D0:HpJmPi0 -> K-:loose pi+:loose pi0:myskim", charmcuts, path=path)
-        ma.reconstructDecay("D*+:HpJmPi0RS -> D0:HpJmPi0 pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmPi0WS -> D0:HpJmPi0 pi-:all", Dstcuts, path=path)
-        ma.copyLists("D*+:HpJmPi0", ["D*+:HpJmPi0RS", "D*+:HpJmPi0WS"], path=path)
-        DstList.append("D*+:HpJmPi0")
+        # NOTE: renamed to avoid particle list name clashes
+        ma.reconstructDecay("D0:HpJmPi0_UnusedSkim -> K-:loose pi+:loose pi0:myskim", charmcuts, path=path)
+        ma.reconstructDecay("D*+:HpJmPi0RS_UnusedSkim -> D0:HpJmPi0_UnusedSkim pi+:all", Dstcuts, path=path)
+        ma.reconstructDecay("D*-:HpJmPi0WS_UnusedSkim -> D0:HpJmPi0_UnusedSkim pi-:all", Dstcuts, path=path)
+        ma.copyLists("D*+:HpJmPi0_UnusedSkim", ["D*+:HpJmPi0RS_UnusedSkim", "D*+:HpJmPi0WS_UnusedSkim"], path=path)
+        DstList.append("D*+:HpJmPi0_UnusedSkim")
 
         self.SkimLists = DstList
 
@@ -1239,9 +1240,12 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
         DstList = []
 
         for chID, channel in enumerate(D0_Channels):
-            ma.reconstructDecay("D0:HpHmPi0" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
-            ma.reconstructDecay("D*+:HpHmPi0" + str(chID) + " -> D0:HpHmPi0" + str(chID) + " pi+:all", Dstcuts, chID, path=path)
-            DstList.append("D*+:HpHmPi0" + str(chID))
+            # NOTE: renamed to avoid particle list name clashes
+            ma.reconstructDecay("D0:HpHmPi0" + str(chID) + "_UnusedSkim" + " -> " + channel, charmcuts, chID, path=path)
+            ma.reconstructDecay(
+                "D*+:HpHmPi0" + str(chID) + "_UnusedSkim" + " -> D0:HpHmPi0" + str(chID) + "_UnusedSkim" + " pi+:all",
+                Dstcuts, chID, path=path)
+            DstList.append("D*+:HpHmPi0" + str(chID) + "_UnusedSkim")
 
         self.SkimLists = DstList
 
@@ -1354,12 +1358,12 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         DstList = []
         ma.reconstructDecay("D0:HpJmEta -> K-:loose pi+:loose eta:myskim", charmcuts, path=path)
         vertex.treeFit("D0:HpJmEta", 0.001, path=path)
-        ma.reconstructDecay("D*+:HpJmEtaRS -> D0:HpJmEta pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmEtaWS -> D0:HpJmEta pi-:all", Dstcuts, path=path)
-        vertex.kFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
-        vertex.kFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
-        DstList.append("D*+:HpJmEtaRS")
-        DstList.append("D*+:HpJmEtaWS")
+        ma.reconstructDecay("D*+:HpJmEtaRS_eta -> D0:HpJmEta pi+:all", Dstcuts, path=path)
+        ma.reconstructDecay("D*-:HpJmEtaWS_eta -> D0:HpJmEta pi-:all", Dstcuts, path=path)
+        vertex.kFit("D*+:HpJmEtaRS_eta", conf_level=0.001, path=path)
+        vertex.kFit("D*+:HpJmEtaWS_eta", conf_level=0.001, path=path)
+        DstList.append("D*+:HpJmEtaRS_eta")
+        DstList.append("D*+:HpJmEtaWS_eta")
 
         self.SkimLists = DstList
 
@@ -1570,7 +1574,8 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
 
         for chID, channel in enumerate(D0_Channels):
             ma.reconstructDecay("D0:HpHmPi0" + str(chID) + " -> " + channel, D0cuts, chID, path=path)
-            ma.reconstructDecay("D*+:HpHmPi0" + str(chID) + " -> D0:HpHmPi0" + str(chID) + " pi+:myhhp0", Dstcuts, chID, path=path)
+            ma.reconstructDecay("D*+:HpHmPi0" + str(chID) + " -> D0:HpHmPi0" + str(chID) + " pi+:myhhp0",
+                                Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmPi0" + str(chID))
 
         self.SkimLists = DstList

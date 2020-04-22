@@ -13,16 +13,17 @@
 
 #pragma once
 
-#include <tracking/dqmUtils/BaseDQMHistogramModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <TH1F.h>
+#include <TH2F.h>
+
 
 using namespace std;
 
@@ -34,29 +35,32 @@ namespace Belle2 {
     * Number of tracks.
     *
     */
-  class TrackDQMModule : public BaseDQMHistogramModule {  // <- derived from HistoModule class
+  class TrackDQMModule : public DQMHistoModuleBase {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
     TrackDQMModule();
     /* Destructor */
-    ~TrackDQMModule();
+    ~TrackDQMModule() { }
 
     /** Module functions */
-    void initialize() override final;
+    virtual void initialize() override;
     //void beginRun() override final;
-    void event() override final;
+    virtual void event() override;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
     * to be placed in this function.
     */
-    void defineHisto() override final;
+    virtual void defineHisto() override;
 
   private:
 
     virtual void DefineFlags();
+
+    /// Acccess to the EventLevelTrackingInfo object in the datastore.
+    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Monitors the Error flags set by the tracking code. As of the time of implementation there only were two flags:
       VXDTF2AbortionFlag, i.e. how often the VXDTF2 did abort the event and did not produce tracks,
@@ -64,5 +68,5 @@ namespace Belle2 {
       The histogram records if any flag was set.
     */
     TH1F* m_trackingErrorFlags = nullptr;
-  };  //end class declaration
-}  // end namespace Belle2
+  };
+}

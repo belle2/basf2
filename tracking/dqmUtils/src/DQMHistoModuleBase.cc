@@ -10,7 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/dqmUtils/BaseDQMHistogramModule.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 #include <tracking/dqmUtils/THFFactory.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -28,34 +28,27 @@ using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
-REG_MODULE(BaseDQMHistogram)
-
-
-//-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-BaseDQMHistogramModule::BaseDQMHistogramModule() : HistoModule()
+DQMHistoModuleBase::DQMHistoModuleBase() : HistoModule()
 {
-  //Set module properties
   setDescription("DQM of finding tracks, their momentum, "
                  "Number of hits in tracks, "
                  "Number of tracks. "
                 );
+
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("TracksStoreArrayName", m_TracksStoreArrayName, "StoreArray name where the merged Tracks are written.",
-           m_TracksStoreArrayName);
-  addParam("RecoTracksStoreArrayName", m_RecoTracksStoreArrayName, "StoreArray name where the merged RecoTracks are written.",
-           m_RecoTracksStoreArrayName);
-
-  addParam("HistogramParameterChanges", m_HistogramParameterChanges, "Changes of default parameters of histograms.",
-           vector<tuple<string, string, string>>());
+  addParam("tracksStoreArrayName", m_tracksStoreArrayName, "StoreArray name where the merged Tracks are written.",
+           m_tracksStoreArrayName);
+  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "StoreArray name where the merged RecoTracks are written.",
+           m_recoTracksStoreArrayName);
+  addParam("histogramParameterChanges", m_histogramParameterChanges, "Changes of default parameters of histograms.",
+           m_histogramParameterChanges);
 }
 
-BaseDQMHistogramModule::~BaseDQMHistogramModule()
+DQMHistoModuleBase::~DQMHistoModuleBase()
 {
 }
 
@@ -63,89 +56,86 @@ BaseDQMHistogramModule::~BaseDQMHistogramModule()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void BaseDQMHistogramModule::initialize()
+void DQMHistoModuleBase::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   if (!recoTracks.isOptional()) {
     B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
     return;
   }
 
-  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  StoreArray<Track> Tracks(m_tracksStoreArrayName);
   if (!Tracks.isOptional()) {
     B2WARNING("Missing Tracks array, Track-DQM is skipped.");
     return;
   }
 
-  // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there
-  m_eventLevelTrackingInfo.isOptional();
-
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 }
 
-void BaseDQMHistogramModule::defineHisto()
+void DQMHistoModuleBase::defineHisto()
 {
 
 }
 
-void BaseDQMHistogramModule::beginRun()
+void DQMHistoModuleBase::beginRun()
 {
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
+  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
   if (!recoTracks.isOptional())
     return;
-  StoreArray<Track> Tracks(m_TracksStoreArrayName);
+  StoreArray<Track> Tracks(m_tracksStoreArrayName);
   if (!Tracks.isOptional())
     return;
 
-  for (TH1* histogram : histograms)
+  for (TH1* histogram : m_histograms)
     histogram->Reset();
 }
 
 
-void BaseDQMHistogramModule::event()
+void DQMHistoModuleBase::event()
 {
 
 }
 
-TH1F* BaseDQMHistogramModule::Create(const char* name, const char* title, int nbinsx, double xlow, double xup, const char* xTitle,
-                                     const char* yTitle)
+TH1F* DQMHistoModuleBase::Create(const char* name, const char* title, int nbinsx, double xlow, double xup, const char* xTitle,
+                                 const char* yTitle)
 {
   TH1F* histogram = new TH1F(name, title, nbinsx, xlow, xup);
   histogram->GetXaxis()->SetTitle(xTitle);
   histogram->GetYaxis()->SetTitle(yTitle);
 
-  histograms.push_back(histogram);
+  m_histograms.push_back(histogram);
 
   return histogram;
 }
 
-TH2F* BaseDQMHistogramModule::Create(const char* name, const char* title, int nbinsx, double xlow, double xup, int nbinsy,
-                                     double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
+TH2F* DQMHistoModuleBase::Create(const char* name, const char* title, int nbinsx, double xlow, double xup, int nbinsy,
+                                 double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
 {
   TH2F* histogram = new TH2F(name, title, nbinsx, xlow, xup, nbinsy, ylow, yup);
   histogram->GetXaxis()->SetTitle(xTitle);
   histogram->GetYaxis()->SetTitle(yTitle);
   histogram->GetZaxis()->SetTitle(zTitle);
 
-  histograms.push_back(histogram);
+  m_histograms.push_back(histogram);
 
   return histogram;
 }
 
-string BaseDQMHistogramModule::SensorNameDescription(VxdID sensorID)
+string DQMHistoModuleBase::SensorNameDescription(VxdID sensorID)
 {
   return str(format("%1%_%2%_%3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() % sensorID.getSensorNumber());
 }
 
-string BaseDQMHistogramModule::SensorTitleDescription(VxdID sensorID)
+string DQMHistoModuleBase::SensorTitleDescription(VxdID sensorID)
 {
   return str(format("Layer %1% Ladder %2% Sensor %3%") % sensorID.getLayerNumber() % sensorID.getLadderNumber() %
              sensorID.getSensorNumber());
 }
 
-TH1F** BaseDQMHistogramModule::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                            double xup, const char* xTitle, const char* yTitle)
+TH1F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
+                                        double xup, const char* xTitle, const char* yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -163,8 +153,8 @@ TH1F** BaseDQMHistogramModule::CreateLayers(boost::format nameTemplate, boost::f
   return output;
 }
 
-TH2F** BaseDQMHistogramModule::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                            double xup, int nbinsy, double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
+TH2F** DQMHistoModuleBase::CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
+                                        double xup, int nbinsy, double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -182,8 +172,8 @@ TH2F** BaseDQMHistogramModule::CreateLayers(boost::format nameTemplate, boost::f
   return output;
 }
 
-TH1F** BaseDQMHistogramModule::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                             double xup, const char* xTitle, const char* yTitle)
+TH1F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
+                                         double xup, const char* xTitle, const char* yTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -201,8 +191,8 @@ TH1F** BaseDQMHistogramModule::CreateSensors(boost::format nameTemplate, boost::
   return output;
 }
 
-TH2F** BaseDQMHistogramModule::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
-                                             double xup, int nbinsy, double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
+TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow,
+                                         double xup, int nbinsy, double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle)
 {
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   auto gTools = geo.getGeoTools();
@@ -220,7 +210,7 @@ TH2F** BaseDQMHistogramModule::CreateSensors(boost::format nameTemplate, boost::
   return output;
 }
 
-void BaseDQMHistogramModule::DefineGeneral()
+void DQMHistoModuleBase::DefineGeneral()
 {
   m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, -180, 180, "Mom Phi [deg]", "counts");
   m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, 180, "Mom Theta [deg]", "counts");
@@ -231,7 +221,7 @@ void BaseDQMHistogramModule::DefineGeneral()
   m_Chi2NDF = Create("Chi2NDF", "Chi2 div NDF of fit", 200, 0, 10, "Chi2NDF", "counts");
 }
 
-void BaseDQMHistogramModule::DefineUBResiduals()
+void DQMHistoModuleBase::DefineUBResiduals()
 {
   double residualRange = 400;  // in um
 
@@ -255,7 +245,7 @@ void BaseDQMHistogramModule::DefineUBResiduals()
   m_UBResidualsSVDV = factory.CreateTH1F("UBResidualsSVDV", "Unbiased residuals in V for SVD");
 }
 
-void BaseDQMHistogramModule::DefineHelixParameters()
+void DQMHistoModuleBase::DefineHelixParameters()
 {
   TDirectory* originalDirectory = gDirectory;
 
@@ -304,7 +294,7 @@ void BaseDQMHistogramModule::DefineHelixParameters()
   originalDirectory->cd();
 }
 
-void BaseDQMHistogramModule::DefineMomentum()
+void DQMHistoModuleBase::DefineMomentum()
 {
   int iMomRange = 60;
   double fMomRange = 3.0;
@@ -318,7 +308,7 @@ void BaseDQMHistogramModule::DefineMomentum()
   m_Mom = factory.xlow(.0).CreateTH1F("TrackMomentumMag", "Track Momentum Magnitude");
 }
 
-void BaseDQMHistogramModule::DefineHits()
+void DQMHistoModuleBase::DefineHits()
 {
   int iHitsInPXD = 10;
   int iHitsInSVD = 20;
@@ -333,7 +323,7 @@ void BaseDQMHistogramModule::DefineHits()
   m_Hits = factory.nbinsx(iHits).xup(iHits).CreateTH1F("NoOfHitsInTrack", "No Of Hits In Track");
 }
 
-void BaseDQMHistogramModule::DefineTracks()
+void DQMHistoModuleBase::DefineTracks()
 {
   int iTracks = 30;
 
@@ -346,7 +336,7 @@ void BaseDQMHistogramModule::DefineTracks()
   m_Tracks = factory.CreateTH1F("NoOfTracks", "No Of All Tracks Per Event");
 }
 
-void BaseDQMHistogramModule::DefineHalfShells()
+void DQMHistoModuleBase::DefineHalfShells()
 {
   TDirectory* originalDirectory = gDirectory;
   TDirectory* halfShells = originalDirectory->mkdir("HalfShells");
@@ -374,7 +364,7 @@ void BaseDQMHistogramModule::DefineHalfShells()
   originalDirectory->cd();
 }
 
-void BaseDQMHistogramModule::DefineClusters()
+void DQMHistoModuleBase::DefineClusters()
 {
   double range = 180; // in um
   int nbins = 360;
@@ -414,7 +404,7 @@ void BaseDQMHistogramModule::DefineClusters()
   }
 }
 
-void BaseDQMHistogramModule::DefineSensors()
+void DQMHistoModuleBase::DefineSensors()
 {
   TDirectory* originalDirectory = gDirectory;
 
@@ -443,7 +433,7 @@ void BaseDQMHistogramModule::DefineSensors()
   originalDirectory->cd();
 }
 
-void BaseDQMHistogramModule::FillTracks(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC)
+void DQMHistoModuleBase::FillTracks(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC)
 {
   m_Tracks->Fill(iTrack);
   m_TracksVXD->Fill(iTrackVXD);
@@ -451,7 +441,7 @@ void BaseDQMHistogramModule::FillTracks(int iTrack, int iTrackVXD, int iTrackCDC
   m_TracksVXDCDC->Fill(iTrackVXDCDC);
 }
 
-void BaseDQMHistogramModule::FillHits(int nPXD, int nSVD, int nCDC)
+void DQMHistoModuleBase::FillHits(int nPXD, int nSVD, int nCDC)
 {
   m_HitsPXD->Fill(nPXD);
   m_HitsSVD->Fill(nSVD);
@@ -459,7 +449,7 @@ void BaseDQMHistogramModule::FillHits(int nPXD, int nSVD, int nCDC)
   m_Hits->Fill(nPXD + nSVD + nCDC);
 }
 
-void BaseDQMHistogramModule::FillMomentum(const TrackFitResult* tfr)
+void DQMHistoModuleBase::FillMomentum(const TrackFitResult* tfr)
 {
   float px = tfr->getMomentum().Px();
   float py = tfr->getMomentum().Py();
@@ -479,7 +469,7 @@ void BaseDQMHistogramModule::FillMomentum(const TrackFitResult* tfr)
   m_MomCosTheta->Fill(cos(Theta)); // this line is from TrackDQMModule
 }
 
-void BaseDQMHistogramModule::FillTrackFitResult(const TrackFitResult* tfr)
+void DQMHistoModuleBase::FillTrackFitResult(const TrackFitResult* tfr)
 {
   m_MomX->Fill(tfr->getMomentum().Px());
   m_MomY->Fill(tfr->getMomentum().Py());
@@ -497,7 +487,7 @@ void BaseDQMHistogramModule::FillTrackFitResult(const TrackFitResult* tfr)
   m_TanLambda->Fill(tfr->getTanLambda());
 }
 
-void BaseDQMHistogramModule::FillTrackFitStatus(const genfit::FitStatus* tfs)
+void DQMHistoModuleBase::FillTrackFitStatus(const genfit::FitStatus* tfs)
 {
   float NDF = tfs->getNdf();
   m_NDF->Fill(NDF);
@@ -511,31 +501,31 @@ void BaseDQMHistogramModule::FillTrackFitStatus(const genfit::FitStatus* tfs)
   m_PValue->Fill(tfs->getPVal());
 }
 
-void BaseDQMHistogramModule::FillCorrelations(float fPosSPU, float fPosSPUPrev, float fPosSPV, float fPosSPVPrev,
-                                              int correlationIndex)
+void DQMHistoModuleBase::FillCorrelations(float fPosSPU, float fPosSPUPrev, float fPosSPV, float fPosSPVPrev,
+                                          int correlationIndex)
 {
   m_TRClusterCorrelationsPhi[correlationIndex]->Fill(fPosSPUPrev, fPosSPU);
   m_TRClusterCorrelationsTheta[correlationIndex]->Fill(fPosSPVPrev, fPosSPV);
 }
 
-void BaseDQMHistogramModule::FillUBResidualsPXD(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias)
+void DQMHistoModuleBase::FillUBResidualsPXD(float residUPlaneRHUnBias, float residVPlaneRHUnBias)
 {
-  m_UBResidualsPXD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-  m_UBResidualsPXDU->Fill(ResidUPlaneRHUnBias);
-  m_UBResidualsPXDV->Fill(ResidVPlaneRHUnBias);
+  m_UBResidualsPXD->Fill(residUPlaneRHUnBias, residVPlaneRHUnBias);
+  m_UBResidualsPXDU->Fill(residUPlaneRHUnBias);
+  m_UBResidualsPXDV->Fill(residVPlaneRHUnBias);
 }
 
-void BaseDQMHistogramModule::FillUBResidualsSVD(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias)
+void DQMHistoModuleBase::FillUBResidualsSVD(float residUPlaneRHUnBias, float residVPlaneRHUnBias)
 {
-  m_UBResidualsSVD->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-  m_UBResidualsSVDU->Fill(ResidUPlaneRHUnBias);
-  m_UBResidualsSVDV->Fill(ResidVPlaneRHUnBias);
+  m_UBResidualsSVD->Fill(residUPlaneRHUnBias, residVPlaneRHUnBias);
+  m_UBResidualsSVDU->Fill(residUPlaneRHUnBias);
+  m_UBResidualsSVDV->Fill(residVPlaneRHUnBias);
 }
 
-void BaseDQMHistogramModule::FillPXDHalfShells(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias,
-                                               const VXD::SensorInfoBase* sensorInfo, bool isNotYang)
+void DQMHistoModuleBase::FillPXDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias,
+                                           const VXD::SensorInfoBase* sensorInfo, bool isNotYang)
 {
-  TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
+  TVector3 localResidual(residUPlaneRHUnBias, residVPlaneRHUnBias, 0);
   auto globalResidual = sensorInfo->vectorToGlobal(localResidual, true);
 
   if (isNotYang) {
@@ -549,10 +539,10 @@ void BaseDQMHistogramModule::FillPXDHalfShells(float ResidUPlaneRHUnBias, float 
   }
 }
 
-void BaseDQMHistogramModule::FillSVDHalfShells(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias,
-                                               const VXD::SensorInfoBase* sensorInfo, bool isNotMat)
+void DQMHistoModuleBase::FillSVDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias,
+                                           const VXD::SensorInfoBase* sensorInfo, bool isNotMat)
 {
-  TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
+  TVector3 localResidual(residUPlaneRHUnBias, residVPlaneRHUnBias, 0);
   auto globalResidual = sensorInfo->vectorToGlobal(localResidual, true);
 
   if (isNotMat) {
@@ -566,19 +556,19 @@ void BaseDQMHistogramModule::FillSVDHalfShells(float ResidUPlaneRHUnBias, float 
   }
 }
 
-void BaseDQMHistogramModule::FillUBResidualsSensor(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, int sensorIndex)
+void DQMHistoModuleBase::FillUBResidualsSensor(float residUPlaneRHUnBias, float residVPlaneRHUnBias, int sensorIndex)
 {
-  m_UBResidualsSensor[sensorIndex]->Fill(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias);
-  m_UBResidualsSensorU[sensorIndex]->Fill(ResidUPlaneRHUnBias);
-  m_UBResidualsSensorV[sensorIndex]->Fill(ResidVPlaneRHUnBias);
+  m_UBResidualsSensor[sensorIndex]->Fill(residUPlaneRHUnBias, residVPlaneRHUnBias);
+  m_UBResidualsSensorU[sensorIndex]->Fill(residUPlaneRHUnBias);
+  m_UBResidualsSensorV[sensorIndex]->Fill(residVPlaneRHUnBias);
 }
 
-void BaseDQMHistogramModule::FillTRClusterHitmap(float fPosSPU, float fPosSPV, int layerIndex)
+void DQMHistoModuleBase::FillTRClusterHitmap(float fPosSPU, float fPosSPV, int layerIndex)
 {
   m_TRClusterHitmap[layerIndex]->Fill(fPosSPU, fPosSPV);
 }
 
-void BaseDQMHistogramModule::ComputeMean(TH1F* output, TH2F* input, bool onX)
+void DQMHistoModuleBase::ComputeMean(TH1F* output, TH2F* input, bool onX)
 {
   output->Reset();
   int nbinsi = onX ? input->GetNbinsX() : input->GetNbinsY();
@@ -599,12 +589,12 @@ void BaseDQMHistogramModule::ComputeMean(TH1F* output, TH2F* input, bool onX)
   }
 }
 
-void BaseDQMHistogramModule::ProcessHistogramParameterChange(string name, string parameter, string value)
+void DQMHistoModuleBase::ProcessHistogramParameterChange(string name, string parameter, string value)
 {
   TH1* histogram;
   bool found = false;
 
-  for (auto adept : histograms)
+  for (auto adept : m_histograms)
     if (adept->GetName() == name) {
       found = true;
       histogram = adept;
@@ -627,7 +617,7 @@ void BaseDQMHistogramModule::ProcessHistogramParameterChange(string name, string
   }
 }
 
-void BaseDQMHistogramModule::EditHistogramParameter(TH1* histogram, string parameter, string value)
+void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, string parameter, string value)
 {
   if (parameter == "title") {
     histogram->SetTitle(value.c_str());

@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
-#include <alignment/modules/AlignmentDQM/AlignmentEventProcessor.h>
+#include <alignment/modules/AlignDQM/AlignDQMModule.h>
+#include <alignment/modules/AlignDQM/AlignDQMEventProcessor.h>
 #include <tracking/dqmUtils/THFFactory.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -31,16 +31,15 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(AlignDQM)
 
+REG_MODULE(AlignDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-AlignDQMModule::AlignDQMModule() : BaseDQMHistogramModule()
+AlignDQMModule::AlignDQMModule() : DQMHistoModuleBase()
 {
-  //Set module properties
   setDescription("DQM of Alignment for off line "
                  "residuals per sensor, layer, "
                  "keep also On-Line DQM from tracking: "
@@ -48,32 +47,11 @@ AlignDQMModule::AlignDQMModule() : BaseDQMHistogramModule()
                  "Number of hits in tracks, "
                  "Number of tracks. "
                 );
-  //setPropertyFlags(c_ParallelProcessingCertified);
-
-  //addParam("TracksStoreArrayName", m_TracksStoreArrayName, "StoreArray name where the merged Tracks are written.", m_TracksStoreArrayName);
-  //addParam("RecoTracksStoreArrayName", m_RecoTracksStoreArrayName, "StoreArray name where the merged RecoTracks are written.", m_RecoTracksStoreArrayName);
-}
-
-
-AlignDQMModule::~AlignDQMModule()
-{
 }
 
 //------------------------------------------------------------------
 // Function to define histograms
 //-----------------------------------------------------------------
-
-void AlignDQMModule::initialize()
-{
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
-  recoTracks.isOptional();
-
-  StoreArray<Track> tracks(m_TracksStoreArrayName);
-  tracks.isOptional();
-
-  // Register histograms (calls back defineHisto)
-  REG_HISTOGRAM
-}
 
 void AlignDQMModule::defineHisto()
 {
@@ -103,14 +81,14 @@ void AlignDQMModule::defineHisto()
 
   originalDirectory->cd();
 
-  for (auto change : m_HistogramParameterChanges)
+  for (auto change : m_histogramParameterChanges)
     ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
 }
 
 void AlignDQMModule::event()
 {
 
-  AlignmentEventProcessor eventProcessor = AlignmentEventProcessor(this, m_RecoTracksStoreArrayName, m_TracksStoreArrayName);
+  AlignDQMEventProcessor eventProcessor = AlignDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
 
   eventProcessor.Run();
 }
@@ -382,7 +360,7 @@ void AlignDQMModule::DefineLayers()
 
 void AlignDQMModule::FillTrackFitResult(const TrackFitResult* tfr)
 {
-  BaseDQMHistogramModule::FillTrackFitResult(tfr);
+  DQMHistoModuleBase::FillTrackFitResult(tfr);
 
   m_PhiZ0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getZ0());
   m_PhiMomPt->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getMomentum().Pt());
@@ -399,27 +377,27 @@ void AlignDQMModule::FillTrackFitResult(const TrackFitResult* tfr)
   m_OmegaTanLambda->Fill(tfr->getOmega(), tfr->getTanLambda());
 }
 
-void AlignDQMModule::FillSensorIndex(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, float posU, float posV, int sensorIndex)
+void AlignDQMModule::FillSensorIndex(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float posU, float posV, int sensorIndex)
 {
   float posU_mm = posU * Unit::convertValueToUnit(1.0, "mm");
   float posV_mm = posV * Unit::convertValueToUnit(1.0, "mm");
 
   m_ResMeanPosUVSensCounts[sensorIndex]->Fill(posU_mm, posV_mm);
-  m_ResMeanUPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, ResidUPlaneRHUnBias);
-  m_ResMeanVPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, ResidVPlaneRHUnBias);
-  m_ResUPosUSens[sensorIndex]->Fill(posU_mm, ResidUPlaneRHUnBias);
-  m_ResUPosVSens[sensorIndex]->Fill(posV_mm, ResidUPlaneRHUnBias);
-  m_ResVPosUSens[sensorIndex]->Fill(posU_mm, ResidVPlaneRHUnBias);
-  m_ResVPosVSens[sensorIndex]->Fill(posV_mm, ResidVPlaneRHUnBias);
+  m_ResMeanUPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, residUPlaneRHUnBias);
+  m_ResMeanVPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, residVPlaneRHUnBias);
+  m_ResUPosUSens[sensorIndex]->Fill(posU_mm, residUPlaneRHUnBias);
+  m_ResUPosVSens[sensorIndex]->Fill(posV_mm, residUPlaneRHUnBias);
+  m_ResVPosUSens[sensorIndex]->Fill(posU_mm, residVPlaneRHUnBias);
+  m_ResVPosVSens[sensorIndex]->Fill(posV_mm, residVPlaneRHUnBias);
 }
 
-void AlignDQMModule::FillLayers(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex)
+void AlignDQMModule::FillLayers(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex)
 {
   m_ResMeanPhiThetaLayerCounts[layerIndex]->Fill(fPosSPU, fPosSPV);
-  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, ResidUPlaneRHUnBias);
-  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, ResidVPlaneRHUnBias);
-  m_ResUPhiLayer[layerIndex]->Fill(fPosSPU, ResidUPlaneRHUnBias);
-  m_ResVPhiLayer[layerIndex]->Fill(fPosSPU, ResidVPlaneRHUnBias);
-  m_ResUThetaLayer[layerIndex]->Fill(fPosSPV, ResidUPlaneRHUnBias);
-  m_ResVThetaLayer[layerIndex]->Fill(fPosSPV, ResidVPlaneRHUnBias);
+  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, residUPlaneRHUnBias);
+  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, residVPlaneRHUnBias);
+  m_ResUPhiLayer[layerIndex]->Fill(fPosSPU, residUPlaneRHUnBias);
+  m_ResVPhiLayer[layerIndex]->Fill(fPosSPU, residVPlaneRHUnBias);
+  m_ResUThetaLayer[layerIndex]->Fill(fPosSPV, residUPlaneRHUnBias);
+  m_ResVThetaLayer[layerIndex]->Fill(fPosSPV, residVPlaneRHUnBias);
 }

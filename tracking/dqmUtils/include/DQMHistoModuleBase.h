@@ -2,14 +2,13 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <TH1F.h>
-#include <TH2F.h>
-
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <TH1F.h>
+#include <TH2F.h>
 
 // asi bude potřeba
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -18,25 +17,25 @@ using namespace std;
 
 namespace Belle2 {
 
-  class BaseDQMHistogramModule : public HistoModule {  // <- derived from HistoModule class
+  class DQMHistoModuleBase : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
-    BaseDQMHistogramModule();
+    DQMHistoModuleBase();
     /* Destructor */
-    ~BaseDQMHistogramModule();
+    ~DQMHistoModuleBase();
 
     /** Module functions */
-    void initialize() override;
-    void beginRun() override;
-    void event() override;
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
     * to be placed in this function.
     */
-    void defineHisto() override;
+    virtual void defineHisto() override;
 
     TH1F* Create(const char* name, const char* title, int nbinsx, double xlow, double xup, const char* xTitle, const char* yTitle);
     TH2F* Create(const char* name, const char* title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
@@ -58,20 +57,23 @@ namespace Belle2 {
     virtual void FillTrackFitResult(const TrackFitResult* tfr);
     virtual void FillTrackFitStatus(const genfit::FitStatus* tfs);
     virtual void FillCorrelations(float fPosSPU, float fPosSPUPrev, float fPosSPV, float fPosSPVPrev, int correlationIndex);
-    virtual void FillUBResidualsPXD(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias);
-    virtual void FillUBResidualsSVD(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias);
-    virtual void FillPXDHalfShells(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
+    virtual void FillUBResidualsPXD(float residUPlaneRHUnBias, float residVPlaneRHUnBias);
+    virtual void FillUBResidualsSVD(float residUPlaneRHUnBias, float residVPlaneRHUnBias);
+    virtual void FillPXDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
                                    bool isNotYang);
-    virtual void FillSVDHalfShells(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
+    virtual void FillSVDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
                                    bool isNotMat);
-    virtual void FillUBResidualsSensor(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, int sensorIndex);
+    virtual void FillUBResidualsSensor(float residUPlaneRHUnBias, float residVPlaneRHUnBias, int sensorIndex);
     virtual void FillTRClusterHitmap(float fPosSPU, float fPosSPV, int layerIndex);
 
   protected:
-    vector<TH1*> histograms;
+    static string SensorNameDescription(VxdID sensorID);
+    static string SensorTitleDescription(VxdID sensorID);
 
-    string SensorNameDescription(VxdID sensorID);
-    string SensorTitleDescription(VxdID sensorID);
+    static void ComputeMean(TH1F* output, TH2F* input, bool onX = true);
+
+    void ProcessHistogramParameterChange(string name, string parameter, string value);
+    static void EditHistogramParameter(TH1* histogram, string parameter, string value);
 
     virtual void DefineGeneral();
     virtual void DefineUBResiduals();
@@ -83,20 +85,13 @@ namespace Belle2 {
     virtual void DefineClusters();
     virtual void DefineSensors();
 
-    void ComputeMean(TH1F* output, TH2F* input, bool onX = true);
-
-    void ProcessHistogramParameterChange(string name, string parameter, string value);
-    void EditHistogramParameter(TH1* histogram, string parameter, string value);
+    vector<TH1*> m_histograms;
+    vector<tuple<string, string, string>> m_histogramParameterChanges;
 
     /** StoreArray name where Tracks are written. */
-    string m_TracksStoreArrayName;
+    string m_tracksStoreArrayName;
     /** StoreArray name where RecoTracks are written. */
-    string m_RecoTracksStoreArrayName;
-
-    /// Acccess to the EventLevelTrackingInfo object in the datastore.
-    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-
-    vector<tuple<string, string, string>> m_HistogramParameterChanges;
+    string m_recoTracksStoreArrayName;
 
     /** p Value */
     TH1F* m_PValue = nullptr;

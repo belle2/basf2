@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackingDQM/TrackDQMModule.h>
-#include <tracking/modules/trackingDQM/TrackingEventProcessor.h>
+#include <tracking/modules/TrackDQM/TrackDQMModule.h>
+#include <tracking/modules/TrackDQM/TrackDQMEventProcessor.h>
 #include <tracking/dqmUtils/THFFactory.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -31,30 +31,19 @@ using boost::format;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackDQM)
 
+REG_MODULE(TrackDQM)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrackDQMModule::TrackDQMModule() : BaseDQMHistogramModule()
+TrackDQMModule::TrackDQMModule() : DQMHistoModuleBase()
 {
-  /*
-  //Set module properties
   setDescription("DQM of finding tracks, their momentum, "
                  "Number of hits in tracks, "
                  "Number of tracks. "
                 );
-  setPropertyFlags(c_ParallelProcessingCertified);
-
-  addParam("TracksStoreArrayName", m_TracksStoreArrayName, "StoreArray name where the merged Tracks are written.", m_TracksStoreArrayName);
-  addParam("RecoTracksStoreArrayName", m_RecoTracksStoreArrayName, "StoreArray name where the merged RecoTracks are written.", m_RecoTracksStoreArrayName);
-  */
-}
-
-TrackDQMModule::~TrackDQMModule()
-{
 }
 
 //------------------------------------------------------------------
@@ -63,23 +52,10 @@ TrackDQMModule::~TrackDQMModule()
 
 void TrackDQMModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_RecoTracksStoreArrayName);
-  if (!recoTracks.isOptional()) {
-    B2WARNING("Missing recoTracks array, Track-DQM is skipped.");
-    return;
-  }
-
-  StoreArray<Track> Tracks(m_TracksStoreArrayName);
-  if (!Tracks.isOptional()) {
-    B2WARNING("Missing Tracks array, Track-DQM is skipped.");
-    return;
-  }
+  DQMHistoModuleBase::initialize();
 
   // eventLevelTrackingInfo is currently only set by VXDTF2, if VXDTF2 is not in path the StoreObject is not there
   m_eventLevelTrackingInfo.isOptional();
-
-  // Register histograms (calls back defineHisto)
-  REG_HISTOGRAM
 }
 
 void TrackDQMModule::defineHisto()
@@ -117,13 +93,13 @@ void TrackDQMModule::defineHisto()
 
   originalDirectory->cd();
 
-  for (auto change : m_HistogramParameterChanges)
+  for (auto change : m_histogramParameterChanges)
     ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
 }
 
 void TrackDQMModule::event()
 {
-  TrackingEventProcessor eventProcessor = TrackingEventProcessor(this, m_RecoTracksStoreArrayName, m_TracksStoreArrayName);
+  TrackDQMEventProcessor eventProcessor = TrackDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
 
   eventProcessor.Run();
 

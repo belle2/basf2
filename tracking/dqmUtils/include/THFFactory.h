@@ -1,67 +1,67 @@
 #pragma once
 
-#include <tracking/dqmUtils/BaseDQMHistogramModule.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 namespace Belle2 {
 
-  template <typename T>
+  template <typename AType>
   class Parameter {
   public:
-    Parameter(T defaultValue)
+    Parameter(AType defaultValue)
     {
-      _value = defaultValue;
-      isSet = false;
-      isSetOneTime = false;
+      m_value = defaultValue;
+      m_isSet = false;
+      m_isSetOneTime = false;
     }
-    void Set(T value);
-    void Set(Parameter<T> parameter);
-    void SetOneTime(T value);
-    void SetOneTime(Parameter<T> parameter);
-    T Get();
+    void Set(AType value);
+    void Set(Parameter<AType> parameter);
+    void SetOneTime(AType value);
+    void SetOneTime(Parameter<AType> parameter);
+    AType Get();
 
   private:
-    T _value;
-    T _oneTimeValue;
-    bool isSet;
-    bool isSetOneTime;
+    AType m_value;
+    AType m_oneTimeValue;
+    bool m_isSet;
+    bool m_isSetOneTime;
   };
 
-  template <class T>
-  void Parameter<T>::Set(T value)
+  template <class AType>
+  void Parameter<AType>::Set(AType value)
   {
-    _value = value;
-    isSet = true;
+    m_value = value;
+    m_isSet = true;
   }
 
-  template <class T>
-  void Parameter<T>::Set(Parameter<T> parameter)
+  template <class AType>
+  void Parameter<AType>::Set(Parameter<AType> parameter)
   {
-    if (parameter.isSet)
-      Set(parameter._value);
+    if (parameter.m_isSet)
+      Set(parameter.m_value);
   }
 
-  template <class T>
-  void Parameter<T>::SetOneTime(T value)
+  template <class AType>
+  void Parameter<AType>::SetOneTime(AType value)
   {
-    _oneTimeValue = value;
-    isSetOneTime = true;
+    m_oneTimeValue = value;
+    m_isSetOneTime = true;
   }
 
-  template <class T>
-  void Parameter<T>::SetOneTime(Parameter<T> parameter)
+  template <class AType>
+  void Parameter<AType>::SetOneTime(Parameter<AType> parameter)
   {
-    if (parameter.isSet)
-      SetOneTime(parameter._value);
+    if (parameter.m_isSet)
+      SetOneTime(parameter.m_value);
   }
 
-  template <class T>
-  T Parameter<T>::Get()
+  template <class AType>
+  AType Parameter<AType>::Get()
   {
-    if (isSetOneTime) {
-      isSetOneTime = false;
-      return _oneTimeValue;
+    if (m_isSetOneTime) {
+      m_isSetOneTime = false;
+      return m_oneTimeValue;
     } else {
-      return _value;
+      return m_value;
     }
   }
 
@@ -71,74 +71,77 @@ namespace Belle2 {
 
     THFAxis(int nbins, double low, double up, const char* title)
     {
-      _nbins.Set(nbins);
-      _low.Set(low);
-      _up.Set(up);
-      _title.Set(title);
+      m_nbins.Set(nbins);
+      m_low.Set(low);
+      m_up.Set(up);
+      m_title.Set(title);
     }
 
     THFAxis(THFAxis& axis)
     {
-      _nbins.Set(axis._nbins);
-      _low.Set(axis._low);
-      _up.Set(axis._up);
-      _title.Set(axis._title);
+      m_nbins.Set(axis.m_nbins);
+      m_low.Set(axis.m_low);
+      m_up.Set(axis.m_up);
+      m_title.Set(axis.m_title);
     }
 
-    THFAxis& nbins(int nbins) { _nbins.Set(nbins); return *this; }
-    THFAxis& low(double low) { _low.Set(low); return *this; }
-    THFAxis& up(double up) { _up.Set(up); return *this; }
-    THFAxis& title(const char* title) { _title.Set(title); return *this; }
+    THFAxis& nbins(int nbins) { m_nbins.Set(nbins); return *this; }
+    THFAxis& low(double low) { m_low.Set(low); return *this; }
+    THFAxis& up(double up) { m_up.Set(up); return *this; }
+    THFAxis& title(const char* title) { m_title.Set(title); return *this; }
 
   private:
-    Parameter<int> _nbins = Parameter(0);
-    Parameter<double> _low = Parameter(.0);
-    Parameter<double> _up = Parameter(.0);
-    Parameter<const char*> _title = Parameter("");
+    Parameter<int> m_nbins = Parameter(0);
+    Parameter<double> m_low = Parameter(.0);
+    Parameter<double> m_up = Parameter(.0);
+    Parameter<const char*> m_title = Parameter("");
 
     friend class THFFactory;
   };
 
   class THFFactory {
   public:
-    THFFactory(BaseDQMHistogramModule* set);
+    THFFactory(DQMHistoModuleBase* histoModule)
+    {
+      m_histoModule = histoModule;
+    }
 
     THFFactory& xAxis(THFAxis& axis)
     {
-      _nbinsx.SetOneTime(axis._nbins);
-      _xlow.SetOneTime(axis._low);
-      _xup.SetOneTime(axis._up);
-      _xTitle.SetOneTime(axis._title);
+      m_nbinsx.SetOneTime(axis.m_nbins);
+      m_xlow.SetOneTime(axis.m_low);
+      m_xup.SetOneTime(axis.m_up);
+      m_xTitle.SetOneTime(axis.m_title);
 
       return *this;
     }
 
     THFFactory& yAxis(THFAxis& axis)
     {
-      _nbinsy.SetOneTime(axis._nbins);
-      _ylow.SetOneTime(axis._low);
-      _yup.SetOneTime(axis._up);
-      _yTitle.SetOneTime(axis._title);
+      m_nbinsy.SetOneTime(axis.m_nbins);
+      m_ylow.SetOneTime(axis.m_low);
+      m_yup.SetOneTime(axis.m_up);
+      m_yTitle.SetOneTime(axis.m_title);
 
       return *this;
     }
 
     THFFactory& xAxisSet(THFAxis& axis)
     {
-      _nbinsx.Set(axis._nbins);
-      _xlow.Set(axis._low);
-      _xup.Set(axis._up);
-      _xTitle.Set(axis._title);
+      m_nbinsx.Set(axis.m_nbins);
+      m_xlow.Set(axis.m_low);
+      m_xup.Set(axis.m_up);
+      m_xTitle.Set(axis.m_title);
 
       return *this;
     }
 
     THFFactory& yAxisSet(THFAxis& axis)
     {
-      _nbinsy.Set(axis._nbins);
-      _ylow.Set(axis._low);
-      _yup.Set(axis._up);
-      _yTitle.Set(axis._title);
+      m_nbinsy.Set(axis.m_nbins);
+      m_ylow.Set(axis.m_low);
+      m_yup.Set(axis.m_up);
+      m_yTitle.Set(axis.m_title);
 
       return *this;
     }
@@ -151,37 +154,37 @@ namespace Belle2 {
     TH1F** CreateSensorsTH1F(boost::format nameTemplate, boost::format titleTemplate);
     TH2F** CreateSensorsTH2F(boost::format nameTemplate, boost::format titleTemplate);
 
-    THFFactory& nbinsxSet(int nbinsx) { _nbinsx.Set(nbinsx); return *this; }
-    THFFactory& xlowSet(double xlow) { _xlow.Set(xlow); return *this; }
-    THFFactory& xupSet(double xup) { _xup.Set(xup); return *this; }
-    THFFactory& nbinsySet(int nbinsy) { _nbinsy.Set(nbinsy); return *this; }
-    THFFactory& ylowSet(double ylow) { _ylow.Set(ylow); return *this; }
-    THFFactory& yupSet(double yup) { _yup.Set(yup); return *this; }
-    THFFactory& xTitleSet(const char* xTitle) { _xTitle.Set(xTitle); return *this; }
-    THFFactory& yTitleSet(const char* yTitle) { _yTitle.Set(yTitle); return *this; }
-    THFFactory& zTitleSet(const char* zTitle) { _zTitle.Set(zTitle); return *this; }
+    THFFactory& nbinsxSet(int nbinsx) { m_nbinsx.Set(nbinsx); return *this; }
+    THFFactory& xlowSet(double xlow) { m_xlow.Set(xlow); return *this; }
+    THFFactory& xupSet(double xup) { m_xup.Set(xup); return *this; }
+    THFFactory& nbinsySet(int nbinsy) { m_nbinsy.Set(nbinsy); return *this; }
+    THFFactory& ylowSet(double ylow) { m_ylow.Set(ylow); return *this; }
+    THFFactory& yupSet(double yup) { m_yup.Set(yup); return *this; }
+    THFFactory& xTitleSet(const char* xTitle) { m_xTitle.Set(xTitle); return *this; }
+    THFFactory& yTitleSet(const char* yTitle) { m_yTitle.Set(yTitle); return *this; }
+    THFFactory& zTitleSet(const char* zTitle) { m_zTitle.Set(zTitle); return *this; }
 
-    THFFactory& nbinsx(int nbinsx) { _nbinsx.SetOneTime(nbinsx); return *this; }
-    THFFactory& xlow(double xlow) { _xlow.SetOneTime(xlow); return *this; }
-    THFFactory& xup(double xup) { _xup.SetOneTime(xup); return *this; }
-    THFFactory& nbinsy(int nbinsy) { _nbinsy.SetOneTime(nbinsy); return *this; }
-    THFFactory& ylow(double ylow) { _ylow.SetOneTime(ylow); return *this; }
-    THFFactory& yup(double yup) { _yup.SetOneTime(yup); return *this; }
-    THFFactory& xTitle(const char* xTitle) { _xTitle.SetOneTime(xTitle); return *this; }
-    THFFactory& yTitle(const char* yTitle) { _yTitle.SetOneTime(yTitle); return *this; }
-    THFFactory& zTitle(const char* zTitle) { _zTitle.SetOneTime(zTitle); return *this; }
+    THFFactory& nbinsx(int nbinsx) { m_nbinsx.SetOneTime(nbinsx); return *this; }
+    THFFactory& xlow(double xlow) { m_xlow.SetOneTime(xlow); return *this; }
+    THFFactory& xup(double xup) { m_xup.SetOneTime(xup); return *this; }
+    THFFactory& nbinsy(int nbinsy) { m_nbinsy.SetOneTime(nbinsy); return *this; }
+    THFFactory& ylow(double ylow) { m_ylow.SetOneTime(ylow); return *this; }
+    THFFactory& yup(double yup) { m_yup.SetOneTime(yup); return *this; }
+    THFFactory& xTitle(const char* xTitle) { m_xTitle.SetOneTime(xTitle); return *this; }
+    THFFactory& yTitle(const char* yTitle) { m_yTitle.SetOneTime(yTitle); return *this; }
+    THFFactory& zTitle(const char* zTitle) { m_zTitle.SetOneTime(zTitle); return *this; }
 
   private:
-    BaseDQMHistogramModule* histogramSet;
+    DQMHistoModuleBase* m_histoModule;
 
-    Parameter<int> _nbinsx = Parameter(0);
-    Parameter<double> _xlow = Parameter(.0);
-    Parameter<double> _xup = Parameter(.0);
-    Parameter<const char*> _xTitle = Parameter("");
-    Parameter<const char*> _yTitle = Parameter("");
-    Parameter<int> _nbinsy = Parameter(0);
-    Parameter<double> _ylow = Parameter(.0);
-    Parameter<double> _yup = Parameter(.0);
-    Parameter<const char*> _zTitle = Parameter("");
+    Parameter<int> m_nbinsx = Parameter(0);
+    Parameter<double> m_xlow = Parameter(.0);
+    Parameter<double> m_xup = Parameter(.0);
+    Parameter<const char*> m_xTitle = Parameter("");
+    Parameter<const char*> m_yTitle = Parameter("");
+    Parameter<int> m_nbinsy = Parameter(0);
+    Parameter<double> m_ylow = Parameter(.0);
+    Parameter<double> m_yup = Parameter(.0);
+    Parameter<const char*> m_zTitle = Parameter("");
   };
 }

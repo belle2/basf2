@@ -13,14 +13,15 @@
 
 #pragma once
 
-#include <tracking/dqmUtils/BaseDQMHistogramModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+
+#include <TH1F.h>
+#include <TH2F.h>
 
 using namespace std;
 
@@ -34,39 +35,35 @@ namespace Belle2 {
     * Number of tracks.
     *
     */
-  class AlignDQMModule : public BaseDQMHistogramModule {  // <- derived from HistoModule class
+  class AlignDQMModule : public DQMHistoModuleBase {  // <- derived from HistoModule class
 
   public:
 
     /** Constructor */
     AlignDQMModule();
     /* Destructor */
-    ~AlignDQMModule();
+    ~AlignDQMModule() { }
 
-    /** Module function initialize */
-    void initialize() override final;
-    /** Module function beginRun */
-    //void beginRun() override final;
     /** Module function event */
-    void event() override final;
+    virtual void event() override;
     /** Module function endRun */
-    void endRun() override final;
+    virtual void endRun() override;
 
     /**
     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
     * to be placed in this function.
     */
-    void defineHisto() override final;
+    virtual void defineHisto() override;
 
-    void FillTrackFitResult(const TrackFitResult* tfr) override;
+    virtual void FillTrackFitResult(const TrackFitResult* tfr) override;
 
-    void FillSensorIndex(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, float posU, float posV, int sensorIndex);
-    void FillLayers(float ResidUPlaneRHUnBias, float ResidVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex);
+    virtual void FillSensorIndex(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float posU, float posV, int sensorIndex);
+    virtual void FillLayers(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex);
 
   private:
-    void DefineSensors() override;
-    void DefineLayers();
-    void DefineHelixParameters() override;
+    virtual void DefineSensors() override;
+    virtual void DefineLayers();
+    virtual void DefineHelixParameters() override;
 
     // Special Alignment related: Sensor level
     /** ResidaulMean vs U vs V counter for sensor*/
@@ -117,7 +114,6 @@ namespace Belle2 {
     TH1F** m_ResMeanVThetaLayer = nullptr;
 
     /** helix parameters and their corellations: */
-
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z) */
     TH2F* m_PhiZ0 = nullptr;
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. Track momentum Pt */

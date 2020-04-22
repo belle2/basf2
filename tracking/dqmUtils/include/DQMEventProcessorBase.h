@@ -1,7 +1,6 @@
 #pragma once
 
-#include <framework/core/HistoModule.h>
-#include <tracking/dqmUtils/BaseDQMHistogramModule.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -11,69 +10,26 @@
 using namespace std;
 
 namespace Belle2 {
-  class BaseDQMEventProcessor {
+
+  class DQMEventProcessorBase {
+
   public:
-    BaseDQMEventProcessor(BaseDQMHistogramModule* p_histoModule, std::string p_m_RecoTracksStoreArrayName,
-                          std::string p_m_TracksStoreArrayName)
+    DQMEventProcessorBase(DQMHistoModuleBase* histoModule, string recoTracksStoreArrayName, string tracksStoreArrayName)
     {
-      histoModule = p_histoModule;
-      m_RecoTracksStoreArrayName = p_m_RecoTracksStoreArrayName;
-      m_TracksStoreArrayName = p_m_TracksStoreArrayName;
+      m_histoModule = histoModule;
+      m_recoTracksStoreArrayName = recoTracksStoreArrayName;
+      m_tracksStoreArrayName = tracksStoreArrayName;
     }
 
     virtual void Run();
 
   protected:
-    BaseDQMHistogramModule* histoModule;
-    string m_TracksStoreArrayName;
-    string m_RecoTracksStoreArrayName;
-
     virtual void ProcessOneTrack(const Track& track);
-
     virtual TString ConstructMessage() = 0;
-
-    int nPXD;
-    int nSVD;
-    int nCDC;
-
-    int iTrack;
-    int iTrackVXD;
-    int iTrackCDC;
-    int iTrackVXDCDC;
-
-    RecoTrack* recoTrack;
-    const TrackFitResult* trackFitResult;
-
     virtual bool ProcessSuccessfulFit();
-
-    bool isNotFirstHit = false;
-
-    VxdID sensorIDPrew;
-
-    float ResidUPlaneRHUnBias;
-    float ResidVPlaneRHUnBias;
-    float fPosSPUPrev;
-    float fPosSPVPrev;
-    float fPosSPU;
-    float fPosSPV;
-    float posU;
-    float posV;
-    int layerNumberPrev;
-    int layerNumber;
-    int layerIndex;
-    int correlationIndex;
-    int sensorIndex;
-
     virtual void ProcessOneRecoHit(RecoHitInformation* recoHitInfo);
-
-    TVectorT<double>* resUnBias = nullptr;
-    VxdID sensorID;
-
     virtual void ProcessPXDRecoHit(RecoHitInformation* recoHitInfo);
     virtual void ProcessSVDRecoHit(RecoHitInformation* recoHitInfo);
-
-    const VXD::SensorInfoBase* sensorInfo;
-
     virtual void ComputeCommonVariables();
     virtual void FillCommonHistograms();
     virtual void SetCommonPrevVariables();
@@ -88,7 +44,7 @@ namespace Belle2 {
     * | 1           | 5, 6, 7, 8          |
     * | 2           | 7, 8, 9, 10, 11, 12 |
     */
-    bool IsNotYang(int ladder, int layer);
+    static bool IsNotYang(int ladder, int layer);
 
     /**
     * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
@@ -102,6 +58,43 @@ namespace Belle2 {
     * | 5           | 5, 6, 7, 8, 9, 10          |
     * | 6           | 6, 7, 8, 9, 10, 11, 12, 13 |
     */
-    bool IsNotMat(int ladder, int layer);
+    static bool IsNotMat(int ladder, int layer);
+
+    DQMHistoModuleBase* m_histoModule;
+    string m_tracksStoreArrayName;
+    string m_recoTracksStoreArrayName;
+
+    int m_nPXD;
+    int m_nSVD;
+    int m_nCDC;
+
+    int m_iTrack;
+    int m_iTrackVXD;
+    int m_iTrackCDC;
+    int m_iTrackVXDCDC;
+
+    RecoTrack* m_recoTrack;
+    const TrackFitResult* m_trackFitResult;
+
+    bool m_isNotFirstHit = false;
+
+    TVectorT<double>* m_resUnBias = nullptr;
+    VxdID m_sensorID;
+    VxdID m_sensorIDPrew;
+
+    float m_residUPlaneRHUnBias;
+    float m_residVPlaneRHUnBias;
+    float m_fPosSPU;
+    float m_fPosSPUPrev;
+    float m_fPosSPV;
+    float m_fPosSPVPrev;
+    float m_posU;
+    float m_posV;
+    int m_layerNumber;
+    int m_layerNumberPrev;
+    int m_layerIndex;
+    int m_correlationIndex;
+    int m_sensorIndex;
+    const VXD::SensorInfoBase* m_sensorInfo;
   };
 }

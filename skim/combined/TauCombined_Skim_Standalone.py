@@ -14,7 +14,7 @@ from skim.standardlists.lightmesons import loadStdLightMesons
 import skimExpertFunctions as expert
 
 skimpath = b2.Path()
-fileList = expert.get_test_file('MC12_mixedBGx1')
+fileList = expert.get_test_file('MC13_mixedBGx1')
 ma.inputMdstList('default', fileList, path=skimpath)
 
 stdE('all', path=skimpath)

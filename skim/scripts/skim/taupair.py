@@ -81,7 +81,7 @@ def TauList(path):
     Ntrk = 2
 
     1. Number of good tracks = 2, net charge < 2
-    2. ``visibleEnergyOfEventCMS < 10 GeV and E_ECLtrk < 6 GeV`` and ``theta_miss < 150``
+    2. ``visibleEnergyOfEventCMS < 10 GeV and E_ECLtrk < 6 GeV`` and ``missingMomentumOfEvent_theta < 2.6180``
     3. ``visibleEnergyOfEventCMS > 3 GeV or max P_t > 1 GeV``
     4. max. opening angle < 178 deg.
 

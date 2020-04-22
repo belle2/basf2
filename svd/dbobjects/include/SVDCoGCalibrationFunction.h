@@ -184,7 +184,7 @@ namespace Belle2 {
     };
 
     /** ID = 3, elsTBindep VERSION: (TB independent)
-    correctedValue = par[0] + t * par[1] + par[2]/(t - par[3])  if t<=par[3]-sqrt(par[2])/4
+    correctedValue = par[0] + t * par[1] + par[2]/(t - par[3])  if t<=par[3]-sqrt(-par[2])/4
     correctedValue = NaN otherwise
     */
     /** els TB indep version implementation*/

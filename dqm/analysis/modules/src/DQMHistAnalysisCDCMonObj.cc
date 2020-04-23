@@ -21,6 +21,7 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH2Poly.h>
+#include <TEllipse.h>
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TLine.h>
@@ -303,8 +304,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH2Poly* h2p = new TH2Poly();
   configureBins(h2p);
   h2p->SetTitle("bad wires in xy view");
-  h2p->GetXaxis()->SetTitle("X [mm]");
-  h2p->GetYaxis()->SetTitle("Y [mm]");
+  h2p->GetXaxis()->SetTitle("X [cm]");
+  h2p->GetYaxis()->SetTitle("Y [cm]");
   makeBadChannelList();
   for (const auto& lw : m_badChannels) {
     const int l = lw.first;
@@ -321,19 +322,6 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     h2p->Fill(x, y, 1.1);
   }
 
-  /*
-    for row in dfCellGeom.itertuples():
-        x = np.array([row.p1x, row.p2x, row.p4x, row.p3x], dtype=float)
-        y = np.array([row.p1y, row.p2y, row.p4y, row.p3y], dtype=float)
-        h2p.AddBin(4, x, y)
-
-    for i in range(h2p.GetNumberOfBins()):
-        h2p.SetBinContent(i+1, -0.1)
-
-    for l, w in badChannels:
-        x, y = getWirePosition(l, w)
-        h2p.Fill(x, y, 1.1)
-  */
 
   // Hit related
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
@@ -370,20 +358,30 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->Draw();
 
   m_cMain->cd(4);
-  // hBadChannel->SetMaximum(2);
-  // hBadChannel->SetMinimum(-1);
   hBadChannel->Draw("col");
 
   m_cMain->cd(5);
-  // hBadChannelBC->SetMaximum(2);
-  // hBadChannelBC->SetMinimum(-1);
   hBadChannelBC->Draw("col");
   m_cMain->cd(6);
   hHitPerLayer->Draw();
+
   m_cBadWire->cd();
   h2p->Draw("col");
+  float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
+                           79.39, 90.31, 101.23, 112.05
+                          };
+
+  TEllipse* circs[10];
+  for (int i = 0; i < 10; ++i) {
+    circs[i] = new TEllipse(0, 0, superLayerR[i], superLayerR[i]);
+    circs[i]->SetFillStyle(4000);
+    circs[i]->SetLineStyle(kDashed);
+    circs[i]->SetLineColor(0);
+    circs[i]->Draw("same");
+  }
+
   std::string comment = "";
-  m_monObj->setVariable("comment", comment); // tentative
+  m_monObj->setVariable("comment", comment); // tentative no comments
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0) / means.size());
   m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0) / tdcEdges.size());
   m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0) / tdcSlopes.size());

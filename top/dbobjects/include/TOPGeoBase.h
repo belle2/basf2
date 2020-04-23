@@ -66,6 +66,12 @@ namespace Belle2 {
      */
     virtual void printSurface(const GeoOpticalSurface& surface) const;
 
+    /**
+     * Returns reflectivity of optical surface at given photon energy
+     * @param surface optical surface parameters
+     * @param energy photon energy in [eV]
+     */
+    double getReflectivity(const GeoOpticalSurface& surface, double energy) const;
 
   protected:
 

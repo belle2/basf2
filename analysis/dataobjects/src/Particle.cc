@@ -245,7 +245,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit(), m_mass);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -673,11 +673,11 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   return false;
 }
 
-bool Particle::isCopyOf(const Particle* oParticle) const
+bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) const
 {
   // the name of the game is to as quickly as possible determine
   // that the Particles are not copies
-  if (this->getPDGCode() != oParticle->getPDGCode())
+  if (this->getPDGCode() != oParticle->getPDGCode() and !doDetailedComparison)
     return false;
 
   unsigned nDaughters = this->getNDaughters();
@@ -699,12 +699,59 @@ bool Particle::isCopyOf(const Particle* oParticle) const
       if (thisDecayChain[i] != othrDecayChain[i])
         return false;
 
-  } else {
+  } else if (this->getMdstSource() != oParticle->getMdstSource() and !doDetailedComparison) {
     // has no daughters: it's a FSP, compare MDST source and index
-    return this->getMdstSource() == oParticle->getMdstSource();
+    return false;
+  }
+  // Stop here if we do not want a detailed comparison
+  if (!doDetailedComparison)
+    return true;
+  //If we compare here a reconstructed Particle to a generated MCParticle
+  //it means that something went horribly wrong and we must stop
+  if ((this->getParticleType() == EParticleType::c_MCParticle and oParticle->getParticleType() != EParticleType::c_MCParticle)
+      or (this->getParticleType() != EParticleType::c_MCParticle and oParticle->getParticleType() == EParticleType::c_MCParticle)) {
+    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+  }
+  if (this->getParticleType() == EParticleType::c_MCParticle
+      and oParticle->getParticleType() == EParticleType::c_MCParticle) {
+    return this->getMCParticle() == oParticle->getMCParticle();
+  }
+  if (this->getParticleType() != oParticle->getParticleType()) {
+    return false;
+  }
+  if (this->getMdstSource() == oParticle->getMdstSource()) {
+    return true;
+  }
+  if (this->getTrack() && oParticle->getTrack() &&
+      this->getTrack()->getArrayIndex() != oParticle->getTrack()->getArrayIndex()) {
+    return false;
+  }
+  if (this->getKLMCluster() && oParticle->getKLMCluster()
+      && this->getKLMCluster()->getArrayIndex() != oParticle->getKLMCluster()->getArrayIndex()) {
+    return false;
   }
 
+  // It can be a bit more complicated for ECLClusters as we might also have to ensure they are connected-region unique
+  if (this->getECLCluster() && oParticle->getECLCluster()
+      && this->getECLCluster()->getArrayIndex() != oParticle->getECLCluster()->getArrayIndex()) {
+
+    // if either is a track then they must be different
+    if (this->getECLCluster()->isTrack() or oParticle->getECLCluster()->isTrack())
+      return false;
+
+    // we cannot combine two particles of different hypotheses from the same
+    // connected region (as their energies overlap)
+    if (this->getECLClusterEHypothesisBit() == oParticle->getECLClusterEHypothesisBit())
+      return false;
+
+    // in the rare case that both are neutral and the hypotheses are different,
+    // we must also check that they are from different connected regions
+    // otherwise they come from the "same" underlying ECLShower
+    if (this->getECLCluster()->getConnectedRegionId() != oParticle->getECLCluster()->getConnectedRegionId())
+      return false;
+  }
   return true;
+
 }
 
 const Track* Particle::getTrack() const

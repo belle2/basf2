@@ -63,6 +63,10 @@ Variables
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
+ .. warning:: The variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and :b2:var:`pointingAngle` now return an angle instead of a cosine.
+
+ * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
+   :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
  * Renamed ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
  * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
@@ -102,17 +106,21 @@ Variables
  * Added PID prior hypothesis to the :b2:var:`pidMostLikelyPDG` and the :b2:var:`pidIsMostLikely` variables.
  * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
    :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
-   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
+   :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumZ`,
+   :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
-   :b2:var:`TagTrackTrueDistanceToTagV`
+   :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
+   of these variables, e.g. by doing ``TagTrackAverage(TagTrackTrueDistanceToTagV)`` 
  * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
-   vertexes in the Y(4S) boost direction
+   vertices in the Y(4S) boost direction
  * Added :b2:var:`mcDeltaTapprox` to get :b2:var:`mcDeltaT` in the kinematic
    approximation, i.e. based on :b2:var:`mcDeltaL` variable
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
+   functionality of the latter.
  * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a
    pseudo-significance.
 
@@ -195,6 +203,8 @@ Modules
    and not anymore as ``TrackFitResult``. This should have no effect to users.
  * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned
    off by setting ``allowChargeViolation=True``.
+ * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
+   charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
 
 Utilities and core objects
 ++++++++++++++++++++++++++

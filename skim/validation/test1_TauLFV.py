@@ -17,6 +17,7 @@ import modularAnalysis as ma
 import skimExpertFunctions as expert
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
+from skim.standardlists.lightmesons import loadStdAllRho0, loadStdAllKstar0, loadStdAllPhi, loadStdAllF_0
 
 taulfvskim = b2.Path()
 
@@ -29,6 +30,10 @@ stdPi('all', path=taulfvskim)
 stdK('all', path=taulfvskim)
 stdPr('all', path=taulfvskim)
 stdPhotons('all', path=taulfvskim)
+loadStdAllRho0(path=taulfvskim)
+loadStdAllKstar0(path=taulfvskim)
+loadStdAllPhi(path=taulfvskim)
+loadStdAllF_0(path=taulfvskim)
 
 # TauLFV skim
 from skim.taupair import TauLFVList

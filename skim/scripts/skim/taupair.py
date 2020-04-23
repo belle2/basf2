@@ -148,11 +148,12 @@ def TauLFVList(flag=1, path=None):
 
     **Skim category**: physics, tau
 
-    **Input particle lists**: `e+:all`, `mu+:all`, `pi+:all`, `K+:all`, `p+:all`, `gamma:all`
+    **Input particle lists**: `e+:all`, `mu+:all`, `pi+:all`, `K+:all`, `p+:all`, `gamma:all`, `rho0:all`, `K*0:all`, `phi:all`,
+    `f_0:all`
 
     **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
-    ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv, f_0:taulfv``,
-    ``rho0:taulfv, K*0:taulfv, phi:taulfv, omega:taulfv``
+    ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
+    ``omega:taulfv``
 
     **Criteria for 1 prong final states **: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
 
@@ -191,14 +192,6 @@ def TauLFVList(flag=1, path=None):
     ma.reconstructDecay('eta\':taulfv1 -> pi+:all pi-:all gamma:taulfvloose', '0.8 < M < 1.1', path=path)
     ma.reconstructDecay('eta\':taulfv2 -> pi+:all pi-:all eta:taulfv', '0.8 < M < 1.1', path=path)
     ma.copyLists('eta\':taulfv', ['eta\':taulfv1', 'eta\':taulfv2'], path=path)
-    # f_0
-    ma.reconstructDecay('f_0:taulfv -> pi+:all pi-:all', '0.78 < M < 1.18', path=path)
-    # rho0
-    ma.reconstructDecay('rho0:taulfv -> pi-:all pi+:all', '0.47 < M < 1.07', path=path)
-    # K*0
-    ma.reconstructDecay('K*0:taulfv -> pi-:all K+:all', '0.74 < M < 1.04', path=path)
-    # phi
-    ma.reconstructDecay('phi:taulfv -> K+:all K-:all', '0.97 < M < 1.1', path=path)
     # omega
     ma.reconstructDecay('omega:taulfv -> pi0:taulfv pi-:all pi+:all', '0.73 < M < 0.83', path=path)
 
@@ -232,18 +225,18 @@ def TauLFVList(flag=1, path=None):
                          'mu+:taulfv K_S0:taulfv'
                          ]
 
-    tau_lS0_Channels = ['e+:taulfv f_0:taulfv',
-                        'mu+:taulfv f_0:taulfv'
+    tau_lS0_Channels = ['e+:taulfv f_0:all',
+                        'mu+:taulfv f_0:all'
                         ]
 
-    tau_lV0_Channels = ['e+:taulfv rho0:taulfv',
-                        'mu+:taulfv rho0:taulfv',
-                        'e+:taulfv K*0:taulfv',
-                        'mu+:taulfv K*0:taulfv',
-                        'e+:taulfv anti-K*0:taulfv',
-                        'mu+:taulfv anti-K*0:taulfv',
-                        'e+:taulfv phi:taulfv',
-                        'mu+:taulfv phi:taulfv',
+    tau_lV0_Channels = ['e+:taulfv rho0:all',
+                        'mu+:taulfv rho0:all',
+                        'e+:taulfv K*0:all',
+                        'mu+:taulfv K*0:all',
+                        'e+:taulfv anti-K*0:all',
+                        'mu+:taulfv anti-K*0:all',
+                        'e+:taulfv phi:all',
+                        'mu+:taulfv phi:all',
                         'e+:taulfv omega:taulfv',
                         'mu+:taulfv omega:taulfv'
                         ]

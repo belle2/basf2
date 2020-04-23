@@ -5,6 +5,7 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
+from skim.standardlists.lightmesons import loadStdAllRho0, loadStdAllKstar0, loadStdAllPhi, loadStdAllF_0
 
 """
 <header>
@@ -24,6 +25,10 @@ stdPi('all', path=taulfvskim)
 stdK('all', path=taulfvskim)
 stdPr('all', path=taulfvskim)
 stdPhotons('all', path=taulfvskim)
+loadStdAllRho0(path=taulfvskim)
+loadStdAllKstar0(path=taulfvskim)
+loadStdAllPhi(path=taulfvskim)
+loadStdAllF_0(path=taulfvskim)
 
 from skim.taupair import TauLFVList
 tauList = TauLFVList(0, path=taulfvskim)

@@ -24,6 +24,10 @@ CKFToSVDState::CKFToSVDState(const RecoTrack* seed, bool reversed) : CKFState(se
   } else {
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
+  m_stateCache.isHitState = false;
+  m_stateCache.phi = seed->getMomentumSeed().Phi();
+  m_stateCache.theta = seed->getMomentumSeed().Theta();
+  m_stateCache.geoLayer = this->getGeometricalLayer();
 }
 
 unsigned int CKFToSVDState::getGeometricalLayer() const
@@ -49,6 +53,10 @@ const SVDRecoHit& CKFToSVDState::getRecoHit() const
   return m_recoHits.front();
 }
 
+const struct CKFToSVDState::stateCache& CKFToSVDState::getStateCache() const {
+  return m_stateCache;
+}
+
 const std::vector<SVDRecoHit>& CKFToSVDState::getRecoHits() const
 {
   B2ASSERT("You are asking for reco hits, although no hit is present.", not m_recoHits.empty());
@@ -62,6 +70,16 @@ CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
     // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&svdCluster);
   }
+  m_stateCache.isHitState = true;
+  m_stateCache.sensorID = hit->getVxdID();
+  m_stateCache.geoLayer = m_stateCache.sensorID.getLayerNumber();
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensorInfo = geoCache.getSensorInfo(hit->getVxdID());
+  m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
+  m_stateCache.phi = hit->getPosition().Phi();
+  m_stateCache.theta = hit->getPosition().Theta();
+  m_stateCache.localNormalizedu = hit->getNormalizedLocalU();
+  m_stateCache.localNormalizedv = hit->getNormalizedLocalV();
 }
 
 const RecoTrack* CKFToSVDState::getRelatedSVDTrack() const

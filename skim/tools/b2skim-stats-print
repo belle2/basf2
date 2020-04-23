@@ -1201,7 +1201,7 @@ def printToJson(
         "stats": allSkimStats,
     }
 
-    OutputFilename = OutputFilename.with_suffix(".json")
+    OutputFilename = Path(OutputFilename).with_suffix(".json")
     with open(OutputFilename, "w") as outputJson:
         json.dump(OutputDict, outputJson, indent=2)
     print(f"Wrote stats to JSON file {OutputFilename}")
@@ -1384,7 +1384,7 @@ def printToConfluence(
 
     confluenceString = "\n".join(confluenceStrings)
 
-    OutputFilename = OutputFilename.with_suffix(".txt")
+    OutputFilename = Path(OutputFilename).with_suffix(".txt")
     with open(OutputFilename, "w") as confluenceFile:
         confluenceFile.write(confluenceString)
 
@@ -1472,7 +1472,7 @@ def printToMarkdown(
         markdownTables.append(f"**Performance statistics for {skimName} skim:**")
         markdownTables.append(table)
 
-    OutputFilename = OutputFilename.with_suffix(".md")
+    OutputFilename = Path(OutputFilename).with_suffix(".md")
     with open(OutputFilename, "w") as markdownFile:
         markdownFile.write("\n\n".join(markdownTables))
 

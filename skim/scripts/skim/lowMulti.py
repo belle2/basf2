@@ -59,14 +59,12 @@ def TwoTrackLeptonsForLuminosityList(path):
     track_cluster_cut = nTracks_cut_1 + ' and ' + deltaTheta_cut
 
     # Reconstruct the event candidates with two tracks
-    ma.fillParticleList('e+:all', '', path=path)
-    ma.cutAndCopyList('e+:' + skim_label_2, 'e+:all', single_track_cut + ' and ' + nTracks_cut_2, path=path)
+    ma.fillParticleList('e+:' + skim_label_2, single_track_cut + ' and ' + nTracks_cut_2, path=path)
     ma.reconstructDecay('vpho:' + skim_label_2 + ' -> e+:' + skim_label_2 + ' e-:' + skim_label_2, two_track_cut, path=path)
 
     # Reconstruct the event candidates with one track plus one cluster
-    ma.cutAndCopyList('e+:' + skim_label_1, 'e+:all', single_track_cut + ' and ' + nTracks_cut_1, path=path)
-    ma.fillParticleList('gamma:all', '', path=path)
-    ma.cutAndCopyList('gamma:' + skim_label_1, 'gamma:all', single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
+    ma.fillParticleList('e+:' + skim_label_1, single_track_cut + ' and ' + nTracks_cut_1, path=path)
+    ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
     ma.reconstructDecay(
         'vpho:' +
         skim_label_1 +
@@ -114,8 +112,7 @@ def LowMassTwoTrackList(path):
     two_track_cut = nTracks_cut + ' and ' + M_cut
 
     # Reconstruct the two track event candidate
-    ma.fillParticleList('pi+:all', '', path=path)
-    ma.cutAndCopyList('pi+:' + skim_label, 'pi+:all', single_track_cut + ' and ' + nTracks_cut, path=path)
+    ma.fillParticleList('pi+:' + skim_label, single_track_cut + ' and ' + nTracks_cut, path=path)
     ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
 
     return ['vpho:' + skim_label]

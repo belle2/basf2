@@ -186,8 +186,8 @@ void WireEfficiencyAlgorithm::detectBadWires()
         double wireID = passed->GetYaxis()->GetBinCenter(i);
         m_badWireList->setWire(layerNo, round(wireID), singleWireEfficiencyFromFit);
       }
-      B2INFO("Bad wires for " << layerNo << " recorded");
     }
+    B2INFO("Bad wires for " << layerNo << " recorded");
   }
   m_badWireList->outputToFile("wireFile.txt");
   TFile* wireList = new TFile("wireList", "RECREATE");

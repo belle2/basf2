@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/svd/filters/relations/SVDPairFilterFactory.h>
-#include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
+#include <tracking/ckf/svd/filters/relations/SensorSVDPairFilter.h>
 #include <tracking/ckf/svd/filters/relations/DistanceSVDPairFilter.h>
 #include <tracking/ckf/svd/filters/relations/SectorMapBasedSVDPairFilter.h>
 

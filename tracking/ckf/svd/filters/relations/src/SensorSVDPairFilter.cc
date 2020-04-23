@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/ckf/svd/filters/relations/SectorSVDPairFilter.h>
+#include <tracking/ckf/svd/filters/relations/SensorSVDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>

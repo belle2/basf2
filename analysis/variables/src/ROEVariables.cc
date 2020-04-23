@@ -1565,20 +1565,17 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string option;
+      std::string maskName("");
+      std::string option("1");
 
-      if (arguments.size() == 0) {
-        maskName = "";
-        option = "1";
-      } else if (arguments.size() == 1) {
+      if (arguments.size() == 1) {
         maskName = arguments[0];
-        option = "1";
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
         option = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 optional) for meta function q2lnuSimple(maskname,option)");
+      } else if (arguments.size() > 2) {
+        B2FATAL("Too many arguments. At most two arguments are allowed for meta function q2lnuSimple(maskname,option)");
+      }
 
       auto func = [maskName, option](const Particle * particle) -> double {
 
@@ -1609,19 +1606,17 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string option;
+      std::string maskName("");
+      std::string option("7");
 
-      if (arguments.size() == 0) {
-        maskName = "";
-      } else if (arguments.size() == 1) {
+      if (arguments.size() == 1) {
         maskName = arguments[0];
-        option = "7";
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
         option = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 optional) for meta function q2lnu(maskname, option)");
+      } else if (arguments.size() > 2) {
+        B2FATAL("Too many arguments. At most two arguments are allowed for meta function q2lnu(maskname, option)");
+      }
 
       auto func = [maskName, option](const Particle * particle) -> double {
 

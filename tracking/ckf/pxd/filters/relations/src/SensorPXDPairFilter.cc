@@ -45,7 +45,7 @@ namespace {
 }
 
 TrackFindingCDC::Weight
-SectorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation)
+SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation)
 {
   const CKFToPXDState& fromState = *(relation.first);
   const CKFToPXDState& toState = *(relation.second);

@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  class SectorPXDPairFilter : public BasePXDPairFilter {
+  class SensorPXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on layer
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;

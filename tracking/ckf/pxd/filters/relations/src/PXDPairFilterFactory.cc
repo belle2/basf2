@@ -59,7 +59,7 @@ PXDPairFilterFactory::create(const std::string& filterName) const
   }
 
   if (filterName == "sensor") {
-    return std::make_unique<SectorPXDPairFilter>();
+    return std::make_unique<SensorPXDPairFilter>();
   }
 
   if (filterName == "distance") {

@@ -61,7 +61,7 @@ SVDPairFilterFactory::create(const std::string& filterName) const
   }
 
   if (filterName == "sensor") {
-    return std::make_unique<SectorSVDPairFilter>();
+    return std::make_unique<SensorSVDPairFilter>();
   }
 
   if (filterName == "distance") {

@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
-  class SectorSVDPairFilter : public BaseSVDPairFilter {
+  class SensorSVDPairFilter : public BaseSVDPairFilter {
   public:
     /// Return the weight based on layer
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;

@@ -45,7 +45,7 @@ namespace {
 }
 
 TrackFindingCDC::Weight
-SectorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
+SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
   const CKFToSVDState& fromState = *(relation.first);
   const CKFToSVDState& toState = *(relation.second);

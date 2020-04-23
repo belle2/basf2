@@ -1578,7 +1578,7 @@ namespace Belle2 {
         maskName = arguments[0];
         option = arguments[1];
       } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function q2lnuSimple(maskname,option)");
+        B2FATAL("Wrong number of arguments (2 optional) for meta function q2lnuSimple(maskname,option)");
 
       auto func = [maskName, option](const Particle * particle) -> double {
 
@@ -1610,15 +1610,20 @@ namespace Belle2 {
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
       std::string maskName;
+      std::string option;
 
-      if (arguments.size() == 0)
+      if (arguments.size() == 0) {
         maskName = "";
-      else if (arguments.size() == 1)
+      } else if (arguments.size() == 1) {
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function q2lnu");
+        option = "7";
+      } else if (arguments.size() == 2) {
+        maskName = arguments[0];
+        option = arguments[1];
+      } else
+        B2FATAL("Wrong number of arguments (2 optional) for meta function q2lnu(maskname, option)");
 
-      auto func = [arguments, maskName](const Particle * particle) -> double {
+      auto func = [maskName, option](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -1639,7 +1644,7 @@ namespace Belle2 {
         TLorentzVector lep_cm = T.rotateLabToCms() * lep->get4Vector();
 
         TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
-        TLorentzVector neu_cm = missing4Vector(particle, maskName, "7");
+        TLorentzVector neu_cm = missing4Vector(particle, maskName, option);
 
         // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
         double e_beam = T.getCMSEnergy() / 2.0;
@@ -2298,13 +2303,15 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
-                      "Returns the momentum transfer squared, :math:`q^2`, calculated in LAB as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
-                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter.");
-
-    REGISTER_VARIABLE("weQ2lnu(maskName)", WE_q2lnu,
-                      "Returns the momentum transfer squared, :math:`q^2`, calculated in LAB as :math:`q^2 = (p_l + p_nu)^2`, \n"
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
-                      "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
+                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
+
+    REGISTER_VARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
+                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
+                      "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
+                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
 
     REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
                       "Returns missing mass squared over missing energy");

@@ -19,43 +19,18 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  bool isConnected(const VxdID& currentSensor, const VxdID& nextSensor)
-  {
-    const int sensorNumberDifference =
-      static_cast<int>(currentSensor.getSensorNumber()) - static_cast<int>(nextSensor.getSensorNumber());
-    const int layerNumberDifference =
-      static_cast<int>(currentSensor.getLayerNumber()) - static_cast<int>(nextSensor.getLayerNumber());
-
-    if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
-      return false;
-    }
-    VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-    const VXD::SensorInfoBase& currentSensorInfo = geoCache.getSensorInfo(currentSensor);
-    const VXD::SensorInfoBase& nextSensorInfo = geoCache.getSensorInfo(nextSensor);
-
-    TVector3 origin;
-
-    const Vector2D currentCenter = Vector3D(currentSensorInfo.pointToGlobal(origin, true)).xy();
-    const Vector2D nextCenter = Vector3D(nextSensorInfo.pointToGlobal(origin, true)).xy();
-
-    const double angle = currentCenter.angleWith(nextCenter);
-    return TMath::Pi() - angle > 2;
-  }
-}
-
 TrackFindingCDC::Weight
 SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation)
 {
   const CKFToSVDState& fromState = *(relation.first);
   const CKFToSVDState& toState = *(relation.second);
 
-  const SpacePoint* fromSpacePoint = fromState.getHit();
-  const SpacePoint* toSpacePoint = toState.getHit();
+  const CKFToSVDState::stateCache& fromStateCache = fromState.getStateCache();
+  const CKFToSVDState::stateCache& toStateCache = toState.getStateCache();
 
-  B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  if (not fromSpacePoint) {
+  if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
     // TODO: implement a better way, e.g. using
     // const RecoTrack* seed = fromState.getSeed();
@@ -63,18 +38,27 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromSpacePoint->getVxdID();
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
+  const VxdID& fromVXDID = fromStateCache.sensorID;
+  const VxdID& toVXDID = toStateCache.sensorID;
 
   if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
     // TODO: Also check for sensors?
     return 1.0;
   }
 
-  // next layer is not an overlap one, so we can just return all hits of the next layer
-  // that are in our sensor mapping.
-  // TODO: test of the lookup is too slow
-  if (isConnected(fromVXDID, toVXDID)) {
+  // Next layer is not an overlap one, so we can just return all hits of the next layer(s)
+  // that are close enough in phi. No cut in theta here since this is the SensorSVXDPairFilter,
+  // a cut in theta is used in the DistanceSVDPairFilter
+  const int sensorNumberDifference =
+    static_cast<int>(fromVXDID.getSensorNumber()) - static_cast<int>(toVXDID.getSensorNumber());
+  const int layerNumberDifference =
+    static_cast<int>(fromVXDID.getLayerNumber()) - static_cast<int>(toVXDID.getLayerNumber());
+
+  if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
+    return NAN;
+  }
+  const double angle = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
+  if (fabs(angle) < (M_PI - 2.)) {
     return 1.0;
   }
 

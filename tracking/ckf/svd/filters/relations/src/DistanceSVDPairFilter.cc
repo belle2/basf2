@@ -21,12 +21,12 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
   const CKFToSVDState& fromState = *(relation.first);
   const CKFToSVDState& toState = *(relation.second);
 
-  const SpacePoint* fromSpacePoint = fromState.getHit();
-  const SpacePoint* toSpacePoint = toState.getHit();
+  const CKFToSVDState::stateCache& fromStateCache = fromState.getStateCache();
+  const CKFToSVDState::stateCache& toStateCache = toState.getStateCache();
 
-  B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  if (not fromSpacePoint) {
+  if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
     // TODO: implement a better way, e.g. using
     // const RecoTrack* seed = fromState.getSeed();
@@ -34,16 +34,16 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromSpacePoint->getVxdID();
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
+  const VxdID& fromVXDID = fromStateCache.sensorID;
+  const VxdID& toVXDID = toStateCache.sensorID;
 
   if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
     // TODO: Also check for sensors?
     return 1.0;
   }
 
-  const double fromPhi = fromSpacePoint->getPosition().Phi();
-  const double toPhi = toSpacePoint->getPosition().Phi();
+  const double& fromPhi = fromStateCache.phi;
+  const double& toPhi = toStateCache.phi;
 
   if (abs(fromPhi - toPhi) < 0.2) {
     return 1.0;

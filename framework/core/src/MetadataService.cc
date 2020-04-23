@@ -96,6 +96,25 @@ void MetadataService::addBasf2Status(const std::string& message)
   writeJson();
 }
 
+void MetadataService::addModuleCallsCount()
+{
+  if (m_fileName.empty()) return;
+
+  StoreObjPtr<ProcessStatistics> processStatistics("", DataStore::c_Persistent);
+
+  if (processStatistics.isValid()) {
+
+    std::vector<ModuleStatistics> modulesSortedByIndex(processStatistics->getAll());
+    sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
+
+    for (const ModuleStatistics& stats : modulesSortedByIndex) {
+      m_json["modules_calls"][stats.getName()] = int(stats.getCalls(ModuleStatistics::EStatisticCounters::c_Event));
+    }
+  }
+
+  writeJson();
+}
+
 void MetadataService::finishBasf2(bool success)
 {
   m_json["basf2_status"]["finished"] = true;

@@ -21,8 +21,10 @@ now = datetime.datetime.now()
 
 
 class defaultELSTimeCalibrationImporter_pol1TBdep(basf2.Module):
+    """1st order pol importer for ELS3 (TB dep)"""
 
     def beginRun(self):
+        """do everything here"""
 
         iov = Belle2.IntervalOfValidity.always()
 
@@ -39,6 +41,7 @@ class defaultELSTimeCalibrationImporter_pol1TBdep(basf2.Module):
 
 
 class defaultELSTimeCalibrationImporter_pol3TBindep(basf2.Module):
+    """3rd order pol importer for ELS3 (TB indep)"""
 
     def beginRun(self):
 

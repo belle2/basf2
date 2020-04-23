@@ -26,6 +26,7 @@ class defaultCoGTimeCalibrationImporter_pol1TBdep(basf2.Module):
     """
 
     def beginRun(self):
+        """do everything here"""
 
         iov = Belle2.IntervalOfValidity.always()
 
@@ -47,6 +48,7 @@ class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
     """
 
     def beginRun(self):
+        """ do everything here"""
 
         iov = Belle2.IntervalOfValidity.always()
 

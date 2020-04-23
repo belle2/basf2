@@ -112,7 +112,6 @@ namespace Belle2 {
     TH2F* m_clsTrkTimeUEvtT0 = nullptr;
     /** v Time of clusters related to tracks vs EventT0 */
     TH2F* m_clsTrkTimeVEvtT0 = nullptr;
-    /** u Time of clusters related to tracks for layer 4,5,6 sensors */
     /** u Time of clusters related to tracks for layer 3 sensors */
     TH1F* m_clsTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors */

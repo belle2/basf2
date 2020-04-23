@@ -9,7 +9,6 @@
 
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/cdc/dataobjects/CDCTriggerHWTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>

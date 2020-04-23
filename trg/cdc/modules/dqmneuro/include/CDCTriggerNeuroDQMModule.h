@@ -14,7 +14,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <trg/cdc/dataobjects/CDCTriggerHWTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
 #include <tracking/dataobjects/RecoTrack.h>

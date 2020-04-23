@@ -24,6 +24,10 @@ CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(se
   } else {
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
+  m_stateCache.isHitState = false;
+  m_stateCache.phi = seed->getMomentumSeed().Phi();
+  m_stateCache.theta = seed->getMomentumSeed().Theta();
+  m_stateCache.geoLayer = this->getGeometricalLayer();
 }
 
 unsigned int CKFToPXDState::getGeometricalLayer() const
@@ -55,10 +59,24 @@ const std::vector<PXDRecoHit>& CKFToPXDState::getRecoHits() const
   return m_recoHits;
 }
 
+const struct CKFToPXDState::stateCache& CKFToPXDState::getStateCache() const {
+  return m_stateCache;
+}
+
 CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
 {
   for (const PXDCluster& pxdCluster : hit->getRelationsTo<PXDCluster>()) {
     // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&pxdCluster);
   }
+  m_stateCache.isHitState = true;
+  m_stateCache.sensorID = hit->getVxdID();
+  m_stateCache.geoLayer = m_stateCache.sensorID.getLayerNumber();
+  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
+  const VXD::SensorInfoBase& sensorInfo = geoCache.getSensorInfo(hit->getVxdID());
+  m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
+  m_stateCache.phi = hit->getPosition().Phi();
+  m_stateCache.theta = hit->getPosition().Theta();
+  m_stateCache.localNormalizedu = hit->getNormalizedLocalU();
+  m_stateCache.localNormalizedv = hit->getNormalizedLocalV();
 }

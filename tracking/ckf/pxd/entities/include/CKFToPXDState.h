@@ -24,6 +24,25 @@ namespace Belle2 {
   /// Specialized CKF State for extrapolating into the PXD
   class CKFToPXDState : public CKFState<RecoTrack, SpacePoint> {
   public:
+    /// Cache containing the most important information of this state which will often be needed
+    struct stateCache {
+      /// Is this state based on a hit (=SpacePoint) or a seed (=RecoTrack)
+      bool isHitState = false;
+      /// VxdID of this state, only set if based on SpacePoint
+      VxdID sensorID = VxdID(0);
+      /// Geometrical Layer this state is based on
+      unsigned short geoLayer = std::numeric_limits<unsigned short>::quiet_NaN();
+      /// Phi of the sensor this state is based on, only set if based on SpacePoint
+      double sensorCenterPhi = std::numeric_limits<double>::quiet_NaN();
+      /// Phi if this state (from SpacePoint or RecoTrack)
+      double phi = std::numeric_limits<double>::quiet_NaN();
+      /// Theta if this state (from SpacePoint or RecoTrack)
+      double theta = std::numeric_limits<double>::quiet_NaN();
+      /// Local normalized uCoordinate of this state, only set if based on SpacePoint
+      double localNormalizedu = std::numeric_limits<double>::quiet_NaN();
+      /// Local normalized vCoordinate of this state, only set if based on SpacePoint
+      double localNormalizedv = std::numeric_limits<double>::quiet_NaN();
+    };
     /// When constructed by a hit, set the reco hit
     explicit CKFToPXDState(const SpacePoint* hit);
 
@@ -42,8 +61,14 @@ namespace Belle2 {
     /// Helper function for getting the already created reco hits (runtime reasons)
     const std::vector<PXDRecoHit>& getRecoHits() const;
 
+    /// Get the cached data of this state
+    const struct stateCache& getStateCache() const;
+
   private:
     /// Precache the PXDRecoHits for runtime performance reasons.
     std::vector<PXDRecoHit> m_recoHits;
+
+    /// Cache the most important data of this state for better runtime performance
+    stateCache m_stateCache;
   };
 }

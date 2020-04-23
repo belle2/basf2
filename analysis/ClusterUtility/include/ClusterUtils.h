@@ -39,6 +39,12 @@ namespace Belle2 {
     ClusterUtils();
 
     /**
+     * Returns cluster four momentum vector
+     * @return const cluster four momentum vector
+     */
+    const TLorentzVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+
+    /**
      * Returns four momentum vector
      * @return const four momentum vector
      */

@@ -20,14 +20,15 @@
 
 namespace Belle2 {
 
-  template <class AFilter>
-  LayerSVDRelationFilter<AFilter>::LayerSVDRelationFilter() : Super()
+  template <class AFilter, class APrefilter>
+  LayerSVDRelationFilter<AFilter, APrefilter>::LayerSVDRelationFilter() : Super()
   {
     Super::addProcessingSignalListener(&m_filter);
+    Super::addProcessingSignalListener(&m_prefilter);
   }
 
-  template <class AFilter>
-  void LayerSVDRelationFilter<AFilter>::beginRun()
+  template <class AFilter, class APrefilter>
+  void LayerSVDRelationFilter<AFilter, APrefilter>::beginRun()
   {
     Super::beginRun();
 
@@ -39,13 +40,13 @@ namespace Belle2 {
     }
   }
 
-  template <class AFilter>
-  LayerSVDRelationFilter<AFilter>::~LayerSVDRelationFilter() = default;
+  template <class AFilter, class APrefilter>
+  LayerSVDRelationFilter<AFilter, APrefilter>::~LayerSVDRelationFilter() = default;
 
-  template <class AFilter>
+  template <class AFilter, class APrefilter>
   std::vector<CKFToSVDState*>
-  LayerSVDRelationFilter<AFilter>::getPossibleTos(CKFToSVDState* currentState,
-                                                  const std::vector<CKFToSVDState*>& states) const
+  LayerSVDRelationFilter<AFilter, APrefilter>::getPossibleTos(CKFToSVDState* currentState,
+                                                              const std::vector<CKFToSVDState*>& states) const
   {
     std::vector<CKFToSVDState*> possibleNextStates;
     possibleNextStates.reserve(states.size());
@@ -101,6 +102,12 @@ namespace Belle2 {
           }
         }
 
+        // Some loose prefiltering of possible states
+        TrackFindingCDC::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
+        if (std::isnan(weight)) {
+          continue;
+        }
+
 
         possibleNextStates.push_back(nextState);
       }
@@ -109,17 +116,18 @@ namespace Belle2 {
     return possibleNextStates;
   }
 
-  template <class AFilter>
-  void LayerSVDRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  template <class AFilter, class APrefilter>
+  void LayerSVDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
                                   "Make it possible to jump over N layers.", m_param_hitJumping);
 
     m_filter.exposeParameters(moduleParamList, prefix);
+    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
   }
 
-  template <class AFilter>
-  TrackFindingCDC::Weight LayerSVDRelationFilter<AFilter>::operator()(const CKFToSVDState& from, const CKFToSVDState& to)
+  template <class AFilter, class APrefilter>
+  TrackFindingCDC::Weight LayerSVDRelationFilter<AFilter, APrefilter>::operator()(const CKFToSVDState& from, const CKFToSVDState& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

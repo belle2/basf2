@@ -21,15 +21,15 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
   const CKFToPXDState& fromState = *(relation.first);
   const CKFToPXDState& toState = *(relation.second);
 
-  const SpacePoint* fromSpacePoint = fromState.getHit();
-  const SpacePoint* toSpacePoint = toState.getHit();
+  const CKFToPXDState::stateCache& fromStateCache = fromState.getStateCache();
+  const CKFToPXDState::stateCache& toStateCache = toState.getStateCache();
 
-  B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
-  const double toPhi = toSpacePoint->getPosition().Phi();
+  const VxdID& toVXDID = toStateCache.sensorID;
+  const double toPhi = toStateCache.phi;
 
-  if (not fromSpacePoint) {
+  if (not fromStateCache.isHitState) {
     // We are coming from an SVD track, so we can use its position to only look for matching ladders
     const genfit::MeasuredStateOnPlane& mSoP = fromState.getMeasuredStateOnPlane();
     const double fromPhi = mSoP.getPos().Phi();
@@ -41,14 +41,14 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
     return NAN;
   }
 
-  const VxdID& fromVXDID = fromSpacePoint->getVxdID();
+  const VxdID& fromVXDID = fromStateCache.sensorID;
 
   if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
     // TODO: Also check for sensors?
     return 1.0;
   }
 
-  const double fromPhi = fromSpacePoint->getPosition().Phi();
+  const double fromPhi = fromStateCache.phi;
 
   if (abs(fromPhi - toPhi) < 0.05) {
     return 1.0;

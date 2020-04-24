@@ -34,21 +34,20 @@ namespace Belle2 {
   {
     std::vector<CKFToPXDState*> possibleNextStates;
 
-    const unsigned int currentLayer = currentState->getGeometricalLayer();
-    const unsigned int nextLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
+    const CKFToPXDState::stateCache& currentStateCache = currentState->getStateCache();
+    const unsigned int& currentLayer = currentStateCache.geoLayer;
+    const unsigned int& nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
 
     for (CKFToPXDState* nextState : states) {
-      const unsigned int layer = nextState->getGeometricalLayer();
-      if (layer < std::min(currentLayer, nextLayer) or std::max(currentLayer, nextLayer) < layer) {
+      const CKFToPXDState::stateCache& nextStateCache = nextState->getStateCache();
+      const unsigned int nextLayer = nextStateCache.geoLayer;
+      if (nextLayer < std::min(currentLayer, nextPossibleLayer) or std::max(currentLayer, nextPossibleLayer) < nextLayer) {
         continue;
       }
 
-      if (currentLayer == layer) {
-        const SpacePoint* const currentSpacePoint = currentState->getHit();
-        const SpacePoint* const nextSpacePoint = nextState->getHit();
-
-        const VxdID& fromVXDID = currentSpacePoint->getVxdID();
-        const VxdID& toVXDID = nextSpacePoint->getVxdID();
+      if (currentLayer == nextLayer) {
+        const VxdID& fromVXDID = currentStateCache.sensorID;
+        const VxdID& toVXDID = nextStateCache.sensorID;
         // next layer is an overlap one, so lets return all hits from the same layer, that are on a
         // ladder which is below the last added hit.
         const unsigned int fromLadderNumber = fromVXDID.getLadderNumber();
@@ -78,13 +77,11 @@ namespace Belle2 {
         //                      ----|----                    ----|----                    ----|----
 
         // for PXD its the other way round!
-        const double currentStateU = currentSpacePoint->getNormalizedLocalU();
-        if (currentStateU <= 0.8) {
+        if (currentStateCache.localNormalizedu <= 0.8) {
           continue;
         }
 
-        const double nextStateU = nextSpacePoint->getNormalizedLocalU();
-        if (nextStateU > 0.2) {
+        if (nextStateCache.localNormalizedu > 0.2) {
           continue;
         }
       }

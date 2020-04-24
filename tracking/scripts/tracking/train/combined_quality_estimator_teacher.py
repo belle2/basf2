@@ -1755,9 +1755,9 @@ class MasterTask(b2luigi.WrapperTask):
         ]
 
         fast_bdt_options = []
-        for i in range(0, 300, 100):  # 1100, 100):
-            for j in range(0, 1):  # 5):
-                for k in range(0, 1):  # 4):
+        for i in range(0, 300, 100):
+            for j in range(0, 7):
+                for k in range(0, 6):
                     fast_bdt_options.append([100 + i, 8, 3+j, 0.05+k*0.05])
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")

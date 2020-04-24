@@ -2,6 +2,7 @@
 # ############################################################# #
 tracking/scripts/tracking/train/logs/
 tracking/scripts/tracking/train/output/
+tracking/scripts/tracking/train/datafiles/
 
 # Weight and geometry files #
 # ######################### #

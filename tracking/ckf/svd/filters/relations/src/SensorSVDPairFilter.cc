@@ -57,7 +57,10 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
     return NAN;
   }
-  const double angle = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
+  double angle = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
+  if (angle > M_PI) angle -= 2. * M_PI;
+  if (angle < -M_PI) angle += 2. * M_PI;
+
   if (fabs(angle) < (M_PI - 2.)) {
     return 1.0;
   }

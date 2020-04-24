@@ -653,9 +653,12 @@ def warn_local_script(args):
 
 
 def make_combined_steering_file(
-    SkimName, CombinedSkimDefinitions, SteeringFileDirectory
+    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
 ):
     """Construct a steering file for the requested combined skim."""
+    SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
+    SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
+
     # Retrieve the list of individual skims going into this combined skim
     SingleSkims = CombinedSkimDefinitions[SkimName]
 
@@ -669,27 +672,44 @@ def make_combined_steering_file(
         for module in modules
     }
 
-    BasicImports = "import basf2 as b2\nimport modularAnalysis as ma\nfrom skimExpertFunctions import CombinedSkim\n\n"
+    # TODO: handle local override here. Shout (raise NotImplementedError) if `len(modules)>1 and args.local`
+    # Handle local override of skim script, in case we need to replace a skim module at production time
+    if LocalModule and len(modules) > 1:
+        B2ERROR(
+            f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
+            "        more than one skim module. Not sure what to do in this situation, so \n"
+            f"        please modify {SteeringFile} yourself."
+        )
+    elif LocalModule:
+        # Replace the normal module with the local one
+        LocalModule = LocalModule.rstrip(".py")
+        NormalModule = modules[0]
+        GroupedSkims[LocalModule] = GroupedSkims.pop(NormalModule)
+
+    BasicImports = """import basf2 as b2
+import modularAnalysis as ma
+from skimExpertFunctions import CombinedSkim
+
+"""
+
     SkimImports = "".join(
         [
             f"from {module} import {', '.join(skims)}\n"
             for (module, skims) in GroupedSkims.items()
         ]
     )
-    # TODO: handle local override here. Shout (raise NotImplementedError) if `len(modules)>1 and args.local`
-    SkimObjects = [f"{skim}()" for skim in SingleSkims]
+    SkimObjects = [f"    {skim}(),\n" for skim in SingleSkims]
     MainProcessing = f"""
 path = b2.Path()
 ma.inputMdstList("default", [], path=path)
-skim = CombinedSkim({', '.join(SkimObjects)})
+skim = CombinedSkim(
+{''.join(SkimObjects)})
 skim(path)
 path.process()
 """
 
     SteeringFileCode = BasicImports + SkimImports + MainProcessing
 
-    SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
-    SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
     with open(SteeringFile, "w") as f:
         f.write(SteeringFileCode)
 
@@ -811,7 +831,10 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             args.output_base_directory, args.campaign, args.release, "SkimScripts"
         )
         make_combined_steering_file(
-            skimName, CombinedSkimDefinitions, SteeringFileDirectory
+            skimName,
+            CombinedSkimDefinitions,
+            SteeringFileDirectory,
+            args.local_skim_script,
         )
 
         for sampleLabel, sampleInfo in sampleRegistry.items():
@@ -853,8 +876,9 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                     LPNBlockIdentifier,
                 )
 
-                if outputFilePath.exists():
-                    B2WARNING(f"Overwriting {outputFilePath}")
+                # NOTE: commented out, because it's noisy and a tad useless
+                # if outputFilePath.exists():
+                #     B2WARNING(f"Overwriting {outputFilePath}")
                 with open(outputFilePath, "w") as outputFile:
                     json.dump(skimRequestDict, outputFile, indent=4)
 
@@ -945,9 +969,9 @@ def main():
     write_json_files(sampleRegistry, args, outputDirectory)
 
     warn_local_script(args)
+    SampleString = "".join([f"\n        - {s}" for s in sampleRegistry.keys()])
     B2INFO(
-        f"Successfully generated {', '.join(args.skims)} JSON files for "
-        f"{', '.join(sampleRegistry.keys())} samples."
+        f"Successfully generated {', '.join(args.skims)} JSON files for samples: {SampleString}"
     )
     B2INFO(f"The JSON files were saved to {outputDirectory}")
 

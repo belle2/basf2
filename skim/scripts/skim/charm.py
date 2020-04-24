@@ -1513,7 +1513,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
 
         eventcuts = "nCleanedTracks(abs(d0) < 0.5 and abs(z0) < 1.0) >= 3"
-        ma.applyEventCuts(eventcuts, path=path)
+        path = self.skim_event_cuts(eventcuts, path=path)
 
         DstList = []
         ma.reconstructDecay("D0:HpJmPi0 -> K-:myhjp0 pi+:myhjp0 pi0:myhjp0", D0cuts, path=path)
@@ -1564,7 +1564,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
 
         eventcuts = "nCleanedTracks(abs(d0) < 0.5 and abs(z0) < 1.0) >= 3"
-        ma.applyEventCuts(eventcuts, path=path)
+        path = self.skim_event_cuts(eventcuts, path=path)
 
         D0_Channels = ["pi+:myhhp0 pi-:myhhp0 pi0:myhhp0",
                        "K+:myhhp0 K-:myhhp0 pi0:myhhp0",

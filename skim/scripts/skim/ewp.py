@@ -178,7 +178,7 @@ class BtoXgamma(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.5 and nTracks >= 3
-        ma.applyEventCuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
         ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
@@ -226,7 +226,7 @@ class BtoXll(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.5 and nTracks >= 3
-        ma.applyEventCuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
@@ -289,7 +289,7 @@ class BtoXll_LFV(BaseSkim):
                            path=path)
 
         # Apply event cuts R2 < 0.5 and nTracks >= 3
-        ma.applyEventCuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack

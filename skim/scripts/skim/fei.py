@@ -970,15 +970,6 @@ class BaseFEISkim(BaseSkim):
         ma.fillParticleList(decayString="gamma:eventShapeForSkims",
                             cut="E > 0.1 and 0.296706 < theta < 2.61799", path=path)
 
-        ma.applyEventCuts(
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3",
-            path=path
-        )
-        ma.applyEventCuts(
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3",
-            path=path
-        )
-
         vm.addAlias("E_ECL_pi",
                     "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
         vm.addAlias("E_ECL_gamma",
@@ -988,8 +979,6 @@ class BaseFEISkim(BaseSkim):
         ma.buildEventKinematics(inputListNames=["pi+:eventShapeForSkims",
                                                 "gamma:eventShapeForSkims"],
                                 path=path)
-        ma.applyEventCuts("visibleEnergyOfEventCMS>4", path=path)
-        ma.applyEventCuts("2<E_ECL<7", path=path)
 
         ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims",
                                            "gamma:eventShapeForSkims"],
@@ -1004,7 +993,16 @@ class BaseFEISkim(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.applyEventCuts("foxWolframR2_maskedNaN<0.4 and nTracks>=4", path=path)
+        EventCuts = [
+            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3"
+            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3"
+            "visibleEnergyOfEventCMS>4"
+            "2<E_ECL<7"
+            "foxWolframR2_maskedNaN<0.4 and nTracks>=4"
+        ]
+
+        # TODO: still to be fixed, once I address https://agira.desy.de/browse/BII-6622
+        ma.applyEventCuts(" and ".join(EventCuts), path=path)
         # Run FEI
         b2.conditions.globaltags = ["analysis_tools_release-04"]
 

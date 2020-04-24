@@ -230,7 +230,7 @@ class PRsemileptonicUntagged(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.applyEventCuts("foxWolframR2<0.5 and nTracks>4", path=path)
+        path = self.skim_event_cuts("foxWolframR2<0.5 and nTracks>4", path=path)
 
         ma.cutAndCopyList("e+:PR1", "e+:all", "useCMSFrame(p) > 1.50 and electronID > 0.5", path=path)
         ma.cutAndCopyList("mu+:PR1", "mu+:all", "useCMSFrame(p) > 1.50 and muonID > 0.5", path=path)

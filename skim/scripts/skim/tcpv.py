@@ -319,12 +319,16 @@ class TCPV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
-        ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3', path=path)
-        ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1', path=path)
         ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
-        ma.applyEventCuts('visibleEnergyOfEventCMS>4', path=path)
-        ma.applyEventCuts('E_ECL<9', path=path)
+
+        EventCuts = [
+            "foxWolframR2_maskedNaN<0.4 and nTracks>=4",
+            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
+            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
+            "visibleEnergyOfEventCMS>4",
+            "E_ECL<9"
+        ]
+        path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
         bPlustoJPsiK_List = []
         bMinustoJPsiK_List = []

@@ -6,6 +6,7 @@ import subprocess
 from importlib import import_module
 import json
 import re
+from time import sleep
 
 import basf2 as b2
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
@@ -469,14 +470,70 @@ class BaseSkim(ABC):
         self.set_skim_logging(path)
         self.load_particle_lists(path)
         self.additional_setup(path)
-        self.build_lists(path)
+        # At this point, BaseSkim.skim_event_cuts may have been run, so pass
+        # self._ConditionalPath for the path if it is not None (otherwise just pass the
+        # regular path)
+        self.build_lists(self._ConditionalPath or path)
 
         if validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
-            self.validation_histograms(path)
+            self.validation_histograms(self._ConditionalPath or path)
         else:
-            self.output_udst(path)
+            self.output_udst(self._ConditionalPath or path)
+
+    _ConditionalPath = None
+    """Conditional path to be set by `BaseSkim.skim_event_cuts` if event-level cuts are applied."""
+
+    def skim_event_cuts(self, cut, *, path):
+        """Apply event-level cuts in a skim-safe way.
+
+        Parameters:
+            cut (str): Event-level cut to be applied.
+            path (basf2.Path): Skim path to be processed.
+
+        Returns:
+            ConditionalPath (basf2.Path): Path on which the rest of this skim should be
+                processed. On this path, only events which passed the event-level cut
+                will be processed further.
+
+        .. Tip::
+            If running this function in `BaseSkim.additional_setup` or
+            `BaseSkim.build_lists`, redefine the ``path`` to the path returned by
+            `BaseSkim.skim_event_cuts`, *e.g.*
+
+            .. code-block:: python
+                def build_lists(self, path):
+                    path = self.skim_event_cuts("nTracks>4", path=path)
+                    # rest of skim list building...
+
+        .. Note::
+            The motivation for using this function over `applyEventCuts` is that
+            `applyEventCuts` completely removes events from processing. If we combine
+            multiple skims in a single steering file (which is done in production), and
+            the first has a set of event-level cuts, then all the remaining skims will
+            never even see those events.
+
+            Internally, this function creates a new path, which is only processed for
+            events passing the event-level cut. To avoid issues around particles not
+            being available on the main path (leading to noisy error logs), we need to
+            add the rest of the skim to this path. So this new path is assigned to the
+            attribute `BaseSkim._ConditionalPath`, and `BaseSkim.__call__` will run all
+            remaining methods on this path.
+        """
+        if self._ConditionalPath is not None:
+            b2.B2FATAL(
+                "BaseSkim.skim_event_cuts cannot be run twice in one skim. "
+                "Please join your event-level cut strings into a single string."
+            )
+
+        ConditionalPath = b2.Path()
+        self._ConditionalPath = ConditionalPath
+
+        eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
+        eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
+
+        return ConditionalPath
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has
@@ -692,7 +749,7 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self.Skims:
-            skim.build_lists(path)
+            skim.build_lists(skim._ConditionalPath or path)
 
     def output_udst(self, path):
         """Run the `BaseSkim.output_udst` function of each skim.
@@ -701,7 +758,7 @@ class CombinedSkim(BaseSkim):
             path (basf2.Path): Skim path to be processed.
         """
         for skim in self.Skims:
-            skim.output_udst(path)
+            skim.output_udst(skim._ConditionalPath or path)
 
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names.

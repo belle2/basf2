@@ -38,10 +38,7 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromStateCache.sensorID;
-  const VxdID& toVXDID = toStateCache.sensorID;
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
+  if (fromStateCache.geoLayer == toStateCache.geoLayer) {
     // TODO: Also check for sensors?
     return 1.0;
   }
@@ -49,6 +46,14 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   // next layer is not an overlap one, so we can just return all hits of the next layer
   // that are in our sensor mapping.
   // TODO: test of the lookup is too slow
+  const int sensorNumberDifference =
+    static_cast<int>(fromStateCache.sensorID.getSensorNumber()) - static_cast<int>(toStateCache.sensorID.getSensorNumber());
+  const int layerNumberDifference =
+    static_cast<int>(fromStateCache.geoLayer) - static_cast<int>(toStateCache.geoLayer);
+
+  if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
+    return false;
+  }
   double angle = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
   if (angle > M_PI) angle -= 2. * M_PI;
   if (angle < -M_PI) angle += 2. * M_PI;

@@ -38,10 +38,7 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromStateCache.sensorID;
-  const VxdID& toVXDID = toStateCache.sensorID;
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
+  if (fromStateCache.geoLayer == toStateCache.geoLayer) {
     // TODO: Also check for sensors?
     return 1.0;
   }
@@ -50,9 +47,9 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   // that are close enough in phi. No cut in theta here since this is the SensorSVXDPairFilter,
   // a cut in theta is used in the DistanceSVDPairFilter
   const int sensorNumberDifference =
-    static_cast<int>(fromVXDID.getSensorNumber()) - static_cast<int>(toVXDID.getSensorNumber());
+    static_cast<int>(fromStateCache.sensorID.getSensorNumber()) - static_cast<int>(toStateCache.sensorID.getSensorNumber());
   const int layerNumberDifference =
-    static_cast<int>(fromVXDID.getLayerNumber()) - static_cast<int>(toVXDID.getLayerNumber());
+    static_cast<int>(fromStateCache.geoLayer) - static_cast<int>(toStateCache.geoLayer);
 
   if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
     return NAN;

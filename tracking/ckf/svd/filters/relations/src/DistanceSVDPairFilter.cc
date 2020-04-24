@@ -34,10 +34,7 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromStateCache.sensorID;
-  const VxdID& toVXDID = toStateCache.sensorID;
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
+  if (fromStateCache.geoLayer == toStateCache.geoLayer) {
     // TODO: Also check for sensors?
     return 1.0;
   }

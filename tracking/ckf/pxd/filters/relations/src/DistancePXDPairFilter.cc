@@ -26,8 +26,7 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
 
   B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  const VxdID& toVXDID = toStateCache.sensorID;
-  const double toPhi = toStateCache.phi;
+  const double& toPhi = toStateCache.phi;
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD track, so we can use its position to only look for matching ladders
@@ -41,14 +40,12 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
     return NAN;
   }
 
-  const VxdID& fromVXDID = fromStateCache.sensorID;
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
+  if (fromStateCache.geoLayer == toStateCache.geoLayer) {
     // TODO: Also check for sensors?
     return 1.0;
   }
 
-  const double fromPhi = fromStateCache.phi;
+  const double& fromPhi = fromStateCache.phi;
 
   if (abs(fromPhi - toPhi) < 0.05) {
     return 1.0;

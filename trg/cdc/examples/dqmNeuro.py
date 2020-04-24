@@ -86,9 +86,9 @@ main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hws
                 hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
 main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
                 hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
-main.add_module('CDCTriggerRecoHitMatcher', hitCollectionName=neurotrigger.simsegmenthits)
-main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.simneurotracks_swtssw2d,
-                hitCollectionName=neurotrigger.simsegmenthits, axialOnly=True)
+# main.add_module('CDCTriggerRecoHitMatcher', hitCollectionName=neurotrigger.simsegmenthits)
+# main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.simneurotracks_swtssw2d,
+#                hitCollectionName=neurotrigger.simsegmenthits, axialOnly=True)
 main.add_module('SetupGenfitExtrapolation')
 
 # adding histomanager and the dqm module: ###

@@ -271,9 +271,16 @@ namespace Belle2 {
         unsigned iTracker,
         const CDCTriggerNeuroConfig::B2FormatLine b2line)
       {
-        if ((b2line.offset + foundtime >= 0) && (b2line.offset + foundtime <= bitsNN->getEntries())) {
+        if ((b2line.offset + foundtime >= 0) &&
+            (b2line.offset + foundtime <= bitsNN->getEntries())) {
+
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
-          data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
+
+          if (slv_to_bin_string(bitsn->signal()[iTracker]).size() >= (NN_WIDTH - b2line.start)) {
+            data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
+          } else {
+            data = "";
+          }
         } else {
           data = "";
         }
@@ -1026,13 +1033,11 @@ namespace Belle2 {
 
         for (short iclock = 0; iclock < bitsNN->getEntries(); ++iclock) {
           // check for NNEnable bit:
-          // B2LDataField p_nnenable(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("NNEnable"));
-          // if (!(p_nnenable.data == "1")) {
-          //   continue;
-          // }
           B2LDataField p_nnenable(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("NNEnable"));
-
-          if (p_nnenable.data == "1") {
+          if (p_nnenable.name == "None") {
+            B2DEBUG(5, "Neurotrigger: NNENable position unknown, skipping ... ");
+            continue;
+          } else if (p_nnenable.data == "1") {
             B2DEBUG(10, padright("Tracker: " + std::to_string(iTracker) + ", Clock: " + std::to_string(iclock) + " : NNEnable set!", 100));
           } else {
             B2DEBUG(21, padright("    UnpackerClock: " + std::to_string(iclock), 100));

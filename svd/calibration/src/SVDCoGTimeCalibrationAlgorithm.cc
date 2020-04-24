@@ -32,6 +32,8 @@ SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(const std::string
 CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 {
 
+  gROOT->SetBatch(true);
+
   int ladderOfLayer[4] = {7, 10, 12, 16};
   int sensorOnLayer[4] = {2, 3, 4, 5};
 

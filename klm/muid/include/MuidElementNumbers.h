@@ -77,6 +77,16 @@ namespace Belle2 {
     };
 
     /**
+     * Bits used for unique identifiers in KLMLikelihoodParameters.
+     */
+    enum IdentifierBits {
+      c_OutcomeBit = 7,
+      c_LastLayerBit = 4,
+      c_DetectorBit = 2,
+      c_DegreesOfFreedomBit = 6
+    };
+
+    /**
      * Constructor.
      */
     MuidElementNumbers();

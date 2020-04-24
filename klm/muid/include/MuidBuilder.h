@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
@@ -144,8 +144,8 @@ namespace Belle2 {
     /**
      * Muid parameters.
      */
-    DBObjPtr<MuidParameters> m_MuidParameters;
+    DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
   };
 
-} // end of namespace Belle2
+}

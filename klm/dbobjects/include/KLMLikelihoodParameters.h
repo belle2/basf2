@@ -21,13 +21,12 @@
 /* C++ headers. */
 #include <map>
 
-
 namespace Belle2 {
 
   /**
    * Database object used to store the parameters for KLM likelihood computation.
    */
-  class KLMLikelihoodParameters: public TObject {
+  class KLMLikelihoodParameters : public TObject {
 
   public:
 
@@ -307,7 +306,7 @@ namespace Belle2 {
     /** Transverse probability density function (analytical): vertical scale. */
     std::map<int, double> m_TransverseScaleY;
 
-    /** ClassDef */
+    /** Class version. */
     ClassDef(KLMLikelihoodParameters, 1);
 
   };

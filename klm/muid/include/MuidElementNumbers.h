@@ -195,6 +195,28 @@ namespace Belle2 {
      */
     static std::vector<int> getPDGVector();
 
+    /**
+     * Get the unique longitudinal identifier for given hypothesis, outcome and last layer crossed.
+     * bits 0-3 for hypothesis;
+     * bits 4-10 for outcome;
+     * bits 11-14 for last layer crossed.
+     * @param[in] hypothesis Hypothesis number.
+     * @param[in] outcome    Track extrapolation outcome.
+     * @param[in] lastLayer  Last layer crossed during the extrapolation..
+     */
+    static int getLongitudinalID(int hypothesis, int outcome, int lastLayer);
+
+    /**
+     * Get the unique transverse identifier for given hypothesis, detector and degrees of freedom.
+     * bit 0-3 for hypothesis;
+     * bit 4-5 for detector;
+     * bit 6-11 for degrees of freedom.
+     * @param[in] hypothesis       Hypothesis number.
+     * @param[in] detector         Detector number.
+     * @param[in] degreesOfFreedom Number of degrees of freedom.
+     */
+    static int getTransverseID(int hypothesis, int detector, int degreesOfFreedom);
+
   protected:
 
     /** Maximal barrel layer number (0-based). */

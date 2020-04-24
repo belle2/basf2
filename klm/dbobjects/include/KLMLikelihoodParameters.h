@@ -54,7 +54,7 @@ namespace Belle2 {
      */
     void setLongitudinalPDF(int hypothesis, int outcome, int lastLayer, const std::vector<double>& params)
     {
-      const int id =  getLongitudinalID(hypothesis, outcome, lastLayer);
+      const int id =  MuidElementNumbers::getLongitudinalID(hypothesis, outcome, lastLayer);
       setLongitudinalPDF(id, params);
     }
 
@@ -67,7 +67,7 @@ namespace Belle2 {
      */
     void setTransversePDF(int hypothesis, int detector, int degreesOfFreedom, const std::vector<double>& params)
     {
-      int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       setTransversePDF(id, params);
     }
 
@@ -80,7 +80,7 @@ namespace Belle2 {
      */
     void setTransverseThreshold(int hypothesis, int detector, int degreesOfFreedom, const double threshold)
     {
-      int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       setTransverseThreshold(id, threshold);
     }
 
@@ -93,7 +93,7 @@ namespace Belle2 {
      */
     void setTransverseScaleX(int hypothesis, int detector, int degreesOfFreedom, const double scaleX)
     {
-      int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       setTransverseScaleX(id, scaleX);
     }
 
@@ -106,7 +106,7 @@ namespace Belle2 {
      */
     void setTransverseScaleY(int hypothesis, int detector, int degreesOfFreedom, const double scaleY)
     {
-      int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       setTransverseScaleY(id, scaleY);
     }
 
@@ -118,7 +118,7 @@ namespace Belle2 {
      */
     const std::vector<double>& getLongitudinalPDF(int hypothesis, int outcome, int lastLayer) const
     {
-      const int id = getLongitudinalID(hypothesis, outcome, lastLayer);
+      const int id = MuidElementNumbers::getLongitudinalID(hypothesis, outcome, lastLayer);
       return getLongitudinalPDF(id);
     }
 
@@ -130,7 +130,7 @@ namespace Belle2 {
      */
     const std::vector<double>& getTransversePDF(int hypothesis, int detector, int degreesOfFreedom) const
     {
-      const int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      const int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       return getTransversePDF(id);
     }
 
@@ -142,7 +142,7 @@ namespace Belle2 {
      */
     double getTransverseThreshold(int hypothesis, int detector, int degreesOfFreedom) const
     {
-      const int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      const int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       return getTransverseThreshold(id);
     }
 
@@ -154,7 +154,7 @@ namespace Belle2 {
      */
     double getTransverseScaleX(int hypothesis, int detector, int degreesOfFreedom) const
     {
-      const int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      const int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       return getTransverseScaleX(id);
     }
 
@@ -166,44 +166,11 @@ namespace Belle2 {
      */
     double getTransverseScaleY(int hypothesis, int detector, int degreesOfFreedom) const
     {
-      const int id = getTransverseID(hypothesis, detector, degreesOfFreedom);
+      const int id = MuidElementNumbers::getTransverseID(hypothesis, detector, degreesOfFreedom);
       return getTransverseScaleY(id);
     }
 
   private:
-
-    /**
-     * Get the unique longitudinal identifier for given hypothesis, outcome and last layer crossed.
-     * bits 0-3 for hypothesis;
-     * bits 4-10 for outcome;
-     * bits 11-14 for last layer crossed.
-     * @param[in] hypothesis Hypothesis number.
-     * @param[in] outcome    Track extrapolation outcome.
-     * @param[in] lastLayer  Last layer crossed during the extrapolation..
-     */
-    int getLongitudinalID(int hypothesis, int outcome, int lastLayer) const
-    {
-      int id = lastLayer + (outcome << MuidElementNumbers::c_LastLayerBit) + (hypothesis << (MuidElementNumbers::c_LastLayerBit +
-               MuidElementNumbers::c_OutcomeBit));
-      return id;
-    }
-
-    /**
-     * Get the unique transverse identifier for given hypothesis, detector and degrees of freedom.
-     * bit 0-3 for hypothesis;
-     * bit 4-5 for detector;
-     * bit 6-11 for degrees of freedom.
-     * @param[in] hypothesis       Hypothesis number.
-     * @param[in] detector         Detector number.
-     * @param[in] degreesOfFreedom Number of degrees of freedom.
-     */
-    int getTransverseID(int hypothesis, int detector, int degreesOfFreedom) const
-    {
-      int id = degreesOfFreedom + (detector << MuidElementNumbers::c_DegreesOfFreedomBit) + (hypothesis <<
-               (MuidElementNumbers::c_DegreesOfFreedomBit +
-                MuidElementNumbers::c_DetectorBit));
-      return id;
-    }
 
     /**
      * Set the longitudinal probability density function for a given identifier.

@@ -1,11 +1,8 @@
 #ifndef _Belle2_FlowMonitor_h
 #define _Belle2_FlowMonitor_h
 
-#include <daq/slc/runcontrol/RCCallback.h>
-
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/slc/readout/IOInfo.h>
-#include <daq/slc/readout/ronode_info.h>
 #include <daq/slc/readout/ronode_status.h>
 
 namespace Belle2 {

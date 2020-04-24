@@ -397,6 +397,7 @@ namespace Belle2 {
        */
       bool isSVDSideU(VxdID chipID) const
       {
+        /* cppcheck-suppress duplicateExpressionTernary */
         return (chipID.getLayerNumber() == 3 ? chipID.getSegmentNumber() < c_nSVDChipsL3 : chipID.getSegmentNumber() < c_nSVDChipsLu);
       }
 

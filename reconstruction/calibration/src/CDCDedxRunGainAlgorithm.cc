@@ -65,11 +65,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   if (isRmBadruns)CheckRunStatus(runtemp, IsSkipRun, rmean);
 
   TF1* fitG = new TF1("fitG", "gaus", 0.5, 1.5);
-  fitG->SetParLimits(1, 0.90, 1.10);
+  fitG->SetParLimits(1, 0.70, 1.30);
   fitG->SetParLimits(2, 0.03, 0.12);
 
-  double RunGainConst = 1.0;
-  std::string rstatus = "";
+  double RunGainConst;
+  std::string rstatus;
   if (IsSkipRun) {
     RunGainConst = rmean;
     rstatus = "BadRun";
@@ -130,15 +130,14 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 
 void CDCDedxRunGainAlgorithm::generateNewPayloads(double RunGainConst)
 {
-  for (auto expRun : getRunList()) {
 
-    updateDBObjPtrs(1, expRun.second, expRun.first);
-    double ExistingRG = m_DBRunGain->getRunGain();
-    // bool refchange = m_DBRunGain.hasChanged(); //Add this feature for major processing
-    B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
-    B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RunGainConst << ", Merged = " << RunGainConst * ExistingRG);
-    if (isMergePayload) RunGainConst *= ExistingRG;
-  }
+  const auto expRun = getRunList()[0];
+  updateDBObjPtrs(1, expRun.second, expRun.first);
+  double ExistingRG = m_DBRunGain->getRunGain();
+  // bool refchange = m_DBRunGain.hasChanged(); //Add this feature for major processing
+  B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
+  B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RunGainConst << ", Merged = " << RunGainConst * ExistingRG);
+  if (isMergePayload) RunGainConst *= ExistingRG;
 
   CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
   saveCalibration(gain, "CDCDedxRunGain");

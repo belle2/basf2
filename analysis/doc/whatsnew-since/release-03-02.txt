@@ -84,7 +84,7 @@ Variables
 
 * The variables ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz`, :b2:var:`dr`, :b2:var:`dphi`, :b2:var:`dcosTheta` ) are now with respect to the interaction point (as documented). 
   This now makes them different with respect to the cartesian position ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` ) with respect to the origin..
-  This is similarly true for ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  versus ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
+  This is similarly true for ( :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ` )  versus ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY` and :b2:var:`mcDecayVertexZ` ).
 
 * Added the meta variable :b2:var:`eclClusterSpecialTrackMatched` to check if
   any track related to an ECL cluster satisfies certain criteria. It can be used
@@ -121,7 +121,7 @@ Variables
                 variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
                 variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
 
-* Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
+* Deprecated ``clusterHypothesis`` following changes to the ECLCluster storage on mdst. 
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ``ClusterHadronIntensity`` and ``clusterUniqueID``.
@@ -196,7 +196,7 @@ Modules
   ParticleList of composite particles (and only this one) was always added to
   the ROE.
 
-* The module :b2:mod:`VertexFitUpdateDaughters` now always updates
+* The module ``VertexFitUpdateDaughters`` now always updates
   the daughters (as advertised).
 
 

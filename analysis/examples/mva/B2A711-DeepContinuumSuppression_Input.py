@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -9,7 +8,7 @@
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A712 AND B2A713 for training, testing, and applying the MVAExpert.
 # It's useful to have a look at B2A701-ContinuumSuppression_Input.py first.
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The new variables are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:
@@ -158,7 +157,7 @@ vertex_variables = ['distance', 'dphi', 'dcosTheta']
 cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg', 'isInRestOfEvent']
 track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
-# Aliases from normal coordinates to thrustframe coordinates (see confluence page)
+# Aliases from normal coordinates to thrustframe coordinates
 for variablename in basic_variables + vertex_variables:
     v.variables.addAlias('thrustsig' + variablename, 'useBThrustFrame(' + variablename + ',Signal)')
 

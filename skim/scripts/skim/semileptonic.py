@@ -110,7 +110,7 @@ def SemileptonicList(path):
     b0List = []
     for chID, channel in enumerate(B0Channels):
         ma.reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        ma.applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
+        ma.applyCuts('B0:SL' + str(chID), 'nTracks>4', path=path)
         b0List.append('B0:SL' + str(chID))
 
     SLLists = b0List + bplusList
@@ -171,10 +171,10 @@ def PRList(path):
     ma.cutAndCopyList('mu+:PR2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
     ma.cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
 
-    ma.reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path)
-    ma.reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path)
-    ma.reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path)
-    ma.reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path)
+    ma.reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path)
+    ma.reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path)
+    ma.reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path)
+    ma.reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path)
 
     PRList = ['B0:L1', 'B0:L2']
 

@@ -35,10 +35,13 @@ namespace Belle2 {
     /* Destructor */
     virtual ~vxdDigitMaskingModule();
 
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
+    /** End run */
     void endRun() override final;
 
     /**

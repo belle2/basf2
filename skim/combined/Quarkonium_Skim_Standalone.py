@@ -13,7 +13,7 @@ import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
-gb2_setuprel = 'release-04-00-00'
+
 
 # create a new path
 skimpath = b2.Path()
@@ -28,13 +28,8 @@ ma.inputMdstList('default', fileList, path=skimpath)
 stdPhotons('loose', path=skimpath)
 
 stdPi('loose', path=skimpath)
-stdK('loose', path=skimpath)
 stdE('loose', path=skimpath)
 stdMu('loose', path=skimpath)
-stdPi('all', path=skimpath)
-stdK('all', path=skimpath)
-stdE('all', path=skimpath)
-stdMu('all', path=skimpath)
 
 # ISRpipicc Skim
 from skim.quarkonium import ISRpipiccList

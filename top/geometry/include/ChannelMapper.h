@@ -163,6 +163,13 @@ namespace Belle2 {
       int getPixelID(unsigned channel) const;
 
       /**
+       * Returns PMT ID (1-based)
+       * @param pixel pixelID (1-based)
+       * @return PMT ID (or 0 for invalid pixel)
+       */
+      int getPmtID(int pixel) const;
+
+      /**
        * Print mappings to terminal screen
        */
       void print() const;

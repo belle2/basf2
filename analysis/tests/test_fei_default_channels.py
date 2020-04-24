@@ -128,7 +128,7 @@ class TestGetDefaultChannels(unittest.TestCase):
                           'B0:semileptonic', 'B+:semileptonic'])
 
         chargedVariables = ['eIDBelle',
-                            'atcPIDBelle(3,2)', 'kIDBelle',
+                            'atcPIDBelle(3,2)',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
                             'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']

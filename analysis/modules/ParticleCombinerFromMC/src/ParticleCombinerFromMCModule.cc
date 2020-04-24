@@ -51,7 +51,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("decayString", m_decayString,
-             "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
+             "Input DecayDescriptor string (see :ref:`DecayString`).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
     addParam("writeOut", m_writeOut,

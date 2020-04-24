@@ -21,6 +21,8 @@ from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedx
 from caf.framework import Calibration, CAF, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV
 from prompt import CalibrationSettings
+import reconstruction as recon
+
 gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
@@ -54,9 +56,44 @@ def get_calibrations(input_data, **kwargs):
     from caf.utils import IoV
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    # ----------1. Run Gain Pre (No Payload saving)
+    # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
+    # Rungain Precollector path
+    Calibrate_RGTrial = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RGTrial)
+    Calibrate_RGTrial.add_module(
+        'CDCDedxCorrection',
+        relativeCorrections=False,
+        scaleCor=True,
+        runGain=True,
+        cosineCor=True,
+        wireGain=True,
+        twoDCell=True,
+        oneDCell=True)
+
+    # Rungain Collector setup
+    Collector_RGTrial = basf2.register_module('CDCDedxElectronCollector')
+    CollParamTrial = {'cleanupCuts': True, 'Isrun': True, 'granularity': 'run', }
+    Collector_RGTrial.param(CollParamTrial)
+
+    # Rungain Algorithm setup
+    Algorithm_RGTrial = CDCDedxRunGainAlgorithm()
+    Algorithm_RGTrial.setMonitoringPlots(True)
+
+    # Rungain Calibration setup
+    Calibration_RGTrial = Calibration(
+        name="RunGainCalibrationTrial",
+        algorithms=[Algorithm_RGTrial],
+        collector=Collector_RGTrial,
+        input_files=input_files_physics)
+    Calibration_RGTrial.strategies = SequentialRunByRun
+    Calibration_RGTrial.pre_collector_path = Calibrate_RGTrial
+    Calibration_RGTrial.algorithms[0].params = {"iov_coverage": output_iov}
+    Calibration_RGTrial.save_payloads = False
+
+    # ----------1b. Run Gain Pre (No Payload saving)
     # Rungain Precollector path
     Calibrate_RGPre = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RGPre)
     Calibrate_RGPre.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -84,12 +121,14 @@ def get_calibrations(input_data, **kwargs):
         input_files=input_files_physics)
     Calibration_RGPre.strategies = SequentialRunByRun
     Calibration_RGPre.pre_collector_path = Calibrate_RGPre
+    Calibration_RGPre.depends_on(Calibration_RGTrial)
     Calibration_RGPre.algorithms[0].params = {"iov_coverage": output_iov}
     Calibration_RGPre.save_payloads = False
 
     # ----------2. CosineCorr Gain
     # Cosine Precollector path
     Calibrate_CC = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_CC)
     Calibrate_CC.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -121,6 +160,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------3. WireGain Gain
     # WireGain Precollector path
     Calibrate_WG = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_WG)
     Calibrate_WG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -138,7 +178,7 @@ def get_calibrations(input_data, **kwargs):
 
     # WireGain Algorithm setup
     Algorithm_WG = CDCDedxWireGainAlgorithm()
-    Algorithm_WG.setMonitoringPlots(False)
+    Algorithm_WG.setMonitoringPlots(True)
 
     # WireGain Calibration setup
     Calibration_WG = Calibration(
@@ -154,6 +194,7 @@ def get_calibrations(input_data, **kwargs):
     # ----------4. Final Run Gain to take Wire and Cosine correction in effect
     # Rungain Precollector path
     Calibrate_RG = basf2.create_path()
+    recon.prepare_cdst_analysis(path=Calibrate_RG)
     Calibrate_RG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -186,4 +227,4 @@ def get_calibrations(input_data, **kwargs):
     Calibration_RG.pre_collector_path = Calibrate_RG
     Calibration_RG.algorithms[0].params = {"iov_coverage": output_iov}
 
-    return [Calibration_RGPre, Calibration_CC, Calibration_WG, Calibration_RG]
+    return [Calibration_RGTrial, Calibration_RGPre, Calibration_CC, Calibration_WG, Calibration_RG]

@@ -1,11 +1,10 @@
 #include <daq/dqm/DqmMasterCallback.h>
 
-#include <daq/slc/base/StringUtil.h>
+#include <TH1.h>
+#include <TKey.h>
 
 #include <unistd.h>
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
 using namespace Belle2;

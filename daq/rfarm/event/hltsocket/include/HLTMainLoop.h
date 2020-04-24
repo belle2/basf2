@@ -10,15 +10,7 @@
 
 #pragma once
 
-#include <framework/logging/LogMethod.h>
 #include <framework/pcore/RingBuffer.h>
-
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <thread>
-#include <vector>
-#include <signal.h>
 
 namespace Belle2 {
   class HLTMainLoop {

@@ -72,32 +72,25 @@ class ShapeFitterModule(Module):
 
             # Waveform data
             adc = waveform.getDspA()
+            cid = digit.getCellId()
+            amp = digit.getAmp()
+            time = digit.getTimeFit()
+            qual = digit.getQuality()
 
-            cellID = digit.getCellId()
-            amplitude = digit.getAmp()
-            timeFit = digit.getTimeFit()
-            quality = digit.getQuality()
+            # == Call emulator
+            result = Belle2.ECL.ECLDspUtilities.shapeFitter(cid, adc, trigger_time)
 
-            # Call emulator
-            result = Belle2.ECL.ECLDspUtilities.shapeFitter(cellID,
-                                                            adc,
-                                                            trigger_time)
-            cellID2 = result.getCellId()
-            amplitude2 = result.getAmp()
-            timeFit2 = result.getTimeFit()
-            quality2 = result.getQuality()
+            amp2 = result.amp
+            time2 = result.time
+            qual2 = result.quality
 
-            if amplitude != amplitude2 or timeFit != timeFit2 or quality != quality2:
-
-                print('\nRealData: %4d %6d %6d %6d' % (cellID, amplitude,
-                                                       timeFit, quality))
-                print('Emulator: %4d %6d %6d %6d' % (cellID2, amplitude2,
-                                                     timeFit2, quality2))
-                if verbose:
-
-                    print('Event: %d Trigger time: %d' % (self.eventNumber, trigger_time))
-                    print('CellID: %d AmpData: %d' % (cellID, amplitude))
-                    print('TimeData: %d QualityData: %d' % (timeFit, quality))
+            if amp != amp2 or time != time2 or qual != qual2:
+                print()
+                print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
+                print('Emulator: %4d %6d %6d %6d' % (cid, amp2, time2, qual2))
+                if VERBOSE:
+                    print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
+                    print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))
                     print(' '.join([str(x) for x in adc]), end='')
                     print(' ')
 

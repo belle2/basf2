@@ -40,7 +40,7 @@ namespace Belle2 {
       virtual void ConstructParticle() override;
 
       /** ConstructProcess() defines the geant4e-specific processes */
-      virtual void ConstructProcess();
+      virtual void ConstructProcess() override;
 
     private:
 

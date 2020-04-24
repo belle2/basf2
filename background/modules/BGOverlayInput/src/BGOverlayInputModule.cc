@@ -58,7 +58,7 @@ namespace Belle2 {
              "List of files with measured beam background ");
     addParam("extensionName", m_extensionName,
              "name added to default branch names", string("_beamBG"));
-
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
   }
 
   BGOverlayInputModule::~BGOverlayInputModule()
@@ -108,7 +108,7 @@ namespace Belle2 {
     }
 
     // add BackgroundInfo to persistent tree
-    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    StoreObjPtr<BackgroundInfo> bkgInfo(m_BackgroundInfoInstanceName, DataStore::c_Persistent);
     bkgInfo.registerInDataStore();
     bkgInfo.create();
     bkgInfo->setMethod(BackgroundInfo::c_Overlay);

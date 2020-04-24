@@ -10,20 +10,8 @@
 #define Belle2_Ds2RawFileModule_h
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/RingBuffer.h>
 
 #include <framework/pcore/DataStoreStreamer.h>
-//#include <framework/datastore/DataStore.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
-
-
-#include <string>
 
 #define RBUFSIZE 100000000
 #define HLT_SUBSYS_ID 300

@@ -10,12 +10,14 @@
 #pragma once
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 #include "ecl/utility/ECLChannelMapper.h"
 
 namespace Belle2 {
 
+  class EventMetaData;
   class RawECL;
   class ECLDigit;
   class ECLTrig;
@@ -51,8 +53,10 @@ namespace Belle2 {
 
 
   private:
-    /** Event number */
-    int    m_EvtNum;
+    /** event number from EventMetaData */
+    int m_globalEvtNum;
+    /** Internally counted event number */
+    int m_localEvtNum;
 
     /** pointer to data from COPPER */
     unsigned int* m_bufPtr;
@@ -68,6 +72,8 @@ namespace Belle2 {
     /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
 
+    /** report only once per crate about inconsistency between trg tag and evt number */
+    long m_evtNumReportedMask;
     /** report only once per crate about problem with different trg tags */
     long m_tagsReportedMask;
     /** report only once per crate about problem with different trg phases */
@@ -75,6 +81,11 @@ namespace Belle2 {
     /** report only once per crate about problem with shaper header */
     long m_badHeaderReportedMask;
 
+    /**
+     * Report the problem with inconsistency between trg tag and evt number.
+     * Exclude the crate from further reports of this type.
+     */
+    void doEvtNumReport(unsigned int iCrate, int tag, int evt_number);
     /**
      * Report the problem with trigger tags and exclude the crate
      * from further reports of this type.
@@ -92,20 +103,25 @@ namespace Belle2 {
     void doBadHeaderReport(unsigned int iCrate);
 
     /**
+     * Check if the problem with trg tag <-> evt number inconsistency was
+     * already reported for crate iCrate.
+     */
+    bool evtNumReported(unsigned int iCrate) { return m_evtNumReportedMask & (1L << (iCrate - 1)); }
+    /**
      * Check if the problem with different trigger tags was already reported
      * for crate iCrate.
      */
-    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1 << (iCrate - 1)); }
+    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1L << (iCrate - 1)); }
     /**
      * Check if the problem with different trigger phases was already reported
      * for crate iCrate.
      */
-    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1 << (iCrate - 1)); }
+    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1L << (iCrate - 1)); }
     /**
      * Check if the problem with bad shaper header was already reported
      * for crate iCrate.
      */
-    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1 << (iCrate - 1)); }
+    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1L << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;
@@ -119,15 +135,21 @@ namespace Belle2 {
     /** ECL channel mapper **/
     ECL::ECLChannelMapper m_eclMapper;
 
-    /** Output data  */
+    /*   Input data   */
+
+    /** store array for RawECL**/
+    StoreArray<RawECL>   m_rawEcl;
+    /** store objptr for EventMetaData **/
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+
+    /*   Output data  */
+
     /** store array for digitized gits**/
     StoreArray<ECLDigit> m_eclDigits;
     /** store array for eclTrigs data (trigger time and tag)**/
     StoreArray<ECLTrig>  m_eclTrigs;
     /** store array for waveforms**/
     StoreArray<ECLDsp>   m_eclDsps;
-    /** store array for RawECL**/
-    StoreArray<RawECL>   m_rawEcl;
 
     /** Cached debug level from LogSystem */
     int m_debugLevel;

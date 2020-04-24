@@ -412,8 +412,14 @@ namespace Belle2 {
 
     bool XTFunction::validate()
     {
+
+      const double p6 = m_fitFunc->GetParameter(6);
       if (fabs(m_fitFunc->Eval(0))  > 0.2) {
         B2WARNING("Bad xt function");
+        m_fitflag = 0;
+        return false;
+      } else if (p6 < 100.0) {
+        B2WARNING("Unrealistic p6");
         m_fitflag = 0;
         return false;
       } else {

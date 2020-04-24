@@ -1,10 +1,7 @@
 #ifndef _Belle2_NSMData_hh
 #define _Belle2_NSMData_hh
 
-#include "daq/slc/nsm/NSMHandlerException.h"
-
 #include <daq/slc/base/AbstractDBObject.h>
-#include <daq/slc/base/StringUtil.h>
 
 extern "C" {
 #include <nsm2/nsm2.h>

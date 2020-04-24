@@ -806,11 +806,12 @@ def command_dump(args, db):
         # the name,revision
         if args.id:
             req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
-            payload = PayloadInformation.from_json(req.json(), {"payloadIov"})
+            payload = PayloadInformation.from_json(req.json())
+            name = payload.name
         elif args.revision:
             name, rev = args.revision
             rev = int(rev)
-            req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
+            req = db.request("GET", f"/module/{encode_name(name)}/payloads", "Getting payload info")
             for p in req.json():
                 if p["revision"] == rev:
                     payload = PayloadInformation.from_json(p)

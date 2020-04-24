@@ -6,7 +6,7 @@ from ROOT import Belle2
 
 
 def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
-                    thetaDef='avg', zDef='min', trueEventTime=False):
+                    thetaDef='avg', zDef='min'):
     """
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
@@ -23,9 +23,6 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     @thetaDef          theta definition for the CDCTriggerTrackCombiner
     @zDef              z definition for the CDCTriggerTrackCombiner
                        (for details see module description)
-    @trueEventTime     since the event time finder is not yet finalized,
-                       the true event time can be used instead.
-                       recommended especially for tests on single tracks.
     """
 
     if SimulationMode == 1:
@@ -44,8 +41,12 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
             minPt = 0.3
         path.add_module('CDCTrigger2DFinder',
                         minHits=4, minHitsShort=minHitsShort, minPt=minPt)
-        # ETF
-        path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
+
+        # Old ETF
+        # path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
+        # ETF priority fastest timings among 2D Tracks
+        path.add_module('CDCTriggerHoughETF')
+
         # fitters
         path.add_module('CDCTrigger2DFitter')
         path.add_module('CDCTrigger3DFitter')

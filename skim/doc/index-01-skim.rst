@@ -112,6 +112,8 @@ Some functions and tools are for the use of skim liaisons and developers. A Jupy
     :members:
     :undoc-members:
 
+.. _testing-skims:
+
 Testing skim performance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -140,7 +142,7 @@ This will read the output files of the test jobs, and produce tables of statisti
 .. tip::
    To test your own newly-developed skim, you must do the following things in your current setup of ``basf2``:
 
-   1. Add your skim to `skim.registry.skim_registry`. This should be an entry of the form ``(SkimCode, SkimName)``.
+   1. Add your skim to the `skim.registry.Registry`. This should be an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
    2. Put your skim steering file in ``skim/standalone/``, with a name of the form ``{SkimName}_Skim_Standalone.py``. This skim name must match what you wrote in the registry.
 
@@ -177,3 +179,14 @@ This will read the output files of the test jobs, and produce tables of statisti
    .. note::
       This tool uses the third-party package `tabulate <https://pypi.org/project/tabulate>`_, which
       can be installed via ``pip``.
+
+
+``b2skim-prod-json``: Produce grid production requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/b2skim-prod-json
+   :func: get_argument_parser
+   :prog: b2skim-prod-json
+   :nodefaultconst:
+   :nogroupsections:

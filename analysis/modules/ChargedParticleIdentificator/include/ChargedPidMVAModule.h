@@ -106,6 +106,11 @@ namespace Belle2 {
     std::string m_payload_name;
 
     /**
+     * Flag to specify if we use an ECL-only based training.
+     */
+    bool m_ecl_only;
+
+    /**
      * The lookup name of the MVA score variable, given the input S, B mass hypotheses for the algorithm.
      */
     std::string m_score_varname;

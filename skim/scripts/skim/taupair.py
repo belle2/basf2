@@ -16,16 +16,19 @@ def SetTauGenericSkimVariables(path):
     """
     Set particle lists and variables for TauGeneric skim
 
-    * input particle lists: pi+:all, gamma:all
+    **Input particle lists**: `pi+:all`, `gamma:all`
 
-    * output particle lists: pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2
+    **Output particle lists**: ``pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2``
 
-    * nGoodTracks: number of good tracks in an event
-    * netCharge: total net charge of good tracks
-    * nTracksS1/nTracksS2: number of good tracks in each hemisphere S1/S2 divided by thrust axis
-    * invMS1/invMS2: invariant mass of particles in each hemisphere
-    * maxPt: maximum Pt amoung good tracks
-    * E_ECLtrk: total ECL energy of good tracks
+    **Variables**:
+
+    * ``nGoodTracks``: number of good tracks in an event
+    * ``netCharge``: total net charge of good tracks
+    * ``nTracksS1/nTracksS2:`` number of good tracks in each hemisphere ``S1/S2`` divided by thrust axis
+    * ``invMS1/invMS2``: invariant mass of particles in each hemisphere
+    * ``maxPt``: maximum Pt amoung good tracks
+    * ``E_ECLtrk``: total ECL energy of good tracks
+
     """
     __author__ = "Kenji Inami"
 
@@ -62,21 +65,24 @@ def SetTauGenericSkimVariables(path):
 
 def TauList(path):
     """
-    Note:
-        * Skim for Tau generic decays
-        * Skim LFN code: 18570600
-        * Channel: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
-        * Skim category: physics, tau
+    Skim for Tau generic decays
 
-    Criteria:
-        1. :math:`1 <`  No. good tracks :math:`< 7`
-        2. :math:`|` net charge :math:`| < 2`
-        3. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
-        4. :math:`visibleEnergyOfEventCMS < 10` GeV and :math:`E_{ECLtrk} < 6` GeV
-        5. :math:`M_{tag} < 1.8` GeV
-        6. :math:`visibleEnergyOfEventCMS > 3` GeV or max `P_t > 1` GeV
-        7. :math:`\\theta_{miss}<150`
-        8. :math:`M_{sig} < 2.3` GeV
+    **Skim LFN code**: 18570600
+
+    **Channel**: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
+
+    **Skim Category**: physics, tau
+
+    **Criteria**:
+
+    1. ``1 < No. good tracks < 7``
+    2. ``net charge < 2``
+    3. Event divided by thrust axis; No. good tracks in tag side = 1 or 3
+    4. ``visibleEnergyOfEventCMS < 10 GeV and E_ECLtrk < 6 GeV``
+    5. ``M_tag < 1.8 GeV``
+    6. ``visibleEnergyOfEventCMS > 3 GeV or max P_t > 1 GeV``
+    7. ``theta_miss < 150``
+    8. ``M_sig < 2.3 GeV``
 
     Returns:
         list name of the TauGeneric skim candidates
@@ -109,12 +115,15 @@ def TauList(path):
 
 def TauLFVList(flag=1, path=None):
     """
-    Note:
-        * Skim for Tau LFV decays
-        * Skim LFN code: 18360100
-        * Channel: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l V^0, lhh, llp, phh`
-        * Skim category: physics, tau
-        * Criteria: :math:`1.58 < M < 1.98` GeV, :math:`|\Delta E|<1` GeV
+    Skim for Tau LFV decays
+
+    **Skim LFN code**: 18360100
+
+    **Channel**: :math:`\\tau \\to l \\gamma, lll, l \\pi^0, l V^0, lhh, llp, phh`
+
+    **Skim category**: physics, tau
+
+    **Criteria**: :math:`1.58 < M < 1.98` GeV, :math:`|\Delta E|<1` GeV
 
     Returns:
         list name of the TauLFV skim candidates
@@ -176,8 +185,8 @@ def TauLFVList(flag=1, path=None):
                         'mu+:loose K-:loose pi+:loose',
                         'e-:loose K+:loose pi+:loose',
                         'mu-:loose K+:loose pi+:loose',
-                        'e-:loose K_S0:merged K_S0:merged',
-                        'mu-:loose K_S0:merged K_S0:merged'
+                        'e+:loose K_S0:merged K_S0:merged',
+                        'mu+:loose K_S0:merged K_S0:merged'
                         ]
 
     tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
@@ -197,7 +206,15 @@ def TauLFVList(flag=1, path=None):
     tau_lll_list = []
     for chID, channel in enumerate(tau_lll_Channels):
         if(flag):
-            ma.reconstructDecay('tau+:LFV_lll' + str(chID) + ' -> ' + channel, tauLFVCuts, chID, path=path)
+            ma.reconstructDecay(
+                'tau+:LFV_lll' +
+                str(chID) +
+                ' -> ' +
+                channel,
+                tauLFVCuts,
+                chID,
+                path=path,
+                allowChargeViolation=True)
         tau_lll_list.append('tau+:LFV_lll' + str(chID))
 
     tau_lP0_list = []
@@ -238,13 +255,15 @@ def SetTauThrustSkimVariables(path):
     """
     Set particle lists and variables for TauThrust skim
 
-    * input particle lists: pi+:all, gamma:all
+    **Input particle lists**: `pi+:all`, `gamma:all`
 
-    * output particle lists: pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust
+    **Output particle lists**: ``pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust``
 
-    * nGoodTracksThrust: number of good tracks in an event
-    * netChargeThrust: total net charge of good tracks
-    * nTracksS1Thrust/nTracksS2Thrust: number of good tracks in each hemisphere S1/S2 divided by thrust axis
+    **Variables**:
+
+    * ``nGoodTracksThrust``: number of good tracks in an event
+    * ``netChargeThrust``: total net charge of good tracks
+    * ``nTracksS1Thrust/nTracksS2Thrust``: number of good tracks in each hemisphere S1/S2 divided by thrust axis
 
     """
     __author__ = "Ami Rostomyan, Kenji Inami"
@@ -277,19 +296,22 @@ def SetTauThrustSkimVariables(path):
 
 def TauThrustList(path):
     """
-    Note:
-        * Skim for Tau decays using thrust
-        * Skim LFN code: 18570700
-        * Channel: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
-        * Skim category: physics, tau
+    Skim for Tau decays using thrust
 
-    Criteria:
-        1. :math:`1 <`  No. good tracks :math:`< 7`
-        2. net charge :math:` == 0`
-        3. Event divided by thrust axis; select 1x1, 1x3, 1x5, 3x3 topology
-        4. :math:`0.8 < thrust`
-        5. :math:`visibleEnergyOfEventCMS < 10.4` GeV
-        6. For 1x1 topology, :math:`thrust < 0.99`
+    **Skim LFN code**: 18570700
+
+    **Channel**: :math:`e^+ e^- \\to \\tau^+ \\tau^-`
+
+    **Skim category**: physics, tau
+
+    **Criteria**:
+
+    1. ``1 < No. good tracks < 7``
+    2. ``net charge == 0``
+    3. Event divided by thrust axis; select 1x1, 1x3, 1x5, 3x3 topology
+    4. ``0.8 < thrust``
+    5. ``visibleEnergyOfEventCMS < 10.4 GeV``
+    6. For 1x1 topology, ``thrust < 0.99``
 
     Returns:
         list name of the TauThrust skim candidates

@@ -282,18 +282,14 @@ namespace {
     // grab variables for testing
     const Manager::Var* vHasNPhotons = Manager::Instance().getVariable("clusterHasNPhotons");
     const Manager::Var* vHasNeutHadr = Manager::Instance().getVariable("clusterHasNeutralHadron");
-    const Manager::Var* vHypothsisID = Manager::Instance().getVariable("clusterHypothesis");
-    // TODO: remove hypothesis id after release-04 (should be gone by -05)
 
     // check that the hypotheses are correcltly propagated to the VM.
     for (size_t i = 0; i < gammalist->getListSize(); ++i) {
       EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
       if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 56.0);
       } else {
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 5.0);
       }
     } // end loop over test list
   }
@@ -306,6 +302,7 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     for (int i = 0; i < eclclusters.getEntries(); ++i)
       if (!eclclusters[i]->isTrack()) {
@@ -313,6 +310,7 @@ namespace {
         EXPECT_TRUE(vIsFromECL->function(p));
         EXPECT_FALSE(vIsFromKLM->function(p));
         EXPECT_FALSE(vIsFromTrack->function(p));
+        EXPECT_FALSE(vIsFromV0->function(p));
       }
   }
 

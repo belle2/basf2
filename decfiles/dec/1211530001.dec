@@ -1,0 +1,37 @@
+# EventType: 1211530001
+# Descriptor: [B+ -> psi(2) [ -> e+ e-] K+ ]
+# NickName: Bu_K+Psi2s_e+e-
+# Documentation:
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Alejandro Mora, Soumen Halder
+# Email: soumen.halder@tifr.res.in
+# Cuts: None
+# Date: 20200404
+# Comments:
+
+# Define aliases
+Alias psi(2s)sig psi(2S)
+#
+# Y(4S) -> B+ B-
+# One B decays to signal mode, while the other generically
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+# B+ -> psi(2s) K+
+#
+Decay B+sig
+1.0 psi(2s)sig K+ PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+#
+# psi(2s) -> l+ l-
+#
+Decay psi(2s)sig
+1.0 e+ e- PHOTOS VLL;
+Enddecay
+End

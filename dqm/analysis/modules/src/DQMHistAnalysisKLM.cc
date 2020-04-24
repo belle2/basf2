@@ -29,7 +29,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
   m_PlaneLine.SetLineColor(8); // dark green
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
@@ -207,7 +207,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       if (layerGlobal < maximalLayer)
         m_PlaneLine.DrawLineNDC(xLineNDC, histMinNDC, xLineNDC, histMaxNDC);
       int section, layer;
-      m_ElementNumbersEKLM->layerNumberToElementNumbers(
+      m_eklmElementNumbers->layerNumberToElementNumbers(
         layerGlobal, &section, &layer);
       if (section == EKLMElementNumbers::c_BackwardSection)
         name = "B";

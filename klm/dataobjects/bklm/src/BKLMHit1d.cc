@@ -28,32 +28,42 @@ BKLMHit1d::BKLMHit1d() :
   RelationsObject(),
   m_ModuleID(0),
   m_Time(0.0),
-  m_EDep(0.0)
+  m_EnergyDeposit(0.0)
 {
 }
 
-// Constructor with a cluster of contiguous parallel BKLMDigits
-BKLMHit1d::BKLMHit1d(const std::vector<const BKLMDigit*>& digits) :
+// Constructor with a cluster of contiguous parallel KLMDigits
+BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
   RelationsObject()
 {
   m_Time = 0.0;
-  m_EDep = 0.0;
+  m_EnergyDeposit = 0.0;
   m_ModuleID = 0;
   if (digits.size() == 0) {
-    B2WARNING("Attempt to create a BKLMHit1d with no BKLMDigits");
+    B2WARNING("Attempt to create a BKLMHit1d with no KLMDigits");
     return;
   }
   int stripMin = INT_MAX;
   int stripMax = INT_MIN;
-  m_ModuleID = digits.front()->getModuleID();
-  for (std::vector<const BKLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
-    const BKLMDigit* digit = *iDigit;
-    if (!BKLMElementNumbers::hitsFromSamePlane(m_ModuleID, digit->getModuleID())) {
-      B2WARNING("Attempt to combine non-parallel or distinct-module BKLMDigits");
+  const KLMDigit* bklmDigit = digits.front();
+  if (bklmDigit->getSubdetector() != KLMElementNumbers::c_BKLM)
+    B2FATAL("Trying to construct a BKLMHit1d using KLMDigits from EKLM.");
+  BKLMElementNumbers::setSectionInModule(m_ModuleID, bklmDigit->getSection());
+  BKLMElementNumbers::setSectorInModule(m_ModuleID, bklmDigit->getSector());
+  BKLMElementNumbers::setLayerInModule(m_ModuleID, bklmDigit->getLayer());
+  BKLMElementNumbers::setPlaneInModule(m_ModuleID, bklmDigit->getPlane());
+  BKLMElementNumbers::setStripInModule(m_ModuleID, bklmDigit->getStrip());
+  for (std::vector<const KLMDigit*>::const_iterator iDigit = digits.begin(); iDigit != digits.end(); ++iDigit) {
+    const KLMDigit* digit = *iDigit;
+    if (!(bklmDigit->getSection() == digit->getSection() &&
+          bklmDigit->getSector() == digit->getSector() &&
+          bklmDigit->getLayer() == digit->getLayer() &&
+          bklmDigit->getPlane() == digit->getPlane())) {
+      B2WARNING("Attempt to combine non-parallel or distinct-module KLMDigits");
       continue;
     }
     m_Time += digit->getTime();
-    m_EDep += digit->getEDep();
+    m_EnergyDeposit += digit->getEnergyDeposit();
     int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);
     stripMax = std::max(stripMax, strip);
@@ -72,7 +82,7 @@ BKLMHit1d::BKLMHit1d(const BKLMHit1d& h) :
   RelationsObject(h),
   m_ModuleID(h.m_ModuleID),
   m_Time(h.m_Time),
-  m_EDep(h.m_EDep)
+  m_EnergyDeposit(h.m_EnergyDeposit)
 {
 }
 
@@ -81,6 +91,6 @@ BKLMHit1d& BKLMHit1d::operator=(const BKLMHit1d& h)
 {
   m_ModuleID = h.m_ModuleID;
   m_Time = h.m_Time;
-  m_EDep = h.m_EDep;
+  m_EnergyDeposit = h.m_EnergyDeposit;
   return *this;
 }

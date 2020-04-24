@@ -33,9 +33,11 @@ namespace Belle2 {
     /* Destructor */
     virtual ~VXDDQMExpressRecoModule();
 
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
 
     /**

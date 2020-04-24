@@ -945,6 +945,7 @@ void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
 
 EKLMGeometry::EKLMGeometry()
 {
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_NSections = 0;
   m_NLayers = 0;
   m_NDetectorLayers = nullptr;
@@ -960,7 +961,7 @@ EKLMGeometry::EKLMGeometry()
 }
 
 EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
-  EKLMElementNumbers(geometry),
+  TObject(geometry),
   m_EndcapStructureGeometry(*geometry.getEndcapStructureGeometry()),
   m_SectionPosition(*geometry.getSectionPosition()),
   m_LayerPosition(*geometry.getLayerPosition()),
@@ -1073,7 +1074,7 @@ int EKLMGeometry::getNLayers() const
 
 int EKLMGeometry::getNDetectorLayers(int section) const
 {
-  checkSection(section);
+  m_ElementNumbers->checkSection(section);
   return m_NDetectorLayers[section - 1];
 }
 
@@ -1109,7 +1110,7 @@ void EKLMGeometry::checkDetectorLayerNumber(int section, int layer) const
   /* cppcheck-suppress variableScope */
   const char* sectionName[2] = {"backward", "forward"};
   if (layer < 0 || layer > m_NLayers ||
-      layer > m_MaximalDetectorLayerNumber[section - 1])
+      layer > m_ElementNumbers->getMaximalDetectorLayerNumber(section))
     B2FATAL("Number of detector layers in the " << sectionName[section - 1] <<
             " section must be from 0 to the number of layers ( " <<
             m_NLayers << ").");
@@ -1127,16 +1128,16 @@ void EKLMGeometry::checkDetectorLayer(int section, int layer) const
 
 void EKLMGeometry::checkSegmentSupport(int support) const
 {
-  if (support <= 0 || support > m_MaximalSegmentNumber + 1)
+  if (support <= 0 || support > m_ElementNumbers->getMaximalSegmentNumber() + 1)
     B2FATAL("Number of segment support element must be from 1 to " <<
-            m_MaximalSegmentNumber + 1 << ".");
+            m_ElementNumbers->getMaximalSegmentNumber() + 1 << ".");
 }
 
 void EKLMGeometry::checkStripSegment(int strip) const
 {
-  if (strip <= 0 || strip > m_NStripsSegment)
+  if (strip <= 0 || strip > m_ElementNumbers->getNStripsSegment())
     B2FATAL("Number of strip in a segment must be from 1 to " <<
-            m_NStripsSegment << ".");
+            m_ElementNumbers->getNStripsSegment() << ".");
 }
 
 /* Positions, coordinates, sizes. */
@@ -1204,7 +1205,7 @@ EKLMGeometry::getSegmentSupportGeometry() const
 const EKLMGeometry::SegmentSupportPosition*
 EKLMGeometry::getSegmentSupportPosition(int plane, int support) const
 {
-  checkPlane(plane);
+  m_ElementNumbers->checkPlane(plane);
   checkSegmentSupport(support);
   return &m_SegmentSupportPosition[(plane - 1) * (m_NSegments + 1) +
                                    support - 1];
@@ -1218,7 +1219,7 @@ const EKLMGeometry::StripGeometry* EKLMGeometry::getStripGeometry() const
 const EKLMGeometry::ElementPosition*
 EKLMGeometry::getStripPosition(int strip) const
 {
-  checkStrip(strip);
+  m_ElementNumbers->checkStrip(strip);
   return &m_StripPosition[strip - 1];
 }
 

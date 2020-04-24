@@ -1894,9 +1894,17 @@ void CDCTriggerNeuroDQMModule::event()
         m_RecoD0->Fill(d0Target);
         m_RecoInvPt->Fill(invptTarget);
         CDCTriggerTrack* neuroHWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_unpackedNeuroTracksName);
-        double neuroHWZ, neuroHWcosTh, neuroHWPhi0, neuroHWPt ;
-        double neuroSWZ, neuroSWcosTh, neuroSWPhi0, neuroSWPt ;
-
+        double neuroHWcosTh, neuroHWPhi0, neuroHWPt;
+        /* cppcheck-suppress variableScope */
+        double neuroHWZ;
+        /* cppcheck-suppress variableScope */
+        double neuroSWZ;
+        /* cppcheck-suppress variableScope */
+        double neuroSWcosTh;
+        /* cppcheck-suppress variableScope */
+        double neuroSWPhi0;
+        /* cppcheck-suppress variableScope */
+        double neuroSWPt;
         if (neuroHWTrack) {
           unsigned checkpattern = getPattern(neuroHWTrack, m_unpackedNeuroInputSegmentsName);
           if (!isValidPattern(checkpattern)) {

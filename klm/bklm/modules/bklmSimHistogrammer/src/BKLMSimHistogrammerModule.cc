@@ -13,7 +13,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/bklm/BKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 
 /* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
@@ -138,7 +138,7 @@ void BKLMSimHistogrammerModule::event()
   for (int i = 0; i < hits1D.getEntries(); i++) {
     cout << "looking at 1DHit " << i << endl;
     int scaledTag = -1;
-    RelationVector<BKLMDigit> bklmDigits = hits1D[i]->getRelationsTo<BKLMDigit>();
+    RelationVector<KLMDigit> bklmDigits = hits1D[i]->getRelationsTo<KLMDigit>();
     for (const auto& bklmDigit : bklmDigits) {
       RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
       for (const auto& simHit : relatedSimHits) {
@@ -238,7 +238,7 @@ void BKLMSimHistogrammerModule::event()
     TVector3 gHitPos = hits2D[i]->getGlobalPosition();
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
-      RelationVector<BKLMDigit> bklmDigits = hit1d.getRelationsTo<BKLMDigit>();
+      RelationVector<KLMDigit> bklmDigits = hit1d.getRelationsTo<KLMDigit>();
       for (const auto& bklmDigit : bklmDigits) {
         RelationVector<BKLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<BKLMSimHit>();
         for (const auto& simHit : relatedSimHits) {

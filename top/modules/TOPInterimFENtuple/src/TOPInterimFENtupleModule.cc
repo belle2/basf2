@@ -230,7 +230,7 @@ namespace Belle2 {
       short globalChannelId = m_pixelId[m_nHit] - 1 + (m_slotNum[m_nHit] - 1) * c_NPixelPerModule;
       if (nHitOfflineFEMap.count(globalChannelId) == 0) nHitOfflineFEMap[globalChannelId] = 0;
       else if (nHitOfflineFEMap[globalChannelId] > c_NMaxHitPerChannel) {
-        if (noisyChannelBlackListSet.count(globalChannelId) == 0) {
+        if (noisyChannelBlackListSet.count(globalChannelId) == 0) { // cppcheck-suppress stlFindInsert
           noisyChannelBlackListSet.insert(globalChannelId);
           B2WARNING("TOPInterimFENtuple : noisy channel with too many hits (slotNum="
                     << (globalChannelId / c_NPixelPerModule + 1) << ", pixelId = "

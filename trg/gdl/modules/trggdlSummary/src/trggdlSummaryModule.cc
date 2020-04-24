@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 #include <trg/gdl/modules/trggdlSummary/trggdlSummaryModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/DataStore.h>
 
@@ -98,11 +97,6 @@ void TRGGDLSummaryModule::event()
 {
 
   if (_debugLevel > 9) printf("TRGGDLSummaryModule::event() start\n");
-  StoreObjPtr<EventMetaData> bevt;
-  unsigned _exp = bevt->getExperiment();
-  unsigned _run = bevt->getRun();
-  unsigned _evt = bevt->getEvent();
-
 
   int n_leafs = 0;
   n_leafs  = m_unpacker->getnLeafs();

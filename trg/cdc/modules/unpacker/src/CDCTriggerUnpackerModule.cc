@@ -70,7 +70,7 @@ namespace Belle2 {
     /** number of merger units in the inner super layer than this one */
     unsigned nInnerMergers;
     /** reserve enough number of clocks (entries) in the Bitstream StoreArray */
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
     {
       if (subDetectorId != iNode) {
         return;
@@ -166,7 +166,7 @@ namespace Belle2 {
      *
      *  @param nWords          Number of words of each FINESSE in the COPPER
      */
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
     {
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
@@ -421,7 +421,7 @@ namespace Belle2 {
     /** Offset bit width */
     unsigned offsetBitWidth;
 
-    void reserve(int subDetectorId, std::array<int, nFinesse> nWords)
+    void reserve(int subDetectorId, std::array<int, nFinesse> nWords) override
     {
       size_t nClocks = (nWords[iFinesse] - headerSize) / eventWidth;
       size_t entries = inputArrayPtr->getEntries();
@@ -445,7 +445,7 @@ namespace Belle2 {
 
     void unpack(int subDetectorId,
                 std::array<int*, nFinesse> data32tab,
-                std::array<int, nFinesse> nWords)
+                std::array<int, nFinesse> nWords) override
     {
       if (subDetectorId != iNode) {
         return;

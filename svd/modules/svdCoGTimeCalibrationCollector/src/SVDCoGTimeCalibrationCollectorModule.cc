@@ -115,7 +115,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
   float eventT0Sync = 0;
   if (m_eventT0->hasEventT0()) {
     eventT0 = m_eventT0->getEventT0();
-    eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+    eventT0Sync = eventT0 - 4000. / 509. * (3 - TB);
     getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
     getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
   }
@@ -133,7 +133,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
     if (m_eventT0->hasEventT0()) {
       // float eventT0 = m_eventT0->getEventT0();
       // float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
-      // float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+      // float eventT0Sync = eventT0 - 4000./509. * (3 - TB);
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);

@@ -71,7 +71,8 @@ CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
   }
   m_stateCache.isHitState = true;
   m_stateCache.sensorID = hit->getVxdID();
-  m_stateCache.geoLayer = m_stateCache.sensorID.getLayerNumber();
+  m_stateCache.geoLayer = this->getGeometricalLayer();
+  m_stateCache.ladder = m_stateCache.sensorID.getLadderNumber();
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensorInfo = geoCache.getSensorInfo(hit->getVxdID());
   m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();

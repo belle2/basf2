@@ -30,8 +30,10 @@ namespace Belle2 {
       bool isHitState = false;
       /// VxdID of this state, only set if based on SpacePoint
       VxdID sensorID = VxdID(0);
-      /// Geometrical Layer this state is based on
+      /// Geometrical Layer this state is based on. Will be set to the SVD layer number if it's a state based on a SpacePoint, to an artificial layer else by using getGeometricalLayer()
       unsigned short geoLayer = std::numeric_limits<unsigned short>::quiet_NaN();
+      /// Ladder this state is based on (only use for SpacePoint based states)
+      unsigned short ladder = std::numeric_limits<unsigned short>::quiet_NaN();
       /// Phi of the sensor this state is based on, only set if based on SpacePoint
       double sensorCenterPhi = std::numeric_limits<double>::quiet_NaN();
       /// Phi if this state (from SpacePoint or RecoTrack)

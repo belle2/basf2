@@ -144,10 +144,10 @@ void MuidBuilder::spline(int n, double dx, double Y[], double B[], double C[], d
 
 double MuidBuilder::getPDF(const KLMMuidLikelihood* muid) const
 {
-  return getPDFLayer(muid) * getPDFRchisq(muid);
+  return getLongitudinalPDF(muid) * getTransversePDF(muid);
 }
 
-double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
+double MuidBuilder::getLongitudinalPDF(const KLMMuidLikelihood* muid) const
 {
   /* Setup the main ingredients for the calculation. */
   unsigned int outcome = muid->getOutcome();
@@ -199,7 +199,7 @@ double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
   return pdf;
 }
 
-double MuidBuilder::getPDFRchisq(const KLMMuidLikelihood* muid) const
+double MuidBuilder::getTransversePDF(const KLMMuidLikelihood* muid) const
 {
   /* Evaluate the transverse-coordinate PDF for this particleID hypothesis. */
   int ndof = muid->getDegreesOfFreedom();

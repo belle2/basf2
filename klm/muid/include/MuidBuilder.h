@@ -83,13 +83,13 @@ namespace Belle2 {
      * Calculate the longitudinal PDF for a given hypothesis.
      * @param[in] muid KLMMuidLikelihood dataobject.
      */
-    double getPDFLayer(const KLMMuidLikelihood* muid) const;
+    double getLongitudinalPDF(const KLMMuidLikelihood* muid) const;
 
     /**
      * Calculate the transverse PDF for a given hypothesis.
      * @param[in] muid KLMMuidLikelihood dataobject.
      */
-    double getPDFRchisq(const KLMMuidLikelihood* muid) const;
+    double getTransversePDF(const KLMMuidLikelihood* muid) const;
 
     /**
      * Longitudinal PDF.
@@ -142,7 +142,7 @@ namespace Belle2 {
     double m_ReducedChiSquaredDx;
 
     /**
-     * Muid parameters.
+     * Likelihood parameters.
      */
     DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 

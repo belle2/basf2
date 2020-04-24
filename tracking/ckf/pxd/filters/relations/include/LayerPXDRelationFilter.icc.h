@@ -18,19 +18,20 @@
 
 namespace Belle2 {
 
-  template <class AFilter>
-  LayerPXDRelationFilter<AFilter>::LayerPXDRelationFilter() : Super()
+  template <class AFilter, class APrefilter>
+  LayerPXDRelationFilter<AFilter, APrefilter>::LayerPXDRelationFilter() : Super()
   {
     Super::addProcessingSignalListener(&m_filter);
+    Super::addProcessingSignalListener(&m_prefilter);
   }
 
-  template <class AFilter>
-  LayerPXDRelationFilter<AFilter>::~LayerPXDRelationFilter() = default;
+  template <class AFilter, class APrefilter>
+  LayerPXDRelationFilter<AFilter, APrefilter>::~LayerPXDRelationFilter() = default;
 
-  template <class AFilter>
+  template <class AFilter, class APrefilter>
   std::vector<CKFToPXDState*>
-  LayerPXDRelationFilter<AFilter>::getPossibleTos(CKFToPXDState* currentState,
-                                                  const std::vector<CKFToPXDState*>& states) const
+  LayerPXDRelationFilter<AFilter, APrefilter>::getPossibleTos(CKFToPXDState* currentState,
+                                                              const std::vector<CKFToPXDState*>& states) const
   {
     std::vector<CKFToPXDState*> possibleNextStates;
 
@@ -84,23 +85,30 @@ namespace Belle2 {
         }
       }
 
+      // Some loose prefiltering of possible states
+      TrackFindingCDC::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
+      if (std::isnan(weight)) {
+        continue;
+      }
+
       possibleNextStates.push_back(nextState);
     }
 
     return possibleNextStates;
   }
 
-  template <class AFilter>
-  void LayerPXDRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  template <class AFilter, class APrefilter>
+  void LayerPXDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
                                   "Make it possible to jump over N layers.", m_param_hitJumping);
 
     m_filter.exposeParameters(moduleParamList, prefix);
+    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
   }
 
-  template <class AFilter>
-  TrackFindingCDC::Weight LayerPXDRelationFilter<AFilter>::operator()(const CKFToPXDState& from, const CKFToPXDState& to)
+  template <class AFilter, class APrefilter>
+  TrackFindingCDC::Weight LayerPXDRelationFilter<AFilter, APrefilter>::operator()(const CKFToPXDState& from, const CKFToPXDState& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

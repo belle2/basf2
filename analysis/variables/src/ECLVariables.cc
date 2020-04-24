@@ -565,7 +565,7 @@ namespace Belle2 {
 
       auto weightedECLTimeAverage = [&numer, &denom, &numberOfClusterDaughters](const Particle * p) {
         const ECLCluster* cluster = p->getECLCluster();
-        if (cluster) {
+        if (cluster and not cluster->hasFailedFitTime()) {
           numberOfClusterDaughters ++;
 
           double time = cluster->getTime();

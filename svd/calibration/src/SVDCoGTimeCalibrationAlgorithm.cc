@@ -40,9 +40,9 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  TF1* pol1 = new TF1("pol1", "[0] + [1]*x", -50, 80);
+  TF1* pol1 = new TF1("pol1", "[0] + [1]*x", -10, 80);
   pol1->SetParameters(-40, 0.9);
-  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -50, 80);
+  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10, 80);
   pol3->SetParLimits(0, -200, 0);
   pol3->SetParLimits(1, 0, 10);
   pol3->SetParLimits(2, -1, 0);

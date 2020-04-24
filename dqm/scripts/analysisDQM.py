@@ -21,3 +21,13 @@ def add_analysis_dqm(path):
         dqm.param('PI0PListName', 'pi0:physDQM')
         dqm.param('KS0PListName', 'K_S0:physDQM')
         path.add_module(dqm)
+
+
+def add_mirabelle_dqm(path):
+    module_names = [m.name() for m in path.modules()]
+    print(module_names)
+    if ('SoftwareTrigger' in module_names):
+        fillParticleList('mu+:physMiraBelle', '', path=path)
+        mirabelle = register_module('PhysicsObjectsMiraBelle')
+        mirabelle.param('MuPListName', 'mu+:physMiraBelle')
+        path.add_module(mirabelle)

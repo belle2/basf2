@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -101,7 +100,7 @@ b_vars = vc.deltae_mbc + \
                                    decay_string='B+ -> anti-D0 ^pi+',
                                    prefix='pi') + \
     vu.create_aliases(list_of_variables=['decayModeID'],
-                      wrapper='daughter(0,extraInfo(variable))',
+                      wrapper='daughter(0,extraInfo({variable}))',
                       prefix="")
 
 # Saving variables to ntuple

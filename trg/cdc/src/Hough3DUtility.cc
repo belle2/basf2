@@ -711,6 +711,7 @@ void Hough3DFinder::runFinderVersion3(vector<double>& trackVariables, vector<vec
   double phiMin = -m_Trg_PI;
   int phiBitSize = 13;
   // pt = 0.3*1.5*rho*0.01;
+  /* cppcheck-suppress variableScope */
   double rhoMin = 20;
   double rhoMax = 2500;
   int rhoBitSize = 11;

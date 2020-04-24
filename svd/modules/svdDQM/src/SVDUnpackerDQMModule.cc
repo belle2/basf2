@@ -17,7 +17,6 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
@@ -119,8 +118,7 @@ void SVDUnpackerDQMModule::defineHisto()
 void SVDUnpackerDQMModule::initialize()
 {
   m_eventMetaData.isRequired();
-  m_svdShapers.isRequired(m_ShaperDigitName);
-  m_svdDAQDiagnostics.isRequired(m_SVDDAQDiagnosticsName);
+  m_svdDAQDiagnostics.isOptional(m_SVDDAQDiagnosticsName);
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -145,7 +143,6 @@ void SVDUnpackerDQMModule::beginRun()
   if (DQMEventFractionHisto != NULL) {
     DQMEventFractionHisto->Reset();
   }
-
 
   shutUpNoData = false;
 
@@ -173,10 +170,11 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (!shutUpNoData) {
-      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
-      shutUpNoData = true;
-    }
+  if (!m_svdDAQDiagnostics.isValid() && (!shutUpNoData)) {
+    B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
+    shutUpNoData = true;
+    return;
+  }
 
   badEvent = 0;
   nEvents++;

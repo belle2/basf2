@@ -145,6 +145,8 @@ namespace Belle2 {
 
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
+    bool m_convertRecTrg; /* Flag to switch on conversion of rectrg_summary3 */
+
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral
@@ -158,6 +160,11 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
+
+    /**
+     * Reads and converts m_final from rectrg_summary3
+     **/
+    void convertRecTrgTable();
 
     /**
      * Reads and converts all entries of evtcls Panther table
@@ -385,8 +392,8 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** Event classification flags */
-    StoreObjPtr<EventExtraInfo> m_evtCls;
+    /** Event Extra Info*/
+    StoreObjPtr<EventExtraInfo> m_evtInfo;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;

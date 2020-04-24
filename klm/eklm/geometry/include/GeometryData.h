@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMGeometry.h>
+#include <klm/dbobjects/eklm/EKLMGeometry.h>
 
 /* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>

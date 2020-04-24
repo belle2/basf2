@@ -19,13 +19,12 @@
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/eklm/geometry/GeometryData.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -938,7 +937,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_EKLM:
       detID = Const::EDetector::EKLM;
-      copyID = EKLM::GeometryData::Instance().stripNumber(
+      copyID = EKLMElementNumbers::Instance().stripNumber(
                  touch->GetVolume(7)->GetCopyNo(),
                  touch->GetVolume(6)->GetCopyNo(),
                  touch->GetVolume(5)->GetCopyNo(),
@@ -1806,7 +1805,7 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
       mapPdgPDF.insert(std::pair<int, double>(std::abs(pdg), pdf));
     }
     if (denom < 1.0E-20)
-      klmMuidLikelihood->setJunkPDFValue(1.0); /* Anomaly: should be very rare. */
+      klmMuidLikelihood->setJunkPDFValue(true); /* Anomaly: should be very rare. */
     else {
       for (auto const& [pdg, pdf] : mapPdgPDF) {
         klmMuidLikelihood->setPDFValue(pdf, std::abs(pdg));

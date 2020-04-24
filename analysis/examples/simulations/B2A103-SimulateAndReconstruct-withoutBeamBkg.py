@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ######################################################
 #
@@ -23,9 +22,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import simulation as si
 import reconstruction as re
-import glob
 import os.path
-import sys
 
 
 # check if the required input file exists (from B2A101 example)

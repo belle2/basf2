@@ -52,6 +52,12 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
+     * Set certain bits in a variable to zero
+     */
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns 1 if the same mdst source object was used to create a particle in
      * the list (0 if not and -1 for non-mdst source based particles
      */
@@ -218,7 +224,14 @@ namespace Belle2 {
      * which is the sum of the first two daughter momenta.
      * The arguments in the argument vector must be generalized daughter indices.
      */
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the granddaughter particle's
+     * and the reverted particle's momentum vector in the daughter particle's rest frame.
+     * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
+     */
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.

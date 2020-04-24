@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMChannels.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>

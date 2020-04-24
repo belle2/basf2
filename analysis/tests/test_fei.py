@@ -379,19 +379,19 @@ class TestPreReconstruction(unittest.TestCase):
         path.add_module('BestCandidateSelection', particleList='K+:generic_0', variable='Kid', selectLowest=False,
                         numBest=20, outputVariable='preCut_rank')
 
-        path.add_module('ParticleCombiner', decayString='D0:generic_0 ==> K-:generic pi+:generic', writeOut=True,
+        path.add_module('ParticleCombiner', decayString='D0:generic_0 -> K-:generic pi+:generic', writeOut=True,
                         decayMode=0, cut='1.7 < M < 1.95')
         path.add_module('BestCandidateSelection', particleList='D0:generic_0',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
 
-        path.add_module('ParticleCombiner', decayString='D0:generic_1 ==> pi-:generic pi+:generic', writeOut=True,
+        path.add_module('ParticleCombiner', decayString='D0:generic_1 -> pi-:generic pi+:generic', writeOut=True,
                         decayMode=1, cut='1.7 < M < 1.95')
         path.add_module('BestCandidateSelection', particleList='D0:generic_1',
                         variable='abs(dM)', selectLowest=True, numBest=20, outputVariable='preCut_rank')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
 
         print_path(path, x.reconstruct())
         self.assertEqual(x.reconstruct(), path)
@@ -463,7 +463,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('chiProb', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterVertex_K+:generic ==> K+:FSP.root')
 
-        path.add_module('ParticleCombiner', decayString='D0:generic_0 ==> K-:generic pi+:generic', writeOut=True,
+        path.add_module('ParticleCombiner', decayString='D0:generic_0 -> K-:generic pi+:generic', writeOut=True,
                         decayMode=0, cut='1.7 < M < 1.95')
         path.add_module('MCMatcherParticles', listName='D0:generic_0')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
@@ -485,7 +485,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> K-:generic pi+:generic.root')
         path.add_module('ParticleVertexFitter', listName='D0:generic_0', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_0',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isSignal']),
@@ -494,7 +494,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('chiProb', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterVertex_D0:generic ==> K-:generic pi+:generic.root')
 
-        path.add_module('ParticleCombiner', decayString='D0:generic_1 ==> pi-:generic pi+:generic', writeOut=True,
+        path.add_module('ParticleCombiner', decayString='D0:generic_1 -> pi-:generic pi+:generic', writeOut=True,
                         decayMode=1, cut='1.7 < M < 1.95')
         path.add_module('MCMatcherParticles', listName='D0:generic_1')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
@@ -516,7 +516,7 @@ class TestPreReconstruction(unittest.TestCase):
                                                                        ('extraInfo(preCut_rank)', 'mcParticleStatus')]),
                         fileName='Monitor_PreReconstruction_AfterRanking_D0:generic ==> pi-:generic pi+:generic.root')
         path.add_module('ParticleVertexFitter', listName='D0:generic_1', confidenceLevel=-2.0,
-                        vertexFitter='kfitter', fitType='vertex')
+                        vertexFitter='KFit', fitType='vertex')
         path.add_module('VariablesToHistogram', particleList='D0:generic_1',
                         variables=fei.config.variables2binnings(['chiProb', 'mcErrors', 'mcParticleStatus',
                                                                  'isSignal']),

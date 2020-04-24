@@ -32,7 +32,7 @@ unpacked_dataobjects = [
     DataStorePrinter("TOPDigit", ["getModuleID", "getPixelID", "getPixelRow", "getPixelCol", "getRawTime",
                                   "getPulseHeight", "getPulseWidth"]),
     DataStorePrinter("ARICHDigit", ["getModuleID", "getChannelID", "getBitmap"]),
-    DataStorePrinter("BKLMDigit", ["getUniqueChannelID", "getTime", "getEDep", "getCharge", "getTime"]),
+    DataStorePrinter("BKLMDigit", ["getUniqueChannelID", "getTime", "getEnergyDeposit", "getCharge", "getTime"]),
     DataStorePrinter("EKLMDigit", ["getUniqueChannelID", "getCTime", "getCharge", "getPlane", "getStrip"]),
     DataStorePrinter("CDCTriggerSegmentHit", ["getID"]),
     DataStorePrinter("CDCTrigger2DFinderTrack", ["getTime", "getPt"]),

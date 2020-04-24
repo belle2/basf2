@@ -530,52 +530,52 @@ class Systematics(BaseSkim):
 
     def JpsimumuTagProbe(self, path):
         """Build JpsimumuTagProbe lists for systematics skims."""
-        #   Cuts = '2.8 < M < 3.4'
-        Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
-        Channel = 'mu+:all mu-:loose'
+        #   Cuts = "2.8 < M < 3.4"
+        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
+        Channel = "mu+:all mu-:loose"
         jpsiList = []
         chID = 0
-        ma.reconstructDecay('J/psi:mumutagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID, path=path)
-        jpsiList.append('J/psi:mumutagprobe' + str(chID))
-        ma.matchMCTruth('J/psi:mumutagprobe0', path=path)
+        ma.reconstructDecay("J/psi:mumutagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
+        jpsiList.append("J/psi:mumutagprobe" + str(chID))
+        ma.matchMCTruth("J/psi:mumutagprobe0", path=path)
         return jpsiList
 
     def JpsieeTagProbe(self, path):
         """Build JpsieeTagProbe lists for systematics skims."""
-        #   Cuts = '2.7 < M < 3.4'
-        Cuts = '2.7 < M < 3.4 and useCMSFrame(p) < 2.0'
-        Channel = 'e+:all e-:loose'
+        #   Cuts = "2.7 < M < 3.4"
+        Cuts = "2.7 < M < 3.4 and useCMSFrame(p) < 2.0"
+        Channel = "e+:all e-:loose"
         jpsiList = []
         chID = 0
-        ma.reconstructDecay('J/psi:eetagprobe' + str(chID) + ' -> ' + Channel, Cuts, chID, path=path)
-        jpsiList.append('J/psi:eetagprobe' + str(chID))
-        ma.matchMCTruth('J/psi:eetagprobe0', path=path)
+        ma.reconstructDecay("J/psi:eetagprobe" + str(chID) + " -> " + Channel, Cuts, chID, path=path)
+        jpsiList.append("J/psi:eetagprobe" + str(chID))
+        ma.matchMCTruth("J/psi:eetagprobe0", path=path)
         return jpsiList
 
     def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
-        D0Cuts = '1.81 < M < 1.91'
-        # DstarCuts = 'massDifference(0)<0.16'
-        DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
+        D0Cuts = "1.81 < M < 1.91"
+        # DstarCuts = "massDifference(0)<0.16"
+        DstarCuts = "massDifference(0)<0.16 and useCMSFrame(p) > 1.5"
 
-        D0Channel = ['K-:all pi+:all'
+        D0Channel = ["K-:all pi+:all"
                      ]
 
         D0List = []
         for chID, channel in enumerate(D0Channel):
-            ma.reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
-            vertex.raveFit('D0:syst' + str(chID), 0.0, path=path)
-            D0List.append('D0:syst' + str(chID))
+            ma.reconstructDecay("D0:syst" + str(chID) + " -> " + channel, D0Cuts, chID, path=path)
+            vertex.raveFit("D0:syst" + str(chID), 0.0, path=path)
+            D0List.append("D0:syst" + str(chID))
 
         DstarChannel = []
         for channel in D0List:
-            DstarChannel.append(channel + ' pi+:all')
+            DstarChannel.append(channel + " pi+:all")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
-            ma.reconstructDecay('D*-:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path, allowChargeViolation=True)
-            DstarList.append('D*-:syst' + str(chID))
-            ma.matchMCTruth('D*+:syst0', path=path)
+            ma.reconstructDecay("D*-:syst" + str(chID) + " -> " + channel, DstarCuts, chID, path=path, allowChargeViolation=True)
+            DstarList.append("D*-:syst" + str(chID))
+            ma.matchMCTruth("D*+:syst0", path=path)
 
         return DstarList
 
@@ -611,31 +611,31 @@ class SystematicsTracking(BaseSkim):
 
     def BtoDStarPiList(self, path):
         """Build BtoDStarPiList lists for systematics skims."""
-        D0Cuts = '1.835 < M < 1.895'
-        DstarCuts = 'massDifference(0)<0.16'
-        B0Cuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+        D0Cuts = "1.835 < M < 1.895"
+        DstarCuts = "massDifference(0)<0.16"
+        B0Cuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         # D0
-        D0Channel = ['K+:loose pi-:loose', 'K+:loose pi-:loose pi-:loose pi+:loose', 'K+:loose pi-:loose pi0:loose']
+        D0Channel = ["K+:loose pi-:loose", "K+:loose pi-:loose pi-:loose pi+:loose", "K+:loose pi-:loose pi0:loose"]
 
         D0List = []
         for chID, channel in enumerate(D0Channel):
-            resonanceName = 'anti-D0:loose' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, D0Cuts, chID, path=path)
+            resonanceName = "anti-D0:loose" + str(chID)
+            ma.reconstructDecay(resonanceName + " -> " + channel, D0Cuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0, path=path)
             ma.matchMCTruth(resonanceName, path=path)
-        ma.copyLists('anti-D0:loose', ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
-        D0List.append('anti-D0:loose')
+        ma.copyLists("anti-D0:loose", ["anti-D0:loose0", "anti-D0:loose1", "anti-D0:loose2"], path=path)
+        D0List.append("anti-D0:loose")
 
         # Dstar
         DstarChannel = []
         for channel in D0List:
-            DstarChannel.append(channel + ' pi-:loose')
+            DstarChannel.append(channel + " pi-:loose")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
-            resonanceName = 'D*-:loose' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
+            resonanceName = "D*-:loose" + str(chID)
+            ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             # vertex.raveFit(resonanceName, 0.0)
             DstarList.append(resonanceName)
             ma.matchMCTruth(resonanceName, path=path)
@@ -643,12 +643,12 @@ class SystematicsTracking(BaseSkim):
         # B0
         B0Channel = []
         for channel in DstarList:
-            B0Channel.append(channel + ' pi+:loose')
+            B0Channel.append(channel + " pi+:loose")
 
         B0List = []
         for chID, channel in enumerate(B0Channel):
-            resonanceName = 'B0:sys' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, B0Cuts, chID, path=path)
+            resonanceName = "B0:sys" + str(chID)
+            ma.reconstructDecay(resonanceName + " -> " + channel, B0Cuts, chID, path=path)
             B0List.append(resonanceName)
             # vertex.raveFit(resonanceName, 0.0)
             ma.matchMCTruth(resonanceName, path=path)
@@ -660,22 +660,22 @@ class SystematicsTracking(BaseSkim):
         ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
 
         # D-
-        DminusCuts = '1.0 < M < 1.75'
-        DminusChannel = ['pi+:fromks pi+:loose pi-:loose']
+        DminusCuts = "1.0 < M < 1.75"
+        DminusChannel = ["pi+:fromks pi+:loose pi-:loose"]
 
         for chID, channel in enumerate(DminusChannel):
-            resonanceName = 'D-:loose' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, DminusCuts, chID, path=path, allowChargeViolation=True)
+            resonanceName = "D-:loose" + str(chID)
+            ma.reconstructDecay(resonanceName + " -> " + channel, DminusCuts, chID, path=path, allowChargeViolation=True)
 
         # Dstar
-        DstarCuts = 'massDifference(0)<0.2 and useCMSFrame(p) > 2.0'
+        DstarCuts = "massDifference(0)<0.2 and useCMSFrame(p) > 2.0"
         DstarChannel = []
-        DstarChannel.append('D-:loose0' + ' pi+:loose')
+        DstarChannel.append("D-:loose0" + " pi+:loose")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
-            resonanceName = 'D*0:loose' + str(chID)
-            ma.reconstructDecay(resonanceName + ' -> ' + channel, DstarCuts, chID, path=path)
+            resonanceName = "D*0:loose" + str(chID)
+            ma.reconstructDecay(resonanceName + " -> " + channel, DstarCuts, chID, path=path)
             DstarList.append(resonanceName)
             ma.matchMCTruth(resonanceName, path=path)
 
@@ -929,7 +929,7 @@ class SystematicsEELL(BaseSkim):
         eelllist = []
 
         # Lepton pair has low invariant mass and tracks are back-to-back-like
-        EELLSelection = "M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75"
+        EELLSelection = "M < 4 and cos(useCMSFrame(daughterAngle(0,1))) < 0.75"
         eventCuts = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2"
         ma.reconstructDecay("gamma:eell -> e+:skimloose e-:skimloose",
                             EELLSelection + " and " + eventCuts, path=path)

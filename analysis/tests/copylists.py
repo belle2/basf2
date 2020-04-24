@@ -33,15 +33,15 @@ def run_copylists():
 
     # first test: check that merging two lists with
     # identical daughters removes duplicates
-    ma.reconstructDecay("vpho:a -> K+", "", path=pa)
-    ma.reconstructDecay("vpho:b -> K+", "", path=pa)
+    ma.reconstructDecay("vpho:a -> K+", "", path=pa, allowChargeViolation=True)
+    ma.reconstructDecay("vpho:b -> K+", "", path=pa, allowChargeViolation=True)
     ma.copyLists("vpho:ab", ["vpho:a", "vpho:b"], path=pa)
     dump_3_v2nts(["a", "b", "ab"], path=pa)
 
     # second test: check that two lists with different daughters (but from the
     # same underlying mdst object) are included twice (as expected)
-    ma.reconstructDecay("vpho:c -> K+", "", path=pa)
-    ma.reconstructDecay("vpho:d -> pi-", "", path=pa)
+    ma.reconstructDecay("vpho:c -> K+", "", path=pa, allowChargeViolation=True)
+    ma.reconstructDecay("vpho:d -> pi-", "", path=pa, allowChargeViolation=True)
     ma.copyLists("vpho:cd", ["vpho:c", "vpho:d"], path=pa)
     dump_3_v2nts(["c", "d", "cd"], path=pa)
 
@@ -77,8 +77,7 @@ class TestCopyLists(unittest.TestCase):
         self.assertEqual(self._count("c") + self._count("d"), self._count("cd"))
 
     def test_different_daughter_order(self):
-        """Merging two lists with daughters in a different order should not
-        double count."""
+        """Merging two lists with daughters in a different order should not double count."""
         self.assertEqual(self._count("e"), self._count("e"))
         self.assertEqual(self._count("e"), self._count("ef"))
 

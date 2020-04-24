@@ -145,6 +145,7 @@ namespace Belle2 {
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(particle, idSeq);
+        sort(idSeq.begin(), idSeq.end());
         m_particlesInTheList.push_back(idSeq);
       }
     }
@@ -187,6 +188,7 @@ namespace Belle2 {
 
       std::vector<int> idSeq;
       fillUniqueIdentifier(part, idSeq);
+      sort(idSeq.begin(), idSeq.end());
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {

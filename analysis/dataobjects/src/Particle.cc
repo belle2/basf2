@@ -695,6 +695,9 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
       oParticle->getDaughter(i)->fillDecayChain(othrDecayChain);
     }
 
+    sort(thisDecayChain.begin(), thisDecayChain.end());
+    sort(othrDecayChain.begin(), othrDecayChain.end());
+
     for (unsigned i = 0; i < thisDecayChain.size(); i++)
       if (thisDecayChain[i] != othrDecayChain[i])
         return false;

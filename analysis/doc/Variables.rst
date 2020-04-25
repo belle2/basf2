@@ -349,8 +349,9 @@ For a detailed description of the event shape variables,  see `EventShape`
 Event Kinematics
 ~~~~~~~~~~~~~~~~
 
-These variables are available after adding the event kinematics modules.
+These variables are available after adding the event kinematics module.
 This can be done with the function `modularAnalysis.buildEventKinematics`.
+The variable collection ``event_kinematics`` allows to add all of them comfortably to your ntuple.
 
 .. b2-variables::
     :group: EventKinematics
@@ -491,6 +492,7 @@ to help to easily create aliases.
 .. autofunction:: variables.utils.create_aliases_for_selected
 .. autofunction:: variables.utils.create_daughter_aliases
 .. autofunction:: variables.utils.create_mctruth_aliases
+.. autofunction:: variables.utils.create_isSignal_alias
 
 Miscellaneous helpers for using variables
 =========================================

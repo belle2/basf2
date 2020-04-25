@@ -12,11 +12,14 @@
 """
 <header>
   <input>EvtGenSimRec.root</input>
-  <output>SVDValidationOutput.root</output>
   <output>SVDValidationTTree.root</output>
   <output>SVDValidationTTreeStrip.root</output>
   <output>SVDValidationTTreeSpacePoint.root</output>
   <output>SVDValidationTTreeSimhit.root</output>
+  <output>SVDValidationTTreeRecoTrack.root</output>
+  <output>SVDValidationTTreeRecoDigit.root</output>
+  <output>SVDValidationTTreeTrueHit.root</output>
+  <output>SVDValidationTTreeCluster.root</output>
   <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>This is the SVD validation steering file.</description>
 </header>
@@ -28,6 +31,10 @@ from SVDValidationTTree import *
 from SVDValidationTTreeStrip import *
 from SVDValidationTTreeSimhit import *
 from SVDValidationTTreeSpacePoint import *
+from SVDValidationTTreeRecoTrack import *
+from SVDValidationTTreeRecoDigit import *
+from SVDValidationTTreeTrueHit import *
+from SVDValidationTTreeCluster import *
 
 set_random_seed(12345)
 
@@ -64,6 +71,15 @@ svdvalidationspacepoint = SVDValidationTTreeSpacePoint()
 main.add_module(svdvalidationspacepoint)
 svdvalidationsimhit = SVDValidationTTreeSimhit()
 main.add_module(svdvalidationsimhit)
+svdvalidationtrack = SVDValidationTTreeRecoTrack()
+main.add_module(svdvalidationtrack)
+svdvalidationdigit = SVDValidationTTreeRecoDigit()
+main.add_module(svdvalidationdigit)
+svdvalidationtruehit = SVDValidationTTreeTrueHit()
+main.add_module(svdvalidationtruehit)
+svdvalidationcluster = SVDValidationTTreeCluster()
+main.add_module(svdvalidationcluster)
+
 
 process(main)
 

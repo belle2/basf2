@@ -296,11 +296,11 @@ def BsigToD0hToKpiList(path):
     return Lists
 
 
-def BsigToD0hToKpipipiList(path):
+def BtoD0h_Kpipipi_Kpipi0List(path):
     """
-    **Skim Author**: N. Rout
+    **Skim Author**: C. La Licata
 
-    **Skim Name**: BtoD0h_Kpipipi
+    **Skim Name**: BtoD0h_Kpipipi_Kpipi0
 
     **Skim Category**: physics, hadronic B to charm
 
@@ -311,9 +311,15 @@ def BsigToD0hToKpipipiList(path):
     **Decay Modes**:
 
 
-    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) \\pi^+`,
+    1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+) K^+`,
+    2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
+
+    3.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\pi^+`
+
+    4.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+                         \\pi^0) \\K^+`
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -324,27 +330,39 @@ def BsigToD0hToKpipipiList(path):
 
     2. ``Mbc > 5.2``
 
-    3. ``abs(deltaE) < 0.5``
+    3. ``abs(deltaE) < 0.3``
 
 
     Note:
-      This skim uses ``loadStdD0_Kpipipi()`` from the ``charm.py`` script where :math:`D^0` channels are defined.
+      This skim uses ``loadStdD0_Kpipipi()`` and ``loadStdD0_Kpipi0()``
+      from the ``charm.py`` script where :math:`D^0` channels are defined.
 
     """
-    __author__ = "Niharika Rout"
+    __author__ = "C. La Licata"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.5'
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
 
     BsigChannels = ['anti-D0:Kpipipi pi+:all',
-                    'anti-D0:Kpipipi K+:all'
+                    'anti-D0:Kpipipi K+:all',
+                    'anti-D0:Kpipi0 pi+:all',
+                    'anti-D0:Kpipi0 K+:all',
+                    'anti-D*0:D0_Kpipipi pi+:all',
+                    'anti-D*0:D0_Kpipipi K+:all',
+                    'anti-D*0:D0_Kpipi0 pi+:all',
+                    'anti-D*0:D0_Kpipi0 K+:all'
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0h_Kpipipi' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0h_Kpipipi' + str(chID))
+        ma.reconstructDecay('B+:BtoD0h_Khh_Khpi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0h_Khh_Khpi0' + str(chID))
 
-    Lists = BsigList
-    return Lists
+    ma.copyLists(outputListName='B+:BtoD0h_merged', inputListNames=BsigList, path=path)
+
+    # Select only three random candidates
+    ma.rankByHighest(particleList='B+:BtoD0h_merged', variable='cos(mdstIndex)', numBest=3,
+                     outputVariable='cosMdstIndex_rank', path=path)
+
+    return ['B+:BtoD0h_merged']
 
 
 def loadB0toDpi_Kpipi(path):
@@ -421,22 +439,22 @@ def loadB0toDstarPi_Kpi(path):
     return ['B0:Dstarpi_Kpi']
 
 
-def loadB0toDstarPi_Kpipipi(path):
+def loadB0toDstarPi_Kpipipi_Kpipi0List(path):
     """
     **Skim Author**: C. La Licata
 
-    **Skim Name**: B0toDstarPi_D0pi_Kpipipi
+    **Skim Name**: B0toDstarPi_D0pi_Kpipipi_Kpipi0
 
     **Skim Category**: physics, hadronic neutral B to charm
 
-    **Skim Code**: 14120700
+    **Skim Code**: 14120800
 
     **Working Group**: BtoCharm (WG4)
 
     **Decay Mode**:
 
 
-    1.  :math:`B^{0}\\to (D^{*-} \\to K^+ \\pi^- \\pi^- \\pi^+) \\pi^+`
+    1.  :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -450,9 +468,18 @@ def loadB0toDstarPi_Kpipipi(path):
 
     Bcuts = '5.2 < Mbc and abs(deltaE) < 0.3'
 
-    ma.reconstructDecay('B0:Dstarpi_Kpipipi -> D*-:D0_Kpipipi pi+:all', Bcuts, 0, path=path)
+    BsigChannels = [
+                    'D*-:D0_Kpipipi pi+:all',
+                    'D*-:D0_Kpipi0 pi+:all'
+                    ]
 
-    return ['B0:Dstarpi_Kpipipi']
+    BsigList = []
+    for chID, channel in enumerate(BsigChannels):
+        ma.reconstructDecay('B0:Dstarpi_Kpipipi_Kpipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B0:Dstarpi_Kpipipi_Kpipi0' + str(chID))
+
+    Lists = BsigList
+    return Lists
 
 
 def BtoD0rho_KpiList(path):
@@ -569,8 +596,8 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
+        ma.reconstructDecay('B+:BtoD0rho_merged' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B+:BtoD0rho_merged' + str(chID))
 
     ma.copyLists(outputListName='B+:BtoD0rho_merged', inputListNames=BsigList, path=path)
 
@@ -764,11 +791,53 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
                     ]
     BsigList = []
     for chID, channel in enumerate(BsigChannels):
-        ma.reconstructDecay('B+:BtoD0rho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoD0rho' + str(chID))
+        ma.reconstructDecay('B0:B0toDstarRho' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
+        BsigList.append('B0:B0toDstarRho' + str(chID))
 
     Lists = BsigList
     return Lists
+
+
+def B0toDpi_KspiList(path):
+    """
+
+    **Skim Author**: Chiara La Licata
+
+    **Skim Name**: B0toDpi_Kspi
+
+    **Skim Category**: physics, hadronic B to charm
+
+    **Skim Code**: 14120601
+
+    **Working Group**: BtoCharm (WG4)
+
+    **Decay Modes**:
+
+    1.  :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\pi^+`,
+
+    **Particle Lists**: Standard lists for all particles.
+
+    **Additional Cuts**:
+
+    1. ``1.8 < M_D < 1.9``
+
+    2. ``Mbc > 5.2``
+
+    3. ``abs(deltaE) < 0.3``
+
+    Note:
+    This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
+    where D0 channels are defined.
+
+    """
+
+    __author__ = "Fernando Abudinen"
+
+    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+
+    ma.reconstructDecay('B0:B0toDpi_Kspi -> D-:Kspi pi+:all', Bcuts, 1, path=path)
+
+    return ['B0:B0toDpi_Kspi']
 
 
 def DoubleCharmList(path):

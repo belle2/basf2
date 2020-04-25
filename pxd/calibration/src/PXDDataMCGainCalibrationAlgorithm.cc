@@ -326,7 +326,7 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
     for (int i = 0; i < nEntries; i += incr) {
       tree->GetEntry(i);
       double noise = gRandom->Gaus(0.0, noiseSigma);
-      signals.push_back(m_signal + noise); //qyliu: why add noise herer?
+      signals.push_back(m_signal + noise); //qyliu: why we introduce noise simulation here?
     }
 
 

@@ -26,17 +26,17 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   protected:
     //! TSF hit distribution as a function of tsfid

@@ -7,7 +7,7 @@ import os
 import re
 import sys
 import queue
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union, Optional
 import collections
 
 # Load ROOT
@@ -51,7 +51,7 @@ PackageSeperatorToken = "__:__"
 ##############################################################################
 
 
-def date_from_revision(revision, work_folder):
+def date_from_revision(revision: str, work_folder: str) -> Optional[Union[int, float]]:
     """
     Takes the name of a revision and returns the 'last modified'-timestamp of
     the corresponding directory, which holds the revision.
@@ -102,7 +102,10 @@ def merge_nested_list_dicts(a, b):
     return _merge_nested_list_dicts(a.copy(), b.copy())
 
 
-def get_plot_files(revisions, work_folder):
+def get_plot_files(
+        revisions: List[str],
+        work_folder: str
+) -> Dict[str, Dict[str, List[str]]]:
     """
     Returns a list of all plot files as absolute paths. For this purpose,
     it loops over all revisions in 'revisions', finds the
@@ -146,7 +149,7 @@ def get_plot_files(revisions, work_folder):
     return results
 
 
-def get_tracked_reference_files():
+def get_tracked_reference_files() -> Dict[str, List[str]]:
     """
     This function loops over the local and central release dir and collects
     the .root-files from the validation-subfolders of the packages. These are
@@ -242,8 +245,12 @@ def get_tracked_reference_files():
     return ret
 
 
-def generate_new_plots(revisions, work_folder, process_queue=None,
-                       root_error_ignore_level=ROOT.kWarning):
+def generate_new_plots(
+        revisions: List[str],
+        work_folder: str,
+        process_queue=None,
+        root_error_ignore_level=ROOT.kWarning
+) -> None:
     """
     Creates the plots that contain the requested revisions. Each plot (or
     n-tuple, for that matter) is stored in an object of class Plot.
@@ -284,8 +291,9 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     plot_files = get_plot_files(revisions[1:], work_folder)
     reference_files = get_plot_files(revisions[:1], work_folder)
 
-    # We don't want to plot tracked references only, so we have to collect all
-    # packages that have at least one plot of a new revision in them.
+    # We don't want to have plots that only show the tracked references.
+    # Instead we collect all packages that have at least one plot of a new
+    # revision in them.
     # Only exception: If 'reference' is the only revision we have, we show it
     # because this is clearly what the user wants
     plot_packages = set()
@@ -300,8 +308,16 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                     plot_packages.add(package)
 
     # The dictionaries {package: {file: {key: [list of root objects]}}}
-    plot_p2f2k2o = rootobjects_from_files(plot_files, False, work_folder)
-    reference_p2f2k2o = rootobjects_from_files(reference_files, True, work_folder)
+    plot_p2f2k2o = rootobjects_from_files(
+        plot_files,
+        is_reference=False,
+        work_folder=work_folder
+    )
+    reference_p2f2k2o = rootobjects_from_files(
+        reference_files,
+        is_reference=True,
+        work_folder=work_folder
+    )
 
     # Delete all that doesn't belong to a package that we want to plot:
     for package in set(plot_p2f2k2o.keys()) - plot_packages:
@@ -461,7 +477,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
 
 def print_plotting_summary(plotuples, warning_verbosity=1,
-                           chi2_verbosity=1):
+                           chi2_verbosity=1) -> None:
     """
     Print summary of all plotuples plotted, especially printing information
     about failed comparisons.
@@ -543,15 +559,21 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
 
-def rootobjects_from_files(root_files_dict, is_reference, work_folder):
+def rootobjects_from_files(
+        root_files_dict: Dict[str, Dict[str, List[str]]],
+        is_reference: bool,
+        work_folder: str
+) -> Dict[str, Dict[str, Dict[str, List[RootObject]]]]:
     """
-    Takes a list of root files, loops over them and creates the RootObjects
-    for it. It then returns the list of RootObjects, a list of all keys,
-    and a list of all packages for those objects.
+    Takes a nested dictionary of root file paths for different revisions
+    and returns a (differently!) nested dictionary of root file objects.
+
     :param root_files_dict: The dict of all *.root files which shall be
-        read in and for which the corresponding RootObjects shall be created
+        read in and for which the corresponding RootObjects shall be created:
+        {revision: {package: [root file]}}
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
+    :param work_folder:
     :return: {package: {file: {key: [list of root objects]}}}
     """
 
@@ -664,17 +686,22 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
     return metadata
 
 
-def rootobjects_from_file(root_file: str,
-                          package: str,
-                          revision: str,
-                          is_reference: bool,
-                          work_folder
-                          ) -> Dict[str, List[RootObject]]:
+def rootobjects_from_file(
+        root_file: str,
+        package: str,
+        revision: str,
+        is_reference: bool,
+        work_folder
+) -> Dict[str, List[RootObject]]:
     """
     Takes a root file, loops over its contents and creates the RootObjects
     for it.
+
     :param root_file: The *.root file which shall be read in and for which the
         corresponding RootObjects shall be created
+    :param package:
+    :param revision:
+    :param work_folder:
     :param is_reference: Boolean value indicating if the object is a
         reference object or not.
     :return: package, {key: [list of root objects]}. Note: The list will

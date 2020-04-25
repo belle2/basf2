@@ -493,7 +493,7 @@ namespace Belle2 {
 
         return sum.M();
       } else {
-        return part->getMass();
+        return part->getMass(); // !
       }
     }
 
@@ -554,7 +554,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Theta();
+      return b2blab.Theta();
     }
 
     double b2bPhi(const Particle* part)
@@ -563,7 +563,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * part->get4Vector();
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Phi();
+      return b2blab.Phi();
     }
 
     double b2bClusterTheta(const Particle* part)
@@ -582,7 +582,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Theta();
+      return b2blab.Theta();
     }
 
     double b2bClusterPhi(const Particle* part)
@@ -601,7 +601,7 @@ namespace Belle2 {
       TLorentzVector pcms = T.rotateLabToCms() * p4Cluster;
       TLorentzVector b2bcms(-pcms.Px(), -pcms.Py(), -pcms.Pz(), pcms.E());
       TLorentzVector b2blab = T.rotateCmsToLab() * b2bcms;
-      return b2blab.Vect().Phi();
+      return b2blab.Phi();
     }
 
 
@@ -720,7 +720,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Px();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Px();
     }
 
     double recoilPy(const Particle* particle)
@@ -730,7 +732,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Py();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Py();
     }
 
     double recoilPz(const Particle* particle)
@@ -740,7 +744,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Pz();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Pz();
     }
 
 
@@ -751,7 +757,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).P();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).P();
     }
 
     double recoilMomentumTheta(const Particle* particle)
@@ -761,7 +769,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Vect().Theta();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Theta();
     }
 
     double recoilMomentumPhi(const Particle* particle)
@@ -771,7 +781,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).Vect().Phi();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).Phi();
     }
 
     double recoilEnergy(const Particle* particle)
@@ -781,7 +793,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).E();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).E();
     }
 
     double recoilMass(const Particle* particle)
@@ -791,7 +805,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).M();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).M();
     }
 
     double recoilMassSquared(const Particle* particle)
@@ -801,7 +817,9 @@ namespace Belle2 {
       // Initial state (e+e- momentum in LAB)
       TLorentzVector pIN = T.getBeamFourMomentum();
 
-      return (pIN - particle->get4Vector()).M2();
+      // Use requested frame for final calculation
+      const auto& frame = ReferenceFrame::GetCurrent();
+      return frame.getMomentum(pIN - particle->get4Vector()).M2();
     }
 
     double m2RecoilSignalSide(const Particle* part)
@@ -1010,8 +1028,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
-    REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass (determined from particle's 4-momentum vector)");
+    REGISTER_VARIABLE("M", particleMass, R"DOC(
+The particle's mass.
+
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+
+- If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
+- If this particle is an MC particle then this is the mass of that particle.
+- If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
+- If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
+
+  * You will see a difference between this mass and the :b2:var:`InvM`.
+  )DOC");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
@@ -1019,12 +1047,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
     REGISTER_VARIABLE("M2", particleMassSquared,
-                      "invariant mass squared (determined from particle's 4-momentum vector)");
+                      "The particle's mass squared.");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
+                      "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,
@@ -1042,9 +1070,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("pRecoil", recoilMomentum,
                       "magnitude of 3 - momentum recoiling against given Particle");
     REGISTER_VARIABLE("pRecoilTheta", recoilMomentumTheta,
-                      "Polar angle of a particle's missing momentum in the lab system");
+                      "Polar angle of a particle's missing momentum");
     REGISTER_VARIABLE("pRecoilPhi", recoilMomentumPhi,
-                      "Azimutal angle of a particle's missing momentum in the lab system");
+                      "Azimutal angle of a particle's missing momentum");
     REGISTER_VARIABLE("eRecoil", recoilEnergy,
                       "energy recoiling against given Particle");
     REGISTER_VARIABLE("mRecoil", recoilMass,

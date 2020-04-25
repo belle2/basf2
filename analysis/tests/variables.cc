@@ -25,6 +25,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
@@ -34,6 +35,7 @@
 #include <TRandom3.h>
 #include <TLorentzVector.h>
 #include <TMath.h>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -313,9 +315,11 @@ namespace {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<TrackFitResult> myResults;
     StoreArray<Track> myTracks;
+    StoreArray<V0> myV0s;
     StoreArray<Particle> myParticles;
     myResults.registerInDataStore();
     myTracks.registerInDataStore();
+    myV0s.registerInDataStore();
     myParticles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
@@ -347,10 +351,12 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     EXPECT_TRUE(vIsFromTrack->function(part));
     EXPECT_FALSE(vIsFromECL->function(part));
     EXPECT_FALSE(vIsFromKLM->function(part));
+    EXPECT_FALSE(vIsFromV0->function(part));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
@@ -358,6 +364,29 @@ namespace {
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
 
+    //-----------------------------------------------------------------------
+    // now add another track and mock up a V0 and a V0-based particle
+    myResults.appendNew(position, momentum, cov6, charge * -1,
+                        Const::electron, pValue, bField, CDCValue, 16777215);
+    Track secondTrack;
+    secondTrack.setTrackFitResultIndex(Const::electron, 1);
+    Track* savedTrack2 = myTracks.appendNew(secondTrack);
+    myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
+    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
+    const TLorentzVector v0Momentum(momentum * 2, (momentum * 2).Mag());
+    auto v0particle = myParticles.appendNew(v0Momentum, 22,
+                                            Particle::c_Unflavored, Particle::c_V0, 0);
+    v0particle->appendDaughter(0, false);
+    v0particle->appendDaughter(1, false);
+    //-----------------------------------------------------------------------
+
+    EXPECT_FALSE(vIsFromTrack->function(v0particle));
+    EXPECT_FALSE(vIsFromECL->function(v0particle));
+    EXPECT_FALSE(vIsFromKLM->function(v0particle));
+    EXPECT_TRUE(vIsFromV0->function(v0particle));
+
+    const Manager::Var* vNDaughters = Manager::Instance().getVariable("nDaughters");
+    EXPECT_FLOAT_EQ(vNDaughters->function(v0particle), 2);
   }
 
   class MCTruthVariablesTest : public ::testing::Test {
@@ -1348,6 +1377,91 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, unmask)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for B -> (muon -> electron + muon_neutrino) + anti_muon_neutrino
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleGrandMother = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleAunt = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleGrandMother.setPDG(-521);
+    graphParticleMother.setPDG(13);
+    graphParticleAunt.setPDG(-14);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(14);
+
+    graphParticleMother.comesFrom(graphParticleGrandMother);
+    graphParticleAunt.comesFrom(graphParticleGrandMother);
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+    mcGraph.generateList();
+
+
+    // Get MC Particles from StoreArray
+    auto* mcGrandMother = mcParticles[0];
+    mcGrandMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcMother = mcParticles[1];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcAunt = mcParticles[2];
+    mcAunt->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[3];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[4];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* pGrandMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    pGrandMother->addRelationTo(mcGrandMother);
+
+    auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    pMother->addRelationTo(mcMother);
+
+
+    pMother->writeExtraInfo("mcErrors", 8);
+    pGrandMother->writeExtraInfo("mcErrors", 8 | 16);
+    const Manager::Var* var1 = Manager::Instance().getVariable("unmask(mcErrors, 8)");
+    const Manager::Var* var2 = Manager::Instance().getVariable("unmask(mcErrors, 8, 16, 32, 64)");
+    ASSERT_NE(var1, nullptr);
+    EXPECT_FLOAT_EQ(var1->function(pMother), 0);
+    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16);
+    ASSERT_NE(var2, nullptr);
+    EXPECT_FLOAT_EQ(var2->function(pMother), 0);
+    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 0);
+
+
+    pMother->writeExtraInfo("mcErrors", 8 | 128);
+    pGrandMother->writeExtraInfo("mcErrors", 8 | 16 | 512);
+    ASSERT_NE(var1, nullptr);
+    EXPECT_FLOAT_EQ(var1->function(pMother), 128);
+    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16 | 512);
+    ASSERT_NE(var2, nullptr);
+    EXPECT_FLOAT_EQ(var2->function(pMother), 128);
+    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 512);
+
+    // unmask variable needs at least two arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors)"));
+
+    // all but the first argument have to be integers
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors, NOTINT)"));
+  }
+
   TEST_F(MetaVariableTest, conditionalVariableSelector)
   {
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
@@ -1968,6 +2082,7 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(p), 0);
 
+    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
 
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
@@ -1993,7 +2108,7 @@ namespace {
     TLorentzVector dau0_4vec_CM(px_CM, py_CM, pz_CM, E_CM), dau1_4vec_CM(-px_CM, -py_CM, -pz_CM, E_CM);
     TLorentzVector dau0_4vec_Lab, dau1_4vec_Lab;
     dau0_4vec_Lab = PCmsLabTransform::cmsToLab(
-                      dau0_4vec_CM); //why is eveybody using the extendend method when there are the functions that do all the steps for us?
+                      dau0_4vec_CM); //why is everybody using the extended method when there are the functions that do all the steps for us?
     dau1_4vec_Lab = PCmsLabTransform::cmsToLab(dau1_4vec_CM);
 
     // add the two photons (now in the Lab frame) as the two daughters of some particle and create the latter
@@ -3367,7 +3482,7 @@ namespace {
 
 
 
-  TEST_F(MetaVariableTest, daughterAngleInBetween)
+  TEST_F(MetaVariableTest, daughterAngle)
   {
     StoreArray<Particle> particles;
 
@@ -3413,20 +3528,20 @@ namespace {
 
 
     // Test the invariant mass of several combinations
-    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleInBetween(0, 1)");
+    const Manager::Var* var = Manager::Instance().getVariable("daughterAngle(0, 1)");
     double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     // this should be a generic combinations
-    var = Manager::Instance().getVariable("daughterAngleInBetween(0:0, 1:0)");
+    var = Manager::Instance().getVariable("daughterAngle(0:0, 1:0)");
     v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween( 1, -1)");
+    var = Manager::Instance().getVariable("daughterAngle( 1, -1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween(1, 0:1:0:0:1)");
+    var = Manager::Instance().getVariable("daughterAngle(1, 0:1:0:0:1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
@@ -3566,7 +3681,7 @@ namespace {
     EXPECT_TRUE(std::isnan(var_d->function(not_child_2)));
 
 
-    // // All but they have differnt K0s mothers
+    // // All but they have different K0s mothers
     const Manager::Var* var_310 = Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, mdstIndex)");
     ASSERT_NE(var_310, nullptr);
     EXPECT_FLOAT_EQ(var_310->function(D_gd_0_0), var_310->function(D_gd_0_1));
@@ -4128,7 +4243,7 @@ namespace {
     Track* dEdxTrack = tracks.appendNew(mytrack);
 
     // Fill by hand likelihood values for all the detectors and hypothesis
-    // This is clearly not a phyisical case, since a particle cannot leave good
+    // This is clearly not a physical case, since a particle cannot leave good
     // signals in both TOP and ARICH
     auto* lAll = likelihood.appendNew();
     lAll->setLogLikelihood(Const::TOP, Const::electron, 0.18);
@@ -4228,7 +4343,7 @@ namespace {
     EXPECT_FLOAT_EQ(particleID(particleProtonAll),   std::exp(2.2) / numsumexp);
     EXPECT_FLOAT_EQ(particleID(particleDeuteronAll), std::exp(3.2) / numsumexp);
 
-    // Check what hapens if no Likelihood is available
+    // Check what happens if no Likelihood is available
     EXPECT_TRUE(std::isnan(electronID(particleNoID)));
     EXPECT_TRUE(std::isnan(muonID(particleNoID)));
     EXPECT_TRUE(std::isnan(pionID(particleNoID)));
@@ -4730,83 +4845,83 @@ namespace {
   };
 
   // MC vertex tests
-  TEST_F(VertexVariablesTest, mcX)
+  TEST_F(VertexVariablesTest, mcDecayVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay x is 4.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 4.0);
   }
 
-  TEST_F(VertexVariablesTest, mcY)
+  TEST_F(VertexVariablesTest, mcDecayVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay y is 5.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 5.0);
   }
 
-  TEST_F(VertexVariablesTest, mcZ)
+  TEST_F(VertexVariablesTest, mcDecayVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth decay z is 0.0
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 0.0);
   }
 
 
-  TEST_F(VertexVariablesTest, mcDistance)
+  TEST_F(VertexVariablesTest, mcDecayVertexFromIPDistance)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth distance of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcDistance");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexFromIPDistance");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcRho)
+  TEST_F(VertexVariablesTest, mcDecayVertexRho)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had truth rho of sqrt(41)
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcRho");
+    const Manager::Var* var = Manager::Instance().getVariable("mcDecayVertexRho");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(4.0 * 4.0 + 5.0 * 5.0));
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexX)
+  TEST_F(VertexVariablesTest, mcProductionVertexX)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex x of 1.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexX");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexX");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 1.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexY)
+  TEST_F(VertexVariablesTest, mcProductionVertexY)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex y of 2.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexY");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexY");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 2.0);
   }
 
-  TEST_F(VertexVariablesTest, mcProdVertexZ)
+  TEST_F(VertexVariablesTest, mcProductionVertexZ)
   {
     StoreArray<Particle> particles;
     const Particle* newKs = particles[0]; //  Ks had production vertex z of 3.0 cm
 
-    const Manager::Var* var = Manager::Instance().getVariable("mcProdVertexZ");
+    const Manager::Var* var = Manager::Instance().getVariable("mcProductionVertexZ");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), 3.0);
   }
@@ -4878,6 +4993,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(newKs), sqrt(0.9));
   }
+
+  // Tests of ContinuumSuppressionVariables
+
   TEST_F(MetaVariableTest, KSFWVariables)
   {
     // simple tests that do not require the ROE builder nor the CS builder
@@ -4890,6 +5008,43 @@ namespace {
     const Particle* particle_with_no_cs = myParticles.appendNew();
     const Manager::Var* var = Manager::Instance().getVariable("KSFWVariables(mm2)");
     EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+  }
 
+  TEST_F(MetaVariableTest, CleoConeCS)
+  {
+    // simple tests that do not require the ROE builder nor the CS builder
+
+    // check that garbage input throws helpful B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(NONSENSE)"));
+
+    // check that string other than ROE for second argument throws B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("CleoConeCS(0, NOTROE)"));
+
+    // check for NaN if we don't have a CS object for this particle
+    StoreArray<Particle> myParticles;
+    const Particle* particle_with_no_cs = myParticles.appendNew();
+    const Manager::Var* var = Manager::Instance().getVariable("CleoConeCS(0)");
+    EXPECT_TRUE(std::isnan(var->function(particle_with_no_cs)));
+  }
+
+  TEST_F(MetaVariableTest, TransformedNetworkOutput)
+  {
+    // check that garbage input throws helpful B2FATAL
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONSENSE)"));
+
+    // check that helpful B2FATAL is thrown if second or third argument is not a double
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, NOTDOUBLE)"));
+    EXPECT_B2FATAL(Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, NOTDOUBLE, 1)"));
+
+    // check for NaN if network output variable does not exist (no matter whether particle is provided or not)
+    StoreArray<Particle> myParticles;
+    const Particle* particle = myParticles.appendNew();
+    const Manager::Var* var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    EXPECT_TRUE(std::isnan(var->function(particle)));
+    StoreObjPtr<EventExtraInfo> eventExtraInfo;
+    if (not eventExtraInfo.isValid())
+      eventExtraInfo.create();
+    var = Manager::Instance().getVariable("transformedNetworkOutput(NONEXISTANT, 0, 1)");
+    EXPECT_TRUE(std::isnan(var->function(nullptr)));
   }
 }

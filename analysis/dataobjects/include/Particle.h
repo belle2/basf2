@@ -31,6 +31,7 @@ namespace Belle2 {
   class TrackFitResult;
   class MCParticle;
   class PIDLikelihood;
+  class V0;
 
   /**
    * Class to store reconstructed particles.
@@ -76,7 +77,7 @@ namespace Belle2 {
     /**
      * particle type enumerators (to be completed when all Mdst dataobjects are defined)
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_MCParticle, c_Composite};
+    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
@@ -212,10 +213,22 @@ namespace Belle2 {
      *        This can be different as chargedStable as we don't fit all tracks with
      *        all hypothesis.
      */
+    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable,
              const Const::ChargedStable& chargedStableUsedForFit);
+
+    /**
+     * Constructor from a reconstructed Track given as TrackFitResult.
+     * To be used to create Particle objects from tracks with full control over
+     * the hypothesis (e.g. V0 daugthers).
+     * @param trackArrayIndex track StoreArray index
+     * @param trackFit pointer to TrackFitResult object
+     * @param chargedStable Type of charged particle
+     */
+    Particle(int trackArrayIndex, const TrackFitResult* trackFit,
+             const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -681,9 +694,12 @@ namespace Belle2 {
      * M1 and M4 are copies since both conditions are fulfilled.
      *
      * @param oParticle pointer to other particle
+     * @param doDetailedComparison if true, this means that particles of different PDG codes,
+     *        but created from the same track or cluster will be indicated as copies.
+     *        Returns B2FATAL in case of comparison of c_MCParticle type to a non c_MCParticle.
      * @return true if particles are copies of each-other, otherwise false
      */
-    bool isCopyOf(const Particle* oParticle) const;
+    bool isCopyOf(const Particle* oParticle, bool doDetailedComparison = false) const;
 
     /**
      * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).
@@ -691,6 +707,21 @@ namespace Belle2 {
      * @return const pointer to the Track
      */
     const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the TrackFitResult that was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track.
+     * @return const pointer to the TrackFitResult
+     */
+    const TrackFitResult* getTrackFitResult() const;
+
+    /**
+     * Returns the pointer to the V0 object that was used to create this
+     * Particle (if ParticleType == c_V0). NULL pointer is returned if the
+     * Particle was not made from a V0.
+     * @return const pointer to the V0
+     */
+    const V0* getV0() const;
 
     /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which

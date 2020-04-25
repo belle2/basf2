@@ -12,9 +12,9 @@
 #include <klm/bklm/geometry/GeometryPar.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/GearDir.h>
@@ -28,13 +28,13 @@ namespace Belle2 {
 
   namespace bklm {
 
-    GeometryPar* GeometryPar::m_Instance = NULL;
+    GeometryPar* GeometryPar::m_Instance = nullptr;
 
     GeometryPar* GeometryPar::instance(void)
     {
       if (m_Instance) return m_Instance;
       B2FATAL("instance() called without initialization");
-      return NULL;  // never reached
+      return nullptr;  // never reached
     }
 
     GeometryPar* GeometryPar::instance(const GearDir& content)
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     GeometryPar::GeometryPar(const GearDir& content) :
       m_DoBeamBackgroundStudy(false),
-      m_BkgSensitiveDetector(NULL),
+      m_BkgSensitiveDetector(nullptr),
       m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
       m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
     {
@@ -62,7 +62,7 @@ namespace Belle2 {
 
     GeometryPar::GeometryPar(const BKLMGeometryPar& element) :
       m_DoBeamBackgroundStudy(false),
-      m_BkgSensitiveDetector(NULL),
+      m_BkgSensitiveDetector(nullptr),
       m_NSector(BKLMElementNumbers::getMaximalSectorNumber()),
       m_NLayer(BKLMElementNumbers::getMaximalLayerNumber())
     {
@@ -720,7 +720,7 @@ namespace Belle2 {
     {
       int moduleID = BKLMElementNumbers::moduleNumber(section, sector, layer);
       map<int, Module*>::const_iterator iM = m_Modules.find(moduleID);
-      return (iM == m_Modules.end() ? NULL : iM->second);
+      return (iM == m_Modules.end() ? nullptr : iM->second);
     }
 
     const HepGeom::Transform3D GeometryPar::getModuleAlignment(int section, int sector, int layer) const

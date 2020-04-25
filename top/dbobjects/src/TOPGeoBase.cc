@@ -11,6 +11,8 @@
 
 #include <top/dbobjects/TOPGeoBase.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <TSpline.h>
 #include <iostream>
 
 using namespace std;
@@ -64,5 +66,28 @@ namespace Belle2 {
     }
 
   }
+
+  double TOPGeoBase::getReflectivity(const GeoOpticalSurface& surface, double energy) const
+  {
+    energy *= Unit::eV;
+    if (surface.hasProperties()) {
+      for (const auto& property : surface.getProperties()) {
+        if (property.getName() == "REFLECTIVITY") {
+          auto energies = property.getEnergies();
+          auto values = property.getValues();
+          if (energies.size() < 2) return 0;
+          if (energy < energies[0] or energy > energies.back()) {
+            B2WARNING("TOPGeoBase::getReflectivity: photon energy out of range - return value not reliable");
+          }
+          auto spline = TSpline3("tmp", energies.data(), values.data(), energies.size());
+          return spline.Eval(energy);
+        }
+      }
+    }
+
+    B2ERROR("Optical surface " << surface.getName() << " has no property REFLECTIVITY");
+    return 0;
+  }
+
 
 } // end Belle2 namespace

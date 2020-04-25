@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
@@ -34,7 +33,7 @@ namespace Belle2 {
   namespace Variable {
 
     // Generated vertex information
-    double particleMCX(const Particle* part)
+    double mcDecayVertexX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -43,7 +42,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCY(const Particle* part)
+    double mcDecayVertexY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -52,7 +51,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCZ(const Particle* part)
+    double mcDecayVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -61,7 +60,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCRho(const Particle* part)
+    double mcDecayVertexRho(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -70,7 +69,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCDX(const Particle* part)
+    double mcDecayVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -81,7 +80,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCDY(const Particle* part)
+    double mcDecayVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -92,7 +91,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCDZ(const Particle* part)
+    double mcDecayVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -103,7 +102,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCDRho(const Particle* part)
+    double mcDecayVertexFromIPRho(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -114,7 +113,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCDistance(const Particle* part)
+    double mcDecayVertexFromIPDistance(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -125,7 +124,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionX(const Particle* part)
+    double mcProductionVertexX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -134,7 +133,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionY(const Particle* part)
+    double mcProductionVertexY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -143,7 +142,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionZ(const Particle* part)
+    double mcProductionVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -152,7 +151,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionDX(const Particle* part)
+    double mcProductionVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -163,7 +162,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionDY(const Particle* part)
+    double mcProductionVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -174,7 +173,7 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    double particleMCProductionDZ(const Particle* part)
+    double mcProductionVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle) {
@@ -387,8 +386,8 @@ namespace Belle2 {
         try {
           ielement = Belle2::convertString<int>(arguments[0]);
           jelement = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Arguments of prodVertexCov function must be integer!");
+        } catch (std::invalid_argument&) {
+          B2ERROR("Arguments of prodVertexCov function must be integer!");
           return nullptr;
         }
       }
@@ -434,35 +433,35 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Vertex Information");
     // Generated vertex information
-    REGISTER_VARIABLE("mcX", particleMCX,
+    REGISTER_VARIABLE("mcDecayVertexX", mcDecayVertexX,
                       "Returns the x position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcY", particleMCY,
+    REGISTER_VARIABLE("mcDecayVertexY", mcDecayVertexY,
                       "Returns the y position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcZ", particleMCZ,
+    REGISTER_VARIABLE("mcDecayVertexZ", mcDecayVertexZ,
                       "Returns the z position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcRho", particleMCRho,
+    REGISTER_VARIABLE("mcDecayVertexRho", mcDecayVertexRho,
                       "Returns the transverse position of the decay vertex of the matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDX", particleMCDX,
+    REGISTER_VARIABLE("mcDecayVertexFromIPX", mcDecayVertexFromIPX,
                       "Returns the x position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDY", particleMCDY,
+    REGISTER_VARIABLE("mcDecayVertexFromIPY", mcDecayVertexFromIPY,
                       "Returns the y position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDZ", particleMCDZ,
+    REGISTER_VARIABLE("mcDecayVertexFromIPZ", mcDecayVertexFromIPZ,
                       "Returns the z position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDRho", particleMCDRho,
+    REGISTER_VARIABLE("mcDecayVertexFromIPRho", mcDecayVertexFromIPRho,
                       "Returns the transverse position of the decay vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcDistance", particleMCDistance,
+    REGISTER_VARIABLE("mcDecayVertexFromIPDistance", mcDecayVertexFromIPDistance,
                       "Returns the distance of the decay vertex of the matched generated particle from the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexX", particleMCProductionX,
+    REGISTER_VARIABLE("mcProductionVertexX", mcProductionVertexX,
                       "Returns the x position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexY", particleMCProductionY,
+    REGISTER_VARIABLE("mcProductionVertexY", mcProductionVertexY,
                       "Returns the y position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexZ", particleMCProductionZ,
+    REGISTER_VARIABLE("mcProductionVertexZ", mcProductionVertexZ,
                       "Returns the z position of production vertex of matched generated particle. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexDX", particleMCProductionDX,
+    REGISTER_VARIABLE("mcProductionVertexFromIPX", mcProductionVertexFromIPX,
                       "Returns the x position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexDY", particleMCProductionDY,
+    REGISTER_VARIABLE("mcProductionVertexFromIPY", mcProductionVertexFromIPY,
                       "Returns the y position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
-    REGISTER_VARIABLE("mcProdVertexDZ", particleMCProductionDZ,
+    REGISTER_VARIABLE("mcProductionVertexFromIPZ", mcProductionVertexFromIPZ,
                       "Returns the z position of the production vertex of the matched generated particle wrt the IP. Returns nan if the particle has no matched generated particle.");
 
     // Decay vertex position

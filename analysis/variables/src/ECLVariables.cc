@@ -130,7 +130,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        TLorentzVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -374,24 +374,6 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         return cluster->getClusterId();
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
-    double eclClusterHypothesisId(const Particle* particle)
-    {
-      // Hypothesis ID is deprecated, this function should be removed in release-05.
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-            and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-          return 56.0;
-        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-          return 5.0;
-        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-          return 6.0;
-        else
-          return -1.0;
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -1504,16 +1486,6 @@ Computed only using cluster digits with energy :math:`> 50\,` MeV and good offli
 )DOC");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId, R"DOC(
 Returns ECL cluster ID of this ECL cluster within the connected region (CR) to which it belongs to.
-)DOC");
-    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId, R"DOC(
-Emulates the deprecated hypothesis ID of this ECL cluster in as-backward-compatible way as possible.
-
-Returns 5 for the nPhotons hypothesis, 6 for the neutralHadron hypothesis.
-Since release-04-00-00, it will be possible for a cluster to have both hypotheses so if both are set it will return 56.
-
-.. warning::
-   This variable is a legacy variable and will be removed in release-05-00-00. 
-   You probably want to use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron` instead of this variable.
 )DOC");
     REGISTER_VARIABLE("clusterHasNPhotons", eclClusterHasNPhotonsHypothesis, R"DOC(
 Returns 1.0 if cluster has the 'N photons' hypothesis (historically called 'N1'),

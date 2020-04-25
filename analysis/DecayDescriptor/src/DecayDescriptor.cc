@@ -25,7 +25,6 @@
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <set>
 #include <utility>
@@ -79,12 +78,9 @@ bool DecayDescriptor::init(const DecayString& s)
     }
 
     // Identify arrow type
-    if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
+    if (d->m_strArrow == "->") {
       m_properties |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons ;
       m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
-      if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-        B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
-      }
     } else if (d->m_strArrow == "=norad=>") {
       m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
     } else if (d->m_strArrow == "=direct=>") {
@@ -379,7 +375,7 @@ vector<string> DecayDescriptor::getSelectionNames()
       // stop, if nothing found
       if (itOccurrence == strNames.end()) break;
       // create new particle name by attaching a number
-      string strNameNew = strNameOld + boost::lexical_cast<string>(iOccurrence);
+      string strNameNew = strNameOld + std::to_string(iOccurrence);
       // ceck if the new particle name exists already, if not, then it is OK to use it
       if (count(strNames.begin(), strNames.end(), strNameNew) == 0) {
         *itOccurrence = strNameNew;

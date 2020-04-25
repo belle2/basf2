@@ -12,6 +12,7 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi
 import skimExpertFunctions as expert
+import stdV0s
 
 gb2_setuprel = 'release-04-01-00'
 b2.set_log_level(b2.LogLevel.INFO)
@@ -25,6 +26,7 @@ ma.inputMdstList('default', fileList, path=c3bh2path)
 
 stdPi('all', path=c3bh2path)
 stdK('all', path=c3bh2path)
+stdV0s.stdKshorts(path=c3bh2path)
 
 from skim.charm import DstToD0PiD0ToHpHmKs
 DstToD0PiD0ToHpHmKsList = DstToD0PiD0ToHpHmKs(c3bh2path)

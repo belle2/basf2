@@ -1,8 +1,7 @@
 #include "daq/storage/BinData.h"
 
-#include "daq/slc/base/StringUtil.h"
+#include "daq/slc/base/IOException.h"
 
-#include <cstring>
 #include <cstdio>
 
 using namespace Belle2;

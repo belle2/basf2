@@ -115,6 +115,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     """
     # ECL cluster and track particle lists
     modularAnalysis.fillParticleList("pi+:skim", 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
@@ -134,8 +136,15 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
     check_components(components)
 
     if run_type == constants.RunTypes.beam:
-        reconstruction.add_reconstruction(path, skipGeometryAdding=True, pruneTracks=False,
-                                          add_trigger_calculation=False, components=components, **kwargs)
+        reconstruction.add_reconstruction(
+            path,
+            skipGeometryAdding=True,
+            pruneTracks=False,
+            add_trigger_calculation=False,
+            components=components,
+            nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
+            nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX,
+            **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)
     elif run_type == constants.RunTypes.cosmic:

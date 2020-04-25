@@ -437,7 +437,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
       B2DEBUG(100, "CDCGeometryPar: Read badwire from DB");
       setBadWire();  //Set bad-wire (from DB)
     } else {
-      readBadWire(gbxParams);  //Read bad-wire (from file)
+      //      readBadWire(gbxParams);  //Read bad-wire (from file)
+      B2FATAL("Text file input mode for bdwires is disabled now!");
     }
 
     if (gcp.getChMapInputType()) {
@@ -1112,6 +1113,7 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
 }
 
 
+/*
 // Read bad-wires.
 void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 {
@@ -1146,6 +1148,7 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 
   ifs.close();
 }
+*/
 
 
 // Read time-walk parameters
@@ -1318,19 +1321,26 @@ void CDCGeometryPar::setT0()
 void CDCGeometryPar::calcMeanT0()
 {
   B2DEBUG(29, "calcMeanT0 start");
-  unsigned short nw = 0;
+  double effiSum = 0.;
   m_meanT0 = 0.;
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
       if (m_t0[iCL][iW] == 0.) continue;
       const WireID wid = WireID(iCL, iW);
+      if (isHotWire(wid)) continue;
       if (isBadWire(wid)) continue;
       //TODO try to reject strage t0s more
-      ++nw;
-      m_meanT0 += m_t0[iCL][iW];
+      double effi = 1.;
+      isDeadWire(wid, effi);
+      effiSum += effi;
+      m_meanT0 += effi * m_t0[iCL][iW];
     }
   }
-  if (nw > 0) m_meanT0 /= nw;
+  if (effiSum > 0.) {
+    m_meanT0 /= effiSum;
+  } else {
+    B2FATAL("Wire efficiency sum <= 0!");
+  }
   B2DEBUG(29, "calcMeanT0 end");
 }
 
@@ -1338,7 +1348,7 @@ void CDCGeometryPar::calcMeanT0()
 // Set bad-wire (from DB)
 void CDCGeometryPar::setBadWire()
 {
-  m_badWire = (*m_badWireFromDB)->getWires();
+  //  m_badWire = (*m_badWireFromDB)->getWires();
   calcMeanT0();
 }
 
@@ -1501,6 +1511,9 @@ void CDCGeometryPar::setChMap()
     const int iBd = cm.getBoardID();
     const WireID wID(isl, il, iw);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
+    const int iCh = cm.getBoardChannel();
+    m_wireToChannel.insert(pair<WireID, unsigned short>(wID, iCh));
+    m_boardAndChannelToWire[iBd][iCh] = wID.getEWire();
   }
 }
 

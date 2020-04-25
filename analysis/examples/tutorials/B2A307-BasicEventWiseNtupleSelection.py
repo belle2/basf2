@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #########################################################
 #
@@ -49,17 +48,17 @@ ma.inputMdstList(environmentType='default',
                  path=my_path)
 
 # We want to apply cut on event shape. For this, we are creating events shape object
-# First, create a list of all the good tracks (using the pion mass hypothesis)
+# First, create a list of good tracks (using the pion mass hypothesis)
 # and good gammas with very minimal cuts
-ma.fillParticleList(decayString='pi+:all',
+ma.fillParticleList(decayString='pi+:goodtracks',
                     cut='pt> 0.1',
                     path=my_path)
-ma.fillParticleList(decayString='gamma:all',
+ma.fillParticleList(decayString='gamma:goodclusters',
                     cut='E > 0.1',
                     path=my_path)
 
 # Second, create event shape
-ma.buildEventShape(inputListNames=['pi+:all', 'gamma:all'],
+ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:goodclusters'],
                    allMoments=True,
                    foxWolfram=True,
                    harmonicMoments=True,

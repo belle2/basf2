@@ -11,10 +11,10 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dbobjects/EKLMChannelData.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHitMCTime.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dbobjects/eklm/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -95,12 +95,12 @@ namespace Belle2 {
       /**
        * Get number of photoelectrons (fit result).
        */
-      double getNPE();
+      double getNPhotoelectrons();
 
       /**
        * Get generated number of photoelectrons.
        */
-      int getGeneratedNPE();
+      int getNGeneratedPhotoelectrons();
 
       /**
        * Get total energy deposited in the strip (sum over ssimulation hits).

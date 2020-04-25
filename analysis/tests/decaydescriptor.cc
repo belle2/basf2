@@ -505,6 +505,18 @@ namespace {
     DecayDescriptor dd5;
     initok = dd5.init("B0:label <- K+:loose pi-:loose");
     EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd6;
+    initok = dd6.init("B0:label => K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd7;
+    initok = dd7.init("B0:label --> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
+
+    DecayDescriptor dd8;
+    initok = dd8.init("B0:label ==> K+:loose pi-:loose");
+    EXPECT_EQ(initok, false);
   }
 
   TEST(DecayDescriptorTest, B2ParticleInterface)

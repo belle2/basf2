@@ -84,8 +84,6 @@ namespace Belle2 {
     std::string m_chargeName;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
-    /** Flag to read MC cluster charge from DB*/
-    bool m_mcFromDB;
     /** Flag to deal with MC samples*/
     bool m_mcSamples;
     /** Flag to check relations between PXDClusters and PXDClustersFromTracks*/

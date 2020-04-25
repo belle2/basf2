@@ -65,6 +65,10 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("onlyUseTracksWithSVD", m_param_onlyUseTracksWithSVD,
                                 "Only use tracks which have an SVD hit associated.",
                                 m_param_onlyUseTracksWithSVD);
+  moduleParamList->addParameter("reverseSeedState",
+                                m_param_reverseSeed,
+                                "Reverse the seed.",
+                                m_param_reverseSeed);
 
   // Default values
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
@@ -115,9 +119,12 @@ void CKFToPXDFindlet::apply()
   TrackFindingCDC::erase_remove_if(m_spacePointVector, notFromPXD);
 
   if (m_param_onlyUseTracksWithSVD) {
-    const auto hasNoSVD = [](const RecoTrack * recoTrack) {
+    const auto hasNoSVD = [this](const RecoTrack * recoTrack) {
       const auto& svdHitList = recoTrack->getSortedSVDHitList();
-      return svdHitList.empty() or svdHitList.front()->getSensorID().getLayerNumber() > 4;
+      if (svdHitList.empty()) return true;
+      // Require at least one hit in layer 3 or 4
+      return m_param_reverseSeed ? svdHitList.back()->getSensorID().getLayerNumber() > 4
+             : svdHitList.front()->getSensorID().getLayerNumber() > 4;
     };
     TrackFindingCDC::erase_remove_if(m_recoTracksVector, hasNoSVD);
   }

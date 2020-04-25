@@ -24,7 +24,7 @@ namespace TreeFitter {
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
     m_bfield(0),
-    m_trackfit(particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())))),
+    m_trackfit(particle->getTrackFitResult()),
     m_cached(false),
     m_flt(0),
     m_params(5),

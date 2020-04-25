@@ -275,21 +275,18 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
     return -2;
   }
 
-  // better check the Magic! TODO
-  // header[0] == 0xBE12DA7A (endianess!)
-
-  // as we did only a peek on the data before, we now have to add it to the data we want to read!
-  n_bytes_from_hltout = sizeof(unsigned int) * 2 + ntohl(header[1]);// OFFSET_LENGTH = 1
+  n_bytes_from_hltout = 4 * ntohl(header[1]);// OFFSET_LENGTH = 1
 
   ret = b2_recv(sd_acc, buf, n_bytes_from_hltout);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-    ERR_FPRINTF(stderr, "[ERROR] merger_merge: b2_recv(): Packet receive timed out\n");
+    ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
   if (size_t(ret) != n_bytes_from_hltout) {
     ERR_FPRINTF(stderr, "[ERROR] merger_merge: b2_recv(): Unexpected return value (%d)\n", ret);
     return -2;
   }
+
 
   return ret;
 }

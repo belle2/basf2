@@ -275,7 +275,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
     return -2;
   }
 
-  n_bytes_from_hltout = 4 * ntohl(header[1]);// OFFSET_LENGTH = 1
+  n_bytes_from_hltout = ntohl(header[1]);// OFFSET_LENGTH = 1
 
   ret = b2_recv(sd_acc, buf, n_bytes_from_hltout);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -472,9 +472,8 @@ main(int argc, char* argv[])
     if (rc < 0) {
       perror("select");
       continue;
-    } else if (rc == 0) { // timeout
+    } else if (rc == 0) // timeout
       continue;
-    }
 
     int t;
     if (FD_ISSET(sd_acc, &rset)) {   // new connection

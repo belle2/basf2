@@ -77,12 +77,16 @@ namespace Belle2 {
     };
 
     /**
-     * Bits used for unique identifiers in KLMLikelihoodParameters.
+     * Bits used for unique identifiers in getLongitudinalID() and in getTransverseID().
      */
     enum IdentifierBits {
+      /** Number of bits occupied by outcome in getLongitudinalID(). */
       c_OutcomeBit = 7,
+      /** Number of bits occupied by lastLayer in getLongitudinalID(). */
       c_LastLayerBit = 4,
+      /** Number of bits occupied by detector in getTransverseID(). */
       c_DetectorBit = 2,
+      /** Number of bits occupied by degreesOfFreedom in getTransverseID(). */
       c_DegreesOfFreedomBit = 6
     };
 

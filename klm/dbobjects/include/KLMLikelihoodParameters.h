@@ -9,11 +9,11 @@
 **************************************************************************/
 #pragma once
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 /* KLM headers. */
 #include <klm/muid/MuidElementNumbers.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
 
 /* ROOT headers. */
 #include <TObject.h>
@@ -31,7 +31,7 @@ namespace Belle2 {
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     KLMLikelihoodParameters()
     {

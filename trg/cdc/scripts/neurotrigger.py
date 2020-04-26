@@ -39,6 +39,41 @@ class filterTRG(basf2.Module):
         self.if_false(self.nullpath)
 
 
+def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
+    #
+    unpacker = basf2.register_module('CDCTriggerUnpacker')
+    if debugout:
+        unpacker.logging.log_level = LogLevel.DEBUG
+        unpacker.logging.debug_level = debug_level
+        unpacker.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+    # size (number of words) of the Belle2Link header
+    unpacker.param('headerSize', 3)
+    # unpack the data from the 2D tracker and save its Bitstream
+    unpacker.param('unpackTracker2D', False)
+    # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
+    unpacker.param('decode2DFinderTrack', False)
+    # make CDCTriggerSegmentHit objects from the 2D input
+    unpacker.param('decode2DFinderInput', False)
+    unpacker.param('NeuroNodeId', [
+        [0x11000005, 0],
+        [0x11000005, 1],
+        [0x11000006, 0],
+        [0x11000006, 1],
+    ])
+    if 'useDB' in kwargs:
+        unpacker.param('useDB', kwargs['useDB'])
+    else:
+        unpacker.param('useDB', True)
+
+    if 'sim13dt' in kwargs:
+        unpacker.param('sim13dt', kwargs['sim13dt'])
+    else:
+        unpacker.param('sim13dt', False)
+    unpacker.param('unpackNeuro', True)
+    unpacker.param('decodeNeuro', True)
+    path.add_module(unpacker)
+
+
 def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     #
     unpacker = basf2.register_module('CDCTriggerUnpacker')
@@ -49,7 +84,7 @@ def add_neuro_2d_unpackers(path, debug_level=4, debugout=False, **kwargs):
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
-    unpacker.param('unpackTracker2D', True)
+    unpacker.param('unpackTracker2D', False)
     # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
     unpacker.param('decode2DFinderTrack', True)
     # make CDCTriggerSegmentHit objects from the 2D input

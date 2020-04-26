@@ -13,6 +13,7 @@ import json
 from os import getenv
 from pathlib import Path
 import re
+from shlex import quote
 import subprocess
 import sys
 
@@ -57,7 +58,7 @@ def getAllSamples(mcCampaign):
     # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
     if mcCampaignNumber > 12:
         mcSamples += [
             f"{mcCampaign}_ggBGx1",
@@ -173,6 +174,12 @@ def getArgumentParser():
         default="MC13",
         choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "--dry",
+        action="store_true",
+        help="Print the submission commands, but don't run them.",
     )
 
     sampleGroup = parser.add_mutually_exclusive_group()
@@ -290,7 +297,7 @@ def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun):
             )
 
 
-def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={}):
+def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinitions={}):
     """Submit ``bsub`` jobs for each skim and for each test sample.
 
     Warns if any of the ``bsub`` submissions returned a non-zero exit code.
@@ -301,6 +308,7 @@ def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={})
         samples (list): A list of internal labels for samples to be tested.
             These are read by `skimExpertFunctions.get_test_file`.
         nEventsPerSample (int): The number of events per file to run on.
+        DryRun (bool): Print the submission commands, but don't run anything.
         CombinedSkimDefinitions (dict(list)): A data structure specifyign which
             individual skims comprise the combined skims. If this argument is provided,
             then this function will assume we are running combined skims.
@@ -357,6 +365,10 @@ def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={})
                     str(nTestEvents), "-i", sampleFile, "--", "single", skim
                 ]
 
+            if DryRun:
+                print(" ".join([quote(arg) for arg in arguments]) + "\n")
+                continue
+
             with working_directory(workingDirectory):
                 process = subprocess.run(
                     arguments,
@@ -371,7 +383,7 @@ def submit_jobs(skims, samples, nEventsPerSample, *, CombinedSkimDefinitions={})
             B2ERROR(
                 f"An error occurred while submitting jobs for {skim} skim."
             )
-        else:
+        elif jobIDs:
             B2INFO(
                 f"Running {skim} skim on {nEventsPerSample} events from test samples of {', '.join(samples)}. Job IDs:\n  "
                 + "\n  ".join(jobIDs)
@@ -409,4 +421,4 @@ if __name__ == "__main__":
             raise ValueError("Cannot pass both 'all' and a list of skim names.")
 
         verify_combined_skims(CombinedSkimDefinitions, skims)
-        submit_jobs(skims, samples, args.nEventsPerSample, CombinedSkimDefinitions=CombinedSkimDefinitions)
+        submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run, CombinedSkimDefinitions=CombinedSkimDefinitions)

@@ -248,5 +248,5 @@ namespace Belle2 {
    * This is used to sort the tag tracks by rave weight, to have the tracks having the
    * most significance contribution to the tag vertex fit appearing first
    */
-  bool compare(ParticleAndWeight& a, ParticleAndWeight& b) { return a.weight > b.weight; }
+  bool compare(const ParticleAndWeight& a, const ParticleAndWeight& b) { return a.weight > b.weight; }
 }

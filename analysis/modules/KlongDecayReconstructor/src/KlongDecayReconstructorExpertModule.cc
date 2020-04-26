@@ -142,7 +142,7 @@ namespace Belle2 {
     int numberOfCandidates = 0;
     while (m_generator->loadNext()) {
 
-      Particle&& particle = m_generator->getCurrentParticle();
+      Particle particle = m_generator->getCurrentParticle();
 
       bool is_physical = true;
 

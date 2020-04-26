@@ -143,7 +143,7 @@ void RestOfEvent::initializeMask(const std::string& name, const std::string& ori
   m_masks.push_back(elon);
 }
 
-void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particlesToUpdate,
+void RestOfEvent::excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particlesToUpdate,
                                            Particle::EParticleType listType, bool discard)
 {
   Mask* mask = findMask(maskName);
@@ -465,7 +465,7 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
   return roe4VectorECLClusters;
 }
 
-bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
+bool RestOfEvent::isInParticleList(const Particle* roeParticle, const std::vector<const Particle*>& particlesToUpdate) const
 {
   for (auto* listParticle : particlesToUpdate) {
     if (roeParticle->isCopyOf(listParticle, true)) {

@@ -93,7 +93,7 @@ namespace Belle2 {
       /**
        *  Add selected particles to the mask
        */
-      void addParticles(std::vector<const Particle*>& particles)
+      void addParticles(const std::vector<const Particle*>& particles)
       {
         if (isValid()) {
           B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
@@ -232,7 +232,7 @@ namespace Belle2 {
      * @param ParticleType of the collection
      * @param Update the ROE mask by passing or discarding particles in the provided particle list
      */
-    void excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particles,
+    void excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particles,
                                   Particle::EParticleType listType,
                                   bool discard);
     /**
@@ -392,7 +392,7 @@ namespace Belle2 {
     /**
      *  Checks if a particle has its copy in the provided list
      */
-    bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const;
+    bool isInParticleList(const Particle* roeParticle, const std::vector<const Particle*>& particlesToUpdate) const;
 
     /**
      *  Helper method to find ROE mask

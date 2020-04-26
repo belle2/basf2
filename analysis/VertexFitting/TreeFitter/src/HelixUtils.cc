@@ -131,7 +131,7 @@ namespace TreeFitter {
 
   }
 
-  void HelixUtils::getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+  void HelixUtils::getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                           int charge, double Bz,
                                                           Belle2::Helix& helix,
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
@@ -178,7 +178,7 @@ namespace TreeFitter {
   }
 
   void HelixUtils::getJacobianFromVertexNumerical(
-    Eigen::Matrix<double, 1, 6>& positionAndMom,
+    const Eigen::Matrix<double, 1, 6>& positionAndMom,
     int charge, double Bz,
     Belle2::Helix& helix,
     Eigen::Matrix<double, 5, 6>& jacobian,

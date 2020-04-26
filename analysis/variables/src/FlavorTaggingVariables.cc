@@ -596,7 +596,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < Y->getListSize(); ++i)
         {
           const auto& oParticle = Y->getParticle(i);
-          result = particle->overlapsWith(oParticle);
+          result = (double)particle->overlapsWith(oParticle);
           if (result == 1.0)
             return 1;
         }

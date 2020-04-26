@@ -25,21 +25,21 @@ skimCode = expert.encodeSkimName('PRsemileptonicUntagged')
 fileList = expert.get_test_file("MC12_mixedBGx1")
 
 # create a new path
-PRSLpath = b2.Path()
+path = b2.Path()
 
-ma.inputMdstList('default', fileList, path=PRSLpath)
-stdPi('all', path=PRSLpath)
-stdE('all', path=PRSLpath)
-stdMu('all', path=PRSLpath)
+ma.inputMdstList('default', fileList, path=path)
+stdPi('all', path=path)
+stdE('all', path=path)
+stdMu('all', path=path)
 # PR Skim
 from skim.semileptonic import PRList
-PRList = PRList(path=PRSLpath)
-expert.skimOutputUdst(skimCode, PRList, path=PRSLpath)
+PRList, path2 = PRList(path)
+expert.skimOutputUdst(skimCode, PRList, path=path2)
 
-ma.summaryOfLists(PRList, path=PRSLpath)
+ma.summaryOfLists(PRList, path=path2)
 
 
-expert.setSkimLogging(path=PRSLpath)
-b2.process(path=PRSLpath)
+expert.setSkimLogging(path=path2)
+b2.process(path)
 # print out the summary
 print(b2.statistics)

@@ -53,9 +53,7 @@ def LeptonicList(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``lepList``, a Python list containing the strings
-        :code:`'B-:L0'` and :code:`'B-:L1'`, the names of the particle
-        lists for leptonic :math:`B^-` skim candidates.
+        ``lepList`` (list(str)): A list containing the names of the skim particle lists.
     """
     __authors__ = [
         "Phillip Urquijo"
@@ -63,11 +61,11 @@ def LeptonicList(path):
 
     ma.cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True, path=path)
     ma.cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True, path=path)
-    ma.reconstructDecay('B-:L0 -> e-:highP', '', 1, path=path)
-    ma.reconstructDecay('B-:L1 -> mu-:highP', '', 2, path=path)
-    ma.applyCuts('B-:L0', 'nTracks>=3', path=path)
-    ma.applyCuts('B-:L1', 'nTracks>=3', path=path)
-    lepList = ['B-:L0', 'B-:L1']
+    ma.reconstructDecay('B-:LeptonicUntagged_0 -> e-:highP', '', 1, path=path)
+    ma.reconstructDecay('B-:LeptonicUntagged_1 -> mu-:highP', '', 2, path=path)
+    ma.applyCuts('B-:LeptonicUntagged_0', 'nTracks>=3', path=path)
+    ma.applyCuts('B-:LeptonicUntagged_1', 'nTracks>=3', path=path)
+    lepList = ['B-:LeptonicUntagged_0', 'B-:LeptonicUntagged_1']
     return lepList
 
 

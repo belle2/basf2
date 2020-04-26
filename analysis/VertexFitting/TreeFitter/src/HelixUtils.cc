@@ -134,6 +134,7 @@ namespace TreeFitter {
   void HelixUtils::getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                           int charge, double Bz,
                                                           Belle2::Helix& helix,
+                                                          // cppcheck-suppress constParameter ; jacobian is updated below
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
@@ -180,7 +181,8 @@ namespace TreeFitter {
   void HelixUtils::getJacobianFromVertexNumerical(
     const Eigen::Matrix<double, 1, 6>& positionAndMom,
     int charge, double Bz,
-    Belle2::Helix& helix,
+    const Belle2::Helix& helix,
+    // cppcheck-suppress constParameter ; jacobian is assigned new matrix elements below
     Eigen::Matrix<double, 5, 6>& jacobian,
     double delta
   )
@@ -375,6 +377,7 @@ namespace TreeFitter {
     return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
   }
 
+  // cppcheck-suppress constParameter ; jacobian is clearly updated in the function
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
                                                         const double x,
                                                         const double y,

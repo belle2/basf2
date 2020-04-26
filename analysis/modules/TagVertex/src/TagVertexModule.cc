@@ -148,6 +148,7 @@ namespace Belle2 {
     }
 
     // input
+    // cppcheck-suppress unreadVariable
     StoreArray<Particle> Particles(plist->getParticleCollectionName());
 
     // output

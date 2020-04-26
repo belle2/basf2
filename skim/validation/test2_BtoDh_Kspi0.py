@@ -26,7 +26,7 @@ loadStdSkimPi0(path=kspi0Path)
 stdKshorts(path=kspi0Path)
 stdPi0s(listtype='veryLooseFit', path=kspi0Path)
 
-ma.reconstructDecay('D0 -> K_S0:merged pi0:veryLooseFit', '1.84 < M < 1.89', path=kspi0Path)
+ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_Jan2020Fit', '1.84 < M < 1.89', path=kspi0Path)
 ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=kspi0Path)
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.

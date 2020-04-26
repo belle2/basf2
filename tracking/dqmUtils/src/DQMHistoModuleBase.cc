@@ -67,7 +67,7 @@ void DQMHistoModuleBase::initialize()
 
 void DQMHistoModuleBase::defineHisto()
 {
-
+  histogramsDefined = true;
 }
 
 void DQMHistoModuleBase::beginRun()
@@ -90,7 +90,10 @@ void DQMHistoModuleBase::beginRun()
 
 void DQMHistoModuleBase::event()
 {
-
+  if (!histogramsDefined) {
+    B2ERROR("Histograms not defined in " + this->getName() + " module, event processing is skipped!");
+    return;
+  }
 }
 
 TH1F* DQMHistoModuleBase::Create(const char* name, const char* title, int nbinsx, double xlow, double xup, const char* xTitle,
@@ -223,7 +226,7 @@ void DQMHistoModuleBase::DefineUBResiduals()
   auto residualU = THFAxis(200, -residualRange, residualRange, "residual U [#mum]");
   auto residualV = THFAxis(residualU).title("residual V [#mum]");
 
-  THFFactory factory = THFFactory(this);
+  auto factory = THFFactory(this);
   factory.xAxisSet(residualU).yAxisSet(residualV).zTitleSet("counts");
 
   m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "Unbiased residuals for PXD");
@@ -295,7 +298,7 @@ void DQMHistoModuleBase::DefineMomentum()
   double fMomRange = 3.0;
 
   auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
-  THFFactory factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");
 
   m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
   m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
@@ -310,7 +313,7 @@ void DQMHistoModuleBase::DefineHits()
   int iHitsInCDC = 200;
   int iHits = 200;
 
-  THFFactory factory = THFFactory(this).xlowSet(0).xTitleSet("# hits").yTitleSet("counts");
+  auto factory = THFFactory(this).xlowSet(0).xTitleSet("# hits").yTitleSet("counts");
 
   m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
   m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "No Of Hits In Track - SVD");
@@ -323,7 +326,7 @@ void DQMHistoModuleBase::DefineTracks()
   int iTracks = 30;
 
   auto tracks = THFAxis(iTracks, 0, iTracks, "# tracks");
-  THFFactory factory = THFFactory(this).xAxisSet(tracks).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisSet(tracks).yTitleSet("counts");
 
   m_TracksVXD = factory.CreateTH1F("NoOfTracksInVXDOnly", "No Of Tracks Per Event, Only In VXD");
   m_TracksCDC = factory.CreateTH1F("NoOfTracksInCDCOnly", "No Of Tracks Per Event, Only In CDC");
@@ -339,7 +342,7 @@ void DQMHistoModuleBase::DefineHalfShells()
 
   double residualRange = 400;  // in um
   auto residual = THFAxis(200, -residualRange, residualRange, "residual [#mum]");
-  THFFactory factory = THFFactory(this).xAxisSet(residual).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisSet(residual).yTitleSet("counts");
 
   m_UBResidualsPXDX_Ying = factory.CreateTH1F("UBResidualsPXDX_Ying", "Unbiased residuals in X for PXD for Ying");
   m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
@@ -411,7 +414,7 @@ void DQMHistoModuleBase::DefineSensors()
   auto residualU = THFAxis(200, -residualRange, residualRange, "residual U [#mum]");
   auto residualV = THFAxis(residualU).title("residual V [#mum]");
 
-  THFFactory factory = THFFactory(this);
+  auto factory = THFFactory(this);
 
   resids2D->cd();
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),

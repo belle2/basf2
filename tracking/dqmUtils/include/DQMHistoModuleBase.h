@@ -81,6 +81,7 @@ namespace Belle2 {
     virtual void DefineSensors();
 
     vector<TH1*> m_histograms;
+    bool histogramsDefined = false;
     vector<tuple<string, string, string>> m_histogramParameterChanges;
 
     /** StoreArray name where Tracks are written. */

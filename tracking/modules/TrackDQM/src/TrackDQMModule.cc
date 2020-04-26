@@ -52,6 +52,8 @@ void TrackDQMModule::initialize()
 
 void TrackDQMModule::defineHisto()
 {
+  DQMHistoModuleBase::defineHisto();
+
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
     B2WARNING("Missing geometry for VXD.");
 
@@ -91,6 +93,10 @@ void TrackDQMModule::defineHisto()
 
 void TrackDQMModule::event()
 {
+  DQMHistoModuleBase::event();
+  if (!histogramsDefined)
+    return;
+
   TrackDQMEventProcessor eventProcessor = TrackDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
 
   eventProcessor.Run();

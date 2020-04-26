@@ -47,6 +47,8 @@ AlignDQMModule::AlignDQMModule() : DQMHistoModuleBase()
 
 void AlignDQMModule::defineHisto()
 {
+  DQMHistoModuleBase::defineHisto();
+
   if (VXD::GeoCache::getInstance().getGeoTools()->getNumberOfLayers() == 0)
     B2WARNING("Missing geometry for VXD.");
 
@@ -79,6 +81,10 @@ void AlignDQMModule::defineHisto()
 
 void AlignDQMModule::event()
 {
+  DQMHistoModuleBase::event();
+  if (!histogramsDefined)
+    return;
+
   AlignDQMEventProcessor eventProcessor = AlignDQMEventProcessor(this, m_recoTracksStoreArrayName, m_tracksStoreArrayName);
 
   eventProcessor.Run();
@@ -217,7 +223,7 @@ void AlignDQMModule::DefineSensors()
   auto residualU = THFAxis(200, -residualRange, residualRange, "residual U [#mum]");
   auto residualV = THFAxis(residualU).title("residual V [#mum]");
 
-  THFFactory factory = THFFactory(this);
+  auto factory = THFFactory(this);
 
   factory.xAxisSet(posU).yAxisSet(posV);
 
@@ -304,7 +310,7 @@ void AlignDQMModule::DefineLayers()
   auto theta = THFAxis(iThetGran, 0, 180, "Theta [deg]");
   auto residual = THFAxis(iYResGran, -residualRange, residualRange, "residual [#mum]");
 
-  THFFactory factory = THFFactory(this);
+  auto factory = THFFactory(this);
   factory.xAxisSet(phi).yAxisSet(theta).zTitleSet("counts");
 
   resMeanUPosUV->cd();

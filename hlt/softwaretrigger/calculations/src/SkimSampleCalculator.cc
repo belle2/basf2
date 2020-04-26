@@ -556,7 +556,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double hadronb1 = 0;
   double hadronb2 = 0;
   std::vector<TVector3> m_pionHadv3;
-  double R2 = 2.;
 
   for (int nPiHad = 0; nPiHad < nHadTracks; nPiHad++) {
     Particle* parPiHad = m_pionHadParticles->getParticle(nPiHad);
@@ -577,7 +576,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     hadronb = 1;
     FoxWolfram fw(m_pionHadv3);
     fw.calculateBasicMoments();
-    R2 = fw.getR(2);
+    double R2 = fw.getR(2);
     if (R2 < 0.4) hadronb1 = 1;
     if (hadronb1 && nHadTracks >= 5) hadronb2 = 1;
   }

@@ -14,12 +14,11 @@ from optparse import OptionParser
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
-reset_database()
-use_database_chain()
 
-# set DB tag with correct merger numbers, etc. (phase3 start)
-use_central_database('online')
-use_central_database('ARICH_phase3_test')
+from basf2 import conditions
+conditions.override_globaltags()
+conditions.append_globaltag('online')
+conditions.append_globaltag('ARICH_phase3_test')
 
 
 # parameters
@@ -37,13 +36,13 @@ histo = register_module('HistoManager')
 cal = register_module('ARICHRateCal')
 cal.param("nrun", 100)
 cal.param("nevents", 1000)
-cal.param("dth", 0.01)  # can be ignored when internal = True
-cal.param("th0", -0.5)  # can be ignored when internal = True
+cal.param("dth", 0.0096)  # can be ignored when internal = True
+cal.param("th0", -0.48)  # can be ignored when internal = True
 cal.param("internal", True)
 
 unpack = register_module('ARICHUnpacker')
-unpack.param('RawUnpackerMode', 1)
-unpack.param('DisableUnpackerMode', 1)
+# unpack.param('RawUnpackerMode', 1)
+# unpack.param('DisableUnpackerMode', 1)
 
 convert = register_module('Convert2RawDet')
 output = register_module('RootOutput')

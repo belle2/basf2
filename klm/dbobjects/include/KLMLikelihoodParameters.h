@@ -12,9 +12,6 @@
 /* KLM headers. */
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 /* ROOT headers. */
 #include <TObject.h>
 
@@ -225,71 +222,31 @@ namespace Belle2 {
      * Get the longitudinal probability density function for a given identifier.
      * @param[in] id Longitudinal identifier.
      */
-    const std::vector<double>& getLongitudinalPDF(const int id) const
-    {
-      std::map<int, std::vector<double>>::const_iterator it = m_LongitudinalPDF.find(id);
-      if (it != m_LongitudinalPDF.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Longitudinal for KLMLikelihoodParameters not found!");
-      }
-    }
+    const std::vector<double>& getLongitudinalPDF(const int id) const;
 
     /**
      * Get the transverse probability density function for a given identifier.
      * @param[in] id Transverse identifier.
      */
-    const std::vector<double>& getTransversePDF(const int id) const
-    {
-      std::map<int, std::vector<double>>::const_iterator it = m_TransversePDF.find(id);
-      if (it != m_TransversePDF.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Transverse PDF for KLMLikelihoodParameters not found!");
-      }
-    }
+    const std::vector<double>& getTransversePDF(const int id) const;
 
     /**
      * Get the transverse probability density function (analytical): threshold for a given identifier.
      * @param[in] id Transverse identifier.
      */
-    double getTransverseThreshold(const int id) const
-    {
-      std::map<int, double>::const_iterator it = m_TransverseThreshold.find(id);
-      if (it != m_TransverseThreshold.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Transverse threshold for KLMLikelihoodParameters not found!");
-      }
-    }
+    double getTransverseThreshold(const int id) const;
 
     /**
      * Get the transverse probability density function (analytical): horizontal scale for a given identifier.
      * @param[in] id Transverse identifier.
      */
-    double getTransverseScaleX(const int id) const
-    {
-      std::map<int, double>::const_iterator it = m_TransverseScaleX.find(id);
-      if (it != m_TransverseScaleX.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Horizontal transverse scale for KLMLikelihoodParameters not found!");
-      }
-    }
+    double getTransverseScaleX(const int id) const;
 
     /**
      * Get the transverse probability density function (analytical): vertical scale for a given identifier.
      * @param[in] id Transverse identifier.
      */
-    double getTransverseScaleY(const int id) const
-    {
-      std::map<int, double>::const_iterator it = m_TransverseScaleY.find(id);
-      if (it != m_TransverseScaleY.end()) {
-        return it->second;
-      } else {
-        B2FATAL("Vertical transverse scale for KLMLikelihoodParameters not found!");
-      }
-    }
+    double getTransverseScaleY(const int id) const;
 
     /** Longitudinal probability density function. */
     std::map<int, std::vector<double>> m_LongitudinalPDF;

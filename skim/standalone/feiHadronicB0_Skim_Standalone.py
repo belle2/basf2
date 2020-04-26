@@ -29,7 +29,7 @@ path2 = runFEIforB0Hadronic(path)
 path2.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 
 # Apply final B0 tag cuts
-B0HadronicList = B0Hadronic(path)
+B0HadronicList = B0Hadronic(path2)
 expert.skimOutputUdst(skimCode, B0HadronicList, path=path2)
 ma.summaryOfLists(B0HadronicList, path=path2)
 

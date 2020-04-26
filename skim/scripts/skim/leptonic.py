@@ -100,30 +100,30 @@ class LeptonicUntagged(BaseSkim):
 
     def build_lists(self, path):
         ma.cutAndCopyList(
-            "e-:highP",
+            "e-:LeptonicUntagged",
             "e-:all",
             "useCMSFrame(p) > 2.0 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
-            "mu-:highP",
+            "mu-:LeptonicUntagged",
             "mu-:all",
             "useCMSFrame(p) > 2.0 and muonID > 0.5",
             True,
             path=path,
         )
-        ma.reconstructDecay("B-:L0 -> e-:highP", "", 1, path=path)
-        ma.reconstructDecay("B-:L1 -> mu-:highP", "", 2, path=path)
-        ma.applyCuts("B-:L0", "nTracks>=3", path=path)
-        ma.applyCuts("B-:L1", "nTracks>=3", path=path)
-        lepList = ["B-:L0", "B-:L1"]
+        ma.reconstructDecay("B-:LeptonicUntagged_0 -> e-:LeptonicUntagged", "", 1, path=path)
+        ma.reconstructDecay("B-:LeptonicUntagged_1 -> mu-:LeptonicUntagged", "", 2, path=path)
+        ma.applyCuts("B-:LeptonicUntagged_0", "nTracks>=3", path=path)
+        ma.applyCuts("B-:LeptonicUntagged_1", "nTracks>=3", path=path)
+        lepList = ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"]
         self.SkimLists = lepList
 
     def validation_histograms(self, path):
-        ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:L0", "B-:L1"], "", path=path)
+        ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"], "", path=path)
 
-        ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)
+        ma.buildRestOfEvent("B-:LeptonicUntaggedeptonicUntagged", path=path)
         ma.appendROEMask(
             "B-:LeptonicUntagged",
             "basic",

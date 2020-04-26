@@ -954,7 +954,6 @@ class BaseFEISkim(BaseSkim):
 
         * :math:`R_2 < 0.4` (`foxWolframR2` from `modularAnalysis.buildEventShape`,
           calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{tracks}} \\geq 4`
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
@@ -978,10 +977,13 @@ class BaseFEISkim(BaseSkim):
         # FEIChannelArgs = {}
 
         # Pre-selection cuts
+        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
+        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+
         ma.fillParticleList(decayString="pi+:eventShapeForSkims",
-                            cut="abs(d0)<0.5 and abs(z0)<2 and pt>0.1", path=path)
+                            cut=CleanedTrackCuts, path=path)
         ma.fillParticleList(decayString="gamma:eventShapeForSkims",
-                            cut="E > 0.1 and 0.296706 < theta < 2.61799", path=path)
+                            cut=CleanedClusterCuts, path=path)
 
         vm.addAlias("E_ECL_pi",
                     "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
@@ -1007,14 +1009,14 @@ class BaseFEISkim(BaseSkim):
                            path=path)
 
         EventCuts = [
-            "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3"
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.1)>=3"
-            "visibleEnergyOfEventCMS>4"
-            "2<E_ECL<7"
-            "foxWolframR2_maskedNaN<0.4 and nTracks>=4"
+            f"nCleanedTracks({CleanedTrackCuts})>=3",
+            f"nCleanedECLClusters({CleanedClusterCuts})>=3",
+            "visibleEnergyOfEventCMS>4",
+            "2<E_ECL<7",
+            "foxWolframR2_maskedNaN<0.4"
         ]
 
-        # TODO: still to be fixed, once I address https://agira.desy.de/browse/BII-6622
+        # TODO: still to be fixed and changed to BaseSkim.skim_event_cuts, once I address https://agira.desy.de/browse/BII-6622
         ma.applyEventCuts(" and ".join(EventCuts), path=path)
         # Run FEI
         b2.conditions.globaltags = ["analysis_tools_release-04"]

@@ -544,32 +544,6 @@ def CharmlessHad3BodyBmList(path):
 
 
 @fancy_skim_header
-class BtoPi0Pi0(BaseSkim):
-    __authors__ = ["Kim Smith"]
-    __description__ = ""
-    __contact__ = ""
-    __category__ = "physics, hadronic B to charmless"
-
-    RequiredStandardLists = {
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
-
-    def build_lists(self, path):
-        Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
-
-        B0_Channels = ["pi0:skim pi0:skim"]
-
-        B0List = []
-        for chID, channel in enumerate(B0_Channels):
-            ma.reconstructDecay("B0:Pi0Pi0" + " -> " + channel, Bcuts, chID, path=path)
-            B0List.append("B0:Pi0Pi0")
-
-        self.SkimLists = B0List
-
-
-@fancy_skim_header
 class CharmlessHad2Body(BaseSkim):
     """
     **Particle Lists**:

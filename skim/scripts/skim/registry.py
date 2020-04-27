@@ -99,7 +99,6 @@ RegisteredSkims = [
     ("18570700", "taupair", "TauThrust"),
 
     # --- WG9: Charmless B decays ---
-    ("14120500", "btocharmless", "BtoPi0Pi0"),  # Why is this skim code 14___ ???
     ("19130100", "btocharmless", "CharmlessHad2Body"),
     ("19130200", "btocharmless", "CharmlessHad3Body"),
 ]

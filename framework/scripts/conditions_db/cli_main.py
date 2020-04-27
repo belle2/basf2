@@ -561,7 +561,7 @@ def command_diff(args, db):
             table[0] += ["Iov"]
             columns += [-36]
         else:
-            table[0] = ["First Exp", "First Run", "Final Exp", "Final Run"]
+            table[0] += ["First Exp", "First Run", "Final Exp", "Final Run"]
             columns += [6, 6, 6, 6]
 
         if args.show_ids:

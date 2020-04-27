@@ -34,17 +34,10 @@ TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
-  if (false) {
-    G4Track* aTrack = nullptr;
-    PreUserTrackingAction(aTrack);
-    PostUserTrackingAction(aTrack);
-  }
 }
-
 
 TrackingAction::~TrackingAction()
 {
-
 }
 
 void TrackingAction::setStoreTrajectories(int store, double distanceTolerance)

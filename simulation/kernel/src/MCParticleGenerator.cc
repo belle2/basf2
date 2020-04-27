@@ -73,7 +73,7 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
 }
 
 
-void MCParticleGenerator::addParticle(MCParticle& mcParticle,
+void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
                                       G4Event* event,
                                       G4PrimaryParticle* lastG4Mother,
                                       int motherIndex,

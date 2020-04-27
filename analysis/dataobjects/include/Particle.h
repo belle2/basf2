@@ -989,7 +989,7 @@ namespace Belle2 {
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
     // v11: added m_daughterProperties
-    // v12: renamed EParticleType to EParticleSourceObject
+    // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
 
     friend class ParticleSubset;
   };

@@ -285,9 +285,12 @@ def command_tag_modify(args, db=None):
     # now we update the tag information
     info = req.json()
     old_name = info["name"]
+    changed = False
     for key in ["name", "description"]:
-        if getattr(args, key) is not None:
-            info[key] = getattr(args, key)
+        value = getattr(args, key)
+        if value is not None and value != info[key]:
+            info[key] = value
+            changed = True
 
     info["modifiedBy"] = os.environ.get("BELLE2_USER", os.getlogin()) if args.user is None else args.user
 
@@ -297,12 +300,15 @@ def command_tag_modify(args, db=None):
         if typeinfo is None:
             return 1
         # seems so, ok modify the tag info
-        info["globalTagType"] = typeinfo
+        if info['gloalTagType'] != typeinfo:
+            info["globalTagType"] = typeinfo
+            changed = True
 
     # and push the changed info to the server
-    db.request("PUT", "/globalTag",
-               "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
-               json=info)
+    if changed:
+        db.request("PUT", "/globalTag",
+                   "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
+                   json=info)
 
     if args.state is not None:
         name = args.name if args.name is not None else old_name
@@ -543,8 +549,8 @@ def command_diff(args, db):
         if ntags != 2:
             return 1
         print()
-        listA = db.get_all_iovs(args.tagA, message=str(iovfilter))
-        listB = db.get_all_iovs(args.tagB, message=str(iovfilter))
+        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter)) if iovfilter.check(e.name)]
+        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter)) if iovfilter.check(e.name)]
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)
@@ -555,7 +561,7 @@ def command_diff(args, db):
             table[0] += ["Iov"]
             columns += [-36]
         else:
-            table[0] = ["First Exp", "First Run", "Final Exp", "Final Run"]
+            table[0] += ["First Exp", "First Run", "Final Exp", "Final Run"]
             columns += [6, 6, 6, 6]
 
         if args.show_ids:

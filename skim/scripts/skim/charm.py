@@ -3,20 +3,13 @@
 
 """
 Skim list building functions for charm analyses.
-"""
-"""
--- note:: The Hp, Hm and Jm in the function name represent
-arbitrary charged particles with positive or negative
-charge.
-"""
-"""
--- note:: The charged conjugate channels are always included
-in every charm skim list.
+
+.. Note::
+    The Hp, Hm and Jm in the function name represent arbitrary charged particles with
+    positive or negative charge.
 """
 
-__authors__ = [
-    ""
-]
+from functools import lru_cache
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
@@ -1024,23 +1017,17 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
     """
     **Decay Modes**:
 
-    * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
-    * :math:`WS: D^{*-}\\to \\pi^- D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
-
+    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where the D^{0} is reconstructed by D0ToHpJm
 
     **Additional Cuts**:
 
-    * ``0.49 < M(eta) < 0.55, p(eta) > 0.28``
-    * ``1.78 < M(D0) < 1.93, pcms(D0) > 2.2``
-    * ``Q < 0.018``
+    1. ``All Cuts in D0ToHpJm()``
+
+    2. ``0 < Q < 0.018``
     """
 
-    __authors__ = []
-    __description__ = (
-        "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds"
-        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
-        "also included."
-    )
+    __authors__ = "Giulia Casarosa"
+    __description__ = "Same as D0ToHpJm, but requiring the D0 is from D*+ -> D0 pi+ process."
     __contact__ = ""
     __category__ = "physics, charm"
 
@@ -1055,19 +1042,14 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
     }
 
     def build_lists(self, path):
-        ma.reconstructDecay("eta:myskim -> gamma:loose gamma:loose", "0.49 < M < 0.55 and p > 0.28", path=path)
-        Dstcuts = "0 < Q < 0.018"
-        charmcuts = "1.78 < M < 1.93 and useCMSFrame(p) > 2.2"
+        D0List = D0ToHpJm(path)
+
+        Dstcuts = '0 < Q < 0.018'
 
         DstList = []
-        ma.reconstructDecay("D0:HpJmEta -> K-:loose pi+:loose eta:myskim", charmcuts, path=path)
-        vertex.treeFit("D0:HpJmEta", 0.001, path=path)
-        ma.reconstructDecay("D*+:HpJmEtaRS -> D0:HpJmEta pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmEtaWS -> D0:HpJmEta pi-:all", Dstcuts, path=path)
-        vertex.kFit("D*+:HpJmEtaRS", conf_level=0.001, path=path)
-        vertex.kFit("D*+:HpJmEtaWS", conf_level=0.001, path=path)
-        DstList.append("D*+:HpJmEtaRS")
-        DstList.append("D*+:HpJmEtaWS")
+        for chID, channel in enumerate(D0List):
+            ma.reconstructDecay('D*+:HpJm' + str(chID) + ' -> D0:HpJm' + str(chID) + ' pi+:mygood', Dstcuts, chID, path=path)
+            DstList.append('D*+:HpJm' + str(chID))
 
         self.SkimLists = DstList
 

@@ -147,10 +147,6 @@ namespace Belle2 {
       return;
     }
 
-    // input
-    // cppcheck-suppress unreadVariable
-    StoreArray<Particle> Particles(plist->getParticleCollectionName());
-
     // output
     StoreArray<TagVertex> verArray;
     analysis::RaveSetup::initialize(1, m_Bfield);

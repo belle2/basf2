@@ -40,6 +40,8 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
+#include <framework/logging/Logger.h>
+
 #define g4ePDGcode 0
 
 using namespace Belle2;
@@ -231,6 +233,30 @@ void Belle2PhysicsList::ConstructG4eParticles()
   }
 }
 
+void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector<std::string>& regions, double cutValue)
+{
+  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
+  if (cutValue == 0) {
+    cutValue = m_globalCutValue;
+  } else {
+    B2INFO("Set production cut for detector region" << LogVar("detector", name) << LogVar("production_cut", cutValue));
+  }
+  auto* regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(cutValue * cm);
+  bool foundOne{false};
+  for (const auto regionName : regions) {
+    auto* region = theRegionStore->GetRegion(regionName, false);
+    if (!region) {
+      B2WARNING("Cannot find Geant4 region for sub detector. Probably detector not present?"
+                << LogVar("detector", name) << LogVar("region", regionName));
+      continue;
+    }
+    region->SetProductionCuts(regionCuts);
+    foundOne = true;
+  }
+  if (!foundOne) delete regionCuts;
+}
+
 
 void Belle2PhysicsList::SetCuts()
 {
@@ -241,62 +267,14 @@ void Belle2PhysicsList::SetCuts()
   SetCutValue(m_globalCutValue * cm, "e+");
   SetCutValue(m_globalCutValue * cm, "gamma");
 
-  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
-  G4ProductionCuts* regionCuts = 0;
-
-  // VXD region cut
-  if (m_pxdCutValue == 0.0) m_pxdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_pxdCutValue * cm);
-  G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
-  theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
-
-  // SVD region cut
-  if (m_svdCutValue == 0.0) m_svdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_svdCutValue * cm);
-  G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
-  theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
-
-  // CDC region cut
-  if (m_cdcCutValue == 0.0) m_cdcCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_cdcCutValue * cm);
-  G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
-  theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
-
-  // ARICH region cut
-  if (m_arichtopCutValue == 0.0) m_arichtopCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
-
-  // TOP module region cuts
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
-  theRegionStore->GetRegion("TOPEnvelope")->SetProductionCuts(regionCuts);
-
-  // ECL region cut
-  if (m_eclCutValue == 0.0) m_eclCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_eclCutValue * cm);
-  G4cout << " ECL cut set to " << m_eclCutValue << G4endl;
-  theRegionStore->GetRegion("ECLForwardEnvelope")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBarrelSector")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBackwardEnvelope")->SetProductionCuts(regionCuts);
-
-  // BKLM region cut
-  if (m_klmCutValue == 0.0) m_klmCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_klmCutValue * cm);
-  theRegionStore->GetRegion("BKLMEnvelope")->SetProductionCuts(regionCuts);
-
-  // EKLM region cut
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_klmCutValue * cm);
-  G4cout << " BKLM and EKLM cuts set to " << m_klmCutValue << G4endl;
-  theRegionStore->GetRegion("EKLMEnvelope")->SetProductionCuts(regionCuts);
+  setRegionCuts("PXD", {"PXDEnvelope"}, m_pxdCutValue);
+  setRegionCuts("SVD", {"SVDEnvelope"}, m_svdCutValue);
+  setRegionCuts("CDC", {"CDCEnvelope"}, m_cdcCutValue);
+  setRegionCuts("ARICH", {"ARICHEnvelope"}, m_arichtopCutValue);
+  setRegionCuts("TOP", {"TOPEnvelope"}, m_arichtopCutValue);
+  setRegionCuts("ECL", {"ECLForwardEnvelope", "ECLBarrelSector", "ECLBackwardEnvelope"}, m_eclCutValue);
+  setRegionCuts("BKLM", {"BKLMEnvelope"}, m_klmCutValue);
+  setRegionCuts("EKLM", {"EKLMEnvelope"}, m_klmCutValue);
 }
 
 
@@ -368,5 +346,3 @@ void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
 {
   if (yesno) G4cout << " High precision neutron option not yet ready " << G4endl;
 }
-
-

@@ -272,11 +272,6 @@ class BottomoniumUpsilon(BaseSkim):
     __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["loose"],
-        },
         "stdPhotons": {
             "stdPhotons": ["loose"],
         },
@@ -285,14 +280,14 @@ class BottomoniumUpsilon(BaseSkim):
     def build_lists(self, path):
         Ycuts = ""
         # create and fill e/mu/pi/photon ParticleLists
-        ma.fillParticleList("mu+:loose", "p<15 and p>3.5", path=path)
-        ma.fillParticleList("e+:loose", "p<15 and p>3.5", path=path)
-        ma.fillParticleList("pi+:loose", "p<1.5 and pt>0.05", path=path)
+        ma.fillParticleList("mu+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
+        ma.fillParticleList("e+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
+        ma.fillParticleList("pi+:BottomoniumUpsilon", "p<1.5 and pt>0.05", path=path)
         ma.cutAndCopyList("gamma:soft", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
-        ma.reconstructDecay("Upsilon:ee -> e+:loose e-:loose", "M > 8", path=path)
-        ma.reconstructDecay("Upsilon:mumu -> mu+:loose mu-:loose", "M > 8", path=path)
+        ma.reconstructDecay("Upsilon:ee -> e+:BottomoniumUpsilon e-:BottomoniumUpsilon", "M > 8", path=path)
+        ma.reconstructDecay("Upsilon:mumu -> mu+:BottomoniumUpsilon mu-:BottomoniumUpsilon", "M > 8", path=path)
         ma.copyLists("Upsilon:all", ["Upsilon:ee", "Upsilon:mumu"], path=path)
 
         # require foxWolframR2 < 0.995
@@ -314,7 +309,7 @@ class BottomoniumUpsilon(BaseSkim):
         ma.applyCuts("Upsilon:all", "foxWolframR2 < 0.995", path=path)
 
         # Y(1S,2S) with pi+ or photon are reconstructed
-        Upsilon_Channels = ["Upsilon:all pi+:loose",
+        Upsilon_Channels = ["Upsilon:all pi+:BottomoniumUpsilon",
                             "Upsilon:all gamma:soft"]
 
         # define the Y(1S,2S) decay channel list
@@ -355,10 +350,9 @@ class ISRpipicc(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdE": ["all", "loose"],
-            "stdK": ["all", "loose"],
-            "stdMu": ["95eff", "all", "loose"],
-            "stdPi": ["95eff", "all", "loose"],
+            "stdE": ["loose"],
+            "stdMu": ["loose"],
+            "stdPi": ["loose"],
         },
     }
 

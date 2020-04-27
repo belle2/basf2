@@ -37,8 +37,20 @@ namespace Belle2 {
    * The module implements charged particle identification using ECL-related observables.
    * For each Track matched with a suitable ECLShower, likelihoods for each particle
    * hypothesis are obtained from pdfs stored in a conditions database payload, and then get stored in an ECLPidLikelihood object.
+   *
    * The dimensionality of the likelihood depends on how many variables are stored in the payload.
-   * The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantitites (e.g. shower shape variables, w/ proper decorrelation).
+   * The baseline method could be a simple univariate likelihood based on E/p PDFs, but it could be extended to include more ECL quantitites (e.g. shower shape variables).
+   *
+   * Please note however that the multi-dimensional likelihood approach is based on the the assumption that PDFs of the observables can be factorised into a simple product:
+   *
+   \f{equation*}{
+   \mathcal{L}_{\mathrm{ECL}} = \prod_{i}^{N_{\mathrm{obs}}} \mathcal{L}(\mathrm{obs}_{i}),
+   \f}
+   *
+   * namely, the observables are \b statistically \b independent.
+   * This is of course quite a strong assumption, which is rarely fulfilled by default.
+   * A first attempt can be made by removing \a linear correlations between the input observables when preparing the payload object.
+   * Please refer to the documentation of ECLChargedPidPDFs for further details on input variable transformations.
    *
    */
   class ECLChargedPIDModule : public Module {

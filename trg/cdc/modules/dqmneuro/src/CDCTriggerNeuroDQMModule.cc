@@ -1878,8 +1878,15 @@ void CDCTriggerNeuroDQMModule::event()
           double neuroSWZ, neuroSWcosTh, neuroSWPhi0, neuroSWPt ;
 
           if (neuroHWTrack) {
-            unsigned checkpattern = getPattern(neuroHWTrack, m_unpackedNeuroInputSegmentsName);
-            if (!isValidPattern(checkpattern)) {
+            bool valtrack = false;
+            try {
+              valtrack = neuroHWTrack->getValidStereoBit();
+            } catch (...) {
+              B2WARNING("HWTrack doesn't have 'valid bit', get it from relations now... ");
+              unsigned checkpattern = getPattern(neuroHWTrack, m_unpackedNeuroInputSegmentsName);
+              valtrack = isValidPattern(checkpattern);
+            }
+            if (!valtrack) {
               continue;
             }
 
@@ -1918,6 +1925,18 @@ void CDCTriggerNeuroDQMModule::event()
           if (!m_limitedoutput && m_simNeuroTracksName != "") {
             CDCTriggerTrack* neuroSWTrack = recoTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
             if (neuroSWTrack) {
+              bool valtrack = false;
+              try {
+                valtrack = neuroSWTrack->getValidStereoBit();
+              } catch (...) {
+                B2INFO("SWTrack doesn't have 'valid bit', get it from relations now... ");
+                unsigned checkpattern = getPattern(neuroSWTrack, m_unpackedNeuroInputSegmentsName);
+                valtrack = isValidPattern(checkpattern);
+              }
+              if (!valtrack) {
+                continue;
+              }
+
               m_RecoSWZ->Fill(zTarget);
               m_RecoSWCosTheta->Fill(cosThetaTarget);
               m_RecoSWPhi->Fill(phi0Target);
@@ -2125,6 +2144,18 @@ void CDCTriggerNeuroDQMModule::event()
   if (!m_limitedoutput && m_simNeuroTracksName != "") {
     m_neuroSWOutTrackCount->Fill(m_simNeuroTracks.getEntries());
     for (CDCTriggerTrack& neuroswTrack : m_simNeuroTracks) {
+      bool valtrack = false;
+      try {
+        valtrack = neuroswTrack.getValidStereoBit();
+      } catch (...) {
+        B2INFO("HWTrack doesn't have 'valid bit', get it from relations now... ");
+        unsigned checkpattern = getPattern(&neuroswTrack, m_unpackedNeuroInputSegmentsName);
+        valtrack = isValidPattern(checkpattern);
+      }
+      if (!valtrack) {
+        continue;
+      }
+
       m_neuroSWOutZ->Fill(neuroswTrack.getZ0());
       double cotThSW = neuroswTrack.getCotTheta();
       double cosThSW = copysign(1.0, cotThSW) / sqrt(1. / (cotThSW * cotThSW) + 1);
@@ -2253,9 +2284,15 @@ void CDCTriggerNeuroDQMModule::event()
   if (m_unpackedNeuroTracksName != "") {
     // fill neurotrigger histograms
     for (CDCTriggerTrack& neuroTrack : m_unpackedNeuroTracks) {
-
-      unsigned checkpattern = getPattern(&neuroTrack, m_unpackedNeuroInputSegmentsName);
-      if (!isValidPattern(checkpattern)) {
+      bool valtrack = false;
+      try {
+        valtrack = neuroTrack.getValidStereoBit();
+      } catch (...) {
+        B2WARNING("NeuroTrack doesn't have 'valid bit', get it from relations now... ");
+        unsigned checkpattern = getPattern(&neuroTrack, m_unpackedNeuroInputSegmentsName);
+        valtrack = isValidPattern(checkpattern);
+      }
+      if (!valtrack) {
         continue;
       }
       // count number of tracks

@@ -80,6 +80,8 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
     //! Final Canvases for Fit and Ref
     std::map<VxdID, TCanvas*> m_cChargeMod {};
+    //! Histogram for TrackedClusters
+    TH1F* m_hTrackedClusters = nullptr;
     //! Final Canvas for TrackedClusters
     TCanvas* m_cTrackedClusters = nullptr;
 

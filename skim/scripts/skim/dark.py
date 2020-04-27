@@ -15,7 +15,7 @@ __authors__ = [
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
-from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header
+from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header, get_test_file
 
 
 def SinglePhotonDarkList(path):
@@ -670,3 +670,104 @@ class LFVZpVisible(BaseSkim):
         lfvzp_list.append("vpho:2tr_vislfvzp")
 
         self.SkimLists = lfvzp_list
+
+
+@fancy_skim_header
+class GammaGammaControlKLMDark(BaseSkim):
+    """
+    **Physics channel**: ee → γγ
+
+    .. Note::
+        This skim can retain a lot of γγ events.
+        In case this becomes unacceptable, we provide prescale parameters.
+        Prescales are given in standard trigger convention (reciprocal),
+        so prescale of 100 is 1% of events kept, etc.
+
+    .. Tip::
+        To prescale the higher-energy probe photons by 10%:
+
+        >>> from skim.dark import GammaGammaControlKLMDark
+        >>> Skim = GammaGammaControlKLMDark(prescale_high=10)
+        >>> Skim(path)  # Add list-building function and uDST output module to path
+        >>> b2.process(path)
+    """
+
+    __authors__ = ["Sam Cunliffe", "Miho Wakai"]
+    __description__ = (
+        "Gamma gamma skim list for study of the KLM efficiency as part of "
+        "the dark photon analysis"
+    )
+    __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+    __category__ = "physics, dark sector, control-channel"
+
+    RequiredStandardLists = {
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
+
+    TestFile = get_test_file("MC13_ggBGx1")
+
+    def __init__(self, prescale_high=1, prescale_low=1, **kwargs):
+        """
+        Parameters:
+            prescale_high (int): the prescale for more energetic probe photon
+            prescale_low (int): the prescale for a less energetic probe photon
+            **kwargs: Passed to constructor of `BaseSkim`.
+        """
+        # Redefine __init__ to allow for additional optional arguments
+        super().__init__(**kwargs)
+        self.prescale_high = prescale_high
+        self.prescale_low = prescale_low
+
+    def build_lists(self, path):
+        # unpack prescales and convert from trigger convention to a number we can
+        # compare with a float
+        prescale_high, prescale_low = self.prescale_high, self.prescale_low
+        if (prescale_high, prescale_low) is not (1, 1):
+            b2.B2INFO(
+                "GammaGammaControlKLMDarkList is prescaled. "
+                f"prescale_high={prescale_high}, prescale_low={prescale_low}"
+            )
+        prescale_high = str(float(1.0 / prescale_high))
+        prescale_low = str(float(1.0 / prescale_low))
+
+        # no good (IP-originating) tracks in the event
+        good_tracks = "abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.2"  # cm, cm, GeV/c
+        no_good_tracks = f"nCleanedTracks({good_tracks}) < 1"
+
+        # get two most energetic photons in the event (must be at least 100 MeV
+        # and not more than 7 GeV)
+        ma.cutAndCopyList(
+            "gamma:controlKLM", "gamma:all", "0.1 < useCMSFrame(clusterE) < 7", path=path)
+        ma.rankByHighest("gamma:controlKLM", "useCMSFrame(clusterE)", numBest=2, path=path)
+
+        # will build pairwise candidates from the gamma:controlKLM list:
+        # vpho -> gamma gamma
+
+        # the more energetic must be at least 4.5 GeV
+        tag_daughter = "daughterHighest(useCMSFrame(clusterE)) > 4.5"
+        # note that sometimes the probe will also fulfill this criteria, but the
+        # candidate list will *not* be double-counted: these extra candidates need
+        # to be added back offline
+
+        # apply prescales to the less energetic daughter: compare to the eventwise random number
+        probe_high = f"[daughterLowest(useCMSFrame(clusterE)) > 4.5] and [eventRandom < {prescale_high}]"
+        probe_low = f"[daughterLowest(useCMSFrame(clusterE)) < 4.5] and [eventRandom < {prescale_low}]"
+        prescale = f"[ {probe_high} ] or [ {probe_low} ]"
+
+        # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
+        delta_phi_cut = "daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065"
+
+        # sum theta in the cms 178 --> 182 degrees
+        sum_th = "daughterSumOf(useCMSFrame(theta))"
+        sum_th_cut = f"3.1066860685499065 < {sum_th} < 3.1764992386296798"
+
+        # now build and return the candidates passing the AND of our cuts
+        cuts = [no_good_tracks, tag_daughter, prescale, delta_phi_cut, sum_th_cut]
+        cuts = " and ".join([f"[ {cut} ]" for cut in cuts])
+
+        ma.reconstructDecay(
+            "vpho:singlePhotonControlKLM -> gamma:controlKLM gamma:controlKLM",
+            cuts, path=path)
+        self.SkimLists = ["vpho:singlePhotonControlKLM"]

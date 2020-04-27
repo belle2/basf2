@@ -447,10 +447,11 @@ namespace {
     for (auto iov_obj : objects)
       Database::Instance().storeData(DataStore::objectName(iov_obj.second->IsA(), ""), iov_obj.second, iov_obj.first);
 
-    // These tests don't work anymore
-    return;
+    // These tests assume that the md5sum doesn't change ... which it shouldn't
+    // unless any of the classes we store get modified or the ROOT version
+    // changes in which case we have to check this again
 
-    TFile file("testPayloads/dbstore_EventDependency_rev_1.root");
+    TFile file("testPayloads/dbstore_EventDependency_rev_d97e18.root");
     auto evdep = (EventDependency*) file.Get("EventDependency");
 
     auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
@@ -467,14 +468,14 @@ namespace {
 
     file.Close();
 
-    TFile file2("testPayloads/dbstore_BeamSpot_rev_3.root");
+    TFile file2("testPayloads/dbstore_BeamSpot_rev_0aa100.root");
     auto beam2 = (BeamSpot*) file2.Get("BeamSpot");
     beam2->getIPPosition().Print();
     EXPECT_EQ(beam2->getIPPosition()[0], 3.);
 
     file2.Close();
 
-    TFile file3("testPayloads/dbstore_VXDAlignment_rev_2.root");
+    TFile file3("testPayloads/dbstore_VXDAlignment_rev_72f4ba.root");
     auto vxd = (VXDAlignment*) file3.Get("VXDAlignment");
     EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
 

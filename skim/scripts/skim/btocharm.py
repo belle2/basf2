@@ -967,7 +967,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
     * ``abs(deltaE) < 0.2``
 
     Note:
-        This skim uses `skim.standardlists.charm.loadD0_Kspi0_loose`, where :math:`D^0`
+        This skim uses `skim.standardlists.charm.loadD0_Kspipipi0`, where :math:`D^0`
         channels are defined.
     """
 
@@ -1096,7 +1096,6 @@ class B0toDpi_Kspi(BaseSkim):
     RequiredStandardLists = {
         "stdCharged": {
             "stdPi": ["all"],
-            "stdK": ["all"],
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -1446,8 +1445,8 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
                         ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
-            ma.reconstructDecay("B+:BtoD0rho" + str(chID) + " -> " + channel, Bcuts, chID, path=path, allowChargeViolation=True)
-            BsigList.append("B+:BtoD0rho" + str(chID))
+            ma.reconstructDecay("B+:B0toDstarRho" + str(chID) + " -> " + channel, Bcuts, chID, path=path, allowChargeViolation=True)
+            BsigList.append("B+:B0toDstarRho" + str(chID))
 
         self.SkimLists = BsigList
 
@@ -1554,10 +1553,6 @@ class BtoD0h_Kpi(BaseSkim):
         "stdCharged": {
             "stdK": ["all"],
             "stdPi": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
         },
         "skim.standardlists.charm": {
             "loadStdD0_Kpi": [],

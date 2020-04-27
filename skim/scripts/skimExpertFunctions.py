@@ -351,7 +351,7 @@ class BaseSkim(ABC):
     """A list of modules which to be silenced for this skim. This may be necessary to
     set in order to keep log file sizes small."""
 
-    TestFile = get_test_file("MC12_mixedBGx1")
+    TestFile = get_test_file("MC13_mixedBGx1")
     """Location of an MDST file to test the skim on. Defaults to an MC12 mixed BGx1
     sample. If you want to use a different test file for your skim, set it using
     `get_test_file`.

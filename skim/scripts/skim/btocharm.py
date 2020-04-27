@@ -991,6 +991,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
             "loadStdPi0ForBToHadrons": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
             "loadD0_Kspipipi0": [],
         },
     }
@@ -1047,25 +1048,16 @@ class B0toDpi_Kpipi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdDplus_Kpipi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
-
-        ma.reconstructDecay("B0:Dpi_Kpipi -> D-:Kpipi pi+:all", Bcuts, 0, path=path)
+        ma.reconstructDecay("B0:Dpi_Kpipi -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
 
         self.SkimLists = ["B0:Dpi_Kpipi"]
 
@@ -1094,9 +1086,6 @@ class B0toDpi_Kspi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
         "stdV0s": {
             "stdKshorts": [],
         },
@@ -1104,18 +1093,14 @@ class B0toDpi_Kspi(BaseSkim):
             "loadStdPi0ForBToHadrons": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
             "loadStdDplus_Kspi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
-
-        ma.reconstructDecay("B0:B0toDpi_Kspi -> D-:Kspi pi+:all", Bcuts, 1, path=path)
+        ma.reconstructDecay("B0:B0toDpi_Kspi -> D-:Kspi pi+:GoodTrack", Bcuts, 1, path=path)
 
         self.SkimLists = ["B0:B0toDpi_Kspi"]
 
@@ -1143,26 +1128,17 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpi": [],
             "loadStdDstarPlus_D0pi_Kpi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
-
-        ma.reconstructDecay("B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:all", Bcuts, 0, path=path)
+        ma.reconstructDecay("B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:GoodTrack", Bcuts, 0, path=path)
 
         self.SkimLists = ["B0:Dstarpi_Kpi"]
 
@@ -1187,14 +1163,12 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.lightmesons": {
             "loadStdPi0ForBToHadrons": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpipi0": [],
             "loadStdD0_Kpipipi": [],
             "loadStdDstarPlus_D0pi_Kpipi0": [],
@@ -1203,18 +1177,11 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
-
         BsigChannels = [
-                        "D*-:D0_Kpipipi pi+:all",
-                        "D*-:D0_Kpipi0 pi+:all"
-                        ]
+            "D*-:D0_Kpipipi pi+:GoodTrack",
+            "D*-:D0_Kpipi0 pi+:GoodTrack"
+        ]
 
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
@@ -1250,10 +1217,11 @@ class B0toDrho_Kpipi(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
             "stdPi": ["all"],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdDplus_Kpipi": [],
         },
         "skim.standardlists.lightmesons": {
@@ -1263,14 +1231,7 @@ class B0toDrho_Kpipi(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
-
         ma.reconstructDecay("B0:B0toDrho_Kpipi -> D-:Kpipi rho+:all", Bcuts, 1, path=path)
 
         self.SkimLists = ["B0:B0toDrho_Kpipi"]
@@ -1309,6 +1270,7 @@ class B0toDrho_Kspi(BaseSkim):
             "stdKshorts": []
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
             "loadStdDplus_Kspi": [],
         },
         "skim.standardlists.lightmesons": {
@@ -1318,10 +1280,6 @@ class B0toDrho_Kspi(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         ma.reconstructDecay("B0:B0toDrho_Kspi -> D-:Kspi rho+:all", Bcuts, 1, path=path)
@@ -1357,7 +1315,6 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
             "stdPi": ["all"],
         },
         "skim.standardlists.lightmesons": {
@@ -1365,20 +1322,15 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
             "loadStdAllRhoPlus": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpi": [],
             "loadStdDstarPlus_D0pi_Kpi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
-
         ma.reconstructDecay("B0:BtoDstarRho_D0pi_Kpi -> D*-:D0_Kpi rho+:all", Bcuts, 1, path=path)
 
         self.SkimLists = ["B0:BtoDstarRho_D0pi_Kpi"]
@@ -1415,7 +1367,6 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
             "stdPi": ["all"],
         },
         "skim.standardlists.lightmesons": {
@@ -1423,6 +1374,8 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
             "loadStdAllRhoPlus": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpipi0": [],
             "loadStdD0_Kpipipi": [],
             "loadStdDstarPlus_D0pi_Kpipi0": [],
@@ -1431,18 +1384,12 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         BsigChannels = [
-                        "D*-:D0_Kpipipi rho+:all",
-                        "D*-:D0_Kpipi0 rho+:all",
-                        ]
+            "D*-:D0_Kpipipi rho+:all",
+            "D*-:D0_Kpipi0 rho+:all",
+        ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
             ma.reconstructDecay("B+:B0toDstarRho" + str(chID) + " -> " + channel, Bcuts, chID, path=path, allowChargeViolation=True)
@@ -1484,11 +1431,9 @@ class BtoD0h_hh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadD0_hh_loose": [],
         },
     }
@@ -1496,9 +1441,10 @@ class BtoD0h_hh(BaseSkim):
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
-        BsigChannels = ["anti-D0:hh pi+:all",
-                        "anti-D0:hh K+:all"
-                        ]
+        BsigChannels = [
+            "anti-D0:hh pi+:GoodTrack",
+            "anti-D0:hh K+:GoodTrack"
+        ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
             ma.reconstructDecay("B+:BtoD0h_hh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
@@ -1507,8 +1453,8 @@ class BtoD0h_hh(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=path)
-        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        ma.reconstructDecay('D0 -> K-:GoodTrack pi+:GoodTrack', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
 
@@ -1550,26 +1496,18 @@ class BtoD0h_Kpi(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.5"
 
-        BsigChannels = ["anti-D0:Kpi pi+:all",
-                        "anti-D0:Kpi K+:all"
+        BsigChannels = ["anti-D0:Kpi pi+:GoodTrack",
+                        "anti-D0:Kpi K+:GoodTrack"
                         ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
@@ -1609,14 +1547,12 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
         "skim.standardlists.lightmesons": {
             "loadStdPi0ForBToHadrons": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpipi0": [],
             "loadStdD0_Kpipipi": [],
             "loadStdDstar0_D0pi0_Kpipipi": [],
@@ -1625,22 +1561,16 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
-        BsigChannels = ["anti-D0:Kpipipi pi+:all",
-                        "anti-D0:Kpipipi K+:all",
-                        "anti-D0:Kpipi0 pi+:all",
-                        "anti-D0:Kpipi0 K+:all",
-                        "anti-D*0:D0_Kpipipi pi+:all",
-                        "anti-D*0:D0_Kpipipi K+:all",
-                        "anti-D*0:D0_Kpipi0 pi+:all",
-                        "anti-D*0:D0_Kpipi0 K+:all"
+        BsigChannels = ["anti-D0:Kpipipi pi+:GoodTrack",
+                        "anti-D0:Kpipipi K+:GoodTrack",
+                        "anti-D0:Kpipi0 pi+:GoodTrack",
+                        "anti-D0:Kpipi0 K+:GoodTrack",
+                        "anti-D*0:D0_Kpipipi pi+:GoodTrack",
+                        "anti-D*0:D0_Kpipipi K+:GoodTrack",
+                        "anti-D*0:D0_Kpipi0 pi+:GoodTrack",
+                        "anti-D*0:D0_Kpipi0 K+:GoodTrack"
                         ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
@@ -1687,14 +1617,12 @@ class BtoD0h_Kshh(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-            "stdK": ["all"],
-        },
         "stdV0s": {
             "stdKshorts": []
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadD0_Kshh_loose": [],
         },
     }
@@ -1702,8 +1630,8 @@ class BtoD0h_Kshh(BaseSkim):
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
-        BsigChannels = ["anti-D0:Kshh pi+:all",
-                        "anti-D0:Kshh K+:all"
+        BsigChannels = ["anti-D0:Kshh pi+:GoodTrack",
+                        "anti-D0:Kshh K+:GoodTrack"
                         ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
@@ -1713,8 +1641,8 @@ class BtoD0h_Kshh(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=path)
-        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+        ma.reconstructDecay('D0 -> K_S0:merged pi+:GoodTrack pi-:GoodTrack', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
         ma.variablesToHistogram(
@@ -1757,7 +1685,6 @@ class BtoD0rho_Kpi(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
             "stdPi": ["all"],
         },
         "skim.standardlists.lightmesons": {
@@ -1765,18 +1692,14 @@ class BtoD0rho_Kpi(BaseSkim):
             "loadStdAllRhoPlus": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpi": [],
             "loadStdDstar0_D0pi0_Kpi": [],
         },
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
         BsigChannels = ["anti-D0:Kpi rho+:all",
@@ -1823,7 +1746,6 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
             "stdPi": ["all"],
         },
         "skim.standardlists.lightmesons": {
@@ -1831,6 +1753,8 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
             "loadStdAllRhoPlus": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0_Kpipi0": [],
             "loadStdD0_Kpipipi": [],
             "loadStdDstar0_D0pi0_Kpipi0": [],
@@ -1839,20 +1763,14 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     }
 
     def build_lists(self, path):
-        # TODO: Copied from steering file. Skim liaisons *must* remove cuts on "all"-labelled lists
-        ma.applyCuts(list_name="pi+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-        ma.applyCuts(list_name="K+:all", cut="abs(dr) < 2 and abs(dz) < 5",
-                     path=path)
-
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9 and 0.6 <= daughter(1,M) <= 0.9"
 
         BsigChannels = [
-                        "anti-D0:Kpipipi rho+:all",
-                        "anti-D0:Kpipi0 rho+:all",
-                        "anti-D*0:D0_Kpipipi rho+:all",
-                        "anti-D*0:D0_Kpipi0 rho+:all"
-                        ]
+            "anti-D0:Kpipipi rho+:all",
+            "anti-D0:Kpipi0 rho+:all",
+            "anti-D*0:D0_Kpipipi rho+:all",
+            "anti-D*0:D0_Kpipi0 rho+:all"
+        ]
         BsigList = []
         for chID, channel in enumerate(BsigChannels):
             ma.reconstructDecay("B+:BtoD0rho_merged" + str(chID) + " -> " + channel, Bcuts, chID, path=path)

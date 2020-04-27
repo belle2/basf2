@@ -12,13 +12,9 @@ __authors__ = [
 
 from basf2 import Path
 import modularAnalysis as ma
-<< << << < HEAD
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skimExpertFunctions import BaseSkim, fancy_skim_header, ifEventPasses
 from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
-== == == =
-from skimExpertFunctions import ifEventPasses
->>>>>> > master
 
 
 def SemileptonicList(path):
@@ -381,6 +377,8 @@ class SLUntagged(BaseSkim):
             "loadStdPi0ForBToHadrons": [],
         },
         "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
             "loadStdD0": [],
             "loadStdDstar0": [],
             "loadStdDplus": [],

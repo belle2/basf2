@@ -216,18 +216,6 @@ class TCPV(BaseSkim):
     __category__ = "physics, TCPV"
 
     RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadStdD0_Kpi": [],
-            "loadStdD0_Kpipipi": [],
-        },
-        "skim.standardlists.dileptons": {
-            "loadStdDiLeptons": [],
-            "loadStdJpsiToee": [],
-            "loadStdJpsiTomumu": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdLightMesons": []
-        },
         "stdCharged": {
             "stdE": ["loose"],
             "stdK": ["all", "loose"],
@@ -244,6 +232,20 @@ class TCPV(BaseSkim):
         },
         "stdV0s": {
             "stdKshorts": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpi": [],
+            "loadStdD0_Kpipipi": [],
+        },
+        "skim.standardlists.dileptons": {
+            "loadStdDiLeptons": [],
+            "loadStdJpsiToee": [],
+            "loadStdJpsiTomumu": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdLightMesons": []
         },
     }
 

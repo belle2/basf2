@@ -672,7 +672,6 @@ def make_combined_steering_file(
         for module in modules
     }
 
-    # TODO: handle local override here. Shout (raise NotImplementedError) if `len(modules)>1 and args.local`
     # Handle local override of skim script, in case we need to replace a skim module at production time
     if LocalModule and len(modules) > 1:
         B2ERROR(

@@ -1618,12 +1618,6 @@ class DstToD0Pi_D0ToSemileptonic(BaseSkim):
         },
     }
 
-    def additional_setup(self, path):
-        # TODO: Copied from steering file; skim liaison *must* change K_S0:all name
-        ma.reconstructDecay("K_S0:all -> pi-:95eff pi+:95eff", "0.4 < M < 0.6", 1, True, path=path)
-        vertex.kFit("K_S0:all", 0.0, path=path)
-        ma.applyCuts("K_S0:all", "0.477614 < M < 0.517614", path=path)
-
     def build_lists(self, path):
         Dcuts = "1.82 < M < 1.92"
         DstarSLcuts = "1.9 < M < 2.1"

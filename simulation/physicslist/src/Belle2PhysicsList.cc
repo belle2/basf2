@@ -51,7 +51,7 @@ using namespace Simulation;
 Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   : G4VModularPhysicsList(), m_globalCutValue(0.07)
 {
-  G4cout << " Using " << physicsListName << " physics list " << G4endl;
+  B2INFO("Using " << physicsListName << " physics list");
 
   m_pxdCutValue = m_globalCutValue;
   m_svdCutValue = m_globalCutValue;
@@ -261,7 +261,8 @@ void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector
 void Belle2PhysicsList::SetCuts()
 {
   // Belle2 assumes input units are cm
-  G4cout << " Global cut set to " << m_globalCutValue << G4endl;
+  B2INFO("Setting global Geant4 production cut" << LogVar("cutValue", m_globalCutValue));
+
   SetCutValue(m_globalCutValue * cm, "proton");
   SetCutValue(m_globalCutValue * cm, "e-");
   SetCutValue(m_globalCutValue * cm, "e+");
@@ -273,8 +274,7 @@ void Belle2PhysicsList::SetCuts()
   setRegionCuts("ARICH", {"ARICHEnvelope"}, m_arichtopCutValue);
   setRegionCuts("TOP", {"TOPEnvelope"}, m_arichtopCutValue);
   setRegionCuts("ECL", {"ECLForwardEnvelope", "ECLBarrelSector", "ECLBackwardEnvelope"}, m_eclCutValue);
-  setRegionCuts("BKLM", {"BKLMEnvelope"}, m_klmCutValue);
-  setRegionCuts("EKLM", {"EKLMEnvelope"}, m_klmCutValue);
+  setRegionCuts("KLM", {"BKLMEnvelope", "EKLMEnvelope"}, m_klmCutValue);
 }
 
 

@@ -543,10 +543,13 @@ class BaseSkim(ABC):
         particular skim.
         """
         cls = self.__class__
-        parent_cls = cls.__mro__[1]
+        ParentsWithAttr = [parent for parent in cls.__mro__[1:] if hasattr(parent, method)]
 
-        if hasattr(cls, method) and hasattr(parent_cls, method):
-            return getattr(cls, method) == getattr(parent_cls, method)
+        if ParentsWithAttr:
+            # Look for oldest ancestor which as that attribute, to handle inheritance.
+            # In the case of `validation_histograms`, this will be `BaseSkim`.
+            OldestParentWithAttr = ParentsWithAttr[-1]
+            return getattr(cls, method) == getattr(OldestParentWithAttr, method)
         else:
             return False
 

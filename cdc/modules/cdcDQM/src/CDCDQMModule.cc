@@ -65,8 +65,8 @@ namespace Belle2 {
       m_hADC[i] = new TH1F(Form("hADC%d", i), Form("hADC%d", i), 400, 0, 400);
       m_hTDC[i] = new TH1F(Form("hTDC%d", i), Form("hTDC%d", i), 1000, 4200, 5200);
       m_hTDCbig[i] = new TH1F(Form("hTDCbig%d", i), Form("hTDCbig%d", i), 200, 4200, 5200);
-      m_hADCTDC[i] = new TH2F(Form("hADCTDC%d", i), Form("hADCTDC%d", i), 100, 0, 400, 200, 4200, 5200);
-      m_hADCTOT[i] = new TH2F(Form("hADCTOT%d", i), Form("hADCTOT%d", i), 100, 0, 200, 15, 0, 15);
+      m_hADCTDC[i] = new TH2F(Form("hADCTDC%d", i), Form("hADCTDC%d", i), 20, 0, 400, 40, 4200, 5200);
+      m_hADCTOT[i] = new TH2F(Form("hADCTOT%d", i), Form("hADCTOT%d", i), 20, 0, 200, 15, 0, 15);
     }
 
     for (int i = 0; i < 56; ++i) {

@@ -101,8 +101,7 @@ class ExamplesTest(unittest.TestCase):
         Test supported tagging examples.
         """
         # list of the broken examples (to be removed when they are individually fixed)
-        broken_tag_egs = ['BtagBsigReconstruction.py',  # BII-4281
-                          'KlongDecayReconstructionExample.py'  # BII-4281
+        broken_tag_egs = ['KlongDecayReconstructionExample.py'  # BII-4281
                           ]
 
         self._test_examples_dir('analysis/examples/tagging/', broken_tag_egs)

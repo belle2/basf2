@@ -101,7 +101,7 @@ namespace Belle2 {
       while (!qq.empty()) {
         auto d = qq.front(); // get daughter
         qq.pop();            // remove the daughter from the queue
-        if (isCloneTrack(d)) return 1.0;
+        if (isCloneTrack(d) == 1.0) return 1.0;
         size_t nDau = d->getNDaughters(); // number of daughters of daughters
         for (size_t iDau = 0; iDau < nDau; iDau++)
           qq.push(d->getDaughter(iDau));

@@ -441,10 +441,11 @@ class SinglePhotonDark(BaseSkim):
         angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
         minimum = "E > 0.1"  # GeV
         ma.cutAndCopyList("gamma:100", "gamma:all", minimum + " and " + angle, path=path)
-        path2 = b2.Path()
-        ifEventPasses(
+
+        path = self.skim_event_cuts(
             f"0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1",
-            conditional_path=path2, path=path)
+            path=path
+        )
 
         # all remaining single photon events (== candidates) with region
         # dependent minimum energy in GeV
@@ -453,7 +454,7 @@ class SinglePhotonDark(BaseSkim):
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
         region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
         region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
-        ma.cutAndCopyList("gamma:singlePhoton", "gamma:100", region_dependent, path=path2)
+        ma.cutAndCopyList("gamma:singlePhoton", "gamma:100", region_dependent, path=path)
         self.SkimLists = ["gamma:singlePhoton"]
 
 
@@ -631,9 +632,6 @@ class LFVZpVisible(BaseSkim):
     RequiredStandardLists = {
         "stdCharged": {
             "stdE": ["all", "loose"],
-            "stdK": ["all", "loose"],
-            "stdMu": ["all", "loose"],
-            "stdPi": ["all", "loose"],
         },
     }
 

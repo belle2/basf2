@@ -771,3 +771,53 @@ class GammaGammaControlKLMDark(BaseSkim):
             "vpho:singlePhotonControlKLM -> gamma:controlKLM gamma:controlKLM",
             cuts, path=path)
         self.SkimLists = ["vpho:singlePhotonControlKLM"]
+
+
+@fancy_skim_header
+class DielectronPlusMissingEnergy(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
+
+    Warning:
+        This skim is currently deactivated, since the retention rate is too high.
+    """
+
+    __authors__ = "Giacomo De Pietro"
+    __description__ = (
+        "Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`"
+        ":math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches."
+    )
+    __contact__ = ""
+    __category__ = "physics, dark sector"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+        },
+    }
+
+    TestFile = get_test_file("MC13_mumuBGx1")
+
+    def build_lists(self, path):
+        dielectron_list = []
+        skim_label = "forDielectronMissingEnergySkim"
+        dielectron_name = f"Z0:{skim_label}"
+
+        # Define some basic cuts
+        fromIP_cut = "[abs(dz) < 5.0] and [abs(dr) < 2.0]"
+        electronID_cut = "[electronID > 0.2]"
+        # We require that the electron points to the barrel ECL + 10 degrees
+        theta_cut = "[0.387 < theta < 2.421]"
+        # We want exactly 2 tracks from IP
+        dielectron_cut = f"[nCleanedTracks({fromIP_cut}) == 2]"
+        # And the pair must have pt > 200 MeV in CMS frame
+        dielectron_cut += " and [useCMSFrame(pt) > 0.2]"
+
+        # Reconstruct the dielectron candidate
+        electron_cuts = " and ".join([fromIP_cut, electronID_cut, theta_cut])
+        ma.cutAndCopyList(f"e+:{skim_label}", "e+:all", electron_cuts, path=path)
+        ma.reconstructDecay(f"{dielectron_name} -> e+:{skim_label} e-:{skim_label}", dielectron_cut, path=path)
+
+        # And return the dielectron list
+        dielectron_list.append(dielectron_name)
+        self.SkimLists = dielectron_list

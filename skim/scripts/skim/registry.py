@@ -93,7 +93,7 @@ RegisteredSkims = [
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
-    # ("18520300", "", "DielectronPlusMissingEnergy"),
+    ("18520300", "dark", "DielectronPlusMissingEnergy"),
     ("18520400", "dark", "LFVZpVisible"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),

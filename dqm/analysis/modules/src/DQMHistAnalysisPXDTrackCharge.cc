@@ -76,6 +76,8 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
+  m_cTrackedClusters = new TCanvas((m_histogramDirectoryName + "/c_TrackedClusters").data());
+
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
 
   m_gCharge = new TGraphErrors();
@@ -142,6 +144,33 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   bool enough = false;
 
+  {
+    m_cTrackedClusters->Clear();
+    m_cTrackedClusters->cd();
+
+    std::string name = "PXD_Tracked_Clusters"; // new name
+    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Track_Clusters");
+    if (hh2) {
+      auto hh3 = (TH1*)hh2->DrawClone("hist");
+      hh2->SetName(name.data());
+      hh2->SetTitle("Tracked Clusters/Event");
+      auto scale = hh3->GetBinContent(0);// overflow misused as event counter!
+      if (scale) hh3->Scale(1. / scale);
+      hh2->SetFillColor(kWhite);
+      hh2->SetStats(kFALSE);
+      hh2->Draw("hist");
+
+      TH1* href2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
+
+      m_cTrackedClusters->cd();
+      if (href2) {
+        href2->SetLineStyle(3);// 2 or 3
+        href2->SetLineColor(kBlack);
+        href2->Draw("same");
+      }
+    }
+  }
+
   m_gCharge->Set(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -178,7 +207,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
 
       if (hist2) {
-        B2INFO("Draw Normalized " << hist2->GetName());
+//         B2INFO("Draw Normalized " << hist2->GetName());
         hist2->SetLineStyle(3);// 2 or 3
         hist2->SetLineColor(kBlack);
 
@@ -283,6 +312,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_low->Draw();
 
   }
+
 #ifdef _BELLE2_EPICS
   SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
   SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");

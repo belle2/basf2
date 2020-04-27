@@ -80,6 +80,8 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
     //! Final Canvases for Fit and Ref
     std::map<VxdID, TCanvas*> m_cChargeMod {};
+    //! Final Canvas for TrackedClusters
+    TCanvas* m_cTrackedClusters = nullptr;
 
     TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
 

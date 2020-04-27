@@ -305,7 +305,7 @@ class TCPV(BaseSkim):
             bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
         ma.fillParticleList(decayString='pi+:eventShapeForSkims',
-                            cut='pt > 0.1 and d0<0.5 and -2<z0<2 and nCDCHits>20', path=path)
+                            cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:eventShapeForSkims',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 

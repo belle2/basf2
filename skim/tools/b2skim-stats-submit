@@ -410,7 +410,7 @@ if __name__ == "__main__":
         elif "all" in skims:
             raise ValueError("Cannot pass both 'all' and a list of skim names.")
 
-        submit_jobs(skims, samples, args.nEventsPerSample)
+        submit_jobs(skims, samples, args.dry_run, args.nEventsPerSample)
     else:
         with open(args.combined[0]) as YAMLFile:
             CombinedSkimDefinitions = yaml.safe_load(YAMLFile)

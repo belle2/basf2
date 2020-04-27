@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -30,10 +29,6 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
-from stdV0s import stdKshorts
-from stdV0s import stdLambdas
-
-b2.conditions.disable_globaltag_replay()
 
 # create path
 my_path = b2.create_path()
@@ -89,7 +84,7 @@ ma.reconstructDecay(decayString='B+:D0pi -> anti-D0:all pi+',
                     dmID=1,
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B+:D0pi',
                 path=my_path)
 
@@ -105,7 +100,7 @@ b_vars = vc.deltae_mbc + \
                                    decay_string='B+ -> anti-D0 ^pi+',
                                    prefix='pi') + \
     vu.create_aliases(list_of_variables=['decayModeID'],
-                      wrapper='daughter(0,extraInfo(variable))',
+                      wrapper='daughter(0,extraInfo({variable}))',
                       prefix="")
 
 # Saving variables to ntuple

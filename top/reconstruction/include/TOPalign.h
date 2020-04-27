@@ -193,6 +193,12 @@ namespace Belle2 {
        */
       bool isValid() const {return m_valid;}
 
+      /**
+       * Returns number of photons used for log likelihood calculation
+       * @return number of photons or -1 if track doesn't hit the bar (no log likelihood)
+       */
+      int getNumOfPhotons() const {return m_numPhotons;}
+
     private:
 
       int m_moduleID = 0; /**< module ID */
@@ -210,6 +216,7 @@ namespace Belle2 {
       int m_numTracks = 0;  /**< track counter */
       int m_numUsedTracks = 0;  /**< number of tracks used */
       bool m_valid = false; /**< validity of results */
+      int m_numPhotons = 0; /**< number of photons used for log likelihood calculation */
 
       std::vector<double> m_U;   /**< matrix (neg. sum of second derivatives) */
 

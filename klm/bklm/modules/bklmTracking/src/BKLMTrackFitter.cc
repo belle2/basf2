@@ -18,6 +18,10 @@
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
+/* CLHEP headers. */
+#include <CLHEP/Matrix/DiagMatrix.h>
+#include <CLHEP/Matrix/Matrix.h>
+
 /* C++ headers. */
 #include <cfloat>
 

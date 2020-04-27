@@ -235,12 +235,15 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
   //
   //
   int nBin = 8000 / (TimeWindow / 2) ; //8000/125
-  double WindowStart = 0;
-  double WindowEnd = 0;
+  /* cppcheck-suppress variableScope */
+  double WindowStart;
+  /* cppcheck-suppress variableScope */
+  double WindowEnd;
   double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
-
-  double check_window_start = 0;
-  double check_window_end = 0;
+  /* cppcheck-suppress variableScope */
+  double check_window_start;
+  /* cppcheck-suppress variableScope */
+  double check_window_end;
 
 
   for (int iBin = 0 ; iBin < nBin; iBin ++) {
@@ -675,9 +678,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   phiringsum.resize(17, 0);
   setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-  double E_br = 0;
-  double E_fwd = 0;
-  double E_bwd = 0;
+  double E_br;
+  double E_fwd;
+  double E_bwd;
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;
@@ -754,7 +757,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   // Bhabha veto
   //--------------
   //
-  cout << m_nEvent << endl;
   obj_bhabha-> set2DBhabhaThreshold(_2DBhabhaThresholdFWD, _2DBhabhaThresholdBWD);
   obj_bhabha -> set3DBhabhaSelectionThreshold(_3DBhabhaSelectionThreshold);
   obj_bhabha -> set3DBhabhaVetoThreshold(_3DBhabhaVetoThreshold);
@@ -1141,7 +1143,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   int bit_prescale = prescale & 0x01;
   int bit_burst = burst & 0x01;
   _Triggerbit[2] |= bit_lowmulti2;
-  _Triggerbit[2] <<= 2;
+  _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_burst;
   _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_prescale;
@@ -1149,10 +1151,12 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
   _Triggerbit[2] |= bit_mumu;
   _Triggerbit[2] <<= 1;
   _Triggerbit[2] |= bit_3DBhabha_sel;
-  _Triggerbit[2] <<= 1;
+  _Triggerbit[2] <<= 10;
   _Triggerbit[2] |= ((bit_lowmulti1) >> 2) & 0x3FF;
+
+
   _Triggerbit[1] |= (bit_lowmulti1 & 0x03);
-  _Triggerbit[1] <<= 2;
+  _Triggerbit[1] <<= 1;
   _Triggerbit[1] |= bit_3Dbhabha;
   _Triggerbit[1] <<= 1;
   _Triggerbit[1] |= bit_ClusterOverflow;
@@ -1173,7 +1177,7 @@ void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSo
 
 
   _Triggerbit[0] |= (bit_bhabhatype & 0x0FFF);
-  _Triggerbit[0] <<= 12;
+  _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_2Dbhabha;
   _Triggerbit[0] <<= 1;
   _Triggerbit[0] |= bit_physics;

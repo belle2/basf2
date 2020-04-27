@@ -16,7 +16,6 @@
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
-#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
@@ -25,6 +24,7 @@
 /* ROOT headers. */
 #include <TFile.h>
 #include <TH1D.h>
+#include <TRandom.h>
 
 /* C++ headers. */
 #include <string>
@@ -131,7 +131,7 @@ void KLM::ScintillatorSimulator::setChannelData(
   const EKLMChannelData* channelData)
 {
   m_Pedestal = channelData->getPedestal();
-  m_PhotoelectronAmplitude = channelData->getPedestal();
+  m_PhotoelectronAmplitude = channelData->getPhotoelectronAmplitude();
   m_Threshold = channelData->getThreshold();
 }
 
@@ -150,8 +150,8 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<uint16_t, BKLMSimHit*>::iterator& firstHit,
-  std::multimap<uint16_t, BKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, const BKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
@@ -163,12 +163,12 @@ void KLM::ScintillatorSimulator::simulate(
     2.0 * (hit->isPhiReadout() ?
            module->getPhiScintHalfLength(hit->getStrip()) :
            module->getZScintHalfLength(hit->getStrip()));
-  for (std::multimap<uint16_t, BKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, const BKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
-    m_Energy = m_Energy + hit->getEDep();
+    m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
     double sipmDistance = hit->getPropagationTime() *
                           m_DigPar->getFiberLightSpeed();
@@ -188,20 +188,20 @@ void KLM::ScintillatorSimulator::simulate(
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<uint16_t, EKLMSimHit*>::iterator& firstHit,
-  std::multimap<uint16_t, EKLMSimHit*>::iterator& end)
+  std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+  std::multimap<uint16_t, const EKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
   const EKLMSimHit* hit = firstHit->second;
   double stripLength = EKLM::GeometryData::Instance().getStripLength(
                          hit->getStrip()) / CLHEP::mm * Unit::mm;
-  for (std::multimap<uint16_t, EKLMSimHit*>::iterator it = firstHit;
+  for (std::multimap<uint16_t, const EKLMSimHit*>::iterator it = firstHit;
        it != end; ++it) {
     hit = it->second;
-    m_Energy = m_Energy + hit->getEDep();
+    m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
     double sipmDistance = 0.5 * stripLength - hit->getLocalPosition().x();
     double time = hit->getTime() +
@@ -481,7 +481,7 @@ enum KLM::ScintillatorFirmwareFitStatus KLM::ScintillatorSimulator::getFitStatus
   return m_FPGAStat;
 }
 
-double KLM::ScintillatorSimulator::getNPE()
+double KLM::ScintillatorSimulator::getNPhotoelectrons()
 {
   double intg;
   intg = m_FPGAFit.getAmplitude();
@@ -489,7 +489,7 @@ double KLM::ScintillatorSimulator::getNPE()
          m_PhotoelectronAmplitude;
 }
 
-int KLM::ScintillatorSimulator::getGeneratedNPE()
+int KLM::ScintillatorSimulator::getNGeneratedPhotoelectrons()
 {
   return m_npe;
 }

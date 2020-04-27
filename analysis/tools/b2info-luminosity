@@ -4,21 +4,8 @@
 """
 Script to get the integrated luminosity of a set of runs
 
-Based on a bash script by Mikhail Remnev mikhail.remnev@desy.de
-https://confluence.desy.de/display/BI/ECL+LM+Integrated+luminosity+in+Phase+3
-
 Usage:
-    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DATE|RUN] [--verbose]
-
-<E> experiment number (mandatory) A range is allowed
-<Range> run range (mandatory)
-    syntax is: xx-yy,zz
-    all runs between xx and yy (included) and run zz. Can have multiple ranges xx-yy,zz-ww
-    not allowed if exp has range as well
---what Use Offline (default) or Online luminosity
---plot Produce plot of integrated luminosity vs day (DATE) or vs run (RUN)
---verbose print lumi for each run
---dbon|offline path of database to use (for developers)
+    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DAY|WEEK|RUN] [--verbose]
 
 """
 
@@ -30,7 +17,7 @@ import argparse
 import re
 import sqlite3
 import time
-import datetime
+from datetime import datetime
 import os
 import basf2 as b2
 
@@ -38,6 +25,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
+
 
 
 def parseNumRange(string):
@@ -68,7 +56,7 @@ def argparser():
     Parse options as command-line arguments.
     """
 
-    description = "Script to get the online integrated luminosity for a range or runs."
+    description = "Script to get the integrated luminosity."
 
     parser = argparse.ArgumentParser(description=description, usage=__doc__, add_help=True)
 
@@ -77,14 +65,14 @@ def argparser():
                         action="store",
                         type=parseNumList,
                         required=True,
-                        help="Experiment numbers")
+                        help="Experiment numbers (required). Range allowed: eg 3,7-10")
     parser.add_argument("--runs",
                         dest="runs",
                         action="store",
                         type=parseNumList,
                         required=False,
                         default=None,
-                        help="Process only the selected run range. Syntax is xx-yy,zz")
+                        help="Process only the selected run range. Syntax is xx-yy,zz. Multiple ranges allowed xx-yy,zz,aa-bb")
     parser.add_argument("--what",
                         dest="what",
                         action="store",
@@ -92,35 +80,36 @@ def argparser():
                         required=False,
                         default='offline',
                         choices=["offline","online"],
-                        help="Offline (default) or online luminosity")
+                        help="Which luminosity: offline (default) or online")
     parser.add_argument("--verbose",
                         dest="verb",
                         action="store_true",
                         default=False,
-                        help="Print each run luminosity")
+                        help="Print luminosity for each run")
     parser.add_argument("--dbonline",
                         dest="dbonlie",
                         action="store",
                         default="/gpfs/group/belle2/group/detector/ECL/ecl_lom.db",
-                        help="EC: DataBase path")
+                        help="ECL DataBase path (for developers)")
     parser.add_argument("--dboffline",
                         dest="dbofflie",
                         action="store",
                         default="/group/belle2/dataprod/Luminosity/OffLineLuminosity.db",
-                        help="DataBase path for OffLine Lumi")
+                        help="DataBase path for OffLine Lumi (for developers)")
 
     plot_actions = {
-        "DATE" : "Histogram of integrated luminosity per date",
+        "DAY"  : "Histogram of daily integrated luminosity",
+        "WEEK" : "Histogram of weekly integrated luminosity",
         "RUN"  : "Histogram of integrated luminosity per run",
-        "TOT"  : "Graph of total integrated luminosity vs. date",
         }
 
     parser.add_argument("--plot",
                         dest="plot",
                         action="store",
+                        nargs='+',
                         choices=list(plot_actions.keys()),
                         default=None,
-                        help="")
+                        help="Produce plot of integrated luminosity for each run, day, or week")
 
     return parser
 
@@ -210,6 +199,7 @@ class Luminosity:
 
         # lumi in /fb
         df['lumi'] *= 1E-6
+
         # cumulative integrated luminosity
         df['intLumi'] = df['lumi'].cumsum()
 
@@ -217,11 +207,11 @@ class Luminosity:
 
     def getDataFrameFromDBOnline(self):
         """
-        create a panda dataframe from DB
+        create a panda dataframe from online DB
         """
 
         #cmdexp = f"SELECT {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp = :exp "
-        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])})  "
+        cmdexp = f"SELECT exp, {self.col_lumi} as lumi, run, start_time as date, end_time FROM prev_bhacnt_det_run WHERE exp IN ({', '.join(['?' for _ in self.exp])}) AND start_time > 0 "
         if args.runs:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
@@ -247,36 +237,49 @@ class Luminosity:
         :param period: 1 for day, 2 for week (start on monday)
         """
 
+        # protection for strange entry in the database
+        df=self.df.copy()
+        #drop runs with no date
+
+        df["TMP"] = df.date.values                 # date is a DateTimeIndex
+        df = df[df.TMP.notnull()]                  # remove all NaT values
+        df.drop(["TMP"], axis=1, inplace=True)     # delete TMP again
+        #drop runs with start date before actual start  of BelleII
+        df=df[~(df['date']<'2018-01-01')]
+
         # Group runs by date, and store the int lumi per date as the max cumulative lumi.
         # This returns a pandas.Series object.
         srs_lumi_date = []
-        if period==1: # per day
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%Y/%m/%d'))["lumi"].sum()
-            label="Day"
-        if period==2: # per week
-            # not working yet
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.strftime('%w'))["lumi"].sum()
-            #srs_lumi_date = self.df.groupby(pd.TimeGrouper(key='date',freq='W-MON'))["lumi"].sum()
-            label="Week"
+        if period==1: # daily
+            srs_lumi_date = df.groupby(df["date"].dt.floor('d'))["lumi"].sum()
+            label="Daily"
+            freq='D'
+            width=1.0
+        if period==2: # weekly
+            srs_lumi_date = df.groupby(df["date"].dt.floor('7d'))["lumi"].sum()
+            label="Weekly"
+            freq='7d'
+            width=3.5
+    
+        srs_lumi_date = srs_lumi_date.asfreq(freq, fill_value=0.0)
 
+        x = srs_lumi_date.index.values
+        y = srs_lumi_date.values
+
+        # integrated luminosity
+        yInt = np.cumsum(srs_lumi_date.values)
 
         figure, ax1 = plt.subplots()
 
-        x = srs_lumi_date.index.values
-        x[0] = x[1] # groupby insert first date as epoch 0
-        y = srs_lumi_date.values
-
-        # there must be a cleaner way to do this
-        yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
         
-        ax1.bar(x, y, label=f"{label} per {label}", color="blue", width=1.0)
+        ax1.bar(x, y, label=f"{label}", color="blue", width=width)
 
         ax1.set_xlabel(r"Date")
-        ax1.set_ylabel(rf"Total integrated luminosity per {label} [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
+        ax1.xaxis.set_minor_locator(ticker.AutoLocator())
         ax1.xaxis.set_major_locator(ticker.AutoLocator())
-        ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -285,25 +288,28 @@ class Luminosity:
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.plot(x, yInt, color="red", label="Total",lw=3)
         ax2.xaxis.set_major_locator(ticker.AutoLocator())
-        ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
+        ax2.xaxis.set_minor_locator(ticker.AutoLocator())
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
-        ax2.legend(h1+h2, l1+l2,loc="best",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+
+        ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
-        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
-        filename=f"Lumi{self.what.title()}Per{label}_Exp{self.expstr}"
+        props = dict(boxstyle='square', facecolor='white', alpha=0.8, edgecolor='None')
+        plt.text(.02, 0.7, rf"Total $\int\mathcal{{L}}dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=12, bbox=props)
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
         print(f"Creating {filename}.pdf|png files")
         for fileformat in ['pdf','png']:
-            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
+            plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
 
     def plotLumiPerRun(self):
         """
@@ -313,7 +319,7 @@ class Luminosity:
         # create a reduced dataframe with only runs selected
         # these are the runs to be selected
         if (self.runs):
-            dfRuns=self.df[self.df['run'].isin(self.runs)]
+            dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
             dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
         else:
             dfRuns=self.df
@@ -322,7 +328,7 @@ class Luminosity:
 
         ax1.bar(dfRuns['run'], dfRuns['lumi'], label=f"Run by run", color="blue", width=1.0)
         ax1.set_xlabel(r"Run")
-        ax1.set_ylabel(rf"Total integrated luminosity per Run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
+        ax1.set_ylabel(rf"Total integrated luminosity by run [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
         ax1.set_xlim(left=dfRuns['run'].min())
@@ -343,8 +349,10 @@ class Luminosity:
         # Text box. Use axis coords.
         plt.text(0., 1.03, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(.5, 1.03, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, fontsize=12)
-        plt.text(.02, 0.7, rf"Total $\int\ \mathcal{{L}}\ dt\  = {dfRuns['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=14)
-        plt.text(1, -0.25, f"Plot on {datetime.date.today().strftime('%Y/%m/%d')}", transform=ax1.transAxes, fontsize=6, ha="right")
+
+        props = dict(boxstyle='square', facecolor='white', alpha=0.8, edgecolor='None')
+        plt.text(.02, 0.7, rf"Total $\int\mathcal{{L}}dt\  = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$", transform=ax1.transAxes, fontsize=12, bbox=props)
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
 
         filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:
@@ -389,15 +397,21 @@ class Luminosity:
 
 if __name__ == '__main__':
 
+    from pandas.plotting import register_matplotlib_converters
+    register_matplotlib_converters()
+
     args = argparser().parse_args()
     
     lumi=Luminosity(args)
 
     lumi.printLumi()
 
+
     if args.plot:
-        if args.plot == 'DATE':
+
+        if 'DAY' in args.plot:
             lumi.plotLumiPerPeriod(1)
-            #lumi.plotLumiPerPeriod(2)
-        if args.plot == 'RUN':
+        if 'WEEK' in args.plot:
+            lumi.plotLumiPerPeriod(2)
+        if 'RUN' in args.plot:
             lumi.plotLumiPerRun()

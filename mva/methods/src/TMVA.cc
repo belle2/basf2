@@ -84,6 +84,36 @@ namespace Belle2 {
       return description;
     }
 
+    void TMVAOptionsMulticlass::load(const boost::property_tree::ptree& pt)
+    {
+      TMVAOptions::load(pt);
+
+      unsigned int numberOfClasses = pt.get<unsigned int>("TMVA_number_classes", 1);
+      m_classes.resize(numberOfClasses);
+      for (unsigned int i = 0; i < numberOfClasses; ++i) {
+        m_classes[i] = pt.get<std::string>(std::string("TMVA_classes") + std::to_string(i));
+      }
+    }
+
+    void TMVAOptionsMulticlass::save(boost::property_tree::ptree& pt) const
+    {
+      TMVAOptions::save(pt);
+
+      pt.put("TMVA_number_classes", m_classes.size());
+      for (unsigned int i = 0; i < m_classes.size(); ++i) {
+        pt.put(std::string("TMVA_classes") + std::to_string(i), m_classes[i]);
+      }
+    }
+
+    po::options_description TMVAOptionsMulticlass::getDescription()
+    {
+      po::options_description description = TMVAOptions::getDescription();
+      description.add_options()
+      ("tmva_classes", po::value<std::vector<std::string>>(&m_classes)->required()->multitoken(),
+       "class name identifiers for multi-class mode");
+      return description;
+    }
+
     TMVATeacher::TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options) : Teacher(general_options),
       specific_options(_specific_options) { }
 
@@ -290,6 +320,17 @@ namespace Belle2 {
 
     }
 
+    TMVATeacherMulticlass::TMVATeacherMulticlass(const GeneralOptions& general_options,
+                                                 const TMVAOptionsMulticlass& _specific_options) : TMVATeacher(general_options, _specific_options),
+      specific_options(_specific_options) { }
+
+    // Implement me!
+    Weightfile TMVATeacherMulticlass::train(Dataset& training_data) const
+    {
+      (void) training_data;
+      return Weightfile();
+    }
+
     TMVATeacherRegression::TMVATeacherRegression(const GeneralOptions& general_options,
                                                  const TMVAOptionsRegression& _specific_options) : TMVATeacher(general_options, _specific_options),
       specific_options(_specific_options) { }
@@ -450,6 +491,37 @@ namespace Belle2 {
 
     }
 
+    void TMVAExpertMulticlass::load(Weightfile& weightfile)
+    {
+
+      weightfile.getOptions(specific_options);
+
+      // TMVA parses the method type for plugins out of the weightfile name, so we must ensure that it has the expected format
+      std::string custom_weightfile = weightfile.generateFileName(std::string("_") + specific_options.m_method + ".weights.xml");
+      weightfile.getFile("TMVA_Weightfile", custom_weightfile);
+
+      TMVAExpert::load(weightfile);
+
+      if (specific_options.m_type == "Plugins") {
+        auto base = std::string("TMVA@@MethodBase");
+        auto regexp1 = std::string(".*_") + specific_options.m_method + std::string(".*");
+        auto regexp2 = std::string(".*") + specific_options.m_method + std::string(".*");
+        auto className = std::string("TMVA::Method") + specific_options.m_method;
+        auto ctor1 = std::string("Method") + specific_options.m_method + std::string("(TMVA::DataSetInfo&,TString)");
+        auto ctor2 = std::string("Method") + specific_options.m_method + std::string("(TString&,TString&,TMVA::DataSetInfo&,TString&)");
+        auto pluginName = std::string("TMVA") + specific_options.m_method;
+
+        gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp1.c_str(), className.c_str(), pluginName.c_str(), ctor1.c_str());
+        gROOT->GetPluginManager()->AddHandler(base.c_str(), regexp2.c_str(), className.c_str(), pluginName.c_str(), ctor2.c_str());
+        B2INFO("Registered new TMVA Plugin named " << pluginName);
+      }
+
+      if (!m_expert->BookMVA(specific_options.m_method, custom_weightfile)) {
+        B2FATAL("Could not set up expert! Please see preceding error message from TMVA!");
+      }
+
+    }
+
     void TMVAExpertRegression::load(Weightfile& weightfile)
     {
 
@@ -498,6 +570,21 @@ namespace Belle2 {
       }
       return probabilities;
 
+    }
+
+    std::vector<float> TMVAExpertMulticlass::apply(Dataset& test_data, const unsigned int classID) const
+    {
+
+      std::vector<float> probabilities(test_data.getNumberOfEvents());
+      for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
+        test_data.loadEvent(iEvent);
+        for (unsigned int i = 0; i < m_input_cache.size(); ++i)
+          m_input_cache[i] = test_data.m_input[i];
+        for (unsigned int i = 0; i < m_spectators_cache.size(); ++i)
+          m_spectators_cache[i] = test_data.m_spectators[i];
+        probabilities[iEvent] = m_expert->EvaluateMulticlass(classID, specific_options.m_method);
+      }
+      return probabilities;
     }
 
     std::vector<float> TMVAExpertRegression::apply(Dataset& test_data) const

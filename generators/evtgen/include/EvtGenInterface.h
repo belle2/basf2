@@ -37,9 +37,9 @@ namespace Belle2 {
      * - Make sure Random engine is setup correctly
      * - Create evt.pdl on the fly from current contents of particle database
      * - Add photos/all models
-     * - Use Coherent mixing
+     * - Use Coherent mixing unless set otherwise
      */
-    static EvtGen* createEvtGen(const std::string& decayFileName);
+    static EvtGen* createEvtGen(const std::string& decayFileName, bool coherentMixing);
 
     /**
      * Constructor.
@@ -55,7 +55,7 @@ namespace Belle2 {
 
     /** Setup evtgen with the given decay files  */
     int setup(const std::string& decayFileName, const std::string& parentParticle,
-              const std::string& userFileName = std::string(""));
+              const std::string& userFileName = std::string(""), bool coherentMixing = true);
 
     /** Generate a single event */
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
@@ -68,11 +68,11 @@ namespace Belle2 {
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
     int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
-                           MCParticleGraph::GraphParticle* parent);
+                           MCParticleGraph::GraphParticle* parent, double timeOffset = 0);
 
     /** Copy parameters from EvtParticle to MCParticle */
-    void updateGraphParticle(EvtParticle* eParticle,
-                             MCParticleGraph::GraphParticle* gParticle, TVector3 pPrimaryVertex);
+    void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
+                             TVector3 pPrimaryVertex, double timeOffset = 0);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */

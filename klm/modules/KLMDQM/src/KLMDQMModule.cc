@@ -47,7 +47,7 @@ KLMDQMModule::KLMDQMModule() :
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
+  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -127,7 +127,7 @@ void KLMDQMModule::defineHisto()
       i += 3;
     }
   }
-  firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNChannels();
+  firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNElements();
   i = 0;
   for (KLMChannelIndex& klmSector : klmSectors) {
     int nHistograms;
@@ -174,10 +174,9 @@ void KLMDQMModule::defineHisto()
 void KLMDQMModule::initialize()
 {
   REG_HISTOGRAM;
-  m_BklmDigits.isRequired();
+  m_Digits.isRequired();
   m_BklmHit1ds.isOptional();
   m_BklmHit2ds.isOptional();
-  m_EklmDigits.isRequired();
 }
 
 void KLMDQMModule::beginRun()
@@ -212,12 +211,14 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
-  int i, nEklmDigits;
-  EKLMDigit* eklmDigit;
-  nEklmDigits = m_EklmDigits.getEntries();
+  int i, nDigits, nEklmDigits = 0;
+  KLMDigit* eklmDigit;
+  nDigits = m_Digits.getEntries();
   /* EKLM. */
-  for (i = 0; i < nEklmDigits; i++) {
-    eklmDigit = m_EklmDigits[i];
+  for (i = 0; i < nDigits; i++) {
+    eklmDigit = m_Digits[i];
+    if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
     /*
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
@@ -241,16 +242,19 @@ void KLMDQMModule::event()
         continue;
       m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
     }
-    int planeGlobal = m_Elements->planeNumber(section, layer, sector, plane);
+    int planeGlobal = m_eklmElementNumbers->planeNumber(
+                        section, layer, sector, plane);
     m_PlaneEKLM->Fill(planeGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
+    nEklmDigits++;
   }
   /* BKLM. */
-  int nBklmDigits = m_BklmDigits.getEntries();
-  m_BklmDigitsNumber->Fill((double)nBklmDigits);
-  m_KlmDigitsNumber->Fill((double)nBklmDigits + nEklmDigits);
-  for (i = 0; i < nBklmDigits; i++) {
-    BKLMDigit* digit = static_cast<BKLMDigit*>(m_BklmDigits[i]);
+  m_BklmDigitsNumber->Fill((double)nDigits - nEklmDigits);
+  m_KlmDigitsNumber->Fill((double)nDigits);
+  for (i = 0; i < nDigits; i++) {
+    KLMDigit* digit = m_Digits[i];
+    if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
     int section = digit->getSection();
     int sector = digit->getSector();
     int layer = digit->getLayer();

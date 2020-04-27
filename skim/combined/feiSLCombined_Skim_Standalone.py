@@ -9,43 +9,39 @@
 
 __authors__ = ["Racha Cheaib", "Sophie Hollitt", "Hannah Wakeling", "Phil Grace"]
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from skimExpertFunctions import add_skim, encodeSkimName, setSkimLogging, get_test_file
-gb2_setuprel = 'release-04-00-00'
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
 
-fileList = get_test_file("mixedBGx1", "MC12")
-path = create_path()
-inputMdstList('default', fileList, path=path)
 
-from skim.fei import *
+fileList = expert.get_test_file("MC12_mixedBGx1")
+path = b2.create_path()
+ma.inputMdstList('default', fileList, path=path)
+
+from skim.fei import B0SL, BplusSL, runFEIforSLCombined
 # run pre-selection  cuts and FEI
-runFEIforSLCombined(path)
+path2 = runFEIforSLCombined(path)
 
 # Include MC matching
-path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
-path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
+path2.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
+path2.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # Apply final B0 semileptonic tag cuts
-B0semileptonicList = B0SL(path)
-skimCode1 = encodeSkimName('feiSLB0')
-skimOutputUdst(skimCode1, B0semileptonicList, path=path)
-summaryOfLists(B0semileptonicList, path=path)
+B0semileptonicList = B0SL(path2)
+skimCode1 = expert.encodeSkimName('feiSLB0')
+expert.skimOutputUdst(skimCode1, B0semileptonicList, path=path2)
+ma.summaryOfLists(B0semileptonicList, path=path2)
 
 # Apply final B+ semileptonic tag cuts
-BpsemileptonicList = BplusSL(path)
-skimCode2 = encodeSkimName('feiSLBplus')
-skimOutputUdst(skimCode2, BpsemileptonicList, path=path)
-summaryOfLists(BpsemileptonicList, path=path)
+BpsemileptonicList = BplusSL(path2)
+skimCode2 = expert.encodeSkimName('feiSLBplus')
+expert.skimOutputUdst(skimCode2, BpsemileptonicList, path=path2)
+ma.summaryOfLists(BpsemileptonicList, path=path2)
 
 
-setSkimLogging(path)
-process(path)
+expert.setSkimLogging(path2)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

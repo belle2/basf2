@@ -3,12 +3,17 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Fernando Abudinen                         *
+ * Contributors: Luigi Li Gioi, Fernando Abudinen, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
+
+#include<vector>
+#include<string>
+#include <analysis/VariableManager/Manager.h>
+#include "TVector3.h"
 
 namespace Belle2 {
   class Particle;
@@ -140,11 +145,26 @@ namespace Belle2 {
     double particleDeltaTErr(const Particle* particle);
 
     /**
-     * return generated Delta T (Brec - Btag) in ps
+     * return generated Delta T (Brec - Btag), i.e. difference of proper times (in ps)
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleMCDeltaT(const Particle* particle);
+
+    /**
+     * return generated Delta T (Brec - Btag) in boost-direction kinematic approximation (in ps)
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleMCDeltaTapprox(const Particle* particle);
+
+    /**
+     * return generated Delta l (Brec - Btag) in boost-direction (in cm)
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleMCDeltaL(const Particle* particle);
+
 
     /**
      * return Delta Z (Brec - Btag) in cm
@@ -253,6 +273,274 @@ namespace Belle2 {
      *
      */
     double particleInternalTagVMCFlavor(const Particle*);
+
+    /**
+     * Return the norm of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentum(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the X component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Y component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Return the Z component of the momentum of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the d0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the z0 parameter of the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the number of tracks used by rave to fit the vertex (not counting the ones coming from Kshorts)
+     *
+     */
+    double particleTagVNFitTracks(const Particle* particle);
+
+    /**
+     * returns the weight assigned by Rave to the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the distance between the centre of the constraint and the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex);
+
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag track indexed by track index
+     *
+     */
+    double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the significance of the distance between the centre of the constraint and
+     * the tag track indexed by track index (computed as distance / uncertainty)
+     *
+     */
+    double tagTrackDistanceToConstraintSignificance(const Particle* part, const std::vector<double>& trackIndex);
+
+
+    /**
+     * returns the distance between the centre of the constraint and the tag vtx
+     *
+     */
+    double tagVDistanceToConstraint(const Particle* part);
+
+    /**
+     * returns the estimated uncertainty on the distance between the centre of the constraint and
+     * the tag vtx
+     *
+     */
+    double tagVDistanceToConstraintErr(const Particle* part);
+
+    /**
+     * returns the significance of the distance between the tag vtx and the centre of the constraint
+     * (computed as distance / uncertainty)
+     */
+    double tagVDistanceToConstraintSignificance(const Particle* part);
+
+
+    /**
+     * returns the measured distance between the tag vtx and the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the estimated uncertainty on the distance between the tag vtx and
+     * the tag track indexed by trackIndex
+     *
+     */
+    double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the significance of the distance between the tag vtx and the tag track indexed by trackIndex
+     * (computed as distance / uncertainty)
+     *
+     */
+    double tagTrackDistanceToTagVSignificance(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * returns the true distance between the true B Tag decay vertex and the particle
+     * corresponding to the tag vtx track indexed by trackIndex.
+     *
+     */
+    double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the X coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the Y coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * Returns the Z coordinate of the vector between the mc particle corresponding to the ith tag vtx track
+     * and the true tag B decay vertex.
+     *
+     */
+    double tagTrackTrueVecToTagVZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return  the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the X component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Y component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Z component of the true momentum of the MC particle corresponding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueMomentumZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the X component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginX(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Y component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginY(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the Z component of the true origin of the MC particle corresonding to the ith tag vtx track.
+     *
+     */
+    double tagTrackTrueOriginZ(const Particle* part, const std::vector<double>& trackIndex);
+
+    /**
+     * return the status of the fit performed with the true track parameters.
+     * 0 fit performed with measured parameters
+     * 1 fit performed with true parameters
+     * 2 unable to recover truth parameters
+     *
+     */
+    int fitTruthStatus(const Particle* part);
+
+    //**********************************
+    //Meta variables
+    //**********************************
+
+    /**
+     * This is a pointer to the various functions that compute information related to the tag tracks
+     *
+     */
+    typedef double (*TagTrFPtr)(const Particle*, const std::vector<double>&);
+
+    /**
+     * returns the average over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable);
+
+    /**
+     * returns the maximum over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackMax(const std::vector<std::string>& variable);
+
+    /**
+     * returns the minimum over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackMin(const std::vector<std::string>& variable);
+
+    /**
+     * returns the sum over the tag tracks of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackSum(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the square of the variable given in argument.
+     * The variable is one of the tagTrack... variables. Tag tracks which are assigned a 0
+     * weight are ignored
+     *
+     */
+    Manager::FunctionPtr tagTrackAverageSquares(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the variable given in argument, weighted
+     * by the weights of the tag vertex fitter
+     * The variable is one of the tagTrack... variables.
+     *
+     */
+    Manager::FunctionPtr tagTrackWeightedAverage(const std::vector<std::string>& variable);
+
+    /**
+     * returns the average over the tag tracks of the square of the variable given in argument, weighted
+     * by the weights of the tag vertex fitter
+     * The variable is one of the tagTrack... variables.
+     *
+     */
+    Manager::FunctionPtr tagTrackWeightedAverageSquares(const std::vector<std::string>& variable);
 
   }
 }

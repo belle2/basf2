@@ -68,29 +68,29 @@ void CDCCalibrationCollectorModule::prepare()
 
 
   auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-  m_tree->Branch<float>("x_mea", &x_mea);
-  m_tree->Branch<float>("x_u", &x_u);
-  m_tree->Branch<float>("x_b", &x_b);
-  m_tree->Branch<float>("alpha", &alpha);
-  m_tree->Branch<float>("theta", &theta);
-  m_tree->Branch<float>("t", &t);
-  m_tree->Branch<unsigned short>("adc", &adc);
+  m_tree->Branch<Float_t>("x_mea", &x_mea);
+  m_tree->Branch<Float_t>("x_u", &x_u);
+  m_tree->Branch<Float_t>("x_b", &x_b);
+  m_tree->Branch<Float_t>("alpha", &alpha);
+  m_tree->Branch<Float_t>("theta", &theta);
+  m_tree->Branch<Float_t>("t", &t);
+  m_tree->Branch<UShort_t>("adc", &adc);
   //  m_tree->Branch<int>("boardID", &boardID);
-  m_tree->Branch<int>("lay", &lay);
-  m_tree->Branch<float>("weight", &weight);
-  m_tree->Branch<int>("IWire", &IWire);
-  m_tree->Branch<float>("Pval", &Pval);
-  m_tree->Branch<float>("ndf", &ndf);
+  m_tree->Branch<UChar_t>("lay", &lay);
+  m_tree->Branch<Float_t>("weight", &weight);
+  m_tree->Branch<UShort_t>("IWire", &IWire);
+  m_tree->Branch<Float_t>("Pval", &Pval);
+  m_tree->Branch<Float_t>("ndf", &ndf);
   if (m_storeTrackParams) {
-    m_tree->Branch<float>("d0", &d0);
-    m_tree->Branch<float>("z0", &z0);
-    m_tree->Branch<float>("phi0", &phi0);
-    m_tree->Branch<float>("tanL", &tanL);
-    m_tree->Branch<float>("omega", &omega);
+    m_tree->Branch<Float_t>("d0", &d0);
+    m_tree->Branch<Float_t>("z0", &z0);
+    m_tree->Branch<Float_t>("phi0", &phi0);
+    m_tree->Branch<Float_t>("tanL", &tanL);
+    m_tree->Branch<Float_t>("omega", &omega);
   }
 
   if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
-    m_tree->Branch<float>("t_fit", &t_fit);
+    m_tree->Branch<Float_t>("t_fit", &t_fit);
   }
 
   auto m_hNDF = new TH1F("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
@@ -134,7 +134,7 @@ void CDCCalibrationCollectorModule::collect()
   const int nTr = recoTracks.getEntries();
   const int nHits = cdcHits.getEntries();
   const int nWires = 14336;
-  float oc = static_cast<float>(nHits / nWires);
+  float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
   int nCTracks  = 0;
 
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);

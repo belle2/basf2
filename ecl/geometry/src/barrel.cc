@@ -5,6 +5,7 @@
 #include <G4Box.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Trd.hh>
 #include <G4TwoVector.hh>
 #include <G4ExtrudedSolid.hh>
@@ -105,6 +106,12 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
                                                            G4Translate3D(r0)*G4RotateZ3D(M_PI / 144)*G4Translate3D(u0.x() / 2, trt0.y() / 2, (2288 - 1219.) / 2)*G4RotateX3D(-M_PI / 2));
     sectorlogical = new G4LogicalVolume(sector, Materials::get("G4_AIR"), "ECLBarrelSectorLogical", 0, 0, 0);
     sectorlogical->SetVisAttributes(att("air"));
+
+    // Set up region for production cuts
+    G4Region* aRegion = new G4Region("ECLBarrelSector");
+    sectorlogical->SetRegion(aRegion);
+    aRegion->AddRootLogicalVolume(sectorlogical);
+
     for (int i = 0; i < nseg; i++) {
       double phi = i * M_PI / 36 - M_PI / 2;
       new G4PVPlacement(G4RotateZ3D(phi), sectorlogical, suf("ECLBarrelSectorPhysical", i), top, false, i, overlap);

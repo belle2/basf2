@@ -5,6 +5,7 @@
 ! mar-2017: change in some commons
 ! dec-2017: change in some commons
 ! oct-2018: change in some commons
+! feb-2020: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -763,6 +764,16 @@
       END
 
 
+      SUBROUTINE SET_STORE_OPT(OPT)
+
+      IMPLICIT NONE
+      INTEGER OPT               ! 0 reduced, 1 full
+#include "TOP_PIK.fi"
+
+      STORE_OPT=OPT.EQ.0
+
+      END
+
       SUBROUTINE REDO_PDF(MASS)
       
       IMPLICIT NONE
@@ -816,4 +827,328 @@
 
       END
 
+
+      REAL FUNCTION GET_BGR(ICH)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_BGR=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      GET_BGR=STFB*PIK_BGR(ICH) ! number of background hits in channel per nano second
+
+      END
+
+      
+      INTEGER FUNCTION GET_PIK_TYP(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_TYP=0 ! unknown
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      IF(PIK_TYP(K,ICH).EQ.0) THEN
+         GET_PIK_TYP=1 ! direct
+      ELSE
+         GET_PIK_TYP=2 ! reflected
+      ENDIF
+
+      END
+
+
+      REAL FUNCTION GET_PIK_FIC(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_FIC=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_FIC=PIK_FIC(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_E(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_E=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_E=PIK_E(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_SIGE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_SIGE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_SIGE=PIK_SIGE(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NX(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NX=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NX=PIK_NX(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NY(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NY=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NY=PIK_NY(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NXM(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NXM=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NXM=PIK_NXM(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NYM(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NYM=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NYM=PIK_NYM(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NXE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NXE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NXE=PIK_NXE(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NYE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NYE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NYE=PIK_NYE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_XD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_XD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_XD=PIK_XD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_YD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_YD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_YD=PIK_YD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KXE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXE=PIK_KXE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYE=PIK_KYE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZE=PIK_KZE(K, ICH)
+
+      END
+
+      
+      REAL FUNCTION GET_PIK_KXD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXD=PIK_KXD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYD=PIK_KYD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZD=PIK_KZD(K, ICH)
+
+      END
 

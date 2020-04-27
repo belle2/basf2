@@ -40,8 +40,7 @@ KLMChannelStatusCalibrationCollectorModule::~KLMChannelStatusCalibrationCollecto
 
 void KLMChannelStatusCalibrationCollectorModule::prepare()
 {
-  m_BKLMDigits.isRequired();
-  m_EKLMDigits.isRequired();
+  m_KLMDigits.isRequired();
   m_HitMap.registerInDataStore();
   m_HitMap.create();
   m_HitMap->setDataAllChannels(0);
@@ -51,16 +50,11 @@ void KLMChannelStatusCalibrationCollectorModule::prepare()
 
 void KLMChannelStatusCalibrationCollectorModule::collect()
 {
-  for (BKLMDigit& digit : m_BKLMDigits) {
-    uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         digit.getSection(), digit.getSector(), digit.getLayer(),
-                         digit.isPhiReadout(), digit.getStrip());
-    m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
-  }
-  for (EKLMDigit& digit : m_EKLMDigits) {
-    uint16_t channel = m_ElementNumbers->channelNumberEKLM(
-                         digit.getSection(), digit.getSector(), digit.getLayer(),
-                         digit.getPlane(), digit.getStrip());
+  for (KLMDigit& digit : m_KLMDigits) {
+    uint16_t channel =
+      m_ElementNumbers->channelNumber(
+        digit.getSubdetector(), digit.getSection(), digit.getSector(),
+        digit.getLayer(), digit.getPlane(), digit.getStrip());
     m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
   }
 }

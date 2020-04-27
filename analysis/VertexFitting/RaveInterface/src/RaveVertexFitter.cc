@@ -57,8 +57,6 @@ void RaveVertexFitter::addTrack(const TrackFitResult* const aTrackPtr)
   m_raveTracks.push_back(TrackFitResultToRaveTrack(aTrackPtr));
 }
 
-
-
 rave::Track RaveVertexFitter::TrackFitResultToRaveTrack(const TrackFitResult* const aTrackPtr) const
 {
   const int id = m_raveTracks.size();

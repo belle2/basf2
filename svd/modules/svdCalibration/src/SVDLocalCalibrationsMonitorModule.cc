@@ -53,6 +53,8 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_pedestalRMS = m_tree->Branch("pedestalRMS", &m_pedestalRMS, "pedestalRMS/F");
   b_noiseAVE = m_tree->Branch("noiseAVE", &m_noiseAVE, "noiseAVE/F");
   b_noiseRMS = m_tree->Branch("noiseRMS", &m_noiseRMS, "noiseRMS/F");
+  b_occupancyAVE = m_tree->Branch("occupancyAVE", &m_occupancyAVE, "occupancyAVE/F");
+  b_occupancyRMS = m_tree->Branch("occupancyRMS", &m_occupancyRMS, "occupancyRMS/F");
   b_gainAVE = m_tree->Branch("gainAVE", &m_gainAVE, "gainAVE/F");
   b_gainRMS = m_tree->Branch("gainRMS", &m_gainRMS, "gainRMS/F");
   b_calPeakADCAVE = m_tree->Branch("calPeakADCAVE", &m_calPeakADCAVE, "calPeakADCAVE/F");
@@ -71,6 +73,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   b_strip = m_treeDetailed->Branch("strip", &m_strip, "strip/i");
   b_mask = m_treeDetailed->Branch("mask", &m_mask, "mask/F");
   b_noise = m_treeDetailed->Branch("noise", &m_noise, "noise/F");
+  b_occupancy = m_treeDetailed->Branch("occupancy", &m_occupancy, "occupancy/F");
   b_noiseEl = m_treeDetailed->Branch("noiseEl", &m_noiseEl, "noiseEl/F");
   b_gain = m_treeDetailed->Branch("gain", &m_gain, "gain/F");
   b_pedestal = m_treeDetailed->Branch("pedestal", &m_pedestal, "pedestal/F");
@@ -87,13 +90,33 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
-  /*
-  if(!m_OccCal.isValid())
+  //  /*
+  if (!m_OccupancyCal.isValid())
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
-  if(!m_HotStripsCal.isValid())
+  if (!m_HotStripsCal.isValid())
     B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
-  */
+  //  */
 
+  ///OCCUPANCY
+  TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
+                  "occupancy in hits/evt in @layer.@ladder.@sensor @view/@side",
+                  1500, 0.0, 0.006);
+  hOccupancy.GetXaxis()->SetTitle("strip occupancy ()");
+  m_hOccupancy = new SVDHistograms<TH1F>(hOccupancy);
+
+  TH2F h2Occupancy_512("occupancy2D_512_L@layerL@ladderS@sensor@view",
+                       "occupancy in HITS/EVT in @layer.@ladder.@sensor @view/@side VS cellID",
+                       128 * 4, -0.5, 128 * 4 - 0.5, 1500, 0.0, 0.006);
+  h2Occupancy_512.GetYaxis()->SetTitle("strip occupancy (HITS/EVT)");
+  h2Occupancy_512.GetXaxis()->SetTitle("cellID");
+
+  TH2F h2Occupancy_768("occupancy2D_768_L@layerL@ladderS@sensor@view",
+                       "occupancy in HITS/EVT in @layer.@ladder.@sensor @view/@side VS cellID",
+                       128 * 6, -0.5, 128 * 6 - 0.5, 1500, 0.0, 0.006);
+  h2Occupancy_768.GetYaxis()->SetTitle("strip occupancy (HITS/EVT)");
+  h2Occupancy_768.GetXaxis()->SetTitle("cellID");
+
+  m_h2Occupancy = new SVDHistograms<TH2F>(h2Occupancy_768, h2Occupancy_768, h2Occupancy_768, h2Occupancy_512);
 
   ///MASKS
   TH1F hMask("masked_L@layerL@ladderS@sensor@view",
@@ -311,6 +334,14 @@ void SVDLocalCalibrationsMonitorModule::event()
 
           for (m_strip = 0; m_strip < Ncells; m_strip++) {
 
+            m_occupancy = -1;
+            if (m_OccupancyCal.isValid()) {
+              m_occupancy = m_OccupancyCal.getOccupancy(theVxdID, m_side, m_strip);
+            }
+            m_hOccupancy->fill(theVxdID, m_side, m_occupancy);
+            m_h2Occupancy->fill(theVxdID, m_side, m_strip, m_occupancy);
+
+
             m_mask = -1;
             if (m_MaskedStr.isValid())
               m_mask = m_MaskedStr.isMasked(theVxdID, m_side, m_strip);
@@ -393,6 +424,8 @@ void SVDLocalCalibrationsMonitorModule::event()
           m_pedestalRMS = (m_hPedestal->getHistogram(theVxdID, m_side))->GetRMS();
           m_noiseAVE = (m_hNoise->getHistogram(theVxdID, m_side))->GetMean();
           m_noiseRMS = (m_hNoise->getHistogram(theVxdID, m_side))->GetRMS();
+          m_occupancyAVE = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetMean();
+          m_occupancyRMS = (m_hOccupancy->getHistogram(theVxdID, m_side))->GetRMS();
           m_gainAVE = (m_hGain->getHistogram(theVxdID, m_side))->GetMean();
           m_gainRMS = (m_hGain->getHistogram(theVxdID, m_side))->GetRMS();
           m_calPeakTimeAVE = (m_hCalPeakTime->getHistogram(theVxdID, m_side))->GetMean();
@@ -419,6 +452,11 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   B2RESULT("******************************************");
   B2RESULT("** UNIQUE IDs of calibration DB objects **");
   B2RESULT("");
+
+  if (m_OccupancyCal.isValid())
+    B2RESULT("   - SVDOccupancyCalibrations:" << m_OccupancyCal.getUniqueID());
+  else
+    B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
 
   if (m_MaskedStr.isValid())
     B2RESULT("   - SVDFADCMaskedStrips:" << m_MaskedStr.getUniqueID());
@@ -455,6 +493,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_rootFilePtr->mkdir("masked_strips");
     m_rootFilePtr->mkdir("pedestal_ADCunits");
     m_rootFilePtr->mkdir("noise_ADCunits");
+    m_rootFilePtr->mkdir("occupancy");
     m_rootFilePtr->mkdir("noise_electronsCharge");
     m_rootFilePtr->mkdir("gain_electronsCharge");
     m_rootFilePtr->mkdir("calPeakTime");
@@ -468,6 +507,11 @@ void SVDLocalCalibrationsMonitorModule::endRun()
       for (auto ladder : geoCache.getLadders(layer))
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
+
+            //writing the histogram list for the noises in ADC units
+            m_rootFilePtr->cd("occupancy");
+            (m_hOccupancy->getHistogram(sensor, view))->Write();
+            (m_h2Occupancy->getHistogram(sensor, view))->Write();
 
             //writing the histogram list for the masks in ADC units
             m_rootFilePtr->cd("masked_strips");
@@ -515,6 +559,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
 
     m_rootFilePtr->cd("expert");
     m_h2Noise->Write("h2Noise");
+    m_h2Occupancy->Write("h2Occupancy");
     m_h2PulseWidth->Write("h2PulseShape");
     m_h2Pedestal->Write("h2Pedestal");
     m_h2Gain->Write("h2Gain");

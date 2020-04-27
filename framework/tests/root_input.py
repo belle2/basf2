@@ -6,14 +6,12 @@ import basf2
 from ROOT import Belle2
 from b2test_utils import safe_process, clean_working_directory
 
-basf2.reset_database()
+basf2.conditions.disable_globaltag_replay()
 basf2.set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
 basf2.logging.set_info(basf2.LogLevel.FATAL, basf2.logging.get_info(basf2.LogLevel.ERROR))
 basf2.logging.enable_summary(False)
-
-Belle2.FileSystem
 
 
 class NoopModule(basf2.Module):
@@ -22,7 +20,7 @@ class NoopModule(basf2.Module):
 
 with clean_working_directory():
     for filename in ["root_input.root", "chaintest_empty.root", "chaintest_1.root", "chaintest_2.root"]:
-        os.symlink(Belle2.FileSystem.findFile(f'framework/tests/{filename}'), filename)
+        os.symlink(basf2.find_file(f'framework/tests/{filename}'), filename)
 
     main = basf2.Path()
     # not used for anything, just checking wether the master module

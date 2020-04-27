@@ -248,7 +248,7 @@ the second element in the second execution.
     A working example of this `for_each` RestOfEvent is to build a veto against
     photons from :math:`\pi^0\to\gamma\gamma`. It is described in `HowToVeto`.
 
-.. note:: This feature is used by both the `FlavorTagger` and `FullEventInterpretation` algorithms.
+.. note:: This feature is used by both the `FlavorTagger` and :ref:`FullEventInterpretation` algorithms.
 
 Changes to existing arrays / objects will be available to all modules after the
 `for_each()`, including those made to the loop object itself (it will simply modify

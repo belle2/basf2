@@ -8,9 +8,6 @@ import ROOT
 from .utils import decode_json_string
 from .utils import IoV_Result
 from .utils import AlgResult
-from .state_machines import MachineError, ConditionError, TransitionError
-from .state_machines import AlgorithmMachine
-from .strategies import AlgorithmStrategy
 from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
 import multiprocessing
 
@@ -63,6 +60,9 @@ class AlgorithmsRunner(Runner):
     But you have freedom to not call this at all in `run`, or to implement a different method to deal with this.
     """
 
+    FAILED = "FAILED"
+    COMPLETED = "COMPLETED"
+
     def __init__(self, name):
         """
         """
@@ -78,6 +78,8 @@ class AlgorithmsRunner(Runner):
         self.output_database_dir = ""
         #: Algorithm results from each algorithm we execute
         self.results = {}
+        #: Final state of runner
+        self.final_state = None
         #: The list of algorithms that this runner executes
         self.algorithms = None
         #: Output directory of these algorithms, for logging mostly
@@ -96,6 +98,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
     def run(self, iov, iteration):
         """
         """
+        from .strategies import AlgorithmStrategy
         B2INFO("SequentialAlgorithmsRunner begun for Calibration {}".format(self.name))
         # First we do the setup of algorithm strategies
         strategies = []
@@ -121,28 +124,59 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                                 args=(strategy, iov, iteration, queue))
 
             self.results[strategy.algorithm.name] = []
-            B2DEBUG(29, "Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO("Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO("Logging will be diverted into algorithm output.")
             child.start()
-            update_interval = 60
-            previous_update_time = time.time()
+            final_state = None
+            final_loop = False
+
+            B2INFO("Collecting results for {}.".format(strategy.algorithm.name))
             while True:
-                if (time.time() - previous_update_time) > update_interval:
-                    B2INFO("Still waiting for AlgorithStrategy to finish for {}".format(strategy.algorithm.name))
-                    previous_update_time = time.time()
-                else:
-                    result = queue.get()
-                    if result == strategy.FINISHED_RESULTS:
-                        break
+                # Do we have results?
+                while not queue.empty():
+                    output = queue.get()
+                    B2DEBUG(29, f"Result from queue was {output}")
+                    if output["type"] == "result":
+                        self.results[strategy.algorithm.name].append(output["value"])
+                    elif output["type"] == "final_state":
+                        final_state = output["value"]
                     else:
-                        self.results[strategy.algorithm.name].append(result)
-            child.join()
-            # Check the exitcode for failed Process()
-            if child.exitcode == 0:
-                B2INFO("AlgorithStrategy subprocess for {} exited correctly.".format(strategy.algorithm.name))
-            else:
-                raise RunnerError("Error during subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
-            B2DEBUG(29, "Finished subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
-        B2INFO("SequentialAlgorithmsRunner finished for Calibration {}".format(self.name))
+                        raise RunnerError(f"Unknown result output: {output}")
+
+                # Still alive but not results at the moment? Wait a few seconds before checking.
+                if child.is_alive():
+                    time.sleep(5)
+                    continue
+                else:
+                    # Reached a good ending of strategy
+                    if final_state:
+                        # Check the exitcode for failed Process()
+                        if child.exitcode == 0:
+                            B2INFO(f"AlgorithStrategy subprocess for {strategy.algorithm.name} exited")
+                            break
+                        else:
+                            raise RunnerError(f"Error during subprocess of AlgorithmStrategy for {strategy.algorithm.name}")
+                    # It might be possible that the subprocess has finished but all results weren't gathered yet.
+                    else:
+                        # Go around once more since all results should be in the queue waiting
+                        if not final_loop:
+                            final_loop = True
+                            continue
+                        else:
+                            raise RunnerError((f"Strategy for {strategy.algorithm.name} "
+                                               "exited subprocess but without a final state!"))
+
+            # Exit early and don't continue strategies as this one failed
+            if final_state == AlgorithmStrategy.FAILED:
+                B2ERROR(f"AlgorithmStrategy for {strategy.algorithm.name} failed. We wil not proceed with any more algorithms")
+                self.final_state = self.FAILED
+                break
+
+            B2DEBUG(29, f"Finished subprocess of AlgorithmStrategy for {strategy.algorithm.name}")
+
+        if self.final_state != self.FAILED:
+            B2INFO(f"SequentialAlgorithmsRunner finished for Calibration {self.name}")
+            self.final_state = self.COMPLETED
 
     @staticmethod
     def _run_strategy(strategy, iov, iteration, queue):

@@ -39,8 +39,26 @@ namespace Belle2 {
       /** Run/event verbosity level */
       void SetVerbosity(G4int verb);
 
-      /** Use parameter to set cut value */
+      /** Use parameter to set global cut value */
       void SetProductionCutValue(G4double);
+
+      /** Set cut value for PXD envelope */
+      void SetPXDProductionCutValue(G4double);
+
+      /** Set cut value for SVD envelope */
+      void SetSVDProductionCutValue(G4double);
+
+      /** Set cut value for CDC envelope */
+      void SetCDCProductionCutValue(G4double);
+
+      /** Set cut value for ARICH and TOP envelopes */
+      void SetARICHTOPProductionCutValue(G4double);
+
+      /** Set cut value for ECL barrel, forward and backward envelopes */
+      void SetECLProductionCutValue(G4double);
+
+      /** Set cut value for BKLM and EKLM envelopes */
+      void SetKLMProductionCutValue(G4double);
 
       /** Use standard EM physics instead of EM option1 */
       void UseStandardEMPhysics(G4bool);
@@ -52,8 +70,19 @@ namespace Belle2 {
       void UseHighPrecisionNeutrons(G4bool);
 
     private:
-      /** Secondary production threshold */
+
+      /** Construct parallel particle types needed for reco */
+      void ConstructG4eParticles();
+
+      /** Secondary production thresholds */
       G4double m_globalCutValue;
+
+      G4double m_pxdCutValue;       /**< threshold for PXD */
+      G4double m_svdCutValue;       /**< threshold for SVD */
+      G4double m_cdcCutValue;       /**< threshold for CDC */
+      G4double m_arichtopCutValue;  /**< threshold for ARICH and TOP */
+      G4double m_eclCutValue;       /**< threshold for ECL */
+      G4double m_klmCutValue;       /**< threshold for BKLM and EKLM */
     };
 
   } // end of namespace Simulation

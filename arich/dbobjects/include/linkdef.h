@@ -37,6 +37,9 @@
 #pragma link C++ class Belle2::ARICHGeoMerger+;
 #pragma link C++ class Belle2::ARICHGeoCablesEnvelope+;
 #pragma link C++ class Belle2::ARICHGeoCooling+;
+#pragma link C++ class Belle2::ARICHGeoFEBCooling+;
+#pragma link C++ class Belle2::ARICHGeoMergerCooling+;
+#pragma link C++ class Belle2::tessellatedSolidStr+;
 #pragma link C++ class Belle2::ARICHGeoSupport+;
 #pragma link C++ class Belle2::ARICHGeoMirrors+;
 #pragma link C++ class Belle2::ARICHGeometryConfig+;
@@ -62,4 +65,5 @@
 #pragma link C++ class Belle2::ARICHGeoGlobalDisplacement+;
 #pragma link C++ class Belle2::ARICHGeoMirrorDisplacement+;
 #pragma link C++ class Belle2::ARICHMirrorAlignment+;
+#pragma link C++ class Belle2::ARICHAeroTilesAlignment+;
 #endif

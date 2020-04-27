@@ -54,10 +54,8 @@ def add_packers(path, components=None):
 
     # KLM
     if components is None or 'KLM' in components:
-        bklmpacker = register_module('BKLMRawPacker')
-        path.add_module(bklmpacker)
-        eklmpacker = register_module('EKLMRawPacker')
-        path.add_module(eklmpacker)
+        klmpacker = register_module('KLMPacker')
+        path.add_module(klmpacker)
 
 
 def add_unpackers(path, components=None):
@@ -86,6 +84,7 @@ def add_unpackers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcunpacker = register_module('CDCUnpacker')
+        cdcunpacker.param('enableStoreCDCRawHit', True)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 
@@ -123,6 +122,8 @@ def add_unpackers(path, components=None):
         path.add_module(trgeclunpacker)
         trggrlunpacker = register_module('TRGGRLUnpacker')
         path.add_module(trggrlunpacker)
+        trgtopunpacker = register_module('TRGTOPUnpacker')
+        path.add_module(trgtopunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:

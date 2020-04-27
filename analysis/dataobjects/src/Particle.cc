@@ -4,7 +4,8 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Anze Zupanc, Marko Staric, Christian Pulvermacher,       *
- *               Sam Cunliffe, Torben Ferber, Thomas Kuhr                 *
+ *               Sam Cunliffe, Torben Ferber, Thomas Kuhr,                *
+ *               Umberto Tamponi                                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,6 +20,7 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/V0.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -27,6 +29,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/HTML.h>
+#include <framework/utilities/Conversion.h>
 
 #include <TClonesArray.h>
 #include <TDatabasePDG.h>
@@ -37,6 +40,8 @@
 #include <stdexcept>
 #include <queue>
 
+#include <boost/algorithm/string.hpp>
+
 using namespace Belle2;
 
 Particle::Particle() :
@@ -46,6 +51,7 @@ Particle::Particle() :
   resetErrorMatrix();
 }
 
+
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
@@ -54,6 +60,7 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -70,6 +77,7 @@ Particle::Particle(const TLorentzVector& momentum,
   set4Vector(momentum);
   resetErrorMatrix();
 }
+
 
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
@@ -93,6 +101,9 @@ Particle::Particle(const TLorentzVector& momentum,
     m_particleType    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
   }
 }
@@ -122,33 +133,66 @@ Particle::Particle(const TLorentzVector& momentum,
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
+    for (unsigned int i = 0; i < m_daughterIndices.size(); i++) {
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
+  }
+}
+
+
+Particle::Particle(const TLorentzVector& momentum,
+                   const int pdgCode,
+                   EFlavorType flavorType,
+                   const std::vector<int>& daughterIndices,
+                   const int properties,
+                   const std::vector<int>& daughterProperties,
+                   TClonesArray* arrayPointer) :
+  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1),
+  m_daughterIndices(daughterIndices),
+  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_daughterProperties(daughterProperties),
+  m_arrayPointer(arrayPointer)
+{
+  m_pdgCode = pdgCode;
+  m_flavorType = flavorType;
+  if (flavorType == c_Unflavored and pdgCode < 0)
+    m_pdgCode = -pdgCode;
+  set4Vector(momentum);
+  resetErrorMatrix();
+  m_properties = properties;
+
+  if (!daughterIndices.empty()) {
+    m_particleType    = c_Composite;
+    if (getArrayPointer() == nullptr) {
+      B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
+    }
   }
 }
 
 
 Particle::Particle(const Track* track,
                    const Const::ChargedStable& chargedStable) :
+  Particle(track ? track->getArrayIndex() : 0, track ? track->getTrackFitResultWithClosestMass(chargedStable) : nullptr,
+           chargedStable)
+{
+}
+
+Particle::Particle(const int trackArrayIndex,
+                   const TrackFitResult* trackFit,
+                   const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
-  if (!track) return;
-
-  auto closestMassFitResult = track->getTrackFitResultWithClosestMass(chargedStable);
-  if (closestMassFitResult == nullptr) return;
-
-  m_pdgCodeUsedForFit = closestMassFitResult->getParticleType().getPDGCode();
-  const auto trackFit = closestMassFitResult;
+  if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
   m_particleType = c_Track;
 
-  setMdstArrayIndex(track->getArrayIndex());
+  setMdstArrayIndex(trackArrayIndex);
 
-  // set PDG code TODO: ask Anze why this procedure is needed?
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  m_pdgCodeUsedForFit = trackFit->getParticleType().getPDGCode();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -159,6 +203,7 @@ Particle::Particle(const Track* track,
   setMomentumPositionErrorMatrix(trackFit);
 }
 
+//FIXME: Deprecated, to be removed after release-05
 Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable,
@@ -174,10 +219,7 @@ Particle::Particle(const int trackArrayIndex,
   setMdstArrayIndex(trackArrayIndex);
 
   m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
-  int absPDGCode = chargedStable.getPDGCode();
-  int signFlip = 1;
-  if (absPDGCode < Const::muon.getPDGCode() + 1) signFlip = -1;
-  m_pdgCode = chargedStable.getPDGCode() * signFlip * trackFit->getChargeSign();
+  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
 
   // set mass
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
@@ -187,6 +229,7 @@ Particle::Particle(const int trackArrayIndex,
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
 }
+
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -202,7 +245,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   const TVector3 clustervertex = C.GetIPPosition();
   setVertex(clustervertex);
 
-  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit(), m_mass);
+  const TLorentzVector clustermom = C.Get4MomentumFromCluster(eclCluster, clustervertex, getECLClusterEHypothesisBit());
   m_px = clustermom.Px();
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
@@ -222,6 +265,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
                               getECLClusterEHypothesisBit());
   storeErrorMatrix(clustercovmat);
 }
+
 
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -247,6 +291,7 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   resetErrorMatrix();
   //storeErrorMatrix(klmCluster->getErrorMatrix());
 }
+
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -593,6 +638,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 
   // add daughter index
   m_daughterIndices.push_back(daughter->getArrayIndex());
+  m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
 }
 
 void Particle::removeDaughter(const Particle* daughter)
@@ -603,6 +649,7 @@ void Particle::removeDaughter(const Particle* daughter)
   for (unsigned i = 0; i < getNDaughters(); i++) {
     if (m_daughterIndices[i] == daughter->getArrayIndex()) {
       m_daughterIndices.erase(m_daughterIndices.begin() + i);
+      m_daughterProperties.erase(m_daughterProperties.begin() + i);
       i--;
     }
   }
@@ -626,11 +673,11 @@ bool Particle::overlapsWith(const Particle* oParticle) const
   return false;
 }
 
-bool Particle::isCopyOf(const Particle* oParticle) const
+bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) const
 {
   // the name of the game is to as quickly as possible determine
   // that the Particles are not copies
-  if (this->getPDGCode() != oParticle->getPDGCode())
+  if (this->getPDGCode() != oParticle->getPDGCode() and !doDetailedComparison)
     return false;
 
   unsigned nDaughters = this->getNDaughters();
@@ -652,12 +699,59 @@ bool Particle::isCopyOf(const Particle* oParticle) const
       if (thisDecayChain[i] != othrDecayChain[i])
         return false;
 
-  } else {
+  } else if (this->getMdstSource() != oParticle->getMdstSource() and !doDetailedComparison) {
     // has no daughters: it's a FSP, compare MDST source and index
-    return this->getMdstSource() == oParticle->getMdstSource();
+    return false;
+  }
+  // Stop here if we do not want a detailed comparison
+  if (!doDetailedComparison)
+    return true;
+  //If we compare here a reconstructed Particle to a generated MCParticle
+  //it means that something went horribly wrong and we must stop
+  if ((this->getParticleType() == EParticleType::c_MCParticle and oParticle->getParticleType() != EParticleType::c_MCParticle)
+      or (this->getParticleType() != EParticleType::c_MCParticle and oParticle->getParticleType() == EParticleType::c_MCParticle)) {
+    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+  }
+  if (this->getParticleType() == EParticleType::c_MCParticle
+      and oParticle->getParticleType() == EParticleType::c_MCParticle) {
+    return this->getMCParticle() == oParticle->getMCParticle();
+  }
+  if (this->getParticleType() != oParticle->getParticleType()) {
+    return false;
+  }
+  if (this->getMdstSource() == oParticle->getMdstSource()) {
+    return true;
+  }
+  if (this->getTrack() && oParticle->getTrack() &&
+      this->getTrack()->getArrayIndex() != oParticle->getTrack()->getArrayIndex()) {
+    return false;
+  }
+  if (this->getKLMCluster() && oParticle->getKLMCluster()
+      && this->getKLMCluster()->getArrayIndex() != oParticle->getKLMCluster()->getArrayIndex()) {
+    return false;
   }
 
+  // It can be a bit more complicated for ECLClusters as we might also have to ensure they are connected-region unique
+  if (this->getECLCluster() && oParticle->getECLCluster()
+      && this->getECLCluster()->getArrayIndex() != oParticle->getECLCluster()->getArrayIndex()) {
+
+    // if either is a track then they must be different
+    if (this->getECLCluster()->isTrack() or oParticle->getECLCluster()->isTrack())
+      return false;
+
+    // we cannot combine two particles of different hypotheses from the same
+    // connected region (as their energies overlap)
+    if (this->getECLClusterEHypothesisBit() == oParticle->getECLClusterEHypothesisBit())
+      return false;
+
+    // in the rare case that both are neutral and the hypotheses are different,
+    // we must also check that they are from different connected regions
+    // otherwise they come from the "same" underlying ECLShower
+    if (this->getECLCluster()->getConnectedRegionId() != oParticle->getECLCluster()->getConnectedRegionId())
+      return false;
+  }
   return true;
+
 }
 
 const Track* Particle::getTrack() const
@@ -669,6 +763,23 @@ const Track* Particle::getTrack() const
     return nullptr;
 }
 
+const TrackFitResult* Particle::getTrackFitResult() const
+{
+  // if the particle is related to a TrackFitResult then return this
+  auto* selfrelated = this->getRelatedTo<TrackFitResult>();
+  if (selfrelated)
+    return selfrelated;
+
+  // if not get the TFR with closest mass to this particle
+  auto* selftrack = this->getTrack();
+  if (selftrack)
+    return selftrack->getTrackFitResultWithClosestMass(
+             Belle2::Const::ChargedStable(std::abs(this->getPDGCode())));
+
+  // otherwise we're probably not a track based particle
+  return nullptr;
+}
+
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
   if (m_particleType == c_Track) {
@@ -676,6 +787,16 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
     return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
     return nullptr;
+}
+
+const V0* Particle::getV0() const
+{
+  if (m_particleType == c_V0) {
+    StoreArray<V0> v0s;
+    return v0s[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
 }
 
 
@@ -741,6 +862,50 @@ const MCParticle* Particle::getMCParticle() const
   }
   return nullptr;
 }
+
+
+const Particle* Particle::getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const
+{
+  // Split the generalizedIndex string in a vector of strings.
+  std::vector<std::string> generalizedIndexes;
+  boost::split(generalizedIndexes, generalizedIndex, boost::is_any_of(":"));
+
+  if (generalizedIndexes.empty()) {
+    B2WARNING("Generalized index of daughter particle is empty. Skipping.");
+    return nullptr;
+  }
+
+  // To explore a decay tree of unknown depth, we need a place to store
+  // both the root particle and the daughter particle at each iteration
+  const Particle* dauPart =
+    nullptr; // This will be eventually returned
+  const Particle* currentPart = this; // This is the root particle of the next iteration
+
+  // Loop over the generalizedIndexes until you get to the particle you want
+  for (auto& indexString : generalizedIndexes) {
+    // indexString is a string. First try to convert it into an int
+    int dauIndex = 0;
+    try {
+      dauIndex = Belle2::convertString<int>(indexString);
+    } catch (std::invalid_argument&) {
+      B2WARNING("Found the string " << indexString << "instead of a daughter index.");
+      return nullptr;
+    }
+
+    // Check that the daughter index is smaller than the number of daughters of the current root particle
+    if (dauIndex >= int(currentPart->getNDaughters()) or dauIndex < 0) {
+      B2WARNING("Daughter index " << dauIndex << " out of range");
+      B2WARNING("Trying to access non-existing particle.");
+      return nullptr;
+    } else {
+      dauPart = currentPart->getDaughter(dauIndex); // Pick the particle indicated by the generalizedIndex
+      currentPart = dauPart;
+    }
+  }
+  return dauPart;
+}
+
+
 
 //--- private methods --------------------------------------------
 
@@ -1086,4 +1251,13 @@ bool Particle::forEachDaughter(const std::function<bool(const Particle*)>& funct
       for (size_t i = 0; i < p->getNDaughters(); ++i) qq.push(p->getDaughter(i));
   }
   return false;
+}
+
+int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::ChargedStable& chargedStable)
+{
+  int absPDGCode = chargedStable.getPDGCode();
+  int PDGCode = absPDGCode * chargeSign;
+  // flip sign of PDG code for leptons: their PDG code is positive if the lepton charge is negative and vice versa
+  if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
+  return PDGCode;
 }

@@ -14,7 +14,7 @@ import sys
 
 from b2test_utils import clean_working_directory, require_file
 from basf2 import find_file
-from skim.registry import skim_registry, combined_skims
+from skim.registry import Registry, combined_skims
 
 
 def getSkimStandaloneScript(skimName, combined=False):
@@ -103,8 +103,9 @@ def testAllSkims(standaloneSkims, combinedSkims):
 
         sys.exit(1)
 
+
 if __name__ == '__main__':
-    standaloneSkims = [name for _, name in skim_registry]
+    standaloneSkims = Registry.names
     combinedSkims = combined_skims.keys()
 
     testAllSkims(standaloneSkims, combinedSkims)

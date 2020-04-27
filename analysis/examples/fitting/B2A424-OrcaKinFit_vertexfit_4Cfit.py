@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###################################################################
-# This tutorial demonstrates how to perform vertexfit with RaveFit
+# This tutorial demonstrates how to perform vertexfit with Rave
 # and four momentum constraint fit with the OrcaKinFit. In this
 # example the following decay chain:
 #
@@ -27,12 +26,11 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import vertexRaveDaughtersUpdate
-from modularAnalysis import fitKinematic4C
+from vertex import raveFit
+from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
 import sys
 import pdg
-from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
 
@@ -51,21 +49,21 @@ pdg.add_particle('A', 9000008, 999., 999., 0, 0)  # name, PDG, mass, width, char
 reconstructDecay("A:sel -> mu-:sel mu+:sel", "", path=my_path)
 reconstructDecay("A:selvertex -> mu-:sel mu+:sel", "", path=my_path)
 
-# Perform four momentum constraint fit using RaveFit and update the Daughters
-vertexRaveDaughtersUpdate("A:selvertex", -1.0, constraint="iptube", path=my_path)
+# Perform four momentum constraint fit using Rave and update the Daughters
+raveFit("A:selvertex", -1.0, constraint="iptube", daughtersUpdate=True, path=my_path)
 
 pdg.add_particle('beam', 9000009, 999., 999., 0, 0)  # name, PDG, mass, width, charge, spin
 reconstructDecay("beam:sel -> A:sel gamma:sel", "", path=my_path)
 reconstructDecay("beam:selv -> A:selvertex gamma:sel", "", path=my_path)
 reconstructDecay("beam:selv4c -> A:selvertex gamma:sel", "", path=my_path)
 
-# Perform four momentum constraint fit using OrcaKinFit and update the Daughters
-fitKinematic4C("beam:selv4c", path=my_path)
-
 # Associates the MC truth
 matchMCTruth('beam:sel', path=my_path)
 matchMCTruth('beam:selv', path=my_path)
 matchMCTruth('beam:selv4c', path=my_path)
+
+# Perform four momentum constraint fit using OrcaKinFit and update the Daughters
+fitKinematic4C("beam:selv4c", path=my_path)
 
 # Select variables that we want to store to ntuple
 muvars = vc.kinematics + vc.mc_truth + vc.mc_kinematics + vc.pid + vc.momentum_uncertainty

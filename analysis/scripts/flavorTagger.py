@@ -8,9 +8,10 @@
 # * and to test the flavor tagger.           *
 # ********************************************
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2INFO, B2FATAL
+import basf2
 import basf2_mva
+import modularAnalysis as ma
 from variables import utils
 from ROOT import Belle2
 import os
@@ -299,7 +300,7 @@ def WhichCategories(categories=[
 
 # Variables for categories on track level - are defined in variables.cc and MetaVariables.cc
 variables = dict()
-KId = {'Belle': 'kIDBelle', 'Belle2': 'kaonID'}
+KId = {'Belle': 'ifNANgiveX(atcPIDBelle(3,2), 0.5)', 'Belle2': 'kaonID'}
 muId = {'Belle': 'muIDBelle', 'Belle2': 'muonID'}
 eId = {'Belle': 'eIDBelle', 'Belle2': 'electronID'}
 
@@ -557,11 +558,12 @@ def setVariables():
         variables['MaximumPstar'].append('distance')
 
 
-def FillParticleLists(mode='Expert', path=None):
+def FillParticleLists(mode='Expert', maskName='', path=None):
     """
     Fills the particle Lists for all categories.
     """
 
+    from vertex import kFit
     readyParticleLists = []
 
     for (particleList, category) in trackLevelParticleLists:
@@ -573,37 +575,41 @@ def FillParticleLists(mode='Expert', path=None):
         if particleList != 'Lambda0:inRoe' and particleList != 'K+:inRoe' and particleList != 'pi+:inRoe':
 
             # Filling particle list for actual category
-            fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+            ma.fillParticleList(particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                              'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
             readyParticleLists.append(particleList)
 
         else:
             if 'pi+:inRoe' not in readyParticleLists:
-                fillParticleList(
-                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                ma.fillParticleList(
+                    'pi+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                 'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 readyParticleLists.append('pi+:inRoe')
 
             if 'K_S0:inRoe' not in readyParticleLists:
                 if getBelleOrBelle2() == 'Belle':
-                    cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
+                    ma.cutAndCopyList('K_S0:inRoe', 'K_S0:mdst', 'extraInfo(ksnbStandard) == 1 and isInRestOfEvent == 1', path=path)
                 else:
-                    reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
-                    vertexKFit('K_S0:inRoe', 0.01, path=path)
+                    ma.reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', False, path=path)
+                    kFit('K_S0:inRoe', 0.01, path=path)
                 readyParticleLists.append('K_S0:inRoe')
 
             if particleList == 'K+:inRoe':
-                fillParticleList(
-                    particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                ma.fillParticleList(
+                    particleList, 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                  'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
                 # Precut done to prevent from overtraining, found not necessary now
                 # applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
                 readyParticleLists.append(particleList)
 
             if particleList == 'Lambda0:inRoe':
-                fillParticleList(
-                    'p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-                reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
-                vertexKFit(particleList, 0.01, path=path)
+                ma.fillParticleList(
+                    'p+:inRoe', 'isInRestOfEvent > 0.5 and passesROEMask(' + maskName + ') > 0.5 and ' +
+                                'isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                ma.reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe', '1.00<=M<=1.23', False, path=path)
+                kFit(particleList, 0.01, path=path)
                 # if mode != 'Expert':
-                matchMCTruth(particleList, path=path)
+                ma.matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
 
     return True
@@ -613,6 +619,9 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
     """
     Samples data for training or tests all categories all categories at event level.
     """
+
+    from basf2 import create_path
+    from basf2 import register_module
 
     B2INFO('EVENT LEVEL')
 
@@ -682,7 +691,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.set_name('SkimFilter_EventLevel_' + particleList)
         SkipEmptyParticleList.param('particleLists', particleList)
-        SkipEmptyParticleList.if_true(eventLevelPath, AfterConditionPath.CONTINUE)
+        SkipEmptyParticleList.if_true(eventLevelPath, basf2.AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
         mvaMultipleExperts = register_module('MVAMultipleExperts')
@@ -698,7 +707,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.set_name('SkimFilter_' + 'K+:inRoe')
         SkipEmptyParticleList.param('particleLists', 'K+:inRoe')
-        SkipEmptyParticleList.if_true(eventLevelKaonPionPath, AfterConditionPath.CONTINUE)
+        SkipEmptyParticleList.if_true(eventLevelKaonPionPath, basf2.AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
         mvaExpertKaonPion = register_module("MVAExpert")
@@ -731,12 +740,12 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                 'flavorTagger: file ' + filesDirectory + '/' +
                 methodPrefixEventLevel + "sampled" + fileId + '.root will be saved.')
 
-            applyCuts(particleList, 'isRightCategory(mcAssociated) > 0', path)
+            ma.applyCuts(particleList, 'isRightCategory(mcAssociated) > 0', path)
             eventLevelpath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
             SkipEmptyParticleList.set_name('SkimFilter_EventLevel' + category)
             SkipEmptyParticleList.param('particleLists', particleList)
-            SkipEmptyParticleList.if_true(eventLevelpath, AfterConditionPath.CONTINUE)
+            SkipEmptyParticleList.if_true(eventLevelpath, basf2.AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
             ntuple = register_module('VariablesToNtuple')
@@ -833,7 +842,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
             B2INFO('flavorTagger: Sampling Data on Combiner Level. File' +
                    methodPrefixCombinerLevel + ".root" + ' will be saved')
 
-            ntuple = register_module('VariablesToNtuple')
+            ntuple = basf2.register_module('VariablesToNtuple')
             ntuple.param('fileName', filesDirectory + '/' + methodPrefixCombinerLevel + "sampled" + fileId + ".root")
             ntuple.param('treeName', methodPrefixCombinerLevel + 'FBDT' + "_tree")
             ntuple.param('variables', variablesCombinerLevel + ['qrCombined'])
@@ -935,7 +944,7 @@ def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
 
             B2INFO('flavorTagger: Apply FANNMethod and FBDTMethod  on combiner level')
 
-            mvaMultipleExperts = register_module('MVAMultipleExperts')
+            mvaMultipleExperts = basf2.register_module('MVAMultipleExperts')
             mvaMultipleExperts.set_name('MVAMultipleExperts_Combiners')
             mvaMultipleExperts.param('listNames', [])
             mvaMultipleExperts.param('extraInfoNames', ['qrCombined' + 'FBDT', 'qrCombined' + 'FANN'])
@@ -1045,7 +1054,8 @@ def flavorTagger(
         'FSC',
         'MaximumPstar',
         'KaonPion'],
-    belleOrBelle2="Belle2",
+    belleOrBelle2='Belle2',
+    maskName='',
     saveCategoriesInfo=True,
     useOnlyLocalWeightFiles=False,
     downloadFromDatabaseIfNotFound=False,
@@ -1079,6 +1089,7 @@ def flavorTagger(
       @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` or ``FANN-MLP``. Both used by default.
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param belleOrBelle2                     Uses files trained for ``Belle`` or ``Belle2`` MC.
+      @param maskName                          Gets ROE particles from a specified ROE mask.
       @param saveCategoriesInfo                Sets to save information of individual categories.
       @param useOnlyLocalWeightFiles           [Expert] Uses only locally saved weight files.
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
@@ -1149,27 +1160,31 @@ def flavorTagger(
     set_FlavorTagger_pid_aliases()
     setVariables()
 
-    roe_path = create_path()
-    deadEndPath = create_path()
+    roe_path = basf2.create_path()
+    deadEndPath = basf2.create_path()
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
-        signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
+        ma.signalSideParticleListsFilter(
+            particleLists,
+            'nROE_Charged(' + maskName + ', 0) > 0 and abs(qrCombined) == 1',
+            roe_path,
+            deadEndPath)
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
-        signalSideParticleListsFilter(particleLists, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
+        ma.signalSideParticleListsFilter(particleLists, 'nROE_Charged(' + maskName + ', 0) > 0', roe_path, deadEndPath)
         # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
-        flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
+        flavorTaggerInfoBuilder = basf2.register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)
 
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
-        if FillParticleLists(mode, roe_path):
+        if FillParticleLists(mode, maskName, roe_path):
             if eventLevel(mode, weightFiles, roe_path):
                 combinerLevel(mode, weightFiles, roe_path)
                 if mode == 'Expert':
-                    flavorTaggerInfoFiller = register_module('FlavorTaggerInfoFiller')
+                    flavorTaggerInfoFiller = basf2.register_module('FlavorTaggerInfoFiller')
                     flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
                     flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
                     flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
@@ -1188,10 +1203,10 @@ def flavorTagger(
             particleListsToRemoveExtraInfo.append(particleList[0])
 
     if mode == 'Expert':
-        removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
+        ma.removeExtraInfo(particleListsToRemoveExtraInfo, True, roe_path)
 
     elif mode == 'Sampler':
-        removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
+        ma.removeExtraInfo(particleListsToRemoveExtraInfo, False, roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

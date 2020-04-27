@@ -151,7 +151,7 @@ void ECLDigiStudyModule::event()
     i = hit.getCellId() - 1;
     m_cellId[i]  = i;
     double e = hit.getEnergyDep();
-    if (hit.getBackgroundTag() == ECLHit::bg_none) {
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) {
       if (m_energy[i] < e)
         m_time[i] = hit.getTimeAve();
       m_energy[i]  += e;

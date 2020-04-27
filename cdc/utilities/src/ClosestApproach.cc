@@ -56,20 +56,23 @@ namespace Belle2 {
         hitPosition = posOut + t1 * hitLine;
         t2 = hitXwire.Dot(wire2hit.Cross(hitLine)) / hitXwire.Mag2();
 
-        double dInOut = (posOut - posIn).Mag();
-        double dHitIn = (hitPosition - posIn).Mag();
-        double dHitOut = (hitPosition - posOut).Mag();
-        if (dHitIn <= dInOut && dHitOut <= dInOut) { //Between point in & out
-          distance = fabs(wire2hit.Dot(hitXwire) / hitXwire.Mag());
-        } else if (dHitOut > dHitIn) { // out posIn
-          distance = wireLine.Cross(posIn - fwp).Mag() / wireLine.Mag();
-          hitPosition = posIn;
-          t2 = (posIn - fwp).Dot(wireLine) / wireLine.Mag2();
-        } else { // out posOut
-          distance = wireLine.Cross(posOut - fwp).Mag() / wireLine.Mag();
-          hitPosition = posOut;
-          t2 = (posOut - fwp).Dot(wireLine) / wireLine.Mag2();
-        }
+        //should not constrain hitPosition inside the cell
+        //        double dInOut = (posOut - posIn).Mag();
+        //        double dHitIn = (hitPosition - posIn).Mag();
+        //        double dHitOut = (hitPosition - posOut).Mag();
+        //        if (dHitIn <= dInOut && dHitOut <= dInOut) { //Between point in & out
+        distance = fabs(wire2hit.Dot(hitXwire) / hitXwire.Mag());
+        /*
+              } else if (dHitOut > dHitIn) { // out posIn
+                distance = wireLine.Cross(posIn - fwp).Mag() / wireLine.Mag();
+                hitPosition = posIn;
+                t2 = (posIn - fwp).Dot(wireLine) / wireLine.Mag2();
+              } else { // out posOut
+                distance = wireLine.Cross(posOut - fwp).Mag() / wireLine.Mag();
+                hitPosition = posOut;
+                t2 = (posOut - fwp).Dot(wireLine) / wireLine.Mag2();
+              }
+        */
       }
 
       wirePosition = fwp + t2 * wireLine;

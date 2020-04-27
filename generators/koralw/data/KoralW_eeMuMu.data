@@ -1,0 +1,55 @@
+*
+* Configuration file to generate e+e- > e+e-mu+mu-(gamma) events with KoralW
+* Author: Giacomo De Pietro (2020)
+*
+BeginX
+*<-i><----data-----><-------------------comments------------------------------>
+*  Kinematics parameters
+   14       0.0001d0 arbitr =xpar(14) ! arbitr  min. vis p_t**2 (GeV**2)
+   15         0.25d0 arbitr1=xpar(15) ! inv_mass**2 cut for e+e-xx (GeV**2)
+   16           1d-6 themin =xpar(16) ! themin  min theta (rad) with beam (0=no cut)
+   17          100d0 arbitr2=xpar(17) ! arbitr2 max p_t**2 of photons in e+e-xx (GeV**2)
+*  ISR/FSR/etc. parameters
+ 1011            1d0 KeyISR =xpar(1011)
+*                    =0,1  initial state radiation off/on
+ 1012            1d0 KeyFSR =xpar(1012) 
+*                    KeyFSR =final state radiation switch, INACTIVE
+ 1013            1d0 KeyNLL =xpar(1013)
+*                    =0 sets next-to leading alpha/pi terms to zero
+*                    =1 alpha/pi in yfs formfactor is kept
+ 1014            1d0 KeyCul =xpar(1014)
+*                    =0,1 Coulomb correction, off/on
+ 1021            2d0 KeyBra =xpar(1021)
+*                    = 0 born branching ratios, no mixing
+*                    = 1 branching ratios with mixing and naive QCD
+*                    = 2 branching ratios with mixing and naive QCD 
+*                       calculated in IBA from the CKM matrix (PDG '98); 
+*                       see routine filexp for more details (file filexp.f)
+*  Z/W parameters
+ 1044            1d0 KeyZon =xpar(1044)
+*                    = 1/0, ZZ type final states ON/OFF
+*                      it must be 1 in our case
+ 1045            1d0 KeyWon =xpar(1045)
+*                    = 1/0, WW type final states ON/OFF
+*                      it must be 1 in our case
+ 1055            0d0 KeyDWM =xpar(1055)    W- decay: 7=(ev), 0=all ch.
+*                    = 0 means inclusive final state (chosen later)   
+ 1056            0d0 KeyDWP =xpar(1056)    W+ decay: 7=(ev), 0=all ch.
+*                    = 0 means inclusive final state (chosen later)     
+*  Tauola and PHOTOS parameters
+ 1071           -1d0 JAK1   =xpar(1071)   Decay mode tau+
+ 1072           -1d0 JAK2   =xpar(1072)   Decay mode tau-
+ 1073            0d0 ITDKRC =xpar(1073)   Bremsstrahlung switch in Tauola 
+*                    -1, -1 and 0 means Tauola switched OFF (otherwise it doesn't work)
+ 1074            1d0 IFPHOT =xpar(1074)   PHOTOS switch
+*  Final state parameters
+ 1242            0d0 = eeee final state
+ 1243            0d0 = mmee final state NOT WORKING, MUST SET eemm
+ 1244            0d0 = ttee final state NOT WORKING, MUST SET eett
+ 1253            1d0 = eemm final state
+ 1254            0d0 = mmmm final state
+ 1255            0d0 = ttmm final state NOT WORKING, MUST SET mmtt
+ 1264            0d0 = eett final state
+ 1265            0d0 = mmtt final state
+ 1266            0d0 = tttt final state
+EndX

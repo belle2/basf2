@@ -75,7 +75,11 @@ class Histograms(object):
             isfinite = isfinite & (data[column] > (mean - range_in_std * std)) & (data[column] < (mean + range_in_std * std))
 
         if equal_frequency:
-            bins = numpy.unique(numpy.percentile(data[column][isfinite], q=range(bins + 1)))
+            if data[column][isfinite].size > 0:
+                bins = numpy.unique(numpy.percentile(data[column][isfinite], q=range(bins + 1)))
+            else:
+                print('Empty Array')
+                bins = [1]
             # If all values are unique, we make at least one bin
             if len(bins) == 1:
                 bins = numpy.array([bins[0]-1, bins[0]+1])
@@ -114,14 +118,17 @@ class Histograms(object):
     def get_efficiency(self, signal_names):
         """
         Return the cumulative efficiency in each bin of the sum of the histograms with the given names.
-        @param names names of the histograms
+        @param  signal_names of the histograms
         @return numpy.array with hist data, numpy.array with corresponding binomial errors
         """
         signal, _ = self.get_summed_hist(signal_names)
         cumsignal = (signal.sum() - signal.cumsum()).astype('float')
 
-        efficiency = cumsignal / signal.sum()
-        efficiency_error = binom_error(cumsignal, signal.sum())
+        efficiency = 0
+        efficiency_error = 0
+        if signal.sum() > 0:
+            efficiency = cumsignal / signal.sum()
+            efficiency_error = binom_error(cumsignal, signal.sum())
         return efficiency, efficiency_error
 
     def get_true_positives(self, signal_names):

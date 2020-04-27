@@ -24,9 +24,15 @@ from ROOT import Belle2
 
 
 class skimOutRNDTrgModule(basf2.Module):
+    """
+    a python basf2 module to skim random trigger events
+    """
 
     def event(self):
-
+        """
+        check RawFTSW to get the event type
+        """
+        #: StoreArray of RawFTSW
         rawFTSW = Belle2.PyStoreArray('RawFTSWs')
 
         if not rawFTSW.isValid():

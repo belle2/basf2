@@ -8,23 +8,8 @@
 // Date : 19 - Feb - 2013
 //-
 
-#include <string>
 #include <vector>
-#include <algorithm>
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <strings.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
-#include <sys/time.h>
-#include <signal.h>
+#include <sys/select.h>
 
 namespace Belle2 {
 

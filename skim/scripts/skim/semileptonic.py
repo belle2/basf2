@@ -10,8 +10,9 @@ __authors__ = [
     "Phil Grace"
 ]
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import Path
+import modularAnalysis as ma
+from skimExpertFunctions import ifEventPasses
 
 
 def SemileptonicList(path):
@@ -41,9 +42,10 @@ def SemileptonicList(path):
     >>> stdMu('all', path=path)
     >>> stdPi('all', path=path)
     >>> stdPi('loose', path=path)
+    >>> stdPi0s('skim', path=path)
     >>> stdPi0s('loose', path=path)
     >>> stdPhotons('loose', path=path)
-    >>> stdK('loose', path=path)
+    >>> stdK('all', path=path)
     >>> stdKshorts(path=path)
     >>> loadStdD0(path)
     >>> loadStdDplus(path)
@@ -72,12 +74,7 @@ def SemileptonicList(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        ``SLLists``, a Python list containing the strings
-        :code:`B+:SL1`, :code:`B+:SL2`, :code:`B+:SL3`,
-        :code:`B+:SL4`, :code:`B0:SL1`, :code:`B0:SL2`,
-        :code:`B0:SL3`, and :code:`B0:SL4`, the names of the particle
-        lists for semileptonic :math:`B^+` and :math:`B^0` skim
-        candidates.
+        ``SLLists`` (list(str)): A list containing the names of the skim particle lists.
     """
 
     __authors__ = [
@@ -85,33 +82,33 @@ def SemileptonicList(path):
         "Racha Cheaib"
     ]
 
-    cutAndCopyList('e+:SLB', 'e+:all', 'p>0.35', True, path=path)
-    cutAndCopyList('mu+:SLB', 'mu+:all', 'p>0.35', True, path=path)
+    ma.cutAndCopyList('e+:SLUntagged', 'e+:all', 'p>0.35', True, path=path)
+    ma.cutAndCopyList('mu+:SLUntagged', 'mu+:all', 'p>0.35', True, path=path)
     Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
-    BplusChannels = ['anti-D0:all e+:SLB',
-                     'anti-D0:all mu+:SLB',
-                     'anti-D*0:all e+:SLB',
-                     'anti-D*0:all mu+:SLB'
+    BplusChannels = ['anti-D0:all e+:SLUntagged',
+                     'anti-D0:all mu+:SLUntagged',
+                     'anti-D*0:all e+:SLUntagged',
+                     'anti-D*0:all mu+:SLUntagged'
                      ]
 
-    B0Channels = ['D-:all e+:SLB',
-                  'D-:all mu+:SLB',
-                  'D*-:all e+:SLB',
-                  'D*-:all mu+:SLB'
+    B0Channels = ['D-:all e+:SLUntagged',
+                  'D-:all mu+:SLUntagged',
+                  'D*-:all e+:SLUntagged',
+                  'D*-:all mu+:SLUntagged'
                   ]
 
     bplusList = []
     for chID, channel in enumerate(BplusChannels):
-        reconstructDecay('B+:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
-        bplusList.append('B+:SL' + str(chID))
+        ma.reconstructDecay(f"B+:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
+        ma.applyCuts(f"B+:SLUntagged_{chID}", "nTracks>4", path=path)
+        bplusList.append(f"B+:SLUntagged_{chID}")
 
     b0List = []
     for chID, channel in enumerate(B0Channels):
-        reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
-        b0List.append('B0:SL' + str(chID))
+        ma.reconstructDecay(f"B0:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
+        ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
+        b0List.append(f"B0:SLUntagged_{chID}")
 
     SLLists = b0List + bplusList
     return SLLists
@@ -126,16 +123,36 @@ def PRList(path):
 
     **Decay Modes**:
 
-    * B0:L1 ->  pi-:PR1 e+:PR1
-    * B0:L2 ->  pi-:PR1 mu+:PR1
+    * :math:`B^0 \\to \\pi^- e^+`
+    * :math:`B^0 \\to \\pi^- \\mu^+`
 
     **Cuts applied**:
 
-    * electronID>0.5
-    * muonID>0.5
-    * lepton Momentum>1.5
-    * foxWolframR2<0.5
-    * nTracks>4
+    Event-level cuts:
+
+    * :math:`\\text{foxWolframR2} > 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} > 4`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.5`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
+
+    Cuts on pions:
+
+    * :math:`\\text{pionID}>0.5`
+    * :math:`\\text{muonID}<0.2`
+    * :math:`0.060\\,\\text{GeV}<p<0.220\\,\\text{GeV}` in CMS frame
+
+    Cuts on partially reconstructed :math:`B` mesons:
+
+    * :math:`\\cos\\theta_{\\ell,\\,\\pi}<0` in CMS frame.
     """
 
     __authors__ = [
@@ -144,38 +161,44 @@ def PRList(path):
         "Romulus Godang"
     ]
 
-    fillParticleList(decayString='pi+:eventShapeForSkims',
-                     cut='pt> 0.1', path=path)
-    fillParticleList(decayString='gamma:eventShapeForSkims',
-                     cut='E > 0.1', path=path)
+    ma.fillParticleList(decayString='pi+:eventShapeForSkims',
+                        cut='pt> 0.1', path=path)
+    ma.fillParticleList(decayString='gamma:eventShapeForSkims',
+                        cut='E > 0.1', path=path)
 
-    buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
-                    allMoments=False,
-                    foxWolfram=True,
-                    harmonicMoments=False,
-                    cleoCones=False,
-                    thrust=False,
-                    collisionAxis=False,
-                    jets=False,
-                    sphericity=False,
-                    checkForDuplicates=False,
-                    path=path)
+    ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+                       allMoments=False,
+                       foxWolfram=True,
+                       harmonicMoments=False,
+                       cleoCones=False,
+                       thrust=False,
+                       collisionAxis=False,
+                       jets=False,
+                       sphericity=False,
+                       checkForDuplicates=False,
+                       path=path)
 
-    applyEventCuts('foxWolframR2<0.5 and nTracks>4', path=path)
+    path2 = Path()
+    ifEventPasses('foxWolframR2<0.5 and nTracks>4', conditional_path=path2, path=path)
 
-    cutAndCopyList('e+:PR1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR1', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path)
+    ma.cutAndCopyList('e+:PRSemileptonic_1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path2)
+    ma.cutAndCopyList('mu+:PRSemileptonic_1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path2)
+    ma.cutAndCopyList('pi-:PRSemileptonic_1', 'pi-:all',
+                      'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path2)
 
-    cutAndCopyList('e+:PR2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
+    ma.cutAndCopyList('e+:PRSemileptonic_2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path2)
+    ma.cutAndCopyList('mu+:PRSemileptonic_2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path2)
+    ma.cutAndCopyList('pi-:PRSemileptonic_2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path2)
 
-    reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path)
-    reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path)
-    reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path)
-    reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path)
+    ma.reconstructDecay('B0:PRSemileptonic_1 ->  pi-:PRSemileptonic_1 e+:PRSemileptonic_1',
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 1, path=path2)
+    ma.reconstructDecay('B0:PRSemileptonic_2 ->  pi-:PRSemileptonic_1 mu+:PRSemileptonic_1',
+                        'useCMSFrame(cos(daughterAngle(0,1)))<0.00', 2, path=path2)
+    ma.reconstructDecay('B0:PRSemileptonic_3 ->  pi-:PRSemileptonic_2 e+:PRSemileptonic_2',
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 3, path=path2)
+    ma.reconstructDecay('B0:PRSemileptonic_4 ->  pi-:PRSemileptonic_2 mu+:PRSemileptonic_2',
+                        'useCMSFrame(cos(daughterAngle(0,1)))<1.00', 4, path=path2)
 
-    PRList = ['B0:L1', 'B0:L2']
+    PRList = ['B0:PRSemileptonic_1', 'B0:PRSemileptonic_2']
 
-    return PRList
+    return PRList, path2

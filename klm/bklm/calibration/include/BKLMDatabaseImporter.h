@@ -12,9 +12,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
+#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 
 namespace Belle2 {
 
@@ -40,26 +39,6 @@ namespace Belle2 {
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
     /**
-     * Load default electronics mapping.
-     */
-    void loadDefaultElectronicMapping();
-
-    /**
-     * Set non-default lane.
-     * @param[in] section Section.
-     * @param[in] sector  Sector.
-     * @param[in] layer   Layer.
-     * @param[in] lane    Lane.
-     */
-    void setElectronicMappingLane(
-      int section, int sector, int layer, int lane);
-
-    /**
-     * Import BKLM electronics mapping in the database.
-     */
-    void importElectronicMapping();
-
-    /**
      * Import BKLM geometry parameters into the database
      */
     void importGeometryPar();
@@ -68,16 +47,6 @@ namespace Belle2 {
      * Import BKLM simulation parameters into the database
      */
     void importSimulationPar();
-
-    /**
-     * Import BKLM Alignment parameters into the database
-     */
-    void importAlignment();
-
-    /**
-     * Import BKLM displaced-geometry parameters into the database
-     */
-    void importDisplacement();
 
     /**
      * Import BKLM scintillator ADC parameters into the database
@@ -90,9 +59,6 @@ namespace Belle2 {
     void importTimeWindow(BKLMTimeWindow* inputWindow);
 
   private:
-
-    /** Electronics mapping. */
-    std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
 
     /** Low experiment. */
     int m_ExperimentLow;

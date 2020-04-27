@@ -30,7 +30,8 @@ CDCDedxRunGainAlgorithm::CDCDedxRunGainAlgorithm() :
   m_badRunFPath(""),
   m_badRunFName(""),
   isRmBadruns(false),
-  isMakePlots(true)
+  isMakePlots(true),
+  isMergePayload(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx run gains");
@@ -64,11 +65,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   if (isRmBadruns)CheckRunStatus(runtemp, IsSkipRun, rmean);
 
   TF1* fitG = new TF1("fitG", "gaus", 0.5, 1.5);
-  fitG->SetParLimits(1, 0.90, 1.10);
+  fitG->SetParLimits(1, 0.70, 1.30);
   fitG->SetParLimits(2, 0.03, 0.12);
 
-  double RunGainConst = 1.0;
-  std::string rstatus = "";
+  double RunGainConst;
+  std::string rstatus;
   if (IsSkipRun) {
     RunGainConst = rmean;
     rstatus = "BadRun";
@@ -76,6 +77,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     if (hDedx->GetEntries() < 100) {
       RunGainConst = 1.0; //try global running avg accorsing all runs: next
       rstatus = "LowStatsRun";
+      B2INFO("Not enough data for this run: going back");
+      return c_NotEnoughData;
     } else {
       if (isMakePlots)hDedx->Fit("fitG");
       else if (!isMakePlots)hDedx->Fit("fitG", "QRM"); //silent fitting
@@ -118,11 +121,24 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 
   B2INFO("dE/dx run gains done: " << RunGainConst);
   printf("run = %d, const = %0.03f, status = %s\n", runtemp, RunGainConst, rstatus.data());
-  CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
-  saveCalibration(gain, "CDCDedxRunGain");
+  generateNewPayloads(RunGainConst);
 
   return c_OK;
 
 }
 
 
+void CDCDedxRunGainAlgorithm::generateNewPayloads(double RunGainConst)
+{
+
+  const auto expRun = getRunList()[0];
+  updateDBObjPtrs(1, expRun.second, expRun.first);
+  double ExistingRG = m_DBRunGain->getRunGain();
+  // bool refchange = m_DBRunGain.hasChanged(); //Add this feature for major processing
+  B2INFO("Saving new rung for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
+  B2INFO("--> RunGain: Previous = " << ExistingRG << ", Relative = " << RunGainConst << ", Merged = " << RunGainConst * ExistingRG);
+  if (isMergePayload) RunGainConst *= ExistingRG;
+
+  CDCDedxRunGain* gain = new CDCDedxRunGain(RunGainConst);
+  saveCalibration(gain, "CDCDedxRunGain");
+}

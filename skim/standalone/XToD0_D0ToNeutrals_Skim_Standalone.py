@@ -8,20 +8,19 @@
 #
 ######################################################
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdV0s import *
-from stdPi0s import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging, get_test_file
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
+from stdPi0s import loadStdSkimPi0
+from stdV0s import stdKshorts
+import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
-skimCode = encodeSkimName('XToD0_D0ToNeutrals')
+skimCode = expert.encodeSkimName('XToD0_D0ToNeutrals')
 
-c2bndpath = Path()
+c2bndpath = b2.Path()
 
-fileList = get_test_file("mixedBGx1", "MC12")
-inputMdstList('default', fileList, path=c2bndpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=c2bndpath)
 
 
 loadStdSkimPi0(path=c2bndpath)
@@ -30,17 +29,16 @@ stdK('loose', path=c2bndpath)
 stdPi('all', path=c2bndpath)
 stdK('all', path=c2bndpath)
 stdKshorts(path=c2bndpath)
-mergedKshorts(path=c2bndpath)
 
 from skim.charm import D0ToNeutrals
 
 D0ToNeutralsList = D0ToNeutrals(c2bndpath)
-skimOutputUdst(skimCode, D0ToNeutralsList, path=c2bndpath)
+expert.skimOutputUdst(skimCode, D0ToNeutralsList, path=c2bndpath)
 
-summaryOfLists(D0ToNeutralsList, path=c2bndpath)
+ma.summaryOfLists(D0ToNeutralsList, path=c2bndpath)
 
 
-setSkimLogging(path=c2bndpath)
-process(c2bndpath)
+expert.setSkimLogging(path=c2bndpath)
+b2.process(c2bndpath)
 
-print(statistics)
+print(b2.statistics)

@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Francesco Tenchini, Wouter Hulsbergen                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

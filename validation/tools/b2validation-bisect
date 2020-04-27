@@ -265,7 +265,7 @@ if __name__ == "__main__":
             ""
         )
         if len(validation_scripts) > 0:
-            validation_call = "validate_basf2 -s " + validation_scripts
+            validation_call = "b2validation -s " + validation_scripts
             exitCode = os.system(validation_call)
 
             print("Exit code of " + validation_call + " was " + str(exitCode))

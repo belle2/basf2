@@ -47,6 +47,7 @@ namespace Belle2 {
       void setStoreTrajectories(bool store) { m_storeTrajectories = store; }
 
       /** Sets the radii of absorbers for killing tracks across them.
+       * This set is used in the PXD only simulation for PXD gain calibration.
        * @param vec The c++ vector with the radii of absorbers in cm
        */
       void setAbsorbersR(std::vector<float>& vec) { m_absorbers = vec; };

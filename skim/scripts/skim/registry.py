@@ -85,8 +85,6 @@ RegisteredSkims = [
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240800", "charm", "EarlyData_DstToD0Pi_D0ToHpJmPi0"),
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
-    # D*(tag) -> D0(tag) -> hadron, D*(q) -> D0(q) -> K+ nu l-
-    ("17260900", "charm", "DstToD0Pi_D0ToSemileptonic"),
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),

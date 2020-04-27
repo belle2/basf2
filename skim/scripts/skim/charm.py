@@ -802,13 +802,21 @@ def DpToKsHp(path):
     return Lists
 
 
-class BaseCharmSkim(BaseSkim):
+@fancy_skim_header
+class XToD0_D0ToHpJm(BaseSkim):
     """
-    Base class containing common list-building functions for charm group skims.
+    Skims :math:`D^0`'s reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`.
     """
+
+    __authors__ = ["Giulia Casarosa"]
+    __description__ = "Skim list for D0 to two charged FSPs."
+    __contact__ = ""
     __category__ = "physics, charm"
 
-    # Cached static method, so that its contents are only executed once for a single path
+    RequiredStandardLists = None
+
+    # Cached static method, so that its contents are only executed once for a single path.
+    # Factored out into a separate function here, so it is available to other skims.
     @staticmethod
     @lru_cache()
     def D0ToHpJm(path):
@@ -851,7 +859,33 @@ class BaseCharmSkim(BaseSkim):
 
         return D0List
 
+    def build_lists(self, path):
+        """Builds :math:`D^0` skim lists defined in `XToD0_D0ToHpJm.D0ToHpJm`."""
+        self.SkimLists = self.D0ToHpJm(path)
+
+
+@fancy_skim_header
+class XToD0_D0ToNeutrals(BaseSkim):
+    """
+    Skims :math:`D^0`'s reconstructed by `XToD0_D0ToNeutrals.D0ToNeutrals`.
+    """
+
+    __authors__ = ["Giulia Casarosa"]
+    __description__ = "Skim list for D0 to neutral FSPs."
+    __contact__ = ""
+    __category__ = "physics, charm"
+
+    RequiredStandardLists = {
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+    }
+
     # Cached static method, so that its contents are only executed once for a single path
+    # Factored out into a separate function here, so it is available to other skims.
     @staticmethod
     @lru_cache()
     def D0ToNeutrals(path):
@@ -886,55 +920,8 @@ class BaseCharmSkim(BaseSkim):
 
         return D0List
 
-    # Cached static method, so that its contents are only executed once for a single path
-    @staticmethod
-    @lru_cache()
-    def fillCharmSkimKs(path):
-        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
-        ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
-
-
-@fancy_skim_header
-class XToD0_D0ToHpJm(BaseCharmSkim):
-    """
-    Skims :math:`D^0`'s reconstructed by `BaseCharmSkim.D0ToHpJm`.
-    """
-
-    __authors__ = ["Giulia Casarosa"]
-    __description__ = "Skim list for D0 to two charged FSPs."
-    __contact__ = ""
-    __category__ = "physics, charm"
-
-    RequiredStandardLists = None
-
     def build_lists(self, path):
-        """Builds :math:`D^0` skim lists defined in `BaseCharmSkim.D0ToHpJm`."""
-        self.SkimLists = self.D0ToHpJm(path)
-
-
-@fancy_skim_header
-class XToD0_D0ToNeutrals(BaseCharmSkim):
-    """
-    Skims :math:`D^0`'s reconstructed by `BaseCharmSkim.D0ToNeutrals`.
-    """
-
-    __authors__ = ["Giulia Casarosa"]
-    __description__ = "Skim list for D0 to neutral FSPs."
-    __contact__ = ""
-    __category__ = "physics, charm"
-
-    RequiredStandardLists = {
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-    }
-
-    def build_lists(self, path):
-        """Builds :math:`D^0` skim lists defined in `BaseCharmSkim.D0ToNeutrals`."""
+        """Builds :math:`D^0` skim lists defined in `XToD0_D0ToNeutrals.D0ToNeutrals`."""
         self.SkimLists = self.D0ToNeutrals(path)
 
 
@@ -997,7 +984,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
 
 @fancy_skim_header
-class XToDp_DpToKsHp(BaseCharmSkim):
+class XToDp_DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
     * :math:`D^+ \\to K_{S} \\pi^+`
@@ -1025,6 +1012,14 @@ class XToDp_DpToKsHp(BaseCharmSkim):
         },
     }
 
+    # Cached static method, so that its contents are only executed once for a single path
+    @staticmethod
+    @lru_cache()
+    def fillCharmSkimKs(path):
+        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
+        ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
+
     def build_lists(self, path):
         mySel = "abs(d0) < 1 and abs(z0) < 3"
         mySel += " and 0.296706 < theta < 2.61799"
@@ -1047,11 +1042,11 @@ class XToDp_DpToKsHp(BaseCharmSkim):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0ToHpJm(BaseCharmSkim):
+class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
 
-    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where the D^{0} is reconstructed by D0ToHpJm
+    1. :math:`D^{*+}\\to D^{0} \\pi^+`, where the D^{0} is reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`
 
     **Additional Cuts**:
 
@@ -1061,7 +1056,7 @@ class DstToD0Pi_D0ToHpJm(BaseCharmSkim):
     """
 
     __authors__ = "Giulia Casarosa"
-    __description__ = "Same as D0ToHpJm, but requiring the D0 is from D*+ -> D0 pi+ process."
+    __description__ = "Same as `XToD0_D0ToHpJm`, but requiring the D0 is from D*+ -> D0 pi+ process."
     __contact__ = ""
     __category__ = "physics, charm"
 
@@ -1350,11 +1345,11 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0ToNeutrals(BaseCharmSkim):
+class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     """
     **Decay Modes**:
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by `BaseCharmSkim.D0ToNeutrals`.
+    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by `XToD0_D0ToNeutrals.D0ToNeutrals`.
 
     **Additional Cuts**:
 
@@ -1364,7 +1359,7 @@ class DstToD0Pi_D0ToNeutrals(BaseCharmSkim):
     """
 
     __authors__ = ["Giulia Casarosa", "Emma Oxford"]
-    __description__ = "Same as `D0ToNeutrals`, but requiring that the D0 is from D* decay."
+    __description__ = "Same as `XToD0_D0ToNeutrals`, but requiring that the D0 is from D* decay."
     __contact__ = ""
     __category__ = "physics, charm"
 

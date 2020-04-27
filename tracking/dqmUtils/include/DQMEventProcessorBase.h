@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Peter Kodys, Jachym Bartik                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
@@ -8,10 +18,22 @@
 using namespace std;
 
 namespace Belle2 {
-
+  /**
+   * The purpose of this class is to process one event() in DQMHistoModuleBase, which is a base for TrackDQMModule and AlignDQMModule.
+   * This class is a base for TrackDQMEventProcessor and AlignDQMEventProcessor.
+   *
+   * After instance of this class is created via constructor its only public function Run() should be called to process the event.
+   *
+   * This class doesn't actually fill the histograms but it calls Fill- functions on given DQMHistoModuleBase instead.
+   *
+   * All functions of this class are supposed to be virtual so they can be overridden in derived classes. */
   class DQMEventProcessorBase {
 
   public:
+    /** Constructor.
+     * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
+     * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
+     * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
     DQMEventProcessorBase(DQMHistoModuleBase* histoModule, string recoTracksStoreArrayName, string tracksStoreArrayName)
     {
       m_histoModule = histoModule;
@@ -19,17 +41,29 @@ namespace Belle2 {
       m_tracksStoreArrayName = tracksStoreArrayName;
     }
 
+    /** Call this to start processing the event data and filling histograms.
+    * Calls ProcessTrack function for each track in store array. */
     virtual void Run();
 
   protected:
-    virtual void ProcessOneTrack(const Track& track);
+    /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
+    virtual void ProcessTrack(const Track& track);
+    /** Make debug message with information about RecoTrack. Used in ProcessTrack function. */
     virtual TString ConstructMessage();
+    /** Continue track processing by calling ProcessRecoHit function on each RecoHitInformation in given RecoHit. */
     virtual bool ProcessSuccessfulFit();
-    virtual void ProcessOneRecoHit(RecoHitInformation* recoHitInfo);
+    /** Compute unbiased residual and the calls ProcesPXDRecoHit or ProcessSVDRecoHit. */
+    virtual void ProcessRecoHit(RecoHitInformation* recoHitInfo);
+    /** Compute position in a PXD way. Then compute some other variables and fill some histograms. */
     virtual void ProcessPXDRecoHit(RecoHitInformation* recoHitInfo);
+    /** Compute position in a SVD way which means we need two consecutive hits to be from the same sensor to get both u and v coordinates.
+    * Then, if this condition is met and we have complete information about position, we can continue in a similar way as the ProcessPXDRecoHit function does. */
     virtual void ProcessSVDRecoHit(RecoHitInformation* recoHitInfo);
+    /** Compute variables which are common for PXD and SVD hit. */
     virtual void ComputeCommonVariables();
+    /** Fill histograms which are common for PXD and SVD hit. */
     virtual void FillCommonHistograms();
+    /** Set the value of -Prev values which are common for PXD and SVD hit. */
     virtual void SetCommonPrevVariables();
 
     /**

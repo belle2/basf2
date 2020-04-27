@@ -1,9 +1,24 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jachym Bartik                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 namespace Belle2 {
-
+  /**
+   * This class represents a quantity which value can be set both permanently and temporarily.
+   * Temporary value has priority but is invalidated when is read for the first time.
+   * Quantity can be of any type.
+   * The class used in THFFactory to save some lines of code.
+   */
   template <typename AType>
   class Parameter {
   public:
@@ -11,19 +26,31 @@ namespace Belle2 {
     {
       m_value = defaultValue;
       m_isSet = false;
-      m_isSetOneTime = false;
+      m_isSetTemporarily = false;
     }
+
+    /** Permanently sets inner quantity to given value.
+    * @param value - a value we want to set */
     void Set(AType value);
+    /** Copy permanent value from another parameter but only if its permanent value is set
+    * @param parameter - another parameter whose permanent value is copied */
     void Set(Parameter<AType> parameter);
-    void SetOneTime(AType value);
-    void SetOneTime(Parameter<AType> parameter);
+    /** Temporarily sets inner quantity to given value
+    * @param value - a value we want to set */
+    void SetTemporarily(AType value);
+    /** Copy temporary value from another parameter but only if its temporary value is set
+    * @param parameter - another parameter whose temporary value is copied */
+    void SetTemporarily(Parameter<AType> parameter);
+
+    /** Returns value of the inner quantity.
+    * Order is: temporary value (if is set), permanent value (if is set), default value. Temporary value is invalidated. */
     AType Get();
 
   private:
     AType m_value;
-    AType m_oneTimeValue;
+    AType m_temporaryValue;
     bool m_isSet;
-    bool m_isSetOneTime;
+    bool m_isSetTemporarily;
   };
 
   template <class AType>
@@ -41,34 +68,40 @@ namespace Belle2 {
   }
 
   template <class AType>
-  void Parameter<AType>::SetOneTime(AType value)
+  void Parameter<AType>::SetTemporarily(AType value)
   {
-    m_oneTimeValue = value;
-    m_isSetOneTime = true;
+    m_temporaryValue = value;
+    m_isSetTemporarily = true;
   }
 
   template <class AType>
-  void Parameter<AType>::SetOneTime(Parameter<AType> parameter)
+  void Parameter<AType>::SetTemporarily(Parameter<AType> parameter)
   {
     if (parameter.m_isSet)
-      SetOneTime(parameter.m_value);
+      SetTemporarily(parameter.m_value);
   }
 
   template <class AType>
   AType Parameter<AType>::Get()
   {
-    if (m_isSetOneTime) {
-      m_isSetOneTime = false;
-      return m_oneTimeValue;
+    if (m_isSetTemporarily) {
+      m_isSetTemporarily = false;
+      return m_temporaryValue;
     } else {
       return m_value;
     }
   }
 
+  /**
+  * This class unites some parameters for THFFactory which describe one axis of histogram. Those parameters are nbins, low, up and title. */
   class THFAxis {
   public:
-    THFAxis();
 
+    /** Constructor.
+    * @param nbins - number of bins along this axis in histogram
+    * @param low - lower boundary of range
+    * @param up - upper boundary of range
+    * @param title - title of the axis */
     THFAxis(int nbins, double low, double up, const char* title)
     {
       m_nbins.Set(nbins);
@@ -77,6 +110,7 @@ namespace Belle2 {
       m_title.Set(title);
     }
 
+    /** Copy constructor. */
     THFAxis(THFAxis& axis)
     {
       m_nbins.Set(axis.m_nbins);
@@ -85,9 +119,13 @@ namespace Belle2 {
       m_title.Set(axis.m_title);
     }
 
+    /** Set value of nbins */
     THFAxis& nbins(int nbins) { m_nbins.Set(nbins); return *this; }
+    /** Set value of low */
     THFAxis& low(double low) { m_low.Set(low); return *this; }
+    /** Set value of up */
     THFAxis& up(double up) { m_up.Set(up); return *this; }
+    /** Set value of title */
     THFAxis& title(const char* title) { m_title.Set(title); return *this; }
 
   private:
@@ -99,33 +137,45 @@ namespace Belle2 {
     friend class THFFactory;
   };
 
+  /**
+  * This class is used for creating TH1F and TH2F objects.
+  * Its main advantage is that parameters can be set individually and also permanently so they can be reused again.
+  *
+  * This class uses named parameters idiom via temporarily set values.
+  *
+  * Most of the methods return this object so they can be chained consecutively. */
   class THFFactory {
   public:
+    /** Constructor.
+    * @param histoModule - pointer on histogram module is needed because this class actually doesn't create histograms by itself, but it calls functions on the module instead. */
     THFFactory(DQMHistoModuleBase* histoModule)
     {
       m_histoModule = histoModule;
     }
 
+    /** Temporarily copies parameters for x axis from given THFAxis. */
     THFFactory& xAxis(THFAxis& axis)
     {
-      m_nbinsx.SetOneTime(axis.m_nbins);
-      m_xlow.SetOneTime(axis.m_low);
-      m_xup.SetOneTime(axis.m_up);
-      m_xTitle.SetOneTime(axis.m_title);
+      m_nbinsx.SetTemporarily(axis.m_nbins);
+      m_xlow.SetTemporarily(axis.m_low);
+      m_xup.SetTemporarily(axis.m_up);
+      m_xTitle.SetTemporarily(axis.m_title);
 
       return *this;
     }
 
+    /** Temporarily copies parameters for y axis from given THFAxis. */
     THFFactory& yAxis(THFAxis& axis)
     {
-      m_nbinsy.SetOneTime(axis.m_nbins);
-      m_ylow.SetOneTime(axis.m_low);
-      m_yup.SetOneTime(axis.m_up);
-      m_yTitle.SetOneTime(axis.m_title);
+      m_nbinsy.SetTemporarily(axis.m_nbins);
+      m_ylow.SetTemporarily(axis.m_low);
+      m_yup.SetTemporarily(axis.m_up);
+      m_yTitle.SetTemporarily(axis.m_title);
 
       return *this;
     }
 
+    /** Permanently copies parameters for x axis from given THFAxis. */
     THFFactory& xAxisSet(THFAxis& axis)
     {
       m_nbinsx.Set(axis.m_nbins);
@@ -136,6 +186,7 @@ namespace Belle2 {
       return *this;
     }
 
+    /** Permanently copies parameters for y axis from given THFAxis. */
     THFFactory& yAxisSet(THFAxis& axis)
     {
       m_nbinsy.Set(axis.m_nbins);
@@ -146,14 +197,23 @@ namespace Belle2 {
       return *this;
     }
 
+    /** Create TH1F with given name and title.
+    * All temporarily set parameters needed to create the TH1F become invalidated. This is common for all following Create- functions. */
     TH1F* CreateTH1F(const char* name, const char* title);
+    /** Create TH2F with given name and title. */
     TH2F* CreateTH2F(const char* name, const char* title);
 
+    /** Create TH1F array for layers from given name template and title template. */
     TH1F** CreateLayersTH1F(boost::format nameTemplate, boost::format titleTemplate);
+    /** Create TH2F array for layers from given name template and title template. */
     TH2F** CreateLayersTH2F(boost::format nameTemplate, boost::format titleTemplate);
+    /** Create TH1F array for sensors from given name template and title template. */
     TH1F** CreateSensorsTH1F(boost::format nameTemplate, boost::format titleTemplate);
+    /** Create TH2F array for sensors from given name template and title template. */
     TH2F** CreateSensorsTH2F(boost::format nameTemplate, boost::format titleTemplate);
 
+    /** All the following functions permanently set the value of given parameter.
+     * They also return this instance so they can be chained. */
     THFFactory& nbinsxSet(int nbinsx) { m_nbinsx.Set(nbinsx); return *this; }
     THFFactory& xlowSet(double xlow) { m_xlow.Set(xlow); return *this; }
     THFFactory& xupSet(double xup) { m_xup.Set(xup); return *this; }
@@ -164,15 +224,17 @@ namespace Belle2 {
     THFFactory& yTitleSet(const char* yTitle) { m_yTitle.Set(yTitle); return *this; }
     THFFactory& zTitleSet(const char* zTitle) { m_zTitle.Set(zTitle); return *this; }
 
-    THFFactory& nbinsx(int nbinsx) { m_nbinsx.SetOneTime(nbinsx); return *this; }
-    THFFactory& xlow(double xlow) { m_xlow.SetOneTime(xlow); return *this; }
-    THFFactory& xup(double xup) { m_xup.SetOneTime(xup); return *this; }
-    THFFactory& nbinsy(int nbinsy) { m_nbinsy.SetOneTime(nbinsy); return *this; }
-    THFFactory& ylow(double ylow) { m_ylow.SetOneTime(ylow); return *this; }
-    THFFactory& yup(double yup) { m_yup.SetOneTime(yup); return *this; }
-    THFFactory& xTitle(const char* xTitle) { m_xTitle.SetOneTime(xTitle); return *this; }
-    THFFactory& yTitle(const char* yTitle) { m_yTitle.SetOneTime(yTitle); return *this; }
-    THFFactory& zTitle(const char* zTitle) { m_zTitle.SetOneTime(zTitle); return *this; }
+    /** All the following functions temporarily set the value of given parameter. This means that its value is invalidated after its first use in the Create- functions.
+     * They also return this instance so they can be chained. */
+    THFFactory& nbinsx(int nbinsx) { m_nbinsx.SetTemporarily(nbinsx); return *this; }
+    THFFactory& xlow(double xlow) { m_xlow.SetTemporarily(xlow); return *this; }
+    THFFactory& xup(double xup) { m_xup.SetTemporarily(xup); return *this; }
+    THFFactory& nbinsy(int nbinsy) { m_nbinsy.SetTemporarily(nbinsy); return *this; }
+    THFFactory& ylow(double ylow) { m_ylow.SetTemporarily(ylow); return *this; }
+    THFFactory& yup(double yup) { m_yup.SetTemporarily(yup); return *this; }
+    THFFactory& xTitle(const char* xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; }
+    THFFactory& yTitle(const char* yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; }
+    THFFactory& zTitle(const char* zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; }
 
   private:
     DQMHistoModuleBase* m_histoModule;

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Peter Kodys, Jachym Bartik                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <tracking/dqmUtils/DQMEventProcessorBase.h>
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
@@ -26,7 +36,7 @@ void DQMEventProcessorBase::Run()
     m_iTrackVXDCDC = 0;
 
     for (const Track& track : tracks) {
-      ProcessOneTrack(track);
+      ProcessTrack(track);
     }
 
     m_histoModule->FillTracks(m_iTrack, m_iTrackVXD, m_iTrackCDC, m_iTrackVXDCDC);
@@ -35,7 +45,7 @@ void DQMEventProcessorBase::Run()
   }
 }
 
-void DQMEventProcessorBase::ProcessOneTrack(const Track& track)
+void DQMEventProcessorBase::ProcessTrack(const Track& track)
 {
   RelationVector<RecoTrack> recoTracksVector = track.getRelationsTo<RecoTrack>(m_recoTracksStoreArrayName);
 
@@ -104,13 +114,13 @@ bool DQMEventProcessorBase::ProcessSuccessfulFit()
   m_isNotFirstHit = false;
 
   for (auto recoHitInfo : m_recoTrack->getRecoHitInformations(true)) {
-    ProcessOneRecoHit(recoHitInfo);
+    ProcessRecoHit(recoHitInfo);
   }
 
   return true;
 }
 
-void DQMEventProcessorBase::ProcessOneRecoHit(RecoHitInformation* recoHitInfo)
+void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
 {
   if (!recoHitInfo) {
     B2DEBUG(20, "Missing genfit::pxd recoHitInfo in event() for " + m_histoModule->getName() + " module.");

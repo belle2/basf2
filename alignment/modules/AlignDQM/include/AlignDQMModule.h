@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
+ * Contributors: Peter Kodys, Jachym Bartik                               *
  *                                                                        *
  * Prepared for track quality check                                       *
  * Prepared for Phase 2 and Belle II geometry                             *
@@ -18,19 +18,15 @@
 using namespace std;
 
 namespace Belle2 {
-
   /** DQM of Alignment for off line
     * residuals per sensor, layer,
     * keep also On-Line DQM from tracking:
     * their momentum,
     * Number of hits in tracks,
-    * Number of tracks.
-    *
-    */
+    * Number of tracks. */
   class AlignDQMModule : public DQMHistoModuleBase {  // <- derived from HistoModule class
 
   public:
-
     /** Constructor */
     AlignDQMModule();
     /* Destructor */
@@ -41,23 +37,25 @@ namespace Belle2 {
     /** Module function endRun */
     virtual void endRun() override;
 
-    /**
-    * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-    * to be placed in this function.
-    */
+    /** Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function.
+     * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
     virtual void defineHisto() override;
 
+    /** All the following Fill- functions are used by AlignDQMEventProcessor or derived classes to fill histograms.
+     * They are supposed not to contain any computations need for more than one of them. If that happens, the computations should be moved to the AlignDQMEventProcessor or derived classes. */
     virtual void FillTrackFitResult(const TrackFitResult* tfr) override;
-
     virtual void FillSensorIndex(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float posU, float posV, int sensorIndex);
     virtual void FillLayers(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex);
 
-  private:
+  protected:
+    /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
+     * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
+     * For the creation of histograms the THFFactory or the Create- functions should be used. */
     virtual void DefineSensors() override;
     virtual void DefineLayers();
     virtual void DefineHelixParameters() override;
 
-    // Special Alignment related: Sensor level
+    /** Special Alignment related: Sensor level */
     /** ResidaulMean vs U vs V counter for sensor*/
     TH2F** m_ResMeanPosUVSensCounts = nullptr;
     /** ResidaulMeanU vs U vs V for sensor*/
@@ -81,7 +79,7 @@ namespace Belle2 {
     /** ResidaulMeanV vs V for sensor*/
     TH1F** m_ResMeanVPosVSens = nullptr;
 
-    // Special Alignment related: Layer level
+    /** Special Alignment related: Layer level */
     /** ResidaulMean vs Phi vs Theta counter for Layer*/
     TH2F** m_ResMeanPhiThetaLayerCounts = nullptr;
     /** ResidaulMeanU vs Phi vs Theta for Layer*/
@@ -105,7 +103,7 @@ namespace Belle2 {
     /** ResidaulMeanV vs Theta for Layer*/
     TH1F** m_ResMeanVThetaLayer = nullptr;
 
-    /** helix parameters and their corellations: */
+    /** helix parameters and their corellations */
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z) */
     TH2F* m_PhiZ0 = nullptr;
     /** Phi - the angle of the transverse momentum in the r-phi plane vs. Track momentum Pt */

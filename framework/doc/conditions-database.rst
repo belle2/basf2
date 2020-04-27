@@ -246,6 +246,64 @@ payload files themselves before running the software:
        export BELLE2_CONDB_PAYLOADS=/path/where/to/download
 
 
+.. _cdb_payload_creation:
+
+Creation of new payloads
+========================
+
+New payloads can be created by calling ``Belle2::Database::storeData()`` from
+either C++ or python. It takes a ``TObject*`` or ``TClonesArray*`` pointer to
+the payload data and an interval of validity. Optionally, the first argument can
+be the name to store the Payload with which usually defaults to the classname of
+the object.
+
+.. code-block:: c++
+
+   #include <framework/database/Database.h>
+   #include <framework/database/IntervalOfValidity.h>
+   #include <framework/dbobjects/BeamParameters.h>
+
+   std::unique_ptr<BeamParameters> beamParams(new BeamParameters());
+   Database::Instance().storeData(beamParams.get(), IntervalOfValidity::always());
+
+In python the name of the payload cannot be inferred so it always needs to be
+specified explicitly
+
+.. code-block:: python
+
+   from ROOT import Belle2
+   beam_params = Belle2.BeamParameters()
+   iov = Belle2.IntervalOfValidity(0,0,3,-1)
+   Belle2.Database.Instance().storeData("BeamParameters", beam_params, iov)
+
+By default this will create new payload files in the subdirectory "localdb"
+relative to the current working directory and also create a text file
+contiaining the metadata for the payload files.
+
+These payloads can then be tested by adding the filename of the textfile to
+`conditions.testing_payloads <basf2.ConditionsConfiguration.testing_payloads>`
+and once satisfied can be uploaded with :ref:`b2conditionsdb-upload <b2conditionsdb>`
+or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+
+.. versionchanged:: release-05-00-00
+
+When new payloads are created via ``Belle2::Database::storeData`` the new
+payloads will be assigned a revision number consisting of the first few
+characters of the checksum of the payload file. This is done for efficient
+creation of payload files but also to distuingish locally created payload files
+from payloads downloaded from the database.
+
+* If a payload has an alphanumeric string similar to a git commit hash as
+  revision number then it was created locally
+
+* If a payload has a numeric
+  revision number it was either downloaded from the database or created with
+  older release versions.
+
+In any case the local revision number is not related with the revision number
+obtained when uploading a payload to the server.
+
+
 .. _cdb_config_transition:
 
 Transition from older releases

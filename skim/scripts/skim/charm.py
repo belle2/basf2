@@ -802,31 +802,35 @@ def DpToKsHp(path):
     return Lists
 
 
-@fancy_skim_header
-class XToD0_D0ToHpJm(BaseSkim):
+class BaseCharmSkim(BaseSkim):
     """
-    **Decay Modes**:
-
-    * :math:`D^{0}\\to \\pi^+ K^-`,
-    * :math:`D^{0}\\to \\pi^+ \\pi^-`,
-    * :math:`D^{0}\\to K^+ \\pi^-`,
-
-
-    **Additional Cuts**:
-
-    * ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
-    * ``1.80 < M(D0) < 1.93``
-    * ``pcms(D0) > 2.2``
+    Base class containing common list-building functions for charm group skims.
     """
-
-    __authors__ = ["Giulia Casarosa"]
-    __description__ = "Skim list for D0 to two charged FSPs."
-    __contact__ = ""
     __category__ = "physics, charm"
 
-    RequiredStandardLists = None
+    # Cached static method, so that its contents are only executed once for a single path
+    @staticmethod
+    @lru_cache()
+    def D0ToHpJm(path):
+        """
+        **Decay Modes**:
 
-    def build_lists(self, path):
+        * :math:`D^{0}\\to \\pi^+ K^-`,
+        * :math:`D^{0}\\to \\pi^+ \\pi^-`,
+        * :math:`D^{0}\\to K^+ \\pi^-`,
+
+        **Additional Cuts**:
+
+        * ``Tracks: abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * ``1.80 < M(D0) < 1.93``
+        * ``pcms(D0) > 2.2``
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+
+        Returns:
+            D0List (list(str)): List of particle list names.
+        """
         mySel = "abs(d0) < 1 and abs(z0) < 3"
         mySel += " and 0.296706 < theta < 2.61799"
         ma.fillParticleList("pi+:mygood", mySel, path=path)
@@ -841,31 +845,78 @@ class XToD0_D0ToHpJm(BaseSkim):
 
         D0List = []
 
-        global haveRunD0ToHpJm
-        if haveRunD0ToHpJm == 0:
-            haveRunD0ToHpJm = 1
-            for chID, channel in enumerate(D0_Channels):
-                ma.reconstructDecay("D0:HpJm" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
-                D0List.append("D0:HpJm" + str(chID))
-        else:
-            for chID, channel in enumerate(D0_Channels):
-                D0List.append("D0:HpJm" + str(chID))
+        for chID, channel in enumerate(D0_Channels):
+            ma.reconstructDecay("D0:HpJm" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
+            D0List.append("D0:HpJm" + str(chID))
 
-        self.SkimLists = D0List
+        return D0List
+
+    # Cached static method, so that its contents are only executed once for a single path
+    @staticmethod
+    @lru_cache()
+    def D0ToNeutrals(path):
+        """
+        **Decay Modes**:
+
+        * :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
+        * :math:`D^{0}\\to K_{S} \\pi^{0}`
+        * :math:`D^{0}\\to K_{S} K_{S}`
+
+        **Additional Cuts**:
+
+        * ``1.78 < M(D0) < 1.94, pcms(D0) > 2.2``
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+
+        Returns:
+            D0List (list(str)): List of particle list names.
+        """
+        charmcuts = "1.78 < M < 1.94 and useCMSFrame(p)>2.2"
+        D0_Channels = ["pi0:skim pi0:skim",
+                       "K_S0:merged pi0:skim",
+                       "K_S0:merged K_S0:merged",
+                       ]
+
+        D0List = []
+
+        for chID, channel in enumerate(D0_Channels):
+            ma.reconstructDecay("D0:2Nbdy" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
+            D0List.append("D0:2Nbdy" + str(chID))
+
+        return D0List
+
+    # Cached static method, so that its contents are only executed once for a single path
+    @staticmethod
+    @lru_cache()
+    def fillCharmSkimKs(path):
+        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
+        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
+        ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
 
 
 @fancy_skim_header
-class XToD0_D0ToNeutrals(BaseSkim):
+class XToD0_D0ToHpJm(BaseCharmSkim):
     """
-    **Decay Modes**:
+    Skims :math:`D^0`'s reconstructed by `BaseCharmSkim.D0ToHpJm`.
+    """
 
-    * :math:`D^{0}\\to \\pi^{0} \\pi^{0}`
-    * :math:`D^{0}\\to K_{S} \\pi^{0}`
-    * :math:`D^{0}\\to K_{S} K_{S}`
+    __authors__ = ["Giulia Casarosa"]
+    __description__ = "Skim list for D0 to two charged FSPs."
+    __contact__ = ""
+    __category__ = "physics, charm"
 
-    **Additional Cuts**:
+    RequiredStandardLists = None
 
-    * ``1.78 < M(D0) < 1.94, pcms(D0) > 2.2``
+    def build_lists(self, path):
+        """Builds :math:`D^0` skim lists defined in `BaseCharmSkim.D0ToHpJm`."""
+        self.SkimLists = self.D0ToHpJm(path)
+
+
+@fancy_skim_header
+class XToD0_D0ToNeutrals(BaseCharmSkim):
+    """
+    Skims :math:`D^0`'s reconstructed by `BaseCharmSkim.D0ToNeutrals`.
     """
 
     __authors__ = ["Giulia Casarosa"]
@@ -883,25 +934,8 @@ class XToD0_D0ToNeutrals(BaseSkim):
     }
 
     def build_lists(self, path):
-        charmcuts = "1.78 < M < 1.94 and useCMSFrame(p)>2.2"
-        D0_Channels = ["pi0:skim pi0:skim",
-                       "K_S0:merged pi0:skim",
-                       "K_S0:merged K_S0:merged",
-                       ]
-
-        D0List = []
-
-        global haveRunD0ToNeutrals
-        if haveRunD0ToNeutrals == 0:
-            haveRunD0ToNeutrals = 1
-            for chID, channel in enumerate(D0_Channels):
-                ma.reconstructDecay("D0:2Nbdy" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
-                D0List.append("D0:2Nbdy" + str(chID))
-        else:
-            for chID, channel in enumerate(D0_Channels):
-                D0List.append("D0:2Nbdy" + str(chID))
-
-        self.SkimLists = D0List
+        """Builds :math:`D^0` skim lists defined in `BaseCharmSkim.D0ToNeutrals`."""
+        self.SkimLists = self.D0ToNeutrals(path)
 
 
 @fancy_skim_header
@@ -963,7 +997,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
 
 @fancy_skim_header
-class XToDp_DpToKsHp(BaseSkim):
+class XToDp_DpToKsHp(BaseCharmSkim):
     """
     **Decay Modes**:
     * :math:`D^+ \\to K_{S} \\pi^+`
@@ -997,7 +1031,7 @@ class XToDp_DpToKsHp(BaseSkim):
         ma.fillParticleList("pi+:kshp", mySel, path=path)
         ma.fillParticleList("K+:kshp", mySel, path=path)
 
-        fillCharmSkimKs(path)
+        self.fillCharmSkimKs(path)
 
         Dpcuts = "1.72 < M < 1.98 and useCMSFrame(p)>2"
         Dp_Channels = ["K_S0:merged pi+:kshp",
@@ -1013,7 +1047,7 @@ class XToDp_DpToKsHp(BaseSkim):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0ToHpJm(BaseSkim):
+class DstToD0Pi_D0ToHpJm(BaseCharmSkim):
     """
     **Decay Modes**:
 
@@ -1042,7 +1076,7 @@ class DstToD0Pi_D0ToHpJm(BaseSkim):
     }
 
     def build_lists(self, path):
-        D0List = D0ToHpJm(path)
+        D0List = self.D0ToHpJm(path)
 
         Dstcuts = '0 < Q < 0.018'
 
@@ -1316,11 +1350,11 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
 
 @fancy_skim_header
-class DstToD0Pi_D0ToNeutrals(BaseSkim):
+class DstToD0Pi_D0ToNeutrals(BaseCharmSkim):
     """
     **Decay Modes**:
 
-    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by D0ToNeutrals()
+    * :math:`D^{*+}\\to \\pi^+ D^{0}`, where the D^{0} is reconstructed by `BaseCharmSkim.D0ToNeutrals`.
 
     **Additional Cuts**:
 
@@ -1347,7 +1381,7 @@ class DstToD0Pi_D0ToNeutrals(BaseSkim):
     }
 
     def build_lists(self, path):
-        D0List = D0ToNeutrals(path)
+        D0List = self.D0ToNeutrals(path)
 
         Dstcuts = "0 < Q < 0.02"
 

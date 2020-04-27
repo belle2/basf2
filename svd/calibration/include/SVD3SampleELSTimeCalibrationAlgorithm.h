@@ -21,21 +21,21 @@
 
 namespace Belle2 {
   /**
-   * Class implementing SVDCoGTimeCalibration calibration algorithm
+   * Class implementing SVD3SampleELSTimeCalibration calibration algorithm
    */
-  class SVDCoGTimeCalibrationAlgorithm : public CalibrationAlgorithm {
+  class SVD3SampleELSTimeCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
     /** Constructor set the prefix to SVDCoGTimeCalibrationCollector*/
-    explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
+    explicit SVD3SampleELSTimeCalibrationAlgorithm(const std::string& str);
 
     /** Destructor*/
-    virtual ~SVDCoGTimeCalibrationAlgorithm() {}
+    virtual ~SVD3SampleELSTimeCalibrationAlgorithm() {}
 
-    /** Setter for m_allowedT0Shift*/
+    /** Setter for m_allowedTimeShift*/
     void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}
 
-    /** Getter for m_allowedT0Shift*/
+    /** Getter for m_allowedTimeShift*/
     float getAllowedTimeShift() {return m_allowedTimeShift;}
 
     /** Set the minimum entries required in the histograms*/
@@ -56,15 +56,14 @@ namespace Belle2 {
     /** setup of the boundary finding*/
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
-      m_previousRawCoGTimeMeanL3V.reset();
+      m_previousRawCoG.reset();
     }
 
 
   private:
 
     std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
-    std::optional<float> m_previousRawCoGTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
-
+    std::optional<float> m_previousRawCoG; /**< RawCog of the previous run*/
     float m_allowedTimeShift = 2.; /**< Allowed EventT0 shift*/
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
   };

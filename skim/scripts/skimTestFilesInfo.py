@@ -101,43 +101,32 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
 
     # generic MC13 BGx1
-    ('MC13_mixedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009434/s00/e1003/4S/r00000/mixed/' +
-     'mdst/sub00/mdst_000001_prod00009434_task10020000001.root'),
-    ('MC13_chargedBGx1', '/group/belle2/dataprod/MC/MC13a/prod00009435/s00/e1003/4S/r00000/charged/' +
-     'mdst/sub00/mdst_000001_prod00009435_task10020000001.root'),
-    ('MC13_uubarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/' +
-     'mdst/sub00/mdst_000001_prod00009436_task10020000001.root'),
-    ('MC13_ccbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009437/s00/e1003/4S/r00000/ccbar/' +
-     'mdst/sub00/mdst_000001_prod00009437_task10020000001.root'),
-    ('MC13_ddbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009438/s00/e1003/4S/r00000/ddbar/' +
-     'mdst/sub00/mdst_000001_prod00009438_task10020000001.root'),
-    ('MC13_ssbarBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009439/s00/e1003/4S/r00000/ssbar/' +
-     'mdst/sub00/mdst_000001_prod00009439_task10020000001.root'),
-    ('MC13_taupairBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009441/s00/e1003/4S/r00000/taupair/' +
-     'mdst/sub00/mdst_000001_prod00009441_task10020000001.root'),
+    # TODO: replace these with a more permanent location for test samples
+    ("MC13_ccbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009437_task10020000001.root"),
+    ("MC13_chargedBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009435_task10020000001.root"),
+    ("MC13_ddbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009438_task10020000001.root"),
+    ("MC13_mixedBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009434_task10020000001.root"),
+    ("MC13_ssbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009439_task10020000001.root"),
+    ("MC13_taupairBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009441_task10020000001.root"),
+    ("MC13_uubarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009436_task10020000001.root"),
 
     # low multiplicity MC13
-    ('MC13_ggBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/3700001000/3700001000_eph3_0.root'),
+    # TODO: replace these with a more permanent location for test samples
+    ('MC13_ggBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/3700001000_eph3_0.root'),
     # ('MC13_eeBGx1', 'FIXME')
-    ('MC13_mumuBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/mumu/mumu_eph3_0.root'),
-    ('MC13_eeeeBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/eeee/eeee_eph3_0.root'),
-    ('MC13_eemumuBGx1', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/lowMult/eemumu/eemumu_eph3_0.root'),
+    ('MC13_mumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/mumu_eph3_0.root'),
+    ('MC13_eeeeBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/eeee_eph3_0.root'),
+    ('MC13_eemumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/eemumu_eph3_0.root'),
 
     # generic MC13 BGx0
-    ('MC13_mixedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009545/s00/e1003/4S/r00000/mixed/' +
-     'mdst/sub00/mdst_000001_prod00009545_task10020000001.root'),
-    ('MC13_chargedBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/' +
-     'mdst/sub00/mdst_000001_prod00009551_task10020000001.root'),
-    ('MC13_uubarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009553/s00/e1003/4S/r00000/uubar/' +
-     'mdst/sub00/mdst_000001_prod00009553_task10020000001.root'),
-    ('MC13_ccbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009559/s00/e1003/4S/r00000/ccbar/' +
-     'mdst/sub00/mdst_000001_prod00009559_task10020000001.root'),
-    ('MC13_ddbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009555/s00/e1003/4S/r00000/ddbar/' +
-     'mdst/sub00/mdst_000001_prod00009555_task10020000001.root'),
-    ('MC13_ssbarBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009557/s00/e1003/4S/r00000/ssbar/' +
-     'mdst/sub00/mdst_000001_prod00009557_task10020000001.root'),
-    ('MC13_taupairBGx0', '/ghi/fs01/belle2/bdata/MC/release-04-00-03/DB00000757/MC13a/prod00009561/s00/e1003/4S/r00000/taupair/' +
-     'mdst/sub00/mdst_000001_prod00009561_task10020000001.root'),
+    # TODO: replace these with a more permanent location for test samples
+    ("MC13_ccbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009559_task10020000001.root"),
+    ("MC13_chargedBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009551_task10020000001.root"),
+    ("MC13_ddbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009555_task10020000001.root"),
+    ("MC13_mixedBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009545_task10020000001.root"),
+    ("MC13_ssbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009557_task10020000001.root"),
+    ("MC13_taupairBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009561_task10020000001.root"),
+    ("MC13_uubarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009553_task10020000001.root"),
 
     # generic MC12 BGx1
     ('MC12_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +

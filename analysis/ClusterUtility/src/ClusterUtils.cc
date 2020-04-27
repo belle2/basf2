@@ -17,6 +17,12 @@ using namespace Belle2;
 ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
+const TLorentzVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+{
+  // Use the geometry origin (0,0,0) and *not* the IP position
+  return Get4MomentumFromCluster(cluster, TVector3(0.0, 0.0, 0.0), hypo);
+}
+
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
@@ -33,7 +39,7 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
 
   // Always ignore mass here (even for neutral hadrons) therefore the magnitude
   // of the momentum is equal to the cluster energy under this hypo.
-  const double E  = cluster->getEnergy(hypo);
+  const double E  = cluster->getEnergy(hypo); //must not be changed or clusterE getters will be wrong
   const double px = E * sin(direction.Theta()) * cos(direction.Phi());
   const double py = E * sin(direction.Theta()) * sin(direction.Phi());
   const double pz = E * cos(direction.Theta());
@@ -41,7 +47,6 @@ const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* clu
   const TLorentzVector l(px, py, pz, E);
   return l;
 }
-
 
 // -----------------------------------------------------------------------------
 

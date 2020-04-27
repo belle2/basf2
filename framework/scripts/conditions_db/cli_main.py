@@ -549,8 +549,8 @@ def command_diff(args, db):
         if ntags != 2:
             return 1
         print()
-        listA = db.get_all_iovs(args.tagA, message=str(iovfilter))
-        listB = db.get_all_iovs(args.tagB, message=str(iovfilter))
+        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter)) if iovfilter.check(e.name)]
+        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter)) if iovfilter.check(e.name)]
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)

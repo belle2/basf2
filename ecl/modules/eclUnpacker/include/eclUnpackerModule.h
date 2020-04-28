@@ -85,6 +85,8 @@ namespace Belle2 {
     bool m_storeTrigTime;
     /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
+    /** Use ECLUnpackingParameters payload for run-dependent unpacking */
+    bool m_useUnpackingParameters;
 
     /** report only once per crate about inconsistency between trg tag and evt number */
     long m_evtNumReportedMask = 0;

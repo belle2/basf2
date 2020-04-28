@@ -283,11 +283,11 @@ def LFVZpVisibleList(path):
 def DimuonPlusMissingEnergyList(path):
     """
     Dimuon + missing energy skim,
-    needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+    needed for :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other searches
 
     **Skim code**: 18520100
 
-    **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\, +` missing energy
 
     **Skim category**: physics, dark sector
 
@@ -323,11 +323,11 @@ def DimuonPlusMissingEnergyList(path):
 def ElectronMuonPlusMissingEnergyList(path):
     """
     Electron-muon pair + missing energy skim,
-    needed for :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches
+    needed for :math:`e^{+}e^{-} \\to e^{\\pm}\\mu^{\\mp} Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other searches
 
     **Skim code**: 18520200
 
-    **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{\\pm}\\mu^{\\mp} \\, +` missing energy
 
     **Skim category**: physics, dark sector
 
@@ -369,8 +369,8 @@ def DielectronPlusMissingEnergyList(path):
     Warning:
         This skim is currently deactivated, since the retention rate is too high
 
-    Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`
-    :math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches
+    Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} h^{\\prime};`
+    :math:`A^{\\prime} \\to e^{+}e^{-}; \\, h^{\\prime} \\to \\mathrm{invisible}` and other searches
 
     **Skim code**: 18520300
 
@@ -537,12 +537,12 @@ class ALP3Gamma(BaseSkim):
 @fancy_skim_header
 class DimuonPlusMissingEnergy(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-} \, +` missing energy.
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\, +` missing energy.
     """
     __authors__ = ["Giacomo De Pietro"]
     __description__ = (
-        "Dimuon + missing energy skim, needed for :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-}"
-        "Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other searches."
+        "Dimuon + missing energy skim, needed for :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}"
+        "Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other searches."
     )
     __contact__ = ""
     __category__ = "physics, dark sector"
@@ -580,7 +580,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     __authors__ = ["Giacomo De Pietro"]
     __description__ = (
         "Electron-muon pair + missing energy skim, needed for :math:`e^{+}e^{-} \\to "
-        "e^{\pm}\mu^{\mp} Z^{\prime}; \, Z^{\prime} \\to \mathrm{invisible}` and other "
+        "e^{\\pm}\\mu^{\\mp} Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other "
         "searches."
     )
     __contact__ = ""
@@ -595,7 +595,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: :math:`e^{+}e^{-} \\to e^{\pm}\mu^{\mp} \, +` missing energy
+        **Physics channel**: :math:`e^{+}e^{-} \\to e^{\\pm}\\mu^{\\mp} \\, +` missing energy
         """
         emu_list = []
         skim_label = "forElectronMuonMissingEnergySkim"
@@ -784,8 +784,8 @@ class DielectronPlusMissingEnergy(BaseSkim):
 
     __authors__ = "Giacomo De Pietro"
     __description__ = (
-        "Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\prime} h^{\prime};`"
-        ":math:`A^{\prime} \\to e^{+}e^{-}; \, h^{\prime} \\to \mathrm{invisible}` and other searches."
+        "Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} h^{\\prime};`"
+        ":math:`A^{\\prime} \\to e^{+}e^{-}; \\, h^{\\prime} \\to \\mathrm{invisible}` and other searches."
     )
     __contact__ = ""
     __category__ = "physics, dark sector"

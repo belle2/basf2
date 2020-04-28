@@ -87,18 +87,12 @@ void EKLMHitBase::setTime(float Time)
   m_Time = Time;
 }
 
-float EKLMHitBase::getEDep() const
+float EKLMHitBase::getEnergyDeposit() const
 {
   return m_EDep;
 }
 
-void EKLMHitBase::setEDep(float EDep)
+void EKLMHitBase::setEnergyDeposit(float EnergyDeposit)
 {
-  m_EDep = EDep;
+  m_EDep = EnergyDeposit;
 }
-
-void EKLMHitBase::increaseEDep(float deltaEDep)
-{
-  m_EDep += deltaEDep;
-}
-

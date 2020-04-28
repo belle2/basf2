@@ -85,10 +85,11 @@ bool LogSystem::sendMessage(LogMessage&& message)
   // add message to list of message or increase repetition value
   bool lastTime(false);
   if (m_printErrorSummary || m_maxErrorRepetition > 0) {
-    int repetition{0};
+    unsigned int repetition{0};
     if (m_messageLog.size() >= c_errorSummaryMaxLines) {
       // we already have maximum size of the error log so don't add more messages.
       // but we might want to increase the counter if it already exists
+      /* cppcheck-suppress stlIfFind */
       if (auto it = m_messageLog.find(message); it != m_messageLog.end()) {
         repetition = ++(it->second);
       }

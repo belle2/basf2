@@ -7,14 +7,15 @@ __authors__ = [
     "Sam Cunliffe",
     "Michael De Nuccio",
     "Ilya Komarov",
-    "Giacomo De Pietro"
+    "Giacomo De Pietro",
+    "Miho Wakai",
 ]
 
 
 import basf2 as b2
 import pdg
 import modularAnalysis as ma
-from skimExpertFunctions import ifEventPasses
+from skimExpertFunctions import ifEventPasses, BaseSkim, fancy_skim_header
 
 
 def SinglePhotonDarkList(path):
@@ -57,6 +58,88 @@ def SinglePhotonDarkList(path):
     region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
     ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
     return ['gamma:singlePhoton']
+
+
+def GammaGammaControlKLMDarkList(path, prescale_high=1, prescale_low=1):
+    """
+    Gamma gamma skim list for study of the KLM efficiency as part of
+    the dark photon analysis
+
+    **Skim code**: 18020200
+
+    **Physics channel**: ee → γγ
+
+    **Skim category**: physics, dark sector, control-channel
+
+    Info:
+        This skim can retain a lot of γγ events.
+        In case this becomes unacceptable, we provide prescale parameters.
+        Prescales are given in standard trigger convention (reciprocal),
+        so prescale of 100 is 1% of events kept, etc.
+
+    Example:
+        To prescale the higher-energy probe photons by 10%:
+
+        >>> GammaGammaControlKLMDarkList(path=mypath, prescale_high=10)
+
+    Parameters:
+        path (basf2.Path): the path to add the skim
+        prescale_high (int): the prescale for more energetic probe photon
+        prescale_low (int): the prescale for a less energetic probe photon
+
+    Returns:
+        list name of the skim candidates
+    """
+    __authors__ = ["Sam Cunliffe", "Miho Wakai"]
+
+    # unpack prescales and convert from trigger convention to a number we can
+    # compare with a float
+    if (prescale_high, prescale_low) is not (1, 1):
+        b2.B2INFO('GammaGammaControlKLMDarkList is prescaled. prescale_high=%i, prescale_low=%i' % (prescale_high, prescale_low))
+    prescale_high = str(float(1.0 / prescale_high))
+    prescale_low = str(float(1.0 / prescale_low))
+
+    # no good (IP-originating) tracks in the event
+    good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.2'  # cm, cm, GeV/c
+    no_good_tracks = 'nCleanedTracks(' + good_tracks + ') < 1'
+
+    # get two most energetic photons in the event (must be at least 100 MeV
+    # and not more than 7 GeV)
+    ma.cutAndCopyList(
+        'gamma:controlKLM', 'gamma:all', '0.1 < useCMSFrame(clusterE) < 7', path=path)
+    ma.rankByHighest('gamma:controlKLM', 'useCMSFrame(clusterE)', numBest=2, path=path)
+
+    # will build pairwise candidates from the gamma:controlKLM list:
+    # vpho -> gamma gamma
+
+    # the more energetic must be at least 4.5 GeV
+    tag_daughter = 'daughterHighest(useCMSFrame(clusterE)) > 4.5'
+    # note that sometimes the probe will also fulfill this criteria, but the
+    # candidate list will *not* be double-counted: these extra candidates need
+    # to be added back offline
+
+    # apply prescales to the less energetic daughter: compare to the eventwise random number
+    probe_high = '[daughterLowest(useCMSFrame(clusterE)) > 4.5] and [eventRandom < %s]' % prescale_high
+    probe_low = '[daughterLowest(useCMSFrame(clusterE)) < 4.5] and [eventRandom < %s]' % prescale_low
+    prescale = '[ %s ] or [ %s ]' % (probe_high, probe_low)
+
+    # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
+    delta_phi_cut = 'daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065'
+
+    # sum theta in the cms 178 --> 182 degrees
+    sum_th = 'daughterSumOf(useCMSFrame(theta))'
+    sum_th_cut = '3.1066860685499065 < ' + sum_th + ' < 3.1764992386296798'
+
+    # now build and return the candidates passing the AND of our cuts
+    cuts = '[ %s ]' % no_good_tracks
+    cuts += ' and [ %s ]' % tag_daughter
+    cuts += ' and [ %s ]' % prescale
+    cuts += ' and [ %s ]' % delta_phi_cut
+    cuts += ' and [ %s ]' % sum_th_cut
+    ma.reconstructDecay(
+        'vpho:singlePhotonControlKLM -> gamma:controlKLM gamma:controlKLM',
+        cuts, path=path)
+    return ['vpho:singlePhotonControlKLM']
 
 
 def _addALPToPDG():
@@ -329,3 +412,48 @@ def DielectronPlusMissingEnergyList(path):
     # And return the dielectron list
     dielectron_list.append(dielectron_name)
     return dielectron_list
+
+
+@fancy_skim_header
+class SinglePhotonDark(BaseSkim):
+    """
+    **Physics channel**: ee → A'γ; A' → invisible
+
+    Skim list contains single photon candidates for the dark photon to invisible final
+    state analysis.
+    """
+    __authors__ = ["Sam Cunliffe"]
+    __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+    __SkimDescription__ = "Single photon skim list for the dark photon analysis."
+    __WorkingGroup__ = "Dark group"
+    __category__ = "physics, dark sector"
+
+    RequiredParticleLists = {
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+        """Build skim list for SinglePhotonDark skim."""
+        # no good tracks in the event
+        cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+
+        # no other photon above 100 MeV
+        angle = '0.296706 < theta < 2.61799'  # rad, (17 -- 150 deg)
+        minimum = 'E > 0.1'  # GeV
+        ma.cutAndCopyList('gamma:100', 'gamma:all', minimum + ' and ' + angle, path=path)
+        path2 = b2.Path()
+        ifEventPasses(
+            f'0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1',
+            conditional_path=path2, path=path)
+
+        # all remaining single photon events (== candidates) with region
+        # dependent minimum energy in GeV
+        region_dependent = ' [clusterReg ==  2 and useCMSFrame(E) > 1.0] or '  # barrel
+        region_dependent += '[clusterReg ==  1 and useCMSFrame(E) > 2.0] or '  # fwd
+        region_dependent += '[clusterReg ==  3 and useCMSFrame(E) > 2.0] or '  # bwd
+        region_dependent += '[clusterReg == 11 and useCMSFrame(E) > 2.0] or '  # between fwd and barrel
+        region_dependent += '[clusterReg == 13 and useCMSFrame(E) > 2.0] '     # between bwd and barrel
+        ma.cutAndCopyList('gamma:singlePhoton', 'gamma:100', region_dependent, path=path2)
+        self.SkimLists = ['gamma:singlePhoton']

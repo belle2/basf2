@@ -36,6 +36,7 @@
 #include <analysis/utility/CLHEPToROOT.h>
 #include <analysis/utility/ROOTToCLHEP.h>
 #include <analysis/utility/DistanceTools.h>
+#include <analysis/utility/RotationTools.h>
 
 // vertex fitting
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
@@ -48,14 +49,17 @@
 #include <framework/geometry/BFieldManager.h>
 
 #include <TVector.h>
+#include <TRotation.h>
 
 
 using namespace std;
 
 namespace Belle2 {
 
-
-
+  // import tools from RotationTools.h
+  using RotationTools::getRotationMatrixYZ;
+  using RotationTools::getRotationMatrixXY;
+  using RotationTools::toSymMatrix;
 
   //-----------------------------------------------------------------
   //                 Register the Module
@@ -67,8 +71,9 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitTruthStatus(0), m_fitPval(0), m_mcPDG(0), m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_shiftZ(0), m_FitType(0),
-    m_tagVl(0),
+    m_Bfield(0), m_fitTruthStatus(0), m_fitPval(0), m_MCtagLifeTime(-1), m_mcPDG(0), m_MCLifeTimeReco(-1),
+    m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
+    m_shiftZ(0), m_FitType(0), m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
     m_verbose(true)
   {
@@ -151,7 +156,7 @@ namespace Belle2 {
 
     std::vector<unsigned int> toRemove;
 
-    for (unsigned i = 0; i < plist->getListSize(); i++) {
+    for (unsigned i = 0; i < plist->getListSize(); ++i) {
       resetReturnParams();
 
       Particle* particle =  plist->getParticle(i);
@@ -177,6 +182,7 @@ namespace Belle2 {
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(m_mcPDG);
           ver->setMCDeltaT(m_MCdeltaT);
+          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
@@ -203,6 +209,7 @@ namespace Belle2 {
           ver->setMCTagVertex(m_MCtagV);
           ver->setMCTagBFlavor(0.);
           ver->setMCDeltaT(m_MCdeltaT);
+          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
@@ -260,12 +267,14 @@ namespace Belle2 {
     m_BeamSpotCov.ResizeTo(3, 3);
     m_BeamSpotCov = m_beamSpotDB->getCovVertex();
 
+
     //make the beam spot bigger for the standard constraint
 
     PCmsLabTransform T;
     TVector3 boost = T.getBoostVector();
     double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
 
+    //TODO: What's the origin of these numbers?
     double cut = 8.717575e-02 * bg;
 
     m_shiftZ = 4.184436e+02 * bg *  0.0001;
@@ -277,7 +286,6 @@ namespace Belle2 {
     if (m_constraintType == "boost") ok = findConstraintBoost(cut * 200000.);
     if (m_constraintType == "noConstraint") ok = true;
     if (m_constraintType == "breco") ok = findConstraint(Breco, cut * 2000.);
-
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;
@@ -321,6 +329,7 @@ namespace Belle2 {
     return ok;
 
   }
+
 
   bool TagVertexModule::findConstraint(Particle* Breco, double cut)
   {
@@ -375,7 +384,7 @@ namespace Belle2 {
     // simpler version of momentum
 
     TVector3 pFinal = Breco->getVertex() - pos;
-    TMatrixDSym errFinal(3); errFinal += Breco->getVertexErrorMatrix(); errFinal += RerrMatrix;
+    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix()) + RerrMatrix;
 
     // end simpler version
 
@@ -386,66 +395,23 @@ namespace Belle2 {
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
 
-    double thetar = v4Final.Theta();
-    double phir = v4Final.Phi();
-
-    double str = TMath::Sin(-1 * thetar);
-    double ctr = TMath::Cos(-1 * thetar);
-    double spr = TMath::Sin(-1 * phir);
-    double cpr = TMath::Cos(-1 * phir);
-
-    TMatrix r1z(3, 3);  r1z(2, 2) = 1;
-    r1z(0, 0) = cpr; r1z(0, 1) = spr;
-    r1z(1, 0) = -1 * spr; r1z(1, 1) = cpr;
-
-    TMatrix r1y(3, 3);  r1y(1, 1) = 1;
-    r1y(0, 0) = ctr; r1y(0, 2) = -1 * str;
-    r1y(2, 0) = str; r1y(2, 2) = ctr;
-
-
-    TMatrix r1(3, 3);  r1.Mult(r1z, r1y);
-    TMatrix r1t(3, 3); r1t.Transpose(r1);
-
-    TMatrix TubeZPart(3, 3);  TubeZPart.Mult(r1t, errFinal);
-    TMatrix TubeZ(3, 3); TubeZ.Mult(TubeZPart, r1);
+    TMatrixD r1 = getRotationMatrixYZ(v4Final.Theta(), v4Final.Phi());
+    TMatrixD r1t = r1; r1t.T();
+    TMatrixD TubeZ = r1t * errFinal * r1;
 
     TubeZ(2, 2) = cut;
     TubeZ(2, 0) = 0; TubeZ(0, 2) = 0;
     TubeZ(2, 1) = 0; TubeZ(1, 2) = 0;
 
-    vec.SetX(-1 * vec.X());
-    vec.SetY(-1 * vec.Y());
-    vec.SetZ(-1 * vec.Z());
+    vec.SetVect(-vec.Vect());
 
     TLorentzVector vecLab = T.rotateCmsToLab() * vec;
-    double theta = vecLab.Theta();
-    double phi = vecLab.Phi();
-
-    double st = TMath::Sin(theta);
-    double ct = TMath::Cos(theta);
-    double sp = TMath::Sin(phi);
-    double cp = TMath::Cos(phi);
-
-    TMatrix r2z(3, 3);  r2z(2, 2) = 1;
-    r2z(0, 0) = cp; r2z(0, 1) = sp;
-    r2z(1, 0) = -1 * sp; r2z(1, 1) = cp;
-
-    TMatrix r2y(3, 3);  r2y(1, 1) = 1;
-    r2y(0, 0) = ct; r2y(0, 2) = -1 * st;
-    r2y(2, 0) = st; r2y(2, 2) = ct;
-
-    TMatrix r2(3, 3);  r2.Mult(r2y, r2z);
-    TMatrix r2t(3, 3); r2t.Transpose(r2);
-
-    TMatrix TubePart(3, 3);  TubePart.Mult(r2t, TubeZ);
-    TMatrix Tube(3, 3); Tube.Mult(TubePart, r2);
+    TMatrixD r2 = getRotationMatrixYZ(vecLab.Theta(), vecLab.Phi()); r2.T(); //inverse rotation
+    TMatrixD r2t = r2; r2t.T();
+    TMatrixD Tube = r2t * TubeZ * r2;
 
     m_constraintCov.ResizeTo(3, 3);
-
-    m_constraintCov(0, 0) = Tube(0, 0);  m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
-    m_constraintCov(1, 0) = Tube(1, 0);  m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
-    m_constraintCov(2, 0) = Tube(2, 0);  m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
-
+    m_constraintCov = toSymMatrix(Tube);
     m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
 
     return true;
@@ -493,16 +459,15 @@ namespace Belle2 {
 
     PCmsLabTransform T;
     TLorentzVector vec = T.rotateLabToCms() * v4Final;
-    TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
+    TLorentzVector vecNew(-vec.Vect(), vec.E());
     TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
 
     //To creat the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
 
-    TMatrixFSym pv = tubecreatorBCopy.getVertexErrorMatrix();
+    TMatrixDSym pv = tubecreatorBCopy.getVertexErrorMatrix();
 
     //print some stuff if wanted
-
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
       B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy.getVertex()));
@@ -519,41 +484,18 @@ namespace Belle2 {
 
 
     // make rotation matrix from z axis to BTag line of flight
-
-    double theta = v4FinalNew.Theta();
-    double phi = v4FinalNew.Phi();
-
-    double st = TMath::Sin(theta);
-    double ct = TMath::Cos(theta);
-    double sp = TMath::Sin(phi);
-    double cp = TMath::Cos(phi);
-
-    TMatrix r2z(3, 3);  r2z(2, 2) = 1;
-    r2z(0, 0) = cp; r2z(0, 1) = -1 * sp;
-    r2z(1, 0) = sp; r2z(1, 1) = cp;
-
-    TMatrix r2y(3, 3);  r2y(1, 1) = 1;
-    r2y(0, 0) = ct; r2y(0, 2) = st;
-    r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
-
-    TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
-    TMatrix r2t(3, 3); r2t.Transpose(r2);
+    TMatrixD r2 = getRotationMatrixYZ(v4FinalNew.Theta(), v4FinalNew.Phi());
+    TMatrixD r2t = r2; r2t.T();
 
 
     //make a long error matrix along BTag direction
-
-    TMatrix longerror(3, 3); longerror(2, 2) = cut * cut;
-    TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
-    TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
+    TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
+    TMatrixD longerrorRotated = r2 * longerror * r2t;
 
     //pvNew will correspond to the covariance matrix of the B tube
-
-    TMatrix pvNew(3, 3);
-    pvNew += pv;
-    pvNew += longerrorRotated;
+    TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
 
     //set the constraint
-
     m_constraintCenter = tubecreatorBCopy.getVertex();
 
     //if we want the true info, set the centre of the constraint to the primary vertex
@@ -566,12 +508,7 @@ namespace Belle2 {
     }
 
     m_constraintCov.ResizeTo(3, 3);
-
-    for (int i(0); i < 3; ++i) {
-      for (int j(0); j < 3; ++j) {
-        m_constraintCov(i, j) = pvNew(i, j);
-      }
-    }
+    m_constraintCov = toSymMatrix(pvNew);
 
     if (m_verbose) {
       B2DEBUG(10, "IPTube covariance: " << printMatrix(m_constraintCov));
@@ -599,46 +536,24 @@ namespace Belle2 {
 
     TMatrixDSym beamSpotCov(3);
     beamSpotCov = m_beamSpotDB->getCovVertex();
-    beamSpotCov(2, 2) = cut * cut;
-    double thetab = boostDir.Theta();
-    double phib = boostDir.Phi();
+    beamSpotCov(2, 2) = cut * cut; //cut on z-BeamSpot Cov
 
-    double stb = TMath::Sin(thetab);
-    double ctb = TMath::Cos(thetab);
-    double spb = TMath::Sin(phib);
-    double cpb = TMath::Cos(phib);
+    TMatrixD r = getRotationMatrixYZ(-boostDir.Theta(), -boostDir.Phi());
+    TMatrixD rt = r; rt.T();
 
+    TMatrixD Tube = rt * beamSpotCov * r; //BeamSpot in CMS
 
-    TMatrix rz(3, 3);  rz(2, 2) = 1;
-    rz(0, 0) = cpb; rz(0, 1) = spb;
-    rz(1, 0) = -1 * spb; rz(1, 1) = cpb;
-
-    TMatrix ry(3, 3);  ry(1, 1) = 1;
-    ry(0, 0) = ctb; ry(0, 2) = -1 * stb;
-    ry(2, 0) = stb; ry(2, 2) = ctb;
-
-    TMatrix r(3, 3);  r.Mult(rz, ry);
-    TMatrix rt(3, 3); rt.Transpose(r);
-
-    TMatrix TubePart(3, 3);  TubePart.Mult(rt, beamSpotCov);
-    TMatrix Tube(3, 3); Tube.Mult(TubePart, r);
 
     m_constraintCov.ResizeTo(3, 3);
-
-    m_constraintCov(0, 0) = Tube(0, 0); m_constraintCov(0, 1) = Tube(0, 1);  m_constraintCov(0, 2) = Tube(0, 2);
-    m_constraintCov(1, 0) = Tube(1, 0); m_constraintCov(1, 1) = Tube(1, 1);  m_constraintCov(1, 2) = Tube(1, 2);
-    m_constraintCov(2, 0) = Tube(2, 0); m_constraintCov(2, 1) = Tube(2, 1);  m_constraintCov(2, 2) = Tube(2, 2);
-
-
+    m_constraintCov = toSymMatrix(Tube);
     m_constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
 
     if (shiftAlongBoost > -1000) {
-      float boostAngle = TMath::ATan(float(boostDir[0]) / boostDir[2]); // boost angle with respect from Z
-
+      double boostAngle = atan2(boostDir[0] , boostDir[2]); // boost angle with respect from Z
       m_constraintCenter = m_BeamSpotCenter +
-                           TVector3(shiftAlongBoost * TMath::Sin(boostAngle), 0., shiftAlongBoost * TMath::Cos(boostAngle)); // boost in the XZ plane
+                           TVector3(shiftAlongBoost * sin(boostAngle), 0., shiftAlongBoost * cos(boostAngle)); // boost in the XZ plane
     }
 
     return true;
@@ -646,6 +561,11 @@ namespace Belle2 {
 
   }
 
+  static double getProperLifeTime(MCParticle* mc) //in ps
+  {
+    double beta = mc->getMomentum().Mag() / mc->getEnergy();
+    return 1e3 * mc->getLifetime() * sqrt(1 - pow(beta, 2));
+  }
 
   void TagVertexModule::BtagMCVertex(Particle* Breco)
   {
@@ -656,6 +576,7 @@ namespace Belle2 {
     TVector3 MCTagVert(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(),
                        std::numeric_limits<float>::quiet_NaN());
     int mcPDG = 0;
+    double mcTagLifeTime = -1;
 
     // Array of MC particles
     StoreArray<Belle2::MCParticle> mcParticles("");
@@ -675,9 +596,11 @@ namespace Belle2 {
         }
         if (isBreco) {
           m_MCVertReco = mc->getDecayVertex();
+          m_MCLifeTimeReco =  getProperLifeTime(mc);
           nReco++;
         } else {
           MCTagVert = mc->getDecayVertex();
+          mcTagLifeTime = getProperLifeTime(mc);
           mcPDG = mc->getPDG();
         }
       }
@@ -691,18 +614,22 @@ namespace Belle2 {
         if (TMath::Abs(mc->getPDG()) == TMath::Abs(Breco->getPDGCode())) {
           double dcalc = (mc->getDecayVertex() - Breco->getVertex()).Mag();
           m_MCVertReco = mc->getDecayVertex();
+          m_MCLifeTimeReco  = getProperLifeTime(mc);
           if (dcalc < dref) {
             dref = dcalc;
             MCTagVert = mc->getDecayVertex();
+            mcTagLifeTime = getProperLifeTime(mc);
             mcPDG = mc->getPDG();
           } else {
             m_MCVertReco = mc->getDecayVertex();
+            m_MCLifeTimeReco  = getProperLifeTime(mc);
           }
         }
       }
     }
 
     m_MCtagV = MCTagVert;
+    m_MCtagLifeTime = mcTagLifeTime;
     m_mcPDG = mcPDG;
   }
 
@@ -781,21 +708,21 @@ namespace Belle2 {
     double mass;
 
     // remove tracks from KS
-    for (unsigned int i(0); i < tagParticles.size(); ++i) {
+    for (unsigned i = 0; i < tagParticles.size(); ++i) {
       particle1 = tagParticles.at(i);
 
       if (particle1) mom1 = particle1->get4Vector();
       if (particle1 && !std::isinf(mom1.Mag2()) && !std::isnan(mom1.Mag2())) {
 
         bool isKsDau = false;
-        for (unsigned int j(0); j < tagParticles.size() && !isKsDau; ++j) {
+        for (unsigned j = 0; j < tagParticles.size() && !isKsDau; ++j) {
           if (i != j) {
             particle2 = tagParticles.at(j);
 
             if (particle2) mom2 = particle2->get4Vector();
             if (particle2 && !std::isinf(mom2.Mag2()) && !std::isnan(mom2.Mag2())) {
               mass = (mom1 + mom2).M();
-              if (TMath::Abs(mass - mks) < massWindowWidth) isKsDau = true;
+              if (abs(mass - mks) < massWindowWidth) isKsDau = true;
             }
           }
         }
@@ -871,7 +798,7 @@ namespace Belle2 {
     m_raveWeights.resize(n);
     m_raveMCParticles.resize(n);
 
-    for (unsigned int i(0); i < n; ++i) {
+    for (unsigned i = 0; i < n; ++i) {
       m_raveParticles.at(i) = particleAndWeights.at(i).particle;
       m_raveMCParticles.at(i) = particleAndWeights.at(i).mcParticle;
       m_raveWeights.at(i) = particleAndWeights.at(i).weight;
@@ -1029,11 +956,13 @@ namespace Belle2 {
   void TagVertexModule::deltaT(Particle* Breco)
   {
 
+    // deltaT and Approximated MCdeltaT
+
     PCmsLabTransform T;
 
     TVector3 boost = T.getBoostVector();
 
-    double bg = boost.Mag() / TMath::Sqrt(1 - boost.Mag2());
+    double bg = boost.Mag() / sqrt(1 - boost.Mag2());
 
     double c = Const::speedOfLight / 1000.; // cm ps-1
 
@@ -1046,35 +975,25 @@ namespace Belle2 {
     double MCdl = MCdVert.Dot(boostDir);
     double MCdt = MCdl / (bg * c);
 
-
     m_deltaT = dt;
-    m_MCdeltaT = MCdt;
+    m_MCdeltaTapprox = MCdt;
+
+    // MCdeltaT=tauRec-tauTag
+    m_MCdeltaT = m_MCLifeTimeReco - m_MCtagLifeTime;
+    if (m_MCLifeTimeReco  == -1 || m_MCtagLifeTime == -1)
+      m_MCdeltaT =  std::numeric_limits<double>::quiet_NaN();
 
 
     // Calculate Delta t error
+    double zxB = sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
+    double angleY = atan2(boost.X(), boost.Z());
+    double angleX = atan2(boost.Y(), zxB);
+    TMatrixD Rot = getRotationMatrixXY(angleX, -angleY);
+    TMatrixD RotT = Rot; RotT.T();
 
-    double cy = boost.Z() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-    double sy = boost.X() / TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X());
-    double cx = TMath::Sqrt(boost.Z() * boost.Z() + boost.X() * boost.X()) / boost.Mag();
-    double sx = boost.Y() / boost.Mag();
-
-    TMatrixD RotY(3, 3);
-    RotY(0, 0) = cy;  RotY(0, 1) = 0;   RotY(0, 2) = -sy;
-    RotY(1, 0) = 0;   RotY(1, 1) = 1;   RotY(1, 2) = 0;
-    RotY(2, 0) = sy;  RotY(2, 1) = 0;   RotY(2, 2) = cy;
-
-    TMatrixD RotX(3, 3);
-    RotX(0, 0) = 1;   RotX(0, 1) = 0;   RotX(0, 2) = 0;
-    RotX(1, 0) = 0;   RotX(1, 1) = cx;  RotX(1, 2) = -sx;
-    RotX(2, 0) = 0;   RotX(2, 1) = sx;  RotX(2, 2) = cx;
-
-    TMatrixD Rot = RotY * RotX;
-    TMatrixD RotCopy = Rot;
-    TMatrixD RotInv = Rot.Invert();
-
-    TMatrixD RotErr = RotInv * m_tagVErrMatrix * RotCopy;
+    TMatrixD RotErr = RotT * m_tagVErrMatrix * Rot;
     TMatrixD RR = (TMatrixD)Breco->getVertexErrorMatrix();
-    TMatrixD RotErrBreco = RotInv * RR * RotCopy;
+    TMatrixD RotErrBreco = RotT * RR * Rot;
 
     double dtErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
 
@@ -1086,27 +1005,14 @@ namespace Belle2 {
 
     // calculate tagV component and error in the direction orthogonal to the boost
 
-    TVector3 oboost(boostDir.Z(), boostDir.Y(), -1 * boostDir.X());
-    double ocy = oboost.Z() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
-    double osy = oboost.X() / TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
-    double ocx = TMath::Sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X()) / oboost.Mag();
-    double osx = oboost.Y() / oboost.Mag();
+    TVector3 oboost(boostDir.Z(), boostDir.Y(), -boostDir.X());
+    double zxOB = sqrt(oboost.Z() * oboost.Z() + oboost.X() * oboost.X());
+    double angleOY = atan2(oboost.X(), oboost.Z());
+    double angleOX = atan2(oboost.Y(), zxOB);
+    TMatrixD oRot = getRotationMatrixXY(angleOX, -angleOY);
+    TMatrixD oRotT = oRot; oRotT.T();
 
-    TMatrixD oRotY(3, 3);
-    oRotY(0, 0) = ocy;  oRotY(0, 1) = 0;   oRotY(0, 2) = -osy;
-    oRotY(1, 0) = 0;    oRotY(1, 1) = 1;   oRotY(1, 2) = 0;
-    oRotY(2, 0) = osy;  oRotY(2, 1) = 0;   oRotY(2, 2) = ocy;
-
-    TMatrixD oRotX(3, 3);
-    oRotX(0, 0) = 1;   oRotX(0, 1) = 0;    oRotX(0, 2) = 0;
-    oRotX(1, 0) = 0;   oRotX(1, 1) = ocx;  oRotX(1, 2) = -osx;
-    oRotX(2, 0) = 0;   oRotX(2, 1) = osx;  oRotX(2, 2) = ocx;
-
-    TMatrixD oRot = oRotY * oRotX;
-    TMatrixD oRotCopy = oRot;
-    TMatrixD oRotInv = oRot.Invert();
-
-    TMatrixD oRotErr = oRotInv * m_tagVErrMatrix * oRotCopy;
+    TMatrixD oRotErr = oRotT * m_tagVErrMatrix * oRot;
 
     m_tagVol = m_tagV.Dot(oboost);
     m_truthTagVol = m_MCtagV.Dot(oboost);
@@ -1226,7 +1132,7 @@ namespace Belle2 {
     return oss.str();
   }
 
-  std::string TagVertexModule::printMatrix(TMatrixFSym const& mat)
+  std::string TagVertexModule::printMatrix(TMatrixDSym const& mat)
   {
     std::ostringstream oss;
     int w(14);

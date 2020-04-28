@@ -12,7 +12,7 @@
 
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 namespace Belle2 {
 
@@ -231,6 +231,15 @@ namespace Belle2 {
     }
 
     /**
+     * Get total number of modules.
+     */
+    static constexpr int getTotalModuleNumber()
+    {
+      return EKLMElementNumbers::getMaximalSectorNumber() +
+             BKLMElementNumbers::getMaximalLayerGlobalNumber();
+    }
+
+    /**
      * Get minimal plane number.
      * @param[in] subdetector Subdetector.
      */
@@ -252,7 +261,7 @@ namespace Belle2 {
     static constexpr uint16_t m_BKLMOffset = 0x8000;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

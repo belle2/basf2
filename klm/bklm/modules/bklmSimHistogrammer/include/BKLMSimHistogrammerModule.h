@@ -31,7 +31,7 @@
 namespace Belle2 {
 
   class BKLMSimHit;
-  class BKLMDigit;
+  class KLMDigit;
 
   //! Convert BKLM raw simulation hits to digitizations
   class BKLMSimHistogrammerModule : public Module {
@@ -133,7 +133,7 @@ namespace Belle2 {
     //! BKLMSimHit StoreArray
     StoreArray<BKLMSimHit> simHits;
     //! digits StoreArray
-    StoreArray<BKLMDigit> digits;
+    StoreArray<KLMDigit> digits;
     //! mcParticles StoreArray
     StoreArray<MCParticle> mcParticles;
     //! hits2D StoreArray

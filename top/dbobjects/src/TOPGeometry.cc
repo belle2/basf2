@@ -53,6 +53,13 @@ namespace Belle2 {
     return it->second;
   }
 
+  double TOPGeometry::getPDETuningFactor(unsigned type) const
+  {
+    std::map<unsigned, float>::const_iterator it = m_tuneFactorsPDE.find(type);
+    if (it == m_tuneFactorsPDE.end()) return 1.0;
+    return it->second;
+  }
+
   double TOPGeometry::getInnerRadius() const
   {
     if (m_modules.empty()) return 0;
@@ -149,6 +156,16 @@ namespace Belle2 {
     m_QBB.print();
     cout << endl;
     m_nominalQE.print();
+    cout << endl;
+    cout << "Photo-detection efficiency tuning factors" << endl;
+    cout << "-----------------------------------------" << endl;
+    if (m_tuneFactorsPDE.empty()) {
+      cout << " Not available" << endl;
+    } else {
+      for (const auto& x : m_tuneFactorsPDE) {
+        cout << " PMT type: " << x.first << "  factor = " << x.second << endl;
+      }
+    }
     cout << endl;
     m_nominalTTS.print();
     cout << endl;

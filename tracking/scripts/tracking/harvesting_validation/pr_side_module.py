@@ -397,7 +397,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         ]
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_hit_efficiency = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -408,7 +408,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_pxd_hit_efficiency = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -419,7 +419,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_svd_hit_efficiency = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -430,7 +430,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_cdc_hit_efficiency = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -441,7 +441,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_hit_purity = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -452,7 +452,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_pxd_hit_purity = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -463,7 +463,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_svd_hit_purity = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",
@@ -474,7 +474,7 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         filter_on="is_matchedPrimary"
     )
 
-    # Save simple FOM
+    #: Save simple FOM
     save_cdc_hit_purity = refiners.save_fom(
         name="{module.id}_subdetector_figures_of_merit",
         title="Overview figures in {module.title}",

@@ -24,7 +24,7 @@ namespace Belle2 {
   /**
    * Class to store EKLM geometry data in the database.
    */
-  class EKLMGeometry : public EKLMElementNumbers {
+  class EKLMGeometry : public TObject {
 
   public:
 
@@ -1254,7 +1254,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMGeometry();
+    virtual ~EKLMGeometry();
 
     /**
      * Operator =.
@@ -1411,6 +1411,9 @@ namespace Belle2 {
 
   protected:
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers; //! ROOT streamer
+
     /** Number of sections. */
     int m_NSections;
 
@@ -1481,7 +1484,7 @@ namespace Belle2 {
     ShieldGeometry m_ShieldGeometry;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMGeometry, 4);
+    ClassDef(Belle2::EKLMGeometry, 5);
 
   };
 

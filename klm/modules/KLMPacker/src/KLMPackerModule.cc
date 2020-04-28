@@ -20,7 +20,7 @@ REG_MODULE(KLMPacker)
 
 KLMPackerModule::KLMPackerModule() : Module()
 {
-  setDescription("KLM raw data packer (creates RawKLM from BKLMDigits and EKLMDigits).");
+  setDescription("KLM raw data packer (creates RawKLM from KLMDigits).");
   setPropertyFlags(c_ParallelProcessingCertified);
   m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
@@ -31,8 +31,7 @@ KLMPackerModule::~KLMPackerModule()
 
 void KLMPackerModule::initialize()
 {
-  m_BklmDigits.isRequired();
-  m_EklmDigits.isRequired();
+  m_Digits.isRequired();
   m_EventMetaData.isRequired();
   m_RawKLMs.registerInDataStore();
 }
@@ -51,70 +50,47 @@ void KLMPackerModule::event()
    */
   std::vector<uint32_t> dataWords[8][4];
 
-  /* Pack BKLM digits. */
-  for (const BKLMDigit& bklmDigit : m_BklmDigits) {
+  /* Pack KLM digits. */
+  for (const KLMDigit& digit : m_Digits) {
     uint32_t buf[2] = {0};
     uint16_t bword1 = 0;
     uint16_t bword2 = 0;
     uint16_t bword3 = 0;
     uint16_t bword4 = 0;
-    int channel = m_ElementNumbers->channelNumberBKLM(
-                    bklmDigit.getSection(), bklmDigit.getSector(),
-                    bklmDigit.getLayer(), bklmDigit.getPlane(),
-                    bklmDigit.getStrip());
+    int channel =
+      m_ElementNumbers->channelNumber(
+        digit.getSubdetector(), digit.getSection(), digit.getSector(),
+        digit.getLayer(), digit.getPlane(), digit.getStrip());
     const KLMElectronicsChannel* electronicsChannel =
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete KLM electronics map.");
-    int flag = 2; // RPC
-    if (!bklmDigit.inRPC())
+    int flag;
+    if (digit.inRPC())
+      flag = 2; // RPC
+    else
       flag = 4; // Scintillator
     int lane = electronicsChannel->getLane();
     int plane = electronicsChannel->getAxis();
     int strip = electronicsChannel->getChannel();
     formatData(flag, lane, plane, strip,
-               bklmDigit.getCharge(), bklmDigit.getCTime(), bklmDigit.getTime(),
+               digit.getCharge(), digit.getCTime(), digit.getTDC(),
                bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
     buf[1] |= ((bword3 << 16));
-    int copper = electronicsChannel->getCopper() - BKLM_ID - 1;
-    int dataConcentrator = electronicsChannel->getSlot() - 1;
-    dataWords[copper][dataConcentrator].push_back(buf[0]);
-    dataWords[copper][dataConcentrator].push_back(buf[1]);
-  }
-
-  /* Pack EKLM digits. */
-  for (const EKLMDigit& eklmDigit : m_EklmDigits) {
-    uint32_t buf[2] = {0};
-    uint16_t bword1 = 0;
-    uint16_t bword2 = 0;
-    uint16_t bword3 = 0;
-    uint16_t bword4 = 0;
-    int channel = m_ElementNumbers->channelNumberEKLM(
-                    eklmDigit.getSection(), eklmDigit.getSector(),
-                    eklmDigit.getLayer(), eklmDigit.getPlane(),
-                    eklmDigit.getStrip());
-    const KLMElectronicsChannel* electronicsChannel =
-      m_ElectronicsMap->getElectronicsChannel(channel);
-    if (electronicsChannel == nullptr)
-      B2FATAL("Incomplete KLM electronics map.");
-    int flag = 4; // Scintillator
-    int lane = electronicsChannel->getLane();
-    int plane = electronicsChannel->getAxis();
-    int strip = electronicsChannel->getChannel();
-    formatData(flag, lane, plane, strip,
-               eklmDigit.getCharge(), eklmDigit.getCTime(), eklmDigit.getTDC(),
-               bword1, bword2, bword3, bword4);
-    buf[0] |= bword2;
-    buf[0] |= ((bword1 << 16));
-    buf[1] |= bword4;
-    buf[1] |= ((bword3 << 16));
-    int copper = electronicsChannel->getCopper() - EKLM_ID - 1;
-    int dataConcentrator = electronicsChannel->getSlot() - 1;
-    dataWords[copper + 4][dataConcentrator].push_back(buf[0]);
-    dataWords[copper + 4][dataConcentrator].push_back(buf[1]);
+    if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
+      int copper = electronicsChannel->getCopper() - BKLM_ID - 1;
+      int dataConcentrator = electronicsChannel->getSlot() - 1;
+      dataWords[copper][dataConcentrator].push_back(buf[0]);
+      dataWords[copper][dataConcentrator].push_back(buf[1]);
+    } else {
+      int copper = electronicsChannel->getCopper() - EKLM_ID - 1;
+      int dataConcentrator = electronicsChannel->getSlot() - 1;
+      dataWords[copper + 4][dataConcentrator].push_back(buf[0]);
+      dataWords[copper + 4][dataConcentrator].push_back(buf[1]);
+    }
   }
 
   /* Create RawKLM objects. */

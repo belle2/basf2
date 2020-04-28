@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 EKLMHit2d::EKLMHit2d()
@@ -19,8 +22,10 @@ EKLMHit2d::EKLMHit2d()
 }
 
 
-EKLMHit2d::EKLMHit2d(EKLMDigit* s1)
+EKLMHit2d::EKLMHit2d(KLMDigit* s1)
 {
+  if (s1->getSubdetector() != KLMElementNumbers::c_EKLM)
+    B2FATAL("Trying to construct a EKLMHit2d using KLMDigits from BKLM.");
   setSection(s1->getSection());
   setLayer(s1->getLayer());
   setSector(s1->getSector());

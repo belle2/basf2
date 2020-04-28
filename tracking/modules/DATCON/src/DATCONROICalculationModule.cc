@@ -10,6 +10,9 @@
 
 #include <tracking/modules/DATCON/DATCONROICalculationModule.h>
 
+#include <pxd/geometry/SensorInfo.h>
+#include <vxd/geometry/GeoCache.h>
+
 using namespace std;
 using namespace Belle2;
 

@@ -129,7 +129,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
   }
 
   if (gcp.getEDepToADCInputType()) {
-    m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
+    m_eDepToADCConversionsFromDB = new OptionalDBObjPtr<CDCEDepToADCConversions>;
     if ((*m_eDepToADCConversionsFromDB).isValid()) {
       (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCGeometryPar::setEDepToADCConversions);
     }
@@ -437,7 +437,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
       B2DEBUG(100, "CDCGeometryPar: Read badwire from DB");
       setBadWire();  //Set bad-wire (from DB)
     } else {
-      readBadWire(gbxParams);  //Read bad-wire (from file)
+      //      readBadWire(gbxParams);  //Read bad-wire (from file)
+      B2FATAL("Text file input mode for bdwires is disabled now!");
     }
 
     if (gcp.getChMapInputType()) {
@@ -457,7 +458,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
     if (gcp.getEDepToADCInputType()) {
       B2DEBUG(29, "CDCGeometryPar: Read EDepToADC from DB");
-      setEDepToADCConversions(); //Set edep-to-adc (from DB)
+      if ((*m_eDepToADCConversionsFromDB).isValid()) {
+        setEDepToADCConversions(); //Set edep-to-adc (from DB)
+      }
     } else {
       readEDepToADC(gbxParams);  //Read edep-to-adc params. (from file)
     }
@@ -484,7 +487,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 // Open a file
 void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) const
 {
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -502,7 +505,7 @@ void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) 
 // Open a file using boost (to be able to read a gzipped file)
 void CDCGeometryPar::openFile(boost::iostreams::filtering_istream& ifs, const std::string& fileName0) const
 {
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -755,7 +758,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   openFileB(ifs, fileName0);
   //TODO: use openFile() in cdc/utilities instead of the following 18 lines <- done
   /*
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1);
 
   if (fileName == "") {
@@ -1041,7 +1044,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
 void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 {
   std::string fileName0 = gbxParams.getString("deltazFileName");
-  fileName0 = "/cdc/data/" + fileName0;
+  fileName0 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
@@ -1110,6 +1113,7 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
 }
 
 
+/*
 // Read bad-wires.
 void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 {
@@ -1144,6 +1148,7 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 
   ifs.close();
 }
+*/
 
 
 // Read time-walk parameters
@@ -1227,7 +1232,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
 
   ifstream ifs;
   //  openFileA(ifs, fileName0);
-  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName1 = "/data/cdc/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName1, true);
 
   if (fileName == "") {
@@ -1246,7 +1251,7 @@ void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
   unsigned short paramMode(0), nParams(0);
   ifs >> paramMode >> nParams;
   if (paramMode > 0) B2FATAL("Param mode > 0!");
-  if (nParams > 4)   B2FATAL("No. of params. > 4!");
+  if (nParams > 6)   B2FATAL("No. of params. > 6!");
   unsigned short groupId(0);
   ifs >> groupId;
   B2DEBUG(29, paramMode << " " << nParams << " " << groupId);
@@ -1316,19 +1321,26 @@ void CDCGeometryPar::setT0()
 void CDCGeometryPar::calcMeanT0()
 {
   B2DEBUG(29, "calcMeanT0 start");
-  unsigned short nw = 0;
+  double effiSum = 0.;
   m_meanT0 = 0.;
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iW = 0; iW < MAX_N_SCELLS; ++iW) {
       if (m_t0[iCL][iW] == 0.) continue;
       const WireID wid = WireID(iCL, iW);
+      if (isHotWire(wid)) continue;
       if (isBadWire(wid)) continue;
       //TODO try to reject strage t0s more
-      ++nw;
-      m_meanT0 += m_t0[iCL][iW];
+      double effi = 1.;
+      isDeadWire(wid, effi);
+      effiSum += effi;
+      m_meanT0 += effi * m_t0[iCL][iW];
     }
   }
-  if (nw > 0) m_meanT0 /= nw;
+  if (effiSum > 0.) {
+    m_meanT0 /= effiSum;
+  } else {
+    B2FATAL("Wire efficiency sum <= 0!");
+  }
   B2DEBUG(29, "calcMeanT0 end");
 }
 
@@ -1336,7 +1348,7 @@ void CDCGeometryPar::calcMeanT0()
 // Set bad-wire (from DB)
 void CDCGeometryPar::setBadWire()
 {
-  m_badWire = (*m_badWireFromDB)->getWires();
+  //  m_badWire = (*m_badWireFromDB)->getWires();
   calcMeanT0();
 }
 
@@ -1499,6 +1511,9 @@ void CDCGeometryPar::setChMap()
     const int iBd = cm.getBoardID();
     const WireID wID(isl, il, iw);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
+    const int iCh = cm.getBoardChannel();
+    m_wireToChannel.insert(pair<WireID, unsigned short>(wID, iCh));
+    m_boardAndChannelToWire[iBd][iCh] = wID.getEWire();
   }
 }
 
@@ -1535,7 +1550,7 @@ void CDCGeometryPar::setEDepToADCConversions()
 
   for (unsigned short id = 0; id < nEnt; ++id) {
     unsigned short np = ((*m_eDepToADCConversionsFromDB)->getParams(id)).size();
-    if (np > 4) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 4");
+    if (np > 6) B2FATAL("CDCGeometryPar:: No. of edep-to-ADC conversion params. > 6");
     if (groupId == 0) { //per super-layer; id=super-layer
       for (unsigned short cL = cLMin[id]; cL <= cLMax[id]; ++cL) { //clayer loop
         for (unsigned short cell = 0; cell < nCell[cL]; ++cell) { //cell loop
@@ -1569,6 +1584,8 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
   const double& alf   = m_eDepToADCParams[iCL][iW][1];
   const double& gam   = m_eDepToADCParams[iCL][iW][2];
   const double& dlt   = m_eDepToADCParams[iCL][iW][3];
+  const double& a     = m_eDepToADCParams[iCL][iW][4];
+  const double& b     = m_eDepToADCParams[iCL][iW][5];
   const double cth  = fabs(costh) + dlt;
   const double iGen = edep / dx; // keV/cm
   const double tmp  = cth - gam * iGen;
@@ -1593,10 +1610,11 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
   } else {
     //TODO: check the following issue more
     //    B2WARNING("CDCGeometryPar: Measured dE/dx <= 0!");
-    //    B2DEBUG(29, "CDCGeometryPar: Measured dE/dx <= 0!" << std::endl;
+    //    B2DEBUG(29, "CDCGeometryPar: Measured dE/dx <= 0!");
     //    B2DEBUG(29, "iGen,iMea= " << std::setw(15) << std::scientific << std::setprecision(8) << iGen <<" "<< iMea);
     //    B2DEBUG(29, "dx,mainF,alf,gam,dlt,cth,tmp,disc= " << dx <<" "<< mainF <<" "<< alf <<" "<< gam <<" "<< dlt <<" "<<" "<< tmp <<" "<< disc);
   }
+  convF *= 1. + a * (costh - b);
   return convF;
 }
 
@@ -2310,11 +2328,18 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 
     //estimate an initial value
     //    bool check = false;
-    double det = a[1] * a[1] - 4.*a[2] * a[0];
-    if (a[2] != 0. && det >= 0.) {
-      //2nd-order approx. near t=0
-      //Choose the solution with dx/dt > 0 which gives x=0
-      minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
+    //    bool nointersection = false;
+    if (a[2] != 0.) {  //2nd-order approx. near t=0
+      const double det = a[1] * a[1] - 4.*a[2] * a[0];
+      if (det >= 0.) {
+        //Choose the solution with dx/dt > 0 which gives x=0
+        minTime = (-a[1] + sqrt(det)) / (2.*a[2]);
+      } else {
+        //Choose the solution with smallest x
+        //  nointersection = true;
+        minTime = -a[1]  / (2.*a[2]);
+        //  cout <<"smallest-x solution= " << minTime << endl;
+      }
     } else if (a[1] != 0.) {
       minTime = -a[0] / a[1];  //1st-order approx.
     } else {
@@ -2325,7 +2350,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 
     //    double minTime0 = minTime;
     //higher-order corr. using Newton method; trial to minimize x^2
-    double  edm = 10.;   //(cm)
+    double  edm; //  = 10.;   //(cm)  (SG: fix to avoid cpp-check warning)
     //      const double epsi4t = 0.01; //(ns)
     //    const double epsi4x = 1.e-5; //(cm)
     const double epsi4x = 5.e-6; //(cm)
@@ -2379,13 +2404,18 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     //choose minMinTime for not-converged case
     if (nIter == (maxIter + 1)) minTime = minMinTime;
 
-    if (minTime > 20.) {
-      B2WARNING("CDCGeometryPar::getMinDriftTime: minDriftTime > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
+    /*
+    if (fabs(minTime) > 20.) {
+      B2WARNING("CDCGeometryPar::getMinDriftTime: |minDriftTime| > 20ns. Ok ?\n" << "layer(#0-55),lr,alpha(rad),theta,minTime(ns)= " <<
                 iCLayer << " "
                 << lr <<
                 " " << alpha << " " << theta << " " << minTime);
     }
-
+    if (nointersection) {
+      cout <<"final minTime= " << minTime << endl;
+      cout <<"final minx   = " << a[0] + a[1] * minTime + a[2] *pow(minTime,2) + a[3] *pow(minTime,3) + a[4] *pow(minTime,4) + a[5] *pow(minTime,5) << endl;
+    }
+    */
     /*
     if (check) {
       double dmin = 999.;

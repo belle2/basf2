@@ -23,11 +23,12 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
 //#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
 //C++/C standard lib elements.
 #include <string>
-#include <vector>
 //#include <queue>
 #include <limits>
 
@@ -64,6 +65,8 @@ namespace Belle2 {
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
       //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+      if (m_runGainFromDB) delete m_runGainFromDB;
+      if (m_xTalkFromDB) delete m_xTalkFromDB;
     };
 
   private:
@@ -113,6 +116,12 @@ namespace Belle2 {
 
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
+
+    /** Set run-gain (from DB) */
+    void setRunGain();
+
+    /** Add crosstalk */
+    void addXTalk();
 
     /** Set edep-to-ADC conversion params. (from DB) */
     //    void setEDepToADCConversions();
@@ -175,6 +184,8 @@ namespace Belle2 {
     double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
     double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
 
+    double m_runGain = 1.;  /**< run gain. */
+    double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
     //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
@@ -195,12 +206,21 @@ namespace Belle2 {
     float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
     float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
     float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
+    unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
+    bool m_useDB4RunGain;               /**< Fetch run gain from DB */
     bool m_spaceChargeEffect;           /**< Space charge effect */
 
+    DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
     //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
     //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
+
+    bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
+    bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
+    bool m_includeEarlyXTalks; /**< Flag to switch on/off xtalks earlier than the hit */
+    int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
+    DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {
@@ -220,6 +240,17 @@ namespace Belle2 {
       float          m_driftTime2;     /**< 2nd-shortest drift time in the cell. */
       int            m_simHitIndex3;   /**< SimHit index for 3rd drift time. */
       float          m_driftTime3;     /**< 3rd-shortest drift time in the cell. */
+    };
+
+    /** Structure for saving the x-talk information. */
+    struct XTalkInfo {
+      /** Constructor that initializes all members. */
+      XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
+        m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
+      unsigned short m_tdc; /**< TDC count */
+      unsigned short m_adc; /**< ADC count */
+      unsigned short m_tot; /**< TOT       */
+      unsigned short m_status; /**< status */
     };
   };
 

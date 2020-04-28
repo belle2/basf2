@@ -13,7 +13,9 @@ class DEDXEstimationTrainer:
 
     def __init__(self):
         """Constructor"""
+        #: by default, the dE/dx-particle-identification trainer has not run yet
         self.dedx_estimator_function = None
+        #: the default data column is 'dedx'
         self.dedx_column = "dedx"
 
     def train(self, data):
@@ -194,7 +196,7 @@ class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTraine
         FittedGroupedDEDXEstimatorTrainer.__init__(self, result_function, use_sigma_for_result_fitting)
 
         def train_function(fit_data):
-            """Train on the curated data whose truth value is known"""
+            """Train on the fit to curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             if self.dimension_of_fit_function == 3:
@@ -206,6 +208,7 @@ class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTraine
 
             return [np.sqrt(np.diag(pcov)[1]), popt]
 
+        #: this class's training function
         self.train_function = train_function
 
     def plot_grouped_result(self, data):
@@ -269,10 +272,12 @@ class MaximumEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=False)
 
         def train_function(fit_data):
+            """Train on the curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             return [None, [None, max_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
@@ -280,15 +285,18 @@ class MedianEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
     """Train a neural network for dE/dx-based particle identification using only the median values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=True)
 
         def train_function(fit_data):
+            """Train on the curated-data median values whose truth value is known"""
             weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
             median_value = np.median(weighted_p_values)
             iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
 
             return [iqr, [None, median_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
@@ -326,10 +334,12 @@ class MaximumEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=False)
 
         def train_function(fit_data):
+            """Train on the curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             return [None, [None, max_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
@@ -337,15 +347,18 @@ class MedianEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
     """Train a neural network for dE/dx-based particle identification using only the median values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=True)
 
         def train_function(fit_data):
+            """Train on the curated-data median values whose truth value is known"""
             weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
             median_value = np.median(weighted_p_values)
             iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
 
             return [iqr, [None, median_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 

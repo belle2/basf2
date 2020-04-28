@@ -10,12 +10,11 @@
 
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 
-#include <alignment/Manager.h>
-#include <alignment/Hierarchy.h>
 #include <alignment/dbobjects/VXDAlignment.h>
-
 #include <alignment/GlobalDerivatives.h>
-
+#include <alignment/Hierarchy.h>
+#include <alignment/Manager.h>
+#include <framework/geometry/BFieldManager.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
@@ -23,12 +22,20 @@ using namespace std;
 using namespace Belle2;
 using namespace alignment;
 
+bool AlignableSVDRecoHit2D::s_enableLorentzGlobalDerivatives = false;
+
 std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit2D::globalDerivatives(const genfit::StateOnPlane* sop)
 {
   auto alignment = GlobalCalibrationManager::getInstance().getAlignmentHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
                    sop);
 
   auto globals = GlobalDerivatives(alignment);
+
+  if (s_enableLorentzGlobalDerivatives) {
+    auto lorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
+                   sop, BFieldManager::getInstance().getField(sop->getPos()));
+    globals.add(lorentz);
+  }
 
   const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
 

@@ -11,8 +11,6 @@
 #pragma once
 #include <TObject.h>
 #include <vector>
-#include <algorithm>
-#include <cctype>
 
 namespace Belle2 {
 

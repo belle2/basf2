@@ -1,10 +1,8 @@
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <TParticlePDG.h>
 
 #include <gtest/gtest.h>
-#include <cmath>
 
 using namespace std;
 using namespace Belle2;

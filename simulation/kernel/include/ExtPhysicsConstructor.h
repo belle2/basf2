@@ -37,10 +37,10 @@ namespace Belle2 {
       virtual ~ExtPhysicsConstructor();
 
       /** ConstructParticle() defines the geant4e-specific particles */
-      virtual void ConstructParticle();
+      void ConstructParticle();
 
       /** ConstructProcess() defines the geant4e-specific processes */
-      virtual void ConstructProcess();
+      void ConstructProcess();
 
     private:
 

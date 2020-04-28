@@ -497,7 +497,9 @@ class CutClassifier(object):
 
     def __init__(self, cut_direction=1, cut_value=np.nan):
         """Constructor"""
+        #: cached copy of the cut direction (< or >)
         self.cut_direction_ = cut_direction
+        #: cached copy of the cut threshold
         self.cut_value_ = cut_value
 
     @property
@@ -563,6 +565,7 @@ class CutAtBackgroundRejectionClassifier(CutClassifier):
     def __init__(self, background_rejection=0.5, cut_direction=1):
         """Constructor"""
         super(CutAtBackgroundRejectionClassifier, self).__init__(cut_direction=cut_direction, cut_value=np.nan)
+        #: cachec copy of the background-rejection threshold
         self.background_rejection = background_rejection
 
     def determine_cut_value(self, estimates, truths):

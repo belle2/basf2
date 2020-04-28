@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <map>
 #include <array>
 #include <iostream>
@@ -135,6 +137,32 @@ namespace Belle2 {
     {
       const XtID xtID = getXtID(iCLayer, iLR, iAlpha, iTheta);
       addXTParams(xtID, delta);
+    }
+
+    /**
+     * Replace xt parameters for the specified id. (=bin)
+     */
+    void replaceXTParams(const XtID xtID, const std::vector<float>&  param)
+    {
+      std::map<XtID, std::vector<float>>::iterator it = m_xts.find(xtID);
+
+      if (it != m_xts.end()) {
+        for (unsigned short i = 0; i < m_nXtParams; ++i) {
+          (it->second)[i] = param[i];
+        }
+      } else {
+        B2FATAL("Specified xt params not found in replaceXTParams !");
+      }
+    }
+
+    /**
+     * Replace xt parameters for the specified id. (=bin)
+     */
+    void replaceXTParams(unsigned short iCLayer, unsigned short iLR, unsigned short iAlpha, unsigned short iTheta,
+                         const std::vector<float>& param)
+    {
+      const XtID xtID = getXtID(iCLayer, iLR, iAlpha, iTheta);
+      replaceXTParams(xtID, param);
     }
 
 
@@ -405,7 +433,7 @@ namespace Belle2 {
     std::map<XtID, std::vector<float>>
                                     m_xts;    /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
 
-    ClassDef(CDCXtRelations, 1); /**< ClassDef */
+    ClassDef(CDCXtRelations, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

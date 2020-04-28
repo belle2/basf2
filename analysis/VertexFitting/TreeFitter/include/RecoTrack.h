@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,6 @@
 #include <analysis/VertexFitting/TreeFitter/RecoParticle.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/Track.h>
 
 namespace TreeFitter {
 

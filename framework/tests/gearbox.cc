@@ -1,8 +1,5 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <gtest/gtest.h>
 #include <string>

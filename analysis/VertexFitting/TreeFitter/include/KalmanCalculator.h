@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -60,9 +60,6 @@ namespace TreeFitter {
   private:
     /** dimension of the constraint  */
     int m_constrDim;
-
-    /**  dimension of the statevector */
-    int m_stateDim; // dimension of the state
 
     /**  chi2 */
     double m_chisq;

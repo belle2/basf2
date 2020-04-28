@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -39,7 +38,7 @@ ma.inputMdst(environmentType='default',
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
+# see Standard Particles section at https://software.belle2.org/
 stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
@@ -55,7 +54,7 @@ ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0:all',
                 path=my_path)
 

@@ -17,10 +17,7 @@
 
 #include <framework/core/Module.h>
 #include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
-#include <arich/dataobjects/ARICHInfo.h>
 #include <string>
-
-#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -79,7 +76,8 @@ namespace Belle2 {
      */
 
     void printBits(const int* buffer, int bufferSize);
-    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
+    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read Merger header */
+    void readFEHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read FE header */
 
 
 

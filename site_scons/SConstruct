@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shlex
 import config
 import subprocess
 
@@ -272,6 +273,11 @@ explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rst
 # make the static library containing the main() function for test executables
 global_env.Library(os.path.join(global_env['LIBDIR'], 'test_main'), "$BUILDDIR/site_scons/test_main.cc")
 
+# figure out where we don't want sphinx to look for documentation. Mostly not
+# in output directories. But depending on whether or not we do a light build we
+# don't want to look in any non-light packages
+sphinx_exclude_pattern = set()
+
 # process the analysis directory
 if analysis:
     global_env['PACKAGE'] = os.path.basename(os.environ['BELLE2_ANALYSIS_DIR'])
@@ -282,6 +288,7 @@ if analysis:
 else:
     # loop over directory entries and select package directories
     exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
+    sphinx_exclude_pattern |= set(exclude_dirs)
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
@@ -291,6 +298,7 @@ else:
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
         light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
+        sphinx_exclude_pattern |= available_packages.difference(light_packages)
         available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile
@@ -330,10 +338,19 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
 if global_env.GetOption("sphinx"):
+    tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
     sphinx_targets = ['html', 'latex', 'json']
+    # we place the tools doc in the build directory so obviously we don't want
+    # to exclude all of that
+    sphinx_exclude_pattern.remove('build')
+    # but we can exclude most of it ...
+    sphinx_exclude_pattern |= {'build/Linux*', 'build/doctrees'} | {f'build/{e}' for e in sphinx_targets}
+    # and convert to a proper argument for sphinx-build
+    sphinx_exclude_pattern = shlex.quote("exclude_patterns=" + ",".join(sphinx_exclude_pattern))
     for sphinx_target in sphinx_targets:
-        tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
-        sphinx = global_env.Command('build/%s' % sphinx_target, 'index.rst', 'sphinx-build -b %s -c site_scons/sphinx -d build/doctrees . $TARGET' % sphinx_target)
+        sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"sphinx-build -b {sphinx_target} "
+                                    f"-ENT -D {sphinx_exclude_pattern} "
+                                    "-c site_scons/sphinx -d build/doctrees . $TARGET")
         global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', tools_doc])
         global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)

@@ -11,8 +11,9 @@
 
 #include <mdst/dataobjects/HitPatternCDC.h>
 
-#include <framework/datastore/RelationsObject.h>
 #include <framework/logging/Logger.h>
+
+#include <TObject.h>
 
 #include <algorithm>
 #include <bitset>
@@ -211,11 +212,37 @@ namespace Belle2 {
       m_flagBlock.set(c_vxdtf2Abortion);
     }
 
+    /** Getter for flag indicating that the SVD CKF was aborted due to high combinatorics in the event. */
+    bool hasSVDCKFAbortionFlag() const
+    {
+      return m_flagBlock[c_svdckfAbortion];
+    }
+
+    /** Setter for flag indicating that the SVD CKF was aborted due to high combinatorics in the event. */
+    void setSVDCKFAbortionFlag()
+    {
+      m_flagBlock.set(c_svdckfAbortion);
+    }
+
+    /** Getter for flag indicating that the PXD CKF was aborted due to high combinatorics in the event. */
+    bool hasPXDCKFAbortionFlag() const
+    {
+      return m_flagBlock[c_pxdckfAbortion];
+    }
+
+    /** Setter for flag indicating that the PXD CKF was aborted due to high combinatorics in the event. */
+    void setPXDCKFAbortionFlag()
+    {
+      m_flagBlock.set(c_pxdckfAbortion);
+    }
+
   private:
     /** Enum to specify meaning of bits in m_flagBlock bitset. */
     enum ETrackingErrorFlags {
       c_unspecifiedError = 0, /**< Indicating a unspecified failure during track finding. */
       c_vxdtf2Abortion   = 1, /**< Indicating abortion of the VXDTF2 due to high combinatorics in the event. */
+      c_svdckfAbortion   = 2, /**< Indicating abortion of the SVD CKF due to high combinatorics in the event. */
+      c_pxdckfAbortion   = 3, /**< Indicating abortion of the PXD CKF due to high combinatorics in the event. */
     };
 
     /** Number of hits in the CDC, that were not assigned to any Track.

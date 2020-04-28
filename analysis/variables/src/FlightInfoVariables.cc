@@ -11,9 +11,9 @@
 #include <analysis/variables/FlightInfoVariables.h>
 #include <framework/logging/Logger.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/utilities/Conversion.h>
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
@@ -45,20 +45,20 @@ namespace Belle2 {
                                    const bool motherToGranddaughter = false)
     {
       if (!particle || !daughter) {
-        outErr = -999;
-        return -999;
+        outErr = std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<float>::quiet_NaN();
       }
       if (!(particle->getParticleType() == Particle::EParticleType::c_Composite) ||
           !(daughter->getParticleType() == Particle::EParticleType::c_Composite)) {
         B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
-        outErr = -999;
-        return -999;
+        outErr = std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<float>::quiet_NaN();
       }
       if (!(mode == "distance") && !(mode == "time")) {
         B2WARNING("FlightInfo helper function called with mode '" << mode
                   << "'. Only 'distance' and 'time' are available.");
-        outErr = -999;
-        return -999;
+        outErr = std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<float>::quiet_NaN();
       }
       // get TreeFitter values if they exist.
       // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
@@ -78,6 +78,7 @@ namespace Belle2 {
         }
       }
 
+
       double mumvtxX = particle->getX();
       double mumvtxY = particle->getY();
       double mumvtxZ = particle->getZ();
@@ -88,10 +89,10 @@ namespace Belle2 {
           mumvtxZ = particle->getExtraInfo("prodVertZ");
         } else {
           //if no production vertex assume the particle originated at the ip
-          PCmsLabTransform T;
-          mumvtxX = T.getBeamParams().getVertex().X();
-          mumvtxY = T.getBeamParams().getVertex().Y();
-          mumvtxZ = T.getBeamParams().getVertex().Z();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumvtxX = (beamSpotDB->getIPPosition()).X();
+          mumvtxY = (beamSpotDB->getIPPosition()).Y();
+          mumvtxZ = (beamSpotDB->getIPPosition()).Z();
         }
       }
       //daughter vertex
@@ -131,8 +132,8 @@ namespace Belle2 {
             }
           }
         } else {
-          PCmsLabTransform T;
-          mumCov = T.getBeamParams().getCovVertex();
+          static DBObjPtr<BeamSpot> beamSpotDB;
+          mumCov = beamSpotDB->getCovVertex();
         }
       }
       //compute total covariance matrix
@@ -193,8 +194,8 @@ namespace Belle2 {
         outErr = sqrt(result[0][0]);
         return fT;
       }
-      outErr = -999;
-      return -999;
+      outErr = std::numeric_limits<float>::quiet_NaN();
+      return std::numeric_limits<float>::quiet_NaN();
     }
 
     // Helper function for MC flight time and distance
@@ -202,7 +203,7 @@ namespace Belle2 {
     {
 
       if (mcparticle == nullptr)
-        return -99;
+        return std::numeric_limits<float>::quiet_NaN();
 
 
       if (mode == "distance") {
@@ -217,7 +218,7 @@ namespace Belle2 {
       if (mode == "time") {
         double lifetime = mcparticle->getLifetime();
         double mass = mcparticle->getMass();
-        double time = -99;
+        double time = std::numeric_limits<float>::quiet_NaN();
         if (mass == 0)
           B2WARNING("you are asking for the proper time of a massless particle which is not allowed, returning -99.");
         else {
@@ -233,42 +234,42 @@ namespace Belle2 {
       }
       B2WARNING("MCFlightInfo helper function called with mode '" << mode
                 << "'. Only 'distance' and 'time' are available.");
-      return -999;
+      return std::numeric_limits<float>::quiet_NaN();
 
     }
 
     double flightDistance(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      return getFlightInfoBtw(part, part, flightDistanceErr, "distance");
+      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
+      return getFlightInfoBtw(part, part, flightDistanceError, "distance");
     }
 
     double flightTime(const Particle* part)
     {
-      double flightTimeErr = -999;
-      return getFlightInfoBtw(part, part, flightTimeErr, "time");
+      double flightTimeError = std::numeric_limits<float>::quiet_NaN();
+      return getFlightInfoBtw(part, part, flightTimeError, "time");
     }
 
     double flightDistanceErr(const Particle* part)
     {
-      double flightDistanceErr = -999;
-      getFlightInfoBtw(part, part, flightDistanceErr, "distance");
-      return flightDistanceErr;
+      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
+      getFlightInfoBtw(part, part, flightDistanceError, "distance");
+      return flightDistanceError;
     }
 
     double flightTimeErr(const Particle* part)
     {
-      double flightTimeErr = -999;
-      getFlightInfoBtw(part, part, flightTimeErr, "time");
-      return flightTimeErr;
+      double flightTimeError = std::numeric_limits<float>::quiet_NaN();
+      getFlightInfoBtw(part, part, flightTimeError, "time");
+      return flightTimeError;
     }
 
     inline double getVertexDistance(const Particle* particle, const Particle* daughter, double& vertexDistanceErr,
                                     bool prodVertIsIP = false)
     {
       if (!particle || !daughter) {
-        vertexDistanceErr = -999;
-        return -999;
+        vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       // production vertex
@@ -343,30 +344,30 @@ namespace Belle2 {
 
     double vertexDistance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
       }
-      return getVertexDistance(part, part, vertexDistanceErr);
+      return getVertexDistance(part, part, vertexDistanceError);
     }
 
     double vertexDistanceErr(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
       }
-      getVertexDistance(part, part, vertexDistanceErr);
-      return vertexDistanceErr;
+      getVertexDistance(part, part, vertexDistanceError);
+      return vertexDistanceError;
     }
 
     double vertexDistanceSignificance(const Particle* part)
     {
-      double vertexDistanceErr = -999;
+      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
       }
-      return getVertexDistance(part, part, vertexDistanceErr) / vertexDistanceErr;
+      return getVertexDistance(part, part, vertexDistanceError) / vertexDistanceError;
     }
 
     Manager::FunctionPtr flightTimeOfDaughter(const std::vector<std::string>& arguments)
@@ -376,7 +377,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
@@ -384,7 +385,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
@@ -392,9 +393,9 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightTimeErr = 0.0;
           if (grandDaughterNumber > -1)
@@ -405,7 +406,7 @@ namespace Belle2 {
           } else {
             return getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
           };
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
         }; // Lambda function END
         return func;
       }
@@ -420,7 +421,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of flightTimeOfDaughterErr function must be integer!");
           return nullptr;
         }
@@ -428,7 +429,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of flightTimeOfDaughterErr function must be integer!");
           return nullptr;
         }
@@ -436,9 +437,9 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightTimeErr = 0.0;
           if (grandDaughterNumber > -1)
@@ -451,7 +452,7 @@ namespace Belle2 {
             getFlightInfoBtw(particle, daughter, flightTimeErr, "time");
             return flightTimeErr;
           };
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
         }; // Lambda function END
         return func;
       }
@@ -465,7 +466,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
@@ -473,7 +474,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of flightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
@@ -481,9 +482,9 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightDistanceErr = 0.0;
           if (grandDaughterNumber > -1)
@@ -494,7 +495,7 @@ namespace Belle2 {
           } else {
             return getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
           };
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
         }; // Lambda function END
         return func;
       }
@@ -509,7 +510,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of flightDistanceOfDaughterErr function must be integer!");
           return nullptr;
         }
@@ -517,7 +518,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of flightDistanceOfDaughterErr function must be integer!");
           return nullptr;
         }
@@ -525,9 +526,9 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter =  particle->getDaughter(daughterNumber);
           double flightDistanceErr = 0.0;
           if (grandDaughterNumber > -1)
@@ -540,7 +541,7 @@ namespace Belle2 {
             getFlightInfoBtw(particle, daughter, flightDistanceErr, "distance");
             return flightDistanceErr;
           };
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
         }; // Lambda function END
         return func;
       }
@@ -555,7 +556,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of vertexDistanceOfDaughter function must be integer!");
           return nullptr;
         }
@@ -566,11 +567,11 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter = particle->getDaughter(daughterNumber);
-          double vertexDistanceErr = -999;
+          double vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
           return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
         }; // Lambda function END
         return func;
@@ -586,7 +587,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of vertexDistanceOfDaughterErr function must be integer!");
           return nullptr;
         }
@@ -597,11 +598,11 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter = particle->getDaughter(daughterNumber);
-          double vertexDistanceErr = -999;
+          double vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
           getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP);
           return vertexDistanceErr;
         }; // Lambda function END
@@ -618,7 +619,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of vertexDistanceOfDaughterSignificance function must be integer!");
           return nullptr;
         }
@@ -629,9 +630,9 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, prodVertIsIP](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) && particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle* daughter = particle->getDaughter(daughterNumber);
           double vertexDistanceErr = 0.0;
           return getVertexDistance(particle, daughter, vertexDistanceErr, prodVertIsIP) / vertexDistanceErr;
@@ -646,12 +647,12 @@ namespace Belle2 {
     double mcFlightDistance(const Particle* particle)
     {
       if (particle == nullptr)
-        return -999; // Initial particle is NULL
+        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
       const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
 
       if (mcparticle == nullptr)
-        return -99; // Initial particle is NULL
+        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
       return getMCFlightInfoBtw(mcparticle, "distance");
     }
@@ -659,12 +660,12 @@ namespace Belle2 {
     double mcFlightTime(const Particle* particle)
     {
       if (particle == nullptr)
-        return -999; // Initial particle is NULL
+        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
       const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
 
       if (mcparticle == nullptr)
-        return -99; // Initial particle is NULL
+        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
 
       return getMCFlightInfoBtw(mcparticle, "time");
@@ -677,7 +678,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of mcFlightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
@@ -685,7 +686,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of mcFlightDistanceOfDaughter function must be integer!");
           return nullptr;
         }
@@ -693,14 +694,14 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is NULL
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
           if (daughterNumber >= int(particle->getNDaughters()) || !particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
           const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
 
-          double flightDistanceMC =  -99;
+          double flightDistanceMC =  std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
             // Compute value between mother and granddaughter
@@ -728,7 +729,7 @@ namespace Belle2 {
       if (arguments.size() == 1 || arguments.size() == 2) {
         try {
           daughterNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("First argument of flightTimeOfDaughter function must be integer!");
           return nullptr;
         }
@@ -736,7 +737,7 @@ namespace Belle2 {
       if (arguments.size() == 2) {
         try {
           grandDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (boost::bad_lexical_cast&) {
+        } catch (std::invalid_argument&) {
           B2WARNING("Second argument of mcFlightTimeOfDaughter function must be integer!");
           return nullptr;
         }
@@ -744,15 +745,15 @@ namespace Belle2 {
       if (daughterNumber > -1) {
         auto func = [daughterNumber, grandDaughterNumber](const Particle * particle) -> double {
           if (particle == nullptr)
-            return -999; // Initial particle is nullptr
+            return std::numeric_limits<float>::quiet_NaN(); // Initial particle is nullptr
           if (daughterNumber >= int(particle->getNDaughters()) || !particle->getDaughter(daughterNumber))
-            return -999; // Daughter number or daughters are inconsistent
+            return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
           const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
           // daughter MOMENTUM
 
-          double flightTimeMC = -99;
+          double flightTimeMC = std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
             const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
@@ -800,19 +801,19 @@ namespace Belle2 {
                       "Returns the MC flight time between mother and daughter particle using generated info");
     //Vertex Distance
     REGISTER_VARIABLE("vertexDistance", vertexDistance,
-                      "Returns the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+                      "Returns the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceErr", vertexDistanceErr,
-                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns -999 if particle has no production or decay vertex.");
+                      "Returns the uncertainty on the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.");
     REGISTER_VARIABLE("vertexDistanceSignificance", vertexDistanceSignificance,
                       "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
     REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN, option = '')", vertexDistanceOfDaughter,
                       "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
-                      "Returns -999 in case anything goes wrong.");
+                      "Returns NaN in case anything goes wrong.");
     REGISTER_VARIABLE("vertexDistanceOfDaughterErr(daughterN, option = '')", vertexDistanceOfDaughterErr,
                       "If any second argument is provided it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
-                      "Returns -999 in case anything goes wrong.");
+                      "Returns NaN in case anything goes wrong.");
     REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN, option = '')", vertexDistanceOfDaughterSignificance,
                       "If any second argument is provided it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
                       "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.");

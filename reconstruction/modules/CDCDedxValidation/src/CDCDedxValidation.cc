@@ -105,6 +105,7 @@ void CDCDedxValidationModule::event()
       continue;
     }
 
+    if (dedxTrack->getNLayerHits() <= 20) continue;
 
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
     if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
@@ -375,9 +376,9 @@ void CDCDedxValidationModule::ExtractHistograms(TString level = "exit")
 
     Double_t mean = 0., meanError = 0.;
     Double_t sigma = 0., sigmaError = 0.;
-    Int_t fitStatus = -1;
 
     if (hdEdx_PR[fiRun]->GetEntries() > 100) {
+      Int_t fitStatus = -1;
       fitStatus = hdEdx_PR[fiRun]->Fit("gaus", "Q"); //Q = No printing
       if (fitStatus == 0) {
         TF1* fit = (TF1*)hdEdx_PR[fiRun]->GetFunction("gaus");

@@ -13,16 +13,15 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
 #include <TF1.h>
-#include <TH2F.h>
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
+#include <TFile.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -47,6 +46,13 @@ namespace Belle2 {
     void endRun(void) override final;
     void terminate(void) override final;
 
+    /**
+     * Get histogram by its name.
+     * @param histoname The name of the histogram.
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
+    TH1* GetHisto(TString histoname);
+
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
@@ -56,6 +62,10 @@ namespace Belle2 {
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
+    //! fit range before peak
+    double m_peakBefore;
+    //! fit range after peak
+    double m_peakAfter;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -68,8 +78,18 @@ namespace Belle2 {
     TGraphErrors* m_gCharge = nullptr;
     //! Final Canvas
     TCanvas* m_cCharge = nullptr;
+    //! Final Canvases for Fit and Ref
+    std::map<VxdID, TCanvas*> m_cChargeMod {};
 
     TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
+
+    /** Reference Histogram Root file name */
+    std::string m_refFileName;
+    /** The pointer to the reference file */
+    TFile* m_refFile = nullptr;
+    /** Whether to use the color code for warnings and errors. */
+    bool m_color = true;
+
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation
     std::vector <chid> mychid;

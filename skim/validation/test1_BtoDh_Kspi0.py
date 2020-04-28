@@ -9,43 +9,46 @@
     <interval>nightly</interval>
 </header>
 """
-__author__ = "N. Rout"
+__author__ = [
+    "N Dash",
+    "N. Rout"
+]
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi
-from stdCharged import stdK
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
 from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+import skimExpertFunctions as expert
 
 
-kspi0 = Path()
+path = b2.Path()
 
-skimCode = encodeSkimName('BtoDh_Kspi0')
+skimCode = expert.encodeSkimName('BtoD0h_Kspi0')
 
 fileList = ['../BtoDh_Kspi0.dst.root']
 
-inputMdstList('default', fileList, path=kspi0)
+ma.inputMdstList('default', fileList, path=path)
 
 # Load particle lists
-stdPi('all', path=kspi0)
-stdK('all', path=kspi0)
-loadStdSkimPi0(path=kspi0)
-stdKshorts(path=kspi0)
+stdPi('all', path=path)
+stdK('all', path=path)
+loadStdSkimPi0(path=path)
+stdKshorts(path=path)
 
 
 # Kspi0 skim
-from skim.btocharm import loadDkspi0, BsigToDhToKspi0List
-loadDkspi0(path=kspi0)
-BtoDhList = BsigToDhToKspi0List(path=kspi0)
-skimOutputUdst(skimCode, BtoDhList, path=kspi0)
-summaryOfLists(BtoDhList, path=kspi0)
+from skim.btocharm import BsigToD0hToKspi0List
+from skim.standardlists.charm import loadD0_Kspi0_loose
+
+loadD0_Kspi0_loose(path=path)
+BtoDhList = BsigToD0hToKspi0List(path=path)
+expert.skimOutputUdst(skimCode, BtoDhList, path=path)
+ma.summaryOfLists(BtoDhList, path=path)
 
 # Suppress noisy modules, and then process
-setSkimLogging()
-process(kspi0)
+expert.setSkimLogging(path)
+b2.process(path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

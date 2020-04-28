@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <limits>
 
 namespace Belle2 {
   class RecoTrack;

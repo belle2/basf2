@@ -22,15 +22,17 @@
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
 #include <display/EveVisBField.h>
+#include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <bklm/dataobjects/BKLMSimHitPosition.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -64,7 +66,6 @@
 #include <TEveTrackPropagator.h>
 #include <TGeoEltu.h>
 #include <TGeoMatrix.h>
-#include <TGeoNode.h>
 #include <TGeoManager.h>
 #include <TGeoSphere.h>
 #include <TGeoTube.h>
@@ -248,6 +249,90 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
   track_lines->AddElement(lines);
   addToGroup(collectionName, track_lines);
   addObject(&recoTrack, track_lines);
+}
+
+void EVEVisualization::addTrackCandidateImproved(const std::string& collectionName,
+                                                 const RecoTrack& recoTrack)
+{
+  const TString label = ObjectInfo::getIdentifier(&recoTrack);
+  // parse the option string ------------------------------------------------------------------------
+  bool drawHits = false;
+
+  if (m_options != "") {
+    for (size_t i = 0; i < m_options.length(); i++) {
+      if (m_options.at(i) == 'H') drawHits = true;
+    }
+  }
+  // finished parsing the option string -------------------------------------------------------------
+
+  // Create a track as a polyline through reconstructed points
+  // FIXME this is snatched from PrimitivePlotter, need to add extrapolation out of CDC
+  TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
+  std::vector<TVector3> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
+  track->SetName(label); //popup label set at end of function
+  track->SetLineColor(c_recoTrackColor);
+  track->SetLineWidth(3);
+  track->SetTitle(ObjectInfo::getTitle(&recoTrack));
+  track->SetSmooth(true);
+
+  for (auto recoHit : recoTrack.getRecoHitInformations()) {
+    // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
+    if (!recoHit->useInFit())
+      continue;
+
+    TVector3 pos;
+    TVector3 mom;
+    TMatrixDSym cov;
+
+    try {
+      const auto* trackPoint = recoTrack.getCreatedTrackPoint(recoHit);
+      const auto* fittedResult = trackPoint->getFitterInfo();
+      if (not fittedResult) {
+        B2WARNING("Skipping unfitted track point");
+        continue;
+      }
+      const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
+      state.getPosMomCov(pos, mom, cov);
+    } catch (const genfit::Exception&) {
+      B2WARNING("Skipping state with strange pos, mom or cov");
+      continue;
+    }
+
+    posPoints.push_back(TVector3(pos.X(), pos.Y(), pos.Z()));
+  }
+
+  sort(posPoints.begin(), posPoints.end(),
+  [](const TVector3 & a, const TVector3 & b) -> bool {
+    return a.X() * a.X() + a.Y() * a.Y() > b.X() * b.X() + b.Y() * b.Y();
+  });
+  for (auto vec : posPoints) {
+    track->SetNextPoint(vec.X(), vec.Y(), vec.Z());
+  }
+  // add corresponding hits     ---------------------------------------------------------------------
+  TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
+  lines->SetMainColor(c_recoTrackColor);
+  lines->SetMarkerColor(c_recoTrackColor);
+  lines->SetMarkerStyle(6);
+  lines->SetMainTransparency(60);
+
+  if (drawHits) {
+    // Loop over all hits in the track (three different types)
+    for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
+      addRecoHit(pxdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
+      addRecoHit(svdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
+      addRecoHit(cdcHit, lines);
+    }
+  }
+
+  track->AddElement(lines);
+  addToGroup(collectionName, track);
+  addObject(&recoTrack, track);
 }
 
 void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
@@ -1405,7 +1490,7 @@ void EVEVisualization::addBKLMHit2d(const BKLMHit2d* bklm2dhit)
 {
   //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->isForward(), bklm2dhit->getSector(), bklm2dhit->getLayer());
+  const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
   CLHEP::Hep3Vector global;
   //+++ global coordinates of the hit
@@ -1588,7 +1673,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   }
 }
 
-void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   TEveStraightLineSet* shape = new TEveStraightLineSet();
@@ -1675,7 +1760,7 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
   shape->SetTitle(ObjectInfo::getTitle(hit) +
                   TString::Format("\nPriority: %d\nLeft/Right: %d",
                                   hit->getPriorityPosition(), hit->getLeftRight()));
-  addToGroup("CDCTriggerSegmentHits", shape);
+  addToGroup(collectionName, shape);
   addObject(hit, shape);
 }
 

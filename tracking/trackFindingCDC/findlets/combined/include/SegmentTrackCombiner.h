@@ -33,8 +33,6 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCTrack;
-    class CDCSegment2D;
 
     // Guard to prevent repeated instantiations
     extern template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;
@@ -101,7 +99,7 @@ namespace Belle2 {
       /// Findlet for normalizing the tracks
       TrackNormalizer m_trackNormalizer;
 
-      // Object pools
+      /// Object pools
       std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>> m_relations;
     };
   }

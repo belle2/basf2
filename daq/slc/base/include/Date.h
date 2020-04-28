@@ -2,7 +2,6 @@
 #define _Belle2_Date_hh
 
 #include <time.h>
-#include <string>
 
 namespace Belle2 {
 

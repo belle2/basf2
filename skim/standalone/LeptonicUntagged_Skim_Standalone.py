@@ -8,53 +8,35 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import stdKshorts
-from skim.standardlists.charm import *
-from skimExpertFunctions import *
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
-gb2_setuprel = 'release-03-00-03'
-skimCode = encodeSkimName('LeptonicUntagged')
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdE, stdMu
+import skimExpertFunctions as expert
 
-fileList = get_test_file("mixedBGx1", "MC11")
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('LeptonicUntagged')
 
-leppath = Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-inputMdstList('default', fileList, path=leppath)
+leppath = b2.Path()
 
-loadStdSkimPi0(path=leppath)
-loadStdSkimPhoton(path=leppath)
-stdPi('loose', path=leppath)
-stdK('loose', path=leppath)
-stdPi('all', path=leppath)
+ma.inputMdstList('default', fileList, path=leppath)
+
 stdE('all', path=leppath)
 stdMu('all', path=leppath)
-stdPi0s('loose', path=leppath)  # for stdCharm.py
-stdPhotons('loose', path=leppath)
-stdKshorts(path=leppath)
-
-loadStdD0(path=leppath)
-loadStdDplus(path=leppath)
-loadStdDstar0(path=leppath)
-loadStdDstarPlus(path=leppath)
 
 # SL Skim
 from skim.leptonic import LeptonicList
 
 lepList = LeptonicList(path=leppath)
-skimOutputUdst(skimCode, lepList, path=leppath)
+expert.skimOutputUdst(skimCode, lepList, path=leppath)
 
-summaryOfLists(lepList, path=leppath)
+ma.summaryOfLists(lepList, path=leppath)
 
 
-setSkimLogging(path=leppath)
-process(leppath)
+expert.setSkimLogging(path=leppath)
+b2.process(leppath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

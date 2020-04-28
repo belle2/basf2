@@ -43,7 +43,7 @@ void CDCDedxSkimCDSTModule::initialize()
   //  m_selector.inheritAllRelations();
 
   // build a map to relate input strings to the right particle type
-  std::map<std::string, std::string> pdgMap = {{"pi+", "211"}, {"K+", "321"}, {"mu+", "13"}, {"e+", "11"}, {"p+", "2212"}, {"deuteron", "1000010020"}};
+  // std::map<std::string, std::string> pdgMap = {{"pi+", "211"}, {"K+", "321"}, {"mu+", "13"}, {"e+", "11"}, {"p+", "2212"}, {"deuteron", "1000010020"}};
 
 }
 

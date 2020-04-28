@@ -43,13 +43,13 @@ namespace Belle2 {
       /// and set m_DBPtrIsValidForCurrentRun accordingly.
       void checkIfDBObjPtrIsValid();
 
-      /// Check if value >= range.first and value <= range.second
-      /// If range.second == -1, then check only if value >= range.first
+      /** Check if value >= range.first and value <= range.second
+        If range.second == -1, then check only if value >= range.first */
       template <typename T>
       bool isInRange(const T& value, const std::pair<T, T>& range) const;
 
-      /// Check if value <= upper_value
-      /// If upper_value == -1, then return true
+      /** Check if value <= upper_value
+       If upper_value == -1, then return true */
       template <typename T>
       bool isLessThanOrEqualTo(const T& value, const T& upper_value) const;
 

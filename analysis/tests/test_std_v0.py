@@ -14,9 +14,14 @@ class TestStdV0(unittest.TestCase):
             std_function=stdV0s.stdKshorts,
             expected_modules=[
                 "ParticleLoader",
-                "ParticleVertexFitter",
-                "ParticleSelector"],
-            expected_lists=['all']):
+                "TreeFitter",
+                "ParticleSelector",
+                "ParticleLoader",
+                "ParticleCombiner",
+                "TreeFitter",
+                "ParticleSelector",
+                "ParticleListManipulator"],
+            expected_lists=['V0', 'all', 'RD', 'merged']):
         """check that a given function works"""
         testpath = create_path()
         std_function(path=testpath)
@@ -54,42 +59,30 @@ class TestStdV0(unittest.TestCase):
         """check that the builder function works with the stdKshorts list"""
         self._check_list()
 
-    def test_mergedkshorts_list(self):
-        """check that the builder function works with the merged Kshorts list"""
-        expected_modules = [
-            "ParticleLoader",
-            "ParticleLoader",
-            "ParticleCombiner",
-            "ParticleListManipulator",
-            "ParticleVertexFitter",
-            "DuplicateVertexMarker",
-            "ParticleSelector"]
-        expected_lists = ['V0', 'all', 'RD', 'merged']
-        self._check_list(std_function=stdV0s.mergedKshorts, expected_modules=expected_modules, expected_lists=expected_lists)
-
     def test_belle_list(self):
         """check that the builder function works with the legacy Belle Kshorts list"""
-        self._check_list(std_function=stdV0s.goodBelleKshort, expected_lists=["legacyGoodKS"])
+        expected_modules = ["ParticleLoader",
+                            "ParticleVertexFitter",
+                            "ParticleSelector"]
+        self._check_list(std_function=stdV0s.goodBelleKshort, expected_modules=expected_modules, expected_lists=["legacyGoodKS"])
 
     def test_stdlambdas_list(self):
         """check that the builder function works with the stdLambdas list"""
-        expected_modules = ["ParticleLoader", "ParticleVertexFitter", "ParticleSelector"]
-        expected_lists = ['all']
-        self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
-
-    def test_mergedlambdas_list(self):
-        """check that the builder function works with the merged Lambdas list"""
-        expected_modules = [
-            "ParticleLoader",
-            "ParticleLoader",
-            "ParticleLoader",
-            "ParticleCombiner",
-            "ParticleListManipulator",
-            "ParticleVertexFitter",
-            "DuplicateVertexMarker",
-            "ParticleSelector"]
+        expected_modules = ["ParticleLoader",
+                            "TreeFitter",
+                            "ParticleSelector",
+                            "DuplicateVertexMarker",
+                            "ParticleSelector",
+                            "ParticleLoader",
+                            "ParticleLoader",
+                            "ParticleCombiner",
+                            "TreeFitter",
+                            "ParticleSelector",
+                            "DuplicateVertexMarker",
+                            "ParticleSelector",
+                            "ParticleListManipulator"]
         expected_lists = ['V0', 'all', 'all', 'RD', 'merged']
-        self._check_list(std_function=stdV0s.mergedLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
+        self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
 
 
 if __name__ == '__main__':

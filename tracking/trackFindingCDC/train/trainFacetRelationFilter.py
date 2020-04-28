@@ -36,8 +36,10 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
         return "trackfindingcdc_FacetRelationFilter.xml"
 
     def create_path(self):
+        """Setup the recording path after the simulation"""
         path = super().create_path()
 
+        #: Post-process events according to the user's desired task (train, eval, explore)
         if self.task == "train":
             var_sets = [
                 "mva",
@@ -76,7 +78,7 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 "filter(truth)",
             ]
 
-            # Signal some variables to select in the classification analysis
+            #: Signal some variables to select in the classification analysis
             # self.variables = None #all variables
             self.variables = [
                 # "delta_phi",
@@ -131,7 +133,9 @@ class FacetRelationFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRu
                 # "abs_curv_proper",
             ]
 
+            #: group output by superlayer_id
             self.groupby = ["", "superlayer_id"]
+            #: auxiliary histograms
             self.auxiliaries = [
                 "superlayer_id",
             ]

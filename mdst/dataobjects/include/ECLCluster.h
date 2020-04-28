@@ -14,7 +14,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TLorentzVector.h>
 #include <TMatrixDSym.h>
 
 #include <cmath>
@@ -53,6 +52,11 @@ namespace Belle2 {
       c_TriggerClusterMatching = 1 << 1,
       /** bit 2: ECLCluster has pulse shape discrimination variables.*/
       c_PulseShapeDiscrimination = 1 << 2,
+      /** bit 3: ECLCluster has fit time that failed.*/
+      c_fitTimeFailed = 1 << 3,
+      /** bit 4: ECLCluster has time resolution calculation that failed.*/
+      c_timeResolutionFailed = 1 << 4,
+
     };
 
     /**
@@ -63,6 +67,7 @@ namespace Belle2 {
       m_isTrack(false),
       m_status(0),
       m_hypotheses(static_cast<unsigned short>(EHypothesisBit::c_nPhotons)), // set to c_nPhotons for b2bii
+      m_maxECellId(0),
       m_connectedRegionId(0),
       m_clusterId(0),
       m_sqrtcovmat_00(0.),
@@ -127,6 +132,9 @@ namespace Belle2 {
 
      */
     void removeHypothesis(EHypothesisBit bitmask) { m_hypotheses &= (~static_cast<short unsigned>(bitmask)); }
+
+    /** Set cellID of maximum energy crystal */
+    void setMaxECellId(unsigned short cellid) {m_maxECellId = cellid;}
 
     /** Set connected region id. */
     void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
@@ -233,6 +241,9 @@ namespace Belle2 {
 
     /** Return hypothesis (expert only, this returns a bti pattern). */
     unsigned short getHypotheses() const {return m_hypotheses;}
+
+    /** Return cellID of maximum energy crystal */
+    unsigned short getMaxECellId() const {return m_maxECellId;}
 
     /** Return connected region id. */
     int getConnectedRegionId() const {return m_connectedRegionId;}
@@ -358,6 +369,13 @@ namespace Belle2 {
     /** Check if ECLCluster has any ECLDigits with waveforms that also passed two component fit chi2 threshold in eclClusterPSD module. */
     bool hasPulseShapeDiscrimination() const {return hasStatus(EStatusBit::c_PulseShapeDiscrimination);}
 
+    /** Check if ECLCluster has a fit time that failed. */
+    bool hasFailedFitTime() const {return hasStatus(EStatusBit::c_fitTimeFailed);}
+
+    /** Check if ECLCluster has a time resolution calculation that failed. */
+    bool hasFailedTimeResolution() const {return hasStatus(EStatusBit::c_timeResolutionFailed);}
+
+
   private:
 
     /** Is related to track (true) or not (false). */
@@ -368,6 +386,9 @@ namespace Belle2 {
 
     /** Hypothesis. */
     unsigned short m_hypotheses;
+
+    /** CellID of maximum energy crystal */
+    unsigned short m_maxECellId;
 
     /** Connected Region of this cluster. */
     int m_connectedRegionId;
@@ -462,7 +483,8 @@ namespace Belle2 {
     Double32_t m_NumberOfHadronDigits;  //[0, 255, 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 13);
+    ClassDef(ECLCluster, 14);
+    // 14: Added m_maxECellId
     // 13: Added m_hypotheses
     // 12: Added m_PulseShapeDiscriminationMVA. Indicated that m_ClusterHadronIntensity will be removed in release-04.
     // 11: Added m_ClusterHadronIntensity an m_NumberOfHadronDigits variables

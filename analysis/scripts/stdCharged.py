@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2ERROR
+from modularAnalysis import fillParticleList
 
 
 # define arrays to interpret cut matrix
@@ -11,6 +11,7 @@ _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
+_mostLikelyList = 'mostlikely'
 
 
 def _stdChargedEffCuts(particletype, listtype):
@@ -34,13 +35,14 @@ def _stdChargedEffCuts(particletype, listtype):
     return effcuts[particleindex][effindex]
 
 
-def stdCharged(particletype, listtype, path=analysis_main):
+def stdCharged(particletype, listtype, path):
     """
     Function to prepare one of several standardized types of charged particle lists:
       - 'all' with no cuts on track
       - 'good' high purity lists for data studies
       - 'loose' loose selections for skimming
       - 'higheff' high efficiency list with loose global ID cut for data studies
+      - 'mostlikely' list with the highest PID likelihood
     Also the following lists, which may or may not be available depending on the release
       - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
       - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
@@ -54,7 +56,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 
     # basic quality cut strings
     trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
-    ipCut = 'd0 < 0.5 and abs(z0) < 2'
+    ipCut = 'dr < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 
     if particletype not in _chargednames:
@@ -103,7 +105,7 @@ def stdCharged(particletype, listtype, path=analysis_main):
 ###
 
 
-def stdPi(listtype=_defaultlist, path=analysis_main):
+def stdPi(listtype=_defaultlist, path=None):
     """
     Function to prepare standard pion lists, refer to stdCharged for details
 
@@ -113,7 +115,7 @@ def stdPi(listtype=_defaultlist, path=analysis_main):
     stdCharged('pi', listtype, path)
 
 
-def stdK(listtype=_defaultlist, path=analysis_main):
+def stdK(listtype=_defaultlist, path=None):
     """
     Function to prepare standard kaon lists, refer to stdCharged for details
 
@@ -123,7 +125,7 @@ def stdK(listtype=_defaultlist, path=analysis_main):
     stdCharged('K', listtype, path)
 
 
-def stdPr(listtype=_defaultlist, path=analysis_main):
+def stdPr(listtype=_defaultlist, path=None):
     """
     Function to prepare standard proton lists, refer to stdCharged for details
 
@@ -133,7 +135,7 @@ def stdPr(listtype=_defaultlist, path=analysis_main):
     stdCharged('p', listtype, path)
 
 
-def stdE(listtype=_defaultlist, path=analysis_main):
+def stdE(listtype=_defaultlist, path=None):
     """
     Function to prepare standard electron lists, refer to stdCharged for details
 
@@ -143,7 +145,7 @@ def stdE(listtype=_defaultlist, path=analysis_main):
     stdCharged('e', listtype, path)
 
 
-def stdMu(listtype=_defaultlist, path=analysis_main):
+def stdMu(listtype=_defaultlist, path=None):
     """
     Function to prepare standard muon lists, refer to stdCharged for details
 
@@ -151,3 +153,21 @@ def stdMu(listtype=_defaultlist, path=analysis_main):
     @param path         modules are added to this path
     """
     stdCharged('mu', listtype, path)
+
+
+def stdMostLikely(pidPriors=None, path=None):
+    """
+    Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
+
+    @param path         modules are added to this path
+    """
+    # Here we need basic track quality cuts to be applied,
+    # otherwise, we get a lot of badly reconstructed particles,
+    # which will end up filled as a random type
+    args = ''
+    if pidPriors is not None:
+        args = str(pidPriors)[1:-1]  # remove brackets
+    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    for name in _chargednames:
+        fillParticleList('%s+:%s' % (name, _mostLikelyList),
+                         'pidIsMostLikely(%s) > 0 and %s' % (args, trackQuality), True, path=path)

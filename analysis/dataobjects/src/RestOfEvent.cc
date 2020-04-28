@@ -21,7 +21,6 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TLorentzVector.h>
-#include <iostream>
 
 using namespace Belle2;
 // New methods:
@@ -33,7 +32,7 @@ void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAd
     for (auto* daughter : daughters) {
       bool toAdd = true;
       for (auto& myIndex : m_particleIndices) {
-        if (compareParticles(allParticles[myIndex], daughter)) {
+        if (allParticles[myIndex]->isCopyOf(daughter, true)) {
           toAdd = false;
           break;
         }
@@ -44,44 +43,6 @@ void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAd
       }
     }
   }
-}
-bool RestOfEvent::compareParticles(const Particle* roeParticle, const Particle* toAddParticle)
-{
-  if (roeParticle->isCopyOf(toAddParticle)) {
-    return true;
-  }
-  if (roeParticle->getParticleType() != toAddParticle->getParticleType()) {
-    return false;
-  }
-  if (roeParticle->getTrack() && toAddParticle->getTrack() &&
-      roeParticle->getTrack()->getArrayIndex() != toAddParticle->getTrack()->getArrayIndex()) {
-    return false;
-  }
-  if (roeParticle->getKLMCluster() && toAddParticle->getKLMCluster()
-      && roeParticle->getKLMCluster()->getArrayIndex() != toAddParticle->getKLMCluster()->getArrayIndex()) {
-    return false;
-  }
-
-  // It can be a bit more complicated for ECLClusters as we might also have to ensure they are connected-region unique
-  if (roeParticle->getECLCluster() && toAddParticle->getECLCluster()
-      && roeParticle->getECLCluster()->getArrayIndex() != toAddParticle->getECLCluster()->getArrayIndex()) {
-
-    // if either is a track then they must be different
-    if (roeParticle->getECLCluster()->isTrack() or toAddParticle->getECLCluster()->isTrack())
-      return false;
-
-    // we cannot combine two particles of different hypotheses from the same
-    // connected region (as their energies overlap)
-    if (roeParticle->getECLClusterEHypothesisBit() == toAddParticle->getECLClusterEHypothesisBit())
-      return false;
-
-    // in the rare case that both are neutral and the hypotheses are different,
-    // we must also check that they are from different connected regions
-    // otherwise they come from the "same" underlying ECLShower
-    if (roeParticle->getECLCluster()->getConnectedRegionId() != toAddParticle->getECLCluster()->getConnectedRegionId())
-      return false;
-  }
-  return true;
 }
 
 std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskName, bool unpackComposite) const
@@ -262,7 +223,7 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
   for (auto* maskParticle : allROEParticles) {
     bool toKeep = true;
     for (auto* daughterV0 : daughtersV0) {
-      if (compareParticles(daughterV0, maskParticle)) {
+      if (daughterV0->isCopyOf(maskParticle, true)) {
         toKeep = false;
       }
     }
@@ -391,28 +352,6 @@ int RestOfEvent::getNKLMClusters(const std::string& maskName) const
   int nROEKLMClusters = getKLMClusters(maskName).size();
   return nROEKLMClusters;
 }
-void RestOfEvent::updateChargedStableFractions(const std::string& maskName, std::vector<double>& fractions)
-{
-  Mask* mask = findMask(maskName);
-  if (!mask) {
-    B2FATAL("No " << maskName << " mask defined in current ROE!");
-  }
-  if (fractions.size() != Const::ChargedStable::c_SetSize) {
-    B2WARNING("Charged stable fractions have incorrect size of array!");
-  }
-  mask->setChargedStableFractions(fractions);
-}
-std::vector<double> RestOfEvent::getChargedStableFractions(const std::string& maskName) const
-{
-  std::vector<double> maskFractions = {0, 0, 1, 0, 0, 0};
-  for (auto& mask : m_masks) {
-    if (mask.getName() == maskName && maskFractions.size() == Const::ChargedStable::c_SetSize) {
-      maskFractions = mask.getChargedStableFractions();
-    }
-  }
-  return maskFractions;
-}
-
 //
 // Old methods:
 //
@@ -427,9 +366,9 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
   //std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
   //for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
   //  roe4VectorTracks += particles[v0List[iV0]]->get4Vector();
-  //const unsigned int n = Const::ChargedStable::c_SetSize;
-  auto fractions = getChargedStableFractions(maskName);
-  //double fractions[n] = {0,0,1,0,0,0};
+  const unsigned int n = Const::ChargedStable::c_SetSize;
+  //auto fractions = getChargedStableFractions(maskName);
+  double fractions[n] = {0, 0, 1, 0, 0, 0};
   //fillFractions(fractions, maskName);
 
   // Add momenta from other tracks
@@ -458,7 +397,6 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
 
     // PID for Belle
     //////////////////////////////////////////
-    double pidChoice = Const::pion.getPDGCode();
     // Set variables
     Const::PIDDetectorSet set = Const::ECL;
     double eIDBelle = pid->getProbability(Const::electron, Const::pion, set);
@@ -468,6 +406,7 @@ TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
     double atcPIDBelle_Kpi = atcPIDBelleKpiFromPID(pid);
 
     // Check for leptons, else kaons or pions
+    double pidChoice;
     if (eIDBelle > 0.9 and eIDBelle > muIDBelle)
       pidChoice = Const::electron.getPDGCode();
     else if (muIDBelle > 0.9 and eIDBelle < muIDBelle)
@@ -529,7 +468,7 @@ TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& mask
 bool RestOfEvent::isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const
 {
   for (auto* listParticle : particlesToUpdate) {
-    if (compareParticles(roeParticle, listParticle)) {
+    if (roeParticle->isCopyOf(listParticle, true)) {
       return true;
     }
   }
@@ -569,6 +508,32 @@ void RestOfEvent::printIndices(const std::set<int>& indices) const
     printout += std::to_string(index) +  ", ";
   }
   B2INFO(printout);
+}
+
+Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)
+{
+  StoreArray<Particle> particles;
+  std::set<int> source;
+  if (maskName == "") {
+    // if no mask provided work with internal source
+    source = m_particleIndices;
+  } else {
+    bool maskFound = false;
+    for (auto& mask : m_masks) {
+      if (mask.getName() == maskName) {
+        maskFound = true;
+        source = mask.getParticles();
+        break;
+      }
+    }
+    if (!maskFound) {
+      B2FATAL("No " << maskName << " mask defined in current ROE!");
+    }
+  }
+  int particlePDG = (pdgCode == 0) ? getPDGCode() : pdgCode;
+  auto isFlavored = (isSelfConjugated) ? Particle::EFlavorType::c_Unflavored : Particle::EFlavorType::c_Flavored;
+  return particles.appendNew(get4Vector(maskName), particlePDG, isFlavored, std::vector(source.begin(),
+                             source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 
 double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const

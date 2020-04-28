@@ -8,8 +8,11 @@
 
 #include <daq/dqm/modules/DqmHistoManagerModule.h>
 
+#include <framework/core/Environment.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/RbTuple.h>
 
+#include "TKey.h"
 #include "TText.h"
 
 using namespace Belle2;
@@ -146,8 +149,8 @@ void DqmHistoManagerModule::event()
   }
   // Dump histograms to file
   if ((ctime - m_dtime) > m_dumpinterval) {
-    // Dump histograms to file
-    RbTupleManager::Instance().dump();
+    // Dump histograms to file  -> Turned Off
+    //    RbTupleManager::Instance().dump();
     m_dtime = ctime;
   }
 
@@ -173,14 +176,14 @@ void DqmHistoManagerModule::terminate()
     (msg->header())->reserved[1] = m_nobjs;
     (msg->header())->reserved[2] = 0;
 
-    m_sock->send(msg);
+    //m_sock->send(msg);
 
     delete(msg);
 
-    // Dump hitograms to file
-    RbTupleManager::Instance().dump();
+    // Dump hitograms to file  -> Turned Off (
+    //    RbTupleManager::Instance().dump();
 
-    //    RbTupleManager::Instance().terminate();
+    //    RbTupleManager::Instance().terminate(); <- not used
     //    delete m_sock;
     //    delete m_msg;
   }

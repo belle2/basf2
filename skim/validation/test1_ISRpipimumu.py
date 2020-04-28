@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+    <input>../ISRpipimumu.dst.root</input>
+    <output>../ISRpipimumu.udst.root</output>
+    <contact>jiasen@buaa.edu.cn</contact>
+    <interval>nightly</interval>
+</header>
+"""
+
 __author__ = "S. Jia"
 
-import sys
-import glob
-import os.path
 
-from basf2 import *
-from modularAnalysis import *
-from analysisPath import analysis_main
-from beamparameters import add_beamparameters
-from skimExpertFunctions import *
-from stdCharged import stdPi, stdK, stdE, stdMu
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
+from stdCharged import stdE, stdK, stdMu, stdPi
 
 # create a new path
-ISRskimpath = Path()
+ISRskimpath = b2.Path()
 
 fileList = ['../ISRpipimumu.dst.root']
 
-inputMdstList('default', fileList, path=ISRskimpath)
+ma.inputMdstList('default', fileList, path=ISRskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=ISRskimpath)
@@ -36,16 +40,16 @@ from skim.quarkonium import ISRpipiccList
 ISRpipicc = ISRpipiccList(path=ISRskimpath)
 
 # output to Udst file
-skimOutputUdst('../ISRpipimumu.udst.root', ISRpipicc, path=ISRskimpath)
+expert.skimOutputUdst('../ISRpipimumu.udst.root', ISRpipicc, path=ISRskimpath)
 
 # print out Particle List statistics
-summaryOfLists(ISRpipicc, path=ISRskimpath)
+ma.summaryOfLists(ISRpipicc, path=ISRskimpath)
 
 # output skim log information
-setSkimLogging(path=ISRskimpath)
+expert.setSkimLogging(path=ISRskimpath)
 
 # process the path
-process(ISRskimpath)
+b2.process(ISRskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

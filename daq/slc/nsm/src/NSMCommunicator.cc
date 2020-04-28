@@ -1,12 +1,9 @@
 #include "daq/slc/nsm/NSMCommunicator.h"
 
-#include <daq/slc/system/LogFile.h>
-#include <daq/slc/runcontrol/RCCommand.h>
-
+#include <daq/slc/base/TimeoutException.h>
 #include <daq/slc/nsm/NSMCallback.h>
-
-#include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/Date.h>
+#include <daq/slc/nsm/NSMHandlerException.h>
+#include <daq/slc/nsm/NSMNotConnectedException.h>
 
 extern "C" {
 #include <nsm2/nsm2.h>
@@ -14,17 +11,16 @@ extern "C" {
 #include <nsm2/belle2nsm.h>
 }
 
-#include <iostream>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
-#include <unistd.h>
 #include <sys/select.h>
 #include <errno.h>
 
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <daq/slc/system/LockGuard.h>
 
 #define NSM_DEBUGMODE 1
 
@@ -40,7 +36,7 @@ NSMCommunicator& NSMCommunicator::select(double usec)
   int ret;
   FD_ZERO(&fds);
   int highest = 0;
-  g_mutex_select.lock();
+  LockGuard lockGuard(g_mutex_select);
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
     NSMCommunicator& com(*(*it));
@@ -63,7 +59,6 @@ NSMCommunicator& NSMCommunicator::select(double usec)
     if (ret != -1 || (errno != EINTR && errno != EAGAIN)) break;
   }
   if (ret < 0) {
-    g_mutex_select.unlock();
     throw (NSMHandlerException("Failed to select"));
   }
   for (NSMCommunicatorList::iterator it = g_comm.begin();
@@ -74,12 +69,10 @@ NSMCommunicator& NSMCommunicator::select(double usec)
         com.m_message.read(com.m_nsmc);
         com.m_message.setRequestName();
         b2nsm_context(com.m_nsmc);
-        g_mutex_select.unlock();
         return com;
       }
     }
   }
-  g_mutex_select.unlock();
   throw (TimeoutException("NSMCommunicator::select was timed out"));
 }
 
@@ -98,7 +91,7 @@ bool NSMCommunicator::send(const NSMMessage& msg)
   bool sent = false;
   bool alive = false;
 #if NSM_PACKAGE_VERSION >= 1914
-  g_mutex.lock();
+  LockGuard lockGuard(g_mutex);
   std::string emsg;
   for (NSMCommunicatorList::iterator it = g_comm.begin();
        it != g_comm.end(); it++) {
@@ -118,7 +111,6 @@ bool NSMCommunicator::send(const NSMMessage& msg)
       }
     }
   }
-  g_mutex.unlock();
   if (alive && !sent) {
     throw (NSMHandlerException("Failed to send request: " + emsg));
   }
@@ -148,7 +140,7 @@ void NSMCommunicator::init(const NSMNode& node,
                            const std::string& host, int port)
 {
 #if NSM_PACKAGE_VERSION >= 1914
-  g_mutex.lock();
+  LockGuard lockGuard(g_mutex);
   if (host.size() > 0) m_host = host;
   if (port > 0) m_port = port;
   if (node.getName().size() == 0) {
@@ -157,7 +149,6 @@ void NSMCommunicator::init(const NSMNode& node,
   m_nsmc = b2nsm_init2(node.getName().c_str(), 0, host.c_str(), port, port);
   if (m_nsmc == NULL) {
     m_id = -1;
-    g_mutex.unlock();
     throw (NSMHandlerException("Error during init2 (%s=>%s:%d): %s",
                                node.getName().c_str(), host.c_str(),
                                m_port, b2nsm_strerror()));
@@ -166,7 +157,6 @@ void NSMCommunicator::init(const NSMNode& node,
   nsmlib_usesig(m_nsmc, 0);
   m_id = m_nsmc->nodeid;
   m_node = node;
-  g_mutex.unlock();
 #else
 #warning "Wrong version of nsm2. try source daq/slc/extra/nsm2/export.sh"
 #endif

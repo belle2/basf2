@@ -245,6 +245,7 @@ namespace Belle2 {
     return (v);
   }
 
+  /// intersection
   int intersect(const TRGCDCLpar& lp1, const TRGCDCLpar& lp2, CLHEP::HepVector& v1, CLHEP::HepVector& v2)
   {
     CLHEP::HepVector cen1(lp1.center());
@@ -322,6 +323,7 @@ namespace Belle2 {
 // static member functions
 //
 
+  /// ostream operator
   std::ostream& operator<<(std::ostream& o, TRGCDCLpar& s)
   {
     return o << " al=" << s.m_alpha << " be=" << s.m_beta

@@ -103,6 +103,7 @@ void FastBDTClassifierTrainingModule::event()
   for (const auto& outerHit : hitNetwork.getNodes()) { // loop over all outer nodes
     for (const auto& centerHit : outerHit->getInnerNodes()) { // loop over all center nodes attached to outer node
       for (const auto& innerHit : centerHit->getInnerNodes()) { // loop over all inner nodes attached to center node
+        // cppcheck-suppress useStlAlgorithm
         m_samples.push_back(makeTrainSample(outerHit->getEntry().m_spacePoint,
                                             centerHit->getEntry().m_spacePoint,
                                             innerHit->getEntry().m_spacePoint));

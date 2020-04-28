@@ -10,12 +10,12 @@
 
 #pragma once
 
+/* ROOT headers. */
+#include <TObject.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TObject.h>
 
 namespace Belle2 {
 
@@ -31,7 +31,7 @@ namespace Belle2 {
      */
     enum ChannelStatus {
 
-      /** Unknown status. */
+      /** Unknown status (no data). */
       c_Unknown,
 
       /** Normally operating channel. */
@@ -42,6 +42,9 @@ namespace Belle2 {
 
       /** Hot channel (large background). */
       c_Hot,
+
+      /** Undetermined (used during calibration). */
+      c_Undetermined,
 
     };
 
@@ -75,10 +78,21 @@ namespace Belle2 {
     void setStatusAllChannels(enum ChannelStatus status);
 
     /**
-     * Get number of active strips in the specified EKLM sector.
-     * @param[in] sectorGlobal Sector global number.
+     * Get number of active strips in the specified KLM module.
+     * @param[in] module Module number.
      */
-    int getActiveStripsEKLMSector(int sectorGlobal) const;
+    int getActiveStripsInModule(uint16_t module) const;
+
+    /**
+     * Operator ==.
+     */
+    bool operator==(KLMChannelStatus& status);
+
+    /**
+     * Number of new channels with status c_Normal
+     * that have a different status in another channel-status data.
+     */
+    unsigned int newNormalChannels(KLMChannelStatus& status);
 
   private:
 

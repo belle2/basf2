@@ -305,8 +305,8 @@ namespace Belle2 {
     double getEventTiming() { return m_eventtiming; }
     //! Get bits for GDL
     int getECLtoGDL(int i) { if (i < 4) { return m_bitECLtoGDL[i]; } else { return 0; }}
-
-
+    //! Get 3D Bhabha bit
+    int get3DBhabha() { return m_3DBhabha; }
 
 
 //! Empty constructor

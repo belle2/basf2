@@ -14,7 +14,6 @@
 
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
 
-#include <utility>
 #include <gtest/gtest.h>
 
 #include <TH2F.h>
@@ -42,12 +41,12 @@ namespace Belle2 {
     std::unique_ptr<TH2F> m_grid;
 
     /**
-     * The clusterTheta bin edges.
+     * The clusterTheta bin edges in [rad].
      */
     std::vector<float> m_thetabins = {0.2164208, 0.5480334, 0.561996, 2.2462387, 2.2811453, 2.7070057};
 
     /**
-     * The p bin edges.
+     * The p bin edges in [GeV/c].
      */
     std::vector<float> m_pbins = {0.0, 0.5, 0.75, 1.0, 3.0, 100.0};
 
@@ -83,13 +82,17 @@ namespace Belle2 {
                                       m_pbins.size() - 1,
                                       m_pbins.data());
 
-      m_dbrep.storeClusterThetaPGrid(m_testHypo.getPDGCode(), m_grid.get());
+      m_dbrep.setWeightCategories(m_grid.get());
 
       m_dbrep.setAngularUnit(Unit::rad);
       m_dbrep.setEnergyUnit(Unit::GeV);
 
+      std::vector<std::pair<float, float>> gridBinCentres;
+
       for (unsigned int ip(0); ip < m_pbins.size() - 1; ip++) {
+        auto p_bin_centre = (m_pbins.at(ip) + m_pbins.at(ip + 1)) / 2.0;
         for (unsigned int jth(0); jth < m_thetabins.size() - 1; jth++) {
+          auto th_bin_centre = (m_thetabins.at(jth) + m_thetabins.at(jth + 1)) / 2.0;
           auto fname = m_basename
                        + "__p__" + std::to_string(m_pbins.at(ip)) + "_" + std::to_string(m_pbins.at(ip + 1))
                        + "__clusterTheta__" + std::to_string(m_thetabins.at(jth)) + "_" + std::to_string(m_thetabins.at(jth + 1));
@@ -98,9 +101,12 @@ namespace Belle2 {
           std::ofstream dummyfile(fname);
           dummyfile.close();
           m_dummyfiles.push_back(fname);
+
+          auto centre = std::make_pair(th_bin_centre, p_bin_centre);
+          gridBinCentres.push_back(centre);
         }
       }
-      m_dbrep.storeMVAWeights(m_testHypo.getPDGCode(), m_dummyfiles);
+      m_dbrep.storeMVAWeights(m_testHypo.getPDGCode(), m_dummyfiles, gridBinCentres);
 
     }
 
@@ -135,7 +141,7 @@ namespace Belle2 {
     auto p = m_grid->GetYaxis()->GetBinCenter(biny);
 
     int jth, ip;
-    auto ij = m_dbrep.getMVAWeightIdx(m_testHypo, theta, p, jth, ip);
+    auto ji = m_dbrep.getMVAWeightIdx(theta, p, jth, ip);
 
     EXPECT_EQ(jth, binx);
     EXPECT_EQ(ip, biny);
@@ -146,12 +152,12 @@ namespace Belle2 {
     std::replace(thisfname.begin(), thisfname.end(), '.', '_');
     thisfname += ".xml";
 
-    EXPECT_EQ(thisfname, m_dummyfiles.at(ij));
+    EXPECT_EQ(thisfname, m_dummyfiles.at(ji));
 
     auto matchitr = std::find(m_dummyfiles.begin(), m_dummyfiles.end(), thisfname);
     auto thisidx = std::distance(m_dummyfiles.begin(), matchitr);
 
-    EXPECT_EQ(thisidx, ij);
+    EXPECT_EQ(thisidx, ji);
 
   }
 

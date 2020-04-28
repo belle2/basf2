@@ -10,7 +10,6 @@ from basf2_mva_evaluation import plotting
 import ROOT
 
 if __name__ == "__main__":
-
     rootchain = ROOT.TChain("variables")
     rootchain.Add('ntuple.root')
 

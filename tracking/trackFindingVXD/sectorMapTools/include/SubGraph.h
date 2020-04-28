@@ -77,6 +77,7 @@ namespace Belle2 {
     /** if both graphs have got the same IDs except the last one, they share a trunk. */
     bool checkSharesTrunk(const SubGraph<FilterType>& b) const { return (m_id.checkSharesTrunk(b.m_id)); }
 
+    /** "print" debugging information to a string */
     std::string print() const
     {
       std::string out = "id: " + m_id.print() + " was found " + std::to_string(m_found) + " times. Filters with values collected:\n";

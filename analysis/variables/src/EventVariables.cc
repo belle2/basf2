@@ -23,29 +23,24 @@
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
-#include <analysis/dataobjects/TauPairDecay.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/dataobjects/EventT0.h>
 
-// cluster utils
-#include <analysis/ClusterUtility/ClusterUtils.h>
+// database
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <framework/logging/Logger.h>
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
-
-#include <functional>
-#include <string>
 
 namespace Belle2 {
   namespace Variable {
@@ -62,12 +57,34 @@ namespace Belle2 {
       return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
+    double isChargedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 521) return 1.0;
+      }
+      return 0.0;
+    }
+
+    double isUnmixedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      std::vector<int> bPDGs;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 511) bPDGs.push_back(pdg_no);
+      }
+      if (bPDGs.size() == 2) {
+        return bPDGs[0] * bPDGs[1] < 0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
-      if (!mcParticles) {
-        return 0.0;
-      }
       for (const MCParticle& mcp : mcParticles) {
         int pdg_no = mcp.getPDG();
         if (mcp.getMother() == nullptr &&
@@ -85,10 +102,6 @@ namespace Belle2 {
     double nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
-      if (!mcps)  {
-        B2DEBUG(19, "Cannot find MCParticles array.");
-        return 0.0;
-      }
       return mcps.getEntries();
     }
 
@@ -127,16 +140,6 @@ namespace Belle2 {
       return klmClusters.getEntries();
     }
 
-    double KLMEnergy(const Particle*)
-    {
-      StoreArray<KLMCluster> klmClusters;
-      double result = 0;
-      for (int i = 0; i < klmClusters.getEntries(); ++i) {
-        result += klmClusters[i]->getMomentum().Energy();
-      }
-      return result;
-    }
-
     double expNum(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
@@ -166,70 +169,52 @@ namespace Belle2 {
     }
 
     // Beam Energies
-    double getHEREnergy(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getHER().E();
-    }
-
-    double getLEREnergy(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getLER().E();
-    }
-
-    double getCrossingAngle(const Particle*)
-    {
-      PCmsLabTransform T;
-      return T.getBeamParams().getHER().Vect().Angle(-1.0 * T.getBeamParams().getLER().Vect());
-    }
-
     double getCMSEnergy(const Particle*)
     {
       PCmsLabTransform T;
-      return T.getBeamParams().getMass();
+      return T.getCMSEnergy();
     }
 
     double getBeamPx(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Px();
+      return (T.getBeamFourMomentum()).Px();
     }
 
     double getBeamPy(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Py();
+      return (T.getBeamFourMomentum()).Py();
     }
 
     double getBeamPz(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).Pz();
+      return (T.getBeamFourMomentum()).Pz();
     }
 
     double getBeamE(const Particle*)
     {
       PCmsLabTransform T;
-      return (T.getBeamParams().getHER() + T.getBeamParams().getLER()).E();
+      return (T.getBeamFourMomentum()).E();
     }
 
     double getIPX(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().X();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).X();
     }
 
     double getIPY(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Y();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Y();
     }
 
     double getIPZ(const Particle*)
     {
-      PCmsLabTransform T;
-      return T.getBeamParams().getVertex().Z();
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return (beamSpotDB->getIPPosition()).Z();
     }
 
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element)
@@ -239,15 +224,15 @@ namespace Belle2 {
 
       if (elementI < 0 || elementI > 3) {
         B2WARNING("Requested IP covariance matrix element is out of boundaries [0 - 3]: i = " << elementI);
-        return 0;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       if (elementJ < 0 || elementJ > 3) {
         B2WARNING("Requested particle's momentumVertex covariance matrix element is out of boundaries [0 - 3]: j = " << elementJ);
-        return 0;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
-      PCmsLabTransform T;
-      return T.getBeamParams().getCovVertex()(elementI, elementJ);
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      return beamSpotDB->getCovVertex()(elementI, elementJ);
     }
 
     // Event kinematics -> missing momentum in lab and CMS, missing energy and mass2, visible energy
@@ -433,12 +418,11 @@ namespace Belle2 {
     double eventTimeSeconds(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
-      double evtTime = 0.;
 
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      evtTime = trunc(evtMetaData->getTime() / 1e9);
+      double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
       return evtTime;
     }
@@ -446,14 +430,13 @@ namespace Belle2 {
     double eventTimeSecondsFractionRemainder(const Particle*)
     {
       StoreObjPtr<EventMetaData> evtMetaData;
-      double evtTimeFrac = 0.;
 
       if (!evtMetaData) {
         return std::numeric_limits<float>::quiet_NaN();
       }
       double evtTime = trunc(evtMetaData->getTime() / 1e9);
 
-      evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
+      double evtTimeFrac = (evtMetaData->getTime() - evtTime * 1e9) / 1e9;
 
       return evtTimeFrac;
     }
@@ -461,7 +444,6 @@ namespace Belle2 {
     double eventT0(const Particle*)
     {
       StoreObjPtr<EventT0> evtT0;
-      double t0 = 0.;
 
       if (!evtT0) {
         B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
@@ -469,22 +451,26 @@ namespace Belle2 {
       }
 
       if (evtT0->hasEventT0()) {
-        t0 = evtT0->getEventT0();
+        return evtT0->getEventT0();
       } else {
         return std::numeric_limits<float>::quiet_NaN();
       }
-      return t0;
     }
-
 
 
     VARIABLE_GROUP("Event");
 
-    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
+    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
                       "[Eventbased] 1.0 if event does contain an Y(4S) and therefore is not a continuum Event");
+
+    REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
+                      "[Eventbased] true if event contains a charged B-meson");
+    REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
+                      R"DOC([Eventbased] true if event contains opposite flavor neutral B-mesons,
+false in case of same flavor B-mesons and NaN if an event has no generated neutral B)DOC");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");
@@ -500,8 +486,6 @@ namespace Belle2 {
                       "consider totalEnergyOfParticlesInList(gamma:all) instead");
     REGISTER_VARIABLE("nKLMClusters", nKLMClusters,
                       "[Eventbased] number of KLM in the event");
-    REGISTER_VARIABLE("KLMEnergy", KLMEnergy,
-                      "[Eventbased] total energy in KLM in the event");
     REGISTER_VARIABLE("nMCParticles", nMCParticles,
                       "[Eventbased] number of MCParticles in the event");
 
@@ -510,10 +494,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("runNum", runNum, "[Eventbased] run number");
     REGISTER_VARIABLE("productionIdentifier", productionIdentifier, "[Eventbased] production identifier");
 
-    REGISTER_VARIABLE("Eher", getHEREnergy, "[Eventbased] HER energy");
-    REGISTER_VARIABLE("Eler", getLEREnergy, "[Eventbased] LER energy");
     REGISTER_VARIABLE("Ecms", getCMSEnergy, "[Eventbased] CMS energy");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, "[Eventbased] Crossing angle");
     REGISTER_VARIABLE("beamE", getBeamE, "[Eventbased] Beam energy (lab)");
     REGISTER_VARIABLE("beamPx", getBeamPx, "[Eventbased] Beam momentum Px (lab)");
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");
@@ -571,6 +552,9 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,
-                      "[Eventbased][Calibration] Event T0 relative to trigger time in ns");
+                      "[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the\n"
+                      "trigger time. The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.\n"
+                      "This Event t0 variable is the final combined value of all the event time measurements.\n"
+                      "(Currently only the CDC and ECL are used in this combination.)");
   }
 }

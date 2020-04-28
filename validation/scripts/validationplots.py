@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import queue
+from typing import Dict, Any, List, Union, Optional
 import collections
 
 # Load ROOT
@@ -33,9 +34,11 @@ try:
 except ImportError:
     import json
 
+from validationrootobject import RootObject
+
 
 # Only execute the program if a basf2 release is set up!
-if os.environ.get('BELLE2_RELEASE', None) is None:
+if os.environ.get('BELLE2_RELEASE_DIR', None) is None and os.environ.get('BELLE2_LOCAL_DIR', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
@@ -48,7 +51,7 @@ PackageSeperatorToken = "__:__"
 ##############################################################################
 
 
-def date_from_revision(revision, work_folder):
+def date_from_revision(revision: str, work_folder: str) -> Optional[Union[int, float]]:
     """
     Takes the name of a revision and returns the 'last modified'-timestamp of
     the corresponding directory, which holds the revision.
@@ -99,7 +102,10 @@ def merge_nested_list_dicts(a, b):
     return _merge_nested_list_dicts(a.copy(), b.copy())
 
 
-def get_plot_files(revisions, work_folder):
+def get_plot_files(
+        revisions: List[str],
+        work_folder: str
+) -> Dict[str, Dict[str, List[str]]]:
     """
     Returns a list of all plot files as absolute paths. For this purpose,
     it loops over all revisions in 'revisions', finds the
@@ -143,7 +149,7 @@ def get_plot_files(revisions, work_folder):
     return results
 
 
-def get_tracked_reference_files():
+def get_tracked_reference_files() -> Dict[str, List[str]]:
     """
     This function loops over the local and central release dir and collects
     the .root-files from the validation-subfolders of the packages. These are
@@ -239,8 +245,12 @@ def get_tracked_reference_files():
     return ret
 
 
-def generate_new_plots(revisions, work_folder, process_queue=None,
-                       root_error_ignore_level=ROOT.kWarning):
+def generate_new_plots(
+        revisions: List[str],
+        work_folder: str,
+        process_queue=None,
+        root_error_ignore_level=ROOT.kWarning
+) -> None:
     """
     Creates the plots that contain the requested revisions. Each plot (or
     n-tuple, for that matter) is stored in an object of class Plot.
@@ -281,8 +291,9 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
     plot_files = get_plot_files(revisions[1:], work_folder)
     reference_files = get_plot_files(revisions[:1], work_folder)
 
-    # We don't want to plot tracked references only, so we have to collect all
-    # packages that have at least one plot of a new revision in them.
+    # We don't want to have plots that only show the tracked references.
+    # Instead we collect all packages that have at least one plot of a new
+    # revision in them.
     # Only exception: If 'reference' is the only revision we have, we show it
     # because this is clearly what the user wants
     plot_packages = set()
@@ -297,8 +308,16 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
                     plot_packages.add(package)
 
     # The dictionaries {package: {file: {key: [list of root objects]}}}
-    plot_p2f2k2o = tobjects_from_files(plot_files, False, work_folder)
-    reference_p2f2k2o = tobjects_from_files(reference_files, True, work_folder)
+    plot_p2f2k2o = rootobjects_from_files(
+        plot_files,
+        is_reference=False,
+        work_folder=work_folder
+    )
+    reference_p2f2k2o = rootobjects_from_files(
+        reference_files,
+        is_reference=True,
+        work_folder=work_folder
+    )
 
     # Delete all that doesn't belong to a package that we want to plot:
     for package in set(plot_p2f2k2o.keys()) - plot_packages:
@@ -458,7 +477,7 @@ def generate_new_plots(revisions, work_folder, process_queue=None,
 
 
 def print_plotting_summary(plotuples, warning_verbosity=1,
-                           chi2_verbosity=1):
+                           chi2_verbosity=1) -> None:
     """
     Print summary of all plotuples plotted, especially printing information
     about failed comparisons.
@@ -485,7 +504,7 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         rf = os.path.basename(plotuple.rootfile)
         if len(rf) > 30:
             rf = rf[:30] + "..."
-        return f"'{key}' from '{rf}'"
+        return f"{plotuple.package}/{key}/{rf}"
 
     n_warnings = 0
     plotuple_no_warning = []
@@ -540,15 +559,21 @@ def print_plotting_summary(plotuples, warning_verbosity=1,
         print()
 
 
-def tobjects_from_files(root_files_dict, is_reference, work_folder):
+def rootobjects_from_files(
+        root_files_dict: Dict[str, Dict[str, List[str]]],
+        is_reference: bool,
+        work_folder: str
+) -> Dict[str, Dict[str, Dict[str, List[RootObject]]]]:
     """
-    Takes a list of root files, loops over them and creates the RootObjects
-    for it. It then returns the list of RootObjects, a list of all keys,
-    and a list of all packages for those objects.
-    :param root_files_dict: The list of all *.root files which shall be
-        read in and for which the corresponding RootObjects shall be created
+    Takes a nested dictionary of root file paths for different revisions
+    and returns a (differently!) nested dictionary of root file objects.
+
+    :param root_files_dict: The dict of all *.root files which shall be
+        read in and for which the corresponding RootObjects shall be created:
+        {revision: {package: [root file]}}
     :param is_reference: Boolean value indicating if the objects are
         reference objects or not.
+    :param work_folder:
     :return: {package: {file: {key: [list of root objects]}}}
     """
 
@@ -563,7 +588,7 @@ def tobjects_from_files(root_files_dict, is_reference, work_folder):
     for revision, package2root_files in root_files_dict.items():
         for package, root_files in package2root_files.items():
             for root_file in root_files:
-                key2objects = tobjects_from_file(
+                key2objects = rootobjects_from_file(
                     root_file,
                     package,
                     revision,
@@ -576,12 +601,107 @@ def tobjects_from_files(root_files_dict, is_reference, work_folder):
     return return_dict
 
 
-def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
+def get_root_object_type(root_object: ROOT.TObject) -> str:
+    """
+    Get the type of the ROOT object as a string in a way that makes sense to us.
+    In particular, "" is returned if we have a ROOT object that is of no
+    use to us.
+    :param root_object: ROOT TObject
+    :return: type as string if the ROOT object
+    """
+    if root_object.InheritsFrom('TNtuple'):
+        return 'TNtuple'
+    # this will also match TProfile, as this root class derives from
+    # TH1D
+    elif root_object.InheritsFrom('TH1'):
+        if root_object.InheritsFrom('TH2'):
+            return 'TH2'
+        else:
+            return 'TH1'
+    # TEfficiency barks and quarks like a TProfile, but is unfortunately not
+    elif root_object.InheritsFrom('TEfficiency'):
+        return 'TEfficiency'
+    elif root_object.InheritsFrom('TGraph'):
+        return 'TGraph'
+    elif root_object.ClassName() == 'TNamed':
+        return 'TNamed'
+    elif root_object.InheritsFrom('TASImage'):
+        return 'TASImage'
+    else:
+        return ""
+
+
+def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
+    """ Extract metadata (description, checks etc.) from a ROOT object
+    :param root_object ROOT TObject
+    """
+    root_object_type = get_root_object_type(root_object)
+
+    metadata = {
+        "description": "n/a",
+        "check": "n/a",
+        "contact": "n/a",
+        "metaoptions": []
+    }
+
+    # todo [ref, medium]: we should incorporate this in the MetaOptionParser and
+    #   never pass them around as a list in the first place
+    def metaoption_str_to_list(metaoption_str):
+        return [
+            opt.strip() for opt in metaoption_str.split(',') if opt.strip()
+        ]
+
+    if root_object_type in ['TH1', 'TH2', 'TEfficiency', 'TGraph']:
+        _metadata = {
+            e.GetName(): e.GetTitle()
+            for e in root_object.GetListOfFunctions()
+        }
+
+        metadata["description"] = _metadata.get("Description", "n/a")
+        metadata["check"] = _metadata.get("Check", "n/a")
+        metadata["contact"] = _metadata.get("Contact", "n/a")
+
+        metadata["metaoptions"] = metaoption_str_to_list(
+            _metadata.get("MetaOptions", "")
+        )
+
+    elif root_object_type == 'TNtuple':
+        _description = root_object.GetAlias('Description')
+        _check = root_object.GetAlias('Check')
+        _contact = root_object.GetAlias('Contact')
+
+        if _description:
+            metadata["description"] = _description
+        if _check:
+            metadata["check"] = _check
+        if _contact:
+            metadata["contact"] = _contact
+
+        _metaoptions_str = root_object.GetAlias('MetaOptions')
+        if _metaoptions_str:
+            metadata["metaoptions"] = metaoption_str_to_list(_metaoptions_str)
+
+    # TODO: Can we somehow incorporate TNameds and TASImages?
+
+    return metadata
+
+
+def rootobjects_from_file(
+        root_file: str,
+        package: str,
+        revision: str,
+        is_reference: bool,
+        work_folder
+) -> Dict[str, List[RootObject]]:
     """
     Takes a root file, loops over its contents and creates the RootObjects
     for it.
-    :param root_file: The *.root files which shall be read in and for which the
+
+    :param root_file: The *.root file which shall be read in and for which the
         corresponding RootObjects shall be created
+    :param package:
+    :param revision:
+    :param work_folder:
     :param is_reference: Boolean value indicating if the object is a
         reference object or not.
     :return: package, {key: [list of root objects]}. Note: The list will
@@ -602,14 +722,7 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
 
     # Loop over all Keys in that ROOT-File
     for key in tfile.GetListOfKeys():
-
-        # Get the name of the Key
         name = key.GetName()
-
-        metaoptions = []
-        description = "n/a"
-        check = "n/a"
-        contact = "n/a"
 
         # temporary workaround for dbstore files located (wrongly)
         # in the validation results folder
@@ -621,66 +734,21 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
         root_object = tfile.Get(name)
         if not root_object:
             continue
-        if root_object is None:
+
+        root_object_type = get_root_object_type(root_object)
+        if not root_object_type:
+            # get_root_object_type returns "" for any type that we're not
+            # interested in
             continue
 
-        # Determine which type of object it is, i.e. TH1, TH2 or TNtuple
+        # Ensure that the data read from the ROOT files lives on even
+        # after the ROOT file is closed
+        if root_object.InheritsFrom("TH1"):
+            root_object.SetDirectory(0)
 
-        if root_object.InheritsFrom('TNtuple'):
-            root_object_type = 'TNtuple'
-        # this will also match TProfile, as this root class derives from
-        # TH1D
-        elif root_object.InheritsFrom('TH1'):
-            if root_object.InheritsFrom('TH2'):
-                root_object_type = 'TH2'
-            else:
-                root_object_type = 'TH1'
-        # TEfficiency barks and quarks like a TProfile, but is unfortunately not
-        elif root_object.InheritsFrom('TEfficiency'):
-            root_object_type = 'TEfficiency'
-        elif root_object.InheritsFrom('TGraph'):
-            root_object_type = 'TGraph'
-        # use to store user's html output
-        elif root_object.ClassName() == 'TNamed':
-            root_object_type = 'TNamed'
-        elif root_object.InheritsFrom('TASImage'):
-            root_object_type = 'TASImage'
-        else:
-            root_object_type = None
+        metadata = get_metadata(root_object)
 
-        # If we are dealing with a histogram:
-        if root_object_type in ['TH1', 'TH2', 'TEfficiency', 'TGraph']:
-
-            # Ensure that the data read from the ROOT files lives on even
-            # after the ROOT file is closed, but TGraph does not have this ....
-            if not root_object_type == 'TGraph':
-                root_object.SetDirectory(0)
-
-            # Read out meta information:
-
-            # Now check if the data exists in the ROOT file and if so, read it
-            if root_object.FindObject('Description'):
-                description = root_object.FindObject('Description').GetTitle()
-            if root_object.FindObject('Check'):
-                check = root_object.FindObject('Check').GetTitle()
-            if root_object.FindObject('Contact'):
-                contact = root_object.FindObject('Contact').GetTitle()
-
-            # Now check for meta-options (colz, log-scale, etc.)
-            metaoptions = []
-            if root_object.FindObject('MetaOptions'):
-                # Get the title. If there is no title, set metaoptions to an
-                # empty list again. Otherwise parse the string of options into
-                # a list of options (split on comma, remove whitespaces).
-                metaoptions = root_object.FindObject('MetaOptions').GetTitle()
-                if metaoptions is None:
-                    metaoptions = []
-                else:
-                    metaoptions = [_.strip() for _ in metaoptions.split(',')]
-
-        # If we are dealing with an n-tuple
-        elif root_object_type == 'TNtuple':
-
+        if root_object_type == "TNtuple":
             # Go to first entry in the n-tuple
             root_object.GetEntry(0)
 
@@ -691,41 +759,12 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
             for leaf in root_object.GetListOfLeaves():
                 ntuple_values[leaf.GetName()] = leaf.GetValue()
 
-            # Get description, check and contact
-            _description = root_object.GetAlias('Description')
-            _check = root_object.GetAlias('Check')
-            _contact = root_object.GetAlias('Contact')
-
-            if _description:
-                description = _description
-            if _check:
-                check = _check
-            if _contact:
-                contact = _contact
-
-            # Now check for meta-options (colz, log-scale, etc.)
-            _metaoptions = root_object.GetAlias('MetaOptions')
-            if _metaoptions:
-                # If there are meta-options, split the string on commas and
-                # remove unnecessary whitespaces
-                metaoptions = [_.strip() for _ in _metaoptions.split(',')]
-
             # Overwrite 'root_object' with the dictionary that contains the
             # values, because the values are what we want to save, and we
             # want to use the same RootObject()-call for both histograms and
             # n-tuples :-)
             root_object = ntuple_values
-        elif root_object_type == 'TNamed':
-            # TODO Set description, check, contact somehow?
-            pass
-        elif root_object_type == 'TASImage':
-            # TODO Set description, check, contact somehow?
-            pass
-        else:
-            # Skip all others
-            continue
 
-        # Create the RootObject and append it to the results
         key2object[name].append(
             RootObject(
                 revision,
@@ -735,10 +774,10 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
                 root_object,
                 root_object_type,
                 dir_date,
-                description,
-                check,
-                contact,
-                metaoptions,
+                metadata["description"],
+                metadata["check"],
+                metadata["contact"],
+                metadata["metaoptions"],
                 is_reference
             )
         )
@@ -747,144 +786,6 @@ def tobjects_from_file(root_file, package, revision, is_reference, work_folder):
     tfile.Close()
 
     return key2object
-
-
-##############################################################################
-#                             Class Definition                               #
-##############################################################################
-
-class RootObject:
-
-    """!
-    Wraps a ROOT object (either a histogram or an n-tuple) together with the
-    available meta-information about it.
-    Storing the information in a dictionary is necessary to make the objects
-    searchable, i.e. implement a function that can return for example all
-    objects from a certain revision.
-
-    @var data: A dict with all information about the Root-object
-    @var revision: The revision to which the object belongs to
-    @var package: The package to which the object belongs to
-    @var rootfile: The root file to which the object belongs to
-    @var key: The key (more precisely: the name of the key) which the object
-        has within the root file
-    @var object: The root object itself
-    @var type: The type, i.e. whether its a histogram or an n-tuple
-    @var description: The description, what the histogram/n-tuple contains
-    @var check: A brief description how the histogram or the values should
-        look like
-    @var contact: A contact person for this histogram/n-tuple
-    @var date: The date of the object (identical with the date of its rootfile)
-    @var is_reference: Boolean value if it is an object from a reference file
-        or not
-    """
-
-    def __init__(self, revision, package, rootfile, key, root_object,
-                 root_object_type, date, description, check, contact,
-                 metaoptions, is_reference):
-        """!
-        The constructor. Sets the element up and store the information in a
-        dict, but also sets up object variables for simplified access.
-
-        @param revision: The revision of the object, e.g. 'release-00-04-01'
-        @param package: The package of the object, e.g. 'analysis'
-        @param rootfile: The absolute path to the ROOT file that contains
-                this object
-        @param key: The key of the object, which is basically its name.
-                Example: 'P_Eff_k_e'. For each revision, there should be one
-                object with the same key.
-        @param root_object: The ROOT object itself. Storing works only for
-                histograms.
-        @param root_object_type: The type of the object. Possible values are
-                'TH1' (1D histogram), 'TH2' (2D histogram), and 'TNtuple'
-        @param date: The date when the containing revision folder was last
-                modified. Important to find the most recent object.
-        @param description: A short description of what is displayed in the
-                plot. May also contain LaTeX-Code (enclosed in $...$),
-                which will later be parsed by MathJax
-        @param check: A short description of how the data in the plot should
-                look like, i.e. for example the target location of a peak etc.
-        @param contact: A name or preferably an e-mail address of the person
-                who is responsible for this plot and may be contacted in case
-                of problems
-        @param metaoptions: Meta-options for the plot, e.g. 'colz' for histo-
-                grams, or log-scale for the axes, etc.
-        @param is_reference: A boolean value telling if an object is a
-                reference object or a normal plot/n-tuple object from a
-                revision. Possible Values: True for reference objects,
-                False for revision objects.
-        """
-
-        # todo: If this is what we want, why don't we just create a dictionary
-        #  in the first place? Or at least implement this by filtering through
-        #  self.__dict__
-        # A dict with all information about the Root-object
-        # Have all information as a dictionary so that we can search and
-        # filter the objects by properties
-        self.data = {'revision': revision,
-                     'package': package,
-                     'rootfile': rootfile,
-                     'key': key,
-                     'object': root_object,
-                     'type': root_object_type,
-                     'check': check,
-                     'description': description,
-                     'contact': contact,
-                     'date': date,
-                     'metaoptions': metaoptions,
-                     'is_reference': is_reference}
-
-        # For convenient access, define the following variables, which are
-        # only references to the values from the dict
-
-        # The revision to which the object belongs to
-        self.revision = self.data['revision']
-
-        # The package to which the object belongs to
-        self.package = self.data['package']
-
-        # The root file to which the object belongs to
-        self.rootfile = self.data['rootfile']
-
-        # The key (more precisely: the name of they) which the object has
-        # within the root file
-        self.key = self.data['key']
-
-        # The root object itself
-        self.object = self.data['object']
-
-        # The type, i.e. whether its a histogram or an n-tuple
-        self.type = self.data['type']
-
-        # The description, what the histogram/n-tuple contains
-        self.description = self.data['description']
-
-        # A brief description how the histogram or the values should look
-        # like (e.g. characteristic peaks etc.)
-        self.check = self.data['check']
-
-        # A contact person for this histogram/n-tuple
-        self.contact = self.data['contact']
-
-        # The date of the object (identical with the date of its rootfile)
-        self.date = self.data['date']
-
-        # Meta-options for the object, e.g. colz or log-scale for the axes
-        self.metaoptions = self.data['metaoptions']
-
-        # Boolean value if it is an object from a reference file or not
-        self.is_reference = self.data['is_reference']
-
-    def __str__(self):
-        return str(self.data)
-
-    def dump(self):
-        """!
-        Allows to print out all information about a RootObject to the command
-        line (for debugging purposes).
-        @return: None
-        """
-        pp.pprint(self.data)
 
 
 ##############################################################################

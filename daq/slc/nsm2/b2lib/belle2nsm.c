@@ -19,9 +19,13 @@
    20160420 1946 debugflag separately from corelib
    20180121 1957 b2nsm_nodename is added
    20180709 1974 b2nsm_reqid is added
+   20180709 1975 one more layer of wrapptr
+   20180912 1990 logflush also at the end of sendany
+   20180926 1990 b2nsm_reqname is added, uprcase fix in b2nsm_callback
+   20181126 1994 b2nsm_nodeproc is added
 \* ---------------------------------------------------------------------- */
 
-const char *belle2nsm_version = "belle2nsm 1.9.74";
+const char *belle2nsm_version = "belle2nsm 1.9.94";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +52,7 @@ FILE *logfp = 0;
 static int b2nsm_debugflag = 0;
 
 typedef struct b2nsm_struct {
+  void *wrapptr;
   char default_dest[32];
   char state[32];
 } b2nsm_t;
@@ -74,19 +79,22 @@ xt()
   return buf;
 }
 /* -- b2nsm_getwrapptr -------------------------------------------------- */
-const void *
+/* since wrapptr is already used by b2nsm, one more wrapping is needed    */
+void *
 b2nsm_getwrapptr()
 {
   if (! nsm) return 0;
-  return nsm->wrapptr;
+  if (! nsm->wrapptr) return 0;
+  
+  return ((b2nsm_t *)nsm->wrapptr)->wrapptr;
 }
 /* -- b2nsm_setwrapptr -------------------------------------------------- */
 int
-b2nsm_setwrapptr(const void *ptr)
+b2nsm_setwrapptr(void *ptr)
 {
   if (! nsm) return -1;
-  if (nsm->wrapptr && ptr) return -2;
-  nsm->wrapptr = ptr;
+  if (! nsm->wrapptr) return -1;
+  ((b2nsm_t *)nsm->wrapptr)->wrapptr = ptr;
   return 1;
 }
 /* -- b2nsm_addincpath -------------------------------------------------- */
@@ -116,6 +124,20 @@ b2nsm_nodepid(const char *nodename)
   int inod = b2nsm_nodeid(nodename);
   if (inod < 0) return -1;
   return ntohl(nsm->sysp->nod[inod].nodpid);
+}
+/* -- b2nsm_nodeproc ---------------------------------------------------- */
+int
+b2nsm_nodeproc(const char *nodename)
+{
+  char nodename_uprcase[NSMSYS_NAME_SIZ + 1];
+  xuprcpy(nodename_uprcase, nodename, NSMSYS_NAME_SIZ + 1);
+  return nsmlib_nodeproc(nsm, nodename_uprcase);
+}
+/* -- b2nsm_reqname ----------------------------------------------------- */
+const char *
+b2nsm_reqname(int reqid)
+{
+  return nsmlib_reqname(nsm, reqid);
 }
 /* -- b2nsm_reqid ------------------------------------------------------- */
 int 
@@ -241,9 +263,9 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
   }
 
   xuprcpy(name_uprcase, name, NSMSYS_NAME_SIZ+1);
-  if (nsmlib_register_request(nsm, name) < 0) return -1;
+  if (nsmlib_register_request(nsm, name_uprcase) < 0) return -1;
   
-  ret = nsmlib_callback(nsm, name, callback, NSMLIB_FNSTD);
+  ret = nsmlib_callback(nsm, name_uprcase, callback, NSMLIB_FNSTD);
 
   if (! logfp) return ret;
 
@@ -251,7 +273,9 @@ b2nsm_callback(const char *name, NSMcallback_t callback)
     nsmlib_log("%scallback(%s) registration failed: %s\n",
 	       xt(), name, b2nsm_strerror());
   } else {
-    if (DBGFLG(1)) nsmlib_log("%scallback(%s) registered\n", xt(), name);
+    if (DBGFLG(1)) {
+      nsmlib_log("%scallback(%s) registered\n", xt(), name_uprcase);
+    }
   }
   nsmlib_logflush();
 
@@ -295,6 +319,8 @@ b2nsm_sendany(const char *node, const char *req, int npar, int32_t *pars,
     }
     nsmlib_log("\n");
   }
+  
+  if (nsmlib_currecursive <= 1) nsmlib_logflush();
   
   return ret;
 }
@@ -519,6 +545,12 @@ NSMcontext *
 b2nsm_init(const char *nodename)
 {
   return b2nsm_init2(nodename, 1, 0, 0, 0);
+}
+/* -- b2nsm_term -------------------------------------------------------- */
+int
+b2nsm_term(const char *nodename)
+{
+  return nsmlib_term(nsm);
 }
 /* -- (emacs outline mode setup) ------------------------------------- */
 /*

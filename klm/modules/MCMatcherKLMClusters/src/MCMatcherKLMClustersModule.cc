@@ -8,20 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
+#include <klm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
+
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/KLMDigit.h>
+
+/* Belle 2 headers. */
+#include <mdst/dataobjects/MCParticle.h>
+
 /* C++ headers. */
 #include <map>
-
-/* Belle2 headers. */
-#include <bklm/dataobjects/BKLMDigit.h>
-#include <bklm/dataobjects/BKLMHit1d.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <framework/datastore/RelationArray.h>
-#include <klm/modules/MCMatcherKLMClusters/MCMatcherKLMClustersModule.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -77,12 +79,12 @@ void MCMatcherKLMClustersModule::event()
         bklmHit2ds[i2]->getRelationsTo<BKLMHit1d>();
       n3 = bklmHit1ds.size();
       for (i3 = 0; i3 < n3; i3++) {
-        RelationVector<BKLMDigit> bklmDigits =
-          bklmHit1ds[i3]->getRelationsTo<BKLMDigit>();
+        RelationVector<KLMDigit> bklmDigits =
+          bklmHit1ds[i3]->getRelationsTo<KLMDigit>();
         n4 = bklmDigits.size();
         for (i4 = 0; i4 < n4; i4++) {
           RelationVector<BKLMSimHit> bklmSimHits =
-            bklmDigits[i4]->getRelationsFrom<BKLMSimHit>();
+            bklmDigits[i4]->getRelationsTo<BKLMSimHit>();
           n5 = bklmSimHits.size();
           for (i5 = 0; i5 < n5; i5++) {
             RelationVector<MCParticle> bklmMCParticles =
@@ -93,18 +95,18 @@ void MCMatcherKLMClustersModule::event()
               if (it == mcParticles.end()) {
                 mcParticles.insert(std::pair<MCParticle*, double>(
                                      bklmMCParticles[i6],
-                                     bklmSimHits[i5]->getEDep()));
+                                     bklmSimHits[i5]->getEnergyDeposit()));
               } else {
-                it->second = it->second + bklmSimHits[i5]->getEDep();
+                it->second = it->second + bklmSimHits[i5]->getEnergyDeposit();
               }
               if (m_Hit2dRelations) {
                 it = mcParticlesHit.find(bklmMCParticles[i6]);
                 if (it == mcParticlesHit.end()) {
                   mcParticlesHit.insert(std::pair<MCParticle*, double>(
                                           bklmMCParticles[i6],
-                                          bklmSimHits[i5]->getEDep()));
+                                          bklmSimHits[i5]->getEnergyDeposit()));
                 } else {
-                  it->second = it->second + bklmSimHits[i5]->getEDep();
+                  it->second = it->second + bklmSimHits[i5]->getEnergyDeposit();
                 }
               }
             }
@@ -125,8 +127,8 @@ void MCMatcherKLMClustersModule::event()
     for (i2 = 0; i2 < n2; i2++) {
       if (m_Hit2dRelations)
         mcParticlesHit.clear();
-      RelationVector<EKLMDigit> eklmDigits =
-        eklmHit2ds[i2]->getRelationsTo<EKLMDigit>();
+      RelationVector<KLMDigit> eklmDigits =
+        eklmHit2ds[i2]->getRelationsTo<KLMDigit>();
       n3 = eklmDigits.size();
       for (i3 = 0; i3 < n3; i3++) {
         RelationVector<EKLMSimHit> eklmSimHits =
@@ -141,18 +143,18 @@ void MCMatcherKLMClustersModule::event()
             if (it == mcParticles.end()) {
               mcParticles.insert(std::pair<MCParticle*, double>(
                                    eklmMCParticles[i5],
-                                   eklmSimHits[i4]->getEDep()));
+                                   eklmSimHits[i4]->getEnergyDeposit()));
             } else {
-              it->second = it->second + eklmSimHits[i4]->getEDep();
+              it->second = it->second + eklmSimHits[i4]->getEnergyDeposit();
             }
             if (m_Hit2dRelations) {
               it = mcParticlesHit.find(eklmMCParticles[i5]);
               if (it == mcParticlesHit.end()) {
                 mcParticlesHit.insert(std::pair<MCParticle*, double>(
                                         eklmMCParticles[i5],
-                                        eklmSimHits[i4]->getEDep()));
+                                        eklmSimHits[i4]->getEnergyDeposit()));
               } else {
-                it->second = it->second + eklmSimHits[i4]->getEDep();
+                it->second = it->second + eklmSimHits[i4]->getEnergyDeposit();
               }
             }
           }

@@ -15,8 +15,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <vector>
-
 
 namespace Belle2 {
 

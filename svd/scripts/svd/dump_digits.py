@@ -23,9 +23,12 @@ class dump_digits(Module):
         #: Factors for decoding VXDId's
         self.vxdid_factors = (8192, 256, 32)
         # Get a handle on the GeoCache
+#: geoCache instance
         self.geoCache = Belle2.VXD.GeoCache.getInstance()
         # Record filenames
+#: noise calibrations database object
         self.noise_cal = Belle2.SVDNoiseCalibrations()
+#: pulse shape (gain, peak time, ...) database object
         self.pulse_cal = Belle2.SVDPulseShapeCalibrations()
 
     def beginRun(self):
@@ -40,7 +43,9 @@ class dump_digits(Module):
         """Cycle through RecoDigit/ShaperDigit pairs and dump the corresponding data"""
 
         evt_info = Belle2.PyStoreObj('EventMetaData')
+        svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
         event_number = evt_info.getEvent()
+        mode_byte = svd_evt_info.getModeByte()
         reco_digits = Belle2.PyStoreArray('SVDRecoDigits')
 
         for reco_digit in reco_digits:
@@ -62,7 +67,7 @@ class dump_digits(Module):
             sensorID = reco_digit.getSensorID()
             stripNo = reco_digit.getCellID()
             # Trigger bin from SVDModeByte
-            triggerBin = ord(shaper_digit.getModeByte().getTriggerBin())
+            triggerBin = ord(mode_byte.getTriggerBin())
             triggerTime = 0.25 * 31.44 * (-4 + triggerBin + 0.5)
             s += '{trigger:.3f} '.format(trigger=triggerTime)
             # Calibrations

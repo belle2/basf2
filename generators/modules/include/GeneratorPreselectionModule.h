@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
-#include <vector>
 #include <map>
 
 namespace Belle2 {

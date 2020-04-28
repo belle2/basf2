@@ -8,52 +8,31 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+import skimExpertFunctions as expert
+import sys
+b2.set_log_level(b2.LogLevel.INFO)
+gb2_setuprel = 'release-04-00-00'
 
-set_log_level(LogLevel.INFO)
-gb2_setuprel = 'release-03-00-03'
 
+skimpath = b2.Path()
 
-skimpath = Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=skimpath)
 
-fileList = get_test_file("mixedBGx1", "MC11")
-inputMdstList('default', fileList, path=skimpath)
-
-from skim.systematics import *
+from skim.systematics import SystematicsLambdaList
 SysList = SystematicsLambdaList(path=skimpath)
 
-skimCode = encodeSkimName('SystematicsLambda')
+skimCode = expert.encodeSkimName('SystematicsLambda')
 
 argc = len(sys.argv)
 argvs = sys.argv
 
-if 'Validation' in sys.argv and len(sys.argv) > 2:
-    skimOutputUdst('%s_%s' % (skimCode, argvs[argvs.index('Validation') + 1]), SysList, path=skimpath)
-else:
-    skimOutputUdst(skimCode, SysList, path=skimpath)
+expert.skimOutputUdst(skimCode, SysList, path=skimpath)
+ma.summaryOfLists(SysList, path=skimpath)
 
-summaryOfLists(SysList, path=skimpath)
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 
-if 'Validation' in sys.argv:
-    if argc > 2:
-        ntupleFile('Validation_%s_%s.root' % (skimCode, (argvs[argvs.index('Validation') + 1])), path=skimpath)
-    else:
-        ntupleFile('Validation_%s.root' % (skimCode), path=skimpath)
-
-    toolsdstar = ['EventMetaData', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['InvMass', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Kinematics', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Track', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['Vertex', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['MCTruth', '^Lambda0 -> p+ pi-']
-    toolsdstar += ['CMSKinematics', '^Lambda0 -> p+ pi-']
-    ntupleTree('Lambda0', 'Lambda0:syst0', toolsdstar, path=skimpath)
-
-
-setSkimLogging(path=skimpath)
-process(skimpath)
-
-print(statistics)
+print(b2.statistics)

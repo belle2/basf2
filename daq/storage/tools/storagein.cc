@@ -13,16 +13,15 @@
 #include <framework/logging/Logger.h>
 
 #include <daq/storage/BinData.h>
-#include <daq/storage/EventBuffer.h>
 #include <daq/storage/SharedEventBuffer.h>
 
+#include <daq/slc/base/IOException.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/slc/system/TCPSocket.h>
 #include <daq/slc/system/TCPSocketReader.h>
 #include <daq/slc/system/Time.h>
 #include <daq/slc/system/LogFile.h>
-#include <daq/slc/base/Date.h>
 
 using namespace Belle2;
 

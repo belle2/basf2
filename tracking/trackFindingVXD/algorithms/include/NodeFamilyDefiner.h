@@ -11,9 +11,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <string>
-#include <vector>
-
 namespace Belle2 {
 
   /** This class assigns a common family identifier to all CACells in the network that are connected.

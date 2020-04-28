@@ -21,18 +21,15 @@
 
 namespace Belle2 {
 
-  /** This Class implements the interceptor of the SVD tracks on the PXD layers.
+  /** The PXDInterceptor class fills a StoreArray of PXDIntercepts that will be used to define the PXD ROIs.
+   * The class assumes that the tracks are coming from the IP and that the genfit propagation direction is
+   * inward bound. (i.e. it does not try to find intercepts on both ends of the track.)
    */
   class PXDInterceptor {
 
   public:
-    /** Constructor.
-     */
-    //    PXDInterceptor();
 
-    /** Another Constructor.
-     *
-     *  @TODO: Can the comment explain, why there are these two constructors?
+    /** Class Constructor.
      */
     PXDInterceptor(const ROIinfo* user_theROIinfo, double toleranceZ, double tolerancePhi);
 

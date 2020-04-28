@@ -13,7 +13,6 @@
 
 #include <G4VTouchable.hh>
 #include <G4PhysicalVolumeStore.hh>
-#include <G4PVReplica.hh>
 #include <G4NavigationHistory.hh>
 #include <G4Transform3D.hh>
 #include <G4Point3D.hh>

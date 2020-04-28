@@ -9,7 +9,6 @@
  **************************************************************************/
 #ifndef ECLCHANNELMAPPER_H
 #define ECLCHANNELMAPPER_H
-#include <framework/logging/Logger.h>
 #include <ecl/dbobjects/ECLChannelMap.h>
 namespace Belle2 {
   namespace ECL {
@@ -41,6 +40,8 @@ namespace Belle2 {
       ECLChannelMapper();
       /// Default destructor
       ~ECLChannelMapper() {}
+      /// Initialize channel mapper using data stored in default location
+      bool initFromFile();
       /// Initialize channel mapper using data stored in the ASCII file
       bool initFromFile(const char* eclMapFile);
       /// Initialize channel mapper from the conditions database

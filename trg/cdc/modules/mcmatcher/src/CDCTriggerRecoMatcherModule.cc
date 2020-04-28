@@ -43,6 +43,7 @@ CDCTriggerRecoMatcherModule::CDCTriggerRecoMatcherModule() : Module()
                  "First makes relations from RecoTracks to CDCTriggerSegmentHits, "
                  "then makes relations from RecoTracks to CDCTriggerTracks "
                  "and vice-versa.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("RecoTrackCollectionName", m_RecoTrackCollectionName,
            "Name of the RecoTrack StoreArray to be matched.",

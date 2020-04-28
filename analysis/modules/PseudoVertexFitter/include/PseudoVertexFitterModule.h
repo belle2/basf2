@@ -11,8 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
 

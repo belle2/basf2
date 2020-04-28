@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <Python.h>
 #include <string>
 #include <vector>
 
@@ -78,6 +79,19 @@ namespace Belle2 {
 
 
     /**
+     * Import ASIC shifts of BS13d
+     * @param s0 shift of carrier 0 [ns]
+     * @param s1 shift of carrier 1 [ns]
+     * @param s2 shift of carrier 2 [ns]
+     * @param s3 shift of carrier 3 [ns]
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                int expNo, int firstRun, int lastRun);
+
+    /**
      * Import module T0 calibration constants to database
      * The input is the text file
      * @param fileName name of the dat file with constants of all modules
@@ -123,9 +137,11 @@ namespace Belle2 {
      * @param expNo experiment number of IOV
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
+     * @param roughlyCalibrated if true set payload status to roughly calibrated
      */
     void importCommonT0(double value, double error,
-                        int expNo, int firstRun, int lastRun);
+                        int expNo, int firstRun, int lastRun,
+                        bool roughlyCalibrated = false);
 
     /**
      * Prints sample time calibration info about constants stored in database
@@ -262,6 +278,18 @@ namespace Belle2 {
      */
     void exportPmtTTSHisto(std::string outFileName = "RetrievedHistos.root");
 
+    /**
+     * Import front-end settings
+     * @param lookback the number of lookback windows
+     * @param readoutWin the number of readout windows
+     * @param extraWin the number of extra windows btw. lookback and readout window
+     * @param offset offset to photon peak [RF clocks]
+     * @param expNo experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importFrontEndSettings(int lookback, int readoutWin, int extraWin, int offset,
+                                int expNo, int firstRun, int lastRun);
 
     /**
      * import a dummy payload of TOPCalModuleAlignment DB objects
@@ -365,12 +393,36 @@ namespace Belle2 {
                                         int lastExp = -1, int lastRun = -1);
 
     /**
+     * import a dummy payload of TOPCalAsicShift DB objects
+     * @param firstExp first experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastExp first experiment number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importDummyCalAsicShift(int firstExp = 0, int firstRun = 0,
+                                 int lastExp = -1, int lastRun = -1);
+
+    /**
      * correct QE values in database for the reflection on window surface
      * be sure that you run the function only once!
      * see: BII-4230
      */
     void correctTOPPmtQE();
 
+    /**
+     * payload TOPCalTimeWalk
+     * import parameters for time-walk correction and electronic time resolution tuning
+     * @param list Python list of parameters of time-walk calibration curve [ns]
+     * @param a electronic time resolution: noise term excess parameter [ns]
+     * @param b electronic time resolution: quadratic term parameter [ns]
+     * @param firstExp first experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastExp first experiment number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importTimeWalk(PyObject* list, double a, double b,
+                        int firstExp = 0, int firstRun = 0,
+                        int lastExp = -1, int lastRun = -1);
     /**
      * for testing purposes only! - will be removed ...
      */

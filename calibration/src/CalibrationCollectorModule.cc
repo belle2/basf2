@@ -9,7 +9,9 @@ CalibrationCollectorModule::CalibrationCollectorModule() :
   HistoModule(),
   m_dir(nullptr),
   m_manager(),
-  m_expRunEvents()
+  m_runRange(nullptr),
+  m_expRunEvents(),
+  m_eventsCollectedInRun(nullptr)
 {
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   addParam("granularity", m_granularity,

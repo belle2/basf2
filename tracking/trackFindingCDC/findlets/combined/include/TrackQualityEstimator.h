@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      explicit TrackQualityEstimator(const std::string& defaultFilterName = "recording");
+      explicit TrackQualityEstimator(const std::string& defaultFilterName = "mva");
 
       /// Short description of the findlet
       std::string getDescription() final;
@@ -40,7 +40,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Receive and dispatch signal before the start of the event processing
-      void initialize();
+      void initialize() override;
 
       /// Main algorithm
       void apply(std::vector<CDCTrack>& tracks) final;
@@ -52,8 +52,11 @@ namespace Belle2 {
       /// Store output of needsTruthInformation from filter in member variable
       bool m_needsTruthInformation = false;
 
-      /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
+      /// Delete tracks below threshold instead of just assigning quality indicator
       bool m_param_deleteTracks = false;
+
+      /// Reset taken flag for deleted tracks so that hits can be used by subsequent TFs
+      bool m_param_resetTakenFlag = false;
 
       /// Reference to the filter to be used to filter
       ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;

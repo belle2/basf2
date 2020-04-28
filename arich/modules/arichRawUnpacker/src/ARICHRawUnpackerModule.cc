@@ -13,19 +13,12 @@
 #include <arich/dataobjects/ARICHRawDigit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // Dataobject classes
 #include <rawdata/dataobjects/RawARICH.h>
 
-#include <framework/database/DBObjPtr.h>
-
 #include <sstream>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TF1.h>
 
 using namespace std;
 

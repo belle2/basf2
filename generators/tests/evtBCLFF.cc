@@ -27,7 +27,7 @@ namespace Belle2 {
     static void SetUpTestCase()
     {
       std::string decayFileName = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC");
-      s_evtgen = EvtGenInterface::createEvtGen(decayFileName);
+      s_evtgen = EvtGenInterface::createEvtGen(decayFileName, true);
     }
 
     /** cleans up after the test */
@@ -40,6 +40,7 @@ namespace Belle2 {
     /** pointer to the evtgen instance */
     static EvtGen* s_evtgen;
   };
+
 
   EvtGen* EvtBCLFFTest::s_evtgen = nullptr;
 
@@ -70,7 +71,7 @@ namespace Belle2 {
 
     bclff.getscalarff(B0, M, q2max, 0, &fplus, &fzero);
 
-    ASSERT_NEAR(7.614, fplus, 0.003);
+    ASSERT_NEAR(7.617, fplus, 0.003);
     ASSERT_NEAR(1.006, fzero, 0.003);
 
 

@@ -11,10 +11,7 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <framework/utilities/TestHelpers.h>
-
 #include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
 #include <framework/database/DBStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
@@ -35,8 +32,7 @@ void CDCGeometryLoader::loadDatabase()
   // use experiment 0 for MC-only events
   evtPtr.construct(1, 0, 0);
 
-  // Load the default database including the remote db
-  Database::Instance();
+  Database::reset();
   // load database content for IoV in EventMetaData
   DBStore::Instance().update();
 

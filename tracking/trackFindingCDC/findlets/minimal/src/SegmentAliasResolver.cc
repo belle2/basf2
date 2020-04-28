@@ -173,9 +173,7 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
         swapBetterChi2(segment, aliasSegment);
       }
     }
-  }
 
-  if (m_borderAliases) {
     for (CDCSegment2D& segment : outputSegments) {
       // Check aliasing first hit
       CDCSegment2D aliasSegment = segment;
@@ -191,7 +189,7 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
         swapBetterChi2(segment, aliasSegment);
       }
     }
-  }
+  }// end if (m_borderAliases)
 
   if (m_middleAliases) {
     for (CDCSegment2D& segment : outputSegments) {

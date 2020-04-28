@@ -1012,8 +1012,10 @@ namespace Belle2 {
 
           B2DEBUG(12, "calcLimitedDx: tried 2nd order correction, phi2ndOrder = "
                   << phi2ndOrder << ", threshold = " << phi0 + eta * dphi0);
-          if (debug > 15) debug_print(vecdxhat, "dxhat");
-          if (debug > 15) debug_print(xnew, "xnew");
+          if (debug > 15) {
+            debug_print(vecdxhat, "dxhat");
+            debug_print(xnew, "xnew");
+          }
           if (phi2ndOrder <= phi0 + eta * alpha * dphi0) {
             B2DEBUG(12, "  -> 2nd order correction successfull!");
             return 1;

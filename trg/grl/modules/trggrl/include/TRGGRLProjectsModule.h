@@ -62,7 +62,7 @@ namespace Belle2 {
     //std::string version(void) const;
 
   private: // Parameters
-    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< output for TRGGRLInfo */
+//    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< output for TRGGRLInfo */
 
     /// Debug level.
     int _debugLevel;

@@ -67,7 +67,8 @@ namespace Belle2 {
                                  const TRGCDC& TRGCDC,
                                  const std::map<std::string, bool>& flags)
     : m_name(name), m_cdc(TRGCDC),
-      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile)
+      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile),
+      m_treeTrackFitter3D(), m_treeConstantsFitter3D() // 2019/07/31 by ytlai
   {
     m_fileFitter3D = 0;
     m_commonData = 0;
@@ -612,6 +613,7 @@ namespace Belle2 {
       int phiBitSize = 13;
       // pt = 0.3*1.5*rho*0.01;
       //double rhoMin = 48;
+      /* cppcheck-suppress variableScope */
       double rhoMin = 20;
       double rhoMax = 2500;
       //double rhoMax = 1600;

@@ -57,6 +57,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mcTrackCandidatesColumnName='MCRecoTracks',
             cdcHitsColumnName='CDCHits',
             write_tables=False):
+        """Constructor"""
 
         TrackingValidationModule.__init__(
             self,

@@ -26,17 +26,23 @@ from tracking.adjustments import adjust_module
 
 
 class CDCCombined(TrackingValidationRun):
+    """Validate the combined CDC track-finding chain include Legendre step"""
+    #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
+    #: no background overlay
     root_input_file = '../EvtGenSimNoBkg.root'
+    #: contact person
     contact = 'software-tracking@belle2.org - why are we not founding this?'
 
     def finder_module(self, path):
+        """Add the CDC track-finding module to the basf2 path"""
         tracking.add_cdc_track_finding(path, with_ca=True)
         # adjust_module(path, "TFCDC_WireHitPreparer",
         #               UseNLoops=1)
 
+    #: Define the user parameters for the track-finding module
     tracking_coverage = {
         'WhichParticles': ['CDC'],  # Include all particles seen in CDC, also secondaries
         'UsePXDHits': False,
@@ -52,7 +58,9 @@ class CDCCombined(TrackingValidationRun):
         "MergeDecayInFlight": True,
         'EnergyCut': 0,
     }
+    #: Include pulls in the validation output
     pulls = True
+    #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
 

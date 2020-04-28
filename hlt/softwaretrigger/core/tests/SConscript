@@ -6,7 +6,7 @@ Import('env')
 env['LIBS'] = [
     'hlt',
     'framework',
-    'hlt_softwaretrigger_dbobjects'
+    'mdst_dbobjects'
     ]
 
 Return('env')

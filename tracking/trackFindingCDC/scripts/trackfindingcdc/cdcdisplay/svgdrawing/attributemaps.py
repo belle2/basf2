@@ -108,7 +108,7 @@ class CDCHitColorMap:
     Base class for CDCHit to color map functional objects.
     """
 
-    # Default color to be used
+    #: Default color to be used
     bkgHitColor = 'orange'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -142,8 +142,11 @@ class TakenFlagColorMap(CDCHitColorMap):
     """
     CDCHit to color map highlighting the CDCHits that posses the do not use flag.
     """
+
     def __init__(self):
+        """Constructor"""
         super().__init__()
+        #: cached copy of the CDCWireHitVector
         self.storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
         if not self.storedWireHits:
             print('Could not find CDCWireHitVector in the data store to lookup TakenFlag')
@@ -199,7 +202,9 @@ class WrongRLColorMap():
     """
     CDCRecoHit3D to color map for the correctness of the rl information
     """
+
     def __init__(self):
+        """Constructor"""
         mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         mcHitLookUp.fill()
 
@@ -263,44 +268,47 @@ class BackgroundTagColorMap(CDCHitColorMap):
     CDCHit to color map by their assoziated CDCSimHit::getBackgroundTag property.
     """
 
-    SimHitBase = Belle2.SimHitBase
+    #: access the SimHitBase enum of background tags
+    BackgroundMetaData = Belle2.BackgroundMetaData
 
+    #: dictionary of (tag, label) pairs
     bkgname_by_bkgtag = {
-        SimHitBase.bg_none: 'bg_none',
-        SimHitBase.bg_Coulomb_LER: 'bg_Coulomb_LER',
-        SimHitBase.bg_Coulomb_HER: 'bg_Coulomb_HER',
-        SimHitBase.bg_RBB_LER: 'bg_RBB_LER',
-        SimHitBase.bg_RBB_HER: 'bg_RBB_HER',
-        SimHitBase.bg_Touschek_LER: 'bg_Touschek_LER',
-        SimHitBase.bg_Touschek_HER: 'bg_Touschek_HER',
-        SimHitBase.bg_twoPhoton: 'bg_twoPhoton',
-        SimHitBase.bg_RBB_gamma: 'bg_RBB_gamma',
-        SimHitBase.bg_RBB_LER_far: 'bg_RBB_LER_far',
-        SimHitBase.bg_RBB_HER_far: 'bg_RBB_HER_far',
-        SimHitBase.bg_Touschek_LER_far: 'bg_Touschek_LER_far',
-        SimHitBase.bg_Touschek_HER_far: 'bg_Touschek_HER_far',
-        SimHitBase.bg_SynchRad_LER: 'bg_SynchRad_LER',
-        SimHitBase.bg_SynchRad_HER: 'bg_SynchRad_HER',
-        SimHitBase.bg_other: 'bg_other',
+        BackgroundMetaData.bg_none: 'bg_none',
+        BackgroundMetaData.bg_Coulomb_LER: 'bg_Coulomb_LER',
+        BackgroundMetaData.bg_Coulomb_HER: 'bg_Coulomb_HER',
+        BackgroundMetaData.bg_RBB_LER: 'bg_RBB_LER',
+        BackgroundMetaData.bg_RBB_HER: 'bg_RBB_HER',
+        BackgroundMetaData.bg_Touschek_LER: 'bg_Touschek_LER',
+        BackgroundMetaData.bg_Touschek_HER: 'bg_Touschek_HER',
+        BackgroundMetaData.bg_twoPhoton: 'bg_twoPhoton',
+        BackgroundMetaData.bg_RBB_gamma: 'bg_RBB_gamma',
+        BackgroundMetaData.bg_RBB_LER_far: 'bg_RBB_LER_far',
+        BackgroundMetaData.bg_RBB_HER_far: 'bg_RBB_HER_far',
+        BackgroundMetaData.bg_Touschek_LER_far: 'bg_Touschek_LER_far',
+        BackgroundMetaData.bg_Touschek_HER_far: 'bg_Touschek_HER_far',
+        BackgroundMetaData.bg_SynchRad_LER: 'bg_SynchRad_LER',
+        BackgroundMetaData.bg_SynchRad_HER: 'bg_SynchRad_HER',
+        BackgroundMetaData.bg_other: 'bg_other',
     }
 
+    #: dictionary of (tag, color) pairs
     color_by_bkgtag = {
-        SimHitBase.bg_none: 'orange',
-        SimHitBase.bg_Coulomb_LER: 'red',
-        SimHitBase.bg_Coulomb_HER: 'darkred',
-        SimHitBase.bg_RBB_LER: 'blue',
-        SimHitBase.bg_RBB_HER: 'darkblue',
-        SimHitBase.bg_Touschek_LER: 'green',
-        SimHitBase.bg_Touschek_HER: 'darkgreen',
-        SimHitBase.bg_twoPhoton: 'violet',
-        SimHitBase.bg_RBB_gamma: 'skyblue',
-        SimHitBase.bg_RBB_LER_far: 'turquoise',
-        SimHitBase.bg_RBB_HER_far: 'darkturquoise',
-        SimHitBase.bg_Touschek_LER_far: 'olivergreen',
-        SimHitBase.bg_Touschek_HER_far: 'darkolivegreen',
-        SimHitBase.bg_SynchRad_LER: 'goldenrod',
-        SimHitBase.bg_SynchRad_HER: 'darkgoldenrod',
-        SimHitBase.bg_other: 'orange',
+        BackgroundMetaData.bg_none: 'orange',
+        BackgroundMetaData.bg_Coulomb_LER: 'red',
+        BackgroundMetaData.bg_Coulomb_HER: 'darkred',
+        BackgroundMetaData.bg_RBB_LER: 'blue',
+        BackgroundMetaData.bg_RBB_HER: 'darkblue',
+        BackgroundMetaData.bg_Touschek_LER: 'green',
+        BackgroundMetaData.bg_Touschek_HER: 'darkgreen',
+        BackgroundMetaData.bg_twoPhoton: 'violet',
+        BackgroundMetaData.bg_RBB_gamma: 'skyblue',
+        BackgroundMetaData.bg_RBB_LER_far: 'turquoise',
+        BackgroundMetaData.bg_RBB_HER_far: 'darkturquoise',
+        BackgroundMetaData.bg_Touschek_LER_far: 'olivergreen',
+        BackgroundMetaData.bg_Touschek_HER_far: 'darkolivegreen',
+        BackgroundMetaData.bg_SynchRad_LER: 'goldenrod',
+        BackgroundMetaData.bg_SynchRad_HER: 'darkgoldenrod',
+        BackgroundMetaData.bg_other: 'orange',
     }
 
     def __call__(self, iCDCHit, cdcHit):
@@ -418,7 +426,7 @@ class MCParticleColorMap(CDCHitColorMap):
         as new during the event.
         """
 
-        # Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
+        #: Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
         self.color_by_mcparticleId = {-1: self.bkgHitColor}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -455,7 +463,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
     CDCHit to color map by the assoziated MCParticle::getPDG()
     """
 
-    # Dictionary to define the color for the most relevant
+    #: Dictionary to define the color for the most relevant
     color_by_pdgcode = {
         -999: CDCHitColorMap.bkgHitColor,
         11: 'blue',
@@ -472,7 +480,7 @@ class MCPDGCodeColorMap(CDCHitColorMap):
         -2212: 'red',
     }
 
-    # Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
+    #: Color for the case a particle a pdg code not mentioned in the color_by_pdgcode map
     missing_pdg_color = 'lime'
 
     def __call__(self, iCDCHit, cdcHit):
@@ -526,7 +534,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
         Constuction method setting up a dictionary to count the hits for each secondary type.
         """
 
-        # Dictionary keeping track of the number of hits with a specific secondary process type.
+        #: Dictionary keeping track of the number of hits with a specific secondary process type.
         self.n_hits_by_secondary_type = {}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -581,7 +589,7 @@ class CDCSegmentColorMap:
     Base class for Segments to color map functional objects.
     """
 
-    # Default color to be used
+    #: Default color to be used
     bkgSegmentColor = 'orange'
 
     def __call__(self, iSegment, segment):

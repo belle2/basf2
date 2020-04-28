@@ -116,6 +116,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
         super().configure(arguments)
         if self.simulation_output:
             get_logger().info("Requested to simulation run. Deactivate input file")
+            #: generating events, so there is no ROOT input file
             self.root_input_file = None
 
     def execute(self):

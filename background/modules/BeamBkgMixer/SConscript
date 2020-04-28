@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'background_dataobjects',
+env['LIBS'] = ['framework', 
                'simulation_dataobjects', 
 	       'vxd_dataobjects',
 	       'pxd_dataobjects',
@@ -9,8 +9,7 @@ env['LIBS'] = ['framework', 'background_dataobjects',
 	       'top_dataobjects',
 	       'arich_dataobjects',
 	       'ecl_dataobjects',
-	       'bklm_dataobjects',
-	       'eklm_dataobjects',
+	       'klm_dataobjects',
                '$ROOT_LIBS']
 
 Return('env')

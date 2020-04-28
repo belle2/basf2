@@ -122,6 +122,7 @@ class TolerateMissingKeyFormatterTest(unittest.TestCase):
 
     def setUp(self):
         """Prepare for the string-formatter test"""
+        #: Use the custom string formatter that tolerates missing values for keywords
         self.formatter = TolerateMissingKeyFormatter()
 
     def test_missing_key(self):

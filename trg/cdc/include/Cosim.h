@@ -25,7 +25,7 @@ namespace Cosim {
    * integer or double respectively
    */
 
-  /* In case you are not familiar with VHDL simulation, there are 9 possible
+  /** In case you are not familiar with VHDL simulation, there are 9 possible
    * values defined for the standard logic type, instead of just 0 and 1. The
    * simulator needs to compute all these possible outcomes. Therefore, XSI uses
    * a byte, instead of a bit, to represent a std_logic. This is represented
@@ -38,6 +38,7 @@ namespace Cosim {
   /** '0' in XSI VHDL simulation */
   const char zero_val = 2;
 
+  /**Display value of the signal*/
   std::string display_value(const char* count, int size)
   {
     std::string res;
@@ -52,6 +53,7 @@ namespace Cosim {
     return res;
   }
 
+  /**Transform into string*/
   template<size_t N>
   std::string slv_to_bin_string(std::array<char, N> signal, bool padding = false)
   {
@@ -68,6 +70,7 @@ namespace Cosim {
     return res;
   }
 
+  /**Display signal in hex*/
   template<size_t N>
   void display_hex(const std::array<char, N>& signal)
   {
@@ -90,6 +93,7 @@ namespace Cosim {
     std::cout.copyfmt(oldState);
   }
 
+  /**Display nonzero value of signal in hex*/
   template<size_t N>
   void display_nonzero_hex(const std::array<char, N>& signal)
   {
@@ -99,7 +103,7 @@ namespace Cosim {
     }
   }
 
-  /* extract a subset of bitstring, like substring.
+  /** extract a subset of bitstring, like substring.
    *
    * In principle this can be done using only integer manipulations, but for the
    * sake of simplicity, let's just cast them to string. Beware the endianness.

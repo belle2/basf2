@@ -62,10 +62,10 @@ namespace Belle2 {
     std::vector<unsigned> hitList;
     /** Coordinate of rectangle for this candidate */
     coord2dPair coord;
-    /** Super layer count (number of hits from different super layers) */
-    unsigned short SLcount;
-    /** candidate number, for debugging */
-    unsigned id;
+    /** Super layer count (number of hits from different super layers). Initialized at 0 by the SW shifter */
+    unsigned short SLcount = 0;
+    /** candidate number, for debugging.  Initialized at 0 by the SW shifter.  */
+    unsigned id = 0;
   };
 
   /** Two cells are identical if they have the same coordinates */
@@ -190,15 +190,15 @@ namespace Belle2 {
      *    0: no shift (same limits for negative and positive half)
      *  > 0: shift in positive direction (positive half is larger) */
     int m_shiftPt;
-    /** Hough plane limit in 1/r [1/cm] */
-    double maxR;
-    /** Hough plane shift in 1/r [1/cm] */
-    double shiftR;
+    /** Hough plane limit in 1/r [1/cm]. Initialized at 0 by the SW shifter*/
+    double maxR = 0.;
+    /** Hough plane shift in 1/r [1/cm]. Initialized at 0 by the SW shifter */
+    double shiftR = 0.;
     /** number of iterations for the fast peak finder,
-     *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR) */
-    unsigned maxIterations;
-    /** number of cells for the fast peak finder: 2^(maxIterations + 1) */
-    unsigned nCells;
+     *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR). Initialized at 0 by the SW shifter */
+    unsigned maxIterations = 0;
+    /** number of cells for the fast peak finder: 2^(maxIterations + 1). Initialized at 0 by the SW shifter */
+    unsigned nCells = 0;
 
     /** minimum number of hits from different super layers in a Hough cell
      *  to form a candidate */
@@ -255,10 +255,10 @@ namespace Belle2 {
     /** Hough Candidates */
     std::vector<CDCTriggerHoughCand> houghCand;
 
-    /** Radius of the CDC layers with priority wires (2 per super layer) */
-    double radius[9][2];
-    /** Number of track segments up to super layer */
-    unsigned TSoffset[10];
+    /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
+    double radius[9][2] = {{0.}};
+    /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
+    unsigned TSoffset[10] = {0};
 
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

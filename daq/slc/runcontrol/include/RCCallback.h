@@ -3,17 +3,9 @@
 #define _Belle2_RCCallback_hh
 
 #include "daq/slc/runcontrol/RCState.h"
-#include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCConfig.h"
-#include "daq/slc/runcontrol/RCHandlerException.h"
-#include "daq/slc/runcontrol/RCHandlerFatalException.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
-#include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/Mutex.h>
-#include <daq/slc/system/Cond.h>
-#include <daq/slc/system/PThread.h>
 
 namespace Belle2 {
 
@@ -53,7 +45,7 @@ namespace Belle2 {
   public:
     const NSMNode& getRuncontrol() const { return m_runcontrol; }
     void setState(const RCState& state);
-    void setRCConfig(const std::string& rcconfig) { m_rcconfig = rcconfig; }
+    void setRCConfig(const std::string& rcconfig) { m_rcconfig_org = rcconfig; }
     void setDBTable(const std::string& table) { m_table = table; }
     void setDBFile(const std::string& file) { m_file = file; }
     const std::string& getDBTable() const { return m_table; }
@@ -91,6 +83,7 @@ namespace Belle2 {
     std::string m_file;
     bool m_auto;
     std::string m_rcconfig;
+    std::string m_rcconfig_org;
     std::string m_provider_host;
     int m_provider_port;
     int m_expno;

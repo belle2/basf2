@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/BestVXDTrackCandidatesSelectorModule.h"
-#include <framework/logging/Logger.h>
 #include <vector>
 #include <numeric>
 
@@ -64,6 +63,7 @@ void BestVXDTrackCandidatesSelectorModule::deactivateCandidates()
     for (int iTracks = 0; iTracks < nTracks - m_subsetSize; ++iTracks) {
       int iCandidate = sortedTrackCandIndices[iTracks];
       m_spacePointTrackCands[iCandidate]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
+      // Note: assignment state of individual hits does not have to be changed here (assignment not set until SPTC2RTConverterModule)
     }
   }
 }

@@ -4,7 +4,7 @@
 """
 <header>
   <contact>software-tracking@belle2.org</contact>
-  <input>CosmicsSimNoBkg.root</input>
+  <input>CosmicsSimNoBkgTrackingVolume.root</input>
   <output>CosmicsTrackingValidation.root</output>
   <description>Validation of the default cosmic track finding (VXD+CDC).</description>
 </header>
@@ -34,8 +34,8 @@ class Cosmics(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'Cosmics'
     #: the input file on which the validation is performed
-    root_input_file = '../CosmicsSimNoBkg.root'
-    #: detector components used for the validation
+    root_input_file = '../CosmicsSimNoBkgTrackingVolume.root'
+    #: use full detector for validation
     components = None
     #: finder module: sets up the track finder used in this validation
     finder_module = staticmethod(add_cr_tracking_reconstruction)

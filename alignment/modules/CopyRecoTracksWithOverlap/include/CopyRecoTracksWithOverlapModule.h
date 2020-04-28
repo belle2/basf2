@@ -14,7 +14,6 @@
 
 namespace Belle2 {
   class RecoTrack;
-  class Particle;
 
   /// Copy RecoTracks with overlap hits in VXD to a new StoreArray (Will need a refit).
   /// If particleList is specified, take only RecoTracks associated to the particles (allows to make prior cuts at analysis level).

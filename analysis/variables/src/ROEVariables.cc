@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Matic Lubej                                 *
+ * Contributors: Anze Zupanc, Matic Lubej, Sviatoslav Bilokin             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -23,16 +23,12 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 
 // utility
-#include <analysis/utility/MCMatching.h>
 #include <analysis/utility/ReferenceFrame.h>
 
 #include <TRandom.h>
@@ -63,7 +59,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (not roe.isValid()) {
         B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
-        return -999.;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
@@ -84,7 +80,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (!roe.isValid()) {
         B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
-        return -999.;
+        return std::numeric_limits<float>::quiet_NaN();
       }
       auto* particleMC = particle->getRelatedTo<MCParticle>();
       if (!particleMC) {
@@ -106,20 +102,29 @@ namespace Belle2 {
 
     Manager::FunctionPtr currentROEIsInList(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function currentROEIsInList");
+
+      std::string listName = arguments[0];
 
       auto func = [listName](const Particle*) -> double {
 
         StoreObjPtr<ParticleList> particleList(listName);
+        if (!(particleList.isValid()))
+        {
+          B2FATAL("Invalid Listname " << listName << " given to currentROEIsInList!");
+        }
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
           return 0;
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
         return particleList->contains(particle) ? 1 : 0;
 
       };
@@ -128,8 +133,6 @@ namespace Belle2 {
 
     Manager::FunctionPtr particleRelatedToCurrentROE(const std::vector<std::string>& arguments)
     {
-      std::string listName;
-
       if (arguments.size() != 1)
         B2FATAL("Wrong number of arguments (1 required) for meta function particleRelatedToCurrentROE");
 
@@ -139,13 +142,52 @@ namespace Belle2 {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
-        auto* particle = roe->getRelatedTo<Particle>();
+        auto* particle = roe->getRelatedFrom<Particle>();
+        if (particle == nullptr)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
         return var->function(particle);
 
       };
       return func;
+    }
+
+    Manager::FunctionPtr useROERecoilFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          // Here we prioritize old variable behaviour first:
+          const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+          // if related ROE not found, get the StoreArray pointer
+          if (roe == nullptr)
+          {
+            StoreObjPtr<RestOfEvent> roeObjPtr("RestOfEvent");
+            if (roeObjPtr.isValid()) {
+              roe = &*roeObjPtr;
+            }
+          }
+          if (roe == nullptr)
+          {
+            B2ERROR("Neither relation between particle and ROE doesn't exist nor ROE object has not been found!");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+          PCmsLabTransform T;
+          TLorentzVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
+          Particle tmp(pRecoil, 0);
+          UseReferenceFrame<RestFrame> frame(&tmp);
+          double result = var->function(particle);
+          return result;
+        };
+        return func;
+      } else {
+        B2WARNING("Wrong number of arguments for meta function useROERecoilFrame");
+        return nullptr;
+      }
     }
 
     // only the helper function
@@ -205,10 +247,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -220,10 +262,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -235,10 +277,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -251,10 +293,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -267,10 +309,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -283,10 +325,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -299,10 +341,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
       auto mcroe4vector = boostvec - mcp->get4Vector();
       const auto& frame = ReferenceFrame::GetCurrent();
       auto frameMCRoe4Vector = frame.getMomentum(mcroe4vector);
@@ -315,10 +357,10 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getRelated<MCParticle>();
 
       if (!mcp)
-        return -999;
+        return std::numeric_limits<float>::quiet_NaN();
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
 
       return (boostvec - mcp->get4Vector()).Mag();
     }
@@ -342,19 +384,19 @@ namespace Belle2 {
         const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
 
         if (!mcParticle)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get Mother
         const MCParticle* mcMother = mcParticle->getMother();
 
         if (!mcMother)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get daughters
         std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
 
         if (mcDaughters.size() != 2)
-          return -999;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Get the companion B meson
         MCParticle* mcROE = nullptr;
@@ -1037,13 +1079,13 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec = missing4Vector(particle, maskName, "1");
         TLorentzVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
-        double deltaE = -999.9;
+        double deltaE = std::numeric_limits<float>::quiet_NaN();
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1086,12 +1128,12 @@ namespace Belle2 {
       auto func = [maskName, opt](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector sig4vec = T.rotateLabToCms() * particle->get4Vector();
         TLorentzVector sig4vecLAB = particle->get4Vector();
         TLorentzVector neutrino4vec;
 
-        double mbc = -999.9;
+        double mbc = std::numeric_limits<float>::quiet_NaN();
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1416,7 +1458,7 @@ namespace Belle2 {
 
         PCmsLabTransform T;
         TLorentzVector missing4Momentum;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
 
         return missing4Vector(particle, maskName, "5").Mag2() / (2.0 * missing4Vector(particle, maskName, "5").Energy());
       };
@@ -1435,7 +1477,7 @@ namespace Belle2 {
       int n = particle->getNDaughters();
 
       if (n < 1)
-        return -999.9;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // TODO: avoid hardocoded values
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
@@ -1467,7 +1509,7 @@ namespace Belle2 {
       int n = particle->getNDaughters();
 
       if (n < 1)
-        return -999.9;
+        return std::numeric_limits<float>::quiet_NaN();
 
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -1523,20 +1565,17 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
-      std::string option;
+      std::string maskName("");
+      std::string option("1");
 
-      if (arguments.size() == 0) {
-        maskName = "";
-        option = "1";
-      } else if (arguments.size() == 1) {
+      if (arguments.size() == 1) {
         maskName = arguments[0];
-        option = "1";
       } else if (arguments.size() == 2) {
         maskName = arguments[0];
         option = arguments[1];
-      } else
-        B2FATAL("Wrong number of arguments (2 required) for meta function q2lnuSimple(maskname,option)");
+      } else if (arguments.size() > 2) {
+        B2FATAL("Too many arguments. At most two arguments are allowed for meta function q2lnuSimple(maskname,option)");
+      }
 
       auto func = [maskName, option](const Particle * particle) -> double {
 
@@ -1552,7 +1591,7 @@ namespace Belle2 {
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return -999.9;
+          return std::numeric_limits<float>::quiet_NaN();
 
         // Assumes lepton is the last particle in the reco decay chain!
         PCmsLabTransform T;
@@ -1567,16 +1606,19 @@ namespace Belle2 {
 
     Manager::FunctionPtr WE_q2lnu(const std::vector<std::string>& arguments)
     {
-      std::string maskName;
+      std::string maskName("");
+      std::string option("7");
 
-      if (arguments.size() == 0)
-        maskName = "";
-      else if (arguments.size() == 1)
+      if (arguments.size() == 1) {
         maskName = arguments[0];
-      else
-        B2FATAL("Wrong number of arguments (1 required) for meta function q2lnu");
+      } else if (arguments.size() == 2) {
+        maskName = arguments[0];
+        option = arguments[1];
+      } else if (arguments.size() > 2) {
+        B2FATAL("Too many arguments. At most two arguments are allowed for meta function q2lnu(maskname, option)");
+      }
 
-      auto func = [arguments, maskName](const Particle * particle) -> double {
+      auto func = [maskName, option](const Particle * particle) -> double {
 
         // Get related ROE object
         const RestOfEvent* roe = getRelatedROEObject(particle);
@@ -1590,14 +1632,14 @@ namespace Belle2 {
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return -999.9;
+          return std::numeric_limits<float>::quiet_NaN();
 
         PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
         TLorentzVector lep_cm = T.rotateLabToCms() * lep->get4Vector();
 
         TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
-        TLorentzVector neu_cm = missing4Vector(particle, maskName, "7");
+        TLorentzVector neu_cm = missing4Vector(particle, maskName, option);
 
         // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
         double e_beam = T.getCMSEnergy() / 2.0;
@@ -1664,7 +1706,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
 
         PCmsLabTransform T;
-        TLorentzVector boostvec = T.getBoostVector();
+        TLorentzVector boostvec = T.getBeamFourMomentum();
         TLorentzVector pNu = missing4Vector(particle, maskName, "6");
 
         TLorentzVector pLep;
@@ -1737,6 +1779,135 @@ namespace Belle2 {
       return 0.0;
     }
 
+
+    Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2ERROR("Wrong number of arguments (1 required) for pi0Prob");
+
+      std::string mode;
+      mode = arguments[0];
+
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+        B2ERROR("the given argument is not supported in pi0Prob!");
+
+      auto func = [mode](const Particle * particle) -> double {
+        if (mode == "standard")
+        {
+          if (particle->hasExtraInfo("Pi0ProbOrigin")) {
+            return particle->getExtraInfo("Pi0ProbOrigin");
+          } else {
+            B2WARNING("Pi0ProbOrigin is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "tight")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThreshold")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThreshold");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThreshold is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "cluster")
+        {
+          if (particle->hasExtraInfo("Pi0ProbLargeClusterSize")) {
+            return particle->getExtraInfo("Pi0ProbLargeClusterSize");
+          } else {
+            B2WARNING("Pi0ProbLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "both")
+        {
+          if (particle->hasExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize")) {
+            return particle->getExtraInfo("Pi0ProbTightEnergyThresholdAndLargeClusterSize");
+          } else {
+            B2WARNING("Pi0ProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      };
+      return func;
+    }
+
+    Manager::FunctionPtr etaProb(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1)
+        B2ERROR("Wrong number of arguments (1 required) for etaProb");
+
+      std::string mode;
+      mode = arguments[0];
+
+      if (mode != "standard" and mode != "tight" and mode != "cluster" and mode != "both")
+        B2ERROR("the given argument is not supported in etaProb!");
+
+      auto func = [mode](const Particle * particle) -> double {
+        if (mode == "standard")
+        {
+          if (particle->hasExtraInfo("EtaProbOrigin")) {
+            return particle->getExtraInfo("EtaProbOrigin");
+          } else {
+            B2WARNING("EtaProbOrigin is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "tight")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThreshold")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThreshold");
+          } else {
+            B2WARNING("EtaProbTightEnergyThreshold is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "cluster")
+        {
+          if (particle->hasExtraInfo("EtaProbLargeClusterSize")) {
+            return particle->getExtraInfo("EtaProbLargeClusterSize");
+          } else {
+            B2WARNING("EtaProbLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else if (mode == "both")
+        {
+          if (particle->hasExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize")) {
+            return particle->getExtraInfo("EtaProbTightEnergyThresholdAndLargeClusterSize");
+          } else {
+            B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
+                      "the function writePi0EtaVeto has to be executed to register this extraInfo.");
+            return std::numeric_limits<float>::quiet_NaN();
+          }
+        }
+
+        else
+        {
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+      };
+      return func;
+    }
+
     // ------------------------------------------------------------------------------
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
@@ -1753,7 +1924,7 @@ namespace Belle2 {
       }
 
       PCmsLabTransform T;
-      TLorentzVector boostvec = T.getBoostVector();
+      TLorentzVector boostvec = T.getBeamFourMomentum();
 
       TLorentzVector rec4vecLAB = particle->get4Vector();
       TLorentzVector roe4vecLAB = roe->get4Vector(maskName);
@@ -1922,6 +2093,11 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Rest Of Event");
 
+    REGISTER_VARIABLE("useROERecoilFrame(variable)", useROERecoilFrame,
+                      "Returns the value of the variable using the rest frame of the ROE recoil as current reference frame.\n"
+                      "Can be used inside for_each loop or outside of it if the particle has associated Rest of Event.\n"
+                      "E.g. ``useROERecoilFrame(E)`` returns the energy of a particle in the ROE recoil frame.");
+
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
@@ -1929,12 +2105,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("isCloneOfSignalSide", isCloneOfSignalSide,
                       "Returns 1 if a particle is a clone of signal side final state particles, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("hasAncestorFromSignalSide", hasAncestorFromSignalSide,
                       "Returns 1 if a particle has ancestor from signal side, 0 otherwise. "
                       "Requires generator information and truth-matching. "
-                      "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+                      "One can use this variable only in a ``for_each`` loop over the RestOfEvent StoreArray.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                       "[Eventbased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."
@@ -1947,7 +2123,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
                       "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                      "Is required for the specific FEI.");
+                      "Is required for the specific FEI. :noindex:");
+    // nROE_RemainingTracks is overloaded (two C++ functions sharing one
+    // variable name) so one of the two needs to be made the indexed
+    // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
@@ -1955,7 +2134,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
                       "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
                       "Second argument is a PDG code to count only one charged particle species, independently of charge. "
-                      "For example: nROE_Charged(cleanMask, 321) will output number of kaons in Rest Of Event with 'cleanMask'. "
+                      "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
                       "PDG code 0 is used to count all charged particles");
 
     REGISTER_VARIABLE("nROE_Photons(maskName)", nROE_Photons,
@@ -1968,31 +2147,31 @@ namespace Belle2 {
                       "[Eventbased] Returns variable applied to the particle which is related to the current RestOfEvent object"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_VARIABLE("ROE_MC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_M", ROE_MC_M,
+    REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
                       "Returns true invariant mass of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_MC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_MC_MissFlags(maskName)", ROE_MC_MissingFlags,
+    REGISTER_VARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
                       "Returns flags corresponding to missing particles on ROE side.");
 
     REGISTER_VARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
@@ -2008,108 +2187,128 @@ namespace Belle2 {
                       "Returns the number of particles in ROE from the given particle list.\n"
                       "Use of variable aliases is advised.");
 
-    REGISTER_VARIABLE("ROE_charge(maskName)", ROE_Charge,
+    REGISTER_VARIABLE("roeCharge(maskName)", ROE_Charge,
                       "Returns total charge of the related RestOfEvent object.");
 
-    REGISTER_VARIABLE("ROE_eextra(maskName)", ROE_ExtraEnergy,
+    REGISTER_VARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
                       "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle");
 
-    REGISTER_VARIABLE("ROE_neextra(maskName)", ROE_NeutralExtraEnergy,
-                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
+                      "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_E(maskName)", ROE_E,
-                      "Returns energy of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeE(maskName)", ROE_E,
+                      "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_M(maskName)", ROE_M,
+    REGISTER_VARIABLE("roeM(maskName)", ROE_M,
                       "Returns invariant mass of unused tracks and clusters in ROE");
 
-    REGISTER_VARIABLE("ROE_P(maskName)", ROE_P,
-                      "Returns momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roeP(maskName)", ROE_P,
+                      "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_Pt(maskName)", ROE_Pt,
-                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roePt(maskName)", ROE_Pt,
+                      "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_Px(maskName)", ROE_Px,
-                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roePx(maskName)", ROE_Px,
+                      "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_Py(maskName)", ROE_Py,
-                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roePy(maskName)", ROE_Py,
+                      "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_Pz(maskName)", ROE_Pz,
-                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roePz(maskName)", ROE_Pz,
+                      "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_PTheta(maskName)", ROE_PTheta,
-                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with Use***Frame() function.");
+    REGISTER_VARIABLE("roePTheta(maskName)", ROE_PTheta,
+                      "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.");
 
-    REGISTER_VARIABLE("ROE_deltae(maskName)", ROE_DeltaE,
-                      "Returns energy difference of the related RestOfEvent object with respect to E_cms/2.");
+    REGISTER_VARIABLE("roeDeltae(maskName)", ROE_DeltaE,
+                      "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.");
 
-    REGISTER_VARIABLE("ROE_mbc(maskName)", ROE_Mbc,
-                      "Returns beam constrained mass of the related RestOfEvent object with respect to E_cms/2.");
+    REGISTER_VARIABLE("roeMbc(maskName)", ROE_Mbc,
+                      "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`.");
 
-    REGISTER_VARIABLE("WE_deltae(maskName, opt)", WE_DeltaE,
-                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
+    REGISTER_VARIABLE("weDeltae(maskName, opt)", WE_DeltaE,
+                      "Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.");
 
-    REGISTER_VARIABLE("WE_mbc(maskName, opt)", WE_Mbc,
-                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to E_cms/2.");
+    REGISTER_VARIABLE("weMbc(maskName, opt)", WE_Mbc,
+                      "Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_\\mathrm{cms}/2`.");
 
-    REGISTER_VARIABLE("WE_MissM2(maskName, opt)", WE_MissM2,
-                      "Returns the invariant mass squared of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
+                      "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)");
 
-    REGISTER_VARIABLE("REC_MissM2", REC_MissM2,
+    REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from p_nu = pB - p_had - p_lep");
+                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`");
 
-    REGISTER_VARIABLE("WE_MissPTheta(maskName, opt)", WE_MissPTheta,
-                      "Returns the polar angle of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
+                      "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)");
 
-    REGISTER_VARIABLE("WE_MissP(maskName, opt)", WE_MissP,
-                      "Returns the magnitude of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissP(maskName, opt)", WE_MissP,
+                      "Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options)");
 
-    REGISTER_VARIABLE("WE_MissPx(maskName, opt)", WE_MissPx,
-                      "Returns the x component of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissPx(maskName, opt)", WE_MissPx,
+                      "Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
-    REGISTER_VARIABLE("WE_MissPy(maskName, opt)", WE_MissPy,
-                      "Returns the y component of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissPy(maskName, opt)", WE_MissPy,
+                      "Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
-    REGISTER_VARIABLE("WE_MissPz(maskName, opt)", WE_MissPz,
-                      "Returns the z component of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissPz(maskName, opt)", WE_MissPz,
+                      "Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options)");
 
-    REGISTER_VARIABLE("WE_MissE(maskName, opt)", WE_MissE,
-                      "Returns the energy of the missing momentum (see possible options)");
+    REGISTER_VARIABLE("weMissE(maskName, opt)", WE_MissE,
+                      R"DOC(Returns the energy of the missing momentum, possible options ``opt`` are the following:
 
-    REGISTER_VARIABLE("WE_xiZ(maskName)", WE_xiZ,
+- ``0``: CMS, use energy and momentum of charged particles and photons
+- ``1``: CMS, same as ``0``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}`
+- ``2``: CMS, same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
+- ``3``: CMS, use only energy and momentum of signal side
+- ``4``: CMS, same as ``3``, update with direction of ROE momentum
+- ``5``: LAB, use energy and momentum of charged particles and photons from whole event
+- ``6``: LAB, same as ``5``, fix :math:`E_\mathrm{miss} = p_\mathrm{miss}``
+- ``7``: CMS, correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0`` (used for :math:`M_\mathrm{bc}` calculation).)DOC");
+
+    REGISTER_VARIABLE("weXiZ(maskName)", WE_xiZ,
                       "Returns Xi_z in event (for Bhabha suppression and two-photon scattering)");
 
     REGISTER_VARIABLE("bssMassDifference(maskName)", bssMassDifference,
                       "Bs* - Bs mass difference");
 
-    REGISTER_VARIABLE("WE_cosThetaEll(maskName)", WE_cosThetaEll,
-                      "Returns the angle between M and lepton in W rest frame in the decays of the type\n"
-                      "M -> h_1 ... h_n ell, where W 4-momentum is given as pW = p_ell + p_nu. The neutrino\n"
-                      "momentum is calculated from ROE taking into account the specified mask and setting\n"
-                      "E_nu = |p_miss|.");
+    REGISTER_VARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
 
-    REGISTER_VARIABLE("REC_q2BhSimple", REC_q2BhSimple,
-                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+Returns the angle between :math:`M` and lepton in :math:`W` rest frame in the decays of the type:
+:math:`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
+
+.. math::
+    p_W = p_\ell + p_\nu.
+
+The neutrino momentum is calculated from ROE taking into account the specified mask, and setting
+
+.. math::
+    E_{\nu} = |p_{miss}|.
+    
+)DOC");
+
+    REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
                       "The B meson momentum in CMS is assumed to be 0.");
 
-    REGISTER_VARIABLE("REC_q2Bh", REC_q2Bh,
-                      "Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell.\n"
+    REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
+                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone");
 
-    REGISTER_VARIABLE("WE_q2lnuSimple(maskName,option)", WE_q2lnuSimple,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
-                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter.");
+    REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
+                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
+                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
 
-    REGISTER_VARIABLE("WE_q2lnu(maskName)", WE_q2lnu,
-                      "Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2, \n"
-                      "where B -> H_1 ... H_n ell nu_ell. Lepton is assumed to be the last reconstructed daughter. \n"
-                      "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction");
+    REGISTER_VARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
+                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
+                      "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
+                      "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
+                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value.");
 
-    REGISTER_VARIABLE("WE_MissM2OverMissE(maskName)", WE_MissM2OverMissE,
+    REGISTER_VARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
                       "Returns missing mass squared over missing energy");
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
@@ -2117,5 +2316,24 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");
+
+    REGISTER_VARIABLE("pi0Prob(mode)", pi0Prob,
+                      "Returns pi0 probability, where mode is used to specify the selection criteria for soft photon. \n"
+                      "The following strings are available. \n\n"
+                      "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
+
+    REGISTER_VARIABLE("etaProb(mode)", etaProb,
+                      "Returns eta probability, where mode is used to specify the selection criteria for soft photon. \n"
+                      "The following strings are available. \n\n"
+                      "- ``standard``: loose energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``tight``: tight energy cut and no clusterNHits cut are applied to soft photon \n"
+                      "- ``cluster``: loose energy cut and clusterNHits cut are applied to soft photon \n"
+                      "- ``both``: tight energy cut and clusterNHits cut are applied to soft photon \n\n"
+                      "You can find more details in `writePi0EtaVeto` function in modularAnalysis.py.");
+
   }
 }

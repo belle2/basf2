@@ -274,6 +274,10 @@ class TestVariableUtilities(unittest.TestCase):
                     always_include_indices=always_include_indices,
                 )
 
+    def test_inclusive(self):
+        """Select a decay with the inclusive particle marker"""
+        self.assertAliases("B0 -> ^Xsd e+:loose e-:loose", ["Xsd"])
+
     def test_zfinal(self):
         """Print all aliases as a final check"""
         vm.printAliases()

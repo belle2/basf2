@@ -8,6 +8,13 @@
 //-
 
 #include "daq/rfarm/manager/RFEventProcessor.h"
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <cstring>
 #include <iostream>
 
 #define RFOTSOUT stdout
@@ -180,6 +187,9 @@ int RFEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 {
   // Simple implementation to stop all processes
   //  system("killall basf2 sock2rbr rb2sockr hrelay hserver");
+
+  // Emergency stop
+  system("killall -9 python");
 
   // Normal abort
   int status;

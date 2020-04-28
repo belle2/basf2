@@ -4,15 +4,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
 #include <genfit/GFRaveVertex.h>
-#include <genfit/Track.h>
 #include <genfit/FieldManager.h>
 #include "genfit/MaterialEffects.h"
-#include <genfit/Exception.h>
 
 #include <framework/utilities/IOIntercept.h>
 
@@ -30,6 +27,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
   if (m_validation) {
     B2DEBUG(300, "Register DataStore for validation.");
     m_validationV0s.registerInDataStore(v0ValidationVerticesName, DataStore::c_ErrorIfAlreadyRegistered);
+    m_v0s.registerRelationTo(m_validationV0s);
   }
 
   B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
@@ -220,11 +218,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
 
   const TVector3& posVert(vert.getPos());
-  TLorentzVector lv0, lv1;
 
-  // Reconstruct invariant mass.
-  lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
-  lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
 
   // Apply cuts. We have one set of cuts inside the beam pipe,
   // the other outside.
@@ -255,20 +249,25 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);
 
   B2DEBUG(100, "Creating new V0.");
-  m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
-                  std::make_pair(trackMinus, tfrMinusVtx));
+  auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
+                            std::make_pair(trackMinus, tfrMinusVtx));
 
   if (m_validation) {
     B2DEBUG(300, "Create StoreArray and Output for validation.");
-    m_validationV0s.appendNew(
-      std::make_pair(trackPlus, tfrPlusVtx),
-      std::make_pair(trackMinus, tfrMinusVtx),
-      vert.getPos(),
-      vert.getCov(),
-      (lv0 + lv1).P(),
-      (lv0 + lv1).M(),
-      vert.getChi2()
-    );
+    TLorentzVector lv0, lv1;
+    // Reconstruct invariant mass.
+    lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
+    lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
+    auto validationV0 = m_validationV0s.appendNew(
+                          std::make_pair(trackPlus, tfrPlusVtx),
+                          std::make_pair(trackMinus, tfrMinusVtx),
+                          vert.getPos(),
+                          vert.getCov(),
+                          (lv0 + lv1).P(),
+                          (lv0 + lv1).M(),
+                          vert.getChi2()
+                        );
+    v0->addRelationTo(validationV0);
 
   }
   return true;

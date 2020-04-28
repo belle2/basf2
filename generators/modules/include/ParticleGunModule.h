@@ -13,12 +13,10 @@
 
 #include <framework/core/Module.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/particlegun/ParticleGun.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -57,6 +55,8 @@ namespace Belle2 {
     std::string m_phiDist;
     /** String representation of the polar angle distribution */
     std::string m_thetaDist;
+    /** String representation of the time distribution */
+    std::string m_timeDist;
     /** String representation of the vertex distribution */
     std::string m_vertexDist;
     /** String representation of the x vertex distribution */

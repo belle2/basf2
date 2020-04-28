@@ -4,7 +4,7 @@
 """
 <header>
   <output>KShortGenSimNoBkg.root</output>
-  <contact>tkuhr</contact>
+  <contact>Software team b2soft@mail.desy.de</contact>
   <cacheable/>
   <description>This steering file produces 500 events with five KLong each
   and runs the detector simulation without mixing in background.</description>
@@ -20,7 +20,7 @@ set_random_seed(1337)
 main = create_path()
 
 main.add_module('EventInfoSetter',
-                evtNumList=[500],
+                evtNumList=[1500],
                 runList=[1],
                 expList=[0]
                 )
@@ -53,14 +53,14 @@ print(statistics)
 from validation import *
 statistics_plots(
     'KShortGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with KShortGenSimNoBkg particleGun',
     prefix='KShortGenSimNoBkg'
 )
 event_timing_plot(
     '../KShortGenSimNoBkg.root',
     'KShortGenSimNoBkg_statistics.root',
-    contact='tkuhr',
+    contact='Software team b2soft@mail.desy.de',
     job_desc='a standard simulation job with Klong particleGun',
     prefix='KShortGenSimNoBkg'
 )

@@ -27,6 +27,7 @@ namespace Belle2 {
                                              float yMax)
     : _name(name),
       _trans(trans),
+      _charge(0),
       _nX(nX),
       _xMin(xMin),
       _xMax(xMax),

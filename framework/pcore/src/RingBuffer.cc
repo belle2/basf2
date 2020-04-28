@@ -17,7 +17,6 @@
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <sys/stat.h>
 
 #include <cerrno>
 #include <cstdio>
@@ -190,12 +189,12 @@ void RingBuffer::dump_db()
          m_bufinfo->wptr, m_bufinfo->rptr, m_bufinfo->nbuf);
 }
 
-int RingBuffer::insq(const int* buf, int size)
+int RingBuffer::insq(const int* buf, int size, bool checkTx)
 {
   if (size <= 0) {
     B2FATAL("RingBuffer::insq() failed: invalid buffer size = " << size);
   }
-  if (m_bufinfo->numAttachedTx == 0) {
+  if (m_bufinfo->numAttachedTx == 0 and checkTx) {
     //safe abort was requested
     B2WARNING("Number of attached Tx is 0, so I will not go on with the processing.");
     exit(0);

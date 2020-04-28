@@ -7,9 +7,11 @@
 //-
 
 #include <daq/rfarm/event/modules/Raw2DsModule.h>
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+
 #include <TSystem.h>
 #include <stdlib.h>
-#include <time.h>
 #include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"
@@ -128,7 +130,7 @@ void Raw2DsModule::registerRawCOPPERs()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
-    if (signalled != 0) break;
+    if (signalled != 0) return;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

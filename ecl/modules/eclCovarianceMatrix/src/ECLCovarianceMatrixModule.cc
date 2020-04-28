@@ -18,7 +18,6 @@
 #include "TMath.h"
 
 // MDST
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ECL

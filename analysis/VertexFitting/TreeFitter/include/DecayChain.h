@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,12 +12,13 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/MergedConstraint.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 
 namespace TreeFitter {
 
   class FitParams ;
   class ParticleBase ;
-
+  class ConstraintConfiguration;
   /** this class does a lot of stuff:
   Build decaytree structure allowing to index particles and handle the filtering of constraints across the tree
   */
@@ -30,11 +31,8 @@ namespace TreeFitter {
 
     /**  constructor   */
     DecayChain(Belle2::Particle* bc,
-               bool forceFitAll = false,
-               const bool ipConstraint = false,
-               const bool customOrigin = false,
-               const std::vector<double>& customOriginVertex = {0, 0, 0},
-               const std::vector<double>& customOriginCovariance = {0, 0, 0, 0, 0, 0, 0, 0, 0,}
+               const ConstraintConfiguration& config,
+               bool forceFitAll = false
               );
 
     /**  destructor   */
@@ -107,6 +105,9 @@ namespace TreeFitter {
 
     /** internal class member to check if we own the chain */
     const bool m_isOwner ;
+
+    /** config container */
+    const ConstraintConfiguration m_config;
 
   };
 

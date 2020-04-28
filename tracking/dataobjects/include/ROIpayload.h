@@ -12,7 +12,6 @@
 
 #include <tracking/dataobjects/ROIrawID.h>
 #include "TObject.h"
-#include <stdio.h>
 #include <stdint.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 
@@ -50,11 +49,15 @@ namespace Belle2 {
 
     int m_packetLengthByte = 0; /**< packet length  in byte*/
     int m_length; /**< packet length*/
-    int*  m_rootdata; /**< pointer to data packet of m_length words*/
+    /** pointer to data packet of m_length words*/
+    int*  m_rootdata; //[m_length]
 
-    int m_index; /**< transient index*/
-    uint32_t* m_data32; /**< pointer to transient 32-bit value*/
-    ROIrawID::baseType* m_data64; /**< pointer to transient 64-bit value*/
+    /** transient index*/
+    int m_index; //! transient value
+    /** pointer to transient 32-bit value*/
+    uint32_t* m_data32; //! transient value
+    /** pointer to transient 64-bit value*/
+    ROIrawID::baseType* m_data64; //! transient value
 
     void setPayloadLength(int length); /**< set payload length*/
     void setPayloadLength(); /**< set payload length*/
@@ -70,7 +73,8 @@ namespace Belle2 {
 
     int getPacketLengthByte() {return m_packetLengthByte;} /**< get packet length in bytes*/
     int getLength() {return m_length;} /**< get packet length*/
-    int* getRootdata() {return m_rootdata;} /**< get pointer to the data packet*/
+    /** get pointer to the data packet*/
+    int* getRootdata() {return m_rootdata;} //[m_length]
 
     void init(int length); /**< initializer*/
 

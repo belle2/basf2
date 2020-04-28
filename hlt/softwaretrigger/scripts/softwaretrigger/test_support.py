@@ -74,8 +74,21 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
     add_packers(path, components=components)
 
+    # express reco expects to have an HLT results, so lets add a fake one
+    if location == constants.Location.expressreco:
+        class FakeHLTResult(basf2.Module):
+            def initialize(self):
+                self.results = Belle2.PyStoreObj(Belle2.SoftwareTriggerResult.Class(), "SoftwareTriggerResult")
+                self.results.registerInDataStore()
+
+            def event(self):
+                self.results.create()
+                self.results.addResult("software_trigger_cut&all&total_result", 1)
+
+        path.add_module(FakeHLTResult())
+
     # remove everything but HLT input raw objects
-    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary"]
+    branch_names = RAWDATA_OBJECTS + ["EventMetaData", "TRGSummary", "SoftwareTriggerResult"]
     if location == constants.Location.hlt:
         branch_names.remove("RawPXDs")
         branch_names.remove("ROIs")
@@ -109,11 +122,12 @@ def test_script(script_location, input_file_name, temp_dir):
     histos_file_name = os.path.join(temp_dir, f"{random_seed}_histos.root")
     output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
     # TODO: should we use the default global tag here?
-    central_database = basf2.get_default_global_tags()
+    globaltags = list(basf2.conditions.default_globaltags)
     num_processes = 1
 
+    os.chdir(os.path.dirname(script_location))
     cmd = [sys.executable, script_location,
-           "--central-db-tag", central_database,
+           "--central-db-tag"] + globaltags + [
            "--input-file", os.path.abspath(input_file_name),
            "--histo-output-file", os.path.abspath(histos_file_name),
            "--output-file", os.path.abspath(output_file_name),
@@ -154,7 +168,7 @@ def test_folder(location, run_type, exp_number, phase):
 
     script_dir = find_file(f"hlt/operation/{phase}/global/{location.name}/evp_scripts/")
     run_at_least_one = False
-    for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}_*.py")):
+    for script_location in glob(os.path.join(script_dir, f"run_{run_type.name}*.py")):
         run_at_least_one = True
         test_script(script_location, input_file_name=output_file_name, temp_dir=temp_dir)
 

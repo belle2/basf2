@@ -8,52 +8,42 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdPhotons import *
-from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-00'
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
+from stdCharged import stdE, stdK, stdMu, stdPi
+import skimExpertFunctions as expert
+
 
 # create a new path
-skimpath = Path()
+skimpath = b2.Path()
 
 
-fileList = \
-    [
-        '/ghi/fs01/belle2/bdata/MC/release-00-09-01/DB00000276/MC9/prod00002288/e0000/4S/r00000/mixed/sub00/' +
-        'mdst_000001_prod00002288_task00000001.root'
-    ]
+fileList = expert.get_test_file("MC12_mixedBGx1")
 
-
-inputMdstList('MC9', fileList, path=skimpath)
+ma.inputMdstList('default', fileList, path=skimpath)
 
 # use standard final state particle lists
 
 stdPhotons('loose', path=skimpath)
 
 stdPi('loose', path=skimpath)
-stdK('loose', path=skimpath)
 stdE('loose', path=skimpath)
 stdMu('loose', path=skimpath)
-stdPi('all', path=skimpath)
-stdK('all', path=skimpath)
-stdE('all', path=skimpath)
-stdMu('all', path=skimpath)
 
 # ISRpipicc Skim
 from skim.quarkonium import ISRpipiccList
-add_skim("ISRpipicc", ISRpipiccList(path=skimpath), skimpath)
+expert.add_skim("ISRpipicc", ISRpipiccList(path=skimpath), skimpath)
 # Bottomonium Etab Skim: 15420100
 from skim.quarkonium import EtabList
-add_skim("BottomoniumEtabExclusive", EtabList(path=skimpath), path=skimpath)
+expert.add_skim("BottomoniumEtabExclusive", EtabList(path=skimpath), path=skimpath)
 # Bottomonium Upsilon Skim: 15440100
 from skim.quarkonium import UpsilonList
-add_skim('BottomoniumUpsilon', UpsilonList(path=skimpath), path=skimpath)
+expert.add_skim('BottomoniumUpsilon', UpsilonList(path=skimpath), path=skimpath)
 
 
-setSkimLogging(path=skimpath)
-process(skimpath)
+expert.setSkimLogging(path=skimpath)
+b2.process(skimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

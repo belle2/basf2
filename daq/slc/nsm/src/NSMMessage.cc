@@ -6,13 +6,15 @@
 #include <stdlib.h>
 
 #include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/BufferedReader.h>
-#include <daq/slc/system/BufferedWriter.h>
-#include <daq/slc/system/StreamSizeCounter.h>
+#include <daq/slc/nsm/NSMHandlerException.h>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
+
+#include <nsm2/nsmlib2.h>
+#include <nsm2/nsmsys2.h>
+
+#include <arpa/inet.h>
 
 using namespace Belle2;
 
@@ -36,7 +38,7 @@ void NSMMessage::init(const NSMNode& node, const NSMVar& var)
   m_nsm_msg.pars[2] = var.getNode().size();
   m_nsm_msg.pars[3] = var.getName().size();
   m_nsm_msg.pars[4] = var.getId();
-  m_nsm_msg.pars[5] = var.getRevision();
+  m_nsm_msg.pars[5] = var.getDate();
   if (var.getType() != NSMVar::NONE) {
     int size = var.getNode().size() + 1 + var.getName().size() + 1 + var.size();
     m_data = Buffer(size);

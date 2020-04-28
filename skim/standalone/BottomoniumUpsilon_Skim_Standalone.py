@@ -8,22 +8,20 @@
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdPi0s import *
-from stdPhotons import *
-from stdCharged import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
-import sys
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
+from stdCharged import stdE, stdMu, stdPi
+import skimExpertFunctions as expert
+gb2_setuprel = 'release-04-00-00'
 
 # create a new path
-BottomoniumUpsilonskimpath = Path()
+BottomoniumUpsilonskimpath = b2.Path()
 
-skimCode = encodeSkimName('BottomoniumUpsilon')
+skimCode = expert.encodeSkimName('BottomoniumUpsilon')
 
-fileList = get_test_file("mixedBGx1", "MC11")
-inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=BottomoniumUpsilonskimpath)
 
 # use standard final state particle lists
 stdPi('loose', path=BottomoniumUpsilonskimpath)
@@ -33,14 +31,14 @@ stdMu('loose', path=BottomoniumUpsilonskimpath)
 stdPhotons('loose', path=BottomoniumUpsilonskimpath)
 
 # Bottomonium Skim
-from skim.quarkonium import *
+from skim.quarkonium import UpsilonList
 YList = UpsilonList(path=BottomoniumUpsilonskimpath)
-skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
-summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
+expert.skimOutputUdst(skimCode, YList, path=BottomoniumUpsilonskimpath)
+ma.summaryOfLists(YList, path=BottomoniumUpsilonskimpath)
 
 
-setSkimLogging(path=BottomoniumUpsilonskimpath)
-process(BottomoniumUpsilonskimpath)
+expert.setSkimLogging(path=BottomoniumUpsilonskimpath)
+b2.process(BottomoniumUpsilonskimpath)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

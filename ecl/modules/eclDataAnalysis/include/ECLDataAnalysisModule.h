@@ -82,8 +82,9 @@ namespace Belle2 {
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
-    bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
-    bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doPureCsI; /**< if true, info on pureCsI upgrade is stored*/
+    bool m_doHits; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doDigits; /**< if true, info on Digits and CalDigits is stored*/
 
     //dataStore objects
     StoreArray<Track> m_tracks;  /**< Tracks storeArray */
@@ -292,6 +293,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterTimingError;  /**< ECLCluster time error */
     std::vector<double>* m_eclClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for ECLCluster*/
     std::vector<double>* m_eclClusterHighestE; /**< Highest energy deposit (per crystal) in ECLCluster */
+    std::vector<int>* m_eclClusterCellId; /**< CellId with highest energy deposit in ECLCluster */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
@@ -400,6 +402,7 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterTimingError;  /**< Cluster time error, PureCsI option */
     std::vector<double>* m_eclPureClusterE9oE21;  /**< Ratio of 3x3 over 5x5 crystal matrices energies for Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterHighestE; /**< Highest energy deposit (per crystal) in Cluster, PureCsI option */
+    std::vector<int>* m_eclPureClusterCellId; /**< CellId with highest energy deposit in Cluster, PureCsI option */
     std::vector<double>* m_eclPureClusterLat; /**< Cluster shape parameter LAT, PureCsI option */
     std::vector<int>* m_eclPureClusterNofCrystals;  /**< Number of crystals in Cluster, PureCsI option */
     std::vector<int>* m_eclPureClusterCrystalHealth;  /**< Crystal healt flag, PureCsI option */
@@ -494,6 +497,7 @@ namespace Belle2 {
     std::vector<int>*
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
+    std::vector<double>*   m_eclShowerNumberOfCrystalsForEnergy; /**< Number of crystals used for energy calculation*/
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */

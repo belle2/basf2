@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>

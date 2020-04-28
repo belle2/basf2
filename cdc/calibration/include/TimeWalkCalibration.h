@@ -9,7 +9,9 @@
  **************************************************************************/
 
 #pragma once
-#include <calibration/CalibrationAlgorithm.h>
+
+#include <framework/logging/Logger.h>
+
 #include <TH1D.h>
 #include <TH2D.h>
 #include "string"

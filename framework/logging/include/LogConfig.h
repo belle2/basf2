@@ -31,14 +31,15 @@ namespace Belle2 {
                    };
 
     /** Definition of the supported log message information. */
-    enum ELogInfo { c_Level = 0x01,    /**< Log level of the message.  */
-                    c_Message = 0x02,  /**< Log message text.  */
-                    c_Module = 0x04,   /**< Module in which the message was emitted. */
-                    c_Package = 0x08,  /**< Package in which the message was emitted. */
-                    c_Function = 0x10, /**< Function in which the message was emitted. */
-                    c_File = 0x20,     /**< Source file in which the message was emitted. */
-                    c_Line = 0x40,     /**< Line in source file in which the message was emitted. */
-                    c_Timestamp = 0x80 /**< Time at which the message was emitted. */
+    enum ELogInfo { c_Level = 0x01,        /**< Log level of the message.  */
+                    c_Message = 0x02,      /**< Log message text.  */
+                    c_Module = 0x04,       /**< Module in which the message was emitted. */
+                    c_Package = 0x08,      /**< Package in which the message was emitted. */
+                    c_Function = 0x10,     /**< Function in which the message was emitted. */
+                    c_File = 0x20,         /**< Source file in which the message was emitted. */
+                    c_Line = 0x40,         /**< Line in source file in which the message was emitted. */
+                    c_Timestamp = 0x80,    /**< Time at which the message was emitted. */
+                    c_NoVariables = 0x100, /**< If set don't output any variables that are part of the message */
                   };
 
     static const int c_DefaultDebugLevel = 10;  /**< Default debug level. */
@@ -122,8 +123,8 @@ namespace Belle2 {
     ELogLevel m_logLevel;               /**< The log messaging level. Defined as int for the parameter handling. */
     int m_debugLevel;                   /**< The debug messaging level. */
     ELogLevel m_abortLevel;             /**< The log level at which the execution should be stopped. */
-    unsigned int
-    m_logInfo[c_Default];  /**< The kind of printed information per log level. (ORed combination of LogConfig::ELogInfo flags). */
+    /** The kind of printed information per log level. (ORed combination of LogConfig::ELogInfo flags). */
+    unsigned int m_logInfo[c_Default];
 
   };
 

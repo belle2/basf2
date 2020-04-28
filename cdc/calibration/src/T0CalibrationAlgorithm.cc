@@ -2,22 +2,19 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dataobjects/WireID.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
 #include <TFile.h>
-#include <TChain.h>
 #include <TTree.h>
-#include "iostream"
-#include "string"
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -34,14 +31,13 @@ void T0CalibrationAlgorithm::createHisto()
 {
 
   B2INFO("Creating histograms");
-  double x;
-  double t_mea;
-  double w;
-  double t_fit;
-  double ndf;
-  double Pval;
-  int IWire;
-  int lay;
+  Float_t x;
+  Float_t t_mea;
+  Float_t t_fit;
+  Float_t ndf;
+  Float_t Pval;
+  UShort_t IWire;
+  UChar_t lay;
 
   auto tree = getObjectPtr<TTree>("tree");
   tree->SetBranchAddress("lay", &lay);
@@ -49,9 +45,19 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("x_u", &x);
   tree->SetBranchAddress("t", &t_mea);
   tree->SetBranchAddress("t_fit", &t_fit);
-  tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
+
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   double halfCSize[56];
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -75,9 +81,9 @@ void T0CalibrationAlgorithm::createHisto()
     m_hT0b[ib] = new TH1F(Form("hT0b%d", ib), Form("boardID_%d", ib), 100, -20, 20);
   }
   //read data
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     double xmax = halfCSize[lay] - 0.1;
     if ((fabs(x) < m_xmin) || (fabs(x) > xmax)
@@ -120,6 +126,8 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
+  auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  double dEventT0 = hEvtT0->GetMean();
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all chanels", 500, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all chanels", 100, 0, 10);
@@ -175,14 +183,31 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
     }
   }
 
+  // mean shift
+  //  const double dt0Mean = hm_All->GetMean();
+  for (int ilay = 0; ilay < 56; ++ilay) {
+    for (unsigned int iwire = 0; iwire < cdcgeo.nWiresInLayer(ilay); ++iwire) {
+      dt[ilay][iwire] += dEventT0;
+    }
+  }
+
+
 
   if (m_storeHisto) {
     B2INFO("Storing histograms");
-
+    auto hNDF =   getObjectPtr<TH1F>("hNDF");
+    auto hPval =   getObjectPtr<TH1F>("hPval");
     TFile* fout = new TFile(m_histName.c_str(), "RECREATE");
     fout->cd();
     TGraphErrors* gr[56];
     TDirectory* top = gDirectory;
+
+    //store NDF, P-val. EventT0 histogram for monitoring during calibration
+    if (hNDF && hPval && hEvtT0) {
+      hEvtT0->Write();
+      hPval->Write();
+      hNDF->Write();
+    }
     m_hTotal->Write();
     hm_All->Write();
     hs_All->Write();

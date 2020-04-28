@@ -15,11 +15,16 @@ class CDCHitUniqueAssumer(basf2.Module):
     """
 
     def initialize(self):
+        """Initialization signal at the start of the event processing"""
+        #: counter for doubled CDC hits
         self.number_of_doubled_hits = 0
+        #: counter for total CDC hits
         self.number_of_total_hits = 0
+        #: counter for CDC hits with wrong flags
         self.number_of_hits_with_wrong_flags = 0
 
     def event(self):
+        """Event method of the module"""
         track_store_vector = Belle2.PyStoreObj('CDCTrackVector')
 
         if track_store_vector:
@@ -52,27 +57,37 @@ class CDCHitUniqueAssumer(basf2.Module):
                         recoHit3D.getWireHit().getAutomatonCell().unsetAssignedFlag()
 
     def terminate(self):
+        """Termination signal at the end of the event processing"""
         print("Number of doubled hits:", self.number_of_doubled_hits)
         print("Number of hits with wrong taken flag:", self.number_of_hits_with_wrong_flags)
         print("Number of total hits:", self.number_of_total_hits)
 
 
 class HitCleaner(basf2.Module):
-    #: A small hit cleaner module to set the track information according to mc information.
-    #: This is surely not for later usage but for testing the genfitter module
+    """A small hit cleaner module to set the track information according to mc information.
+    This is surely not for later usage but for testing the genfitter module
+    """
 
     def __init__(self):
+        """Constructor"""
         super(HitCleaner, self).__init__()
 
+        #: count the tracks
         self.number_of_tracks = 0
+        #: count the deleted hits
         self.number_of_deleted_hits = 0
+        #: count the hits
         self.number_of_hits = 0
 
     def initialize(self):
+        """Initialization signal at the start of the event processing"""
+        #: function to look up CDC MC hits
         self.cdc_hit_look_up = Belle2.TrackFindingCDC.CDCMCHitLookUp()
+        #: function to match track candidatess to MC track candidates
         self.mc_matcher_lookup = Belle2.TrackMatchLookUp("MCTrackCands", "TrackCands")
 
     def event(self):
+        """Event method of the module"""
         tracks = Belle2.PyStoreArray("TrackCands")
         cdc_hits = Belle2.PyStoreArray("CDCHits")
         mc_particles = Belle2.PyStoreArray("MCParticles")
@@ -137,6 +152,7 @@ class HitCleaner(basf2.Module):
                 track.setPdgCode(int(track.getChargeSeed() * 211))
 
     def terminate(self):
+        """Termination signal at the end of the event processing"""
         print(("Number of tracks in total: %d" % self.number_of_tracks))
         print(("Number of hits in total: %d" % self.number_of_hits))
         print(("Number of deleted hits: %d" % self.number_of_deleted_hits))

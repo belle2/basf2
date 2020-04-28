@@ -14,24 +14,40 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
 
     """ Create segments and plot them in a segment quad tree """
 
+    #: Use CDCSVGDisplay to draw the MCTrackCand segments
     display_module_segments = CDCSVGDisplayModule(interactive=True)
+    #: Do not draw the genfit MCTrackCand trajectories
     display_module_segments.draw_gftrackcand_trajectories = False
+    #: Draw the genfit MCTrackCands
     display_module_segments.draw_gftrackcands = True
+    #: Do not draw the associated clusters
     display_module_segments.draw_clusters = False
+    #: Tell the plotter where to find the information
     display_module_segments.track_cands_store_array_name = "MCTrackCands"
 
+    #: Use CDCSVGDisplay to draw the TrackCand information
     display_module_tracks = CDCSVGDisplayModule(interactive=True)
+    #: Draw the genfit TrackCands
     display_module_tracks.draw_gftrackcands = True
+    #: Tell the plotter where to find the information
     display_module_tracks.track_cands_store_array_name = "TrackCands"
 
+    #: Use CDCSVGDisplay to draw the MC tracks
     display_module_mc = CDCSVGDisplayModule(interactive=True)
+    #: Draw the genfit MCTrackCand trajectories
     display_module_mc.draw_gftrackcand_trajectories = True
+    #: Draw the track IDs
     display_module_mc.draw_segments_mctrackid = True
+    #: Tell the plotter where to find the information
     display_module_mc.track_cands_store_array_name = "MCTrackCands"
 
+    #: Convert the information to QuadTree segments then draw these
     plotter_module = SegmentQuadTreePlotter()
+    #: Draw the QuadTree segments
     plotter_module.draw_quad_tree_content = True
+    #: Draw the segment intersections
     plotter_module.draw_segment_intersection = True
+    #: Draw the MC information
     plotter_module.draw_mc_information = True
 
     def create_path(self):

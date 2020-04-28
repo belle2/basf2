@@ -233,11 +233,21 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     // Check if the first event of a run is zero.
     if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
       if (*cur_evenum_rawcprhdr != 0) {
+
+        unsigned int eve[4];
+        for (int i = 0; i < 4 ; i++) {
+          eve[ i ] = 0xbaadf00d;
+          if (GetFINESSENwords(n, i) > 0) {
+            int pos_nwords = GetOffsetFINESSE(n, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
+            eve[ i ] = m_buffer[ pos_nwords ];
+          }
+        }
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
                 prev_evenum, *cur_evenum_rawcprhdr,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
                 *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,
+                eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
                 GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         err_flag = 1;
@@ -762,12 +772,32 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 //   }
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
-
+      unsigned int eve[4] = {0xbaadf00d, 0xbaadf00d, 0xbaadf00d, 0xbaadf00d };
 #ifndef NO_ERROR_STOP
+      if (m_num_nodes * m_num_events != 1) {
+        char err_buf[500];
+        sprintf(err_buf,
+                "[FATAL] This function should be used for PreRawCOPPERFormat_latest containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
+                m_num_nodes, m_num_events,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        //    string err_str = err_buf;    throw (err_str);
+        B2FATAL(err_buf); // to reduce multiple error messages
+      } else {
+        for (int i = 0; i < 4 ; i++) {
+          // Only one block is in this m_buffer[] when m_num_nodes*m_num_events=1
+          // 0 is specified as a block number
+          if (GetFINESSENwords(0 , i) > 0) {
+            int pos_nwords = GetOffsetFINESSE(0, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
+            eve[ i ] = m_buffer[ pos_nwords ];
+          }
+        }
+      }
+
       char err_buf[500];
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %u crun %u\n %s %s %d\n",
+              "[FATAL] ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) prun %u crun %u\n %s %s %d\n",
               cur_ftsw_eve32, prev_eve32,
+              eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
               prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] %s\n", err_buf);

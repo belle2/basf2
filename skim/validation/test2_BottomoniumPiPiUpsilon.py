@@ -1,33 +1,40 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdMu
+"""
+<header>
+  <input>../BottomoniumPiPiUpsilon.udst.root</input>
+  <output>BottomoniumPiPiUpsilon_Validation.root</output>
+  <contact>jiasen@buaa.edu.cn</contact>
+</header>
+"""
+
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdMu, stdPi
 from beamparameters import add_beamparameters
 
 # create a new path
-BottomoniumPiPiUpsilonskimpath = Path()
+BottomoniumPiPiUpsilonskimpath = b2.Path()
 
 # set up for running at Y(3S)
 beamparameters = add_beamparameters(BottomoniumPiPiUpsilonskimpath, "Y3S")
 
 filelist = ['../BottomoniumPiPiUpsilon.udst.root']
-inputMdstList('default', filelist, path=BottomoniumPiPiUpsilonskimpath)
+ma.inputMdstList('default', filelist, path=BottomoniumPiPiUpsilonskimpath)
 
 # use standard final state particle lists
 stdMu('loose', path=BottomoniumPiPiUpsilonskimpath)
-stdPi('loose', path=BottomoniumPiPiUpsilonskimpath)
+stdPi('all', path=BottomoniumPiPiUpsilonskimpath)
 
 # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
-reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
-reconstructDecay('Upsilon(3S):pipirecoil -> pi+:loose pi-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
-reconstructDecay('Upsilon(3S):12Smumu -> Upsilon(3S):pipirecoil Upsilon:mumu', '', path=BottomoniumPiPiUpsilonskimpath)
+ma.reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', '', path=BottomoniumPiPiUpsilonskimpath)
+ma.reconstructDecay('Upsilon(3S):pipirecoil -> pi+:all pi-:all', '', path=BottomoniumPiPiUpsilonskimpath)
+ma.reconstructDecay('Upsilon(3S):12Smumu -> Upsilon(3S):pipirecoil Upsilon:mumu', '', path=BottomoniumPiPiUpsilonskimpath)
 
 # the variables that are printed out are: the invariant mass of Y(1S,2S), the invariant mass
 # of Y(3S), and the recoil mass of pi+pi-
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='BottomoniumPiPiUpsilon_Validation.root',
     decayString='Upsilon(3S):12Smumu',
     variables=[
@@ -45,5 +52,5 @@ variablesToHistogram(
          10.2)
     ], path=BottomoniumPiPiUpsilonskimpath)
 
-process(BottomoniumPiPiUpsilonskimpath)
-print(statistics)
+b2.process(BottomoniumPiPiUpsilonskimpath)
+print(b2.statistics)

@@ -16,8 +16,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <string>
-
 namespace Belle2 {
 
   /** Baseclass for all RelationIndexContainers.

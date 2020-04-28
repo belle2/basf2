@@ -14,9 +14,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TObject.h>
 #include <TVector3.h>
-#include <vector>
 
 namespace Belle2 {
 

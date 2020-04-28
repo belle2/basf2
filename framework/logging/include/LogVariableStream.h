@@ -110,7 +110,7 @@ public:
   /** Constructor which sets an initial text for this stream
    * @param text Initial text
    * */
-  LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
+  explicit LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
   {
     m_stringStream << text;
     for (auto const& kv : variables) {
@@ -185,11 +185,11 @@ public:
    * Return the content of the stream as string. First the stringstream part
    * and then a list of the variables
    */
-  std::string str() const
+  std::string str(bool showVariables = true) const
   {
     // little optimization, so we don't need to copy the whole string
     // in the cases where there are no variables ...
-    if (m_variables.size() == 0) {
+    if (m_variables.size() == 0 or !showVariables) {
       return m_stringStream.str();
     }
 

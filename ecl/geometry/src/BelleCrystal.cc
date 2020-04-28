@@ -7,12 +7,10 @@
 
 #include "G4VPVParameterisation.hh"
 
-#include "Randomize.hh"
-
 #include "G4VGraphicsScene.hh"
 
-//#include "G4Trap.hh"
-#include <map>
+#include "CLHEP/Random/RandFlat.h"
+
 using namespace Belle2;
 using namespace std;
 using namespace ECL;

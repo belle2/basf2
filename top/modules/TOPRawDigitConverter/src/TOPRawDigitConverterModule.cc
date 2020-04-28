@@ -60,26 +60,32 @@ namespace Belle2 {
              "name of TOPDigit store array", string(""));
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
              "if true, use sample time calibration", true);
+    addParam("useAsicShiftCalibration", m_useAsicShiftCalibration,
+             "if true, use ASIC shifts calibration", true);
     addParam("useChannelT0Calibration", m_useChannelT0Calibration,
              "if true, use channel T0 calibration", true);
     addParam("useModuleT0Calibration", m_useModuleT0Calibration,
              "if true, use module T0 calibration", true);
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration", true);
+    addParam("useTimeWalkCalibration", m_useTimeWalkCalibration,
+             "if true, use time-walk calibration", true);
     addParam("pedestalRMS", m_pedestalRMS,
              "r.m.s of pedestals [ADC counts], "
              "if positive, timeError will be estimated from FE data. "
-             "This is the default value used if r.m.s is not available from DB.", 9.0);
+             "This is the default value used if r.m.s is not available from DB.", 9.7);
     addParam("minPulseWidth", m_minPulseWidth,
              "minimal pulse width [ns] to flag digit as good", 1.0);
     addParam("maxPulseWidth", m_maxPulseWidth,
              "maximal pulse width [ns] to flag digit as good", 10.0);
+    addParam("minWidthXheight", m_minWidthXheight,
+             "minimal product of width and height [ns * ADC counts]", 100.0);
     addParam("storageDepth", m_storageDepth,
              "ASIC analog storage depth of Interim FE format (ignored in other formats)",
              (unsigned) 508);
-    addParam("lookBackWindows", m_lookBackWindows, "number of look back windows. "
-             "Useful to adjust time origin (e.g. to shift hits in time)."
-             " No side effects if not set exactly as in the firmware", 220);
+    addParam("lookBackWindows", m_lookBackWindows,
+             "number of look back windows, if positive override the number from database",
+             0);
     addParam("setPhase", m_setPhase,
              "if true, set (override) phase in TOPRawDigits", true);
     addParam("calibrationChannel", m_calibrationChannel,
@@ -92,6 +98,10 @@ namespace Belle2 {
              "calpulse selection: minimal height [ADC counts]", 0);
     addParam("calpulseHeightMax", m_calpulseHeightMax,
              "calpulse selection: maximal height [ADC counts]", 0);
+    addParam("calpulseTimeMin", m_calpulseTimeMin,
+             "calpulse selection (ON if max > min): minimal time [ns]", 0.0);
+    addParam("calpulseTimeMax", m_calpulseTimeMax,
+             "calpulse selection (ON if max > min): maximal time [ns]", 0.0);
   }
 
 
@@ -115,19 +125,6 @@ namespace Belle2 {
     m_syncTimeBase = geo->getNominalTDC().getSyncTimeBase();
     m_sampleTimes.setTimeAxis(m_syncTimeBase);
 
-    // set write-window depths of production debug format (write-window is 128 samples)
-    for (int i = 0; i < 3; i++) {
-      m_writeDepths.push_back(214);
-      m_writeDepths.push_back(212);
-      m_writeDepths.push_back(214);
-    }
-
-    // check validity of steering parameters
-    if (m_lookBackWindows >= (int) m_storageDepth)
-      B2ERROR("TOPRawDigitConverter: 'lookBackWindows' must be less than 'storageDepth'."
-              << LogVar("storage depth", m_storageDepth)
-              << LogVar("look-back windows", m_lookBackWindows));
-
   }
 
 
@@ -139,35 +136,54 @@ namespace Belle2 {
     // check if calibrations are available when needed - if not, terminate
 
     if (m_useSampleTimeCalibration) {
-      if (!m_timebase.isValid()) {
+      if (not m_timebase.isValid()) {
         B2FATAL("Sample time calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useChannelT0Calibration) {
-      if (!m_channelT0.isValid()) {
+      if (not m_channelT0.isValid()) {
         B2FATAL("Channel T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
+    if (m_useAsicShiftCalibration) {
+      if (not m_asicShift.isValid()) {
+        B2FATAL("ASIC shifts calibration requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+    }
     if (m_useModuleT0Calibration) {
-      if (!m_moduleT0.isValid()) {
+      if (not m_moduleT0.isValid()) {
         B2FATAL("Module T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useCommonT0Calibration) {
-      if (!m_commonT0.isValid()) {
+      if (not m_commonT0.isValid()) {
         B2FATAL("Common T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
-    if (m_pedestalRMS > 0 and !m_noises.isValid()) {
-      B2FATAL("Channel noise levels not available for run "
+    if (not m_timeWalk.isValid()) {
+      // B2FATAL("Time-walk calibration is not available for run "
+      B2WARNING("Time-walk calibration is not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+    }
+    if (m_pedestalRMS > 0 and not m_noises.isValid()) {
+      B2FATAL("Channel noise levels are not available for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
+    }
+
+    if (not m_feSetting.isValid()) {
+      B2FATAL("Front-end settings are not available for run "
               << evtMetaData->getRun()
               << " of experiment " << evtMetaData->getExperiment());
     }
@@ -205,7 +221,7 @@ namespace Belle2 {
       for (const auto& eventDebug : m_eventDebugs) {
         auto scrodID = eventDebug.getScrodID();
         const auto* feemap = feMapper.getMap(scrodID);
-        if (!feemap) {
+        if (not feemap) {
           B2WARNING("TOPRawDigitConverter: No front-end map available."
                     << LogVar("scrodID", scrodID));
           continue;
@@ -233,7 +249,7 @@ namespace Belle2 {
 
       auto scrodID = rawDigit.getScrodID();
       const auto* feemap = feMapper.getMap(scrodID);
-      if (!feemap) {
+      if (not feemap) {
         B2WARNING("TOPRawDigitConverter: No front-end map available."
                   << LogVar("scrodID", scrodID));
         continue;
@@ -258,7 +274,6 @@ namespace Belle2 {
       // timing alignment: set time origin according to data type
 
       double timeOffset = 0;
-      unsigned phase = 0;
       int storageDepth = m_storageDepth;
       if (rawDigit.getDataType() == TOPRawDigit::c_Interim) {
 
@@ -270,7 +285,9 @@ namespace Belle2 {
         int lastWriteAddr = rawDigit.getLastWriteAddr();
         int nback = lastWriteAddr - window;
         if (nback < 0) nback += m_storageDepth;
-        int nwin = m_lookBackWindows - nback;
+        int lookBackWindows = m_feSetting->getLookbackWindows();
+        if (m_lookBackWindows > 0) lookBackWindows = m_lookBackWindows;
+        int nwin = lookBackWindows - nback;
         window -= nwin;
         if (window < 0) window += m_storageDepth;
         if (window >= (int) m_storageDepth) window -= m_storageDepth;
@@ -284,12 +301,19 @@ namespace Belle2 {
         int revo9cnt = rawDigit.getRevo9Counter();
         int SSTcnt = revo9cnt / 6;
         double SSTfrac = (revo9cnt % 6) / 6.0;
-        timeOffset = SSTfrac * m_syncTimeBase;  // in [ns], to be subtracted
+        double offset = m_feSetting->getOffset() / 24.0;
+        timeOffset = (SSTfrac + offset) * m_syncTimeBase;  // in [ns], to be subtracted
 
         // find reference window
         int refWindow = SSTcnt * 2;  // seems to be the same as lastWriteAddr
-        int lastDepth = m_writeDepths.back();
-        for (auto depth : m_writeDepths) {
+        const auto& writeDepths = m_feSetting->getWriteDepths();
+        if (writeDepths.empty()) {
+          B2ERROR("TOPRawDigitConverter: vector of write depths is empty. Return!");
+          return;
+        }
+        int lastDepth = writeDepths.back();
+        unsigned phase = 0;
+        for (auto depth : writeDepths) {
           SSTcnt -= depth;
           if (SSTcnt < 0) break;
           phase++;
@@ -309,10 +333,10 @@ namespace Belle2 {
         // set window number: number of look back windows back from the reference window
         int deltaWindow = window - refWindow;
         if (deltaWindow > 0) deltaWindow -= storageDepth;
-        int lookBackWindows = m_lookBackWindows;
-        if (rawDigit.getLookBackWindows() > 0) {
-          lookBackWindows = rawDigit.getLookBackWindows();
-        }
+        int lookBackWindows = m_feSetting->getLookbackWindows();
+        if (m_lookBackWindows > 0) lookBackWindows = m_lookBackWindows;
+        lookBackWindows -= m_feSetting->getExtraWindows();
+
         int nwin = lookBackWindows + deltaWindow;
         int startWindow = refWindow - lookBackWindows;
         if (startWindow < 0) startWindow += storageDepth;
@@ -337,37 +361,48 @@ namespace Belle2 {
       double time = sampleTimes->getTime(window, rawTimeLeading) - timeOffset;
       double width = sampleTimes->getDeltaTime(window, rawTimeFalling, rawTimeLeading);
 
-      // determine time uncertainty
-
+      // default time uncertainty
       double timeError = geo->getNominalTDC().getTimeJitter();
-      if (m_pedestalRMS > 0) {
-        double rmsNoise = m_pedestalRMS;
-        if (m_noises->isCalibrated(moduleID, channel)) {
-          rmsNoise = m_noises->getNoise(moduleID, channel);
+
+      if (rawDigit.getDataType() == TOPRawDigit::c_MC) {
+        // MC with simplified digitization
+        time -= geo->getNominalTDC().getOffset();
+        statusBits |= TOPDigit::c_OffsetSubtracted;
+      } else {
+        // data and MC with full waveform digitization
+        if (m_pedestalRMS > 0) {
+          double rmsNoise = m_pedestalRMS;
+          if (m_noises->isCalibrated(moduleID, channel)) {
+            rmsNoise = m_noises->getNoise(moduleID, channel);
+          }
+          double rawErr = rawDigit.getCFDLeadingTimeError(rmsNoise); // in [samples]
+          int sample = static_cast<int>(rawTimeLeading);
+          if (rawTimeLeading < 0) sample--;
+          timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
         }
-        double rawErr = rawDigit.getCFDLeadingTimeError(rmsNoise); // in [samples]
-        int sample = static_cast<int>(rawTimeLeading);
-        if (rawTimeLeading < 0) sample--;
-        timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
-      }
 
-      // is Monte Carlo ?
-      // c_Production: temporary solution, since only MC is packed in this format for now
+        auto pulseHeight = rawDigit.getValuePeak();
+        double timeErrorSq = timeError * timeError;
+        if (m_timeWalk.isValid()) timeErrorSq += m_timeWalk->getSigmaSq(pulseHeight);
 
-      bool isMC = (rawDigit.getDataType() == TOPRawDigit::c_MC or
-                   rawDigit.getDataType() == TOPRawDigit::c_Production);
-
-      // apply T0 calibration or subtract offset - depending on data/MC
-
-      double calErrorSq = 0;
-      if (!isMC) { // data: apply T0 calibration
+        if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
+          if (m_timeWalk->isCalibrated()) {
+            time -= m_timeWalk->getTimeWalk(pulseHeight);
+          }
+        }
         if (m_useChannelT0Calibration) {
           const auto& cal = m_channelT0;
           if (cal->isCalibrated(moduleID, channel)) {
             time -= cal->getT0(moduleID, channel);
             double err = cal->getT0Error(moduleID, channel);
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
+          }
+        }
+        if (m_useAsicShiftCalibration) {
+          auto asic = channel / 8;
+          if (m_asicShift->isCalibrated(moduleID, asic)) {
+            time -= m_asicShift->getT0(moduleID, asic);
           }
         }
         if (m_useModuleT0Calibration) {
@@ -375,7 +410,7 @@ namespace Belle2 {
           if (cal->isCalibrated(moduleID)) {
             time -= cal->getT0(moduleID);
             double err = cal->getT0Error(moduleID);
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_ModuleT0Calibrated;
           }
         }
@@ -384,18 +419,12 @@ namespace Belle2 {
           if (cal->isCalibrated()) {
             time -= cal->getT0();
             double err = cal->getT0Error();
-            calErrorSq += err * err;
+            timeErrorSq += err * err;
             statusBits |= TOPDigit::c_CommonT0Calibrated;
           }
         }
-      } else { // MC: subtract offset
-        time -= geo->getNominalTDC().getOffset();
-        statusBits |= TOPDigit::c_OffsetSubtracted;
+        timeError = sqrt(timeErrorSq);
       }
-
-      // include T0 calibration uncertainties into time uncertainty
-
-      if (calErrorSq > 0) timeError = sqrt(timeError * timeError + calErrorSq);
 
       // append new TOPDigit and set it
 
@@ -410,12 +439,13 @@ namespace Belle2 {
       digit->setStatus(statusBits);
       digit->addRelationTo(&rawDigit);
 
-      if (!rawDigit.isFEValid() or rawDigit.isPedestalJump())
+      if (not rawDigit.isFEValid() or rawDigit.isPedestalJump())
         digit->setHitQuality(TOPDigit::c_Junk);
       if (rawDigit.isAtWindowDiscontinuity(storageDepth))
         digit->setHitQuality(TOPDigit::c_Junk);
       if (digit->getPulseWidth() < m_minPulseWidth or
-          digit->getPulseWidth() > m_maxPulseWidth)
+          digit->getPulseWidth() > m_maxPulseWidth or
+          digit->getPulseWidth() * digit->getPulseHeight() < m_minWidthXheight)
         digit->setHitQuality(TOPDigit::c_Junk);
     }
 
@@ -430,6 +460,10 @@ namespace Belle2 {
         if (digit.getPulseHeight() > m_calpulseHeightMax) continue;
         if (digit.getPulseWidth() < m_calpulseWidthMin) continue;
         if (digit.getPulseWidth() > m_calpulseWidthMax) continue;
+        if (m_calpulseTimeMax > m_calpulseTimeMin) {
+          if (digit.getTime() < m_calpulseTimeMin) continue;
+          if (digit.getTime() > m_calpulseTimeMax) continue;
+        }
         digit.setHitQuality(TOPDigit::c_CalPulse);
       }
     }

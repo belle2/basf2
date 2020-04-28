@@ -35,7 +35,9 @@ class PxdPackerUnpackerTestModule(Module):
         # call constructor of base class, required if you implement __init__ yourself!
         super().__init__()
         # and do whatever else is necessary like declaring member variables
+        #: the PXDRawHits
         self.rawhits_collection = rawhits_collection
+        #: the PXDDigits
         self.digits_collection = digits_collection
 
     def sortDigits(self, unsortedPyStoreArray):
@@ -122,7 +124,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
-simulation.add_simulation(main, components=['PXD'], usePXDDataReduction=False)
+simulation.add_simulation(main, components=['PXD'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
 set_module_parameters(main, type="Geometry", useDB=False, components=["PXD"])
 
 main.add_module(progress)

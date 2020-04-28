@@ -11,8 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>

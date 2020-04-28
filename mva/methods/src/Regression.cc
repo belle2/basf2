@@ -10,8 +10,6 @@
 
 #include <mva/methods/Regression.h>
 
-#include <framework/logging/Logger.h>
-#include <sstream>
 #include <vector>
 
 using namespace Belle2;

@@ -45,7 +45,15 @@ namespace Belle2 {
 
   TRGCDCEventTime::TRGCDCEventTime(const TRGCDC& TRGCDC, bool makeRootFile)
     : _cdc(TRGCDC),
-      m_makeRootFile(makeRootFile)
+      cnt{{0}},
+  ft{{{0}}},
+  m_foundT0(0), // 2019/07/31 by ytlai
+  m_minusET(0),
+  m_noET(0),
+  threshold(0),
+  m_eventN(0),
+  m_makeRootFile(makeRootFile),
+  m_ver(0)
   {
 
     if (m_makeRootFile) m_fileEvtTime = new TFile("ETF.root", "RECREATE");
@@ -63,11 +71,13 @@ namespace Belle2 {
 
     memset(cnt, 0, sizeof cnt);
     memset(ft, 0, sizeof ft);
-    m_minusET = 0;
-    m_noET = 0;
-    m_eventN = 0;
-    m_ver = 0;
-    m_foundT0 = 0;
+
+    // move to constructor
+    //m_minusET = 0;
+    //m_noET = 0;
+    //m_eventN = 0;
+    //m_ver = 0;
+    //m_foundT0 = 0;
   }
   TRGCDCEventTime::~TRGCDCEventTime()
   {

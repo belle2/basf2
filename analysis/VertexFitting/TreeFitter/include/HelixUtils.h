@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Jo-Frederik Krohn, Francesco Tenchini                     *
+ * Contributor: Wouter Hulsbergen, Jo-Frederik Krohn, Francesco Tenchini  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,7 +12,6 @@
 #include <string>
 
 #include <framework/dataobjects/Helix.h>
-#include <framework/dataobjects/UncertainHelix.h>
 #include <Eigen/Core>
 namespace TreeFitter {
 

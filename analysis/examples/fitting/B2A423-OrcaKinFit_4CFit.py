@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###################################################################
 # This tutorial demonstrates how to perform four momentum constraint
@@ -27,18 +26,14 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import fitKinematic4C
+from kinfit import fitKinematic4C
 from modularAnalysis import variablesToNtuple
-from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
 from stdPhotons import stdPhotons
-b2.use_central_database('GT_gen_data_004.51_reprocessing-release-01-02-03')
 
 # create path
 mypath = b2.create_path()
-
-beamparameters = add_beamparameters(mypath, "Y4S")
 
 # load input ROOT file
 inputMdst(environmentType='default',
@@ -58,14 +53,12 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.", path=mypath)
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=mypath)
 reconstructDecay("Upsilon(4S):4c -> eta:gg Upsilon:uu", "", path=mypath)
 
-
-# Perform four momentum constraint fit using OrcaKinFit
-fitKinematic4C("Upsilon(4S):4c", path=mypath)
-
 # Associates the MC truth to the reconstructed Upsilon(4S)
 matchMCTruth('Upsilon(4S)', path=mypath)
 matchMCTruth('Upsilon(4S):4c', path=mypath)
 
+# Perform four momentum constraint fit using OrcaKinFit
+fitKinematic4C("Upsilon(4S):4c", path=mypath)
 
 # Select variables that we want to store to ntuple
 muvars = vc.mc_truth + vc.pid + vc.kinematics

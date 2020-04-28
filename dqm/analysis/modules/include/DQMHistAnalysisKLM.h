@@ -3,23 +3,29 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin                                          *
+ * Contributors: Kirill Chilikin, Leo Piilonen                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-/* External headers. */
+/* DQM headers. */
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
+
+/* ROOT headers. */
 #include <TCanvas.h>
 #include <TLatex.h>
-
-/* Belle2 headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <eklm/dataobjects/ElementNumbersSingleton.h>
-#include <eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
+#include <TText.h>
+#include <TLine.h>
 
 namespace Belle2 {
 
@@ -68,23 +74,55 @@ namespace Belle2 {
   protected:
 
     /**
-     * Analyse strip number histogram.
-     * @param[in]  layerGlobal Global layer number.
-     * @param[in]  histogram   Histogram.
-     * @param[out] latex       TLatex to draw messages.
+     * Analyse channel hit histogram.
+     * @param[in]  subdetector    Subdetector.
+     * @param[in]  section        Section.
+     * @param[in]  sector         Sector.
+     * @param[in]  histogram      Histogram.
+     * @param[in]  canvas         Canvas.
+     * @param[out] latex          TLatex to draw messages.
      */
-    void analyseStripLayerHistogram(int layerGlobal, TH1* histogram,
-                                    TLatex& latex);
+    void analyseChannelHitHistogram(
+      int subdetector, int section, int sector,
+      TH1* histogram, TCanvas* canvas, TLatex& latex);
+
+    /**
+     * Process histogram containing the number of hits in plane.
+     * @param[in]  histName  Histogram name.
+     */
+    void processPlaneHistogram(const std::string& histName);
+
+    /**
+     * Find TCanvas that matches a given name.
+     * @param[in]  canvasName   name of the desired TCanvas.
+     * @param[out] TCanvas*     matching TCanvas.
+     */
+    TCanvas* findCanvas(const std::string& canvasName);
 
     /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
-    /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
+    /** KLM channel array index. */
+    const KLMChannelArrayIndex* m_ChannelArrayIndex;
+
+    /** KLM sector array index. */
+    const KLMSectorArrayIndex* m_SectorArrayIndex;
+
+    /** KLM element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[
       EKLMElementNumbers::getMaximalLayerGlobalNumber()];
+
+    /** TLine for boundary in plane histograms. */
+    TLine m_PlaneLine;
+
+    /** TText for names in plane histograms. */
+    TText m_PlaneText;
 
   };
 

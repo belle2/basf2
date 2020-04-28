@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
+/* Own header. */
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 using namespace Belle2;

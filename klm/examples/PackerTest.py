@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Particle gun muon events for EKLM, only EKLM digitization and reconstruction.
+# Particle gun muon events for KLM, only KLM digitization and reconstruction.
 
-import os
-import random
 import basf2
 import ROOT
 
@@ -30,31 +28,28 @@ paramloader = basf2.register_module('Gearbox')
 
 # Geometry builder
 geobuilder = basf2.register_module('Geometry')
-geobuilder.param('components', ['EKLM', 'BKLM'])
+geobuilder.param('components', ['KLM'])
+geobuilder.param('useDB', False)
 
 # Full Geant4 simulation
 g4sim = basf2.register_module('FullSim')
 
-# Root file output
-output = basf2.register_module('RootOutput')
-output.param('outputFileName', 'ParticleGunMuonsKLM.root')
-
 # Digitizers
-bklm_digitizer = basf2.register_module('BKLMDigitizer')
-eklm_digitizer = basf2.register_module('EKLMDigitizer')
+klm_digitizer = basf2.register_module('KLMDigitizer')
 
-# Packers
-bklm_packer = basf2.register_module('BKLMRawPacker')
-eklm_packer = basf2.register_module('EKLMRawPacker')
+# Packer
+klm_packer = basf2.register_module('KLMPacker')
 
 # Unpacker
 klm_unpacker = basf2.register_module('KLMUnpacker')
-klm_unpacker.param('outputBKLMDigitsName', 'BKLMDigitsUnpacked')
-klm_unpacker.param('outputEKLMDigitsName', 'EKLMDigitsUnpacked')
+klm_unpacker.param('outputKLMDigitsName', 'KLMDigitsUnpacked')
 
-# Reconstructors
-bklm_reconstructor = basf2.register_module('BKLMReconstructor')
-eklm_reconstructor = basf2.register_module('EKLMReconstructor')
+# Reconstructor
+klm_reconstructor = basf2.register_module('KLMReconstructor')
+
+# Root file output
+output = basf2.register_module('RootOutput')
+output.param('outputFileName', 'ParticleGunMuonsKLM.root')
 
 # Create main path
 main = basf2.create_path()
@@ -66,17 +61,14 @@ main.add_module(paramloader)
 main.add_module(geobuilder)
 main.add_module(g4sim)
 
-main.add_module(bklm_digitizer)
-main.add_module(eklm_digitizer)
-main.add_module(bklm_packer)
-main.add_module(eklm_packer)
+main.add_module(klm_digitizer)
+main.add_module(klm_packer)
 main.add_module(klm_unpacker)
-main.add_module(bklm_reconstructor)
-main.add_module(eklm_reconstructor)
+main.add_module(klm_reconstructor)
 
 main.add_module(output)
 
-# Process 100 events
+# Process the events
 basf2.process(main)
 print(basf2.statistics)
 

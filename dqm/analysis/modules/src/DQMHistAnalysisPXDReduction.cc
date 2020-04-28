@@ -9,15 +9,10 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDReduction.h>
 #include <TROOT.h>
-#include <TStyle.h>
-#include <TClass.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
-
-
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -132,16 +127,18 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   // not enough Entries
   if (!enough) {
-    m_cReduction->Pad()->SetFillColor(6);// Magenta
+    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
 //   B2INFO("data "<<data);
-    /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
 //   if (data > 100.) {
-//     m_cReduction->Pad()->SetFillColor(2);// Red
+//     m_cReduction->Pad()->SetFillColor(kRed);// Red
 //   } else if (data > 50.) {
-//     m_cReduction->Pad()->SetFillColor(5);// Yellow
+//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
 //   } else {
-    m_cReduction->Pad()->SetFillColor(0);// White
+//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
+//   } else {
+    m_cReduction->Pad()->SetFillColor(kWhite);// White
   }
 
   if (m_hReduction) {

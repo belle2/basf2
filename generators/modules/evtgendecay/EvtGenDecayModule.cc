@@ -14,9 +14,6 @@
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 #include <generators/modules/evtgendecay/EvtGenDecayModule.h>
 

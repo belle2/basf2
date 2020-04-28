@@ -15,16 +15,13 @@
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MetaData
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 // root
 #include <framework/io/RootIOUtilities.h>
@@ -61,7 +58,7 @@ namespace Belle2 {
              "List of files with measured beam background ");
     addParam("extensionName", m_extensionName,
              "name added to default branch names", string("_beamBG"));
-
+    addParam("bkgInfoName", m_BackgroundInfoInstanceName, "name of the BackgroundInfo StoreObjPtr", string(""));
   }
 
   BGOverlayInputModule::~BGOverlayInputModule()
@@ -111,12 +108,12 @@ namespace Belle2 {
     }
 
     // add BackgroundInfo to persistent tree
-    StoreObjPtr<BackgroundInfo> bkgInfo("", DataStore::c_Persistent);
+    StoreObjPtr<BackgroundInfo> bkgInfo(m_BackgroundInfoInstanceName, DataStore::c_Persistent);
     bkgInfo.registerInDataStore();
     bkgInfo.create();
     bkgInfo->setMethod(BackgroundInfo::c_Overlay);
     BackgroundInfo::BackgroundDescr descr;
-    descr.tag = SimHitBase::bg_other;
+    descr.tag = BackgroundMetaData::bg_other;
     descr.type = string("RandomTrigger");
     descr.fileNames = m_inputFileNames;
     descr.numEvents = m_numEvents;

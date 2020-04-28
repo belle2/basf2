@@ -5,6 +5,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc                                *
  *               Sam Cunliffe, Torben Ferber                              *
+ *               Frank Meier                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,14 +28,15 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/KlId.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <utility>
 
@@ -62,17 +64,33 @@ namespace Belle2 {
     std::vector<std::tuple<std::string, std::string>> emptyDecayStringsAndCuts;
 
     addParam("decayStringsWithCuts", m_decayStringsWithCuts,
-             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see https://confluence.desy.de/display/BI/Physics+DecayString and https://confluence.desy.de/display/BI/Physics+ParticleSelectorFunctions).",
+             "List of (decayString, Variable::Cut) tuples that specify all output ParticleLists to be created by the module. Only Particles that pass specified selection criteria are added to the ParticleList (see :ref:`DecayString` and `cut_strings_selections`).",
              emptyDecayStringsAndCuts);
 
     addParam("useMCParticles", m_useMCParticles,
              "Use MCParticles instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("useROEs", m_useROEs,
+             "Use ROE instead of reconstructed MDST dataobjects (tracks, ECL, KLM, clusters, V0s, ...)", false);
+
+    addParam("roeMaskName", m_roeMaskName,
+             "ROE mask name to load", std::string(""));
+
+    addParam("sourceParticleListName", m_sourceParticleListName,
+             "Particle list name from which we need to get ROEs", std::string(""));
+
+    addParam("useMissing", m_useMissing,
+             "If true, the Particle List will be filled with missing momentum from the ROE and signal particle.", false);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
     addParam("addDaughters", m_addDaughters,
              "If true, the particles from the bottom part of the selected particle's decay chain will also be created in the datastore and mother-daughter relations are recursively set",
+             false);
+
+    addParam("skipNonPrimaryDaughters", m_skipNonPrimaryDaughters,
+             "If true, the secondary MC daughters will be skipped, default is false",
              false);
 
     addParam("trackHypothesis", m_trackHypothesis,
@@ -91,6 +109,7 @@ namespace Belle2 {
     StoreArray<Particle> particles;
     StoreArray<MCParticle> mcparticles;
     StoreArray<PIDLikelihood> pidlikelihoods;
+    StoreArray<TrackFitResult> trackfitresults;
     StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
 
@@ -103,6 +122,9 @@ namespace Belle2 {
     }
     if (pidlikelihoods.isOptional()) {
       particles.registerRelationTo(pidlikelihoods);
+    }
+    if (trackfitresults.isOptional()) {
+      particles.registerRelationTo(trackfitresults);
     }
 
     if (m_useMCParticles) {
@@ -129,7 +151,14 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         string listName = mother->getFullName();
 
-        if (not isValidPDGCode(pdgCode) and m_useMCParticles == false)
+        // special case. if the list is called "all" it may not have a
+        // corresponding cut string this can introduce very dangerous bugs
+        string listLabel = mother->getLabel();
+        if (listLabel == "all")
+          if (cutParameter != "")
+            B2FATAL("You have tried to create a list " << listName << " with cuts! This is *very* error prone, so it is now forbidden.");
+
+        if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
         // if we're not loading MCParticles and we are loading K0S, Lambdas, or photons --> ee then this decaystring is a V0
@@ -141,9 +170,17 @@ namespace Belle2 {
 
         int nProducts = m_decaydescriptor.getNDaughters();
         if (mdstSourceIsV0 == false) {
-          if (nProducts > 0)
-            B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
-                    << ". DecayString should not contain any daughters, only the mother particle.");
+          if (nProducts > 0) {
+            if (!m_useROEs) {
+              B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
+                      << ". DecayString should not contain any daughters, only the mother particle.");
+            } else {
+              B2INFO("ParticleLoaderModule: Replacing the source particle list name by " <<
+                     m_decaydescriptor.getDaughter(0)->getMother()->getFullName()
+                     << " all other daughters will be ignored.");
+              m_sourceParticleListName = m_decaydescriptor.getDaughter(0)->getMother()->getFullName();
+            }
+          }
         } else {
           if (nProducts != 2)
             B2ERROR("ParticleLoaderModule::initialize Invalid input DecayString " << decayString
@@ -177,7 +214,10 @@ namespace Belle2 {
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");
-        if (m_useMCParticles) {
+        if (m_useROEs) {
+          B2INFO("   -> MDST source: RestOfEvents");
+          m_ROE2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
+        } else if (m_useMCParticles) {
           B2INFO("   -> MDST source: MCParticles");
           m_MCParticles2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
         } else {
@@ -202,10 +242,9 @@ namespace Belle2 {
             m_V02Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
-          if (abs(pdgCode) == abs(Const::Klong.getPDGCode())) {
-            B2INFO("   -> MDST source: KLMClusters");
+          if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
+            B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
             m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-            B2INFO("   -> MDST source: ECLClusters");
             m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
@@ -220,6 +259,7 @@ namespace Belle2 {
 
 
     m_chargeZeroTrackCounts = std::vector<int>(m_Tracks2Plists.size(), 0);
+    m_sameChargeDaughtersV0Counts = std::vector<int>(m_V02Plists.size(), 0);
   }
 
   void ParticleLoaderModule::event()
@@ -230,8 +270,9 @@ namespace Belle2 {
       particleExtraInfoMap.create();
     }
 
-
-    if (m_useMCParticles)
+    if (m_useROEs)
+      roeToParticles();
+    else if (m_useMCParticles)
       mcParticlesToParticles();
     else {
       tracksToParticles();
@@ -251,7 +292,92 @@ namespace Belle2 {
                   << " tracks skipped because of zero charge for "
                   << get<c_PListName>(track2Plist));
       }
+    // report V0 errors integrated
+    for (size_t i = 0; i < m_V02Plists.size(); i++)
+      if (m_sameChargeDaughtersV0Counts[i] > 0) {
+        auto v02Plist = m_V02Plists[i];
+        B2WARNING("There were " << m_sameChargeDaughtersV0Counts[i]
+                  << " v0s skipped because of same charge daughters for "
+                  << get<c_PListName>(v02Plist));
+      }
   }
+
+  void ParticleLoaderModule::roeToParticles()
+  {
+    if (m_ROE2Plists.empty()) // nothing to do
+      return;
+    // Multiple particle lists are not supported
+    auto roe2Plist = m_ROE2Plists[0];
+    string listName = get<c_PListName>(roe2Plist);
+    string antiListName = get<c_AntiPListName>(roe2Plist);
+    int pdgCode = get<c_PListPDGCode>(roe2Plist);
+    bool isSelfConjugatedParticle = get<c_IsPListSelfConjugated>(roe2Plist);
+
+    StoreObjPtr<ParticleList> plist(listName);
+    plist.create();
+    plist->initialize(pdgCode, listName);
+
+    if (!isSelfConjugatedParticle) {
+      StoreObjPtr<ParticleList> antiPlist(antiListName);
+      antiPlist.create();
+      antiPlist->initialize(-1 * pdgCode, antiListName);
+      antiPlist->bindAntiParticleList(*(plist));
+    }
+    if (m_sourceParticleListName != "") {
+      // Take related ROEs from a particle list
+      StoreObjPtr<ParticleList> pList(m_sourceParticleListName);
+      if (!pList.isValid())
+        B2FATAL("ParticleList " << m_sourceParticleListName << " could not be found or is not valid!");
+      for (unsigned int i = 0; i < pList->getListSize(); i++) {
+        RestOfEvent* roe = pList->getParticle(i)->getRelatedTo<RestOfEvent>("ALL");
+        if (!roe) {
+          B2ERROR("ParticleList " << m_sourceParticleListName << " has no associated ROEs!");
+        } else {
+          addROEToParticleList(roe, pdgCode);
+        }
+      }
+
+    } else {
+      // Take all ROE if no particle list provided
+      StoreArray<RestOfEvent> roes;
+      for (int i = 0; i < roes.getEntries(); i++) {
+        addROEToParticleList(roes[i]);
+      }
+    }
+  }
+
+  void ParticleLoaderModule::addROEToParticleList(RestOfEvent* roe, int pdgCode, bool isSelfConjugatedParticle)
+  {
+
+    Particle* newPart = nullptr;
+    if (!m_useMissing) {
+      // Convert ROE to particle
+      newPart = roe->convertToParticle(m_roeMaskName, pdgCode, isSelfConjugatedParticle);
+    } else {
+      // Create a particle from missing momentum
+      StoreArray<Particle> particles;
+      auto* signalSideParticle = roe->getRelatedFrom<Particle>();
+      PCmsLabTransform T;
+      TLorentzVector boost4Vector = T.getBeamFourMomentum();
+
+      TLorentzVector signal4Vector = signalSideParticle->get4Vector();
+      TLorentzVector roe4Vector = roe->get4Vector(m_roeMaskName);
+      TLorentzVector missing4Vector;
+      missing4Vector.SetVect(boost4Vector.Vect() - (signal4Vector.Vect() + roe4Vector.Vect()));
+      missing4Vector.SetE(missing4Vector.Vect().Mag());
+      newPart = particles.appendNew(missing4Vector, pdgCode);
+
+    }
+    for (auto roe2Plist : m_ROE2Plists) {
+      string listName = get<c_PListName>(roe2Plist);
+      auto& cut = get<c_CutPointer>(roe2Plist);
+      StoreObjPtr<ParticleList> plist(listName);
+      if (cut->check(newPart))
+        plist->addParticle(newPart);
+    }
+
+  }
+
 
   void ParticleLoaderModule::v0sToParticles()
   {
@@ -292,14 +418,24 @@ namespace Belle2 {
       const V0* v0 = V0s[i];
       Const::ParticleType v0Type = v0->getV0Hypothesis();
 
-      for (auto v02Plist : m_V02Plists) {
+      // inner loop over the ParticleLists
+      for (size_t ilist = 0; ilist < m_V02Plists.size(); ilist++) {
+        auto v02Plist = m_V02Plists[ilist];
         int listPDGCode = get<c_PListPDGCode>(v02Plist);
 
         if (abs(listPDGCode) != abs(v0Type.getPDGCode()))
           continue;
 
+        // check if the charge of the 2 V0's daughters is opposite
+        if (v0->getTrackFitResults().first->getChargeSign() == v0->getTrackFitResults().second->getChargeSign()) {
+          B2DEBUG(19, "V0 with same charge daughters skipped!");
+          m_sameChargeDaughtersV0Counts[ilist]++;
+          continue;
+        }
+
         Const::ChargedStable pTypeP(Const::pion);
         Const::ChargedStable pTypeM(Const::pion);
+        Particle::EFlavorType v0FlavorType = Particle::c_Unflavored;
 
         if (v0Type.getPDGCode() == Const::Kshort.getPDGCode()) { // K0s -> pi+ pi-
           pTypeP = Const::pion;
@@ -307,9 +443,11 @@ namespace Belle2 {
         } else if (v0Type.getPDGCode() == Const::Lambda.getPDGCode()) { // Lambda -> p+ pi-
           pTypeP = Const::proton;
           pTypeM = Const::pion;
+          v0FlavorType = Particle::c_Flavored; // K0s are not flavoured, lambdas are
         } else if (v0Type.getPDGCode() == Const::antiLambda.getPDGCode()) { // anti-Lambda -> pi+ anti-p-
           pTypeP = Const::pion;
           pTypeM = Const::proton;
+          v0FlavorType = Particle::c_Flavored;
         } else if (v0Type.getPDGCode() == Const::photon.getPDGCode()) { // gamma -> e+ e-
           pTypeP = Const::electron;
           pTypeM = Const::electron;
@@ -328,14 +466,14 @@ namespace Belle2 {
         std::pair<Track*, Track*> v0Tracks = v0->getTracks();
         std::pair<TrackFitResult*, TrackFitResult*> v0TrackFitResults = v0->getTrackFitResults();
 
-        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP, v0TrackFitResults.first->getParticleType());
-        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM, v0TrackFitResults.second->getParticleType());
+        Particle daugP((v0Tracks.first)->getArrayIndex(), v0TrackFitResults.first, pTypeP);
+        Particle daugM((v0Tracks.second)->getArrayIndex(), v0TrackFitResults.second, pTypeM);
 
         const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
         const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
 
-        const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
-        const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
+        const auto& mcParticlePWithWeight = (v0Tracks.first)->getRelatedToWithWeight<MCParticle>();
+        const auto& mcParticleMWithWeight = (v0Tracks.second)->getRelatedToWithWeight<MCParticle>();
 
         // add V0 daughters to the Particle StoreArray
         Particle* newDaugP;
@@ -349,29 +487,37 @@ namespace Belle2 {
           newDaugP = particles.appendNew(daugP);
         }
 
+        // if there are PIDLikelihoods and MCParticles then also add relations to the particles
         if (pidP)
           newDaugP->addRelationTo(pidP);
-        if (mcParticleP)
-          newDaugP->addRelationTo(mcParticleP);
+        if (mcParticlePWithWeight.first)
+          newDaugP->addRelationTo(mcParticlePWithWeight.first, mcParticlePWithWeight.second);
+        newDaugP->addRelationTo(v0TrackFitResults.first);
 
         if (pidM)
           newDaugM->addRelationTo(pidM);
-        if (mcParticleM)
-          newDaugM->addRelationTo(mcParticleM);
+        if (mcParticleMWithWeight.first)
+          newDaugM->addRelationTo(mcParticleMWithWeight.first, mcParticleMWithWeight.second);
+        newDaugM->addRelationTo(v0TrackFitResults.second);
 
+        // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
+        Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
+                     Particle::EParticleType::c_V0, v0->getArrayIndex());
 
-        Particle v0P(v0Momentum, v0Type.getPDGCode());
+        // add the daughters of the V0 (in the correct order) and don't update
+        // the type to c_Composite (i.e. maintain c_V0)
         if (correctOrder) {
-          v0P.appendDaughter(newDaugP);
-          v0P.appendDaughter(newDaugM);
+          v0P.appendDaughter(newDaugP, false);
+          v0P.appendDaughter(newDaugM, false);
         } else {
-          v0P.appendDaughter(newDaugM);
-          v0P.appendDaughter(newDaugP);
+          v0P.appendDaughter(newDaugM, false);
+          v0P.appendDaughter(newDaugP, false);
         }
 
+        // append the particle to the Particle StoreArray and check that we pass
+        // any cuts before adding the new particle to the ParticleList
         Particle* newPart = particles.appendNew(v0P);
-
         string listName = get<c_PListName>(v02Plist);
         auto& cut = get<c_CutPointer>(v02Plist);
         StoreObjPtr<ParticleList> plist(listName);
@@ -456,10 +602,9 @@ namespace Belle2 {
           continue;
         }
 
-        // create particle and add it to the Particle list. The Particle class
-        // internally also uses the getTrackFitResultWithClosestMass() to load the best available
-        // track fit result
-        Particle particle(track, type);
+        // create particle and add it to the Particle list.
+        Particle particle(track->getArrayIndex(), trackFit, type);
+
         if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
 
           Particle* newPart = particles.appendNew(particle);
@@ -467,6 +612,7 @@ namespace Belle2 {
             newPart->addRelationTo(pid);
           if (mcParticleWithWeight.first)
             newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
+          newPart->addRelationTo(trackFit);
 
           if (cut->check(newPart))
             plist->addParticle(newPart);
@@ -492,15 +638,15 @@ namespace Belle2 {
       if (!plist) { // create the list only if the klmClustersToParticles function has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      // create anti-particle list if necessary
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        // create anti-particle list if necessary
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 
@@ -559,6 +705,12 @@ namespace Belle2 {
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
+        // don't fill a neutron list with clusters that don't have the neutral
+        // hadron hypothesis set (ECL people call this N2)
+        if (abs(listPdgCode) == Const::neutron.getPDGCode()
+            and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
+          continue;
+
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
         if (particle.getParticleType() != Particle::c_ECLCluster) {
@@ -572,11 +724,12 @@ namespace Belle2 {
           const MCParticle* relMCParticle = mcParticles[weightsAndIndex.first];
           double weight = weightsAndIndex.second;
 
-          // TODO: study this further and avoid hardcoded values
+          // TODO: study this further and avoid hard-coded values
           // set the relation only if the MCParticle(reconstructed Particle)'s
-          // energy contribution to this cluster ammounts to at least 30(20)%
+          // energy contribution to this cluster amounts to at least 30(20)%
           if (relMCParticle)
-            if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
+            if (weight / newPart->getECLClusterEnergy() > 0.20
+                && weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
         }
 
@@ -584,7 +737,6 @@ namespace Belle2 {
         // add particle to list if it passes the selection criteria
         auto& cut = get<c_CutPointer>(eclCluster2Plist);
         StoreObjPtr<ParticleList> plist(listName);
-
         if (cut->check(newPart))
           plist->addParticle(newPart);
 
@@ -608,49 +760,51 @@ namespace Belle2 {
       if (!plist) { // create the list only if the eclClustersToParticle has not already created it
         plist.create();
         plist->initialize(pdgCode, listName);
-      }
 
-      if (!isSelfConjugatedParticle) {
-        StoreObjPtr<ParticleList> antiPlist(antiListName);
-        antiPlist.create();
-        antiPlist->initialize(-1 * pdgCode, antiListName);
+        if (!isSelfConjugatedParticle) {
+          StoreObjPtr<ParticleList> antiPlist(antiListName);
+          antiPlist.create();
+          antiPlist->initialize(-1 * pdgCode, antiListName);
 
-        antiPlist->bindAntiParticleList(*(plist));
+          antiPlist->bindAntiParticleList(*(plist));
+        }
       }
     }
 
     StoreArray<KLMCluster> KLMClusters;
     StoreArray<Particle> particles;
 
-    // load reconstructed neutral KLM cluster's as Klongs
+    // load reconstructed neutral KLM cluster's as Klongs or neutrons
     for (int i = 0; i < KLMClusters.getEntries(); i++) {
       const KLMCluster* cluster      = KLMClusters[i];
 
-      if ((cluster->getRelatedTo<KlId>()) == NULL)
+      if (std::isnan(cluster->getMomentumMag())) {
+        B2WARNING("Skipping KLMCluster because of nan momentum.");
         continue;
-
-      if ((cluster->getRelatedTo<KlId>()->getKlId() < 0) || (cluster->getRelatedTo<KlId>()->getKlId() > 1))
-        continue;
+      }
 
       const MCParticle* mcParticle = cluster->getRelated<MCParticle>();
 
-      Particle particle(cluster);
+      for (auto klmCluster2Plist : m_KLMClusters2Plists) {
+        string listName = get<c_PListName>(klmCluster2Plist);
+        int pdgCode = get<c_PListPDGCode>(klmCluster2Plist);
 
-      if (particle.getParticleType() == Particle::c_KLMCluster) { // should always hold but...
+        // create particle and check its type before adding it to list
+        Particle particle(cluster, pdgCode);
+        if (particle.getParticleType() != Particle::c_KLMCluster) {
+          B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
+        }
         Particle* newPart = particles.appendNew(particle);
 
         if (mcParticle)
           newPart->addRelationTo(mcParticle);
 
         // add particle to list if it passes the selection criteria
-        for (auto klmCluster2Plist : m_KLMClusters2Plists) {
-          string listName = get<c_PListName>(klmCluster2Plist);
-          auto&  cut = get<c_CutPointer>(klmCluster2Plist);
-          StoreObjPtr<ParticleList> plist(listName);
+        auto&  cut = get<c_CutPointer>(klmCluster2Plist);
+        StoreObjPtr<ParticleList> plist(listName);
 
-          if (cut->check(newPart))
-            plist->addParticle(newPart);
-        }
+        if (cut->check(newPart))
+          plist->addParticle(newPart);
       }
     }
   }
@@ -729,6 +883,9 @@ namespace Belle2 {
     if (abs(pdgCode) == abs(Const::Lambda.getPDGCode()))
       return true;
 
+    if (abs(pdgCode) == abs(Const::neutron.getPDGCode()))
+      return true;
+
     return result;
   }
 
@@ -743,10 +900,11 @@ namespace Belle2 {
     vector<MCParticle*> mcdaughters = mcmother->getDaughters();
 
     for (auto& mcdaughter : mcdaughters) {
+      if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle) and m_skipNonPrimaryDaughters) continue;
       Particle particle(mcdaughter);
       Particle* daughter = particles.appendNew(particle);
       daughter->addRelationTo(mcdaughter);
-      mother->appendDaughter(daughter);
+      mother->appendDaughter(daughter, false);
 
       if (mcdaughter->getNDaughters() > 0)
         appendDaughtersRecursive(daughter);

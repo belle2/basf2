@@ -63,6 +63,11 @@ void RandomNumbers::initialize(const std::string& seed)
   s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
 }
 
+bool RandomNumbers::isInitialized()
+{
+  return (s_evtRng != nullptr);
+}
+
 void RandomNumbers::barrier()
 {
   auto* gen = dynamic_cast<RandomGenerator*>(gRandom);

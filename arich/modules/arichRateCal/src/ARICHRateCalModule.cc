@@ -15,14 +15,9 @@
 #include <arich/dataobjects/ARICHInfo.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-// Dataobject classes
-#include <rawdata/dataobjects/RawARICH.h>
-
-#include <framework/database/DBObjPtr.h>
 
 /*
 #include <daq/slc/database/DBObjectLoader.h>
@@ -32,9 +27,7 @@
 */
 
 #include <sstream>
-#include <TH1F.h>
 #include <TH2F.h>
-#include <TF1.h>
 
 using namespace std;
 
@@ -93,7 +86,7 @@ namespace Belle2 {
       B2WARNING("dth is set to 0");
     }
     for (int i = 0; i < 100; i++) {
-      h_rate2D[i] = new TH2F(Form("h_rate2D_%d", i), Form("MRG#%d;Channel ID; Vth [mV]", i), 144 * 6, 0, 144 * 6,
+      h_rate2D[i] = new TH2F(Form("h_rate2D_%d", i), Form("MRG#%d;Channel ID; Vth [mV]", i), 144 * 6, -0.5, -0.5 + 144 * 6,
                              m_nrun, (m_th0 - 0.5 * m_dth) * 1000, (m_th0 + (m_nrun - 0.5)*m_dth) * 1000);
     }
   }
@@ -122,12 +115,13 @@ namespace Belle2 {
   {
     StoreObjPtr<EventMetaData> evtmetadata;
     StoreObjPtr<ARICHInfo> arichinfo;
+    if (!arichinfo->getthscan_mode()) return;
     double vth_thscan = arichinfo->getvth_thscan();
 
     //int runno = m_internalmode ? m_run_count : evtmetadata->getRun();
     //int raw_evtno = m_internalmode ? m_evt_count : evtmetadata->getEvent();
     int runno = evtmetadata->getRun();
-    int raw_evtno = evtmetadata->getEvent();
+    //int raw_evtno = evtmetadata->getEvent();
 
     ARICHThParam param(runno, m_dth, m_th0, m_nrun);
     StoreArray<ARICHRawDigit> rawdigits;

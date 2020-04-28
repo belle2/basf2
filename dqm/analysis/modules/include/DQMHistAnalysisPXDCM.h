@@ -13,12 +13,10 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
-#include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TLine.h>
@@ -63,7 +61,7 @@ namespace Belle2 {
     //! Line in the Canvas to guide the eye
     TLine* m_line2 = nullptr;
     //! Line in the Canvas to guide the eye
-    TLine* m_line3 = nullptr;
+//     TLine* m_line3 = nullptr;
 
 #ifdef _BELLE2_EPICS
     //! epics PVs

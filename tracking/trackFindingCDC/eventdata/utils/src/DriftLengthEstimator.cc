@@ -38,8 +38,6 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <algorithm>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

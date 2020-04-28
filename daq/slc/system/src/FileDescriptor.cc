@@ -1,7 +1,6 @@
 #include "daq/slc/system/FileDescriptor.h"
 
-#include <sys/types.h>
-#include <arpa/inet.h>
+#include <daq/slc/base/IOException.h>
 
 #include <unistd.h>
 #include <sys/select.h>

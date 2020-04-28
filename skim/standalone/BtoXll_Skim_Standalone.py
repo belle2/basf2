@@ -1,52 +1,44 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
+######################################################
 #
 # EWP standalone skim steering
-# P. Urquijo, 6/Jan/2015
+#
+# B->Xll (no LFV modes) inclusive skim
+#
+# Trevor Shillington December 2019
 #
 ######################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.lightmesons import *
-from stdPhotons import *
-from skimExpertFunctions import *
-gb2_setuprel = 'release-03-00-03'
-skimCode = encodeSkimName('BtoXll')
+import basf2 as b2
+import modularAnalysis as ma
+from stdPhotons import stdPhotons
+from stdCharged import stdE, stdMu, stdPi
+import skimExpertFunctions as expert
 
+gb2_setuprel = 'release-04-00-00'
+skimCode = expert.encodeSkimName('BtoXll')
 
-path = Path()
-fileList = get_test_file("mixedBGx1", "MC11")
-inputMdstList('default', fileList, path=path)
-loadStdSkimPi0(path=path)
-loadStdSkimPhoton(path=path)
-stdPi0s('loose', path=path)
-stdPhotons('loose', path=path)
-stdK('95eff', path=path)
-stdPi('95eff', path=path)
-stdE('95eff', path=path)
-stdMu('95eff', path=path)
-stdK('loose', path=path)
-stdPi('loose', path=path)
-stdKshorts(path=path)
-loadStdLightMesons(path=path)
+path = b2.Path()
+fileList = expert.get_test_file("MC12_mixedBGx1")
+ma.inputMdstList('default', fileList, path=path)
 
-cutAndCopyList('gamma:ewp', 'gamma:loose', 'E > 0.1', path=path)
-reconstructDecay('eta:ewp -> gamma:ewp gamma:ewp', '0.505 < M < 0.580', path=path)
-# EWP Skim
+# import standard lists
+stdE('all', path=path)
+stdMu('all', path=path)
+stdPi('all', path=path)
+stdPhotons('all', path=path)
+
+# call reconstructed lists from scripts/skim/ewp.py
 from skim.ewp import B2XllList
 XllList = B2XllList(path=path)
-skimOutputUdst(skimCode, XllList, path=path)
-summaryOfLists(XllList, path=path)
+expert.skimOutputUdst(skimCode, XllList, path=path)
+ma.summaryOfLists(XllList, path=path)
 
-
-setSkimLogging(path=path)
-process(path=path)
+# process
+expert.setSkimLogging(path=path)
+b2.process(path=path)
 
 # print out the summary
-print(statistics)
+print(b2.statistics)

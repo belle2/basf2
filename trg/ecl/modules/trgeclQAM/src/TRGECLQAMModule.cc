@@ -1,3 +1,4 @@
+
 //---------------------------------------------------------------
 // $Id$
 //---------------------------------------------------------------
@@ -10,19 +11,15 @@
 //               Check data quality run by run
 //
 //              Checking variables
-//             - Total Energy > 1 GeV (E High) : PSNM 8
-//             - ICN >  3  : PSNM 13
-//             - Bhabha Trigger : PSNM 15
-//             - Track Trigger : PSNM 7
-//             - E High or ICN > 3
-//             - ICN > 3 && Bhabha Trigger : Should be 0 % because bhabha trigger logic has ICN < 4
-//             - E High && Bhabha
-//             - Track Trigger && Bbabha : Should be 0 %
+//             - ECLTRG Total Energy peak and width
+//             - ECLTRG Caltiming peak and width
+//             - ECLTRG Cluster Energy peak and width
 //             - Low Hit TC (Less than 0.1 x Average ) in Forward, Backward endcap and Barrel
 //
 //
 //---------------------------------------------------------------
 // 1.00 : 2018/11/29 : First version
+// 2.00 : 2019/08/08 : Second version
 //---------------------------------------------------------------
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
@@ -41,6 +38,23 @@
 #include <fstream>
 #include <TFile.h>
 #include <TString.h>
+
+#include <TCanvas.h>
+#include <TPDF.h>
+#include <TAttMarker.h>
+#include <TAttLine.h>
+#include <TNamed.h>
+#include <TAxis.h>
+#include <TPaveText.h>
+
+
+#include <RooRealVar.h>
+#include <RooDataHist.h>
+#include <RooGaussian.h>
+#include <RooAddModel.h>
+#include <RooPlot.h>
+#include <RooArgList.h>
+#include <RooNovosibirsk.h>
 
 using namespace std;
 
@@ -75,16 +89,6 @@ namespace Belle2 {
     m_nRun   = 0;
     m_nevent    = 1;
 
-    //ECLTRG Physcis Efficiency
-    m_psnm8     = 0;
-    m_psnm13    = 0;
-    m_psnm8_13  = 0;
-
-    //GDL Logic Test
-    m_psnm7_15  = 0;
-    m_psnm8_15  = 0;
-    m_psnm13_15 = 0;
-
     //Problem TC Check
     m_FWD = 0;
     m_BAR = 0;
@@ -92,6 +96,28 @@ namespace Belle2 {
     m_ALL = 0;
     memset(TCID, 0, sizeof(TCID));
 
+
+    //Total Energy
+
+    m_etot = 0;
+    m_etot_mean = 0;
+    m_etot_error = 0;
+    m_etot_sigma = 0;
+
+    //  std::vector<int> etot;
+    etot.clear();
+
+    //Caltime
+
+    m_caltime_mean = 0;
+    m_caltime_error = 0;
+    m_caltime_sigma = 0;
+    caltime.clear();
+
+    //Cluster E
+
+    clusterE = 0;
+    cluster.clear();
 
     B2DEBUG(100, "TRGECLQAMModule ... created");
   }
@@ -114,8 +140,12 @@ namespace Belle2 {
 
 
     m_TRGECLUnpackerStore.registerInDataStore();
+    m_TRGECLUnpackerEvtStore.registerInDataStore();
+
     m_TRGSummary.registerInDataStore();
-    //    EvtMeta.registterInDataStore();
+    //  EvtMeta.registterInDataStore();
+
+
   }
   //
   //
@@ -137,42 +167,50 @@ namespace Belle2 {
     B2DEBUG(200, "TRGECLFAMMoudle ... event called");
 
 
-    // QAM efficiency
-
-    int psnmbits = m_TRGSummary->getPsnmBits(0);
-    //    cout << psnmbits <<endl;
-    if (((psnmbits >> 8) & 1)) {
-      m_psnm8++;
-      // cout << "8" <<endl;
-    }
-    if (((psnmbits >> 13) & 1)) {
-      m_psnm13++;
-    }
-    if (((psnmbits >> 8) & 1) || ((psnmbits >> 13) & 1)) {
-      m_psnm8_13++;
-    }
-
-    // QAM GDL Logic Test
-    if (((psnmbits >> 7) & 1) && ((psnmbits >> 15) & 1)) {
-      m_psnm7_15++;
-    }
-    if (((psnmbits >> 8) & 1) && ((psnmbits >> 15) & 1)) {
-      m_psnm8_15++;
-    }
-    if (((psnmbits >> 13) & 1) && ((psnmbits >> 15) & 1)) {
-      m_psnm13_15++;
-    }
 
     //QAM ECL Hit Map
+
     //    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerStore;
     for (int ii = 0; ii < m_TRGECLUnpackerStore.getEntries(); ii++) {
       TRGECLUnpackerStore* m_TRGECLUnpacker = m_TRGECLUnpackerStore[ii];
+
+
       int TCId = (m_TRGECLUnpacker->getTCId());
       int HitEnergy = (m_TRGECLUnpacker->getTCEnergy());
+
+      m_etot += HitEnergy;
       if (TCId < 1 || TCId > 576 || HitEnergy == 0) {continue;}
       TCID[TCId - 1]++;
-
+      int Caltime = m_TRGECLUnpacker->getTCCALTime();
+      if (Caltime != 0) {
+        caltime.push_back(Caltime);
+      }
     }
+
+    etot.push_back(m_etot);
+
+    m_etot = 0;
+
+    //Unpacker EvtStore
+    //for ( int ii = 0; ii < m_TRGECLUnpackerSumStore.getEntries(); ii++){
+    TRGECLUnpackerEvtStore* m_TRGECLUnpackerEvt = m_TRGECLUnpackerEvtStore[0];
+
+    if (m_TRGECLUnpackerEvt->get3DBhabhaS() == 1) {
+      //Cluster Energy 2D Check
+      const int* clE = m_TRGECLUnpackerEvt->getCLEnergy();
+
+      int clER[6] = {0};
+
+      for (int i = 0; i < 6; i++) {
+        clER[i] = clE[i];
+      }
+
+      sort(clER, clER + 6);
+
+      clusterE = clER[5] + clER[4]; // Ecl1+Ecl2
+      cluster.push_back(clusterE);
+    }
+
     StoreObjPtr<EventMetaData> bevt;
     m_nRun = bevt->getRun();
     m_nevent++;
@@ -184,15 +222,6 @@ namespace Belle2 {
   void
   TRGECLQAMModule::endRun()
   {
-    //QAM ECLTRG Physics Efficiency
-    m_psnm8  /= m_nevent;
-    m_psnm13 /= m_nevent;
-    m_psnm8_13 /= m_nevent;
-
-    //QAM GDL Logic Test
-    m_psnm7_15 /= m_nevent;
-    m_psnm8_15 /= m_nevent;
-    m_psnm13_15 /= m_nevent;
 
     double mean_FWD = 0;
     double mean_BAR = 0;
@@ -223,46 +252,156 @@ namespace Belle2 {
     }
 
     m_ALL = m_FWD + m_BAR + m_BWD;
+    const int etot_size = etot.size();
+    for (int i = 0; i < etot_size; i++) {
+      h_etot->Fill(etot[i]);
+    }
+    //Caluate E_total peak and width
+
+    RooRealVar* E_tot = new RooRealVar("E_tot", "E_tot", 0, 4000);
+    RooDataHist* data_E_tot = new RooDataHist("data_E_tot", "dataset with E_tot", *E_tot, h_etot);
+    RooRealVar* mean_check = new RooRealVar("mean_check", "Mean for checking", 2000, 1000, 3000);
+    RooRealVar* sigma_check = new RooRealVar("sigma_check", "Sigma for checking", 100, 0, 300);
+    RooGaussian* gauss_check = new RooGaussian("gauss_check", "Gaussian for checking", *E_tot, *mean_check, *sigma_check);
+    gauss_check->fitTo(*data_E_tot);
+    double mean_ch = mean_check->getVal();
+
+    RooRealVar* mean_E_tot = new RooRealVar("mean_E_tot", "Mean of Gaussian", mean_ch, mean_ch - 200, mean_ch + 200);
+    //  RooRealVar sigma_E_tot("sigma_E_tot","Width of Gaussian", 10, 0, 50);
+
+    RooRealVar* sigma1_E_tot = new RooRealVar("sigma1_E_tot", "Width of Gaussian", 30, 0, 60);
+    RooGaussian* gauss1_E_tot = new RooGaussian("gauss1_E_tot", "gauss(x,mean,sigma)", *E_tot, *mean_E_tot, *sigma1_E_tot);
+    RooRealVar* sigma2_E_tot = new RooRealVar("sigma2_E_tot", "Width of Gaussian", 100, 30, 250);
+    RooGaussian* gauss2_E_tot = new RooGaussian("gauss2_E_tot", "gauss(x,mean,sigma)", *E_tot, *mean_E_tot, *sigma2_E_tot);
+
+    RooRealVar* frac_core_E_tot = new RooRealVar("frac_core", "core fraction", 0.85, 0.0, 1.0);
+    RooAddModel* gaussm_E_tot = new RooAddModel("gaussm", "core+tail gauss", RooArgList(*gauss1_E_tot, *gauss2_E_tot),
+                                                RooArgList(*frac_core_E_tot));
+
+    //  RooGaussian gauss_E_tot("gauss_E_tot","gauss(x,mean,sigma)",E_tot,mean_E_tot,sigma_E_tot);
+
+    gaussm_E_tot->fitTo(*data_E_tot, RooFit::Range(mean_ch - 300, mean_ch + 300));
+    //RooPlot* xframe_E_tot = E_tot->frame();
+    RooPlot* xframe_E_tot = E_tot->frame(RooFit::Title("energy_tot"));
+    //data_E_tot->plotOn(xframe_E_tot);
+    data_E_tot->plotOn(xframe_E_tot, RooFit::MarkerStyle(7));
+    //  gauss_E_tot->plotOn(xframe_E_tot);
+    gaussm_E_tot->plotOn(xframe_E_tot, RooFit::Name("Cal_energy"), RooFit::LineColor(2));
+    double v_m_E_tot  = mean_E_tot->getVal();
+    double e_m_E_tot  = mean_E_tot->getError();
+
+    double v1_s1_E_tot = sigma1_E_tot->getVal();
+    //    double e1_s1_E_tot = sigma1_E_tot->getError();
+    double v2_s1_E_tot = sigma2_E_tot->getVal();
+    //    double e2_s1_E_tot = sigma2_E_tot->getError();
+
+    double frac_E_tot = frac_core_E_tot->getVal();
+    double v_s1_E_tot = v1_s1_E_tot * (frac_E_tot) + v2_s1_E_tot * (1 - frac_E_tot);
+
+
+
+    for (long unsigned int ii = 0; ii < caltime.size(); ii++) {
+      h_caltime->Fill(caltime[ii]);
+    }
+
+
+    //Calculate Caltime peak and width
+    RooRealVar T_c("T_c", "T_c", -100, 100);
+    RooDataHist data_T_c("data_T_c", "dataset with T_c", T_c, h_caltime);
+
+    RooRealVar mean_T_c("mean_T_c", "Mean of Gaussian", 0, -100, 100);
+    RooRealVar sigma1_T_c("sigma1_T_c", "Width of Gaussian", 10, 0, 50);
+    RooGaussian gauss1_T_c("gauss1_T_c", "gauss(x,mean,sigma)", T_c, mean_T_c, sigma1_T_c);
+    RooRealVar sigma2_T_c("sigma2_T_c", "Width of Gaussian", 30, 10, 100);
+    RooGaussian gauss2_T_c("gauss2_T_c", "gauss(x,mean,sigma)", T_c, mean_T_c, sigma2_T_c);
+
+    RooRealVar frac_core_T_c("frac_core", "core fraction", 0.85, 0.0, 1.0);
+    RooAddModel gaussm_T_c("gaussm", "core+tail gauss", RooArgList(gauss1_T_c, gauss2_T_c), RooArgList(frac_core_T_c));
+
+    gaussm_T_c.fitTo(data_T_c, RooFit::Range(-45, 45));
+    RooPlot* xframe_T_c = T_c.frame(RooFit::Title("Caltime"));
+    data_T_c.plotOn(xframe_T_c, RooFit::MarkerStyle(7));
+    gaussm_T_c.plotOn(xframe_T_c, RooFit::Name("Caltime"), RooFit::LineColor(2));
+    gaussm_T_c.plotOn(xframe_T_c, RooFit::Components("gauss1_T_c"), RooFit::LineColor(kGreen));
+    gaussm_T_c.plotOn(xframe_T_c, RooFit::Components("gauss2_T_c"), RooFit::LineColor(kMagenta));
+
+    xframe_T_c->GetXaxis()->SetTitle("Caltime[ns]");
+    xframe_T_c->GetYaxis()->SetTitle("Entries");
+
+    double v_m_T_c  = mean_T_c.getVal();
+    double e_m_T_c  = mean_T_c.getError();
+
+    double v1_s1_T_c = sigma1_T_c.getVal();
+    //    double e1_s1_T_c = sigma1_T_c.getError();
+    double v2_s1_T_c = sigma2_T_c.getVal();
+    //    double e2_s1_T_c = sigma2_T_c.getError();
+
+    double frac_T_c = frac_core_T_c.getVal();
+    double v_s1_T_c = v1_s1_T_c * (frac_T_c) + v2_s1_T_c * (1 - frac_T_c);
+
+
+
+    //Cluster E sum for Bhabha skim
+    const int cluster_size = cluster.size();
+    for (int ii = 0; ii < cluster_size; ii++) {
+      h_clusterE->Fill(cluster[ii]);
+    }
+
+    RooRealVar x("x", "esum", 0, 4000);
+    RooDataHist dh("dh", "ecltrg",   x, h_clusterE);
+
+    RooRealVar mean("mean",    "mean", 2000, 1000, 2500);
+    RooRealVar sigma("sigma", "sigma",  150 ,   0,   300);
+    RooRealVar tail("tail",    "tail",  0.45,     0,     1);
+    RooNovosibirsk novo("novo", "", x, mean, sigma, tail);
+    novo.fitTo(dh, RooFit::Extended(0), RooFit::Range(1500, 2200));
+
+
+    double clusterE_vm, clusterE_em, clusterE_vs;
+
+    clusterE_vm = mean.getVal();
+    clusterE_em = mean.getError();
+    clusterE_vs = sigma.getVal();
+
 
     TString outputfile = m_outputfile;
     TFile file(outputfile, "RECREATE");
     TTree* tree = new TTree("tree", "tree");
     int nevent;
-    double psnm8;
-    double psnm13;
-    double psnm8_13;
-    double psnm7_15;
-    double psnm8_15;
-    double psnm13_15;
     double FWD;
     double BAR;
     double BWD;
     double ALL;
 
     nevent = m_nevent;
-    psnm8 = m_psnm8;
-    psnm13 = m_psnm13;
-    psnm8_13 = m_psnm8_13;
-    psnm7_15 = m_psnm7_15;
-    psnm8_15 = m_psnm8_15;
-    psnm13_15 = m_psnm13_15;
     FWD = m_FWD;
     BAR = m_BAR;
     BWD = m_BWD;
     ALL = m_ALL;
 
+    m_etot_mean = v_m_E_tot;
+    m_etot_error = e_m_E_tot;
+    m_etot_sigma = v_s1_E_tot;
+
+    m_caltime_mean = v_m_T_c;
+    m_caltime_error = e_m_T_c;
+    m_caltime_sigma = v_s1_T_c;
+
     tree->Branch("m_nRun",  &m_nRun,   "m_nRun/I");
     tree->Branch("m_nevent",  &nevent,   "m_nevent/I");
-    tree->Branch("m_psnm8",  &psnm8,   "m_psnm8/D");
-    tree->Branch("m_psnm13",  &psnm13,   "m_psnm13/D");
-    tree->Branch("m_psnm8_13",  &psnm8_13,   "m_psnm8_13/D");
-    tree->Branch("m_psnm7_15",  &psnm7_15,   "m_psnm7_15/D");
-    tree->Branch("m_psnm8_15",  &psnm8_15,   "m_psnm8_15/D");
-    tree->Branch("m_psnm13_15",  &psnm13_15,   "m_psnm13_15/D");
     tree->Branch("m_FWD",  &FWD,   "m_FWD/D");
     tree->Branch("m_BAR",  &BAR,   "m_BAR/D");
     tree->Branch("m_BWD",  &BWD,   "m_BWD/D");
     tree->Branch("m_ALL",  &ALL,   "m_ALL/D");
+    tree->Branch("m_etot_mean",  &m_etot_mean,   "m_etot_mean/D");
+    tree->Branch("m_etot_error",  &m_etot_error,   "m_etot_error/D");
+    tree->Branch("m_etot_sigma",  &m_etot_sigma,   "m_etot_sigma/D");
+    tree->Branch("m_caltime_mean",  &m_caltime_mean,   "m_caltime_mean/D");
+    tree->Branch("m_caltime_error",  &m_caltime_error,   "m_caltime_error/D");
+    tree->Branch("m_caltime_sigma",  &m_caltime_sigma,   "m_caltime_sigma/D");
+    tree->Branch("m_clusterE_mean",  &clusterE_vm,   "m_clusterE_mean/D");
+    tree->Branch("m_clusterE_error",  &clusterE_em,   "m_clusterE_error/D");
+    tree->Branch("m_clusterE_sigma",  &clusterE_vs,   "m_clusterE_sigma/D");
 
     tree->Fill();
     tree->Write();
@@ -273,13 +412,15 @@ namespace Belle2 {
     B2INFO("ECL Trigger QAM result "
            << LogVar("Run Number",  m_nRun)
            << LogVar("Total Event",  nevent)
-           << LogVar("Rate of Ehigh or ICN >3 ", psnm8_13)
-           << LogVar("Rate of EHigh and Bhabha",  psnm8_15)
-           << LogVar("Rate of ICN>3 and Bhabha (Should be 0 %)",  psnm13_15)
-           << LogVar("Rate of Track Trigger and Bhabha (Should be 0 %)",  psnm7_15)
            << LogVar("The # of Low Hit TC in Forward Endcap",  FWD)
            << LogVar("The # of Low Hit TC in Barrel",  BAR)
-           << LogVar("The # of Low Hit TC in Backward Endcap",  BWD));
+           << LogVar("The # of Low Hit TC in Backward Endcap",  BWD)
+           << LogVar("Total Energy Peak",  m_etot_mean)
+           << LogVar("Total Energy Peak width",  m_etot_sigma)
+           << LogVar("Caltime Peak",  m_caltime_mean)
+           << LogVar("Caltime Peak width",  m_caltime_sigma)
+           << LogVar("Cluster Energy Peak",  clusterE_vm)
+           << LogVar("Cluster Energy Peak width",  clusterE_vs));
 
 
     B2DEBUG(100, "TRGECLQAMModule ... endRun called ");

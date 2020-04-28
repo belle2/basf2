@@ -1,11 +1,14 @@
 //THIS MODULE
 #include <analysis/modules/ChargedParticleIdentificator/ChargedPidMVAModule.h>
 
+//ANALYSIS
+#include <mva/interface/Interface.h>
+#include <analysis/VariableManager/Utility.h>
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
-
-//C++
-#include <algorithm>
 
 using namespace Belle2;
 
@@ -13,7 +16,7 @@ REG_MODULE(ChargedPidMVA)
 
 ChargedPidMVAModule::ChargedPidMVAModule() : Module()
 {
-  setDescription("This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B. Currently, it uses only ECL-based inputs. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
+  setDescription("This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B. For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists, calculates the MVA score using the appropriate xml weight file, and adds it as ExtraInfo to the Particle objects.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -29,6 +32,14 @@ ChargedPidMVAModule::ChargedPidMVAModule() : Module()
            m_particle_lists,
            "The input list of ParticleList names.",
            std::vector<std::string>());
+  addParam("payloadName",
+           m_payload_name,
+           "The name of the database payload object with the MVA weights.",
+           std::string("ChargedPidMVAWeights"));
+  addParam("useECLOnlyTraining",
+           m_ecl_only,
+           "Specify whether to use an ECL-only training of the MVA.",
+           bool(false));
 }
 
 
@@ -37,34 +48,44 @@ ChargedPidMVAModule::~ChargedPidMVAModule() = default;
 
 void ChargedPidMVAModule::initialize()
 {
+
   m_event_metadata.isRequired();
+
+  m_weightfiles_representation = std::make_unique<DBObjPtr<ChargedPidMVAWeights>>(m_payload_name);
+
 }
 
 
 void ChargedPidMVAModule::beginRun()
 {
+
   // Retrieve the payload from the DB.
-  m_weightfiles_representation.addCallback([this]() { initializeMVA(); });
+  (*m_weightfiles_representation.get()).addCallback([this]() { initializeMVA(); });
   initializeMVA();
 
-  if (!m_weightfiles_representation->isValidPdg(m_sig_pdg)) {
+  if (!(*m_weightfiles_representation.get())->isValidPdg(m_sig_pdg)) {
     B2FATAL("PDG: " << m_sig_pdg <<
             " of the signal mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
-  if (!m_weightfiles_representation->isValidPdg(m_bkg_pdg)) {
+  if (!(*m_weightfiles_representation.get())->isValidPdg(m_bkg_pdg)) {
     B2FATAL("PDG: " << m_bkg_pdg <<
             " of the background mass hypothesis is not that of a valid particle in Const::chargedStableSet! Aborting...");
   }
 
   m_score_varname = "pidPairChargedBDTScore_" + std::to_string(m_sig_pdg) + "_VS_" + std::to_string(m_bkg_pdg);
 
+  if (m_ecl_only) {
+    m_score_varname += "_" + std::to_string(Const::ECL);
+  } else {
+    for (size_t iDet(0); iDet < Const::PIDDetectors::set().size(); ++iDet) {
+      m_score_varname += "_" + std::to_string(Const::PIDDetectors::set()[iDet]);
+    }
+  }
 }
 
 
 void ChargedPidMVAModule::event()
 {
-
-  auto sigPart = Const::ChargedStable(m_sig_pdg);
 
   B2DEBUG(11, "EVENT: " << m_event_metadata->getEvent());
 
@@ -77,7 +98,7 @@ void ChargedPidMVAModule::event()
     int pdg = abs(pList->getPDGCode());
 
     // Check if this ParticleList is made up of legit Const::ChargedStable particles.
-    if (!m_weightfiles_representation->isValidPdg(pdg)) {
+    if (!(*m_weightfiles_representation.get())->isValidPdg(pdg)) {
       B2FATAL("PDG: " << pList->getPDGCode() << " of ParticleList: " << pList->getParticleListName() <<
               " is not that of a valid particle in Const::chargedStableSet! Aborting...");
     }
@@ -95,68 +116,85 @@ void ChargedPidMVAModule::event()
 
       B2DEBUG(11, "\tParticle [" << ipart << "]");
 
-      // If the particle list was created by the FSRCorrection module,
-      // the info in the mdst objects associated to the particles cannot be retrieved directly from the particle.
-      // Instead, one has to get the associated daughters, that hold relations with the mdst objects:
-      // -) the 0-th daughter, i.e. the original particle before brem correction,
-      // -) the 1-st daughter i.e. the brems photon particle (if found), needed to correct E/p.
-      auto nDaughters = particle->getNDaughters();
-      const Particle* daughterLep = (nDaughters) ? particle->getDaughter(0) : nullptr;
-      const Particle* daughterPh  = (nDaughters > 0) ? particle->getDaughter(1) : nullptr;
-
-      // Check that the particle (or the 'daughterLep') has a valid relation set between track and ECL cluster.
+      // Check that the particle has a valid relation set between track and ECL cluster.
       // Otherwise, skip to next.
-      const ECLCluster* eclCluster = (!nDaughters) ? particle->getECLCluster() : daughterLep->getECLCluster();
+      const ECLCluster* eclCluster = particle->getECLCluster();
       if (!eclCluster) {
-        B2DEBUG(11, "\t --> Invalid track-cluster relation, skip...");
+        B2WARNING("\tParticle has invalid Track-ECLCluster relation, skip MVA application...");
         continue;
       }
 
-      // Retrieve the index for the correct MVA expert and dataset, given (signal hypo, clusterTheta, p)
+      // Retrieve the index for the correct MVA expert and dataset,
+      // given reconstructed (clusterTheta, p)
       auto theta   = eclCluster->getTheta();
-      auto p       = particle->getP(); // This is the momentum from the 4-vec after any possible correction,
-      // hence it must be the one of the actual particle.
+      auto p       = particle->getP();
       int jth, ip;
-      auto index   = m_weightfiles_representation->getMVAWeightIdx(sigPart, theta, p, jth, ip);
+      auto index   = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, jth, ip);
 
-      B2DEBUG(11, "\t\tclusterTheta = " << theta << " [rad]");
-      B2DEBUG(11, "\t\tp = " << p << " [GeV/c]");
-      B2DEBUG(11, "\t\tFSRCorrected? " << static_cast<bool>(nDaughters));
-      B2DEBUG(11, "\t\tweightfile idx in payload = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      // Get the cut defining the MVA category under exam (this reflects the one used in the training).
+      const auto cuts   = (*m_weightfiles_representation.get())->getCuts(m_sig_pdg);
+      const auto cutstr = (!cuts->empty()) ? cuts->at(index) : "";
+
+      B2DEBUG(11, "\t\tcharge          = " << particle->getCharge());
+      B2DEBUG(11, "\t\tclusterTheta    = " << theta << " [rad]");
+      B2DEBUG(11, "\t\tp               = " << p << " [GeV/c]");
+      B2DEBUG(11, "\t\tBrems corrected = " << particle->hasExtraInfo("bremsCorrectedPhotonEnergy"));
+      B2DEBUG(11, "\t\tWeightfile idx  = " << index << " - (clusterTheta, p) = (" << jth << ", " << ip << ")");
+      if (!cutstr.empty()) {
+        B2DEBUG(11, "\tCategory cut: " << cutstr);
+      }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.
-      auto nvars  = m_variables.at(index).size();
+
+      B2DEBUG(11, "\tMVA variables:");
+
+      auto nvars = m_variables.at(index).size();
       for (unsigned int ivar(0); ivar < nvars; ++ivar) {
-        auto varobj =  m_variables.at(index).at(ivar);
-        // Set the variables from the daughter particle, if found.
-        // In that case, also ensure E/p is calculated *after* the 4-vec correction,
-        // i.e. using the actual particle's momentum, and the cluster energy includes the brems photon contribution.
-        auto var(-999.0);
-        if (varobj->name == "clusterEoP") {
-          if (nDaughters) {
-            auto energyLep = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-            auto energyPh = (daughterPh) ? daughterPh->getECLCluster()->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) : 0.0;
-            var = (energyLep + energyPh) / p;
-          } else {
-            var = varobj->function(particle);
-          }
-        } else {
-          var = varobj->function((!nDaughters) ? particle : daughterLep);
-        }
-        B2DEBUG(11, "\t\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+
+        auto varobj = m_variables.at(index).at(ivar);
+
+        auto var = varobj->function(particle);
+
+        // Manual imputation value of -999 for NaN (undefined) variables.
+        var = (std::isnan(var)) ? -999.0 : var;
+
+        B2DEBUG(11, "\t\tvar[" << ivar << "] : " << varobj->name << " = " << var);
+
         m_datasets.at(index)->m_input[ivar] = var;
+
       }
-      auto nspecs  = m_spectators.at(index).size();
+
+      B2DEBUG(12, "\tMVA spectators:");
+
+      auto nspecs = m_spectators.at(index).size();
       for (unsigned int ispec(0); ispec < nspecs; ++ispec) {
-        auto specobj =  m_spectators.at(index).at(ispec);
-        auto spec = specobj->function((!nDaughters) ? particle : daughterLep);
-        B2DEBUG(11, "\t\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+
+        auto specobj = m_spectators.at(index).at(ispec);
+
+        auto spec = specobj->function(particle);
+
+        B2DEBUG(12, "\t\tspec[" << ispec << "] : " << specobj->name << " = " << spec);
+
         m_datasets.at(index)->m_spectators[ispec] = spec;
+
+      }
+
+      // Compute MVA score only if particle fulfils category selection.
+      if (!cutstr.empty()) {
+
+        std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(cutstr);
+
+        if (!cut->check(particle)) {
+          B2WARNING("\tParticle didn't pass MVA category cut, skip MVA application...");
+          continue;
+        }
+
       }
 
       float score = m_experts.at(index)->apply(*m_datasets.at(index))[0];
 
-      B2DEBUG(11, "\t\tscore = " << score);
+      B2DEBUG(11, "\tMVA score = " << score);
+      B2DEBUG(12, "\tExtraInfo: " << m_score_varname);
 
       // Store the MVA score as a new particle object property.
       particle->writeExtraInfo(m_score_varname, score);
@@ -178,7 +216,7 @@ void ChargedPidMVAModule::initializeMVA()
 
   B2INFO("\tLoading weightfiles from the payload class for SIGNAL particle hypothesis: " << m_sig_pdg);
 
-  auto serialized_weightfiles = m_weightfiles_representation->getMVAWeights(m_sig_pdg);
+  auto serialized_weightfiles = (*m_weightfiles_representation.get())->getMVAWeights(m_sig_pdg);
   auto nfiles = serialized_weightfiles->size();
 
   B2INFO("\tConstruct the MVA experts and datasets from N = " << nfiles << " weightfiles...");
@@ -226,5 +264,3 @@ void ChargedPidMVAModule::initializeMVA()
   }
 
 }
-
-

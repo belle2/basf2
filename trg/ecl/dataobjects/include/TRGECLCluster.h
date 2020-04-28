@@ -61,9 +61,9 @@ namespace Belle2 {
     double m_Z;
 
     //! Cluster Phi position
-    double m_Phi;
+    double m_Phi = 0.;
     //! Cluster Theta position
-    double m_Theta;
+    double m_Theta = 0.;
 
     //! The method to set event id
     void setEventId(int eventId) { m_eventId = eventId; }

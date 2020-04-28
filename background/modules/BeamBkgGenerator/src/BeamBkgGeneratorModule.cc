@@ -12,7 +12,6 @@
 #include <background/modules/BeamBkgGenerator/BeamBkgGeneratorModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -112,6 +111,7 @@ namespace Belle2 {
     // for SADMetaHit
     m_tree->SetBranchAddress("ss", &m_sad.ss);
     m_tree->SetBranchAddress("sraw", &m_sad.sraw);
+    m_tree->SetBranchAddress("ssraw", &m_sad.ssraw);
     m_tree->SetBranchAddress("nturn", &m_sad.nturn);
     m_tree->SetBranchAddress("xraw", &m_sad.xraw);
     m_tree->SetBranchAddress("yraw", &m_sad.yraw);
@@ -186,7 +186,7 @@ namespace Belle2 {
     if ((unsigned)section < m_sectionOrdering.size()) ring_section = m_sectionOrdering[section];
 
     StoreArray<SADMetaHit> SADMetaHits;
-    SADMetaHits.appendNew(SADMetaHit(m_sad.ss, m_sad.sraw, m_sad.ss, m_sad.s,
+    SADMetaHits.appendNew(SADMetaHit(m_sad.ssraw, m_sad.sraw, m_sad.ss, m_sad.s,
                                      0., m_sad.nturn,
                                      m_sad.x, m_sad.y, m_sad.px, m_sad.py, m_sad.xraw, m_sad.yraw,
                                      m_sad.r, m_sad.rr, m_sad.dp_over_p0, m_sad.E, m_sad.rate,

@@ -23,8 +23,6 @@
 #include "G4EmCalculator.hh"
 
 #include "TGraph.h"
-#include "TFile.h"
-#include <string>
 
 namespace Belle2 {
   namespace ECL {

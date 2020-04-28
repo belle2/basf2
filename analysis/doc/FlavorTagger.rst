@@ -1,3 +1,5 @@
+.. _FlavorTagger:
+
 Flavor Tagger
 ==============
 
@@ -100,7 +102,7 @@ ECL and KLM clusters.
 
 In the first step a dedicated ParticleList is created for each type of
 reconstructed tracks (electrons, muons, Kaons, pions and protons). The
-particles in each list correspond to the whole set of `RestOfEvent` (ROE) tracks
+particles in each list correspond to the whole set of :doc:`RestOfEvent` (ROE) tracks
 fitted with a specific mass hypothesis. The mass hypothesis of each
 ParticleList corresponds to the searched flavor signature, e.g. "K+:KaonROE" is
 created for the categories using the information of kaons. Several flavor
@@ -144,6 +146,7 @@ the inputs of the combiner are saved.
 For more information see 
 `BELLE2-PTHESIS-2018-003 <https://docs.belle2.org/record/1215/files/BELLE2-PTHESIS-2018-003.pdf>`_.
 
+
 Using the FlavorTagger
 ----------------------
 
@@ -165,55 +168,28 @@ If you just want to use the flavor tagger as standard user you need only:
 
   ft.flavorTagger( particleLists=['B0:yourSignalBlist'], weightFiles='B2nunubarBGx1')
 
-and to add the `flavor_tagging` variables to your nTuple as explained below. BGx1 stays for MC generated
+and to add the ``flavor_tagging`` variables to your nTuple as explained below. BGx1 stays for MC generated
 with machine Background. Only BGx1 files are provided centrally.
  
-If you use a release that is older than release-03 please use 
-
-::
-
-  weightFiles='B2JpsiKs_muBGx1'
-
 The current flavor tagger is trained with MC samples for the signal channel 
 :math:`B^0 \to \overline{\nu}\nu` which has
 no built-in CP violation. This is needed to avoid that the flavorTagger learns CP asymmetries
-on the tag side. This effect was discovered first before release-03. 
-Before release-03-01-00, the flavor tagger was trained with MC samples for the signal channel 
-:math:`B^0 \to J/\Psi K^0_{\rm S}`.
+on the tag side. 
 
 The full interface of :func:`flavorTagger` function has 10 possible arguments and it is described below.
 
-How to get the weight files?
-----------------------------
-
-To download the weightfiles from the conditionsdb you have to append a special global tag 
-that depends on the release that you are using.
-You need to add in the
-steering file right before calling the flavor tagger:
-
-::
- 
-  basf2.use_central_database("analysis_tools_release-03-01-00")
-
-+---------------------------+-------------------------------------------+
-| Release                   | Global DataBase Tag                       |
-+===========================+===========================================+
-| release-01-02-04          | analysis_AAT-parameters_release-01-02-03  |
-+---------------------------+-------------------------------------------+
-| release-03-01-00 or later | analysis_tools_release-03-01-00           |
-+---------------------------+-------------------------------------------+
 
 Saving to nTuples
 -----------------
 
 The flavor tagger provides the output of the two combiners and the outputs 
 of the 13 categories. It provides also the MC information relevant for the categories. 
-To save this information you just have to add the predefined predefined list
+To save this information you just have to add the predefined list
 ``ft.flavor_tagging``
-to the variables that you use as argument for the module :func:`variablesToNtuple`.
+to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
 The two available combiners provide two different flavor tags which can be
-found in the ntupleTree of the output root file: ``FBDT_qrCombined`` or
+found in the ntuple of the output root file: ``FBDT_qrCombined`` or
 ``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
 FANN is the output of a multi-layer perceptron of the open source library fast
 artificial neural network . The default output -2 is saved for events without
@@ -262,9 +238,9 @@ The variable has several output values. The meaning  are the following:
     not work well at all and one could think for an instant that the flavor tagger
     is under or overestimating the dilution.
 
-The flavor tagger also saves the variable ``mcFlavorOfOtherB0`` which returns the flavor of the 
-accompaning tag-side neutral :math:`B` meson if the given particle is a correctly MC matched 
-neutral :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
+The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the 
+accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched 
+:math:`B` (it returns 0 else). In other words, this variable checks the generated flavor 
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional informations about individual categories are saved using the aliases
@@ -319,11 +295,11 @@ An example tutorial for normal use can be found under:
 
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
+Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_ 
+at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
 
 Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
 (Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
-There are also some slides for the tutorial accessible from 
-`this confluence page <https://confluence.desy.de/display/BI/Physics+AnalysisSoftware>`_ .
 
 As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged. 
 You find them under:
@@ -347,6 +323,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
+If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
 
 
 Functions

@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
-#include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
 #include <tracking/trackFindingCDC/utilities/TupleGenerate.h>
 
@@ -21,7 +20,6 @@
 #include <tuple>
 #include <array>
 #include <memory>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

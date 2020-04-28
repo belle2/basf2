@@ -54,6 +54,15 @@ namespace Belle2 {
     //! Cluster energy of this hit.
     int e_cl_energy[6];
 
+    //! Cluster CM 1GeV Flag of this hit.
+    int e_cl_1gev[6];
+
+    //! Cluster CM 2GeV Flag of this hit.
+    int e_cl_2gev[6];
+
+    //! Cluster Bhabha Flag of this hit.
+    int e_cl_bha[6];
+
     //! Number of Cluster of this hit.
     int e_ncl;
 
@@ -75,11 +84,17 @@ namespace Belle2 {
     //! ICN of this hit.
     int e_icn;
 
+    //! ICN overflow bit of this hit.
+    int e_icn_over;
+
     //! Total Energy Type of this hit.
     int e_etot_type;
 
-    //! Total Energy of this event.
+    //! Total Energy of this event (Physics region).
     int e_etot;
+
+    //! The case of Total Energy > 20GeV  of this hit.
+    int e_ecl_bst;
 
     //! 2D Bhabha bit of this event.
     int e_b1bhabha;
@@ -101,6 +116,18 @@ namespace Belle2 {
 
     //! trigger type
     int e_trgtype;
+
+    //! Total Energy of this event (All region).
+    int e_etot_all;
+
+    //! Event Timing Range min of this event.
+    int e_evt_time_min;
+
+    //! Event Timing Range max of this event.
+    int e_evt_time_max;
+
+    //! Event Timing win of this event. -1 or 1
+    int e_evt_time_win;
 
     //! The method to set event id
     void setEventId(int eventId) {e_eventId = eventId;}
@@ -155,6 +182,30 @@ namespace Belle2 {
       }
     }
 
+    //! The mothod to set 1GeV Flag
+    void setCLF1GeV(int cl_1gev[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_1gev[i] = cl_1gev[i];
+      }
+    }
+
+    //! The mothod to set 2GeV Flag
+    void setCLF2GeV(int cl_2gev[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_2gev[i] = cl_2gev[i];
+      }
+    }
+
+    //! The mothod to set Bha Flag
+    void setCLFBha(int cl_bha[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_bha[i] = cl_bha[i];
+      }
+    }
+
     //! The mothod to set Number of Cluster
     void setNCL(int ncl) {e_ncl = ncl;}
 
@@ -176,11 +227,17 @@ namespace Belle2 {
     //! The mothod to set ICN
     void setICN(int icn) {e_icn = icn;}
 
+    //! The mothod to set ICN overflow bit
+    void setICNOver(int icn_over) {e_icn_over = icn_over;}
+
     //! The mothod to set Total Energy Type
     void setEtotType(int etot_type) {e_etot_type = etot_type;}
 
     //! The method to set Total Energy
     void setEtot(int etot) {e_etot = etot;}
+
+    //! The mothod to set Total Energy more than 20 gev
+    void setECLBST(int eclbst) {e_ecl_bst = eclbst;}
 
     //! The method to set 2D Bhabha bit
     void set2DBhabha(int b1bhabha) {e_b1bhabha = b1bhabha;}
@@ -202,6 +259,18 @@ namespace Belle2 {
 
     //! The method to set TRG Type
     void setTRGTYPE(int trgtype) {e_trgtype = trgtype;}
+
+    //! The method to set ETOT all
+    void setEtotAll(int etotall) {e_etot_all = etotall;}
+
+    //! The method to set Evt Timing Min
+    void setEvtTimeMin(int timemin) {e_evt_time_min = timemin;}
+
+    //! The method to set Evt Timing Max
+    void setEvtTimeMax(int timemax) {e_evt_time_max = timemax;}
+
+    //! The method to set Evt Timing Win
+    void setEvtTimeWin(int timewin) {e_evt_time_win = timewin;}
 
     //! The method to get event id
     int getEventId() const {return e_eventId;}
@@ -236,6 +305,15 @@ namespace Belle2 {
     //! The mothod to get Cluster energy
     const int* getCLEnergy() const {return e_cl_energy;}
 
+    //! The mothod to get 1GeV Flag
+    const int* getCL1GeV() const {return e_cl_1gev;}
+
+    //! The mothod to get 2GeV Flag
+    const int* getCL2GeV() const {return e_cl_2gev;}
+
+    //! The mothod to get Bhabha Flag
+    const int* getCLBha() const {return e_cl_bha;}
+
     //! The mothod to get Number of Cluster
     int getNCL() const {return e_ncl;}
 
@@ -257,11 +335,17 @@ namespace Belle2 {
     //! The mothod to get ICN
     int getICN() const {return e_icn;}
 
+    //! The mothod to get ICN overflow bit
+    int getICNOver() const {return e_icn_over;}
+
     //! The mothod to get Total Energy Type
     int getEtotType() const {return e_etot_type;}
 
     //! The method to get Total Energy
     int getEtot() const {return e_etot;}
+
+    //! The mothod to get Total Energy more than 20GeV
+    int getECLBST() const {return e_ecl_bst;}
 
     //! The method to get 2D Bhabha bit
     int get2DBhabha() const {return e_b1bhabha;}
@@ -281,35 +365,59 @@ namespace Belle2 {
     //! The method to get TRG Type
     int getTRGTYPE() const {return e_trgtype;}
 
+    //! The mothod to get Timing Type
+    int getTimeType() const {return e_time_type;}
+
+    //! The mothod to get ETOT all
+    int getEtotAll() const {return e_etot_all;}
+
+    //! The mothod to get Evt Timing Min
+    int getEvtTimeMin() const {return e_evt_time_min;}
+
+    //! The mothod to get Evt Timing Max
+    int getEvtTimeMax() const {return e_evt_time_max;}
+
+    //! The mothod to get Evt Timing Win
+    int getEvtTimeWin() const {return e_evt_time_win;}
+
     TRGECLUnpackerEvtStore()
     {
-      e_eventId   = 0;
-      e_etm       = 0;
-      e_l1_revo   = 0;
-      e_evt_time  = 0;
-      e_evt_revo  = 0;
-      e_evt_win   = 0;
-      e_ntc       = 0;
+      e_eventId      = 0;
+      e_etm          = 0;
+      e_l1_revo      = 0;
+      e_evt_time     = 0;
+      e_evt_revo     = 0;
+      e_evt_win      = 0;
+      e_ntc          = 0;
       memset(e_cl_theta,   0, sizeof(e_cl_theta));
       memset(e_cl_phi,     0, sizeof(e_cl_phi));
       memset(e_cl_time,    0, sizeof(e_cl_time));
       memset(e_cl_energy,  0, sizeof(e_cl_energy));
-      e_ncl       = 0;
-      e_low_multi = 0;
-      e_b2bhabhav = 0;
-      e_b2bhabhas = 0;
-      e_mumu      = 0;
-      e_prescale  = 0;
-      e_icn       = 0;
-      e_etot_type = 0;
-      e_etot      = 0;
-      e_b1bhabha  = 0;
-      e_b1_type   = 0;
-      e_physics   = 0;
-      e_time_type = 0;
-      e_checksum  = 0;
-      e_checkevt  = 0;
-      e_trgtype   = 0;
+      memset(e_cl_1gev,    0, sizeof(e_cl_1gev));
+      memset(e_cl_2gev,    0, sizeof(e_cl_2gev));
+      memset(e_cl_bha,     0, sizeof(e_cl_bha));
+      e_ncl          = 0;
+      e_low_multi    = 0;
+      e_b2bhabhav    = 0;
+      e_b2bhabhas    = 0;
+      e_mumu         = 0;
+      e_prescale     = 0;
+      e_icn          = 0;
+      e_icn_over     = 0;
+      e_etot_type    = 0;
+      e_etot         = 0;
+      e_ecl_bst      = 0;
+      e_b1bhabha     = 0;
+      e_b1_type      = 0;
+      e_physics      = 0;
+      e_time_type    = 0;
+      e_checksum     = 0;
+      e_checkevt     = 0;
+      e_trgtype      = 0;
+      e_etot_all     = 0;
+      e_evt_time_min = 0;
+      e_evt_time_max = 0;
+      e_evt_time_win = 0;
     }
 
     //! Useful Constructor
@@ -325,6 +433,9 @@ namespace Belle2 {
       int cl_phi[6],
       int cl_time[6],
       int cl_energy[6],
+      int cl_1gev[6],
+      int cl_2gev[6],
+      int cl_bha[6],
       int ncl,
       int low_multi,
       int b2bhabhav,
@@ -332,49 +443,64 @@ namespace Belle2 {
       int mumu,
       int prescale,
       int icn,
+      int icn_over,
       int etot_type,
       int etot,
+      int eclbst,
       int b1bhabha,
       int b1_type,
       int physics,
       int time_type,
       int checksum,
       int evtexist,
-      int trgtype
+      int trgtype,
+      int etotall,
+      int timemin,
+      int timemax,
+      int timewin
     )
     {
-      e_eventId   = eventId;
-      e_etm       = etm;
-      e_l1_revo   = l1_revo;
-      e_evt_time  = evt_time;
-      e_evt_revo  = evt_revo;
-      e_evt_win   = evt_win;
-      e_ntc       = ntc;
+      e_eventId      = eventId;
+      e_etm          = etm;
+      e_l1_revo      = l1_revo;
+      e_evt_time     = evt_time;
+      e_evt_revo     = evt_revo;
+      e_evt_win      = evt_win;
+      e_ntc          = ntc;
       for (int i = 0; i < 6; i++) {
         e_cl_theta[i]   = cl_theta[i];
         e_cl_phi[i]     = cl_phi[i];
         e_cl_time[i]    = cl_time[i];
         e_cl_energy[i]  = cl_energy[i];
+        e_cl_1gev[i]    = cl_1gev[i];
+        e_cl_2gev[i]    = cl_2gev[i];
+        e_cl_bha[i]     = cl_bha[i];
       }
-      e_ncl       = ncl;
-      e_low_multi = low_multi;
-      e_b2bhabhav = b2bhabhav;
-      e_b2bhabhas = b2bhabhas;
-      e_mumu      = mumu;
-      e_prescale  = prescale;
-      e_icn       = icn;
-      e_etot_type = etot_type;
-      e_etot      = etot;
-      e_b1bhabha  = b1bhabha;
-      e_b1_type   = b1_type;
-      e_physics   = physics;
-      e_time_type = time_type;
-      e_checksum  = checksum;
-      e_checkevt  = evtexist;
-      e_trgtype   = trgtype;
+      e_ncl          = ncl;
+      e_low_multi    = low_multi;
+      e_b2bhabhav    = b2bhabhav;
+      e_b2bhabhas    = b2bhabhas;
+      e_mumu         = mumu;
+      e_prescale     = prescale;
+      e_icn          = icn;
+      e_icn_over     = icn_over;
+      e_etot_type    = etot_type;
+      e_etot         = etot;
+      e_ecl_bst      = eclbst;
+      e_b1bhabha     = b1bhabha;
+      e_b1_type      = b1_type;
+      e_physics      = physics;
+      e_time_type    = time_type;
+      e_checksum     = checksum;
+      e_checkevt     = evtexist;
+      e_trgtype      = trgtype;
+      e_etot_all     = etotall;
+      e_evt_time_min = timemin;
+      e_evt_time_max = timemax;
+      e_evt_time_win = timewin;
     }
     /** the class title */
-    ClassDef(TRGECLUnpackerEvtStore, 3);
+    ClassDef(TRGECLUnpackerEvtStore, 4);
   };
 
 } // end namespace Belle2

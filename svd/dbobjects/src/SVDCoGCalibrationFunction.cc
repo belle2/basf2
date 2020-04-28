@@ -3,8 +3,9 @@
 
 using namespace Belle2;
 
-std::vector <SVDCoGCalibrationFunction::cogFunction>
-SVDCoGCalibrationFunction::m_implementations;
+std::vector <SVDCoGCalibrationFunction::cogFunction> SVDCoGCalibrationFunction::m_implementations;
+
+std::vector <SVDCoGCalibrationFunction::cogFunctionErr> SVDCoGCalibrationFunction::m_implementationsErr;
 
 SVDCoGCalibrationFunction::SVDCoGCalibrationFunction(const SVDCoGCalibrationFunction& a): TObject(a)
 {
@@ -13,6 +14,9 @@ SVDCoGCalibrationFunction::SVDCoGCalibrationFunction(const SVDCoGCalibrationFunc
     m_scale[i] = a.m_scale[i];
   }
   m_current = a.m_current;
+
+  for (int i = 0; i < m_nPar; i++)
+    m_par[i] = a.m_par[i];
 }
 
 

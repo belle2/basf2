@@ -12,22 +12,21 @@
 # Reconstruct B0 to J/PsiKs using the TreeFitter. Use the ..._Plot.py
 # to plot the resolutions.
 
-from basf2 import create_path, process, statistics
+from basf2 import create_path, process, statistics, set_random_seed
 
-from modularAnalysis import use_central_database, set_random_seed, inputMdst, reconstructDecay, fillParticleList, matchMCTruth
+from modularAnalysis import inputMdst, reconstructDecay, fillParticleList, matchMCTruth
 import os
-from vertex import vertexTree
+from vertex import treeFit
 
 from variables import variables
 import sys
 
 path = create_path()
-use_central_database("development")
 set_random_seed('#BAADF00D')
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst11_BGx1_b2jpsiks.root')
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/prerel04_eph3_BGx1_b2jpsiks.root')
 inputMdst('default', inputFile, path=path)
 
 
@@ -40,7 +39,7 @@ reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.27 and abs(deltaE
 
 matchMCTruth('B0:jpsiks', path=path)
 
-vertexTree(
+treeFit(
     list_name='B0:jpsiks',
     conf_level=-1,
     updateAllDaughters=True,
@@ -66,9 +65,9 @@ variables = [
     'x_uncertainty',
     'y_uncertainty',
     'z_uncertainty',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
 ]
 
 path.add_module('VariablesToNtuple',

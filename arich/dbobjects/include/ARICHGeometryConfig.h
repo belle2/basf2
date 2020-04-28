@@ -12,13 +12,11 @@
 
 #include <framework/gearbox/GearDir.h>
 #include "TVector2.h"
-#include <G4MaterialPropertyVector.hh>
-#include <cmath>
-#include <TObject.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 #include <arich/dbobjects/ARICHGeoMerger.h>
 #include <arich/dbobjects/ARICHGeoCablesEnvelope.h>
 #include <arich/dbobjects/ARICHGeoCooling.h>
+#include <arich/dbobjects/ARICHGeoFEBCooling.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
 #include <arich/dbobjects/ARICHGeoMirrors.h>
@@ -138,6 +136,12 @@ namespace Belle2 {
     const ARICHGeoCooling& getCoolingGeometry() const { return m_cooling; }
 
     /**
+     * Get ARICH FEB cooling system (v2) geometry parameters
+     * @return ARICH FEB cooling system (v2) geometry parameters
+     */
+    const ARICHGeoFEBCooling& getFEBCoolingGeometry() const { return m_coolingv2; }
+
+    /**
      * Get global displacement parameters
      * @return global displacement parameters
      */
@@ -245,20 +249,20 @@ namespace Belle2 {
     ARICHGeoMerger m_merger;                  /**< Merger PCB geometry configuration */
     ARICHGeoCablesEnvelope m_cablesenvelope;  /**< ARICH cables envelop geometry configuration */
     ARICHGeoCooling m_cooling;                /**< ARICH cooling system geometry configuration */
-    ARICHGeoGlobalDisplacement m_globalDispl;  /**< global displacement parameters */
-    ARICHGeoMirrorDisplacement m_mirrorDispl;  /**< mirror displacement parameters */
-    bool m_displaceMirrors = 0;                 /**< use mirror displacement parameters */
-    bool m_displaceGlobal = 0;                  /**< use global displacement parameters */
+    ARICHGeoFEBCooling m_coolingv2;           /**< ARICH cooling system (v2) geometry configuration */
+    ARICHGeoGlobalDisplacement m_globalDispl; /**< global displacement parameters */
+    ARICHGeoMirrorDisplacement m_mirrorDispl; /**< mirror displacement parameters */
+    bool m_displaceMirrors = 0;               /**< use mirror displacement parameters */
+    bool m_displaceGlobal = 0;                /**< use global displacement parameters */
 
     int m_bbstudy = 0; /**< is beam background study */
 
     //! initializes the positions of HAPD modules, with the parameters from xml.
     void modulesPosition(const GearDir& content);
 
-    ClassDef(ARICHGeometryConfig, 4);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHGeometryConfig, 5);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
-
 
   inline double ARICHGeometryConfig::getDetectorZPosition() const
   {

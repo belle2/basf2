@@ -21,8 +21,6 @@
 
 // framework aux
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // SimHits
@@ -32,16 +30,16 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <simulation/dataobjects/BeamBackHit.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
-#include <background/dataobjects/BackgroundMetaData.h>
-#include <background/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundInfo.h>
 
 // Root
+#include <TFile.h>
 #include <TRandom3.h>
 
 //std::find
@@ -125,8 +123,7 @@ namespace Belle2 {
     m_TOP = isComponentIncluded(components, "TOP");
     m_ARICH = isComponentIncluded(components, "ARICH");
     m_ECL = isComponentIncluded(components, "ECL");
-    m_BKLM = isComponentIncluded(components, "BKLM");
-    m_EKLM = isComponentIncluded(components, "EKLM");
+    m_KLM = isComponentIncluded(components, "KLM");
 
     // ignore these ones
 
@@ -190,7 +187,7 @@ namespace Belle2 {
       }
       branchBMD->SetAddress(&bkgMetaData);
 
-      std::vector<SimHitBase::BG_TAG> tags;
+      std::vector<BackgroundMetaData::BG_TAG> tags;
       std::vector<std::string> types;
       std::vector<BackgroundMetaData::EFileType> fileTypes;
       double realTime = 0;
@@ -264,9 +261,9 @@ namespace Belle2 {
         bkg.tree->SetBranchAddress("ARICHSimHits", &m_simHits.ARICH);
       if (m_ECL and bkg.tree->GetBranch("ECLHits"))
         bkg.tree->SetBranchAddress("ECLHits", &m_simHits.ECL);
-      if (m_BKLM and bkg.tree->GetBranch("BKLMSimHits"))
+      if (m_KLM and bkg.tree->GetBranch("BKLMSimHits"))
         bkg.tree->SetBranchAddress("BKLMSimHits", &m_simHits.BKLM);
-      if (m_EKLM and bkg.tree->GetBranch("EKLMSimHits"))
+      if (m_KLM and bkg.tree->GetBranch("EKLMSimHits"))
         bkg.tree->SetBranchAddress("EKLMSimHits", &m_simHits.EKLM);
 
       if (m_BeamBackHits and bkg.tree->GetBranch("BeamBackHits"))
@@ -309,10 +306,10 @@ namespace Belle2 {
     if (m_ECL) eclHits.registerInDataStore();
 
     StoreArray<BKLMSimHit> bklmSimHits;
-    if (m_BKLM) bklmSimHits.registerInDataStore();
+    if (m_KLM) bklmSimHits.registerInDataStore();
 
     StoreArray<EKLMSimHit> eklmSimHits;
-    if (m_EKLM) eklmSimHits.registerInDataStore();
+    if (m_KLM) eklmSimHits.registerInDataStore();
 
     StoreArray<BeamBackHit> beamBackHits;
     if (m_BeamBackHits) beamBackHits.registerInDataStore();
@@ -534,7 +531,7 @@ namespace Belle2 {
   }
 
 
-  void BeamBkgMixerModule::appendSample(SimHitBase::BG_TAG  tag,
+  void BeamBkgMixerModule::appendSample(BackgroundMetaData::BG_TAG  tag,
                                         const std::string& type,
                                         const std::string& fileName,
                                         double realTime,

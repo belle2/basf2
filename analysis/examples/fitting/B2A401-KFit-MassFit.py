@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -27,7 +26,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import massKFit
+from vertex import kFit
 from modularAnalysis import variablesToNtuple
 from stdPi0s import stdPi0s
 import variables.collections as vc
@@ -51,15 +50,15 @@ stdPi0s('looseFit', path=my_path)
 reconstructDecay('D0:pi0pi0 -> pi0:looseFit pi0:looseFit', '1.7 < M < 2.0', path=my_path)
 
 # perform mass fit using KFit
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-massKFit('D0:pi0pi0', 0.0, path=my_path)
+# Reject the candidates with failed fit.
+kFit('D0:pi0pi0', 0.0, 'mass', path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
 reconstructDecay('B0:all -> D0:pi0pi0 pi0:looseFit', '5.24 < Mbc < 5.29 and abs(deltaE) < 1.0', path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 matchMCTruth('B0:all', path=my_path)
 
 # Select variables that we want to store to ntuple

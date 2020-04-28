@@ -59,6 +59,7 @@ Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>&
   std::vector<const CDCWireHit*> fromWireHits;
   fromWireHits.reserve(from->size());
   for (const CDCRecoHit2D& recoHit2D : *from) {
+    // cppcheck-suppress useStlAlgorithm
     fromWireHits.push_back(&recoHit2D.getWireHit());
   }
   std::sort(fromWireHits.begin(), fromWireHits.end());

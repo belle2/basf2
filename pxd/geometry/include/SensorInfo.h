@@ -12,7 +12,6 @@
 #define PXD_SENSORINFO_H
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <algorithm>
 
 #include <root/TVector3.h>
 

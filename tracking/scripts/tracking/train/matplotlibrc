@@ -1,0 +1,2 @@
+# Use non-interactive plotting backend so that the steering file won't fail on  servers without X
+backend : PDF

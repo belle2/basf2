@@ -4,15 +4,9 @@
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/V0.h>
-
-#include <TMath.h>
-#include <TLorentzVector.h>
-
-#include <genfit/Track.h>
 
 using namespace Belle2;
 

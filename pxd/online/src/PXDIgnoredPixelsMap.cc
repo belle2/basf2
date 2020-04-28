@@ -14,7 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <vxd/geometry/GeoCache.h>
-#include <pxd/geometry/SensorInfo.h>
 
 using namespace Belle2;
 using namespace std;

@@ -1,9 +1,7 @@
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 
@@ -79,8 +77,25 @@ namespace {
     const Manager::Var* aliasDoesExists = Manager::Instance().getVariable("myAlias");
     EXPECT_TRUE(aliasDoesExists != nullptr);
 
+    // aliases also should work recursively
+    auto& vm = Manager::Instance();
+    EXPECT_TRUE(vm.addAlias("myAliasAlias", "myAlias"));
+    // and it should resolve to the same variable as the original alias
+    EXPECT_EQ(aliasDoesExists, vm.getVariable("myAliasAlias"));
+
+    // but we expect a fatal if there's a loop in alias definitions
+    EXPECT_TRUE(vm.addAlias("aliasLoop1", "aliasLoop2"));
+    EXPECT_TRUE(vm.addAlias("aliasLoop2", "aliasLoop3"));
+    EXPECT_TRUE(vm.addAlias("aliasLoop3", "aliasLoop4"));
+    EXPECT_TRUE(vm.addAlias("aliasLoop4", "aliasLoop1"));
+    EXPECT_B2FATAL(vm.getVariable("aliasLoop1"));
+    EXPECT_B2FATAL(vm.getVariable("aliasLoop3"));
+
+    // redefine the alias with the same values is fine
     EXPECT_NO_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
+    // redefine the alias with a different value gives an error
     EXPECT_B2WARNING(Manager::Instance().addAlias("myAlias", "daughterSumOf(daughter(0, extraInfo(signalProbability)))"));
+    // creating an alias for a known variables doesn't work and gives an error
     EXPECT_B2ERROR(Manager::Instance().addAlias("M", "daughterSumOf(daughter(1, extraInfo(signalProbability)))"));
 
     //re-registration not allowed

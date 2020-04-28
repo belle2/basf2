@@ -16,7 +16,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     std::unique_ptr<SoftwareTriggerCut> SoftwareTriggerCut::compile(const std::string& cut_string,
-        const std::vector<unsigned int>& prescaleFactor,
+        unsigned int prescaleFactor,
         const bool rejectCut)
     {
       auto compiledGeneralCut = GeneralCut<SoftwareTriggerVariableManager>::compile(cut_string);
@@ -26,11 +26,8 @@ namespace Belle2 {
       return compiledSoftwareTriggerCut;
     }
 
-    /**
-     * Main function of the SoftwareTriggerCut: check the cut condition.
-     * See the constructor of this class for more information on when which result is returned.
-     */
-    SoftwareTriggerCutResult SoftwareTriggerCut::checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
+    std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> SoftwareTriggerCut::check(const
+        SoftwareTriggerVariableManager::Object& prefilledObject) const
     {
       if (not m_cut) {
         B2FATAL("Software Trigger is not initialized!");
@@ -40,9 +37,9 @@ namespace Belle2 {
       // If the cut is a reject cut, return false if the cut is true and false if the cut is true.
       if (isRejectCut()) {
         if (cutCondition) {
-          return SoftwareTriggerCutResult::c_reject;
+          return {SoftwareTriggerCutResult::c_reject, SoftwareTriggerCutResult::c_reject};
         } else {
-          return SoftwareTriggerCutResult::c_noResult;
+          return {SoftwareTriggerCutResult::c_noResult, SoftwareTriggerCutResult::c_noResult};
         }
       } else {
         // This is the "normal" accept case:
@@ -50,12 +47,20 @@ namespace Belle2 {
         if (cutCondition) {
           // if yes, we have to use the prescale factor to see, if the result is really yes.
           if (makePreScale(getPreScaleFactor())) {
-            return SoftwareTriggerCutResult::c_accept;
+            return {SoftwareTriggerCutResult::c_accept, SoftwareTriggerCutResult::c_accept};
+          } else {
+            // This is the only case were prescaled and non-prescaled results are different.
+            return {SoftwareTriggerCutResult::c_noResult, SoftwareTriggerCutResult::c_accept};
           }
+        } else {
+          return {SoftwareTriggerCutResult::c_noResult, SoftwareTriggerCutResult::c_noResult};
         }
-
-        return SoftwareTriggerCutResult::c_noResult;
       }
+    }
+
+    SoftwareTriggerCutResult SoftwareTriggerCut::checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
+    {
+      return check(prefilledObject).first;
     }
   }
 }

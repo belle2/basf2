@@ -10,10 +10,9 @@
 #include <tracking/ckf/svd/filters/relations/SensorSVDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
@@ -37,7 +36,8 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-    if (fabs(phiDiff) < 0.5) {
+    if (fabs(phiDiff) < m_param_PhiRecoTrackToHitCut and
+        fabs(fromStateCache.theta - toStateCache.theta) < m_param_ThetaRecoTrackToHitCut) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -69,9 +69,22 @@ SensorSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFT
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-  if (fabs(phiDiff) < (M_PI - 2.)) {
+  if (fabs(phiDiff) < m_param_PhiHitHitCut and
+      fabs(fromStateCache.theta - toStateCache.theta) < m_param_ThetaHitHitCut) {
     return 1.0;
   }
 
   return NAN;
+}
+
+void SensorSVDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaRecoTrackToHitCut"), m_param_ThetaRecoTrackToHitCut,
+                                "Cut in theta for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_ThetaRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+                                "Cut in phi for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_PhiRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitCut,
+                                "Cut in theta between two hit-based states.", m_param_ThetaHitHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+                                "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
 }

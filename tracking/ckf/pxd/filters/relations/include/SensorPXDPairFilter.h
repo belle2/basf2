@@ -18,5 +18,17 @@ namespace Belle2 {
   public:
     /// Return the weight based on layer
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    /// Expose the parameters.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+  private:
+    /// Pre-filter relations in theta for overlay
+    double m_param_ThetaRecoTrackToHitCut = 0.4;
+    /// Pre-filter relations in phi between seed states and hit states
+    double m_param_PhiRecoTrackToHitCut = 0.3;
+    /// Pre-filter relations in phi between hit states
+    double m_param_ThetaHitHitCut = M_PI / 3.;
+    /// Pre-filter relations in theta between hit states
+    double m_param_PhiHitHitCut = (M_PI - 2.);
   };
 }

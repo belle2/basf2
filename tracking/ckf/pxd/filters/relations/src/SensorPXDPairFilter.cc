@@ -10,10 +10,9 @@
 #include <tracking/ckf/pxd/filters/relations/SensorPXDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
@@ -37,7 +36,8 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
     while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
     while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-    if (fabs(phiDiff) < 0.3) {
+    if (fabs(phiDiff) < m_param_PhiRecoTrackToHitCut and
+        fabs(fromStateCache.theta - toStateCache.theta) < m_param_ThetaRecoTrackToHitCut) {
       return 1.0;
     }
     // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
@@ -49,8 +49,6 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   // So it's sufficient here to check for same layer number to accept states in the overlap region.
   if (fromStateCache.geoLayer == toStateCache.geoLayer and
       fromStateCache.sensorID.getSensorNumber() == toStateCache.sensorID.getSensorNumber()) {
-    // TODO: Checking for equality of sensor numbers seems not to harm the hit efficiency,
-    // but maybe it's safer to allow for a sensor number difference of 1?
     return 1.0;
   }
 
@@ -70,9 +68,22 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-  if (fabs(phiDiff) < (M_PI - 2.)) {
+  if (fabs(phiDiff) < m_param_PhiHitHitCut and
+      fabs(fromStateCache.theta - toStateCache.theta) < m_param_ThetaHitHitCut) {
     return 1.0;
   }
 
   return NAN;
+}
+
+void SensorPXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaRecoTrackToHitCut"), m_param_ThetaRecoTrackToHitCut,
+                                "Cut in theta for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_ThetaRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+                                "Cut in phi for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_PhiRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitCut,
+                                "Cut in theta between two hit-based states.", m_param_ThetaHitHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+                                "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
 }

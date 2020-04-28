@@ -695,6 +695,13 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
       oParticle->getDaughter(i)->fillDecayChain(othrDecayChain);
     }
 
+    // Even if the daughters have been provided in a different order in the
+    // decay string the particles should be identified as copies / duplicates.
+    // Therefore, the decay chain vectors, which contain both the pdg codes and
+    // the mdst sources, are sorted here before comparing them.
+    sort(thisDecayChain.begin(), thisDecayChain.end());
+    sort(othrDecayChain.begin(), othrDecayChain.end());
+
     for (unsigned i = 0; i < thisDecayChain.size(); i++)
       if (thisDecayChain[i] != othrDecayChain[i])
         return false;

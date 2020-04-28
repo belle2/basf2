@@ -10,7 +10,6 @@
 #include <tracking/ckf/pxd/filters/relations/LoosePXDPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -27,7 +26,7 @@ LoosePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFTo
   // but as there could in principle be a chance between sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1)
   // check for a similar theta value instead of v
   if (currentStateCache.geoLayer == nextStateCache.geoLayer) {
-    if (fabs(currentStateCache.theta - nextStateCache.theta) > m_param_theta_overlay_region_precut) {
+    if (fabs(currentStateCache.theta - nextStateCache.theta) > m_param_ThetaOverlayRegionPrecut) {
       return NAN;
     }
   }
@@ -37,11 +36,11 @@ LoosePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFTo
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
   if (not currentStateCache.isHitState) {
-    if (fabs(phiDiff) > m_param_phi_seed_hit_precut) {
+    if (fabs(phiDiff) > m_param_PhiSeedHitPrecut) {
       return NAN;
     }
-  } else if (!(fabs(phiDiff) < m_param_phi_hit_hit_precut and
-               fabs(currentStateCache.theta - nextStateCache.theta) < m_param_theta_hit_hit_precut)) {
+  } else if (!(fabs(phiDiff) < m_param_PhiHitHitPrecut and
+               fabs(currentStateCache.theta - nextStateCache.theta) < m_param_ThetaHitHitPrecut)) {
     return NAN;
   }
 
@@ -50,12 +49,12 @@ LoosePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFTo
 
 void LoosePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaOverlayRegionCut"), m_param_theta_overlay_region_precut,
-                                "Pre-cut in theta for the overlay region.", m_param_theta_overlay_region_precut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiSeedHitCut"), m_param_phi_seed_hit_precut,
-                                "Pre-cut in phi for relations between seed states and hit states.", m_param_phi_seed_hit_precut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_phi_hit_hit_precut,
-                                "Pre-cut in phi for relations between hit states.", m_param_phi_hit_hit_precut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_theta_hit_hit_precut,
-                                "Pre-cut in theta for relations between hit states.", m_param_theta_hit_hit_precut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaOverlayRegionCut"), m_param_ThetaOverlayRegionPrecut,
+                                "Pre-cut in theta for the overlay region.", m_param_ThetaOverlayRegionPrecut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiSeedHitCut"), m_param_PhiSeedHitPrecut,
+                                "Pre-cut in phi for relations between seed states and hit states.", m_param_PhiSeedHitPrecut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitPrecut,
+                                "Pre-cut in phi for relations between hit states.", m_param_PhiHitHitPrecut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitPrecut,
+                                "Pre-cut in theta for relations between hit states.", m_param_ThetaHitHitPrecut);
 }

@@ -471,14 +471,13 @@ class ALP3Gamma(BaseSkim):
     RequiredStandardLists = None
 
     def addALPToPDG(self):
-        """ Adds the ALP codes to the basf2 pdg instance """
+        """Adds the ALP codes to the basf2 pdg instance """
         pdg.add_particle('beam', 55, 999., 999., 0, 0)
         pdg.add_particle('ALP', 9000006, 999., 999., 0, 0)
 
     def initialALP(self, path):
         """
-        An list builder function for the ALP decays. Part of the
-        `ALP3GammaList` skim functions.
+        An list builder function for the ALP decays. Part of the `ALP3Gamma` skim.
 
         Parameters:
             path (basf2.Path): the path to add the skim

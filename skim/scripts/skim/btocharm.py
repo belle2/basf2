@@ -1731,8 +1731,11 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     * ``abs(deltaE) < 0.3``
 
     Note:
-        This skim uses `skim.standardlists.charm.loadStdD0` and `skim.standardlists.charm.loadStdDstar0_D0pi0`,
-        where :math:`D^0` channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`,
+        `skim.standardlists.charm.loadStdD0_Kpipipi`,
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpipi0`, and
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpipipi`, where :math:`D^0`
+        channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
 
     Warning:
        This skim saves only three randomly-chosen :math:`B^{+}` candidates in a

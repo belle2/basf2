@@ -6,17 +6,11 @@ import subprocess
 from importlib import import_module
 import json
 import re
-from time import sleep
 
 import basf2 as b2
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import Registry
 import skimTestFilesInfo
-# For channels in fei skim
-# from fei import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration
-
-
-_all_skims = Registry.names
 
 
 def encodeSkimName(SkimName):
@@ -524,8 +518,8 @@ class BaseSkim(ABC):
             events passing the event-level cut. To avoid issues around particles not
             being available on the main path (leading to noisy error logs), we need to
             add the rest of the skim to this path. So this new path is assigned to the
-            attribute `BaseSkim._ConditionalPath`, and `BaseSkim.__call__` will run all
-            remaining methods on this path.
+            attribute ``BaseSkim._ConditionalPath``, and ``BaseSkim.__call__`` will run
+            all remaining methods on this path.
         """
         if self._ConditionalPath is not None:
             b2.B2FATAL(
@@ -687,8 +681,8 @@ class CombinedSkim(BaseSkim):
         skims(path)  # load standard lists, create skim lists, and save to uDST
         path.process()
 
-    When skims are combined using this class, the `NoisyModules` lists of each skim are
-    combined and all silenced, and the `RequiredStandardLists` objects are
+    When skims are combined using this class, the `BaseSkim.NoisyModules` lists of each
+    skim are combined and all silenced, and the `RequiredStandardLists` objects are
     merged, removing duplicates. This way, `load_particle_lists` will load all the
     required lists of each skim, without accidentally loading a list twice.
 

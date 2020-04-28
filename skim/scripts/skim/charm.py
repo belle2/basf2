@@ -1152,8 +1152,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 
     __authors__ = ["Emma Oxford"]
     __description__ = (
-        "Skim list for D*+ to pi+ D0, D0 to pi0 and two charged FSPs, where the kinds"
-        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
+        "Skim list for D*+ to pi+ D0, D0 to pi0 and two charged FSPs, where the kinds "
+        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is "
         "also included."
     )
     __contact__ = ""
@@ -1304,8 +1304,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
     __authors__ = []
     __description__ = (
-        "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds"
-        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is"
+        "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds "
+        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is "
         "also included."
     )
     __contact__ = ""
@@ -1447,7 +1447,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __description__ = "An special version of `DstToD0PiD0ToHpJmPi0` to deal with Early Data."
+    __description__ = "An special version of `DstToD0Pi_D0ToHpJmPi0` to deal with Early Data."
     __contact__ = ""
     __category__ = "physics, charm"
 
@@ -1492,7 +1492,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __description__ = "A special version of `DstToD0PiD0ToHpHmPi0` to deal with Early Data."
+    __description__ = "A special version of `DstToD0Pi_D0ToHpHmPi0` to deal with Early Data."
     __contact__ = ""
     __category__ = "physics, charm"
 

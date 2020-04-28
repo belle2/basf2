@@ -69,8 +69,8 @@ namespace Belle2 {
 
       /**
        * Find intersections with an arc.
-       * @param[in]  arc          Arc.
-       * @param[out] intersection Intersections.
+       * @param[in]  arc           Arc.
+       * @param[out] intersections Intersections.
        * @return Number of intersections (0, 1 or 2).
        */
       int findIntersection(const Arc2D& arc,

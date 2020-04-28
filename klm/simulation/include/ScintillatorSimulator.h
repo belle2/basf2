@@ -114,11 +114,11 @@ namespace Belle2 {
 
       /**
        * Generate photoelectrons.
-       * @param[in]     stripLen    Strip length.
-       * @param[in]     distSiPM    Distance from hit to SiPM.
-       * @param[in]     nPE         Number of photons to be simulated.
-       * @param[in]     timeShift   Time of hit.
-       * @param[in]     isReflected Whether the hits are reflected or not.
+       * @param[in] stripLen    Strip length.
+       * @param[in] distSiPM    Distance from hit to SiPM.
+       * @param[in] nPhotons    Number of photons to be simulated.
+       * @param[in] timeShift   Time of hit.
+       * @param[in] isReflected Whether the hits are reflected or not.
        */
       void generatePhotoelectrons(double stripLen, double distSiPM,
                                   int nPhotons, double timeShift,

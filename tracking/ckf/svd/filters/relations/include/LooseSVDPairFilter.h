@@ -23,11 +23,11 @@ namespace Belle2 {
 
   private:
     /// Pre-filter relations in theta for overlay
-    double m_param_theta_overlay_region_precut = 0.5;
+    double m_param_theta_overlay_region_precut = 0.4;
     /// Pre-filter relations in phi between seed states and hit states
-    double m_param_phi_seed_hit_precut = M_PI / 2.;
+    double m_param_phi_seed_hit_precut = M_PI / 3.;
     /// Pre-filter relations in phi between hit states
-    double m_param_phi_hit_hit_precut = M_PI / 2.;
+    double m_param_phi_hit_hit_precut = M_PI / 3.;
     /// Pre-filter relations in theta between hit states
     double m_param_theta_hit_hit_precut = M_PI / 3.;
   };

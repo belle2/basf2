@@ -113,21 +113,21 @@ def main():
     if args.action == "single":
         SkimFunction = Registry.get_skim_function(args.skim)
         Skim = SkimFunction(OutputFileName=args.OutputFilename)
+        InputFileList = args.InputFileList or [Skim.TestFile]
     elif args.action == "combined":
         skims = list({*args.skims})
         if sorted(skims) != sorted(args.skims):
             b2.B2FATAL("Attempting to run a skim twice!")
         SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
         Skim = CombinedSkim(*SkimObjects)
+        InputFileList = args.InputFileList or list({skim.TestFile for skim in SkimObjects})
     elif args.action == "module":
         SkimObjects = [
             Registry.get_skim_function(skim)()
             for skim in Registry.get_skims_in_module(args.module)
         ]
         Skim = CombinedSkim(*SkimObjects)
-
-    # Now proceed like a regular steering file
-    InputFileList = args.InputFileList or [Skim.TestFile]
+        InputFileList = args.InputFileList or list({skim.TestFile for skim in SkimObjects})
 
     ma.inputMdstList("default", InputFileList, path=path)
     Skim(path)

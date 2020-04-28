@@ -390,6 +390,12 @@ class BaseSkim(ABC):
             }
         """
 
+    MergeDataStructures = {}
+    """Dict of ``str -> function`` pairs to determine if any special data structures
+    should be merged when combining skims. Currently, this is only used to merge FEI
+    config parameters when running multiple FEI skims at once, so that it can be run
+    just once with all the necessary arguments."""
+
     @property
     @abstractmethod
     def __description__(self):
@@ -722,6 +728,8 @@ class CombinedSkim(BaseSkim):
             skim.RequiredStandardLists for skim in skims
         )
 
+        self.merge_data_structures()
+
     def __str__(self):
         return self.name
 
@@ -762,6 +770,28 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self.Skims:
             skim.output_udst(skim._ConditionalPath or path)
+
+    def merge_data_structures(self):
+        """Read the values of `BaseSkim.MergeDataStructures` and merge data structures
+        accordingly.
+
+        For example, if ``MergeDataStructures`` has the value ``{"FEIChannelArgs":
+        _merge_boolean_dicts.__func__}``, then ``_merge_boolean_dicts`` is run on all
+        input skims with the attribute ``FEIChannelArgs``, and the value of
+        ``FEIChannelArgs`` for that skim is set to the result.
+
+        In the FEI skims, this is used to merge configs which are passed to a cached
+        function, thus allowing us to apply the FEI once with all the required particles
+        available.
+        """
+        for iSkim, skim in enumerate(self.Skims):
+            for attribute, MergingFunction in skim.MergeDataStructures.items():
+                SkimsWithAttribute = [skim for skim in self.Skims if hasattr(skim, attribute)]
+                setattr(
+                    self.Skims[iSkim],
+                    attribute,
+                    MergingFunction(*[getattr(skim, attribute) for skim in SkimsWithAttribute])
+                )
 
     def _check_duplicate_list_names(self):
         """Check for duplicate particle list names.
@@ -826,11 +856,10 @@ class CombinedSkim(BaseSkim):
                     # Raise a warning if one list is empty and the other is not.
                     if len(d1[k]) == 0 ^ len(d2[k]) == 0:
                         # TODO: remove this warning and replace with proper handling
-                        # b2.B2WARNING(
-                        #     "Merging empty list into non-empty list. "
-                        #     "Some particle lists may not be loaded."
-                        # )
-                        pass
+                        b2.B2WARNING(
+                            "Merging empty list into non-empty list. "
+                            "Some particle lists may not be loaded."
+                        )
 
                     d1[k] = sorted({*d1[k], *d2[k]})
                 else:

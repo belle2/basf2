@@ -11,8 +11,7 @@ __authors__ = [
     "Phil Grace"
 ]
 
-from functools import lru_cache
-import re
+from functools import lru_cache, wraps
 
 import basf2 as b2
 import fei
@@ -898,6 +897,35 @@ def runFEIforSkimCombined(path):
     return path2
 
 
+def _merge_boolean_dicts(*dicts):
+    """Merge dicts of boolean, with `True` values taking precedence if values
+    differ.
+
+    This is a utility function for combining FEI configs. It acts in the following
+    way:
+
+        >>> d1 = {"neutralB": True, "chargedB": False, "hadronic": True}
+        >>> d2 = {"chargedB": True, "semileptonic": True}
+        >>> _merge_FEI_configs(d1, d2)
+        {"chargedB": True, "hadronic": True, "neutralB": True, "semileptonic": True}
+
+    Parameters:
+        dicts (dict(str -> bool)): Any number of dicts of keyword-boolean pairs.
+
+    Returns:
+        merged (dict(str -> bool)): A single dict, containing all the keys of the
+            input dicts.
+    """
+    keys = {k for d in dicts for k in d}
+    occurances = {k: [d for d in dicts if k in d] for k in keys}
+    merged = {k: any(d[k] for d in occurances[k]) for k in keys}
+
+    # Sort the merged dict before returning
+    merged = dict(sorted(merged.items()))
+
+    return merged
+
+
 def _get_fei_channel_names(particleName, **kwargs):
     """Create a list containing the decay strings of all decay channels available to a
     particle. Any keyword arguments are passed to `fei.get_default_channels`.
@@ -920,6 +948,23 @@ def _get_fei_channel_names(particleName, **kwargs):
     return channels
 
 
+def _hash_dict(func):
+    """Wrapper for `functools.lru_cache` to deal with dictionaries. Dictionaries are
+    mutable, so cannot be cached. This wrapper turns all dict arguments into a hashable
+    dict type, so we can use caching.
+    """
+    class HashableDict(dict):
+        def __hash__(self):
+            return hash(frozenset(self.items()))
+
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        args = tuple([HashableDict(arg) if isinstance(arg, dict) else arg for arg in args])
+        kwargs = {k: HashableDict(v) if isinstance(v, dict) else v for k, v in kwargs.items()}
+        return func(*args, **kwargs)
+    return wrapped
+
+
 class BaseFEISkim(BaseSkim):
     """Base class for FEI skims. Applies event-level pre-cuts and applies the FEI."""
 
@@ -939,11 +984,61 @@ class BaseFEISkim(BaseSkim):
 
     NoisyModules = ["ParticleCombiner"]
 
+    @staticmethod
+    @lru_cache()
+    def fei_precuts(path):
+        # Pre-selection cuts
+        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
+        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+
+        ma.fillParticleList(decayString="pi+:eventShapeForSkims",
+                            cut=CleanedTrackCuts, path=path)
+        ma.fillParticleList(decayString="gamma:eventShapeForSkims",
+                            cut=CleanedClusterCuts, path=path)
+
+        ma.buildEventKinematics(inputListNames=["pi+:eventShapeForSkims",
+                                                "gamma:eventShapeForSkims"],
+                                path=path)
+
+        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims",
+                                           "gamma:eventShapeForSkims"],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
+
+        EventCuts = " and ".join(
+            [
+                f"nCleanedTracks({CleanedTrackCuts})>=3",
+                f"nCleanedECLClusters({CleanedClusterCuts})>=3",
+                "visibleEnergyOfEventCMS>4",
+                "2<E_ECL<7",
+                "foxWolframR2_maskedNaN<0.4"
+            ]
+        )
+
+        # NOTE: The FEI skims are somewhat complicated, and require some manual handling
+        # of conditional paths to avoid adding the FEI to the path twice. In general, DO
+        # NOT do this kind of path handling in your own skim. Instead, use:
+        #     >>>  path = self.skim_event_cuts(EventLevelCuts, path=path)
+        ConditionalPath = b2.Path()
+        eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({EventCuts})")
+        eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
+
+        return ConditionalPath
+
     # This is a cached static method so that we can avoid adding FEI path twice.
     # In combined skims, FEIChannelArgs must be combined across skims first, so that all
     # the required particles are included in the FEI.
     @staticmethod
-    # @lru_cache()
+    @_hash_dict
+    @lru_cache()
     def run_fei_for_skims(FEIChannelArgs, FEIPrefix, *, path):
         """Reconstruct hadronic and semileptonic :math:`B^0` and :math:`B^+` tags using
         the generically trained FEI. Skim pre-cuts are applied before running the FEI,
@@ -973,51 +1068,6 @@ class BaseFEISkim(BaseSkim):
             FEIPrefix (str): Prefix label for the FEI training used in the FEI skims.
             path (`basf2.Path`): The skim path to be processed.
         """
-        # TODO: figure out a way to get this to work with caching
-        # FEIChannelArgs = {}
-
-        # Pre-selection cuts
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
-
-        ma.fillParticleList(decayString="pi+:eventShapeForSkims",
-                            cut=CleanedTrackCuts, path=path)
-        ma.fillParticleList(decayString="gamma:eventShapeForSkims",
-                            cut=CleanedClusterCuts, path=path)
-
-        vm.addAlias("E_ECL_pi",
-                    "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
-        vm.addAlias("E_ECL_gamma",
-                    "totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)")
-        vm.addAlias("E_ECL", "formula(E_ECL_pi+E_ECL_gamma)")
-
-        ma.buildEventKinematics(inputListNames=["pi+:eventShapeForSkims",
-                                                "gamma:eventShapeForSkims"],
-                                path=path)
-
-        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims",
-                                           "gamma:eventShapeForSkims"],
-                           allMoments=False,
-                           foxWolfram=True,
-                           harmonicMoments=False,
-                           cleoCones=False,
-                           thrust=False,
-                           collisionAxis=False,
-                           jets=False,
-                           sphericity=False,
-                           checkForDuplicates=False,
-                           path=path)
-
-        EventCuts = [
-            f"nCleanedTracks({CleanedTrackCuts})>=3",
-            f"nCleanedECLClusters({CleanedClusterCuts})>=3",
-            "visibleEnergyOfEventCMS>4",
-            "2<E_ECL<7",
-            "foxWolframR2_maskedNaN<0.4"
-        ]
-
-        # TODO: still to be fixed and changed to BaseSkim.skim_event_cuts, once I address https://agira.desy.de/browse/BII-6622
-        ma.applyEventCuts(" and ".join(EventCuts), path=path)
         # Run FEI
         b2.conditions.globaltags = ["analysis_tools_release-04"]
 
@@ -1029,15 +1079,26 @@ class BaseFEISkim(BaseSkim):
         feistate = fei.get_path(particles, configuration)
         path.add_path(feistate.path)
 
-        # Add some aliases to be used later
+    @staticmethod
+    @_hash_dict
+    @lru_cache()
+    def setup_fei_aliases(FEIChannelArgs, *, path):
+        # Aliases for pre-FEI event-level cuts
+        vm.addAlias("E_ECL_pi",
+                    "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
+        vm.addAlias("E_ECL_gamma",
+                    "totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)")
+        vm.addAlias("E_ECL", "formula(E_ECL_pi+E_ECL_gamma)")
+        vm.addAlias("foxWolframR2_maskedNaN", "ifNANgiveX(foxWolframR2,1)")
+
+        # Aliases for variables available after running the FEI
         vm.addAlias("sigProb", "extraInfo(SignalProbability)")
         vm.addAlias("log10_sigProb", "log10(extraInfo(SignalProbability))")
         vm.addAlias("dmID", "extraInfo(decayModeID)")
         vm.addAlias("decayModeID", "extraInfo(decayModeID)")
-        vm.addAlias("foxWolframR2_maskedNaN", "ifNANgiveX(foxWolframR2,1)")
 
         if "semileptonic" in FEIChannelArgs and FEIChannelArgs["semileptonic"]:
-            # Add some aliases specific to SL FEI
+            # Aliases specific to SL FEI
             vm.addAlias("cosThetaBY", "cosThetaBetweenParticleAndNominalB")
             vm.addAlias("d1_p_CMSframe", "useCMSFrame(daughter(1,p))")
             vm.addAlias("d2_p_CMSframe", "useCMSFrame(daughter(2,p))")
@@ -1045,6 +1106,8 @@ class BaseFEISkim(BaseSkim):
                 "p_lepton_CMSframe",
                 "conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)"
             )
+
+    MergeDataStructures = {"FEIChannelArgs": _merge_boolean_dicts}
 
     def additional_setup(self, path):
         """Apply pre-FEI event-level cuts and apply the FEI. This setup function is run
@@ -1056,6 +1119,12 @@ class BaseFEISkim(BaseSkim):
         See also:
             `run_fei_for_skims` for event-level cut definitions.
         """
+        path = self.fei_precuts(path)
+        # The FEI skims require some manual handling of paths that is not necessary in
+        # any other skim.
+        self._ConditionalPath = path
+
+        self.setup_fei_aliases(self.FEIChannelArgs, path=path)
         self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, path=path)
 
 

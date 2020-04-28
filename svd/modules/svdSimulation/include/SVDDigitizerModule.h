@@ -142,7 +142,7 @@ namespace Belle2 {
       /** Shaping time of the APV25 shapers.*/
       double m_shapingTime = 40;
       /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime = 32;
+      double m_samplingTime = 16000. / 509.;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -161,7 +161,7 @@ namespace Belle2 {
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
-      double m_startSampling = 0;
+      double m_startSampling = -2.0;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */

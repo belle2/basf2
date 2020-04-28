@@ -101,9 +101,9 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
            double(250.0));
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns", double(31.44));
+           "Interval between ADC samples in ns", m_samplingTime);
   addParam("StartSampling", m_startSampling,
-           "Start of the sampling window, in ns", double(47.16));
+           "Start of the sampling window, in ns", m_startSampling);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
            "Randomize event times over a frame interval", bool(false));
   addParam("TimeFrameLow", m_minTimeFrame,

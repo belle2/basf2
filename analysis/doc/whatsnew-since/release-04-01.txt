@@ -138,6 +138,7 @@ Variables
  * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
  * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors.
  * Removed the previously deprecated variable ``clusterHypothesis``.
+ * Added :b2:var:`firstCDCLayer`, returns the ID of the CDC layer closest to the IP with a hit attributed to the particles track 
 
 Modules
 +++++++

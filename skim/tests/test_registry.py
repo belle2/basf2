@@ -67,7 +67,7 @@ class TestSkimCodes(unittest.TestCase):
     def test_decode(self):
         """Check that we raise a LookupError if the skim code doesn't exist."""
         with self.assertRaises(LookupError):
-            Registry.decode_skim_name("1337")
+            Registry.decode_skim_code("1337")
 
     def test_modules_exist(self):
         """Check that all modules listed in registry exist in skim/scripts/skim/."""

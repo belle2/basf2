@@ -82,6 +82,9 @@ CDCTriggerNeuroDQMModule::CDCTriggerNeuroDQMModule() : HistoModule()
   addParam("maxRecoD0Dist", m_maxRecoD0Dist,
            "Select only RecoTracks with a maximum d0 distance to the z axis. -1.0 for all tracks",
            (double)(- 1.0));
+  addParam("nSameTS", m_nsamets,
+           "Number of identical track segments to be required for matching between HW and SW Neurotrigger",
+           (int)(9));
 }
 
 
@@ -2503,7 +2506,7 @@ void CDCTriggerNeuroDQMModule::event()
               // only calculate deltas if the same TS are selected in unpacker and TSIM
 
 
-              if (nsameTS >= 9) {
+              if (nsameTS >= m_nsamets) {
                 m_neuroDeltaZ->Fill(neuroTrack.getZ0() - neuroSimTrack->getZ0());
                 double nnHWtheta = neuroTrack.getDirection().Theta() * 180. / M_PI;
                 double nnSWtheta = neuroSimTrack->getDirection().Theta() * 180. / M_PI;

@@ -166,6 +166,8 @@ namespace Belle2 {
     std::string m_histogramDirectoryName;
     /** Switch to supress output for dqm online module */
     bool m_limitedoutput;
+    /** Number of identical track segments to be required for matching between HW and SW Neurotrigger */
+    int m_nsamets;
     // names for unpacked objects
     /** Name for TS hits from unpacker */
     std::string m_unpackedSegmentHitsName;

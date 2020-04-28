@@ -22,7 +22,9 @@ if __name__ == "__main__":
         "old: mcProdVertex{X, Y, Z} --> new: mcProductionVertex{X, Y, Z}\n"
         "old: mcProdVertexD{X, Y, Z} --> new: mcProductionVertexFromIP{X, Y ,Z}\n"
         "old: mcDistance --> new: mcDecayVertexFromIPDistance\n"
-        "old: WE_XXX, ROE_XXX, Rec_XXX --> new: weXXX, roeXXX, recXXX\n"
+        "old: WE_XXX, ROE_XXX, Rec_XXX --> new: weXXX, roeXXX, recXXX\n\n"
+        "The variables 'decayAngle', 'daughterAngle', and 'pointingAngle' return angles in rad and no longer the corresponding "
+        "cosine!\n"
     )
     if args.pager:
         with Pager(r'Available variables in Variable\:\:Manager'):

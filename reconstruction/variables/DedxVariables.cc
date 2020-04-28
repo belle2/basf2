@@ -35,7 +35,7 @@
 namespace Belle2 {
 
   /**
-  * dEdx value from particle
+  * CDC dEdx value from particle
   */
   CDCDedxTrack const* getDedxFromParticle(Particle const* particle)
   {
@@ -51,6 +51,10 @@ namespace Belle2 {
 
     return dedxTrack;
   }
+
+  /**
+  * SVD dEdx value from particle
+  */
   VXDDedxTrack const* getSVDDedxFromParticle(Particle const* particle)
   {
     const Track* track = particle->getTrack();

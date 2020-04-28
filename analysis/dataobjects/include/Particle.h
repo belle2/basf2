@@ -694,9 +694,12 @@ namespace Belle2 {
      * M1 and M4 are copies since both conditions are fulfilled.
      *
      * @param oParticle pointer to other particle
+     * @param doDetailedComparison if true, this means that particles of different PDG codes,
+     *        but created from the same track or cluster will be indicated as copies.
+     *        Returns B2FATAL in case of comparison of c_MCParticle type to a non c_MCParticle.
      * @return true if particles are copies of each-other, otherwise false
      */
-    bool isCopyOf(const Particle* oParticle) const;
+    bool isCopyOf(const Particle* oParticle, bool doDetailedComparison = false) const;
 
     /**
      * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).

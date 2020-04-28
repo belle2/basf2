@@ -16,8 +16,7 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] Number of ParticleLists studied 1 
 [INFO] RestOfEventInterpreter added ROEMask with specific fractions under name 'cleanMask' with track cuts: E > 0.05 and eclCluster cuts: E > 0.05

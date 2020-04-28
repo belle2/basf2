@@ -19,7 +19,7 @@ input_file = ROOT.TFile('../CosmicsExtrapolation.root')
 output_file = ROOT.TFile('CosmicsExtrapolationPlots.root', 'recreate')
 
 bklm_numbers = Belle2.BKLMElementNumbers()
-eklm_numbers = Belle2.EKLMElementNumbers()
+eklm_numbers = Belle2.EKLMElementNumbers.Instance()
 
 # X resolution histogram.
 hist_xres = ROOT.TH1F('xres', 'Extrapolated hit X resolution', 100, -20, 20)

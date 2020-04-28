@@ -101,32 +101,30 @@ kekcc_locations = [
      'mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root'),
 
     # generic MC13 BGx1
-    # TODO: replace these with a more permanent location for test samples
-    ("MC13_ccbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009437_task10020000001.root"),
-    ("MC13_chargedBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009435_task10020000001.root"),
-    ("MC13_ddbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009438_task10020000001.root"),
-    ("MC13_mixedBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009434_task10020000001.root"),
-    ("MC13_ssbarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009439_task10020000001.root"),
-    ("MC13_taupairBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009441_task10020000001.root"),
-    ("MC13_uubarBGx1", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009436_task10020000001.root"),
+    ("MC13_ccbarBGx1", "/group/belle2/dataprod/MC/SkimTraining/ccbar_BGx1.mdst_000001_prod00009437_task10020000001.root"),
+    ("MC13_chargedBGx1", "/group/belle2/dataprod/MC/SkimTraining/charged_BGx1.mdst_000001_prod00009435_task10020000001.root"),
+    ("MC13_ddbarBGx1", "/group/belle2/dataprod/MC/SkimTraining/ddbar_BGx1.mdst_000001_prod00009438_task10020000001.root"),
+    ("MC13_mixedBGx1", "/group/belle2/dataprod/MC/SkimTraining/mixed_BGx1.mdst_000001_prod00009434_task10020000001.root"),
+    ("MC13_ssbarBGx1", "/group/belle2/dataprod/MC/SkimTraining/ssbar_BGx1.mdst_000001_prod00009439_task10020000001.root"),
+    ("MC13_taupairBGx1", "/group/belle2/dataprod/MC/SkimTraining/taupair_BGx1.mdst_000001_prod00009441_task10020000001.root"),
+    ("MC13_uubarBGx1", "/group/belle2/dataprod/MC/SkimTraining/uubar_BGx1.mdst_000001_prod00009436_task10020000001.root"),
 
     # low multiplicity MC13
     # TODO: replace these with a more permanent location for test samples
-    ('MC13_ggBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/3700001000_eph3_0.root'),
+    ('MC13_ggBGx1', '/home/belle2/pgrace/TemporarySkimSamples/3700001000_eph3_0.root'),
     # ('MC13_eeBGx1', 'FIXME')
-    ('MC13_mumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/mumu_eph3_0.root'),
-    ('MC13_eeeeBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/eeee_eph3_0.root'),
-    ('MC13_eemumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/MC13a/eemumu_eph3_0.root'),
+    ('MC13_mumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/mumu_eph3_0.root'),
+    ('MC13_eeeeBGx1', '/home/belle2/pgrace/TemporarySkimSamples/eeee_eph3_0.root'),
+    ('MC13_eemumuBGx1', '/home/belle2/pgrace/TemporarySkimSamples/eemumu_eph3_0.root'),
 
     # generic MC13 BGx0
-    # TODO: replace these with a more permanent location for test samples
-    ("MC13_ccbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009559_task10020000001.root"),
-    ("MC13_chargedBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009551_task10020000001.root"),
-    ("MC13_ddbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009555_task10020000001.root"),
-    ("MC13_mixedBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009545_task10020000001.root"),
-    ("MC13_ssbarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009557_task10020000001.root"),
-    ("MC13_taupairBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009561_task10020000001.root"),
-    ("MC13_uubarBGx0", "/home/belle2/pgrace/TemporarySkimSamples/MC13a/mdst_000001_prod00009553_task10020000001.root"),
+    ("MC13_ccbarBGx0", "/group/belle2/dataprod/MC/SkimTraining/ccbar_BGx0.mdst_000001_prod00009559_task10020000001.root"),
+    ("MC13_chargedBGx0", "/group/belle2/dataprod/MC/SkimTraining/charged_BGx0.mdst_000001_prod00009551_task10020000001.root"),
+    ("MC13_ddbarBGx0", "/group/belle2/dataprod/MC/SkimTraining/ddbar_BGx0.mdst_000001_prod00009555_task10020000001.root"),
+    ("MC13_mixedBGx0", "/group/belle2/dataprod/MC/SkimTraining/mixed_BGx0.mdst_000001_prod00009545_task10020000001.root"),
+    ("MC13_ssbarBGx0", "/group/belle2/dataprod/MC/SkimTraining/ssbar_BGx0.mdst_000023_prod00009557_task10020000023.root"),
+    ("MC13_uubarBGx0", "/group/belle2/dataprod/MC/SkimTraining/uubar_BGx0.mdst_000003_prod00009553_task10020000003.root"),
+    ("MC13_taupairBGx0", "/group/belle2/dataprod/MC/SkimTraining/taupair_BGx0.mdst_000001_prod00009561_task10020000001.root"),
 
     # generic MC12 BGx1
     ('MC12_mixedBGx1', '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/' +

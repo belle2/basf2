@@ -7,7 +7,7 @@ from pathlib import Path
 import unittest
 
 from basf2 import find_file
-from skim.registry import Registry, combined_skims
+from skim.registry import Registry
 from skimExpertFunctions import BaseSkim
 
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
@@ -151,26 +151,6 @@ class TestSkimCodes(unittest.TestCase):
                         f"Skim {SkimName} defined in "
                         f"skim/scripts/skim/{ModuleName}.py, but listed in registry as "
                         f"belonging to skim/scripts/skim/{ExpectedModuleName}.py."
-                    ),
-                )
-
-    def test_combined_skims(self):
-        for CombinedName, skimlist in combined_skims.items():
-            # Check for duplicated values in list
-            self.assertEqual(
-                len(skimlist),
-                len(set(skimlist)),
-                f"Duplicated skim in combined skim {CombinedName}.",
-            )
-
-            # Check the combined skims only contain valid skim names
-            for skim in skimlist:
-                self.assertIn(
-                    skim,
-                    Registry.names,
-                    (
-                        f"Skim {skim} in combined skim {CombinedName} is not a "
-                        "registered skim."
                     ),
                 )
 

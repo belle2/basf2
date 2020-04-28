@@ -26,28 +26,27 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
 
   B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  const double& toPhi = toStateCache.phi;
+  double phiDiff = fromStateCache.phi - toStateCache.phi;
+  while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
+  while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD track, so we can use its position to only look for matching ladders
-    const genfit::MeasuredStateOnPlane& mSoP = fromState.getMeasuredStateOnPlane();
-    const double fromPhi = mSoP.getPos().Phi();
-
-    if (abs(fromPhi - toPhi) < 0.2) {
+    if (abs(phiDiff) < 0.2) {
       return 1.0;
     }
 
     return NAN;
   }
 
-  if (fromStateCache.geoLayer == toStateCache.geoLayer) {
-    // TODO: Also check for sensors?
+  if (fromStateCache.geoLayer == toStateCache.geoLayer and
+      fromStateCache.sensorID.getSensorNumber() == toStateCache.sensorID.getSensorNumber()) {
+    // TODO: Checking for equality of sensor numbers seems not to harm the hit efficiency,
+    // but maybe it's safer to allow for a sensor number difference of 1?
     return 1.0;
   }
 
-  const double& fromPhi = fromStateCache.phi;
-
-  if (abs(fromPhi - toPhi) < 0.05) {
+  if (abs(phiDiff) < 0.05) {
     return 1.0;
   }
 

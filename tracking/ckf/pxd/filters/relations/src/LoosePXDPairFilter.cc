@@ -32,11 +32,15 @@ LoosePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFTo
     }
   }
 
+  double phiDiff = currentStateCache.phi - nextStateCache.phi;
+  while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
+  while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
+
   if (not currentStateCache.isHitState) {
-    if (fabs(currentStateCache.phi - nextStateCache.phi) > m_param_phi_seed_hit_precut) {
+    if (fabs(phiDiff) > m_param_phi_seed_hit_precut) {
       return NAN;
     }
-  } else if (!(fabs(currentStateCache.phi - nextStateCache.phi) < m_param_phi_hit_hit_precut and
+  } else if (!(fabs(phiDiff) < m_param_phi_hit_hit_precut and
                fabs(currentStateCache.theta - nextStateCache.theta) < m_param_theta_hit_hit_precut)) {
     return NAN;
   }

@@ -25,9 +25,7 @@ CKFToPXDState::CKFToPXDState(const RecoTrack* seed, bool reversed) : CKFState(se
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
   m_stateCache.isHitState = false;
-//   m_stateCache.phi = seed->getMomentumSeed().Phi();
   m_stateCache.phi = this->getMeasuredStateOnPlane().getPos().Phi();
-//   m_stateCache.theta = seed->getMomentumSeed().Theta();
   m_stateCache.theta = this->getMeasuredStateOnPlane().getPos().Theta();
   m_stateCache.geoLayer = this->getGeometricalLayer();
 }
@@ -59,10 +57,6 @@ const std::vector<PXDRecoHit>& CKFToPXDState::getRecoHits() const
 {
   B2ASSERT("You are asking for the reco hit, although no hit is present.", not m_recoHits.empty());
   return m_recoHits;
-}
-
-const struct CKFToPXDState::stateCache& CKFToPXDState::getStateCache() const {
-  return m_stateCache;
 }
 
 CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)

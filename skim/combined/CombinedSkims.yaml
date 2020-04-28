@@ -73,3 +73,7 @@ TauCombined:
   - TauLFV
   - TauGeneric
   - TauThrust
+
+LowMulti:
+  - TwoTrackLeptonsForLuminosity
+  - LowMassTwoTrack

@@ -578,8 +578,10 @@ namespace Belle2 {
     };
 
     //nothing matched?
-    if (!isReco(mcBs[0]) && !isReco(mcBs[1]))
+    if (!isReco(mcBs[0]) && !isReco(mcBs[1])) {
+      B2WARNING("TagVertexModule:: no B found in MC");
       return;
+    }
 
     //first is Tag, second Reco -> swap the order
     if (!isReco(mcBs[0]) && isReco(mcBs[1]))

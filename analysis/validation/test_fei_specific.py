@@ -86,7 +86,7 @@ assert len(glob.glob('K+*')) == 1
 
 fei.do_trainings(particles, configuration)
 
-assert len(glob.glob('gamma*')) == 6
+assert len(glob.glob('gamma*')) == 5
 assert len(glob.glob('mu+*')) == 3
 assert len(glob.glob('pi+*')) == 3
 assert len(glob.glob('K+*')) == 3

@@ -11,7 +11,7 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
+from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 import vertex
 
 
@@ -502,24 +502,24 @@ class Systematics(BaseSkim):
     Lists in this skim are those defined in `JpsimumuTagProbe`, `JpsieeTagProbe`, and
     `PiKFromDstarList`.
     """
-    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib"]
     __description__ = ""
     __contact__ = ""
     __category__ = "systematics"
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdE": ["all", "loose"],
             "stdK": ["all"],
-            "stdMu": ["all", "loose"],
             "stdPi": ["all"],
         },
     }
 
+    TestFile = get_test_file("MC13_ccbarBGx1")
+
     def build_lists(self, path):
         lists = [
-            self.JpsimumuTagProbe(path),
-            self.JpsieeTagProbe(path),
+            # self.JpsimumuTagProbe(path),
+            # self.JpsieeTagProbe(path),
             self.PiKFromDstarList(path),
         ]
 
@@ -552,28 +552,27 @@ class Systematics(BaseSkim):
 
     def PiKFromDstarList(self, path):
         """Build PiKFromDstarList lists for systematics skims."""
-        D0Cuts = "1.81 < M < 1.91"
-        # DstarCuts = "massDifference(0)<0.16"
+        D0Cuts = "1.75 < M < 2.0"
         DstarCuts = "massDifference(0)<0.16 and useCMSFrame(p) > 1.5"
 
-        D0Channel = ["K-:all pi+:all"
-                     ]
+        ma.cutAndCopyList("K-:syst", "K-:all", "dr<2 and abs(dz)<4", path=path)
+        ma.cutAndCopyList("pi+:syst", "pi+:all", "dr<2 and abs(dz)<4", path=path)
+
+        D0Channel = ["K-:syst pi+:syst"]
 
         D0List = []
         for chID, channel in enumerate(D0Channel):
-            ma.reconstructDecay("D0:syst" + str(chID) + " -> " + channel, D0Cuts, chID, path=path)
-            vertex.raveFit("D0:syst" + str(chID), 0.0, path=path)
-            D0List.append("D0:syst" + str(chID))
+            ma.reconstructDecay(f"D0:syst{chID} -> {channel}", D0Cuts, chID, path=path)
+            D0List.append(f"D0:syst{chID}")
 
         DstarChannel = []
         for channel in D0List:
-            DstarChannel.append(channel + " pi+:all")
+            DstarChannel.append(f"{channel} pi+:syst")
 
         DstarList = []
         for chID, channel in enumerate(DstarChannel):
-            ma.reconstructDecay("D*-:syst" + str(chID) + " -> " + channel, DstarCuts, chID, path=path, allowChargeViolation=True)
-            DstarList.append("D*-:syst" + str(chID))
-            ma.matchMCTruth("D*+:syst0", path=path)
+            ma.reconstructDecay(f"D*+:syst{chID} -> {channel}", DstarCuts, chID, path=path)
+            DstarList.append(f"D*+:syst{chID}")
 
         return DstarList
 

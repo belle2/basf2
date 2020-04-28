@@ -65,10 +65,7 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("onlyUseTracksWithSVD", m_param_onlyUseTracksWithSVD,
                                 "Only use tracks which have an SVD hit associated.",
                                 m_param_onlyUseTracksWithSVD);
-  moduleParamList->addParameter("reverseSeedState",
-                                m_param_reverseSeed,
-                                "Reverse the seed.",
-                                m_param_reverseSeed);
+  moduleParamList->addParameter("reverseSeedState", m_param_reverseSeed, "Reverse the seed.", m_param_reverseSeed);
 
   // Default values
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");

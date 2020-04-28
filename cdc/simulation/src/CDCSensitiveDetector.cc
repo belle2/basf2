@@ -1528,18 +1528,18 @@ line100:
   void CDCSensitiveDetector::reAssignLeftRightInfo()
   {
     CDCSimHit* sHit = nullptr;
-    WireID sWireId             = WireID();
-    TVector3 sPos              = TVector3();
+    WireID sWireId; //            = WireID();
+    TVector3 sPos;  //            = TVector3();
 
     CDCSimHit* pHit = nullptr;
-    WireID pWireId = WireID();
-    double minDistance2 = DBL_MAX;
-    double    distance2 = DBL_MAX;
+    WireID pWireId; // = WireID();
+    //   double minDistance2 = DBL_MAX;
+    //   double    distance2 = DBL_MAX;
     //    unsigned short bestNeighb = 0;
-    unsigned short neighb = 0;
+    // unsigned short neighb = 0;
 
-    std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
-    std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
+    // std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
+    // std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
 
     //    unsigned short sClayer     = 0;
     //    unsigned short sSuperLayer = 0;
@@ -1564,8 +1564,8 @@ line100:
       unsigned short sWire       = sWireId.getIWire();
       CDCSimHit*     fHit = sHit;
 
-      pItBegin = m_hitWithPosWeight.find(sSuperLayer);
-      pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);
+      std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.find(sSuperLayer);
+      std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);
       /*
       if (sSuperLayer <= 8) {
       pItBegin = m_posWeightMapItBegin.at(sSuperLayer);
@@ -1575,7 +1575,7 @@ line100:
       }
       */
 
-      minDistance2 = DBL_MAX;
+      double minDistance2 = DBL_MAX;
       //      bestNeighb = 0;
 
       /*      for (std::multimap<unsigned short, CDCSimHit*>::iterator pIt = m_hitWithPosWeight.begin(); pIt != m_hitWithPosWeight.end(); ++pIt) {
@@ -1589,9 +1589,9 @@ line100:
         pHit = pIt->second;
         pWireId = pHit->getWireID();
         //      neigh = areNeighbors(sWireId, pWireId);
-        neighb = areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
+        unsigned short neighb = areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
         if (neighb != 0 || pWireId == sWireId) {
-          distance2 = (pHit->getPosTrack() - sPos).Mag2();
+          double distance2 = (pHit->getPosTrack() - sPos).Mag2();
           if (distance2 < minDistance2) {
             fHit = pHit;
             minDistance2 = distance2;

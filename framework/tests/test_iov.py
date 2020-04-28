@@ -12,6 +12,7 @@ from conditions_db import iov
 
 
 class TestIntervalOfValidity(unittest.TestCase):
+    """Helper class to test an IoV"""
     def iovify(self, iov):
         """Helper function to turn a tuple/None/list(tuple) into iov instances"""
         if isinstance(iov, list):
@@ -110,6 +111,7 @@ class TestIntervalOfValidity(unittest.TestCase):
 
 
 class TestIoVSet(unittest.TestCase):
+    """Helper class to test a set of IoVs"""
     def test_add(self):
         """Test adding iovs to a set"""
         inputs = [

@@ -59,10 +59,20 @@ void BKLMAlignment::setGlobalParam(double value, unsigned short element,
 {
   KLMAlignmentData* alignmentData =
     const_cast<KLMAlignmentData*>(getModuleAlignment(element));
-  if (alignmentData == nullptr)
-    return;
-  alignmentData->setParameter(
-    static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+  /*
+   * Create alignment data if it does not exist.
+   * This is necessary for errors and corrections.
+   */
+  if (alignmentData == nullptr) {
+    KLMAlignmentData newAlignmentData(0, 0, 0, 0, 0, 0);
+    newAlignmentData.setParameter(
+      static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+    m_ModuleAlignment.insert(
+      std::pair<uint16_t, KLMAlignmentData>(element, newAlignmentData));
+  } else {
+    alignmentData->setParameter(
+      static_cast<enum KLMAlignmentData::ParameterNumbers>(param), value);
+  }
 }
 
 /* TODO: this function is not implemented. */

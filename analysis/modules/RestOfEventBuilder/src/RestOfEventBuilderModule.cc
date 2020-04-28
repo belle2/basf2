@@ -109,7 +109,7 @@ void RestOfEventBuilderModule::createNestedROE()
     for (auto* outerROEParticle : outerROEParticles) {
       bool toAdd = true;
       for (auto* daughter : fsdaughters) {
-        if (RestOfEvent::compareParticles(outerROEParticle, daughter)) {
+        if (outerROEParticle->isCopyOf(daughter, true)) {
           toAdd = false;
           break;
         }
@@ -184,7 +184,7 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
           continue;
         }
         for (auto* daughter : fsdaughters) {
-          if (RestOfEvent::compareParticles(storedParticleDaughter, daughter)) {
+          if (storedParticleDaughter->isCopyOf(daughter, true)) {
             B2DEBUG(10, "Ignoring Particle with PDG " << daughter->getPDGCode() << " index " <<
                     storedParticleDaughter->getArrayIndex() << " to " << daughter->getArrayIndex());
             B2DEBUG(10, "Is copy " << storedParticleDaughter->isCopyOf(daughter));

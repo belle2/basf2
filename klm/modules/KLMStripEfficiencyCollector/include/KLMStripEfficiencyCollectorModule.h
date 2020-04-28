@@ -12,7 +12,7 @@
 
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
@@ -29,6 +29,7 @@
 
 /* ROOT headers. */
 #include <TFile.h>
+#include <TH1F.h>
 #include <TTree.h>
 
 /* C++ headers. */
@@ -137,10 +138,13 @@ namespace Belle2 {
 
     /**
      * Collect the data for one muon.
-     * @param[in] muon Muon.
+     * @param[in] muon                 Muon.
+     * @param[in] matchedDigitsInPlane Matched digits.
+     * @param[in] allExtHitsInPlane    Number of ExtHits.
      * @return True if the muon satisfies the selection criteria.
      */
-    bool collectDataTrack(const Particle* muon);
+    bool collectDataTrack(const Particle* muon, TH1F* matchedDigitsInPlane,
+                          TH1F* allExtHitsInPlane);
 
     /** Muon list name. */
     std::string m_MuonListName;
@@ -182,7 +186,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;

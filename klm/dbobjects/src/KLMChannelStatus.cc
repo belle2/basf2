@@ -12,7 +12,6 @@
 #include <klm/dbobjects/KLMChannelStatus.h>
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 

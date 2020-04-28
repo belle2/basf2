@@ -44,6 +44,7 @@
 #include <arich/dbobjects/ARICHMirrorAlignment.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
 #include <arich/dbobjects/ARICHAeroTilesAlignment.h>
+#include <arich/dbobjects/ARICHGeoMergerCooling.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -323,6 +324,101 @@ void ARICHDatabaseImporter::importChannelMask()
 
 }
 
+void ARICHDatabaseImporter::importMergerCoolingGeo()
+{
+
+  ARICHGeoMergerCooling cooling;
+  GearDir mergerCoolingParams = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/mergerCoolingBodiesv2");
+
+  cooling.setMergerCoolingBodiesMaterialName(mergerCoolingParams.getString("material"));
+  //std::cout<<"Merger cooling material -> "<<mergerCoolingParams.getString("material")<<std::endl;
+  for (auto mergerCoolingNode : mergerCoolingParams.getNodes("BodiesDatFileName/Body")) {
+    //std::cout<<"@positionID = "<<mergerCoolingNode.getInt("@positionID")<<std::endl;
+    tessellatedSolidStr mergerTessellation = readTessellatedSolidVerticesFromDATfile(mergerCoolingNode.getString());
+    cooling.addMergerCoolingBodiesInfo(mergerTessellation);
+  }
+  cooling.setMergerCoolingPositionID(mergerCoolingParams.getArray("mergerCoolingPositionID"));
+  cooling.checkMergerCoolingSystemDataConsistency();
+
+  DBImportObjPtr<ARICHGeoMergerCooling> importObj;
+  importObj.construct(cooling);
+  importObj.import(m_iov);
+  B2INFO("--> Mergers cooling bodies geometry imported.");
+
+}
+
+
+tessellatedSolidStr ARICHDatabaseImporter::readTessellatedSolidVerticesFromDATfile(const std::string& inDATfile)
+{
+
+  tessellatedSolidStr solidStr;
+  std::string mot;
+  std::ifstream infile(inDATfile.c_str(), std::ifstream::in);
+
+  if (infile.is_open()) {
+    double val = 0.0;
+    while (infile >> mot) {
+      if (mot == "BodyPositionID")
+        infile >> solidStr.tessellatedSolidID;
+      else
+        assert(0);
+      infile >> mot;
+      if (mot == "nCells")
+        infile >> solidStr.nCells;
+      else
+        assert(0);
+      infile >> mot;
+      if (mot == "nApexPerCell")
+        infile >> solidStr.nApexPerCell;
+      else
+        assert(0);
+
+      TString apexNamesStr[3][3] = { { "Apex_1_x", "Apex_1_y", "Apex_1_z" },
+        { "Apex_2_x", "Apex_2_y", "Apex_2_z" },
+        { "Apex_3_x", "Apex_3_y", "Apex_3_z" }
+      };
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[0][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV1.push_back(valv);
+      }
+      //Apex_2_x, Apex_2_y, Apex_2_z
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[1][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV2.push_back(valv);
+      }
+      //Apex_3_x, Apex_3_y, Apex_3_z
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[2][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV3.push_back(valv);
+      }
+    }
+    infile.close();
+  } else {
+    B2WARNING("Unable to open file : " << inDATfile << " with cooling bodies geometry.");
+  }
+  return solidStr;
+}
 
 void ARICHDatabaseImporter::importChannelMask(TH1* h)
 {

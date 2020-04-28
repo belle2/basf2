@@ -243,9 +243,8 @@ namespace Belle2 {
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
-            B2INFO("   -> MDST source: KLMClusters");
+            B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
             m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-            B2INFO("   -> MDST source: ECLClusters");
             m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
@@ -708,7 +707,7 @@ namespace Belle2 {
 
         // don't fill a neutron list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
-        if (listPdgCode == Const::neutron.getPDGCode()
+        if (abs(listPdgCode) == Const::neutron.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
@@ -729,7 +728,8 @@ namespace Belle2 {
           // set the relation only if the MCParticle(reconstructed Particle)'s
           // energy contribution to this cluster amounts to at least 30(20)%
           if (relMCParticle)
-            if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
+            if (weight / newPart->getECLClusterEnergy() > 0.20
+                && weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
         }
 
@@ -737,7 +737,6 @@ namespace Belle2 {
         // add particle to list if it passes the selection criteria
         auto& cut = get<c_CutPointer>(eclCluster2Plist);
         StoreObjPtr<ParticleList> plist(listName);
-
         if (cut->check(newPart))
           plist->addParticle(newPart);
 

@@ -467,13 +467,21 @@ def correctBremsBelle(outputListName,
 
 def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
-    Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    Copy all Particle indices from all input ParticleLists to the
+    single output ParticleList.
     Note that the Particles themselves are not copied.
     The original and copied ParticleLists will point to the same Particles.
+
     Duplicates are removed based on the first-come, first-served principle.
     Therefore, the order of the input ParticleLists matters.
-    If you want to select the best duplicate based on another criterion, have
-    a look at the function `mergeListsWithBestDuplicate`.
+
+    .. seealso::
+        If you want to select the best duplicate based on another criterion, have
+        a look at the function `mergeListsWithBestDuplicate`.
+
+    .. note::
+        Two particles that differ only by the order of their daughters are
+        considered duplicates and one of them will be removed.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -524,7 +532,7 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     ``outputListName`` if they pass ``cut`` (given selection criteria).
 
     Note:
-        Note the Particles themselves are not copied.
+        Note that the Particles themselves are not copied.
         The original and copied ParticleLists will point to the same Particles.
 
     Example:
@@ -981,26 +989,27 @@ def reconstructDecay(decayString,
                      path=None,
                      candidate_limit=None,
                      ignoreIfTooManyCandidates=True,
+                     chargeConjugation=True,
                      allowChargeViolation=False):
     r"""
-    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via
-    their specified decay mode, e.g. in form of a DecayString: D0 -> K- pi+; B+ -> anti-D0 pi+, .... All
-    possible combinations are created (overlaps are forbidden) and combinations that pass the specified selection
-    criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is
-    reconstructed as well (meaning that the charge conjugated mother list is created as well).
+    Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via their specified
+    decay mode, e.g. in form of a :ref:`DecayString`: :code:`D0 -> K- pi+` or :code:`B+ -> anti-D0 pi+`, ... All possible
+    combinations are created (particles are used only once per candidate) and combinations that pass the specified selection
+    criteria are saved to a newly created (mother) ParticleList. By default the charge conjugated decay is reconstructed as well
+    (meaning that the charge conjugated mother list is created as well) but this can be deactivated.
 
-    One can use an at-sign '@' to mark a particle as unspecified, e.g. in form of a DecayString: '\@Xsd -> K+ pi-'. If the particle
-    is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which
-    decays into the correct daughters will be flagged as correct. For example the DecayString '\@Xsd -> K+ pi-'
-    would match all particles which decay into a Kaon and a pion, for example K*, B0, D0. Still the daughters
-    need to be stated correctly so this can be used for "sum of exclusive" decays
+    One can use an ``@``-sign to mark a particle as unspecified, e.g. in form of a DecayString: :code:`\@Xsd -> K+ pi-`. If the
+    particle is marked as unspecified, its identity will not be checked when doing :ref:`MCMatching`. Any particle which decays into
+    the correct daughters will be flagged as correct. For example the DecayString :code:`\@Xsd -> K+ pi-` would match all particles
+    which decay into a kaon and a pion, for example :math:`K^*`, :math:`B^0`, :math:`D^0`. Still the daughters need to be stated
+    correctly so this can be used for "sum of exclusive" decays.
 
     .. warning::
         The input ParticleLists are typically ordered according to the upstream reconstruction algorithm.
         Therefore, if you combine two or more identical particles in the decay chain you should not expect to see the same
         distribution for the daughter kinematics as they may be sorted by geometry, momentum etc.
 
-        For example, in the decay ``D0 -> pi0 pi0`` the momentum distributions of the two ``pi0`` s are not identical.
+        For example, in the decay :code:`D0 -> pi0 pi0` the momentum distributions of the two ``pi0`` s are not identical.
         This can be solved by manually randomising the lists before combining.
 
     See Also:
@@ -1026,6 +1035,7 @@ def reconstructDecay(decayString,
     @param ignoreIfTooManyCandidates whether event should be ignored or not if number of reconstructed
                        candidates reaches limit. If event is ignored, no candidates are reconstructed,
                        otherwise, number of candidates in candidate_limit is reconstructed.
+    @param chargeConjugation boolean to decide whether charge conjugated mode should be reconstructed as well (on by default)
     @param allowChargeViolation whether the decay string needs to conserve the electric charge
     """
 
@@ -1038,6 +1048,7 @@ def reconstructDecay(decayString,
     if candidate_limit is not None:
         pmake.param("maximumNumberOfCandidates", candidate_limit)
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
+    pmake.param('chargeConjugation', chargeConjugation)
     pmake.param("allowChargeViolation", allowChargeViolation)
     path.add_module(pmake)
 

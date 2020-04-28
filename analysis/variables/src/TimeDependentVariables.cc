@@ -42,22 +42,15 @@ namespace Belle2 {
     // from RotationTools.h
     using RotationTools::rotateTensor;
     using RotationTools::rotateTensorInv;
+    using RotationTools::getUnitOrthogonal;
 
-    static const TVector3 vecNaN(std::numeric_limits<double>::quiet_NaN(),
-                                 std::numeric_limits<double>::quiet_NaN(),
-                                 std::numeric_limits<double>::quiet_NaN());
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
     //   ############################################## Time Dependent CPV Analysis Variables  ###############################################
 
-    // Return unit vector orthogonal to eY & v
-    static TVector3 getUnitOrthogonal(TVector3 v)
-    {
-      return (TVector3(0, 1, 0).Cross(v)).Unit();
-    }
 
     // TagV x, y, z
-
     double particleTagVx(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();

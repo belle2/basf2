@@ -107,6 +107,15 @@ namespace Belle2 {
       return mS;
     }
 
+    /**
+     * Get a vector orthogonal to v of the unit lenght
+     *
+     */
+    TVector3 getUnitOrthogonal(TVector3 v)
+    {
+      return TVector3(v.Z(), 0, -v.X()).Unit();
+    }
+
   }
 
 }

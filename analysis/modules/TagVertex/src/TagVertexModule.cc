@@ -68,17 +68,13 @@ namespace Belle2 {
   });
 
 
-  // Return unit vector orthogonal to eY & v
-  static TVector3 getUnitOrthogonal(TVector3 v)
-  {
-    return (TVector3(0, 1, 0).Cross(v)).Unit();
-  }
 
 
   // import tools from RotationTools.h
   using RotationTools::rotateTensor;
   using RotationTools::rotateTensorInv;
   using RotationTools::toSymMatrix;
+  using RotationTools::getUnitOrthogonal;
 
   //-----------------------------------------------------------------
   //                 Register the Module

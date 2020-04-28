@@ -480,17 +480,8 @@ def copyLists(outputListName, inputListNames, writeOut=False, path=None):
         a look at the function `mergeListsWithBestDuplicate`.
 
     .. note::
-        Also note that two particles are different (for these purposes) if they
-        have a different order of daughters.
-
-        ::
-
-            reconstructDecay("D0:a -> K- pi+", "", path=mypath)
-            reconstructDecay("D0:b -> pi+ K-", "", path=mypath)
-            copyLists("D0:ab", ["D0:a", "D0:b"], path=mypath) # double counts
-
-        If you merge ParticleLists that you reconstructed with a different
-        order of daughters you will **not** remove duplicates.
+        Two particles that differ only by the order of their daughters are
+        considered duplicates and one of them will be removed.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -541,7 +532,7 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     ``outputListName`` if they pass ``cut`` (given selection criteria).
 
     Note:
-        Note the Particles themselves are not copied.
+        Note that the Particles themselves are not copied.
         The original and copied ParticleLists will point to the same Particles.
 
     Example:

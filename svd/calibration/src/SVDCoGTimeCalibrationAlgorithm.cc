@@ -66,7 +66,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           cout << " " << endl;
-          cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+          // cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
+          cout << "Histogram: " << hEventT0vsCoG->GetName() << " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() << endl;
           if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
             cout << " " << endl;
             cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << " Entries required: " << m_minEntries << endl;
@@ -74,8 +75,8 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
             return c_NotEnoughData;
           }
           cout << " " << endl;
-          for (int i = 0; i < hEventT0vsCoG->GetNbinsX(); i++) {
-            for (int j = 0; j < hEventT0vsCoG->GetNbinsY(); j++) {
+          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
+            for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
               if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
@@ -85,14 +86,15 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
           pfx->SetErrorOption("S");
-          pfx->Fit("pol3", "RQ");
-          double par[4];
-          pol3->GetParameters(par);
-          // pfx->Fit("pol1", "RQ");
+          // pfx->Fit("pol3", "RQ");
           // double par[4];
-          // pol1->GetParameters(par);
-          // par[2] = 0;
-          // par[3] = 0;
+          // pol3->GetParameters(par);
+          pfx->Fit("pol1", "RQ");
+          // pfx->Fit("pol1", "Q");
+          double par[4];
+          pol1->GetParameters(par);
+          par[2] = 0;
+          par[3] = 0;
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);

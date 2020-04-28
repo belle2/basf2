@@ -69,8 +69,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
 
       /**
        * Simulate EKLM strip.
@@ -78,8 +78,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.

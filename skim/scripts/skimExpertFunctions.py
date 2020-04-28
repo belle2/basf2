@@ -7,10 +7,11 @@ from importlib import import_module
 import json
 import re
 
+import yaml
+
 import basf2 as b2
 from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import Registry
-import skimTestFilesInfo
 
 
 def encodeSkimName(SkimName):
@@ -35,49 +36,77 @@ def decodeSkimName(SkimCode):
     return Registry.decode_skim_code(SkimCode)
 
 
+def _get_test_sample_info(sampleName):
+    """Read in the YAML file of test samples (``skim/scripts/TestFiles.yaml``) and
+    return the info for a sample as a dict.
+    """
+
+    with open(b2.find_file("skim/scripts/TestFiles.yaml")) as f:
+        skimTestFilesInfo = yaml.safe_load(f)
+
+    try:
+        return skimTestFilesInfo[sampleName]
+    except KeyError:
+        msg = f"Sample {sampleName} not listed in skim/scripts/TestFiles.yaml."
+        b2.B2ERROR(msg)
+        raise KeyError(msg)
+
+
 def get_test_file(sampleName):
     """
-    Returns the KEKcc location of files used specifically for skim testing
+    Returns the KEKCC location of files used specifically for skim testing
 
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         sampleFileName (str): The path to the test file on KEKCC.
     """
-    lookup_dict = {s: f for s, f in skimTestFilesInfo.kekcc_locations}
-    if sampleName not in lookup_dict:
-        b2.B2ERROR("Testing file for this sample and skim campaign is not available.")
-    return lookup_dict[sampleName]
+    sampleInfo = _get_test_sample_info(sampleName)
+
+    if "location" in sampleInfo and sampleInfo["location"] is not None:
+        return sampleInfo["location"]
+    else:
+        msg = f"No test file location listed for {sampleName} sample."
+        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def get_total_infiles(sampleName):
     """
-    Returns the total number of input Mdst files for a given sample. This is useful for resource estimate.
+    Returns the total number of input MDST files for a given sample. This is useful for resource estimate.
 
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         nInFiles (int): Total number of input files for sample.
     """
-    lookup_dict = {s: f for s, f in skimTestFilesInfo.total_input_files}
-    if sampleName not in lookup_dict:
-        return None
-    return lookup_dict[sampleName]
+    sampleInfo = _get_test_sample_info(sampleName)
+
+    if "total_input_files" in sampleInfo and sampleInfo["total_input_files"] is not None:
+        return sampleInfo["total_input_files"]
+    else:
+        msg = f"'total_input_files' not listed for {sampleName} sample."
+        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
-def get_events_per_file(sample):
+def get_events_per_file(sampleName):
     """
-    Returns an estimate for the average number of events in an input Mdst file of the given sample type.
+    Returns an estimate for the average number of events in an input MDST file of the given sample type.
 
     Args:
-        sample (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
+        sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
         nEventsPerFile (int): The average number of events in file of the given sample type.
     """
-    try:
-        return skimTestFilesInfo.nEventsPerFile[sample]
-    except KeyError:
-        return None
+    sampleInfo = _get_test_sample_info(sampleName)
+
+    if "average_events_per_file" in sampleInfo and sampleInfo["average_events_per_file"] is not None:
+        return sampleInfo["average_events_per_file"]
+    else:
+        msg = f"'average_events_per_file' not listed for {sampleName} sample."
+        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def add_skim(label, lists, path):

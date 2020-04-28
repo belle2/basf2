@@ -56,17 +56,23 @@ To write a new skim, please follow these steps:
 
 5. *[Mandatory]* Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
 
-6. If any modules are producing too much noise, then override the attribute ``NoisyModules`` as a list of those modules, and their output will be set to only print error-level messages.
+6. Skims can crash on the grid if the log files are too large. If any modules is producing too much output, then override the attribute ``NoisyModules`` as a list of such modules, and their output will be set to print only error-level messages.
 
-7. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
+7. By default, the skim test file is a neutral :math:`B` pair sample with beam background. If your skim has a retention rate of close to zero for this sample type, you may wish to override the attribute ``TestFiles``. This should be a list of file names retrieved from `skimExpertFunctions.get_test_file`, such as:
+
+   .. code-block:: python
+
+       TestFiles = [get_test_file("MC13_ggBGx1")]
+
+8. Add your skim to the registry, with an appropriate skim code (see :ref:`Skim Registry<skim-registry>`).
 
 With all of these steps followed, you will now be able to run your skim using the :ref:`skim command line tools<skim-running>`. To make sure that you skim does what you expect, and is feasible to put into production, please also complete the following steps:
 
-8. Test your skim! The primary point of skims is to be run on the grid, so you want to be sure that the retention rate and processing time are low enough to make this process smooth.
+9. Test your skim! The primary point of skims is to be run on the grid, so you want to be sure that the retention rate and processing time are low enough to make this process smooth.
 
    The skim package contains a set of tools to make this straightforward for you. See `Testing skim performance`_ for more details.
 
-9. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
+10. Define validation histograms for your skim by overriding the method ``validation_histograms``. Please see the source code of various skims for examples of how to do this.
 
 Calling an instance of a skim class will run the particle list loaders, setup function, list builder function, and uDST output function. So a minimal skim steering file might consist of the following:
 
@@ -123,16 +129,6 @@ The skim numbering convention is defined on the `Confluence skim page`_.
     :members:
     :undoc-members:
 
-.. _skim-expert-functions:
-
-Utility functions for skim experts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The module ``skimExpertFunctions`` contains helper functions to perform common tasks relating to skims. Importantly, it contains the `skimExpertFunctions.BaseSkim` class, which is how skims are defined.
-
-.. automodule:: skimExpertFunctions
-    :members:
-    :undoc-members:
 
 .. _testing-skims:
 
@@ -202,6 +198,18 @@ This will read the output files of the test jobs, and produce tables of statisti
       can be installed via ``pip``.
 
       This will be included in a future version of the externals.
+
+
+.. _skim-expert-functions:
+
+Utility functions for skim experts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The module ``skimExpertFunctions`` contains helper functions to perform common tasks relating to skims. Importantly, it contains the `skimExpertFunctions.BaseSkim` class, which is how skims are defined.
+
+.. automodule:: skimExpertFunctions
+    :members:
+    :undoc-members:
 
 
 .. _b2skim-prod:

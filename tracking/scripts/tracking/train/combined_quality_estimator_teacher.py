@@ -702,16 +702,16 @@ class TrackQETeacherBaseTask(Basf2Task):
             "Teacher Task must define a data collection task to require "
         )
 
-    # def requires(self):
-    #    """
-    #    Generate list of luigi Tasks that this Task depends on.
-    #    """
-    #    yield self.data_collection_task(
-    #        num_processes=MasterTask.num_processes,
-    #        n_events=self.n_events_training,
-    #        experiment_number=self.experiment_number,
-    #        random_seed=self.random_seed,
-    #    )
+    def requires(self):
+        """
+        Generate list of luigi Tasks that this Task depends on.
+        """
+        yield self.data_collection_task(
+            num_processes=MasterTask.num_processes,
+            n_events=self.n_events_training,
+            experiment_number=self.experiment_number,
+            random_seed=self.random_seed,
+        )
 
     def output(self):
         """
@@ -728,11 +728,11 @@ class TrackQETeacherBaseTask(Basf2Task):
         This is the main process that is dispatched by the ``run`` method that
         is inherited from ``Basf2Task``.
         """
-        # records_files = self.get_input_file_names(
-        #    self.data_collection_task.records_file_name
-        # )
+        records_files = self.get_input_file_names(
+            self.data_collection_task.records_file_name
+        )
 
-        records_files = ['datafiles/10k_events/cdc_qe_records.root']
+        # records_files = ['datafiles/10k_events/cdc_qe_records.root']
 
         my_basf2_mva_teacher(
             records_files=records_files,
@@ -1135,12 +1135,12 @@ class TrackQEEvaluationBaseTask(Task):
             training_target=self.training_target,
             fast_bdt_option=self.fast_bdt_option,
         )
-        # yield self.data_collection_task(
-        #    num_processes=MasterTask.num_processes,
-        #    n_events=self.n_events_testing,
-        #    experiment_number=self.experiment_number,
-        #    random_seed="testdata_0",
-        # )
+        yield self.data_collection_task(
+            num_processes=MasterTask.num_processes,
+            n_events=self.n_events_testing,
+            experiment_number=self.experiment_number,
+            random_seed="testdata_0",
+        )
 
     def output(self):
         """
@@ -1171,10 +1171,9 @@ class TrackQEEvaluationBaseTask(Task):
                 self.teacher_task.get_weightfile_xml_identifier(
                     self.teacher_task,
                     fbdt_option=self.fast_bdt_option))[0],
-            # self.get_input_file_names(self.teacher_task.get_weightfile_xml_identifier(self.teacher_task))[0],
             "--datafiles",
-            # self.get_input_file_names(self.data_collection_task.records_file_name)[0],
-            "datafiles/1k_events/cdc_qe_records.root",
+            self.get_input_file_names(self.data_collection_task.records_file_name)[0],
+            # "datafiles/1k_events/cdc_qe_records.root",
             "--treename",
             self.teacher_task.tree_name,
             "--outputfile",
@@ -1755,10 +1754,11 @@ class MasterTask(b2luigi.WrapperTask):
         ]
 
         fast_bdt_options = []
-        for i in range(0, 300, 100):
-            for j in range(0, 7):
-                for k in range(0, 6):
-                    fast_bdt_options.append([100 + i, 8, 3+j, 0.05+k*0.05])
+        # for i in range(0, 300, 100):
+        #    for j in range(0, 7):
+        #        for k in range(0, 6):
+        #            fast_bdt_options.append([100 + i, 8, 3+j, 0.05+k*0.05])
+        fast_bdt_options.append([200, 8, 3, 0.1])
 
         experiment_numbers = b2luigi.get_setting("experiment_numbers")
 
@@ -1766,12 +1766,12 @@ class MasterTask(b2luigi.WrapperTask):
         for experiment_number, exclude_variables, cdc_training_target, fast_bdt_option in itertools.product(
                 experiment_numbers, exclude_variables_combinations, cdc_training_targets, fast_bdt_options
         ):
-            # yield QEWeightsLocalDBCreatorTask(
-            #    n_events_training=self.n_events_training,
-            #    experiment_number=experiment_number,
-            #    exclude_variables=exclude_variables,
-            #    cdc_training_target=cdc_training_target,
-            # )
+            yield QEWeightsLocalDBCreatorTask(
+                n_events_training=self.n_events_training,
+                experiment_number=experiment_number,
+                exclude_variables=exclude_variables,
+                cdc_training_target=cdc_training_target,
+            )
 
             if b2luigi.get_setting("run_validation_tasks", default=True):
                 yield FullTrackQEValidationPlotsTask(
@@ -1795,14 +1795,14 @@ class MasterTask(b2luigi.WrapperTask):
 
             if b2luigi.get_setting("run_mva_evaluate", default=True):
                 # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
-                # requires a latex installation to work
-                # yield FullTrackQEEvaluationTask(
-                #    exclude_variables=exclude_variables,
-                #    cdc_training_target=cdc_training_target,
-                #    n_events_training=self.n_events_training,
-                #    n_events_testing=self.n_events_testing,
-                #    experiment_number=experiment_number,
-                # )
+                #  requires a latex installation to work
+                yield FullTrackQEEvaluationTask(
+                    exclude_variables=exclude_variables,
+                    cdc_training_target=cdc_training_target,
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
                 yield CDCTrackQEEvaluationTask(
                     training_target=cdc_training_target,
                     n_events_training=self.n_events_training,
@@ -1810,11 +1810,11 @@ class MasterTask(b2luigi.WrapperTask):
                     fast_bdt_option=fast_bdt_option,
                     experiment_number=experiment_number,
                 )
-                # yield VXDTrackQEEvaluationTask(
-                #    n_events_training=self.n_events_training,
-                #    n_events_testing=self.n_events_testing,
-                #    experiment_number=experiment_number,
-                # )
+                yield VXDTrackQEEvaluationTask(
+                    n_events_training=self.n_events_training,
+                    n_events_testing=self.n_events_testing,
+                    experiment_number=experiment_number,
+                )
 
 
 if __name__ == "__main__":

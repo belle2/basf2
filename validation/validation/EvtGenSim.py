@@ -23,15 +23,15 @@ set_random_seed(12345)
 
 exp = '8'
 run = '*'
-bgfile = '/group/belle2/users/jbennett/BGOverlayFromData/e000' + exp + \
-    '/release-04-01-00/data_reprocessing_proc10/BGOverlay.physics.e000' + exp + '.r0' + run + '.root'
+bgfile = '/group/belle2/dataprod/BGOverlay/e000' + exp + \
+    '/release-04-01-04/data_reprocessing_proc10/BGOverlay.physics.e000' + exp + '.r0' + run + '.root'
 bg = glob.glob(bgfile)
 
 # define the settings for the generator (?!)
 usedExp = 1003  # 1003 is the incomplete detector due to some missing parts in the PXD. 0 would be the complete detector
 runNo = 1
-events = 5000
-postfix = ''
+events = 200
+postfix = '_local'
 OUTPUT_FILE_NAME = 'EvtGenSim_' + str(int(round(events / 1000, 0))) + 'k_exp' + \
                                       str(usedExp) + '_run' + str(runNo) + postfix + '.root'
 

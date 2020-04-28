@@ -45,6 +45,12 @@ namespace Belle2 {
       "adc_min",
       "adc_sum",
 
+      "tot_mean",
+      "tot_variance",
+      "tot_max",
+      "tot_min",
+      "tot_sum",
+
       "empty_s_mean",
       "empty_s_variance",
       "empty_s_max",

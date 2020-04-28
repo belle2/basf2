@@ -38,8 +38,9 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
   // data that they accumulate (i.e. are "filled" with).
   statistics_accumulator drift_length_acc;
-  statistics_accumulator adc_acc;
+  statistics_accumulator adc_acc; /* integrated charge over the cell*/
   statistics_accumulator empty_s_acc;
+  statistics_accumulator tot_acc; /* time over threshold */
 
   unsigned int size = track->size();
 
@@ -47,6 +48,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   for (const CDCRecoHit3D& recoHit : *track) {
     drift_length_acc(recoHit.getWireHit().getRefDriftLength());
     adc_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getADCCount()));
+    tot_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getTOT()));
   }
 
   // Extract empty_s (ArcLength2D gap) information
@@ -78,11 +80,13 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // Set variances containers with for 0/1 elements to -1 (boost default: nan/0 respectively)
   double drift_length_variance = -1;
   double adc_variance = -1;
+  double tot_variance = -1;
   if (size > 1) {
     // for more than two elements, calculate variance with bessel correction
     double bessel_corr = (double)size / (size - 1.0);
     drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
     adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
+    tot_variance = std::sqrt(bacc::variance(tot_acc) * bessel_corr);
   }
   double empty_s_variance = -1;
   if (empty_s_size > 1) {
@@ -109,6 +113,12 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("adc_max")>() = toFinite(bacc::max(adc_acc), 0);
   var<named("adc_min")>() = toFinite(bacc::min(adc_acc), 0);
   var<named("adc_sum")>() = toFinite(bacc::sum(adc_acc), 0);
+
+  var<named("tot_mean")>() = toFinite(bacc::mean(tot_acc), 0);
+  var<named("tot_variance")>() = toFinite(tot_variance, 0);
+  var<named("tot_max")>() = toFinite(bacc::max(tot_acc), 0);
+  var<named("tot_min")>() = toFinite(bacc::min(tot_acc), 0);
+  var<named("tot_sum")>() = toFinite(bacc::sum(tot_acc), 0);
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 

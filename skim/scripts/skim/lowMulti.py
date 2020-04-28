@@ -127,7 +127,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     RequiredStandardLists = None
-    TestFile = get_test_file("MC13_mumuBGx1")
+    TestFiles = [get_test_file("MC13_mumuBGx1")]
 
     def build_lists(self, path):
         # Skim label for the case of two tracks
@@ -190,7 +190,7 @@ class LowMassTwoTrack(BaseSkim):
     __category__ = "physics, low multiplicity"
 
     RequiredStandardLists = None
-    TestFile = get_test_file("MC13_mumuBGx1")
+    TestFiles = [get_test_file("MC13_mumuBGx1")]
 
     def build_lists(self, path):
         skim_label = 'LowMassTwoTrack'

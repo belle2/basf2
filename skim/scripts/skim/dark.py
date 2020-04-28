@@ -705,7 +705,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         },
     }
 
-    TestFile = get_test_file("MC13_ggBGx1")
+    TestFiles = [get_test_file("MC13_ggBGx1")]
 
     def __init__(self, prescale_high=1, prescale_low=1, **kwargs):
         """
@@ -795,7 +795,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
         },
     }
 
-    TestFile = get_test_file("MC13_mumuBGx1")
+    TestFiles = [get_test_file("MC13_mumuBGx1")]
 
     def build_lists(self, path):
         dielectron_list = []

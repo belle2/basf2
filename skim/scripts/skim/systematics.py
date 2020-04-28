@@ -514,7 +514,7 @@ class Systematics(BaseSkim):
         },
     }
 
-    TestFile = get_test_file("MC13_ccbarBGx1")
+    TestFiles = [get_test_file("MC13_ccbarBGx1")]
 
     def build_lists(self, path):
         lists = [

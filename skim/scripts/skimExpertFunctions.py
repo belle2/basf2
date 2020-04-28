@@ -345,7 +345,7 @@ class BaseSkim(ABC):
     """A list of modules which to be silenced for this skim. This may be necessary to
     set in order to keep log file sizes small."""
 
-    TestFile = get_test_file("MC13_mixedBGx1")
+    TestFiles = [get_test_file("MC13_mixedBGx1")]
     """Location of an MDST file to test the skim on. Defaults to an MC12 mixed BGx1
     sample. If you want to use a different test file for your skim, set it using
     `get_test_file`.
@@ -714,6 +714,7 @@ class CombinedSkim(BaseSkim):
         self.Skims = skims
         self.name = CombinedSkimName
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
+        self.TestFiles = list({skim.TestFiles for skim in skims})
 
         for skim in skims:
             skim._validate_required_particle_lists()

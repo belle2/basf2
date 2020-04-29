@@ -1447,11 +1447,18 @@ def execute(tag=None, is_test=None):
             validation.log.note("Checking for cached script output")
             validation.apply_script_caching()
 
+        # Allow to change the maximal run time of the scripts
         if cmd_arguments.max_run_time is not None:
-            validation.log.note(
-                f"Setting maximal run time of the steering files "
-                f"to {cmd_arguments.max_run_time} minutes."
-            )
+            if cmd_arguments.max_run_time > 0:
+                validation.log.note(
+                    f"Setting maximal run time of the steering files "
+                    f"to {cmd_arguments.max_run_time} minutes."
+                )
+            else:
+                validation.log.note(
+                    "Disabling run time limitation of steering files as "
+                    "requested (max run time set to <= 0)."
+                )
             validation.script_max_runtime_in_minutes = \
                 cmd_arguments.max_run_time
 

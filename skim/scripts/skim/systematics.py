@@ -658,11 +658,11 @@ class SystematicsTracking(BaseSkim):
 
         # D-
         DminusCuts = "1.0 < M < 1.75"
-        DminusChannel = ["pi+:fromks pi+:loose pi-:loose"]
+        DminusChannel = ["pi-:fromks pi+:loose pi-:loose"]
 
         for chID, channel in enumerate(DminusChannel):
             resonanceName = "D-:loose" + str(chID)
-            ma.reconstructDecay(resonanceName + " -> " + channel, DminusCuts, chID, path=path, allowChargeViolation=True)
+            ma.reconstructDecay(resonanceName + " -> " + channel, DminusCuts, chID, path=path)
 
         # Dstar
         DstarCuts = "massDifference(0)<0.2 and useCMSFrame(p) > 2.0"
@@ -912,7 +912,6 @@ class SystematicsEELL(BaseSkim):
     RequiredStandardLists = {
         "stdCharged": {
             "stdE": ["all"],
-            "stdMu": ["all"],
         },
     }
 

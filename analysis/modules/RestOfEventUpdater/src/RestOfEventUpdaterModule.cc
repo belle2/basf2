@@ -68,7 +68,7 @@ namespace Belle2 {
       B2WARNING("ROE list is not valid somehow, ROE masks are not updated!");
       return;
     }
-    Particle::EParticleType listType = getListType();
+    Particle::EParticleSourceObject listType = getListType();
 
     // Apply cuts on input list
     std::vector<const Particle*> particlesToUpdate;
@@ -78,11 +78,11 @@ namespace Belle2 {
         particlesToUpdate.push_back(partWithInfo);
       }
     }
-    if (listType != Particle::EParticleType::c_Composite) {
+    if (listType != Particle::EParticleSourceObject::c_Composite) {
       updateMasksWithParticles(roe, particlesToUpdate, listType);
     }
 
-    if (listType == Particle::EParticleType::c_Composite) {
+    if (listType == Particle::EParticleSourceObject::c_Composite) {
       updateMasksWithV0(roe, particlesToUpdate);
     }
   }
@@ -107,7 +107,7 @@ namespace Belle2 {
 
   }
   void RestOfEventUpdaterModule::updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe,
-                                                          std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
+                                                          std::vector<const Particle*>& particlesToUpdate, Particle::EParticleSourceObject listType)
   {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {
       if (maskToUpdate == "") {
@@ -122,24 +122,24 @@ namespace Belle2 {
     }
   }
 
-  Particle::EParticleType RestOfEventUpdaterModule::getListType()
+  Particle::EParticleSourceObject RestOfEventUpdaterModule::getListType()
   {
     int pdgCode = m_inputList->getPDGCode();
     if (pdgCode == Const::pion.getPDGCode()) {
-      return Particle::EParticleType::c_Track;
+      return Particle::EParticleSourceObject::c_Track;
     }
     if (pdgCode == Const::photon.getPDGCode()) {
-      return Particle::EParticleType::c_ECLCluster;
+      return Particle::EParticleSourceObject::c_ECLCluster;
     }
     if (pdgCode == Const::Klong.getPDGCode()) {
-      return Particle::EParticleType::c_KLMCluster;
+      return Particle::EParticleSourceObject::c_KLMCluster;
     }
     //add converted photon support
     if (pdgCode == Const::Kshort.getPDGCode() or pdgCode == Const::Lambda.getPDGCode()) {
-      return Particle::EParticleType::c_Composite;
+      return Particle::EParticleSourceObject::c_Composite;
     }
     B2WARNING("Unknown PDG code of particle list!");
-    return Particle::EParticleType::c_Undefined;
+    return Particle::EParticleSourceObject::c_Undefined;
   }
 
 

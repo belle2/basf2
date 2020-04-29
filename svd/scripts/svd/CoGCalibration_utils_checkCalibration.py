@@ -42,7 +42,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
     Python class used for checking SVD CoG Calibration stored in a localDB
     """
 
-    # def fillLists(self, svdRecoDigitsFromTracks, svdClustersFromTracks):
     def fillLists(self, svdClustersFromTracks):
         """
         Function that fill the lists needed for the check of the calibration

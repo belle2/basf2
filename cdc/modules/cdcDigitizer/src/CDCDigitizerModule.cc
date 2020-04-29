@@ -129,7 +129,7 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            "Additional fudge factor for space resol. (common to all cells)",  1.);
   addParam("SpaceChargeEffect", m_spaceChargeEffect, "Switch for space charge effect", true);
 
-  addParam("AddXTalk", m_addXTalk, "A switch for crosstalk; true: on; false: off", false);
+  addParam("AddXTalk", m_addXTalk, "A switch for crosstalk; true: on; false: off", true);
   addParam("Issue2ndHitWarning", m_issue2ndHitWarning, "=true: issue a warning when a 2nd TDC hit is found.", true);
   addParam("IncludeEarlyXTalks", m_includeEarlyXTalks, "=true: include earlier x-talks as well than the signal hit in question.",
            true);
@@ -977,7 +977,7 @@ void CDCDigitizerModule::addXTalk()
               xTalks[i].second.TOT);
       WireID widx = m_cdcgp->getWireID(board, xTalks[i].first);
       if (!m_cdcgp->isBadWire(widx)) { // for non-bad wire
-        if (m_includeEarlyXTalks || (!m_includeEarlyXTalks && xTalks[i].second.TDC <= tdcCount)) {
+        if (m_includeEarlyXTalks || (xTalks[i].second.TDC <= tdcCount)) {
           const double t0 = m_cdcgp->getT0(widx);
           const double ULOfTDC = (t0 - m_lowEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;
           const double LLOfTDC = (t0 - m_uprEdgeOfTimeWindow[board]) * m_tdcBinWidthInv;

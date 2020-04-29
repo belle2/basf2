@@ -283,7 +283,6 @@ namespace Belle2 {
     if (m_constraintType == "boost") ok = findConstraintBoost(cut * 200000.);
     if (m_constraintType == "noConstraint") ok = true;
     if (m_constraintType == "breco") ok = findConstraint(Breco, cut * 2000.);
-
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
       return false;

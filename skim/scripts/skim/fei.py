@@ -994,8 +994,6 @@ class BaseFEISkim(BaseSkim):
         This setup function is run by all FEI skims, so they all have the save
         event-level pre-cuts:
 
-        * :math:`R_2 < 0.4` (`foxWolframR2` from `modularAnalysis.buildEventShape`,
-          calculated using all cleaned tracks and clusters)
         * :math:`n_{\\text{cleaned tracks}} \\geq 3`
         * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
         * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
@@ -1023,26 +1021,12 @@ class BaseFEISkim(BaseSkim):
                                                 "gamma:eventShapeForSkims"],
                                 path=path)
 
-        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims",
-                                           "gamma:eventShapeForSkims"],
-                           allMoments=False,
-                           foxWolfram=True,
-                           harmonicMoments=False,
-                           cleoCones=False,
-                           thrust=False,
-                           collisionAxis=False,
-                           jets=False,
-                           sphericity=False,
-                           checkForDuplicates=False,
-                           path=path)
-
         EventCuts = " and ".join(
             [
                 f"nCleanedTracks({CleanedTrackCuts})>=3",
                 f"nCleanedECLClusters({CleanedClusterCuts})>=3",
                 "visibleEnergyOfEventCMS>4",
                 "2<E_ECL<7",
-                "foxWolframR2_maskedNaN<0.4"
             ]
         )
 
@@ -1086,14 +1070,13 @@ class BaseFEISkim(BaseSkim):
     @staticmethod
     @_hash_dict
     @lru_cache()
-    def setup_fei_aliases(FEIChannelArgs, *, path):
+    def setup_fei_aliases(FEIChannelArgs):
         # Aliases for pre-FEI event-level cuts
         vm.addAlias("E_ECL_pi",
                     "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
         vm.addAlias("E_ECL_gamma",
                     "totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)")
         vm.addAlias("E_ECL", "formula(E_ECL_pi+E_ECL_gamma)")
-        vm.addAlias("foxWolframR2_maskedNaN", "ifNANgiveX(foxWolframR2,1)")
 
         # Aliases for variables available after running the FEI
         vm.addAlias("sigProb", "extraInfo(SignalProbability)")
@@ -1121,12 +1104,12 @@ class BaseFEISkim(BaseSkim):
         See also:
             `fei_precuts` for event-level cut definitions.
         """
+        self.setup_fei_aliases(self.FEIChannelArgs)
         path = self.fei_precuts(path)
         # The FEI skims require some manual handling of paths that is not necessary in
         # any other skim.
         self._ConditionalPath = path
 
-        self.setup_fei_aliases(self.FEIChannelArgs, path=path)
         self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, path=path)
 
 

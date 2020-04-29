@@ -6,9 +6,8 @@ from reconstruction import add_reconstruction
 from simulation import add_simulation
 import os
 
-# use_central_database('data_reprocessing_prompt')
 set_random_seed(1)
-bkgdir = "/remote/pcbelle11/sebastian/OfficialBKG/15thCampaign/phase3/set0/"
+bkgdir = "/remote/neurobelle/data/bckg/OfficialBKG/15thCampaign/phase3/set0/"
 thrange = [10, 170]
 particlegun_params = {
         'pdgCodes': [-13, 13],              # muons
@@ -42,21 +41,30 @@ main.add_module('CDCDigitizer')
 main.add_module('CDCTriggerTSF',
                 InnerTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/innerLUT_v2.2.coe"),
                 OuterTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/outerLUT_v2.2.coe"),
+                TSHitCollectionName='CDCTriggerNNInputSegmentHits')
+main.add_module('CDCTriggerTSF',
+                InnerTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/innerLUT_v2.2.coe"),
+                OuterTSLUTFile=Belle2.FileSystem.findFile("trg/cdc/data/outerLUT_v2.2.coe"),
                 TSHitCollectionName='CDCTriggerSegmentHits')
 main.add_module('CDCTrigger2DFinder',
                 minHits=4,
                 minHitsShort=4,
                 minPt=0.3,
-                outputCollectionName='CDCTrigger2DFinderTracks')
-main.add_module('CDCTriggerETF',
-                hitCollectionName='CDCTriggerSegmentHits')
-main.add_module('CDCTriggerNeuro',
-                filename=Belle2.FileSystem.findFile("trg/cdc/data/Background2.0_20161207.root"),
-                # et_option='fastestpriority',
-                et_option='fastestpriority',
                 hitCollectionName='CDCTriggerSegmentHits',
+                outputCollectionName='CDCTrigger2DFinderTracks')
+main.add_module('CDCTrigger2DFinder',
+                minHits=4,
+                minHitsShort=4,
+                minPt=0.3,
+                hitCollectionName='CDCTriggerNNInputSegmentHits',
+                outputCollectionName='CDCTriggerNNInput2DFinderTracks')
+main.add_module('CDCTriggerETF',
+                hitCollectionName='CDCTriggerNNInputSegmentHits')
+main.add_module('CDCTriggerNeuro',
+                hitCollectionName='CDCTriggerNNInputSegmentHits',
                 outputCollectionName='CDCTriggerNeuroTracks',
-                inputCollectionName='CDCTrigger2DFinderTracks',
+                inputCollectionName='CDCTriggerNNInput2DFinderTracks',
+                fixedPoint=True,
                 writeMLPinput=True)
 add_reconstruction(main)
 

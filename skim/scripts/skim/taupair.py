@@ -450,7 +450,7 @@ class TauLFV(BaseSkim):
 
     def build_lists(self, path):
         # particle selection
-        trackCuts = "-3.0 < dz < 7.0 and dr < 1.0"
+        trackCuts = "-3.0 < dz < 3.0 and dr < 1.0"
         ma.cutAndCopyList("e+:taulfv", "e+:all", trackCuts, path=path)
         ma.cutAndCopyList("mu+:taulfv", "mu+:all", trackCuts, path=path)
         ma.cutAndCopyList("pi+:taulfv", "pi+:all", trackCuts, path=path)
@@ -661,7 +661,7 @@ class TauGeneric(BaseSkim):
         """
 
         # Track and gamma cuts
-        trackCuts = "-3.0 < dz < 7.0 and dr < 1.0"
+        trackCuts = "-3.0 < dz < 3.0 and dr < 1.0"
         # trackCuts += " and -0.8660 < cosTheta < 0.9563"
         gammaCuts = "E > 0.15"
         gammaCuts += " and -0.8660 < cosTheta < 0.9563"
@@ -737,12 +737,12 @@ class TauGeneric(BaseSkim):
             filename='TauGeneric_Validation.root',
             decayString='',
             variables=[('nGoodTracks', 7, 1, 8),
-                       ('visibleEnergyOfEventCMS', 60, 0, 12),
+                       ('visibleEnergyOfEventCMS', 40, 0, 12),
                        ('E_ECLtrk', 70, 0, 7),
                        ('maxPt', 60, 0, 6),
                        ('invMS1', 60, 0, 3),
                        ('invMS2', 60, 0, 3),
-                       ('Theta_miss', 60, 0, 180)],
+                       ('Theta_miss', 30, 0, 180)],
             variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
             path=path
         )
@@ -790,7 +790,7 @@ class TauThrust(BaseSkim):
         * ``nTracksS1Thrust/nTracksS2Thrust``: number of good tracks in each hemisphere S1/S2 divided by thrust axis
         """
         # Track and gamma cuts
-        trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+        trackCuts = '-3.0 < dz < 3.0 and dr < 1.0'
         ma.cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
         gammaForPi0Cuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
         ma.cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)
@@ -849,7 +849,7 @@ class TauThrust(BaseSkim):
             filename='TauThrust_Validation.root',
             decayString='',
             variables=[('nGoodTracksThrust', 7, 1, 8),
-                       ('visibleEnergyOfEventCMS', 60, 0, 12),
+                       ('visibleEnergyOfEventCMS', 40, 0, 12),
                        ('thrust', 50, 0.75, 1)],
             path=path
         )

@@ -1444,7 +1444,7 @@ namespace Belle2 {
     return !(lhs == rhs);
   }*/
 
-  /** Dummy function*/
+  /** Dummy function */
   static void null_scale(double[5], double, double)
   {
     return;
@@ -1503,21 +1503,21 @@ namespace Belle2 {
   /*****                     *****/
   /***** misc math functions *****/
   /*****                     *****/
-  /** */
+  /** vfunc */
   inline double
   vfunc(const double x, const double x1, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            (x - x1) * a2 + yc ;
   }
-
+  /** cupfunc */
   inline double
   cupfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            x > x2 ? (x - x2) * a2 + yc : yc;
   }
-
+  /** rootfunc */
   inline double
   rootfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
@@ -1525,7 +1525,7 @@ namespace Belle2 {
            x > x2 ? (x2 - x1) * a2 + yc : (x - x1) * a2 + yc;
   }
 
-  /** Lambda function */
+  /** lambdafunc */
   inline double
   lambdafunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2, const double a3)
   {

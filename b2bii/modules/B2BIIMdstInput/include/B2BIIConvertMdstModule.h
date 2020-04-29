@@ -112,7 +112,7 @@ namespace Belle2 {
     virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun() override;
+    virtual void beginRun() override; /**< Called when the current run begins. */
     virtual void event() override; /**< Called for each event */
     virtual void endRun() override; /**<  Called when the current run is finished.*/
     virtual void terminate() override; /**< Terminates the module.*/
@@ -397,7 +397,7 @@ namespace Belle2 {
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
-    BeamSpot m_beamSpot; /**< Interaction Point of the beam*/
+    BeamSpot m_beamSpot; /**< Interaction Point of the beam */
 
     /** CollisionBoostVector for boost vector*/
     OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
@@ -405,7 +405,7 @@ namespace Belle2 {
 
     /** CollisionInvariantMass for Invariant Mass of Beam*/
     OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
-    CollisionInvariantMass m_collisionInvM; /**< CollisionInvriantMass for the invariant mass of the beam */
+    CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

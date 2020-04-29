@@ -74,9 +74,9 @@ namespace Belle2 {
 
   class MuidProb;
 
-//
-// Declaration of class B2BIIFixMdst
-//
+  /**
+   * Declaration of class B2BIIFixMdst
+   */
 
   class B2BIIFixMdstModule : public Belle2::Module {
 
@@ -138,13 +138,13 @@ namespace Belle2 {
     int m_correct_ecl; /**< Apply correct_ecl */
     int m_correct_ecl_option; /**< Apply correct_ecl_option */
     int m_correct_ecl_version; /**< Apply correct_ecl_version */
-    int m_correct_ecl_primary_vertex; /** Apply correct_ecl_primary_vertex */
+    int m_correct_ecl_primary_vertex; /**< Apply correct_ecl_primary_vertex */
     int m_correct_ecl_5s; /**<  For run indep. MC exp.61 5S runs. */
     int m_make_pi0; /**< Apply make_pi0 (after correct_ecl) */
     int m_make_pi0_option; /**< Set make_pi0 option */
-    double m_make_pi0_lower_limit; /**< Set make_pi0 lower mass limit*/
-    double m_make_pi0_upper_limit; /**< Set make_pi0 upper mass limit*/
-    int m_make_pi0_primary_vertex; /**< Apply make_pi0_primary_vertex (after correct_ecl)*/
+    double m_make_pi0_lower_limit; /**< Set make_pi0 lower mass limit */
+    double m_make_pi0_upper_limit; /**< Set make_pi0 upper mass limit */
+    int m_make_pi0_primary_vertex; /**< Apply make_pi0_primary_vertex (after correct_ecl) */
     int m_benergy; /**< Apply Benergy */
     int m_benergy_db; /**< Apply Benergy from DB or file */
     int m_benergy_mcdb; /**< Apply Benergy from DB or default value in MC */
@@ -158,7 +158,7 @@ namespace Belle2 {
     int m_table_size; /**< Check table sizes */
     int m_limit_mdst_ecl_trk; /**< Limit of mdst_ecl_trk table size */
     int m_limit_mdst_klm_cluster_hit; /**< Limit of mdst_klm_cluster_hit table size */
-    int m_reprocess_version; /**< Reprocess version (=0:old; =1:new)*/
+    int m_reprocess_version; /**< Reprocess version (=0:old; =1:new) */
     int m_reprocess_version_specified; /**< Specify reprocess version */
     int m_5Srun; /**< 5S,2S,1S run or not */
     int m_check_version_consistency; /**< Check consistency between environment variable and mdst version */

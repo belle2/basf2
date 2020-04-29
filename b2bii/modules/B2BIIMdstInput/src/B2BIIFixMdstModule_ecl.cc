@@ -139,7 +139,7 @@ namespace Belle2 {
 //static double ecl_adhoc_corr( int Exp, int Run, double Energy, double)
 //Modified 20081222
   /** The function giving correction factor.
-   *  Correcponding Data/MC so that energy in data should be divided by this.
+   *  Corresponding Data/MC so that energy in data should be divided by this.
    */
   static double ecl_adhoc_corr(int Exp, int Run, int iflag05th,
                                double Energy, double)

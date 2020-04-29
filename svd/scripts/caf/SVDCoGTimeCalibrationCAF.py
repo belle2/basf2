@@ -83,37 +83,9 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     path.add_module('Progress')
 
-    '''
-    # Remove not useful branches
-    path.add_module('RootInput', branchNames=input_branches)
-
-    path.add_module("Gearbox")
-    path.add_module("Geometry", useDB=True)
-
-    # run SVD unpacker
-    svd.add_svd_unpacker(path)
-
-    # run SVD reconstruction, changing names of StoreArray
-    reco.add_svd_reconstruction(path)
-
-    for moda in path.modules():
-        if moda.name() == 'SVDCoGTimeEstimator':
-            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-        if moda.name() == 'SVDSimpleClusterizer':
-            moda.param("Clusters", 'SVDClustersFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-            moda.param("timeAlgorithm", 0)
-        if moda.name() == 'SVDSpacePointCreator':
-            moda.param("SVDClusters", 'SVDClustersFromTracks')
-
-    path = remove_module(path, 'SVDMissingAPVsClusterCreator')
-    '''
-
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
-    collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
     collector.param("SVDEventInfoName", "SVDEventInfo")
     collector.param("EventT0Name", "EventT0")
     collector.param("granularity", "run")

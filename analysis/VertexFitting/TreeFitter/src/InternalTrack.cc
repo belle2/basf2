@@ -169,7 +169,20 @@ namespace TreeFitter {
   ErrCode InternalTrack::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
-    ParticleBase::initCovariance(fitparams);
+    const int posindex = posIndex();
+    if (posindex >= 0) {
+      for (int i = 0; i < 3; ++i) {
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1;
+      }
+    }
+
+    const int momindex = momIndex();
+    if (momindex >= 0) {
+      const int maxrow = hasEnergy() ? 4 : 3;
+      for (int i = 0; i < maxrow; ++i) {
+        fitparams.getCovariance()(momindex + i, momindex + i) = .1;
+      }
+    }
     for (ParticleBase* daughter : m_daughters) {
       status |= daughter->initCovariance(fitparams);
     }

@@ -980,6 +980,8 @@ class BaseFEISkim(BaseSkim):
     inheriting from `BaseFEISkim`, override this value to apply the FEI for only *e.g.*
     SL charged :math:`B`'s."""
 
+    MergeDataStructures = {"FEIChannelArgs": _merge_boolean_dicts}
+
     RequiredStandardLists = None
 
     NoisyModules = ["ParticleCombiner"]
@@ -987,6 +989,27 @@ class BaseFEISkim(BaseSkim):
     @staticmethod
     @lru_cache()
     def fei_precuts(path):
+        """
+        Skim pre-cuts are applied before running the FEI, to reduce computation time.
+        This setup function is run by all FEI skims, so they all have the save
+        event-level pre-cuts:
+
+        * :math:`R_2 < 0.4` (`foxWolframR2` from `modularAnalysis.buildEventShape`,
+          calculated using all cleaned tracks and clusters)
+        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
+        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
+        * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
+        * :math:`2~{\\rm GeV}<E_{\\text{cleaned tracks & clusters in
+          ECL}}<7~{\\rm GeV}`
+
+        We define "cleaned" tracks and clusters as:
+
+        * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5~{\\rm cm}`,
+          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
+        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta
+          < 2.61799`, and :math:`E>0.1~{\\rm GeV}`
+        """
+
         # Pre-selection cuts
         CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
         CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
@@ -1041,26 +1064,7 @@ class BaseFEISkim(BaseSkim):
     @lru_cache()
     def run_fei_for_skims(FEIChannelArgs, FEIPrefix, *, path):
         """Reconstruct hadronic and semileptonic :math:`B^0` and :math:`B^+` tags using
-        the generically trained FEI. Skim pre-cuts are applied before running the FEI,
-        to reduce computation time.
-
-        This setup function is run by all FEI skims, so they all have the save
-        event-level pre-cuts:
-
-        * :math:`R_2 < 0.4` (`foxWolframR2` from `modularAnalysis.buildEventShape`,
-          calculated using all cleaned tracks and clusters)
-        * :math:`n_{\\text{cleaned tracks}} \\geq 3`
-        * :math:`n_{\\text{cleaned ECL clusters}} \\geq 3`
-        * :math:`\\text{Visible energy of event (CMS frame)}>4~{\\rm GeV}`
-        * :math:`2~{\\rm GeV}<E_{\\text{cleaned tracks & clusters in
-          ECL}}<7~{\\rm GeV}`
-
-        We define "cleaned" tracks and clusters as:
-
-        * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5~{\\rm cm}`,
-          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
-        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta
-          < 2.61799`, and :math:`E>0.1~{\\rm GeV}`
+        the generically trained FEI.
 
         Parameters:
             FEIChannelArgs (dict(str, bool)): A dict of keyword-boolean pairs to be
@@ -1107,8 +1111,6 @@ class BaseFEISkim(BaseSkim):
                 "conditionalVariableSelector(dmID<4, d1_p_CMSframe, d2_p_CMSframe)"
             )
 
-    MergeDataStructures = {"FEIChannelArgs": _merge_boolean_dicts}
-
     def additional_setup(self, path):
         """Apply pre-FEI event-level cuts and apply the FEI. This setup function is run
         by all FEI skims, so they all have the save event-level pre-cuts.
@@ -1117,7 +1119,7 @@ class BaseFEISkim(BaseSkim):
         to avoid applying the FEI twice.
 
         See also:
-            `run_fei_for_skims` for event-level cut definitions.
+            `fei_precuts` for event-level cut definitions.
         """
         path = self.fei_precuts(path)
         # The FEI skims require some manual handling of paths that is not necessary in
@@ -1182,9 +1184,8 @@ class feiHadronicB0(BaseFEISkim):
     <CHANNELS>
 
     See also:
-        `BaseFEISkim.FEIPrefix` for FEI training used, and
-        `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
-        FEI.
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying hadronically."
 
@@ -1265,9 +1266,8 @@ class feiHadronicBplus(BaseFEISkim):
     <CHANNELS>
 
     See also:
-        `BaseFEISkim.FEIPrefix` for FEI training used, and
-        `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
-        FEI.
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying hadronically."
 
@@ -1349,9 +1349,8 @@ class feiSLB0(BaseFEISkim):
     <CHANNELS>
 
     See also:
-        `BaseFEISkim.FEIPrefix` for FEI training used, and
-        `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
-        FEI.
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
 
@@ -1433,9 +1432,8 @@ class feiSLBplus(BaseFEISkim):
     <CHANNELS>
 
     See also:
-        `BaseFEISkim.FEIPrefix` for FEI training used, and
-        `BaseFEISkim.run_fei_for_skims` for event-level cuts made before applying the
-        FEI.
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
     """
     __description__ = "FEI-tagged charged :math:`B`'s decaying semileptonically."
 

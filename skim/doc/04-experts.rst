@@ -94,7 +94,12 @@ Calling an instance of a skim class will run the particle list loaders, setup fu
 Running a skim
 ~~~~~~~~~~~~~~
 
-In the skim package, there is a command-line tool available for running skims, documented below. These take a skim name as a command line argument, and run the code defined in the corresponding subclass of `BaseSkim`.
+In the skim package, there are command-line tools available for running skims, documented below. These take a skim name as a command line argument, and run the code defined in the corresponding subclass of `BaseSkim`.
+
+.. _b2skim-run:
+
+``b2skim-run``: Run a skim
+..........................
 
 .. tip::
    This tool completely supplants the ``<SkimName>_Skim_Standalone.py`` steering files from
@@ -108,6 +113,21 @@ In the skim package, there is a command-line tool available for running skims, d
    :nodefaultconst:
    :nogroupsections:
 
+.. _b2skim-generate:
+
+``b2skim-generate``: Generate skim steering files
+.................................................
+
+.. tip::
+   If you just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. This tool
+   is for special cases where this does not suffice (such as running on the grid).
+
+.. argparse::
+   :filename: skim/tools/b2skim-generate
+   :func: get_argument_parser
+   :prog: b2skim-generate
+   :nodefaultconst:
+   :nogroupsections:
 
 Skim tutorial
 ~~~~~~~~~~~~~

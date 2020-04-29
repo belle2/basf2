@@ -704,7 +704,7 @@ ma.inputMdstList("default", [], path=path)
 skim = CombinedSkim(
 {''.join(SkimObjects)})
 skim(path)
-path.process()
+b2.process(path)
 """
 
     SteeringFileCode = BasicImports + SkimImports + MainProcessing

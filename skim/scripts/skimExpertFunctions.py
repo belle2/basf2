@@ -743,7 +743,7 @@ class CombinedSkim(BaseSkim):
         self.Skims = skims
         self.name = CombinedSkimName
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
-        self.TestFiles = list({skim.TestFiles for skim in skims})
+        self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
         for skim in skims:
             skim._validate_required_particle_lists()

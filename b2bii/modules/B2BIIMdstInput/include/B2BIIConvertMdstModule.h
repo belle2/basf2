@@ -104,11 +104,12 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIConvertMdstModule();
+    /** Destructor */
     virtual ~B2BIIConvertMdstModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
     //! Module functions to be called from event process

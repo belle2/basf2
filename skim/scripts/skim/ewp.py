@@ -12,8 +12,10 @@ __authors__ = [
     "Trevor Shillington"
 ]
 
+import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from variables import variables
 
 
 def B2XgammaList(path):
@@ -311,3 +313,58 @@ class BtoXll_LFV(BaseSkim):
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
         self.SkimLists = ['B+:lfv']
+
+
+class inclusiveBplusToKplusNuNu(BaseSkim):
+    __authors__ = ["Cyrille Praz"]
+    __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
+    __contact__ = "Cyrille Praz <cyrille.praz@desy.de>"
+    __category__ = "physics, electroweak penguins, radiative decays"
+
+    NoisyModules = ["ParticleCombiner"]
+
+    RequiredStandardLists = None
+
+    def build_lists(self, path):
+
+        # Default cleanup also used in and ma.buildEventShape
+        track_cleanup = 'pt > 0.1'
+        track_cleanup += ' and thetaInCDCAcceptance'
+        track_cleanup += ' and abs(dz) < 3.0'
+        track_cleanup += ' and dr < 0.5'
+
+        # Min 3 tracks and Max 10 tracks per event.
+        event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
+        event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
+
+        # Define the signal
+        total_cleanup = track_cleanup + ' and ' + event_cleanup + ' and ' + 'nPXDHits>0'
+        ma.fillParticleList('K+:inclusiveBplusToKplusNuNu', cut=total_cleanup, path=path)
+        ma.rankByHighest('K+:inclusiveBplusToKplusNuNu', 'pt', path=path)
+        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'extraInfo(pt_rank)==1', path=path)
+        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'kaonID>1e-2', path=path)
+        ma.reconstructDecay(decayString='B+:inclusiveBplusToKplusNuNu -> K+:inclusiveBplusToKplusNuNu', cut='', path=path)
+
+        # Build the event-based variables that we need
+        ma.buildEventShape(inputListNames=[],
+                           default_cleanup=True,
+                           allMoments=False,
+                           cleoCones=True,
+                           collisionAxis=False,
+                           foxWolfram=True,
+                           harmonicMoments=True,
+                           jets=False,
+                           sphericity=True,
+                           thrust=True,
+                           checkForDuplicates=False,
+                           path=path)
+
+        # Apply a MVA by reading from the DB
+        mva_identifier = 'MVAFastBDT_InclusiveBplusToKplusNuNu_Skim'
+        b2.conditions.append_globaltag('mva_inclusiveBplusToKplusNuNu')
+        path.add_module('MVAExpert', listNames=['B+:inclusiveBplusToKplusNuNu'],
+                        extraInfoName=mva_identifier, identifier=mva_identifier)
+        variables.addAlias(mva_identifier, 'extraInfo({})'.format(mva_identifier))
+        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier+'>0.5', path=path)
+
+        self.SkimLists = ['B+:inclusiveBplusToKplusNuNu']

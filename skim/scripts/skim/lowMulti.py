@@ -100,19 +100,76 @@ def LowMassTwoTrackList(path):
 
     # Tracks from IP
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
-    # Tracks points to the barrel ECL + 10 degrees
-    theta_cut = '[0.387 < theta < 2.421]'
-    single_track_cut = IP_cut + ' and ' + theta_cut
+    # Clusters of energy greater than 2 GeV in the CMS frame
+    E_cut = '[useCMSFrame(E) > 2]'
 
-    # Exactly 2 tracks
-    nTracks_cut = '[nCleanedTracks(' + single_track_cut + ') == 2]'
-    # Invariant mass of pi+pi- system less than 1.5 GeV
-    M_cut = 'M < 3.5'
-    two_track_cut = nTracks_cut + ' and ' + M_cut
+    # Number of cleaned tracks larger than 1 and less than 5
+    nTracks_cut = '[nCleanedTracks(' + IP_cut + ') > 1] and [nCleanedTracks(' + IP_cut + ') < 5]'
+    # Exactly 1 cleaned cluster
+    nClusters_cut_1ISR = '[nCleanedECLClusters(' + E_cut + ') == 1]'
+    # Exactly 2 cleaned clusters
+    nClusters_cut_2ISR = '[nCleanedECLClusters(' + E_cut + ') == 2]'
+
+    # Invariant mass of pi+pi- system less than 3.5 GeV
+    Mpipi_cut = 'daughterInvM(0,1) < 3.5'
+    # Invariant mass of pi+pi-ISR system larger than 5 GeV
+    M_cut = 'M > 5'
+    two_track_cut = Mpipi_cut + ' and ' + M_cut
 
     # Reconstruct the two track event candidate
-    ma.fillParticleList('pi+:' + skim_label, single_track_cut + ' and ' + nTracks_cut, path=path)
-    ma.reconstructDecay('vpho:' + skim_label + ' -> pi+:' + skim_label + ' pi-:' + skim_label, two_track_cut, path=path)
+    ma.fillParticleList(
+        'pi+:' +
+        skim_label,
+        IP_cut +
+        ' and ' +
+        nTracks_cut +
+        ' and [' +
+        nClusters_cut_1ISR +
+        ' or ' +
+        nClusters_cut_2ISR +
+        ']',
+        path=path)
+    ma.fillParticleList(
+        'gamma:' +
+        skim_label,
+        E_cut +
+        ' and ' +
+        nTracks_cut +
+        ' and [' +
+        nClusters_cut_1ISR +
+        ' or ' +
+        nClusters_cut_2ISR +
+        ']',
+        path=path)
+    ma.reconstructDecay(
+        'vpho:' +
+        skim_label +
+        '1ISR -> pi+:' +
+        skim_label +
+        ' pi-:' +
+        skim_label +
+        ' gamma:' +
+        skim_label,
+        nClusters_cut_1ISR +
+        ' and ' +
+        two_track_cut,
+        path=path)
+    ma.reconstructDecay(
+        'vpho:' +
+        skim_label +
+        '2ISR -> pi+:' +
+        skim_label +
+        ' pi-:' +
+        skim_label +
+        ' gamma:' +
+        skim_label +
+        ' gamma:' +
+        skim_label,
+        nClusters_cut_2ISR +
+        ' and ' +
+        two_track_cut,
+        path=path)
+    ma.copyLists('vpho:' + skim_label, ['vpho:' + skim_label + '1ISR', 'vpho:' + skim_label + '2ISR'], path=path)
 
     return ['vpho:' + skim_label]
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll                                             *
+ * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -34,10 +34,9 @@ TestTriggerTimeOffsetModule::TestTriggerTimeOffsetModule() : Module()
 {
   //Set module properties
   setDescription(
-    "Sets the event meta data information (exp, run, evt). You must use this "
-    "module to tell basf2 about the number of events you want to generate, "
-    "unless you have an input module that already does so. Note that all "
-    "experiment/run combinations specified must be unique."
+    "Simple module to test the trigger offset object used in simulation."
+    "First import object from datastore then ask value of trigger offset"
+    "for different sub detectors."
   );
 
   //Parameter definition
@@ -58,14 +57,14 @@ void TestTriggerTimeOffsetModule::initialize()
 
 void TestTriggerTimeOffsetModule::event()
 {
+  std::cout << "get revo9 " << m_timer->getTriggerBitWrtRevo9() << std::endl;
   std::cout << "get clock TOP " << m_timer->getClock(Const::EDetector::TOP, "sampling") << std::endl;
   std::cout << "get clock SVD " << m_timer->getClock(Const::EDetector::SVD, "sampling") << std::endl;
-  //  std::cout << "phase top " << m_timer->getPhase(Const::EDetector::SVD) << std::endl;
-  std::cout << "tiggr bit position TOP " << m_timer->getTriggerBit(Const::EDetector::TOP, "sampling") << " [ns] " << std::endl;
-  std::cout << "tiggr bit position SVD " << m_timer->getTriggerBit(Const::EDetector::SVD, "sampling") << " [ns] " << std::endl;
-  std::cout << "tiggr bit position ECL sampling " << m_timer->getTriggerBit(Const::EDetector::ECL,
+  std::cout << "tigger bit position TOP " << m_timer->getTriggerOffset(Const::EDetector::TOP, "sampling") << " [ns] " << std::endl;
+  std::cout << "tigger bit position SVD " << m_timer->getTriggerOffset(Const::EDetector::SVD, "sampling") << " [ns] " << std::endl;
+  std::cout << "tigger bit position ECL sampling " << m_timer->getTriggerOffset(Const::EDetector::ECL,
             "sampling") << " [ns] " << std::endl;
-  std::cout << "tiggr bit position ECL fitting " << m_timer->getTriggerBit(Const::EDetector::ECL, "fitting") << " [ns] " << std::endl;
-  //std::cout << "tiggr bit position CDC fitting " << m_timer->getTriggerBit(Const::EDetector::CDC,"sampling") << " [ns] " << std::endl;
+  std::cout << "tigger bit position ECL fitting " << m_timer->getTriggerOffset(Const::EDetector::ECL,
+            "fitting") << " [ns] " << std::endl;
 
 }

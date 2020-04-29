@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,9 +17,12 @@ using namespace Belle2;
 
 TriggerTimeOffset::TriggerTimeOffset()
 {
-  globalClock = 2.;//m_clock->getGlobalClock();
+  globalClock = m_clock->getGlobalClock();
+}
+
+void TriggerTimeOffset::update()
+{
   triggerBitPosWrtRevo9 = gRandom->Integer(revo9nbit);
-  phase = gRandom->Uniform(1);
 }
 
 Float_t TriggerTimeOffset::getClock(Const::EDetector detector, std::string label) //del
@@ -27,14 +30,9 @@ Float_t TriggerTimeOffset::getClock(Const::EDetector detector, std::string label
   return m_clock->getClock(detector, label);
 }
 
-//Float_t TriggerTimeOffset::getPhase(const Const::EDetector detector)
-//{
-// return phase;
-//}
-
-Float_t TriggerTimeOffset::getTriggerBit(Const::EDetector detector, std::string label)
+Float_t TriggerTimeOffset::getTriggerOffset(Const::EDetector detector, std::string label)
 {
-  return triggerBitPosWrtRevo9 % m_clock->getISub(detector, label);
+  return (triggerBitPosWrtRevo9 % m_clock->getISub(detector, label)) / (globalClock * 1e-3);
 }
 
 Int_t TriggerTimeOffset::getTriggerBitWrtRevo9()

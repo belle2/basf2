@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,10 +26,9 @@ namespace Belle2 {
     /** Constructor */
     TriggerTimeOffset();
 
-    // Float_t getPhase(Const::EDetector detector);
-
+    void    update();
     Float_t getClock(Const::EDetector detector, std::string label);
-    Float_t getTriggerBit(Const::EDetector detector, std::string label);
+    Float_t getTriggerOffset(Const::EDetector detector, std::string label);
     Int_t   getTriggerBitWrtRevo9();
 
   private:

@@ -22,19 +22,24 @@ inputMdst('default', '../LowMassTwoTrackPions.udst.root', path=LowMassTwoTrackPi
 
 variables.addAlias('pip_p_cms', 'daughter(0, useCMSFrame(p))')
 variables.addAlias('pim_p_cms', 'daughter(1, useCMSFrame(p))')
+variables.addAlias('gamma_E_cms', 'daughter(2, useCMSFrame(E))')
 variables.addAlias('pip_theta_lab', 'formula(daughter(0, theta)*180/3.1415927)')
 variables.addAlias('pim_theta_lab', 'formula(daughter(1, theta)*180/3.1415927)')
-variables.addAlias('Mpipi', 'M')
+variables.addAlias('gamma_theta_lab', 'formula(daughter(2, theta)*180/3.1415927)')
+variables.addAlias('Mpipi', 'daughterInvM(0,1)')
 
 variablesHist = [
                   ('pip_p_cms', 60, 0, 6),
                   ('pim_p_cms', 60, 0, 6),
+                  ('gamma_E_cms', 60, 0, 6),
                   ('pip_theta_lab', 90, 0, 180),
                   ('pim_theta_lab', 90, 0, 180),
-                  ('Mpipi', 80, 0., 2.)
+                  ('gamma_theta_lab', 90, 0, 180),
+                  ('Mpipi', 80, 0., 4.),
+                  ('M', 60, 6., 12.)
                 ]
 
-# Output the variables to a ntuple
+# Output the variables to histograms
 variablesToHistogram(
     'vpho:LowMassTwoTrack',
     variablesHist,

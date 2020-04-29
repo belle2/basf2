@@ -38,7 +38,8 @@ total_input_files = [
     ('MC13_ssbarBGx0', 384),
     ('MC13_ccbarBGx0', 1330),
     ('MC13_taupairBGx0', 920),
-
+    ('phigamma_neutral', 500),
+    ('phigamma_charged', 500),
 ]
 
 # Average number of events in test files
@@ -85,6 +86,11 @@ nEventsPerFile = {
 
 #: location of test files on kekcc
 kekcc_locations = [
+    # phi-gamma neutral and charged MC
+    ('phigamma_neutral', '/group/belle2/users/fnc/MC/phi_gamma_neutral_prod/' +
+     'phi_gamma_neutral_prod_mdst_?????.root'),
+    ('phigamma_charged', '/group/belle2/users/fnc/MC/phi_gamma_charged_prod/' +
+     'phi_gamma_charged_prod_mdst_?????.root'),
 
     # data
     ('proc10_exp7', '/group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0007/4S/GoodRuns/r03491/all/' +

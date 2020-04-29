@@ -510,3 +510,53 @@ def XiList(path):
         XiList.append('Xi-:syst' + str(chID))
 
     return XiList
+
+
+def PhiGammaLooseList(path):
+    """
+    Note:
+        * **Skim description**: Skim for ISR - phi gamma analyses,
+        :math:`e^+ e^- \\to \\phi \\gamma ` and
+        :math:`\\phi` decays into two charged tracks
+        (:math: `K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)
+        * **Skim LFN code**: 11640100
+        * **Working Group**: Systematics (KL)
+
+    Build loose phi gamma list, and supply the list (PhiGammaLooseList).
+    Uses the gamma:loose and a cut on the number of tracks so
+    these must be added to the path first.
+
+    Example usage:
+
+    >>> charged.stdPi('all', path=phigamma_path)
+    >>> charged.stdK('all',  path=phigamma_path)
+    >>> stdPhotons('loose',  path=phigamma_path)
+    >>> from skim.skim_phigamma import PhiGammaLooseList
+    >>> phigamma_list=PhiGammaLooseList(phigamma_path)
+
+    ['gamma:phi']
+
+
+    Cuts applied
+        * :math:`E_{\\gamma}> 3\\,\\text{GeV}` AND
+        * :math:`E_{\\gamma}< 8\\,\\text{GeV}`
+        * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 4`
+
+    Parameters:
+        path (`basf2.Path`): the path to add the skim list builders.
+
+    Returns:
+        ``PhiGammaLooseList``, a Python list containing the string
+        :code:`'gamma:phi'`
+    """
+    __authors__ = [
+        "Giuseppe Finocchiaro", "Benjamin Oberhof"
+    ]
+
+    import modularAnalysis as ma
+
+    ma.cutAndCopyList('gamma:highE', 'gamma:loose', '3. < E < 8.', writeOut=True, path=path)
+    ma.copyList('gamma:phi', 'gamma:highE', writeOut=True, path=path)
+    ma.applyCuts('gamma:phi', '[nTracks>=2] and [nTracks<=4]', path=path)
+    PhiGammaLooseList = ['gamma:phi']
+    return PhiGammaLooseList

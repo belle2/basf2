@@ -27,11 +27,10 @@ import numpy as np
 from numpy.linalg import inv, pinv
 from numpy.linalg import det, norm, cond
 
-svd_recoDigits = "SVDRecoDigitsFromTracks"
 cdc_Time0 = "EventT0"
 svd_Clusters = "SVDClustersFromTracks"
 svd_EventInfo = "SVDEventInfo"
-svd_EventMD = "EventMetaData"
+# svd_EventMD = "EventMetaData"
 
 gROOT.SetBatch(True)
 
@@ -70,12 +69,9 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
 
         hasTimezero = self.cdcEventT0.hasEventT0()
         if hasTimezero:
-            # TBClusters = svdRecoDigitsFromTracks.getModeByte().getTriggerBin()
-            # TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             # tZero_err = 5.1
-            # tZeroSync = tZero - 4000./509. * (3 - TBIndex)
             tZeroSync = tZero - 4000.0/509.0 * (3 - self.TB)
 
             # filling histograms
@@ -298,8 +294,6 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
         # self.expnumber = svd_evtMD.getExperiment()
 
         for svdCluster in svdCluster_list:
-            # svdRecoDigit = svdCluster.getRelatedTo(svd_recoDigits)
-            # self.fillLists(svdRecoDigit, svdCluster)
             self.fillLists(svdCluster)
 
     def terminate(self):

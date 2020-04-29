@@ -43,7 +43,6 @@ localdb = sys.argv[1]
 filename = sys.argv[2]
 run = sys.argv[3]
 exp = sys.argv[4]
-# branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0', 'SVDEventInfo']
 branches = ['RawSVDs', 'SVDShaperDigitsFromTracks', 'EventT0']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
@@ -66,11 +65,6 @@ conditions.globaltags = [
     "data_reprocessing_proc11_baseline",
     "online_proc11"]
 
-# conditions.globaltags = [
-#     'svd_NOCoGCorrections',
-#     'klm_alignment_testing'
-# ]
-
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",
 ]
@@ -79,24 +73,12 @@ main = create_path()
 
 rootinput = register_module('RootInput')
 rootinput.param('inputFileNames', inputFileList)
-# rootinput.param('branchNames', branches)
+rootinput.param('branchNames', branches)
 main.add_module(rootinput)
 
 main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
-# Track selection - NOT APPLIED
-'''
-trkFlt = register_module('TrackFilter')
-trkFlt.param('outputFileName', trk_outputFile)
-trkFlt.param('outputINArrayName', 'SelectedTracks')
-trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
-trkFlt.param('min_NumHitSVD', nSVD)
-trkFlt.param('min_NumHitCDC', nCDC)
-trkFlt.param('min_Pvalue', pVal)
-trkFlt.logging.log_level = LogLevel.DEBUG
-main.add_module(trkFlt)
-'''
 # unpack raw data to get SVDEventInfo
 add_unpackers(main, components=['SVD'])
 

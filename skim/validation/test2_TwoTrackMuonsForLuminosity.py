@@ -53,7 +53,7 @@ variablesHist1 = [
                    ('mu_gamma_delta_theta_cms', 100, 0, 2)
                  ]
 
-# Output the variables to a ntuple
+# Output the variables to histograms
 variablesToHistogram(
     'vpho:TwoTrackLeptonsForLuminosity2',
     variablesHist2,

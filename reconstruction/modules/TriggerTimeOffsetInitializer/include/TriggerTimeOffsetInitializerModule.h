@@ -17,11 +17,10 @@
 
 namespace Belle2 {
   /**
-   * Module to set the phases between the clocks of the different sub-detectors
+   * Module to set the offset between the trigger signal and the clocks of the different sub-detectors
    *
-   * This module generates a random phase that is than saved in datastore.
+   * This module generates a random offset that is than saved in datastore.
    *
-   * @sa EventMetaData
    */
   class TriggerTimeOffsetInitializerModule : public Module {
 
@@ -39,22 +38,17 @@ namespace Belle2 {
 
     /** Initializes the Module.
      *
-     * Does a check of the parameters and gives an error of the parameters
-     * were not correctly set by the user.
      */
     virtual void initialize() override;
 
 
-    /** Stores the phases into the DataStore.
+    /** Stores the offset into the DataStore.
      *
-     * Based on the random numbers and ec...
      *
      */
     virtual void event() override;
 
-
   protected:
-
 
   private:
 

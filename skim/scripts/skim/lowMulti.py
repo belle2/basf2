@@ -119,57 +119,24 @@ def LowMassTwoTrackList(path):
 
     # Reconstruct the two track event candidate
     ma.fillParticleList(
-        'pi+:' +
-        skim_label,
-        IP_cut +
-        ' and ' +
-        nTracks_cut +
-        ' and [' +
-        nClusters_cut_1ISR +
-        ' or ' +
-        nClusters_cut_2ISR +
-        ']',
+        'pi+:' + skim_label,
+        IP_cut + ' and ' + nTracks_cut + ' and [' + nClusters_cut_1ISR + ' or ' + nClusters_cut_2ISR + ']',
         path=path)
     ma.fillParticleList(
-        'gamma:' +
-        skim_label,
-        E_cut +
-        ' and ' +
-        nTracks_cut +
-        ' and [' +
-        nClusters_cut_1ISR +
-        ' or ' +
-        nClusters_cut_2ISR +
-        ']',
+        'gamma:' + skim_label,
+        E_cut + ' and ' + nTracks_cut + ' and [' + nClusters_cut_1ISR + ' or ' + nClusters_cut_2ISR + ']',
         path=path)
     ma.reconstructDecay(
-        'vpho:' +
-        skim_label +
-        '1ISR -> pi+:' +
-        skim_label +
-        ' pi-:' +
-        skim_label +
-        ' gamma:' +
-        skim_label,
-        nClusters_cut_1ISR +
-        ' and ' +
-        two_track_cut,
+        'vpho:' + skim_label + '1ISR -> pi+:' + skim_label + ' pi-:' + skim_label + ' gamma:' + skim_label,
+        nClusters_cut_1ISR + ' and ' + two_track_cut,
         path=path)
     ma.reconstructDecay(
-        'vpho:' +
-        skim_label +
-        '2ISR -> pi+:' +
-        skim_label +
-        ' pi-:' +
-        skim_label +
-        ' gamma:' +
-        skim_label +
-        ' gamma:' +
-        skim_label,
-        nClusters_cut_2ISR +
-        ' and ' +
-        two_track_cut,
+        'vpho:' + skim_label + '2ISR -> pi+:' + skim_label + ' pi-:' + skim_label + ' gamma:' + skim_label + ' gamma:' + skim_label,
+        nClusters_cut_2ISR + ' and ' + two_track_cut,
         path=path)
-    ma.copyLists('vpho:' + skim_label, ['vpho:' + skim_label + '1ISR', 'vpho:' + skim_label + '2ISR'], path=path)
+    ma.copyLists(
+        'vpho:' + skim_label,
+        ['vpho:' + skim_label + '1ISR', 'vpho:' + skim_label + '2ISR'],
+        path=path)
 
     return ['vpho:' + skim_label]

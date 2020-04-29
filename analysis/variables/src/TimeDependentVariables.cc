@@ -1094,9 +1094,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
                       R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
     REGISTER_VARIABLE("DeltaTRes", particleDeltaTRes,
-                      R"DOC(:math:`\Delta t residual in ps, to be used for resolution function studies)DOC");
+                      R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
-                      R"DOC([Legacy] :math:`\Delta t in ps, as it was used in Belle)DOC");
+                      R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,

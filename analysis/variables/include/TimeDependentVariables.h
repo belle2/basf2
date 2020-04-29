@@ -149,6 +149,7 @@ namespace Belle2 {
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaTErr(const Particle* particle);
+
     /**
      * return Delta T - MCDeltaT in ps
      *

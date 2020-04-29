@@ -26,6 +26,8 @@ RegisteredSkims = [
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),
     ("11180400", "fei", "feiSLBplus"),
+    ("11180500", "fei", "feiHadronic"),
+    ("11180600", "fei", "feiSL"),
 
     # --- WG2: Electroweak penguins ---
     ("12160100", "ewp", "BtoXgamma"),

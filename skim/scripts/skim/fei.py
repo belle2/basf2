@@ -1130,7 +1130,7 @@ class BaseFEISkim(BaseSkim):
         self.run_fei_for_skims(self.FEIChannelArgs, self.FEIPrefix, path=path)
 
 
-def _FEI_skim_header(ParticleName):
+def _FEI_skim_header(ParticleNames):
     """Decorator factory for applying the `fancy_skim_header` header and replacing
     <CHANNELS> in the class docstring with a list of FEI channels.
 
@@ -1144,22 +1144,32 @@ def _FEI_skim_header(ParticleName):
             # docstring here including the string '<CHANNELS>' somewhere
 
     Parameters:
-        ParticleName (str): One of either ``B0`` or ``B+``.
+        ParticleNames (str, list(str)): One of either ``B0`` or ``B+``, or a list of both.
     """
 
     def decorator(SkimClass):
-        channels = _get_fei_channel_names(ParticleName, **SkimClass.FEIChannelArgs)
-        FormattedChannels = [_sphinxify_decay(channel) for channel in channels]
-        ChannelList = "\n".join(
-            [f"    {dmID}. {channel}"
-             for (dmID, channel) in enumerate(FormattedChannels)]
-        )
-        ChannelList = "List of reconstructed channels and corresponding decay mode IDs:\n\n" + ChannelList
+        if isinstance(ParticleNames, str):
+            particles = [ParticleNames]
+        else:
+            particles = ParticleNames
+
+        ChannelsString = "List of reconstructed channels and corresponding decay mode IDs:"
+        for particle in particles:
+            channels = _get_fei_channel_names(particle, **SkimClass.FEIChannelArgs)
+            FormattedChannels = [_sphinxify_decay(channel) for channel in channels]
+            ChannelList = "\n".join(
+                [f"    {dmID}. {channel}"
+                 for (dmID, channel) in enumerate(FormattedChannels)]
+            )
+            if len(particles) == 1:
+                ChannelsString += "\n\n" + ChannelList
+            else:
+                ChannelsString += f"\n\n    ``{particle}`` channels:\n\n" + ChannelList
 
         if SkimClass.__doc__ is None:
             return SkimClass
         else:
-            SkimClass.__doc__ = SkimClass.__doc__.replace("<CHANNELS>", ChannelList)
+            SkimClass.__doc__ = SkimClass.__doc__.replace("<CHANNELS>", ChannelsString)
 
         return fancy_skim_header(SkimClass)
 
@@ -1498,3 +1508,90 @@ class feiSLBplus(BaseFEISkim):
             variables_2d=variables_2d,
             path=path
         )
+
+
+@_FEI_skim_header(["B0", "B+"])
+class feiHadronic(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`M_{\\text{bc}} > 5.24~{\\rm GeV}`
+    * :math:`|\\Delta E| < 0.2~{\\rm GeV}`
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
+      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+
+    All available FEI :math:`B^0` and :math:`B^+` hadronic tags are reconstructed. From
+    `Thomas Keck's thesis
+    <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_, "the
+    channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not yet
+    used in the FEI due to unexpected technical restrictions in the KFitter algorithm".
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+    __description__ = "FEI-tagged neutral and charged :math:`B`'s decaying hadronically."
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": True,
+        "hadronic": True,
+        "semileptonic": False,
+        "KLong": False,
+        "baryonic": True
+    }
+
+    def build_lists(self, path):
+        HadronicBLists = ["B0:generic", "B+:generic"]
+
+        for BList in HadronicBLists:
+            ma.applyCuts(BList, "Mbc>5.24", path=path)
+            ma.applyCuts(BList, "abs(deltaE)<0.200", path=path)
+
+        ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
+        ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
+
+        self.SkimLists = HadronicBLists
+
+
+@_FEI_skim_header(["B0", "B+"])
+class feiSL(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`-4 < \\cos\\theta_{BY} < 3`
+    * :math:`\\log_{10}(\\text{signal probability}) > -2.4`
+    * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
+
+    SL :math:`B^0` and :math:`B^+` tags are reconstructed. Hadronic :math:`B` with SL
+    :math:`D` are not reconstructed, as these are rare and time-intensive.
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+    __description__ = "FEI-tagged neutral and charged :math:`B`'s decaying semileptonically."
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": True,
+        "hadronic": False,
+        "semileptonic": True,
+        "KLong": False,
+        "baryonic": True,
+        "removeSLD": True
+    }
+
+    def build_lists(self, path):
+        SLBLists = ["B0:semileptonic", "B+:semileptonic"]
+        Bcuts = ["log10_sigProb>-2.4", "-4.0<cosThetaBY<3.0", "p_lepton_CMSframe>1.0"]
+
+        for BList in SLBLists:
+            for cut in Bcuts:
+                ma.applyCuts(BList, cut, path=path)
+
+        self.SkimLists = SLBLists

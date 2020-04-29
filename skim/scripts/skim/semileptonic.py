@@ -333,12 +333,14 @@ class PRsemileptonicUntagged(BaseSkim):
 class SLUntagged(BaseSkim):
     """
     Cuts applied:
+
     * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
     * :math:`5.24 < M_{\\text{bc}} < 5.29`
     * :math:`|\\Delta E | < 0.5`
     * :math:`n_{\\text{tracks}} > 4`
 
     Reconstructed decays:
+
     * :math:`B^+ \\to \\overline{D}^{0} e^+`
     * :math:`B^+ \\to \\overline{D}^{0} \\mu^+`
     * :math:`B^+ \\to \\overline{D}^{*0} e^+`

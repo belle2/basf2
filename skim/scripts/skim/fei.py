@@ -1527,14 +1527,16 @@ class feiHadronic(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        HadronicBLists = ["B0:generic", "B+:generic"]
+        ma.copyList("B0:feiHadronic", "B0:generic", path=path)
+        ma.copyList("B+:feiHadronic", "B+:generic", path=path)
+        HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
 
         for BList in HadronicBLists:
             ma.applyCuts(BList, "Mbc>5.24", path=path)
             ma.applyCuts(BList, "abs(deltaE)<0.200", path=path)
 
-        ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-        ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
+        ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
+        ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
 
         self.SkimLists = HadronicBLists
 
@@ -1570,7 +1572,10 @@ class feiSL(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        SLBLists = ["B0:semileptonic", "B+:semileptonic"]
+        ma.copyList("B0:feiSL", "B0:semileptonic", path=path)
+        ma.copyList("B+:feiSL", "B+:semileptonic", path=path)
+        SLBLists = ["B0:feiSL", "B+:feiSL"]
+
         Bcuts = ["log10_sigProb>-2.4", "-4.0<cosThetaBY<3.0", "p_lepton_CMSframe>1.0"]
 
         for BList in SLBLists:

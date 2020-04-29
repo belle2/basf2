@@ -1,6 +1,6 @@
 /**************************************************************************
 * BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2016 - Belle II Collaboration                             *
+* Copyright(C) 2020 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Gian Luca Pinna Angioni                                  *
@@ -33,29 +33,50 @@
 
 
 // DB objects
-#include <framework/dbobjects/Clocks.h> //del
+#include <framework/dbobjects/Clocks.h>
 
 
 using namespace std;
 
 namespace Belle2 {
 
+  ClockDatabaseImporter::ClockDatabaseImporter()
+  {
+    clockbase.construct();
+  }
 
   void ClockDatabaseImporter::importClock(int firstExp, int firstRun,
                                           int lastExp, int lastRun)
   {
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
-    DBImportObjPtr<Clocks> clockbase;
-    clockbase.construct();
-
-    clockbase->setGlobalClock(127.222); // MHz
-    clockbase->setClock(Const::EDetector::TOP, "sampling", 6);
-    clockbase->setClock(Const::EDetector::SVD, "sampling", 4);
-    clockbase->setClock(Const::EDetector::ECL, "sampling", 3 * 24);
-    clockbase->setClock(Const::EDetector::ECL, "fitting", 3);
-
     clockbase.import(iov);
-    B2INFO("Dummy clock importer");
+    B2INFO("Clock importer");
     return;
+  }
+
+
+  Const::EDetector  ClockDatabaseImporter::parseDetectors(const std::string val)
+  {
+    Const::EDetector result;
+
+    if (val == "svd")        result = Const::SVD;
+    else if (val == "cdc")   result = Const::CDC;
+    else if (val == "top")   result = Const::TOP;
+    else if (val == "arich") result = Const::ARICH;
+    else if (val == "ecl")   result = Const::ECL;
+    else if (val == "klm")   result = Const::KLM;
+    else B2ERROR("Unknown detector component: " << val);
+
+    return result;
+  }
+
+  void ClockDatabaseImporter::setGlobalClock(Float_t val)
+  {
+    clockbase->setGlobalClock(val); // MHz
+  }
+
+  void ClockDatabaseImporter::setClock(string detector, string type, Int_t val)
+  {
+    clockbase->setClock(parseDetectors(detector), type, val);
   }
 }

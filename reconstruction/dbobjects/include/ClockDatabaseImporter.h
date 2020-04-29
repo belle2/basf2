@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2016 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Umberto Tamponi                            *
+ * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +13,11 @@
 #include <Python.h>
 #include <string>
 #include <vector>
+#include <framework/gearbox/Const.h>
+
+#include <framework/dbobjects/Clocks.h>
+#include <framework/database/DBImportObjPtr.h>
+
 
 namespace Belle2 {
 
@@ -28,8 +33,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ClockDatabaseImporter()
-    {}
+    ClockDatabaseImporter();
 
 
     /**
@@ -48,9 +52,16 @@ namespace Belle2 {
     void importClock(int firstExp = 0, int firstRun = 0,
                      int lastExp = -1, int lastRun = -1);
 
-  private:
 
-    // ClassDef(ClockDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
+    Const::EDetector parseDetectors(const std::string val);
+
+    void setClock(std::string detector, std::string type, Int_t val);
+
+    void setGlobalClock(Float_t val);
+
+  private:
+    DBImportObjPtr<Clocks> clockbase;
+    ClassDef(ClockDatabaseImporter, 1);  /**< ClassDef - why this is needed? */
   };
 
 } // Belle2 namespace

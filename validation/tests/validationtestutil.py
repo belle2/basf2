@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def check_excecute(cmd, terminate_on_error=True):
+def check_execute(cmd, terminate_on_error=True):
     """
     Executes a shell commands and check for =! 0 return codes
     """

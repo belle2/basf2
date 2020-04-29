@@ -16,6 +16,7 @@ import sys
 import time
 import shutil
 import datetime
+from typing import List
 
 import json_objects
 import mail_log
@@ -323,7 +324,7 @@ def event_timing_plot(
     save_dir.cd()
 
 
-def draw_progress_bar(delete_lines, scripts, barlength=50):
+def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
     """
     This function plots a progress bar of the validation, i.e. it shows which
     percentage of the scripts has been executed yet.
@@ -1289,26 +1290,21 @@ class Validation:
         @return: None
         """
 
-        # Go to the html directory and create a link to the results folder
-        # if it is not yet existing
-        save_dir = os.getcwd()
-        if not os.path.exists(validationpath.folder_name_html):
-            os.mkdir(validationpath.folder_name_html)
+        html_folder = validationpath.get_html_folder(self.work_folder)
+        results_folder = validationpath.get_results_folder(
+                self.work_folder
+        )
 
-        if not os.path.exists(validationpath.folder_name_results):
+        os.makedirs(html_folder, exist_ok=True)
+
+        if not os.path.exists(results_folder):
             self.log.error(
-                f"Folder {validationpath.folder_name_results} not found in "
-                f"the current directory {save_dir}, please run "
-                f"validate_basf2 first"
+                f"Folder {results_folder} not found in "
+                f"the work directory {self.work_folder}, please run "
+                f"b2validation first"
             )
 
-        os.chdir(validationpath.folder_name_html)
-
-        # import and run plot function
         validationplots.create_plots(force=True, work_folder=self.work_folder)
-
-        # restore original working directory
-        os.chdir(save_dir)
 
 
 def execute(tag=None, is_test=None):

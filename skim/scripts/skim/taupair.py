@@ -35,7 +35,7 @@ def SetTauGenericSkimVariables(path):
     __author__ = "Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    trackCuts = '-3.0 < dz < 3.0 and dr < 1.0'
     # trackCuts = 'pt > 0.1 and abs(d0) < 1 and abs(z0) < 5'
     # trackCuts += ' and -0.8660 < cosTheta < 0.9563'
     gammaCuts = 'E > 0.15'
@@ -167,7 +167,7 @@ def TauLFVList(flag=1, path=None):
     __author__ = "K. Inami"
 
     # particle selection
-    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    trackCuts = '-3.0 < dz < 3.0 and dr < 1.0'
     ma.cutAndCopyList('e+:taulfv', 'e+:all', trackCuts, path=path)
     ma.cutAndCopyList('mu+:taulfv', 'mu+:all', trackCuts, path=path)
     ma.cutAndCopyList('pi+:taulfv', 'pi+:all', trackCuts, path=path)
@@ -332,7 +332,7 @@ def SetTauThrustSkimVariables(path):
     __author__ = "Ami Rostomyan, Kenji Inami"
 
     # Track and gamma cuts
-    trackCuts = '-3.0 < dz < 7.0 and dr < 1.0'
+    trackCuts = '-3.0 < dz < 3.0 and dr < 1.0'
     ma.cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
     gammaForPi0Cuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
     ma.cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)

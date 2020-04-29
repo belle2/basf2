@@ -60,10 +60,10 @@ namespace Belle2 {
 
     // Methods:
     /**
-     * Get the ParticleType of the input particle list
-     * @returns ParticleType, which is used in RestOfEvent methods
+     * Get the ParticleSourceObject of the input particle list
+     * @returns ParticleSource, which is used in RestOfEvent methods
      */
-    Particle::EParticleType getListType();
+    Particle::EParticleSourceObject getListType();
     /**
      * Update ROE masks by excluding or keeping particles
      * @param Pointer to RestOfEvent object for update
@@ -71,7 +71,7 @@ namespace Belle2 {
      * @param ParticleType of the collection
      */
     void updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate,
-                                  Particle::EParticleType listType);
+                                  Particle::EParticleSourceObject listType);
     /**
      * Update ROE masks with provided composite particle collection
      * @param Pointer to RestOfEvent object for update

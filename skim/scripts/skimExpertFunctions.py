@@ -134,7 +134,7 @@ def ifEventPasses(cut, conditional_path, path):
         path (basf2.Path): modules are added to this path
     """
     eselect = path.add_module("VariableToReturnValue", variable=f"passesEventCut({cut})")
-    eselect.if_value('=0', conditional_path, b2.AfterConditionPath.CONTINUE)
+    eselect.if_value('=1', conditional_path, b2.AfterConditionPath.CONTINUE)
 
 
 def get_eventN(fileName):

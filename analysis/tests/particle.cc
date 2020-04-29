@@ -58,7 +58,7 @@ namespace {
       Particle p;
       EXPECT_EQ(0, p.getPDGCode());
       EXPECT_TRUE(TLorentzVector(0, 0, 0, 0) == p.get4Vector());
-      EXPECT_EQ(Particle::c_Undefined, p.getParticleType());
+      EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
       TLorentzVector momentum(1, 2, 3, 4);
@@ -69,7 +69,7 @@ namespace {
       EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
       EXPECT_FLOAT_EQ(momentum.Energy(), p.getEnergy());
       EXPECT_FLOAT_EQ(momentum.M(), p.getMass());
-      EXPECT_EQ(Particle::c_Undefined, p.getParticleType());
+      EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
       TLorentzVector momentum(1, 2, 3, 4);
@@ -79,7 +79,7 @@ namespace {
       EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
       EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_EQ(Particle::c_MCParticle, p.getParticleType());
+      EXPECT_EQ(Particle::c_MCParticle, p.getParticleSource());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
     }
     {
@@ -94,7 +94,7 @@ namespace {
       Particle p(cluster);
       EXPECT_EQ(22, p.getPDGCode());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_EQ(Particle::c_ECLCluster, p.getParticleType());
+      EXPECT_EQ(Particle::c_ECLCluster, p.getParticleSource());
       EXPECT_FLOAT_EQ(1337, p.getEnergy());
       EXPECT_EQ(cluster, p.getECLCluster());
       EXPECT_EQ(nullptr, p.getTrack());
@@ -102,14 +102,14 @@ namespace {
     {
       // test constructor used for V0s (there is not actually a V0 constructor,
       // the heavy-lifting is done in the particle loader), but this is V0-style
-      // construction with EParticleType::V0 and the correct getters
+      // construction with EParticleSourceObject::V0 and the correct getters
       StoreArray<V0> v0s;
       V0* v0 = v0s.appendNew(V0());
       TLorentzVector momentum(1, 2, 3, 4);
       Particle p(momentum, 310, Particle::c_Unflavored, Particle::c_V0, 0);
       EXPECT_EQ(310, p.getPDGCode());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_EQ(Particle::c_V0, p.getParticleType());
+      EXPECT_EQ(Particle::c_V0, p.getParticleSource());
       EXPECT_EQ(0u, p.getMdstArrayIndex());
       EXPECT_EQ(p.getV0(), v0); // pointers should be same
     }
@@ -134,7 +134,7 @@ namespace {
     EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
     EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
     EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-    EXPECT_EQ(Particle::c_Composite, p.getParticleType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
     EXPECT_EQ(0u, p.getMdstArrayIndex());
     EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
@@ -174,7 +174,7 @@ namespace {
     EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
     EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
     EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-    EXPECT_EQ(Particle::c_Composite, p.getParticleType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
     EXPECT_EQ(0u, p.getMdstArrayIndex());
     EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
@@ -666,7 +666,7 @@ namespace {
       Particle p(cluster, Const::Klong);
       EXPECT_EQ(130, p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
-      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.497614 * 0.497614), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
       EXPECT_FLOAT_EQ(0.497614, p.getMass());
     }
@@ -680,7 +680,7 @@ namespace {
       Particle p(cluster, Const::neutron);
       EXPECT_EQ(2112, p.getPDGCode());
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
-      EXPECT_FLOAT_EQ(2., p.getEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.93956536 * 0.93956536), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
       EXPECT_FLOAT_EQ(0.93956536, p.getMass());
     }

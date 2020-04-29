@@ -90,10 +90,10 @@ namespace Belle2 {
      */
     void setSigmaParams(const SigmaID sigmaID, const std::vector<float>& params)
     {
-      unsigned short nSigmaParams = params.size();
+      unsigned short nSigmaPars = params.size();
 
-      if (nSigmaParams <= c_maxNSigmaParams) {
-        m_nSigmaParams = nSigmaParams;
+      if (nSigmaPars <= c_maxNSigmaParams) {
+        m_nSigmaParams = nSigmaPars;
         m_sigmas.insert(std::pair<SigmaID, std::vector<float>>(sigmaID, params));
         //  std::cout <<"sigmaID in setSigmaParams= " << sigmaID << std::endl;
       } else {

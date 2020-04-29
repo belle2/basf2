@@ -76,6 +76,20 @@ void PXDTrackClusterDQMModule::defineHisto()
     }
   }
 
+  m_trackedClusters = new TH1F("PXD_Tracked_Clusters", "PXD_Tracked_Clusters", 64, 0, 64);
+
+  for (auto i = 0; i < 64; i++) {
+    auto layer = (((i >> 5) & 0x1) + 1);
+    auto ladder = ((i >> 1) & 0xF);
+    auto sensor = ((i & 0x1) + 1);
+
+    auto id = Belle2::VxdID(layer, ladder, sensor);
+    // Check if sensor exist
+    if (Belle2::VXD::GeoCache::getInstance().validSensorID(id)) {
+      m_vxd_to_dhe[id] = i;
+    }
+  }
+
   oldDir->cd();
 
 }
@@ -84,11 +98,13 @@ void PXDTrackClusterDQMModule::beginRun()
 {
   for (auto& it : m_trackClusterCharge) if (it.second) it.second->Reset();
   for (auto& it : m_trackClusterChargeUC) if (it.second) it.second->Reset();
+  if (m_trackedClusters) m_trackedClusters->Reset();
 }
 
 
 void PXDTrackClusterDQMModule::event()
 {
+  if (m_trackedClusters) m_trackedClusters->Fill(-1); // Underflow as event counter
   for (const Track& track : m_tracks) {
     /// loop over tracks, this means that all clusters attached are already
     /// used in the fit with reasonable prob and other cuts. Thus no add
@@ -101,6 +117,7 @@ void PXDTrackClusterDQMModule::event()
     double correction = 1.0;
     if (tfr) correction = sin(tfr->getMomentum().Theta());
     for (auto& cluster : pxdClustersTrack) {
+      m_trackedClusters->Fill(m_vxd_to_dhe[cluster.getSensorID()]);
       if (m_trackClusterChargeUC[cluster.getSensorID()]) m_trackClusterChargeUC[cluster.getSensorID()]->Fill(cluster.getCharge());
       if (tfr && m_trackClusterCharge[cluster.getSensorID()]) m_trackClusterCharge[cluster.getSensorID()]->Fill(
           cluster.getCharge()*correction);

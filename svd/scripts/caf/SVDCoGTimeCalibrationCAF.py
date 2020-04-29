@@ -103,6 +103,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("timeAlgorithm", 0)
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 

@@ -564,7 +564,7 @@ void PXDDigitizerModule::saveDigits()
       charge = charge - round(pedestal);
 
       // Zero Suppression in DHP
-      if (charge < m_chargeThreshold)
+      if (charge <= m_chargeThreshold)
         continue;
 
       // Check if the readout digits is coming from a gated row

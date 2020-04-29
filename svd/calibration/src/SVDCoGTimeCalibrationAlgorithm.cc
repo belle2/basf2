@@ -50,7 +50,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   TF1* pol5 = new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100);
   pol5->SetParameters(-50, 1.5, 0.01, 0.0001, 0.00001, 0.000001);
 
-  TFile* f = new TFile("algorithm_output.root", "RECREATE");
+  TFile* f = new TFile("algorithm_6SampleCoG_output.root", "RECREATE");
 
   for (int layer = 0; layer < 4; layer++) {
     int layer_num = layer + 3;
@@ -86,15 +86,17 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
           pfx->SetErrorOption("S");
-          // pfx->Fit("pol3", "RQ");
-          // double par[4];
-          // pol3->GetParameters(par);
-          pfx->Fit("pol1", "RQ");
-          // pfx->Fit("pol1", "Q");
+          pfx->Fit("pol3", "RQ");
           double par[4];
-          pol1->GetParameters(par);
-          par[2] = 0;
-          par[3] = 0;
+          pol3->GetParameters(par);
+          // pfx->Fit("pol1", "RQ");
+          // pfx->Fit("pol1", "Q");
+          // double par[4];
+          // pol1->GetParameters(par);
+          // par[2] = 0;
+          // par[3] = 0;
+          // double meanT0 = hEventT0->GetMean();
+          // double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
           // timeCal->set_current(2);
           timeCal->set_pol3parameters(par[0], par[1], par[2], par[3]);
@@ -135,6 +137,7 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
     m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
+
     return true;
   } else if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
     B2INFO("Histogram mean has shifted from " << m_previousRawCoGTimeMeanL3V.value()

@@ -23,6 +23,7 @@ import sys
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd import *
+from rawdata import *
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
 from basf2 import conditions
 import rawdata as raw
@@ -43,6 +44,7 @@ filename = sys.argv[2]
 run = sys.argv[3]
 exp = sys.argv[4]
 # branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0', 'SVDEventInfo']
+branches = ['RawSVDs', 'SVDShaperDigitsFromTracks', 'EventT0']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
 nSVD = 6
@@ -95,8 +97,8 @@ trkFlt.param('min_Pvalue', pVal)
 trkFlt.logging.log_level = LogLevel.DEBUG
 main.add_module(trkFlt)
 '''
-# unpack SVD data
-raw.add_unpackers(main, components=['SVD'])
+# unpack raw data to get SVDEventInfo
+add_unpackers(main, components=['SVD'])
 
 # re-reconstruct SVDShaperDigitsFromTracks using the localDB
 add_svd_reconstruction(main)
@@ -108,6 +110,7 @@ for moda in main.modules():
     if moda.name() == 'SVDSimpleClusterizer':
         moda.param("Clusters", 'SVDClustersFromTracks')
         moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+        moda.param("timeAlgorithm", 0)
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("SVDClusters", 'SVDClustersFromTracks')
 

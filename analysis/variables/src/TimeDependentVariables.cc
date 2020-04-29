@@ -1215,7 +1215,7 @@ namespace Belle2 {
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
 
     REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus,
-                      "Returns the status of the fit performed with rolled back tracks.")
+                      "Returns the status of the fit performed with rolled back tracks. Possible values are: 0: fit performed with measured parameters, 1: fit performed with rolled back tracks, 2: unable to recover truth parameters")
 
     REGISTER_VARIABLE("TagTrackMax(var)", tagTrackMax,
                       "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMax(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")

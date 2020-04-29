@@ -484,6 +484,7 @@ namespace Belle2 {
      *
      */
     int rollbackStatus(const Particle* part);
+
     //**********************************
     //Meta variables
     //**********************************

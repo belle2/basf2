@@ -288,6 +288,16 @@ def get_argument_parser(modes: Optional[List[str]] = None) \
              "display the validation results in the system's default browser.",
         action='store_true'
     )
+    parser.add_argument(
+        "--max-run-time",
+        help="By default, running scripts (that is, steering files executed by"
+             "the validation framework) are terminated after a "
+             "certain time. Use this flag to change this setting by supplying "
+             "the maximal run time in minutes. Value <=0 disables the run "
+             "time upper limit entirely.",
+        type=int,
+        default=None,
+    )
 
     return parser
 

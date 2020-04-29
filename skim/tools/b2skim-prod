@@ -693,7 +693,7 @@ from skimExpertFunctions import CombinedSkim
 
     SkimImports = "".join(
         [
-            f"from {module} import {', '.join(skims)}\n"
+            f"from skim.{module} import {', '.join(skims)}\n"
             for (module, skims) in GroupedSkims.items()
         ]
     )

@@ -18,10 +18,14 @@ def get_argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
 
     parser.add_argument(
-        "skim",
+        "skims",
         choices=Registry.names,
+        nargs="+",
         metavar="Skim",
-        help="Skim to produce a steering file for.",
+        help=(
+            "Skim/s to produce a steering file for. If more than one skim is provided, "
+            "then a combined steering file is produced."
+        ),
     )
 
     parser.add_argument(
@@ -34,54 +38,91 @@ def get_argument_parser():
         help=(
             "Location to output steering file. If flag not given, code is printed to "
             "screen. If flag is given with no arguments, writes to a file "
-            "``<SKIMNAME>.py`` in the current directory"
+            "in the current directory using a default name."
         ),
     )
 
     return parser
 
 
-def main():
-    parser = get_argument_parser()
-    args = parser.parse_args()
+def make_imports(skims):
+    # Group skims by module, so we can put together some nice import statements
+    modules = sorted({Registry.get_skim_module(skim) for skim in skims})
+    GroupedSkims = {
+        module: sorted([
+            skim for skim in skims if Registry.get_skim_module(skim) == module
+        ])
+        for module in modules
+    }
 
-    skim = args.skim
-    module = Registry.get_skim_module(skim)
-
-    Imports = f"""import basf2 as b2
+    BasicImports = """import basf2 as b2
 import modularAnalysis as ma
-from skim.{module} import {skim}
 """
+    if len(skims) > 1:
+        BasicImports += "from skimExpertFunctions import CombinedSkim\n"
 
-    Processing = f"""
+    SkimImports = "".join(
+        [
+            f"from skim.{module} import {', '.join(skims)}\n"
+            for (module, skims) in GroupedSkims.items()
+        ]
+    )
+
+    return BasicImports + SkimImports
+
+
+def make_processing(skims):
+    if len(skims) == 1:
+        skim = skims[0]
+        MainProcessing = f"""
 path = b2.Path()
 skim = {skim}()
+"""
+    else:
+        SkimObjects = [f"    {skim}(),\n" for skim in skims]
+        MainProcessing = f"""
+path = b2.Path()
+skim = CombinedSkim(
+{''.join(SkimObjects)})
+"""
+    MainProcessing += """
 ma.inputMdstList("default", skim.TestFiles, path=path)
 skim(path)
-
-ma.summaryOfLists(skim.SkimLists, path=path)
 b2.process(path)
 
 print(b2.statistics())
 """
+    return MainProcessing
 
-    SteeringFileCode = Imports + Processing
+
+def main():
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
+    SteeringFileCode = make_imports(args.skims) + make_processing(args.skims)
+
+    SkimName = args.skims[0] if len(args.skims) == 1 else ", ".join(args.skims) + " combined"
 
     if args.OutputFilename == "":
         # -o flag was not passed
         print(SteeringFileCode)
     elif args.OutputFilename is None:
         # -o flag was passed with no argument
-        OutputFilename = f"{skim}.py"
+        if len(args.skims) == 1:
+            OutputFilename = f"{SkimName}.py"
+        else:
+            OutputFilename = f"CombinedSkim.py"
+
         with open(OutputFilename, "w") as f:
             f.write(SteeringFileCode)
-        print(f"Steering file for {skim} skim written to {OutputFilename}")
+
+        print(f"Steering file for {SkimName} skim written to {OutputFilename}")
     else:
         # -o flag was passed with argument
         OutputFilename = args.OutputFilename
         with open(OutputFilename, "w") as f:
             f.write(SteeringFileCode)
-        print(f"Steering file for {skim} skim written to {OutputFilename}")
+        print(f"Steering file for {SkimName} skim written to {OutputFilename}")
 
 
 if __name__ == "__main__":

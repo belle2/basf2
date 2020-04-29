@@ -30,9 +30,9 @@ namespace Belle2 {
       m_logEnergiesBrl(),
       m_logEnergiesBwd(),
       m_thetaBoundaries(),
-      m_thetaCor(),
-      m_phiCor(),
-      m_nCrysCor()
+      m_thetaCorrections(),
+      m_phiCorrections(),
+      m_nCrystalCorrections()
     { };
 
     //---------------------------------------------------
@@ -41,23 +41,23 @@ namespace Belle2 {
     /** Get vector of log(energies) used to evaluate the leakage corrections in the forward endcap*/
     const std::vector<float>& getlogEnergiesFwd() const {return m_logEnergiesFwd;}
 
-    /** Get vector of log(energies) used in the barrel. Same number as forward, but different values*/
+    /** Get vector of log(energies) used in the barrel. Same number of test energies as forward, but different values*/
     const std::vector<float>& getlogEnergiesBrl() const {return m_logEnergiesBrl;}
 
-    /** Get vector of log(energies) used in the backward endcap. Same number as forward, but different values*/
+    /** Get vector of log(energies) used in the backward endcap. Same number of test energies as forward, but different values*/
     const std::vector<float>& getlogEnergiesBwd() const {return m_logEnergiesBwd;}
 
     /** Get vector containing theta (deg) separating theta rings */
     const std::vector<float>& getThetaBoundaries() const {return m_thetaBoundaries;}
 
     /** Get 2D histogram of theta-dependent constants  (one column per thetaID & energy) */
-    const TH2F getThetaCor() const {return m_thetaCor;}
+    const TH2F getThetaCorrections() const {return m_thetaCorrections;}
 
     /** Get 2D histogram of phi-dependent constants  (one column per thetaID & energy in barrel, 2 in endcaps) */
-    const TH2F getPhiCor() const {return m_phiCor;}
+    const TH2F getPhiCorrections() const {return m_phiCorrections;}
 
     /** Get 2D histogram of nCrys dependent constants (one column per thetaID & energy) */
-    const TH2F getnCrysCor() const {return m_nCrysCor;}
+    const TH2F getnCrystalCorrections() const {return m_nCrystalCorrections;}
 
 
     //---------------------------------------------------
@@ -80,13 +80,13 @@ namespace Belle2 {
     }
 
     /** Set the 2D histogram containing the theta corrections for each thetaID and energy*/
-    void setThetaCor(const TH2F& thetaCor) {m_thetaCor = thetaCor;}
+    void setThetaCorrections(const TH2F& thetaCorrections) {m_thetaCorrections = thetaCorrections;}
 
     /** Set the 2D histogram containing the phi corrections for each thetaID and energy*/
-    void setPhiCor(const TH2F& phiCor) {m_phiCor = phiCor;}
+    void setPhiCorrections(const TH2F& phiCorrections) {m_phiCorrections = phiCorrections;}
 
     /** Set the 2D histogram containing the nCrys corrections for each thetaID and energy*/
-    void setnCrysCor(const TH2F& nCrysCor) {m_nCrysCor = nCrysCor;}
+    void setnCrystalCorrections(const TH2F& nCrystalCorrections) {m_nCrystalCorrections = nCrystalCorrections;}
 
 
 //---------------------------------------------------
@@ -95,9 +95,9 @@ namespace Belle2 {
     std::vector<float> m_logEnergiesBrl; /**< log(energies) used to find constants in the barrel (GeV) */
     std::vector<float> m_logEnergiesBwd; /**< log(energies) used to find constants in the backward endcap (GeV) */
     std::vector<float> m_thetaBoundaries; /**< 70 values of theta that bound the 69 theta rings (rad) */
-    TH2F m_thetaCor; /**< 2D histogram containing theta-dependent correction for each thetaID & energy */
-    TH2F m_phiCor; /**< 2D histogram containing phi-dependent correction for each thetaID & energy */
-    TH2F m_nCrysCor; /**< 2D histogram containing nCrys-dependent correction for each thetaID & energy */
+    TH2F m_thetaCorrections; /**< 2D histogram containing theta-dependent correction for each thetaID & energy */
+    TH2F m_phiCorrections; /**< 2D histogram containing phi-dependent correction for each thetaID & energy */
+    TH2F m_nCrystalCorrections; /**< 2D histogram containing nCrys-dependent correction for each thetaID & energy */
 
     ClassDef(ECLLeakageCorrections, 1); /**< ClassDef */
   };

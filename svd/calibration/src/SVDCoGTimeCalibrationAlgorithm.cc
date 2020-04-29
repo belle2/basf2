@@ -89,12 +89,14 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           pfx->Fit("pol3", "RQ");
           double par[4];
           pol3->GetParameters(par);
-          // pfx->Fit("pol1", "RQ");
-          // pfx->Fit("pol1", "Q");
-          // double par[4];
-          // pol1->GetParameters(par);
-          // par[2] = 0;
-          // par[3] = 0;
+          /** Fit with pol1 **/
+          /*
+          pfx->Fit("pol1", "RQ");
+          double par[4];
+          pol1->GetParameters(par);
+          par[2] = 0;
+          par[3] = 0;
+          */
           // double meanT0 = hEventT0->GetMean();
           // double meanT0NoSync = hEventT0nosync->GetMean();
           timeCal->set_current(1);
@@ -132,7 +134,6 @@ bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRu
   } else {
     meanRawCoGTimeL3V = rawCoGTimeL3V->GetMean();
   }
-  // float meanRawCoGTimeL3V = rawCoGTimeL3V->GetMean();
   if (!m_previousRawCoGTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");

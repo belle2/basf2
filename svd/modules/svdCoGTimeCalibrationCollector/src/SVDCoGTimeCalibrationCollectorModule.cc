@@ -108,14 +108,10 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
-  // float TB = (m_svdEI->getModeByte()).getTriggerBin();
   float eventT0 = 0;
-  // float eventT0Sync = 0;
   if (m_eventT0->hasEventT0()) {
     eventT0 = m_eventT0->getEventT0();
-    // eventT0Sync = eventT0 - 4000. / 509. * (3 - TB);
     getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
-    // getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
   }
   if (!m_svdCls.isValid()) {
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
@@ -131,9 +127,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
-    // SVDCluster* cluster = m_svdCls[cl];
-    // RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
-
+    // get cluster time
     float clTime = m_svdCls[cl]->getClsTime();
 
     //remove firstFrame and triggerBin correction applied in the clusterizer
@@ -148,17 +142,12 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
 
     //fill histograms only if EventT0 is there
     if (m_eventT0->hasEventT0()) {
-      // float eventT0 = m_eventT0->getEventT0();
-      // float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
-      // float eventT0Sync = eventT0 - 4000./509. * (3 - TB);
 
-      // float eventT0 = m_eventT0->getEventT0();
       float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
 
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      // getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawCoGTimeL3V")->Fill(clTime);}
     }

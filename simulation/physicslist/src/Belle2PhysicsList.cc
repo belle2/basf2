@@ -40,16 +40,13 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
-<<< <<< < HEAD
 // Long lived
 #include "simulation/longlivedneutral/G4LongLivedNeutralPhysics.h"
-== == == =
 #include <framework/logging/Logger.h>
-  >>> >>> > 1bacf5237b44ad9853b8cf8a393a821c1c44b848
 
 #define g4ePDGcode 0
 
-  using namespace Belle2;
+using namespace Belle2;
 using namespace Simulation;
 
 

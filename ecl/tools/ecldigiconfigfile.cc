@@ -14,7 +14,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/digitization/algorithms.h>
 #include <iostream>
 #include <stdio.h>

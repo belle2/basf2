@@ -181,5 +181,6 @@ namespace Belle2 {
     double m_WaveformThresholdOverride; /**< If gt 0, value will override ECL_FPGA_StoreWaveform and apply value (in GeV) as threshold for all crystals for waveform saving*/
     double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
+    bool m_dspDataTest; /**< DSP data usage flag */
   };
 }//Belle2

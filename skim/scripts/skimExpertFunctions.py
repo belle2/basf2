@@ -375,7 +375,7 @@ class BaseSkim(ABC):
     set in order to keep log file sizes small."""
 
     TestFiles = [get_test_file("MC13_mixedBGx1")]
-    """Location of an MDST file to test the skim on. Defaults to an MC12 mixed BGx1
+    """Location of an MDST file to test the skim on. Defaults to an MC13 mixed BGx1
     sample. If you want to use a different test file for your skim, set it using
     `get_test_file`.
     """

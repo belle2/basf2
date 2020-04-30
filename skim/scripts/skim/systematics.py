@@ -159,15 +159,15 @@ def EELLList(path):
 
     # At skim level we avoid any PID-like requirements and just select events
     # with two good tracks coming from the interavtion region.
-    eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and p > 0.3'
     ma.cutAndCopyList('e+:skimloose', 'e+:all', eLooseSelection, path=path)
 
     # create a list of possible selections
     eelllist = []
 
-    # Lepon pair has low invariant mass and tracks are back-to-back-like
-    EELLSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
-    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
+    # Lepon pair tracks are back-to-back-like
+    EELLSelection = 'useCMSFrame(pt)<0.3'
+    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) < 4'
     ma.reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts, path=path)
     eelllist.append('gamma:eell')
 
@@ -347,36 +347,34 @@ def SystematicsLambdaList(path):
 def SystematicsList(path):
 
     Lists = []
-    Lists += JpsimumuTagProbe(path)
-    Lists += JpsieeTagProbe(path)
+    # Lists = JpsimumuTagProbe(path)
+    # Lists = JpsieeTagProbe(path)
     Lists += PiKFromDstarList(path)
     return Lists
 
 
 def PiKFromDstarList(path):
-    D0Cuts = '1.81 < M < 1.91'
-#   DstarCuts = 'massDifference(0)<0.16'
+    D0Cuts = '1.75 < M < 2.0'
     DstarCuts = 'massDifference(0)<0.16 and useCMSFrame(p) > 1.5'
 
-    D0Channel = ['K-:all pi+:all'
-                 ]
+    ma.cutAndCopyList('K-:syst', 'K-:all', 'dr<2 and abs(dz)<4', path=path)
+    ma.cutAndCopyList('pi+:syst', 'pi+:all', 'dr<2 and abs(dz)<4', path=path)
+
+    D0Channel = ['K-:syst pi+:syst']
 
     D0List = []
     for chID, channel in enumerate(D0Channel):
         ma.reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID, path=path)
-        vertex.raveFit('D0:syst' + str(chID), 0.0, path=path)
         D0List.append('D0:syst' + str(chID))
 
     DstarChannel = []
     for channel in D0List:
-        DstarChannel.append(channel + ' pi+:all')
+        DstarChannel.append(channel + ' pi+:syst')
 
     DstarList = []
     for chID, channel in enumerate(DstarChannel):
         ma.reconstructDecay('D*+:syst' + str(chID) + ' -> ' + channel, DstarCuts, chID, path=path)
         DstarList.append('D*+:syst' + str(chID))
-        ma.matchMCTruth('D*+:syst0', path=path)
-
     return DstarList
 
 

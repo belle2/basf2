@@ -447,9 +447,9 @@ namespace Belle2 {
 
         // this only makes sense for particles that are *not* composite and come
         // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
+        Particle::EParticleSourceObject particlesource = particle->getParticleSource();
+        if (particlesource == Particle::EParticleSourceObject::c_Composite
+        or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
@@ -458,7 +458,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particletype == iparticle->getParticleType())
+          if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
               return 1.0;
         }
@@ -789,10 +789,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -820,10 +816,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -855,10 +847,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -896,10 +884,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -941,10 +925,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -985,10 +965,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -1033,10 +1009,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1074,10 +1046,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1118,10 +1086,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1473,7 +1437,6 @@ namespace Belle2 {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-        // cppcheck-suppress unreadVariable ; cppcheck has problems with lambda capture
         const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
         const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
 
@@ -1751,10 +1714,6 @@ namespace Belle2 {
         std::string rankedVariableName = arguments[1];
         std::string returnVariableName = arguments[2];
         std::string extraInfoName = rankedVariableName + "_rank";
-        // 'rank' is correctly scoped, but cppcheck support the lambda
-        // function syntax and throws a (wrong) variableScope error
-
-        // cppcheck-suppress variableScope
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);
@@ -1833,11 +1792,6 @@ namespace Belle2 {
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
-        // cppcheck has problems understanding lambda function syntax and throws
-        // a warning here about cut being unread. but it is read in the if
-        // statements so suppress the false positive
-        //
-        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {

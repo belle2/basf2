@@ -95,15 +95,15 @@ void BFieldComponentQuad::initialize()
 
   /** Magnetic field data structure. */
   struct ParamPoint {
-    double s;   /**< s in [m] */
-    double L;   /**< element length in [m] */
-    double K0;  /**< dipole component in [dimensionless] */
-    double K1;  /**< quadrupole component in [1/m] */
-    double SK0; /**< skew dipole component  in [dimensionless] */
-    double SK1; /**< skew quadrupole component in [1/m] */
-    double ROTATE; /**< rotation in [radian] */
-    double DX;   /**< horizontal displacement in [m] */
-    double DY;   /**< vertical displacement in [m] */
+    double s{0};   /**< s in [m] */
+    double L{0};   /**< element length in [m] */
+    double K0{0};  /**< dipole component in [dimensionless] */
+    double K1{0};  /**< quadrupole component in [1/m] */
+    double SK0{0}; /**< skew dipole component  in [dimensionless] */
+    double SK1{0}; /**< skew quadrupole component in [1/m] */
+    double ROTATE{0}; /**< rotation in [radian] */
+    double DX{0};   /**< horizontal displacement in [m] */
+    double DY{0};   /**< vertical displacement in [m] */
     /* Note that K parameters used in SAD is multiplied by the element length.
      * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
      */

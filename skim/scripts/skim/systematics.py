@@ -159,15 +159,15 @@ def EELLList(path):
 
     # At skim level we avoid any PID-like requirements and just select events
     # with two good tracks coming from the interavtion region.
-    eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5'
+    eLooseSelection = 'abs(dz) < 2.0 and abs(dr) < 0.5 and p > 0.3'
     ma.cutAndCopyList('e+:skimloose', 'e+:all', eLooseSelection, path=path)
 
     # create a list of possible selections
     eelllist = []
 
-    # Lepon pair has low invariant mass and tracks are back-to-back-like
-    EELLSelection = 'M < 4 and useCMSFrame(daughterAngle(0,1)) < 0.75'
-    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2'
+    # Lepon pair tracks are back-to-back-like
+    EELLSelection = 'useCMSFrame(pt)<0.3'
+    eventCuts = 'nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) < 4'
     ma.reconstructDecay('gamma:eell -> e+:skimloose e-:skimloose', EELLSelection + " and " + eventCuts, path=path)
     eelllist.append('gamma:eell')
 

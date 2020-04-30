@@ -233,6 +233,10 @@ class TCPV(BaseSkim):
         "stdV0s": {
             "stdKshorts": [],
         },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdLightMesons": [],
+        },
         "skim.standardlists.charm": {
             "loadPiForBtoHadrons": [],
             "loadKForBtoHadrons": [],
@@ -244,9 +248,6 @@ class TCPV(BaseSkim):
             "loadStdJpsiToee": [],
             "loadStdJpsiTomumu": [],
         },
-        "skim.standardlists.lightmesons": {
-            "loadStdLightMesons": []
-        },
     }
 
     def additional_setup(self, path):
@@ -256,9 +257,9 @@ class TCPV(BaseSkim):
 
     def build_lists(self, path):
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-        vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:TCPV_eventshape)')
-        vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:TCPV_eventshape)')
-        vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+        vm.addAlias('E_ECL_pi_TCPV', 'totalECLEnergyOfParticlesInList(pi+:TCPV_eventshape)')
+        vm.addAlias('E_ECL_gamma_TCPV', 'totalECLEnergyOfParticlesInList(gamma:TCPV_eventshape)')
+        vm.addAlias('E_ECL_TCPV', 'formula(E_ECL_pi_TCPV+E_ECL_gamma_TCPV)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
@@ -328,7 +329,7 @@ class TCPV(BaseSkim):
             "nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and nCDCHits>20)>=3",
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
-            "E_ECL<9"
+            "E_ECL_TCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 

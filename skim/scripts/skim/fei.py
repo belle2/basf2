@@ -1026,7 +1026,7 @@ class BaseFEISkim(BaseSkim):
                 f"nCleanedTracks({CleanedTrackCuts})>=3",
                 f"nCleanedECLClusters({CleanedClusterCuts})>=3",
                 "visibleEnergyOfEventCMS>4",
-                "2<E_ECL<7",
+                "2<E_ECL_FEI<7",
             ]
         )
 
@@ -1072,11 +1072,11 @@ class BaseFEISkim(BaseSkim):
     @lru_cache()
     def setup_fei_aliases(FEIChannelArgs):
         # Aliases for pre-FEI event-level cuts
-        vm.addAlias("E_ECL_pi",
+        vm.addAlias("E_ECL_pi_FEI",
                     "totalECLEnergyOfParticlesInList(pi+:FEI_cleaned)")
-        vm.addAlias("E_ECL_gamma",
+        vm.addAlias("E_ECL_gamma_FEI",
                     "totalECLEnergyOfParticlesInList(gamma:FEI_cleaned)")
-        vm.addAlias("E_ECL", "formula(E_ECL_pi+E_ECL_gamma)")
+        vm.addAlias("E_ECL_FEI", "formula(E_ECL_pi_FEI+E_ECL_gamma_FEI)")
 
         # Aliases for variables available after running the FEI
         vm.addAlias("sigProb", "extraInfo(SignalProbability)")

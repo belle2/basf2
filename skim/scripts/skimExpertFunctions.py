@@ -876,7 +876,7 @@ class CombinedSkim(BaseSkim):
                 elif isinstance(d1[k], list) and isinstance(d2[k], list):
                     # If we are looking at two lists, return a list with duplicates removed.
                     # Raise a warning if one list is empty and the other is not.
-                    if len(d1[k]) == 0 ^ len(d2[k]) == 0:
+                    if (len(d1[k]) == 0) ^ (len(d2[k]) == 0):
                         # TODO: remove this warning and replace with proper handling
                         b2.B2WARNING(
                             "Merging empty list into non-empty list. "

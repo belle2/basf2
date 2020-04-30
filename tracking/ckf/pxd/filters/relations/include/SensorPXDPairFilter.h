@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,8 +27,8 @@ namespace Belle2 {
     /// Pre-filter relations in phi between seed states and hit states
     double m_param_PhiRecoTrackToHitCut = 0.8;
     /// Pre-filter relations in phi between hit states
-    double m_param_ThetaHitHitCut = M_PI / 3.;
+    double m_param_ThetaHitHitCut = 0.6;//M_PI / 3.;
     /// Pre-filter relations in theta between hit states
-    double m_param_PhiHitHitCut = 1.0;
+    double m_param_PhiHitHitCut = 0.6;//1.0;
   };
 }

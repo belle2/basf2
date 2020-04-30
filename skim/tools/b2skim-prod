@@ -647,8 +647,7 @@ def warn_local_script(args):
     for skimName in args.skims:
         B2WARNING(
             f"Using local skim script! Please make sure to place sandbox file {skimScript}\n"
-            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}\n"
-            f"          and modify {skimName}_Skim_Standalone.py to import this script."
+            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}"
         )
 
 
@@ -666,7 +665,7 @@ def make_combined_steering_file(
     # nice import statements
     modules = sorted({Registry.get_skim_module(skim) for skim in SingleSkims})
     GroupedSkims = {
-        module: [
+        f"skim.{module}": [
             skim for skim in SingleSkims if Registry.get_skim_module(skim) == module
         ]
         for module in modules
@@ -683,17 +682,18 @@ def make_combined_steering_file(
         # Replace the normal module with the local one
         LocalModule = LocalModule.rstrip(".py")
         NormalModule = modules[0]
-        GroupedSkims[LocalModule] = GroupedSkims.pop(NormalModule)
+        GroupedSkims[LocalModule] = GroupedSkims.pop(f"skim.{NormalModule}")
 
     BasicImports = """import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import CombinedSkim
-
 """
+    if LocalModule:
+        BasicImports += "\n"
 
     SkimImports = "".join(
         [
-            f"from skim.{module} import {', '.join(skims)}\n"
+            f"from {module} import {', '.join(skims)}\n"
             for (module, skims) in GroupedSkims.items()
         ]
     )

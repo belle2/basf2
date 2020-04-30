@@ -256,8 +256,8 @@ class TCPV(BaseSkim):
 
     def build_lists(self, path):
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-        vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
-        vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+        vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:TCPV_eventshape)')
+        vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:TCPV_eventshape)')
         vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
@@ -304,12 +304,12 @@ class TCPV(BaseSkim):
             ma.applyCuts('B0:TCPV_ccs' + str(chID), 'nTracks>4', path=path)
             bd_ccs_List.append('B0:TCPV_ccs' + str(chID))
 
-        ma.fillParticleList(decayString='pi+:eventShapeForSkims',
+        ma.fillParticleList(decayString='pi+:TCPV_eventshape',
                             cut='pt > 0.1 and abs(d0)<0.5 and abs(z0)<2 and nCDCHits>20', path=path)
-        ma.fillParticleList(decayString='gamma:eventShapeForSkims',
+        ma.fillParticleList(decayString='gamma:TCPV_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-        ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'],
+        ma.buildEventShape(inputListNames=['pi+:TCPV_eventshape', 'gamma:TCPV_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -321,7 +321,7 @@ class TCPV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.buildEventKinematics(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSkims'], path=path)
+        ma.buildEventKinematics(inputListNames=['pi+:TCPV_eventshape', 'gamma:TCPV_eventshape'], path=path)
 
         EventCuts = [
             "foxWolframR2_maskedNaN<0.4 and nTracks>=4",

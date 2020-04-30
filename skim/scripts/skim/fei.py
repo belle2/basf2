@@ -1002,23 +1002,23 @@ class BaseFEISkim(BaseSkim):
 
         We define "cleaned" tracks and clusters as:
 
-        * Cleaned tracks (``pi+:eventShapeForSkims``): :math:`d_0 < 0.5~{\\rm cm}`,
-          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
-        * Cleaned ECL clusters (``gamma:eventShapeForSkims``): :math:`0.296706 < \\theta
-          < 2.61799`, and :math:`E>0.1~{\\rm GeV}`
+        * Cleaned tracks (``pi+:FEI_cleaned``): :math:`d_0 < 0.5~{\\rm cm}`,
+          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}` * Cleaned ECL
+          clusters (``gamma:FEI_cleaned``): :math:`0.296706 < \\theta < 2.61799`, and
+          :math:`E>0.1~{\\rm GeV}`
         """
 
         # Pre-selection cuts
         CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
         CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
 
-        ma.fillParticleList(decayString="pi+:eventShapeForSkims",
+        ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
-        ma.fillParticleList(decayString="gamma:eventShapeForSkims",
+        ma.fillParticleList(decayString="gamma:FEI_cleaned",
                             cut=CleanedClusterCuts, path=path)
 
-        ma.buildEventKinematics(inputListNames=["pi+:eventShapeForSkims",
-                                                "gamma:eventShapeForSkims"],
+        ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
+                                                "gamma:FEI_cleaned"],
                                 path=path)
 
         EventCuts = " and ".join(
@@ -1073,9 +1073,9 @@ class BaseFEISkim(BaseSkim):
     def setup_fei_aliases(FEIChannelArgs):
         # Aliases for pre-FEI event-level cuts
         vm.addAlias("E_ECL_pi",
-                    "totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)")
+                    "totalECLEnergyOfParticlesInList(pi+:FEI_cleaned)")
         vm.addAlias("E_ECL_gamma",
-                    "totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)")
+                    "totalECLEnergyOfParticlesInList(gamma:FEI_cleaned)")
         vm.addAlias("E_ECL", "formula(E_ECL_pi+E_ECL_gamma)")
 
         # Aliases for variables available after running the FEI

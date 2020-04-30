@@ -1038,9 +1038,9 @@ class SystematicsLambda(BaseSkim):
     def build_lists(self, path):
         LambdaCuts = "M < 1.2"
 
-        ma.fillParticleList("p+:all", "", enforceFitHypothesis=True, path=path)
-        ma.fillParticleList("pi-:all", "", enforceFitHypothesis=True, path=path)
-        LambdaChannel = ["p+:all pi-:all"]
+        ma.fillParticleList("p+:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
+        ma.fillParticleList("pi-:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
+        LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
 
         LambdaList = []
         for chID, channel in enumerate(LambdaChannel):

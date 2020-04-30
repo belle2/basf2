@@ -217,10 +217,10 @@ class BottomoniumEtabExclusive(BaseSkim):
 
     def build_lists(self, path):
         # create and fill hard photon
-        ma.fillParticleList(decayString="pi+:eventShapeForSkims", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:eventShapeForSkims", cut="E > 0.1", path=path)
+        ma.fillParticleList(decayString="pi+:BottomoniumEtab_eventshape", cut="pt > 0.1", path=path)
+        ma.fillParticleList(decayString="gamma:BottomoniumEtab_eventshape", cut="E > 0.1", path=path)
 
-        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims", "gamma:eventShapeForSkims"],
+        ma.buildEventShape(inputListNames=["pi+:BottomoniumEtab_eventshape", "gamma:BottomoniumEtab_eventshape"],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -291,10 +291,10 @@ class BottomoniumUpsilon(BaseSkim):
         ma.copyLists("Upsilon:all", ["Upsilon:ee", "Upsilon:mumu"], path=path)
 
         # require foxWolframR2 < 0.995
-        ma.fillParticleList(decayString="pi+:eventShapeForSkims", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:eventShapeForSkims", cut="E > 0.1", path=path)
+        ma.fillParticleList(decayString="pi+:BottomoniumUpsilon_eventshape", cut="pt > 0.1", path=path)
+        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path)
 
-        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims", "gamma:eventShapeForSkims"],
+        ma.buildEventShape(inputListNames=["pi+:BottomoniumUpsilon_eventshape", "gamma:BottomoniumUpsilon_eventshape"],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -359,8 +359,8 @@ class ISRpipicc(BaseSkim):
     def build_lists(self, path):
         # intermediate state J/psi and psi(2S) are reconstructed
         # add mass window cut for J/psi and psi(2S) candidates
-        ma.reconstructDecay("J/psi:ee -> e+:loose e-:loose", "M>3.0 and M<3.2", path=path)
-        ma.reconstructDecay("J/psi:mumu -> mu+:loose mu-:loose", "M>3.0 and M<3.2", path=path)
+        ma.reconstructDecay("J/psi:ee_ISR -> e+:loose e-:loose", "M>3.0 and M<3.2", path=path)
+        ma.reconstructDecay("J/psi:mumu_ISR -> mu+:loose mu-:loose", "M>3.0 and M<3.2", path=path)
         ma.reconstructDecay("psi(2S):ee -> pi+:loose pi-:loose e+:loose e-:loose", "M>3.64 and M<3.74", path=path)
         ma.reconstructDecay("psi(2S):mumu -> pi+:loose pi-:loose mu+:loose mu-:loose", "M>3.64 and M<3.74", path=path)
 
@@ -373,8 +373,8 @@ class ISRpipicc(BaseSkim):
         # e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e- via ISR
         # e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu- via ISR
         vpho_Channels = [
-            "pi+:loose pi-:loose J/psi:ee",
-            "pi+:loose pi-:loose J/psi:mumu",
+            "pi+:loose pi-:loose J/psi:ee_ISR",
+            "pi+:loose pi-:loose J/psi:mumu_ISR",
             "pi+:loose pi-:loose psi(2S):ee",
             "pi+:loose pi-:loose psi(2S):mumu"
         ]

@@ -254,12 +254,12 @@ class PRsemileptonicUntagged(BaseSkim):
     }
 
     def build_lists(self, path):
-        ma.fillParticleList(decayString="pi+:eventShapeForSkims",
+        ma.fillParticleList(decayString="pi+:PRSL_eventshape",
                             cut="pt> 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:eventShapeForSkims",
+        ma.fillParticleList(decayString="gamma:PRSL_eventshape",
                             cut="E > 0.1", path=path)
 
-        ma.buildEventShape(inputListNames=["pi+:eventShapeForSkims", "gamma:eventShapeForSkims"],
+        ma.buildEventShape(inputListNames=["pi+:PRSL_eventshape", "gamma:PRSL_eventshape"],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,

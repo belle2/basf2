@@ -118,9 +118,6 @@ namespace Belle2 {
     /** Perform alignment correction (true) or not (false). */
     bool m_bklmIfAlign;
 
-    /** Load timing window from database (true) or not (false). */
-    bool m_bklmLoadTimingFromDB;
-
     /** Ignore scintillators (to debug their electronics mapping). */
     bool m_bklmIgnoreScintillators;
 

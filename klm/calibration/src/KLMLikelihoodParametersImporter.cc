@@ -34,6 +34,7 @@ void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
 {
   B2WARNING("The method KLMLikelihoodParametersImporter::writeMuidParameters() is temporary unavailable, sorry! :(");
   return;
+  /** cppcheck-suppress unreachableCode */
   DBImportObjPtr<KLMLikelihoodParameters> likelihoodParameters;
   likelihoodParameters.construct();
   vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };

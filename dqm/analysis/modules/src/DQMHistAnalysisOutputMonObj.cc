@@ -81,6 +81,12 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   if (m_filename.length()) fname = m_filename;
   else fname = TString::Format("mon_e%04dr%06d.root", exp, run);
 
+  TH1* runtype = findHist("DQMInfo/rtype");
+  if (runtype) m_metaData->setRunType(std::string(runtype->GetTitle()));
+
+  TH1* hnevt = findHist("DAQ/Nevent");
+  if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
+
   TFile f(fname, "NEW");
 
   if (f.IsZombie()) {
@@ -96,11 +102,6 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   timeinfo = localtime(&ts);
   m_metaData->setRunDate(asctime(timeinfo));
 
-  TH1* runtype = findHist("DQMInfo/rtype");
-  if (runtype) m_metaData->setRunType(std::string(runtype->GetTitle()));
-
-  TH1* hnevt = findHist("DAQ/Nevent");
-  if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
   m_metaData->Write();
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
@@ -124,8 +125,8 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   int run = m_metaData->getRun();
   int expe = m_metaData->getExperiment();
   int nevt = m_metaData->getNEvents();
-  int rune = 0;
-  int expee = 0;
+  //int rune = 0;
+  //int expee = 0;
   char* rel = const_cast<char*>(m_metaData->getRelease().c_str());
   char* db = const_cast<char*>(m_metaData->getDatabaseGlobalTag().c_str());
   char* datee = const_cast<char*>(m_metaData->getRunDate().c_str());

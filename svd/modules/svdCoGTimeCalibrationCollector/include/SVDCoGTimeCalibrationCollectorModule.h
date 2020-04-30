@@ -75,16 +75,16 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_emdata; /**< EventMetaData store object pointer*/
 
     /**SVDEventInfo */
-    std::string m_svdEventInfo; /**< Name of the SVDEventInfo store array used as parameter of the module*/
+    std::string m_svdEventInfo = "SVDEventInfo"; /**< Name of the SVDEventInfo store array used as parameter of the module*/
     StoreObjPtr<SVDEventInfo> m_svdEI; /**< SVDEventInfo store object pointer*/
 
 
     /**SVDCluster */
-    std::string m_svdClusters; /**< Name of the SVDClusters store array used as parameter of the module*/
+    std::string m_svdClusters = "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/
     StoreArray<SVDCluster> m_svdCls; /**< SVDClusters store array*/
 
     /**EventT0 */
-    std::string m_eventTime; /**< Name of the EventT0 store object pointer used as parameter of the module*/
+    std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
 
     /**SVDHistograms */

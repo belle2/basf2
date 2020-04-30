@@ -30,9 +30,9 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
   setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
-  addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
-  addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", std::string("SVDEventInfo"));
+  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", m_svdClusters);
+  addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
+  addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", m_svdEventInfo);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()

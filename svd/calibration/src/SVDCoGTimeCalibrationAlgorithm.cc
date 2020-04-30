@@ -65,16 +65,15 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           auto hEventT0vsCoG = getObjectPtr<TH2F>(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           auto hEventT0 = getObjectPtr<TH1F>(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           auto hEventT0nosync = getObjectPtr<TH1F>(Form("eventT0nosync__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
-          cout << " " << endl;
-          // cout << typeid(hEventT0vsCoG).name() << " " << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << endl;
-          cout << "Histogram: " << hEventT0vsCoG->GetName() << " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() << endl;
+          B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                 " Entries (n. clusters): " << hEventT0vsCoG->GetEntries());
           if (layer_num == 3 && hEventT0vsCoG->GetEntries() < m_minEntries) {
-            cout << " " << endl;
-            cout << hEventT0vsCoG->GetName() << " " << hEventT0vsCoG->GetEntries() << " Entries required: " << m_minEntries << endl;
-            cout << "Not enough data, adding one run to the collector" << endl;
+            B2INFO("Histogram: " << hEventT0vsCoG->GetName() <<
+                   " Entries (n. clusters): " << hEventT0vsCoG->GetEntries() <<
+                   " Entries required: " << m_minEntries);
+            B2WARNING("Not enough data, adding one run to the collector");
             return c_NotEnoughData;
           }
-          cout << " " << endl;
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
               if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {

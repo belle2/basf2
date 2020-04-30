@@ -113,10 +113,11 @@ class svdCoGCalibrationAnalysisTool(basf2.Module):
             self.ladder[0] = svdCluster.getSensorID().getLadderNumber()
             self.sensor[0] = svdCluster.getSensorID().getSensorNumber()
             self.side[0] = svdCluster.isUCluster()
+            self.ftswShift = svd_evtInfo.getSVD2FTSWTimeShift(svdCluster.getFirstFrame())
             hasT0 = et0.hasEventT0()
             if hasT0:
                 self.evtTime[0] = et0.getEventT0()
-                self.evtTimeSync[0] = et0.getEventT0() - 7.8625 * (3 - self.TB)
+                self.evtTimeSync[0] = et0.getEventT0() - self.ftswShift
             else:
                 self.evtTime[0] = -999
                 self.evtTimeSync[0] = -999
@@ -131,10 +132,11 @@ class svdCoGCalibrationAnalysisTool(basf2.Module):
             self.ladderTracks[0] = svdClusterTracks.getSensorID().getLadderNumber()
             self.sensorTracks[0] = svdClusterTracks.getSensorID().getSensorNumber()
             self.sideTracks[0] = svdClusterTracks.isUCluster()
+            self.ftswShiftTracks = svd_evtInfo.getSVD2FTSWTimeShift(svdCluster.getFirstFrame())
             hasT0 = et0.hasEventT0()
             if hasT0:
                 self.evtTimeTracks[0] = et0.getEventT0()
-                self.evtTimeSyncTracks[0] = et0.getEventT0() - 7.8625 * (3 - self.TB)
+                self.evtTimeSyncTracks[0] = et0.getEventT0() - self.ftswShiftTracks
             else:
                 self.evtTimeTracks[0] = -999
                 self.evtTimeSyncTracks[0] = -999

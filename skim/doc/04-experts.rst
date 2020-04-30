@@ -119,8 +119,9 @@ In the skim package, there are command-line tools available for running skims, d
 .................................................
 
 .. tip::
-   If you just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. This tool
-   is for special cases where this does not suffice (such as running on the grid).
+   This tool is for special cases where this does not suffice (such as running on the grid). If you
+   just want to run a skim on KEKCC, consider using :ref:`b2skim-run<b2skim-run>`. If you want to
+   test the performance of your skim, consider using the :ref:`b2skim-stats tools<testing-skims>`.
 
 .. argparse::
    :filename: skim/tools/b2skim-generate

@@ -5,11 +5,29 @@
 
 import argparse
 import sys
+from textwrap import indent
 
 import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import CombinedSkim
 from skim.registry import Registry
+
+
+class _HelpAction(argparse._HelpAction):
+    """Help action which prints the help strings of all subparsers."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        parser.print_help()
+
+        subparsers_actions = [
+            action for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)]
+
+        for subparsers_action in subparsers_actions:
+            for choice, subparser in subparsers_action.choices.items():
+                print(f"\nhelp for subcommand '{choice}':")
+                print(indent(subparser.format_help(), " "*2))
+
+        parser.exit()
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -40,8 +58,8 @@ class CustomArgumentParser(argparse.ArgumentParser):
 
 
 def get_argument_parser():
-    parser = CustomArgumentParser(description=__doc__)
-
+    parser = CustomArgumentParser(description=__doc__, add_help=False)
+    parser.add_argument("-h", "--help", action=_HelpAction, help="Show a full help message.")
     subparsers = parser.add_subparsers(
         dest="action", help="Run just one skim, or multiple skims at once.",
     )

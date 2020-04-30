@@ -182,7 +182,17 @@ namespace Belle2 {
       if (!vert) return realNaN;
       return vert->getDeltaTErr();
     }
+    double particleDeltaTRes(const Particle* particle)
+    {
+      return particleDeltaT(particle) - particleMCDeltaT(particle);
+    }
 
+    double particleDeltaTBelle(const Particle* particle)
+    {
+      PCmsLabTransform T;
+      double boost = T.getBoostVector().Mag();
+      return particleDeltaZ(particle) / boost / Const::speedOfLight * 1e3;
+    }
     double particleMCDeltaT(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -1060,6 +1070,10 @@ namespace Belle2 {
                       R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
                       R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
+    REGISTER_VARIABLE("DeltaTRes", particleDeltaTRes,
+                      R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
+    REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
+                      R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,

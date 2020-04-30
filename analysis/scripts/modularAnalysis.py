@@ -2830,7 +2830,7 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     path.add_module(dist_mod)
 
 
-def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut, path):
+def addInclusiveDstarReconstruction(decayString, slowPionCut, path):
     """
     Adds the InclusiveDstarReconstruction module to the given path.
     This module creates a D* particle list by estimating the D* four momenta
@@ -2840,14 +2840,12 @@ def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut,
     to the slow pion direction. The charge of the given pion list has to be consistent
     with the D* charge
 
-    @param inputPionList Name of the input pion particle list
-    @param outputDstarList Name of the output D* particle list
+    @param decayString Decay string, must be of form [D* -> pi ...]
     @param slowPionCut Cut applied to the pion list to identify slow pions
     @param path the module is added to this path
     """
     incl_dstar = register_module("InclusiveDstarReconstruction")
-    incl_dstar.param("pionListName", inputPionList)
-    incl_dstar.param("DstarListName", outputDstarList)
+    incl_dstar.param("decayString", decayString)
     incl_dstar.param("slowPionCut", slowPionCut)
     path.add_module(incl_dstar)
 

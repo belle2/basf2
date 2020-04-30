@@ -137,23 +137,17 @@ void InclusiveDstarReconstructionModule::event()
       with the same candidates
     */
     // for decay 1 and decay 2/3 with positive flavor
-    Particle dstar = Particle(dstar_four_vector,
-                              (pion->getCharge() >= 0) ? m_dstar_pdg_code : -m_dstar_pdg_code,
-                              Particle::EFlavorType::c_Flavored,
-    {pion->getArrayIndex()},
-    m_properties,
-    pion->getArrayPointer());
+    Particle dstar = Particle(dstar_four_vector, (pion->getCharge() >= 0) ? m_dstar_pdg_code : -m_dstar_pdg_code,
+                              Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
+                              m_properties, pion->getArrayPointer());
     Particle* new_dstar = particles.appendNew(dstar);
     outputDstarList->addParticle(new_dstar);
 
     // for decay 2/3 with negative flavor
     if (pion->getCharge() == 0) {
-      Particle antidstar = Particle(dstar_four_vector,
-                                    -m_dstar_pdg_code,
-                                    Particle::EFlavorType::c_Flavored,
-      {pion->getArrayIndex()},
-      m_properties,
-      pion->getArrayPointer());
+      Particle antidstar = Particle(dstar_four_vector, -m_dstar_pdg_code,
+                                    Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
+                                    m_properties, pion->getArrayPointer());
       Particle* new_antidstar = particles.appendNew(antidstar);
       outputAntiDstarList->addParticle(new_antidstar);
     }

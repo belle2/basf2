@@ -164,7 +164,7 @@ namespace TreeFitter {
       if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> feedthrough
         rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
       } else { // Got gammas -> Internal track
-        rc = new InternalTrack(particle, mother, config, forceFitAll, true);
+        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Alway mass-constrain brems tracks
       }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||

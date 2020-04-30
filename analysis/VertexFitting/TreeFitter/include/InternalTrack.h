@@ -24,7 +24,8 @@ namespace TreeFitter {
                   const ParticleBase* mother,
                   const ConstraintConfiguration& config,
                   bool forceFitAll,
-                  bool noEnergySum
+                  bool noEnergySum,
+                  bool forceMassConstraint
                  );
 
     /** destructor */

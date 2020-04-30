@@ -28,7 +28,8 @@ namespace TreeFitter {
                                const ParticleBase* mother,
                                const ConstraintConfiguration& config,
                                bool forceFitAll,
-                               bool noEnergySum
+                               bool noEnergySum,
+                               bool forceMassConstraint
                               ) :
     ParticleBase(particle, mother, &config), // config pointer here to allow final states not to have it
     m_massconstraint(false),
@@ -48,6 +49,9 @@ namespace TreeFitter {
     }
     m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
                                  std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+    if (forceMassConstraint) {
+      m_massconstraint = true;
+    }
   }
 
   bool InternalTrack::compTrkTransverseMomentum(const RecoTrack* lhs, const RecoTrack* rhs)

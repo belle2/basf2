@@ -1,6 +1,5 @@
 from basf2 import *
 set_log_level(LogLevel.INFO)
-# set_log_level(LogLevel.WARNING)
 
 import os
 import sys
@@ -66,6 +65,7 @@ def pre_collector():
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("timeAlgorithm", 0)
         if moda.name() == 'SVDSpacePointCreator':
             moda.param("SVDClusters", 'SVDClustersFromTracks')
 

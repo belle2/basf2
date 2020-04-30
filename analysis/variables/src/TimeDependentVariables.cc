@@ -729,6 +729,13 @@ namespace Belle2 {
       return vert->getFitTruthStatus();
     }
 
+    int rollbackStatus(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return std::numeric_limits<int>::quiet_NaN();
+      return vert->getRollBackStatus();
+    }
+
     //**********************************
     //Meta variables
     //**********************************
@@ -1176,6 +1183,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
+
+    REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus,
+                      "Returns the status of the fit performed with rolled back tracks. Possible values are: 0: fit performed with measured parameters, 1: fit performed with rolled back tracks, 2: unable to recover truth parameters")
 
     REGISTER_VARIABLE("TagTrackMax(var)", tagTrackMax,
                       "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMax(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")

@@ -172,3 +172,19 @@ std::vector<int> MuidElementNumbers::getPDGVector()
   std::sort(pdgVector.begin(), pdgVector.end());
   return pdgVector;
 }
+
+int MuidElementNumbers::getLongitudinalID(int hypothesis, int outcome, int lastLayer)
+{
+  int id = lastLayer;
+  id += (outcome << MuidElementNumbers::c_LastLayerBit);
+  id += (hypothesis << (MuidElementNumbers::c_LastLayerBit + MuidElementNumbers::c_OutcomeBit));
+  return id;
+}
+
+int MuidElementNumbers::getTransverseID(int hypothesis, int detector, int degreesOfFreedom)
+{
+  int id = degreesOfFreedom;
+  id += (detector << MuidElementNumbers::c_DegreesOfFreedomBit);
+  id += (hypothesis << (MuidElementNumbers::c_DegreesOfFreedomBit + MuidElementNumbers::c_DetectorBit));
+  return id;
+}

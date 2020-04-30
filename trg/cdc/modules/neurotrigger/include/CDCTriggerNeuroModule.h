@@ -49,8 +49,10 @@ namespace Belle2 {
     std::string m_hitCollectionName;
     /** name of the event time StoreObjPtr */
     std::string m_EventTimeName;
-    /** Name of the StoreArray containing the input 2D tracks. */
+    /** Name of the StoreArray containing the input 2D tracks or neurotracks. */
     std::string m_inputCollectionName;
+    /** Name of the StoreArray containing the real input 2D tracks. */
+    std::string m_realinputCollectionName;
     /** Name of the StoreArray containing the resulting NN tracks. */
     std::string m_outputCollectionName;
     /** Instance of the NeuroTrigger. */
@@ -84,8 +86,12 @@ namespace Belle2 {
     bool m_writeMLPinput;
     /** Switch to mimic an apparent bug in the hardware preprocessing. */
     bool m_hardwareCompatibilityMode;
-    /** list of input 2D tracks */
+    /** use Neurotracks as InputTracks */
+    bool m_neuroTrackInputMode;
+    /** list of input 2D tracks or neurotracks */
     StoreArray<CDCTriggerTrack> m_tracks2D;
+    /** list of input real 2D tracks */
+    StoreArray<CDCTriggerTrack> m_realtracks2D;
     /** list of output NN tracks */
     StoreArray<CDCTriggerTrack> m_tracksNN;
     /** list of track segment hits */

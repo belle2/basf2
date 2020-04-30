@@ -690,7 +690,7 @@ enum KFitError::ECode FourCFitKFit::updateMother(Particle* mother)
   if (haschi2) {
     mother->setExtraInfo("chiSquared", chi2);
     mother->setExtraInfo("ndf", ndf);
-  } else if (!haschi2) {
+  } else {
     mother->addExtraInfo("chiSquared", chi2);
     mother->addExtraInfo("ndf", ndf);
   }

@@ -162,9 +162,6 @@ namespace Belle2 {
       return;
     }
 
-    // input
-    StoreArray<Particle> Particles(plist->getParticleCollectionName());
-
     // output
     StoreArray<TagVertex> verArray;
     analysis::RaveSetup::initialize(1, m_Bfield);
@@ -710,7 +707,7 @@ namespace Belle2 {
   {
     unsigned n = particleAndWeights.size();
     sort(particleAndWeights.begin(), particleAndWeights.end(),
-    [](ParticleAndWeight & a, ParticleAndWeight & b) { return a.weight > b.weight; });
+    [](const ParticleAndWeight & a, const ParticleAndWeight & b) { return a.weight > b.weight; });
 
     m_raveParticles.resize(n);
     m_raveWeights.resize(n);

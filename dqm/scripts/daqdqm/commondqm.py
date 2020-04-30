@@ -39,7 +39,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             path.add_module('PXDROIFinder',
                             recoTrackListName='RecoTracks',
                             PXDInterceptListName='PXDIntercepts')
-            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
+            # moved to cosmics/collision as we need different cuts
+            # path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
         # SVD

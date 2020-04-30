@@ -9,6 +9,7 @@ import argparse
 from functools import lru_cache
 from pathlib import Path
 import re
+from shlex import quote
 import subprocess
 import sys
 
@@ -47,10 +48,10 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0",
     ]
 
-    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
     if mcCampaignNumber > 12:
         mcSamples += [
             f"{mcCampaign}_ggBGx1",
@@ -135,6 +136,12 @@ def getArgumentParser():
         default="MC13",
         choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "--dry",
+        action="store_true",
+        help="Print the submission commands, but don't run them.",
     )
 
     sampleGroup = parser.add_mutually_exclusive_group()
@@ -231,7 +238,7 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
         return mcSamples + dataSamples
 
 
-def submitJobs(skims, scripts, samples, nEventsPerSample):
+def submitJobs(skims, scripts, samples, nEventsPerSample, DryRun):
     """Submit ``bsub`` jobs for each skim and for each test sample.
 
     Warns if any of the ``bsub`` submissions returned a non-zero exit code.
@@ -244,6 +251,7 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
         samples (list): A list of internal labels for samples to be tested.
             These are read by `skimExpertFunctions.get_test_file`.
         nEventsPerSample (int): The number of events per file to run on.
+        DryRun (bool): Print the submission commands, but don't run anything.
     """
     logDirectory = Path("log").resolve()
     logDirectory.mkdir(parents=True, exist_ok=True)
@@ -279,29 +287,33 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
             # Removing this may confuse the stats printer.
             nTestEvents = min(nEventsPerSample, get_cached_eventN(sampleFile))
 
+            arguments = [
+                "bsub",
+                "-q",
+                "l",
+                "-oo",
+                str(logFile),
+                "-e",
+                str(errFile),
+                "-J",
+                f"{skim} {sample}",
+                "basf2",
+                str(script),
+                "--job-information",
+                str(jsonFile),
+                "-n",
+                str(nTestEvents),
+                "-i",
+                str(sampleFile),
+            ]
+
+            if DryRun:
+                print(" ".join([quote(arg) for arg in arguments]) + "\n")
+                continue
+
             with working_directory(workingDirectory):
                 process = subprocess.run(
-                    [
-                        "bsub",
-                        "-q",
-                        "l",
-                        "-oo",
-                        logFile,
-                        "-e",
-                        errFile,
-                        "-J",
-                        f"{skim} {sample}",
-                        "basf2",
-                        script,
-                        "--job-information",
-                        jsonFile,
-                        "-n",
-                        str(nTestEvents),
-                        "-i",
-                        sampleFile,
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 )
 
             jobIDs.append(re.findall("\d+", str(process.stdout))[0])
@@ -311,7 +323,7 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
             B2ERROR(
                 f"An error occurred while submitting jobs for {skim} skim with script {script}."
             )
-        else:
+        elif jobIDs:
             B2INFO(
                 f'Running {script} on {nEventsPerSample} events from test samples of {", ".join(samples)}. Job IDs:\n  '
                 + "\n  ".join(jobIDs)
@@ -332,4 +344,4 @@ if __name__ == "__main__":
     skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
     samples = getSamplesToRun(mcSamples, dataSamples, args.mconly, args.dataonly)
 
-    submitJobs(skims, scripts, samples, args.nEventsPerSample)
+    submitJobs(skims, scripts, samples, args.nEventsPerSample, args.dry_run)

@@ -76,6 +76,15 @@ void KLMDatabaseImporter::importTimeConversion(
   timeConversionImport.import(iov);
 }
 
+void KLMDatabaseImporter::importTimeWindow(KLMTimeWindow* timeWindow)
+{
+  DBImportObjPtr<KLMTimeWindow> timeWindowImport;
+  timeWindowImport.construct(*timeWindow);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeWindowImport.import(iov);
+}
+
 void KLMDatabaseImporter::loadStripEfficiency(
   KLMStripEfficiency* stripEfficiency, std::string fileName)
 {

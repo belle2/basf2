@@ -33,17 +33,21 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIMdstInputModule();
+    /** Destructor */
     virtual ~B2BIIMdstInputModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /** Called when a new run is started */
     virtual void beginRun() override;
+    /** Called for each event */
     virtual void event() override;
+    /** Called when the current run finished */
     virtual void endRun() override;
+    /** Terminates the module. */
     virtual void terminate() override;
 
     // Data members

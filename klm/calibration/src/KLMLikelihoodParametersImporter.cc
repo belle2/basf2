@@ -9,10 +9,10 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/calibration/MuidParameterDBReaderWriter.h>
+#include <klm/calibration/KLMLikelihoodParametersImporter.h>
 
 /* KLM headers. */
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
@@ -30,14 +30,13 @@
 using namespace std;
 using namespace Belle2;
 
-void MuidParameterDBReaderWriter::writeMuidParameters()
+void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
 {
-  B2WARNING("The method MuidParameterDBReaderWriter::writeMuidParameters() is temporary unavailable, sorry! :(");
+  B2WARNING("The method KLMLikelihoodParametersImporter::writeMuidParameters() is temporary unavailable, sorry! :(");
   return;
-
-  DBImportObjPtr<MuidParameters> muidPar;
-  muidPar.construct();
-
+  /** cppcheck-suppress unreachableCode */
+  DBImportObjPtr<KLMLikelihoodParameters> likelihoodParameters;
+  likelihoodParameters.construct();
   vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
     GearDir content("/Detector/Muid/MuidParameters//Experiment[@exp=\"0\"]/");
@@ -49,10 +48,9 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
         if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
           break;
         std::vector<double> layerPDF = outcomeContent.getArray((boost::format("LastLayer[@layer=\"%1%\"]") % (lastLayer)).str());
-        muidPar->setLayerProfile(hypothesis, outcome, lastLayer, layerPDF);
+        likelihoodParameters->setLongitudinalPDF(hypothesis, outcome, lastLayer, layerPDF);
       }
     }
-
     for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
       GearDir detectorContent(content);
       if (detector == 0) detectorContent.append("/TransversePDF/BarrelAndEndcap");
@@ -67,23 +65,20 @@ void MuidParameterDBReaderWriter::writeMuidParameters()
                                                                     (2 * halfNdof)).str());
         std::vector<double> reducedChiSquaredPDF = detectorContent.getArray((boost::format("DegreesOfFreedom[@ndof=\"%1%\"]/Histogram") %
                                                    (2 * halfNdof)).str());
-        muidPar->setPDF(hypothesis, detector, halfNdof * 2, reducedChiSquaredPDF);
-        muidPar->setThreshold(hypothesis, detector, halfNdof * 2, reducedChiSquaredThreshold);
-        muidPar->setScaleY(hypothesis, detector, halfNdof * 2, reducedChiSquaredScaleY);
-        muidPar->setScaleX(hypothesis, detector, halfNdof * 2, reducedChiSquaredScaleX);
+        likelihoodParameters->setTransversePDF(hypothesis, detector, halfNdof * 2, reducedChiSquaredPDF);
+        likelihoodParameters->setTransverseThreshold(hypothesis, detector, halfNdof * 2, reducedChiSquaredThreshold);
+        likelihoodParameters->setTransverseScaleY(hypothesis, detector, halfNdof * 2, reducedChiSquaredScaleY);
+        likelihoodParameters->setTransverseScaleX(hypothesis, detector, halfNdof * 2, reducedChiSquaredScaleX);
       }
     }
   }
-
   IntervalOfValidity Iov(0, 0, -1, -1);
-  muidPar.import(Iov);
-
+  likelihoodParameters.import(Iov);
 }
 
-void MuidParameterDBReaderWriter::readMuidParameters()
+void KLMLikelihoodParametersImporter::readLikelihoodParameters()
 {
-
-  DBObjPtr<MuidParameters> m_muidParameters("MuidParameters");
+  DBObjPtr<KLMLikelihoodParameters> likelihoodParameters;
   vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
     B2INFO(" hypothesisName  " << hypotheses[hypothesis]);
@@ -93,25 +88,24 @@ void MuidParameterDBReaderWriter::readMuidParameters()
         B2INFO(" lastLayer " << lastLayer);
         if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
           break;
-        std::vector<double> layerPDF = m_muidParameters->getProfile(hypothesis, outcome, lastLayer);
+        std::vector<double> layerPDF = likelihoodParameters->getLongitudinalPDF(hypothesis, outcome, lastLayer);
         B2INFO(" layerPDF:  ");
         for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
           B2INFO(layerPDF[layer] << " , ");
         }
       }
     }
-
     const char* detectorNames[] = {"BarrelAndEndcap", "BarrelOnly", "EndcapOnly"};
     for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
       B2INFO(" detectorName  " << detectorNames[detector]);
       for (int halfNdof = 1; halfNdof <= MuidElementNumbers::getMaximalHalfNdof(); ++halfNdof) {
         B2INFO(" Ndof  " << halfNdof * 2);
-        B2INFO(" ReducedChiSquaredThreshold  " << m_muidParameters->getThreshold(hypothesis, detector, halfNdof * 2));
-        B2INFO(" ReducedChiSquaredScaleY " << m_muidParameters->getScaleY(hypothesis, detector, halfNdof * 2));
-        B2INFO(" ReducedChiSquaredScaleX " << m_muidParameters->getScaleX(hypothesis, detector, halfNdof * 2));
-        std::vector<double> reducedChiSquaredPDF = m_muidParameters->getPDF(hypothesis, detector, halfNdof * 2);
+        B2INFO(" ReducedChiSquaredThreshold  " << likelihoodParameters->getTransverseThreshold(hypothesis, detector, halfNdof * 2));
+        B2INFO(" ReducedChiSquaredScaleY " << likelihoodParameters->getTransverseScaleY(hypothesis, detector, halfNdof * 2));
+        B2INFO(" ReducedChiSquaredScaleX " << likelihoodParameters->getTransverseScaleX(hypothesis, detector, halfNdof * 2));
+        std::vector<double> reducedChiSquaredPDF = likelihoodParameters->getTransversePDF(hypothesis, detector, halfNdof * 2);
         if (reducedChiSquaredPDF.size() != MuidElementNumbers::getSizeReducedChiSquared()) {
-          B2ERROR("MuidParameterDBReaderWriter::TransversePDF vector for hypothesis " << hypotheses[hypothesis] << "  detector " <<
+          B2ERROR("KLMLikelihoodParametersImporter::TransversePDF vector for hypothesis " << hypotheses[hypothesis] << "  detector " <<
                   detectorNames[detector]
                   << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MuidElementNumbers::getSizeReducedChiSquared());
         } else {
@@ -121,8 +115,6 @@ void MuidParameterDBReaderWriter::readMuidParameters()
         }
       }
     }
-
   }
-
 }
 

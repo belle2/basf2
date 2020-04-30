@@ -261,22 +261,22 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
 static int
 MM_get_packet(const int sd_acc, unsigned char* buf)
 {
-  int ret;
-  size_t n_words_from_hltout;
-  size_t n_bytes_from_hltout;
+  unsigned int header[2] = {}; // length is second word, thus read two
 
-  ret = recv(sd_acc, &n_words_from_hltout, sizeof(unsigned int), MSG_PEEK);
+  int ret = recv(sd_acc, &header, sizeof(unsigned int) * 2, MSG_PEEK);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
     ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Packet receive timed out\n");
     return -1;
   }
-  if (ret != sizeof(unsigned int)) {
+  if (ret != 2 * sizeof(unsigned int)) {
     ERR_FPRINTF(stderr, "[ERROR] merger_merge: recv(): Unexpected return value (%d)\n", ret);
     return -2;
   }
 
-  n_words_from_hltout = ntohl(n_words_from_hltout);
-  n_bytes_from_hltout = n_words_from_hltout * sizeof(unsigned int);
+  /// TODO: check teh first word to be the correct magic, but for TCP/IP this is overkill
+  /// anyway unclear how to recover from a misalignment in data stream
+
+  size_t n_bytes_from_hltout = 2 * sizeof(unsigned int) + ntohl(header[1]);// OFFSET_LENGTH = 1
 
   ret = b2_recv(sd_acc, buf, n_bytes_from_hltout);
   if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -380,12 +380,10 @@ main(int argc, char* argv[])
 
   /* RoI transmission loop */
   // RoI packets
-  const size_t n_bytes_header  = sizeof(struct h2m_header_t);
-  const size_t n_bytes_footer  = sizeof(struct h2m_footer_t);
   size_t n_bytes_from_hltout;
   size_t n_bytes_to_onsen;
 
-  unsigned char* buf = (unsigned char*)valloc(n_bytes_header + ROI_MAX_PACKET_SIZE + n_bytes_footer);
+  unsigned char* buf = (unsigned char*)valloc(ROI_MAX_PACKET_SIZE);
   if (!buf) {
     ERROR(valloc);
     exit(1);
@@ -545,7 +543,7 @@ main(int argc, char* argv[])
         /* send packet */
         if (n_bytes_from_hltout > 0) {
           int ret;
-          unsigned char* ptr_head_to_onsen = buf + n_bytes_header;
+          unsigned char* ptr_head_to_onsen = buf;
 
           // extract trigger number, run+exp nr and fill it in a table.
 
@@ -556,7 +554,7 @@ main(int argc, char* argv[])
           //     enum { OFFSET_MAGIC = 0, OFFSET_LENGTH = 1, OFFSET_HEADER = 2, OFFSET_TRIGNR = 3, OFFSET_RUNNR = 4, OFFSET_ROIS = 5};
           //    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
 
-          if (n_bytes_from_hltout >= 5 * 4) {
+          if (n_bytes_from_hltout >= 6 * 4) {
             boost::spirit::endian::ubig32_t* iptr = (boost::spirit::endian::ubig32_t*)ptr_head_to_onsen;
             eventnr = iptr[3];
             runnr = (iptr[4] & 0x3FFF00) >> 8;
@@ -581,7 +579,7 @@ main(int argc, char* argv[])
             check_event_nr(eventnr);
           }
 
-          n_bytes_to_onsen = n_bytes_from_hltout - n_bytes_header - n_bytes_footer;
+          n_bytes_to_onsen = n_bytes_from_hltout;
           while (1) {
             ret = b2_send(sd_con, ptr_head_to_onsen, n_bytes_to_onsen);
             if (ret == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {

@@ -362,7 +362,7 @@ class PreReconstruction(object):
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
-                    pvfit.param('vertexFitter', 'kfitter')
+                    pvfit.param('vertexFitter', 'KFit')
                     pvfit.param('fitType', 'vertex')
                     pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)

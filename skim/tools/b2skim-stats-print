@@ -17,8 +17,8 @@ calculated, and how they are calculated. It also contains entries which
 determine whether a statistic is printed to the screen or included in the
 Confluence tables.
 
-The functions ``printToJson``, ``printToScreen``, and ``printToConfluence``
-handle all the output of the statistics tables.
+The functions ``printToJson``, ``printToScreen``, ``printToConfluence``, and
+``printToMarkdown`` handle all the output of the statistics tables.
 """
 
 
@@ -37,7 +37,7 @@ from textwrap import wrap
 
 from basf2 import B2WARNING, B2ERROR
 from basf2.utils import pretty_print_table
-from skim.registry import skim_registry, combined_skims
+from skim.registry import Registry, combined_skims
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
 
 
@@ -70,7 +70,7 @@ def getArgumentParser():
         parser (argparse.ArgumentParser): An argument parser which obtains its
             list of valid skim names from `skim.registry`.
     """
-    allStandaloneSkims = [skim for _, skim in sorted(skim_registry)]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(
@@ -104,6 +104,15 @@ def getArgumentParser():
         help="Print a wiki markup table to be copied to Confluence.",
     )
     parser.add_argument(
+        "-M",
+        "--markdown",
+        action="store_true",
+        help=(
+            "Save a markdown table in a format that can be copied into "
+            "pull request comments."
+        ),
+    )
+    parser.add_argument(
         "-J",
         "--json",
         action="store_true",
@@ -112,7 +121,7 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC9", "MC10", "MC11", "MC12", "MC13"],
+        choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
     )
     parser.add_argument(
@@ -171,7 +180,8 @@ def getLogFile(skim, sample):
 
     if not testLogFile(logFileContents):
         raise SkimNotRunException(
-            f"    The log file {logFileName} does not indicate that the test job finished successfully."
+            f"    The log file {logFileName} does not indicate that the test job "
+            "finished successfully."
         )
 
     return logFileContents
@@ -484,7 +494,7 @@ def getSkimsToPrint(parser, standaloneList, combinedList):
     Returns:
         skims (list): A list of skim names to be tested.
     """
-    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = list(combined_skims.keys())
 
     if not (standaloneList or combinedList):
@@ -534,6 +544,19 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_ssbarBGx0": f"{mcCampaign}: ssbar BGx0",
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
+
+    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # and older) so here is a hack.
+    # TODO: remove once when we regularly add the same low mult samples
+    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    if mcCampaignNumber > 12:
+        mcSampleLabels.update({
+            f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+            # f"{mcCampaign}_eeBGx1": f"{mcCampaign}: ee BGx1",
+            f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+            f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+            f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
+        })
 
     dataSampleLabels = {
         "proc10_exp8": "Data: proc10 exp. 8",
@@ -585,7 +608,7 @@ def getStatSpecifier():
       printed.
 
     * ``'PrintToScreen'`` (`bool`): Determines whether the statistic is included
-      in the table in terminal output.
+      in the table in terminal output or the markdown output.
 
     * ``'PrintToConfluence'`` (`bool`): Determines whether the statistic is
       included in the Confluence table.
@@ -625,8 +648,8 @@ def getStatSpecifier():
             * nSkimmedEvents(skim, sample)
             / nInputEvents(skim, sample),
             "CalculationDescription": "Number of skimmed events divided by number of input events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "nInputEvents": {
@@ -656,34 +679,41 @@ def getStatSpecifier():
             "PrintToConfluence": True,
             "PrintAverages": False,
             "Calculate": lambda skim, sample: cpuTime(skim, sample),
-            "CalculationDescription": "CPU time of test job as printed in the output logs.",
+            "CalculationDescription": (
+                "CPU time of test job as printed in the output logs."
+            ),
             "CombineMC": None,
         },
         "cpuTimePerEvent": {
             "LongName": "CPU time per input event on KEKCC (s)",
             "FloatFormat": ".3f",
-            "PrintToScreen": True,
+            "PrintToScreen": False,
             "PrintToConfluence": False,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: cpuTime(skim, sample)
-            / nInputEvents(skim, sample),
-            "CalculationDescription": "CPU time of test job divided by number of input events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                cpuTime(skim, sample) / nInputEvents(skim, sample)
+            ),
+            "CalculationDescription": (
+                "CPU time of test job divided by number of input events."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "HS06TimePerEvent": {
             "LongName": "Estimated CPU time per input event (HS06)",
             "FloatFormat": ".3f",
-            "PrintToScreen": False,
+            "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: cpuTime(skim, sample)
-            / nInputEvents(skim, sample)
-            * HEPSpecPerCore,
-            "CalculationDescription": "CPU time of test job divided by number of input events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                cpuTime(skim, sample) / nInputEvents(skim, sample) * HEPSpecPerCore
+            ),
+            "CalculationDescription": (
+                "CPU time of test job divided by number of input events."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "HS06TimePerFile": {
@@ -692,15 +722,18 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: cpuTime(skim, sample)
-            / nInputEvents(skim, sample)
-            * get_events_per_file(sample)
-            * HEPSpecPerCore,
-            "CalculationDescription": (
-                "CPU time of test job, divided by number of input events, multiplied by average number of events in a file of this sample type."
+            "Calculate": lambda skim, sample: (
+                cpuTime(skim, sample)
+                / nInputEvents(skim, sample)
+                * get_events_per_file(sample)
+                * HEPSpecPerCore
             ),
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "CalculationDescription": (
+                "CPU time of test job, divided by number of input events, multiplied "
+                "by average number of events in a file of this sample type."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "udstSize": {
@@ -709,7 +742,7 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: udstSize(skim, sample) / 1024,
+            "Calculate": lambda skim, sample: (udstSize(skim, sample) / 1024),
             "CalculationDescription": "File size of output uDST.",
             "CombineMC": None,
         },
@@ -719,11 +752,14 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: udstSize(skim, sample)
-            / nSkimmedEvents(skim, sample),
-            "CalculationDescription": "File size of output uDST divided by number of skimmed events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                udstSize(skim, sample) / nSkimmedEvents(skim, sample)
+            ),
+            "CalculationDescription": (
+                "File size of output uDST divided by number of skimmed events."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "udstSizePerInputEvent": {
@@ -732,11 +768,14 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: udstSize(skim, sample)
-            / nInputEvents(skim, sample),
-            "CalculationDescription": "File size of output uDST divided by number of input events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                udstSize(skim, sample) / nInputEvents(skim, sample)
+            ),
+            "CalculationDescription": (
+                "File size of output uDST divided by number of input events."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "udstSizePerFile": {
@@ -751,15 +790,18 @@ def getStatSpecifier():
                 * get_events_per_file(sample)
                 / 1024
             ),
-            "CalculationDescription": "uDST size per event multiplied by average number of events in a file of this sample type.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "CalculationDescription": (
+                "uDST size per event multiplied by average number of events in a file "
+                "of this sample type."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "logSize": {
             "LongName": "Log size of test (kB)",
             "FloatFormat": ".1f",
-            "PrintToScreen": False,
+            "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
             "Calculate": lambda skim, sample: logSize(skim, sample),
@@ -769,15 +811,17 @@ def getStatSpecifier():
         "logSizePerEvent": {
             "LongName": "Log size per event (B)",
             "FloatFormat": ".2f",
-            "PrintToScreen": True,
+            "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: logSize(skim, sample)
-            / nInputEvents(skim, sample)
-            * 1024,
-            "CalculationDescription": "File size of the output logs divided by the number of input events.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                logSize(skim, sample) / nInputEvents(skim, sample) * 1024
+            ),
+            "CalculationDescription": (
+                "File size of the output logs divided by the number of input events."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "averageCandidateMultiplicity": {
@@ -786,12 +830,15 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: averageCandidateMultiplicity(
-                skim, sample
+            "Calculate": lambda skim, sample: (
+                averageCandidateMultiplicity(skim, sample)
             ),
-            "CalculationDescription": "Candidate multiplicity as listed in output logs, averaged over the particle lists.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
-                statDict, mcCampaign, beamBackground
+            "CalculationDescription": (
+                "Candidate multiplicity as listed in output logs, averaged over the "
+                "particle lists."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcWeightedAverage(statDict, mcCampaign, beamBackground)
             ),
         },
         "memoryAverage": {
@@ -814,8 +861,8 @@ def getStatSpecifier():
             "PrintAverages": False,
             "Calculate": lambda skim, sample: memoryMaximum(skim, sample),
             "CalculationDescription": "Maximum memory usage, as listed in output logs.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcMax(
-                statDict, mcCampaign, beamBackground
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcMax(statDict, mcCampaign, beamBackground)
             ),
         },
         "udstSizePerEntireSample": {
@@ -824,13 +871,18 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: udstSize(skim, sample)
-            * nTotalEvents(sample)
-            / nInputEvents(skim, sample)
-            / 1024 ** 2,
-            "CalculationDescription": "Output uDST size per event multiplied by total number of events in the full sample.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcSum(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                udstSize(skim, sample)
+                * nTotalEvents(sample)
+                / nInputEvents(skim, sample)
+                / 1024 ** 2
+            ),
+            "CalculationDescription": (
+                "Output uDST size per event multiplied by total number of events in "
+                "the full sample."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcSum(statDict, mcCampaign, beamBackground)
             ),
         },
         "logSizePerEntireSample": {
@@ -839,13 +891,18 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: logSize(skim, sample)
-            * nTotalEvents(sample)
-            / nInputEvents(skim, sample)
-            / 1024 ** 2,
-            "CalculationDescription": "Output log file size per event multiplied by total number of events in the full sample.",
-            "CombineMC": lambda statDict, mcCampaign, beamBackground: mcSum(
-                statDict, mcCampaign, beamBackground
+            "Calculate": lambda skim, sample: (
+                logSize(skim, sample)
+                * nTotalEvents(sample)
+                / nInputEvents(skim, sample)
+                / 1024 ** 2
+            ),
+            "CalculationDescription": (
+                "Output log file size per event multiplied by total number of events "
+                "in the full sample."
+            ),
+            "CombineMC": lambda statDict, mcCampaign, beamBackground: (
+                mcSum(statDict, mcCampaign, beamBackground)
             ),
         },
     }
@@ -866,8 +923,8 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
         samples (list): List of sample labels to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
-        verbose (bool): Print extra messages when a statistic can't be calculated, but the script
-            moves on anyway.
+        verbose (bool): Print extra messages when a statistic can't be calculated, but
+            the script moves on anyway.
 
     Returns:
         skimStatsDict (dict): A nested dict containing all requested skim
@@ -994,13 +1051,14 @@ def addWeightedMC(
     statistic.
 
     Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
         mcCampaign (str): A label like ``MC12`` for the MC campaign to test on.
         beamBackgrounds (list): A list of beam background labels, such as "BGx1".
-        verbose (bool): Print extra messages when a statistic can't be calculated, but the script
-            moves on anyway.
+        verbose (bool): Print extra messages when a statistic can't be calculated, but
+            the script moves on anyway.
 
     Returns:
         allSkimStatsWithWeightedMC (dict): A modified version of skim statistics
@@ -1021,8 +1079,9 @@ def addWeightedMC(
                     elif verbose:
                         skimStats[stat][f"Combined MC {beamBackground}"] = None
                         B2WARNING(
-                            f"No method provided in `statsSpecifier` for combining MC estimate of {stat}. "
-                            "This may be because there is no sensible way to combine this value."
+                            f"No method provided in `statsSpecifier` for combining MC "
+                            f"estimate of {stat}. This may be because there is no "
+                            "sensible way to combine this value."
                         )
                 except TypeError:
                     skimStats[stat][f"Combined MC {beamBackground}"] = None
@@ -1039,7 +1098,8 @@ def printToJson(allSkimStats, statSpecifier):
     prints a message after writing the file.
 
     Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
     """
@@ -1144,11 +1204,6 @@ def printToScreen(
 
             pretty_print_table([headers] + rows, [-14] * nColumns)
 
-            B2WARNING(
-                "Please consider installing the third-party package `tabulate`:\n"
-                "    pip3 install tabulate --user"
-            )
-
 
 def printToConfluence(
     allSkimStats,
@@ -1164,7 +1219,8 @@ def printToConfluence(
     prints a message about how to copy this table to a Confluence page.
 
     Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
         mcSampleLabels (dict): A dict in which the keys are internal MC sample
@@ -1237,11 +1293,91 @@ def printToConfluence(
     )
 
 
+def printToMarkdown(
+    allSkimStats, mcSampleLabels, dataSampleLabels, beamBackgrounds, mcOnly, dataOnly,
+):
+    """Format the skim performance statistics as a markdown table, which will be
+    formatted nicely if pasted into a pull request on BitBucket.
+
+    Args:
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
+        mcSampleLabels (dict): A dict in which the keys are internal MC sample
+            labels (as used by `skimExpertFunctions.get_test_file`), and the
+            values are more readable labels to be used in printed tables.
+        dataSampleLabels (dict): A dict in which the keys are internal data
+            sample labels (as used by `skimExpertFunctions.get_test_file`), and
+            the values are more readable labels to be used in printed tables.
+        beamBackgrounds (list): A list of beam background labels, such as "BGx1".
+        mcOnly (bool): Print only MC samples statistics.
+        dataOnly (bool): Print only data samples statistics.
+    """
+    statSpecifier = getStatSpecifier()
+    selectedStats = [
+        stat for (stat, statSpec) in statSpecifier.items() if statSpec["PrintToScreen"]
+    ]
+
+    headers = [statSpecifier[stat]["LongName"] for stat in selectedStats]
+    floatFormat = [""] + [statSpecifier[stat]["FloatFormat"] for stat in selectedStats]
+
+    markdownTables = []
+    for skimName, skimStats in allSkimStats.items():
+        # Only print some stats
+        df = pd.DataFrame(skimStats, columns=selectedStats)
+
+        # Handle skims only being run on data or MC
+        if mcOnly:
+            index = [
+                *[
+                    f"Combined MC {beamBackground}"
+                    for beamBackground in beamBackgrounds
+                ],
+                *mcSampleLabels.keys(),
+            ]
+            renamingPairs = mcSampleLabels
+        elif dataOnly:
+            index = list(dataSampleLabels.keys())
+            renamingPairs = dataSampleLabels
+        else:
+            index = [
+                *dataSampleLabels.keys(),
+                *[
+                    f"Combined MC {beamBackground}"
+                    for beamBackground in beamBackgrounds
+                ],
+                *mcSampleLabels.keys(),
+            ]
+            renamingPairs = {**dataSampleLabels, **mcSampleLabels}
+
+        df = df.reindex(index)
+        df = df.rename(index=renamingPairs)
+        # Make entries in first column bold
+        df.rename(index={label: f"**{label}**" for label in df.index}, inplace=True)
+
+        table = tabulate(
+            df[selectedStats], headers=headers, tablefmt="pipe", floatfmt=floatFormat,
+        )
+
+        table = table.replace(" nan ", " --  ")
+        markdownTables.append(f"**Performance statistics for {skimName} skim:**")
+        markdownTables.append(table)
+
+    markdownFileName = "skimStats.md"
+    with open(markdownFileName, "w") as markdownFile:
+        markdownFile.write("\n\n".join(markdownTables))
+
+    print(
+        f"\nWrote tables to {markdownFileName}. This format is suitable for including "
+        "in pull request comments."
+    )
+
+
 def printAverages(allSkimStats, skims, samples, statSpecifier, averageRequest):
     """Produce averages for statistics over all given skims or all given samples.
 
     Args:
-        allSkimStats (dict): A nested dict of statistics, as returned by ``getSkimStatsDict``.
+        allSkimStats (dict): A nested dict of statistics, as returned by
+            ``getSkimStatsDict``.
         skims (list): List of skims to run.
         samples (list): List of sample labels to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
@@ -1364,6 +1500,16 @@ if __name__ == "__main__":
                 beamBackgrounds,
             )
 
+        if args.markdown:
+            printToMarkdown(
+                allSkimStats,
+                mcSampleLabels,
+                dataSampleLabels,
+                beamBackgrounds,
+                args.mconly,
+                args.dataonly,
+            )
+
     except ModuleNotFoundError:
         printToScreen(
             allSkimStats,
@@ -1376,7 +1522,12 @@ if __name__ == "__main__":
             tabulateAvailable=False,
         )
 
-        if args.confluence:
+        B2WARNING(
+            "Please consider installing the third-party package `tabulate`:\n"
+            "    pip3 install tabulate --user"
+        )
+
+        if args.confluence or args.markdown:
             B2ERROR(
                 "This tool relies on the third-party package `tabulate` to "
                 "format wiki markdown. The package is not currently installed, "

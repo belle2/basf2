@@ -104,18 +104,19 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIConvertMdstModule();
+    /** Destructor */
     virtual ~B2BIIConvertMdstModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    virtual void beginRun() override; /**< Called when the current run begins. */
+    virtual void event() override; /**< Called for each event */
+    virtual void endRun() override; /**<  Called when the current run is finished.*/
+    virtual void terminate() override; /**< Terminates the module.*/
 
     // Data members
   private:
@@ -145,6 +146,8 @@ namespace Belle2 {
 
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
+    bool m_convertRecTrg; /**< Flag to switch on conversion of rectrg_summary3 */
+
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral
@@ -160,8 +163,13 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
 
     /**
+     * Reads and converts m_final from rectrg_summary3
+     */
+    void convertRecTrgTable();
+
+    /**
      * Reads and converts all entries of evtcls Panther table
-     **/
+     */
     void convertEvtclsTable();
 
     /**
@@ -316,7 +324,7 @@ namespace Belle2 {
     double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    /* calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    /** calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
     double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
@@ -385,20 +393,20 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** Event classification flags */
-    StoreObjPtr<EventExtraInfo> m_evtCls;
+    /** Event Extra Info*/
+    StoreObjPtr<EventExtraInfo> m_evtInfo;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
-    BeamSpot m_beamSpot;
+    BeamSpot m_beamSpot; /**< Interaction Point of the beam */
 
     /** CollisionBoostVector for boost vector*/
     OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
-    CollisionBoostVector m_collisionBoostVector;
+    CollisionBoostVector m_collisionBoostVector; /**< CollisionBoostVector for bosst vector of the beam */
 
     /** CollisionInvariantMass for Invariant Mass of Beam*/
     OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
-    CollisionInvariantMass m_collisionInvM;
+    CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

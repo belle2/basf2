@@ -9,12 +9,13 @@ import argparse
 from functools import lru_cache
 from pathlib import Path
 import re
+from shlex import quote
 import subprocess
 import sys
 
 from b2test_utils import working_directory
 from basf2 import find_file, B2ERROR, B2INFO
-from skim.registry import skim_registry, combined_skims
+from skim.registry import Registry, combined_skims
 from skimExpertFunctions import get_test_file, get_eventN
 
 
@@ -46,6 +47,19 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_ssbarBGx0",
         f"{mcCampaign}_taupairBGx0",
     ]
+
+    # For MC13 the low mult test samples exist (but they don't for MC12
+    # and older) so here is a hack.
+    # TODO: remove once when we regularly add the same low mult samples
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
+    if mcCampaignNumber > 12:
+        mcSamples += [
+            f"{mcCampaign}_ggBGx1",
+            # f"{mcCampaign}_eeBGx1",
+            f"{mcCampaign}_mumuBGx1",
+            f"{mcCampaign}_eeeeBGx1",
+            f"{mcCampaign}_eemumuBGx1",
+        ]
 
     dataSamples = [
         "proc9_exp3",
@@ -80,7 +94,7 @@ def getArgumentParser():
         parser (argparse.ArgumentParser): An argument parser which obtains its
             list of valid skim names from `skim.registry`.
     """
-    allStandaloneSkims = [skim for _, skim in sorted(skim_registry)]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = sorted(combined_skims.keys())
 
     parser = argparse.ArgumentParser(
@@ -120,8 +134,14 @@ def getArgumentParser():
     parser.add_argument(
         "--mccampaign",
         default="MC13",
-        choices=["MC9", "MC10", "MC11", "MC12", "MC13"],
+        choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "--dry",
+        action="store_true",
+        help="Print the submission commands, but don't run them.",
     )
 
     sampleGroup = parser.add_mutually_exclusive_group()
@@ -160,7 +180,7 @@ def getSkimsAndScriptsToRun(parser, standaloneSkimList, combinedSkimList):
             missing, the value is left as `None` rather than crashing this
             program.
     """
-    allStandaloneSkims = [skim for _, skim in skim_registry]
+    allStandaloneSkims = Registry.names
     allCombinedSkims = list(combined_skims.keys())
 
     # Check that at least one skim name was supplied
@@ -218,7 +238,7 @@ def getSamplesToRun(mcSamples, dataSamples, mcOnly=False, dataOnly=False):
         return mcSamples + dataSamples
 
 
-def submitJobs(skims, scripts, samples, nEventsPerSample):
+def submitJobs(skims, scripts, samples, nEventsPerSample, DryRun):
     """Submit ``bsub`` jobs for each skim and for each test sample.
 
     Warns if any of the ``bsub`` submissions returned a non-zero exit code.
@@ -231,6 +251,7 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
         samples (list): A list of internal labels for samples to be tested.
             These are read by `skimExpertFunctions.get_test_file`.
         nEventsPerSample (int): The number of events per file to run on.
+        DryRun (bool): Print the submission commands, but don't run anything.
     """
     logDirectory = Path("log").resolve()
     logDirectory.mkdir(parents=True, exist_ok=True)
@@ -266,29 +287,33 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
             # Removing this may confuse the stats printer.
             nTestEvents = min(nEventsPerSample, get_cached_eventN(sampleFile))
 
+            arguments = [
+                "bsub",
+                "-q",
+                "l",
+                "-oo",
+                str(logFile),
+                "-e",
+                str(errFile),
+                "-J",
+                f"{skim} {sample}",
+                "basf2",
+                str(script),
+                "--job-information",
+                str(jsonFile),
+                "-n",
+                str(nTestEvents),
+                "-i",
+                str(sampleFile),
+            ]
+
+            if DryRun:
+                print(" ".join([quote(arg) for arg in arguments]) + "\n")
+                continue
+
             with working_directory(workingDirectory):
                 process = subprocess.run(
-                    [
-                        "bsub",
-                        "-q",
-                        "l",
-                        "-oo",
-                        logFile,
-                        "-e",
-                        errFile,
-                        "-J",
-                        f"{skim} {sample}",
-                        "basf2",
-                        script,
-                        "--job-information",
-                        jsonFile,
-                        "-n",
-                        str(nTestEvents),
-                        "-i",
-                        sampleFile,
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 )
 
             jobIDs.append(re.findall("\d+", str(process.stdout))[0])
@@ -298,7 +323,7 @@ def submitJobs(skims, scripts, samples, nEventsPerSample):
             B2ERROR(
                 f"An error occurred while submitting jobs for {skim} skim with script {script}."
             )
-        else:
+        elif jobIDs:
             B2INFO(
                 f'Running {script} on {nEventsPerSample} events from test samples of {", ".join(samples)}. Job IDs:\n  '
                 + "\n  ".join(jobIDs)
@@ -319,4 +344,4 @@ if __name__ == "__main__":
     skims, scripts = getSkimsAndScriptsToRun(parser, args.standalone, args.combined)
     samples = getSamplesToRun(mcSamples, dataSamples, args.mconly, args.dataonly)
 
-    submitJobs(skims, scripts, samples, args.nEventsPerSample)
+    submitJobs(skims, scripts, samples, args.nEventsPerSample, args.dry_run)

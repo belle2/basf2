@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -45,6 +45,7 @@ namespace Belle2 {
     //! Do any needed actions at the start of a simulation run
     virtual void beginRun() override;
 
+    //! This method is called for each event
     virtual void event() override;
 
     //! Do any needed actions at the end of a simulation run

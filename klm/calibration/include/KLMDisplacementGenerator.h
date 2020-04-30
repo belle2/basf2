@@ -11,9 +11,10 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* ROOT headers. */
@@ -136,6 +137,9 @@ namespace Belle2 {
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

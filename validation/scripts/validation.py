@@ -16,6 +16,7 @@ import sys
 import time
 import shutil
 import datetime
+from typing import List
 
 import json_objects
 import mail_log
@@ -323,7 +324,7 @@ def event_timing_plot(
     save_dir.cd()
 
 
-def draw_progress_bar(delete_lines, scripts, barlength=50):
+def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
     """
     This function plots a progress bar of the validation, i.e. it shows which
     percentage of the scripts has been executed yet.
@@ -503,13 +504,14 @@ class Validation:
 
         # : reporting time (in minutes)
         # the time in minutes when there will
-        # be there first logoutput if a script is still not complete This
-        # prints every 30 minutes which scripts are still running
+        # be the first log output if a script is still not complete This
+        # prints every x minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
         #: The maximum time before a script is skipped, if it does not
-        #: terminate The current limit is 10h
-        self.script_max_runtime_in_minutes = 720
+        #: terminate. Unit: minutes. Set to <= 0 to skip this limitation
+        #: entirely.
+        self.script_max_runtime_in_minutes = 60*5
 
         #: Number of parallel processes
         self.parallel = None
@@ -1097,7 +1099,7 @@ class Validation:
         # execute slow scripts first
         self.sort_scripts(remaining_scripts)
 
-        def handle_finished_script(script_obj):
+        def handle_finished_script(script_obj: Script):
             # Write to log that the script finished
             self.log.debug('Finished: ' + script_obj.path)
 
@@ -1146,7 +1148,7 @@ class Validation:
                     )
                 )
 
-        def handle_unfinished_script(script_obj):
+        def handle_unfinished_script(script_obj: Script):
             if (time.time() - script_obj.last_report_time) / 60.0 > \
                     self.running_script_reporting_interval:
                 print(
@@ -1163,24 +1165,24 @@ class Validation:
             # terminate if exceeded
             total_runtime_in_minutes = \
                 (time.time() - script_obj.start_time) / 60.0
-            if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+            if total_runtime_in_minutes > self.script_max_runtime_in_minutes > 0:
                 script_obj.status = ScriptStatus.failed
                 self.log.warning(
                     f'Script {script_obj.path} did not finish after '
-                    f'{total_runtime_in_minutes} minutes, skipping '
+                    f'{total_runtime_in_minutes} minutes, attempting to '
+                    f'terminate. '
                 )
                 # kill the running process
                 script_obj.control.terminate(script_obj)
                 # Skip all dependent scripts
                 self.skip_script(
                     script_obj,
-                    reason="Script '{}' did not finish in time, so we're"
-                           "setting it to 'skipped' so that all dependent "
-                           "scripts will be skipped "
-                           "as well.".format(script_object.path)
+                    reason=f"Script '{script_object.path}' did not finish in "
+                           f"time, so we're setting it to 'failed' so that all "
+                           f"dependent scripts will be skipped."
                 )
 
-        def handle_waiting_script(script_obj):
+        def handle_waiting_script(script_obj: Script):
             # Determine the way of execution depending on whether
             # data files are created
             if script_obj.header and \
@@ -1289,26 +1291,21 @@ class Validation:
         @return: None
         """
 
-        # Go to the html directory and create a link to the results folder
-        # if it is not yet existing
-        save_dir = os.getcwd()
-        if not os.path.exists(validationpath.folder_name_html):
-            os.mkdir(validationpath.folder_name_html)
+        html_folder = validationpath.get_html_folder(self.work_folder)
+        results_folder = validationpath.get_results_folder(
+                self.work_folder
+        )
 
-        if not os.path.exists(validationpath.folder_name_results):
+        os.makedirs(html_folder, exist_ok=True)
+
+        if not os.path.exists(results_folder):
             self.log.error(
-                f"Folder {validationpath.folder_name_results} not found in "
-                f"the current directory {save_dir}, please run "
-                f"validate_basf2 first"
+                f"Folder {results_folder} not found in "
+                f"the work directory {self.work_folder}, please run "
+                f"b2validation first"
             )
 
-        os.chdir(validationpath.folder_name_html)
-
-        # import and run plot function
         validationplots.create_plots(force=True, work_folder=self.work_folder)
-
-        # restore original working directory
-        os.chdir(save_dir)
 
 
 def execute(tag=None, is_test=None):
@@ -1335,7 +1332,7 @@ def execute(tag=None, is_test=None):
     # Otherwise we can start the execution. The mainpart is wrapped in a
     # try/except-contruct to fetch keyboard interrupts
     # fixme: except instructions make only sense after Validation obj is
-    # initialized ==> Pull everything until there out of try statement
+    #   initialized ==> Pull everything until there out of try statement
     try:
 
         # Now we process the command line arguments.
@@ -1445,6 +1442,21 @@ def execute(tag=None, is_test=None):
         if cmd_arguments.use_cache:
             validation.log.note("Checking for cached script output")
             validation.apply_script_caching()
+
+        # Allow to change the maximal run time of the scripts
+        if cmd_arguments.max_run_time is not None:
+            if cmd_arguments.max_run_time > 0:
+                validation.log.note(
+                    f"Setting maximal run time of the steering files "
+                    f"to {cmd_arguments.max_run_time} minutes."
+                )
+            else:
+                validation.log.note(
+                    "Disabling run time limitation of steering files as "
+                    "requested (max run time set to <= 0)."
+                )
+            validation.script_max_runtime_in_minutes = \
+                cmd_arguments.max_run_time
 
         # Start the actual validation
         validation.log.note('Starting the validation...')

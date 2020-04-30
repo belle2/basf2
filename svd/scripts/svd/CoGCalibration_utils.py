@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
 #
 # evaluates the CoG corrections, create a localDB
 # with the corrections and a root file to check
@@ -14,7 +13,6 @@
 # this script can be launched with launch_calibration_cog.sh in the
 # B2SVD project, svd_CoGHitTime_calibration repository
 #
-#################################################################################
 
 
 from basf2 import *
@@ -93,7 +91,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
             # print(str(tZero_err))

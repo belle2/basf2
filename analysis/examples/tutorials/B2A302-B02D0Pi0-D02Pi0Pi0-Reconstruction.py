@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -39,7 +38,7 @@ ma.inputMdst(environmentType='default',
 # use standard final state particle lists
 #
 # creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
+# see Standard Particles section at https://software.belle2.org/
 stdPi0s(listtype='looseFit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
@@ -72,7 +71,7 @@ B0_vars = vc.inv_mass + \
 
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
-    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    ['extraInfo(BDT)', 'decayAngle(0)', 'weightedAverageECLTime'] + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')

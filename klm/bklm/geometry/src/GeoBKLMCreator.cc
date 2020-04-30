@@ -12,9 +12,9 @@
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/simulation/SensitiveDetector.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
 /* Belle 2 headers. */
 #include <geometry/Materials.h>
@@ -47,37 +47,37 @@ namespace Belle2 {
     GeoBKLMCreator::GeoBKLMCreator()
     {
       m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new SensitiveDetector(G4String("BKLM")));
-      m_GeoPar = NULL;
+      m_GeoPar = nullptr;
       m_SectorDphi = 0.0;
       m_SectorDz = 0.0;
       m_RibShift = 0.0;
-      m_CapSolid = NULL;
-      m_CapLogical[0] = m_CapLogical[1] = NULL;
-      m_InnerIronSolid = NULL;
-      m_InnerIronLogical[0] = m_InnerIronLogical[1] = m_InnerIronLogical[2] = m_InnerIronLogical[3] = NULL;
-      m_InnerAirSolid = NULL;
-      m_InnerAirLogical[0] = m_InnerAirLogical[1] = m_InnerAirLogical[2] = m_InnerAirLogical[3] = NULL;
-      m_SupportLogical[0] = m_SupportLogical[1] = NULL;
-      m_BracketLogical = NULL;
+      m_CapSolid = nullptr;
+      m_CapLogical[0] = m_CapLogical[1] = nullptr;
+      m_InnerIronSolid = nullptr;
+      m_InnerIronLogical[0] = m_InnerIronLogical[1] = m_InnerIronLogical[2] = m_InnerIronLogical[3] = nullptr;
+      m_InnerAirSolid = nullptr;
+      m_InnerAirLogical[0] = m_InnerAirLogical[1] = m_InnerAirLogical[2] = m_InnerAirLogical[3] = nullptr;
+      m_SupportLogical[0] = m_SupportLogical[1] = nullptr;
+      m_BracketLogical = nullptr;
       for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
-        m_LayerIronSolid[j] = NULL;
+        m_LayerIronSolid[j] = nullptr;
       }
       for (int j = 0; j < 2 * BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
-        m_LayerModuleLogical[j] = NULL;
-        m_LayerGapSolid[j] = NULL;
+        m_LayerModuleLogical[j] = nullptr;
+        m_LayerGapSolid[j] = nullptr;
       }
       for (int j = 0; j < 12 * BKLMElementNumbers::getMaximalLayerNumber(); ++j) {
-        m_LayerIronLogical[j] = NULL;
-        m_LayerGapLogical[j] = NULL;
+        m_LayerIronLogical[j] = nullptr;
+        m_LayerGapLogical[j] = nullptr;
       }
-      m_SectorTube = NULL;
+      m_SectorTube = nullptr;
       for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorNumber(); ++sector) {
-        m_SectorLogical[0][sector] = NULL;
-        m_SectorLogical[1][sector] = NULL;
+        m_SectorLogical[0][sector] = nullptr;
+        m_SectorLogical[1][sector] = nullptr;
       }
-      m_MPPCHousingLogical = NULL;
-      m_ReadoutContainerLogical = NULL;
-      m_SolenoidTube = NULL;
+      m_MPPCHousingLogical = nullptr;
+      m_ReadoutContainerLogical = nullptr;
+      m_SolenoidTube = nullptr;
       m_ScintLogicals.clear();
       m_VisAttributes.clear();
       m_VisAttributes.push_back(new G4VisAttributes(false)); // for "invisible"
@@ -183,7 +183,7 @@ namespace Belle2 {
 
     void GeoBKLMCreator::putSectorsInEnd(G4LogicalVolume* endLogical, int section)
     {
-      if (m_SectorTube == NULL) {
+      if (m_SectorTube == nullptr) {
         m_SectorTube =
           new G4Tubs("BKLM.SectorSolid",
                      m_GeoPar->getSolenoidOuterRadius() * CLHEP::cm,
@@ -229,7 +229,7 @@ namespace Belle2 {
       const double dz = m_SectorDz - gapHalfSize.z();
       const double ri = m_GeoPar->getLayerInnerRadius(1) * CLHEP::cm + 2.0 * gapHalfSize.x();
       const double ro = m_GeoPar->getOuterRadius() * CLHEP::cm;
-      if (m_CapSolid == NULL) {
+      if (m_CapSolid == nullptr) {
         const double z[2] = { -dz, dz};
         const double rInner[2] = {ri, ri};
         const double rOuter[2] = {ro, ro};
@@ -243,7 +243,7 @@ namespace Belle2 {
       }
       int newLvol = (hasChimney ? 1 : 0);
       G4String name = (hasChimney ? "BKLM.ChimneyCapLogical" : "BKLM.CapLogical");
-      if (m_CapLogical[newLvol] == NULL) {
+      if (m_CapLogical[newLvol] == nullptr) {
         m_CapLogical[newLvol] =
           new G4LogicalVolume(m_CapSolid,
                               Materials::get("G4_Fe"),
@@ -290,7 +290,7 @@ namespace Belle2 {
     {
 
       // Fill inner region with iron
-      if (m_InnerIronSolid == NULL) {
+      if (m_InnerIronSolid == nullptr) {
         const double r = m_GeoPar->getLayerInnerRadius(1) * CLHEP::cm;
         const double z[2] = { -m_SectorDz, +m_SectorDz};
         const double rInner[2] = {0.0, 0.0};
@@ -309,7 +309,7 @@ namespace Belle2 {
                                 );
       }
       int newLvol = (hasInnerSupport ? 2 : 0) + (hasChimney ? 1 : 0);
-      if (m_InnerIronLogical[newLvol] == NULL) {
+      if (m_InnerIronLogical[newLvol] == nullptr) {
         m_InnerIronLogical[newLvol] =
           new G4LogicalVolume(m_InnerIronSolid,
                               Materials::get("G4_Fe"),
@@ -333,7 +333,7 @@ namespace Belle2 {
 
       // Carve out an air void from the inner-region iron, leaving only the ribs
       // at the azimuthal edges
-      if (m_InnerAirSolid == NULL) {
+      if (m_InnerAirSolid == nullptr) {
         const double r = m_GeoPar->getLayerInnerRadius(1) * CLHEP::cm - m_RibShift;
         const double z[2] = { -m_SectorDz, +m_SectorDz};
         const double rInner[2] = {0.0, 0.0};
@@ -353,7 +353,7 @@ namespace Belle2 {
                                 );
       }
       int newLvol = (hasInnerSupport ? 2 : 0) + (hasChimney ? 1 : 0);
-      if (m_InnerAirLogical[newLvol] == NULL) {
+      if (m_InnerAirLogical[newLvol] == nullptr) {
         m_InnerAirLogical[newLvol] =
           new G4LogicalVolume(m_InnerAirSolid,
                               Materials::get("G4_AIR"),
@@ -380,7 +380,7 @@ namespace Belle2 {
 
       int newLvol = (hasChimney ? 1 : 0);
       const CLHEP::Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * CLHEP::cm;
-      if (m_SupportLogical[newLvol] == NULL) {
+      if (m_SupportLogical[newLvol] == nullptr) {
         G4Box* supportBox =
           new G4Box((hasChimney ? "BKLM.ChimneySupportSolid" : "BKLM.SupportSolid"),
                     size.x(),
@@ -409,7 +409,7 @@ namespace Belle2 {
     void GeoBKLMCreator::putLayer1BracketsInInnerVoid(G4LogicalVolume* innerAirLogical, bool hasChimney)
     {
 
-      if (m_BracketLogical == NULL) {
+      if (m_BracketLogical == nullptr) {
         const CLHEP::Hep3Vector size = m_GeoPar->getSupportPlateHalfSize(hasChimney) * CLHEP::cm;
         const double dz = 0.5 * m_GeoPar->getBracketLength() * CLHEP::cm;
         const double r = m_GeoPar->getLayerInnerRadius(1) * CLHEP::cm - m_RibShift - 2.0 * size.x();
@@ -512,7 +512,7 @@ namespace Belle2 {
       char name[80] = "";
       for (int layer = 1; layer <= m_GeoPar->getNLayer(); ++layer) {
         // Fill layer with iron
-        if (m_LayerIronSolid[layer - 1] == NULL) {
+        if (m_LayerIronSolid[layer - 1] == nullptr) {
           const double ri = m_GeoPar->getLayerInnerRadius(layer) * CLHEP::cm;
           const double ro = m_GeoPar->getLayerOuterRadius(layer) * CLHEP::cm;
           const double rInner[2] = {ri, ri};
@@ -538,7 +538,7 @@ namespace Belle2 {
         } else {
           newLvol += BKLMElementNumbers::getMaximalLayerNumber() * 8;
         }
-        if (m_LayerIronLogical[newLvol] == NULL) {
+        if (m_LayerIronLogical[newLvol] == nullptr) {
           sprintf(name, "BKLM.Layer%02d%s%sIronLogical", layer, (isFlipped ? "Flipped" : ""), (hasChimney ? "Chimney" : ""));
           m_LayerIronLogical[newLvol] =
             new G4LogicalVolume(m_LayerIronSolid[layer - 1],
@@ -708,7 +708,7 @@ namespace Belle2 {
       char name[80] = "";
       // Fill gap with air
       int modLvol = (hasChimney ? BKLMElementNumbers::getMaximalLayerNumber() : 0) + (layer - 1);
-      if (m_LayerModuleLogical[modLvol] == NULL) {
+      if (m_LayerModuleLogical[modLvol] == nullptr) {
         // Module is aluminum (but interior will be filled)
         sprintf(name, "BKLM.Layer%02d%sModuleSolid", layer, (hasChimney ? "Chimney" : ""));
         G4Box* moduleBox =
@@ -761,7 +761,7 @@ namespace Belle2 {
                     gapHalfSize.x(), gapHalfSize.y(), gapHalfSize.z()
                    );
       }
-      if (m_LayerGapLogical[newLvol] == NULL) {
+      if (m_LayerGapLogical[newLvol] == nullptr) {
         sprintf(name, "BKLM.Layer%02d%s%sGapLogical", layer, (isFlipped ? "Flipped" : ""), (hasChimney ? "Chimney" : ""));
         m_LayerGapLogical[newLvol] =
           new G4LogicalVolume(m_LayerGapSolid[modLvol],
@@ -1075,7 +1075,7 @@ namespace Belle2 {
 
     G4LogicalVolume* GeoBKLMCreator::getMPPCHousingLogical()
     {
-      if (m_MPPCHousingLogical == NULL) {
+      if (m_MPPCHousingLogical == nullptr) {
         G4Tubs* mppcHousingSolid =
           new G4Tubs("BKLM.MPPCHousingSolid",
                      0.0,
@@ -1120,7 +1120,7 @@ namespace Belle2 {
 
     G4LogicalVolume* GeoBKLMCreator::getReadoutContainerLogical()
     {
-      if (m_ReadoutContainerLogical == NULL) {
+      if (m_ReadoutContainerLogical == nullptr) {
         const CLHEP::Hep3Vector containerHalfSize = m_GeoPar->getReadoutContainerHalfSize() * CLHEP::cm;
         G4Box* containerBox =
           new G4Box("BKLM.ReadoutContainerSolid",
@@ -1205,7 +1205,7 @@ namespace Belle2 {
     G4Tubs* GeoBKLMCreator::getSolenoidTube(void)
     {
 
-      if (m_SolenoidTube == NULL) {
+      if (m_SolenoidTube == nullptr) {
         m_SolenoidTube =
           new G4Tubs("BKLM.SolenoidTube",
                      0.0,

@@ -8,10 +8,9 @@
 
 #include <daq/rfarm/event/modules/EvReduction.h>
 #include <TSystem.h>
-#include <stdlib.h>
 
-#include "framework/datastore/StoreObjPtr.h"
-
+#include <rawdata/dataobjects/RawTLU.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 // #define DESY
 

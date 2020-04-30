@@ -6,11 +6,8 @@
 #include <iostream>
 #include <sstream>
 #include <cstdio>
-#include <cstdarg>
 
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <cstdlib>
 #include <daq/slc/system/LockGuard.h>
 

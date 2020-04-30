@@ -142,7 +142,7 @@ This will read the output files of the test jobs, and produce tables of statisti
 .. tip::
    To test your own newly-developed skim, you must do the following things in your current setup of ``basf2``:
 
-   1. Add your skim to `skim.registry.skim_registry`. This should be an entry of the form ``(SkimCode, SkimName)``.
+   1. Add your skim to the `skim.registry.Registry`. This should be an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
    2. Put your skim steering file in ``skim/standalone/``, with a name of the form ``{SkimName}_Skim_Standalone.py``. This skim name must match what you wrote in the registry.
 

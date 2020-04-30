@@ -1,7 +1,6 @@
 #ifndef _Belle2_DBInterface_hh
 #define _Belle2_DBInterface_hh
 
-#include "daq/slc/database/DBHandlerException.h"
 #include "daq/slc/database/DBRecord.h"
 
 #include <vector>

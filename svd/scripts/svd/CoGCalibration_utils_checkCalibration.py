@@ -1,14 +1,12 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
 #
 # util module to check SVD CoG Calibration stored in a localDB
 #
 # called by SVDCoGTimeCalibrationCheck script in
 # svd/scripts/caf/SVDCoGTimeCalibrationCheck.py
 #
-#################################################################################
 
 
 from basf2 import *
@@ -74,7 +72,7 @@ class SVDCoGTimeCalibrationCheckModule(basf2.Module):
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             # tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
 
             # filling histograms
             resHist = self.resList[layerIndex][ladderIndex][sensorIndex][sideIndex]

@@ -60,7 +60,13 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.
      */
     genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane& state) const override;
+
+    /** build MeasurementsOnPlane
+    */
     std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
+
+    /** construct error matrix
+     */
     virtual const genfit::HMatrixU* constructHMatrix(const genfit::AbsTrackRep*) const override;
 
     /** Get the time derivative of the MesuredStateOnPlane (derived from the track fit).  */
@@ -92,7 +98,9 @@ namespace Belle2 {
      */
     void setLeftRightResolution(int lr) { m_leftRight = lr; }
 
+    /** CDC RecoHits always have left-right ambiguity */
     bool isLeftRightMeasurement() const override { return true; }
+
     /** Getter for left/right passage flag. */
     int getLeftRightResolution() const override { return m_leftRight; }
 

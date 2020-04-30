@@ -9,7 +9,6 @@
 #ifndef DESERIALIZERHLT_H
 #define DESERIALIZERHLT_H
 #include <daq/rawdata/modules/DeSerializerPC.h>
-#include <daq/rawdata/modules/DAQConsts.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>

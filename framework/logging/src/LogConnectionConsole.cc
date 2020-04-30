@@ -11,6 +11,7 @@
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogMessage.h>
 #include <boost/python.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cstring> // strerror()
 #include <unistd.h> // isatty(), dup()
@@ -19,6 +20,7 @@
 using namespace Belle2;
 
 bool LogConnectionConsole::s_pythonLoggingEnabled{false};
+bool LogConnectionConsole::s_escapeNewlinesEnabled{false};
 
 LogConnectionConsole::LogConnectionConsole(int outputFD, bool color):
   m_fd(dup(outputFD)), m_color(color)
@@ -79,10 +81,19 @@ bool LogConnectionConsole::sendMessage(const LogMessage& message)
     stream << c;
   }
   stream << message;
-  if (m_color) {
-    stream << "\x1b[m";
+  std::string messagestr = stream.str();
+  if (s_escapeNewlinesEnabled) {
+    // remove trailing whitespace
+    boost::trim_right_if(messagestr, boost::is_any_of(" \t\n\r"));
+    // escape all remaining newlines
+    boost::replace_all(messagestr, "\n", "\\n");
+    // and make sure we end in an actual newline
+    messagestr += "\n";
   }
-  write(stream.str());
+  if (m_color) {
+    messagestr += "\x1b[m";
+  }
+  write(messagestr);
   return true;
 }
 

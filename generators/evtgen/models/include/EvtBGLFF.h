@@ -67,7 +67,7 @@ private:
       Fitted values cited from
       R.Glattauer, etc. (Belle) Phys. Rev. D 93,032006 (2016).
 
-      B -> D*lnu:
+      B -> D*lnu (l=e, mu):
       a_n, b_n (n = 0,1) and c_n (n = 0,1,2) are free coefficients of z expansion parametrization from
       C.G.Boyd, B.Grinstein and R.F.Lebed, Phys. Rev. D 56,6895(1997) &
       B.Grinstein, A.Kobach, Phys. Lett. B 771(2017)359-364
@@ -81,6 +81,7 @@ private:
       Fitted values are taken from a private discussion of Florian Bernlochner based on
       B.Grinstein and A.Kobach, Phys. Lett. B 771(2017)359-364
 
+      It should not be used to generate D* with tau, due to the lack of fitted parameters in a0f amplitude.
 
    **/
 

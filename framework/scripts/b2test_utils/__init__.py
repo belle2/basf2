@@ -139,7 +139,7 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
-    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:

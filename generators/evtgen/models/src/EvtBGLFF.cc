@@ -36,7 +36,7 @@ EvtBGLFF::EvtBGLFF(double bglap_0, double bglap_1, double bglap_2, double bglap_
 }
 
 
-// BGL for vector meson i.e. B->D*lv  (l=e,mu)
+// BGL for vector meson i.e. B->D*lv (l=e,mu), and should not be used to taus.
 EvtBGLFF::EvtBGLFF(double bgla_0, double bgla_1, double bglb_0, double bglb_1, double bglc_1, double bglc_2)
 {
 
@@ -141,6 +141,8 @@ void EvtBGLFF::getvectorff(EvtId parent, EvtId, double t, double mass, double* a
   *a1f = (w + 1.) / 2. * rstar * ha1;
   *a2f = (r2 / rstar) * ha1;
   *vf  = (r1 / rstar) * ha1;
+  *a0f = 0; // a0f is related to B->D* tau nu decay.
+  // The class should not be used for taus, due to the lack of fitted parameters in a0f amplitude.
 
   return;
 }

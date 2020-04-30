@@ -60,6 +60,12 @@ namespace Belle2 {
     /** Cluster Charge for PXD clusters, uncorrected */
     std::map <VxdID, TH1F*> m_trackClusterChargeUC{};
 
+    /** Number of Tracked Clusters per module */
+    TH1F* m_trackedClusters{};
+
+    /** map vxd id to dhe id */
+    std::map<VxdID, int> m_vxd_to_dhe;
+
   };  //end class declaration
 
 }  // end namespace Belle2

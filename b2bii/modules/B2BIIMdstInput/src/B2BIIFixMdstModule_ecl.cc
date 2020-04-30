@@ -138,6 +138,9 @@ namespace Belle2 {
 //Original definition.
 //static double ecl_adhoc_corr( int Exp, int Run, double Energy, double)
 //Modified 20081222
+  /** The function giving correction factor.
+   *  Corresponding Data/MC so that energy in data should be divided by this.
+   */
   static double ecl_adhoc_corr(int Exp, int Run, int iflag05th,
                                double Energy, double)
   {
@@ -580,6 +583,7 @@ namespace Belle2 {
 //=================================================================
 // Fix up wrong calib. in Exp.45 by Isamu Nakamura, added 20060413.
 //=================================================================
+  /** The function giving correction factor in Exp.45. */
   static double ecl_adhoc_corr_45(int exp, int /*run*/, int cid)
   {
 
@@ -604,6 +608,7 @@ namespace Belle2 {
 //=====================
 // Correct energy scale (MC) to make pi0 peak nominal. 20080530
 //=====================
+  /** Correct energy scale (MC) to make pi0 peak nominal. */
   static double ecl_mcx3_corr(int /*exp*/, int /*run*/, double energy, double /*theta*/)
   {
     //KM std::cout<<"ecl_mcx3_corr called."<<std::endl;
@@ -622,6 +627,7 @@ namespace Belle2 {
 // Make MC mass peak to PDG's one.
 // Version0.1 2001/07/17 trial version.
 //===============================================
+  /** Make MC mass peak to PDG value. */
   static double mpi0pdg(double Energy) // Energy in GeV.
   {
     // return value.

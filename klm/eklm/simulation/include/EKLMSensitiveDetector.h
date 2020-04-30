@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/geometry/GeometryData.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -51,8 +51,8 @@ namespace Belle2 {
 
     private:
 
-      /** Geometry data. */
-      const EKLM::GeometryData* m_GeoDat;
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;

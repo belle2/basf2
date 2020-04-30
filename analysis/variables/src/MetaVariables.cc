@@ -2376,10 +2376,13 @@ namespace Belle2 {
         auto func = [listName](const Particle*) -> double {
           StoreObjPtr<ParticleList> listOfParticles(listName);
 
-          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxPtInList");
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxOpeningAngleInList");
           int nParticles = listOfParticles->getListSize();
+          // return NaN if number of particles is less than 2
+          if (nParticles < 2) return std::numeric_limits<double>::quiet_NaN();
+
           const auto& frame = ReferenceFrame::GetCurrent();
-          double maxOpeningAngle = 0;
+          double maxOpeningAngle = -1;
           for (int i = 0; i < nParticles; i++)
           {
             TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();

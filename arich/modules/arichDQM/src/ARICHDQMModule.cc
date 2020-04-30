@@ -96,8 +96,8 @@ namespace Belle2 {
                             125 - 0.5);
     h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 5, -1 - 0.5,
                       4 - 0.5); //Bin at -1 is added to set minimum 0 without SetMinimum(0) due to bugs in jsroot on DQM server.
-    h_bitsPerHapd = new TH2D("bitsPerHapd", "Number of hits in each bit in each Hapd;Bit;HAPD serial;Hits", 5, -1 - 0.5,
-                             4 - 0.5, 420, 1, 420); // copy of h_bits
+    h_bitsPerApd = new TH2D("bitsPerApd", "Number of hits in each bit in each Apd;Bit;APD #;Hits", 5, -1 - 0.5,
+                            4 - 0.5, 420 * 4, -0.5, 420 * 4 - 0.5); // copy of h_bits
     h_hitsPerTrack2D = new TH2D("hitsPerTrack2D", "2D distribution of track associated hits;X[cm];Y[cm];Hits", 230, -115, 115, 230,
                                 -115, 115);
     h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 230, -115, 115, 230, -115, 115);
@@ -146,7 +146,7 @@ namespace Belle2 {
 
     h_aerogelHit->SetOption("LIVE");
     h_bits->SetOption("LIVE");
-    h_bitsPerHapd->SetOption("LIVE");
+    h_bitsPerApd->SetOption("LIVE");
     h_hitsPerTrack2D->SetOption("LIVE");
     h_tracks2D->SetOption("LIVE");
 
@@ -173,7 +173,7 @@ namespace Belle2 {
     h_bitsPerHapdMerger->SetMinimum(0);
     h_aerogelHit->SetMinimum(0);
     h_bits->SetMinimum(0);
-    h_bitsPerHapd->SetMinimum(0);
+    h_bitsPerApd->SetMinimum(0);
     h_hitsPerTrack2D->SetMinimum(0);
     h_tracks2D->SetMinimum(0);
     h_flashPerAPD->SetMinimum(0);
@@ -227,7 +227,7 @@ namespace Belle2 {
 
     h_aerogelHit->Reset();
     h_bits->Reset();
-    h_bitsPerHapd->Reset();
+    h_bitsPerApd->Reset();
     h_hitsPerTrack2D->Reset();
     h_tracks2D->Reset();
     h_aerogelHits3D->Reset();
@@ -276,16 +276,16 @@ namespace Belle2 {
       int mergerID = arichMergerMap->getMergerID(moduleID);
       int febSlot = arichMergerMap->getFEBSlot(moduleID);
       unsigned binID = (mergerID - 1) * N_FEB2MERGER + (febSlot);
-
+      int apdID = (moduleID - 1) * 4 + channelID / 36.;
       for (int i = 0; i < 8; i++) {
         if ((bits & (1 << i)) && !(bits & ~(1 << i))) {
           h_bits->Fill(i);
-          h_bitsPerHapd->Fill(i, moduleID);
+          h_bitsPerApd->Fill(i, apdID);
           h_bitsPerMergerNorm->Fill(i, mergerID);
           h_bitsPerHapdMerger->Fill(i, binID);
         } else if (!bits) {
           h_bits->Fill(8);
-          h_bitsPerHapd->Fill(8, moduleID);
+          h_bitsPerApd->Fill(8, apdID);
           h_bitsPerMergerNorm->Fill(8, mergerID);
           h_bitsPerHapdMerger->Fill(8, binID);
         }

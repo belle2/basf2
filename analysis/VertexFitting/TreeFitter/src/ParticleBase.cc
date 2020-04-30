@@ -164,7 +164,7 @@ namespace TreeFitter {
       if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> feedthrough
         rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
       } else { // Got gammas -> Internal track
-        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Alway mass-constrain brems tracks
+        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Always mass-constrain brems tracks
       }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||
@@ -259,7 +259,7 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::initCovariance(FitParams& fitparams) const
   {
-    // this is very sensitive and can heavily affect the efficency of the fit
+    // this is very sensitive and can heavily affect the efficiency of the fit
     ErrCode status;
 
     const int posindex = posIndex();
@@ -351,7 +351,7 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
     assert(m_config);
-    // only allow 2d for head of tree particles that are beam cosntraint
+    // only allow 2d for head of tree particles that are beam constrained
     const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
     const int posindexmother = mother()->posIndex();
     const int posindex = posIndex();
@@ -551,7 +551,7 @@ namespace TreeFitter {
       const int mother_ps_index = mother()->posIndex();
       const int dim  = m_config->m_originDimension; // TODO can we configure this to be particle specific?
 
-      // tau has different meaning depending on the dimension of the cosntraint
+      // tau has different meaning depending on the dimension of the constraint
       // 2-> use x-y projection
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
         fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
@@ -559,7 +559,7 @@ namespace TreeFitter {
       mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
 
       // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
-      // same for the momentum of for example B0, it might be initialsed with 0
+      // same for the momentum of for example B0, it might be initialised with 0
       // in those cases use pdg value
       const double mom_norm = mom.norm();
       const double dot = std::abs(vertex_dist.dot(mom));

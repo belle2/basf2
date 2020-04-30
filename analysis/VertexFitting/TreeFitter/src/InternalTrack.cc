@@ -119,7 +119,7 @@ namespace TreeFitter {
 
         } else if (mother() && mother()->posIndex() >= 0) {
           const int posindexmother = mother()->posIndex();
-          const int dim = m_config->m_originDimension; //TODO acess mother
+          const int dim = m_config->m_originDimension; //TODO access mother
           fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
         } else {
           /** (0,0,0) is the best guess in any other case */
@@ -144,7 +144,7 @@ namespace TreeFitter {
         fitparams.getStateVector()(posindex + 1) == 0 && \
         fitparams.getStateVector()(posindex + 2) == 0) {
       const int posIndexMother = mother()->posIndex();
-      const int dim = m_config->m_originDimension; // TODO acess mother (copied from InternalParticle.cc)
+      const int dim = m_config->m_originDimension; // TODO access mother (copied from InternalParticle.cc)
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posIndexMother, dim);
     }
     return initTau(fitparams); // This will never have Tau (copy anyway from InternalParticle.cc)

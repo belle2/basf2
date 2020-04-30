@@ -52,8 +52,10 @@ peakTime_fwd_V = 51
 
 
 class defaultPulseShapeImporter(basf2.Module):
+    '''default pulse shape calibrations importer'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 

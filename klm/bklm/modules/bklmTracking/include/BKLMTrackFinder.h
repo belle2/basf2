@@ -37,7 +37,7 @@ namespace Belle2 {
     void registerFitter(BKLMTrackFitter* fitter);
 
     //! find associated hits and do fit.
-    bool filter(std::list<BKLMHit2d* >& seed,
+    bool filter(const std::list<BKLMHit2d* >& seed,
                 std::list<BKLMHit2d* >& hits,
                 std::list<BKLMHit2d* >& track);
 

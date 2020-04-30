@@ -364,7 +364,7 @@ namespace Belle2 {
 //}
 //
 
-    bool JetFitObject::adjustEThetaPhi(double& m, double& E, double& theta, double& phi)
+    bool JetFitObject::adjustEThetaPhi(const double& m, double& E, double& theta, double& phi)
     {
       bool result = false;
 

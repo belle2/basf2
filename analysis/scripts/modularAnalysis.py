@@ -467,13 +467,21 @@ def correctBremsBelle(outputListName,
 
 def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
-    Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    Copy all Particle indices from all input ParticleLists to the
+    single output ParticleList.
     Note that the Particles themselves are not copied.
     The original and copied ParticleLists will point to the same Particles.
+
     Duplicates are removed based on the first-come, first-served principle.
     Therefore, the order of the input ParticleLists matters.
-    If you want to select the best duplicate based on another criterion, have
-    a look at the function `mergeListsWithBestDuplicate`.
+
+    .. seealso::
+        If you want to select the best duplicate based on another criterion, have
+        a look at the function `mergeListsWithBestDuplicate`.
+
+    .. note::
+        Two particles that differ only by the order of their daughters are
+        considered duplicates and one of them will be removed.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -524,7 +532,7 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     ``outputListName`` if they pass ``cut`` (given selection criteria).
 
     Note:
-        Note the Particles themselves are not copied.
+        Note that the Particles themselves are not copied.
         The original and copied ParticleLists will point to the same Particles.
 
     Example:
@@ -2727,14 +2735,22 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     # Map the training mode enum value to the actual name of the payload in the GT.
     payloadNames = {
-        Belle2.ChargedPidMVAWeights.c_Classification: {"mode": "Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_Multiclass: {"mode": "Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_Classification: {"mode": "ECL_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: {"mode": "ECL_Multiclass", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_PSD_Classification: {"mode": "PSD_Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: {"mode": "PSD_Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: {"mode": "ECL_PSD_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification:
+        {"mode": "Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass:
+        {"mode": "Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification:
+        {"mode": "ECL_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass:
+        {"mode": "ECL_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Classification:
+        {"mode": "PSD_Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Multiclass:
+        {"mode": "PSD_Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Classification:
+        {"mode": "ECL_PSD_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Multiclass:
+        {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
     }
 
     if payloadNames.get(trainingMode) is None:

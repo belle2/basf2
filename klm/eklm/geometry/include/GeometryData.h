@@ -81,7 +81,7 @@ namespace Belle2 {
 
       /**
        * Get index in position-based array.
-       * @param[in] positionIndex index in position-based array.
+       * @param[in] lengthIndex index in length-based array.
        */
       int getStripPositionIndex(int lengthIndex) const;
 

@@ -125,9 +125,10 @@ namespace Belle2 {
 
     /**
      * Dummy value of Log Likelihood for a particle hypothesis.
+     * This leads to a null contribution in the PID likelihood ratio.
      * Used when the pdf value is (0 | subnormal | inf | NaN).
     */
-    static constexpr double c_dummyLogL = std::numeric_limits<float>::quiet_NaN();
+    static constexpr double c_dummyLogL = 0.0;
 
     /**
      * Apply cluster timing selection.

@@ -126,27 +126,28 @@ void ECLChargedPIDModule::event()
     }
     B2DEBUG(20,  "-------------------------------");
 
-    float likelihoods[Const::ChargedStable::c_SetSize];
-    // Initialise PDF value.
-    // This will correspond to a LogL = NaN if unchanged.
-    double pdfval(0.0);
+    // For tracks w/:
+    // -) A matched shower
+    // -) Shower is in the tracker acceptance (reg != 0)
+    // -) Well defined charge (+/-1),
+    // get the pdf value for each charged particle hypothesis,
+    // and store a ECLPidLikelihood data object.
+    if (mostEnergeticShower && showerReg && std::abs(charge)) {
 
-    // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
-    unsigned int hypo_idx(-1);
-    for (const auto& hypo : Const::chargedStableSet) {
+      float likelihoods[Const::ChargedStable::c_SetSize];
+      // Initialise PDF value.
+      // This will correspond to a LogL = 0.0 if unchanged.
+      double pdfval(0.0);
 
-      hypo_idx = hypo.getIndex();
+      // Order of loop is defined in UnitConst.cc: e, mu, pi, K, p, d
+      unsigned int hypo_idx(-1);
+      for (const auto& hypo : Const::chargedStableSet) {
 
-      auto pdgId = hypo.getPDGCode();
+        hypo_idx = hypo.getIndex();
 
-      B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << pdgId << ", hypo[" << hypo_idx << "] * reco_charge = " << pdgId * charge);
+        auto pdgId = hypo.getPDGCode();
 
-      // For tracks w/:
-      // -) A matched shower
-      // -) Shower is in the tracker acceptance (reg != 0)
-      // -) Well defined charge (+/-1),
-      // get the pdf value.
-      if (mostEnergeticShower && showerReg && std::abs(charge)) {
+        B2DEBUG(20, "\n\thypo[" << hypo_idx << "] = " << pdgId << ", hypo[" << hypo_idx << "] * reco_charge = " << pdgId * charge);
 
         // Retrieve the list of enum ids for the input variables from the payload.
         auto varids = m_pdfs->getVars(pdgId, charge, p, showerTheta);
@@ -163,7 +164,7 @@ void ECLChargedPIDModule::event()
         }
 
         // Get the PDF templates for the various observables, and multiply the PDF values for this candidate.
-        // This assumes observables aren't correlated
+        // If more than 1 observable is used, this assumes they are independent
         // (or at least linear correlations have been removed by suitably transforming the inputs...).
         double prod(1.0);
         double ipdfval;
@@ -192,18 +193,19 @@ void ECLChargedPIDModule::event()
 
         B2DEBUG(20, "\tL(" << pdgId * charge << ") = " << pdfval);
 
-      }
+        likelihoods[hypo_idx] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : c_dummyLogL;
 
-      likelihoods[hypo_idx] = (std::isnormal(pdfval) && pdfval > 0) ? log(pdfval) : c_dummyLogL;
+        B2DEBUG(20, "\tlog(L(" << pdgId * charge << ")) = " << likelihoods[hypo_idx]);
 
-      B2DEBUG(20, "\tlog(L(" << pdgId * charge << ")) = " << likelihoods[hypo_idx]);
-    }
+      } // Loop over hypotheses
 
-    const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods);
+      const auto eclPidLikelihood = m_eclPidLikelihoods.appendNew(likelihoods);
 
-    track.addRelationTo(eclPidLikelihood);
+      track.addRelationTo(eclPidLikelihood);
 
-  } // end loop on tracks
+    } // Check on good tracks.
+
+  } // End loop on tracks
 }
 
 double ECLChargedPIDModule::getPdfVal(const double& x, const TF1* pdf)

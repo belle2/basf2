@@ -229,13 +229,13 @@ namespace Belle2 {
                             bool updateExisting = false);
     /**
      * Update mask by keeping or excluding particles
-     * @param maskName Name of the mask to work with
-     * @param particles Reference to particle collection
-     * @param listType ParticleType of the collection
-     * @param discard Update the ROE mask by passing or discarding particles in the provided particle list
+     * @param Name of the mask to work with
+     * @param Reference to particle collection
+     * @param ParticleSourceObject of the collection
+     * @param Update the ROE mask by passing or discarding particles in the provided particle list
      */
     void excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particles,
-                                  Particle::EParticleType listType,
+                                  Particle::EParticleSourceObject listType,
                                   bool discard);
     /**
      * True if this ROE object has mask

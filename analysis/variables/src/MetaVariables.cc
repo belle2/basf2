@@ -447,9 +447,9 @@ namespace Belle2 {
 
         // this only makes sense for particles that are *not* composite and come
         // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
+        Particle::EParticleSourceObject particlesource = particle->getParticleSource();
+        if (particlesource == Particle::EParticleSourceObject::c_Composite
+        or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
@@ -458,7 +458,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particletype == iparticle->getParticleType())
+          if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
               return 1.0;
         }
@@ -1162,7 +1162,7 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
 
@@ -1193,7 +1193,48 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function daughterAngleInBetween");
+        B2FATAL("Wrong number of arguments for meta function daughterAngle");
+      }
+    }
+
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (!particle)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          unsigned daughterIndex, grandDaughterIndex;
+          try {
+            daughterIndex = Belle2::convertString<int>(arguments[0]);
+            grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
+          } catch (std::invalid_argument&)
+          {
+            B2FATAL("The arguments of grandDaughterDecayAngle have to be integers!");
+          }
+
+          if (daughterIndex >= particle->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          const Particle* daughter = particle->getDaughter(daughterIndex);
+
+          if (grandDaughterIndex >= daughter->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          TVector3  boost = - (daughter->get4Vector().BoostVector());
+
+          TLorentzVector motherMomentum = - particle->get4Vector();
+          motherMomentum.Boost(boost);
+
+          TLorentzVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+          grandDaughterMomentum.Boost(boost);
+
+          return motherMomentum.Angle(grandDaughterMomentum.Vect());
+        };
+        return func;
+      } else {
+        B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
       }
     }
 
@@ -1518,7 +1559,7 @@ namespace Belle2 {
         auto func = [var](const Particle * particle) -> double { return std::cos(var->function(particle)); };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function sin");
+        B2FATAL("Wrong number of arguments for meta function cos");
       }
     }
 
@@ -2747,18 +2788,31 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
                       "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
-    REGISTER_VARIABLE("daughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", daughterAngleInBetween, R"DOC(
-Returns the angle in between any pair of particles belonging to the same decay tree. 
-The particles are identified via generalized daughter indexes, which are simply colon-separated lists of daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply identifies the second daughter of the root particle. 
+    REGISTER_VARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
+                       Returns the angle in between any pair of particles belonging to the same decay tree.
 
-Both two and three generalized indexes can be given to ``daughterAngleInBetween``. If two indices are given, the variable returns the angle between the momenta of the two given particles. If three indices are given,  the variable returns the angle between the momentum of the third particle and a vector which is the sum of the first two daughter momenta.
+                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                       daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                       identifies the second daughter of the root particle.
 
-.. tip::
-    ``daughterAngleInBetween(0, 3)`` will return the angle between the first and fourth daughter.
-    ``daughterAngleInBetween(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and second daughter. 
-    ``daughterAngleInBetween(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
+                       Both two and three generalized indexes can be given to ``daughterAngle``. If two indices are given, the
+                       variable returns the angle between the momenta of the two given particles. If three indices are given, the
+                       variable returns the angle between the momentum of the third particle and a vector which is the sum of the
+                       first two daughter momenta.
 
-)DOC");
+                       .. tip::
+                           ``daughterAngle(0, 3)`` will return the angle between the first and fourth daughter.
+                           ``daughterAngle(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and
+                           second daughter.
+                           ``daughterAngle(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and
+                           the first daughter of the fourth daughter.
+
+                      )DOC");
+    REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
+                      "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
+                      "It is calculated with respect to the reverted momentum vector of the particle.\n"
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
@@ -2799,7 +2853,7 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
                       "E.g. sin(?) returns the sine of the value of the variable.");
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
-                      "E.g. sin(?) returns the cosine of the value of the variable.");
+                      "E.g. cos(?) returns the cosine of the value of the variable.");
     REGISTER_VARIABLE("log10(variable)", log10,
                       "Returns log10 value of the given variable.\n"
                       "E.g. log10(?) returns the log10 of the value of the variable.");

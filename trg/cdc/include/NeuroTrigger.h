@@ -165,7 +165,7 @@ namespace Belle2 {
      * or has no pattern restriction. An unrestricted expert is returned only
      * if there is no exactly matching expert.
      * @return index of the selected MLP, -1 if no matching MLP is found */
-    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern);
+    int selectMLPbyPattern(std::vector<int>& MLPs, unsigned long pattern, const bool neurotrackinputmode);
 
     /** Calculate 2D phi position and arclength for the given track and store them. */
     void updateTrack(const CDCTriggerTrack& track);
@@ -191,7 +191,7 @@ namespace Belle2 {
      *                                  "fastestppriority" is used.
      *   "etf_or_zero"              :   the event time is obtained by the ETF, if
      */
-    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option);
+    void getEventTime(unsigned isector, const CDCTriggerTrack& track, std::string et_option, const bool);
 
     /** DEPRECATED!! Read out the event time and store it.
      * If there is no valid event time, it can be determined
@@ -217,7 +217,15 @@ namespace Belle2 {
      * @param track   axial hit relations are taken from given track
      * @return super layer pattern of hits in the current track
      */
-    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track);
+    unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+
+    /** Select hits for each super layer from the ones related to input track
+     * @param isector              index of the MLP that will use the input
+     * @param track                all hit relations are taken from given track
+     * @param returnAllRelevant    if true, return all relevant hits instead of
+     *                             selecting the best (for making relations)
+     * @return list of selected hit indices */
+    std::vector<unsigned> selectHitsHWSim(unsigned isector, const CDCTriggerTrack& track);
 
     /** Select best hits for each super layer
      * @param isector              index of the MLP that will use the input

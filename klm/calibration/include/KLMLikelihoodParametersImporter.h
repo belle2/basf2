@@ -13,33 +13,33 @@
 namespace Belle2 {
 
   /**
-   This class writes muidParameters to database and read muidParameters from database
-  */
-  class MuidParameterDBReaderWriter {
+   * This class imports KLMLikelihoodParameters into the database.
+   */
+  class KLMLikelihoodParametersImporter {
+
   public:
 
     /**
-     * default constructor
+     * Constructor
      */
-    MuidParameterDBReaderWriter() = default;
+    KLMLikelihoodParametersImporter() = default;
 
     /**
      * Destructor
      */
-    ~MuidParameterDBReaderWriter() = default;
+    ~KLMLikelihoodParametersImporter() = default;
 
     /**
-     * Write MuidParameters to the database.
+     * Write KLMLikelihoodParameters into the database.
      */
-    void writeMuidParameters();
+    void writeLikelihoodParameters();
 
     /**
-     * Read MuidParameters from the database.
+     * Read KLMLikelihoodParameters from the database.
      */
-    void readMuidParameters();
+    void readLikelihoodParameters();
 
   };
-
 
 }
 

@@ -26,7 +26,7 @@ namespace Belle2 {
    * o) flavor specific particles (particles that have an anti-particle, e.g. pi-, K-, D+, D0)
    * o) self-conjugated particles (particles that do not have an anti-particle, e.g. pi0, phi, or particles
    *    that have an anti-particle but are reconstructed in self-conjugated decay mode, e.g. K*0 -> K0s pi0, or D0 -> K- K+, ...)
-   * ParticleList can store only particles with same PDG code (whcih however can be reconstructed in different decay modes).
+   * ParticleList can store only particles with same PDG code (which however can be reconstructed in different decay modes).
    *
    * Each ParticleList can and should be bound with its anti-ParticleList at the time of creation of the lists.
    * This bond for example enables automatic reconstruction of charged conjugated decays in ParticleCombiner module for example.

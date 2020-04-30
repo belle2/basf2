@@ -23,18 +23,18 @@ ma.inputMdstList('default', fileList, path=path)
 
 from skim.fei import BplusSL, runFEIforBplusSL
 # run pre-selection cuts and FEI
-runFEIforBplusSL(path)
+path2 = runFEIforBplusSL(path)
 
 # Include MC matching
-path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
+path2.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 
 # Apply final B+ tag cuts
-BtagList = BplusSL(path)
-expert.skimOutputUdst(skimCode, BtagList, path=path)
-ma.summaryOfLists(BtagList, path=path)
+BtagList = BplusSL(path2)
+expert.skimOutputUdst(skimCode, BtagList, path=path2)
+ma.summaryOfLists(BtagList, path=path2)
 
 # Suppress noisy modules, and then process
-expert.setSkimLogging(path, ['ParticleCombiner'])
+expert.setSkimLogging(path2, ['ParticleCombiner'])
 b2.process(path)
 
 # print out the summary

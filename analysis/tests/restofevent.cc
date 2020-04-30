@@ -77,9 +77,9 @@ namespace {
       roe.updateMaskWithCuts("cutMask", trackSelection, eclSelection);
       roe.initializeMask("excludeMask", "TestModule");
       vector<const Particle*> excludeParticles = {ksParticle->getDaughter(1), d0Particle->getDaughter(0)};
-      roe.excludeParticlesFromMask("excludeMask", excludeParticles, Particle::EParticleType::c_Track, true);
+      roe.excludeParticlesFromMask("excludeMask", excludeParticles, Particle::EParticleSourceObject::c_Track, true);
       roe.initializeMask("keepMask", "TestModule");
-      roe.excludeParticlesFromMask("keepMask", excludeParticles, Particle::EParticleType::c_Track, false);
+      roe.excludeParticlesFromMask("keepMask", excludeParticles, Particle::EParticleSourceObject::c_Track, false);
       roe.initializeMask("V0Mask", "TestModule");
       roe.updateMaskWithCuts("V0Mask"); // No selection
       //Add V0 to ROE mask:

@@ -14,13 +14,20 @@ import modularAnalysis as ma
 
 def EtabList(path):
     """
-    Skim code: 15420200
-    Skim selection of the following channel:
-    - eta_b -> gamma gamma
-    selection criteria are listed below
-    (1) 2 std photon with E > 3.5 GeV
-    (2) 7 < M(eta_b) < 10 GeV/c^2
-    (3) foxWolframR2 < 0.995
+    **Skim code**: 15420200
+
+    **Skim Author**: Stefano Spataro, Sen Jia
+
+    **Decay Modes**:
+
+    * ``eta_b -> gamma gamma``
+
+    **Selection Criteria**:
+
+    1. ``2 std photon with E > 3.5 GeV``
+    2. ``7 < M(eta_b) < 10 GeV/c^2``
+    3. ``foxWolframR2 < 0.995``
+
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
@@ -40,8 +47,7 @@ def EtabList(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5', path=path)
-    ma.applyCuts('gamma:hard', 'foxWolframR2 < 0.995', path=path)
+    ma.cutAndCopyList('gamma:hard', 'gamma:loose', 'E>3.5 and foxWolframR2 < 0.995', path=path)
 
     # the requirement of 7 < M(eta_b) < 10 GeV/c2
     Etabcuts = 'M > 7 and M < 10'
@@ -63,14 +69,21 @@ def EtabList(path):
 
 def UpsilonList(path):
     """
-    Skim code: 15440100
-    Skim selection of the following channel:
-    - Y(1S,2S) -> l^+ l^{-} (l = e or mu)
-    selection criteria are listed below
-    (1) 2 tracks with momentum ranging between 3.5 < p < 15,
-    (2) At least 1 track p < 1.5 or 1 std photon with E > 150 MeV
-    (3) M(Y(1S,2S)) > 8 GeV/c^2
-    (4) foxWolframR2 < 0.995
+    **Skim Code**: 15440100
+
+    **Skim Author**: Stefano Spataro, Sen Jia
+
+    **Skim Selection**:
+
+    * Y(1S,2S) -> l^+ l^{-} (l = e or mu)
+
+    **Selection Criteria**
+
+    1. 2 tracks with momentum ranging between ``3.5 < p < 15``
+    2. At least 1 track ``p < 1.5`` or 1 std photon with ``E > 150 MeV``
+    3. ``M(Y(1S,2S)) > 8 GeV/c^2``
+    4. ``foxWolframR2 < 0.995``
+
     """
     __author__ = "Stefano Spataro & Sen Jia"
 
@@ -84,7 +97,7 @@ def UpsilonList(path):
     # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
     ma.reconstructDecay('Upsilon:ee -> e+:loose e-:loose', 'M > 8', path=path)
     ma.reconstructDecay('Upsilon:mumu -> mu+:loose mu-:loose', 'M > 8', path=path)
-    ma.copyLists('Upsilon:all', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
+    ma.copyLists('Upsilon:ll', ['Upsilon:ee', 'Upsilon:mumu'], path=path)
 
     # require foxWolframR2 < 0.995
     ma.fillParticleList(decayString='pi+:eventShapeForSkims', cut='pt > 0.1', path=path)
@@ -102,7 +115,7 @@ def UpsilonList(path):
                        checkForDuplicates=False,
                        path=path)
 
-    ma.applyCuts('Upsilon:all', 'foxWolframR2 < 0.995', path=path)
+    ma.cutAndCopyList('Upsilon:all', 'Upsilon:ll', 'foxWolframR2 < 0.995', path=path)
 
     # Y(1S,2S) with pi+ or photon are reconstructed
     Upsilon_Channels = ['Upsilon:all pi+:loose',
@@ -113,7 +126,7 @@ def UpsilonList(path):
 
     # reconstruct the decay channel
     for chID, channel in enumerate(Upsilon_Channels):
-        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path)
+        ma.reconstructDecay('junction:all' + str(chID) + ' -> ' + channel, Ycuts, chID, path=path, allowChargeViolation=True)
         UpsilonList.append('junction:all' + str(chID))
 
     # reture the list
@@ -122,16 +135,23 @@ def UpsilonList(path):
 
 def ISRpipiccList(path):
     """
-    Skim code: 16460100
-    Skim selection of the following channels:
-    - e+e- -> pi+ pi- J/psi -> e+e-
-    - e+e- -> pi+ pi- J/psi -> mu+mu-
-    - e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-
-    - e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-
-    selection criteria are listed below
-    (1) standard e/mu/pi ParticleLists
-    (2) mass window cut for J/psi and psi(2S) candidates
-    (3) Apply -4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4} to extract ISR signal events
+    **Skim Code**: 16460100
+
+    **Skim Author**: Sen Jia
+
+    **Skim Selection**:
+
+    * ``e+e- -> pi+ pi- J/psi -> e+e-``
+    * ``e+e- -> pi+ pi- J/psi -> mu+mu-``
+    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> e+e-``
+    * ``e+e- -> pi+ pi- psi(2S) -> pi+ pi- J/psi -> mu+mu-``
+
+    **Selection Criteria**:
+
+    (1) Standard `e/mu/pi ParticleLists`
+    (2) Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
+    (3) Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
+
     """
     __author__ = "Sen Jia"
 

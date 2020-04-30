@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *
@@ -44,6 +44,7 @@ REG_MODULE(ECLBhabhaTCollector)
 //-----------------------------------------------------------------
 
 ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorModule(),
+  m_ElectronicsDB("ECLCrystalElectronics"),
   m_ElectronicsTimeDB("ECLCrystalElectronicsTime"),
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
@@ -175,8 +176,6 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_crys_allCuts->Branch("t0_ECL_closestCDC", &m_tree_t0_ECLclosestCDC)->SetTitle("T0 ECL closest to CDC t0, ns");
     m_dbgTree_crys_allCuts->Branch("t0_ECL_minChi2", &m_tree_t0_ECL_minChi2)->SetTitle("T0 ECL with smallest chi squared, ns");
     m_dbgTree_crys_allCuts->Branch("CrystalCellID", &m_tree_cid)->SetTitle("Cell ID, 1..8736");
-    m_dbgTree_crys_allCuts->Branch("CrystalCellphi", &m_tree_phi)->SetTitle("Cell phi");
-    m_dbgTree_crys_allCuts->Branch("CrystalCelltheta", &m_tree_theta)->SetTitle("Cell theta");
 
     m_dbgTree_crys_allCuts->SetAutoSave(10);
 
@@ -336,13 +335,11 @@ void ECLBhabhaTCollectorModule::collect()
   shared_ptr< ECL::ECLChannelMapper > crystalMapper(new ECL::ECLChannelMapper());
   crystalMapper->initFromDB();
 
-  // Set up a tool for determining the theta/phi of a crystal
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-
-
   //== Get expected energies and calibration constants from DB. Need to call
   //   hasChanged() for later comparison
-
+  if (m_ElectronicsDB.hasChanged()) {
+    m_Electronics = m_ElectronicsDB->getCalibVector();
+  }
   if (m_ElectronicsTimeDB.hasChanged()) {
     m_ElectronicsTime = m_ElectronicsTimeDB->getCalibVector();
   }
@@ -406,10 +403,7 @@ void ECLBhabhaTCollectorModule::collect()
   }
 
 
-
-
   /* Getting the event t0 using the full event t0 rather than from the CDC specifically */
-
   double evt_t0 = -1;
   double evt_t0_unc = -1;
   double evt_t0_ECL_closestCDC = -1;
@@ -529,7 +523,6 @@ void ECLBhabhaTCollectorModule::collect()
      We will select events with only 2 tight tracks and no additional loose tracks.
      Tight tracks are a subset of looses tracks. */
   for (int iTrk = 0; iTrk < nTrkAll; iTrk++) {
-
     // Get track and assume it is a pion for now ... because it is the only particle we can assume?
     const TrackFitResult* tempTrackFit = tracks[iTrk]->getTrackFitResult(Const::ChargedStable(211));
     if (not tempTrackFit) {continue;}
@@ -540,7 +533,6 @@ void ECLBhabhaTCollectorModule::collect()
     double d0 = tempTrackFit->getD0();
     int nCDChits = tempTrackFit->getHitPatternCDC().getNHits();
     double p = tempTrackFit->getMomentum().Mag();
-
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     //== Save debug TTree with detailed information if necessary.
@@ -622,7 +614,6 @@ void ECLBhabhaTCollectorModule::collect()
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
   B2DEBUG(10, "Cutflow: No additional loose tracks: index = " << cutIndexPassed);
 
-
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
      and [1] fo the positively charged track.  If both are filled then both a negatively charged
@@ -663,8 +654,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   vector<double> time_ECLCaldigits_bothClusters;
   vector<int> cid_ECLCaldigits_bothClusters;
-  vector<double> phi_ECLCaldigits_bothClusters;
-  vector<double> theta_ECLCaldigits_bothClusters;
   vector<double> E_ECLCaldigits_bothClusters;
   vector<double> amp_ECLDigits_bothClusters;
   vector<int> chargeID_ECLCaldigits_bothClusters;
@@ -728,15 +717,6 @@ void ECLBhabhaTCollectorModule::collect()
             B2DEBUG(30,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
             time_ECLCaldigits_bothClusters.push_back(calDigit->getTime());
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
-
-
-            // Code to determine the phi and theta of the crystal.
-            TVector3 crystal3Vec = eclp->GetCrystalPos(calDigit->getCellId() - 1);
-            phi_ECLCaldigits_bothClusters.push_back(crystal3Vec.Phi());
-            theta_ECLCaldigits_bothClusters.push_back(crystal3Vec.Theta());
-            B2DEBUG(30,  "calDigit(ir" << ir << "), calDigit->getCellId() =  " << calDigit->getCellId() << ", theta = " << crystal3Vec.Theta()
-                    << ", phi = " << crystal3Vec.Phi());
-
             E_ECLCaldigits_bothClusters.push_back(tempE);
             amp_ECLDigits_bothClusters.push_back(ecl_dig->getAmp());
             chargeID_ECLCaldigits_bothClusters.push_back(icharge);
@@ -800,8 +780,10 @@ void ECLBhabhaTCollectorModule::collect()
     time -= m_FlightTime[cid - 1];
 
 
-    // Apply the time walk correction: time shift as a function of energy
-    double energyTimeShift = energyDependentTimeOffsetElectronic(amplitude) * TICKS_TO_NS;
+    // Apply the time walk correction: time shift as a function of the amplitude corrected by the electronics calibration.
+    //    The electronics calibration also accounts for crystals that have a dead pre-amp and thus half the normal amplitude.
+    double energyTimeShift = m_ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * m_Electronics[cid - 1]) * TICKS_TO_NS;
+
     B2DEBUG(35, "cellid = " << cid << ", amplitude = " << amplitude << ", time before t(E) shift = " << time <<
             ", t(E) shift = " << energyTimeShift << " ns");
     time -= energyTimeShift;
@@ -1086,8 +1068,6 @@ void ECLBhabhaTCollectorModule::collect()
                                       ts_prevCalib[chargeID_ECLCaldigits_bothClusters[digit_i]] -
                                       tcrate_prevCalib[chargeID_ECLCaldigits_bothClusters[digit_i]];
     m_tree_cid = cid_ECLCaldigits_bothClusters[digit_i];
-    m_tree_phi = phi_ECLCaldigits_bothClusters[digit_i];
-    m_tree_theta = theta_ECLCaldigits_bothClusters[digit_i];
 
     //  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Tree saving
     if (m_saveTree) {
@@ -1100,25 +1080,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   B2DEBUG(30, "This was for event number = " << m_tree_evtNum);
 
-}
-
-
-
-/*  Time walk function : time shift as a function of crystal amplitude.
-    This function is copy-pasted from ecl/modules/eclDigitCalibration/src/ECLDigitCalibratorModule.cc
-    Ideally this code would just execute the function from ECLDigitCalibratorModule; however,
-    it is non-trivial to make an instance of ECLDigitCalibratorModule so that a
-    copy of the function is available.  In the future, the function should be moved to a
-    different location to make it more easily accessible to outside modules.
-*/
-double ECLBhabhaTCollectorModule::energyDependentTimeOffsetElectronic(const double amp)
-{
-  double ticks_offset = m_energyDependenceTimeOffsetFitParam_p1 + pow((m_energyDependenceTimeOffsetFitParam_p3 /
-                        (amp + m_energyDependenceTimeOffsetFitParam_p2)),
-                        m_energyDependenceTimeOffsetFitParam_p4) + m_energyDependenceTimeOffsetFitParam_p5 * exp(-amp /
-                            m_energyDependenceTimeOffsetFitParam_p6);
-
-  return ticks_offset;
 }
 
 

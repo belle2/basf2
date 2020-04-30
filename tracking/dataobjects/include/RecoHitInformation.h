@@ -13,8 +13,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -78,7 +78,7 @@ namespace Belle2 {
       c_MCTrackFinderAuxiliaryHit,
       c_invalidTrackFinder,
       // non CKF-based track finders
-      c_LegendreTrackFinder,
+      c_CDCTrackFinder,
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,

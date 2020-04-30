@@ -12,12 +12,12 @@
 #include <klm/bklm/simulation/SensitiveDetector.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
+#include <klm/dataobjects/bklm/BKLMStatus.h>
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
@@ -50,8 +50,8 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
     {
       m_FirstCall = true;
-      m_BkgSensitiveDetector = NULL;
-      m_GeoPar = NULL;
+      m_BkgSensitiveDetector = nullptr;
+      m_GeoPar = nullptr;
       if (!m_SimPar.isValid())
         B2FATAL("BKLM simulation parameters are not available.");
       m_HitTimeMax = m_SimPar->getHitTimeMax();
@@ -86,7 +86,7 @@ namespace Belle2 {
       }
 
       // Record a BeamBackHit for any particle
-      if (m_BkgSensitiveDetector != NULL) {
+      if (m_BkgSensitiveDetector != nullptr) {
         m_BkgSensitiveDetector->step(step, history);
       }
 

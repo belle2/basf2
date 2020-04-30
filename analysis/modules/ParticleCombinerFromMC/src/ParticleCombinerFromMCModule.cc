@@ -51,7 +51,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("decayString", m_decayString,
-             "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
+             "Input DecayDescriptor string (see :ref:`DecayString`).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
     addParam("writeOut", m_writeOut,
@@ -203,7 +203,7 @@ namespace Belle2 {
         unsigned nPart = plist->getListSize();
         for (unsigned iPart = 0; iPart < nPart; iPart++) {
           const Particle* part = plist->getParticle(iPart);
-          Particle::EParticleType particleType = part->getParticleType();
+          Particle::EParticleSourceObject particleType = part->getParticleSource();
           if (particleType == Particle::c_Track or
               particleType == Particle::c_ECLCluster or
               particleType == Particle::c_KLMCluster)

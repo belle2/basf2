@@ -35,7 +35,7 @@ def loadStdLooseJpsi2mumu(persistent=True, path=None):
 
 def loadStdLooseJpsi2ee(persistent=True, path=None):
     """
-    Load the 'J/psi:ee' list from 'e-:loose e+:loose', with :math:`2.8 < M < 3.7~GeV`
+    Load the 'J/psi:eeLoose' list from 'e-:loose e+:loose', with :math:`2.8 < M < 3.7~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
@@ -51,8 +51,9 @@ def loadStdJpsiToee(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
+
     ma.reconstructDecay(
-        'J/psi:ee -> e+:all e-:all',
+        'J/psi:ee -> e+:bremCorr e-:bremCorr',
         '2.8 < M < 3.4 and daughter(0, electronID) > 0.01 or daughter(1, electronID) > 0.01',
         2,
         persistent,
@@ -62,13 +63,14 @@ def loadStdJpsiToee(persistent=True, path=None):
 
 def loadStdJpsiTomumu(persistent=True, path=None):
     """
-    Load the 'J/psi:mumu' list from 'mu+:all mu-:all', with :math:`2.8 < M < 3.4~GeV`
+    Load the 'J/psi:mumu' list from 'mu+:withCuts mu+:withCuts', with :math:`2.8 < M < 3.4~GeV`
+    where mu+:withCuts list is with cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and kaonID > 0.01"
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
     ma.reconstructDecay(
-        'J/psi:mumu -> mu+:all mu-:all',
+        'J/psi:mumu -> mu+:withCuts mu-:withCuts',
         '2.8 < M < 3.4 and daughter(0, muonID) > 0.01 or daughter(1,muonID) > 0.01',
         2,
         persistent,

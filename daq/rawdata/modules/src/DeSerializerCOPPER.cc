@@ -6,11 +6,11 @@
 // Date : 2 - Aug - 2013
 //-
 
+#include <daq/rawdata/modules/copper.h>
 #include <daq/rawdata/modules/DeSerializerCOPPER.h>
-#include <rawdata/CRCCalculator.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 
-
+#include <sys/ioctl.h>
 
 #define CHECKEVT 10000
 //#define CHECK_SUM

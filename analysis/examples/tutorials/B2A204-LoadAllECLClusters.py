@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -15,7 +14,6 @@
 import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
-from modularAnalysis import printDataStore
 from modularAnalysis import reconstructDecay
 from modularAnalysis import copyLists
 from modularAnalysis import variablesToNtuple
@@ -30,17 +28,22 @@ inputMdst(environmentType='default',
           path=mypath)
 
 # fill an all photon and all charged particle (does not really matter which one) list
-fillParticleList('gamma:all', 'clusterE > 0.1', path=mypath)  # neutral clusters
-fillParticleList('e-:all', 'clusterE > 0.1', path=mypath)  # track matched clusters
+fillParticleList('gamma:minimumE', 'clusterE > 0.1', path=mypath)  # neutral clusters
+fillParticleList('e-:minimumE', 'clusterE > 0.1', path=mypath)  # track matched clusters
 
 # reconstruct a pseudo particles with different combinations (implicit charge conjugation)
-reconstructDecay('vpho:1 -> gamma:all gamma:all', '', 1, path=mypath)  # two neutral '00'
-reconstructDecay('vpho:2 -> gamma:all e-:all', '', 2, path=mypath)  # neutral and charged '0+' and '0-'
-reconstructDecay('vpho:3 -> e-:all e+:all', '', 3, path=mypath)  # different charge '+-' and '-+'
-reconstructDecay('vpho:4 -> e-:all e-:all', '', 4, path=mypath)  # same charge '++' and '--'
+reconstructDecay('vpho:1 -> gamma:minimumE gamma:minimumE', '', 1, path=mypath)  # two neutral '00'
+reconstructDecay('vpho:2 -> gamma:minimumE e-:minimumE', '', 2, path=mypath,
+                 allowChargeViolation=True)  # neutral and charged '0+' and '0-'
+reconstructDecay('vpho:3 -> e-:minimumE e+:minimumE', '', 3, path=mypath)  # different charge '+-' and '-+'
+reconstructDecay('vpho:4 -> e-:minimumE e-:minimumE', '', 4, path=mypath, allowChargeViolation=True)  # same charge '++' and '--'
 copyLists('vpho:bhabha', ['vpho:1', 'vpho:2', 'vpho:3', 'vpho:4'], path=mypath)
 
 # aliases to make output better readable
+# For more information on alias definitions (including an intrdouction to
+# some very handy convenience functions with which you could
+# define below aliases in very few lines), head over to
+# ``VariableManager/variableAliases.py``.
 variables.addAlias('combinationID', 'extraInfo(decayModeID)')
 variables.addAlias('deltaPhi', 'daughterDiffOfClusterPhi(0, 1)')
 variables.addAlias('deltaTheta', 'formula(daughter(0, clusterTheta) - daughter(1, clusterTheta))')

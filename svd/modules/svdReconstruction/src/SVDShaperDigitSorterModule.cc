@@ -17,7 +17,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/reconstruction/Sample.h>
 #include <utility>
 #include <vector>
 #include <algorithm>

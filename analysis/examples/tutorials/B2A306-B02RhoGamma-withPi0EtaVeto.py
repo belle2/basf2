@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -36,12 +35,11 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
-import stdCharged as stdc
 
 # create path
 my_path = b2.create_path()
 
-b2.conditions.prepend_globaltag('analysis_tools_release-04')
+b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
@@ -210,7 +208,7 @@ b_vars = vc.kinematics + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
     vu.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
-                      wrapper='extraInfo(variable)',
+                      wrapper='extraInfo({variable})',
                       prefix="B")
 
 # Saving variables to ntuple

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MDSTPIDMODULE
-#define MDSTPIDMODULE
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -136,8 +135,6 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif
 
 
 

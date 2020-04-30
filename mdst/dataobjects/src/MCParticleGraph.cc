@@ -179,7 +179,7 @@ public:
    * @param m Reference to the mother particle whose vertex and time information should be set.
    * @param d Reference to the daughter particle.
    */
-  void setVertexTime(MCParticleGraph::GraphParticle& m, MCParticleGraph::GraphParticle& d)
+  void setVertexTime(MCParticleGraph::GraphParticle& m, const MCParticleGraph::GraphParticle& d)
   {
     //Only set vertex information if both particles have a valid vertex set
     m.setValidVertex(m.hasValidVertex() &&  d.hasValidVertex());

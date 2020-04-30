@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>

@@ -10,7 +10,7 @@
 [INFO]    -> With cuts  : dr < 2 and abs(dz) < 5
 [INFO] ParticleSelector: pi+:fromPV
 [INFO]    -> With cuts  : abs(dzFromMedianDz) < 0.05
-[INFO] ParticleVertexFitter: Performing vertex fit on vpho:PVFit using kfitter
+[INFO] ParticleVertexFitter: Performing vertex fit on vpho:PVFit using KFit
 [INFO] ParticleVertexFitter: Additional iptube will be applied
 [INFO] Number of ParticleLists studied 1 
 [INFO] ParticleStats Summary: 

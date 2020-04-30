@@ -48,9 +48,9 @@ G4mplIonisationWithDeltaModel::G4mplIonisationWithDeltaModel(G4double mCharge,
     betalow(0.01),
     betalim(0.1),
     beta2lim(betalim * betalim),
-    bg2lim(beta2lim * (1.0 + beta2lim))
+    bg2lim(beta2lim * (1.0 + beta2lim)),
+    pi_hbarc2_over_mc2(pi * hbarc * hbarc / electron_mass_c2)
 {
-  pi_hbarc2_over_mc2 = pi * hbarc * hbarc / electron_mass_c2;
   nmpl = magCharge * 2 * fine_structure_const;
   chargeSquare = magCharge * magCharge * 4 * fine_structure_const *
                  fine_structure_const;

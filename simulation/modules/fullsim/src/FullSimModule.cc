@@ -151,6 +151,10 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
+  vector<float> defaultAbsorbers;
+  addParam("AbsorbersRadii", m_absorbers,
+           "Radii (in cm) of absorbers across which tracks will be destroyed.", defaultAbsorbers);
+
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
   m_magneticField = NULL;
@@ -328,6 +332,10 @@ void FullSimModule::initialize()
   //Add the stepping action which provides additional security checks
   SteppingAction* steppingAction = new SteppingAction();
   steppingAction->setMaxNumberSteps(m_maxNumberSteps);
+  steppingAction->setAbsorbersR(m_absorbers);
+  for (auto& rAbsorber : m_absorbers) {
+    B2INFO("An absorber found at R = " << rAbsorber << " cm");
+  }
   runManager.SetUserAction(steppingAction);
 
   //Add the stacking action which provides performance speed ups for the handling of optical photons

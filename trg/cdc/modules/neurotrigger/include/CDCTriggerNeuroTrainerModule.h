@@ -119,6 +119,8 @@ namespace Belle2 {
     int m_maxEpochs;
     /** Number of training runs with different random start weights. */
     int m_repeatTrain;
+    /** Use neurotracks instead of 2dtracks as input for the neurotrigger. */
+    bool m_neuroTrackInputMode;
 
     //other data
     /** Instance of the NeuroTrigger. */

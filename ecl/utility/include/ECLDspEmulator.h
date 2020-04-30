@@ -1,14 +1,41 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Mikhail Remnev                                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+#pragma once
+
+#include <vector>
+
 namespace Belle2 {
   namespace ECL {
+    /** ShaperDSP fit results from _lftda function */
+    typedef struct ECLShapeFit {
+      /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
+      int amp;
+      /** Fit time, -2048..2047 (with reference to trigger time), ADC ticks (1 tick ~= 0.5 ns) */
+      int time;
+      /** Quality flag, see enum QualityFlag in emulator implementation */
+      int quality;
+      /** Pedestal */
+      int pedestal;
+      /** (Peak < HIT_THR) => true */
+      bool hit_thr;
+      /** (Peak < SKIP_THR) => true */
+      bool skip_thr;
+      /** (Peak < LA_THR) => true */
+      bool low_amp;
+      /** Shape of the fitted function. */
+      std::vector<long long> fit;
+      /** Chi^2 from the fit */
+      unsigned long long chi2;
+    } ECLShapeFit;
+
     /**
      * @brief Function that emulates shape fitting algorithm used in ShaperDSP.
      *        f, f1, fg* are coefficients from ECLDspData
@@ -25,8 +52,9 @@ namespace Belle2 {
      * @param[in] y[31]  Array of signal measurements
      * @param[in] ttrig2 Trigger time (0-23)
      *
-     * @param[in] A0    Low amplitude threshold
-     * @param[in] Ahard Hit threshold
+     * @param[in] la_thr    Low amplitude threshold
+     * @param[in] hit_thr   Hit threshold
+     * @param[in] skip_thr  Skip threshold
      *
      * @param[in] k_a Number of bits for FG31, FG41
      * @param[in] k_b Number of bits for FG32
@@ -38,12 +66,19 @@ namespace Belle2 {
      * @param[in] k2_chi    Bit shift for chi2 threshold calculation
      * @param[in] chi_thres Base value for chi2 threshold
      *
-     * @param[out] m_AmpFit     Amplitude from the fit
-     * @param[out] m_TimeFit    Time from the fit
-     * @param[out] m_QualityFit Quality from the fit
+     * @param[in] adjusted_timing Optional. Use adjusted formula to determine fit time.
+     *              Not implemented into firmware yet, thus false by default.
+     *              If true, algorithm will determine time near 0 with higher
+     *              precision, time of low-energy hits will be one of {-4,0,4}
+     *              If false, time will be one of {-32, -16, 0}
      */
-    void lftda_(short int* f, short int* f1, short int* fg41, short int* fg43, short int* fg31, short int* fg32, short int* fg33,
-                int* y, int& ttrig2, int& A0, int& Ahard, int& k_a, int& k_b, int& k_c, int& k_16, int& k1_chi, int& k2_chi, int& chi_thres,
-                int& m_AmpFit, int& m_TimeFit, int& m_QualityFit);
+    template <typename INT>
+    ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
+                       INT* fg43, INT* fg31, INT* fg32,
+                       INT* fg33, int* y, int& ttrig2, int& la_thr,
+                       int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                       int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                       int& chi_thres, bool adjusted_timing = false);
+
   }
 }

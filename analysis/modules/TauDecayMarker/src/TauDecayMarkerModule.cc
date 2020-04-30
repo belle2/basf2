@@ -37,7 +37,7 @@ TauDecayMarkerModule::TauDecayMarkerModule() : Module(), tauPair(false), numOfTa
   setDescription("Module to identify generated tau pair decays, using MCParticle information. Each tau lepton decay channel "
                  "is numbered following the order in the default KKMC decay table. Using this module, "
                  "the channel number will be stored in the variables ``tauPlusMcMode``, and ``tauMinusMcMode``. "
-                 "Further details and usage can be found at https://confluence.desy.de/display/BI/Tau+Physics+Analysis+Tools. ");
+                 "Further details and usage can be found at `TauDecayMCModes`. ");
   //Parameter definition
   addParam("printDecayInfo", m_printDecayInfo, "Print information of the tau pair decay from MC.", false);
 }
@@ -113,7 +113,7 @@ int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
-  MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
@@ -147,7 +147,7 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
-  MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {

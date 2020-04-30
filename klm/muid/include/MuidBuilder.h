@@ -11,139 +11,141 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
-
-//! Outermost barrel layer number (zero-based counting)
-#define MUID_MaxBarrelLayer 14
-
-//! Outermost forward-endcap layer number (zero-based counting)
-#define MUID_MaxForwardEndcapLayer 13
-
-//! Outermost backward-endcap layer number (zero-based counting)
-#define MUID_MaxBackwardEndcapLayer 11
-
-/** Greatest value for outcome.
-    0: never reached KLM
-    1: stop in barrel
-    2: stop in forward endcap (without crossing barrel)
-    3: exit from barrel (without crossing endcap)
-    4: exit from forward endcap (without crossing barrel)
-    5: stop in backward endcap (without crossing barrel)
-    6: exit from backward endcap (without crossing barrel)
-    7-21: stop in forward endcap (after crossing barrel)
-    22-36: stop in backward endcap (after crossing barrel)
-    37-51: exit from forward endcap (after crossing barrel)
-    52-66: exit from backward endcap (after crossing barrel)
-**/
-#define MUID_MaxOutcome 66
-
-//! Greatest value for reduced-chi-squared struck-detector selector
-#define MUID_MaxDetector 2
-
-//! Greatest value for ndof/2 (half of # of degrees of freedom in transverse-scattering chi-squared)
-#define MUID_MaxHalfNdof 18
-
-//! Reduced-chi-squared array size for tabulated values
-#define MUID_ReducedChiSquaredNbins 100
-
-//! Maximum reduced-chi-squared tabulated value for transverse scattering
-#define MUID_ReducedChiSquaredLimit 10.0
 
 namespace Belle2 {
 
   class KLMMuidLikelihood;
 
-  //! Provides muid parameters (from Database)
+  /**
+   * Build the Muid likelihoods starting from the hit pattern and the transverse scattering in the KLM.
+   */
   class MuidBuilder {
 
   public:
 
     /**
-     * Enum for the state of a track to KLM
+     * Constructor.
+     * @param[in] pdg PDG code of the particle hypothesis.
      */
-    enum EMuidOutcome {
-      NotReached = 0,
-      c_StopInBarrel = 1,
-      c_StopInForwardEndcap = 2,
-      c_ExitBarrel = 3,
-      c_ExitForwardEndcap = 4,
-      c_StopInBackwardEndcap = 5,
-      c_ExitBackWardEndcap = 6,
-      c_CrossBarrelStopInForwardMin = 7,
-      c_CrossBarrelStopInForwardMax = 21,
-      c_CrossBarrelStopInBackwardMin = 22,
-      c_CrossBarrelStopInBackwardMax = 36,
-      c_CrossBarrelExitForwardMin = 37,
-      c_CrossBarrelExitForwardMax = 51,
-      c_CrossBarrelExitBackwardMin = 52,
-      c_CrossBarrelExitBackwardMax = 66
-    };
+    explicit MuidBuilder(int pdg);
 
-    //! Constructor with arguments (experiment #, particleID hypothesis)
-    MuidBuilder(int, const char*);
-
-    //! Destructor
+    /**
+     * Destructor.
+     */
     ~MuidBuilder();
 
-    //! Get the PDF for a particular hypothesis
-    double getPDF(const KLMMuidLikelihood*, bool isForward) const;
+    /**
+     * Get total PDG for a given hypothesis.
+     * @param[in] muid KLMMuidLikelihood dataobject.
+     */
+    double getPDF(const KLMMuidLikelihood* muid) const;
 
   private:
 
-    //! Hidden constructor
+    /**
+     * Default constructor.
+     */
     MuidBuilder();
 
-    //! Hidden copy constructor
+    /**
+     * Copy constructor.
+     */
     MuidBuilder(MuidBuilder&);
 
-    //! Hidden copy assignment
+    /**
+     * Copy assignment.
+     */
     MuidBuilder& operator=(const MuidBuilder&);
 
-    //! Get probability density functions for this particleID hypothesis from Dababase
-    void fillPDFs(const char*);
+    /**
+     * Retrieve the PDFs from the database according to the given hypothesis.
+     * @param[in] hypothesis Hypothesis number.
+     */
+    void fillPDFs(MuidElementNumbers::Hypothesis hypothesis);
 
-    //! Construct spline interpolation coefficients (first, second, third derivatives)
-    void spline(int, double, double*, double*, double*, double*);
+    /**
+     * Construct spline interpolation coefficients (first, second, third derivatives).
+     * @param[in] n  Number of bins.
+     * @param[in] dx Width of each bin.
+     * @param[in] Y  Value of the bins.
+     * @param[in] B  First derivative.
+     * @param[in] C  Second derivative.
+     * @param[in] D  Third derivative.
+     */
+    void spline(int n, double dx, double Y[], double B[], double C[], double D[]);
 
-    //! Get the per-layer PDF for a particular hypothesis
-    double getPDFLayer(const KLMMuidLikelihood*, bool) const;
+    /**
+     * Calculate the longitudinal PDF for a given hypothesis.
+     * @param[in] muid KLMMuidLikelihood dataobject.
+     */
+    double getLongitudinalPDF(const KLMMuidLikelihood* muid) const;
 
-    //! Get the transverse-coordinate PDF for a particular hypothesis
-    double getPDFRchisq(const KLMMuidLikelihood*) const;
+    /**
+     * Calculate the transverse PDF for a given hypothesis.
+     * @param[in] muid KLMMuidLikelihood dataobject.
+     */
+    double getTransversePDF(const KLMMuidLikelihood* muid) const;
 
-    //! Per-layer (longitudinal) probability density function
-    double m_LayerPDF[MUID_MaxOutcome + 1][MUID_MaxBarrelLayer + 1][MUID_MaxBarrelLayer + MUID_MaxForwardEndcapLayer + 2];
+    /**
+     * Longitudinal PDF.
+     */
+    double m_LayerPDF[MuidElementNumbers::getMaximalOutcome() + 1][MuidElementNumbers::getMaximalBarrelLayer() +
+        1][MuidElementNumbers::getMaximalBarrelLayer() + MuidElementNumbers::getMaximalEndcapForwardLayer() + 2];
 
-    //! Reduced chi-squared (transverse) probability density function (analytical): threshold
-    double m_ReducedChiSquaredThreshold[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1];
+    /**
+     * Reduced chi-squared (transverse) analytical PDF: threshold.
+     */
+    double m_ReducedChiSquaredThreshold[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() + 1];
 
-    //! Reduced chi-squared (transverse) probability density function (analytical): horizontal scale ~ 1
-    double m_ReducedChiSquaredScaleX[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1];
+    /**
+     * Reduced chi-squared (transverse) analytical PDF: horizontal scale ~ 1.
+     */
+    double m_ReducedChiSquaredScaleX[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() + 1];
 
-    //! Reduced chi-squared (transverse) probability density function (analytical): vertical scale
-    double m_ReducedChiSquaredScaleY[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1];
+    /**
+     * Reduced chi-squared (transverse) analytical PDF: vertical scale.
+     */
+    double m_ReducedChiSquaredScaleY[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() + 1];
 
-    //! Reduced chi-squared (transverse) probability density function (overflows in last bin)
-    double m_ReducedChiSquaredPDF[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
+    /**
+     * Reduced chi-squared (transverse) PDF (overflows in last bin).
+     */
+    double m_ReducedChiSquaredPDF[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() +
+        1][MuidElementNumbers::getSizeReducedChiSquared()];
 
-    //! First derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD1[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
+    /**
+     * First derivative of reduced chi-squared PDF (for spline interpolation).
+     */
+    double m_ReducedChiSquaredD1[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() +
+        1][MuidElementNumbers::getSizeReducedChiSquared()];
 
-    //! Second derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD2[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
+    /**
+     * Second derivative of reduced chi-squared PDF (for spline interpolation).
+     */
+    double m_ReducedChiSquaredD2[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() +
+        1][MuidElementNumbers::getSizeReducedChiSquared()];
 
-    //! Third derivative of reduced chi-squared PDF (for spline interpolation)
-    double m_ReducedChiSquaredD3[MUID_MaxDetector + 1][MUID_MaxHalfNdof + 1][MUID_ReducedChiSquaredNbins];
+    /**
+     * Third derivative of reduced chi-squared PDF (for spline interpolation).
+     */
+    double m_ReducedChiSquaredD3[MuidElementNumbers::getMaximalDetector() + 1][MuidElementNumbers::getMaximalHalfNdof() +
+        1][MuidElementNumbers::getSizeReducedChiSquared()];
 
-    //! Reduced chi-squared (transverse) probability density function's bin size
+    /**
+     * Reduced chi-squared (transverse) PDF's bin size.
+     */
     double m_ReducedChiSquaredDx;
 
-    //! Muid parameters from database
-    DBObjPtr<MuidParameters> m_muidParameters;
+    /**
+     * Likelihood parameters.
+     */
+    DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
   };
 
-} // end of namespace Belle2
+}

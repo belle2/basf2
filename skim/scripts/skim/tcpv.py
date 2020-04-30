@@ -1,99 +1,75 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-
-"""
-
-
-
-  Note :
-    * Time dependent CP violation skim standalone for the analysis of TDCPV analysis in WG
-
-    * Physics channels : bd → qqs and bd → ccs .
-
-    * Skim code : 13160100
-
-
-    **Decay Channels**
-
-         B0 -> phi K_S0,
-
-         B0 -> eta K_S0,
-
-         B0 -> eta K_S0,
-
-         B0 -> K_S0 K_S0 K_S0,
-
-         B0 -> pi0 K_S0,
-
-         B0 -> rho0 K_S0,
-
-         B0 -> omega  K_S0,
-
-         B0 -> f_0 K_S0,
-
-         B0 -> pi0 pi0 K_S0 ,
-
-         B0 ->phi K_S0 pi0,
-
-         B0 -> pi+ pi- K_S0,
-
-         B0 -> pi+ pi- K_S0 gamma,
-
-         B0 -> pi0  K_S0 gamma,
-
-     **Particle lists used**:
-
-              phi:loose
-
-
-        B0 -> pi0 pi0 K_S0 ,
-
-         B0 ->phi K_S0 pi0,
-
-         B0 -> pi+ pi- K_S0,
-
-         B0 -> pi+ pi- K_S0 gamma,
-
-         B0 -> pi0  K_S0 gamma,
-
-     **Particle lists used**:
-
-              phi:loose
-              k_S0:all
-              eta:loose
-              pi0:loose
-              pi0:skim
-              rho0:loose
-              pi+:all
-              gamma:E15 , cut : 1.4 < E < 4
-              omega:loose
-              J/psi: eeLoose
-              J/psi: mumuLoose
-              psi(2S): eeLoose
-              psi(2S): mumuloose
-              K*0:loose
-              phi:loose
-
-
-     **Cuts used**
-
-        5.2 < Mbc < 5.29
-        abs(deltaE) < 0.5
-
-"""
-
-__author__ = " Reem Rasheed"
-
 import modularAnalysis as ma
 from variables import variables as vm
-vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
-vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
-vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
 
 def TCPVList(path):
+    """
+    Time dependent CP violation skim standalone for the analysis of TDCPV analysis in WG
+
+    **Physics channels**: bd → qqs and bd → ccs
+
+    **Skim code**: 13160100
+
+    **Decay Channels**:
+
+    * ``B0 -> phi K_S0``
+    * ``B0 -> eta K_S0``
+    * ``B0 -> eta K_S0``
+    * ``B0 -> K_S0 K_S0 K_S0``
+    * ``B0 -> pi0 K_S0``
+    * ``B0 -> rho0 K_S0``
+    * ``B0 -> omega  K_S0``
+    * ``B0 -> f_0 K_S0``
+    * ``B0 -> pi0 pi0 K_S0``
+    * ``B0 -> phi K_S0 pi0``
+    * ``B0 -> pi+ pi- K_S0``
+    * ``B0 -> pi+ pi- K_S0 gamma``
+    * ``B0 -> pi0  K_S0 gamma``
+
+    **Particle lists used**:
+
+    * ``phi:loose``
+
+    * ``B0 -> pi0 pi0 K_S0``
+    * ``B0 -> phi K_S0 pi0``
+    * ``B0 -> pi+ pi- K_S0``
+    * ``B0 -> pi+ pi- K_S0 gamma``
+    * ``B0 -> pi0  K_S0 gamma``
+
+    **Particle lists used**:
+
+    * ``phi:loose``
+    * ``k_S0:all``
+    * ``eta:loose``
+    * ``pi0:loose``
+    * ``pi0:skim``
+    * ``rho0:loose``
+    * ``pi+:all``
+    * ``gamma:E15 , cut : 1.4 < E < 4``
+    * ``omega:loose``
+    * ``J/psi: eeLoose``
+    * ``J/psi: mumuLoose``
+    * ``psi(2S): eeLoose``
+    * ``psi(2S): mumuloose``
+    * ``K*0:loose``
+    * ``phi:loose``
+
+
+    **Cuts used**:
+
+    * ``5.2 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+    """
+
+    __author__ = " Reem Rasheed"
+
+    vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+    vm.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)')
+    vm.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
+    vm.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
+
     btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
 
     bd_qqs_Channels = [
@@ -122,8 +98,8 @@ def TCPVList(path):
     bPlustoJPsiK_Channel = ['J/psi:mumu K+:1%',
                             'J/psi:ee K+:1%']
 
-    btoD_Channels = ['D0:Kpipipi pi+:all',
-                     'D0:Kpi pi+:all',
+    btoD_Channels = ['anti-D0:Kpipipi pi+:all',
+                     'anti-D0:Kpi pi+:all',
                      ]
 
     bd_qqs_List = []

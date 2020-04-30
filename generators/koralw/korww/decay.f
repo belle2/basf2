@@ -569,17 +569,17 @@ ccc            write(6,*)'ddd',umask_lbl(ilbl),ilbl
             READ(io_number,*) lbl_lcl,eminx,emaxx
             READ(io_number,*) ( wtma_lcl(iene,ilbl), iene=1,n_ene )
             IF(ilbl .GT. lbl_lcl) THEN
-              WRITE(6,*)'give_phot_spec_crud=>wt skipped label ',lbl_lcl
+CC              WRITE(6,*)'give_phot_spec_crud=>wt skipped label ',lbl_lcl
               GOTO 200
             ELSEIF(ilbl .LT. lbl_lcl) THEN
-              WRITE(6,*)'give_phot_spec_cr=>wt not found label ',ilbl
+CC              WRITE(6,*)'give_phot_spec_cr=>wt not found label ',ilbl
               STOP
             ENDIF
           ENDIF
         ENDDO
         CALL close_data(name_full_wt,name_wt,io_number)
 
-        WRITE(6,*)' '
+CC        WRITE(6,*)' '
 
 ! read xsectn
         CALL open_data(name_full_xs,name_xs,io_number)
@@ -590,10 +590,10 @@ ccc            write(6,*)'ddd',umask_lbl(ilbl),ilbl
             READ(io_number,*) lbl_lcl,eminx,emaxx
             READ(io_number,*) ( xsec_lcl(iene,ilbl), iene=1,n_ene )
             IF(ilbl .GT. lbl_lcl) THEN
-              WRITE(6,*)'give_phot_spec_crud=>xs skipped label ',lbl_lcl
+CC              WRITE(6,*)'give_phot_spec_crud=>xs skipped label ',lbl_lcl
               GOTO 201
             ELSEIF(ilbl .LT. lbl_lcl) THEN
-              WRITE(6,*)'give_phot_spec_cr=>xs not found label ',ilbl
+CC              WRITE(6,*)'give_phot_spec_cr=>xs not found label ',ilbl
               STOP
             ENDIF
           ENDIF

@@ -64,12 +64,6 @@ def stdCharged(particletype, listtype, path):
 
     if listtype == 'all':
         fillParticleList(particletype + '+:all', '', True, path=path)
-    elif listtype == _mostLikelyList:
-        # Here we need basic track quality cuts to be applied,
-        # otherwise, we get a lot of badly reconstructed particles,
-        # which will end up filled as a random type
-        fillParticleList(particletype + '+:'+_mostLikelyList,
-                         'pidIsMostLikely > 0 and ' + trackQuality, True, path=path)
     elif listtype == 'good':
         fillParticleList(
             particletype + '+:good',
@@ -161,14 +155,19 @@ def stdMu(listtype=_defaultlist, path=None):
     stdCharged('mu', listtype, path)
 
 
-def stdMostLikely(path=None):
+def stdMostLikely(pidPriors=None, path=None):
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
     @param path         modules are added to this path
     """
-    stdCharged('e',  _mostLikelyList, path)
-    stdCharged('mu', _mostLikelyList, path)
-    stdCharged('pi', _mostLikelyList, path)
-    stdCharged('K',  _mostLikelyList, path)
-    stdCharged('p',  _mostLikelyList, path)
+    # Here we need basic track quality cuts to be applied,
+    # otherwise, we get a lot of badly reconstructed particles,
+    # which will end up filled as a random type
+    args = ''
+    if pidPriors is not None:
+        args = str(pidPriors)[1:-1]  # remove brackets
+    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    for name in _chargednames:
+        fillParticleList('%s+:%s' % (name, _mostLikelyList),
+                         'pidIsMostLikely(%s) > 0 and %s' % (args, trackQuality), True, path=path)

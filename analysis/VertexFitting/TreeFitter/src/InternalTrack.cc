@@ -226,6 +226,7 @@ namespace TreeFitter {
   }
 
   ErrCode InternalTrack::projectHelixConstraint(const FitParams& fitparams,
+                                                // cppcheck-suppress constParameter ; projection p is in fact set in this function
                                                 Projection&       p) const
   {
     ErrCode status;

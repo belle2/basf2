@@ -64,6 +64,9 @@ static bool sameSector(KLMDigit* d1, KLMDigit* d2)
 
 KLMReconstructorModule::KLMReconstructorModule() :
   Module(),
+  m_CoincidenceWindow(0),
+  m_PromptTime(0),
+  m_PromptWindow(0),
   m_bklmGeoPar(nullptr),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),

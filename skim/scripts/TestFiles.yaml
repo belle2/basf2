@@ -88,22 +88,22 @@ MC13_eeBGx1:
   average_events_per_file:
 
 MC13_eeeeBGx1:
-  location: /home/belle2/pgrace/TemporarySkimSamples/eeee_eph3_0.root
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx1.root
   total_input_files: 36843
   average_events_per_file: 10000
 
 MC13_eemumuBGx1:
-  location: /home/belle2/pgrace/TemporarySkimSamples/eemumu_eph3_0.root
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eemumuBGx1.root
   total_input_files: 15096
   average_events_per_file: 10000
 
 MC13_ggBGx1:
-  location: /home/belle2/pgrace/TemporarySkimSamples/3700001000_eph3_0.root
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_ggBGx1.root
   total_input_files: 25201
   average_events_per_file: 9390
 
 MC13_mumuBGx1:
-  location: /home/belle2/pgrace/TemporarySkimSamples/mumu_eph3_0.root
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx1.root
   total_input_files: 2297
   average_events_per_file: 10000
 
@@ -205,7 +205,7 @@ MC12_eeeeBGx1:
   average_events_per_file:
 
 MC12_eemumuBGx0:
-  location: /ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007516_task10020000001.root/ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007465_task10020000001.root
+  location: /ghi/fs01/belle2/bdata/group/skim/sub00/mdst_000001_prod00007516_task10020000001.root
   total_input_files:
   average_events_per_file:
 
@@ -228,32 +228,27 @@ MC12_mumuBGx1:
 #  |____/ \__,_|\__\__,_| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                             |_|
 
-bucket7_exp8:
-  location: /group/belle2/dataprod/Data/release-03-02-04/DB00000677/bucket7/e0008/4S/GoodRuns/r03123/skim/hlt_hadron/mdst/sub00/mdst.physics.0008.03123.HLT4.hlt_hadron.f00000.root
-  total_input_files:
-  average_events_per_file: 11242
-
 proc10_exp8:
-  location: /group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0008/4S/GoodRuns/r01291/all/mdst/sub00/mdst.physics.0008.01291.HLT2.f00010.root
+  location: /group/belle2/dataprod/MC/SkimTraining/proc10_exp8.mdst.root
   total_input_files:
   average_events_per_file:
 
 proc10_exp7:
-  location: /group/belle2/dataprod/Data/release-04-01-00/DB00000748/proc10/e0007/4S/GoodRuns/r03491/all/mdst/sub00/mdst.physics.0007.03491.HLT1.f00001.root
+  location: /group/belle2/dataprod/MC/SkimTraining/proc10_exp7.mdst.root
   total_input_files:
   average_events_per_file:
 
 proc9_exp3:
-  location: /group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0003/4S/r05241/skim/hlt_hadron/mdst/sub00/mdst.physics.0003.05241.HLT0.hlt_hadron.f00000.root
+  location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp3.mdst.root
   total_input_files:
-  average_events_per_file: 3456
+  average_events_per_file:
 
 proc9_exp7:
-  location: /group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0007/4S/GoodRuns/r03822/skim/hlt_hadron/mdst/sub00/mdst.physics.0007.03822.HLT0.hlt_hadron.f00000.root
+  location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp7.mdst.root
   total_input_files:
-  average_events_per_file: 3691
+  average_events_per_file:
 
 proc9_exp8:
-  location: /group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/e0008/4S/GoodRuns/r01527/skim/hlt_hadron/mdst/sub00/mdst.physics.0008.01527.HLT4.hlt_hadron.f00000.root
+  location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp8.mdst.root
   total_input_files:
-  average_events_per_file: 7846
+  average_events_per_file:

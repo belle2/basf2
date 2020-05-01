@@ -32,7 +32,7 @@ namespace Belle2 {
     TCanvas* m_c_xvsy[32] = {nullptr};
     TCanvas* m_c_xvsz = nullptr;
     std::vector<TList*> contLevelXY;
-    TList* contLevelXZ;
+    TList* contLevelXZ = NULL;
 
     std::string m_OverlayPath = "";
 

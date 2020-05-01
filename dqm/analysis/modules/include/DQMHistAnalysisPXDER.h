@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisPXDERModule();
     /* Destructor */
-    ~DQMHistAnalysisPXDERModule() override final;
+    ~DQMHistAnalysisPXDERModule();
 
   private:
 

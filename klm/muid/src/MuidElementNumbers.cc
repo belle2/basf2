@@ -155,7 +155,7 @@ MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(in
 std::vector<int> MuidElementNumbers::getPDGVector(int charge)
 {
   std::vector<int> pdgVector;
-  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+  for (const auto& particle : Const::chargedStableSet) {
     if ((particle == Const::electron) || (particle == Const::muon))
       pdgVector.push_back(-charge * particle.getPDGCode());
     else

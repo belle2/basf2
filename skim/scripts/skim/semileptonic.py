@@ -370,7 +370,7 @@ class SLUntagged(BaseSkim):
             "stdPhotons": ["loose"],
         },
         "stdPi0s": {
-            "stdPi0s": ["loose"],
+            "stdPi0s": ["eff40_Jan2020"],
         },
         "stdV0s": {
             "stdKshorts": [],

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-SVD Default HotStrips Calibration importer.
+SVD Default Pedestal Calibration importer (MC).
 Script to Import Calibrations into a local DB
 """
 import basf2
@@ -10,23 +10,24 @@ from basf2 import *
 from svd import *
 import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import SVDHotStripsCalibrations
+from ROOT.Belle2 import SVDPedestalCalibrations
 import datetime
 import os
 
 now = datetime.datetime.now()
 
+# fake pedestals for MC
+pedestal = 0
 
-class defaultHotStripsImporter(basf2.Module):
-    '''default importer for hot strips'''
+
+class defaultPedestalImporter(basf2.Module):
 
     def beginRun(self):
-        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
-        #      iov = IntervalOfValidity(0,0,-1,-1)
 
-        payload = Belle2.SVDHotStripsCalibrations.t_payload(0, "HotStrips_default_" + str(now.isoformat()) + "_INFO:_noHotstrips")
+        payload = Belle2.SVDPedestalCalibrations.t_payload(-1, "PedestalCalibrations_default_" +
+                                                           str(now.isoformat()) + "_INFO:_fakeNULLpedestals")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -38,21 +39,18 @@ class defaultHotStripsImporter(basf2.Module):
                     sensorNumber = sensor.getSensorNumber()
                     for side in (0, 1):
                         Nstrips = 768
-                        print("setting hot strips default value (0, good strip) for " +
-                              str(layerNumber) + "." + str(ladderNumber) + "." + str(sensorNumber))
-
-                        if side == 0 and not layerNumber == 3:  # non-L3 V side
+                        if side == 0:
                             Nstrips = 512
+                            if layerNumber == 3:  # L3
+                                Nstrips = 768
 
                         for strip in range(0, Nstrips):
-                            payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), 1, 0)
+                            payload.set(layerNumber, ladderNumber, sensorNumber, bool(side), strip, pedestal)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDHotStripsCalibrations.name, payload, iov)
+        Belle2.Database.Instance().storeData(Belle2.SVDPedestalCalibrations.name, payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultHotStripsCalibrations/database.txt", "localDB_defaultHotStripsCalibrations")
+use_local_database("localDB_pedestal/database.txt", "localDB_pedestal")
 
 main = create_path()
 
@@ -62,9 +60,9 @@ eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = True)
+main.add_module("Geometry", components=['SVD'])
 
-main.add_module(defaultHotStripsImporter())
+main.add_module(defaultPedestalImporter())
 
 # Show progress of processing
 progress = register_module('Progress')

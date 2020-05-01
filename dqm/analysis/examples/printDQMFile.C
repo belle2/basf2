@@ -27,7 +27,7 @@ void printDQMFile(TString name="",TString opt=""){
   
   for(auto mon : monobj){    
     if(name.Length() && name!=mon->GetName()) continue;
-    mon->Print();    
+    mon->print();    
     if(opt=="draw"){
       const std::vector<TCanvas*> canvs = mon->getListOfCanvases();
       for(auto canv : canvs) canv->Draw();    

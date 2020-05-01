@@ -121,12 +121,6 @@ namespace Belle2 {
      */
     virtual void Print(Option_t* option = "") const override;
 
-    /** Get a json representation.
-     */
-    std::string getJsonStr() const;
-
-    bool write(std::ostream& output, const std::string& physicalFileName) const;
-
   private:
 
     unsigned int m_nEvents; /**< Number of events.  */

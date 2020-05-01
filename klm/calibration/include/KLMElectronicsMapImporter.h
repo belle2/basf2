@@ -103,7 +103,7 @@ namespace Belle2 {
 
     /**
      * Get EKLM firmware strip number by software strip number.
-     * @param[in] stripFirmware Firmware strip number.
+     * @param[in] stripSoftware Software strip number.
      */
     int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
 
@@ -130,7 +130,7 @@ namespace Belle2 {
      * @param[in] lane    Lane.
      */
     void addEKLMLane(
-      int section, int sector, int layer, int copper, int slot, int axis);
+      int section, int sector, int layer, int copper, int slot, int lane);
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

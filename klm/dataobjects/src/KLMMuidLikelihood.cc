@@ -30,7 +30,7 @@ KLMMuidLikelihood::KLMMuidLikelihood() :
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
-  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+  for (const Const::ChargedStable particle : Const::chargedStableSet) {
     m_PDFValue[particle.getIndex()] = 0.0;
     m_LogL[particle.getIndex()] = -1.0E20;
   }

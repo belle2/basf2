@@ -1109,3 +1109,38 @@ class SystematicsLambda(BaseSkim):
             LambdaList.append("Lambda0:syst" + str(chID))
 
         self.SkimLists = LambdaList
+
+
+@fancy_skim_header
+class PhiGammaLoose(BaseSkim):
+    """
+    Uses the ``gamma:loose`` list and a cut on the number of tracks.
+
+    Cuts applied:
+
+    * :math:`E_{\\gamma}> 3\\,\\text{GeV}` AND
+    * :math:`E_{\\gamma}< 8\\,\\text{GeV}`
+    * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 4`
+    """
+    __authors__ = ["Giuseppe Finocchiaro", "Benjamin Oberhof"]
+    __description__ = (
+        "Skim for ISR - phi gamma analyses, "
+        ":math:`e^+ e^- \\to \\phi \\gamma ` and "
+        ":math:`\\phi` decays into two charged tracks "
+        "(:math: `K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
+    )
+    __contact__ = ""
+    __category__ = "systematics"
+
+    RequiredStandardLists = {
+        "stdPhotons": {
+            "stdPhotons": ["loose"]
+        }
+    }
+
+    TestFiles = [get_test_file("phigamma_neutral")]
+
+    def build_lists(self, path):
+        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
+        ma.applyCuts("gamma:PhiSystematics", "[nTracks>=2] and [nTracks<=4]", path=path)
+        self.SkimLists = ["gamma:PhiSystematics"]

@@ -182,7 +182,17 @@ namespace Belle2 {
       if (!vert) return realNaN;
       return vert->getDeltaTErr();
     }
+    double particleDeltaTRes(const Particle* particle)
+    {
+      return particleDeltaT(particle) - particleMCDeltaT(particle);
+    }
 
+    double particleDeltaTBelle(const Particle* particle)
+    {
+      PCmsLabTransform T;
+      double boost = T.getBoostVector().Mag();
+      return particleDeltaZ(particle) / boost / Const::speedOfLight * 1e3;
+    }
     double particleMCDeltaT(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -729,6 +739,13 @@ namespace Belle2 {
       return vert->getFitTruthStatus();
     }
 
+    int rollbackStatus(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return std::numeric_limits<int>::quiet_NaN();
+      return vert->getRollBackStatus();
+    }
+
     //**********************************
     //Meta variables
     //**********************************
@@ -1053,6 +1070,10 @@ namespace Belle2 {
                       R"DOC(Proper decay time difference :math:`\Delta t` between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})` in ps.)DOC");
     REGISTER_VARIABLE("DeltaTErr", particleDeltaTErr,
                       R"DOC(Proper decay time difference :math:`\Delta t` uncertainty in ps)DOC");
+    REGISTER_VARIABLE("DeltaTRes", particleDeltaTRes,
+                      R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
+    REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
+                      R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,
@@ -1176,6 +1197,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("TagVFitTruthStatus", fitTruthStatus,
                       "Returns the status of the fit performed with the truth info. Possible values are: 0: fit performed with measured parameters, 1: fit performed with true parameters, 2: unable to recover truth parameters")
+
+    REGISTER_VARIABLE("TagVRollBackStatus", rollbackStatus,
+                      "Returns the status of the fit performed with rolled back tracks. Possible values are: 0: fit performed with measured parameters, 1: fit performed with rolled back tracks, 2: unable to recover truth parameters")
 
     REGISTER_VARIABLE("TagTrackMax(var)", tagTrackMax,
                       "return the maximum value of the variable ``var`` evaluated for each tag track. ``var`` must be one of the TagTrackXXX variables, for example: ``TagTrackMax(TagTrackDistanceToConstraint)``. The tracks that are assigned a zero weight are ignored.")

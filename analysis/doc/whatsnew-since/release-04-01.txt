@@ -141,6 +141,7 @@ Variables
  * Added :b2:var:`firstCDCLayer`, returns the ID of the CDC layer closest to the IP with a hit attributed to the particles track 
  * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
    particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
+ * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
 
 Modules
 +++++++
@@ -205,6 +206,8 @@ Modules
    and not anymore as ``TrackFitResult``. This should have no effect to users.
  * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned
    off by setting ``allowChargeViolation=True``.
+ * In :b2:mod:`TagVertex` module, added the possibility to perform vertex fit with the tag particle tracks rolled back to their primary vertex points. The
+   option :code:`useRollBack = True` switches that on.
  * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
    charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
 

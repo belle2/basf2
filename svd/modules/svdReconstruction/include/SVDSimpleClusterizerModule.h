@@ -105,7 +105,7 @@ namespace Belle2 {
       //calibration objects
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
-      SVDClusterCalibrations m_ClusterCal; /**SVDCluser calibratins db object*/
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
 
       SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
       SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/

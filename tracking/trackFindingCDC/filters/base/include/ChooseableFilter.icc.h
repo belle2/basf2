@@ -94,6 +94,12 @@ namespace Belle2 {
       return (*m_filter)(object);
     }
 
+    template <class AFilter>
+    Weight Chooseable<AFilter>::operator()(const Object& object) const
+    {
+      return (*m_filter)(object);
+    }
+
     template <class AFilterFactory>
     ChooseableFilter<AFilterFactory>::ChooseableFilter()
       : Super(std::make_unique<AFilterFactory>())

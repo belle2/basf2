@@ -56,18 +56,19 @@ from ROOT import EventData
 
 
 class SVDValidationTTree(Module):
+    '''class to produced the validation ttree '''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTree, self).__init__()
-        # Output ROOT file
-        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
-        # TTrees for output data
-        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
 
-        # Instance of the EventData class
+        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
+        '''Output ROOT file'''
+        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
+        '''TTrees for output data'''
         self.data = EventData()
+        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventData.__dict__:

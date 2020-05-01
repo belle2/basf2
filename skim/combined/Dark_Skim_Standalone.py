@@ -16,7 +16,7 @@ import skimExpertFunctions as expert
 
 darkskimpath = b2.Path()
 
-fileList = expert.get_test_file("MC12_mixedBGx1")
+fileList = expert.get_test_file("MC13_mixedBGx1")
 ma.inputMdstList('default', fileList, path=darkskimpath)
 
 charged.stdMu('all', path=darkskimpath)

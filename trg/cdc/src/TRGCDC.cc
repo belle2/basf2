@@ -1520,9 +1520,7 @@ namespace Belle2 {
     // }
     //}
 
-
-
-
+    /* cppcheck-suppress variableScope */
     int trgOutput = 2;
     // Store TRG data to TRGSignalBundle.
     // 1 is FE output. 2 is Merger output. 3 is TRG output.

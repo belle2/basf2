@@ -74,10 +74,12 @@ namespace Belle2 {
              "  b) recoilParticleType = 2: \n\n"
              "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
              "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
+    addParam("chargeConjugation", m_chargeConjugation,
+             "If true, the charge-conjugated mode will be reconstructed as well", true);
     addParam("allowChargeViolation", m_allowChargeViolation,
              "If true the decay string does not have to conserve electric charge", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
     m_isSelfConjugatedParticle = false;
     m_generator = nullptr;
@@ -133,7 +135,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     particleList.registerInDataStore(flags);
-    if (!m_isSelfConjugatedParticle) {
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
       antiParticleList.registerInDataStore(flags);
     }
@@ -151,7 +153,7 @@ namespace Belle2 {
     outputList.create();
     outputList->initialize(m_pdgCode, m_listName);
 
-    if (!m_isSelfConjugatedParticle) {
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
       outputAntiList.create();
       outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
@@ -162,7 +164,7 @@ namespace Belle2 {
     m_generator->init();
 
     int numberOfCandidates = 0;
-    while (m_generator->loadNext()) {
+    while (m_generator->loadNext(m_chargeConjugation)) {
 
       Particle&& particle = m_generator->getCurrentParticle();
 
@@ -183,7 +185,7 @@ namespace Belle2 {
         const std::vector<Particle*> daughters = particle.getDaughters();
 
         if (daughters.size() < 2)
-          B2FATAL("Reconstructing particle as a duaghter of a recoil with less then 2 daughters!");
+          B2FATAL("Reconstructing particle as a daughter of a recoil with less then 2 daughters!");
 
         TLorentzVector pDaughters;
         for (unsigned i = 1; i < daughters.size(); i++) {

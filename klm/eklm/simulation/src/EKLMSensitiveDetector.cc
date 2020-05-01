@@ -13,7 +13,6 @@
 
 /* KLM headers. */
 #include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>

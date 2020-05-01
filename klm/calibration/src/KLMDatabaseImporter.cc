@@ -11,9 +11,6 @@
 /* Own header. */
 #include <klm/calibration/KLMDatabaseImporter.h>
 
-/* KLM headers. */
-#include <klm/dataobjects/KLMChannelIndex.h>
-
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -77,6 +74,15 @@ void KLMDatabaseImporter::importTimeConversion(
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   timeConversionImport.import(iov);
+}
+
+void KLMDatabaseImporter::importTimeWindow(KLMTimeWindow* timeWindow)
+{
+  DBImportObjPtr<KLMTimeWindow> timeWindowImport;
+  timeWindowImport.construct(*timeWindow);
+  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
+                         m_ExperimentHigh, m_RunHigh);
+  timeWindowImport.import(iov);
 }
 
 void KLMDatabaseImporter::loadStripEfficiency(

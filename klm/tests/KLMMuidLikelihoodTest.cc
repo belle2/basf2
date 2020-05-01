@@ -13,11 +13,13 @@
 
 /* Belle2 headers. */
 #include <framework/datastore/StoreArray.h>
-#include <framework/utilities/TestHelpers.h>
 
 /* C++ headers. */
 #include <bitset>
 #include <string>
+
+/* Google Test headers. */
+#include <gtest/gtest.h>
 
 using namespace std;
 

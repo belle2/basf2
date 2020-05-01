@@ -31,18 +31,18 @@ from ROOT import EventDataTrueHit
 
 
 class SVDValidationTTreeTrueHit(Module):
+    '''class to create the true hit ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeTrueHit, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeTrueHit.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventDataTrueHit class
+        '''TTrees for output data'''
         self.data = EventDataTrueHit()
+        '''Instance of the EventDataTrueHit class'''
 
         # Declare tree branches
         for key in EventDataTrueHit.__dict__:
@@ -51,9 +51,6 @@ class SVDValidationTTreeTrueHit(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """ Start with truehits and use the relation to get the corresponding clusters """

@@ -113,7 +113,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
-      if ((part->getParticleType() == Particle::EParticleType::c_ECLCluster)
+      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster)
           and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 

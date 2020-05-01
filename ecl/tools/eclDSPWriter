@@ -61,7 +61,7 @@ def main():
 
     if len(sys.argv) < 3:
         print()
-        print('Usage: eclDSPTools.py input_files output_path')
+        print('Usage: eclDSPTools input_files output_path')
         print('  input_files: one of three options to access DSP data:')
         print('    path/to/folder                Path to folder with crate??/dsp??.dat files')
         print('    localdb/database.txt,exp,run  Path to local database')

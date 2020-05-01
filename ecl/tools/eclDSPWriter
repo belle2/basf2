@@ -54,6 +54,54 @@ CRATE_GROUPS = [
 
 ################################################
 
+
+def main():
+    """
+    """
+
+    if len(sys.argv) < 3:
+        print()
+        print('Usage: eclDSPTools.py input_files output_path')
+        print('  input_files: one of three options to access DSP data:')
+        print('    path/to/folder                Path to folder with crate??/dsp??.dat files')
+        print('    localdb/database.txt,exp,run  Path to local database')
+        print('    db://GLOBAL_TAG,exp,run       global tag from ConditionsDB')
+        print()
+        print('  output_path: one of two options to output DSP data:')
+        print('    path/to/folder                Path to folder where crate??/dsp??.dat files')
+        print('                                  will be saved')
+        print('    localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database')
+        print()
+        exit(2)
+    input_arg = sys.argv[1]
+    output_arg = sys.argv[2]
+    if input_arg.startswith('db://'):
+        tag, exp, run = input_arg.lstrip('db://').split(',')
+        dsp_data = ecldspFromDB(tag, int(exp), int(run))
+    elif ',' in input_arg:
+        path, exp, run = input_arg.split(',')
+        dsp_data = ecldspFromRoot(path, int(exp), int(run))
+    else:
+        path = input_arg
+        dsp_data = ecldspFromDat(path)
+
+    if ',' in output_arg or output_arg.endswith('database.txt'):
+        args = output_arg.split(',')
+        path = args[0]
+        exp, run, expHigh, runHigh = 0, 0, -1, -1
+        if len(args) > 1: exp     = int(args[1])
+        if len(args) > 2: run     = int(args[2])
+        if len(args) > 3: expHigh = int(args[3])
+        if len(args) > 4: runHigh = int(args[4])
+        ecldspToRoot(path, dsp_data, exp, run, expHigh, runHigh)
+    else:
+        path = output_arg
+        ecldspToDat(path, dsp_data)
+
+################################################
+# AUXILLARY FUNCTIONS
+################################################
+
 def ecldspFromDat(path_list):
     """
     Read 52*12 files with dsp data and convert them to payload objects.
@@ -211,42 +259,5 @@ def ensureDir(file_path):
 ################################################
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print()
-        print('Usage: eclDSPTools.py input_files output_path')
-        print('  input_files: one of three options to access DSP data:')
-        print('    path/to/folder                Path to folder with crate??/dsp??.dat files')
-        print('    localdb/database.txt,exp,run  Path to local database')
-        print('    db://GLOBAL_TAG,exp,run       global tag from ConditionsDB')
-        print()
-        print('  output_path: one of two options to output DSP data:')
-        print('    path/to/folder                Path to folder where crate??/dsp??.dat files')
-        print('                                  will be saved')
-        print('    localdb/database.txt,expLow,runLow,expHigh,runHigh  Path to local database')
-        print()
-        exit(2)
-    input_arg = sys.argv[1]
-    output_arg = sys.argv[2]
-    if input_arg.startswith('db://'):
-        tag, exp, run = input_arg.lstrip('db://').split(',')
-        dsp_data = ecldspFromDB(tag, int(exp), int(run))
-    elif ',' in input_arg:
-        path, exp, run = input_arg.split(',')
-        dsp_data = ecldspFromRoot(path, int(exp), int(run))
-    else:
-        path = input_arg
-        dsp_data = ecldspFromDat(path)
-
-    if ',' in output_arg or output_arg.endswith('database.txt'):
-        args = output_arg.split(',')
-        path = args[0]
-        exp, run, expHigh, runHigh = 0, 0, -1, -1
-        if len(args) > 1: exp     = int(args[1])
-        if len(args) > 2: run     = int(args[2])
-        if len(args) > 3: expHigh = int(args[3])
-        if len(args) > 4: runHigh = int(args[4])
-        ecldspToRoot(path, dsp_data, exp, run, expHigh, runHigh)
-    else:
-        path = output_arg
-        ecldspToDat(path, dsp_data)
+    main()
 

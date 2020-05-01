@@ -49,9 +49,11 @@ namespace Belle2 {
     /** Find RecoTrack for given track. Calls ProcessSuccesfulFit if the RecoTrack has a successful fit. */
     virtual void ProcessTrack(const Track& track);
     /** Make debug message with information about RecoTrack. Used in ProcessTrack function. */
-    virtual TString ConstructMessage();
+    virtual TString ConstructMessage(const TrackFitResult* trackFitResult, int nPXDClusters, int nSVDClusters, int nCDCHits);
+    /** Fill histograms with values derived from TrackFitResult. */
+    virtual void FillTrackFitResult(const TrackFitResult* trackFitResult);
     /** Continue track processing by calling ProcessRecoHit function on each RecoHitInformation in given RecoHit. */
-    virtual bool ProcessSuccessfulFit();
+    virtual void ProcessSuccessfulFit();
     /** Compute unbiased residual and the calls ProcesPXDRecoHit or ProcessSVDRecoHit. */
     virtual void ProcessRecoHit(RecoHitInformation* recoHitInfo);
     /** Compute position in a PXD way. Then compute some other variables and fill some histograms. */
@@ -76,7 +78,7 @@ namespace Belle2 {
     * | 1           | 5, 6, 7, 8          |
     * | 2           | 7, 8, 9, 10, 11, 12 |
     */
-    static bool IsNotYang(int ladder, int layer);
+    static bool IsNotYang(int ladderNumber, int layerNumber);
 
     /**
     * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
@@ -90,43 +92,64 @@ namespace Belle2 {
     * | 5           | 5, 6, 7, 8, 9, 10          |
     * | 6           | 6, 7, 8, 9, 10, 11, 12, 13 |
     */
-    static bool IsNotMat(int ladder, int layer);
+    static bool IsNotMat(int ladderNumber, int layerNumber);
 
+    /** DQM histogram module on which the Fill- functions are called to fill histograms. */
     DQMHistoModuleBase* m_histoModule;
+    /** StoreArray name where Tracks are written. */
     string m_tracksStoreArrayName;
+    /** StoreArray name where RecoTracks are written. */
     string m_recoTracksStoreArrayName;
 
-    int m_nPXD;
-    int m_nSVD;
-    int m_nCDC;
-
+    /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack;
+    /** index of track where are VXD hits and aren't CDC hits (with valid TrackFitResult and related RecoTrack) */
     int m_iTrackVXD;
+    /** index of track where are CDC hits and aren't VXD hits (with valid TrackFitResult and related RecoTrack) */
     int m_iTrackCDC;
+    /** index of track where are both VXD hits and CDC hits (with valid TrackFitResult and related RecoTrack) */
     int m_iTrackVXDCDC;
 
+    /** RecoTrack related to currently processed Track */
     RecoTrack* m_recoTrack;
-    const TrackFitResult* m_trackFitResult;
-
+    /** Determines if the hit is not the first hit in the current track */
     bool m_isNotFirstHit = false;
 
-    TVectorT<double>* m_resUnBias = nullptr;
+    /** unbiased residual for the hit */
+    TVectorT<double>* m_UBResidual = nullptr;
+    /** ID of the current sensor */
     VxdID m_sensorID;
-    VxdID m_sensorIDPrew;
+    /** ID of the prewious sensor*/
+    VxdID m_sensorIDPrev;
 
-    float m_residUPlaneRHUnBias;
-    float m_residVPlaneRHUnBias;
-    float m_fPosSPU;
-    float m_fPosSPUPrev;
-    float m_fPosSPV;
-    float m_fPosSPVPrev;
-    float m_posU;
-    float m_posV;
+    /** u coordinate of the hit position */
+    float m_positionU;
+    /** v coordinate of the hit position */
+    float m_positionV;
+    /** u coordinate of the unbiased residual for the hit in micrometers */
+    float m_UBResidualU_um;
+    /** v coordinate of the unbiased residual for the hit in micrometers */
+    float m_UBResidualV_um;
+    /** global phi in degrees of the hit */
+    float m_phi_deg;
+    /** global phi in degrees of the previous hit*/
+    float m_phiPrev_deg;
+    /** global theta in degrees of the hit */
+    float m_theta_deg;
+    /** global theta in degrees of the previous hit*/
+    float m_thetaPrev_deg;
+    /** number of the layer of the hit */
     int m_layerNumber;
+    /** number of the layer of the previous hit */
     int m_layerNumberPrev;
+    /** index of the layer of the hit */
     int m_layerIndex;
+    /** index of the layer of the previous hit */
     int m_correlationIndex;
+    /** index of the sensor of the hit */
     int m_sensorIndex;
+
+    /** senor info of the sensor of the hit */
     const VXD::SensorInfoBase* m_sensorInfo;
   };
 }

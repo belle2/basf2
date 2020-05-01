@@ -58,14 +58,15 @@ void AlignDQMModule::defineHisto()
   TDirectory* layersDirectory = originalDirectory->mkdir("AlignmentDQMLayers");
 
   alignmentDirectory->cd();
-  DefineHelixParameters();
-  DefineGeneral();
-  DefineUBResiduals();
-  DefineHalfShells();
-  DefineClusters();
-  DefineMomentum();
-  DefineHits();
   DefineTracks();
+  DefineHits();
+  DefineMomentumAngles();
+  DefineMomentumCoordinates();
+  DefineHelixParametersAndCorrelations();
+  DefineTrackFitStatus();
+  DefineTRClusters();
+  DefineUBResidualsVXD();
+  DefineHalfShellsVXD();
 
   sensorsDirectory->cd();
   DefineSensors();
@@ -119,7 +120,7 @@ void AlignDQMModule::endRun()
   }
 }
 
-void AlignDQMModule::DefineHelixParameters()
+void AlignDQMModule::DefineHelixParametersAndCorrelations()
 {
   TDirectory* originalDirectory = gDirectory;
 
@@ -218,14 +219,14 @@ void AlignDQMModule::DefineSensors()
   double fSizeMax = -fSizeMin;
   double residualRange = 400;  // in um
 
-  auto posU = THFAxis(iSizeBins, fSizeMin, fSizeMax, "position U [mm]");
-  auto posV = THFAxis(posU).title("position V [mm]");
+  auto positionU = THFAxis(iSizeBins, fSizeMin, fSizeMax, "position U [mm]");
+  auto positionV = THFAxis(positionU).title("position V [mm]");
   auto residualU = THFAxis(200, -residualRange, residualRange, "residual U [#mum]");
   auto residualV = THFAxis(residualU).title("residual V [#mum]");
 
   auto factory = THFFactory(this);
 
-  factory.xAxisSet(posU).yAxisSet(posV);
+  factory.xAxisSet(positionU).yAxisSet(positionV);
 
   resMeanUPosUV->cd();
   m_ResMeanUPosUVSens =       factory.zTitle("residual U [#mum]").CreateSensorsTH2F(format("ResMeanUPosUVSens_%1%"),
@@ -243,7 +244,7 @@ void AlignDQMModule::DefineSensors()
   m_ResMeanVPosUSens =        factory.yTitle("residual mean V [#mum]").CreateSensorsTH1F(format("ResMeanVPosUSens_%1%"),
                               format("Residual Mean V in Position U, %1%"));
 
-  factory.xAxisSet(posV);
+  factory.xAxisSet(positionV);
 
   resMeanUPosV->cd();
   m_ResMeanUPosVSens =        factory.yTitle("residual mean U [#mum]").CreateSensorsTH1F(format("ResMeanUPosVSens_%1%"),
@@ -252,7 +253,7 @@ void AlignDQMModule::DefineSensors()
   m_ResMeanVPosVSens =        factory.yTitle("residual mean V [#mum]").CreateSensorsTH1F(format("ResMeanVPosVSens_%1%"),
                               format("Residual Mean V in Position V, %1%"));
 
-  factory.xAxisSet(posU).zTitleSet("counts");
+  factory.xAxisSet(positionU).zTitleSet("counts");
 
   resUPosU->cd();
   m_ResUPosUSens =            factory.yAxis(residualU).CreateSensorsTH2F(format("ResUPosUSensor_%1%"),
@@ -261,7 +262,7 @@ void AlignDQMModule::DefineSensors()
   m_ResVPosUSens =            factory.yAxis(residualV).CreateSensorsTH2F(format("ResVPosUSensor_%1%"),
                               format("Residual V in Position U, %1%"));
 
-  factory.xAxisSet(posV);
+  factory.xAxisSet(positionV);
 
   resUPosV->cd();
   m_ResUPosVSens =            factory.yAxis(residualU).CreateSensorsTH2F(format("ResUPosVSensor_%1%"),
@@ -355,9 +356,9 @@ void AlignDQMModule::DefineLayers()
   originalDirectory->cd();
 }
 
-void AlignDQMModule::FillTrackFitResult(const TrackFitResult* tfr)
+void AlignDQMModule::FillHelixParametersAndCorrelations(const TrackFitResult* tfr)
 {
-  DQMHistoModuleBase::FillTrackFitResult(tfr);
+  DQMHistoModuleBase::FillHelixParametersAndCorrelations(tfr);
 
   m_PhiZ0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getZ0());
   m_PhiMomPt->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getMomentum().Pt());
@@ -374,27 +375,39 @@ void AlignDQMModule::FillTrackFitResult(const TrackFitResult* tfr)
   m_OmegaTanLambda->Fill(tfr->getOmega(), tfr->getTanLambda());
 }
 
-void AlignDQMModule::FillSensorIndex(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float posU, float posV, int sensorIndex)
+void AlignDQMModule::FillPositionSensors(float UBResidualU_um, float UBResidualV_um, float positionU, float positionV,
+                                         int sensorIndex)
 {
-  float posU_mm = posU * Unit::convertValueToUnit(1.0, "mm");
-  float posV_mm = posV * Unit::convertValueToUnit(1.0, "mm");
+  float positionU_mm = positionU * Unit::convertValueToUnit(1.0, "mm");
+  float positionV_mm = positionV * Unit::convertValueToUnit(1.0, "mm");
 
-  m_ResMeanPosUVSensCounts[sensorIndex]->Fill(posU_mm, posV_mm);
-  m_ResMeanUPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, residUPlaneRHUnBias);
-  m_ResMeanVPosUVSens[sensorIndex]->Fill(posU_mm, posV_mm, residVPlaneRHUnBias);
-  m_ResUPosUSens[sensorIndex]->Fill(posU_mm, residUPlaneRHUnBias);
-  m_ResUPosVSens[sensorIndex]->Fill(posV_mm, residUPlaneRHUnBias);
-  m_ResVPosUSens[sensorIndex]->Fill(posU_mm, residVPlaneRHUnBias);
-  m_ResVPosVSens[sensorIndex]->Fill(posV_mm, residVPlaneRHUnBias);
+  m_ResMeanPosUVSensCounts[sensorIndex]->Fill(positionU_mm, positionV_mm);
+  m_ResMeanUPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, UBResidualU_um);
+  m_ResMeanVPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, UBResidualV_um);
+  m_ResUPosUSens[sensorIndex]->Fill(positionU_mm, UBResidualU_um);
+  m_ResUPosVSens[sensorIndex]->Fill(positionV_mm, UBResidualU_um);
+  m_ResVPosUSens[sensorIndex]->Fill(positionU_mm, UBResidualV_um);
+  m_ResVPosVSens[sensorIndex]->Fill(positionV_mm, UBResidualV_um);
 }
 
-void AlignDQMModule::FillLayers(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex)
+void AlignDQMModule::FillLayers(float UBResidualU_um, float UBResidualV_um, float phi_deg, float theta_deg, int layerIndex)
 {
-  m_ResMeanPhiThetaLayerCounts[layerIndex]->Fill(fPosSPU, fPosSPV);
-  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, residUPlaneRHUnBias);
-  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(fPosSPU, fPosSPV, residVPlaneRHUnBias);
-  m_ResUPhiLayer[layerIndex]->Fill(fPosSPU, residUPlaneRHUnBias);
-  m_ResVPhiLayer[layerIndex]->Fill(fPosSPU, residVPlaneRHUnBias);
-  m_ResUThetaLayer[layerIndex]->Fill(fPosSPV, residUPlaneRHUnBias);
-  m_ResVThetaLayer[layerIndex]->Fill(fPosSPV, residVPlaneRHUnBias);
+  m_ResMeanPhiThetaLayerCounts[layerIndex]->Fill(phi_deg, theta_deg);
+  m_ResMeanUPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, UBResidualU_um);
+  m_ResMeanVPhiThetaLayer[layerIndex]->Fill(phi_deg, theta_deg, UBResidualV_um);
+  m_ResUPhiLayer[layerIndex]->Fill(phi_deg, UBResidualU_um);
+  m_ResVPhiLayer[layerIndex]->Fill(phi_deg, UBResidualV_um);
+  m_ResUThetaLayer[layerIndex]->Fill(theta_deg, UBResidualU_um);
+  m_ResVThetaLayer[layerIndex]->Fill(theta_deg, UBResidualV_um);
+}
+
+TH1F* AlignDQMModule::Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle)
+{
+  return DQMHistoModuleBase::Create("Alig_" + name, title, nbinsx, xlow, xup, xTitle, yTitle);
+}
+
+TH2F* AlignDQMModule::Create(string name, string title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
+                             string xTitle, string yTitle, string zTitle)
+{
+  return DQMHistoModuleBase::Create("Alig_" + name, title, nbinsx, xlow, xup,  nbinsy, ylow, yup, xTitle, yTitle, zTitle);
 }

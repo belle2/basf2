@@ -39,7 +39,7 @@ void DQMEventProcessorBase::Run()
       ProcessTrack(track);
     }
 
-    m_histoModule->FillTracks(m_iTrack, m_iTrackVXD, m_iTrackCDC, m_iTrackVXDCDC);
+    m_histoModule->FillTrackIndexes(m_iTrack, m_iTrackVXD, m_iTrackCDC, m_iTrackVXDCDC);
   } catch (...) {
     B2ERROR("Unhandled exception in " + m_histoModule->getName() + " module!");
   }
@@ -47,67 +47,67 @@ void DQMEventProcessorBase::Run()
 
 void DQMEventProcessorBase::ProcessTrack(const Track& track)
 {
-  RelationVector<RecoTrack> recoTracksVector = track.getRelationsTo<RecoTrack>(m_recoTracksStoreArrayName);
+  auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
+  if (!trackFitResult)
+    return;
 
+  auto recoTracksVector = track.getRelationsTo<RecoTrack>(m_recoTracksStoreArrayName);
   if (!recoTracksVector.size())
     return;
 
   m_recoTrack = recoTracksVector[0];
 
-  RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(m_recoTrack);
-  m_nPXD = (int)pxdClustersTrack.size();
-  RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(m_recoTrack);
-  m_nSVD = (int)svdClustersTrack.size();
-  RelationVector<CDCHit> cdcHitTrack = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
-  m_nCDC = (int)cdcHitTrack.size();
+  RelationVector<PXDCluster> pxdClusters = DataStore::getRelationsWithObj<PXDCluster>(m_recoTrack);
+  int nPXDClusters = (int)pxdClusters.size();
+  RelationVector<SVDCluster> svdClusters = DataStore::getRelationsWithObj<SVDCluster>(m_recoTrack);
+  int nSVDClusters = (int)svdClusters.size();
+  RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
+  int nCDCHits = (int)cdcHits.size();
 
-  m_trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
-  if (m_trackFitResult == nullptr)
-    return;
-
-  TString message = ConstructMessage();
+  TString message = ConstructMessage(trackFitResult, nPXDClusters, nSVDClusters, nCDCHits);
   B2DEBUG(20, message.Data());
 
-  m_iTrack++;
+  FillTrackFitResult(trackFitResult);
+  m_histoModule->FillHitNumbers(nPXDClusters, nSVDClusters, nCDCHits);
 
-  m_histoModule->FillMomentum(m_trackFitResult);
-
-  bool wasProcessingSuccessful = false;
   if (m_recoTrack->wasFitSuccessful())
-    wasProcessingSuccessful = ProcessSuccessfulFit();
+    ProcessSuccessfulFit();
 
-  if (!wasProcessingSuccessful)
-    return;
-
-  if (((m_nPXD > 0) || (m_nSVD > 0)) && (m_nCDC > 0))
-    m_iTrackVXDCDC++;
-  if (((m_nPXD > 0) || (m_nSVD > 0)) && (m_nCDC == 0))
+  m_iTrack++;
+  if (((nPXDClusters > 0) || (nSVDClusters > 0)) && (nCDCHits == 0))
     m_iTrackVXD++;
-  if (((m_nPXD == 0) && (m_nSVD == 0)) && (m_nCDC > 0))
+  if (((nPXDClusters == 0) && (nSVDClusters == 0)) && (nCDCHits > 0))
     m_iTrackCDC++;
-
-  m_histoModule->FillHits(m_nPXD, m_nSVD, m_nCDC);
-  m_histoModule->FillTrackFitResult(m_trackFitResult);
+  if (((nPXDClusters > 0) || (nSVDClusters > 0)) && (nCDCHits > 0))
+    m_iTrackVXDCDC++;
 }
 
-TString DQMEventProcessorBase::ConstructMessage()
+TString DQMEventProcessorBase::ConstructMessage(const TrackFitResult* trackFitResult, int nPXDClusters, int nSVDClusters,
+                                                int nCDCHits)
 {
   return Form("%s: track %3i, Mom: %f, %f, %f, Pt: %f, Mag: %f, Hits: PXD %i SVD %i CDC %i Suma %i\n",
               m_histoModule->getName().c_str(),
               m_iTrack,
-              (float)m_trackFitResult->getMomentum().Px(),
-              (float)m_trackFitResult->getMomentum().Py(),
-              (float)m_trackFitResult->getMomentum().Pz(),
-              (float)m_trackFitResult->getMomentum().Pt(),
-              (float)m_trackFitResult->getMomentum().Mag(),
-              m_nPXD, m_nSVD, m_nCDC, m_nPXD + m_nSVD + m_nCDC
+              (float)trackFitResult->getMomentum().Px(),
+              (float)trackFitResult->getMomentum().Py(),
+              (float)trackFitResult->getMomentum().Pz(),
+              (float)trackFitResult->getMomentum().Pt(),
+              (float)trackFitResult->getMomentum().Mag(),
+              nPXDClusters, nSVDClusters, nCDCHits, nPXDClusters + nSVDClusters + nCDCHits
              );
 }
 
-bool DQMEventProcessorBase::ProcessSuccessfulFit()
+void DQMEventProcessorBase::FillTrackFitResult(const TrackFitResult* trackFitResult)
+{
+  m_histoModule->FillMomentumAngles(trackFitResult);
+  m_histoModule->FillMomentumCoordinates(trackFitResult);
+  m_histoModule->FillHelixParametersAndCorrelations(trackFitResult);
+}
+
+void DQMEventProcessorBase::ProcessSuccessfulFit()
 {
   if (!m_recoTrack->getTrackFitStatus())
-    return false;
+    return;
 
   m_histoModule->FillTrackFitStatus(m_recoTrack->getTrackFitStatus());
 
@@ -116,8 +116,6 @@ bool DQMEventProcessorBase::ProcessSuccessfulFit()
   for (auto recoHitInfo : m_recoTrack->getRecoHitInformations(true)) {
     ProcessRecoHit(recoHitInfo);
   }
-
-  return true;
 }
 
 void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
@@ -138,9 +136,7 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   if (!isPXD && !isSVD)
     return;
 
-  bool biased = false;
-  m_resUnBias = new TVectorT<double>(m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()->getResidual(0,
-                                     biased).getState());
+  m_UBResidual = new TVectorT<double>(m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()->getResidual().getState());
 
   if (isPXD) {
     ProcessPXDRecoHit(recoHitInfo);
@@ -148,24 +144,24 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
     ProcessSVDRecoHit(recoHitInfo);
   }
 
-  delete m_resUnBias;
+  delete m_UBResidual;
 }
 
 void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 {
-  m_posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
-  m_posV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
-  m_residUPlaneRHUnBias = m_resUnBias->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-  m_residVPlaneRHUnBias = m_resUnBias->GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
+  m_positionU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
+  m_positionV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
+  m_UBResidualU_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+  m_UBResidualV_um = m_UBResidual->GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
 
   m_sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
   ComputeCommonVariables();
 
   FillCommonHistograms();
 
-  m_histoModule->FillUBResidualsPXD(m_residUPlaneRHUnBias, m_residVPlaneRHUnBias);
-  m_histoModule->FillPXDHalfShells(m_residUPlaneRHUnBias, m_residVPlaneRHUnBias, m_sensorInfo, IsNotYang(m_sensorID.getLadderNumber(),
-                                   m_sensorID.getLayerNumber()));
+  m_histoModule->FillUBResidualsPXD(m_UBResidualU_um, m_UBResidualV_um);
+  m_histoModule->FillHalfShellsPXD(m_UBResidualU_um, m_UBResidualV_um, m_sensorInfo, IsNotYang(m_sensorID.getLadderNumber(),
+                                   m_layerNumber));
 
   SetCommonPrevVariables();
 }
@@ -173,38 +169,38 @@ void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 {
   if (recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster()) {
-    m_posU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-    m_residUPlaneRHUnBias = m_resUnBias->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+    m_positionU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
+    m_UBResidualU_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
   } else {
-    m_posV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-    m_residVPlaneRHUnBias = m_resUnBias->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+    m_positionV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
+    m_UBResidualV_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
   }
 
   m_sensorID = recoHitInfo->getRelatedTo<SVDCluster>()->getSensorID();
-  if (m_sensorIDPrew == m_sensorID) {
+  if (m_sensorIDPrev == m_sensorID) {
     ComputeCommonVariables();
 
     FillCommonHistograms();
 
-    m_histoModule->FillUBResidualsSVD(m_residUPlaneRHUnBias, m_residVPlaneRHUnBias);
-    m_histoModule->FillSVDHalfShells(m_residUPlaneRHUnBias, m_residVPlaneRHUnBias, m_sensorInfo, IsNotMat(m_sensorID.getLadderNumber(),
-                                     m_sensorID.getLayerNumber()));
+    m_histoModule->FillUBResidualsSVD(m_UBResidualU_um, m_UBResidualV_um);
+    m_histoModule->FillHalfShellsSVD(m_UBResidualU_um, m_UBResidualV_um, m_sensorInfo, IsNotMat(m_sensorID.getLadderNumber(),
+                                     m_layerNumber));
 
     SetCommonPrevVariables();
   }
 
-  m_sensorIDPrew = m_sensorID;
+  m_sensorIDPrev = m_sensorID;
 }
 
 void DQMEventProcessorBase::ComputeCommonVariables()
 {
   m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
 
-  TVector3 rLocal(m_posU, m_posV, 0);
-  TVector3 ral = m_sensorInfo->pointToGlobal(rLocal, true);
+  TVector3 localPosition(m_positionU, m_positionV, 0);
+  TVector3 globalPosition = m_sensorInfo->pointToGlobal(localPosition, true);
 
-  m_fPosSPV = ral.Theta() / TMath::Pi() * 180;
-  m_fPosSPU = ral.Phi() / TMath::Pi() * 180;
+  m_phi_deg = globalPosition.Phi() / TMath::Pi() * 180;
+  m_theta_deg = globalPosition.Theta() / TMath::Pi() * 180;
 
   m_layerNumber = m_sensorID.getLayerNumber();
 
@@ -217,45 +213,45 @@ void DQMEventProcessorBase::ComputeCommonVariables()
 void DQMEventProcessorBase::FillCommonHistograms()
 {
   if (m_isNotFirstHit && ((m_layerNumber - m_layerNumberPrev) == 1)) {
-    m_histoModule->FillCorrelations(m_fPosSPU, m_fPosSPUPrev, m_fPosSPV, m_fPosSPVPrev, m_correlationIndex);
+    m_histoModule->FillTRClusterCorrelations(m_phi_deg, m_phiPrev_deg, m_theta_deg, m_thetaPrev_deg, m_correlationIndex);
   } else {
     m_isNotFirstHit = true;
   }
 
-  m_histoModule->FillUBResidualsSensor(m_residUPlaneRHUnBias, m_residVPlaneRHUnBias, m_sensorIndex);
-  m_histoModule->FillTRClusterHitmap(m_fPosSPU, m_fPosSPV, m_layerIndex);
+  m_histoModule->FillUBResidualsSensor(m_UBResidualU_um, m_UBResidualV_um, m_sensorIndex);
+  m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 
 void DQMEventProcessorBase::SetCommonPrevVariables()
 {
   m_layerNumberPrev = m_layerNumber;
-  m_fPosSPUPrev = m_fPosSPU;
-  m_fPosSPVPrev = m_fPosSPV;
+  m_phiPrev_deg = m_phi_deg;
+  m_thetaPrev_deg = m_theta_deg;
 }
 
-bool DQMEventProcessorBase::IsNotYang(int ladder, int layer)
+bool DQMEventProcessorBase::IsNotYang(int ladderNumber, int layerNumber)
 {
-  switch (layer) {
+  switch (layerNumber) {
     case 1:
-      return ladder < 5 || ladder > 8;
+      return ladderNumber < 5 || ladderNumber > 8;
     case 2:
-      return ladder < 7 || ladder > 12;
+      return ladderNumber < 7 || ladderNumber > 12;
     default:
       return true;
   }
 }
 
-bool DQMEventProcessorBase::IsNotMat(int ladder, int layer)
+bool DQMEventProcessorBase::IsNotMat(int ladderNumber, int layerNumber)
 {
-  switch (layer) {
+  switch (layerNumber) {
     case 3:
-      return ladder < 3 || ladder > 5;
+      return ladderNumber < 3 || ladderNumber > 5;
     case 4:
-      return ladder < 4 || ladder > 8;
+      return ladderNumber < 4 || ladderNumber > 8;
     case 5:
-      return ladder < 5 || ladder > 10;
+      return ladderNumber < 5 || ladderNumber > 10;
     case 6:
-      return ladder < 6 || ladder > 13;
+      return ladderNumber < 6 || ladderNumber > 13;
     default:
       return true;
   }

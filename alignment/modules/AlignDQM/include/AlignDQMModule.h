@@ -41,19 +41,38 @@ namespace Belle2 {
      * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
     virtual void defineHisto() override;
 
-    /** All the following Fill- functions are used by AlignDQMEventProcessor or derived classes to fill histograms.
-     * They are supposed not to contain any computations need for more than one of them. If that happens, the computations should be moved to the AlignDQMEventProcessor or derived classes. */
-    virtual void FillTrackFitResult(const TrackFitResult* tfr) override;
-    virtual void FillSensorIndex(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float posU, float posV, int sensorIndex);
-    virtual void FillLayers(float residUPlaneRHUnBias, float residVPlaneRHUnBias, float fPosSPU, float fPosSPV, int layerIndex);
+    /** Function to create TH1F and add it to the vector of histograms (m_histograms).
+     * All histograms in the module should be created via this function (or following Create- functions).
+     * This function calls base function but wirh "Alig_" prefix to the name parameter */
+    virtual TH1F* Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle) override;
+    /** Same as above but for TH2F. */
+    virtual TH2F* Create(string name, string title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
+                         string xTitle, string yTitle, string zTitle) override;
+
+    /** @name Fill- functions
+     * All the following Fill- functions are used by DQMEventProcessorBase or derived classes to fill histograms.
+     * They are supposed not to contain any computations need for more than one of them. All computations should be moved to the DQMEventProcessorBase or derived classes. */
+    /** @{ */
+    /** Fill histograms with helix parameters and their correlations. */
+    virtual void FillHelixParametersAndCorrelations(const TrackFitResult* tfr) override;
+    /** Fill histograms which depend on position for individual sensors. */
+    virtual void FillPositionSensors(float UBResidualU_um, float UBResidualV_um, float positionU, float positionV, int sensorIndex);
+    /** Fill histograms which depend on layerIndex */
+    virtual void FillLayers(float UBResidualU_um, float UBResidualV_um, float phi_deg, float theta_deg, int layerIndex);
+    /** @} */
 
   protected:
     /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
      * For the creation of histograms the THFFactory or the Create- functions should be used. */
+    /** @{ */
+    /** Define histograms with helix parameters and their correlations. */
+    virtual void DefineHelixParametersAndCorrelations() override;
+    /** Define histograms which depend on position for individual sensors. */
     virtual void DefineSensors() override;
+    /** Define histograms which depend on layerIndex */
     virtual void DefineLayers();
-    virtual void DefineHelixParameters() override;
+    /** @} */
 
     /** Special Alignment related: Sensor level */
     /** ResidaulMean vs U vs V counter for sensor*/

@@ -44,45 +44,61 @@ namespace Belle2 {
 
     /** Function to create TH1F and add it to the vector of histograms (m_histograms).
      * All histograms in the module should be created via this function (or following Create- functions). */
-    TH1F* Create(const char* name, const char* title, int nbinsx, double xlow, double xup, const char* xTitle, const char* yTitle);
+    virtual TH1F* Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle);
     /** Same as above but for TH2F. */
-    TH2F* Create(const char* name, const char* title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
-                 const char* xTitle, const char* yTitle, const char* zTitle);
+    virtual TH2F* Create(string name, string title, int nbinsx, double xlow, double xup, int nbinsy, double ylow, double yup,
+                         string xTitle, string yTitle, string zTitle);
 
     /** Function to create array of TH1F histograms, one for each layer.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the layer number and then used as a name for the histogram.
      * @param titleTemplate - same as nameTemplate but for title. */
-    TH1F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                        const char* xTitle, const char* yTitle);
+    virtual TH1F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
+                                string xTitle, string yTitle);
     /** Same as above but for TH2F. */
-    TH2F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup, int nbinsy,
-                        double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle);
+    virtual TH2F** CreateLayers(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
+                                int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle);
 
     /** Function to create array of TH1F histograms, one for each sensor.
      * @param nameTemplate - format() of string with exactly one %1% which is then replaced by the output of the SensorNameDescription function and then used as a name for the histogram.
      * @param titleTemplate - same as nameTemplate but for title and with the SensorTitleDescription function. */
-    TH1F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
-                         const char* xTitle, const char* yTitle);
+    virtual TH1F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
+                                 string xTitle, string yTitle);
     /** Same as above but for TH2F. */
-    TH2F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup, int nbinsy,
-                         double ylow, double yup, const char* xTitle, const char* yTitle, const char* zTitle);
+    virtual TH2F** CreateSensors(boost::format nameTemplate, boost::format titleTemplate, int nbinsx, double xlow, double xup,
+                                 int nbinsy, double ylow, double yup, string xTitle, string yTitle, string zTitle);
 
-    /** All the following Fill- functions are used by DQMEventProcessorBase or derived classes to fill histograms.
-     * They are supposed not to contain any computations need for more than one of them. If that happens, the computations should be moved to the DQMEventProcessorBase or derived classes. */
-    virtual void FillTracks(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC);
-    virtual void FillHits(int nPXD, int nSVD, int nCDC);
-    virtual void FillMomentum(const TrackFitResult* tfr);
-    virtual void FillTrackFitResult(const TrackFitResult* tfr);
+    /** @name Fill- functions
+     * All the following Fill- functions are used by DQMEventProcessorBase or derived classes to fill histograms.
+     * They are supposed not to contain any computations need for more than one of them. All computations should be moved to the DQMEventProcessorBase or derived classes. */
+    /** @{ */
+    /** Fill histograms with track indexes. */
+    virtual void FillTrackIndexes(int iTrack, int iTrackVXD, int iTrackCDC, int iTrackVXDCDC);
+    /** Fill histograms with numbers of hits. */
+    virtual void FillHitNumbers(int nPXD, int nSVD, int nCDC);
+    /** Fill histograms with track momentum Pt. angles. */
+    virtual void FillMomentumAngles(const TrackFitResult* tfr);
+    /** Fill histograms with track momentum Pt. coordinates. */
+    virtual void FillMomentumCoordinates(const TrackFitResult* tfr);
+    /** Fill histograms with helix parameters and their correlations. */
+    virtual void FillHelixParametersAndCorrelations(const TrackFitResult* tfr);
+    /** Fill histograms which require FitStatus. */
     virtual void FillTrackFitStatus(const genfit::FitStatus* tfs);
-    virtual void FillCorrelations(float fPosSPU, float fPosSPUPrev, float fPosSPV, float fPosSPVPrev, int correlationIndex);
-    virtual void FillUBResidualsPXD(float residUPlaneRHUnBias, float residVPlaneRHUnBias);
-    virtual void FillUBResidualsSVD(float residUPlaneRHUnBias, float residVPlaneRHUnBias);
-    virtual void FillPXDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
-                                   bool isNotYang);
-    virtual void FillSVDHalfShells(float residUPlaneRHUnBias, float residVPlaneRHUnBias, const VXD::SensorInfoBase* sensorInfo,
-                                   bool isNotMat);
-    virtual void FillUBResidualsSensor(float residUPlaneRHUnBias, float residVPlaneRHUnBias, int sensorIndex);
-    virtual void FillTRClusterHitmap(float fPosSPU, float fPosSPV, int layerIndex);
+    /** Fill histograms with correlations between neighbor layers. */
+    virtual void FillTRClusterCorrelations(float phi_deg, float phiPrev_deg, float theta_deg, float thetaPrev_deg,
+                                           int correlationIndex);
+    /** Fill cluster hitmap in IP angle range. */
+    virtual void FillTRClusterHitmap(float phi_deg, float theta_deg, int layerIndex);
+    /** Fill histograms with unbiased residuals in PXD sensors. */
+    virtual void FillUBResidualsPXD(float UBResidualU_um, float UBResidualV_um);
+    /** Fill histograms with unbiased residuals in SVD sensors. */
+    virtual void FillUBResidualsSVD(float UBResidualU_um, float UBResidualV_um);
+    /** Fill histograms with unbiased residuals for half-shells for PXD sensors. */
+    virtual void FillHalfShellsPXD(float UBResidualU_um, float UBResidualV_um, const VXD::SensorInfoBase* sensorInfo, bool isNotYang);
+    /** Fill histograms with unbiased residuals for half-shells for SVD sensors. */
+    virtual void FillHalfShellsSVD(float UBResidualU_um, float UBResidualV_um, const VXD::SensorInfoBase* sensorInfo, bool isNotMat);
+    /** Fill histograms with unbiased residuals for individual sensors. */
+    virtual void FillUBResidualsSensor(float UBResidualU_um, float UBResidualV_um, int sensorIndex);
+    /** @} */
 
   protected:
     /** Creates string description of the sensor from given sensor ID to be used in a histogram name. Its used in the CreateSensors functions. */
@@ -108,15 +124,28 @@ namespace Belle2 {
     /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
      * For the creation of histograms the THFFactory or the Create- functions should be used. */
-    virtual void DefineGeneral();
-    virtual void DefineUBResiduals();
-    virtual void DefineHelixParameters();
-    virtual void DefineMomentum();
-    virtual void DefineHits();
+    /** @{ */
+    /** Define histograms with track indexes. */
     virtual void DefineTracks();
-    virtual void DefineHalfShells();
-    virtual void DefineClusters();
+    /** Define histograms with numbers of hits. */
+    virtual void DefineHits();
+    /** Define histograms with track momentum Pt. angles. */
+    virtual void DefineMomentumAngles();
+    /** Define histograms with track momentum Pt. coordinates. */
+    virtual void DefineMomentumCoordinates();
+    /** Define histograms with helix parameters and their correlations. */
+    virtual void DefineHelixParametersAndCorrelations();
+    /** Define histograms which require FitStatus. */
+    virtual void DefineTrackFitStatus();
+    /** Define histograms with correlations between neighbor layers and cluster hitmap in IP angle range. */
+    virtual void DefineTRClusters();
+    /** Define histograms with unbiased residuals in PXD and SVD sensors. */
+    virtual void DefineUBResidualsVXD();
+    /** Define histograms with unbiased residuals for half-shells for PXD and SVD sensors. */
+    virtual void DefineHalfShellsVXD();
+    /** Define histograms with unbiased residuals for individual sensors. */
     virtual void DefineSensors();
+    /** @} */
 
     /** All histograms created via the Create- functions are automatically added to this set.
      * Its used to easy call Reset() on all histograms in beginRun() and also for changing parameters of histograms via the ProcessHistogramParameterChange function. */

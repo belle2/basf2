@@ -70,17 +70,17 @@ void TrackDQMModule::defineHisto()
     TracksDQMAlignment = originalDirectory->mkdir("TracksDQMAlignment");
 
   TracksDQM->cd();
-
-  DefineGeneral();
-  DefineUBResiduals();
-  DefineHelixParameters();
-  DefineMomentum();
-  DefineHits();
   DefineTracks();
-  DefineHalfShells();
-  DefineFlags();
+  DefineHits();
+  DefineMomentumAngles();
+  DefineMomentumCoordinates();
+  DefineHelixParametersAndCorrelations();
+  DefineTrackFitStatus();
+  DefineTRClusters();
+  DefineUBResidualsVXD();
+  DefineHalfShellsVXD();
 
-  DefineClusters();
+  DefineFlags();
 
   TracksDQMAlignment->cd();
   DefineSensors();

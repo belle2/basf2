@@ -8,30 +8,26 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
-from stdPi0s import stdPi0s, loadStdSkimPi0
-from stdV0s import stdKshorts
-from skim.standardlists.lightmesons import loadStdLightMesons
+from skim.standardlists.lightmesons import loadStdAllRho0, loadStdAllKstar0, loadStdAllPhi, loadStdAllF_0
 import skimExpertFunctions as expert
 
 skimpath = b2.Path()
-fileList = expert.get_test_file('MC12_mixedBGx1')
+fileList = expert.get_test_file('MC13_mixedBGx1')
 ma.inputMdstList('default', fileList, path=skimpath)
 
-stdE('loose', path=skimpath)
-stdK('loose', path=skimpath)
-stdKshorts(path=skimpath)
-stdMu('loose', path=skimpath)
-stdPhotons('all', path=skimpath)
-stdPhotons('loose', path=skimpath)
+stdE('all', path=skimpath)
+stdMu('all', path=skimpath)
 stdPi('all', path=skimpath)
-stdPi('loose', path=skimpath)
-stdPi0s('eff40_Jan2020', path=skimpath)
-stdPr('loose', path=skimpath)
-loadStdLightMesons(path=skimpath)
-loadStdSkimPi0(path=skimpath)
+stdK('all', path=skimpath)
+stdPr('all', path=skimpath)
+stdPhotons('all', path=skimpath)
+loadStdAllRho0(path=skimpath)
+loadStdAllKstar0(path=skimpath)
+loadStdAllPhi(path=skimpath)
+loadStdAllF_0(path=skimpath)
 
 from skim.taupair import TauLFVList, TauList, TauThrustList
-expert.add_skim('TauLFV', TauLFVList(path=skimpath), path=skimpath)
+expert.add_skim('TauLFV', TauLFVList(1, path=skimpath), path=skimpath)
 expert.add_skim('TauGeneric', TauList(path=skimpath), path=skimpath)
 expert.add_skim('TauThrust', TauThrustList(path=skimpath), path=skimpath)
 

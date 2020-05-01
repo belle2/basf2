@@ -26,26 +26,26 @@
 #include <algorithm>
 #include <queue>
 
-
-using namespace std;
 using namespace Belle2;
 
+namespace {
 // Thread related
-static DataStoreStreamer* s_streamer = nullptr;
+  static DataStoreStreamer* s_streamer = nullptr;
 
-static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t mutex_thread[DataStoreStreamer::c_maxThreads];
+  static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  static pthread_mutex_t mutex_thread[DataStoreStreamer::c_maxThreads];
 //static char* evtbuf_thread[DataStoreStreamer::c_maxThreads];
-static int msg_compLevel[DataStoreStreamer::c_maxThreads];
+  static int msg_compLevel[DataStoreStreamer::c_maxThreads];
 
-static std::queue<char*> my_evtbuf[DataStoreStreamer::c_maxThreads];
+  static std::queue<char*> my_evtbuf[DataStoreStreamer::c_maxThreads];
 
-static std::queue<int> my_nobjs;
-static std::queue<int> my_narrays;
-static std::queue<std::vector<TObject*>> my_objlist;
-static std::queue<std::vector<std::string>> my_namelist;
+  static std::queue<int> my_nobjs;
+  static std::queue<int> my_narrays;
+  static std::queue<std::vector<TObject*>> my_objlist;
+  static std::queue<std::vector<std::string>> my_namelist;
 
-static int my_decstat[DataStoreStreamer::c_maxThreads];
+  static int my_decstat[DataStoreStreamer::c_maxThreads];
+};
 
 void* RunDecodeEvtMessage(void* targ)
 {
@@ -98,7 +98,7 @@ DataStoreStreamer::~DataStoreStreamer()
   delete m_msghandler;
 }
 
-void DataStoreStreamer::setStreamingObjects(const vector<string>& objlist)
+void DataStoreStreamer::setStreamingObjects(const std::vector<std::string>& objlist)
 {
   m_streamobjnames = objlist;
 }
@@ -219,8 +219,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     m_msghandler->clear();
 
     // List of objects to be restored
-    vector<TObject*> objlist;
-    vector<string> namelist;
+    std::vector<TObject*> objlist;
+    std::vector<std::string> namelist;
 
     // Decode EvtMessage
     m_msghandler->decode_msg(msg, objlist, namelist);
@@ -362,8 +362,8 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     auto* msg = new EvtMessage(evtbuf);
 
     // Decode EvtMessage into Objects
-    vector<TObject*> objlist;
-    vector<string> namelist;
+    std::vector<TObject*> objlist;
+    std::vector<std::string> namelist;
 
     //    pthread_mutex_lock(&mutex);     // Lock test
     msghandler.decode_msg(msg, objlist, namelist);
@@ -407,8 +407,8 @@ int DataStoreStreamer::restoreDataStoreAsync()
     return 0;
   }
   int narrays = my_narrays.front(); my_narrays.pop();
-  vector<TObject*> objlist = my_objlist.front(); my_objlist.pop();
-  vector<string> namelist = my_namelist.front(); my_namelist.pop();
+  std::vector<TObject*> objlist = my_objlist.front(); my_objlist.pop();
+  std::vector<std::string> namelist = my_namelist.front(); my_namelist.pop();
   pthread_mutex_unlock(&mutex);
 
   // Restore objects in DataStore
@@ -486,7 +486,7 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
   TStreamerInfo* info;
   TObjLink* lnk = list->FirstLink();
 
-  vector<string> class_name;
+  std::vector<std::string> class_name;
 
   // First call BuildCheck for regular class
   while (lnk) {
@@ -503,7 +503,7 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
 
     // If the same class is in the object, ignore it. ( Otherwise it causes error. )
     if (ovlap == 0) {
-      string temp_classname = info->GetName();
+      std::string temp_classname = info->GetName();
       class_name.push_back(temp_classname);
 
       TObject* element = info->GetElements()->UncheckedAt(0);
@@ -536,7 +536,7 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
 
     // If the same class is in the object, ignore it. ( Otherwise it causes error. )
     if (ovlap == 0) {
-      string temp_classname = info->GetName();
+      std::string temp_classname = info->GetName();
       class_name.push_back(temp_classname);
 
       TObject* element = info->GetElements()->UncheckedAt(0);

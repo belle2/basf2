@@ -29,6 +29,7 @@ DQMHistAnalysisModule::IntValueList DQMHistAnalysisModule::g_vint;
 DQMHistAnalysisModule::FloatValueList DQMHistAnalysisModule::g_vfloat;
 DQMHistAnalysisModule::TextList DQMHistAnalysisModule::g_text;
 DQMHistAnalysisModule::HistList DQMHistAnalysisModule::g_hist;
+DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::g_monObj;
 
 DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 {
@@ -51,10 +52,33 @@ void DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   }
 }
 
+MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
+{
+  if (g_monObj.find(objName) != g_monObj.end()) {
+    if (g_monObj[objName]) {
+      return g_monObj[objName];
+    } else {
+      B2WARNING("MonitoringObject " << objName << " listed as being in memfile but points to nowhere. New Object will be made.");
+      g_monObj.erase(objName);
+    }
+  }
+
+  MonitoringObject* obj = new MonitoringObject(objName);
+  g_monObj.insert(MonObjList::value_type(objName, obj));
+  return obj;
+}
+
+
 const DQMHistAnalysisModule::HistList& DQMHistAnalysisModule::getHistList()
 {
   return g_hist;
 }
+
+const DQMHistAnalysisModule::MonObjList& DQMHistAnalysisModule::getMonObjList()
+{
+  return g_monObj;
+}
+
 
 TH1* DQMHistAnalysisModule::findHist(const std::string& histname)
 {
@@ -125,6 +149,21 @@ TH1* DQMHistAnalysisModule::findHist(const TDirectory* histdir, const TString& h
   }
   return NULL;
 }
+
+MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string& objName)
+{
+  if (g_monObj.find(objName) != g_monObj.end()) {
+    if (g_monObj[objName]) {
+      //Want to search elsewhere if null-pointer saved in map
+      return g_monObj[objName];
+    } else {
+      B2ERROR("MonitoringObject " << objName << " listed as being in memfile but points to nowhere.");
+    }
+  }
+  B2INFO("MonitoringObject " << objName << " not in memfile.");
+  return NULL;
+}
+
 
 
 void DQMHistAnalysisModule::setIntValue(const std::string& parname, int vint)

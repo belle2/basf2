@@ -183,7 +183,7 @@ namespace Belle2 {
       /** Index of the TrueHit the current hit belongs to */
       int                m_currentTrueHit = -1;
       /** Pointer to the sensor in which the current hit occurred */
-      Sensor*            m_currentSensor = 0;
+      Sensor*            m_currentSensor = NULL;
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Time of the current SimHit.. */

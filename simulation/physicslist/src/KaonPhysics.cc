@@ -26,11 +26,8 @@
 #include "G4GeneratorPrecompoundInterface.hh"
 #include "G4HadronElastic.hh"
 
-#include "G4ChipsKaonPlusInelasticXS.hh"
-#include "G4ChipsKaonMinusInelasticXS.hh"
-#include "G4ChipsKaonZeroInelasticXS.hh"
-#include "G4CrossSectionPairGG.hh"
 #include "G4CrossSectionElastic.hh"
+#include "G4CrossSectionInelastic.hh"
 #include "G4ComponentGGHadronNucleusXsc.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -83,12 +80,8 @@ void KaonPhysics::ConstructProcess()
   m_ftfp->SetMaxEnergy(100 * TeV);
 
   // Inelastic cross section sets
-  G4VCrossSectionDataSet* kpCS =
-    new G4CrossSectionPairGG(new G4ChipsKaonPlusInelasticXS, 91 * GeV);
-  G4VCrossSectionDataSet* kmCS =
-    new G4CrossSectionPairGG(new G4ChipsKaonMinusInelasticXS, 91 * GeV);
-  G4VCrossSectionDataSet* kzCS =
-    new G4CrossSectionPairGG(new G4ChipsKaonZeroInelasticXS, 91 * GeV);
+  G4VCrossSectionDataSet* kinelCS =
+    new G4CrossSectionInelastic(new G4ComponentGGHadronNucleusXsc);
 
   // Elastic cross section
   G4VCrossSectionDataSet* kelCS =
@@ -110,7 +103,7 @@ void KaonPhysics::ConstructProcess()
   G4KaonPlusInelasticProcess* kpProcInel = new G4KaonPlusInelasticProcess;
   kpProcInel->RegisterMe(loInelModel);
   kpProcInel->RegisterMe(m_ftfp);
-  kpProcInel->AddDataSet(kpCS);
+  kpProcInel->AddDataSet(kinelCS);
   procMan->AddDiscreteProcess(kpProcInel);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -129,7 +122,7 @@ void KaonPhysics::ConstructProcess()
   G4KaonMinusInelasticProcess* kmProcInel = new G4KaonMinusInelasticProcess;
   kmProcInel->RegisterMe(loInelModel);
   kmProcInel->RegisterMe(m_ftfp);
-  kmProcInel->AddDataSet(kmCS);
+  kmProcInel->AddDataSet(kinelCS);
   procMan->AddDiscreteProcess(kmProcInel);
 
   // stopping
@@ -152,7 +145,7 @@ void KaonPhysics::ConstructProcess()
   G4KaonZeroLInelasticProcess* k0LProcInel = new G4KaonZeroLInelasticProcess;
   k0LProcInel->RegisterMe(loInelModel);
   k0LProcInel->RegisterMe(m_ftfp);
-  k0LProcInel->AddDataSet(kzCS);
+  k0LProcInel->AddDataSet(kinelCS);
   procMan->AddDiscreteProcess(k0LProcInel);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -171,7 +164,7 @@ void KaonPhysics::ConstructProcess()
   G4KaonZeroSInelasticProcess* k0SProcInel = new G4KaonZeroSInelasticProcess;
   k0SProcInel->RegisterMe(loInelModel);
   k0SProcInel->RegisterMe(m_ftfp);
-  k0SProcInel->AddDataSet(kzCS);
+  k0SProcInel->AddDataSet(kinelCS);
   procMan->AddDiscreteProcess(k0SProcInel);
 }
 

@@ -21,7 +21,7 @@ namespace Belle2 {
      *
      * Created copies are stored in the same StoreArray as the original Particle.
      *
-     * @param particle pointer to the original Particle to be copied
+     * @param original pointer to the original Particle to be copied
      *
      * @return returns pointer to the copied Particle
      */
@@ -34,7 +34,7 @@ namespace Belle2 {
      * relations of the original daughter Particles are copied as well. Note that only the relation is
      * copied and that the related object is not. Copy is related to the *same* object as the original one.
      *
-     * @param particle pointer to the mother Particle whose daughters are to be copied
+     * @param mother pointer to the mother Particle whose daughters are to be copied
      */
     void copyDaughters(Particle* mother);
 

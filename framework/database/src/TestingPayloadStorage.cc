@@ -213,11 +213,8 @@ namespace Belle2::Conditions {
   {
     // Save the current gDirectory
     TDirectory::TContext saveDir;
-    // Change settings to create reproducible output files
-    // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
-    auto scopegard = ScopeGuard::guardGetterSetter(&TDirectory::IsReproducible, &TDirectory::MakeReproducible, true);
-    // And create the file ...
-    std::unique_ptr<TFile> file{TFile::Open(fileName.c_str(), "RECREATE")};
+    // And create a reproducible TFile: one that has the same checksum every time it's created as long as the content is the same
+    std::unique_ptr<TFile> file{TFile::Open((fileName + "?reproducible=PayloadFile").c_str(), "RECREATE")};
     if (!file || !file->IsOpen()) {
       B2ERROR("Could not open payload file for writing." << LogVar("filename", m_filename));
       return false;

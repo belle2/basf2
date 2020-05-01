@@ -80,6 +80,12 @@ namespace Belle2 {
         m_fitterMode = fitterMode;
       }
 
+      /** Enables the fit amplitude bins.  */
+      void fitInAmpliduteBins(bool isFitInAmplitudeBins)
+      {
+        m_isFitInAmplitudeBins = isFitInAmplitudeBins;
+      }
+
 
     protected:
 
@@ -116,7 +122,8 @@ namespace Belle2 {
       std::string m_TTSData =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the Fit constraints and MC info */
       std::string m_fitterMode = "calibration";/**< Fit mode. Can be 'calibration', 'monitoring' or 'MC' */
-
+      bool m_isFitInAmplitudeBins = false; /**< Enables the fit in amplitude bins */
+      std::vector<float> m_binEdges = {50, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520, 550, 580, 610, 640, 670, 700, 800, 900, 1000, 1200, 1500, 2000}; /**< Amplitude bins */
       TFile* m_inputTTS = nullptr; /**< File containing m_treeTTS */
       TFile* m_inputConstraints = nullptr; /**< File containing m_treeConstraints */
 
@@ -125,6 +132,8 @@ namespace Belle2 {
         nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the paraeters to be fixed in the fit*/
       TFile* m_histFile = nullptr; /**< Output of the fitter. The file containing the output trees and histograms*/
       TTree* m_fitTree = nullptr; /**< Output of the fitter. The tree containg the fit results. */
+      TTree* m_timewalkTree =
+        nullptr; /**< Output of the fitter. The tree containg the fit results to be used to study timewalk and asymptotic time resolution. */
 
 
       // Variables for the TTS parametrization tree
@@ -149,6 +158,8 @@ namespace Belle2 {
 
 
       // Variables for the output tree
+      float m_binLowerEdge = 0; /**< Lower edge of the amplitude bin in which this fit is performed */
+      float m_binUpperEdge = 0; /**< Upper edge of the amplitude bin in which this fit is performed */
       short m_channel = 0; /**< Channel number (0-511)*/
       short m_slot = 0; /**< Slot ID (1-16)*/
       short m_row = 0; /**< Pixel row */
@@ -158,7 +169,8 @@ namespace Belle2 {
         0; /**< Time difference between the main peak and the secondary peak. Can be either fixed to the MC value or fitted. */
       float m_sigma = 0.; /**< Gaussian time resolution, fitted */
       float m_fraction = 0.; /**< Fraction of events in the secondary peak*/
-      float m_yieldLaser = 0.; /**< Toral number of laser hits from the fitting function integral */
+      float m_yieldLaser = 0.; /**< Total number of laser hits from the fitting function integral */
+      float m_histoIntegral = 0.; /**< Integral of the fitted histogram */
 
       float m_peakTimeErr = 0; /**< Statistical error on peakTime*/
       float m_deltaTErr = 0; /**< Statistical error on deltaT */

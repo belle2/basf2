@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-Utility script to be used in conjuction with the git bisect functionality 
-[1]_ to search for degredations in validation variables. To use it, you can 
+Utility script to be used in conjunction with the git bisect functionality
+[1]_ to search for degradations in validation variables. To use it, you can
 set the last known good git commit and the first known bad commit and start 
-the bistecting process. Git will then checkout commits between the good and 
+the bisecting process. Git will then checkout commits between the good and
 the bad and perform a binary search to arrive at the first bad commit. 
 
 To give feed back to git, which is first bad commit, this script either 
@@ -13,7 +13,7 @@ returns the exit code 0 for good commit, code 125 to ignore the current
 commit or code 1 for a bad commit. 
 
 Information contained within .root files produced by the official validation 
-scripcts or your custom scripts can be used to distingush between good and 
+scripts or your custom scripts can be used to distinguish between good and
 bad commits. 
 
 The syntax of the ``--check-quantity`` option is the following: ``<root 
@@ -31,7 +31,7 @@ filename>:<quantity>:<compare op>:<value>``
 - ``compare op`` can be ``>`` or ``<``
 - ``value`` is the reference value as a float to compare to
 
-As an example, to identfiy the commit which made the tracking efficiency drop 
+As an example, to identify the commit which made the tracking efficiency drop
 below 0.93, the following snippet can be used:: 
 
   git bisect good <last good release>
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     if argsVar["test_check"] is False:
         # output current git commit and svn revision
         os.system("echo -n 'git commit ' && git rev-parse HEAD")
-        os.system("echo -n 'SVN revsion ' && git svn find-rev `git rev-parse "
+        os.system("echo -n 'SVN revision ' && git svn find-rev `git rev-parse "
                   "HEAD`")
 
         # make sure the proper environment is setup. If for example the
@@ -303,14 +303,14 @@ if __name__ == "__main__":
             print("Cannot retrieve git commit hash, no archival possible")
         else:
             archive_folder_name = "results_" + current_git_commit
-            # remove a previously archieved folder, if present
+            # remove a previously achieved folder, if present
             shutil.rmtree(archive_folder_name, True)
             shutil.copytree("results", archive_folder_name)
 
     # check if comparison failed ?!?
     if argsVar["check_failed_comparison"]:
         plots_result_folder = "html/plots/"
-        comparsion_json_filename = validationpath.file_name_comparison_json
+        comparison_json_filename = validationpath.file_name_comparison_json
 
         comparison_folders = [
             (
@@ -319,7 +319,7 @@ if __name__ == "__main__":
                     os.path.join(
                         plots_result_folder,
                         x,
-                        comparsion_json_filename
+                        comparison_json_filename
                     )
                 )
             )
@@ -337,7 +337,7 @@ if __name__ == "__main__":
             result_file_name = os.path.join(
                 plots_result_folder,
                 comparison_folders[-1][0],
-                comparsion_json_filename
+                comparison_json_filename
             )
             ecount = get_error_count_from_json(result_file_name)
 

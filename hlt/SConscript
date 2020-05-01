@@ -8,7 +8,8 @@ env['LIBS'] = [
     "analysis_dataobjects",
     "analysis_ClusterUtility",
     "mdst_dataobjects",
-    'reconstruction_dataobjects'
+    'reconstruction_dataobjects',
+    'analysis_ContinuumSuppression',
 ]
 
 Return('env')

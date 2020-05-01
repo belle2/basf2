@@ -40,6 +40,8 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
+// Long lived
+#include "simulation/longlivedneutral/G4LongLivedNeutralPhysics.h"
 #include <framework/logging/Logger.h>
 
 #define g4ePDGcode 0
@@ -345,4 +347,11 @@ void Belle2PhysicsList::UseOpticalPhysics(G4bool yesno)
 void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
 {
   if (yesno) G4cout << " High precision neutron option not yet ready " << G4endl;
+}
+
+void Belle2PhysicsList::UseLongLivedNeutralParticles()
+{
+  G4LongLivedNeutralPhysics* pLongLivedNeutral = new G4LongLivedNeutralPhysics();
+  RegisterPhysics(pLongLivedNeutral);
+  pLongLivedNeutral->ConstructParticle();
 }

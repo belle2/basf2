@@ -32,6 +32,7 @@
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
+#include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
@@ -137,7 +138,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0.0);
   addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
-
   vector<string> defaultCommandsAtPreInit;
   addParam("UICommandsAtPreInit", m_uiCommandsAtPreInit,
            "A list of Geant4 UI commands that should be applied at PreInit state, before the simulation starts.",
@@ -146,14 +146,11 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("UICommandsAtIdle", m_uiCommandsAtIdle,
            "A list of Geant4 UI commands that should be applied at Idle state, before the simulation starts.",
            defaultCommandsAtIdle);
-
-
   addParam("trajectoryStore", m_trajectoryStore,
            "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
-
   vector<float> defaultAbsorbers;
   addParam("AbsorbersRadii", m_absorbers,
            "Radii (in cm) of absorbers across which tracks will be destroyed.", defaultAbsorbers);
@@ -222,6 +219,7 @@ void FullSimModule::initialize()
     physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
     physicsList->SetECLProductionCutValue(m_eclProductionCut);
     physicsList->SetKLMProductionCutValue(m_klmProductionCut);
+    physicsList->UseLongLivedNeutralParticles();
 
     //Apply the Geant4 UI commands in PreInit State - before initialization
     if (m_uiCommandsAtPreInit.size() > 0) {
@@ -244,6 +242,9 @@ void FullSimModule::initialize()
     if (m_monopoles) {
       physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
+
+    physicsList->RegisterPhysics(new G4LongLivedNeutralPhysics());
+
     physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 
     //Apply the Geant4 UI commands in PreInit State - before initialization

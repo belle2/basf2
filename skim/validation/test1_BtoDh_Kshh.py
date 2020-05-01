@@ -23,6 +23,6 @@ path = b2.Path()
 fileList = ['../BtoDh_Kshh.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = BtoDh_Kshh(OutputFileName='../BtoDh_Kshh.udst.root')
+skim = BtoDh_Kshh()
 skim(path)
 b2.process(path)

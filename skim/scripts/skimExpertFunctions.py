@@ -14,28 +14,6 @@ from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOf
 from skim.registry import Registry
 
 
-def encodeSkimName(SkimName):
-    """
-    Returns the appropriate 8 digit skim code that will be used as the output uDST
-    file name for any give name of a skimming script.
-
-    :param str SkimName: Name of the skim.
-    """
-    # TODO: delete `encodeSkimName` and use `Registry.encode_skim_name` in its place
-    return Registry.encode_skim_name(SkimName)
-
-
-def decodeSkimName(SkimCode):
-    """
-    Returns the appropriate name of the skim given a specific skim code. This is useful to determine the skim script used
-    to produce a specific uDST file, given the 8-digit code  name of the file itself.
-
-    :param str code:
-    """
-    # TODO: delete `decodeSkimName` and use `Registry.decode_skim_code` in its place
-    return Registry.decode_skim_code(SkimCode)
-
-
 def _get_test_sample_info(sampleName):
     """Read in the YAML file of test samples (``skim/scripts/TestFiles.yaml``) and
     return the info for a sample as a dict.

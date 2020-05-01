@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,14 +20,15 @@
 
 namespace Belle2 {
 
-  template <class AFilter>
-  LayerSVDRelationFilter<AFilter>::LayerSVDRelationFilter() : Super()
+  template <class AFilter, class APrefilter>
+  LayerSVDRelationFilter<AFilter, APrefilter>::LayerSVDRelationFilter() : Super()
   {
     Super::addProcessingSignalListener(&m_filter);
+    Super::addProcessingSignalListener(&m_prefilter);
   }
 
-  template <class AFilter>
-  void LayerSVDRelationFilter<AFilter>::beginRun()
+  template <class AFilter, class APrefilter>
+  void LayerSVDRelationFilter<AFilter, APrefilter>::beginRun()
   {
     Super::beginRun();
 
@@ -39,38 +40,36 @@ namespace Belle2 {
     }
   }
 
-  template <class AFilter>
-  LayerSVDRelationFilter<AFilter>::~LayerSVDRelationFilter() = default;
+  template <class AFilter, class APrefilter>
+  LayerSVDRelationFilter<AFilter, APrefilter>::~LayerSVDRelationFilter() = default;
 
-  template <class AFilter>
+  template <class AFilter, class APrefilter>
   std::vector<CKFToSVDState*>
-  LayerSVDRelationFilter<AFilter>::getPossibleTos(CKFToSVDState* currentState,
-                                                  const std::vector<CKFToSVDState*>& states) const
+  LayerSVDRelationFilter<AFilter, APrefilter>::getPossibleTos(CKFToSVDState* currentState,
+                                                              const std::vector<CKFToSVDState*>& states) const
   {
     std::vector<CKFToSVDState*> possibleNextStates;
     possibleNextStates.reserve(states.size());
 
-    const unsigned int currentLayer = currentState->getGeometricalLayer();
-    const unsigned int nextLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
+    const CKFToSVDState::stateCache& currentStateCache = currentState->getStateCache();
+    const unsigned int currentLayer = currentStateCache.geoLayer;
+    const unsigned int nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_param_hitJumping, 0);
 
     for (CKFToSVDState* nextState : states) {
       if (currentState == nextState) {
         continue;
       }
 
-      const unsigned int layer = nextState->getGeometricalLayer();
-      if (std::max(currentLayer, nextLayer) >= layer and layer >= std::min(currentLayer, nextLayer)) {
+      const CKFToSVDState::stateCache& nextStateCache = nextState->getStateCache();
+      const unsigned int nextLayer = nextStateCache.geoLayer;
 
-        if (currentLayer == layer) {
-          const SpacePoint* const currentSpacePoint = currentState->getHit();
-          const SpacePoint* const nextSpacePoint = nextState->getHit();
+      if (std::max(currentLayer, nextPossibleLayer) >= nextLayer and nextLayer >= std::min(currentLayer, nextPossibleLayer)) {
 
-          const VxdID& fromVXDID = currentSpacePoint->getVxdID();
-          const VxdID& toVXDID = nextSpacePoint->getVxdID();
+        if (currentLayer == nextLayer) {
           // next layer is an overlap one, so lets return all hits from the same layer, that are on a
           // ladder which is below the last added hit.
-          const unsigned int fromLadderNumber = fromVXDID.getLadderNumber();
-          const unsigned int maximumLadderNumber = m_maximalLadderCache.find(fromVXDID.getLayerNumber())->second;
+          const unsigned int fromLadderNumber = currentStateCache.ladder;
+          const unsigned int maximumLadderNumber = m_maximalLadderCache.find(currentLayer)->second;
 
           // the reason for this strange formula is the numbering scheme in the VXD.
           // we first substract 1 from the ladder number to have a ladder counting from 0 to N - 1,
@@ -81,7 +80,7 @@ namespace Belle2 {
           const unsigned int overlappingLadder =
             ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
-          if (toVXDID.getLadderNumber() != overlappingLadder) {
+          if (nextStateCache.ladder != overlappingLadder) {
             continue;
           }
 
@@ -94,16 +93,19 @@ namespace Belle2 {
           //               ----|----                    ----|----                    ----|----
           //  This is fine:         X        This not:                X   This not:          X
           //                      ----|----                    ----|----                    ----|----
-          const double currentStateU = currentSpacePoint->getNormalizedLocalU();
-          if (currentStateU > 0.2) {
+          if (currentStateCache.localNormalizedu > 0.2) {
             continue;
           }
 
-          const double nextStateU = nextSpacePoint->getNormalizedLocalU();
-          if (nextStateU <= 0.8) {
+          if (nextStateCache.localNormalizedu <= 0.8) {
             continue;
           }
+        }
 
+        // Some loose prefiltering of possible states
+        TrackFindingCDC::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
+        if (std::isnan(weight)) {
+          continue;
         }
 
 
@@ -114,17 +116,18 @@ namespace Belle2 {
     return possibleNextStates;
   }
 
-  template <class AFilter>
-  void LayerSVDRelationFilter<AFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  template <class AFilter, class APrefilter>
+  void LayerSVDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
                                   "Make it possible to jump over N layers.", m_param_hitJumping);
 
     m_filter.exposeParameters(moduleParamList, prefix);
+    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
   }
 
-  template <class AFilter>
-  TrackFindingCDC::Weight LayerSVDRelationFilter<AFilter>::operator()(const CKFToSVDState& from, const CKFToSVDState& to)
+  template <class AFilter, class APrefilter>
+  TrackFindingCDC::Weight LayerSVDRelationFilter<AFilter, APrefilter>::operator()(const CKFToSVDState& from, const CKFToSVDState& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

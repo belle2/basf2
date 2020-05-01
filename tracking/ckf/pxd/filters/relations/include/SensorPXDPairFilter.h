@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,9 +14,21 @@
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  class SectorPXDPairFilter : public BasePXDPairFilter {
+  class SensorPXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on layer
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    /// Expose the parameters.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+  private:
+    /// Pre-filter relations in theta for overlay
+    double m_param_ThetaRecoTrackToHitCut = 0.8;
+    /// Pre-filter relations in phi between seed states and hit states
+    double m_param_PhiRecoTrackToHitCut = 0.8;
+    /// Pre-filter relations in phi between hit states
+    double m_param_ThetaHitHitCut = M_PI / 3.;
+    /// Pre-filter relations in theta between hit states
+    double m_param_PhiHitHitCut = 1.0;
   };
 }

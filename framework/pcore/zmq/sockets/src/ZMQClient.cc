@@ -59,7 +59,7 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
   m_socket = std::make_unique<zmq::socket_t>(*m_context, AZMQType);
 
   if (AZMQType == ZMQ_DEALER) {
-    const std::string& uniqueID = std::to_string(getpid());
+    const std::string uniqueID = std::to_string(getpid());
     m_socket->setsockopt(ZMQ_IDENTITY, uniqueID.c_str(), uniqueID.length());
   }
 

@@ -56,7 +56,7 @@ namespace Belle2 {
 
       void printFitObjects(BaseFitter& fitter);
       void printConstraints(BaseFitter& fitter);
-      void printTraceValues(BaseFitter& fitter);
+      void printTraceValues(const BaseFitter& fitter);
       void printSums(BaseFitter& fitter);
 
     protected:

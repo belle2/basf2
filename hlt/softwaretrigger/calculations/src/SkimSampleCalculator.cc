@@ -387,8 +387,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double radee = 0.;
-  const double lowdEdxEdge = 0.8, highdEdxEdge = 1.2;
-  const double lowEoPEdge = 0.8, highEoPEdge = 1.2;
+  const double lowdEdxEdge = 0.70, highdEdxEdge = 1.30;
+  const double lowEoPEdge = 0.70, highEoPEdge = 1.30;
 
   if (m_pionParticles->getListSize() == 2) {
 

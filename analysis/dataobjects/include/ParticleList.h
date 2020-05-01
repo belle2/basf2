@@ -172,6 +172,7 @@ namespace Belle2 {
      *
      * @param pdg PDG code of particles to be hold in this list
      * @param name of the particle list
+     * @param particleStoreName name of the Particle StoreArray
      */
     void initialize(int pdg, const std::string& name, const std::string& particleStoreName = "Particles");
 
@@ -209,6 +210,7 @@ namespace Belle2 {
      * @param iparticle index of the particle in the StoreArray<Particle>
      * @param pdg particle PDG code
      * @param flavorType particle flavor type
+     * @param includingAntiList include anti-particle list?
      */
     void addParticle(unsigned iparticle, int pdg, Particle::EFlavorType flavorType, bool includingAntiList = true);
 
@@ -280,8 +282,9 @@ namespace Belle2 {
     unsigned getListSize(bool includingAntiList = true) const;
 
     /**
-     * Returns i-th particle from the this list and anti list if requested
+     * Returns i-th particle from the list and anti list if requested
      * @param i list index (i < getListSize())
+     * @param includingAntiList consider anti-particle list as well?
      * @return pointer to Particle or NULL
      */
     Particle* getParticle(unsigned i, bool includingAntiList = true) const;

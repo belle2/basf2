@@ -5,7 +5,8 @@
    This tool is intended for use by skim production managers, not by skim liaisons.
 
 ``%(prog)s`` is a tool for producing grid production requests in the format required by the
-`production system <https://confluence.desy.de/display/BI/Production+Definition>`_.
+`production system <https://confluence.desy.de/display/BI/Production+Definition>`_, and
+also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of valid YAML
 entries for data and MC.
@@ -83,27 +84,60 @@ names of the skims. The combined skims must be defined in
 intended release to be used, and base directory of the repository to output the JSON
 files in.
 
-This tool is designed to work with the ``skimStats.json`` output of
+This tool is designed to work with the ``SkimStats.json`` output of
 ``b2skim-stats-print`` (see :ref:`testing-skims`). The YAML files can be used to specify
 which sample statistics are to be used for each dataset, with the keyword
 ``sampleLabel``---this must match one of the sample labels used by the skim statistics
-tools. ``skimStats.json`` must be present in the current directory when this tool is
+tools. ``SkimStats.json`` must be present in the current directory when this tool is
 run.
+
+Production requests cannot be produced without resource usage estimates, so the pipeline
+for producing a production request and combined steering file is as follows:
+
+1. Put together a YAML file defining which single skims comprise each combined skim. For
+   example,
+
+   .. code-block:: yaml
+
+       # contents of CombinedSkims.yaml
+       EWP:
+         - BtoXll
+         - BtoXll_LFV
+         - BtoXgamma
+       Tau:
+         - TauLFV
+         - TauGeneric
+         - TauThrust
+
+2. Pass this combined skim definition to
+   :ref:`b2skim-stats-submit<b2skim-stats-submit>`, and produce JSON output of
+   :ref:`b2skim-stats-print<b2skim-stats-print>`
+
+  .. code-block::
+
+      $ b2skim-stats-submit -c CombinedSkims.yaml EWP Tau
+      # wait for LSF jobs to complete...
+      $ b2skim-stats-print -c EWP Tau -J
+
+3. The output ``SkimStats.json`` can then be used to produce production JSON files for
+   the EWP and Tau combined skims, and will construct a steering files for the specified
+   combined skims.
+
 
 --epilog--
 .. rubric:: Example usage
 
 * Produce requests for EWP and feiSLCombined skims on proc9::
 
-    $ %(prog)s Registry_proc9.yaml -s EWP feiSLCombined --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_proc9.yaml SkimStats.json -s EWP feiSLCombined --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 
 * Produce requests for EWP on MC13, with one LPN per JSON file::
 
-    $ %(prog)s Registry_MC13.yaml -N 1 -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 
 * Produce requests for EWP on MC13, using local skim module script::
 
-    $ %(prog)s Registry_MC13.yaml -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
+    $ %(prog)s Registry_MC13.yaml SkimStats.json -N 1 -l ewp_local.py -s EWP --data -c SKIMDATAx1 -r release-04-01-01 -o B2P/data/
 """
 
 __author__ = "Phil Grace, Racha Cheaib"
@@ -122,7 +156,7 @@ import yaml
 from basf2 import B2ERROR, B2INFO, B2WARNING
 from conditions_db import ConditionsDB, encode_name
 from skimExpertFunctions import encodeSkimName
-from skim.registry import combined_skims as combinedSkimsInfo
+from skim.registry import Registry
 
 
 def read_registry_yaml(sampleRegistryYaml, mc):
@@ -142,7 +176,7 @@ def read_registry_yaml(sampleRegistryYaml, mc):
         top-level names are used throughout this script as labels for each set
         of data/MC. The key "sampleLabel" must correspond to a sample label used
         in `b2skim-stats-print`, so that the performance statistics can be
-        retrieved from ``skimStats.json``. The remaining keys are used to
+        retrieved from ``SkimStats.json``. The remaining keys are used to
         construct the LPNs of the input datasets.
     """
     with open(sampleRegistryYaml) as sampleRegistryFile:
@@ -153,25 +187,30 @@ def read_registry_yaml(sampleRegistryYaml, mc):
     return sampleRegistry
 
 
-def get_skim_stats_dict():
+@lru_cache()
+def get_skim_stats_dict(SkimStatsJson):
     """Read in the JSON output of ``b2skim-stats-print`` into a dict.
 
-    Returns:
-        skimStatsDict (dict): A dict containing the tested skim statistics.
-    """
-    # Assumes that skimStats.json is in the current directory
-    try:
-        with open("skimStats.json") as skimStatsFile:
-            skimStatsDict = json.load(skimStatsFile)
-    except FileNotFoundError:
-        B2ERROR(
-            "Could not find required file `skimStats.json` in current directory.\n"
-            "          Please run `b2skim-stats-print` with the `-J` flag, and put\n"
-            "          the output `skimStats.json` in the current directory."
-        )
-        sys.exit(1)
+    Parameters:
+        SkimStatsJson (str): Path to the JSON output of `b2skim-stats-print`.
 
-    return skimStatsDict
+    Returns:
+        skimStats (dict): A dict containing the tested skim statistics.
+        CombinedSkimDefinitions (dict(list)): A data structure defining which single
+            skims are included in each combined skim.
+    """
+    with open(SkimStatsJson) as skimStatsFile:
+        JSONContents = json.load(skimStatsFile)
+
+    try:
+        skimStats = JSONContents["stats"]
+        CombinedSkimDefinitions = JSONContents["CombinedSkims"]
+    except KeyError:
+        raise ValueError(
+            "Cannot find definitions of combined skims in skim stats JSON file."
+        )
+
+    return skimStats, CombinedSkimDefinitions
 
 
 def verify_registry(sampleRegistry, mc):
@@ -250,7 +289,7 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
     if missingSkims:
         for missingSkim in missingSkims:
             B2ERROR(
-                f"Cannot find stats for {missingSkim} skim in skimStats.json.\n"
+                f"Cannot find stats for {missingSkim} skim in skim stats JSON file.\n"
                 "          Perhaps you misspelled it or forgot to produce the\n"
                 "          stats with `b2skim-stats-print`?"
             )
@@ -608,9 +647,72 @@ def warn_local_script(args):
     for skimName in args.skims:
         B2WARNING(
             f"Using local skim script! Please make sure to place sandbox file {skimScript}\n"
-            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}\n"
-            f"          and modify {skimName}_Skim_Standalone.py to import this script."
+            f"          in {Path(args.output_base_directory, localScriptDirectory).resolve()}"
         )
+
+
+def make_combined_steering_file(
+    SkimName, CombinedSkimDefinitions, SteeringFileDirectory, LocalModule=None
+):
+    """Construct a steering file for the requested combined skim."""
+    SteeringFileDirectory.mkdir(parents=True, exist_ok=True)
+    SteeringFile = SteeringFileDirectory / f"{SkimName}_Skim.py"
+
+    # Retrieve the list of individual skims going into this combined skim
+    SingleSkims = CombinedSkimDefinitions[SkimName]
+
+    # And then group them into the modules they belong to, so we can put together some
+    # nice import statements
+    modules = sorted({Registry.get_skim_module(skim) for skim in SingleSkims})
+    GroupedSkims = {
+        f"skim.{module}": [
+            skim for skim in SingleSkims if Registry.get_skim_module(skim) == module
+        ]
+        for module in modules
+    }
+
+    # Handle local override of skim script, in case we need to replace a skim module at production time
+    if LocalModule and len(modules) > 1:
+        B2ERROR(
+            f"Local module {LocalModule} specified, but combined skim {SkimName} uses\n"
+            "        more than one skim module. Not sure what to do in this situation, so \n"
+            f"        please modify {SteeringFile} yourself."
+        )
+    elif LocalModule:
+        # Replace the normal module with the local one
+        LocalModule = LocalModule.rstrip(".py")
+        NormalModule = modules[0]
+        GroupedSkims[LocalModule] = GroupedSkims.pop(f"skim.{NormalModule}")
+
+    BasicImports = """import basf2 as b2
+import modularAnalysis as ma
+from skimExpertFunctions import CombinedSkim
+"""
+    if LocalModule:
+        BasicImports += "\n"
+
+    SkimImports = "".join(
+        [
+            f"from {module} import {', '.join(skims)}\n"
+            for (module, skims) in GroupedSkims.items()
+        ]
+    )
+    SkimObjects = [f"    {skim}(),\n" for skim in SingleSkims]
+    MainProcessing = f"""
+path = b2.Path()
+ma.inputMdstList("default", [], path=path)
+skim = CombinedSkim(
+{''.join(SkimObjects)})
+skim(path)
+b2.process(path)
+"""
+
+    SteeringFileCode = BasicImports + SkimImports + MainProcessing
+
+    with open(SteeringFile, "w") as f:
+        f.write(SteeringFileCode)
+
+    B2INFO(f"Steering file for {SkimName} combined skim written to {SteeringFile}")
 
 
 def make_request_dict(
@@ -641,10 +743,10 @@ def make_request_dict(
     if LPNBlockIdentifier:
         sampleLabel += LPNBlockIdentifier
 
-    skimStatsDict = get_skim_stats_dict()
+    skimStatsDict, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
     verify_stats_dict(args, sampleRegistry, skimStatsDict)
 
-    individualSkims = combinedSkimsInfo[skimName]
+    individualSkims = CombinedSkimDefinitions[skimName]
 
     if args.mc:
         fabricationType = "MCSkim"
@@ -676,7 +778,11 @@ def make_request_dict(
         "SteeringFilePrefix": f"{args.campaign}/{args.release}/SkimScripts",
         "LPNPrefix": LPNPrefix,
         "DataDescription": [
-            {"": individualSkim, "SkimDecayMode": encodeSkimName(individualSkim), "DataLevel": "udst"}
+            {
+                "": individualSkim,
+                "SkimDecayMode": encodeSkimName(individualSkim),
+                "DataLevel": "udst",
+            }
             for individualSkim in individualSkims
         ],
     }
@@ -684,7 +790,9 @@ def make_request_dict(
     # We only want the MCEventType to include the beam background level if the sample is BGx0
     if args.mc:
         skimRequestDict["MCEventType"] = sampleInfo["mcType"].rstrip("BGx1")
-        if sampleInfo["mcBackground"] == "BGx0" and not sampleInfo["mcType"].endswith("BGx0"):
+        if sampleInfo["mcBackground"] == "BGx0" and not sampleInfo["mcType"].endswith(
+            "BGx0"
+        ):
             skimRequestDict["MCEventType"] += "BGx0"
 
     if args.local_skim_script:
@@ -711,10 +819,23 @@ def write_json_files(sampleRegistry, args, outputDirectory):
     """
 
     if args.lpns_per_json:
-        B2INFO(f"Producing JSON files with {args.lpns_per_json} "
-               f"LPN{'s'*(args.lpns_per_json>1)} per JSON file.")
+        B2INFO(
+            f"Producing JSON files with {args.lpns_per_json} "
+            f"LPN{'s'*(args.lpns_per_json>1)} per JSON file."
+        )
 
     for skimName in args.skims:
+        _, CombinedSkimDefinitions = get_skim_stats_dict(args.SkimStatsJson)
+        SteeringFileDirectory = Path(
+            args.output_base_directory, args.campaign, args.release, "SkimScripts"
+        )
+        make_combined_steering_file(
+            skimName,
+            CombinedSkimDefinitions,
+            SteeringFileDirectory,
+            args.local_skim_script,
+        )
+
         for sampleLabel, sampleInfo in sampleRegistry.items():
 
             SampleLPNList = get_lpn_list(sampleInfo, args.mc)
@@ -754,15 +875,11 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                     LPNBlockIdentifier,
                 )
 
-                if outputFilePath.exists():
-                    B2WARNING(f"Overwriting {outputFilePath}")
+                # NOTE: commented out, because it's noisy and a tad useless
+                # if outputFilePath.exists():
+                #     B2WARNING(f"Overwriting {outputFilePath}")
                 with open(outputFilePath, "w") as outputFile:
                     json.dump(skimRequestDict, outputFile, indent=4)
-
-        B2INFO(
-            f"Make sure to copy {skimName}_Skim_Standalone.py to "
-            f"{get_base_directory(args)}/{args.campaign}/{args.release}/SkimScripts/"
-        )
 
 
 def get_argument_parser():
@@ -784,12 +901,14 @@ def get_argument_parser():
         help="YAML file defining the samples produce JSON files for.",
     )
     parser.add_argument(
+        "SkimStatsJson", help="The JSON output file of b2skim-stats-print.",
+    )
+    parser.add_argument(
         "-s",
         "--skims",
         required=True,
         nargs="+",
-        metavar="SKIM",
-        choices=combinedSkimsInfo.keys(),
+        metavar="CombinedSkim",
         help="List of skims to produce request files for. "
         "Only accepts combined skims listed in `skim.registry.combined_skims`.",
     )
@@ -849,9 +968,9 @@ def main():
     write_json_files(sampleRegistry, args, outputDirectory)
 
     warn_local_script(args)
+    SampleString = "".join([f"\n        - {s}" for s in sampleRegistry.keys()])
     B2INFO(
-        f"Successfully generated {', '.join(args.skims)} JSON files for "
-        f"{', '.join(sampleRegistry.keys())} samples."
+        f"Successfully generated {', '.join(args.skims)} JSON files for samples: {SampleString}"
     )
     B2INFO(f"The JSON files were saved to {outputDirectory}")
 

@@ -201,6 +201,11 @@ int TagVertex::getFitTruthStatus()
   return m_fitTruthStatus;
 }
 
+int TagVertex::getRollBackStatus()
+{
+  return m_rollbackStatus;
+}
+
 void TagVertex::setTagVertex(const TVector3& tagVertex)
 {
   m_tagVertex = tagVertex;
@@ -350,4 +355,9 @@ void  TagVertex::resetConstraintCov()
 void TagVertex::setFitTruthStatus(int truthStatus)
 {
   m_fitTruthStatus = truthStatus;
+}
+
+void TagVertex::setRollBackStatus(int backStatus)
+{
+  m_rollbackStatus = backStatus;
 }

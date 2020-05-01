@@ -308,7 +308,7 @@ void SVDDQMExpressRecoModule::defineHisto()
   m_histoList->Add(m_clusterTimeU3);
   name = str(format("SVDDQM_ClusterTimeV3"));
   Title = Form("SVD V-Cluster Time %s for layer 3 sensors", refFrame.Data());
-  m_clusterTimeV3 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
   m_clusterTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV3);

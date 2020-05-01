@@ -208,7 +208,7 @@ b_vars = vc.kinematics + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
     vu.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
-                      wrapper='extraInfo(variable)',
+                      wrapper='extraInfo({variable})',
                       prefix="B")
 
 # Saving variables to ntuple

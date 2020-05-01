@@ -13,7 +13,6 @@
 
 /* KLM headers. */
 #include <klm/dbobjects/bklm/BKLMADCThreshold.h>
-#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 
 namespace Belle2 {
 
@@ -52,11 +51,6 @@ namespace Belle2 {
      * Import BKLM scintillator ADC parameters into the database
      */
     void importADCThreshold(BKLMADCThreshold* inputThreshold);
-
-    /**
-     * Import BKLM time window cuts into the database
-     */
-    void importTimeWindow(BKLMTimeWindow* inputWindow);
 
   private:
 

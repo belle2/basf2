@@ -63,6 +63,7 @@ namespace Belle2 {
       m_constraintType = "";
       m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
       m_fitTruthStatus = 0;
+      m_rollbackStatus = 0;
     }
 
     // get methods
@@ -241,6 +242,11 @@ namespace Belle2 {
      */
     int getFitTruthStatus();
 
+    /**
+     * Get the status of the fit performed with the rolled back tracks
+     */
+    int getRollBackStatus();
+
     // set methods
 
     /**
@@ -381,6 +387,11 @@ namespace Belle2 {
      */
     void setFitTruthStatus(int truthStatus);
 
+    /**
+     * Set the status of the fit performed with the rolled back tracks
+     */
+    void setRollBackStatus(int backStatus);
+
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
     TMatrixDSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
@@ -410,6 +421,7 @@ namespace Belle2 {
     TVector3 m_constraintCenter;        /**< centre of the constraint */
     TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
     int m_fitTruthStatus;               /**< status of the fit when fitted with the truth info of the tracks */
+    int m_rollbackStatus;               /**< status of the fit when fitted with rolled back tracks */
 
 
     /**

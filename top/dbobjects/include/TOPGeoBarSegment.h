@@ -164,6 +164,16 @@ namespace Belle2 {
     const GeoOpticalSurface& getSurface() const {return m_surface;}
 
     /**
+     * Returns surface reflectivity at given photon energy
+     * @param energy photon energy in [eV]
+     * @return reflectivity
+     */
+    double getSurfaceReflectivity(double energy) const
+    {
+      return TOPGeoBase::getReflectivity(m_surface, energy);
+    }
+
+    /**
      * Returns geant4 parameter describing surface roughness
      * @return surface roughness
      */

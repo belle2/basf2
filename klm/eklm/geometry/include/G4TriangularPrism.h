@@ -26,6 +26,7 @@ namespace Belle2 {
 
     /**
      * Constructor.
+     * @param[in] name      Name of the volume.
      * @param[in] r1        First point radius.
      * @param[in] phi1      First point angle.
      * @param[in] r2        Second point radius.

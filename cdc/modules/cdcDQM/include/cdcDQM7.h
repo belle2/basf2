@@ -33,9 +33,13 @@ namespace Belle2 {
 
     //! Module functions
     void initialize() override;
+    //! action at runbegin
     void beginRun() override;
+    //! action per each event
     void event() override;
+    //! action at run end
     void endRun() override;
+    //! termination action
     void terminate() override;
 
     //! function to define histograms

@@ -12,9 +12,6 @@
 #include <klm/modules/KLMStripEfficiencyCollector/KLMStripEfficiencyCollectorModule.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 
-/* ROOT headers. */
-#include <TH1F.h>
-
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
@@ -157,9 +154,18 @@ void KLMStripEfficiencyCollectorModule::collect()
 {
   std::vector<unsigned int> toRemove;
   unsigned int nMuons = m_MuonList->getListSize();
+  /*
+   * The getter functions create the object for particular experiment and run.
+   * It is not guaranteed that collectDataTrack() is called if there are
+   * no tracks (e.g. for too short or bad runs). Thus, they are called here
+   * to guarantee the creation of histograms.
+   */
+  TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
+  TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   for (unsigned int i = 0; i < nMuons; ++i) {
     const Particle* muon = m_MuonList->getParticle(i);
-    bool trackUsed = collectDataTrack(muon);
+    bool trackUsed = collectDataTrack(muon, matchedDigitsInPlane,
+                                      allExtHitsInPlane);
     if (m_RemoveUnusedMuons && !trackUsed)
       toRemove.push_back(muon->getArrayIndex());
   }
@@ -200,13 +206,12 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   }
 }
 
-bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
+bool KLMStripEfficiencyCollectorModule::collectDataTrack(
+  const Particle* muon, TH1F* matchedDigitsInPlane, TH1F* allExtHitsInPlane)
 {
   const int nExtrapolationLayers =
     KLMElementNumbers::getMaximalExtrapolationLayer();
   const Track* track = muon->getTrack();
-  TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
-  TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
   std::map<uint16_t, struct HitData> selectedHits;
   std::map<uint16_t, struct HitData>::iterator it;

@@ -26,4 +26,5 @@
 #pragma link C++ class Belle2::ECLChannelMap+;
 #pragma link C++ class Belle2::ECLCrystalLocalRunCalib;
 #pragma link C++ class Belle2::ECLLocalRunCalibRef;
+#pragma link C++ class Belle2::ECLLeakageCorrections;
 #endif

@@ -29,6 +29,7 @@
 
 /* ROOT headers. */
 #include <TFile.h>
+#include <TH1F.h>
 #include <TTree.h>
 
 /* C++ headers. */
@@ -137,10 +138,13 @@ namespace Belle2 {
 
     /**
      * Collect the data for one muon.
-     * @param[in] muon Muon.
+     * @param[in] muon                 Muon.
+     * @param[in] matchedDigitsInPlane Matched digits.
+     * @param[in] allExtHitsInPlane    Number of ExtHits.
      * @return True if the muon satisfies the selection criteria.
      */
-    bool collectDataTrack(const Particle* muon);
+    bool collectDataTrack(const Particle* muon, TH1F* matchedDigitsInPlane,
+                          TH1F* allExtHitsInPlane);
 
     /** Muon list name. */
     std::string m_MuonListName;

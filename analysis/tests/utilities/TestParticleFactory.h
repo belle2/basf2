@@ -63,20 +63,20 @@ namespace TestUtilities {
     };
 
     /**
-     * Helper method to get EParticleType from PDG code
+     * Helper method to get EParticleSourceObject from PDG code
      */
-    Belle2::Particle::EParticleType getType(const Belle2::DecayDescriptorParticle* particleDescription)
+    Belle2::Particle::EParticleSourceObject getType(const Belle2::DecayDescriptorParticle* particleDescription)
     {
       int pdg = abs(particleDescription->getPDGCode());
       if (pdg == Belle2::Const::pion.getPDGCode() || pdg == Belle2::Const::electron.getPDGCode()
           || pdg == Belle2::Const::kaon.getPDGCode() || pdg == Belle2::Const::muon.getPDGCode()
           || pdg == Belle2::Const::proton.getPDGCode()) {
-        return Belle2::Particle::EParticleType::c_Track;
+        return Belle2::Particle::EParticleSourceObject::c_Track;
       }
       if (pdg == Belle2::Const::photon.getPDGCode()) {
-        return Belle2::Particle::EParticleType::c_ECLCluster;
+        return Belle2::Particle::EParticleSourceObject::c_ECLCluster;
       }
-      return Belle2::Particle::EParticleType::c_Composite;
+      return Belle2::Particle::EParticleSourceObject::c_Composite;
     }
 
     /**
@@ -85,11 +85,11 @@ namespace TestUtilities {
     const Belle2::Particle* createParticle(const Belle2::DecayDescriptor* particleDescriptor, const TLorentzVector& momentum,
                                            const TVector3& vertex)
     {
-      Belle2::Particle::EParticleType type = getType(particleDescriptor->getMother());
-      if (type == Belle2::Particle::EParticleType::c_Track) {
+      Belle2::Particle::EParticleSourceObject type = getType(particleDescriptor->getMother());
+      if (type == Belle2::Particle::EParticleSourceObject::c_Track) {
         return createCharged(particleDescriptor, momentum, vertex);
       }
-      if (type == Belle2::Particle::EParticleType::c_ECLCluster) {
+      if (type == Belle2::Particle::EParticleSourceObject::c_ECLCluster) {
         return createPhoton(momentum);
       }
       Belle2::StoreArray<Belle2::Particle> myParticles;

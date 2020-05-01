@@ -117,7 +117,6 @@ namespace Belle2 {
      */
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
 
-
     /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
@@ -224,7 +223,14 @@ namespace Belle2 {
      * which is the sum of the first two daughter momenta.
      * The arguments in the argument vector must be generalized daughter indices.
      */
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the granddaughter particle's
+     * and the reverted particle's momentum vector in the daughter particle's rest frame.
+     * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
+     */
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.
@@ -411,6 +417,11 @@ namespace Belle2 {
     * Returns function which returns maximum transverse momentum Pt in the given particle Lists.
     */
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns maximum opening angle in the given particle Lists.
+     */
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments);
 
     /**
     * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.

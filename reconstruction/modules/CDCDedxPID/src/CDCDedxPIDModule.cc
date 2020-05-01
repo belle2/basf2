@@ -21,11 +21,13 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <tracking/gfbfield/GFGeant4Field.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
 #include <genfit/StateOnPlane.h>
+#include <genfit/KalmanFitterInfo.h>
 
 #include <TFile.h>
 #include <TH2F.h>
@@ -278,6 +280,7 @@ void CDCDedxPIDModule::event()
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
     int tpcounter = 0;
+    const std::vector< genfit::AbsTrackRep* >& gftrackRepresentations = recoTrack->getRepresentations();
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); ++tp) {
@@ -303,6 +306,38 @@ void CDCDedxPIDModule::event()
       const int wire = wireID.getIWire(); // use getEWire() for encoded wire number
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
+
+      // check which algorithm found this hit
+      int foundByTrackFinder = 0;
+      const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
+      foundByTrackFinder = hitInfo->getFoundByTrackFinder();
+
+      // add weights for hypotheses
+      double weightPionHypo = 0;
+      double weightProtHypo = 0;
+      double weightKaonHypo = 0;
+      // loop over all the present hypotheses
+      for (std::vector<genfit::AbsTrackRep* >::const_iterator trep = gftrackRepresentations.begin();
+           trep != gftrackRepresentations.end(); ++trep) {
+        const int pdgCode = TMath::Abs((*trep)->getPDG());
+        // configured to only save weights for one of these 3
+        if (!(pdgCode == Const::pion.getPDGCode() ||
+              pdgCode == Const::kaon.getPDGCode() ||
+              pdgCode == Const::proton.getPDGCode())) continue;
+        const genfit::KalmanFitterInfo* kalmanFitterInfo = (*tp)->getKalmanFitterInfo(*trep);
+        if (kalmanFitterInfo == NULL) {
+          //B2WARNING("No KalmanFitterInfo for hit in "<<pdgCode<<" track representationt. Skipping.");
+          continue;
+        }
+
+        // there are always 2 hits, one of which is ~1, the other ~0; or both ~0. Store only the largest.
+        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        const double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
+        if (pdgCode == Const::pion.getPDGCode()) weightPionHypo = maxWeight;
+        else if (pdgCode == Const::kaon.getPDGCode()) weightKaonHypo = maxWeight;
+        else if (pdgCode == Const::proton.getPDGCode()) weightProtHypo = maxWeight;
+
+      }
 
       // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
@@ -467,7 +502,8 @@ void CDCDedxPIDModule::event()
             if (m_enableDebugOutput)
               dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
                                 cellHalfWidth, driftT,
-                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
+                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                                foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
           }
         }

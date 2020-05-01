@@ -16,7 +16,7 @@ using namespace Belle2::VXD;
 
 GeoTools::GeoTools()
 {
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   m_listOfSensors = geo.getListOfSensors();
   // The list comes from a map, and is NOT sorted!
   std::sort(m_listOfSensors.begin(), m_listOfSensors.end());
@@ -93,4 +93,3 @@ void GeoTools::createListOfSVDChips()
     m_listOfSVDChips.insert(m_listOfSVDChips.end(), sensorIDs.begin(), sensorIDs.end());
   }
 }
-

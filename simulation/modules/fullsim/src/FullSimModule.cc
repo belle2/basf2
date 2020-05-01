@@ -94,7 +94,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0);
   addParam("HadronProcessVerbosity", m_hadronProcessVerbosity, "Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
-  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
+  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("Belle2"));
   addParam("StandardEM", m_standardEM, "If true, replaces fast EM physics with standard EM physics.", false);
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
   addParam("UseHighPrecisionNeutrons", m_HPneutrons, "If true, high precision neutron models used below 20 MeV.", false);

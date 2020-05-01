@@ -14,6 +14,19 @@ __author__ = "Kenji Inami"
 
 import basf2 as b2
 import modularAnalysis as ma
+from skim.tau import TauLFV
+
+path = b2.Path()
+
+fileList = ['../TauLFV.dst.root']
+ma.inputMdstList('default', fileList, path=path)
+
+skim = TauLFV(OutputFileName='../TauLFV.udst.root')
+skim(path)
+b2.process(path)
+
+import basf2 as b2
+import modularAnalysis as ma
 import skimExpertFunctions as expert
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons

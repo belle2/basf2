@@ -175,7 +175,7 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const {return true;}
+    bool isConsistent() const override {return true;}
 
     /**
      * Print the content of the class

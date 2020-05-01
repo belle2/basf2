@@ -53,14 +53,14 @@ namespace Belle2 {
     void setCoincidenceWindow(double coincidenceWindow) { m_CoincidenceWindow = coincidenceWindow; }
 
     /**
-     * Set the prompt Time.
+     * Set the prompt time.
      * @param[in] promptTime Prompt time.
      */
     void setPromptTime(double promptTime) { m_PromptTime = promptTime; }
 
     /**
-     * Set the time window.
-     * @param[in] timeWindow Time window.
+     * Set the prompt time window.
+     * @param[in] promptWindow Prompt time window.
      */
     void setPromptWindow(double promptWindow) { m_PromptWindow = promptWindow; }
 
@@ -75,7 +75,7 @@ namespace Belle2 {
     double getPromptTime() const { return m_PromptTime; }
 
     /**
-    * Get the time window.
+    * Get the prompt time window.
     */
     double getPromptWindow() const { return m_PromptWindow; }
 

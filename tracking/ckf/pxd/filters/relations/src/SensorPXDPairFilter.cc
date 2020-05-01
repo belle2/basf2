@@ -60,10 +60,6 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
   const int layerNumberDifference =
     static_cast<int>(fromStateCache.geoLayer) - static_cast<int>(toStateCache.geoLayer);
 
-  if ((abs(sensorNumberDifference) > 1 and layerNumberDifference == 1) or (abs(sensorNumberDifference) > 2)) {
-    return false;
-  }
-
   double phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;

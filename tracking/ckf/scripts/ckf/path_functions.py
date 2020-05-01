@@ -266,12 +266,14 @@ def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fal
 def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, use_best_results=5,
                         filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10,  direction="backward"):
     """
-    Convenience function to add the SVD ckf to the path with cosmics settings valid for phase2 and 3.
+    Convenience function to add the PXD ckf to the path with cosmics settings valid for phase2 and 3.
     :param path: The path to add the module to
     :param svd_cdc_reco_tracks: The name of the already created CDC reco tracks
     :param pxd_reco_tracks: The name to output the SVD reco tracks to
     :param use_mc_truth: Use the MC information in the CKF
     :param use_best_results: CKF parameter for useNResults
+    :param filter_cut: CKF parameter for MVA filter
+    :param overlap_cut: CKF parameter for MVA overlap filter
     :param use_best_seeds: CKF parameter for useBestNInSeed
     :param direction: where to extrapolate to. Valid options are forward and backward
     """

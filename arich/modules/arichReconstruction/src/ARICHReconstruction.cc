@@ -496,8 +496,13 @@ namespace Belle2 {
       int nfoo = nDetPhotons;
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; ebgri[iHyp] = 0;}
 
+      bool reflOK = true; // remove window photons from reflected hypothesis
+
       // loop over possible mirror reflections
       for (int mirr = 0; mirr < refl; mirr++) {
+
+        if (!reflOK) break; // photon from window so break
+
         // calculate fi_ch for a given track refl
         TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
@@ -534,6 +539,7 @@ namespace Belle2 {
           fi_cer_all[iAerogel] = fi_cer;
           fi_cer_trk = dirch.XYvector().DeltaPhi(edirr.XYvector());
 
+          if (mirr == 0 && th_cer < 0.1) reflOK = false;
           // skip photons with irrelevantly large/small Cherenkov angle
           if (th_cer > 0.5 || th_cer < 0.1) continue;
 

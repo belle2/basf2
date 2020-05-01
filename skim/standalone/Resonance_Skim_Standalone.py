@@ -28,7 +28,7 @@ stdPi('loose', path=syspath)
 stdK('loose', path=syspath)
 stdMu('loose', path=syspath)
 stdPr('loose', path=syspath)
-stdPi0s('looseFit', path=syspath)
+stdPi0s('eff40_Jan2020Fit', path=syspath)
 
 
 skimCode = expert.encodeSkimName('Resonance')

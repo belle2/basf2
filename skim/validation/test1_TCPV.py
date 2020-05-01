@@ -31,7 +31,7 @@ ma.inputMdstList('default', fileList, path=tcpvskimpath)
 
 loadStdSkimPi0(path=tcpvskimpath)
 loadStdSkimPhoton(path=tcpvskimpath)
-stdPi0s('loose', path=tcpvskimpath)
+stdPi0s('eff40_Jan2020', path=tcpvskimpath)
 stdPi('loose', path=tcpvskimpath)
 stdK('loose', path=tcpvskimpath)
 stdE('loose', path=tcpvskimpath)

@@ -20,7 +20,7 @@ settings = CalibrationSettings(name="Example Simple",
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
                                depends_on=[],
-                               expert_config={"iov_boundary": [[8, 1900, 8, 1995], [8, 1996, -1, -1]]})
+                               expert_config={})
 
 ##############################
 

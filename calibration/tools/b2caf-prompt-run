@@ -74,7 +74,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
 
 
 def setup_caf(args, input_data_files, prompt_caf):
-    """Path to config JSON file, used to set up the CAF and calibrations used 
+    """Path to config JSON file, used to set up the expert configuration, CAF and calibrations used 
 in this CAF process.
 
 Required format of JSON file:
@@ -85,7 +85,8 @@ Required format of JSON file:
      "caf_script": (str),
      "database_chain" array[str],
      "backend_args" dict,
-     "requested_iov" array[4](int)
+     "requested_iov" array[4](int),
+     "expert_config" dict 
     }
 """
 
@@ -111,18 +112,14 @@ Required format of JSON file:
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
     
-    # Check for expert configurations
-    if args.expert_config or cal_module.settings.expert_config:
+    # Check for expert configurations 
+    if "expert_config" in caf_config or cal_module.settings.expert_config:
         updated_expert_config = {} 
         expert_config = {}
     
-        if args.expert_config:
-            expert_config_path = Path(args.expert_config)
-            if not expert_config_path.is_file():
-                raise FileNotFoundError(f"The file {expert_config_path.as_posix()} does not exist")
-            with open(expert_config_path, 'r') as expert_config_file:
-                expert_config = json.load(expert_config_file)
-            
+        # Check if we have expert config in CalibrationSettings 
+        if "expert_config" in caf_config:
+            expert_config = caf_config["expert_config"]       
         if not expert_config and cal_module.settings.expert_config:
             updated_expert_config = cal_module.settings.expert_config
             
@@ -164,18 +161,6 @@ Required format of JSON file:
         prompt_caf.add_calibration(cal)
 
 
-def expert_config():
-    """Path to JSON file used for expert configuration of calibration. The default value should be optionally set in the calibration's prompt script in the CalibrationSettings object.
-
-Required format of JSON file:
-
-.. code-block:: python
-
-    {
-     "iov_boundary" list of array[4](int)
-    }
-"""
-
 def run_caf(prompt_caf):
     """Actually runs the CAF and checks the final state"""
     prompt_caf.run()
@@ -214,7 +199,6 @@ def get_argparser():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("caf_config", help=setup_caf.__doc__)
     parser.add_argument("input_data", help=get_input_data.__doc__)
-    parser.add_argument("expert_config", help=expert_config.__doc__)
     parser.add_argument("--files-per-job", dest="files_per_job", metavar="",
                         type=int, default=default_max_files_per_collector_job,
                         help="Sets the number of input files that wil be used per collector job for all calibrations."

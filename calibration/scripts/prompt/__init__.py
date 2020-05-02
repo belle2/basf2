@@ -6,7 +6,7 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 
 
 class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username", "description",
-                                                        "input_data_formats", "input_data_names", "depends_on"])):
+                                                        "input_data_formats", "input_data_names", "depends_on", "expert_config"])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 
@@ -31,13 +31,15 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             want to depend on. This will allow the external automatic system to understand the overall ordering of
             scripts to run. If you encounter an import error when trying to run your prompt calibration script, it is
             likely that you have introduced a circular dependency.
+
+        expert_config (dict): Expert configurations, currently used only for iov boundaries.
     """
 
     #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, expert_username, description,
-                input_data_formats=None, input_data_names=None, depends_on=None):
+                input_data_formats=None, input_data_names=None, depends_on=None, expert_config=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
@@ -52,6 +54,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         if not input_data_names:
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
+        if expert_config and not isinstance(expert_config, dict):
+            raise ValueError("expert_config must be a dictionary")
 
         if depends_on:
             for calibration_settings in depends_on:
@@ -60,7 +64,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         else:
             depends_on = []
 
-        return super().__new__(cls, name, expert_username, description, input_data_formats, input_data_names, depends_on)
+        return super().__new__(cls, name, expert_username, description,
+                               input_data_formats, input_data_names, depends_on, expert_config)
 
     def json_dumps(self):
         """
@@ -73,7 +78,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),
                            "depends_on": list(depends_on_names),
-                           "description": self.description
+                           "description": self.description,
+                           "expert_config": self.expert_config
                            })
 
     def __str__(self):
@@ -83,5 +89,5 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
-        output_str += f"  description='{self.description}'"
+        output_str += f"  description='{self.description}'\n"
         return output_str

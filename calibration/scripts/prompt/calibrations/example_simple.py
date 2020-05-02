@@ -19,7 +19,8 @@ settings = CalibrationSettings(name="Example Simple",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics"],
-                               depends_on=[])
+                               depends_on=[],
+                               expert_config={"iov_boundary": [[8, 1900, 8, 1995], [8, 1996, -1, -1]]})
 
 ##############################
 
@@ -79,6 +80,9 @@ def get_calibrations(input_data, **kwargs):
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
+
+    # Get the expert configurations if they exist
+    expert_config = kwargs.get("expert_config", None)
 
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.

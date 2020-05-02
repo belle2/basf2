@@ -52,14 +52,9 @@ SensorPXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CKFT
     return 1.0;
   }
 
-  // Next layer is not an overlap one, so we can just return all hits of the next layer
+  // Next layer and sensor is not an overlap one, so we can just return all hits of the next layer
   // that are close enough in phi. No cut in theta here since this is the SensorPXDPairFilter,
   // a cut in theta is used in the DistancePXDPairFilter
-  const int sensorNumberDifference =
-    static_cast<int>(fromStateCache.sensorID.getSensorNumber()) - static_cast<int>(toStateCache.sensorID.getSensorNumber());
-  const int layerNumberDifference =
-    static_cast<int>(fromStateCache.geoLayer) - static_cast<int>(toStateCache.geoLayer);
-
   double phiDiff = fromStateCache.sensorCenterPhi - toStateCache.sensorCenterPhi;
   while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
   while (phiDiff < -M_PI) phiDiff += 2. * M_PI;

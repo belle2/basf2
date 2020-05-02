@@ -39,6 +39,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 namespace Belle2 {
   /**
@@ -71,14 +72,19 @@ namespace Belle2 {
   private:
 
     /**EventMetaData */
-    StoreObjPtr<EventMetaData> m_emdata;
+    StoreObjPtr<EventMetaData> m_emdata; /**< EventMetaData store object pointer*/
+
+    /**SVDEventInfo */
+    std::string m_svdEventInfo = "SVDEventInfo"; /**< Name of the SVDEventInfo store array used as parameter of the module*/
+    StoreObjPtr<SVDEventInfo> m_svdEI; /**< SVDEventInfo store object pointer*/
+
 
     /**SVDCluster */
-    std::string m_svdClusters; /**< Name of the SVDClusters store array used as parameter of the module*/
+    std::string m_svdClusters = "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/
     StoreArray<SVDCluster> m_svdCls; /**< SVDClusters store array*/
 
     /**EventT0 */
-    std::string m_eventTime; /**< Name of the EventT0 store object pointer used as parameter of the module*/
+    std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
 
     /**SVDHistograms */

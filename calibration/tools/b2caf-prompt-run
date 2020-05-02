@@ -85,7 +85,8 @@ Required format of JSON file:
      "caf_script": (str),
      "database_chain" array[str],
      "backend_args" dict,
-     "requested_iov" array[4](int)
+     "requested_iov" array[4](int), 
+     "iov_boundary" list of array[4](int)
     }
 """
 
@@ -139,9 +140,22 @@ Required format of JSON file:
         cal.heartbeat = default_collection_heartbeat
         # Backend should be chosen by us, not the calibration setup function
         cal.backend = prompt_caf_backend
-        # Add the final Calibration object to the CAF
-        B2INFO(f"Adding Calibration(name={col_name}) to CAF process")
-        prompt_caf.add_calibration(cal)
+            
+        # Setup the IoV boundaries if they exist
+        if "iov_boundary" in caf_config:
+            for i in range(len(caf_config["iov_boundary"])):
+                cal_block = cal
+                iov_end = caf_config["iov_boundary"][i]
+                print(cal_block.name)
+                cal_block.iov = IoV(iov_end[0],iov_end[1],iov_end[2],iov_end[3])
+                # Add the Calibration objects to the CAF
+                B2INFO(f"Adding Calibration(name={col_name}) with IoV {iov_end} to CAF process")
+                cal_block.name = str(i)
+                prompt_caf.add_calibration(cal_block)
+        else:
+            # Add the final Calibration object to the CAF
+            B2INFO(f"Adding Calibration(name={col_name}) to CAF process")
+            prompt_caf.add_calibration(cal)
 
 
 def run_caf(prompt_caf):

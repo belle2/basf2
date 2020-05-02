@@ -85,8 +85,7 @@ Required format of JSON file:
      "caf_script": (str),
      "database_chain" array[str],
      "backend_args" dict,
-     "requested_iov" array[4](int), 
-     "iov_boundary" list of array[4](int)
+     "requested_iov" array[4](int)
     }
 """
 
@@ -111,8 +110,28 @@ Required format of JSON file:
                          f"Required: {sorted(cal_module.input_data_names)}\n"
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
+    
+    # Check for expert configurations
+    if args.expert_config or cal_module.settings.expert_config:
+        updated_expert_config = {} 
+        expert_config = {}
+    
+        if args.expert_config:
+            expert_config_path = Path(args.expert_config)
+            if not expert_config_path.is_file():
+                raise FileNotFoundError(f"The file {expert_config_path.as_posix()} does not exist")
+            with open(expert_config_path, 'r') as expert_config_file:
+                expert_config = json.load(expert_config_file)
+            
+        if not expert_config and cal_module.settings.expert_config:
+            updated_expert_config = cal_module.settings.expert_config
+            
+        # Overwrite the Calibration Settings with JSON
+        updated_expert_config = {**updated_expert_config,**expert_config}
+        calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]), expert_config=updated_expert_config)
 
-    calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]))
+    else:
+        calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]))
 
     from caf import backends
     prompt_caf_backend = backends.LSF()
@@ -140,23 +159,22 @@ Required format of JSON file:
         cal.heartbeat = default_collection_heartbeat
         # Backend should be chosen by us, not the calibration setup function
         cal.backend = prompt_caf_backend
-            
-        # Setup the IoV boundaries if they exist
-        if "iov_boundary" in caf_config:
-            for i in range(len(caf_config["iov_boundary"])):
-                cal_block = cal
-                iov_end = caf_config["iov_boundary"][i]
-                print(cal_block.name)
-                cal_block.iov = IoV(iov_end[0],iov_end[1],iov_end[2],iov_end[3])
-                # Add the Calibration objects to the CAF
-                B2INFO(f"Adding Calibration(name={col_name}) with IoV {iov_end} to CAF process")
-                cal_block.name = str(i)
-                prompt_caf.add_calibration(cal_block)
-        else:
-            # Add the final Calibration object to the CAF
-            B2INFO(f"Adding Calibration(name={col_name}) to CAF process")
-            prompt_caf.add_calibration(cal)
+        # Add the final Calibration object to the CAF
+        B2INFO(f"Adding Calibration(name={col_name}) to CAF process")
+        prompt_caf.add_calibration(cal)
 
+
+def expert_config():
+    """Path to JSON file used for expert configuration of calibration. The default value should be optionally set in the calibration's prompt script in the CalibrationSettings object.
+
+Required format of JSON file:
+
+.. code-block:: python
+
+    {
+     "iov_boundary" list of array[4](int)
+    }
+"""
 
 def run_caf(prompt_caf):
     """Actually runs the CAF and checks the final state"""
@@ -196,6 +214,7 @@ def get_argparser():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("caf_config", help=setup_caf.__doc__)
     parser.add_argument("input_data", help=get_input_data.__doc__)
+    parser.add_argument("expert_config", help=expert_config.__doc__)
     parser.add_argument("--files-per-job", dest="files_per_job", metavar="",
                         type=int, default=default_max_files_per_collector_job,
                         help="Sets the number of input files that wil be used per collector job for all calibrations."
@@ -206,6 +225,7 @@ def get_argparser():
                              "to submit any jobs."
                        )
     parser.set_defaults(dry_run=False)
+    parser.set_defaults(expert_config={})
 
     return parser
 
@@ -238,7 +258,7 @@ def main():
 
     if exit_code:
         return exit_code
-
+        
     if not args.dry_run:
         run_caf(cal_fw)
         return collect_outputdb(cal_fw)

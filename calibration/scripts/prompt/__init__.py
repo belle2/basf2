@@ -1,3 +1,4 @@
+import basf2
 from collections import namedtuple
 import json
 
@@ -32,7 +33,13 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             scripts to run. If you encounter an import error when trying to run your prompt calibration script, it is
             likely that you have introduced a circular dependency.
 
-        expert_config (dict): Expert configurations, currently used only for iov boundaries.
+        expert_config (dict): Default expert configuration for this calibration script. This is an optional dictionary
+            (which must be JSON compliant) of configuration options for your get_calibrations(...) function.
+            This is supposed to be used as a catch-all place to send in options for your calibration setup. For example,
+            you may want to have an optional list of IoV boundaries so that your prompt script knows that it should split the
+            input data between different IoV ranges. Or you might want to send if options like the maximum events per
+            input file to process. The value in your settings object will be the *default*, but you can override the value via
+            the caf_config.json sent into ``b2caf-prompt-run``.
     """
 
     #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
@@ -54,13 +61,25 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         if not input_data_names:
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
-        if expert_config and not isinstance(expert_config, dict):
-            raise ValueError("expert_config must be a dictionary")
+
+        if expert_config:
+            # Check that it's a dictionary and not some other valid JSON object
+            if not isinstance(expert_config, dict):
+                raise TypeError("expert_config must be a dictionary")
+            # Check if it is JSONable since people might put objects in there by mistake
+            try:
+                json.dumps(expert_config)
+            except TypeError as e:
+                basf2.B2ERROR("expert_config could not be serialised to JSON. "
+                              "Most likely you used a non-supported type e.g. datetime.")
+                raise e
+        else:
+            expert_config = {}
 
         if depends_on:
             for calibration_settings in depends_on:
                 if not isinstance(calibration_settings, cls):
-                    raise ValueError("A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
+                    raise TypeError("A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
         else:
             depends_on = []
 
@@ -90,4 +109,5 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
         output_str += f"  description='{self.description}'\n"
+        output_str += f"  expert_config={self.expert_config}"
         return output_str

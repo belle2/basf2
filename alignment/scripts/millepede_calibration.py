@@ -1,9 +1,89 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import basf2
+
 from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
 from caf import backends
 from caf import strategies
+
+import os
+
+
+def collect(calibration, collection, input_files, output_file='CollectorOutput.root', basf2_args=None, bsub=False):
+    """
+    Standalone collection for calibration (without CAF)
+    (experimental)
+
+    Pickles the reprocessing path and collector of given collection and runs it in separate process
+    to collect calibration data in output_file from input_files.
+
+    Parameters
+    ----------
+    calibration : caf.framework.Calibration
+      The configured Millepede calibration (see create(...)) to use for collection
+    collection : str
+      Collection name which should be collected (which re-processing path and collector to use)
+    input_files : list(str)
+      List of input files for this collection job
+    output_file : str
+      Name of output collector file with data/histograms (produced by HistoManager)
+    basf2_args : dict
+      Additional arguments to pass to basf2 job
+    """
+    if basf2_args is None:
+        basf2_args = []
+
+    import pickle
+    import subprocess
+
+    main = calibration.collections[collection].pre_collector_path
+
+    tmp = basf2.Path()
+    for m in main.modules():
+        if m.name() == 'RootInput':
+            m.param('inputFileNames', input_files)
+            tmp.add_module('HistoManager', histoFileName=output_file)
+        tmp.add_module(m)
+    main = tmp
+    main.add_module(calibration.collections[collection].collector)
+
+    path_file_name = calibration.name + '.' + collection + '.' + '.path'
+    with open(path_file_name, 'bw') as serialized_path_file:
+        pickle.dump(basf2.pickle_path.serialize_path(main), serialized_path_file)
+
+    if bsub:
+        subprocess.call(["bsub", "-o", output_file + ".txt", "basf2", "--execute-path", path_file_name] + basf2_args)
+    else:
+        subprocess.call(["basf2", "--execute-path", path_file_name] + basf2_args)
+
+    return os.path.abspath(output_file)
+
+
+def calibrate(calibration, input_files=None, iteration=0):
+    """
+    Execute the algorithm from configured Millepede calibration over collected
+    files in input_files. The pre_algorithm function is run before the algorithm.
+
+    Parameters
+    ----------
+    calibration : caf.framework.Calibration
+      Configured Millepede calibration (see create(...))
+    input_files : list(str)
+      List of input collected files
+    iteration : int
+      Iteration number to pass to pre_algorithm function
+    """
+    if input_files is None:
+        input_files = ['CollectorOutput.root']
+    """
+    Execute algorithm of the Millepede calibration over
+    """
+    for algo in calibration.algorithms:
+        algo.pre_algorithm(algo, iteration)
+        algo.algorithm.setInputFileNames(input_files)
+        algo.algorithm.execute()
+        algo.algorithm.commit()
 
 
 def create_algorithm(dbobjects, min_entries=10, ignore_undetermined=True):
@@ -373,7 +453,7 @@ def main():
 
         ana.fillParticleList('mu+:mu_dimuon', 'abs(formula(z0)) < 0.5 and abs(d0) < 0.5 and nTracks == 2', writeOut=True, path=path)
         ana.reconstructDecay('Z0:mumu -> mu-:mu_dimuon mu+:mu_dimuon', '', writeOut=True, path=path)
-        vtx.raveFit('Z0:mumu', 0.001, daughtersUpdate=True, path=path)
+        vtx.raveFit('Z0:mumu', 0.001, daughtersUpdate=True, silence_warning=True, path=path)
 
         return make_collection(name, path=path, primaryVertices=['Z0:mumu'])
 
@@ -402,6 +482,10 @@ def main():
       timedep=[([], [(0, 0, 0)])],
       params=dict(minPValue=0.001, externalIterations=0))
 
+    collect(cal, 'dimuon_skim', [f for f in Belle2.Environment.Instance().getInputFilesOverride()])
+    calibrate(cal)
+
+    exit()
     cal_fw = CAF()
     cal_fw.add_calibration(cal)
     cal_fw.backend = backends.Local(1)

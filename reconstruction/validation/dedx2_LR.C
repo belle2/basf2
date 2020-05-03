@@ -62,7 +62,7 @@ void plot(const TString &input_filename)
     tree->Project(TString::Format("%d_prob", pdg_codes[part]), logl_strings[part].Data(),
         TString::Format("abs(CDCDedxTracks.m_pdg) == %d", pdg_codes[part]));
     TH1* hist = (TH1*)output_file->Get(TString::Format("%d_prob", pdg_codes[part]));
-    hist->SetTitle(TString::Format("Unweighted output prob. for true %s", pdg_names[part]));
+    hist->SetTitle(TString::Format("CDC dE/dx only: Unweighted output prob. for true %s", pdg_names[part]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
     if (pdg_codes[part] == 211) {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at around middle (because of muons) and some at 1"));

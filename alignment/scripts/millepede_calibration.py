@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
 from caf import backends
 from caf import strategies
@@ -158,7 +161,7 @@ def create(name,
     files : dict( str -> list(str) )
         Dictionary of lists of input file paths, key is collection name, value is list of input files
     tags : list(str)
-        List of input global tags. Can include absolute file paths to local databases (added to the chain)
+        List of input global tags. Can include absolute file paths to local databases (added to the chain).
 
     timedep : list(tuple(list(int), list(tuple(int, int, int))))
         Time-depence configuration.
@@ -270,7 +273,7 @@ def create(name,
                 chain.append(CentralDatabase(tag))
         return chain
 
-    dbchain = make_database_chain(tags)
+    dbchain = make_database_chain(tags) if tags is not None else None
 
     #  Note the default collector and path are ignored
     #  The user is supposed to add at least one own collection
@@ -279,7 +282,7 @@ def create(name,
                               algorithms=algo,
                               input_files=None,
                               pre_collector_path=None,
-                              database_chain=dbchain if tags is not None else None,
+                              database_chain=dbchain,
                               output_patterns=None,
                               max_files_per_collector_job=1,
                               backend_args=None
@@ -314,7 +317,7 @@ def create(name,
                                 input_files=filelist,
                                 pre_collector_path=path,
                                 max_files_per_collector_job=1,
-                                database_chain=dbchain if tags is not None else None)
+                                database_chain=dbchain)
 
         calibration.add_collection(colname, collection)
 

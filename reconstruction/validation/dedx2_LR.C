@@ -47,13 +47,13 @@ void plot(const TString &input_filename)
   TString logl_strings[num_particles];
   for(int part = 0; part < show_particles; part++) {
     //for this particle, take its likelihood...
-    logl_strings[part] = TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i] + VXDDedxLikelihoods.m_vxdLogl[][%i]) / (", part, part);
+    logl_strings[part] = TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i]) / (", part);
 
     //and divide by summed likelihood of all particles
     for(int i = 0; i < num_particles; i++) {
       if(i!=0)
         logl_strings[part] += " + ";
-      logl_strings[part] += TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i] + VXDDedxLikelihoods.m_vxdLogl[][%i])", i, i);
+      logl_strings[part] += TString::Format("exp(CDCDedxLikelihoods.m_cdcLogl[][%i])", i);
     }
     logl_strings[part] += ") ";
     std::cout << logl_strings[part] << "\n";
@@ -65,11 +65,11 @@ void plot(const TString &input_filename)
     hist->SetTitle(TString::Format("Unweighted output prob. for true %s", pdg_names[part]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
     if (pdg_codes[part] == 211) {
-      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1, but also many at lower values"));
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at around middle (because of muons) and some at 1"));
     } else if (pdg_codes[part] == 13) {
       hist->GetListOfFunctions()->Add(new TNamed("Check", "Like pions, but too few entries for evaluation"));
     } else {
-      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak at 1"));
+      hist->GetListOfFunctions()->Add(new TNamed("Check", "Peak towards 1"));
     }
     hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
     hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));

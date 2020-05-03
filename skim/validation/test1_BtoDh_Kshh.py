@@ -16,13 +16,13 @@ __author__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.btocharm import BtoDh_Kshh
+from skim.btocharm import BtoD0h_Kshh
 
 path = b2.Path()
 
 fileList = ['../BtoDh_Kshh.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = BtoDh_Kshh()
+skim = BtoD0h_Kshh()
 skim(path)
 b2.process(path)

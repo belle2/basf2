@@ -48,7 +48,7 @@ def collect(calibration, collection, input_files, output_file='CollectorOutput.r
     main = tmp
     main.add_module(calibration.collections[collection].collector)
 
-    path_file_name = calibration.name + '.' + collection + '.' + '.path'
+    path_file_name = calibration.name + '.' + collection + '.path'
     with open(path_file_name, 'bw') as serialized_path_file:
         pickle.dump(basf2.pickle_path.serialize_path(main), serialized_path_file)
 
@@ -409,87 +409,3 @@ def create(name,
     print("----------------------------")
 
     return calibration
-
-
-def main():
-    import os
-
-    import basf2
-    from ROOT import Belle2
-
-    import rawdata as raw
-    import reconstruction as reco
-    import modularAnalysis as ana
-    import vertex as vtx
-
-    import alignment.parameters
-    import alignment.constraints
-
-    def diMuonCollection(name="diMuons", add_unpackers=True):
-        path = basf2.create_path()
-
-        path.add_module('Progress')
-        # Remove all non-raw data to run the full reco again
-        path.add_module('RootInput')  # , branchNames=input_branches, entrySequences=['0:5000'])
-        path.add_module('Gearbox')
-        path.add_module('Geometry')
-
-        if add_unpackers:
-            raw.add_unpackers(path)
-
-        reco.add_reconstruction(path, pruneTracks=False)
-
-        tmp = basf2.create_path()
-        for m in path.modules():
-            if m.name() == "PXDPostErrorChecker":
-                m.param('CriticalErrorMask', 0)
-            if m.name() in ["PXDUnpacker", "CDCHitBasedT0Extraction", "TFCDC_WireHitPreparer"]:
-                m.set_log_level(basf2.LogLevel.ERROR)
-            if m.name() == "SVDSpacePointCreator":
-                m.param("MinClusterTime", -999)
-            tmp.add_module(m)
-        path = tmp
-        path.add_module('DAFRecoFitter')
-
-        ana.fillParticleList('mu+:mu_dimuon', 'abs(formula(z0)) < 0.5 and abs(d0) < 0.5 and nTracks == 2', writeOut=True, path=path)
-        ana.reconstructDecay('Z0:mumu -> mu-:mu_dimuon mu+:mu_dimuon', '', writeOut=True, path=path)
-        vtx.raveFit('Z0:mumu', 0.001, daughtersUpdate=True, silence_warning=True, path=path)
-
-        return make_collection(name, path=path, primaryVertices=['Z0:mumu'])
-
-    cal = create(
-      name='alignment',
-      dbobjects=['VXDAlignment', 'BeamSpot'],
-      collections=[
-        diMuonCollection(name="dimuon_skim", add_unpackers=False),
-        make_collection(name="cosmics", path=basf2.create_path(), tracks=['RecoTracks'], minPValue=0.)
-        ],
-      constraints=[
-        alignment.constraints.VXDHierarchyConstraints(),
-        ],
-      fixed=alignment.parameters.vxd_sensors() + alignment.parameters.vxd_ladders(),
-      commands=[
-        'method diagonalization 3 0.1',
-        'scaleerrors 1. 1.',
-        ('printcounts', None)
-
-        ],
-
-      tags=[tag for tag in basf2.conditions.default_globaltags],
-
-      files={'dimuon_skim': [os.path.abspath(f) for f in Belle2.Environment.Instance().getInputFilesOverride()]},
-
-      timedep=[([], [(0, 0, 0)])],
-      params=dict(minPValue=0.001, externalIterations=0))
-
-    collect(cal, 'dimuon_skim', [f for f in Belle2.Environment.Instance().getInputFilesOverride()])
-    calibrate(cal)
-
-    exit()
-    cal_fw = CAF()
-    cal_fw.add_calibration(cal)
-    cal_fw.backend = backends.Local(1)
-    cal_fw.run()
-
-if __name__ == '__main__':
-    main()

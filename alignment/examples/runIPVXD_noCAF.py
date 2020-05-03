@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import basf2
 import os
 import sys
 from basf2 import *
@@ -11,11 +11,12 @@ import numpy as np
 from runIPVXD_CAF import get_calibration
 import millepede_calibration as mpc
 
-cal = get_calibration(dict(), None)
+cal = get_calibration(dict(), [tag for tag in basf2.conditions.globaltags])
+collector_file = 'CollectorOutput.root'
 collector_file = mpc.collect(cal,
                              'dimuon_skim',
-                             [f for f in Belle2.Environmen().Instance().getInputFilesOverride()],
-                             'CollectorOutput.root')
+                             [f for f in Belle2.Environment.Instance().getInputFilesOverride()],
+                             collector_file)
 mpc.calibrate(cal, [collector_file])
 
 algo = cal.algorithms[0].algorithm
@@ -25,7 +26,7 @@ algo = cal.algorithms[0].algorithm
 payloads = list(algo.getPayloads())
 vxd = None
 for payload in payloads:
-    if payload.module == 'VXDAlignment':
+    if payload.name == 'VXDAlignment':
         vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
 
 
@@ -83,8 +84,8 @@ for ipar in range(0, algo.result().getNoParameters()):
     correction[0] = algo.result().getParameterCorrection(ipar)
     error[0] = algo.result().getParameterError(ipar)
 
-    if (label.isVXD()):
-        sid = label.getVxdID().getID()
+    if (label.getUniqueId() == Belle2.VXDAlignment.getGlobalUniqueID()):
+        sid = label.getElementId()
         pid = label.getParameterId()
         ew = algo.result().getEigenVectorElement(0, ipar)  # + algo.result().getEigenVectorElement(1, ipar)
 
@@ -96,10 +97,10 @@ for ipar in range(0, algo.result().getNoParameters()):
         errors.set(sid, pid, error[0])
         eigenweights.set(sid, pid, ew)
 
-        layer[0] = label.getVxdID().getLayerNumber()
-        ladder[0] = label.getVxdID().getLadderNumber()
-        sensor[0] = label.getVxdID().getSensorNumber()
-        segment[0] = label.getVxdID().getSegmentNumber()
+        layer[0] = Belle2.VxdID(sid).getLayerNumber()
+        ladder[0] = Belle2.VxdID(sid).getLadderNumber()
+        sensor[0] = Belle2.VxdID(sid).getSensorNumber()
+        segment[0] = Belle2.VxdID(sid).getSegmentNumber()
 
         x[0] = 0.
         y[0] = 0.
@@ -120,19 +121,6 @@ if algo.result().getNoEigenPairs():
 if condition:
     print("Condition number of the matrix: ", condition)
 
-# Skip into interactive environment
-# You can draw something in the trees or the profile
-# Exit with Ctrl+D
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(' You are now in interactive environment. You can still access the algorithm')
-print('')
-print(' Look into this script and use TAB or python ? help to play more...')
-print(' Exit with [Ctrl] + [D] and then [Enter]')
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-
-import interactive
-interactive.embed()
-
 diagfile = ROOT.TFile('MillepedeJobDiagnostics.root', 'recreate')
 diagfile.cd()
 if vxd:
@@ -141,4 +129,5 @@ corrections.Write('corrections')
 errors.Write('errors')
 eigenweights.Write('eigenweights')
 vxdtree.Write('vxdtree')
+profile.Write('profile')
 diagfile.Close()

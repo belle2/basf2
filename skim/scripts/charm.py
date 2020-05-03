@@ -987,8 +987,8 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 class XToDp_DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
-    * :math:`D^+_{(S)} \\to K_{S} \\pi^+`
-    * :math:`D^+_{(S)} \\to K_{S} K^+`
+    * :math:`D^+ \\to K_{S} \\pi^+`
+    * :math:`D^+ \\to K_{S} K^+`
 
     **Additional Cuts**:
 
@@ -1028,7 +1028,7 @@ class XToDp_DpToKsHp(BaseSkim):
 
         self.fillCharmSkimKs(path)
 
-        Dpcuts = "1.72 < M < 2.2 and useCMSFrame(p)>2"
+        Dpcuts = "1.72 < M < 1.98 and useCMSFrame(p)>2"
         Dp_Channels = ["K_S0:merged pi+:kshp",
                        "K_S0:merged K+:kshp",
                        ]

@@ -155,6 +155,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
+    if (digit->isMultiStrip())
+      continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
     if (digit->inRPC() || digit->isGood()) {
@@ -241,6 +243,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
+    if (m_Digits[i]->isMultiStrip())
       continue;
     if (m_Digits[i]->isGood())
       digitVector.push_back(m_Digits[i]);

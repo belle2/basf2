@@ -100,6 +100,68 @@ void KLMUnpackerModule::beginRun()
   m_triggerCTimeOfPreviousEvent = 0;
 }
 
+void KLMUnpackerModule::createDigit(
+  const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
+  KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+  int sector, int layer, int plane, int strip, int lastStrip, bool isRPC)
+{
+  KLMDigit* klmDigit = m_Digits.appendNew();
+  klmDigit->addRelationTo(klmDigitEventInfo);
+  if (m_WriteDigitRaws)
+    klmDigit->addRelationTo(klmDigitRaw);
+  if (isRPC) {
+    /*
+     * For RPC hits, digitize both the coarse (ctime) and fine (tdc) times
+     * relative to the revo9 trigger time rather than the event header's
+     * TriggerCTime. For the fine-time (tdc) measurement (11 bits), shift
+     * the revo9Trig time by 10 ticks to align the new prompt-time peak
+     * with the TriggerCtime-relative peak.
+     */
+    klmDigitEventInfo->increaseRPCHits();
+    float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
+    std::pair<int, double> rpcTimes =
+      m_TimeConversion->getRPCTimes(raw->ctime, raw->tdc, triggerTime);
+    klmDigit->setTime(rpcTimes.second);
+  } else {
+    /*
+     * For scintillator hits, store the ctime relative to the event header's
+     * trigger ctime.
+     */
+    klmDigitEventInfo->increaseSciHits();
+    double time = m_TimeConversion->getScintillatorTime(
+                    raw->ctime, klmDigitEventInfo->getTriggerCTime());
+    klmDigit->setTime(time);
+    if (subdetector == KLMElementNumbers::c_BKLM) {
+      if (raw->charge < m_scintThreshold)
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+      else
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+    } else {
+      int stripGlobal = m_eklmElementNumbers->stripNumber(
+                          section, layer, sector, plane, strip);
+      const EKLMChannelData* channelData =
+        m_eklmChannels->getChannelData(stripGlobal);
+      if (channelData == nullptr)
+        B2FATAL("Incomplete EKLM channel data.");
+      if (raw->charge < channelData->getThreshold())
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
+      else
+        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+    }
+  }
+  klmDigit->setSubdetector(subdetector);
+  klmDigit->setSection(section);
+  klmDigit->setLayer(layer);
+  klmDigit->setSector(sector);
+  klmDigit->setPlane(plane);
+  klmDigit->setStrip(strip);
+  if (lastStrip > 0)
+    klmDigit->setLastStrip(lastStrip);
+  klmDigit->setCharge(raw->charge);
+  klmDigit->setCTime(raw->ctime);
+  klmDigit->setTDC(raw->tdc);
+}
+
 void KLMUnpackerModule::unpackKLMDigit(
   const int* rawData, int copper, int hslb, int daqSubdetector,
   KLMDigitEventInfo* klmDigitEventInfo)
@@ -204,65 +266,30 @@ void KLMUnpackerModule::unpackKLMDigit(
       }
     }
   }
-  /* Ignore multi-strip scintillator hits. */
+  /* Create KLM digits. */
   bool isRPC = (subdetector == KLMElementNumbers::c_BKLM) &&
                (layer >= BKLMElementNumbers::c_FirstRPCLayer);
-  if (!isRPC && ((raw.triggerBits & 0x10) != 0))
-    return;
-  /* Create KLM digit. */
-  KLMDigit* klmDigit = m_Digits.appendNew();
-  klmDigit->addRelationTo(klmDigitEventInfo);
-  if (m_WriteDigitRaws)
-    klmDigit->addRelationTo(klmDigitRaw);
-  if (isRPC) {
-    /*
-     * For RPC hits, digitize both the coarse (ctime) and fine (tdc) times
-     * relative to the revo9 trigger time rather than the event header's
-     * TriggerCTime. For the fine-time (tdc) measurement (11 bits), shift
-     * the revo9Trig time by 10 ticks to align the new prompt-time peak
-     * with the TriggerCtime-relative peak.
-     */
-    klmDigitEventInfo->increaseRPCHits();
-    float triggerTime = klmDigitEventInfo->getRevo9TriggerWord();
-    std::pair<int, double> rpcTimes =
-      m_TimeConversion->getRPCTimes(raw.ctime, raw.tdc, triggerTime);
-    klmDigit->setTime(rpcTimes.second);
-  } else {
-    /*
-     * For scintillator hits, store the ctime relative to the event header's
-     * trigger ctime.
-     */
-    klmDigitEventInfo->increaseSciHits();
-    double time = m_TimeConversion->getScintillatorTime(
-                    raw.ctime, klmDigitEventInfo->getTriggerCTime());
-    klmDigit->setTime(time);
-    if (subdetector == KLMElementNumbers::c_BKLM) {
-      if (raw.charge < m_scintThreshold)
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
-    } else {
-      int stripGlobal = m_eklmElementNumbers->stripNumber(
-                          section, layer, sector, plane, strip);
-      const EKLMChannelData* channelData =
-        m_eklmChannels->getChannelData(stripGlobal);
-      if (channelData == nullptr)
-        B2FATAL("Incomplete EKLM channel data.");
-      if (raw.charge < channelData->getThreshold())
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareSuccessfulFit);
-      else
-        klmDigit->setFitStatus(KLM::c_ScintillatorFirmwareNoSignal);
+  if (!isRPC && raw.multipleStripHit()) {
+    if ((raw.triggerBits & 0x1) != 0) {
+      createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
+                  sector, layer, plane, 1, 4, false);
     }
+    if ((raw.triggerBits & 0x2) != 0) {
+      createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
+                  sector, layer, plane, 5, 8, false);
+    }
+    if ((raw.triggerBits & 0x4) != 0) {
+      createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
+                  sector, layer, plane, 9, 12, false);
+    }
+    if ((raw.triggerBits & 0x8) != 0) {
+      createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
+                  sector, layer, plane, 13, 15, false);
+    }
+  } else {
+    createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
+                sector, layer, plane, strip, 0, isRPC);
   }
-  klmDigit->setSubdetector(subdetector);
-  klmDigit->setSection(section);
-  klmDigit->setLayer(layer);
-  klmDigit->setSector(sector);
-  klmDigit->setPlane(plane);
-  klmDigit->setStrip(strip);
-  klmDigit->setCharge(raw.charge);
-  klmDigit->setCTime(raw.ctime);
-  klmDigit->setTDC(raw.tdc);
 }
 
 void KLMUnpackerModule::event()

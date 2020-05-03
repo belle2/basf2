@@ -108,6 +108,14 @@ namespace Belle2 {
         return raw & 0xFFF;
       }
 
+      /**
+       * Check whether this hit corresponds to multiple strips.
+       */
+      bool multipleStripHit() const
+      {
+        return (triggerBits & 0x10) != 0;
+      }
+
     };
 
     /**

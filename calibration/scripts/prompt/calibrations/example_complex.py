@@ -28,7 +28,12 @@ settings = CalibrationSettings(name="Example Complex",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["physics", "cosmics", "Bcosmics"],
-                               depends_on=[example_simple])
+                               depends_on=[example_simple],
+                               expert_config={
+                                              "max_files_per_run": 2
+                                             })
+
+# The values in expert_config above are the DEFAULT for this script. They will be overwritten by values in caf_config.json
 
 # Note that you are forced to import the relevant script that you depend on, even though you never use it.
 # This is to make sure that this script won't run unless the dependent one exists, as well as automatically
@@ -58,8 +63,13 @@ def get_calibrations(input_data, **kwargs):
         backwards compatibility problems. But you could use the correct arguments in b2caf-prompt-run for this
         release explicitly if you want to.
 
-        Currently only kwargs["requested_iov"] is used. This is the output IoV range that your payloads should
-        correspond to. Generally your highest ExpRun payload should be open ended e.g. IoV(3,4,-1,-1)
+        Currently only kwargs["requested_iov"] and kwargs["expert_config"] are used.
+
+        "requested_iov" is the IoV range of the bucket and your payloads should correspond to this range.
+        However your highest payload IoV should be open ended e.g. IoV(3,4,-1,-1)
+
+        "expert_config" is the input configuration. It takes default values from your `CalibrationSettings` but these are
+        overwritten by values from the 'expert_config' key in your input `caf_config.json` file when running ``b2caf-prompt-run``.
 
     Returns:
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
@@ -81,7 +91,9 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a requested range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
+    expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["max_files_per_run"]
+    basf2.B2INFO(f"Reducing to a maximum of {max_files_per_run} files per run.")
 
     # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering

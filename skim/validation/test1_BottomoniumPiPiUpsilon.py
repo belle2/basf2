@@ -14,13 +14,13 @@ __author__ = "S. Spataro && S. Jia"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.quarkonium import BottomoniumPiPiUpsilon
+from skim.quarkonium import BottomoniumUpsilon
 
 path = b2.Path()
 
 fileList = ['../BottomoniumPiPiUpsilon.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = BottomoniumPiPiUpsilon(OutputFileName='../BottomoniumPiPiUpsilon.udst.root')
+skim = BottomoniumUpsilon(OutputFileName='../BottomoniumPiPiUpsilon.udst.root')
 skim(path)
 b2.process(path)

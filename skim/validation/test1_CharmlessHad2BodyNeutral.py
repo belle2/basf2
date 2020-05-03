@@ -13,7 +13,7 @@ __author__ = "K. Smith"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.charmless import CharmlessHad2Body
+from skim.btocharmless import CharmlessHad2Body
 
 path = b2.Path()
 

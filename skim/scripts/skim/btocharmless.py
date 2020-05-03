@@ -44,7 +44,11 @@ class CharmlessHad2Body(BaseSkim):
             "stdPi": ["loose"],
         },
         "stdPi0s": {
+            "stdPi0s": ["loose"],  # used for validation histograms
             "loadStdSkimPi0": [],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],  # used for validation histograms
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -342,7 +346,11 @@ class CharmlessHad3Body(BaseSkim):
             "stdPi": ["loose"],
         },
         "stdPi0s": {
+            "stdPi0s": ["loose"],  # used for validation histograms
             "loadStdSkimPi0": [],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],  # used for validation histograms
         },
         "stdV0s": {
             "stdKshorts": [],

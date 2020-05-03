@@ -20,7 +20,7 @@ from skim.btocharm import BtoD0h_Kspi0
 
 path = b2.Path()
 
-fileList = ['../BtoD0h_Kspi0.dst.root']
+fileList = ['../BtoDh_Kspi0.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
 skim = BtoD0h_Kspi0()

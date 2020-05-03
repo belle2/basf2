@@ -96,7 +96,7 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_legError->SetFillColor(kRed);
   m_legError->SetTextColor(kWhite);
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();

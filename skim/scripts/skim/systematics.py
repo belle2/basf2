@@ -1112,7 +1112,7 @@ class SystematicsLambda(BaseSkim):
 
 
 @fancy_skim_header
-class PhiGammaLoose(BaseSkim):
+class SystematicsPhiGamma(BaseSkim):
     """
     Uses the ``gamma:loose`` list and a cut on the number of tracks.
 

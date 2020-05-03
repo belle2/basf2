@@ -86,7 +86,7 @@ Required format of JSON file:
      "database_chain" array[str],
      "backend_args" dict,
      "requested_iov" array[4](int),
-     "expert_config" dict 
+     "expert_config" dict     <- Optional as the prompt script default will be used if this is missing.
     }
 """
 
@@ -112,23 +112,17 @@ Required format of JSON file:
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
     
-    # Check for expert configurations 
-    if "expert_config" in caf_config or cal_module.settings.expert_config:
-        updated_expert_config = {} 
-        expert_config = {}
-    
-        # Check if we have expert config in CalibrationSettings 
-        if "expert_config" in caf_config:
-            expert_config = caf_config["expert_config"]       
-        if not expert_config and cal_module.settings.expert_config:
-            updated_expert_config = cal_module.settings.expert_config
-            
-        # Overwrite the Calibration Settings with JSON
-        updated_expert_config = {**updated_expert_config,**expert_config}
-        calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]), expert_config=updated_expert_config)
+    B2INFO("Getting values for 'expert_config' from the prompt script.")
+    expert_config = cal_module.settings.expert_config   # set to be the default from the script
+    # If we have values in the caf_config we merge/overwrite with the default
+    if "expert_config" in caf_config:
+        # Overwrite/merge the default Calibration Settings with JSON
+        B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
+        expert_config = {**expert_config, **caf_config["expert_config"]}
 
-    else:
-        calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]))
+    calibrations = cal_module.get_calibrations(input_data_files,
+                                               requested_iov=IoV(*caf_config["requested_iov"]),
+                                               expert_config=expert_config)
 
     from caf import backends
     prompt_caf_backend = backends.LSF()

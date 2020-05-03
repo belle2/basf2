@@ -8,47 +8,17 @@ import ROOT
 from ROOT import Belle2
 import numpy as np
 
-set_debug_level(1000)
+from runIPVXD_CAF import get_calibration
+import millepede_calibration as mpc
 
-gear = register_module('Gearbox')
-geom = register_module('Geometry')
-geom.param('components', ['PXD', 'SVD'])
-gear.initialize()
-geom.initialize()
+cal = get_calibration(dict(), None)
+collector_file = mpc.collect(cal,
+                             'dimuon_skim',
+                             [f for f in Belle2.Environmen().Instance().getInputFilesOverride()],
+                             'CollectorOutput.root')
+mpc.calibrate(cal, [collector_file])
 
-algo = Belle2.MillepedeAlgorithm()
-algo.setInputFileNames(['RootOutput.root'])
-algo.steering().command('method diagonalization 1 0.1')
-# algo.steering().command('entries 100')
-algo.steering().command('hugecut 100000')
-algo.steering().command('chiscut 3000. 600.')
-algo.steering().command('outlierdownweighting 3')
-algo.steering().command('dwfractioncut 0.1')
-
-algo.steering().command('Parameters')
-for vxdid in Belle2.VXD.GeoCache.getInstance().getListOfSensors():
-    # Fix 6th SVD layer
-    if vxdid.getLayerNumber() != 6:
-        continue
-    label = Belle2.GlobalLabel(vxdid, 0)
-    for ipar in range(1, 7):
-        par_label = label.label() + ipar
-        cmd = str(par_label) + ' 0.0 -1.'
-        algo.steering().command(cmd)
-
-"""
-algo.steering().command('fortranfiles')
-algo.steering().command('constraints.txt')
-"""
-
-# algo.invertSign()
-
-algo.execute()
-
-# Done in algo
-# algo.commit()
-
-# -----------------------------------------------------------
+algo = cal.algorithms[0].algorithm
 
 
 # Get the payloads into handy variables
@@ -75,6 +45,7 @@ error = np.zeros(1, dtype=float)
 layer = np.zeros(1, dtype=int)
 ladder = np.zeros(1, dtype=int)
 sensor = np.zeros(1, dtype=int)
+segment = np.zeros(1, dtype=int)
 x = np.zeros(1, dtype=float)
 y = np.zeros(1, dtype=float)
 z = np.zeros(1, dtype=float)
@@ -85,6 +56,7 @@ vxdtree = ROOT.TTree('vxd', 'VXD data')
 vxdtree.Branch('layer', layer, 'layer/I')
 vxdtree.Branch('ladder', ladder, 'ladder/I')
 vxdtree.Branch('sensor', sensor, 'sensor/I')
+vxdtree.Branch('segment', segment, 'segment/I')
 vxdtree.Branch('param', param, 'param/I')
 vxdtree.Branch('value', value, 'value/D')
 vxdtree.Branch('correction', correction, 'correction/D')
@@ -127,6 +99,8 @@ for ipar in range(0, algo.result().getNoParameters()):
         layer[0] = label.getVxdID().getLayerNumber()
         ladder[0] = label.getVxdID().getLadderNumber()
         sensor[0] = label.getVxdID().getSensorNumber()
+        segment[0] = label.getVxdID().getSegmentNumber()
+
         x[0] = 0.
         y[0] = 0.
         z[0] = 0.

@@ -27,6 +27,7 @@ namespace Belle2 {
     void initialize() final;
     void beginRun()  final;
     void event() final;
+    void terminate() final;
 
   private:
     /// prefix for EPICS PVs

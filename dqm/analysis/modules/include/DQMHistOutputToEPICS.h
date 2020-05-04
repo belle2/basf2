@@ -60,7 +60,8 @@ namespace Belle2 {
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
 
-    bool m_dirty = false; //> Flag to mark that a new runs as started anddata not copied to last PV
+    /** Flag to mark that a new runs as started anddata not copied to last PV */
+    bool m_dirty = false;
 
 #ifdef _BELLE2_EPICS
     std::vector<MYNODE*> pmynode;

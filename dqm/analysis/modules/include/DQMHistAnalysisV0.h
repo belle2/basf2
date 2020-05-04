@@ -18,6 +18,7 @@ namespace Belle2 {
 
   class DQMHistAnalysisV0Module : public DQMHistAnalysisModule {
 
+    //! List of histograms for display
     typedef std::map<std::string, TH1*> HistList;
 
 
@@ -29,11 +30,16 @@ namespace Belle2 {
 
   private:
 
+    //! TCanvas objects for x vs y plots
     TCanvas* m_c_xvsy[32] = {nullptr};
+    //! TCanvas object for x vs z plot
     TCanvas* m_c_xvsz = nullptr;
+    //! Vector of TList objects for contour in XY plane
     std::vector<TList*> contLevelXY;
+    //! TList objects for contour in XZ plane
     TList* contLevelXZ = NULL;
 
+    //! Path to overlay file
     std::string m_OverlayPath = "";
 
     //! Module functions to be called from main process

@@ -14,7 +14,7 @@
 """
 <header>
     <input>muon-BKLMValidation.root</input>
-    <contact>giacomo.depietro@roma3.infn.it</contact>
+    <contact>martina.laurenza@roma3.infn.it</contact>
     <description>Create validation plots for BKLM</description>
 </header>
 """

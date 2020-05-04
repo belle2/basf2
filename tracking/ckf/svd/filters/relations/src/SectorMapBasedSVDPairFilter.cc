@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -36,26 +36,26 @@ namespace Belle2 {
   TrackFindingCDC::Weight SectorMapBasedSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>&
       relation)
   {
-    const CKFToSVDState* from = relation.first;
-    const CKFToSVDState* to = relation.second;
+    const CKFToSVDState* fromState = relation.first;
+    const CKFToSVDState* toState = relation.second;
 
-    B2ASSERT("From and to state must be set", from and to);
+    B2ASSERT("From and to state must be set", fromState and toState);
 
-    const SpacePoint* outerHit = from->getHit();
-    const SpacePoint* innerHit = to->getHit();
+    const CKFToSVDState::stateCache& outerStateCache = fromState->getStateCache();
+    const CKFToSVDState::stateCache& innerStateCache = toState->getStateCache();
 
-    B2ASSERT("Both hits must be present!", outerHit and innerHit);
+    B2ASSERT("Both hits must be present!", outerStateCache.isHitState and innerStateCache.isHitState);
 
     // TODO maybe it would be better to look for the full IDs first; maybe not
     B2ASSERT("Outer hit is invalid",
-             m_vxdtfFilters->areCoordinatesValid(outerHit->getVxdID(), outerHit->getNormalizedLocalU(), outerHit->getNormalizedLocalV()));
+             m_vxdtfFilters->areCoordinatesValid(outerStateCache.sensorID, outerStateCache.localNormalizedu, outerStateCache.localNormalizedv));
     B2ASSERT("Inner hit is invalid",
-             m_vxdtfFilters->areCoordinatesValid(innerHit->getVxdID(), innerHit->getNormalizedLocalU(), innerHit->getNormalizedLocalV()));
+             m_vxdtfFilters->areCoordinatesValid(innerStateCache.sensorID, innerStateCache.localNormalizedu, innerStateCache.localNormalizedv));
 
-    FullSecID outerSecID = m_vxdtfFilters->getFullID(outerHit->getVxdID(), outerHit->getNormalizedLocalU(),
-                                                     outerHit->getNormalizedLocalV());
-    FullSecID innerSecID = m_vxdtfFilters->getFullID(innerHit->getVxdID(), innerHit->getNormalizedLocalU(),
-                                                     innerHit->getNormalizedLocalV());
+    FullSecID outerSecID = m_vxdtfFilters->getFullID(outerStateCache.sensorID, outerStateCache.localNormalizedu,
+                                                     outerStateCache.localNormalizedv);
+    FullSecID innerSecID = m_vxdtfFilters->getFullID(innerStateCache.sensorID, innerStateCache.localNormalizedu,
+                                                     innerStateCache.localNormalizedv);
 
     const auto* outerStaticSector = m_vxdtfFilters->getStaticSector(outerSecID);
 
@@ -63,6 +63,9 @@ namespace Belle2 {
     if (not filter) {
       return NAN;
     }
+
+    const SpacePoint* outerHit = fromState->getHit();
+    const SpacePoint* innerHit = toState->getHit();
 
     if (not filter->accept(*outerHit, *innerHit)) {
       return NAN;

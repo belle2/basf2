@@ -72,7 +72,7 @@ namespace Belle2 {
      * @param[in] hypothesis       Hypothesis number.
      * @param[in] detector         Detector number.
      * @param[in] degreesOfFreedom Number of degrees of freedom.
-     * @param[in] params           Likelihood parameters.
+     * @param[in] threshold        Transverse threshold.
      */
     void setTransverseThreshold(int hypothesis, int detector, int degreesOfFreedom, const double threshold)
     {
@@ -85,7 +85,7 @@ namespace Belle2 {
      * @param[in] hypothesis       Hypothesis number.
      * @param[in] detector         Detector number.
      * @param[in] degreesOfFreedom Number of degrees of freedom.
-     * @param[in] params           Likelihood parameters.
+     * @param[in] scaleX           Horizontal scale.
      */
     void setTransverseScaleX(int hypothesis, int detector, int degreesOfFreedom, const double scaleX)
     {
@@ -98,7 +98,7 @@ namespace Belle2 {
      * @param[in] hypothesis       Hypothesis number.
      * @param[in] detector         Detector number.
      * @param[in] degreesOfFreedom Number of degrees of freedom.
-     * @param[in] params           Likelihood parameters.
+     * @param[in] scaleY           Vertical scale.
      */
     void setTransverseScaleY(int hypothesis, int detector, int degreesOfFreedom, const double scaleY)
     {
@@ -190,8 +190,8 @@ namespace Belle2 {
 
     /**
      * Set the transverse probability density function (analytical): threshold for a given identifier.
-     * @param[in] id     Transverse identifier.
-     * @param[in] params Likelihood parameters.
+     * @param[in] id        Transverse identifier.
+     * @param[in] threshold Transverse threshold.
      */
     void setTransverseThreshold(const int id, const double threshold)
     {
@@ -201,7 +201,7 @@ namespace Belle2 {
     /**
      * Set the transverse probability density function (analytical): horizontal scale for a given identifier.
      * @param[in] id     Transverse identifier.
-     * @param[in] params Likelihood parameters.
+     * @param[in] scaleX Horizontal scale.
      */
     void setTransverseScaleX(const int id, const double scaleX)
     {
@@ -211,7 +211,7 @@ namespace Belle2 {
     /**
      * Set the transverse probability density function (analytical): vertical scale for a given identifier.
      * @param[in] id     Transverse identifier.
-     * @param[in] params Likelihood parameters.
+     * @param[in] scaleY Vertical scale.
      */
     void setTransverseScaleY(const int id, const double scaleY)
     {

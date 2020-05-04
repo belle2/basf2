@@ -18,8 +18,10 @@ now = datetime.datetime.now()
 
 
 class defaultCrossTalkStripsImporter(basf2.Module):
+    '''default cross talk strips importer'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
         #      iov = IntervalOfValidity(0,0,-1,-1)

@@ -43,7 +43,7 @@ class TCPV(BaseSkim):
     * ``phi:loose``
     * ``k_S0:all``
     * ``eta:loose``
-    * ``pi0:loose``
+    * ``pi0:eff40_Jan2020``
     * ``pi0:skim``
     * ``rho0:loose``
     * ``pi+:all``
@@ -79,7 +79,7 @@ class TCPV(BaseSkim):
             "loadStdSkimPhoton": []
         },
         "stdPi0s": {
-            "stdPi0s": ["loose"],
+            "stdPi0s": ["eff40_Jan2020"],
             "loadStdSkimPi0": [],
         },
         "stdV0s": {

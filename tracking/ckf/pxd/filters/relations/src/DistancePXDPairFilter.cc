@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,36 +21,32 @@ DistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, const CK
   const CKFToPXDState& fromState = *(relation.first);
   const CKFToPXDState& toState = *(relation.second);
 
-  const SpacePoint* fromSpacePoint = fromState.getHit();
-  const SpacePoint* toSpacePoint = toState.getHit();
+  const CKFToPXDState::stateCache& fromStateCache = fromState.getStateCache();
+  const CKFToPXDState::stateCache& toStateCache = toState.getStateCache();
 
-  B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
-  const double toPhi = toSpacePoint->getPosition().Phi();
+  double phiDiff = fromStateCache.phi - toStateCache.phi;
+  while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
+  while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
 
-  if (not fromSpacePoint) {
+  if (not fromStateCache.isHitState) {
     // We are coming from an SVD track, so we can use its position to only look for matching ladders
-    const genfit::MeasuredStateOnPlane& mSoP = fromState.getMeasuredStateOnPlane();
-    const double fromPhi = mSoP.getPos().Phi();
-
-    if (abs(fromPhi - toPhi) < 0.2) {
+    if (abs(phiDiff) < 0.2) {
       return 1.0;
     }
 
     return NAN;
   }
 
-  const VxdID& fromVXDID = fromSpacePoint->getVxdID();
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
-    // TODO: Also check for sensors?
+  if (fromStateCache.geoLayer == toStateCache.geoLayer and
+      fromStateCache.sensorID.getSensorNumber() == toStateCache.sensorID.getSensorNumber()) {
+    // TODO: Checking for equality of sensor numbers seems not to harm the hit efficiency,
+    // but maybe it's safer to allow for a sensor number difference of 1?
     return 1.0;
   }
 
-  const double fromPhi = fromSpacePoint->getPosition().Phi();
-
-  if (abs(fromPhi - toPhi) < 0.05) {
+  if (abs(phiDiff) < 0.05) {
     return 1.0;
   }
 

@@ -50,8 +50,10 @@ noise_fwd_V = -1
 
 
 class defaultNoiseImporter(basf2.Module):
+    ''' default strip noise importer'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 

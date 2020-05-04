@@ -51,21 +51,21 @@ void DQMHistAnalysisOutputModule::beginRun()
 void DQMHistAnalysisOutputModule::event()
 {
   ParamTypeList& parnames(getParNames());
-  IntValueList& vints(getIntValues());
-  FloatValueList& vfloats(getFloatValues());
-  TextList& texts(getTexts());
+  const IntValueList& vints(getIntValues());
+  const FloatValueList& vfloats(getFloatValues());
+  const TextList& texts(getTexts());
   for (ParamTypeList::iterator i = parnames.begin(); i != parnames.end(); ++i) {
     std::string pname = i->first;
     std::string vname = StringUtil::tolower(StringUtil::replace(pname, "/", "."));
     switch (i->second) {
       case c_ParamINT:
-        B2DEBUG(20, vname << " " << vints[pname]);
+        B2DEBUG(20, vname << " " << vints.at(pname));
         break;
       case c_ParamFLOAT:
-        B2DEBUG(20, vname << " " << vfloats[pname]);
+        B2DEBUG(20, vname << " " << vfloats.at(pname));
         break;
       case c_ParamTEXT:
-        B2DEBUG(20, vname << " " << texts[pname]);
+        B2DEBUG(20, vname << " " << texts.at(pname));
         break;
     }
   }

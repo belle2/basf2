@@ -128,7 +128,7 @@ namespace Belle2 {
     SVDNoiseCalibrations m_NoiseCal; /**< noise payload*/
     SVDPulseShapeCalibrations m_PulseShapeCal; /**< pulse shape payload*/
     SVDPedestalCalibrations m_PedestalCal; /**< pedestal payload*/
-    SVDOccupancyCalibrations m_OccupancyCal; /**< occupancy payload*/
+    //    SVDOccupancyCalibrations m_OccupancyCal; /**< occupancy payload*/
     SVDHotStripsCalibrations m_HotStripsCal; /**< hot strips calibration*/
 
     /** MASKS */

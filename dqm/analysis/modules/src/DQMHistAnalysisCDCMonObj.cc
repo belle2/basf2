@@ -205,6 +205,7 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
     return it->second;
   } else {
     B2ERROR("no corresponding board/channel found layer "  << layer << " wire " << wire);
+    return std::make_pair(-1, -1);
   }
 }
 

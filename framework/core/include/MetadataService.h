@@ -56,6 +56,11 @@ namespace Belle2 {
     void addBasf2Status(const std::string& message = "");
 
     /**
+     * Add the metadata of number of calls of all modules
+     */
+    void addModuleCallsCount();
+
+    /**
      * Add metadata for basf2 completion
      */
     void finishBasf2(bool success = true);

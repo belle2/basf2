@@ -34,7 +34,7 @@ namespace Belle2 {
     MonitoringObject() {};
     /** Constructor with name (always use this)
      */
-    MonitoringObject(const std::string& name)
+    explicit MonitoringObject(const std::string& name)
     {
       fName = name;
     }
@@ -110,7 +110,7 @@ namespace Belle2 {
     /**
      * Print content of MonitoringObject
      */
-    void Print() const;
+    void print() const;
 
     /**
      * set value to float variable (new variable is made if not yet existing)

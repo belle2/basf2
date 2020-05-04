@@ -128,9 +128,8 @@ namespace Belle2 {
       for (unsigned int i = 0; i < AMessage::c_messageParts; i++) {
         B2ASSERT("The next part does not belong to the same message",
                  socket->getsockopt<int>(ZMQ_RCVMORE) == 1 or i == 0);
-        auto received = socket->recv(messageParts[i]);
-        B2ASSERT("Receiving interrupted, should try again", !received);
-        B2ASSERT("Message should not be empty", *received > 0);
+        auto received = socket->recv(messageParts[i], zmq::recv_flags::none);
+        B2ASSERT("No message received", received);
       }
       B2ASSERT("There should not be more than the retrieved parts", socket->getsockopt<int>(ZMQ_RCVMORE) == 0);
       return newMessage;

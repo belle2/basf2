@@ -52,7 +52,7 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
   // We will always get one or two parts. The first one is the identity..
   zmq::message_t identity;
   auto received = m_socket->recv(identity, zmq::recv_flags::none);
-  B2ASSERT("Receiving interrupted, should try again", !received);
+  B2ASSERT("No message received", received);
   B2ASSERT("Message should not be empty", *received > 0);
   std::string identityString(identity.data<char>(), identity.size());
   B2ASSERT("The message is incomplete!", m_socket->getsockopt<int>(ZMQ_RCVMORE) == 1);
@@ -62,7 +62,7 @@ std::vector<zmq::message_t> ZMQRawInput::handleIncomingData()
   // ... and the second one is the message itself.
   const size_t remainingSpace = m_maximalBufferSize - m_writeAddress;
   auto receivedBytes = m_socket->recv(zmq::mutable_buffer{&m_buffer[m_writeAddress], remainingSpace}, zmq::recv_flags::none);
-  B2ASSERT("Receiving interrupted, should try again", !receivedBytes);
+  B2ASSERT("No message received", receivedBytes);
   B2ASSERT("The message is longer than expected! Increase the buffer size.", !receivedBytes->truncated());
   if (receivedBytes->size == 0) {
     // Empty message means the client connected or disconnected
@@ -188,10 +188,10 @@ void ZMQRawOutput::handleIncomingData()
   // The only possibility that we can receive a message is when the client connects or disconnects
   zmq::message_t identity;
   auto received = m_socket->recv(identity, zmq::recv_flags::none);
-  B2ASSERT("Receiving interrupted, should try again", !received);
+  B2ASSERT("No message received", received);
   zmq::message_t nullMessage;
   received = m_socket->recv(nullMessage, zmq::recv_flags::none);
-  B2ASSERT("Receiving interrupted, should try again", !received);
+  B2ASSERT("No message received", received);
   std::string identityString(identity.data<char>(), identity.size());
 
   if (m_dataIdentity.empty()) {

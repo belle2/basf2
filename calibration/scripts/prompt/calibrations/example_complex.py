@@ -147,21 +147,15 @@ def get_calibrations(input_data, **kwargs):
 
     rec_path_physics = create_path()
     rec_path_physics.add_module(root_input)
-    rec_path_physics.add_module('Gearbox')
-    rec_path_physics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'ARICH', 'BeamPipe', 'EKLM'])
-    # could now add reconstruction modules dependent on the type on input data
+    # could now add reconstruction modules dependent on the type of input data
 
     rec_path_cosmics = create_path()
     rec_path_cosmics.add_module(root_input)
-    rec_path_cosmics.add_module('Gearbox')
-    rec_path_cosmics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'CDC', 'BeamPipe', 'EKLM'])
-    # could now add reconstruction modules dependent on the type on input data
+    # could now add reconstruction modules dependent on the type of input data
 
     rec_path_Bcosmics = create_path()
     rec_path_Bcosmics.add_module(root_input)
-    rec_path_Bcosmics.add_module('Gearbox')
-    rec_path_Bcosmics.add_module('Geometry', excludedComponents=['SVD', 'PXD', 'CDC', 'BeamPipe', 'EKLM'])
-    # could now add reconstruction modules dependent on the type on input data
+    # could now add reconstruction modules dependent on the type of input data
 
     ###################################################
     # Algorithm setup

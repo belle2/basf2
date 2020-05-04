@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# *****************************************************************************
+
+# title           : 3_ValidationCosmics.py
+# description     : Validation of cosmic tracks in phase II
+# author          : Jakub Kandra (jakub.kandra@karlov.mff.cuni.cz)
+# date            : 8. 2. 2018
+
+# *****************************************************************************
+
+from basf2 import *
+from modularAnalysis import *
+
+
 import sys
 import math
 from basf2 import *
@@ -140,7 +153,7 @@ class CosmicAnalysis(Module):
                 self.tree_DEDX.Fill()
 
         # We are using RecoTracks to finding overlaps.
-        RecoTracks = Belle2.PyStoreArray('CosmicRecoTracks')
+        RecoTracks = Belle2.PyStoreArray('RecoTracks')
         nRecoTracks = RecoTracks.getEntries()
         geoCache = Belle2.VXD.GeoCache.getInstance()
         for track_index in range(nRecoTracks):
@@ -148,7 +161,7 @@ class CosmicAnalysis(Module):
 
             if track.wasFitSuccessful():
 
-                TrackFitResults = Belle2.PyStoreArray('CosmicTrackFitResults')
+                TrackFitResults = Belle2.PyStoreArray('TrackFitResults')
                 nTrackFitResults = TrackFitResults.getEntries()
                 if nTrackFitResults == 1:
                     self.trackData.momentum = TrackFitResults[0].getMomentum().Mag()
@@ -408,3 +421,25 @@ class CosmicAnalysis(Module):
 
         self.rootfile.Write()
         self.rootfile.Close()
+
+main = create_path()
+
+main.add_module('RootInput')
+main.add_module('Gearbox')
+main.add_module('Geometry')
+
+import reconstruction as reco
+reco.add_cosmics_reconstruction(main, pruneTracks=False, merge_tracks=True)
+main.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
+main.add_module("CDCDedxPID")
+
+CosmicAnalysis = CosmicAnalysis()
+main.add_module(CosmicAnalysis)
+
+progress = register_module('ProgressBar')
+main.add_module(progress)
+
+process(main)
+
+# Print call statistics
+print(statistics)

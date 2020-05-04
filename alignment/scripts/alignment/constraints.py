@@ -243,8 +243,23 @@ class CDCWireConstraints(Constraints):
         352, 352, 352, 352, 352, 352,
         384, 384, 384, 384, 384, 384]
 
-    def __init__(self, filename='cdc-wire-constraints.txt'):
+    def __init__(self, filename='cdc-wire-constraints.txt', layers=None, layer_rigid=True, layer_radius=False, cdc_radius=False):
         super(CDCWireConstraints, self).__init__(filename)
+        #: List of layers for whose wires to generate the constraints. None = all layers
+        if layers is None:
+            layers = [l for l in range(0, 56)]
+        self.layers = layers
+        #: 6 x 56 (6/layer) constraints. Sum(dX_B/dY_B/drot_B/dX_FB/dY_FB/drot_FB)=0 for all wires in each layer
+        #  -> removes the basic unconstrained DoF when aligning wires and layers simultaneously.
+        #  Average shift and rotation of wires in layer (at each end-plate) = 0. ->
+        #  coherent movements of wires absorbed in layer parameters
+        self.layer_rigid = layer_rigid
+        #: 2 x 56 constraints: Sum(dr)=0 for all wires in each layer at each end-plate -> layer radius kept
+        #  same by this constraint (1 per layer)
+        self.layer_radius = layer_radius
+        #: 2 Constraints: Sum(dr)=0 for all wires in CDC at each end-plate -> "average CDC radius" kept same
+        #  by this constraint (1 per CDC)
+        self.cdc_radius = cdc_radius
         pass
 
     def configure_collector(self, collector):
@@ -261,59 +276,105 @@ class CDCWireConstraints(Constraints):
         print("Generating constraints for CDC wires...")
         consts = []
 
-        layers = [l for l in range(0, 56)]
+        layers = self.layers
 
-        const1 = Constraint()
-        for layer in layers:
-            # sum of wire X (BWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
-                const1.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), 1.)
-        consts.append(const1)
+        if self.layer_rigid:
+            for layer in layers:
+                const = Constraint()
+                # sum of wire X (BWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), 1.)
+                consts.append(const)
 
-        const2 = Constraint()
-        for layer in layers:
-            # sum of wire Y (BWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
-                const2.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), 1.)
-        consts.append(const2)
+            for layer in layers:
+                const = Constraint()
+                # sum of wire Y (BWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), 1.)
+                consts.append(const)
 
-        const3 = Constraint()
-        for layer in layers:
-            # sum of wire rotations (BWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
+            for layer in layers:
+                const = Constraint()
+                # sum of wire rotations (BWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
 
-                const3.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), -math.sin(wirePhi))
-                const3.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.cos(wirePhi))
-        consts.append(const3)
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), -math.sin(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.cos(wirePhi))
+                consts.append(const)
 
-        const4 = Constraint()
-        for layer in layers:
-            # sum of wire X (FWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
-                const4.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), 1.)
-        consts.append(const4)
+            for layer in layers:
+                const = Constraint()
+                # sum of wire X (FWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), 1.)
+                consts.append(const)
 
-        const5 = Constraint()
-        for layer in layers:
-            # sum of wire Y (FWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
-                const5.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), 1.)
-        consts.append(const5)
+            for layer in layers:
+                const = Constraint()
+                # sum of wire Y (FWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), 1.)
+                consts.append(const)
 
-        const6 = Constraint()
-        for layer in layers:
-            # sum of wire rotations (FWD) in layer
-            for wire in range(0, self.wires_in_layer[layer]):
+            for layer in layers:
+                const = Constraint()
+                # sum of wire rotations (FWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
 
-                wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
 
-                const6.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), -math.sin(wirePhi))
-                const6.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.cos(wirePhi))
-        consts.append(const6)
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), -math.sin(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.cos(wirePhi))
+                consts.append(const)
+
+        if self.layer_radius:
+            for layer in layers:
+                const = Constraint()
+                # sum of wire rotations (BWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
+                const.add(self.get_label(layer, 0, 0), 0.)
+                consts.append(const)
+
+            for layer in layers:
+                const = Constraint()
+                # sum of wire rotations (FWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
+                const.add(self.get_label(layer, 0, 0), 0.)
+                consts.append(const)
+
+        if self.cdc_radius:
+            const = Constraint()
+            for layer in layers:
+                # sum of wire rotations (BWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getBackwardPos3D().phi()
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
+            consts.append(const)
+
+            const = Constraint()
+            for layer in layers:
+                # sum of wire rotations (FWD) in layer
+                for wire in range(0, self.wires_in_layer[layer]):
+                    wirePhi = Belle2.TrackFindingCDC.CDCWire.getInstance(Belle2.WireID(layer, wire)).getForwardPos3D().phi()
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
+                    const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
+            consts.append(const)
 
         return consts
+
 
 # ------------ Main: Generate available constraint files with default config (no time-dependence, default global tags) ------
 

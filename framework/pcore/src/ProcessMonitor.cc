@@ -50,7 +50,8 @@ void ProcessMonitor::subscribe(const std::string& pubSocketAddress, const std::s
     bool running = true;
     while (running) {
       try {
-        zmq::proxy_steerable(pubSocket, subSocket, nullptr, controlSocket);
+        zmq::socket_ref nullsocket;
+        zmq::proxy_steerable(pubSocket, subSocket, nullsocket, controlSocket);
         running = false;
       } catch (zmq::error_t& ex) {
         if (ex.num() != EINTR) {

@@ -231,7 +231,9 @@ class SLUntagged(BaseSkim):
         self.SkimLists = b0List + bplusList
 
     def validation_histograms(self, path):
-        ma.cutAndCopyLists("B+:SLUntagged", ["B+:SL0", "B+:SL1", "B+:SL2", "B+:SL3"], "", path=path)
+        ma.cutAndCopyLists("B+:SLUntagged",
+                           ["B+:SLUntagged_0", "B+:SLUntagged_1", "B+:SLUntagged_2", "B+:SLUntagged_3"],
+                           "", path=path)
 
         ma.buildRestOfEvent("B+:SLUntagged", path=path)
         ma.appendROEMask("B+:SLUntagged", "basic",

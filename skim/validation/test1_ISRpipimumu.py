@@ -14,13 +14,13 @@ __author__ = "S. Jia"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.quarkonium import ISRpipimumu
+from skim.quarkonium import ISRpipicc
 
 path = b2.Path()
 
 fileList = ['../ISRpipimumu.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = ISRpipimumu(OutputFileName='../ISRpipimumu.udst.root')
+skim = ISRpipicc(OutputFileName='../ISRpipimumu.udst.root')
 skim(path)
 b2.process(path)

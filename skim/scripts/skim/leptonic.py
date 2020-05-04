@@ -71,7 +71,7 @@ class LeptonicUntagged(BaseSkim):
     def validation_histograms(self, path):
         ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"], "", path=path)
 
-        ma.buildRestOfEvent("B-:LeptonicUntaggedeptonicUntagged", path=path)
+        ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)
         ma.appendROEMask(
             "B-:LeptonicUntagged",
             "basic",

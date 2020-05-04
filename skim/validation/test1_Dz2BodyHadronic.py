@@ -11,13 +11,13 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.charm import DstToD0PiD0ToHpJm
+from skim.charm import DstToD0Pi_D0ToHpJm
 
 path = b2.Path()
 
 fileList = ['../WG6_DstToD0ToKpi.dst.root']
 ma.inputMdstList('default', fileList, path=path)
 
-skim = DstToD0PiD0ToHpJm(OutputFileName='../WG6_DstToD0ToKpi.udst.root')
+skim = DstToD0Pi_D0ToHpJm(OutputFileName='../WG6_DstToD0ToKpi.udst.root')
 skim(path)
 b2.process(path)

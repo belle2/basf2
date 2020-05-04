@@ -14,7 +14,7 @@ __author__ = "Kenji Inami"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.tau import TauLFV
+from skim.taupair import TauLFV
 
 path = b2.Path()
 

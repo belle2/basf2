@@ -55,6 +55,35 @@ namespace Belle2 {
     /** Get vector of map entries for ECL backward endcap */
     const std::vector<int>& getMappingBWD() const {return m_MappingBWD;}
 
+    /** Get value for specific (crate, shaper, channel) */
+    int get(int crate, int shaper, int channel) const
+    {
+      using namespace ECL;
+
+      int id;
+      if (crate <= ECL_BARREL_CRATES) {
+        id = (crate - 1) * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+             + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+        return m_MappingBAR[id];
+      }
+      crate -= ECL_BARREL_CRATES;
+
+      if (crate <= ECL_FWD_CRATES) {
+        id = (crate - 1) * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+             + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+        return m_MappingFWD[id];
+      }
+      crate -= ECL_FWD_CRATES;
+
+      if (crate <= ECL_BKW_CRATES) {
+        id = (crate - 1) * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER
+             + (shaper - 1) * ECL_CHANNELS_IN_SHAPER + (channel - 1);
+        return m_MappingBWD[id];
+      }
+
+      return -1;
+    }
+
     /**
      * Set three vectors of map entries
      * @param mappingBAR Map entries for barrel.

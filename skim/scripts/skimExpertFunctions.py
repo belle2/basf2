@@ -310,13 +310,10 @@ def fancy_skim_header(SkimClass):
         category = ", ".join(category)
 
     # If the contact is of the form "NAME <EMAIL>" or "NAME (EMAIL)", then make it a link
-    if isinstance(contact, str):
-        match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
-        if match:
-            name, email = match[1], match[2]
-            contact = f"`{name} <mailto:{email}>`_"
-    else:
-        raise ValueError("__contact__ attribute not properly defined for skim {SkimName}")
+    match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
+    if match:
+        name, email = match[1], match[2]
+        contact = f"`{name} <mailto:{email}>`_"
 
     header = f"""
     Note:
@@ -327,10 +324,6 @@ def fancy_skim_header(SkimClass):
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
         * **Contact**: {contact}
     """
-
-    # Handle weird indentation mistakes that can occur from starting comment directly after quotes
-    if not (SkimClass.__doc__.startswith("\n") or SkimClass.__doc__.startswith("    ")):
-        SkimClass.__doc__ = "\n    " + SkimClass.__doc__
 
     if SkimClass.__doc__:
         SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
@@ -546,6 +539,20 @@ class BaseSkim(ABC):
         eselect.if_value('=1', ConditionalPath, b2.AfterConditionPath.CONTINUE)
 
         return ConditionalPath
+
+    def get_skim_list_names(self):
+        """
+        Get the list of skim particle list names, without creating the particle lists on
+        the current path.
+        """
+        DummyPath = b2.Path()
+
+        OriginalSkimListsValue = self.SkimLists
+        self.build_lists(DummyPath)
+        SkimLists = self.SkimLists
+        self.SkimLists = OriginalSkimListsValue
+
+        return SkimLists
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has

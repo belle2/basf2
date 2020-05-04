@@ -15,7 +15,7 @@ from skim.charm import DstToD0Pi_D0ToHpJm
 
 path = b2.Path()
 
-fileList = ['../WG6_DstToD0ToKpi.dst.root']
+fileList = ["../WG6_DstToD0pi_D0ToKpi.dst.root"]
 ma.inputMdstList('default', fileList, path=path)
 
 skim = DstToD0Pi_D0ToHpJm(OutputFileName='../WG6_DstToD0ToKpi.udst.root')

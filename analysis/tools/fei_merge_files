@@ -6,7 +6,7 @@ import ROOT
 import os
 
 def printUsage():
-    print('Usage: b2add OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
+    print(f'Usage: {os.path.basename(__file__)} OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
     print('')
     print(' Like hadd for most .root files,  but if a file only contains persistent.ProcessStatistics')
     print(' (and possibly FileMetaData, EventMetaData), these objects are merged into a single')

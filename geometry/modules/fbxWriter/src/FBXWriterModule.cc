@@ -298,7 +298,7 @@ void FBXWriterModule::addModels(G4VPhysicalVolume* physVol, int replica)
 {
   // Descend to the leaves of the tree
   G4LogicalVolume* logVol = physVol->GetLogicalVolume();
-  for (int daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
+  for (size_t daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
     G4VPhysicalVolume* physVolDaughter = logVol->GetDaughter(daughter);
     for (int j = 0; j < physVolDaughter->GetMultiplicity(); ++j) {
       addModels(physVolDaughter, j);
@@ -424,7 +424,7 @@ void FBXWriterModule::countEntities(G4VPhysicalVolume* physVol)
 {
   // Descend to the leaves of the tree
   G4LogicalVolume* logVol = physVol->GetLogicalVolume();
-  for (int daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
+  for (size_t daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
     G4VPhysicalVolume* physVolDaughter = logVol->GetDaughter(daughter);
     for (int j = 0; j < physVolDaughter->GetMultiplicity(); ++j) {
       countEntities(physVolDaughter);
@@ -496,7 +496,7 @@ void FBXWriterModule::addConnections(G4VPhysicalVolume* physVol, int replica)
   unsigned long long lvID = (*m_LVID)[lvIndex];
   unsigned int lvCount = (*m_LVCount)[lvIndex];
   std::string lvName = (*m_LVName)[lvIndex];
-  for (int daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
+  for (size_t daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
     G4VPhysicalVolume* physVolDaughter = logVol->GetDaughter(daughter);
     int pvIndexDaughter = std::find(pvStore->begin(), pvStore->end(), physVolDaughter) - pvStore->begin();
     unsigned long long pvIDDaughter = (*m_PVID)[pvIndexDaughter];

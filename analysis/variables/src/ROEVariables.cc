@@ -1524,7 +1524,6 @@ namespace Belle2 {
       TLorentzVector had_cm = T.rotateLabToCms() * hadron4vec;
       TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
 
-      // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
 
       double bmass = particle->getPDGMass();
 
@@ -1535,7 +1534,6 @@ namespace Belle2 {
         //makes no sense in this case, return simple value
         return Variable::REC_q2BhSimple(particle);
       }
-
       double thetaBY = TMath::ACos(cos_cone_angle);
       const double E_B = T.getCMSEnergy() / 2.0;
       const double p_B = sqrt(E_B * E_B - bmass * bmass);
@@ -1545,21 +1543,59 @@ namespace Belle2 {
       double q2 = 0;
       double denom = 0;
 
+      TVector3 zHatY(Y_cm.Vect().Unit());
+      TVector3 yHatY((had_cm.Vect().Cross(zHatY)).Unit());
+      TVector3 xHatY(yHatY.Cross(zHatY));
+
+      double phi = phi_start;
+      double dphi = TMath::Pi() / 2;
+      TLorentzVector static_B(0, 0, 0, bmass);
+
       for (int around_the_cone = 0; around_the_cone < 4; around_the_cone++) {
-        TLorentzVector one_B(1, 1, 1, E_B);
-        double B_theta = Y_cm.Theta() + thetaBY * cos(phi_start + around_the_cone / 2.*TMath::Pi());
-        double B_phi = Y_cm.Phi() + thetaBY * sin(phi_start + around_the_cone / 2.*TMath::Pi());
-        one_B.SetTheta(B_theta);
-        one_B.SetPhi(B_phi);
-        one_B.SetRho(p_B);
-        one_B.SetE(E_B);
-        double this_q2 = (one_B - had_cm).Mag2();
-        q2 += this_q2 * sin(B_theta) * sin(B_theta);
-        denom += sin(B_theta) * sin(B_theta);
+        //Define the momentum of B in the Y rest frame using the angles thetaBY and the
+        //current phi in the loop.
+
+        //The purpose of these lines is to calculate the B momentum in the BY cone in the coordinate system previously developed.
+        double B0_px_Y_frame = p_B * TMath::Sin(thetaBY) * TMath::Cos(phi);
+        double B0_py_Y_frame = p_B * TMath::Sin(thetaBY) * TMath::Sin(phi);
+        double B0_pz_Y_frame = p_B * TMath::Cos(thetaBY);
+
+        //The 3 components of the guess for the B0 p direction at the current phi are
+        //calculated by scaling the 3 basis vectors computed before by the corresponding B
+        //momentum in that direction.
+
+        TVector3 B0_px_Dframe(xHatY);
+        B0_px_Dframe *= B0_px_Y_frame;
+        TVector3 B0_py_Dframe(yHatY);
+        B0_py_Dframe *= B0_py_Y_frame;
+        TVector3 B0_pz_Dframe(zHatY);
+        B0_pz_Dframe *= B0_pz_Y_frame;
+        //Construct the B0 p 3-vector with the current phi by summing the 3 components.
+
+        TVector3 B0_p3_Dframe(B0_px_Dframe + B0_py_Dframe + B0_pz_Dframe);
+        TLorentzVector B0_p4_Dframe(B0_p3_Dframe, E_B);
+
+        //This is the polar angle of B0.
+
+        double cosThetaB = B0_p3_Dframe.CosTheta();
+        double sinThetaB2 = (1 - cosThetaB * cosThetaB);
+
+        //The weight is given by the sin squared of such angle.
+        double wt = sinThetaB2;
+
+        //Boost the haadronic daughter to the computed B0 rest frame.
+        // In that frame, q2 can simply be calculated by subtracting the hadron 4-momentum from the momentum of a static B.
+        TLorentzVector had_B0(had_cm);
+        had_B0.Boost(-B0_p4_Dframe.BoostVector());
+        q2 += wt * ((static_B - had_B0).M2());
+        denom += wt;
+        phi += dphi;
       }
 
       q2 /= denom;
-
+      if (q2 < 0) {
+        q2 = 0.0;
+      }
       return q2;
     }
 

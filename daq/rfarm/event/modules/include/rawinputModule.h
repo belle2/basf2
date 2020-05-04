@@ -11,22 +11,10 @@
 
 #include <framework/core/Module.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-
 #include <string>
-#include <vector>
-#include <cmath>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/time.h>
-#include <fcntl.h>
-
 
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -38,10 +26,6 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawTRG.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-//#include <rawdata/dataobjects/RawHeader.h>
-//#include <rawdata/dataobjects/RawTrailer.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 

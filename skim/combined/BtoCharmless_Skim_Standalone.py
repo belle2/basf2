@@ -16,7 +16,6 @@ from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 import skimExpertFunctions as expert
 
-gb2_setuprel = "release-04-00-00"
 
 # Create skim path
 btocharmlesspath = b2.Path()
@@ -29,7 +28,7 @@ stdPhotons('loose', path=btocharmlesspath)
 stdK('loose', path=btocharmlesspath)
 stdKshorts(path=btocharmlesspath)
 stdPi('loose', path=btocharmlesspath)
-stdPi0s('loose', path=btocharmlesspath)
+stdPi0s('eff40_Jan2020', path=btocharmlesspath)
 stdPi0s('all', path=btocharmlesspath)
 loadStdSkimPi0(path=btocharmlesspath)
 loadStdLightMesons(path=btocharmlesspath)

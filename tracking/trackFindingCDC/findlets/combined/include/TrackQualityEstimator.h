@@ -52,8 +52,11 @@ namespace Belle2 {
       /// Store output of needsTruthInformation from filter in member variable
       bool m_needsTruthInformation = false;
 
-      /// Parameter : Delete tracks below threshold instead of just assigning quality indicator
+      /// Delete tracks below threshold instead of just assigning quality indicator
       bool m_param_deleteTracks = false;
+
+      /// Reset taken flag for deleted tracks so that hits can be used by subsequent TFs
+      bool m_param_resetTakenFlag = false;
 
       /// Reference to the filter to be used to filter
       ChooseableFilter<TrackQualityFilterFactory> m_trackQualityFilter;

@@ -5,7 +5,6 @@
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
-#include <daq/slc/readout/RunInfoBuffer.h>
 
 #ifndef DAQCONSTS_H
 #define DAQCONSTS_H

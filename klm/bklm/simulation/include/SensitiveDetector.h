@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+#include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>

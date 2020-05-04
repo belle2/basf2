@@ -51,7 +51,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("timeZeroJitter", m_timeZeroJitter,
-             "r.m.s of T0 jitter [ns]", 25e-3);
+             "r.m.s of T0 jitter [ns]", 15e-3);
     addParam("electronicJitter", m_electronicJitter,
              "r.m.s of electronic jitter [ns], "
              "if negative the one from TOPNominalTDC is used. "
@@ -59,15 +59,15 @@ namespace Belle2 {
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("ADCx0", m_ADCx0,
-             "pulse height distribution parameter [ADC counts]", 3.0);
+             "pulse height distribution parameter [ADC counts]", 204.1);
     addParam("ADCp1", m_ADCp1,
-             "pulse height distribution parameter (must be non-negative)", 3.85);
+             "pulse height distribution parameter (must be non-negative)", 1.0);
     addParam("ADCp2", m_ADCp2,
-             "pulse height distribution parameter (must be non-negative)", 0.544);
+             "pulse height distribution parameter (must be non-negative)", 1.025);
     addParam("ADCmax", m_ADCmax,
              "pulse height distribution upper bound [ADC counts]", 2000.0);
     addParam("rmsNoise", m_rmsNoise,
-             "r.m.s of noise [ADC counts]", 9.0);
+             "r.m.s of noise [ADC counts]", 9.7);
     addParam("threshold", m_threshold,
              "pulse height threshold [ADC counts]", 40);
     addParam("hysteresis", m_hysteresis,
@@ -89,6 +89,8 @@ namespace Belle2 {
              "if true, simulate time transition spread. "
              "Should be always switched ON, except for some dedicated timing studies.",
              true);
+    addParam("minWidthXheight", m_minWidthXheight,
+             "minimal product of width and height [ns * ADC counts]", 100.0);
 
   }
 
@@ -190,6 +192,15 @@ namespace Belle2 {
         B2FATAL("Channel noise levels requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
+      }
+      if (m_timeWalk.isValid()) {
+        TimeDigitizer::setTimeWalk(&m_timeWalk);
+      } else {
+        TimeDigitizer::setTimeWalk(0);
+        // B2FATAL("Time-walk parameters requested but not available for run "
+        B2WARNING("Time-walk parameters not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
       }
     } else if (m_useSampleTimeCalibration) {
       if (not m_timebases.isValid()) {
@@ -458,6 +469,13 @@ namespace Belle2 {
           digit.addStatus(TOPDigit::c_CommonT0Calibrated);
         }
       }
+    }
+
+    // cut on product of pulse width and height, as for data in TOPRawDigitConverter
+
+    for (auto& digit : m_digits) {
+      if (digit.getPulseWidth() * digit.getPulseHeight() < m_minWidthXheight)
+        digit.setHitQuality(TOPDigit::c_Junk);
     }
 
   }

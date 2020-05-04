@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>PRsemileptonicUntagged.dst.root</output>
+  <output>../PRsemileptonicUntagged.dst.root</output>
   <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """

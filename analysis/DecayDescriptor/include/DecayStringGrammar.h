@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Christian Oswald                                         *
+ * Contributors: Christian Oswald, Yo Sato                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,15 +48,14 @@ namespace Belle2 {
     // particle composed of selector, particle name, and user label: "^D_s+:label"
     particle %= *selector >> lexeme[+(char_ - reserved)] >> -label;
     // cppcheck-suppress useInitializationList
-    selector = string("^") | string("@");
+    selector = string("^") | string("@") | string("(misID)") | string("(decay)");
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types
-    arrow %= string("->") | string("-->") | string("=>") | string("==>") | string("=direct=>") | string("=norad=>") |
-             string("=exact=>");
+    arrow %= string("->") | string("=direct=>") | string("=norad=>") | string("=exact=>");
 
     // Keyword for custom MC Matching
-    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma");
+    keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma") | string("?addbrems");
     keywordlist = *keyword;
 
     // Basic decay: mother -> daughterlist

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###################################################################
 #
@@ -29,7 +28,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
-from vertex import KFit
+from vertex import kFit
 from modularAnalysis import matchMCTruth
 from modularAnalysis import variablesToNtuple
 from stdPhotons import stdPhotons
@@ -58,16 +57,16 @@ reconstructDecay("Upsilon:uu -> mu+:pid mu-:pid", "M>2.", path=my_path)
 # Reconstructs Upsilon(4S) -> Upsilon eta
 reconstructDecay("Upsilon(4S) -> eta:gg Upsilon:uu", "", path=my_path)
 
+# Associates the MC truth to the reconstructed particles
+matchMCTruth('Upsilon(4S)', path=my_path)
+
 # Perform four momentum constraint fit using KFit.
 # Reject the candidates with failed fit.
-KFit("Upsilon(4S)", 0.0, 'fourC', path=my_path)
+kFit("Upsilon(4S)", 0.0, 'fourC', path=my_path)
 
 # Perform four momentum constraint fit using KFit and update the Daughters
 # Reject the candidates with failed fit.
-# KFit("Upsilon(4S)", 0.0, 'fourC', daughtersUpdate=True, path=my_path)
-
-# Associates the MC truth to the reconstructed D0
-matchMCTruth('Upsilon(4S)', path=my_path)
+# kFit("Upsilon(4S)", 0.0, 'fourC', daughtersUpdate=True, path=my_path)
 
 # Select variables that we want to store to ntuple
 muvars = vc.mc_truth + vc.pid + vc.kinematics

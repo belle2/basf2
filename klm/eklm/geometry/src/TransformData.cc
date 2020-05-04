@@ -12,8 +12,8 @@
 #include <klm/eklm/geometry/TransformData.h>
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
@@ -31,6 +31,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   int nSections, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
   AlignmentChecker alignmentChecker(true);
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_GeoDat = &(GeometryData::Instance());
   nSections = m_GeoDat->getNSections();
   nSectors = m_GeoDat->getNSectors();
@@ -38,7 +39,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   nPlanes = m_GeoDat->getNPlanes();
   nStrips = m_GeoDat->getNStrips();
   nSegments = m_GeoDat->getNSegments();
-  nStripsSegment = m_GeoDat->getNStripsSegment();
+  nStripsSegment = m_ElementNumbers->getNStripsSegment();
   m_Section = new HepGeom::Transform3D[nSections];
   m_Layer = new HepGeom::Transform3D*[nSections];
   m_Sector = new HepGeom::Transform3D** [nSections];
@@ -126,7 +127,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
-          sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
+          sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
           const KLMAlignmentData* sectorAlignment =
             alignment->getModuleAlignment(sector);
           if (sectorAlignment == nullptr)
@@ -149,8 +150,8 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
                                    CLHEP::rad / Unit::rad);
             }
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
-              segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
-                                                iPlane, iSegment);
+              segment = m_ElementNumbers->segmentNumber(
+                          iSection, iLayer, iSector, iPlane, iSegment);
               const KLMAlignmentData* segmentAlignmentData =
                 segmentAlignment->getSegmentAlignment(segment);
               if (segmentAlignmentData == nullptr)
@@ -325,14 +326,14 @@ getStripTransform(int section, int layer, int sector, int plane, int strip) cons
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripLocalToGlobal(EKLMDigit* hit) const
+EKLM::TransformData::getStripLocalToGlobal(KLMDigit* hit) const
 {
   return &(m_Strip[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
+EKLM::TransformData::getStripGlobalToLocal(KLMDigit* hit) const
 {
   return &(m_StripInverse[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
@@ -346,7 +347,7 @@ EKLM::TransformData::getStripGlobalToLocal(int section, int layer, int sector,
            [strip - 1]);
 }
 
-bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+bool EKLM::TransformData::intersection(KLMDigit* hit1, KLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
                                        double* d1, double* d2, double* sd,
                                        bool segments) const
@@ -473,7 +474,7 @@ int EKLM::TransformData::getStripsByIntersection(
   sector = getSectorByPosition(section, intersection);
   nPlanes = m_GeoDat->getNPlanes();
   nSegments = m_GeoDat->getNSegments();
-  nStripsSegment = m_GeoDat->getNStripsSegment();
+  nStripsSegment = m_ElementNumbers->getNStripsSegment();
   stripWidth = m_GeoDat->getStripGeometry()->getWidth() / CLHEP::cm * Unit::cm;
   minY = -stripWidth / 2;
   maxY = (double(nStripsSegment) - 0.5) * stripWidth;
@@ -526,7 +527,8 @@ int EKLM::TransformData::getStripsByIntersection(
      */
     if (fabs(x) > 0.5 * l)
       return -1;
-    stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane, strip);
+    stripGlobal = m_ElementNumbers->stripNumber(
+                    section, layer, sector, plane, strip);
     if (plane == 1)
       *strip1 = stripGlobal;
     else

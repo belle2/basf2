@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #############################################################################
 #
@@ -36,7 +35,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import variableToSignalSideExtraInfo
-from vertex import vertexRave
+from vertex import raveFit
 from vertex import treeFit
 from stdCharged import stdPi, stdK
 from variables import variables
@@ -72,12 +71,12 @@ treeFit('D0:kpi', 0.0, path=my_path)
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
 reconstructDecay('D*+:all -> D0:kpi pi+:all', '0.0 <= Q < 0.02', path=my_path)
 
+# perform MC matching (MC truth association)
+matchMCTruth('D*+:all', path=my_path)
+
 # perform D*+ vertex fit
 # reject candidates with C.L. value of the fit < 0.0
 treeFit('D*+:all', 0.0, path=my_path)
-
-# perform MC matching (MC truth association)
-matchMCTruth('D*+:all', path=my_path)
 
 # build rest of event
 buildRestOfEvent('D*+:all', path=my_path)
@@ -135,7 +134,7 @@ applyCuts('pi+:fromPV', PVParticlesCuts, path=roe_path)
 
 # combine all particles in the rest of the event and fit them to a common vertex
 combineAllParticles(['pi+:fromPV'], 'vpho:PV', path=roe_path)
-vertexRave('vpho:PV', conf_level=0, constraint='iptube', path=roe_path)
+raveFit('vpho:PV', conf_level=0, constraint='iptube', path=roe_path)
 
 # save information about the calculated PV position
 PVVtxDictionary = {'x': 'PVx',

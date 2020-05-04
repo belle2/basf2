@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini,Jo-Frederik Krohn                      *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -141,6 +141,7 @@ namespace TreeFitter {
       case lifetime:     rc = "lifetime";   break;
       case merged:       rc = "merged";     break;
       case conversion:   rc = "conversion"; break;
+      case helix:        rc = "helix";      break;
       case ntypes:
       case unknown:
         break;

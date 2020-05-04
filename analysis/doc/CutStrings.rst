@@ -1,3 +1,5 @@
+.. _cut_strings_selections:
+
 Cut strings and selections
 --------------------------
 

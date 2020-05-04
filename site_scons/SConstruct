@@ -262,8 +262,8 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 
 # cling remembers include paths to be able to find them at run-time, so only use -I here
 # remove all compiler warnings
-global_env['CLINGFLAGS'] = ["-std=c++17"] + [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
-                                             if not (s.startswith("-W") or s.startswith('-wd'))] + \
+global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
+                            if not (s.startswith("-W") or s.startswith('-wd')) and s not in ['-g', '-O3', '-flto']] + \
                            ["-noIncludePaths"]
 
 special_targets = ['tests', 'b2test-units', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']

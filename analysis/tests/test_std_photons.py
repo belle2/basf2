@@ -49,55 +49,51 @@ class TestStdPhotons(unittest.TestCase):
 
     def test_cdc_list(self):
         """check that the builder function works with the cdc list"""
-        self._check_list("cdc", expected_lists=["all", "cdc"])
+        self._check_list("cdc", expected_lists=["cdc"])
 
     def test_loose_list(self):
         """check that the builder function works with the loose list"""
-        self._check_list("loose", expected_lists=["all", "cdc", "loose"])
+        self._check_list("loose", expected_lists=["cdc", "loose"])
 
     def test_default_list(self):
         """check that the builder function works with the default (loose) list"""
-        self._check_list(expected_lists=["all", "cdc", "loose"])
+        self._check_list(expected_lists=["cdc", "loose"])
 
     def test_tight_list(self):
         """check that the builder function works with the tight list"""
-        self._check_list("tight", expected_lists=["all", "cdc", "loose", "tight"])
+        self._check_list("tight", expected_lists=["cdc", "loose", "tight"])
 
-    def test_pi0eff60_list(self):
-        """check that the builder function works with the pi0eff60 list"""
-        self._check_list("pi0eff60", expected_lists=["all", "pi0eff60"])
+    def test_pi0eff60_Jan2020_list(self):
+        """check that the builder function works with the pi0eff60_Jan2020 list"""
+        self._check_list("pi0eff60_Jan2020", expected_lists=["pi0eff60_Jan2020"])
 
-    def test_pi0eff50_list(self):
-        """check that the builder function works with the pi0eff50 list"""
-        self._check_list("pi0eff50", expected_lists=["all", "pi0eff50"])
+    def test_pi0eff50_Jan2020_list(self):
+        """check that the builder function works with the pi0eff50_Jan2020 list"""
+        self._check_list("pi0eff50_Jan2020", expected_lists=["pi0eff50_Jan2020"])
 
-    def test_pi0eff40_list(self):
-        """check that the builder function works with the pi0eff40 list"""
-        self._check_list("pi0eff40", expected_lists=["all", "pi0eff40"])
+    def test_pi0eff40_Jan2020_list(self):
+        """check that the builder function works with the pi0eff40_Jan2020 list"""
+        self._check_list("pi0eff40_Jan2020", expected_lists=["pi0eff40_Jan2020"])
 
-    def test_pi0eff30_list(self):
-        """check that the builder function works with the pi0eff30 list"""
-        self._check_list("pi0eff30", expected_lists=["all", "pi0eff30"])
+    def test_pi0eff30_Jan2020_list(self):
+        """check that the builder function works with the pi0eff30_Jan2020 list"""
+        self._check_list("pi0eff30_Jan2020", expected_lists=["pi0eff30_Jan2020"])
 
-    def test_pi0eff20_list(self):
-        """check that the builder function works with the pi0eff20 list"""
-        self._check_list("pi0eff20", expected_lists=["all", "pi0eff20"])
+    def test_pi0eff20_Jan2020_list(self):
+        """check that the builder function works with the pi0eff20_Jan2020 list"""
+        self._check_list("pi0eff20_Jan2020", expected_lists=["pi0eff20_Jan2020"])
 
-    def test_pi0_list(self):
-        """check that the builder function works with the pi0 list"""
-        self._check_list("pi0", expected_lists=["all", "pi0eff60", "pi0"])
-
-    def test_pi0highE_list(self):
-        """check that the builder function works with the pi0highE list"""
-        self._check_list("pi0highE", expected_lists=["all", "pi0eff60", "pi0highE"])
+    def test_pi0eff10_Jan2020_list(self):
+        """check that the builder function works with the pi0eff10_Jan2020 list"""
+        self._check_list("pi0eff10_Jan2020", expected_lists=["pi0eff10_Jan2020"])
 
     def test_skim(self):
         """check that the builder function works with the skim list"""
-        self._check_list("skim", std_function=stdPhotons.loadStdSkimPhoton, expected_lists=["all", "cdc", "loose", "skim"])
+        self._check_list("skim", std_function=stdPhotons.loadStdSkimPhoton, expected_lists=["cdc", "loose", "skim"])
 
     def test_belle(self):
         """check that the builder function works with the belle list"""
-        self._check_list("goodBelle", std_function=stdPhotons.loadStdGoodBellePhoton, expected_lists=["all", "goodBelle"])
+        self._check_list("goodBelle", std_function=stdPhotons.loadStdGoodBellePhoton, expected_lists=["goodBelle"])
 
 
 if __name__ == '__main__':

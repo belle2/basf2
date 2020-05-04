@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -31,7 +30,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import vertexRave
+from vertex import raveFit
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
@@ -61,7 +60,7 @@ reconstructDecay('D0:kpi -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D0:kpi', 0.0, path=my_path)
+raveFit('D0:kpi', 0.0, path=my_path)
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -69,12 +68,12 @@ vertexRave('D0:kpi', 0.0, path=my_path)
 reconstructDecay('D*+ -> D0:kpi pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
+# perform MC matching (MC truth association)
+matchMCTruth('D*+', path=my_path)
+
 # perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+', 0.0, path=my_path)
-
-# perform MC matching (MC truth asociation)
-matchMCTruth('D*+', path=my_path)
+raveFit('D*+', 0.0, path=my_path)
 
 # Select variables that we want to store to ntuple
 

@@ -317,6 +317,18 @@ namespace Belle2 {
     }
 
     /**
+     * Returns average surface reflectivity at given photon energy (weigthed by segment lengths)
+     * @param energy photon energy in [eV]
+     * @return average reflectivity
+     */
+    double getSurfaceReflectivity(double energy) const
+    {
+      return (m_bar1.getSurfaceReflectivity(energy) * m_bar1.getFullLength() +
+              m_bar2.getSurfaceReflectivity(energy) * m_bar2.getFullLength() +
+              m_mirror.getSurfaceReflectivity(energy) * m_mirror.getFullLength()) / getBarLength();
+    }
+
+    /**
      * Returns z of bar center (w/o prism) in Belle II frame
      * @return z coordinate if bar center
      */

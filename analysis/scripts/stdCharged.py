@@ -11,6 +11,7 @@ _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
+_mostLikelyList = 'mostlikely'
 
 
 def _stdChargedEffCuts(particletype, listtype):
@@ -41,6 +42,7 @@ def stdCharged(particletype, listtype, path):
       - 'good' high purity lists for data studies
       - 'loose' loose selections for skimming
       - 'higheff' high efficiency list with loose global ID cut for data studies
+      - 'mostlikely' list with the highest PID likelihood
     Also the following lists, which may or may not be available depending on the release
       - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
       - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
@@ -151,3 +153,21 @@ def stdMu(listtype=_defaultlist, path=None):
     @param path         modules are added to this path
     """
     stdCharged('mu', listtype, path)
+
+
+def stdMostLikely(pidPriors=None, path=None):
+    """
+    Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
+
+    @param path         modules are added to this path
+    """
+    # Here we need basic track quality cuts to be applied,
+    # otherwise, we get a lot of badly reconstructed particles,
+    # which will end up filled as a random type
+    args = ''
+    if pidPriors is not None:
+        args = str(pidPriors)[1:-1]  # remove brackets
+    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
+    for name in _chargednames:
+        fillParticleList('%s+:%s' % (name, _mostLikelyList),
+                         'pidIsMostLikely(%s) > 0 and %s' % (args, trackQuality), True, path=path)

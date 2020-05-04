@@ -35,7 +35,7 @@ stdE('all', path=SLpath)
 stdMu('all', path=SLpath)
 
 stdPi0s('skim', path=SLpath)  # for skim.standardlists.charm
-stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
+stdPi0s('eff40_Jan2020', path=SLpath)  # for skim.standardlists.charm
 stdPhotons('loose', path=SLpath)
 stdKshorts(path=SLpath)
 

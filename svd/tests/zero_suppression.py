@@ -16,10 +16,13 @@ class CheckZS(basf2.Module):
     """Check that SVVDShaperDigits are correctly zero-suppressed."""
 
     def __init__(self, thresholdSN):
+        '''initialize python module'''
         super().__init__()
         self.thresholdSN = thresholdSN
+        '''SNR threshold'''
 
     def event(self):
+        '''event'''
         storedigits = Belle2.PyStoreArray("SVDShaperDigits")
         gc = Belle2.VXD.GeoCache.getInstance()
         for digit in storedigits:

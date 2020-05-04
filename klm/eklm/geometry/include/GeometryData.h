@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMGeometry.h>
+#include <klm/dbobjects/eklm/EKLMGeometry.h>
 
 /* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
@@ -81,7 +81,7 @@ namespace Belle2 {
 
       /**
        * Get index in position-based array.
-       * @param[in] positionIndex index in position-based array.
+       * @param[in] lengthIndex index in length-based array.
        */
       int getStripPositionIndex(int lengthIndex) const;
 

@@ -14,6 +14,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from skim.standardlists.charm import loadStdD0, loadStdDstar0, loadStdDplus, loadStdDstarPlus
 import skimExpertFunctions as expert
 gb2_setuprel = 'release-04-00-00'
@@ -31,8 +32,8 @@ stdPi('all', path=SLpath)
 stdE('all', path=SLpath)
 stdMu('all', path=SLpath)
 
-stdPi0s('skim', path=SLpath)  # for skim.standardlists.charm
-stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
+loadStdPi0ForBToHadrons(path=SLpath)  # For skim.standardlists.charm lists
+stdPi0s('eff40_Jan2020', path=SLpath)
 stdPhotons('loose', path=SLpath)
 stdKshorts(path=SLpath)
 

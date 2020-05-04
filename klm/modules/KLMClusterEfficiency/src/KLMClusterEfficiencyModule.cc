@@ -12,8 +12,8 @@
 #include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 
 /* ROOT headers. */
 #include <TCanvas.h>

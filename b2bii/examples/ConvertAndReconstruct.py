@@ -4,38 +4,28 @@
 import os
 import sys
 
-from basf2 import *
-from modularAnalysis import inputMdstList
-from modularAnalysis import reconstructDecay
-from modularAnalysis import matchMCTruth
-from modularAnalysis import variablesToNtuple
-from modularAnalysis import fillParticleList
-from modularAnalysis import fillConvertedPhotonsList
-from modularAnalysis import loadGearbox
-from modularAnalysis import KFit
-from modularAnalysis import vertexRave
-from modularAnalysis import printVariableValues
-from variables.utils import create_aliases_for_selected
-from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase
+import basf2
+import modularAnalysis as ma
+import variables as va
+import variables.collections as vc
+import variables.utils as vu
+from vertex import kFit
+from b2biiConversion import convertBelleMdstToBelleIIMdst
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
 from b2biiMonitors import addNeutralsConversionMonitors
-import variables as va
-
-if len(sys.argv) != 4:
-    sys.exit('Must provide two input parameters: [mc|data] [input_Belle_MDST_file][output_BelleII_ROOT_file].\n'
-             'A small example Belle MDST file can be downloaded from '
-             'http://www-f9.ijs.si/~zupanc/evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst')
-
-mc_or_data = sys.argv[1].lower()
-isMC = {"mc": True, "data": False}.get(mc_or_data, None)
-if isMC is None:
-    sys.exit('First parameter must be "mc" or "data" to indicate whether we run on MC or real data')
-
-inputBelleMDSTFile = sys.argv[2]
-outputBelle2ROOTFile = sys.argv[3]
 
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
+os.environ['PGUSER'] = 'g0db'
+
+# If you want to create the monitoring histograms (recommended in the beginning of your analysis), just provide any argument
+monitoring = False
+if len(sys.argv) == 1:
+    basf2.B2WARNING("In the beginning of an analysis it is recommended to study the monitoring histograms.\n"
+                    "These tell you if the conversion works as expected.\n"
+                    "If you want to create them, just provide any argument to this script.")
+else:
+    monitoring = True
 
 print('BELLE2_EXTERNALS_DIR     = ' + str(os.getenv('BELLE2_EXTERNALS_DIR')))
 print('BELLE2_EXTERNALS_SUBDIR  = ' + str(os.getenv('BELLE2_EXTERNALS_SUBDIR')))
@@ -50,84 +40,79 @@ print('PANTHER_TABLE_DIR        = ' + str(os.getenv('PANTHER_TABLE_DIR')))
 print('PGUSER                   = ' + str(os.getenv('PGUSER')))
 
 # Convert
-mypath = create_path()
-convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, path=mypath)
+mypath = basf2.create_path()
+inputfile = basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
+convertBelleMdstToBelleIIMdst(inputfile, path=mypath)
 
 # Reconstruct
-# first the gearbox needs to be loaded
-loadGearbox(mypath)
+if monitoring:
+    # Create monitoring histograms if requested
+    addBeamParamsConversionMonitors(path=mypath)
+    addTrackConversionMonitors(path=mypath)
+    addNeutralsConversionMonitors(path=mypath)
 
-# Create monitoring histograms
-addBeamParamsConversionMonitors(path=mypath)
-addTrackConversionMonitors(path=mypath)
-addNeutralsConversionMonitors(path=mypath)
+# Only charged final state particles need to be loaded. The neutral particles
+# gamma, pi0, K_S0, K_L0, and Lambda0 are already loaded to the 'gamma:mdst',
+# 'pi0:mdst', 'K_S0:mdst', 'K_L0:mdst', and 'Lambda0:mdst' particle lists,
+# respectively.
+ma.fillParticleList('pi+:all', '', path=mypath)
+ma.fillParticleList('K+:all', '', path=mypath)
+ma.fillParticleList('mu+:all', '', path=mypath)
+ma.fillParticleList('e+:all', '', path=mypath)
 
-# Only charged final state particles need to be loaded
-# All photon and pi0 candidates are already loaded
-# to 'gamma:mdst' and 'pi0:mdst' particle lists
-fillParticleList('pi+:all', '', path=mypath)
-fillParticleList('K-:all', '', path=mypath)
-fillParticleList('mu+:all', '', path=mypath)
-fillParticleList('e+:all', '', path=mypath)
+# Let's have a look at the pi0 candidates in 'pi0:mdst' and print the values of some variables
+# In order to access the MC information we need to run the MC matching first
+ma.matchMCTruth('pi0:mdst', path=mypath)
+ma.printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'], path=mypath)
+ma.printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'], path=mypath)
 
-# in the case of pi0 candidates in 'pi0:mdst' the mc truth matching
-# needs to be executed
-matchMCTruth('pi0:mdst', path=mypath)
-matchMCTruth('K_S0:mdst', path=mypath)
-KFit('K_S0:mdst', -1, path=mypath)
+# The advantage of the pre-loaded V0s (which are the only ones that you should
+# use in B2BII analyses) is that the momenta and the position of the daughter
+# tracks are determined wrt. a pivot at the decay vertex of the V0. In
+# addition, K_S0:mdst (Lambda0:mdst) has goodKs (goodLambda) and nisKsFinder
+# outputs attached as extra info. It can be used to select good candidates.
+ma.cutAndCopyList('K_S0:good', 'K_S0:mdst', cut='goodBelleKshort', path=mypath)
+
+# It makes sense to perform a vertex fit of the K_S0 candidates and accept
+# only those candidates where the vertex fit converged
+kFit('K_S0:good', 0, path=mypath)
+
+# Again, let's print a few variable values:
+ma.matchMCTruth('K_S0:good', path=mypath)
+ma.printVariableValues('K_S0:good', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
+                                     'extraInfo(goodKs)', 'extraInfo(ksnbVLike)', 'extraInfo(ksnbNoLam)'], path=mypath)
 
 # The Belle PID variables are: atcPIDBelle(sigHyp, bkgHyp), muIDBelle, and eIDBelle
 va.variables.addAlias('Lkpi', 'atcPIDBelle(3,2)')
 va.variables.addAlias('Lppi', 'atcPIDBelle(4,2)')
 va.variables.addAlias('Lpk', 'atcPIDBelle(4,3)')
 
-printVariableValues('pi+:all', ['mcPDG', 'p', 'Lkpi', 'muIDBelle',
-                                'muIDBelleQuality', 'eIDBelle', 'nSVDHits'], path=mypath)
+# Since we did not apply any PID requirement the 'pi+:all' particle list
+# contains all type of charged final state particles. Have a look at the
+# printOut and notice how the true identity correlates with the corresponding
+# PID values.
+ma.printVariableValues('pi+:all', ['mcPDG', 'p', 'Lkpi', 'Lppi', 'muIDBelle',
+                                   'muIDBelleQuality', 'eIDBelle', 'nSVDHits'], path=mypath)
 
-printVariableValues('gamma:mdst', ['mcPDG', 'E', 'clusterE9E25'], path=mypath)
-printVariableValues('pi0:mdst', ['mcPDG', 'p', 'M', 'InvM'], path=mypath)
+# Now, let's really reconstruct a B decay with an intermediate D meson:
+ma.reconstructDecay('D0:Kpipi0 -> K-:all pi+:all pi0:mdst', '1.7 < M < 2.0', path=mypath)
+ma.reconstructDecay('B+:D0pi -> anti-D0:Kpipi0 pi+:all', '4.8 < M < 5.5', path=mypath)
 
-# V0's (loaded by ParticleLoader from the converted V0 Array)
-# the difference between K_S0:all and K_S0:mdst is in the
-# momentum/position of the daughter tracks. The K_S0:all
-# daughters have momentum/position determined wrt. pivot=(0,0,0),
-# while K_S0:mdst daughters have it wrt. pivot=Decay vertex.
-# In addition K_S0:mdst has goodKs and nisKsFinder outputs attached
-# as extra info.
-# fillParticleList('K_S0:all', '')
-# vertexRave('K_S0:all', 0.0)
-# matchMCTruth('K_S0:all')
-
-printVariableValues('K_S0:mdst', ['mcPDG', 'M', 'InvM', 'p', 'px', 'py', 'pz',
-                                  'extraInfo(goodKs)', 'extraInfo(ksnbVLike)', 'extraInfo(ksnbNoLam)'], path=mypath)
-
-# reconstructDecay('D0:Kpipi0 -> K-:all pi+:all pi0:mdst', '1.7 < M < 2.0')
-# reconstructDecay('B+:D0pi -> anti-D0:Kpipi0 pi+:all', '4.8 < M < 5.5')
-
-# matchMCTruth('B+:D0pi')
+ma.matchMCTruth('B+:D0pi', path=mypath)
 
 # create and fill flat Ntuple with MCTruth and kinematic information
-kinematics = ['p', 'E']
-truth = ['isSignal', 'mcPDG']
-kinematics_and_truth = kinematics + truth
+kinematics_and_truth = vc.kinematics + vc.mc_truth
+variables = vu.create_aliases_for_selected(kinematics_and_truth, '^B+ -> [ ^D0 -> ^K- ^pi+ ^pi0] ^pi+')
 
-variables = create_aliases_for_selected(
-    kinematics_and_truth, '^K_S0 -> ^pi+ ^pi-')
+belle1pid = ['eIDBelle', 'muIDBelleQuality', 'muIDBelle', 'Lkpi', 'Lppi', 'Lpk']
+variables += vu.create_aliases_for_selected(belle1pid, 'B+ -> [ D0 -> ^K- ^pi+ pi0] ^pi+')
 
-belle1pid = [
-    'eIDBelle', 'muIDBelleQuality', 'muIDBelle',
-    'Lkpi', 'Lppi', 'Lpk']
-variables += create_aliases_for_selected(
-    belle1pid, 'K_S0 -> ^pi+ ^pi-')
-
-variablesToNtuple('K_S0:mdst', variables,
-                  filename=outputBelle2ROOTFile, path=mypath)
+ma.variablesToNtuple('B+:D0pi', variables, filename='B2BII_ConvertAndReconstruct_Example.root', path=mypath)
 
 # progress
-progress = register_module('Progress')
-mypath.add_module(progress)
+mypath.add_module('Progress')
 
-process(mypath)
+basf2.process(mypath)
 
 # Print call statistics
-print(statistics)
+print(basf2.statistics)

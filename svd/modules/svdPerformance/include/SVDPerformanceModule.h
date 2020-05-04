@@ -65,7 +65,7 @@ namespace Belle2 {
     bool m_is2017TBanalysis = false; /**< true if we analyze 2017 TB data*/
     bool m_isSimulation = false; /**< true if we analyze Simulated data*/
 
-    float m_debugLowTime = - 100; /** cluster Time below this number will produce a printout */
+    float m_debugLowTime = - 100; /**< cluster Time below this number will produce a printout */
 
 
     /* user-defined parameters */
@@ -84,7 +84,7 @@ namespace Belle2 {
     StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit store array*/
     StoreArray<SVDRecoDigit> m_svdRecos; /**<SVDRecoDigits store array*/
     StoreArray<SVDCluster> m_svdClusters; /**<SVDCluster store array*/
-    StoreArray<RecoTrack> m_recoTracks; /*<<RecoTracks store array*/
+    StoreArray<RecoTrack> m_recoTracks; /**<RecoTracks store array*/
     StoreArray<Track> m_Tracks; /**<Tracks store array*/
     StoreArray<TrackFitResult> m_tfr; /**<TrackFitResult store array*/
 
@@ -208,11 +208,6 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             TList* histoList = NULL);
-
-    /** Function creating the ration (bin by bin) of two TH1*/
-    TH1F* createHistogramsRatio(const char* name, const char* title,
-                                TH1* hNum, TH1* hDen, bool isEffPlot,
-                                int axisRef);
 
   };
 }

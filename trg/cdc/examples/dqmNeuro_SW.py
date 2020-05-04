@@ -1,98 +1,101 @@
-from basf2 import *
+import basf2
 from ROOT import Belle2
+import neurotrigger
+import reconstruction
 import sys
 import os
+import rawdata
+
+################################################################################
+# Setting global tags in case Raw data is unpacked: ###
+
+# basf2.conditions.override_globaltags()
+# basf2.conditions.append_globaltag('klm_alignment_testing')
+# basf2.conditions.append_globaltag('neurotrigger')  # should not be needed
+# basf2.conditions.append_globaltag('online')
+
+################################################################################
+# Optional Log Output:
+basf2.set_log_level(basf2.LogLevel.DEBUG)
+basf2.set_debug_level(20)
 
 
-def add_neuro_simulation_swts(path):
-    path.add_module('CDCTriggerTSF',
-                    InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
-                    OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"),
-                    TSHitCollectionName="CDCTriggerSegmentHitsSW")
-    path.add_module('CDCTrigger2DFinder',
-                    minHits=4, minHitsShort=4, minPt=0.3,
-                    hitCollectionName="CDCTriggerSegmentHitsSW",
-                    outputCollectionName="TRGCDC2DFinderTracksSWTS")
-    path.add_module('CDCTriggerNeuro',
-                    inputCollectionName='TRGCDC2DFinderTracksSWTS',
-                    outputCollectionName='TRGCDCNeuroTracksSWTSSW2D',
-                    hitCollectionName='CDCTriggerSegmentHitsSW',
-                    filename=Belle2.FileSystem.findFile("data/trg/cdc/Background2.0_20161207.root"),
-                    writeMLPinput=True,
-                    fixedPoint=True,
-                    et_option='fastestpriority',
-                    )
+################################################################################
+# Start path: ###
+################################################################################
+main = basf2.create_path()
 
-
-def add_neuro_simulation(path):
-    path.add_module('CDCTriggerNeuro',
-                    inputCollectionName='CDCTrigger2DFinderTracks',
-                    outputCollectionName='TSimNeuroTracks',
-                    hitCollectionName='CDCTriggerSegmentHits',
-                    # TODO: load used network from the database
-                    filename=Belle2.FileSystem.findFile("data/trg/cdc/Background2.0_20161207.root"),
-                    # 'CosmicsBfield_20171006.root'
-                    # 'FixedAbsPt350MeV_20170112_Bkg.root'
-                    writeMLPinput=True,
-                    fixedPoint=True,
-                    et_option='fastestpriority',
-                    )
-
-
-set_log_level(LogLevel.ERROR)
-use_central_database("data_reprocessing_prompt")
-
-main = create_path()
-
+# Loading filelist and checking for ending: ###
 dstfiles = [sys.argv[1]]
-outputfile = ''
-dstputfile = ''
-os.makedirs('dqmoutput/data', exist_ok=True)
-os.makedirs('dqmoutput/hist', exist_ok=True)
-os.makedirs('dqmoutput/log', exist_ok=True)
-if '.sroot' in sys.argv[1]:
-    outputfile = 'dqmoutput/hist/histo.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
-    dstputfile = 'dqmoutput/data/dst.' + sys.argv[1].split('/')[-1].split('.sroot')[0] + '.root'
-    main.add_module("SeqRootInput", inputFileNames=dstfiles)
-elif '.root' in sys.argv[1]:
-    outputfile = 'dqmoutput/hist/histo.' + sys.argv[1].split('/')[-1].split('.root')[0] + '.root'
-    dstputfile = 'dqmoutput/data/dst.' + sys.argv[1].split('/')[-1].split('.root')[0] + '.root'
-    main.add_module("RootInput", inputFileNames=dstfiles)
 
+ending = ".root"
+
+print('Files to be processed:')
+for x in dstfiles:
+    print(x)
+
+# Creating output directories with the script's name: ###
+os.makedirs(sys.argv[0].split('.py')[0] + '/data', exist_ok=True)
+os.makedirs(sys.argv[0].split('.py')[0] + '/hist', exist_ok=True)
+
+# Creating filenames for dqm histogram output and root dst output: ###
+outputfile = sys.argv[0].split('.py')[0] + '/hist/histo.' + sys.argv[1].split('/')[-1].split(ending)[0] + '.root'
+dstputfile = sys.argv[0].split('.py')[0] + '/data/dst.' + sys.argv[1].split('/')[-1].split(ending)[0] + '.root'
+
+# adding root input module depending on the input file: ###
+main.add_module("RootInput", inputFileNames=dstfiles)
+
+# loading gearbox and geometry, which is needed for simulation: ###
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
+# show progress at least every 10^maxN events: ###
 main.add_module('Progress', maxN=3)
 
+# add filter to just use events with trg information present: ###
+main.add_module(neurotrigger.filterTRG())  # branchname="CDCTriggerNNInput2DFinderTracks"))
 
-add_neuro_simulation(main)
-add_neuro_simulation_swts(main)
-showRecoTracks = True
-if showRecoTracks:
-    main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='TSimNeuroTracks',
-                    hitCollectionName='CDCTriggerSegmentHits', axialOnly=True)
-    main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
-                    hitCollectionName='CDCTriggerSegmentHits', axialOnly=True)
-    main.add_module(
-        'CDCTriggerRecoMatcher',
-        TrgTrackCollectionName='TRGCDCNeuroTracksSWTSSW2D',
-        hitCollectionName='CDCTriggerSegmentHitsSW',
-        axialOnly=True)
-    main.add_module('SetupGenfitExtrapolation')
+# adding neurotrigger simulations for one hwsim and one swsim case: ###
+# neurotrigger.add_neurotrigger_sim(main)
+neurotrigger.add_neurotrigger_hw(main)
 
+# adding software neurotrigger simulation from CDCHits on:
+# neurotrigger.add_neuro_simulation(main)
+
+# add reconstruction in case .sroot files were used: ###
+#    main.add_module('CDCUnpacker')
+# add matcher modules to match trigger tracks to reco tracks: ###
+
+main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
+                hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
+                hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
+                hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+# main.add_module('CDCTriggerRecoHitMatcher', hitCollectionName=neurotrigger.simsegmenthits)
+# main.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.simneurotracks_swtssw2d,
+#                hitCollectionName=neurotrigger.simsegmenthits, axialOnly=True)
+main.add_module('SetupGenfitExtrapolation')
+
+# adding histomanager and the dqm module: ###
 main.add_module('HistoManager',
                 histoFileName=outputfile)
 main.add_module('CDCTriggerNeuroDQM',
-                simNeuroTracksName='TSimNeuroTracks',
-                simNeuroTracksSWTSSW2DName='TRGCDCNeuroTracksSWTSSW2D',
-                unpackedNeuroInput2dTracksName='CDCTrigger2DFinderTracks',
-                unpackedNeuroInputSegmentHits='CDCTriggerSegmentHits',
-                showRecoTracks=showRecoTracks,
-                recoTrackMultiplicity=1,
-                skipWithoutHWTS=False,
-                maxRecoZDist=3.0
+                simNeuroTracksName=neurotrigger.hwsimneurotracks,
+                unpackedNeuroInput2dTracksName=neurotrigger.hwneuroinput2dfindertracks,
+                # simNeuroTracksSWTSSW2DName=neurotrigger.simneurotracks_swtssw2d,
+                # sim2DTracksSWTSName=neurotrigger.sim2dtracks_swts,
+                # simSegmentHitsName=neurotrigger.simsegmenthits,
+                showRecoTracks=True,
+                skipWithoutHWTS=True,
+                maxRecoZDist=-1,
+                maxRecoD0Dist=-1,
+                limitedoutput=False,
                 )
+
+# add root output: ###
 main.add_module('RootOutput', outputFileName=dstputfile)
 
-process(main)
-print(statistics)
+# run basf2: ###
+basf2.process(main)
+print(basf2.statistics)

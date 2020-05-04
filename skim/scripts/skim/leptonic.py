@@ -17,6 +17,10 @@ from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class LeptonicUntagged(BaseSkim):
     """
@@ -32,7 +36,7 @@ class LeptonicUntagged(BaseSkim):
     """
 
     __authors__ = ["Phillip Urquijo"]
-    __contact__ = ""
+    __contact__ = __liaison__
     __description__ = (
         "Skim for leptonic analyses, "
         ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"

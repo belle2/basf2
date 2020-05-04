@@ -18,12 +18,15 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables
 
 
+__liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
+
+
 @fancy_skim_header
 class BtoXgamma(BaseSkim):
     """"""
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\gamma` inclusive skim."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
@@ -68,7 +71,7 @@ class BtoXgamma(BaseSkim):
 class BtoXll(BaseSkim):
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
@@ -131,7 +134,7 @@ class BtoXll(BaseSkim):
 class BtoXll_LFV(BaseSkim):
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
@@ -192,7 +195,7 @@ class BtoXll_LFV(BaseSkim):
 class inclusiveBplusToKplusNuNu(BaseSkim):
     __authors__ = ["Cyrille Praz"]
     __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
-    __contact__ = "Cyrille Praz <cyrille.praz@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
     NoisyModules = ["ParticleCombiner"]

@@ -1,0 +1,65 @@
+[INFO] Steering file: /gpfs/home/belle2/pgrace/basf2/master/skim/validation/test0_BottomoniumPiPiUpsilon.py
+[?1034h[INFO] The random number seed is set to "12345"
+
+======================
+  BeamParameters:Y3S
+======================
+Description: Setting of beam parameters. This module allows to set the beamparameters to be used by generators and analyis. One can either select from a list of predefined parameter sets or manually set the parameters to use.
+Package:     generators
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Parameter      Type        Default         Current                   Steering Description
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+angleHER       float       0.0415          0.0415                    True     angle of the High Energy Ring. Negative values are interpreted as pi - value
+angleLER       float       -0.0415         -0.0415                   True     angle of the Low Energy Ring. Negative values are interpreted as pi - value
+covHER         list(float) [0.0]           [2.63169e-05]             True     covariance matrix of the High Energy Ring. This can either be one value which is the squared energy spread, three
+                                                                              values corresponding to the variances of energy and the horizontal and vertial spread (E, theta_x, theta_y) or a
+                                                                              full covariance matrix with 9 elements
+covLER         list(float) [0.0]           [5.640625e-06]            True     covariance matrix of the Low Energy Ring. This can either be one value which is the squared energy spread, three
+                                                                              values corresponding to the variances of energy and the horizontal and vertial spread (E, theta_x, theta_y) or a
+                                                                              full covariance matrix with 9 elements
+covVertex      list(float) [0.0]           [4.10915993064694e-07,    True     covariance matrix of the nominal vertex position. Can be either one value which is the common variance for all
+                                           0.0,                               directions, three values for the variance of x, y and z or a full covariance matrix
+                                           -2.6480154862736073e-06,           
+                                           0.0, 1.7405e-11, 0.0,              
+                                           -2.6480154862522946e-06,           
+                                           0.0,                               
+                                           0.00023796244287945182]            
+createPayload  bool        False           False                     False    if true create a database payload with the iov given with the payloadIov parameter
+energyHER      float       7.0             6.855                     True     Energy of the High Energy Ring
+energyLER      float       4.0             3.917                     True     Energy of the Low Energy Ring
+generateCMS    bool        False           False                     False    if true, generate events in CMS, not lab system
+payloadIov     list(int)   [0, 0, -1, -1]  [0, 0, -1, -1]            False    iov of the payload to be created. List of four numbers: first experiment, first run, last experiment, last run
+smearDirection bool        True            True                      False    if true, smear beam direction when generating initial events
+smearEnergy    bool        True            True                      False    if true, smear energy when generating initial events
+smearVertex    bool        True            True                      False    if true, smear vertex position when generating initial events
+vertex         list(float) [0.0, 0.0, 0.0] [0.0, 0.0, 0.0]           True     nominal vertex position
+
+
+**************************************************************
+ Geant4 version Name: geant4-10-06-patch-01    (14-February-2020)
+                       Copyright : Geant4 Collaboration
+                      References : NIM A 506 (2003), 250-303
+                                 : IEEE-TNS 53 (2006), 270-278
+                                 : NIM A 835 (2016), 186-225
+                             WWW : http://geant4.org/
+**************************************************************
+
+[INFO] Starting event processing, random seed is set to '12345'
+[WARNING] An override for DBEntry BeamParameters was created.  { module: BeamParameters:Y3S }
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltag is master_2020-04-28
+[INFO] SVDClusterCuts: from now on we are using ClusterCalibrations_default_2018-11-22T17:15:14.509000_INFO:_seed=5_adj=3_cls=0_scaleFactors=fromSimulation
+ ... message repeated 3 times
+[INFO] SVDFADCMaskedStrips: from now on we are using FADCMaskedStrips_default_2019-07-02T16:42:18.880884_INFO:_noFADCMaskedstrips
+[INFO] SVDPulseShapeCalibrations: from now on we are using PulseShapeCalibrations_default_2018-11-22T17:15:16.043000_INFO:_peakTime=75_pulseWidth=130_gain=fromPhase3calibrations
+ ... message repeated 3 times
+[INFO] SVDCoGTimeCalibrations: from now on we are using SVDCoGTimeCalibrations_MC_2019-07-30T20:18:02.275349_INFO:_3rdOrderPol_TBindep_lat=+47.16
+ ... message repeated 1 times
+[INFO] SVDHitTimeSelectionFunction: from now on we are using HitTimeSelection_default_2020-03-25T01:45:02.220079_INFO:_tmin=-999_tDiff=10
+ ... message repeated 3 times
+[INFO] SVDNoiseCalibrations: from now on we are using NoiseCalibrations_default_2018-11-22T17:15:15.605000_INFO:_fromPhase3calibrations
+ ... message repeated 3 times
+[INFO] SVD3SampleCoGTimeCalibrations: from now on we are using 3SampleCoGTimeCalibrations_default_2020-02-08T00:05:55.338255_INFO:_3rdOrderPol_a=0_b=1_c=0_d=0
+ ... message repeated 1 times
+[INFO] SVD3SampleELSTimeCalibrations: from now on we are using 3SampleELSTimeCalibrations_default_2020-02-08T00:06:50.653871_INFO:_3rdOrderPol_a=0_b=1_c=0_d=0

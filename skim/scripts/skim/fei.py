@@ -21,6 +21,10 @@ from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 def _merge_boolean_dicts(*dicts):
     """Merge dicts of boolean, with `True` values taking precedence if values
     differ.
@@ -93,7 +97,7 @@ class BaseFEISkim(BaseSkim):
     """Base class for FEI skims. Applies event-level pre-cuts and applies the FEI."""
 
     __authors__ = ["Racha Cheaib", "Hannah Wakeling", "Phil Grace"]
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
     FEIPrefix = "FEIv4_2020_MC13_release_04_01_01"

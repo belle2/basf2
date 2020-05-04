@@ -13,6 +13,10 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class TauLFV(BaseSkim):
     """
@@ -28,7 +32,7 @@ class TauLFV(BaseSkim):
     """
     __authors__ = ["Kenji Inami"]
     __description__ = "Skim for Tau LFV decays."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, tau"
 
     RequiredStandardLists = {
@@ -234,7 +238,7 @@ class TauGeneric(BaseSkim):
     """
     __authors__ = ["Kenji Inami"]
     __description__ = "Skim for Tau generic decays."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, tau"
 
     RequiredStandardLists = {
@@ -367,7 +371,7 @@ class TauThrust(BaseSkim):
     """
     __authors__ = ["Ami Rostomyan", "Kenji Inami"]
     __description__ = "Skim for Tau decays using thrust."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, tau"
 
     RequiredStandardLists = {

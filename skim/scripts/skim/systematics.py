@@ -15,6 +15,10 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 import vertex
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class Systematics(BaseSkim):
     """
@@ -23,7 +27,7 @@ class Systematics(BaseSkim):
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Racha Cheaib"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics"
 
     RequiredStandardLists = {
@@ -103,7 +107,7 @@ class SystematicsTracking(BaseSkim):
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics"
 
     RequiredStandardLists = {
@@ -206,7 +210,7 @@ class Resonance(BaseSkim):
     """
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics"
 
     RequiredStandardLists = {
@@ -379,7 +383,7 @@ class SystematicsRadMuMu(BaseSkim):
         "Skim of radiative muon pairs (:math:`ee\\to\\mu\\mu(\\gamma)`) "
         "for photon systematics."
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
     RequiredStandardLists = {
@@ -425,7 +429,7 @@ class SystematicsRadMuMu(BaseSkim):
 class SystematicsEELL(BaseSkim):
     __authors__ = ["Ilya Komarov"]
     __description__ = "Systematics skim of :math:`ee\\to ee\\ell\\ell`"
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics, lepton ID"
 
     RequiredStandardLists = {
@@ -471,7 +475,7 @@ class SystematicsRadEE(BaseSkim):
 
     __authors__ = ["Sam Cunliffe"]
     __description__ = "Radiative electron pairs for photon systematics"
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
     RequiredStandardLists = {
@@ -549,7 +553,7 @@ class SystematicsRadEE(BaseSkim):
 class SystematicsLambda(BaseSkim):
     __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "systematics"
 
     RequiredStandardLists = None

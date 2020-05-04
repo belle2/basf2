@@ -13,6 +13,10 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class CharmlessHad2Body(BaseSkim):
     """
@@ -32,7 +36,7 @@ class CharmlessHad2Body(BaseSkim):
 
     __authors__ = ["Kim Smith"]
     __description__ = "Skim list for all neutral and charged :math:`B` to charmless 2 body modes."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
 
     RequiredStandardLists = {
@@ -334,7 +338,7 @@ class CharmlessHad3Body(BaseSkim):
 
     __authors__ = ["Kim Smith"]
     __description__ = "Skim list for all neutral and charged :math:`B` to charmless 3 body modes."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, hadronic B to charmless"
 
     RequiredStandardLists = {

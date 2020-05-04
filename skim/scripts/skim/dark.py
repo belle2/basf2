@@ -18,6 +18,9 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 
 
+__liaison__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+
+
 @fancy_skim_header
 class SinglePhotonDark(BaseSkim):
     """
@@ -27,7 +30,7 @@ class SinglePhotonDark(BaseSkim):
     state analysis.
     """
     __authors__ = ["Sam Cunliffe"]
-    __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+    __contact__ = __liaison__
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
 
@@ -69,7 +72,7 @@ class ALP3Gamma(BaseSkim):
         "Neutral dark sector skim list for the ALP 3-photon analysis: "
         ":math:`ee\\to a(\\to\\gamma\\gamma)\\gamma`"
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = None
@@ -147,7 +150,7 @@ class DimuonPlusMissingEnergy(BaseSkim):
         "Dimuon + missing energy skim, needed for :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}"
         "Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other searches."
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
@@ -186,7 +189,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
         "e^{\\pm}\\mu^{\\mp} Z^{\\prime}; \\, Z^{\\prime} \\to \\mathrm{invisible}` and other "
         "searches."
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
@@ -229,7 +232,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 class LFVZpVisible(BaseSkim):
     __authors__ = ["Ilya Komarov"]
     __description__ = "Lepton flavour violating Z' skim, Z' to visible FS."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = {
@@ -300,7 +303,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         "Gamma gamma skim list for study of the KLM efficiency as part of "
         "the dark photon analysis"
     )
-    __contact__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
 
     RequiredStandardLists = {
@@ -390,7 +393,7 @@ class DielectronPlusMissingEnergy(BaseSkim):
         "Dielectron skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} h^{\\prime};`"
         ":math:`A^{\\prime} \\to e^{+}e^{-}; \\, h^{\\prime} \\to \\mathrm{invisible}` and other searches."
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
     RequiredStandardLists = {

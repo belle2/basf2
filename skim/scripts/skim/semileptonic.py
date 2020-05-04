@@ -16,6 +16,10 @@ from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class PRsemileptonicUntagged(BaseSkim):
     """
@@ -53,7 +57,7 @@ class PRsemileptonicUntagged(BaseSkim):
 
     __authors__ = ["Lucien Cremaldi", "Racha Cheaib", "Romulus Godang"]
     __description__ = "Skim for partial reconstruction analysis in leptonic group."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
     RequiredStandardLists = {
@@ -167,7 +171,7 @@ class SLUntagged(BaseSkim):
         "Skim for semileptonic decays, :math:`B: decays "
         "(:math:`B \\to D \\ell\\nu,` where :math:`\\ell=e,\\mu`)"
     )
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
     RequiredStandardLists = {

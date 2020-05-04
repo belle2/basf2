@@ -8,6 +8,10 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class TCPV(BaseSkim):
     """
@@ -60,7 +64,7 @@ class TCPV(BaseSkim):
 
     __authors__ = ["Reem Rasheed"]
     __description__ = "Skim for time-dependent CP violation analysis."
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, TCPV"
 
     RequiredStandardLists = {

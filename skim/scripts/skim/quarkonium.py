@@ -13,6 +13,10 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
+# TODO: Add liaison name and email address
+__liaison__ = ""
+
+
 @fancy_skim_header
 class BottomoniumEtabExclusive(BaseSkim):
     """
@@ -29,7 +33,7 @@ class BottomoniumEtabExclusive(BaseSkim):
 
     __authors__ = ["Stefano Spataro", "Sen Jia"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
@@ -91,7 +95,7 @@ class BottomoniumUpsilon(BaseSkim):
     """
     __authors__ = ["Stefano Spataro", "Sen Jia"]
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {
@@ -168,7 +172,7 @@ class ISRpipicc(BaseSkim):
     """
     __authors__ = []
     __description__ = ""
-    __contact__ = ""
+    __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
     RequiredStandardLists = {

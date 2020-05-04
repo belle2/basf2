@@ -74,10 +74,10 @@ void CsiGeometryPar::read()
 
   for (int iEnc = 1; iEnc <= nEnc; iEnc++) {
     // Build the box (same for all)
-    double length = content.getLength("Enclosures/Length") * CLHEP::cm;
-    double thk    = content.getLength("Enclosures/Thickness") * CLHEP::cm;
-    double halflength = 15.0 * CLHEP::cm;
-    double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis (cry touches panel) **/
+    //double length = content.getLength("Enclosures/Length") * CLHEP::cm;
+    //double thk    = content.getLength("Enclosures/Thickness") * CLHEP::cm;
+    //double halflength = 15.0 * CLHEP::cm;
+    //double zshift = 0.5 * length - thk - halflength; /*< Shift of the box along z-axis (cry touches panel) **/
 
     string enclosurePath = (boost::format("/%1%[%2%]") % gearPath % iEnc).str();
 
@@ -95,7 +95,7 @@ void CsiGeometryPar::read()
     double Theta = enclosureContent.getAngle("AngTheta") ;
     double Phi2  = enclosureContent.getAngle("AngPhi2") ;
 
-    Transform3D zsh = Translate3D(0, 0, zshift);
+    //Transform3D zsh = Translate3D(0, 0, zshift);
     Transform3D m1 = RotateZ3D(Phi1);
     Transform3D m2 = RotateY3D(Theta);
     Transform3D m3 = RotateZ3D(Phi2);

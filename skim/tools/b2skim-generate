@@ -99,7 +99,7 @@ ma.inputMdstList("default", skim.TestFiles, path=path)
 skim(path)
 b2.process(path)
 
-print(b2.statistics())
+print(b2.statistics
 """
     return MainProcessing
 

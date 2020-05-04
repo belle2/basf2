@@ -26,7 +26,7 @@ namespace Belle2 {
   class SVDCoGTimeCalibrationAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /**Constructor set the prefix to SVDCoGTimeCalibrationCollector*/
+    /** Constructor set the prefix to SVDCoGTimeCalibrationCollector*/
     explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
 
     /** Destructor*/
@@ -49,21 +49,22 @@ namespace Belle2 {
     /** Run algo on data*/
     virtual EResult calibrate() override;
 
-    /** If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function in the base class.*/
+    /** If the event T0 changes significantly return true. This is run inside the findPayloadBoundaries member function
+    in the base class.*/
     virtual bool isBoundaryRequired(const Calibration::ExpRun& currentRun) override;
 
+    /** setup of the boundary finding*/
     virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) override
     {
-      /** m_previousEventT0.reset();*/
       m_previousRawCoGTimeMeanL3V.reset();
     }
 
 
   private:
 
-    std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
-    // std::optional<float> m_previousEventT0; /**< EventT0 of the previous run*/
-    std::optional<float> m_previousRawCoGTimeMeanL3V; /**< CoG time average of the previous run for V side of layer 3*/
+    std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
+    std::optional<float> m_previousRawCoGTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
+
     float m_allowedTimeShift = 2.; /**< Allowed EventT0 shift*/
     float m_minEntries = 10000; /**< Set the minimun number of entries required in the histograms of layer 3*/
   };

@@ -316,6 +316,7 @@ namespace Belle2 {
      * @param theta the particle polar angle (from the ECL cluster) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
      * @param pdg the particle mass hypothesis' pdgId.
+     * @param dump_all dump all information
      */
     void dumpPayload(const double& theta, const double& p, const int pdg, bool dump_all = false) const
     {
@@ -388,6 +389,7 @@ namespace Belle2 {
     /**
      * Find global bin index of a 2D histogram for the given (x, y) values.
      * This method had to be re-implemented b/c ROOT has no const version of TH1::FindBin() :(
+     * @param h 2D histogram
      * @param x value along the x axis.
      * @param y value along the y axis.
      * @return the global linearised bin index.

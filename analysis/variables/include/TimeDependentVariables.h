@@ -135,6 +135,12 @@ namespace Belle2 {
      */
     double particleDeltaT(const Particle* particle);
 
+    /**
+     * return Delta T as it was used in Belle in ps
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaTBelle(const Particle* particle);
 
 
     /**
@@ -143,6 +149,13 @@ namespace Belle2 {
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
     double particleDeltaTErr(const Particle* particle);
+
+    /**
+     * return Delta T - MCDeltaT in ps
+     *
+     * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
+     */
+    double particleDeltaTRes(const Particle* particle);
 
     /**
      * return generated Delta T (Brec - Btag), i.e. difference of proper times (in ps)
@@ -475,6 +488,15 @@ namespace Belle2 {
      *
      */
     int fitTruthStatus(const Particle* part);
+
+    /**
+     * return the status of the fit performed with the rolled back postion of tracks.
+     * 0 fit performed with measured parameters
+     * 1 fit performed with rolled back tracks
+     * 2 unable to recover truth parameters
+     *
+     */
+    int rollbackStatus(const Particle* part);
 
     //**********************************
     //Meta variables

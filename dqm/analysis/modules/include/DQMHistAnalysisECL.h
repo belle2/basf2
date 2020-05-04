@@ -115,7 +115,7 @@ namespace Belle2 {
     std::vector<TCanvas*> c_wf_analysis{};
 
     /** Normalize histograms. */
-    void normalize(TCanvas*, const std::string&, Double_t&);
+    void normalize(TCanvas*, const std::string&, const Double_t&);
   };
 } // end namespace Belle2
 

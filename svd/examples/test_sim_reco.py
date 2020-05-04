@@ -10,14 +10,6 @@ from ROOT import Belle2
 
 numEvents = 10000
 
-# CoG calibration - CAF - BEGIN
-use_database_chain()
-# no cuts on cluster time
-# use_central_database("svd_testGT_noSVDHitTimeSelection")
-# no time in the sectormaps:
-use_local_database("centraldb/dbcache.txt", "centraldb", invertLogging=True)
-# CoG calibration - CAF - END
-
 set_random_seed(1)
 
 eventinfosetter = register_module('EventInfoSetter')
@@ -40,7 +32,6 @@ main.add_module(evtgeninput)
 add_simulation(main)
 add_reconstruction(main)
 
-# CoG calibration - CAF - BEGIN
 fil = register_module('SVDShaperDigitsFromTracks')
 fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
 main.add_module(fil)
@@ -52,12 +43,6 @@ input_branches = [
 ]
 
 main.add_module("RootOutput", branchNames=input_branches, outputFileName="RootOutput_CoGCalibration_10k.root")
-
-# CoG calibration - CAF - END
-
-# display = register_module("Display")
-# main.add_module(display)
-# main.add_module('RootOutput')
 
 print_path(main)
 

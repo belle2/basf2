@@ -28,7 +28,7 @@ fileList = expert.get_test_file("MC12_mixedBGx1")
 ma.inputMdstList('default', fileList, path=skimpath)
 stdPi('loose', path=skimpath)
 stdK('loose', path=skimpath)
-stdPi0s('loose', path=skimpath)
+stdPi0s('eff40_Jan2020', path=skimpath)
 
 skimCode = expert.encodeSkimName('SystematicsTracking')
 

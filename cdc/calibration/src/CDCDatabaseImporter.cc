@@ -1017,7 +1017,7 @@ void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
 
     if (! spotChecks) {
       B2INFO("Performing CDCCrossTalkLibrary checks");
-      auto timer = Utils::Timer("CDCCrossTalkLibrary checks took");
+      auto timer = new Utils::Timer("CDCCrossTalkLibrary checks took"); // use "new" to avoid cpp-check warning
       int counter = 0;
       int size = 0;
       for (Short_t ADC = 0; ADC < 8196; ADC += 1) {
@@ -1030,6 +1030,7 @@ void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
         }
       }
       B2INFO("CDCCrossTalkLibrary called " << counter << " times. Total number of cross talk hits " << size);
+      delete timer;
       return;
     }
 

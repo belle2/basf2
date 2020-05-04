@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
      * Returns id of bin with given bin limits
      * Returns out-of-range binID if can't find
-     * @param limits bin limits
+     * @param bin bin limits
      * @return key ID
      */
     int findBin(ParticleWeightingBinLimits* bin);

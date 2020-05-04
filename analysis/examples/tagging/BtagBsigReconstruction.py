@@ -2,9 +2,7 @@
 
 import basf2
 import modularAnalysis as ma
-from generators import add_evtgen_generator
-from simulation import add_simulation
-from reconstruction import add_reconstruction
+from variables import variables as vm
 import variables.collections as vc
 import variables.utils as vu
 from ROOT import Belle2
@@ -12,57 +10,47 @@ from ROOT import Belle2
 
 myMain = basf2.create_path()
 
-# generation of 1000 events according to the specified DECAY table
-# Y(4S) -> B-:tag- B+:sig
-# B-:tag -> D0 pi-; D0 -> K- pi+
-# B+:sig -> pi0 e+ nu_e
-ma.setupEventInfo(1000, myMain)
-add_evtgen_generator(myMain, 'signal', Belle2.FileSystem.findFile(
-    'analysis/examples/exampleEvtgenDecayFiles/Btag2Dpi_Bsig2pi0enu.dec'))
+# Y(4S) -> B0:tag B0:sig
+# anti-B0:tag -> D*+ pi-; D*+ -> D0 pi+; D0 -> K- pi+
+# B0:sig -> anti-D0 pi0; anti-D0 -> K+ pi-
+ma.inputMdst(environmentType='default',
+             filename=basf2.find_file('B02pi0D0_D2kpi_B2Dstarpi_Dstar2Dpi_D2kpi.root', 'examples', False),
+             path=myMain)
 
-# simulation
-add_simulation(myMain)
-
-# reconstruction
-add_reconstruction(myMain)
 
 # create final state particle lists
 kaons = ('K-', '')
 pions = ('pi+', '')
-elecs = ('e+', '')
 photons = ('gamma', '')
 
-ma.fillParticleLists([kaons, pions, elecs, photons], True, myMain)
+ma.fillParticleLists([kaons, pions, photons], path=myMain)
 
 # reconstruct pi0 -> gamma gamma decay
-ma.reconstructDecay('pi0 -> gamma gamma', '0.05 < M < 1.7', 1, True, myMain)
+ma.reconstructDecay('pi0 -> gamma gamma', '0.05 < M < 1.7', path=myMain)
 
 # reconstruct D0 -> K- pi+ decay (and c.c.)
-ma.reconstructDecay('D0 -> K- pi+', '1.800 < M < 1.900', 1, True, myMain)
+ma.reconstructDecay('D0 -> K- pi+', '1.800 < M < 1.900', path=myMain)
 
-# reconstruct Btag -> D0 pi- (and c.c.)
-ma.reconstructDecay('B-:tag -> D0 pi-', '5.000 < M < 6.000', 1, True, myMain)
+# reconstruct D*+ -> D0 pi+ (and c.c.)
+ma.reconstructDecay('D*+ -> D0 pi+', '0.0 <= Q < 0.02', path=myMain)
 
-# reconstruct Bsig -> pi0 e+ [nu_e] (and c.c.)
-ma.reconstructDecay('B+:sig -> pi0 e+', '0.000 < M < 6.000', 10, True, myMain)
+# reconstruct Btag -> D*+ pi- (and c.c.)
+ma.reconstructDecay('anti-B0:tag -> D*+ pi-', '5.000 < M < 6.000', path=myMain)
+
+# reconstruct Bsig -> D0 pi0 (and c.c.)
+ma.reconstructDecay('B0:sig -> anti-D0 pi0', '0.000 < M < 6.000', path=myMain)
 
 # reconstruct Y(4S) -> Btag Bsig
-ma.reconstructDecay('Upsilon(4S) -> B-:tag B+:sig', '0.000 < M < 11.000', 1, True, myMain)
+ma.reconstructDecay('Upsilon(4S):B0barB0 -> anti-B0:tag B0:sig', '0.000 < M < 11.000', dmID=1, path=myMain)
+ma.reconstructDecay('Upsilon(4S):B0B0 -> B0:tag B0:sig', '0.000 < M < 11.000', dmID=2, path=myMain)
+ma.copyLists('Upsilon(4S):all', ['Upsilon(4S):B0barB0', 'Upsilon(4S):B0B0'], path=myMain)
 
 # perform MC matching
-ma.matchMCTruth('pi0', myMain)
-ma.matchMCTruth('B-:tag', myMain)
-ma.matchMCTruth('B+:sig', myMain)
-ma.matchMCTruth('Upsilon(4S)', myMain)
+ma.matchMCTruth('Upsilon(4S):all', myMain)
 
-decayhashmodule = basf2.register_module('ParticleMCDecayString')
-decayhashmodule.param('listName', 'B-:tag')
-myMain.add_module(decayhashmodule)
-
-
-# create and fill RestOfEvent for B- and Y(4S) particles
-ma.buildRestOfEvent('B-:tag', path=myMain)
-ma.buildRestOfEvent('Upsilon(4S)', path=myMain)
+# create and fill RestOfEvent for Btag and Y(4S) particles
+ma.buildRestOfEvent('B0:tag', path=myMain)
+ma.buildRestOfEvent('Upsilon(4S):all', path=myMain)
 
 # define variables for Btag ntuple
 commonVariables = vc.mc_truth + vc.deltae_mbc
@@ -70,12 +58,14 @@ BvariableList = commonVariables + vc.roe_multiplicities
 
 # define variables for Upsilon(4S) ntuple
 Y4SvariableList = vc.mc_truth + vc.roe_multiplicities + vc.recoil_kinematics + vc.extra_energy
+vm.addAlias('dmID', 'extraInfo(decayModeID)')
+Y4SvariableList += ['dmID']
 Y4SvariableList += vu.create_aliases(commonVariables, 'daughter(0, {variable})', 'Btag')
 Y4SvariableList += vu.create_aliases(commonVariables, 'daughter(1, {variable})', 'Bsig')
 
 # write flat ntuples
-ma.variablesToNtuple('B-:tag', variables=BvariableList, filename='restOfEvent_pi0enu.root', treename='btag', path=myMain)
-ma.variablesToNtuple('Upsilon(4S)', variables=Y4SvariableList, filename='restOfEvent_pi0enu.root', treename='btagbsig', path=myMain)
+ma.variablesToNtuple('B0:tag', variables=BvariableList, filename='ROE_BtagBsig.root', treename='btag', path=myMain)
+ma.variablesToNtuple('Upsilon(4S):all', variables=Y4SvariableList, filename='ROE_BtagBsig.root', treename='btagbsig', path=myMain)
 
 basf2.process(myMain)
 print(basf2.statistics)

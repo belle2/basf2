@@ -11,6 +11,9 @@
 /* Own header. */
 #include <klm/dataobjects/KLMModuleArrayIndex.h>
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
 using namespace Belle2;
 
 KLMModuleArrayIndex::KLMModuleArrayIndex() :

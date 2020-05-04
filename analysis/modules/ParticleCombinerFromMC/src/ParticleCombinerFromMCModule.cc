@@ -203,7 +203,7 @@ namespace Belle2 {
         unsigned nPart = plist->getListSize();
         for (unsigned iPart = 0; iPart < nPart; iPart++) {
           const Particle* part = plist->getParticle(iPart);
-          Particle::EParticleType particleType = part->getParticleType();
+          Particle::EParticleSourceObject particleType = part->getParticleSource();
           if (particleType == Particle::c_Track or
               particleType == Particle::c_ECLCluster or
               particleType == Particle::c_KLMCluster)

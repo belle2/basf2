@@ -23,19 +23,19 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DAQMonitorModule();
-    virtual ~DAQMonitorModule();
+    ~DAQMonitorModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    void initialize() override final;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    void beginRun() override final;
+    void event() override final;
+    void endRun() override final;
+    void terminate() override final;
 
     //! Histogram definition
-    virtual void defineHisto();
+    void defineHisto() override final;
 
     // Data members
 
@@ -45,28 +45,28 @@ namespace Belle2 {
     int m_nevt;
 
     /** Histogram for PXD data size */
-    TH1F* h_pxdsize;
+    TH1F* h_pxdsize = NULL;
     /** Histogram for SVD data size */
-    TH1F* h_svdsize;
+    TH1F* h_svdsize = NULL;
     /** Histogram for CDC data size */
-    TH1F* h_cdcsize;
+    TH1F* h_cdcsize = NULL;
     /** Histogram for TOP data size */
-    TH1F* h_topsize;
+    TH1F* h_topsize = NULL;
     /** Histogram for ARICH data size */
-    TH1F* h_arichsize;
+    TH1F* h_arichsize = NULL;
     /** Histogram for ECL data size */
-    TH1F* h_eclsize;
+    TH1F* h_eclsize = NULL;
     /** Histogram for KLM data size */
-    TH1F* h_klmsize;
+    TH1F* h_klmsize = NULL;
     /** Histogram for TRG data size */
-    TH1F* h_trgsize;
+    TH1F* h_trgsize = NULL;
 
     /** Histogram for total number of events */
-    TH1F* h_nevt;
+    TH1F* h_nevt = NULL;
     /** Histogram for total data size */
-    TH1F* h_size;
+    TH1F* h_size = NULL;
     /** Histogram for HLT data size */
-    TH1F* h_hltsize;
+    TH1F* h_hltsize = NULL;
 
   };
 

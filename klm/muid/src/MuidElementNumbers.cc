@@ -155,7 +155,7 @@ MuidElementNumbers::Hypothesis MuidElementNumbers::calculateHypothesisFromPDG(in
 std::vector<int> MuidElementNumbers::getPDGVector(int charge)
 {
   std::vector<int> pdgVector;
-  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+  for (const Const::ChargedStable particle : Const::chargedStableSet) {
     if ((particle == Const::electron) || (particle == Const::muon))
       pdgVector.push_back(-charge * particle.getPDGCode());
     else
@@ -171,4 +171,20 @@ std::vector<int> MuidElementNumbers::getPDGVector()
   pdgVector.insert(pdgVector.end(), temp.begin(), temp.end());
   std::sort(pdgVector.begin(), pdgVector.end());
   return pdgVector;
+}
+
+int MuidElementNumbers::getLongitudinalID(int hypothesis, int outcome, int lastLayer)
+{
+  int id = lastLayer;
+  id += (outcome << MuidElementNumbers::c_LastLayerBit);
+  id += (hypothesis << (MuidElementNumbers::c_LastLayerBit + MuidElementNumbers::c_OutcomeBit));
+  return id;
+}
+
+int MuidElementNumbers::getTransverseID(int hypothesis, int detector, int degreesOfFreedom)
+{
+  int id = degreesOfFreedom;
+  id += (detector << MuidElementNumbers::c_DegreesOfFreedomBit);
+  id += (hypothesis << (MuidElementNumbers::c_DegreesOfFreedomBit + MuidElementNumbers::c_DetectorBit));
+  return id;
 }

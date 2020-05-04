@@ -158,7 +158,7 @@ namespace Belle2 {
     * Set geometry configuration of aerogel plane
     * @param aerogelPlane aerogel plane geometry parameters
     */
-    void setAerogelPlane(ARICHGeoAerogelPlane& aerogelPlane)
+    void setAerogelPlane(const ARICHGeoAerogelPlane& aerogelPlane)
     {
       m_aerogelPlane = aerogelPlane;
     }
@@ -167,7 +167,7 @@ namespace Belle2 {
      * Set geometry configuration of HAPD plane
      * @param detectorPlane detector plane geometry parameters
      */
-    void setDetectorPlane(ARICHGeoDetectorPlane& detectorPlane)
+    void setDetectorPlane(const ARICHGeoDetectorPlane& detectorPlane)
     {
       m_detectorPlane = detectorPlane;
     }
@@ -176,7 +176,7 @@ namespace Belle2 {
      * Set mirrors geometry configuration
      * @param mirrors mirrors geometry parameters
      */
-    void setMirrors(ARICHGeoMirrors& mirrors)
+    void setMirrors(const ARICHGeoMirrors& mirrors)
     {
       m_mirrors = mirrors;
     }
@@ -185,7 +185,7 @@ namespace Belle2 {
      * Set master volume geometry configuration
      * @param masterVolume master volume geometry parameters
      */
-    void setMasterVolume(ARICHGeoMasterVolume& masterVolume)
+    void setMasterVolume(const ARICHGeoMasterVolume& masterVolume)
     {
       m_masterVolume = masterVolume;
     }
@@ -194,7 +194,7 @@ namespace Belle2 {
      * Set support structure geometry configuration
      * @param supportStructure support structure geometry parameters
      */
-    void setSupportStructure(ARICHGeoSupport& supportStructure)
+    void setSupportStructure(const ARICHGeoSupport& supportStructure)
     {
       m_supportStructure = supportStructure;
     }
@@ -203,7 +203,7 @@ namespace Belle2 {
      * Set global displacement parameters
      * @param displ global displacement parameters
      */
-    void setGlobalDisplacement(ARICHGeoGlobalDisplacement& displ)
+    void setGlobalDisplacement(const ARICHGeoGlobalDisplacement& displ)
     {
       m_globalDispl = displ;
     }
@@ -212,7 +212,7 @@ namespace Belle2 {
      * Set mirror displacement parameters
      * @param displ mirror displacement parameters
      */
-    void setMirrorDisplacement(ARICHGeoMirrorDisplacement& displ)
+    void setMirrorDisplacement(const ARICHGeoMirrorDisplacement& displ)
     {
       m_mirrorDispl = displ;
     }

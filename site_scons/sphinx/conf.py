@@ -20,7 +20,6 @@ import glob
 import shutil
 import subprocess
 import jupytext
-import jupytext
 
 sys.path.insert(0, os.path.abspath("extensions"))
 

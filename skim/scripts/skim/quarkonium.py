@@ -13,8 +13,7 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
-# TODO: Add liaison name and email address
-__liaison__ = ""
+__liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
 
 
 @fancy_skim_header
@@ -150,7 +149,6 @@ class BottomoniumUpsilon(BaseSkim):
         # reture the list
         self.SkimLists = UpsilonList
 
-    # TODO: Not sure how to implement validation_histograms, as BottomoniumUpsilon has
     #       *two* sets of validation scripts defined.
 
 

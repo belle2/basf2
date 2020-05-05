@@ -8,8 +8,7 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
-# TODO: Add liaison name and email address
-__liaison__ = ""
+__liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
 
 
 @fancy_skim_header

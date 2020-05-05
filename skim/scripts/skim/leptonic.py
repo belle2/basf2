@@ -17,8 +17,7 @@ from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
 
-# TODO: Add liaison name and email address
-__liaison__ = ""
+__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
 
 @fancy_skim_header

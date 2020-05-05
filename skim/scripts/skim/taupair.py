@@ -13,8 +13,7 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
 
 
-# TODO: Add liaison name and email address
-__liaison__ = ""
+__liaison__ = "Kenji Inami <kenji.inami@desy.de>"
 
 
 @fancy_skim_header
@@ -335,7 +334,6 @@ class TauGeneric(BaseSkim):
 
         # contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-        # TODO: change this to use
         #       validation_tools.metadata.create_validation_histograms, to add contact
         #       info without reopening and closing ROOT file and add 'shifter' flag
 
@@ -447,7 +445,6 @@ class TauThrust(BaseSkim):
     def validation_histograms(self, path):
         self.additional_setup(path)
 
-        # TODO: change this to use
         #       validation_tools.metadata.create_validation_histograms, to add contact
         #       info without reopening and closing ROOT file and add 'shifter' flag
 

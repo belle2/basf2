@@ -19,8 +19,7 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
-# TODO: Add liaison name and email address
-__liaison__ = ""
+__liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
 
 
 @fancy_skim_header

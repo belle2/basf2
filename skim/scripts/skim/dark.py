@@ -18,7 +18,7 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 
 
-__liaison__ = "Sam Cunliffe <sam.cunliffe@desy.de>"
+__liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
 
 
 @fancy_skim_header

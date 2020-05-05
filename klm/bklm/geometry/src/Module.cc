@@ -347,7 +347,3 @@ const CLHEP::HepRotation Module::getRotationFromTransform3D(const HepGeom::Trans
   r.set(rRep);
   return r;
 }
-
-} // end of namespace bklm
-
-} // end of namespace Belle2

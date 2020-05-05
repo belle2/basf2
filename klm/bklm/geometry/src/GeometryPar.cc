@@ -808,8 +808,3 @@ HepGeom::Transform3D GeometryPar::getTransformFromRigidBodyParams(double dU, dou
   //and then we map it to global rotation x -> z -> y axis
   return HepGeom::Transform3D(dy * dz * dx, shift);
 }
-
-
-} // end of namespace bklm
-
-} // end of namespace Belle2

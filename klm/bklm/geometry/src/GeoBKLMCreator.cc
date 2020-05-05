@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace Belle2::bklm;
+using namespace Belle2::geometry;
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -1226,7 +1227,3 @@ G4String GeoBKLMCreator::physicalName(G4LogicalVolume* lvol)
   m_Names.push_back(name);
   return *name;
 }
-
-} // namespace bklm
-
-} // namespace Belle2

@@ -29,8 +29,8 @@
 
 using namespace Belle2;
 
-//#define ONLINE 0
-#define ONLINE 1
+#define ONLINE 0
+//#define ONLINE 1
 //#define ONLINE 2
 
 //prescale setting
@@ -1868,14 +1868,18 @@ void setalg()
 
   // const int N_BITS_RESERVED = 200;
 
-  const int N = 2;
+  const int N = 6;
   const int run[N][4] = { //itnitial exp, initial run, end exp, end run
-    0, 0,   -1, -1,
-    10, 135, 10, -1
+    0,  0,    -1,   -1,
+    7,  0,     7, 2102,
+    7,  2103,  7, 4023,
+    7,  4024,  8, 1201,
+    8,  1202,  8,   -1,
+    10, 135,  -1,   -1
   };
 
   const char* alg_file_names[] = {
-    "ftd_0023.alg", "ftd_0023.alg"
+    "ftd_0023.alg", "ftd_0011.alg", "ftd_0012.alg", "ftd_0014.alg", "ftd_0015.alg", "ftd_0023.alg"
   };
 
   char logname[2000];
@@ -1924,8 +1928,8 @@ int main()
   setftdlbits();
   setinputbits();
   setunpacker();
-  setdelay();
-  setbadrun();
+  //setdelay();
+  //setbadrun();
   setalg();
 
 

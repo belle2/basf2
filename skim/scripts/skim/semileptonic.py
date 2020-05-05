@@ -45,7 +45,7 @@ def SemileptonicList(path):
     >>> stdPi('all', path=path)
     >>> stdPi('loose', path=path)
     >>> stdPi0s('skim', path=path)
-    >>> stdPi0s('loose', path=path)
+    >>> stdPi0s('eff40_Jan2020', path=path)
     >>> stdPhotons('loose', path=path)
     >>> stdK('all', path=path)
     >>> stdKshorts(path=path)
@@ -370,7 +370,7 @@ class SLUntagged(BaseSkim):
             "stdPhotons": ["loose"],
         },
         "stdPi0s": {
-            "stdPi0s": ["loose"],
+            "stdPi0s": ["eff40_Jan2020"],
         },
         "stdV0s": {
             "stdKshorts": [],

@@ -669,8 +669,8 @@ void MicrotpcStudyModule::getXMLData()
   m_ChipRowY = content.getDouble("ChipRowY");
   m_z_DG = content.getDouble("z_DG");
 
-  content = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/RecoilProbability");
-  for (const GearDir& recoil : content.getNodes("Recoil")) {
+  GearDir content2 = GearDir("/Detector/DetectorComponent[@name=\"MICROTPC\"]/Content/RecoilProbability");
+  for (const GearDir& recoil : content2.getNodes("Recoil")) {
     m_maxEnFrac.push_back(recoil.getDouble("Fraction"));
     istringstream probstream;
     double e, prob;

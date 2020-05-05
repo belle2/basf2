@@ -42,7 +42,7 @@ ma.correctBrems(outputList='e+:bremCorr', inputList='e+:withCuts', gammaList='ga
 ma.fillParticleList('mu+:withCuts',  cut="dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance", path=path)
 loadStdSkimPi0(path=path)
 loadStdSkimPhoton(path=path)
-stdPi0s('loose', path=path)
+stdPi0s('eff40_Jan2020', path=path)
 stdPi('loose', path=path)
 stdK('all', path=path)
 stdK('loose', path=path)

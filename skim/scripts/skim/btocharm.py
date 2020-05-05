@@ -982,7 +982,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
             "stdPi": ["all"],
         },
         "stdPi0s": {
-            "stdPi0s": ["looseFit"]
+            "stdPi0s": ["eff40_Jan2020Fit"]
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -1010,7 +1010,7 @@ class BtoD0h_Kspipipi0(BaseSkim):
         self.SkimLists = BsigList
 
     def validation_histograms(self, path):
-        ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:looseFit', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_Jan2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.

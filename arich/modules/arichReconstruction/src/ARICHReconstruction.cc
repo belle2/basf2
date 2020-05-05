@@ -296,8 +296,6 @@ namespace Belle2 {
     rf0[0] = r;
     rf0[1] = rf;
 
-    double rind = 0;
-
     for (int iter = 0; iter < niter; iter++) {
 
       // direction in the space between aerogels and detector
@@ -308,7 +306,7 @@ namespace Belle2 {
       // *************************************
       // n-layers of aerogel // refractiveInd relative refractive index
       for (int a = n - 1; a >= 0 ; a--) {
-        rind = refractiveInd[a] / refractiveInd[a + 1];
+        double rind = refractiveInd[a] / refractiveInd[a + 1];
         dirf0[a] = Refraction(dirf0[a + 1], rind);
       }
 
@@ -344,7 +342,8 @@ namespace Belle2 {
     return -1;
   }
 
-  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
+  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits,
+                                       ARICHLikelihood& arichLikelihood)
   {
 
     const unsigned int nPhotonHits = arichHits.getEntries(); // number of detected photons

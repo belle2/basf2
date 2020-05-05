@@ -89,7 +89,14 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
     print('Global tags reversed (this will be used for conditions.override_globaltags(...)):')
     print([tag for tag in reversed(global_tags)])
 
-    conditions.override_globaltags([tag for tag in reversed(global_tags)])
+    import os
+    import basf2
+
+    for tag in [tag for tag in reversed(global_tags)]:
+        if os.path.exists(tag):
+            basf2.conditions.append_testing_payloads(os.path.abspath(tag))
+        else:
+            basf2.conditions.append_globaltag(tag)
 
     for index, event in enumerate(events):
         #  conditions.reset()

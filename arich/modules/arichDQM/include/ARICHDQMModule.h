@@ -94,7 +94,7 @@ namespace Belle2 {
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/
-    TH2* h_bitsPerHapd = NULL;/**/
+    TH2* h_bitsPerChannel = NULL;/**/
     TH2* h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
     TH3* h_aerogelHits3D = NULL; /**< 3D histogram of */

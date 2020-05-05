@@ -389,6 +389,7 @@ namespace Belle2 {
     /**
      * Find global bin index of a 2D histogram for the given (x, y) values.
      * This method had to be re-implemented b/c ROOT has no const version of TH1::FindBin() :(
+     * @param h 2D histogram
      * @param x value along the x axis.
      * @param y value along the y axis.
      * @return the global linearised bin index.

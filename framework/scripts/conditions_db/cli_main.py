@@ -45,6 +45,7 @@ from .cli_utils import ItemFilter
 # this if pylama/pylint is used to check
 from .cli_upload import command_upload  # noqa
 from .cli_download import command_download, command_legacydownload  # noqa
+from .cli_management import command_tag_merge  # noqa
 
 
 def escape_ctrl_chars(name):

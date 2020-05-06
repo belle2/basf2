@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <reconstruction/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/TriggerTimeOffset.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <TRandom.h>

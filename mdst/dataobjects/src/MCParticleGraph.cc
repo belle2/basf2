@@ -32,8 +32,8 @@ struct cycle_detector : public dfs_visitor<> {
    * This method is invoked on back edges in the graph.
    * If a back edge is found, it means a cyclic reference was found and therefore
    * an exception of type MCParticleGraph::CyclicReferenceError() is thrown.
-   * @param Edge The edge of the graph.
-   * @param Graph Reference to the graph itself.
+   * @tparam Edge The edge of the graph.
+   * @tparam Graph Reference to the graph itself.
    */
   template <class Edge, class Graph> void back_edge(Edge, Graph&) { throw MCParticleGraph::CyclicReferenceError(); }
 };

@@ -47,7 +47,10 @@ namespace Belle2 {
     /**
      * Get digit identifier.
      */
-    int getDigitIdentifier() const;
+    int getDigitIdentifier() const
+    {
+      return m_DigitIdentifier;
+    }
 
   private:
 

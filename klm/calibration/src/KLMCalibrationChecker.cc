@@ -56,29 +56,6 @@ void KLMCalibrationChecker::setExperimentRun(int experiment, int run)
   }
 }
 
-void KLMCalibrationChecker::setTestingPayload(
-  const std::string& testingPayloadName)
-{
-  m_testingPayloadName = testingPayloadName;
-}
-
-void KLMCalibrationChecker::setGlobalTag(const std::string& globalTagName)
-{
-  m_GlobalTagName = globalTagName;
-}
-
-void KLMCalibrationChecker::setAlignmentResultsFile(
-  const std::string& alignmentResultsFile)
-{
-  m_AlignmentResultsFile = alignmentResultsFile;
-}
-
-void KLMCalibrationChecker::setStripEfficiencyResultsFile(
-  const std::string& stripEfficiencyResultsFile)
-{
-  m_StripEfficiencyResultsFile = stripEfficiencyResultsFile;
-}
-
 void KLMCalibrationChecker::initializeDatabase()
 {
   /* Mimic a module initialization. */

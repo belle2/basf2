@@ -100,9 +100,3 @@ bool EKLM::Polygon2D::hasIntersection(const Polygon2D& polygon) const
     return true;
   return false;
 }
-
-EKLM::LineSegment2D** EKLM::Polygon2D::getLineSegments() const
-{
-  return m_LineSegments;
-}
-

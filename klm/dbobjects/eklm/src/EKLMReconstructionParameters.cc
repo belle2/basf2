@@ -21,14 +21,3 @@ EKLMReconstructionParameters::EKLMReconstructionParameters()
 EKLMReconstructionParameters::~EKLMReconstructionParameters()
 {
 }
-
-float EKLMReconstructionParameters::getTimeResolution() const
-{
-  return m_TimeResolution;
-}
-
-void EKLMReconstructionParameters::setTimeResolution(float resolution)
-{
-  m_TimeResolution = resolution;
-}
-

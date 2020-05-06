@@ -21,14 +21,3 @@ EKLMHitMCTime::EKLMHitMCTime()
 EKLMHitMCTime::~EKLMHitMCTime()
 {
 }
-
-void EKLMHitMCTime::setMCTime(float t)
-{
-  m_MCTime = t;
-}
-
-float EKLMHitMCTime::getMCTime() const
-{
-  return m_MCTime;
-}
-

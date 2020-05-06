@@ -11,7 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <reconstruction/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/TriggerTimeOffset.h>
 
 #include <vector>
 

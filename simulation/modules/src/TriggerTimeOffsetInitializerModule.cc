@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <reconstruction/modules/TriggerTimeOffsetInitializer/TriggerTimeOffsetInitializerModule.h>
+#include <simulation/modules/TriggerTimeOffsetInitializerModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>

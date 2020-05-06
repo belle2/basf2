@@ -11,19 +11,18 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <reconstruction/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/TriggerTimeOffset.h>
 
 #include <vector>
 
 namespace Belle2 {
   /**
-   * Module to set the phases between the clocks of the different sub-detectors
+   * Module to set the offset between the trigger signal and the clocks of the different sub-detectors
    *
-   * This module generates a random phase that is than saved in datastore.
+   * This module generates a random offset that is than saved in datastore.
    *
-   * @sa EventMetaData
    */
-  class TestTriggerTimeOffsetModule : public Module {
+  class TriggerTimeOffsetInitializerModule : public Module {
 
   public:
 
@@ -31,33 +30,29 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    TestTriggerTimeOffsetModule();
+
+    TriggerTimeOffsetInitializerModule();
 
     /** Destructor. */
-    virtual ~TestTriggerTimeOffsetModule();
+    virtual ~TriggerTimeOffsetInitializerModule();
 
     /** Initializes the Module.
      *
-     * Does a check of the parameters and gives an error of the parameters
-     * were not correctly set by the user.
      */
     virtual void initialize() override;
 
 
-    /** Stores the phases into the DataStore.
+    /** Stores the offset into the DataStore.
      *
-     * Based on the random numbers and ec...
      *
      */
     virtual void event() override;
 
-
   protected:
-
 
   private:
 
-    StoreObjPtr<TriggerTimeOffset> m_timer; /**< Input object. */
-
+    StoreObjPtr<TriggerTimeOffset> m_trgOffSetPtr; /**< Output object. */
+    Float_t m_seed;
   };
 }

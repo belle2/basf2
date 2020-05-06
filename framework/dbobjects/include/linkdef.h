@@ -10,5 +10,6 @@
 #pragma link C++ class Belle2::MagneticFieldComponentConstant+;
 #pragma link C++ class Belle2::MagneticField+;
 #pragma link C++ class Belle2::Clocks+;
+#pragma link C++ class Belle2::ClockDatabaseImporter;
 
 #endif

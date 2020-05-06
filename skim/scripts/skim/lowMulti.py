@@ -31,6 +31,8 @@ def TwoTrackLeptonsForLuminosityList(path):
     """
     __author__ = 'Xing-Yu Zhou'
 
+    # Skim label
+    skim_label = 'TwoTrackLeptonsForLuminosity'
     # Skim label for the case of two tracks
     skim_label_2 = 'TwoTrackLeptonsForLuminosity2'
     # Skim label for the case of one track plus one cluster
@@ -40,14 +42,14 @@ def TwoTrackLeptonsForLuminosityList(path):
     IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
     # Tracks or clusters of momenta greater than 2 GeV in the CMS frame
     p_cut = '[useCMSFrame(p) > 2.0]'
-    # Tracks pointing to or clusters locating in the barrel ECL + 10 degrees
-    theta_cut = '[0.387 < theta < 2.421]'
+    # Tracks pointing to or clusters locating in the barrel ECL
+    theta_cut = '[0.561 < theta < 2.247]'
 
     single_track_cut = IP_cut + ' and ' + p_cut + ' and ' + theta_cut
     single_cluster_cut = p_cut + ' and ' + theta_cut
 
     # Exactly 2 tracks
-    nTracks_cut_2 = '[nCleanedTracks(' + single_track_cut + ') == 2]'
+    nTracks_cut_2 = '[nCleanedTracks(' + single_track_cut + ') == 2 or nCleanedTracks(' + single_track_cut + ') == 3]'
     # Exactly 1 track
     nTracks_cut_1 = '[nCleanedTracks(' + single_track_cut + ') == 1]'
     # Acollinearity angle in the theta dimension less than 10 degrees in the CMS frame
@@ -76,7 +78,9 @@ def TwoTrackLeptonsForLuminosityList(path):
         allowChargeViolation=True,
         path=path)
 
-    return ['vpho:' + skim_label_2, 'vpho:' + skim_label_1]
+    ma.copyLists('vpho:' + skim_label, ['vpho:' + skim_label_2, 'vpho:' + skim_label_1], path=path)
+
+    return ['vpho:' + skim_label]
 
 
 def LowMassTwoTrackList(path):

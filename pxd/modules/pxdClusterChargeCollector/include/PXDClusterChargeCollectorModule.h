@@ -16,6 +16,7 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <pxd/dataobjects/PXDCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -51,6 +52,8 @@ namespace Belle2 {
   private:
     /** Required input PXDClusters  */
     StoreArray<PXDCluster> m_pxdClusters;
+    /** Optional input MCParticles  */
+    StoreArray<MCParticle> m_mcParticles;
     /** Required input Tracks */
     StoreArray<Track> m_tracks;
     /** Required input RecoTracks */
@@ -64,6 +67,8 @@ namespace Belle2 {
     std::string m_storeTracksName;
     /** Name of the collection to use for RecoTracks */
     std::string m_storeRecoTracksName;
+    /** Name of the collection to use for MCParticles */
+    std::string m_storeMCParticlesName;
 
     /** Minimum cluster charge cut  */
     int m_minClusterCharge;
@@ -79,6 +84,10 @@ namespace Belle2 {
     std::string m_chargeName;
     /** Payload name for Gain to be read from DB */
     std::string m_gainName;
+    /** Flag to deal with MC samples*/
+    bool m_mcSamples;
+    /** Flag to check relations between PXDClusters and PXDClustersFromTracks*/
+    bool m_relationCheck;
     /** Flag to fill cluster charge histograms*/
     bool m_fillChargeHistogram;
     /** Flag to use track matched clusters (=1) and apply theta angle projection to cluster charge (=2)*/

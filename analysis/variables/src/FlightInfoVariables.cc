@@ -48,8 +48,8 @@ namespace Belle2 {
         outErr = std::numeric_limits<float>::quiet_NaN();
         return std::numeric_limits<float>::quiet_NaN();
       }
-      if (!(particle->getParticleType() == Particle::EParticleType::c_Composite) ||
-          !(daughter->getParticleType() == Particle::EParticleType::c_Composite)) {
+      if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) ||
+          !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite)) {
         B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
         outErr = std::numeric_limits<float>::quiet_NaN();
         return std::numeric_limits<float>::quiet_NaN();

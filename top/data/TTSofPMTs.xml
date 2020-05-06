@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<TTSofPMTs descr="parameterized time transition spreads of different PMT types">
+<TTSofPMTs descr="parameterized time transition spreads and photon detection efficiency tune factors of different PMT types">
 
   <TTSpar name="conventional">
     <type>1</type>
+    <PDEtuneFactor>0.963</PDEtuneFactor>
     <Gauss>
       <fraction>0.662241</fraction>
       <mean unit="ps">0</mean>
@@ -23,6 +24,7 @@
 
   <TTSpar name="ALD">
     <type>2</type>
+    <PDEtuneFactor>1.129</PDEtuneFactor>
     <Gauss>
       <fraction>0.470075</fraction>
       <mean unit="ps">0</mean>
@@ -47,6 +49,7 @@
 
   <TTSpar name="life extended ALD">
     <type>3</type>
+    <PDEtuneFactor>1.129</PDEtuneFactor>
     <Gauss>
       <fraction>0.475963</fraction>
       <mean unit="ps">0</mean>

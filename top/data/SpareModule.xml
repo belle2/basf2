@@ -20,13 +20,13 @@
     <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
   </Glue>
   
-  <Surface name="QuartzSurface">
+  <Surface name="QuartzSurface_1">
     <Properties>
       <Property name="REFLECTIVITY" unit="eV">
-        <value energy="1.0">0.99984</value>
-        <value energy="2.0">0.99984</value>
-        <value energy="3.0">0.99984</value>
-        <value energy="4.0">0.99984</value>
+        <value energy="1.0">0.99905</value>
+        <value energy="2.0">0.99905</value>
+        <value energy="3.0">0.99905</value>
+        <value energy="4.0">0.99905</value>
       </Property>
       <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
       <Property name="SPECULARLOBECONSTANT" unit="eV">

@@ -171,7 +171,7 @@ namespace Belle2 {
      * @param[out] plane       Plane number.
      */
     void planeNumberToElementNumbers(
-      int planeGlobal, int* section, int* layer, int* sector, int* segment)
+      int planeGlobal, int* section, int* layer, int* sector, int* plane)
     const;
 
     /**

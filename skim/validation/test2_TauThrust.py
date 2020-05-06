@@ -30,7 +30,7 @@ ma.variablesToHistogram(
     filename='TauThrust_Validation.root',
     decayString='',
     variables=[('nGoodTracksThrust', 7, 1, 8),
-               ('visibleEnergyOfEventCMS', 60, 0, 12),
+               ('visibleEnergyOfEventCMS', 40, 0, 12),
                ('thrust', 50, 0.75, 1)],
     path=tauthrustskim
 )

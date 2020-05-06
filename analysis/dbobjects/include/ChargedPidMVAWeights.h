@@ -316,6 +316,7 @@ namespace Belle2 {
      * @param theta the particle polar angle (from the ECL cluster) in [rad].
      * @param p the particle momentum (from the track) in [GeV/c].
      * @param pdg the particle mass hypothesis' pdgId.
+     * @param dump_all dump all information
      */
     void dumpPayload(const double& theta, const double& p, const int pdg, bool dump_all = false) const
     {

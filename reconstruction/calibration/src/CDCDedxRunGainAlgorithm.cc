@@ -68,8 +68,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   fitG->SetParLimits(1, 0.70, 1.30);
   fitG->SetParLimits(2, 0.03, 0.12);
 
-  double RunGainConst = 1.0;
-  std::string rstatus = "";
+  double RunGainConst;
+  std::string rstatus;
   if (IsSkipRun) {
     RunGainConst = rmean;
     rstatus = "BadRun";

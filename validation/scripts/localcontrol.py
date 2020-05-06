@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
 import subprocess
 import multiprocessing
+from typing import Optional, Dict
+
+# ours
 import validationpath
 import validationfunctions
+from validationscript import Script
 
 
 class Local:
@@ -44,7 +49,7 @@ class Local:
         """
         return "Multi-processing on the local machine"
 
-    def __init__(self, max_number_of_processes=None):
+    def __init__(self, max_number_of_processes: Optional[int] = None):
         """!
         The default constructor.
         - Initializes a list which holds a connection between Script-Objects
@@ -56,7 +61,7 @@ class Local:
 
         #: A dict which holds the connections between the jobs (=Script
         #: objects) and the processes that were spawned for them
-        self.jobs_processes = {}
+        self.jobs_processes = {}  # type: Dict[Script, subprocess.Popen]
 
         #: Contains a reference to the logger-object from validate_basf2
         #: Set up the logging functionality for the 'local execution'-Class,
@@ -99,7 +104,7 @@ class Local:
         return (self.max_number_of_processes > 0) and \
             (self.current_number_of_processes < self.max_number_of_processes)
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it locally,
         either with ROOT or with basf2, depending on the file type.
@@ -166,7 +171,7 @@ class Local:
         # Return to previous cwd
         os.chdir(cwd)
 
-    def is_job_finished(self, job):
+    def is_job_finished(self, job: Script):
         """!
         Checks if a given job has finished.
 
@@ -186,7 +191,7 @@ class Local:
         else:
             return [False, 0]
 
-    def terminate(self, job):
+    def terminate(self, job: Script):
         """!
         Terminate a running job
         """

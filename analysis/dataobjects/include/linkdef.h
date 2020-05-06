@@ -30,4 +30,12 @@
 #pragma link C++ class vector<map<string, unsigned int> >+;
 #pragma link C++ class Belle2::Btube+;
 
+#pragma read                                    \
+  sourceClass="Belle2::Particle"                \
+  source="int m_particleType"                   \
+  version="[11]"                                \
+  targetClass="Belle2::FileMetaData"            \
+  target="m_particleSource"                     \
+  code="{m_particleSource = m_particleType;}"   \
+
 #endif

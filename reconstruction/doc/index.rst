@@ -1,9 +1,9 @@
-==============
 Reconstruction
 ==============
 
-reconstruction
-==============
+Functions in reconstructions.py
+-------------------------------
+
 .. automodule:: reconstruction
    :members:
    :undoc-members:

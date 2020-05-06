@@ -321,11 +321,11 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM channel status data are not available.");
     if (!m_klmStripEfficiency.isValid())
       B2FATAL("KLM strip efficiency data are not available.");
-    if (!m_muidParameters.isValid())
-      B2FATAL("Muid parameters are not available.");
+    if (!m_klmLikelihoodParameters.isValid())
+      B2FATAL("KLM likelihood parameters are not available.");
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
-      if (m_muidParameters.hasChanged()) { /* Clear m_MuidBuilderMap if MuidParameters payload changed. */
+      if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
         for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
           delete muidBuilder;
         m_MuidBuilderMap.clear();

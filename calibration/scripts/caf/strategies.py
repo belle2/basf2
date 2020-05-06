@@ -755,6 +755,8 @@ class SequentialBoundaries(AlgorithmStrategy):
             # First figure out the run lists to use for each execution (potentially different from the applied IoVs)
             # We use the boundaries and the run_list
             boundary_iovs_to_run_lists = find_run_lists_from_boundaries(runs_from_vector(vec_boundaries), run_list)
+            # If there were any boundary IoVs with no run data, just remove them. Otherwise they will execute over all data.
+            boundary_iovs_to_run_lists = {key: value for key, value in boundary_iovs_to_run_lists.items() if value}
             # Actually execute now that we have an IoV list to apply
             success = self.execute_over_boundaries(boundary_iovs_to_run_lists, lowest_exprun, highest_exprun, iteration)
             if not success:

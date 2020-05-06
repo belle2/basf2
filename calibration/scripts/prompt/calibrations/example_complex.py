@@ -30,7 +30,8 @@ settings = CalibrationSettings(name="Example Complex",
                                input_data_names=["physics", "cosmics", "Bcosmics"],
                                depends_on=[example_simple],
                                expert_config={
-                                              "max_files_per_run": 2
+                                              "max_files_per_run": 2,
+                                              "payload_boundaries": []
                                              })
 
 # The values in expert_config above are the DEFAULT for this script. They will be overwritten by values in caf_config.json
@@ -78,8 +79,11 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     from basf2 import register_module, create_path
     import ROOT
-    from ROOT.Belle2 import TestCalibrationAlgorithm
+    from ROOT.Belle2 import TestCalibrationAlgorithm, TestBoundarySettingAlgorithm
     from caf.framework import Calibration, Collection
+    from caf.strategies import SequentialBoundaries
+    from caf.utils import vector_from_runs, ExpRun, IoV
+
     # In this script we want to use three different sources of input data, and reconstruct them
     # differently before the Collector module runs.
 
@@ -115,7 +119,6 @@ def get_calibrations(input_data, **kwargs):
     # with -1, -1 when setting the output payload IoVs.
     requested_iov = kwargs.get("requested_iov", None)
 
-    from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
@@ -123,7 +126,9 @@ def get_calibrations(input_data, **kwargs):
     # Collector setup
     # We'll make two instances of the same CollectorModule, but configured differently
     col_test_physics = register_module('CaTest')
-    col_test_physics.param('granularity', 'all')
+    # This has to be 'run' otherwise our SequentialBoundaries strategy can't work.
+    # We could make it optional, based on the contents of the expert_config.
+    col_test_physics.param('granularity', 'run')
     col_test_physics.param('spread', 4)
 
     col_test_Bcosmics = register_module('CaTest')
@@ -161,7 +166,22 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
     # We'll only use one algorithm for each of our two Calibrations.
     alg_test1 = TestCalibrationAlgorithm()
-    alg_test2 = TestCalibrationAlgorithm()
+    alg_test2 = TestBoundarySettingAlgorithm()
+
+    # Send in a list of boundaries for our algorithm class and SequentialBoundaries strategy to use.
+    # A boundary is the STARTING run number for a new payload and all data from runs between this run and the next
+    # boundary will be used.
+    # In our algorithm the first run in our data is always a starting boundary, so we can pass an empty list here
+    # safely and still have it work.
+
+    # We make sure that the first payload begins at the start of the requested IoV.
+    # This is a quirk of SequentialBoundaries strategy as there must always be one boundary to START from.
+    payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
+    # Now we can add the boundaries that exist in the expert config. They are extra boundaries, so that we don't have
+    # to set the initial one every time.
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    # Now set them all
+    alg_test2.setBoundaries(vector_from_runs(payload_boundaries))  # This takes boundaries from the expert_config
 
     ###################################################
     # Collection Setup
@@ -202,8 +222,10 @@ def get_calibrations(input_data, **kwargs):
     # Add collections in with unique names
     cal_test2.add_collection(name="physics", collection=collection_physics)
     cal_test2.algorithms = [alg_test2]
-    # Do this for the default AlgorithmStrategy to force the output payload IoV
-    cal_test2.algorithms[0].params = {"apply_iov": output_iov}
+    # We apply a a different strategy that will allow us to split the data we run over into chunks based on the boundaries above
+    cal_test2.strategies = SequentialBoundaries
+    # Do this to force the output payload IoV. Note the different name to above!
+    cal_test2.algorithms[0].params["iov_coverage"] = output_iov
 
     cal_test2.depends_on(cal_test1)
 

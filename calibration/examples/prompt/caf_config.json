@@ -3,5 +3,6 @@
     "database_chain": ["online", "data_reprocessing_prompt"],
     "backend_args": {"queue": "s"},
     "requested_iov" : [8,1900,8,3500],
-    "expert_config" : {"max_files_per_run": 4}
+    "expert_config" : {"max_files_per_run": 4,
+                       "payload_boundaries": [[8,1980]]}
 }

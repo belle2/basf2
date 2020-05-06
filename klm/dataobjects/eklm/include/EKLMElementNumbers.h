@@ -412,7 +412,9 @@ namespace Belle2 {
     static constexpr int m_MaximalLayerNumber = 14;
 
     /** Maximal detector layer number. */
-    static constexpr int m_MaximalDetectorLayerNumber[2] = {12, 14};
+    static constexpr int m_MaximalDetectorLayerNumber[2] = {
+      12, 14
+    };
 
     /** Maximal sector number. */
     static constexpr int m_MaximalSectorNumber = 4;

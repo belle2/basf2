@@ -129,7 +129,9 @@ namespace Belle2 {
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
       EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {
+      nullptr
+    };
 
     /** Number of channel hit histograms per sector for BKLM. */
     const int m_ChannelHitHistogramsBKLM = 2;

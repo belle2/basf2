@@ -43,9 +43,9 @@ static double CrystalBall(double* x, double* par)
 }
 
 EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
-  CalibrationAlgorithm("EKLMTimeCalibrationCollector")
+  CalibrationAlgorithm("EKLMTimeCalibrationCollector"),
+  m_Debug(false)
 {
-  m_Debug = false;
 }
 
 EKLMTimeCalibrationAlgorithm::~EKLMTimeCalibrationAlgorithm()

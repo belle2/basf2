@@ -18,11 +18,12 @@ using namespace Belle2;
 
 REG_MODULE(EKLMDataChecker)
 
-EKLMDataCheckerModule::EKLMDataCheckerModule() : Module()
+EKLMDataCheckerModule::EKLMDataCheckerModule() :
+  Module(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_GeoDat(nullptr)
 {
   setDescription("EKLM data checker module.");
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_GeoDat = nullptr;
 }
 
 EKLMDataCheckerModule::~EKLMDataCheckerModule()

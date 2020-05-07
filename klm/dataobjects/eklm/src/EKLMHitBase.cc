@@ -13,26 +13,20 @@
 
 using namespace Belle2;
 
-EKLMHitBase::EKLMHitBase()
+EKLMHitBase::EKLMHitBase() :
+  m_Section(-1),
+  m_Layer(-1),
+  m_Sector(-1)
 {
-  m_PDG = -1;
-  m_Time = -1;
-  m_EDep = -1;
-  m_Section = -1;
-  m_Layer = -1;
-  m_Sector = -1;
 }
 
 EKLMHitBase::~EKLMHitBase()
 {
 }
 
-EKLMHitBase::EKLMHitBase(int Section, int Layer, int Sector)
+EKLMHitBase::EKLMHitBase(int section, int layer, int sector) :
+  m_Section(section),
+  m_Layer(layer),
+  m_Sector(sector)
 {
-  m_PDG = -1;
-  m_Time = -1;
-  m_EDep = -1;
-  m_Section = Section;
-  m_Layer = Layer;
-  m_Sector = Sector;
 }

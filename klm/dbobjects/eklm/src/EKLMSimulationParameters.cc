@@ -15,7 +15,6 @@ using namespace Belle2;
 
 EKLMSimulationParameters::EKLMSimulationParameters()
 {
-  m_HitTimeThreshold = 0;
 }
 
 EKLMSimulationParameters::~EKLMSimulationParameters()

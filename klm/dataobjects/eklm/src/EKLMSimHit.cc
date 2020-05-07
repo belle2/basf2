@@ -15,11 +15,6 @@ using namespace Belle2;
 
 EKLMSimHit::EKLMSimHit()
 {
-  m_trackID = -1;
-  m_parentTrackID = -1;
-  m_volid = -1;
-  m_Plane = -1;
-  m_Strip = -1;
 }
 
 EKLMSimHit::~EKLMSimHit()

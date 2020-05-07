@@ -37,9 +37,9 @@ using namespace Belle2;
 
 KLMCalibrationChecker::KLMCalibrationChecker() :
   m_experiment(0),
-  m_run(0)
+  m_run(0),
+  m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMCalibrationChecker::~KLMCalibrationChecker()

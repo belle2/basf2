@@ -100,10 +100,10 @@ namespace Belle2 {
     std::map<uint16_t, EKLMTimeCalibrationData> m_data;
 
     /** Effective light speed. */
-    float m_EffectiveLightSpeed;
+    float m_EffectiveLightSpeed = 0;
 
     /** Amplitude dependence time constant. */
-    float m_AmplitudeTimeConstant;
+    float m_AmplitudeTimeConstant = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMTimeCalibration, 2);

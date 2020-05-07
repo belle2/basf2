@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor with section, layer and sector initializations.
      */
-    EKLMHitBase(int Section, int Layer, int Sector);
+    EKLMHitBase(int section, int layer, int sector);
 
     /**
      * Destructor.
@@ -148,13 +148,13 @@ namespace Belle2 {
   protected:
 
     /** PDG code of the (leading) particle. */
-    int m_PDG;
+    int m_PDG = -1;
 
     /** Time of the hit. */
-    float m_Time;
+    float m_Time = -1;
 
     /** Energy deposition. */
-    float m_EDep;
+    float m_EDep = -1;
 
     /** Number of section. */
     int m_Section;

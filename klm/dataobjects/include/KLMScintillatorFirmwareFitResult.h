@@ -119,16 +119,16 @@ namespace Belle2 {
   private:
 
     /** Start of signal. */
-    int m_StartTime;
+    int m_StartTime = -1;
 
     /** Amplitude. */
-    float m_Amplitude;
+    float m_Amplitude = -1;
 
     /** Background amplitude. */
-    float m_BackgroundAmplitude;
+    float m_BackgroundAmplitude = -1;
 
     /** Minimal amplitude. */
-    int m_MinimalAmplitude;
+    int m_MinimalAmplitude = -1;
 
     /** Class version. */
     ClassDef(Belle2::KLMScintillatorFirmwareFitResult, 1);

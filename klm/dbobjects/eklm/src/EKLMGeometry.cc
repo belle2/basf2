@@ -20,8 +20,6 @@ using namespace Belle2;
 
 EKLMGeometry::EndcapStructureGeometry::EndcapStructureGeometry()
 {
-  m_Phi = 0;
-  m_NSides = 0;
 }
 
 EKLMGeometry::EndcapStructureGeometry::~EndcapStructureGeometry()
@@ -32,98 +30,48 @@ EKLMGeometry::EndcapStructureGeometry::~EndcapStructureGeometry()
 
 EKLMGeometry::ElementPosition::ElementPosition()
 {
-  m_InnerR = 0;
-  m_OuterR = 0;
-  m_Length = 0;
-  m_X = 0;
-  m_Y = 0;
-  m_Z = 0;
 }
 
 /* Class EKLMGeometry::SectorSupportGeometry. */
 
 EKLMGeometry::SectorSupportGeometry::SectorSupportGeometry()
 {
-  m_Thickness = 0;
-  m_DeltaLY = 0;
-  m_CornerX = 0;
-  m_Corner1LX = 0;
-  m_Corner1Width = 0;
-  m_Corner1Thickness = 0;
-  m_Corner1Z = 0;
-  m_Corner2LX = 0;
-  m_Corner2LY = 0;
-  m_Corner2Thickness = 0;
-  m_Corner2Z = 0;
-  m_Corner3LX = 0;
-  m_Corner3LY = 0;
-  m_Corner3Thickness = 0;
-  m_Corner3Z = 0;
-  m_Corner4LX = 0;
-  m_Corner4LY = 0;
-  m_Corner4Thickness = 0;
-  m_Corner4Z = 0;
-  m_CornerAngle = 0;
 }
 
 /* Class EKLMGeometry::PlasticSheetGeometry. */
 
 EKLMGeometry::PlasticSheetGeometry::PlasticSheetGeometry()
 {
-  m_Width = 0;
-  m_DeltaL = 0;
 }
 
 /* Class EKLMGeometry::SegmentSupportGeometry. */
 
 EKLMGeometry::SegmentSupportGeometry::SegmentSupportGeometry()
 {
-  m_TopWidth = 0;
-  m_TopThickness = 0;
-  m_MiddleWidth = 0;
-  m_MiddleThickness = 0;
 }
 
 /* Class EKLMGeometry::SegmentSupportPosition. */
 
 EKLMGeometry::SegmentSupportPosition::SegmentSupportPosition()
 {
-  m_DeltaLRight = 0;
-  m_DeltaLLeft = 0;
-  m_Length = 0;
-  m_X = 0;
-  m_Y = 0;
-  m_Z = 0;
 }
 
 /* Class EKLMGeometry::StripGeometry. */
 
 EKLMGeometry::StripGeometry::StripGeometry()
 {
-  m_Width = 0;
-  m_Thickness = 0;
-  m_GrooveDepth = 0;
-  m_GrooveWidth = 0;
-  m_NoScintillationThickness = 0;
-  m_RSSSize = 0;
 }
 
 /* Class EKLMGeometry::Point. */
 
 EKLMGeometry::Point::Point()
 {
-  m_X = 0;
-  m_Y = 0;
 }
 
 /* Class EKLMGeometry::ShieldDetailGeometry. */
 
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry()
 {
-  m_LengthX = 0;
-  m_LengthY = 0;
-  m_NPoints = 0;
-  m_Points = nullptr;
 }
 
 EKLMGeometry::ShieldDetailGeometry::ShieldDetailGeometry(
@@ -202,7 +150,6 @@ void EKLMGeometry::ShieldDetailGeometry::setPoint(int i, const Point& point)
 
 EKLMGeometry::ShieldGeometry::ShieldGeometry()
 {
-  m_Thickness = 0;
 }
 
 void EKLMGeometry::ShieldGeometry::setDetailACenter(double x, double y)
@@ -225,25 +172,26 @@ void EKLMGeometry::ShieldGeometry::setDetailCCenter(double x, double y)
 
 /* Class EKLMGeometry. */
 
-EKLMGeometry::EKLMGeometry()
+EKLMGeometry::EKLMGeometry() :
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_NSections(0),
+  m_NLayers(0),
+  m_NDetectorLayers(nullptr),
+  m_NSectors(0),
+  m_NPlanes(0),
+  m_NSegments(0),
+  m_NSegmentSupportElementsSector(0),
+  m_NStrips(0),
+  m_SolenoidZ(0),
+  m_LayerShiftZ(0),
+  m_SegmentSupportPosition(nullptr),
+  m_StripPosition(nullptr)
 {
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_NSections = 0;
-  m_NLayers = 0;
-  m_NDetectorLayers = nullptr;
-  m_NSectors = 0;
-  m_NPlanes = 0;
-  m_NSegments = 0;
-  m_NSegmentSupportElementsSector = 0;
-  m_NStrips = 0;
-  m_SolenoidZ = 0;
-  m_LayerShiftZ = 0;
-  m_SegmentSupportPosition = nullptr;
-  m_StripPosition = nullptr;
 }
 
 EKLMGeometry::EKLMGeometry(const EKLMGeometry& geometry) :
   TObject(geometry),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
   m_EndcapStructureGeometry(*geometry.getEndcapStructureGeometry()),
   m_SectionPosition(*geometry.getSectionPosition()),
   m_LayerPosition(*geometry.getLayerPosition()),

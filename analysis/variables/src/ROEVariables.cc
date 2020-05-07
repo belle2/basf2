@@ -1493,7 +1493,6 @@ namespace Belle2 {
       TLorentzVector phCMS = T.rotateLabToCms() * hadron4vec;
       TLorentzVector pBCMS;
       pBCMS.SetXYZM(0.0, 0.0, 0.0, particle->getPDGMass());
-
       return (pBCMS - phCMS).Mag2();
     }
 
@@ -1532,7 +1531,11 @@ namespace Belle2 {
 
       if (abs(cos_cone_angle) > 1) {
         //makes no sense in this case, return simple value
-        return Variable::REC_q2BhSimple(particle);
+        double q2 = Variable::REC_q2BhSimple(particle);
+        if (q2 < 0) {
+          return 0;
+        }
+        return q2;
       }
       double thetaBY = TMath::ACos(cos_cone_angle);
       const double E_B = T.getCMSEnergy() / 2.0;
@@ -2331,7 +2334,9 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
-                      "This calculation uses a weighted average of the B meson around the reco B cone");
+                      "This calculation uses a weighted average of the B meson around the reco B cone. \n"
+		      "Based on diamond frame calculation of :math:`q^2` following the idea presented in https://www.osti.gov/biblio/1442697 \n"
+		      "It will switch to use of :var`recQ2BhSimple` if |:var`cosThetaBetweenParticleAndNominalB`| > 1.");
 
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"

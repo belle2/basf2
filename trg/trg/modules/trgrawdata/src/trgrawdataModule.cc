@@ -353,47 +353,54 @@ void TRGRAWDATAModule::event()
 
           if (nword < 3) {
             cntr_nwe_badnwd[e_gdl]++;
-            printf("ab:0x%x%c exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
+            printf("ab:GDL(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
             printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
             continue;
           }
 
           if (nword < 8) {
-            printf("ad:0x%x%c exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
+            printf("ad:GDL(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
             cntr_nwe_badnwd[e_gdl]++;
           } else {
-            unsigned buf5 = (unsigned)buf[5];
+            unsigned buf5 = (unsigned)buf[m_hdr_nwd_gdl - 1];
+            // 626 = 646 -
             unsigned buf6 = (unsigned)buf[626]; // 1st wd in the last clock cycle
             unsigned buf7 = (unsigned)buf[627]; // 2nd wd in the last clock cycle
-            unsigned buf6dd = (buf6 >> 24) & 0xff;
+            unsigned lastdd = (buf6 >> 24) & 0xff;
             unsigned last_rvc = (buf6 >> 4) & 0xfff;
             unsigned cnttrg_data_15to12 = buf6 & (0xf);
             unsigned cnttrg_data_12 = (buf7 >> 20) & (0xfff);
+            gdlrvc12 = (buf5 & 0xfff);
+            unsigned gdlhdrcnttrg20 = (buf5 >> 12) & 0xfffff;
+
+            unsigned wdperclk = (m_nwd_gdl - m_hdr_nwd_gdl) / m_nclk_gdl;
+            unsigned ibuf_lastclk_msw  = m_nwd_gdl - wdperclk;
+            unsigned buf_lastclk_msw  = (unsigned)buf[ibuf_lastclk_msw];
+            unsigned buf_lastclk_msw2 = (unsigned)buf[ibuf_lastclk_msw + 1];
+            unsigned buf_lastclk_msw3 = (unsigned)buf[ibuf_lastclk_msw + 2];
             unsigned cnttrg_data_16 = (cnttrg_data_15to12 << 12) + cnttrg_data_12;
             unsigned eve16 = (_eve & 0xffff);
-            gdlrvc12 = (buf5 & 0xfff);
-            unsigned buf5cnttrg20 = (buf5 >> 12) & 0xfffff;
 
-            h_0->SetBinContent(4 * (int)e_gdl + 1, m_nclk_gdl, buf5cnttrg20);
+            h_0->SetBinContent(4 * (int)e_gdl + 1, m_nclk_gdl, gdlhdrcnttrg20);
             h_0->SetBinContent(4 * (int)e_gdl + 2, m_nclk_gdl, cnttrg_data_16);
             h_0->SetBinContent(4 * (int)e_gdl + 3, m_nclk_gdl, gdlrvc12);
 
-            if (nword != m_nwd_gdl || buf0 != m_fmid_gdl || buf6dd != 0xdd ||
-                buf5cnttrg20 != eve20 ||
+            if (nword != m_nwd_gdl || buf0 != m_fmid_gdl || lastdd != 0xdd ||
+                gdlhdrcnttrg20 != eve20 ||
                 !(eve16 == cnttrg_data_16 + 1 || (eve16 == 0 && cnttrg_data_16 == 0xffff))
                ) {
 
               unsigned diag = 0;
               diag |= (nword  != m_nwd_gdl)  ? 1 : 0;
               diag |= (buf0   != m_fmid_gdl) ? 2 : 0;
-              diag |= (buf6dd != 0xdd)       ? 4 : 0;
-              diag |= (buf5cnttrg20 != eve20) ? 8 : 0;
+              diag |= (lastdd != 0xdd)       ? 4 : 0;
+              diag |= (gdlhdrcnttrg20 != eve20) ? 8 : 0;
               diag |= !(eve16 == cnttrg_data_16 + 1 || (eve16 == 0 && cnttrg_data_16 == 0xffff)) ? 16 : 0;
-              printf("ae:0x%x%c exp(%d), run(%d), evedaq(%d=0x%x), buf5cnttrg20(%d,0x%x), "
+              printf("ae:GDL(0x%x%c) exp(%d), run(%d), evedaq(%d=0x%x), gdlhdrcnttrg20(%d,0x%x), "
                      "cnttrg_data16(%d=0x%x), l1rvc(%d)-lastrvc(%d)=%d, nword(%d), diag(%d)\n",
-                     cprid, 'a' + hslb, _exp, _run, _eve, _eve, buf5cnttrg20, buf5cnttrg20,
+                     cprid, 'a' + hslb, _exp, _run, _eve, _eve, gdlhdrcnttrg20, gdlhdrcnttrg20,
                      cnttrg_data_16, cnttrg_data_16, gdlrvc12, last_rvc, gdlrvc12 - last_rvc, nword, diag);
               printf("\n");
               cntr_nwn_badtrg[e_gdl]++;
@@ -480,19 +487,19 @@ void TRGRAWDATAModule::event()
         if (nword < 3) {
           // err
           cntr_nwe_badnwd[e_mdl]++;
-          printf("ah:0x%x%c exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
+          printf("ah:%s(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
           printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
           continue;
         } else if (nword == _hdr_nwd) {
           // header-only event
           if (gdlrvc12 != buf2rvc12) {
-            printf("ai:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
-                   cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
+            printf("ai:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
+                   moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
             cntr_nw3_badrvc[e_mdl]++;
           } else if (eve20 != buf2cnttrg20) {
-            printf("aj:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x)\n",
-                   cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20);
+            printf("aj:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x)\n",
+                   moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20);
             cntr_nw3_badtrg[e_mdl]++;
           } else if ((_eve % _scale) == 0) {
             cntr_nw3_badvet[e_mdl]++;
@@ -502,8 +509,8 @@ void TRGRAWDATAModule::event()
           continue;
         } else if (nword != _nwd) {
           // err
-          printf("bo:wrong nword: 0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), buf0(0x%x), buf2(0x%x)\n",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf0, buf2);
+          printf("bo:wrong nword: %s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), buf0(0x%x), buf2(0x%x)\n",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf0, buf2);
           cntr_nwe_badnwd[e_mdl]++;
           continue;
         }
@@ -524,8 +531,8 @@ void TRGRAWDATAModule::event()
         unsigned buf5_lsb16 = ((buf5 >> 16) & 0xffff);
 
         if (m_mydebug) {
-          printf("af:Debug0: 0x%x%c exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
+          printf("af:Debug0: %s(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
         }
 
         /*
@@ -632,21 +639,21 @@ void TRGRAWDATAModule::event()
         h_0->SetBinContent(4 * e_mdl + 2, _nclk, datacnttrg32);
         h_0->SetBinContent(4 * e_mdl + 3, _nclk, buf2rvc12);
         if (gdlrvc12 != buf2rvc12) {
-          printf("ba:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
+          printf("ba:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
           cntr_nwn_badrvc[e_mdl]++;
           something_bad = true;
         }
         if (buf3dddd == 0xbbbb) {
           cntr_nwn_badbbb[e_mdl]++;
-          printf("bv:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
+          printf("bv:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
         }
         if (buf3dddd != 0xdddd) {
           cntr_nwn_badddd[e_mdl]++;
-          printf("bb:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
-                 cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
+          printf("bb:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+                 moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
         }
         if (datacnttrg32 + 1 != _eve) {
@@ -655,8 +662,8 @@ void TRGRAWDATAModule::event()
                 (m_cpr_3d0 <= cprid && cprid <= m_cpr_3d3)
               )
              ) {
-            printf("bc:0x%x%c exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
-                   cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
+            printf("bc:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+                   moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
             cntr_nwn_badtrg[e_mdl]++;
             something_bad = true;
           }
@@ -740,15 +747,15 @@ void TRGRAWDATAModule::event()
           int nword = raw_trgarray[i]->GetDetectorNwords(j, hslb);
           if (nword == _hdr_nwd) continue;
           if (nword != _nwd) {
-            printf("bu:Nword mismatch:nword(%d),expected(%d). eve(%d), 0x%x%c, nword(%d)\n",
-                   nword, _nwd, _eve, cprid, 'a' + hslb, nword);
+            printf("bu:Nword mismatch:nword(%d),expected(%d). eve(%d), %s(0x%x%c), nword(%d)\n",
+                   nword, _nwd, _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
           }
           int* buf  = raw_trgarray[i]->GetDetectorBuffer(j, hslb);
           int i47 = _hdr_nwd + (nclks - 1) * (_nwd - _hdr_nwd) / nclks;
           if (i47 > nword - 1) {
             if (m_print_clkcyc_err)
-              printf("bp:data truncation. eve(%d), 0x%x%c, nword(%d)\n",
-                     _eve, cprid, 'a' + hslb, nword);
+              printf("bp:data truncation. eve(%d), %s(0x%x%c), nword(%d)\n",
+                     _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
             break;
           }
           unsigned buf47 = buf[i47];
@@ -766,8 +773,8 @@ void TRGRAWDATAModule::event()
             unsigned ibuf = _hdr_nwd + clk * (nword - _hdr_nwd) / nclks;
             if (ibuf > nword - 1) {
               if (m_print_clkcyc_err)
-                printf("bq:data truncation. eve(%d), 0x%x%c, nword(%d)\n",
-                       _eve, cprid, 'a' + hslb, nword);
+                printf("bq:data truncation. eve(%d), %s(0x%x%c), nword(%d)\n",
+                       _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
               cntr_bad_nwd[e_mdl]++;
               break;
@@ -804,16 +811,16 @@ void TRGRAWDATAModule::event()
               dddd = (ddddcc >> 24);
               if (dddd != 0xdd) {
                 if (m_print_clkcyc_err)
-                  printf("br:dddd not found. eve(%d), 0x%x%c, nword(%d)\n",
-                         _eve, cprid, 'a' + hslb, nword);
+                  printf("br:dddd not found. eve(%d), %s(0x%x%c), nword(%d)\n",
+                         _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
                 break_this_module = true;
                 cntr_bad_ddd[e_mdl]++;
                 break;
               }
             } else if (dddd != 0xdddd) {
               if (m_print_clkcyc_err)
-                printf("bs:dddd not found. eve(%d), 0x%x%c, nword(%d)\n",
-                       _eve, cprid, 'a' + hslb, nword);
+                printf("bs:dddd not found. eve(%d), %s(0x%x%c), nword(%d)\n",
+                       _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword);
               break_this_module = true;
               cntr_bad_ddd[e_mdl]++;
               break;
@@ -830,8 +837,8 @@ void TRGRAWDATAModule::event()
           if (cc_disorder) {
             cntr_bad_odr[e_mdl]++;
             if (m_print_cc) {
-              printf("bt:ccdisorder: eve(%d), 0x%x%c, nword(%d), %s\n",
-                     _eve, cprid, 'a' + hslb, nword, ccs.c_str());
+              printf("bt:ccdisorder: eve(%d), %s(0x%x%c), nword(%d), %s\n",
+                     _eve, moduleNames[e_mdl], cprid, 'a' + hslb, nword, ccs.c_str());
             }
           } else {
             cntr_good_odr[e_mdl]++;

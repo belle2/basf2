@@ -80,34 +80,34 @@ namespace Belle2 {
       };
       */
 
-      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
-             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
+      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
+             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
              "--------", "--------", "--------", "--------", "--------");
-      printf(" %3s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s |\n",
+      printf(" %3s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s | %-8s |\n",
+//    printf(" %3s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s | %8s |\n",
              "",
-             "hdr ok",   // cntr_nw3[i],
-             "data ok",  // cntr_nwn[i],
-             "cc ok",    // cntr_good_odr[i]);
-             "hdtrg",  // cntr_nw3_badtrg[i]
-             "hdrvc",  // cntr_nw3_badrvc[i]
-             "hdvet",  // cntr_nw3_badvet[i],
-             "dttg", // cntr_nwn_badtrg[i]
-             "dtrc", // cntr_nwn_badrvc[i]
-             "dtbb", // cntr_nwn_badbbb[i]
-             "dtdd", // cntr_nwn_badddd[i]
-             "#wd",   // cntr_bad_nwd[i],
-             "ddsft", // cntr_bad_ddd[i],
-             "ccodr"  // cntr_bad_odr[i],
+             "a)dataOk",  // cntr_nwn[i],        Data event that has no problem
+             "b)hdrOk",   // cntr_nw3[i],        Header event that has no problem (except cc check)
+             "c)ccOk",    // cntr_good_odr[i]);  Data event that has good cc
+             "d)hdrTag",  // cntr_nw3_badtrg[i]  Header event that has bad number
+             "e)hdrL1",  // cntr_nw3_badrvc[i]   Header event that has L1 timing
+             "f)hdrScl",  // cntr_nw3_badvet[i]  Header event that should not be header event
+             "g)dataTag", // cntr_nwn_badtrg[i]    Data event that has bad bad event number in data
+             "h)dataL1", // cntr_nwn_badrvc[i]     Data event that has bad L1 timing
+             "i)bbbb", // cntr_nwn_badbbb[i]     Data event from dummy buffer
+             "j)#wd",   // cntr_bad_nwd[i],       Data event that does not have expected #word
+             "k)ddsft", // cntr_bad_ddd[i],       Data event that does not have expected dddd in clock cycle
+             "l)ccodr"  // cntr_bad_odr[i],       Data event that has bad cc cycle
             );
-      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
-             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
+      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
+             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
              "--------", "--------", "--------", "--------", "--------");
       for (int i = 0; i < c_nModules; i++) {
         if (m_ons[i]) {
-          printf(" %3s | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d |\n",
+          printf(" %3s | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d | %8d |\n",
                  moduleNames[i],
-                 cntr_nw3[i],
                  cntr_nwn[i],
+                 cntr_nw3[i],
                  cntr_good_odr[i],
                  cntr_nw3_badtrg[i],
                  cntr_nw3_badrvc[i],
@@ -115,20 +115,39 @@ namespace Belle2 {
                  cntr_nwn_badtrg[i],
                  cntr_nwn_badrvc[i],
                  cntr_nwn_badbbb[i],
-                 cntr_nwn_badddd[i],
                  cntr_bad_nwd[i],
                  cntr_bad_ddd[i],
                  cntr_bad_odr[i]
                 );
         }
       }
-      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
-             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
+      printf("-%3s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s---%8s--\n",
+             "---", "--------", "--------", "--------", "--------", "--------", "--------", "--------",
              "--------", "--------", "--------", "--------", "--------");
-      printf("dtbadbb : buf3dddd == 0xbbbb\n");
-      printf("dtbaddd : buf3dddd != 0xbbbb, != 0xdddd\n");
-      printf("ddsft : dddd not found in at least one clock. Can be 0xbbbb(=dummy buffer).\n");
-      printf("dttg  : event number in 1st clock cycle is not cnttrg-1. Available for only 2Dfinder.\n");
+      printf("%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n"
+             "%-10s: %-s\n",
+             "a)dataOk",  "Data event that has no problem (except cc check)",
+             "b)hdrOk",   "Header event that has no problem",
+             "c)ccOk",    "Data event that has good cc cycle",
+             "d)hdrTag",  "Header event that has bad event number in header",
+             "e)hdrL1",   "Header event that has bad L1 timing in header",
+             "f)hdrScl",  "Header event that should not be header event",
+             "g)dataTag", "Data event that has bad event number in data (can be dummy buffer)",
+             "h)dataL1",  "Data event that has bad L1 timing in header",
+             "i)bbbb",    "Data event from dummy buffer",
+             "j)#wd",     "Data event that does not have expected #word",
+             "k)ddsft",   "Data event that does not have expected dddd in clock cycle (can be dummy buffer)",
+             "l)ccodr",   "Data event that has bad cc cycle");
 
     }
 

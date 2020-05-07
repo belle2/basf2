@@ -362,7 +362,7 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       // Hardcoded value, how to bypass this?
-      double e_Beam = 1.0579400E+1 / 2.0; // GeV
+      double e_Beam = T.getCMSEnergy() / 2.0; // GeV
       double m_B = part->getPDGMass();
 
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);

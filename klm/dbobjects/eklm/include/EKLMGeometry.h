@@ -1467,7 +1467,7 @@ namespace Belle2 {
       int m_NPoints = 0;
 
       /** Points. */
-      Point* m_Points; //[m_NPoints]
+      Point* m_Points = nullptr; //[m_NPoints]
 
       /** Class version. */
       ClassDef(ShieldDetailGeometry, 1);

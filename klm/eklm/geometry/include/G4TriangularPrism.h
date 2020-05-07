@@ -64,7 +64,10 @@ namespace Belle2 {
      * deleted when is is not necessary. If it is used in Geant geometry,
      * do not delete it.
      */
-    G4VSolid* getSolid();
+    G4VSolid* getSolid()
+    {
+      return m_is;
+    }
 
   private:
 

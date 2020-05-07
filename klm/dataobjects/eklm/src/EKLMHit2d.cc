@@ -35,14 +35,3 @@ EKLMHit2d::EKLMHit2d(KLMDigit* s1)
 EKLMHit2d::~EKLMHit2d()
 {
 }
-
-float EKLMHit2d::getChiSq() const
-{
-  return m_ChiSq;
-}
-
-void EKLMHit2d::setChiSq(float chisq)
-{
-  m_ChiSq = chisq;
-}
-

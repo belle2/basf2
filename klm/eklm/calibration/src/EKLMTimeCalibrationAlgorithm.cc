@@ -231,9 +231,3 @@ CalibrationAlgorithm::EResult EKLMTimeCalibrationAlgorithm::calibrate()
   saveCalibration(calibration, "EKLMTimeCalibration");
   return CalibrationAlgorithm::c_OK;
 }
-
-void EKLMTimeCalibrationAlgorithm::setDebug()
-{
-  m_Debug = true;
-}
-

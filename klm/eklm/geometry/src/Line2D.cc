@@ -30,16 +30,6 @@ EKLM::Line2D::~Line2D()
 {
 }
 
-const HepGeom::Point3D<double>& EKLM::Line2D::getInitialPoint() const
-{
-  return m_Point;
-}
-
-const HepGeom::Vector3D<double>& EKLM::Line2D::getVector() const
-{
-  return m_Vector;
-}
-
 int EKLM::Line2D::
 findIntersection(const Line2D& line,
                  HepGeom::Point3D<double>* intersection) const

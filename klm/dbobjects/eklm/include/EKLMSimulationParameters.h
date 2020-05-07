@@ -35,12 +35,18 @@ namespace Belle2 {
     /**
      * Get hit time threshold.
      */
-    float getHitTimeThreshold() const;
+    float getHitTimeThreshold() const
+    {
+      return m_HitTimeThreshold;
+    }
 
     /**
      * Set hit time threshold.
      */
-    void setHitTimeThreshold(float threshold);
+    void setHitTimeThreshold(float threshold)
+    {
+      m_HitTimeThreshold = threshold;
+    }
 
   private:
 

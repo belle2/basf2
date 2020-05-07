@@ -26,9 +26,3 @@ EKLMAlignmentHit::EKLMAlignmentHit(int digitIdentifier)
 EKLMAlignmentHit::~EKLMAlignmentHit()
 {
 }
-
-int EKLMAlignmentHit::getDigitIdentifier() const
-{
-  return m_DigitIdentifier;
-}
-

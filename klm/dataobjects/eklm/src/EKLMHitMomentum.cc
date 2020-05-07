@@ -32,9 +32,3 @@ void EKLMHitMomentum::setMomentum(const TLorentzVector& p)
   m_pY = p.Py();
   m_pZ = p.Pz();
 }
-
-TLorentzVector EKLMHitMomentum::getMomentum() const
-{
-  return TLorentzVector(m_pX, m_pY, m_pZ, m_e);
-}
-

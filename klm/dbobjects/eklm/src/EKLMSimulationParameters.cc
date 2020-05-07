@@ -21,14 +21,3 @@ EKLMSimulationParameters::EKLMSimulationParameters()
 EKLMSimulationParameters::~EKLMSimulationParameters()
 {
 }
-
-float EKLMSimulationParameters::getHitTimeThreshold() const
-{
-  return m_HitTimeThreshold;
-}
-
-void EKLMSimulationParameters::setHitTimeThreshold(float threshold)
-{
-  m_HitTimeThreshold = threshold;
-}
-

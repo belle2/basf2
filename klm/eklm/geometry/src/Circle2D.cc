@@ -24,14 +24,3 @@ EKLM::Circle2D::Circle2D(double x, double y, double radius)
 EKLM::Circle2D::~Circle2D()
 {
 }
-
-const HepGeom::Point3D<double>& EKLM::Circle2D::getCenter() const
-{
-  return m_Center;
-}
-
-double EKLM::Circle2D::getRadius() const
-{
-  return m_Radius;
-}
-

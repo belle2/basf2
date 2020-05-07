@@ -31,21 +31,6 @@ KLMHit2d::~KLMHit2d()
 {
 }
 
-bool KLMHit2d::inBKLM() const
-{
-  return m_bklmHit;
-}
-
-BKLMHit2d* KLMHit2d::getBKLMHit2d() const
-{
-  return m_bklmHit2d;
-}
-
-EKLMHit2d* KLMHit2d::getEKLMHit2d() const
-{
-  return m_eklmHit2d;
-}
-
 TVector3 KLMHit2d::getPosition() const
 {
   if (m_bklmHit)

@@ -46,29 +46,3 @@ EKLMTimeCalibration::getTimeCalibrationData(uint16_t strip) const
     return nullptr;
   return &(it->second);
 }
-
-void EKLMTimeCalibration::cleanTimeCalibrationData()
-{
-  m_data.clear();
-}
-
-float EKLMTimeCalibration::getEffectiveLightSpeed() const
-{
-  return m_EffectiveLightSpeed;
-}
-
-void EKLMTimeCalibration::setEffectiveLightSpeed(float lightSpeed)
-{
-  m_EffectiveLightSpeed = lightSpeed;
-}
-
-float EKLMTimeCalibration::getAmplitudeTimeConstant() const
-{
-  return m_AmplitudeTimeConstant;
-}
-
-void EKLMTimeCalibration::setAmplitudeTimeConstant(float amplitudeTimeConstant)
-{
-  m_AmplitudeTimeConstant = amplitudeTimeConstant;
-}
-

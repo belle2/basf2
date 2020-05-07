@@ -11,25 +11,11 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import skimExpertFunctions as expert
-from skim import lowMulti
+from skim.lowMulti import TwoTrackLeptonsForLuminosity
 
-b2.set_log_level(b2.LogLevel.INFO)
+path = b2.Path()
+skim = TwoTrackLeptonsForLuminosity(OutputFileName="../TwoTrackMuonsForLuminosity.udst.root")
 
-TwoTrackLeptonsForLuminosity_path = b2.Path()
-
-ma.inputMdst('default', '../TwoTrackMuonsForLuminosity.dst.root', path=TwoTrackLeptonsForLuminosity_path)
-
-TwoTrackLeptonsForLuminosity_list = lowMulti.TwoTrackLeptonsForLuminosityList(path=TwoTrackLeptonsForLuminosity_path)
-expert.skimOutputUdst(
-    '../TwoTrackMuonsForLuminosity.udst.root',
-    TwoTrackLeptonsForLuminosity_list,
-    path=TwoTrackLeptonsForLuminosity_path)
-
-ma.summaryOfLists(TwoTrackLeptonsForLuminosity_list, path=TwoTrackLeptonsForLuminosity_path)
-
-expert.setSkimLogging(path=TwoTrackLeptonsForLuminosity_path)
-
-b2.process(TwoTrackLeptonsForLuminosity_path)
-
-print(b2.statistics)
+ma.inputMdst("default", "../TwoTrackMuonsForLuminosity.dst.root", path=path)
+skim(path)
+b2.process(path)

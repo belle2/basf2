@@ -43,7 +43,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getPulseShapeDiscriminationMVA();
         } else {
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();
@@ -57,7 +57,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getNumberOfHadronDigits();
         } else
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -415,7 +415,7 @@ namespace Belle2 {
           return cluster->isTriggerCluster();
         } else {
           B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
-          return -1.;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();

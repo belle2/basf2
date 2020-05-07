@@ -30,7 +30,9 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~BKLMDatabaseImporter() {};
+    virtual ~BKLMDatabaseImporter()
+    {
+    }
 
     /**
      * Set interval of validity.

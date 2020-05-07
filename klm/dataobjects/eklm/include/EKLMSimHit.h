@@ -108,13 +108,19 @@ namespace Belle2 {
      * Get hit time (implementation of base class function)
      * @return hit time
      */
-    float getGlobalTime() const override { return getTime(); }
+    float getGlobalTime() const override
+    {
+      return getTime();
+    }
 
     /**
      * Shift SimHit in time (implementation of base class function)
      * @param delta time shift.
      */
-    void shiftInTime(float delta) override { setTime(getTime() + delta); }
+    void shiftInTime(float delta) override
+    {
+      setTime(getTime() + delta);
+    }
 
 
   private:

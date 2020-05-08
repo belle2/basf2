@@ -108,6 +108,19 @@ namespace Belle2 {
       else return 1.0;
     }
 
+    /** Reset dE/dx mean value for the given bin
+     * @param bin number
+     */
+    void setMean(unsigned int layer, unsigned int bin, double value)
+    {
+      int mylayer = 0;
+      if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
+      else if (m_onedgains.size() == 56) mylayer = layer;
+
+      if (bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
+      else m_onedgains[mylayer][bin] = 1.0;
+    }
+
     /** Return dE/dx mean value for given entrance angle
      * @param continuous layer number
      * @param entrance angle (-pi/2 to pi/2)

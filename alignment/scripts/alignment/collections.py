@@ -27,7 +27,7 @@ def make_collection(name, path, **argk):
     return (name, path, argk)
 
 
-def physicsTracks(name="PhysicsTracks", add_unpackers=True, klm=False):
+def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False):
     path = basf2.create_path()
 
     path.add_module('Progress')
@@ -54,7 +54,7 @@ def physicsTracks(name="PhysicsTracks", add_unpackers=True, klm=False):
     return make_collection(name, path=path, tracks=['RecoTracks'])
 
 
-def cosmicTracks(name="CosmicTracks",
+def cosmicTracks(name="cosmicTracks",
                  add_unpackers=True,
                  skim_hlt_cosmic=False,
                  cut='[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
@@ -110,7 +110,7 @@ def cosmicTracks(name="CosmicTracks",
 
 
 def diMuonsIP(
-        name="DiMuonsIP",
+        name="diMuonsIP",
         add_unpackers=True,
         skim_mumu_2trk=False,
         muon_cut='p > 1.0 and abs(dz) < 2.0 and dr < 0.5',

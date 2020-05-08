@@ -1,11 +1,10 @@
 #!/bin/bash
-# Runs the externTeacher tool as a job on the cluster
+# Runs the basf2_mva_teacher tool as a job on the cluster
 
 rf=`mktemp -u`
 f=$(basename $rf)
 echo "Use $f as temporary file"
 printf " %q" basf2_mva_teacher "$@" > "$f" 
-#echo "externTeacher $*" > "$f"
 cat "$f"
 chmod +x ./"$f"
 

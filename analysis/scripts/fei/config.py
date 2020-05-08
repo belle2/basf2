@@ -39,7 +39,7 @@ FeiConfiguration.b2bii.__doc__ = "If true, it is assumed that we run on converte
 FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   "and the algorithm will be able to apply this training."
-FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
+FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
 
 

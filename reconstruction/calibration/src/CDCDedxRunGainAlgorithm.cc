@@ -66,7 +66,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   //Fit relative run
   TString status = "";
   double RunGainConst = 1.0, RunGainConstErr = 0.0;
-  FitGaussiaWRange(hDedx, status);
+  FitGaussianWRange(hDedx, status);
   if (status == "LowStats") {
     B2INFO("Not enough data for this run: adding next run data");
     return c_NotEnoughData;
@@ -85,7 +85,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   //Fit absolute run
   status = "";
   double RunGainAbs = 1.0, RunGainAbsErr = 0.0;
-  FitGaussiaWRange(hDedxAbs, status);
+  FitGaussianWRange(hDedxAbs, status);
   if (status != "FitOK") RunGainAbs = 1.0;
   else {
     RunGainAbs = hDedxAbs->GetFunction("gaus")->GetParameter(1);
@@ -162,7 +162,7 @@ void CDCDedxRunGainAlgorithm::generateNewPayloads(double RunGainConst, double Ex
 }
 
 
-void CDCDedxRunGainAlgorithm::FitGaussiaWRange(TH1D*& temphist, TString& status)
+void CDCDedxRunGainAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
 
   if (temphist->Integral() < 250) {

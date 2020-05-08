@@ -139,7 +139,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
       double meanErr = 0.0;
       double sigma = 0.0, sigmaErr = 0.0;
-      FitGaussiaWRange(hdEdx_epCosbin[i], status);
+      FitGaussianWRange(hdEdx_epCosbin[i], status);
       if (status != "FitOK")mean = 1.0;
       else {
         mean = hdEdx_epCosbin[i]->GetFunction("gaus")->GetParameter(1);
@@ -172,7 +172,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       double meanposi = 1.0, meanposiErr = 0.0;
       double sigmaposi = 0.0, sigmaposiErr = 0.0;
       //Fit Electrons in cos bins
-      FitGaussiaWRange(hdEdx_elCosbin[i], status);
+      FitGaussianWRange(hdEdx_elCosbin[i], status);
       if (status != "FitOK")meanelec = 1.0;
       else {
         meanelec = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(1);
@@ -185,7 +185,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
 
       //Fit Positron in cos bins
-      FitGaussiaWRange(hdEdx_poCosbin[i], status);
+      FitGaussianWRange(hdEdx_poCosbin[i], status);
       if (status != "FitOK")meanposi = 1.0;
       else {
         meanposi = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(1);
@@ -372,7 +372,7 @@ void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
 }
 
 
-void CDCDedxCosineAlgorithm::FitGaussiaWRange(TH1D*& temphist, TString& status)
+void CDCDedxCosineAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
 
   if (temphist->Integral() < 250) {

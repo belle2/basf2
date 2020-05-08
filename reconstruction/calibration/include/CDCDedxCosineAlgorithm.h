@@ -55,7 +55,7 @@ namespace Belle2 {
     void setFitWidth(double value = 2.5) {fSigLim = value;}
 
     /** * function to fit histogram in each cosine bin */
-    void FitGaussiaWRange(TH1D*& temphist, TString& status);
+    void FitGaussianWRange(TH1D*& temphist, TString& status);
 
   protected:
 

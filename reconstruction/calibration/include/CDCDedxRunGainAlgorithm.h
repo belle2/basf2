@@ -55,7 +55,7 @@ namespace Belle2 {
     /**
     * function to perform fit run by run
     */
-    void FitGaussiaWRange(TH1D*& temphist, TString& status);
+    void FitGaussianWRange(TH1D*& temphist, TString& status);
 
     /**
     * function to make flag active for plotting

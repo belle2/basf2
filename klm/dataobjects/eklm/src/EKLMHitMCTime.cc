@@ -15,7 +15,6 @@ using namespace Belle2;
 
 EKLMHitMCTime::EKLMHitMCTime()
 {
-  m_MCTime = -1;
 }
 
 EKLMHitMCTime::~EKLMHitMCTime()

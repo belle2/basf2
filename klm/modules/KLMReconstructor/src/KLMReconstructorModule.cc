@@ -68,6 +68,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_PromptTime(0),
   m_PromptWindow(0),
   m_bklmGeoPar(nullptr),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),
   m_eklmTransformData(nullptr),
@@ -83,7 +84,6 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()

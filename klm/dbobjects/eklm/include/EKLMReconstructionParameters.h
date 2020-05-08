@@ -51,7 +51,7 @@ namespace Belle2 {
   private:
 
     /** Time resolution. */
-    float m_TimeResolution;
+    float m_TimeResolution = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMReconstructionParameters, 1);

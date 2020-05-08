@@ -13,14 +13,14 @@
 
 using namespace Belle2;
 
-EKLMTimeCalibrationData::EKLMTimeCalibrationData()
+EKLMTimeCalibrationData::EKLMTimeCalibrationData() :
+  m_TimeShift(0)
 {
-  m_TimeShift = 0;
 }
 
-EKLMTimeCalibrationData::EKLMTimeCalibrationData(float timeShift)
+EKLMTimeCalibrationData::EKLMTimeCalibrationData(float timeShift) :
+  m_TimeShift(timeShift)
 {
-  m_TimeShift = timeShift;
 }
 
 EKLMTimeCalibrationData::~EKLMTimeCalibrationData()

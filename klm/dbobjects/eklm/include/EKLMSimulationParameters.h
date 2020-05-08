@@ -51,7 +51,7 @@ namespace Belle2 {
   private:
 
     /** Maximal hit time. */
-    float m_HitTimeThreshold;
+    float m_HitTimeThreshold = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMSimulationParameters, 1);

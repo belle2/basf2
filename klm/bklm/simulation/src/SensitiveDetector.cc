@@ -44,11 +44,12 @@
 using namespace std;
 using namespace Belle2::bklm;
 
-SensitiveDetector::SensitiveDetector(const G4String& name) : SensitiveDetectorBase(name, Const::KLM)
+SensitiveDetector::SensitiveDetector(const G4String& name) :
+  SensitiveDetectorBase(name, Const::KLM),
+  m_FirstCall(true),
+  m_BkgSensitiveDetector(nullptr),
+  m_GeoPar(nullptr)
 {
-  m_FirstCall = true;
-  m_BkgSensitiveDetector = nullptr;
-  m_GeoPar = nullptr;
   if (!m_SimPar.isValid())
     B2FATAL("BKLM simulation parameters are not available.");
   m_HitTimeMax = m_SimPar->getHitTimeMax();

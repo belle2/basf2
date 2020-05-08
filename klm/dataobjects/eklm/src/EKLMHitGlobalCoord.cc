@@ -13,11 +13,11 @@
 
 using namespace Belle2;
 
-EKLMHitGlobalCoord::EKLMHitGlobalCoord()
+EKLMHitGlobalCoord::EKLMHitGlobalCoord() :
+  m_globalX(-1),
+  m_globalY(-1),
+  m_globalZ(-1)
 {
-  m_globalX = -1;
-  m_globalY = -1;
-  m_globalZ = -1;
 }
 
 EKLMHitGlobalCoord::~EKLMHitGlobalCoord()

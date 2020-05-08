@@ -28,7 +28,9 @@ using namespace Belle2;
 REG_MODULE(KLMUnpacker)
 
 KLMUnpackerModule::KLMUnpackerModule() : Module(),
-  m_triggerCTimeOfPreviousEvent(0)
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_triggerCTimeOfPreviousEvent(0),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -58,8 +60,6 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
            "marked as bad.", double(140.0));
   addParam("loadThresholdFromDB", m_loadThresholdFromDB,
            "Load threshold from database (true) or not (false)", true);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMUnpackerModule::~KLMUnpackerModule()

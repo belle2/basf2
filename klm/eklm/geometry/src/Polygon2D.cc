@@ -16,10 +16,10 @@
 
 using namespace Belle2;
 
-EKLM::Polygon2D::Polygon2D(const HepGeom::Point3D<double>* points, int n)
+EKLM::Polygon2D::Polygon2D(const HepGeom::Point3D<double>* points, int n) :
+  m_nPoints(n)
 {
   int i;
-  m_nPoints = n;
   m_LineSegments = new LineSegment2D*[n];
   for (i = 0; i < n; i++) {
     if (i < n - 1)

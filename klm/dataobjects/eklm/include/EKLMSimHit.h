@@ -151,19 +151,19 @@ namespace Belle2 {
   private:
 
     /** Track ID. */
-    int m_trackID;
+    int m_trackID = -1;
 
     /** Parent track ID. */
-    int m_parentTrackID;
+    int m_parentTrackID = -1;
 
     /** Volume identifier. */
-    int m_volid;
+    int m_volid = -1;
 
     /** Number of plane. */
-    int m_Plane;
+    int m_Plane = -1;
 
     /** Number of strip. */
-    int m_Strip;
+    int m_Strip = -1;
 
     /** Class version. */
     ClassDefOverride(Belle2::EKLMSimHit, 2);

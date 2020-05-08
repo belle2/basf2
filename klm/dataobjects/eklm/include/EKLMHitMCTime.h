@@ -53,7 +53,7 @@ namespace Belle2 {
   protected:
 
     /** Time. */
-    float m_MCTime;
+    float m_MCTime = -1;
 
   private:
 

@@ -82,10 +82,10 @@ namespace Belle2 {
     private:
 
       /** The starting angle of the octagonal endcap structure shape. */
-      double m_Phi;
+      double m_Phi = 0;
 
       /** The number of sides (=8 : octagonal). */
-      int m_NSides;
+      int m_NSides = 0;
 
       /** Class version. */
       ClassDef(EndcapStructureGeometry, 1);
@@ -209,22 +209,22 @@ namespace Belle2 {
     private:
 
       /** Inner radius. */
-      double m_InnerR;
+      double m_InnerR = 0;
 
       /** Outer radius. */
-      double m_OuterR;
+      double m_OuterR = 0;
 
       /** Length. */
-      double m_Length;
+      double m_Length = 0;
 
       /** X coordinate. */
-      double m_X;
+      double m_X = 0;
 
       /** Y coordinate. */
-      double m_Y;
+      double m_Y = 0;
 
       /** Z coordinate. */
-      double m_Z;
+      double m_Z = 0;
 
       /** Class version. */
       ClassDef(ElementPosition, 1);
@@ -773,66 +773,66 @@ namespace Belle2 {
     private:
 
       /** Thickness. */
-      double m_Thickness;
+      double m_Thickness = 0;
 
       /** outerR - Y of upper edge of BoxY. */
-      double m_DeltaLY;
+      double m_DeltaLY = 0;
 
       /** Coordinate X of corner 1. */
-      double m_CornerX;
+      double m_CornerX = 0;
 
       /** Corner 1 X length. */
-      double m_Corner1LX;
+      double m_Corner1LX = 0;
 
       /** Corner 1 width. */
-      double m_Corner1Width;
+      double m_Corner1Width = 0;
 
       /** Corner 1 thickness. */
-      double m_Corner1Thickness;
+      double m_Corner1Thickness = 0;
 
       /** Corner 1 Z coordinate. */
-      double m_Corner1Z;
+      double m_Corner1Z = 0;
 
       /** Corner 2 X length. */
-      double m_Corner2LX;
+      double m_Corner2LX = 0;
 
       /** Corner 2 Y length. */
-      double m_Corner2LY;
+      double m_Corner2LY = 0;
 
       /** Corner 2 thickness. */
-      double m_Corner2Thickness;
+      double m_Corner2Thickness = 0;
 
       /** Corner 2 Z coordinate. */
-      double m_Corner2Z;
+      double m_Corner2Z = 0;
 
       /** Corner 3 X length. */
-      double m_Corner3LX;
+      double m_Corner3LX = 0;
 
       /** Corner 3 Y length. */
-      double m_Corner3LY;
+      double m_Corner3LY = 0;
 
       /** Corner 3 thickness. */
-      double m_Corner3Thickness;
+      double m_Corner3Thickness = 0;
 
       /** Corner 3 Z coordinate. */
-      double m_Corner3Z;
+      double m_Corner3Z = 0;
 
       /** Corner 4 X length. */
-      double m_Corner4LX;
+      double m_Corner4LX = 0;
 
       /** Corner 4 Y length. */
-      double m_Corner4LY;
+      double m_Corner4LY = 0;
 
       /** Corner 4 thickness. */
-      double m_Corner4Thickness;
+      double m_Corner4Thickness = 0;
 
       /** Corner 4 Z coordinate. */
-      double m_Corner4Z;
+      double m_Corner4Z = 0;
 
       /* The following data members are not stored in the database. */
 
       /** Corner 1 angle. */
-      double m_CornerAngle;                     //!
+      double m_CornerAngle = 0;                 //!
 
       /** Corner 1A coordinates. */
       HepGeom::Point3D<double> m_Corner1A;      //!
@@ -921,10 +921,10 @@ namespace Belle2 {
     private:
 
       /** Width. */
-      double m_Width;
+      double m_Width = 0;
 
       /** Distance from edge of last strip to edge of plastic sheet. */
-      double m_DeltaL;
+      double m_DeltaL = 0;
 
       /** Class version. */
       ClassDef(PlasticSheetGeometry, 1);
@@ -1014,16 +1014,16 @@ namespace Belle2 {
     private:
 
       /** Top box width. */
-      double m_TopWidth;
+      double m_TopWidth = 0;
 
       /** Top box thickness. */
-      double m_TopThickness;
+      double m_TopThickness = 0;
 
       /** Middle box width. */
-      double m_MiddleWidth;
+      double m_MiddleWidth = 0;
 
       /** Middle box thickness. */
-      double m_MiddleThickness;
+      double m_MiddleThickness = 0;
 
       /** Class version. */
       ClassDef(SegmentSupportGeometry, 1);
@@ -1147,22 +1147,22 @@ namespace Belle2 {
     private:
 
       /** Right (X-plane) delta L. */
-      double m_DeltaLRight;
+      double m_DeltaLRight = 0;
 
       /** Left (X-plane) delta L. */
-      double m_DeltaLLeft;
+      double m_DeltaLLeft = 0;
 
       /** Length */
-      double m_Length;
+      double m_Length = 0;
 
       /** X coordinate. */
-      double m_X;
+      double m_X = 0;
 
       /** Y coordinate. */
-      double m_Y;
+      double m_Y = 0;
 
       /** Z coordinate. */
-      double m_Z;
+      double m_Z = 0;
 
       /** Class version. */
       ClassDef(SegmentSupportPosition, 1);
@@ -1286,22 +1286,22 @@ namespace Belle2 {
     private:
 
       /** Width. */
-      double m_Width;
+      double m_Width = 0;
 
       /** Thickness. */
-      double m_Thickness;
+      double m_Thickness = 0;
 
       /** Groove depth. */
-      double m_GrooveDepth;
+      double m_GrooveDepth = 0;
 
       /** Groove width. */
-      double m_GrooveWidth;
+      double m_GrooveWidth = 0;
 
       /** Non-scintillating layer thickness. */
-      double m_NoScintillationThickness;
+      double m_NoScintillationThickness = 0;
 
       /** Radiation study SiPM size. */
-      double m_RSSSize;
+      double m_RSSSize = 0;
 
       /** Class version. */
       ClassDef(StripGeometry, 1);
@@ -1357,10 +1357,10 @@ namespace Belle2 {
     private:
 
       /** X coordinate. */
-      double m_X;
+      double m_X = 0;
 
       /** Y coordinate. */
-      double m_Y;
+      double m_Y = 0;
 
       /** Class version. */
       ClassDef(Point, 1);
@@ -1458,16 +1458,16 @@ namespace Belle2 {
     private:
 
       /** X length. */
-      double m_LengthX;
+      double m_LengthX = 0;
 
       /** Y length. */
-      double m_LengthY;
+      double m_LengthY = 0;
 
       /** Number of points. */
-      int m_NPoints;
+      int m_NPoints = 0;
 
       /** Points. */
-      Point* m_Points; //[m_NPoints]
+      Point* m_Points = nullptr; //[m_NPoints]
 
       /** Class version. */
       ClassDef(ShieldDetailGeometry, 1);
@@ -1619,7 +1619,7 @@ namespace Belle2 {
     private:
 
       /** Thickness. */
-      double m_Thickness;
+      double m_Thickness = 0;
 
       /** Detail A. */
       ShieldDetailGeometry m_DetailA;

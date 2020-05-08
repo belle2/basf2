@@ -15,10 +15,6 @@ using namespace Belle2;
 
 KLMScintillatorFirmwareFitResult::KLMScintillatorFirmwareFitResult()
 {
-  m_StartTime = -1;
-  m_Amplitude = -1;
-  m_BackgroundAmplitude = -1;
-  m_MinimalAmplitude = -1;
 }
 
 KLMScintillatorFirmwareFitResult::~KLMScintillatorFirmwareFitResult()

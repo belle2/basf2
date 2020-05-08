@@ -15,7 +15,6 @@ using namespace Belle2;
 
 EKLMReconstructionParameters::EKLMReconstructionParameters()
 {
-  m_TimeResolution = 0;
 }
 
 EKLMReconstructionParameters::~EKLMReconstructionParameters()

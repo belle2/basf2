@@ -147,28 +147,28 @@ namespace Belle2 {
   private:
 
     /** True if channel is active. */
-    bool m_Active;
+    bool m_Active = false;
 
     /** Pedestal. */
-    float m_Pedestal;
+    float m_Pedestal = 0;
 
     /** Photoelectron amplitude. */
-    float m_PhotoelectronAmplitude;
+    float m_PhotoelectronAmplitude = 0;
 
     /** Threshold (maximal EKLMDigit.m_Charge). */
-    int m_Threshold;
+    int m_Threshold = 0;
 
     /** Voltage. */
-    float m_Voltage;
+    float m_Voltage = 0;
 
     /** Adjustment voltage. */
-    int m_AdjustmentVoltage;
+    int m_AdjustmentVoltage = 0;
 
     /** Lookback time (unit is 32 TDC counts). */
-    int m_LookbackTime;
+    int m_LookbackTime = 0;
 
     /** Lookback window width (unit is 32 TDC counts). */
-    int m_LookbackWindowWidth;
+    int m_LookbackWindowWidth = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMChannelData, 4);

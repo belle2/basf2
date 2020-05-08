@@ -362,11 +362,11 @@ namespace Belle2 {
 
       PCmsLabTransform T;
       double e_Beam = T.getCMSEnergy() / 2.0; // GeV
+      double m_B = part->getPDGMass();
       // if this is a continuum run, use an approximate Y(4S) CMS energy
       if (e_Beam * e_Beam - m_B * m_B < 0) {
         e_Beam = 1.0579400E+1 / 2.0; // GeV
       }
-      double m_B = part->getPDGMass();
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();

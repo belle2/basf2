@@ -47,10 +47,6 @@ void DQMEventProcessorBase::Run()
 
 void DQMEventProcessorBase::ProcessTrack(const Track& track)
 {
-  auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
-  if (!trackFitResult)
-    return;
-
   auto recoTracksVector = track.getRelationsTo<RecoTrack>(m_recoTracksStoreArrayName);
   if (!recoTracksVector.size())
     return;
@@ -63,6 +59,9 @@ void DQMEventProcessorBase::ProcessTrack(const Track& track)
   int nSVDClusters = (int)svdClusters.size();
   RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
   int nCDCHits = (int)cdcHits.size();
+
+  // This method allways returns TrackFitResult so there's no need to check if it's not nullptr
+  auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
 
   TString message = ConstructMessage(trackFitResult, nPXDClusters, nSVDClusters, nCDCHits);
   B2DEBUG(20, message.Data());
@@ -106,9 +105,7 @@ void DQMEventProcessorBase::FillTrackFitResult(const TrackFitResult* trackFitRes
 
 void DQMEventProcessorBase::ProcessSuccessfulFit()
 {
-  if (!m_recoTrack->getTrackFitStatus())
-    return;
-
+  // function wasFitSuccessful already checked if TrackFitStatus is not nullptr so it's not necessary to do so
   m_histoModule->FillTrackFitStatus(m_recoTrack->getTrackFitStatus());
 
   m_isNotFirstHit = false;
@@ -128,15 +125,16 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   if (!recoHitInfo->useInFit())
     return;
 
-  if (!m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo())
-    return;
-
   bool isPXD = recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD;
   bool isSVD = recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD;
   if (!isPXD && !isSVD)
     return;
 
-  m_UBResidual = new TVectorT<double>(m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()->getResidual().getState());
+  auto fitterInfo = m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo();
+  if (!fitterInfo)
+    return;
+
+  m_UBResidual = new TVectorT<double>(fitterInfo->getResidual().getState());
 
   if (isPXD) {
     ProcessPXDRecoHit(recoHitInfo);

@@ -61,7 +61,7 @@ void PhysicsObjectsDQMModule::initialize()
   REG_HISTOGRAM
 
   StoreObjPtr<SoftwareTriggerResult> result;
-  result.isRequired();
+  result.isOptional();
 }
 
 

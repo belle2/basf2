@@ -164,7 +164,7 @@ try:
     import b2luigi
     from b2luigi.core.utils import get_serialized_parameters, get_log_file_dir
     from b2luigi.basf2_helper import Basf2PathTask, Basf2Task
-    from b2luigi.core.task import Task
+    from b2luigi.core.task import Task, ExternalTask
     from b2luigi.basf2_helper.utils import get_basf2_git_hash
 except ModuleNotFoundError:
     print(install_helpstring_formatter.format(module="b2luigi"))
@@ -359,8 +359,12 @@ class GenerateSimTask(Basf2PathTask):
 
     #: Name of the ROOT output file with generated and simulated events.
 
-    def output_file_name(self):
-        return "generated_mc_N" + str(self.n_events) + "_" + self.random_seed + ".root"
+    def output_file_name(self, n_events=None, random_seed=None):
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        return "generated_mc_N" + str(n_events) + "_" + random_seed + ".root"
 
     def output(self):
         """
@@ -394,7 +398,7 @@ class GenerateSimTask(Basf2PathTask):
         return path
 
 
-class CheckExistingFile(Task):
+class CheckExistingFile(ExternalTask):
     """
     Task to check if the given file really exists.
     """
@@ -405,16 +409,6 @@ class CheckExistingFile(Task):
     def output(self):
         from luigi import LocalTarget
         return LocalTarget(self.filename)
-
-    def run(self):
-        pass
-#        self.found_file = os.path.isfile(self.filename)
-#        if self.found_file == True:
-#            print("Successfully found the input file " + self.filename)
-#        else:
-#            print("ERROR! Cannot find the input file " + self.filename)
-#    def complete(self):
-#        return self.found_file
 
 
 class VXDQEDataCollectionTask(Basf2PathTask):
@@ -433,11 +427,15 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     random_seed = b2luigi.Parameter()
 
     #: Filename of the recorded/collected data for the final QE MVA training.
-    def get_records_file_name(self):
-        postfix = self.random_seed[6:]
+    def get_records_file_name(self, n_events=None, random_seed=None):
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        postfix = random_seed[6:]
         if 'vxd' not in postfix:
             postfix += '_vxd'
-        return 'qe_records_N' + str(self.n_events) + postfix + '.root'
+        return 'qe_records_N' + str(n_events) + postfix + '.root'
 
     def requires(self):
         """
@@ -471,7 +469,8 @@ class VXDQEDataCollectionTask(Basf2PathTask):
         if "USE_EX" in self.random_seed:
             inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root']
         else:
-            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name)
+            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
+                GenerateSimTask, n_events=self.n_events, random_seed=self.random_seed[7:]))
         path.add_module(
             "RootInput",
             inputFileNames=inputFileNames,
@@ -518,11 +517,15 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     random_seed = b2luigi.Parameter()
 
     #: Filename of the recorded/collected data for the final QE MVA training.
-    def get_records_file_name(self):
-        postfix = self.random_seed[6:]
+    def get_records_file_name(self,  n_events=None, random_seed=None):
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        postfix = random_seed[6:]
         if 'cdc' not in postfix:
             postfix += '_cdc'
-        return 'qe_records_N' + str(self.n_events) + postfix + '.root'
+        return 'qe_records_N' + str(n_events) + postfix + '.root'
 
     def requires(self):
         """
@@ -556,7 +559,8 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         if "USE_EX" in self.random_seed:
             inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root']
         else:
-            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name)
+            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
+                GenerateSimTask, n_events=self.n_events, random_seed=self.random_seed[7:]))
         path.add_module(
             "RootInput",
             inputFileNames=inputFileNames,
@@ -594,20 +598,26 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
+    #: Random basf2 seed used by the GenerateSimTask.
+    random_seed = b2luigi.Parameter()
     #: Define if any existing data like the simulated (SIM) and/or reconstructed (RECO)
     # files should be used instead of reprocessing them (is additive, e.g. 'SIM_RECO')
     use_existing_files = b2luigi.Parameter(default="NONE")
-    #: Random basf2 seed used by the GenerateSimTask.
-    random_seed = b2luigi.Parameter()
     #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
 
     #: Filename of the recorded/collected data for the final QE MVA training.
-    def get_records_file_name(self):
-        postfix = self.random_seed[6:]
+    def get_records_file_name(self, n_events=None, random_seed=None):
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        postfix = random_seed[6:]
         if 'rec' not in postfix:
             postfix += '_rec'
-        return 'qe_records_N' + str(self.n_events) + postfix + '.root'
+        return 'qe_records_N' + str(n_events) + postfix + '.root'
 
     def requires(self):
         """
@@ -629,12 +639,14 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             n_events_training=MasterTask.n_events_training,
             experiment_number=self.experiment_number,
             training_target=self.cdc_training_target,
-            use_existing_files=self.use_existing_files
+            use_existing_files=self.use_existing_files,
+            fast_bdt_option=self.fast_bdt_option,
         )
         yield VXDQETeacherTask(
             n_events_training=MasterTask.n_events_training,
             experiment_number=self.experiment_number,
-            use_existing_files=self.use_existing_files
+            use_existing_files=self.use_existing_files,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
     def output(self):
@@ -655,7 +667,8 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         if "USE_EX" in self.random_seed:
             inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root']
         else:
-            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name)
+            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
+                GenerateSimTask, n_events=self.n_events, random_seed=self.random_seed[7:]))
         path.add_module(
             "RootInput",
             inputFileNames=inputFileNames,
@@ -668,9 +681,10 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
         # Replace weightfile identifiers from defaults (CDB payloads) to new
         # weightfiles created by this b2luigi script
         cdc_qe_mva_filter_parameters = {
-            "identifier":
-            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
-        }
+            "identifier": self.get_input_file_names(
+                CDCQETeacherTask.get_weightfile_xml_identifier(
+                    CDCQETeacherTask,
+                    fast_bdt_option=self.fast_bdt_option))[0]}
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
@@ -680,7 +694,7 @@ class FullTrackQEDataCollectionTask(Basf2PathTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask)
+                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             )[0],
         )
 
@@ -741,13 +755,14 @@ class TrackQETeacherBaseTask(Basf2Task):
             "Teacher Task must define a static weightfile_identifier"
         )
 
-    def get_weightfile_xml_identifier(self, fbdt_option):
+    def get_weightfile_xml_identifier(self, fast_bdt_option=None):
         """
         Name of the xml weightfile that is created by the teacher task.
         It is subsequently used as a local weightfile in the following validation tasks.
         """
-
-        weightfile_details = create_fbdt_option_string(fbdt_option)
+        if fast_bdt_option is None:
+            fast_bdt_option = self.fast_bdt_option
+        weightfile_details = create_fbdt_option_string(fast_bdt_option)
         return self.weightfile_identifier_basename + weightfile_details + ".weights.xml"
 
     @property
@@ -817,8 +832,10 @@ class TrackQETeacherBaseTask(Basf2Task):
             records_files = ['datafiles/qe_records_N' + str(self.n_events_training) + '_' + self.random_seed + '.root']
         else:
             records_files = self.get_input_file_names(
-                self.data_collection_task.records_file_name
-                )
+                self.data_collection_task.get_records_file_name(
+                    self.data_collection_task,
+                    n_events=self.n_events_training,
+                    random_seed='DUMMY__' + self.random_seed))
 
         my_basf2_mva_teacher(
             records_files=records_files,
@@ -900,6 +917,7 @@ class FullTrackQETeacherTask(TrackQETeacherBaseTask):
                 experiment_number=self.experiment_number,
                 use_existing_files=self.use_existing_files,
                 random_seed=prefix + self.random_seed,
+                fast_bdt_option=self.fast_bdt_option,
                 )
 
 
@@ -918,6 +936,8 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     #: Define if any existing data like the simulated (SIM) and/or reconstructed (RECO)
     # files should be used instead of reprocessing them (is additive, e.g. 'SIM_RECO')
     use_existing_files = b2luigi.Parameter(default="NONE")
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
     #: Name of the "harvested" ROOT output file with variables that can be used for validation.
     validation_output_file_name = "harvesting_validation.root"
     #: Name of the output of the RootOutput module with reconstructed events.
@@ -948,6 +968,7 @@ class HarvestingValidationBaseTask(Basf2PathTask):
             n_events_training=self.n_events_training,
             experiment_number=self.experiment_number,
             use_existing_files=self.use_existing_files,
+            fast_bdt_option=self.fast_bdt_option,
         )
         if 'SIM' in self.use_existing_files:
             yield CheckExistingFile(
@@ -978,10 +999,11 @@ class HarvestingValidationBaseTask(Basf2PathTask):
         """
         # prepare track finding
         path = basf2.create_path()
-        if 'SIM' in use_existing_files:
+        if 'SIM' in self.use_existing_files:
             inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events_testing) + '_test.root']
         else:
-            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name)
+            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
+                GenerateSimTask, n_events=self.n_events_testing, random_seed='test'))
         path.add_module(
             "RootInput",
             inputFileNames=inputFileNames,
@@ -1038,7 +1060,7 @@ class VXDQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                self.teacher_task.get_weightfile_xml_identifier(self.teacher_task)
+                self.teacher_task.get_weightfile_xml_identifier(self.teacher_task, fast_bdt_option=self.fast_bdt_option)
             )[0],
         )
         tracking.add_mc_matcher(path, components=["SVD"])
@@ -1093,10 +1115,10 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
         )
         # change weightfile of quality estimator to the one produced by this training script
         cdc_qe_mva_filter_parameters = {
-            "identifier":
-            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
-
-        }
+            "identifier": self.get_input_file_names(
+                CDCQETeacherTask.get_weightfile_xml_identifier(
+                    CDCQETeacherTask,
+                    fast_bdt_option=self.fast_bdt_option))[0]}
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
@@ -1111,10 +1133,6 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
     Run track reconstruction and write out (="harvest") a root file with variables
     useful for validation of the MVA track Quality Estimator.
     """
-    #: Number of events to generate for the test data set.
-    n_events_testing = b2luigi.IntParameter()
-    #: Number of events to generate for the training data set.
-    n_events_training = b2luigi.IntParameter()
     #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
     #: List of collected variables to not use in the training of the QE MVA classifier.
@@ -1136,12 +1154,14 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             experiment_number=self.experiment_number,
             use_existing_files=self.use_existing_files,
             training_target=self.cdc_training_target,
-        )
+            fast_bdt_option=self.fast_bdt_option,
+            )
         yield VXDQETeacherTask(
             n_events_training=self.n_events_training,
             experiment_number=self.experiment_number,
             use_existing_files=self.use_existing_files,
-        )
+            fast_bdt_option=self.fast_bdt_option,
+            )
 
         yield self.teacher_task(
             n_events_training=self.n_events_training,
@@ -1149,7 +1169,8 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             use_existing_files=self.use_existing_files,
             exclude_variables=self.exclude_variables,
             cdc_training_target=self.cdc_training_target,
-        )
+            fast_bdt_option=self.fast_bdt_option,
+            )
         if 'SIM' in self.use_existing_files:
             yield CheckExistingFile(
                 filename='datafiles/generated_mc_N' + str(self.n_events_testing) + '_test.root'
@@ -1181,9 +1202,10 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
         # Replace the weightfiles of all quality estimator modules by those
         # produced in the training by b2luigi
         cdc_qe_mva_filter_parameters = {
-            "identifier":
-            self.get_input_file_names(CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask))[0]
-        }
+            "identifier": self.get_input_file_names(
+                CDCQETeacherTask.get_weightfile_xml_identifier(
+                    CDCQETeacherTask,
+                    fast_bdt_option=self.fast_bdt_option))[0]}
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
@@ -1193,14 +1215,14 @@ class FullTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="VXDQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask)
+                VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             )[0],
         )
         basf2.set_module_parameters(
             path,
             name="TrackQualityEstimatorMVA",
             WeightFileIdentifier=self.get_input_file_names(
-                FullTrackQETeacherTask.get_weightfile_xml_identifier(FullTrackQETeacherTask)
+                FullTrackQETeacherTask.get_weightfile_xml_identifier(FullTrackQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             )[0],
         )
 
@@ -1311,16 +1333,21 @@ class TrackQEEvaluationBaseTask(Task):
         evaluation_pdf_output_path = self.get_output_file_name(evaluation_pdf_output_basename)
 
         if 'RECO' in self.use_existing_files:
-            datafiles = 'datafiles/qe_records_N' + str(self.n_events_testing) + '_test_' + self.use_existing_files[-3:] + '.root'
+            datafiles = 'datafiles/qe_records_N' + str(self.n_events_testing) + '_test_' + self.task_acronym + '.root'
         else:
-            datafiles = get_input_file_names(self.data_collection_task.records_file_name)[0]
+            datafiles = self.get_input_file_names(
+                self.data_collection_task.get_records_file_name(
+                    self.data_collection_task,
+                    n_events=self.n_events_testing,
+                    random_seed='DUMMY__test_' +
+                    self.task_acronym))[0]
         cmd = [
             "basf2_mva_evaluate.py",
             "--identifiers",
             self.get_input_file_names(
                 self.teacher_task.get_weightfile_xml_identifier(
                     self.teacher_task,
-                    fbdt_option=self.fast_bdt_option))[0],
+                    fast_bdt_option=self.fast_bdt_option))[0],
             "--datafiles",
             datafiles,
             "--treename",
@@ -1455,6 +1482,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     # : Define if any existing data like the simulated (SIM) and/or reconstructed (RECO)
     # files should be used instead of reprocessing them (is additive, e.g. 'SIM_RECO')
     use_existing_files = b2luigi.Parameter(default="NONE")
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
     #: Whether to normalize the track finding efficiencies to primary particles only.
     primaries_only = b2luigi.BoolParameter(default=True)  # normalize finding efficiencies to primary MC-tracks
 
@@ -1541,7 +1570,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
             title = f"Quality Estimator validation plots from {self.__class__.__name__}"
             titlepage_ax.set_title(title)
             teacher_task = self.harvesting_validation_task_instance.teacher_task
-            weightfile_identifier = teacher_task.get_weightfile_xml_identifier(teacher_task)
+            weightfile_identifier = teacher_task.get_weightfile_xml_identifier(teacher_task, fast_bdt_option=self.fast_bdt_option)
             meta_data = {
                 "Date": datetime.today().strftime("%Y-%m-%d %H:%M"),
                 "Created by steering file": os.path.realpath(__file__),
@@ -1716,6 +1745,7 @@ class VXDQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
             use_existing_files=self.use_existing_files,
             experiment_number=self.experiment_number,
             num_processes=MasterTask.num_processes,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
 
@@ -1741,6 +1771,7 @@ class CDCQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
             experiment_number=self.experiment_number,
             training_target=self.training_target,
             num_processes=MasterTask.num_processes,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
 
@@ -1770,6 +1801,7 @@ class FullTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
             cdc_training_target=self.cdc_training_target,
             exclude_variables=self.exclude_variables,
             num_processes=MasterTask.num_processes,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
 
@@ -1790,6 +1822,8 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
     exclude_variables = b2luigi.ListParameter(hashed=True, default=[])
     #: Feature/vaiable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
+    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
+    fast_bdt_option = b2luigi.ListParameter(hashed=True, default=[200, 8, 3, 0.1])
 
     def requires(self):
         """
@@ -1799,12 +1833,14 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
             n_events_training=self.n_events_training,
             use_existing_files=self.use_existing_files,
             experiment_number=self.experiment_number,
+            fast_bdt_option=self.fast_bdt_option,
         )
         yield CDCQETeacherTask(
             n_events_training=self.n_events_training,
             use_existing_files=self.use_existing_files,
             experiment_number=self.experiment_number,
             training_target=self.cdc_training_target,
+            fast_bdt_option=self.fast_bdt_option,
         )
         yield FullTrackQETeacherTask(
             n_events_training=self.n_events_training,
@@ -1812,6 +1848,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
             experiment_number=self.experiment_number,
             cdc_training_target=self.cdc_training_target,
             exclude_variables=self.exclude_variables,
+            fast_bdt_option=self.fast_bdt_option,
         )
 
     def output(self):
@@ -1834,7 +1871,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
         for task in (VXDQETeacherTask, CDCQETeacherTask, FullTrackQETeacherTask):
             # Extract xml identifier input file name before switching working directories, as it returns relative paths
             weightfile_xml_identifier_path = os.path.abspath(self.get_input_file_names(
-                task.get_weightfile_xml_identifier(task))[0])
+                task.get_weightfile_xml_identifier(task, fast_bdt_option=self.fast_bdt_option))[0])
             # As localdb is created in working directory, chdir into desired output path
             try:
                 os.chdir(output_dir)
@@ -1947,6 +1984,7 @@ class MasterTask(b2luigi.WrapperTask):
                 experiment_number=experiment_number,
                 exclude_variables=exclude_variables,
                 cdc_training_target=cdc_training_target,
+                fast_bdt_option=fast_bdt_option,
             )
 
             if b2luigi.get_setting("run_validation_tasks", default=True):
@@ -1957,6 +1995,7 @@ class MasterTask(b2luigi.WrapperTask):
                     experiment_number=experiment_number,
                     cdc_training_target=cdc_training_target,
                     exclude_variables=exclude_variables,
+                    fast_bdt_option=fast_bdt_option,
                 )
                 yield CDCQEValidationPlotsTask(
                     n_events_training=self.n_events_training,
@@ -1964,12 +2003,14 @@ class MasterTask(b2luigi.WrapperTask):
                     use_existing_files=use_existing_files,
                     experiment_number=experiment_number,
                     training_target=cdc_training_target,
+                    fast_bdt_option=fast_bdt_option,
                 )
                 yield VXDQEValidationPlotsTask(
                     n_events_training=self.n_events_training,
                     n_events_testing=self.n_events_testing,
                     use_existing_files=use_existing_files,
                     experiment_number=experiment_number,
+                    fast_bdt_option=fast_bdt_option,
                 )
 
             if b2luigi.get_setting("run_mva_evaluate", default=True):
@@ -1982,6 +2023,7 @@ class MasterTask(b2luigi.WrapperTask):
                     experiment_number=experiment_number,
                     cdc_training_target=cdc_training_target,
                     exclude_variables=exclude_variables,
+                    fast_bdt_option=fast_bdt_option,
                 )
                 yield CDCTrackQEEvaluationTask(
                     n_events_training=self.n_events_training,
@@ -1996,6 +2038,7 @@ class MasterTask(b2luigi.WrapperTask):
                     n_events_testing=self.n_events_testing,
                     use_existing_files=use_existing_files,
                     experiment_number=experiment_number,
+                    fast_bdt_option=fast_bdt_option,
                 )
 
 

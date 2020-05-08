@@ -87,17 +87,30 @@ namespace Belle2 {
      * */
     bool pionCompatibleWithDstar(int pion_pdg_code);
 
+    /**
+     * Helper function to get the correct D* PDG code for the output list,
+     * depending on the input (DecayString) and the charge of the reconstructed
+     * pion. This allows to use both positive and negative decay strings.
+     *
+     * @param pion_charge - charge of the reconstructed pion
+     * @param input_dstar_pdg - PDG code of the input Dstar list
+     * */
+    int getDstarOutputPDG(int pion_charge, int input_dstar_pdg);
+
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+    std::unique_ptr<Variable::Cut> m_cut_pion; /**< cut object which performs the cuts */
+    std::unique_ptr<Variable::Cut> m_cut_dstar; /**< cut object which performs the cuts */
 
     std::string m_pionListName;  /**< Name of the input pion particle list */
     std::string m_decayString;  /**< Input DecayDescriptor string */
     std::string m_outputListName;  /**< Name of the output D* particle list */
     std::string m_outputAntiListName;  /**< Name of the output anti-D* particle list */
-    std::string m_slowPionCut;  /**< Cut used to identify slow pions */
+    std::string m_slowPionCut;  /**< Cut to select slow pions. */
+    std::string m_DstarCut;  /**< Cut for Dstar */
 
     int m_properties; /**< Decay property: ignore massive daughter particle */
+
     int m_dstar_pdg_code; /**< PDG code of the given D* particle list */
 
     float m_dstar_pdg_mass; /**< PDG mass of the mother-D* */

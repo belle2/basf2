@@ -2830,7 +2830,7 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     path.add_module(dist_mod)
 
 
-def addInclusiveDstarReconstruction(decayString, slowPionCut, path):
+def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     """
     Adds the InclusiveDstarReconstruction module to the given path.
     This module creates a D* particle list by estimating the D* four momenta
@@ -2847,6 +2847,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, path):
     incl_dstar = register_module("InclusiveDstarReconstruction")
     incl_dstar.param("decayString", decayString)
     incl_dstar.param("slowPionCut", slowPionCut)
+    incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
 
 if __name__ == '__main__':

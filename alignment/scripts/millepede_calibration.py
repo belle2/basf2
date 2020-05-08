@@ -328,7 +328,7 @@ def create(name,
         import basf2
         from alignment.constraints import generate_constraints
 
-        data_iov = algorithm.algorithm.getRunRangeFromAllData().getIntervalOfValidity()
+        data_iov = algorithm.getRunRangeFromAllData().getIntervalOfValidity()
         init_event = (0, data_iov.getRunLow(), data_iov.getExperimentLow())
 
         # Use [] instead of None (= use default GTs) or our input tags:

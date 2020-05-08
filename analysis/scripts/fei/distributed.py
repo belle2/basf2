@@ -285,7 +285,7 @@ def merge_root_files(args):
         for f in rootfiles:
             output = args.directory + '/collection/' + f
             inputs = [args.directory + f'/jobs/{i}/' + f for i in range(args.nJobs)]
-            ret = subprocess.call(['b2file-merge-fei-output', output] + inputs)
+            ret = subprocess.call(['analysis-fei-mergefiles', output] + inputs)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
             # Replace mcParticlesCount.root with merged file in all directories

@@ -110,6 +110,15 @@ def process_dir(
     env = parent_env.Clone()
     env['HEADER_FILES'] = header_files
     env['LINKDEF_FILES'] = linkdef_files
+    if 'ADDITIONAL_SOURCES' in env.Dictionary():
+        additional_src_nodes = []
+        for source in env.Dictionary()['ADDITIONAL_SOURCES']:
+            additional_src_nodes += get_files(os.path.join(dir_name, source))
+        additional_src_files = [
+            os.path.join(parent_env['BUILDDIR'], str(node)) for node in
+            additional_src_nodes]
+        if (len(additional_src_files) > 0):
+            src_files.append(additional_src_files)
     env['SRC_FILES'] = src_files
     env['TEST_FILES'] = test_files
     env['TEST_LIBS'] = []

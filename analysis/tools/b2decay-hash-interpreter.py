@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import decayHash
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print('Usage {name} hashmap.root decayHash decayHashExtended'.format(sys.argv[0]))
+        print(f'Usage {os.path.basename(__file__)} hashmap.root decayHash decayHashExtended')
 
     rootfile = sys.argv[1]
     hashmap = decayHash.DecayHashMap(rootfile)

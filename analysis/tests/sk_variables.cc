@@ -38,7 +38,10 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-      TLorentzVector b0momentum(0.065314, -0.082151, 1.706387, 5.548032);
+
+      auto pb = 1.72;
+      auto mb = 5.28;
+      TLorentzVector b0momentum(0.2, 0., pb, sqrt(pb * pb + mb * mb));
       TLorentzVector pimomentum(0.1, 0, 2.5, sqrt(0.139 * 0.139 + 2.5 * 2.5));
       TLorentzVector emomentum(0., 0, 1., 1.);
       TVector3 ipposition(0, 0, 0);

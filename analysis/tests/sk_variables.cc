@@ -7,6 +7,7 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/datastore/StoreArray.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <analysis/variables/SpecificKinematicVariables.h>
 
@@ -38,10 +39,9 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;
-
-      auto pb = 1.72;
-      auto mb = 5.28;
-      TLorentzVector b0momentum(0.2, 0., pb, sqrt(pb * pb + mb * mb));
+      PCmsLabTransform T;
+      TLorentzVector b0momentum(-0.254525, 0.047494, 0.186099, 5.278341);
+      b0momentum = T.rotateCmsToLab() * b0momentum;
       TLorentzVector pimomentum(0.1, 0, 2.5, sqrt(0.139 * 0.139 + 2.5 * 2.5));
       TLorentzVector emomentum(0., 0, 1., 1.);
       TVector3 ipposition(0, 0, 0);
@@ -60,18 +60,17 @@ namespace {
   TEST_F(SpecificKinematicVariablesTest, REC_q2BhSimple)
   {
     StoreArray<Particle> myParticles;
-    B2INFO("HERE!");
-    myParticles[0]->print();
-    myParticles[1]->print();
     EXPECT_FLOAT_EQ(7.9078646, REC_q2BhSimple(myParticles[2])); // B-meson
   }
   TEST_F(SpecificKinematicVariablesTest, REC_q2Bh)
   {
     StoreArray<Particle> myParticles;
-    B2INFO("HERE!");
-    myParticles[0]->print();
-    myParticles[1]->print();
-    EXPECT_FLOAT_EQ(7.9078646, REC_q2Bh(myParticles[2])); // B-meson
+    EXPECT_FLOAT_EQ(8.4915943, REC_q2Bh(myParticles[2])); // B-meson
+  }
+  TEST_F(SpecificKinematicVariablesTest, REC_MissM2)
+  {
+    StoreArray<Particle> myParticles;
+    EXPECT_FLOAT_EQ(-0.10159744, REC_MissM2(myParticles[2])); // B-meson
   }
 
 }

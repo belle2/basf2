@@ -45,6 +45,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");
+  if (ttree->GetEntries() < 100)return c_NotEnoughData;
 
   double dedx, costh; int charge;
   ttree->SetBranchAddress("dedx", &dedx);

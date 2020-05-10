@@ -509,7 +509,8 @@ class Validation:
         self.running_script_reporting_interval = 30
 
         #: The maximum time before a script is skipped, if it does not
-        #: terminate
+        #: terminate. Unit: minutes. Set to <= 0 to skip this limitation
+        #: entirely.
         self.script_max_runtime_in_minutes = 60*5
 
         #: Number of parallel processes
@@ -1164,7 +1165,7 @@ class Validation:
             # terminate if exceeded
             total_runtime_in_minutes = \
                 (time.time() - script_obj.start_time) / 60.0
-            if total_runtime_in_minutes > self.script_max_runtime_in_minutes:
+            if total_runtime_in_minutes > self.script_max_runtime_in_minutes > 0:
                 script_obj.status = ScriptStatus.failed
                 self.log.warning(
                     f'Script {script_obj.path} did not finish after '
@@ -1331,7 +1332,7 @@ def execute(tag=None, is_test=None):
     # Otherwise we can start the execution. The mainpart is wrapped in a
     # try/except-contruct to fetch keyboard interrupts
     # fixme: except instructions make only sense after Validation obj is
-    # initialized ==> Pull everything until there out of try statement
+    #   initialized ==> Pull everything until there out of try statement
     try:
 
         # Now we process the command line arguments.
@@ -1441,6 +1442,21 @@ def execute(tag=None, is_test=None):
         if cmd_arguments.use_cache:
             validation.log.note("Checking for cached script output")
             validation.apply_script_caching()
+
+        # Allow to change the maximal run time of the scripts
+        if cmd_arguments.max_run_time is not None:
+            if cmd_arguments.max_run_time > 0:
+                validation.log.note(
+                    f"Setting maximal run time of the steering files "
+                    f"to {cmd_arguments.max_run_time} minutes."
+                )
+            else:
+                validation.log.note(
+                    "Disabling run time limitation of steering files as "
+                    "requested (max run time set to <= 0)."
+                )
+            validation.script_max_runtime_in_minutes = \
+                cmd_arguments.max_run_time
 
         # Start the actual validation
         validation.log.note('Starting the validation...')

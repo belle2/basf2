@@ -101,7 +101,7 @@ namespace Belle2 {
      * Set parameters of module slot rings (r of center of slots in ring, phi (angle) distance between module slots)
      * @param ringPar vector of module slot ring radiuses and phi (angle) distance between module slots in ring
      */
-    void setRingPar(std::vector<std::pair<double, double>>& ringPar);
+    void setRingPar(const std::vector<std::pair<double, double>>& ringPar);
 
     /**
      * Get center point

@@ -70,7 +70,7 @@ namespace {
     // and now compare it to generation in Lab
     beamparams.setGenerationFlags(0);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
-    auto initialLAB = generator.generate();
+    auto initialLAB = generator.generate(true);
     // same invariant mass
     EXPECT_EQ(initialLAB.getMass(), beamparams.getMass());
     // no smearing so LER and HER need to be identical to beam parameters
@@ -96,7 +96,7 @@ namespace {
     {
       CalcMeanCov<1> mean;
       for (int i = 0; i < 100000; ++i) {
-        auto& initial = generator.generate();
+        auto& initial = generator.generate(true);
         ASSERT_TRUE(initial.hasGenerationFlags(BeamParameters::c_smearBeamEnergy));
         mean.add(initial.getMass());
       }
@@ -112,7 +112,7 @@ namespace {
     {
       CalcMeanCov<1> mean;
       for (int i = 0; i < 100000; ++i) {
-        auto& initial = generator.generate();
+        auto& initial = generator.generate(true);
         ASSERT_TRUE(initial.hasGenerationFlags(BeamParameters::c_smearBeamEnergy));
         mean.add(initial.getMass());
       }
@@ -132,7 +132,7 @@ namespace {
 
     CalcMeanCov<3> mean;
     for (int i = 0; i < 100000; ++i) {
-      auto& initial = generator.generate();
+      auto& initial = generator.generate(true);
       mean.add(initial.getVertex().X(), initial.getVertex().Y(), initial.getVertex().Z());
     }
     auto cov = beamparams.getCovVertex();
@@ -164,7 +164,7 @@ namespace {
       MCInitialParticles last = beamparams;
       // no generate a few events and check everything
       for (int i = 0; i < 5; ++i) {
-        auto& initial = generator.generate();
+        auto& initial = generator.generate(true);
         EXPECT_EQ(flag, initial.getGenerationFlags());
         // create text representation of flags
         const std::string flags = initial.getGenerationFlagString();
@@ -207,5 +207,46 @@ namespace {
         last = initial;
       }
     }
+  }
+
+  /** Test the functionality of the valid flag. */
+  TEST_F(InitialParticleGenerationTests, TestValidFlag)
+  {
+    beamparams.setGenerationFlags(BeamParameters::c_smearALL);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+
+    MCInitialParticles& initial = generator.generate();
+    TLorentzVector her = initial.getHER();
+    TLorentzVector ler = initial.getLER();
+    TVector3 vertex = initial.getVertex();
+    for (int i = 0; i < 10; ++i) {
+      initial = generator.generate(true);
+      EXPECT_NE(her, initial.getHER());
+      EXPECT_NE(ler, initial.getLER());
+      EXPECT_NE(vertex, initial.getVertex());
+      her = initial.getHER();
+      ler = initial.getLER();
+      vertex = initial.getVertex();
+    }
+    initial = generator.generate();
+    EXPECT_EQ(her, initial.getHER());
+    EXPECT_EQ(ler, initial.getLER());
+    EXPECT_EQ(vertex, initial.getVertex());
+    her = initial.getHER();
+    ler = initial.getLER();
+    vertex = initial.getVertex();
+    for (int i = 0; i < 10; ++i) {
+      initial = generator.generate(true);
+      EXPECT_NE(her, initial.getHER());
+      EXPECT_NE(ler, initial.getLER());
+      EXPECT_NE(vertex, initial.getVertex());
+      her = initial.getHER();
+      ler = initial.getLER();
+      vertex = initial.getVertex();
+    }
+    initial = generator.generate();
+    EXPECT_EQ(her, initial.getHER());
+    EXPECT_EQ(ler, initial.getLER());
+    EXPECT_EQ(vertex, initial.getVertex());
   }
 }

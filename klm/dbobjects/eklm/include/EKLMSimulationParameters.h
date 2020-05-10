@@ -35,17 +35,23 @@ namespace Belle2 {
     /**
      * Get hit time threshold.
      */
-    float getHitTimeThreshold() const;
+    float getHitTimeThreshold() const
+    {
+      return m_HitTimeThreshold;
+    }
 
     /**
      * Set hit time threshold.
      */
-    void setHitTimeThreshold(float threshold);
+    void setHitTimeThreshold(float threshold)
+    {
+      m_HitTimeThreshold = threshold;
+    }
 
   private:
 
     /** Maximal hit time. */
-    float m_HitTimeThreshold;
+    float m_HitTimeThreshold = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMSimulationParameters, 1);

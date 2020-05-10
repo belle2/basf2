@@ -13,7 +13,7 @@ using namespace ECL;
 
 ECLChannelMapper::ECLChannelMapper()
 {
-  int i = 0;
+  int i;
   for (i = 0; i < ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
     convertArrayBarrel[i] = 0;
   for (i = 0; i < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)

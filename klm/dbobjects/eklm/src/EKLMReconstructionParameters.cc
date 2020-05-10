@@ -15,20 +15,8 @@ using namespace Belle2;
 
 EKLMReconstructionParameters::EKLMReconstructionParameters()
 {
-  m_TimeResolution = 0;
 }
 
 EKLMReconstructionParameters::~EKLMReconstructionParameters()
 {
 }
-
-float EKLMReconstructionParameters::getTimeResolution() const
-{
-  return m_TimeResolution;
-}
-
-void EKLMReconstructionParameters::setTimeResolution(float resolution)
-{
-  m_TimeResolution = resolution;
-}
-

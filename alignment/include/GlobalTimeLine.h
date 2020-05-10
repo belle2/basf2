@@ -67,7 +67,7 @@ namespace Belle2 {
       /// Convert the finalized TimeTable to PayloadsTable
       /// @param timeTable finalized TimeTable
       /// @param vector GlobalParamVector initialized with DB object for which payloads should be generated
-      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, GlobalParamVector& vector);
+      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector);
 
       /// Create the initial TimeTable fromm the mapping of timedep parameters
       /// in GlobalLabel

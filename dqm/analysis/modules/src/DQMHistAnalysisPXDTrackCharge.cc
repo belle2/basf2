@@ -54,12 +54,15 @@ DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
+
+  m_monObj = getMonitoringObject("pxd");
+
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
   }
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -89,6 +92,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   } else B2ERROR("no axis");
 
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
+  m_monObj->addCanvas(m_cCharge);
 
   m_gCharge = new TGraphErrors();
   m_gCharge->SetName("Track_Cluster_Charge");
@@ -162,9 +166,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "Tracked_Clusters"; // new name
     TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters");
     if (hh2) {
-      int j = 1;
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
+        int j = 1;
         for (int i = 0; i < 64; i++) {
           auto layer = (((i >> 5) & 0x1) + 1);
           auto ladder = ((i >> 1) & 0xF);
@@ -232,6 +236,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         int p = m_gCharge->GetN();
         m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
+                              m_fLandau->GetParError(1));
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
@@ -266,20 +272,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist");
         h->Draw("same hist");
 
-        double data = 1.0;
         canvas->Pad()->SetFrameFillColor(10);
         if (m_color) {
           if (hh1->GetEntries() < 1000) {
             // not enough Entries
             canvas->Pad()->SetFillColor(kGray);
           } else {
-            if (data < 1e-2) {
-              canvas->Pad()->SetFillColor(kRed);
-            } else if (data < 1e-4) {
-              canvas->Pad()->SetFillColor(kYellow);
-            } else {
-              canvas->Pad()->SetFillColor(kGreen);
-            }
+            canvas->Pad()->SetFillColor(kGreen);
           }
         } else {
           canvas->Pad()->SetFillColor(kWhite);// White
@@ -341,6 +340,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->Draw();
     m_line_low->Draw();
 
+    m_monObj->setVariable("trackcharge", mean, diff);
   }
 
 #ifdef _BELLE2_EPICS

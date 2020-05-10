@@ -108,28 +108,52 @@ namespace Belle2 {
       ~Module();
 
       //! Determine if this module is flipped by 180 degrees about z axis within its air gap
-      bool isFlipped() const { return m_IsFlipped; }
+      bool isFlipped() const
+      {
+        return m_IsFlipped;
+      }
 
       //! Determine if this module contains RPCs (true) or scintillators (false)
-      bool hasRPCs() const { return m_HasRPCs; }
+      bool hasRPCs() const
+      {
+        return m_HasRPCs;
+      }
 
       //! Get module's phi-strip minimum index
-      int getPhiStripMin() const { return m_PhiStripMin; }
+      int getPhiStripMin() const
+      {
+        return m_PhiStripMin;
+      }
 
       //! Get module's phi-strip maximum index
-      int getPhiStripMax() const { return m_PhiStripMax; }
+      int getPhiStripMax() const
+      {
+        return m_PhiStripMax;
+      }
 
       //! Get phi-strip width
-      double getPhiStripWidth() const { return m_PhiStripWidth; }
+      double getPhiStripWidth() const
+      {
+        return m_PhiStripWidth;
+      }
 
       //! Get module's z-strip minimum index
-      int getZStripMin() const { return m_ZStripMin; }
+      int getZStripMin() const
+      {
+        return m_ZStripMin;
+      }
 
       //! Get module's z-strip maximum index
-      int getZStripMax() const { return m_ZStripMax; }
+      int getZStripMax() const
+      {
+        return m_ZStripMax;
+      }
 
       //! Get z-strip width
-      double getZStripWidth() const { return m_ZStripWidth; }
+      double getZStripWidth() const
+      {
+        return m_ZStripWidth;
+      }
 
       //! Add one phi-measuring scintillator strip to the module
       void addPhiScint(int scint, double length, double offset, double position);
@@ -138,22 +162,40 @@ namespace Belle2 {
       void addZScint(int scint, double length, double offset, double position);
 
       //! Get the half-length (within the scintillator envelope) of a given phi-measuring scintillator
-      double getPhiScintHalfLength(int scint) const { return 0.5 * m_PhiScintLengths[scint]; }
+      double getPhiScintHalfLength(int scint) const
+      {
+        return 0.5 * m_PhiScintLengths[scint];
+      }
 
       //! Get the longitudinal offset (within the scintillator envelope) of a given phi-measuring scintillator
-      double getPhiScintOffset(int scint) const { return m_PhiScintOffsets[scint]; }
+      double getPhiScintOffset(int scint) const
+      {
+        return m_PhiScintOffsets[scint];
+      }
 
       //! Get the transverse position (within the scintillator envelope) of a given phi-measuring scintillator
-      double getPhiScintPosition(int scint) const { return m_PhiScintPositions[scint]; }
+      double getPhiScintPosition(int scint) const
+      {
+        return m_PhiScintPositions[scint];
+      }
 
       //! Get the half-length (within the scintillator envelope) of a given z-measuring scintillator
-      double getZScintHalfLength(int scint) const { return 0.5 * m_ZScintLengths[scint]; }
+      double getZScintHalfLength(int scint) const
+      {
+        return 0.5 * m_ZScintLengths[scint];
+      }
 
       //! Get the longitudinal offset (within the scintillator envelope) of a given z-measuring scintillator
-      double getZScintOffset(int scint) const { return m_ZScintOffsets[scint]; }
+      double getZScintOffset(int scint) const
+      {
+        return m_ZScintOffsets[scint];
+      }
 
       //! Get the transverse position (within the scintillator envelope) of a given z-measuring scintillator
-      double getZScintPosition(int scint) const { return m_ZScintPositions[scint]; }
+      double getZScintPosition(int scint) const
+      {
+        return m_ZScintPositions[scint];
+      }
 
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
@@ -162,10 +204,16 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getPropagationTimes(const CLHEP::Hep3Vector&) const;
 
       //! Return phi strip (including fractional part) corresponding to local phi coordinate
-      double getPhiStrip(const CLHEP::Hep3Vector& p) const { return p.y() / m_PhiStripWidth + m_PhiPositionBase; }
+      double getPhiStrip(const CLHEP::Hep3Vector& p) const
+      {
+        return p.y() / m_PhiStripWidth + m_PhiPositionBase;
+      }
 
       //! Return z strip (including fractional part) corresponding to local z coordinate
-      double getZStrip(const CLHEP::Hep3Vector& p) const { return p.z() / m_ZStripWidth + m_ZPositionBase; }
+      double getZStrip(const CLHEP::Hep3Vector& p) const
+      {
+        return p.z() / m_ZStripWidth + m_ZPositionBase;
+      }
 
       //! Get phi strip corresponding to local phi coordinate
       //! @return Strip number, -1 if not found.
@@ -176,27 +224,38 @@ namespace Belle2 {
       int getZStripNumber(const CLHEP::Hep3Vector& p) const;
 
       //! Transform space-point within this module from local to global coordinates
-      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
+      //! @param[in] v Point in local coordinates.
+      //! @param[in] reco Apply alignment correction (true) or return nominal position (false).
       const CLHEP::Hep3Vector localToGlobal(const CLHEP::Hep3Vector& v, bool reco = false) const;
 
       //! Rotate a vector from global to local system
-      const CLHEP::Hep3Vector RotateToLocal(const CLHEP::Hep3Vector& v) const { return m_RotationInverse * v;  }
+      const CLHEP::Hep3Vector RotateToLocal(const CLHEP::Hep3Vector& v) const
+      {
+        return m_RotationInverse * v;
+      }
 
       //! Rotate a vector from local to global system
-      const CLHEP::Hep3Vector RotateToGlobal(const CLHEP::Hep3Vector& v) const { return m_Rotation * v;  }
+      const CLHEP::Hep3Vector RotateToGlobal(const CLHEP::Hep3Vector& v) const
+      {
+        return m_Rotation * v;
+      }
 
       //! Transform space-point within this module from global to local coordinates
-      //! @param reco set transformation for reconstruction including alignment correctoin (true) or nominal without alignment correction (false)
+      //! @param[in] v Point in global coordinates.
+      //! @param[in] reco Apply alignment correction (true) or return nominal position (false).
       const CLHEP::Hep3Vector globalToLocal(const CLHEP::Hep3Vector& v,  bool reco = false) const;
 
       //! Return the local-coordinate real-vs-ideal translation of this module's sensitive volume; nominally (0,0,0)
-      const CLHEP::Hep3Vector getLocalReconstructionShift() const { return m_LocalReconstructionShift; }
+      const CLHEP::Hep3Vector getLocalReconstructionShift() const
+      {
+        return m_LocalReconstructionShift;
+      }
 
       //! Return the position (in global coordinates) of this module's sensitive-volume origin
-      const CLHEP::Hep3Vector getGlobalOrigin() const {return m_GlobalOrigin;}
-
-      //! Switch on/off the alignment correction
-      // void setAlignmentCorrectionSwitch(bool ifreo ) { m_AlignmentCorrectionSwitch = ifreo;}
+      const CLHEP::Hep3Vector getGlobalOrigin() const
+      {
+        return m_GlobalOrigin;
+      }
 
       //! Set the alignment Transformation
       void setAlignment(const HepGeom::Transform3D& moduleAlignment);
@@ -205,10 +264,16 @@ namespace Belle2 {
       void setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo);
 
       //! Get the alignment Transformation
-      const HepGeom::Transform3D getAlignment() const { return m_Alignment; }
+      const HepGeom::Transform3D getAlignment() const
+      {
+        return m_Alignment;
+      }
 
       //! Get the displaced geometry Transformation
-      const HepGeom::Transform3D getDisplacedGeo() const { return m_DisplacedGeo; }
+      const HepGeom::Transform3D getDisplacedGeo() const
+      {
+        return m_DisplacedGeo;
+      }
 
       //! Get the rotation from Transform3D
       const CLHEP::HepRotation getRotationFromTransform3D(const HepGeom::Transform3D& trans) const;

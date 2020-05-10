@@ -100,7 +100,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legEmpty->SetLineColor(kBlack);
 
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -158,10 +158,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_hEfficiencyErr->getHistogram(0)->Reset();
   m_hEfficiencyErr->getHistogram(1)->Reset();
 
-  Float_t effU = 0;
-  Float_t effV = 0;
-  Float_t erreffU = 0;
-  Float_t erreffV = 0;
+  Float_t effU;
+  Float_t effV;
+  Float_t erreffU;
+  Float_t erreffV;
 
   //Efficiency for the U side
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");

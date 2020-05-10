@@ -35,17 +35,23 @@ namespace Belle2 {
     /**
      * Get time resolution (of reconstructed time, not ADC).
      */
-    float getTimeResolution() const;
+    float getTimeResolution() const
+    {
+      return m_TimeResolution;
+    }
 
     /**
      * Set time resolution (of reconstructed time, not ADC).
      */
-    void setTimeResolution(float resolution);
+    void setTimeResolution(float resolution)
+    {
+      m_TimeResolution = resolution;
+    }
 
   private:
 
     /** Time resolution. */
-    float m_TimeResolution;
+    float m_TimeResolution = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMReconstructionParameters, 1);

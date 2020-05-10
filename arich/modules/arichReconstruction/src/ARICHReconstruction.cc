@@ -296,8 +296,6 @@ namespace Belle2 {
     rf0[0] = r;
     rf0[1] = rf;
 
-    double rind = 0;
-
     for (int iter = 0; iter < niter; iter++) {
 
       // direction in the space between aerogels and detector
@@ -308,7 +306,7 @@ namespace Belle2 {
       // *************************************
       // n-layers of aerogel // refractiveInd relative refractive index
       for (int a = n - 1; a >= 0 ; a--) {
-        rind = refractiveInd[a] / refractiveInd[a + 1];
+        double rind = refractiveInd[a] / refractiveInd[a + 1];
         dirf0[a] = Refraction(dirf0[a + 1], rind);
       }
 
@@ -344,7 +342,8 @@ namespace Belle2 {
     return -1;
   }
 
-  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
+  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits,
+                                       ARICHLikelihood& arichLikelihood)
   {
 
     const unsigned int nPhotonHits = arichHits.getEntries(); // number of detected photons
@@ -496,8 +495,13 @@ namespace Belle2 {
       int nfoo = nDetPhotons;
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; ebgri[iHyp] = 0;}
 
+      bool reflOK = true; // remove window photons from reflected hypothesis
+
       // loop over possible mirror reflections
       for (int mirr = 0; mirr < refl; mirr++) {
+
+        if (!reflOK) break; // photon from window so break
+
         // calculate fi_ch for a given track refl
         TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
@@ -534,6 +538,7 @@ namespace Belle2 {
           fi_cer_all[iAerogel] = fi_cer;
           fi_cer_trk = dirch.XYvector().DeltaPhi(edirr.XYvector());
 
+          if (mirr == 0 && th_cer < 0.1) reflOK = false;
           // skip photons with irrelevantly large/small Cherenkov angle
           if (th_cer > 0.5 || th_cer < 0.1) continue;
 

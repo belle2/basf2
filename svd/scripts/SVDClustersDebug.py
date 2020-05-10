@@ -38,16 +38,18 @@ if(len(sys.argv) == 1 + 1):
 
 
 class SVDClustersDebug(basf2.Module):
+    '''class to debug clusterizer'''
 
     def initialize(self):
-
-        self.test = []
+        ''' initialize'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         self.fb2u = TH2F("nCl_L4L5S2U", "4.5.2 U ZS3 vs ZS5 clusters", 100, 0, 100, 100, 0, 100)
+        '''debug histogram'''
 
     def event(self):
+        '''event'''
 
         evt = Belle2.PyStoreObj("EventMetaData")
 
@@ -106,9 +108,10 @@ class SVDClustersDebug(basf2.Module):
                                 charge = r.getCharge()
                                 noise = noisePayload.getNoiseInElectrons(r.getSensorID(), True, r.getCellID())
                                 print(" SNR = " + str(charge / noise) + ", charge = " + str(charge) + ", noise = " + str(noise))
-# shaper = r.getRelatedTo(shaper3)
 
     def terminate(self):
+        '''terminate'''
+
         f = TFile(fileOUT, "RECREATE")
         self.fb2u.GetXaxis().SetTitle("# cl ZS3")
         self.fb2u.GetYaxis().SetTitle("# cl ZS5")

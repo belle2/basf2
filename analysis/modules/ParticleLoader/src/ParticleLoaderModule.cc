@@ -503,7 +503,7 @@ namespace Belle2 {
         // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
         Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
-                     Particle::EParticleType::c_V0, v0->getArrayIndex());
+                     Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
 
         // add the daughters of the V0 (in the correct order) and don't update
         // the type to c_Composite (i.e. maintain c_V0)
@@ -605,7 +605,7 @@ namespace Belle2 {
         // create particle and add it to the Particle list.
         Particle particle(track->getArrayIndex(), trackFit, type);
 
-        if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
+        if (particle.getParticleSource() == Particle::c_Track) { // should always hold but...
 
           Particle* newPart = particles.appendNew(particle);
           if (pid)
@@ -713,7 +713,7 @@ namespace Belle2 {
 
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
-        if (particle.getParticleType() != Particle::c_ECLCluster) {
+        if (particle.getParticleSource() != Particle::c_ECLCluster) {
           B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
           continue;
         }
@@ -791,7 +791,7 @@ namespace Belle2 {
 
         // create particle and check its type before adding it to list
         Particle particle(cluster, pdgCode);
-        if (particle.getParticleType() != Particle::c_KLMCluster) {
+        if (particle.getParticleSource() != Particle::c_KLMCluster) {
           B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
         }
         Particle* newPart = particles.appendNew(particle);

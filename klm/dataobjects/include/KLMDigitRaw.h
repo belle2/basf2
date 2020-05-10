@@ -52,7 +52,8 @@ namespace Belle2 {
       m_word2(word2),
       m_word3(word3),
       m_word4(word4)
-    {}
+    {
+    }
 
     /**
      * Get copper identifier.

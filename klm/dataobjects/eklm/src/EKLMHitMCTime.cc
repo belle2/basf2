@@ -15,20 +15,8 @@ using namespace Belle2;
 
 EKLMHitMCTime::EKLMHitMCTime()
 {
-  m_MCTime = -1;
 }
 
 EKLMHitMCTime::~EKLMHitMCTime()
 {
 }
-
-void EKLMHitMCTime::setMCTime(float t)
-{
-  m_MCTime = t;
-}
-
-float EKLMHitMCTime::getMCTime() const
-{
-  return m_MCTime;
-}
-

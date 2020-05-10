@@ -15,7 +15,6 @@
 /* KLM headers. */
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
-#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 
 /* Belle 2 headers. */
 #include <framework/database/Database.h>
@@ -23,15 +22,11 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
 
-using namespace std;
 using namespace Belle2;
 
-BKLMDatabaseImporter::BKLMDatabaseImporter() :
-  m_ExperimentLow(0),
-  m_RunLow(0),
-  m_ExperimentHigh(-1),
-  m_RunHigh(-1)
-{}
+BKLMDatabaseImporter::BKLMDatabaseImporter()
+{
+}
 
 void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
                                   int experimentHigh, int runHigh)
@@ -68,13 +63,4 @@ void BKLMDatabaseImporter::importADCThreshold(BKLMADCThreshold* inputThreshold)
   IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
                          m_ExperimentHigh, m_RunHigh);
   adcThreshold.import(iov);
-}
-
-void BKLMDatabaseImporter::importTimeWindow(BKLMTimeWindow* inputWindow)
-{
-  DBImportObjPtr<BKLMTimeWindow> timeWindow;
-  timeWindow.construct(*inputWindow);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  timeWindow.import(iov);
 }

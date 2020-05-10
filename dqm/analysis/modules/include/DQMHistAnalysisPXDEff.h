@@ -67,6 +67,10 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
 
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
+
 #ifdef _BELLE2_EPICS
     //! one EPICS PV
     chid  mychid;

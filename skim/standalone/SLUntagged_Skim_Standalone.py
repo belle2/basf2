@@ -33,7 +33,7 @@ stdE('all', path=SLpath)
 stdMu('all', path=SLpath)
 
 loadStdPi0ForBToHadrons(path=SLpath)  # For skim.standardlists.charm lists
-stdPi0s('loose', path=SLpath)
+stdPi0s('eff40_Jan2020', path=SLpath)
 stdPhotons('loose', path=SLpath)
 stdKshorts(path=SLpath)
 

@@ -40,11 +40,14 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * Here there is a memory leak in case of realloc() failure, but it does not
    * matter because a fatal error is issued in this case.
    */
+  /* cppcheck-suppress memleakOnRealloc */
   m_Photoelectrons =
     (struct Photoelectron*)realloc(m_Photoelectrons,
                                    size * sizeof(struct Photoelectron));
+  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
                                        size * sizeof(int));
+  /* cppcheck-suppress memleakOnRealloc */
   m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
                                         size * sizeof(int));
   if (size != 0) {
@@ -150,8 +153,8 @@ void KLM::ScintillatorSimulator::prepareSimulation()
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
-  std::multimap<uint16_t, const BKLMSimHit*>::iterator& end)
+  const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+  const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
@@ -188,8 +191,8 @@ void KLM::ScintillatorSimulator::simulate(
 }
 
 void KLM::ScintillatorSimulator::simulate(
-  std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
-  std::multimap<uint16_t, const EKLMSimHit*>::iterator& end)
+  const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+  const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end)
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();

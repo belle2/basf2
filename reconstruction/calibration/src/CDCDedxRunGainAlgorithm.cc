@@ -77,10 +77,10 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     RunGainConst = hDedx->GetFunction("gaus")->GetParameter(1);
     RunGainConstErr = hDedx->GetFunction("gaus")->GetParError(1);
     B2INFO("Fit OK for this run: (run = " << expRun.second << ", gain = " << RunGainConst << ")");
+    hDedx->SetTitle(Form("dE/dx rel, Run %d, Fit %s, Fit-mean %0.03f#pm%0.03f", expRun.second, status.Data(), RunGainConst,
+                         RunGainConstErr));
   }
 
-  hDedx->SetTitle(Form("dE/dx rel, Run %d, Fit %s, Fit-mean %0.02f+-%0.02f", expRun.second, status.Data(), RunGainConst,
-                       RunGainConstErr));
 
   //Fit absolute run
   status = "";
@@ -90,9 +90,9 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
   else {
     RunGainAbs = hDedxAbs->GetFunction("gaus")->GetParameter(1);
     RunGainAbsErr = hDedxAbs->GetFunction("gaus")->GetParError(1);
+    hDedxAbs->SetTitle(Form("dE/dx abs, Run %d, Fit %s, Fit-mean %0.03f#pm%0.03f", expRun.second, status.Data(), RunGainAbs,
+                            RunGainAbsErr));
   }
-  hDedxAbs->SetTitle(Form("dE/dx abs, Run %d, Fit %s, Fit-mean %0.02f+-%0.02f", expRun.second, status.Data(), RunGainAbs,
-                          RunGainAbsErr));
 
 
   if (isMakePlots) {
@@ -110,7 +110,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     ctmp->cd(1);
     hDedx->SetName(Form("hDedxRel_run%d_%s", expRun.second, status.Data()));
     hDedx->SetFillColorAlpha(kYellow, 0.20);
-    hDedx->DrawCopy("hist");
+    hDedx->DrawCopy("");
 
     TLine* tl = new TLine();
     tl->SetLineColor(kRed);
@@ -122,7 +122,7 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     ctmp->cd(2);
     hDedxAbs->SetName(Form("hDedxAbs_run%d_%s", expRun.second, status.Data()));
     hDedxAbs->SetFillColorAlpha(kBlue, 0.10);
-    hDedxAbs->DrawCopy("hist");
+    hDedxAbs->DrawCopy("");
 
     TLine* tlAbs = new TLine();
     tlAbs->SetLineColor(kRed);

@@ -70,6 +70,14 @@ baseName = "eclBhabhaTAlgorithm"
 basePathAndName = basePath + baseName
 algo.debugFilenameBase = basePathAndName
 
+
+reset_database()
+use_database_chain()
+# use_central_database("data_reprocessing_proc10")
+use_central_database("data_reprocessing_proc9")
+use_local_database("localdb/database.txt")
+
+
 if (combineRuns):
     print("Combining all runs' histograms for a single calibration")
     print("path = ", basePathAndName)

@@ -214,7 +214,6 @@ void ECLBhabhaTCollectorModule::prepare()
 
 
   //=== Create histograms and register them in the data store
-
   int nbins = m_timeAbsMax * 8;
   int max_t = m_timeAbsMax;
   int min_t = -m_timeAbsMax;
@@ -278,29 +277,12 @@ void ECLBhabhaTCollectorModule::prepare()
   auto cutflow = new TH1F("cutflow", ";Cut label number;Number of events passing cut", 20, 0, 20);
   registerObject<TH1F>("cutflow", cutflow);
 
-  auto numPhotonClustersPerTrack = new TH1F("numPhotonClustersPerTrack",
-                                            ";Number of photon clusters per track;Number", 20, 0, 20);
-  registerObject<TH1F>("numPhotonClustersPerTrack", numPhotonClustersPerTrack);
-
   auto maxEcrsytalEnergyFraction = new TH1F("maxEcrsytalEnergyFraction",
                                             ";Maximum energy crystal energy / (sum) cluster energy;Number", 22, 0, 1.1);
   registerObject<TH1F>("maxEcrsytalEnergyFraction", maxEcrsytalEnergyFraction);
 
-
-  auto numEntriesPerCrystal = new TH1F("numEntriesPerCrystal", ";cell id;Number", 8736, 0, 8736);
-  registerObject<TH1F>("numEntriesPerCrystal", numEntriesPerCrystal);
-
-
-  auto TimevsRunPrevCrateCalibPrevCrystCalibCID1338 = new TH2F("TimevsRunPrevCrateCalibPrevCrystCalibCID1338",
-      "Time t psi - ts - tcrate (previous calibs) vs run number cid 1338;Run number;Time t_psi with previous calib (ns)",
-      7000, 1, 7000, nbins, min_t, max_t);
-  registerObject<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCID1338", TimevsRunPrevCrateCalibPrevCrystCalibCID1338);
-
-  auto TimevsRunPrevCrateCalibPrevCrystCalibCrate8 = new TH2F("TimevsRunPrevCrateCalibPrevCrystCalibCrate8",
-                                                              "Time t psi - ts - tcrate (previous calibs) vs run number crate 8;Run number;Time t_psi with previous calib (ns)",
-                                                              7000, 1, 7000, nbins, min_t, max_t);
-  registerObject<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCrate8", TimevsRunPrevCrateCalibPrevCrystCalibCrate8);
-
+  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 0, 8736);
+  registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
 
 
@@ -370,6 +352,25 @@ void ECLBhabhaTCollectorModule::collect()
     int crateID_temp = crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
   }
+
+
+
+
+
+
+  /** Store the crystal id of those being used as the reference crystals for ts.
+      One crystal per crate is defined as having ts=0.  This histogram only keeps
+      track of the crystal id, not the crate id.  The talg can figure out to which
+      crate to associate the crystal.
+  */
+  //vector <short> crystalIDReferenceForZeroTs = {2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349, 2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397, 2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445, 667, 583, 595, 607, 619, 631, 643, 655, 8256, 8172, 8184, 8196, 8208, 8220, 8232, 8244};  // orig - has bad crystals
+  vector <short> crystalIDReferenceForZeroTs = {2306, 2309, 2313, 2317, 2321, 2326, 2329, 2334, 2337, 2343, 2348, 2349, 2356, 2357, 2361, 2365, 2372, 2373, 2377, 2381, 2388, 2391, 2393, 2399, 2401, 2407, 2409, 2413, 2417, 2421, 2426, 2429, 2433, 2440, 2585, 2446, 671, 583, 595, 607, 619, 631, 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244};  // each crystal distribution checked and approved.
+  for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
+    getObjectPtr<TH1F>("refCrysIDzeroingCrate")->Fill(crystalIDReferenceForZeroTs[crateID_temp - 1] + 0.001);
+  }
+
+
+
 
 
   /** Record the input database constants for the first call */
@@ -630,7 +631,6 @@ void ECLBhabhaTCollectorModule::collect()
   double trkEClustCOM[2] = {0., 0.};
   double trkpLab[2];
   double trkpCOM[2];
-  //double trkThetaLab[2];
   TLorentzVector trkp4Lab[2];
   TLorentzVector trkp4COM[2];
 
@@ -717,10 +717,6 @@ void ECLBhabhaTCollectorModule::collect()
         }
       }
       trkEClustCOM[icharge] = trkEClustLab[icharge] * trkpCOM[icharge] / trkpLab[icharge];
-
-      // Send to the histogram the number of photon clusters associated to the track
-      getObjectPtr<TH1F>("numPhotonClustersPerTrack")->Fill(numClustersPerTrack[icharge]);
-
 
       // Check both electrons to see if their cluster energy / track momentum is good.
       // The Belle II physics book shows that this is the main way of separating electrons from other particles
@@ -949,22 +945,8 @@ void ECLBhabhaTCollectorModule::collect()
       getObjectPtr<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] , 1);
 
-      getObjectPtr<TH1F>("numEntriesPerCrystal")->Fill((crystalIDs[iCharge] - 1) + 0.001);
-
       // Record number of crystals used from the event.  Should be exactly two.
       numCrystalsPassingCuts++;
-
-
-      /* Store information about one random specific crystal and one random specific crate for
-         studies of how they vary over time.*/
-      if (crystalIDs[iCharge] == 1338) {
-        getObjectPtr<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCID1338")->Fill(m_runNum + 0.001,
-            times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
-      }
-      if (crateIDs[iCharge] == 8) {
-        getObjectPtr<TH2F>("TimevsRunPrevCrateCalibPrevCrystCalibCrate8")->Fill(m_runNum + 0.001,
-            times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
-      }
 
     }
   }

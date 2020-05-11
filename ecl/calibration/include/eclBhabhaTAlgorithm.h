@@ -39,6 +39,10 @@ namespace Belle2 {
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
       std::string debugFilenameBase;
       std::string collectorName;  /**< Name of the collector */
+      bool loadTsFromDB;   /**< If true, read crystal calib constants and apply them to the
+                                uncalibrated histogram from the collector.  If false, read in the
+                                histogram from the collector where the crystal calibration constants
+                                have already been applied   */
 
     protected:
 

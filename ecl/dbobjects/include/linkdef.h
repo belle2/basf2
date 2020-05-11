@@ -33,6 +33,7 @@
 #pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
 #pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
+#pragma link C++ class Belle2::ECLReferenceCrystalPerCrateCalib;
 
 // workaround for https://github.com/root-project/root/issues/7960
 #pragma link C++ class std::pair<int,std::unordered_map<int,vector<Belle2::ECLChargedPidPDFs::InputVar>>>+; // checksum=0xacd09862, version=-1
@@ -45,5 +46,4 @@
 #pragma link C++ class std::__pair_base<int,std::unordered_map<int,unordered_map<Belle2::ECLChargedPidPDFs::InputVar,TF1*>>>+; // checksum=0xe95f49d8, version=-1
 #pragma link C++ class std::__pair_base<int,std::unordered_map<Belle2::ECLChargedPidPDFs::InputVar,TF1*>>+; // checksum=0x7c760302, version=-1
 #pragma link C++ class std::__pair_base<Belle2::ECLChargedPidPDFs::InputVar,TF1*>+; // checksum=0x1b51fbdc, version=-1
-
 #endif

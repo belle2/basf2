@@ -7,9 +7,17 @@
  **************************************************************************/
 #include <ecl/calibration/eclBhabhaTAlgorithm.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <ecl/utility/ECLChannelMapper.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBStore.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/database/Configuration.h>
 
 #include "TH2F.h"
 #include "TFile.h"
@@ -72,21 +80,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
 
-  // Make tool for mapping ecl crystal to other ecl objects
-  //    e.g. crates, shapers, etc.
-  //    Need to load information about the event/run/experiment to get the right database information
-  int expNumberForCrates = -1;
-  int runNumberForCrates = -1;
-  int eventNumberForCrates = 1;
-  for (auto expRun : getRunList()) {
-    expNumberForCrates = expRun.first;
-    runNumberForCrates = expRun.second;
-  }
-  updateDBObjPtrs(eventNumberForCrates, runNumberForCrates, expNumberForCrates);
-  unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
-  crystalMapper->initFromDB();
-
-
   TFile* histfile = 0;
   unique_ptr<TTree> tree_crystal(new TTree("tree_crystal", "Debug data from bhabha time calibration algorithm for crystals"));
 
@@ -147,6 +140,185 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   string runNumsString = string("_") + to_string(minExpNum) + "_" + to_string(minRunNum) + string("-") + to_string(
                            maxExpNum) + "_" + to_string(maxRunNum);
   string debugFilename = debugFilenameBase + runNumsString + string(".root");
+
+
+  // Need to load information about the event/run/experiment to get the right database information
+  // Will be used for:
+  // * ECLChannelMapper (to map crystal to crates)
+  // * crystal payload updating for iterating crystal and crate fits
+  int eventNumberForCrates = 1;
+
+  auto& conf = Conditions::Configuration::getInstance();
+  conf.prependTestingPayloadLocation("localdb/database.txt");
+
+  /** Create the DBObjPtr for the payloads that we want to read from the DB */
+  DBObjPtr<Belle2::ECLCrystalCalib> GammaGamma("ECLCrystalEnergyGammaGamma");
+  DBObjPtr<Belle2::ECLCrystalCalib> Existing("ECLCrystalEnergy");
+
+
+  StoreObjPtr<EventMetaData> evtPtr;
+  // simulate the initialize() phase where we can register objects in the DataStore
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  DataStore::Instance().setInitializeActive(false);
+  // now construct the event metadata
+  evtPtr.construct(eventNumberForCrates, minRunNum, minExpNum);
+  // and update the database contents
+  DBStore& dbstore = DBStore::Instance();
+  dbstore.update();
+  // this is only needed it the payload might be intra-run dependent,
+  // that is if it might change during one run as well
+  dbstore.updateEvent();
+
+  /*
+    //------------------------------------------------------------------------
+    std::vector<float> GammaGammaCalib;
+    std::vector<float> GammaGammaCalibUnc;
+    GammaGammaCalib = GammaGamma->getCalibVector();
+    GammaGammaCalibUnc = GammaGamma->getCalibUncVector();
+
+    std::vector<float> ExistingCalib;
+    std::vector<float> ExistingCalibUnc;
+    ExistingCalib = Existing->getCalibVector();
+    ExistingCalibUnc = Existing->getCalibUncVector();
+
+    //------------------------------------------------------------------------
+    std::vector<float> NewCalib;
+    std::vector<float> NewCalibUnc;
+    NewCalib.resize(8736);
+    NewCalibUnc.resize(8736);
+    for (int ic = 0; ic < 8736; ic++) {
+      if (GammaGammaCalib[ic] > 0.) {
+        NewCalib[ic] = GammaGammaCalib[ic];
+        NewCalibUnc[ic] = GammaGammaCalibUnc[ic];
+      } else {
+        NewCalib[ic] = ExistingCalib[ic];
+        NewCalibUnc[ic] = ExistingCalibUnc[ic];
+      }
+    }
+  */
+
+
+  updateDBObjPtrs(eventNumberForCrates, minRunNum, minExpNum);
+  unique_ptr<ECLChannelMapper> crystalMapper(new ECL::ECLChannelMapper());
+  crystalMapper->initFromDB();
+
+
+  //------------------------------------------------------------------------
+  //..Read payloads from database
+  DBObjPtr<Belle2::ECLCrystalCalib> existingObject("ECLCrystalTimeOffset");
+  B2INFO("Dumping payload");
+
+  //..Get vectors of values from the payloads
+  std::vector<float> currentValues = existingObject->getCalibVector();
+  std::vector<float> currentUnc = existingObject->getCalibUncVector();
+
+  //..Print out a few values for quality control
+  B2INFO("Values read from database");
+  for (int ic = 0; ic < 9000; ic += 500) {
+    B2INFO("cellID " << ic + 1 << " " << currentValues[ic] << " +/- " << currentUnc[ic]);
+  }
+
+
+  auto refCrysIDzeroingCrate = getObjectPtr<TH1F>("refCrysIDzeroingCrate");
+
+  // crystal index for the crystals (one per crate) that is used as the reference crystal.  This one has
+  //    ts defined as zero.  The crystal id runs 1...8636, not starting at 0.
+  // vector <short> crystalIDReferenceForZeroTs = {2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349, 2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397, 2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445, 667, 583, 595, 607, 619, 631, 643, 655, 8256, 8172, 8184, 8196, 8208, 8220, 8232, 8244}; // original has bad crystals
+  //  vector <short> crystalIDReferenceForZeroTs = {2306, 2309, 2313, 2317, 2321, 2326, 2329, 2334, 2337, 2343, 2348, 2349, 2356, 2357, 2361, 2365, 2372, 2373, 2377, 2381, 2388, 2391, 2393, 2399, 2401, 2407, 2409, 2413, 2417, 2421, 2426, 2429, 2433, 2440, 2585, 2446, 671, 583, 595, 607, 619, 631, 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244};  // each crystal distribution checked and approved.
+
+  // Extract from the histogram the list of crystals to be used as reference crystals.
+  //    The crystal id runs 1...8636, not starting at 0.
+  vector <short> crystalIDreferenceUntested;
+  for (int bin = 1; bin <= 8736; bin++) {
+    if (refCrysIDzeroingCrate->GetBinContent(bin) > 0.5) {
+      crystalIDreferenceUntested.push_back(bin);
+    }
+  }
+
+  // Output for the user the crystal id to be used as a reference
+  //    and also state which crate the crystal is in.
+  B2INFO("Reference crystals to define as having ts=0.  Base 1 counting for both crates and crystals");
+  for (long unsigned int crysRefCounter = 0; crysRefCounter < crystalIDreferenceUntested.size(); crysRefCounter++) {
+    int crys_id = crystalIDreferenceUntested[crysRefCounter] ;
+    int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
+    B2INFO("   crystal " << crys_id << " is a reference for crate " << crate_id_from_crystal);
+  }
+
+  // Check that the reference crystals make sense.  There should be exactly one per crate but
+  //   since the crystal calibration executes over multiple runs, it is possible that the
+  //   reference crystals could change but we don't want to allow this.
+  B2INFO("Checking number of reference crystals");
+  B2INFO("Number of reference crystals = " << crystalIDreferenceUntested.size());
+
+  // Check that there are exactly 52 reference crystals
+  if (crystalIDreferenceUntested.size() != 52) {
+    B2FATAL("The number of reference crystals does not equal 52, which is one per crate");
+    return c_Failure;
+  } else {
+    B2INFO("Number of reference crystals is 52 as required");
+  }
+
+  // Count the number of reference crystals for each crate to make sure that there is exactly
+  //    one reference crystal for each crate.
+  //    also fill the final vector that maps the crate id to the reference crystal id
+  vector <short> crateIDsNumRefCrystalsUntested(52, 0);
+  vector <short> crystalIDReferenceForZeroTs(52, 0);
+
+  for (long unsigned int crysRefCounter = 0; crysRefCounter < crystalIDreferenceUntested.size(); crysRefCounter++) {
+    int crys_id = crystalIDreferenceUntested[crysRefCounter] ;
+    int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
+    crateIDsNumRefCrystalsUntested[crate_id_from_crystal - 1]++;
+    crystalIDReferenceForZeroTs[crate_id_from_crystal - 1] = crys_id;
+  }
+  for (int crateTest = 0; crateTest < 52; crateTest++) {
+    if (crateIDsNumRefCrystalsUntested[crateTest] != 1) {
+      B2FATAL("Crate " << crateTest + 1 << " (base 1) has " << crateIDsNumRefCrystalsUntested[crateTest] << " reference crystals");
+      return c_Failure;
+    }
+  }
+  B2INFO("All reference crystals are reasonably mapped one crystal to one crate for all crates");
+
+
+
+
+
+
+
+
+
+
+
+  bool saveRefCrysPayload = true;
+
+
+
+
+  ECLReferenceCrystalPerCrateCalib* refCrystalsCalib = new ECLReferenceCrystalPerCrateCalib();
+  refCrystalsCalib->setCalibVector(crystalIDReferenceForZeroTs);
+
+
+  // Save the information to the payload if there is at least one crate
+  //    begin calibrated.
+  if (saveRefCrysPayload) {
+    saveCalibration(refCrystalsCalib, "ECLReferenceCrystalPerCrateCalib");
+    B2INFO("Reference crystal per crate payload made");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   B2INFO("Debug output rootfile: " << debugFilename);
@@ -223,9 +395,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     /* Determining which bins to mask out for mean calculation
     */
 
-    TH1D* h_time = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionY("h_time_psi", crys_id, crys_id);
+    TH1D* h_time = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionY((std::string("h_time_psi__") + std::to_string(crys_id)).c_str(),
+                   crys_id, crys_id);
     TH1D* h_timeMask = (TH1D*)h_time->Clone();
-    TH1D* h_timeMasked = (TH1D*)h_time->Clone();
+    TH1D* h_timeMasked = (TH1D*)h_time->Clone((std::string("h_time_psi_masked__") + std::to_string(crys_id)).c_str());
     TH1D* h_timeRebin = (TH1D*)h_time->Clone();
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down
@@ -397,6 +570,58 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     delete gaus;
     tree_crystal->Fill();
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  vector <double> tsRefCID ;
+  B2INFO("crystal times before shift");
+  for (int crate_id = 1; crate_id <= 52; crate_id++) {
+    tsRefCID.push_back(t_offsets[ crystalIDReferenceForZeroTs[crate_id - 1] - 1 ]);
+    B2INFO("crystal time [crystal = " << crystalIDReferenceForZeroTs[crate_id - 1] << ", crate = " << crate_id  << " (base 1)] = " <<
+           t_offsets[ crystalIDReferenceForZeroTs[crate_id - 1] ] << " ns");
+  }
+
+  B2INFO("crystal times after shift wrt reference crystal");
+  for (int crys_id = 1; crys_id <= 8736; crys_id++) {
+    int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
+    B2INFO("crystal time before shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
+           t_offsets[ crys_id - 1 ] << " ns");
+    t_offsets[crys_id - 1] = t_offsets[crys_id - 1] - tsRefCID[crate_id_from_crystal - 1];
+    B2INFO("crystal time after shift [crystal = " << crys_id << ", crate = " << crate_id_from_crystal  << " (base 1)] = " <<
+           t_offsets[ crys_id - 1 ] << " ns");
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   ECLCrystalCalib* BhabhaTCalib = new ECLCrystalCalib();
   BhabhaTCalib->setCalibVector(t_offsets, t_offsets_unc);

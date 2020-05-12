@@ -39,7 +39,8 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   crateIDHi(52),
   debugOutput(true),
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
-  collectorName("ECLBhabhaTCollector")
+  collectorName("ECLBhabhaTCollector"),
+  refCrysPerCrate{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1} //,
   // Private members
   //m_runCount(0)
 {
@@ -62,6 +63,11 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("meanCleanCutMinFactor = " << meanCleanCutMinFactor);
   B2INFO("crateIDLo = " << crateIDLo);
   B2INFO("crateIDHi = " << crateIDHi);
+  B2INFO("refCrysPerCrate = {");
+  for (int crateTest = 0; crateTest < 51; crateTest++) {
+    B2INFO(refCrysPerCrate[crateTest] << ",");
+  }
+  B2INFO(refCrysPerCrate[51] << "}");
 
 
   /* Histogram with the data collected by eclBhabhaTCollectorModule */
@@ -227,6 +233,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // vector <short> crystalIDReferenceForZeroTs = {2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349, 2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397, 2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445, 667, 583, 595, 607, 619, 631, 643, 655, 8256, 8172, 8184, 8196, 8208, 8220, 8232, 8244}; // original has bad crystals
   //  vector <short> crystalIDReferenceForZeroTs = {2306, 2309, 2313, 2317, 2321, 2326, 2329, 2334, 2337, 2343, 2348, 2349, 2356, 2357, 2361, 2365, 2372, 2373, 2377, 2381, 2388, 2391, 2393, 2399, 2401, 2407, 2409, 2413, 2417, 2421, 2426, 2429, 2433, 2440, 2585, 2446, 671, 583, 595, 607, 619, 631, 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244};  // each crystal distribution checked and approved.
 
+
+
+  B2INFO("Extract reference crystals from collector histogram.");
   // Extract from the histogram the list of crystals to be used as reference crystals.
   //    The crystal id runs 1...8636, not starting at 0.
   vector <short> crystalIDreferenceUntested;
@@ -278,6 +287,49 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     }
   }
   B2INFO("All reference crystals are reasonably mapped one crystal to one crate for all crates");
+
+
+
+  B2INFO("Extract reference crystals from algorithm steering script if provided.  If user inputs custom values via steering script for this algorithm, they are only applied after all the tests are performed on the values from the histogram and override the histogram valuees.  User can adjust just a single crystal if desired.  Use -1 to indicate that a crystal is not to be modified.  Position of crystal in list determines the crate to which the crystal is meant to be associated.");
+
+  /*
+    if (refCrysPerCrate.size()!=52)
+    {
+      B2FATAL("There are not 52 reference crystals per crate in the list set by the steering script.");
+      return c_Failure;
+    }
+  */
+
+  bool userSetRefCrysPerCrate = false ;
+  for (int crateTest = 0; crateTest < 52; crateTest++) {
+    if (refCrysPerCrate[crateTest] != -1) {
+      crystalIDReferenceForZeroTs[crateTest] = refCrysPerCrate[crateTest] ;
+      B2INFO("Crate " << crateTest + 1 << " (base 1) new reference crystal = " << crystalIDReferenceForZeroTs[crateTest]);
+      userSetRefCrysPerCrate = true ;
+    }
+  }
+  if (!userSetRefCrysPerCrate) {
+    B2INFO("User did not change reference crystals via steering script");
+  } else {
+    // Validate crystals per crate again with the new user set values
+    fill(crateIDsNumRefCrystalsUntested.begin(), crateIDsNumRefCrystalsUntested.end(), 0);
+    for (long unsigned int crysRefCounter = 0; crysRefCounter < 52; crysRefCounter++) {
+      int crys_id = crystalIDReferenceForZeroTs[crysRefCounter] ;
+      int crate_id_from_crystal = crystalMapper->getCrateID(crys_id);
+      crateIDsNumRefCrystalsUntested[crate_id_from_crystal - 1]++;
+    }
+    for (int crateTest = 0; crateTest < 52; crateTest++) {
+      if (crateIDsNumRefCrystalsUntested[crateTest] != 1) {
+        B2FATAL("Crate " << crateTest + 1 << " (base 1) has " << crateIDsNumRefCrystalsUntested[crateTest] << " reference crystals");
+        return c_Failure;
+      }
+    }
+    B2INFO("All reference crystals are reasonably mapped one crystal to one crate for all crates after changes made by user steering script.");
+  }
+
+
+
+
 
 
 

@@ -19,38 +19,38 @@ Clocks::Clocks()
 
 }
 
-Float_t  Clocks::getClock(Const::EDetector detector, std::string label) const
+Float_t  Clocks::getClockFreq(Const::EDetector detector, std::string label) const
 {
-  if (iSubMap.count(detector) == 0) {
+  if (prescaleMap.count(detector) == 0) {
     throw "Detector not found";
   }
-  return  m_globalClock / iSubMap.at(detector).at(label);
+  return  m_globalClockFreq / prescaleMap.at(detector).at(label);
 }
 
 
-Float_t  Clocks::getGlobalClock() const
+Float_t  Clocks::getGlobalClockFreq() const
 {
-  return  m_globalClock;
+  return  m_globalClockFreq;
 }
 
 
-Int_t Clocks::getISub(Const::EDetector detector, std::string label) const
+Int_t Clocks::getClockPrescale(Const::EDetector detector, std::string label) const
 {
-  return iSubMap.at(detector).at(label);
+  return prescaleMap.at(detector).at(label);
 }
 
 
-void Clocks::setClock(const Const::EDetector detector, std::string label, Int_t iSub)
+void Clocks::setClockPrescale(const Const::EDetector detector, std::string label, Int_t prescale)
 {
 
-  if (iSubMap.count(detector) == 0) {
-    iSubMap[detector] = std::map<std::string, int>();
+  if (prescaleMap.count(detector) == 0) {
+    prescaleMap[detector] = std::map<std::string, int>();
   }
-  iSubMap[detector][label] = iSub;
+  prescaleMap[detector][label] = prescale;
 }
 
 
-void Clocks::setGlobalClock(Float_t globalClock)
+void Clocks::setGlobalClockFreq(Float_t globalClockFreq)
 {
-  m_globalClock = globalClock;
+  m_globalClockFreq = globalClockFreq;
 }

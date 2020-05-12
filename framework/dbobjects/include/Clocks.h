@@ -27,23 +27,23 @@ namespace Belle2 {
     /** Constructor */
     Clocks();
 
-    Int_t   getISub(Const::EDetector detector, std::string label) const;
-    Float_t getClock(Const::EDetector detector, std::string label) const;
-    Float_t getGlobalClock() const;
-    void    setClock(const Const::EDetector detector, std::string, Int_t iSub);
-    void    setGlobalClock(Float_t globalClock);
+    Int_t   getClockPrescale(Const::EDetector detector, std::string label) const;
+    Float_t getClockFreq(Const::EDetector detector, std::string label) const;
+    Float_t getGlobalClockFreq() const;
+    void    setClockPrescale(const Const::EDetector detector, std::string, Int_t prescale);
+    void    setGlobalClockFreq(Float_t globalClockFreq);
 
   private:
 
     // Map of clocks derived from the global clock.
     // Clocks are stored as integer divisor of the global clock
-    std::map<Const::EDetector, std::map<std::string, int>> iSubMap;
+    std::map<Const::EDetector, std::map<std::string, int>> prescaleMap;
 
     // Map of clocks not  derived from the global clock.
     // Clocks are stored as frequency in MhZ
     std::map<Const::EDetector, std::map<std::string, float>> clocksMap;
 
-    Float_t m_globalClock; //[MHz]
+    Float_t m_globalClockFreq; //[MHz]
 
     ClassDef(Clocks, 1)
   };

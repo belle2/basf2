@@ -70,13 +70,13 @@ namespace Belle2 {
     return result;
   }
 
-  void ClockDatabaseImporter::setGlobalClock(Float_t val)
+  void ClockDatabaseImporter::setGlobalClockFreq(Float_t val)
   {
-    clockbase->setGlobalClock(val); // MHz
+    clockbase->setGlobalClockFreq(val); // MHz
   }
 
-  void ClockDatabaseImporter::setClock(string detector, string type, Int_t val)
+  void ClockDatabaseImporter::setClockPrescale(string detector, string type, Int_t val)
   {
-    clockbase->setClock(parseDetectors(detector), type, val);
+    clockbase->setClockPrescale(parseDetectors(detector), type, val);
   }
 }

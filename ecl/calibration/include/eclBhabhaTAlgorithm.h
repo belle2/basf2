@@ -43,7 +43,8 @@ namespace Belle2 {
                                 uncalibrated histogram from the collector.  If false, read in the
                                 histogram from the collector where the crystal calibration constants
                                 have already been applied   */
-
+      int refCrysPerCrate[52] ;  /**< List of crystals, one per crate, used as reference
+                                        time for crystal time calibration */
     protected:
 
       /**..Run algorithm on events */

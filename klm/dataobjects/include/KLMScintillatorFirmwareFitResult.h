@@ -42,12 +42,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMScintillatorFirmwareFitResult();
+    KLMScintillatorFirmwareFitResult()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~KLMScintillatorFirmwareFitResult();
+    ~KLMScintillatorFirmwareFitResult()
+    {
+    }
 
     /**
      * Get signal start time (in TDC counts).

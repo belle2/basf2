@@ -33,12 +33,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMSimHit();
+    EKLMSimHit()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMSimHit();
+    ~EKLMSimHit()
+    {
+    }
 
     /**
      * Get track ID

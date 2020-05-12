@@ -25,12 +25,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMSimulationParameters();
+    EKLMSimulationParameters()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMSimulationParameters();
+    ~EKLMSimulationParameters()
+    {
+    }
 
     /**
      * Get hit time threshold.

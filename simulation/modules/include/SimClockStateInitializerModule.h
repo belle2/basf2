@@ -11,7 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <simulation/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/SimClockState.h>
 
 #include <vector>
 
@@ -22,7 +22,7 @@ namespace Belle2 {
    * This module generates a random offset that is than saved in datastore.
    *
    */
-  class TriggerTimeOffsetInitializerModule : public Module {
+  class SimClockStateInitializerModule : public Module {
 
   public:
 
@@ -31,16 +31,18 @@ namespace Belle2 {
      * Sets the description, the properties and the parameters of the module.
      */
 
-    TriggerTimeOffsetInitializerModule();
+    SimClockStateInitializerModule();
 
     /** Destructor. */
-    virtual ~TriggerTimeOffsetInitializerModule();
+    virtual ~SimClockStateInitializerModule();
 
     /** Initializes the Module.
      *
      */
     virtual void initialize() override;
 
+    /** beginRun. */
+    void beginRun() override;
 
     /** Stores the offset into the DataStore.
      *
@@ -52,7 +54,8 @@ namespace Belle2 {
 
   private:
 
-    StoreObjPtr<TriggerTimeOffset> m_trgOffSetPtr; /**< Output object. */
+
+    StoreObjPtr<SimClockState> m_clockStatePtr; /**< Output object. */
     Float_t m_seed;
   };
 }

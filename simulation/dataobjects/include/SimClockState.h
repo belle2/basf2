@@ -19,26 +19,26 @@ namespace Belle2 {
    * Provide clocks for each sub-detectors and relative phases with respect to global tag.
    **/
 
-  class TriggerTimeOffset : public TObject {
+  class SimClockState : public TObject {
 
   public:
 
     /** Constructor */
-    TriggerTimeOffset();
+    SimClockState();
 
     void    update();
-    Float_t getClock(Const::EDetector detector, std::string label);
+    Float_t getClockFreq(Const::EDetector detector, std::string label);
     Float_t getTriggerOffset(Const::EDetector detector, std::string label);
-    Int_t   getTriggerBitWrtRevo9();
+    Int_t   getRevo9Status();
 
   private:
 
     DBObjPtr<Clocks> m_clock;
-    Float_t phase;
-    Float_t globalClock; //[MHz]
 
-    Int_t   triggerBitPosWrtRevo9;
+    Float_t globalClockFreq; //[MHz]
+
+    Int_t   revo9Status;
     Int_t   revo9nbit = 1280 * 9;
-    ClassDef(TriggerTimeOffset, 1)
+    ClassDef(SimClockState, 1)
   };
 }

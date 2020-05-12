@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <simulation/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/SimClockState.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <TRandom.h>
@@ -15,27 +15,27 @@
 
 using namespace Belle2;
 
-TriggerTimeOffset::TriggerTimeOffset()
+SimClockState::SimClockState()
 {
-  globalClock = m_clock->getGlobalClock();
+  globalClockFreq = m_clock->getGlobalClockFreq();
 }
 
-void TriggerTimeOffset::update()
+void SimClockState::update()
 {
-  triggerBitPosWrtRevo9 = gRandom->Integer(revo9nbit);
+  revo9Status = gRandom->Integer(revo9nbit);
 }
 
-Float_t TriggerTimeOffset::getClock(Const::EDetector detector, std::string label) //del
+Float_t SimClockState::getClockFreq(Const::EDetector detector, std::string label)
 {
-  return m_clock->getClock(detector, label);
+  return m_clock->getClockFreq(detector, label);
 }
 
-Float_t TriggerTimeOffset::getTriggerOffset(Const::EDetector detector, std::string label)
+Float_t SimClockState::getTriggerOffset(Const::EDetector detector, std::string label)
 {
-  return (triggerBitPosWrtRevo9 % m_clock->getISub(detector, label)) / (globalClock * 1e-3);
+  return (revo9Status % m_clock->getClockPrescale(detector, label)) / (globalClockFreq * 1e-3);
 }
 
-Int_t TriggerTimeOffset::getTriggerBitWrtRevo9()
+Int_t SimClockState::getRevo9Status()
 {
-  return triggerBitPosWrtRevo9;
+  return revo9Status;
 }

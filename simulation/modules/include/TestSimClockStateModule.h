@@ -11,7 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <simulation/dataobjects/TriggerTimeOffset.h>
+#include <simulation/dataobjects/SimClockState.h>
 
 #include <vector>
 
@@ -23,7 +23,7 @@ namespace Belle2 {
    *
    * @sa EventMetaData
    */
-  class TestTriggerTimeOffsetModule : public Module {
+  class TestSimClockStateModule : public Module {
 
   public:
 
@@ -31,10 +31,10 @@ namespace Belle2 {
      * Constructor.
      * Sets the description, the properties and the parameters of the module.
      */
-    TestTriggerTimeOffsetModule();
+    TestSimClockStateModule();
 
     /** Destructor. */
-    virtual ~TestTriggerTimeOffsetModule();
+    virtual ~TestSimClockStateModule();
 
     /** Initializes the Module.
      *
@@ -57,7 +57,7 @@ namespace Belle2 {
 
   private:
 
-    StoreObjPtr<TriggerTimeOffset> m_timer; /**< Input object. */
+    StoreObjPtr<SimClockState> m_clockState; /**< Input object. */
 
   };
 }

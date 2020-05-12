@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/modules/TriggerTimeOffsetInitializerModule.h>
+#include <simulation/modules/SimClockStateInitializerModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>
@@ -22,13 +22,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TriggerTimeOffsetInitializer)
+REG_MODULE(SimClockStateInitializer)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TriggerTimeOffsetInitializerModule::TriggerTimeOffsetInitializerModule() : Module()
+SimClockStateInitializerModule::SimClockStateInitializerModule() : Module()
 {
   //Set module properties
   setDescription(
@@ -40,17 +40,26 @@ TriggerTimeOffsetInitializerModule::TriggerTimeOffsetInitializerModule() : Modul
 
 }
 
-TriggerTimeOffsetInitializerModule::~TriggerTimeOffsetInitializerModule() = default;
+SimClockStateInitializerModule::~SimClockStateInitializerModule() = default;
 
-void TriggerTimeOffsetInitializerModule::initialize()
+void SimClockStateInitializerModule::initialize()
 {
   //Register the object in the data store
-  m_trgOffSetPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+  m_clockStatePtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 }
 
 
-void TriggerTimeOffsetInitializerModule::event()
+void SimClockStateInitializerModule::beginRun()
 {
-  m_trgOffSetPtr.create();
-  m_trgOffSetPtr->update();
+
+}
+
+
+void SimClockStateInitializerModule::event()
+{
+
+  // StoreObjPtr<SimClockState> m_clockStatePtrEv; /**< Output object. */
+  m_clockStatePtr.create();
+  m_clockStatePtr->update();
+
 }

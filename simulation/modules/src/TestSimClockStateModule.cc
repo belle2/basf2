@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <simulation/modules/TestTriggerTimeOffsetModule.h>
+#include <simulation/modules/TestSimClockStateModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/Utils.h>
@@ -24,13 +24,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TestTriggerTimeOffset)
+REG_MODULE(TestSimClockState)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TestTriggerTimeOffsetModule::TestTriggerTimeOffsetModule() : Module()
+TestSimClockStateModule::TestSimClockStateModule() : Module()
 {
   //Set module properties
   setDescription(
@@ -41,30 +41,32 @@ TestTriggerTimeOffsetModule::TestTriggerTimeOffsetModule() : Module()
 
   //Parameter definition
 
-  //  addParam("timerName", m_timerName,
+  //  addParam("timerName",m_clockStateName,
   //     "name of timer store object", string(""));
 }
 
-TestTriggerTimeOffsetModule::~TestTriggerTimeOffsetModule() = default;
+TestSimClockStateModule::~TestSimClockStateModule() = default;
 
-void TestTriggerTimeOffsetModule::initialize()
+void TestSimClockStateModule::initialize()
 {
   //Load the timer object from the data store
-  m_timer.isRequired();
+  m_clockState.isRequired();
 
 }
 
 
-void TestTriggerTimeOffsetModule::event()
+void TestSimClockStateModule::event()
 {
-  std::cout << "get revo9 " << m_timer->getTriggerBitWrtRevo9() << std::endl;
-  std::cout << "get clock TOP " << m_timer->getClock(Const::EDetector::TOP, "sampling") << std::endl;
-  std::cout << "get clock SVD " << m_timer->getClock(Const::EDetector::SVD, "sampling") << std::endl;
-  std::cout << "tigger bit position TOP " << m_timer->getTriggerOffset(Const::EDetector::TOP, "sampling") << " [ns] " << std::endl;
-  std::cout << "tigger bit position SVD " << m_timer->getTriggerOffset(Const::EDetector::SVD, "sampling") << " [ns] " << std::endl;
-  std::cout << "tigger bit position ECL sampling " << m_timer->getTriggerOffset(Const::EDetector::ECL,
+  std::cout << "get revo9 status " << m_clockState->getRevo9Status() << std::endl;
+  std::cout << "get clock frequency TOP " << m_clockState->getClockFreq(Const::EDetector::TOP, "sampling") << std::endl;
+  std::cout << "get clock frequency SVD " << m_clockState->getClockFreq(Const::EDetector::SVD, "sampling") << std::endl;
+  std::cout << "tigger signal offsetTOP " << m_clockState->getTriggerOffset(Const::EDetector::TOP,
             "sampling") << " [ns] " << std::endl;
-  std::cout << "tigger bit position ECL fitting " << m_timer->getTriggerOffset(Const::EDetector::ECL,
+  std::cout << "tigger signal offset SVD " << m_clockState->getTriggerOffset(Const::EDetector::SVD,
+            "sampling") << " [ns] " << std::endl;
+  std::cout << "tigger signal offset ECL sampling " << m_clockState->getTriggerOffset(Const::EDetector::ECL,
+            "sampling") << " [ns] " << std::endl;
+  std::cout << "tigger signal offset ECL fitting " << m_clockState->getTriggerOffset(Const::EDetector::ECL,
             "fitting") << " [ns] " << std::endl;
 
 }

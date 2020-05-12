@@ -4,5 +4,5 @@ Changes in the analysis package since release-05-00
 Variables
 +++++++++
 
- * Variables var:`recQ2Bh`, var:`recMissM2`, var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``, 
-   and var:`recQ2Bh` is now using a diamond frame method https://www.osti.gov/biblio/1442697
+ * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``, 
+   and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_

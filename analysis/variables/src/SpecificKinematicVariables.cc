@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sviat Bilokin                                            *
@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <analysis/variables/ROEVariables.h>
+#include <analysis/variables/SpecificKinematicVariables.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/variables/Variables.h>
 
@@ -37,15 +37,14 @@ namespace Belle2 {
 
       TLorentzVector hadron4vec;
 
-      int n = particle->getNDaughters();
+      unsigned n = particle->getNDaughters();
 
       if (n < 1)
         return std::numeric_limits<float>::quiet_NaN();
 
-      // TODO: avoid hardocoded values
-      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
+      for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
+        if (absPDG == Const::electron.getPDGCode() || absPDG == Const::muon.getPDGCode() || absPDG == 15)
           continue;
 
         hadron4vec += particle->getDaughter(i)->get4Vector();
@@ -68,14 +67,14 @@ namespace Belle2 {
 
       TLorentzVector hadron4vec;
 
-      int n = particle->getNDaughters();
+      unsigned n = particle->getNDaughters();
 
       if (n < 1)
         return std::numeric_limits<float>::quiet_NaN();
 
-      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
+      for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
+        if (absPDG == Const::electron.getPDGCode() || absPDG ==  Const::muon.getPDGCode() || absPDG == 15)
           continue;
 
         hadron4vec += particle->getDaughter(i)->get4Vector();
@@ -147,7 +146,7 @@ namespace Belle2 {
         //The weight is given by the sin squared of such angle.
         double wt = sinThetaB2;
 
-        //Boost the haadronic daughter to the computed B0 rest frame.
+        //Boost the hadronic daughter to the computed B0 rest frame.
         // In that frame, q2 can simply be calculated by subtracting the hadron 4-momentum from the momentum of a static B.
         TLorentzVector had_B0(had_cm);
         had_B0.Boost(-B0_p4_Dframe.BoostVector());
@@ -191,7 +190,7 @@ namespace Belle2 {
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone. \n"
                       "Based on diamond frame calculation of :math:`q^2` following the idea presented in https://www.osti.gov/biblio/1442697 \n"
-                      "It will switch to use of :var`recQ2BhSimple` if |:var`cosThetaBetweenParticleAndNominalB`| > 1.");
+                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.");
 
     REGISTER_VARIABLE("recMissM2", REC_MissM2,
                       "Returns the invariant mass squared of the missing momentum calculated assumings the"

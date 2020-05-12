@@ -249,13 +249,14 @@ void KLMUnpackerModule::unpackKLMDigit(
       }
       /* No matches found for this group at all. */
       if (firstMatchedChannel) {
-        B2ERROR("No matching channels exist in the KLM electronics map."
+        B2DEBUG(20, "No matching channels exist in the KLM electronics map."
                 << LogVar("Copper", electronicsChannel.getCopper())
                 << LogVar("Slot", electronicsChannel.getSlot())
                 << LogVar("Lane", electronicsChannel.getLane())
                 << LogVar("Axis", electronicsChannel.getAxis())
                 << LogVar("First channel", channelGroup.firstChannel)
-                << LogVar("Last channel", channelGroup.lastChannel));
+                << LogVar("Last channel", channelGroup.lastChannel)
+                << LogVar("Trigger bits", raw.getTriggerBits()));
       }
     }
   }

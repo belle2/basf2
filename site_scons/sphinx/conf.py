@@ -119,6 +119,8 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
+# Note: This is overwritten when using ``scons --sphinx`` to build the documentation
+# change the ``sphinx_exclude_patterns`` in ``site_scons/SConscript``.
 exclude_patterns = ['_sphinxbuild', 'Thumbs.db', '.DS_Store', '**/*.ipynb']
 
 # The reST default role (used for this markup: `text`) to use for all

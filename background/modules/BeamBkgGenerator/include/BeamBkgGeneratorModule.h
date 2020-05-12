@@ -16,6 +16,8 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TRotation.h>
+#include <TGeoMatrix.h>
+#include <generators/SAD/ReaderSAD.h>
 
 namespace Belle2 {
 
@@ -65,6 +67,8 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
+    TGeoHMatrix SADtoGeant(TString accRing, double s);
+
   private:
 
     /**
@@ -72,6 +76,9 @@ namespace Belle2 {
      * @return TTree entry number
      */
     int generateEntry() const;
+
+    ReaderSAD* m_readerSAD;
+    TGeoHMatrix* m_transMatrix; /**< Transformation matrix from local SAD to global geant4 space. */
 
     /**
      * Structure of the TTree in the SAD file
@@ -112,6 +119,22 @@ namespace Belle2 {
     int m_numEvents = 0 ; /**< number of events to generate */
     int m_eventCounter = 0; /**< event counter */
     std::vector<int> m_counters; /**< counters: how many times SAD particles are used */
+
+    struct straightElement {
+      double x0;        /**< Initial position in X */
+      double z0;        /**< Initial position in Z */
+      double l;         /**< Parameter */
+      double phi;       /**< Phi angle */
+    };
+
+    /** Sensitive Element  */
+    struct bendingElement {
+      double rt;        /**< Parameter */
+      double x0;        /**< Initial position in X  */
+      double z0;        /**< Initial position in Z  */
+      double sphi;      /**< Bending Angle */
+      double dphi;      /**< Bending Angle for torus in phi */
+    };
 
   };
 

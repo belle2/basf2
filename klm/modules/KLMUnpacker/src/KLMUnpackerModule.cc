@@ -104,12 +104,14 @@ void KLMUnpackerModule::beginRun()
 void KLMUnpackerModule::createDigit(
   const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
   KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
-  int sector, int layer, int plane, int strip, int lastStrip, bool isRPC)
+  int sector, int layer, int plane, int strip, int lastStrip)
 {
   KLMDigit* klmDigit = m_Digits.appendNew();
   klmDigit->addRelationTo(klmDigitEventInfo);
   if (m_WriteDigitRaws)
     klmDigit->addRelationTo(klmDigitRaw);
+  bool isRPC = (subdetector == KLMElementNumbers::c_BKLM) &&
+               (layer >= BKLMElementNumbers::c_FirstRPCLayer);
   if (isRPC) {
     /*
      * For RPC hits, digitize both the coarse (ctime) and fine (tdc) times
@@ -173,13 +175,6 @@ void KLMUnpackerModule::unpackKLMDigit(
                    &m_klmDigitRaws, &klmDigitRaw, m_WriteDigitRaws);
   const uint16_t* detectorChannel;
   int subdetector, section, sector, layer, plane, strip;
-  /* Determine whether this hit is a multiple-strip one. */
-  bool isRPC = (subdetector == KLMElementNumbers::c_BKLM) &&
-               (layer >= BKLMElementNumbers::c_FirstRPCLayer);
-  bool multipleStripHit = !isRPC && raw.multipleStripHit();
-  /* Do not process multiple-strip hit in the electronics map debug mode. */
-  if (multipleStripHit && m_DebugElectronicsMap)
-    return;
   /* Get channel groups. */
   std::vector<ChannelGroup> channelGroups;
   raw.getChannelGroups(channelGroups);
@@ -221,6 +216,9 @@ void KLMUnpackerModule::unpackKLMDigit(
         }
       }
     } else {
+      /* Do not process multiple-strip hit in the electronics map debug mode. */
+      if (m_DebugElectronicsMap)
+        return;
       /*
        * Multiple-strip hit. It is necessary to find matching detector channels
        * for all DAQ channels, because all channels in the group may not
@@ -314,7 +312,7 @@ void KLMUnpackerModule::unpackKLMDigit(
     if (channelGroup.firstStrip != 0) {
       createDigit(&raw, klmDigitRaw, klmDigitEventInfo, subdetector, section,
                   sector, layer, plane, channelGroup.firstStrip,
-                  channelGroup.lastStrip, isRPC);
+                  channelGroup.lastStrip);
     }
   }
 }

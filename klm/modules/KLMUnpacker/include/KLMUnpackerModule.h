@@ -88,12 +88,11 @@ namespace Belle2 {
      * @param[in] plane             Plane.
      * @param[in] strip             Strip.
      * @param[in] lastStrip         Last strip (for multiple-strip hits).
-     * @param[in] isRPC             Whether this digit is from RPC.
      */
     void createDigit(
       const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
       KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
-      int sector, int layer, int plane, int strip, int lastStrip, bool isRPC);
+      int sector, int layer, int plane, int strip, int lastStrip);
 
     /**
      * Unpack KLM digit.

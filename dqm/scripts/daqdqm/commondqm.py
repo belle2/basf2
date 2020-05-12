@@ -146,6 +146,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             cdcdedxdqm = register_module('CDCDedxDQM')
             path.add_module(cdcdedxdqm)
 
+        if dqm_environment == "expressreco":
+            path.add_module('CDCDQM')
+
     # ECL
     if (components is None or 'ECL' in components) and (dqm_mode in ["dont_care", "filtered"]):
         ecldqm = register_module('ECLDQM')

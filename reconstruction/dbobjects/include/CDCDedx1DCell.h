@@ -157,6 +157,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 3); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 4); /**< ClassDef */
   };
 } // end namespace Belle2

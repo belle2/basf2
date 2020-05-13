@@ -265,8 +265,8 @@ settings like custom log levels and database parameters are no longer supported.
 
 * `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
 
-* the payloads in `localdb/database.txt` are no longer used by default, you have to explicitly enable that
-  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`
+* the payloads in ``localdb/database.txt`` are no longer used by default, you have to explicitly enable that
+  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.prepend_testing_payloads>`
 
 * you can now inspect what are the settings (``print(conditions.globaltags)``)
   and also edit that list (``conditions.globaltags += ["some", "other", "tags"]``).

@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <map>
 #include <set>
+#include <vector>
 #include <arpa/inet.h>
 
 #include "daq/roisend/util.h"
@@ -29,6 +30,8 @@ using namespace std;
 
 std::map<int, std::string> myconn;
 std::map<int, unsigned int> mycount;
+std::set<int> hltused; // we want a sorted list
+std::vector<int> hlts; // initialized on run START
 
 std::set<int> triggers;
 unsigned int event_number_max = 0;
@@ -77,20 +80,32 @@ void clear_triggers(void)
 
 void plot_triggers(void)
 {
+  int hltcount = hltused.size();
+  std::map<int, int> modmissing;
+  hlts.clear();
+  for (auto h : hltused) hlts.push_back(h);
   if (!triggers.empty()) {
     ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
                 *(--triggers.end()),
                 triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
     for (auto& it : triggers) {
-      ERR_FPRINTF(stderr, "[INFO] Miss trig %u\n", it);
-      if (i++ == 100) {
-        ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
-        break;
+      int mod = it % hltcount;
+      modmissing[hlts[mod]]++;
+      if (i < 100) {
+        ERR_FPRINTF(stderr, "[INFO] Miss trig %u (%d) HLT%d\n", it, mod, hlts[mod]);
+        i++;
+        if (i == 100) {
+          ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
+          i++;
+        }
       }
     }
   } else {
     ERR_FPRINTF(stderr, "[RESULT] merger_merge: missing triggers 0\n");
+  }
+  for (auto m : modmissing) {
+    ERR_FPRINTF(stderr, "[INFO] merger_merge: missing triggers from HLT%d: %d\n", m.first, m.second);
   }
 }
 
@@ -494,6 +509,12 @@ main(int argc, char* argv[])
 
       LOG_FPRINTF(stderr, "[INFO] %d is IP <%s>\n", t, address);
       myconn[t] = address;
+      // Assume IP4 and take last decimal as HLT number
+      char* ptr = strrchr(address, '.');
+      if (ptr) {
+        int nr = atoi(ptr + 1);
+        hltused.insert(nr);
+      }
 
       fflush(stdout);
       FD_SET(t, &allset);
@@ -623,8 +644,11 @@ main(int argc, char* argv[])
       }
       event_count++;
       if (event_count % 10000 == 0) {
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
-                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
+        int hltcount = hltused.size();
+        int mod = *triggers.begin() % hltcount;
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u low mod %d low HLT %d\n",
+                    *triggers.begin(),
+                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
       }
     }
   }

@@ -1879,7 +1879,7 @@ void setalg()
   };
 
   const char* alg_file_names[] = {
-    "ftd_0023.alg", "ftd_0011.alg", "ftd_0012.alg", "ftd_0014.alg", "ftd_0015.alg", "ftd_0023.alg"
+    "ftd_0024.alg", "ftd_0011.alg", "ftd_0012.alg", "ftd_0014.alg", "ftd_0015.alg", "ftd_0024.alg"
   };
 
   char logname[2000];

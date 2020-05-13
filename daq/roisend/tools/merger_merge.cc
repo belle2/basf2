@@ -565,19 +565,21 @@ main(int argc, char* argv[])
           }
 
           if (runnr > current_runnr) {
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: run number increases: got %d current %d trig %d\n", runnr, current_runnr,
+                        eventnr);
             print_stat();
             clear_triggers();
             current_runnr = runnr;
           } else if (runnr < current_runnr) {
             // got some event from old run
-            ERR_FPRINTF(stderr, "[WARNING] merger_merge: Got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
                         eventnr);
           }
 
           if (runnr == current_runnr) {
             // seperate if, as we might set it in the if above
             check_event_nr(eventnr);
-          }
+          } // if we end the if here, we will send out old events to ONSEN!
 
           n_bytes_to_onsen = n_bytes_from_hltout;
           while (1) {
@@ -616,6 +618,7 @@ main(int argc, char* argv[])
             LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }
+          // } // if we end if here, we will NOT send old events to onsen, but only after we received the first new event
         }
       }
       event_count++;

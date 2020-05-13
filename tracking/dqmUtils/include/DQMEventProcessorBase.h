@@ -13,7 +13,6 @@
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
 #include <tracking/dataobjects/RecoHitInformation.h>
-#include <vxd/geometry/SensorInfoBase.h>
 
 using namespace std;
 
@@ -115,21 +114,19 @@ namespace Belle2 {
     /** Determines if the hit is not the first hit in the current track */
     bool m_isNotFirstHit = false;
 
-    /** unbiased residual for the hit */
-    TVectorT<double>* m_UBResidual = nullptr;
+    /** unbiased residual for the hit obtained from the sensor so its length is different for PXD and SVD sensors */
+    TVectorT<double>* m_rawSensorResidual = nullptr;
     /** ID of the current sensor */
     VxdID m_sensorID;
     /** ID of the prewious sensor*/
     VxdID m_sensorIDPrev;
 
-    /** u coordinate of the hit position */
-    float m_positionU;
-    /** v coordinate of the hit position */
-    float m_positionV;
-    /** u coordinate of the unbiased residual for the hit in micrometers */
-    float m_UBResidualU_um;
-    /** v coordinate of the unbiased residual for the hit in micrometers */
-    float m_UBResidualV_um;
+    /** local coordinates of the hit position (u, v, w) */
+    TVector3 m_position;
+    /** unbiased residual for the hit in micrometers in local coordinates (u, v, w) */
+    TVector3 m_residual_um;
+    /** unbiased residual for the hit in micrometers in global coordinates (x, y, z) */
+    TVector3 m_globalResidual_um;
     /** global phi in degrees of the hit */
     float m_phi_deg;
     /** global phi in degrees of the previous hit*/
@@ -148,8 +145,5 @@ namespace Belle2 {
     int m_correlationIndex;
     /** index of the sensor of the hit */
     int m_sensorIndex;
-
-    /** senor info of the sensor of the hit */
-    const VXD::SensorInfoBase* m_sensorInfo;
   };
 }

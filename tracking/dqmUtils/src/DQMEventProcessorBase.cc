@@ -13,6 +13,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <vxd/geometry/GeoTools.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 using namespace Belle2;
 
@@ -134,7 +135,7 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   if (!fitterInfo)
     return;
 
-  m_UBResidual = new TVectorT<double>(fitterInfo->getResidual().getState());
+  m_rawSensorResidual = new TVectorT<double>(fitterInfo->getResidual(0, false).getState());
 
   if (isPXD) {
     ProcessPXDRecoHit(recoHitInfo);
@@ -142,24 +143,23 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
     ProcessSVDRecoHit(recoHitInfo);
   }
 
-  delete m_UBResidual;
+  delete m_rawSensorResidual;
 }
 
 void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 {
-  m_positionU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
-  m_positionV = recoHitInfo->getRelatedTo<PXDCluster>()->getV();
-  m_UBResidualU_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
-  m_UBResidualV_um = m_UBResidual->GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
+  m_position.SetX(recoHitInfo->getRelatedTo<PXDCluster>()->getU());
+  m_position.SetY(recoHitInfo->getRelatedTo<PXDCluster>()->getV());
+  m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
+  m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um"));
 
   m_sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
   ComputeCommonVariables();
 
   FillCommonHistograms();
 
-  m_histoModule->FillUBResidualsPXD(m_UBResidualU_um, m_UBResidualV_um);
-  m_histoModule->FillHalfShellsPXD(m_UBResidualU_um, m_UBResidualV_um, m_sensorInfo, IsNotYang(m_sensorID.getLadderNumber(),
-                                   m_layerNumber));
+  m_histoModule->FillUBResidualsPXD(m_residual_um);
+  m_histoModule->FillHalfShellsPXD(m_globalResidual_um, IsNotYang(m_sensorID.getLadderNumber(), m_layerNumber));
 
   SetCommonPrevVariables();
 }
@@ -167,11 +167,11 @@ void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 {
   if (recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster()) {
-    m_positionU = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-    m_UBResidualU_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+    m_position.SetX(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition());
+    m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
   } else {
-    m_positionV = recoHitInfo->getRelatedTo<SVDCluster>()->getPosition();
-    m_UBResidualV_um = m_UBResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
+    m_position.SetY(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition());
+    m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
   }
 
   m_sensorID = recoHitInfo->getRelatedTo<SVDCluster>()->getSensorID();
@@ -180,9 +180,8 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
     FillCommonHistograms();
 
-    m_histoModule->FillUBResidualsSVD(m_UBResidualU_um, m_UBResidualV_um);
-    m_histoModule->FillHalfShellsSVD(m_UBResidualU_um, m_UBResidualV_um, m_sensorInfo, IsNotMat(m_sensorID.getLadderNumber(),
-                                     m_layerNumber));
+    m_histoModule->FillUBResidualsSVD(m_residual_um);
+    m_histoModule->FillHalfShellsSVD(m_globalResidual_um, IsNotMat(m_sensorID.getLadderNumber(), m_layerNumber));
 
     SetCommonPrevVariables();
   }
@@ -192,10 +191,9 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
 void DQMEventProcessorBase::ComputeCommonVariables()
 {
-  m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
-
-  TVector3 localPosition(m_positionU, m_positionV, 0);
-  TVector3 globalPosition = m_sensorInfo->pointToGlobal(localPosition, true);
+  auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
+  m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
+  TVector3 globalPosition = sensorInfo->pointToGlobal(m_position, true);
 
   m_phi_deg = globalPosition.Phi() / TMath::Pi() * 180;
   m_theta_deg = globalPosition.Theta() / TMath::Pi() * 180;
@@ -216,7 +214,7 @@ void DQMEventProcessorBase::FillCommonHistograms()
     m_isNotFirstHit = true;
   }
 
-  m_histoModule->FillUBResidualsSensor(m_UBResidualU_um, m_UBResidualV_um, m_sensorIndex);
+  m_histoModule->FillUBResidualsSensor(m_residual_um, m_sensorIndex);
   m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 

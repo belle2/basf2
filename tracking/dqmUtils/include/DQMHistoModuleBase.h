@@ -89,15 +89,15 @@ namespace Belle2 {
     /** Fill cluster hitmap in IP angle range. */
     virtual void FillTRClusterHitmap(float phi_deg, float theta_deg, int layerIndex);
     /** Fill histograms with unbiased residuals in PXD sensors. */
-    virtual void FillUBResidualsPXD(float UBResidualU_um, float UBResidualV_um);
+    virtual void FillUBResidualsPXD(TVector3 residual_um);
     /** Fill histograms with unbiased residuals in SVD sensors. */
-    virtual void FillUBResidualsSVD(float UBResidualU_um, float UBResidualV_um);
+    virtual void FillUBResidualsSVD(TVector3 residual_um);
     /** Fill histograms with unbiased residuals for half-shells for PXD sensors. */
-    virtual void FillHalfShellsPXD(float UBResidualU_um, float UBResidualV_um, const VXD::SensorInfoBase* sensorInfo, bool isNotYang);
+    virtual void FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang);
     /** Fill histograms with unbiased residuals for half-shells for SVD sensors. */
-    virtual void FillHalfShellsSVD(float UBResidualU_um, float UBResidualV_um, const VXD::SensorInfoBase* sensorInfo, bool isNotMat);
+    virtual void FillHalfShellsSVD(TVector3 globalResidual_um, bool isNotMat);
     /** Fill histograms with unbiased residuals for individual sensors. */
-    virtual void FillUBResidualsSensor(float UBResidualU_um, float UBResidualV_um, int sensorIndex);
+    virtual void FillUBResidualsSensor(TVector3 residual_um, int sensorIndex);
     /** @} */
 
   protected:

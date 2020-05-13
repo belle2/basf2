@@ -56,9 +56,9 @@ namespace Belle2 {
     /** Fill histograms with helix parameters and their correlations. */
     virtual void FillHelixParametersAndCorrelations(const TrackFitResult* tfr) override;
     /** Fill histograms which depend on position for individual sensors. */
-    virtual void FillPositionSensors(float UBResidualU_um, float UBResidualV_um, float positionU, float positionV, int sensorIndex);
+    virtual void FillPositionSensors(TVector3 residual_um, TVector3 position, int sensorIndex);
     /** Fill histograms which depend on layerIndex */
-    virtual void FillLayers(float UBResidualU_um, float UBResidualV_um, float phi_deg, float theta_deg, int layerIndex);
+    virtual void FillLayers(TVector3 residual_um, float phi_deg, float theta_deg, int layerIndex);
     /** @} */
 
   protected:

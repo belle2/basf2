@@ -505,59 +505,51 @@ void DQMHistoModuleBase::FillTRClusterCorrelations(float phi_deg, float phiPrev_
   m_TRClusterCorrelationsTheta[correlationIndex]->Fill(thetaPrev_deg, theta_deg);
 }
 
-void DQMHistoModuleBase::FillUBResidualsPXD(float UBResidualU_um, float UBResidualV_um)
+void DQMHistoModuleBase::FillUBResidualsPXD(TVector3 residual_um)
 {
-  m_UBResidualsPXD->Fill(UBResidualU_um, UBResidualV_um);
-  m_UBResidualsPXDU->Fill(UBResidualU_um);
-  m_UBResidualsPXDV->Fill(UBResidualV_um);
+  m_UBResidualsPXD->Fill(residual_um.x(), residual_um.y());
+  m_UBResidualsPXDU->Fill(residual_um.x());
+  m_UBResidualsPXDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillUBResidualsSVD(float UBResidualU_um, float UBResidualV_um)
+void DQMHistoModuleBase::FillUBResidualsSVD(TVector3 residual_um)
 {
-  m_UBResidualsSVD->Fill(UBResidualU_um, UBResidualV_um);
-  m_UBResidualsSVDU->Fill(UBResidualU_um);
-  m_UBResidualsSVDV->Fill(UBResidualV_um);
+  m_UBResidualsSVD->Fill(residual_um.x(), residual_um.y());
+  m_UBResidualsSVDU->Fill(residual_um.x());
+  m_UBResidualsSVDV->Fill(residual_um.y());
 }
 
-void DQMHistoModuleBase::FillHalfShellsPXD(float UBResidualU_um, float UBResidualV_um, const VXD::SensorInfoBase* sensorInfo,
-                                           bool isNotYang)
+void DQMHistoModuleBase::FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang)
 {
-  TVector3 localResidual(UBResidualU_um, UBResidualV_um, 0);
-  auto globalResidual = sensorInfo->vectorToGlobal(localResidual, true);
-
   if (isNotYang) {
-    m_UBResidualsPXDX_Ying->Fill(globalResidual.x());
-    m_UBResidualsPXDY_Ying->Fill(globalResidual.y());
-    m_UBResidualsPXDZ_Ying->Fill(globalResidual.z());
+    m_UBResidualsPXDX_Ying->Fill(globalResidual_um.x());
+    m_UBResidualsPXDY_Ying->Fill(globalResidual_um.y());
+    m_UBResidualsPXDZ_Ying->Fill(globalResidual_um.z());
   } else {
-    m_UBResidualsPXDX_Yang->Fill(globalResidual.x());
-    m_UBResidualsPXDY_Yang->Fill(globalResidual.y());
-    m_UBResidualsPXDZ_Yang->Fill(globalResidual.z());
+    m_UBResidualsPXDX_Yang->Fill(globalResidual_um.x());
+    m_UBResidualsPXDY_Yang->Fill(globalResidual_um.y());
+    m_UBResidualsPXDZ_Yang->Fill(globalResidual_um.z());
   }
 }
 
-void DQMHistoModuleBase::FillHalfShellsSVD(float UBResidualU_um, float UBResidualV_um,
-                                           const VXD::SensorInfoBase* sensorInfo, bool isNotMat)
+void DQMHistoModuleBase::FillHalfShellsSVD(TVector3 globalResidual_um, bool isNotMat)
 {
-  TVector3 localResidual(UBResidualU_um, UBResidualV_um, 0);
-  auto globalResidual = sensorInfo->vectorToGlobal(localResidual, true);
-
   if (isNotMat) {
-    m_UBResidualsSVDX_Pat->Fill(globalResidual.x());
-    m_UBResidualsSVDY_Pat->Fill(globalResidual.y());
-    m_UBResidualsSVDZ_Pat->Fill(globalResidual.z());
+    m_UBResidualsSVDX_Pat->Fill(globalResidual_um.x());
+    m_UBResidualsSVDY_Pat->Fill(globalResidual_um.y());
+    m_UBResidualsSVDZ_Pat->Fill(globalResidual_um.z());
   } else {
-    m_UBResidualsSVDX_Mat->Fill(globalResidual.x());
-    m_UBResidualsSVDY_Mat->Fill(globalResidual.y());
-    m_UBResidualsSVDZ_Mat->Fill(globalResidual.z());
+    m_UBResidualsSVDX_Mat->Fill(globalResidual_um.x());
+    m_UBResidualsSVDY_Mat->Fill(globalResidual_um.y());
+    m_UBResidualsSVDZ_Mat->Fill(globalResidual_um.z());
   }
 }
 
-void DQMHistoModuleBase::FillUBResidualsSensor(float UBResidualU_um, float UBResidualV_um, int sensorIndex)
+void DQMHistoModuleBase::FillUBResidualsSensor(TVector3 residual_um, int sensorIndex)
 {
-  m_UBResidualsSensor[sensorIndex]->Fill(UBResidualU_um, UBResidualV_um);
-  m_UBResidualsSensorU[sensorIndex]->Fill(UBResidualU_um);
-  m_UBResidualsSensorV[sensorIndex]->Fill(UBResidualV_um);
+  m_UBResidualsSensor[sensorIndex]->Fill(residual_um.x(), residual_um.y());
+  m_UBResidualsSensorU[sensorIndex]->Fill(residual_um.x());
+  m_UBResidualsSensorV[sensorIndex]->Fill(residual_um.y());
 }
 
 void DQMHistoModuleBase::FillTRClusterHitmap(float phi_deg, float theta_deg, int layerIndex)

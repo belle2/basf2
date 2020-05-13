@@ -19,8 +19,6 @@ void AlignDQMEventProcessor::FillCommonHistograms()
 {
   DQMEventProcessorBase::FillCommonHistograms();
 
-  (dynamic_cast<AlignDQMModule*>(m_histoModule))->FillPositionSensors(m_UBResidualU_um, m_UBResidualV_um, m_positionU, m_positionV,
-      m_sensorIndex);
-  (dynamic_cast<AlignDQMModule*>(m_histoModule))->FillLayers(m_UBResidualU_um, m_UBResidualV_um, m_phi_deg, m_theta_deg,
-                                                             m_layerIndex);
+  (dynamic_cast<AlignDQMModule*>(m_histoModule))->FillPositionSensors(m_residual_um, m_position, m_sensorIndex);
+  (dynamic_cast<AlignDQMModule*>(m_histoModule))->FillLayers(m_residual_um, m_phi_deg, m_theta_deg, m_layerIndex);
 }

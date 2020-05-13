@@ -97,17 +97,17 @@ class LowMassTwoTrack(BaseSkim):
 
         # Tracks from IP
         IP_cut = '[abs(dz) < 5.0] and [abs(dr) < 2.0]'
+        # Tracks of momenta greater than 0.5 GeV in the Lab frame
+        p_cut = '[p > 0.5]'
         # Clusters of energy greater than 2 GeV in the CMS frame
         E_cut = '[useCMSFrame(E) > 2]'
         # Number of cleaned tracks larger than 1 and less than 5
-        nTracks_cut = '[nCleanedTracks(' + IP_cut + ') > 1] and [nCleanedTracks(' + IP_cut + ') < 5]'
+        nTracks_cut = '[nCleanedTracks(' + IP_cut + ' and ' + p_cut + ')] == 2'
         # Invariant mass of pi+pi- system less than 3.5 GeV
         Mpipi_cut = 'daughterInvM(0,1) < 3.5'
-        # Invariant mass of pi+pi-ISR system larger than 8 GeV
-        M_cut = 'M > 8'
 
         # Reconstruct the two track event candidate
-        ma.fillParticleList('pi+:' + skim_label, IP_cut + ' and ' + nTracks_cut, path=path)
+        ma.fillParticleList('pi+:' + skim_label, IP_cut + ' and ' + p_cut + ' and ' + nTracks_cut, path=path)
         ma.fillParticleList('gamma:' + skim_label, E_cut + ' and ' + nTracks_cut, path=path)
         ma.reconstructDecay(
             'vpho:' +
@@ -118,9 +118,7 @@ class LowMassTwoTrack(BaseSkim):
             skim_label +
             ' gamma:' +
             skim_label,
-            Mpipi_cut +
-            ' and ' +
-            M_cut,
+            Mpipi_cut,
             path=path)
 
         self.SkimLists = ['vpho:' + skim_label]

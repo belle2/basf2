@@ -121,7 +121,7 @@ class Collection():
     def reset_database(self):
         """
         Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.conditions.default_globaltags`
+        tag automatically included from `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`
         """
         self.database_chain = []
 
@@ -131,7 +131,8 @@ class Collection():
             global_tag (str): The central database global tag to use for this calibration.
 
         Using this allows you to add a central database to the head of the global tag database chain for this collection.
-        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
+        The default database chain is just the central one from
+        `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
         The input file global tag will always be overrided and never used unless explicitly set.
 
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
@@ -554,10 +555,10 @@ class Calibration(CalibrationBase):
         Keyword Arguments:
             apply_to_default_collection (bool): Should we also reset the default collection?
 
-        Remove everything in the database_chain of this Calibration, including the default central database
-        tag automatically included from `basf2.conditions.default_globaltags`. This will NOT affect the database chain of any
-        `Collection` other than the default one. You can prevent the default Collection from having its chain reset by setting
-        'apply_to_default_collection' to False.
+        Remove everything in the database_chain of this Calibration, including the default central database tag automatically
+        included from `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`. This will NOT affect the
+        database chain of any `Collection` other than the default one. You can prevent the default Collection from having its chain
+        reset by setting 'apply_to_default_collection' to False.
         """
         self.database_chain = []
         if self.default_collection_name in self.collections and apply_to_default_collection:
@@ -572,7 +573,8 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also call use_central_database on the default collection (if it exists)
 
         Using this allows you to append a central database to the database chain for this calibration.
-        The default database chain is just the central one from `basf2.conditions.default_globaltags`.
+        The default database chain is just the central one from
+        `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
         and start adding databases with `Calibration.use_local_database` and `Calibration.use_central_database`.
 

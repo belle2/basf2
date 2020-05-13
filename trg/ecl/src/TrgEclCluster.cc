@@ -29,7 +29,7 @@
 //---------------------------------------------------------------
 // $Log$
 // 2018-07-30 : Add the limit number of Cluster (defult : 6)
-// 2010-05-13 : Bug Fixed for BWD ICN by SungHyun Kim
+// 2020-05-13 : Bug Fixed for BWD ICN by SungHyun Kim
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES

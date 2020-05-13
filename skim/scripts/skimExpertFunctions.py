@@ -64,7 +64,7 @@ def get_total_infiles(sampleName):
         return sampleInfo["total_input_files"]
     else:
         msg = f"'total_input_files' not listed for {sampleName} sample."
-        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def get_events_per_file(sampleName):
@@ -82,7 +82,7 @@ def get_events_per_file(sampleName):
         return sampleInfo["average_events_per_file"]
     else:
         msg = f"'average_events_per_file' not listed for {sampleName} sample."
-        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def add_skim(label, lists, path):

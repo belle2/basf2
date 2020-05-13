@@ -1027,7 +1027,7 @@ def fillSkimStatsDict(
                         skim, sample, TestingCombined
                     )
 
-                except (TypeError, ZeroDivisionError):
+                except (TypeError, ZeroDivisionError, KeyError):
                     allSkimStats[skim][statName][sample] = None
                     if verbose:
                         B2WARNING(

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric , Andrii Natochii                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -226,22 +226,27 @@ namespace Belle2 {
     part->addStatus(MCParticle::c_StableInGenerator);
 
     // FarBeamLine region transformation
-
     if (abs(m_sad.s) > 4.) { // [m]
+
+      // initial coordinates in SAD space
       double particlePosSADfar[] = {m_sad.x, -m_sad.y, 0};
-      double particlePosGeant4[] = {0.0, 0.0, 0.0};
       double particleMomSADfar[] = {m_sad.px, -m_sad.py, pz};
+      // final coordinates in Geant4 space
+      double particlePosGeant4[] = {0.0, 0.0, 0.0};
       double particleMomGeant4[] = {0.0, 0.0, 0.0};
 
+      // create a transformation matrix for a given ring
       if (m_ringName == "LER") {
         m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s));
       } else {
         m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s));
       }
 
-      m_transMatrix->LocalToMaster(particlePosSADfar, particlePosGeant4);
-      m_transMatrix->LocalToMasterVect(particleMomSADfar, particleMomGeant4);
+      // calculate a new set of coordinates in Geant4 space
+      m_transMatrix->LocalToMaster(particlePosSADfar, particlePosGeant4); // position
+      m_transMatrix->LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
 
+      // apply a new set of coordinates
       part->setMomentum(TVector3(particleMomGeant4));
       part->setProductionVertex(TVector3(particlePosGeant4));
     }

@@ -273,7 +273,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
     return -2;
   }
 
-  /// TODO: check teh first word to be the correct magic, but for TCP/IP this is overkill
+  /// TODO: check the first word to be the correct magic, but for TCP/IP this is overkill
   /// anyway unclear how to recover from a misalignment in data stream
 
   size_t n_bytes_from_hltout = 2 * sizeof(unsigned int) + ntohl(header[1]);// OFFSET_LENGTH = 1

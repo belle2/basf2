@@ -17,7 +17,7 @@ def SetTauGenericSkimVariables(path):
     """
     Set particle lists and variables for TauGeneric skim
 
-    **Input particle lists**: `pi+:all`, `gamma:all`
+    **Input particle lists**: ``pi+:all``, ``gamma:all``
 
     **Output particle lists**: ``pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2``
 
@@ -147,16 +147,16 @@ def TauLFVList(flag=1, path=None):
 
     **Skim category**: physics, tau
 
-    **Input particle lists**: `e+:all`, `mu+:all`, `pi+:all`, `K+:all`, `p+:all`, `gamma:all`, `rho0:all`, `K*0:all`, `phi:all`,
-    `f_0:all`
+    **Input particle lists**: ``e+:all``, ``mu+:all``, ``pi+:all``, ``K+:all``, ``p+:all``,
+    ``gamma:all``, ``rho0:all``, ``K*0:all``, ``phi:all``, ``f_0:all``
 
     **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
     ``omega:taulfv``
 
-    **Criteria for 1 prong final states **: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \Delta E < 0.5` GeV
+    **Criteria for 1 prong final states**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \\Delta E < 0.5` GeV
 
-    **Criteria for >1 prong final states **: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \Delta E < 0.5` GeV
+    **Criteria for >1 prong final states**: Number of good tracks < 7, :math:`1.4 < M < 2.0` GeV, :math:`-1.0 < \\Delta E < 0.5` GeV
 
     Returns:
         list name of the TauLFV skim candidates
@@ -318,7 +318,7 @@ def SetTauThrustSkimVariables(path):
     """
     Set particle lists and variables for TauThrust skim
 
-    **Input particle lists**: `pi+:all`, `gamma:all`
+    **Input particle lists**: ``pi+:all``, ``gamma:all``
 
     **Output particle lists**: ``pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust``
 

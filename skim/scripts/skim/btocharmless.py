@@ -86,8 +86,8 @@ def CharmlessHad2BodyB0List(path):
     **Particle Lists**:
 
     * Standard loose lists for all light mesons.
-    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    * Modified ``K_S0:merged`` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified ``pi0:skim`` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
 
     **Additional Cuts**:
 
@@ -242,8 +242,8 @@ def CharmlessHad2BodyBmList(path):
     **Particle Lists**:
 
     * Standard loose lists for all light mesons.
-    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    * Modified ``K_S0:merged`` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified ``pi0:skim`` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
 
     **Additional Cuts**:
 
@@ -368,8 +368,8 @@ def CharmlessHad3BodyB0List(path):
     **Particle Lists**:
 
     * Standard loose lists for all light mesons.
-    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    * Modified ``K_S0:merged`` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified ``pi0:skim`` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
 
     **Additional Cuts**:
 
@@ -473,8 +473,8 @@ def CharmlessHad3BodyBmList(path):
     **Particle Lists**:
 
     * Standard loose lists for all light mesons.
-    * Modified `K_S0:merged` with tighter invariant mass, ``0.48 < M < 0.51``.
-    * Modified `pi0:skim` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
+    * Modified ``K_S0:merged`` with tighter invariant mass, ``0.48 < M < 0.51``.
+    * Modified ``pi0:skim`` with tighter invariant mass and minimum energy, ``0.12 < M < 0.14 and E > 0.25``.
 
     **Additional Cuts**:
 

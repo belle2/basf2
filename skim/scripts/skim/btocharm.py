@@ -316,11 +316,9 @@ def BtoD0h_Kpipipi_Kpipi0List(path):
 
     2.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
 
-    3.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\pi^+`
+    3.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^0) \\pi^+`
 
-    4.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\K^+`
+    4.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^0) \\K^+`
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -518,7 +516,7 @@ def BtoD0rho_KpiList(path):
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstar0_D0pi0_Kpi() from the ``charm.py`` script,
-    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
 
@@ -555,8 +553,7 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
 
     1.  :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`,
 
-    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^0) \\rho^+`,
+    2.  :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^0) \\rho^+`,
 
 
     **Particle Lists**: Standard lists for all particles.
@@ -577,7 +574,7 @@ def BtoD0rho_Kpipipi_Kpipi0List(path):
 
     Note:
     This skim uses loadStdD0 and loadStdDstar0_D0pi0 functions from the ``charm.py`` script,
-    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
    .. Warning::
        This skim saves only three randomly-chosen :math:`B^{+}` candidates in a 'B+:BtoD0rho_merged' list,
@@ -640,7 +637,7 @@ def B0toDrho_KpipiList(path):
 
     Note:
     This skim uses loadStdDplus_Kpipi() from the ``charm.py`` script,
-    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
 
@@ -683,7 +680,7 @@ def B0toDrho_KspiList(path):
     5. ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses stdKshorts() from ```stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
+    This skim uses stdKshorts() from ``stdV0s.py`` and loadStdDplus_Kspi() from the ``charm.py`` script,
     where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
@@ -730,7 +727,7 @@ def B0toDstarRho_KpiList(path):
 
     Note:
     This skim uses loadStdD0_Kpi() and loadStdDstarPlus_D0pi_Kpi() from the ``charm.py`` script,
-    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
 
@@ -758,9 +755,7 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
 
     **Decay Modes**:
 
-    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to
-                         K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-                         \\pi^-) \\rho^+`,
+    1.  :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^-) \\rho^+`,
 
     **Particle Lists**: Standard lists for all particles.
 
@@ -778,7 +773,7 @@ def B0toDstarRho_Kpipipi_Kpipi0List(path):
 
     Note:
     This skim uses loadStdD0 and loadStdDstarPlus_D0pi functions from the ``charm.py`` script,
-    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py `` script.
+    where :math:`D^0` channels are defined, and loadStdAllRhoPlus() from the ``lightmesons.py`` script.
 
     """
 

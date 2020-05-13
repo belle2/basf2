@@ -149,7 +149,7 @@ def ISRpipiccList(path):
 
     **Selection Criteria**:
 
-    (1) Standard `e/mu/pi ParticleLists`
+    (1) Standard ``e/mu/pi ParticleLists``
     (2) Mass window cut for ``J/psi`` and ``psi(2S)`` candidates
     (3) Apply ``-4 < the recoil mass square of hadrons < 4 GeV^{2}/c^{4}`` to extract ISR signal events
 

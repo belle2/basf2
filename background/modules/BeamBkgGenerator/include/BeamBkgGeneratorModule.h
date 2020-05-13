@@ -67,7 +67,10 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-    TGeoHMatrix SADtoGeant(TString accRing, double s);
+  protected:
+
+    ReaderSAD m_readerSAD;     /**< The SAD reader object for the SAD data. */
+    TGeoHMatrix* m_transMatrix; /**< Transformation matrix from SAD space into geant4 space. */
 
   private:
 
@@ -76,9 +79,6 @@ namespace Belle2 {
      * @return TTree entry number
      */
     int generateEntry() const;
-
-    ReaderSAD* m_readerSAD;
-    TGeoHMatrix* m_transMatrix; /**< Transformation matrix from local SAD to global geant4 space. */
 
     /**
      * Structure of the TTree in the SAD file

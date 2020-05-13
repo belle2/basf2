@@ -24,26 +24,41 @@ namespace Belle2 {
   public:
 
     //! Empty constructor for ROOT IO (needed to make the class storable)
-    BKLMSimHitPosition() : RelationsObject() {}
+    BKLMSimHitPosition() : RelationsObject()
+    {
+    }
 
     //! Constructor with initial values (from simulation step)
     //! @param x Cartesian x coordinate of global position
     //! @param y Cartesian y coordinate of global position
     //! @param z Cartesian z coordinate of global position
-    BKLMSimHitPosition(double x, double y, double z) : RelationsObject() { m_Position.SetX(x); m_Position.SetY(y); m_Position.SetZ(z); }
+    BKLMSimHitPosition(double x, double y, double z) : RelationsObject()
+    {
+      m_Position.SetX(x); m_Position.SetY(y); m_Position.SetZ(z);
+    }
 
     //! Destructor
-    virtual ~BKLMSimHitPosition() {}
+    virtual ~BKLMSimHitPosition()
+    {
+    }
 
     //! Copy constructor
-    BKLMSimHitPosition(const BKLMSimHitPosition& p) : RelationsObject(p), m_Position(p.m_Position) {}
+    BKLMSimHitPosition(const BKLMSimHitPosition& p) : RelationsObject(p), m_Position(p.m_Position)
+    {
+    }
 
     //! Assignment operator
-    BKLMSimHitPosition& operator=(const BKLMSimHitPosition& p) { m_Position = p.m_Position; return *this;}
+    BKLMSimHitPosition& operator=(const BKLMSimHitPosition& p)
+    {
+      m_Position = p.m_Position; return *this;
+    }
 
     //! Get the BKLMSimHit's global position
     //! @return Cartesian global position (cm)
-    const TVector3& getPosition() { return m_Position; }
+    const TVector3& getPosition()
+    {
+      return m_Position;
+    }
 
   private:
 

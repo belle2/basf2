@@ -29,7 +29,8 @@ namespace Belle2 {
       m_CoincidenceWindow(0),
       m_PromptTime(0),
       m_PromptWindow(0)
-    {};
+    {
+    }
 
     /**
     * Constructor
@@ -39,45 +40,65 @@ namespace Belle2 {
       m_CoincidenceWindow = coincidenceWindow;
       m_PromptTime = promptTime;
       m_PromptWindow = promptWindow;
-    };
+    }
 
     /**
     * Destructor
     */
-    ~KLMTimeWindow() {};
+    ~KLMTimeWindow()
+    {
+    }
 
     /**
      * Set the coincidence window.
      * @param[in] coincidenceWindow Coincidence window.
      */
-    void setCoincidenceWindow(double coincidenceWindow) { m_CoincidenceWindow = coincidenceWindow; }
+    void setCoincidenceWindow(double coincidenceWindow)
+    {
+      m_CoincidenceWindow = coincidenceWindow;
+    }
 
     /**
      * Set the prompt time.
      * @param[in] promptTime Prompt time.
      */
-    void setPromptTime(double promptTime) { m_PromptTime = promptTime; }
+    void setPromptTime(double promptTime)
+    {
+      m_PromptTime = promptTime;
+    }
 
     /**
      * Set the prompt time window.
      * @param[in] promptWindow Prompt time window.
      */
-    void setPromptWindow(double promptWindow) { m_PromptWindow = promptWindow; }
+    void setPromptWindow(double promptWindow)
+    {
+      m_PromptWindow = promptWindow;
+    }
 
     /**
     * Get the coincidence window.
     */
-    double getCoincidenceWindow() const {return m_CoincidenceWindow;}
+    double getCoincidenceWindow() const
+    {
+      return m_CoincidenceWindow;
+    }
 
     /**
      * Get the prompt time.
      */
-    double getPromptTime() const { return m_PromptTime; }
+    double getPromptTime() const
+    {
+      return m_PromptTime;
+    }
 
     /**
     * Get the prompt time window.
     */
-    double getPromptWindow() const { return m_PromptWindow; }
+    double getPromptWindow() const
+    {
+      return m_PromptWindow;
+    }
 
   private:
 

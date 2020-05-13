@@ -23,14 +23,15 @@ using namespace Belle2;
 REG_MODULE(EKLMAlignmentAlongStripsCollector)
 
 EKLMAlignmentAlongStripsCollectorModule::
-EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
+EKLMAlignmentAlongStripsCollectorModule() :
+  CalibrationCollectorModule(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_GeoDat(nullptr),
+  m_TransformData(nullptr),
+  m_Event(new EKLMAlignmentAlongStripsAlgorithm::Event)
 {
   setDescription("Module for EKLM alignment along strip (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_Event = new EKLMAlignmentAlongStripsAlgorithm::Event;
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_GeoDat = nullptr;
-  m_TransformData = nullptr;
 }
 
 EKLMAlignmentAlongStripsCollectorModule::

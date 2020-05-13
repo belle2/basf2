@@ -125,7 +125,7 @@ void TpcDigitizerModule::event()
 
     const int PDGid = microtpcSimHit.gettkPDG();
     if (m_LookAtRec == 1) {
-      if (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212) {
+      if (PDGid != 1000020040 && PDGid != 1000060120 && PDGid != 1000080160 && PDGid != 2212) {
         continue;
       }
     }

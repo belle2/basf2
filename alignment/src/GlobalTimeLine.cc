@@ -60,7 +60,7 @@ namespace Belle2 {
         return std::get<EventHeader>(timeTable).at(timeid);
       }
 
-      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, GlobalParamVector& vector)
+      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector)
       {
         PayloadsTable payloadsTable;
 

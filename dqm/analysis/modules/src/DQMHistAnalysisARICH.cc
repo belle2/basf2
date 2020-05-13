@@ -77,12 +77,6 @@ void DQMHistAnalysisARICHModule::beginRun()
 void DQMHistAnalysisARICHModule::event()
 {
 
-  int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-  int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-  int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-  //int alertTheta = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
-
-
   //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
   TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
@@ -94,6 +88,7 @@ void DQMHistAnalysisARICHModule::event()
     m_h_mergerHit->Draw("hist");
     gPad->Update();
 
+    int alertMerger = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
     double mean = m_h_mergerHit->Integral() / 72;
     for (int i = 0; i < 72; i++) {
       int hit = m_h_mergerHit->GetBinContent(i + 1);
@@ -130,6 +125,8 @@ void DQMHistAnalysisARICHModule::event()
     m_h_bits->Draw("hist");
     gPad->Update();
 
+    int alertBits = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
+
     double side = m_h_bits->GetBinContent(2) + m_h_bits->GetBinContent(5);
     double center = m_h_bits->GetBinContent(3) + m_h_bits->GetBinContent(4);
     if (center / side < 2) alertBits = 1;
@@ -151,6 +148,7 @@ void DQMHistAnalysisARICHModule::event()
     m_h_hitsPerEvent->Draw("hist");
     gPad->Update();
 
+    int alertHitsPerEvent = 0;/**<Alert level variable for shifter plot (0:no problem, 1:need to check, 2:contact experts immediately)*/
     double mean = m_h_hitsPerEvent->GetMean();
     if (mean < 1) alertHitsPerEvent = 1;
     double entry = m_h_hitsPerEvent->GetEntries();

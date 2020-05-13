@@ -33,9 +33,9 @@ namespace Belle2 {
     static void toSocket(std::unique_ptr<ZMQModuleMessage> message, const std::unique_ptr<zmq::socket_t>& socket)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
-        socket->send(message->m_messageParts[i], ZMQ_SNDMORE);
+        socket->send(message->m_messageParts[i], zmq::send_flags::sndmore);
       }
-      socket->send(message->m_messageParts[c_messageParts - 1]);
+      socket->send(message->m_messageParts[c_messageParts - 1], zmq::send_flags::none);
     }
 
     /// Do not allow to copy a message

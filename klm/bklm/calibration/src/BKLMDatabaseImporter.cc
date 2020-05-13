@@ -24,12 +24,9 @@
 
 using namespace Belle2;
 
-BKLMDatabaseImporter::BKLMDatabaseImporter() :
-  m_ExperimentLow(0),
-  m_RunLow(0),
-  m_ExperimentHigh(-1),
-  m_RunHigh(-1)
-{}
+BKLMDatabaseImporter::BKLMDatabaseImporter()
+{
+}
 
 void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
                                   int experimentHigh, int runHigh)

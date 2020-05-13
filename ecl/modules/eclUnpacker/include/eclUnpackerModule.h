@@ -1,19 +1,23 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily, Mikhail Remnev                          *
+ * Contributors: Vasily Shebalin, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
+// Framework
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
-#include "ecl/utility/ECLChannelMapper.h"
+
+// ECL
+#include <ecl/utility/ECLChannelMapper.h>
 
 namespace Belle2 {
 
@@ -49,6 +53,16 @@ namespace Belle2 {
 
     BELLE2_DEFINE_EXCEPTION(Bad_ShaperDSP_header, "Corrupted Shaper DSP header");
 
+    /** ECL unpacker run-dependent parameters (per channel) */
+    enum ECLUnpack {
+      /** Skip ECLDigit unpacking */
+      ECL_DISCARD_DSP_DATA   = 0x00000001,
+      /** Keep ECLDigits for quality flag 0 even if ECL_DISCARD_DSP_DATA is set */
+      ECL_KEEP_GOOD_DSP_DATA = 0x00000002,
+      /** Get ECLDigits from offline waveform fit */
+      ECL_OFFLINE_ADC_FIT = 0x00000004,
+    };
+
   protected:
 
 
@@ -71,15 +85,17 @@ namespace Belle2 {
     bool m_storeTrigTime;
     /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
+    /** Use ECLUnpackingParameters payload for run-dependent unpacking */
+    bool m_useUnpackingParameters;
 
     /** report only once per crate about inconsistency between trg tag and evt number */
-    long m_evtNumReportedMask;
+    long m_evtNumReportedMask = 0;
     /** report only once per crate about problem with different trg tags */
-    long m_tagsReportedMask;
+    long m_tagsReportedMask = 0;
     /** report only once per crate about problem with different trg phases */
-    long m_phasesReportedMask;
+    long m_phasesReportedMask = 0;
     /** report only once per crate about problem with shaper header */
-    long m_badHeaderReportedMask;
+    long m_badHeaderReportedMask = 0;
 
     /**
      * Report the problem with inconsistency between trg tag and evt number.
@@ -135,6 +151,9 @@ namespace Belle2 {
     /** ECL channel mapper **/
     ECL::ECLChannelMapper m_eclMapper;
 
+    /** Run-dependent unpacking parameters for each channel */
+    DBObjPtr<ECLChannelMap> m_unpackingParams;
+
     /*   Input data   */
 
     /** store array for RawECL**/
@@ -160,6 +179,8 @@ namespace Belle2 {
     unsigned int readNBits(int bitsToRead);
     /** read raw data from COPPER and fill output m_eclDigits container */
     void readRawECLData(RawECL* rawCOPPERData, int n);
+    /** Check if DSP data should be saved to datastore */
+    bool isDSPValid(int cellID, int crate, int shaper, int channel, int amp, int time, int quality);
 
   };
 }//namespace Belle2

@@ -57,6 +57,7 @@ namespace Belle2 {
     /** last histogram */
     TH1* m_h_last = nullptr;
 
+    /** number of EPICS PVs */
     static const int m_parameters = 2;
 #ifdef _BELLE2_EPICS
     chid mychid[m_parameters];// hard limit max 2 parameters

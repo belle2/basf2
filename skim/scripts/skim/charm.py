@@ -1025,12 +1025,11 @@ class XToDp_DpToKsHp(BaseSkim):
         mySel += " and 0.296706 < theta < 2.61799"
         ma.fillParticleList("pi+:kshp", mySel, path=path)
         ma.fillParticleList("K+:kshp", mySel, path=path)
-
-        self.fillCharmSkimKs(path)
+        ma.cutAndCopyList('K_S0:kshp', 'K_S0:merged', 'formula(flightDistance/flightDistanceErr) > 2', path=path)
 
         Dpcuts = "1.72 < M < 2.2 and useCMSFrame(p)>2"
-        Dp_Channels = ["K_S0:merged pi+:kshp",
-                       "K_S0:merged K+:kshp",
+        Dp_Channels = ["K_S0:kshp pi+:kshp",
+                       "K_S0:kshp K+:kshp",
                        ]
 
         DpList = []
@@ -1262,7 +1261,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdPi": ["loose"],
+            "stdPi": ["all"],
         },
         "stdPi0s": {
             "loadStdSkimPi0": [],
@@ -1273,8 +1272,12 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     }
 
     def build_lists(self, path):
+        mySel = "abs(d0) < 1 and abs(z0) < 3"
+        mySel += " and 0.296706 < theta < 2.61799"
+        ma.fillParticleList("pi+:ksomega", mySel, path=path)
+
         ma.cutAndCopyList("pi0:mypi0", "pi0:skim", "0.11 < M < 0.15 and p > 0.25 ", path=path)
-        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:mypi0", "", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:ksomega pi-:ksomega pi0:mypi0", "", path=path)
 
         charmcuts = "1.7 < M < 2 and useCMSFrame(p)>2.4"
         ma.reconstructDecay("D0:KsOmega -> K_S0:merged omega:3pi", charmcuts, path=path)

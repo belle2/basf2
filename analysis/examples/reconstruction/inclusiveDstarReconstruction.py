@@ -92,7 +92,6 @@ list_tree_tuples.append(("D*0:Dstzero_slowPizero", "Dstzero_slowPizero"))
 
 dstar_variables = [
     "isSignal",
-    "isSignalAcceptMissing",
     "isWrongCharge",
     "PDG",
     "daughter(0, PDG)",

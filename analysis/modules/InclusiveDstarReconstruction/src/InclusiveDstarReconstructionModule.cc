@@ -193,17 +193,23 @@ int InclusiveDstarReconstructionModule::getDstarOutputPDG(int pion_charge, int i
   // Helper function to get the correct D* PDG code depending on the input (DecayDescriptor)
   // and the charge of the reconstructed pion
 
-  // DecayDescriptor: D*+ -> pi+
-  if (input_dstar_pdg > 0) {
-    return (pion_charge > 0) ? input_dstar_pdg : -input_dstar_pdg;
-  }
-  // DecayDescriptor: D* -> pi-
-  else if (input_dstar_pdg < 0) {
-    return (pion_charge < 0) ? input_dstar_pdg : -input_dstar_pdg;
-  }
-
   // DecayDescriptor: D*+ -> pi0 or D*0 -> pi0
   // the opposite (D*- -> pi0 or anti-D*0 -> pi0) are treated from line 150.
-  return input_dstar_pdg;
+  if (pion_charge == 0) {
+    return input_dstar_pdg;
+  }
+
+  else {
+    // DecayDescriptor: D*+ -> pi+
+    if (input_dstar_pdg > 0) {
+      return (pion_charge > 0) ? input_dstar_pdg : -input_dstar_pdg;
+    }
+    // DecayDescriptor: D* -> pi-
+    else {
+      return (pion_charge < 0) ? input_dstar_pdg : -input_dstar_pdg;
+    }
+  }
+
+
 
 }

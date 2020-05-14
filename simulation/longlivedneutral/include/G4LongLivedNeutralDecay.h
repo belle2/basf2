@@ -48,7 +48,7 @@ namespace Belle2 {
     ) override;
 
     /**
-     * G4VProess::AtRestDoIt() implemention,
+     * G4VProess::AtRestDoIt() implemention for decay at rest
      * @param aTrack
      * @param aStep
      */

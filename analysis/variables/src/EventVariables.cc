@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sam Cunliffe     *
  *       for the EventKinematics variables: Ami Rostomyan,                *
  *                                          Michel Villanueva             *
  *                                                                        *
@@ -500,11 +500,16 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Beam momentum Pz (lab)");
 
-    REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
+    REGISTER_VARIABLE("IPX", getIPX, R"DOC(
+[Eventbased] x coordinate of the measured interaction point.
 
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
+.. note:: For old data and uncalibrated MC files this will return 0.0.
+
+.. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
+)DOC");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
                       "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"

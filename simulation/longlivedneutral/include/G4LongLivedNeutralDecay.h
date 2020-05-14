@@ -37,12 +37,11 @@ namespace Belle2 {
 
     /**
      * G4VProcess::PostStepDoIt() implemention
-
      * @param aTrack
      * @param aStep
      *
      * for decay in flight
-     * G4Decay Process has both */
+     */
     virtual G4VParticleChange* PostStepDoIt(
       const G4Track& aTrack,
       const G4Step& aStep
@@ -126,47 +125,47 @@ namespace Belle2 {
 
     virtual G4double GetMeanLifeTime(const G4Track& aTrack,
                                      G4ForceCondition* condition
-                                    ) override
+                                    ) override;
     /**<  GetMeanLifeTime returns ctau for decay at rest*/
 
 
 
-    public:
+  public:
 
-      virtual void StartTracking(G4Track*) override;
-      /**< inform Start of tracking for each track to the physics process*/
-      virtual void EndTracking() override;
-      /**< inform End of tracking for each track to the physics process */
+    virtual void StartTracking(G4Track*) override;
+    /**< inform Start of tracking for each track to the physics process*/
+    virtual void EndTracking() override;
+    /**< inform End of tracking for each track to the physics process */
 
 
-    public:
+  public:
 
-      G4double GetRemainderLifeTime() const;
-      /**< Get Remainder of life time at rest decay*/
+    G4double GetRemainderLifeTime() const;
+    /**< Get Remainder of life time at rest decay*/
 
-    protected:
-      G4int verboseLevel;
-      /**< controle flag for output message
-       *   0: Silent
-       *   1: Warning message
-       *   2: More */
+  protected:
+    G4int verboseLevel;
+    /**< controle flag for output message
+     *   0: Silent
+     *   1: Warning message
+     *   2: More */
 
-    protected:
-      // HighestValue.
+  protected:
+    // HighestValue.
 
-      const G4double HighestValue; /**< Remainder of life time at rest */
+    const G4double HighestValue; /**< Remainder of life time at rest */
 
-      G4double fRemainderLifeTime; /**< ParticleChange for decay process */
+    G4double fRemainderLifeTime; /**< ParticleChange for decay process */
 
-      G4ParticleChangeForDecay fParticleChangeForDecay; /**< ParticleChange for decay process */
+    G4ParticleChangeForDecay fParticleChangeForDecay; /**< ParticleChange for decay process */
 
-    };
+  };
 
-    inline
-    G4VParticleChange * G4LongLivedNeutralDecay::AtRestDoIt(
-      const G4Track & aTrack,
-      const G4Step &  aStep
-    )
+  inline
+  G4VParticleChange* G4LongLivedNeutralDecay::AtRestDoIt(
+    const G4Track& aTrack,
+    const G4Step&   aStep
+  )
   {
     return DecayIt(aTrack, aStep);
   }

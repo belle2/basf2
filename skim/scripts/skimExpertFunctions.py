@@ -646,6 +646,13 @@ class BaseSkim(ABC):
             k: v for (k, v) in self.RequiredStandardLists.items()
             if k.startswith("skim.standardlists.")
         }
+        try:
+            # The lightmesons module creates particle lists required by other skim
+            # lists, so make sure they are run before any other skim list functions.
+            lightmesons = StandardSkimLists.pop("skim.standardlists.lightmesons")
+            StandardSkimLists = {"skim.standardlists.lightmesons": lightmesons, **StandardSkimLists}
+        except KeyError:
+            pass
 
         self.RequiredStandardLists = {**StandardLists, **StandardSkimLists}
 

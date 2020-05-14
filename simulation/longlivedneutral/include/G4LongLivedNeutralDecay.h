@@ -18,7 +18,7 @@ namespace Belle2 {
   class G4LongLivedNeutralDecay : public G4VRestDiscreteProcess {
 
   public:
-    /**  Constructors
+    /**  Constructor
      */
     G4LongLivedNeutralDecay(const G4String& processName = "LongLivedNeutralDecay");
 
@@ -33,17 +33,16 @@ namespace Belle2 {
     //  Assignment Operation (generated)
     G4LongLivedNeutralDecay& operator=(const G4LongLivedNeutralDecay& right);
 
-  public: //With Description
+  public:
+
     /**
      * G4VProcess::PostStepDoIt() implemention
+
      * @param aTrack
-     * @param astep
+     * @param aStep
      *
      * for decay in flight
      * G4Decay Process has both */
-
-    // AtRestDoIt (for decay at rest)
-
     virtual G4VParticleChange* PostStepDoIt(
       const G4Track& aTrack,
       const G4Step& aStep
@@ -54,7 +53,6 @@ namespace Belle2 {
      * @param aTrack
      * @param aStep
      */
-
     virtual G4VParticleChange* AtRestDoIt(
       const G4Track& aTrack,
       const G4Step&  aStep
@@ -71,7 +69,7 @@ namespace Belle2 {
     /**< returns "true" if the decay process can be applied to
          the particle type. */
 
-  protected: // With Description
+  protected:
 
     /**
      * G4Decay::DecayIt() implemention
@@ -117,7 +115,7 @@ namespace Belle2 {
       G4ForceCondition* condition
     ) override;
 
-  protected: // With Description
+  protected:
 
 
     virtual G4double GetMeanFreePath(const G4Track& aTrack,
@@ -133,7 +131,7 @@ namespace Belle2 {
 
 
 
-    public: //With Description
+    public:
 
       virtual void StartTracking(G4Track*) override;
       /**< inform Start of tracking for each track to the physics process*/
@@ -141,7 +139,7 @@ namespace Belle2 {
       /**< inform End of tracking for each track to the physics process */
 
 
-    public: //With Description
+    public:
 
       G4double GetRemainderLifeTime() const;
       /**< Get Remainder of life time at rest decay*/

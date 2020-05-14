@@ -114,12 +114,13 @@ namespace Belle2 {
 
     /**
      * G4VProcess::PostStepGetPhysicalInteractionLength() implementation.
-     * Forces the PostStepDoIt action to be called,
-     * but does not limit the step
      *
      * @param track This argument of base function is ignored
      * @param previousStepSize This argument of base function is ignored
-     * @param pCoreCond Force condition by default
+     * @param pForceCond Force condition by default
+     *
+     * Forces the PostStepDoIt action to be called,
+     * but does not limit the step
      */
     G4double PostStepGetPhysicalInteractionLength(
       const G4Track&,
@@ -205,14 +206,23 @@ namespace Belle2 {
     void StartTracking(G4Track* aTrack);
     /**< Reset state for new (potentially resumed) track*/
 
+    /**
+     * G4LongLivedNeutralTransportation::ProcessDescription()
+     *
+     * @outfile Description of process
+     */
     virtual void ProcessDescription(std::ostream& outFile) const; //override;
+
     void PrintStatistics(std::ostream& outStr) const;
     /**< returns current logging info of the algorithm */
 
   protected:
 
+    /**
+     * Checks whether a field exists for the "global" field manager.
+     */
+
     inline G4bool DoesGlobalFieldExist()
-    /**< Checks whether a field exists for the "global" field manager. */
     {
       G4TransportationManager* transportMgr;
       transportMgr = G4TransportationManager::GetTransportationManager();

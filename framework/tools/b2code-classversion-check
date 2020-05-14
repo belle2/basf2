@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+"""
+Tool to check that all ROOT dictionary information is correct and up to date as expected
+
+This tool will look for all "linkdef.h" files and check if the classes mentioned
+in there are as expected, that is that the version is what we expect and that the checksum is unchanged
+"""
+
+import os
+import sys
+from pathlib import Path
+import argparse
+
+from ROOT import PyConfig
+PyConfig.DisableRootLogon = True
+PyConfig.IgnoreCommandLineOptions = True
+PyConfig.StartGuiThread = False
+from b2test_utils.classversion import check_linkdef
+from basf2 import B2ERROR
+
+def get_argument_parser():
+    """
+    Return an ArgumentParser with all defined arguments
+    """
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("directory", nargs="*", help="Name of a directory or linkdef file to check. "
+                        "If it's a directory it will be searched recursively for linkdef files")
+    return parser
+
+if __name__ == "__main__":
+    parser = get_argument_parser()
+    args = parser.parse_args()
+    if not args.directory:
+        args.directory = [os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DIR', '.'))]
+
+    all_ok = True
+    for base in args.directory:
+        base = Path(base)
+        if not base.exists():
+            B2ERROR(f"File {base} doesn't exist")
+            continue
+        files = base.glob("**/linkdef.h") if base.is_dir() else [base]
+        for filename in files:
+            all_ok &= check_linkdef(filename)
+
+    if not all_ok:
+        B2ERROR("Error checking linkdef files. Most probably a class layout has"
+                "changed. Please run b2code-classversion-update on the corresponding"
+                "linkdef if you updated the content of a class that has a ROOT dictionary.")
+        sys.exit(1)

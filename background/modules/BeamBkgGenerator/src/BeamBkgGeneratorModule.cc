@@ -226,20 +226,20 @@ namespace Belle2 {
     part->addStatus(MCParticle::c_StableInGenerator);
 
     // FarBeamLine region transformation
-    if (abs(m_sad.s) > 4.) { // [m]
+    if (abs(m_sad.s * Unit::m) > 4.0 * Unit::m) {
 
       // initial coordinates in SAD space
-      double particlePosSADfar[] = {m_sad.x, -m_sad.y, 0};
-      double particleMomSADfar[] = {m_sad.px, -m_sad.py, pz};
+      double particlePosSADfar[] = {m_sad.x* Unit::m, -m_sad.y* Unit::m, 0.0 * Unit::m};
+      double particleMomSADfar[] = {m_sad.px* Unit::GeV, -m_sad.py* Unit::GeV, pz* Unit::GeV};
       // final coordinates in Geant4 space
       double particlePosGeant4[] = {0.0, 0.0, 0.0};
       double particleMomGeant4[] = {0.0, 0.0, 0.0};
 
       // create a transformation matrix for a given ring
       if (m_ringName == "LER") {
-        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s));
+        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s * Unit::m));
       } else {
-        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s));
+        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s * Unit::m));
       }
 
       // calculate a new set of coordinates in Geant4 space
@@ -251,7 +251,6 @@ namespace Belle2 {
       part->setProductionVertex(TVector3(particlePosGeant4));
     }
   }
-
 
   void BeamBkgGeneratorModule::endRun()
   {

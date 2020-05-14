@@ -19,9 +19,9 @@
 
 using namespace Belle2;
 
-KLMElementNumbers::KLMElementNumbers()
+KLMElementNumbers::KLMElementNumbers() :
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMElementNumbers::~KLMElementNumbers()

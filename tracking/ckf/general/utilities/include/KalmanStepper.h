@@ -65,7 +65,7 @@ namespace Belle2 {
     }
 
     /// Helper function to calculate a residual between the mSoP and the measurement.
-    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
+    double calculateResidual(const genfit::MeasuredStateOnPlane& measuredStateOnPlane,
                              const genfit::MeasurementOnPlane& measurementOnPlane) const
     {
       // Extract matrices from the state

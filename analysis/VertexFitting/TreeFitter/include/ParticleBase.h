@@ -38,7 +38,9 @@ namespace TreeFitter {
                          kResonance,
                          kRecoPhoton,
                          kRecoKlong,
-                         kMissingParticle
+                         kMissingParticle,
+                         kFeedthroughParticle,
+                         kInternalTrack
                         };
 
     /** default constructor  */
@@ -101,7 +103,7 @@ namespace TreeFitter {
     int index() const { return m_index ; }
 
     /** getMother() / hasMother() */
-    const ParticleBase* mother() const { return m_mother ; }
+    const ParticleBase* mother() const;
 
     /**  get name of the particle */
     const std::string& name() const { return m_name ; }
@@ -117,7 +119,6 @@ namespace TreeFitter {
 
     /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
-
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
@@ -188,7 +189,6 @@ namespace TreeFitter {
 
     /** set the relation to basf2 particle type */
     void setParticle(Belle2::Particle* particle) { m_particle = particle ; }
-
 
   protected:
 

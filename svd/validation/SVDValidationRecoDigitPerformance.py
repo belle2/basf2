@@ -39,7 +39,7 @@ ploter(
     cut='',
     descr='Definition: (reconstructed time of the RecoDigit) - (time of the Truehit);\
     for all RecoDigit related to one TrueHit.',
-    check='Distribution peaks around 0.',
+    check='Distribution between -40 and 20 ns.',
     isShifter=True)
 
 ploter(

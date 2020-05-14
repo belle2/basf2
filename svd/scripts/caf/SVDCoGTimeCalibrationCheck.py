@@ -26,6 +26,7 @@ from svd import *
 from rawdata import *
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
 from basf2 import conditions
+import rawdata as raw
 
 import matplotlib.pyplot as plt
 import simulation
@@ -49,11 +50,6 @@ nSVD = 6
 nCDC = 1
 pVal = 0.0  # 0001
 
-# inputFileList = [
-#    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-# e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"
-# ]
-
 inputFileList = []
 
 if filename.rfind(".root") != -1:
@@ -62,15 +58,13 @@ else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
 
-
-# reset_database()
-# use_database_chain()
-# use_local_database(str(localdb) + "/database.txt", str(localdb), invertLogging=True)
-
+conditions.override_globaltags()
 conditions.globaltags = [
-    # 'svd_NOCoGCorrections',
-    'klm_alignment_testing'
-]
+    "svd_NOCoGCorrections",
+    "staging_data_reprocessing_proc11",
+    "data_reprocessing_proc11_baseline",
+    "online_proc11"]
+
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",
 ]

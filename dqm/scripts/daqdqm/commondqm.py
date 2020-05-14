@@ -230,6 +230,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
     if dqm_mode in ["dont_care", "filtered"]:
         # PhysicsObjectsDQM
         add_analysis_dqm(path)
+    if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
 
     # We want to see the datasize of all events after removing the raw data

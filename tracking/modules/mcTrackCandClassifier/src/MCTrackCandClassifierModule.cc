@@ -230,7 +230,7 @@ void MCTrackCandClassifierModule::event()
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   //1.a retrieve the MCTrackCands
   BOOST_FOREACH(genfit::TrackCand & mcTrackCand, mcTrackCands) {

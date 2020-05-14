@@ -25,6 +25,10 @@ Vertex Fitting
 
  * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
 
+ * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
+   This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
+   TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 

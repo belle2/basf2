@@ -166,10 +166,10 @@ void TRGGRLMatchModule::initialize()
     int x3 = patterns_base2[p][2];
     int x4 = patterns_base2[p][3];
     int d = x2 - x0;
-    x1 -= d;
-    x2 -= d;
-    x3 -= d;
-    x4 -= d;
+    x1 += d;
+    x2 += d;
+    x3 += d;
+    x4 += d;
     patterns_base0.push_back({x1, x2, x3, x4});
   }
 

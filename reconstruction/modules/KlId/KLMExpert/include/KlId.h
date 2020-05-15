@@ -231,7 +231,7 @@ namespace KlId {
         }
         ++index;
       }
-      if (indexOfClosestCluster != -1)
+      if (indexOfClosestCluster > -1)
         closestECL = eclClusters[indexOfClosestCluster];
     }
     return std::make_pair(closestECL, closestECLAngleDist);

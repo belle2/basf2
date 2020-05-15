@@ -208,13 +208,13 @@ namespace KlId {
       const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
 
-    Belle2::ECLCluster* closestECL = nullptr ;
+    Belle2::ECLCluster* closestECL = nullptr;
     double closestECLAngleDist = 1e10;
     Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
     if (eclClusters.getEntries() > 0) {
-      unsigned int index = 0;
-      unsigned int indexOfClosestCluster = 0;
+      int index = 0;
+      int indexOfClosestCluster = -1;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
         if (eclcluster.hasHypothesis(eclhypothesis)) {
@@ -231,7 +231,8 @@ namespace KlId {
         }
         ++index;
       }
-      closestECL = eclClusters[indexOfClosestCluster];
+      if (indexOfClosestCluster != -1)
+        closestECL = eclClusters[indexOfClosestCluster];
     }
     return std::make_pair(closestECL, closestECLAngleDist);
   }

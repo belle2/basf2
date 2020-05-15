@@ -338,7 +338,7 @@ class Calibration(CalibrationBase):
         name (str): Name of this calibration. It should be unique for use in the `CAF`
     Keyword Arguments:
         collector (str or `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
-        algorithms (list or ROOT.Belle2.CalibrationAlgorithm): The algorithm(s) to use for this `Calibration`.
+        algorithms (list or ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
         input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:

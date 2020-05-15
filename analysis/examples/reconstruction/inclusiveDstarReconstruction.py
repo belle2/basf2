@@ -26,19 +26,19 @@ list_tree_tuples = list()
 # MC Truth
 mA.fillParticleListFromMC("pi+:from_mc", cut="[dr < 2] and [abs(dz) < 4]", addDaughters=True, path=main_path)
 mA.addInclusiveDstarReconstruction(
-    "D*+:Dstcharged_slowPicharged_MC -> pi+:from_mc ...",
+    "D*+:Dstcharged_slowPicharged_MC -> pi+:from_mc ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
 
 mA.fillParticleListFromMC("pi0:from_mc", "", addDaughters=True, path=main_path)
 mA.addInclusiveDstarReconstruction(
-    "D*+:Dstcharged_slowPizero_MC -> pi0:from_mc ...",
+    "D*+:Dstcharged_slowPizero_MC -> pi0:from_mc ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
 mA.addInclusiveDstarReconstruction(
-    "D*0:Dstzero_slowPizero_MC -> pi0:from_mc ...",
+    "D*0:Dstzero_slowPizero_MC -> pi0:from_mc ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
@@ -55,14 +55,14 @@ mA.fillParticleList("pi+:slow", cut="[dr < 2] and [abs(dz) < 4]",  path=main_pat
 mA.matchMCTruth("pi+:slow", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*+:Dstcharged_slowPicharged -> pi+:slow ...",
+    "D*+:Dstcharged_slowPicharged -> pi+:slow ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
 mA.matchMCTruth("D*+:Dstcharged_slowPicharged", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*-:Dstcharged_slowPicharged_negative -> pi-:slow ...",
+    "D*-:Dstcharged_slowPicharged_negative -> pi-:slow ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
@@ -72,14 +72,14 @@ stdPi0s.stdPi0s("eff60_Jan2020", path=main_path)
 mA.matchMCTruth("pi0:eff60_Jan2020", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*+:Dstcharged_slowPizero -> pi0:eff60_Jan2020 ...",
+    "D*+:Dstcharged_slowPizero -> pi0:eff60_Jan2020 ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
 mA.matchMCTruth("D*+:Dstcharged_slowPizero", path=main_path)
 
 mA.addInclusiveDstarReconstruction(
-    "D*0:Dstzero_slowPizero -> pi0:eff60_Jan2020 ...",
+    "D*0:Dstzero_slowPizero -> pi0:eff60_Jan2020 ... ?nu ?gamma",
     slowPionCut="[useCMSFrame(p) < 2]",
     DstarCut="useCMSFrame(p) < 2",
     path=main_path)
@@ -92,7 +92,6 @@ list_tree_tuples.append(("D*0:Dstzero_slowPizero", "Dstzero_slowPizero"))
 
 dstar_variables = [
     "isSignal",
-    "isWrongCharge",
     "PDG",
     "daughter(0, PDG)",
     "E",

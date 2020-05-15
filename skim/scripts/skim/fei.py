@@ -124,7 +124,7 @@ def B0Hadronic(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        B0HadronicList (list(str)): A Python list containing the string
+        A Python list containing the string
         :code:`'B0:generic'`, the name of the particle list for
         hadronic :math:`B^0` skim candidates.
     """
@@ -231,7 +231,7 @@ def BplusHadronic(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        BplusHadronicList (list(str)): A Python list containing the string
+        A Python list containing the string
         :code:`'B+:generic'`, the name of the particle list for
         hadronic :math:`B^+` skim candidates.
     """
@@ -515,7 +515,7 @@ def B0SL(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        B0SLList (list(str)): A Python list containing the string
+        A Python list containing the string
         :code:`'B0:semileptonic'`, the name of the particle list for
         SL :math:`B^0` skim candidates.
     """
@@ -600,7 +600,7 @@ def BplusSL(path):
         path (`basf2.Path`): the path to add the skim list builders.
 
     Returns:
-        BplusSLList (list(str)): A Python list containing the string
+        A Python list containing the string
         :code:`'B+:semileptonic'`, the name of the particle list for
         SL :math:`B^+` skim candidates.
     """

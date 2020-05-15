@@ -75,6 +75,9 @@ def getAllSamples(mcCampaign):
         "proc9_exp8",
         "proc10_exp7",
         "proc10_exp8",
+        "proc11_exp7",
+        "proc11_exp8",
+        "proc11_exp10",
     ]
 
     return mcSamples, dataSamples

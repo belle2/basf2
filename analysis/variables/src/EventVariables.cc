@@ -202,20 +202,31 @@ namespace Belle2 {
 
     double getGenIPX(const Particle*)
     {
-      static DBObjPtr<BeamParameters> generatorBeamParameters;
-      return (generatorBeamParameters->getVertex()).X();
+      // generated IP corresponds to the generated vertex of the
+      // first not-initial and not-virtual MCParticle
+      StoreArray<MCParticle> mcps;
+      for (const auto mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().X();
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double getGenIPY(const Particle*)
     {
-      static DBObjPtr<BeamParameters> generatorBeamParameters;
-      return (generatorBeamParameters->getVertex()).Y();
+      StoreArray<MCParticle> mcps;
+      for (const auto mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Y();
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double getGenIPZ(const Particle*)
     {
-      static DBObjPtr<BeamParameters> generatorBeamParameters;
-      return (generatorBeamParameters->getVertex()).Z();
+      StoreArray<MCParticle> mcps;
+      for (const auto mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Z();
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double getIPX(const Particle*)
@@ -532,6 +543,7 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
+Returns NAN for data.
 
 .. note:: This is normally smeared from 0.0
 )DOC");

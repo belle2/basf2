@@ -1,5 +1,5 @@
 [INFO] Steering file: analysis/tests/test_beamspot_and_ip_variables.py
-[INFO] Starting event processing, random seed is set to '27dabc79de192e55cd162db37f2639de9e48da3982752a8b8b7b24b635c0141'
+[INFO] Starting event processing, random seed is set to 'dbbaca3e4b210bd53fd81379340c2e4613504cf750b3ba221134f9a9fdbf1f47'
 [INFO] Added file /nfs/dust/belle2/user/b2soft/validation-data/mdst12.root
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
@@ -7,10 +7,10 @@
 [INFO]      o) IPX = 1.47059e-05
 [INFO]      o) IPY = 7.91667e-05
 [INFO]      o) IPZ = -0.000703704
-[INFO]      o) genIPX = 0
-[INFO]      o) genIPY = 0
-[INFO]      o) genIPZ = 0
-[INFO] Starting event processing, random seed is set to '27dabc79de192e55cd162db37f2639de9e48da3982752a8b8b7b24b635c0141'
+[INFO]      o) genIPX = 0.000401804
+[INFO]      o) genIPY = 2.44703e-06
+[INFO]      o) genIPZ = -0.0105944
+[INFO] Starting event processing, random seed is set to 'dbbaca3e4b210bd53fd81379340c2e4613504cf750b3ba221134f9a9fdbf1f47'
 [INFO] Added file /nfs/dust/belle2/user/b2soft/validation-data/mdst13.root
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
@@ -18,6 +18,6 @@
 [INFO]      o) IPX = 1.47059e-05
 [INFO]      o) IPY = 7.91667e-05
 [INFO]      o) IPZ = -0.000703704
-[INFO]      o) genIPX = 0
-[INFO]      o) genIPY = 0
-[INFO]      o) genIPZ = 0
+[INFO]      o) genIPX = 0.000588823
+[INFO]      o) genIPY = -1.58771e-06
+[INFO]      o) genIPZ = -0.0355383

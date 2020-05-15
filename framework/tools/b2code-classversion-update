@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
 
 """
-Tool to update the expected version and checksum for all ROOT classes in a linkdef file
+Tool to update the expected version and checksum for all ROOT classes in a
+linkdef file
 
 This tool will look for all given "linkdef.h" files and update the comments for
-the classes to contain the class version and checksum from the compiled dictionary
-so that we can prevent accidental changes to classes without increase in linkdef
-version.
+the classes to contain the class version and checksum from the compiled
+dictionary.
+
+For a more detailed explanation please look at the documentation for
+`b2code-classversion-check`. But basically this tool looks for linkdef.h files
+in the given search folders and will update the class version and class checksum
+comments to reflect the actual values reported by ROOT when loading the class.
+
+It will only update the values if no comments already exist or if version and
+checksum differ from the existing values and the class version increases by one.
+Otherwise it will report detailed errors on these cases so that the differences
+can be fixed manually.
+
+.. versionadded:: after release-05-00-00
 """
 
-import os
-import sys
 from pathlib import Path
 import argparse
 

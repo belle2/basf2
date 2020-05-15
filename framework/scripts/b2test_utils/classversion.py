@@ -2,22 +2,25 @@
 b2test_utils.classversion - Helper functions to inspect and verify ROOT dictionaries
 ------------------------------------------------------------------------------------
 
-This module contains some functions to make sure classes which have a ROOT dictionary
-are healthy by allowing to check that
+This module contains some functions to make sure classes which have a ROOT
+dictionary are healthy by allowing to check that
 
 * All base classes are fully defined and not forward declared
 * All members have a dictionary
 * The class version and checksum is as expected to avoid mistakes where the
   classdef is not increased after class changes
 
-Users should only need to call ``b2code-classversion-check`` and ``b2code-classversion-update``
+Users should only need to call ``b2code-classversion-check`` and
+``b2code-classversion-update``. The documentation of
+``b2code-classversion-check`` also contains a bit more detailed explanation of
+class versions and checksums
 """
 
 import re
 import os
 import sys
 import ROOT
-from basf2 import B2INFO, B2ERROR
+from basf2 import B2INFO, B2ERROR, B2WARNING
 
 
 class ClassVersionError(Exception):
@@ -26,27 +29,21 @@ class ClassVersionError(Exception):
 
 
 class ErrorWithExtraVariables(Exception):
-    """Exception class with etra keyword arguments to show in log message"""
+    """Exception class with extra keyword arguments to show in log message"""
     def __init__(self, *args, **argk):
         super().__init__(*args)
         self.variables = argk
-
-
-def printMessage(filename, line, char, text):
-    """Print a message similar to GCC or Clang: ``filename:line:column: error: text``
-    so that it gets picked up by the build system"""
-    print(f"{os.path.relpath(filename)}:{line}:{char}: {text}", file=sys.stderr, flush=True)
 
 
 def check_base_classes(tclass):
     """Recursively check all base classes of a TClass to make sure all are well defined"""
     bases = tclass.GetListOfBases()
     if not bases:
-        raise ClassVersionError(f"class {tclass.GetName()} is incomplete")
+        raise ClassVersionError("class is incomplete")
     for base in bases:
         baseclass = base.GetClassPointer()
         if not baseclass:
-            raise ClassVersionError(f"incomplete base class for {tclass.GetName()}: {base.GetName()}")
+            raise ClassVersionError(f"incomplete base class {base.GetName()}")
         check_base_classes(baseclass)
 
 
@@ -54,13 +51,13 @@ def check_dictionary(classname):
     """Make sure we have a dictionary for the class and all its members"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass for {classname}")
+        raise ClassVersionError(f"Cannot find TClass object")
     streamerinfo = tclass.GetStreamerInfo()
     if streamerinfo:
         for element in streamerinfo.GetElements():
             elementclass = element.GetClassPointer()
             if elementclass and not elementclass.IsLoaded():
-                raise ClassVersionError(f"{tclass.GetName()}: Missing dictionary for {element.GetName()} "
+                raise ClassVersionError(f"Missing dictionary for member {element.GetName()}, "
                                         f"type {elementclass.GetName()}")
 
 
@@ -68,7 +65,7 @@ def get_class_version(classname):
     """Get the Class version and checksum for a fully qualified C++ class name"""
     tclass = ROOT.TClass.GetClass(classname)
     if not tclass:
-        raise ClassVersionError(f"Cannot find TClass for {classname}")
+        raise ClassVersionError(f"Cannot find TClass object")
     # good time to also check base classes
     check_base_classes(tclass)
     version = tclass.GetClassVersion()
@@ -129,7 +126,7 @@ def iterate_linkdef(filename):
                 yield True, (line, start, classname, clingflags, options)
 
 
-def check_linkdef(filename):
+def check_linkdef(filename, message_style="belle2"):
     """Check a linkdef file for expected versions/checksums
 
     * If the class has ``version=N, checksum=0x1234`` in the comment in the
@@ -138,80 +135,93 @@ def check_linkdef(filename):
     * But skip classes which are not stored to file.
     """
     errors = 0
+    relative_filename = os.path.relpath(filename)
+
+    def print_message(severity, text, **argk):
+        """Print a message similar to GCC or Clang: ``filename:line:column: error: text``
+        so that it gets picked up by the build system
+        """
+        nonlocal message_style, errors, relative_filename, nr, column, classname
+
+        if message_style == "gcc":
+            print(f"{relative_filename}:{nr}:{column}: {severity}: class {classname}: {text}", file=sys.stderr, flush=True)
+        else:
+            variables = {"linkdef": f"{relative_filename}:{nr}", "classname": classname}
+            variables.update(argk)
+            if severity == "error":
+                B2ERROR(text, **variables)
+            else:
+                B2WARNING(text, **variables)
+
+        if severity == "error":
+            errors += 1
 
     def get_int(container, key):
         """Get the value from a container if it exists and try to convert to int.
         Otherwise show error"""
-        nonlocal errors
         value = options.get(key, None)
         if value is not None:
             try:
                 return int(value, 0)
             except ValueError as e:
-                printMessage(filename, nr, column, f"error: expected {key} for {classname} is not valid: {e}")
-                errors += 1
+                print_message("error", f"expected {key} is not valid: {e}")
 
     # loop over all lines in the linkdef
     for nr, (isclass, content) in enumerate(iterate_linkdef(filename)):
         # and ignore everything not a class
         if not isclass:
             continue
+
         line, column, classname, clingflags, options = content
 
         # check if we can actually load the class
         try:
             version, checksum = get_class_version(classname)
         except ClassVersionError as e:
-            printMessage(filename, nr, column, f"error: {e}")
-            errors += 1
-            continue
+            print_message("error", e)
 
         # no need to check anything else if we don't have storage enabled
         if "nostreamer" in clingflags:
             if "evolution" in clingflags:
-                printMessage(filename, nr, column, f"error: {classname} both, "
-                             "no streamer and class evolution requested.")
-                errors += 1
+                print_message("error", "both, no streamer and class evolution requested.")
                 # current ROOT code lets "evolution win so lets continue as if
                 # nostreamer wouldn't be present, we flagged the error"
             else:
                 continue
-        # but warn if we use old syle streamer without evolution rules
+        # but warn if we use old style streamer without evolution rules
         elif "evolution" not in clingflags:
-            printMessage(filename, nr, column, f"warning: {classname} using old "
-                         "ROOT3 streamer format without evolution. Please add + "
-                         "or - (for classes not to be written to file) after the classname.")
+            print_message("warning", "using old ROOT3 streamer format without evolution. "
+                          "Please add + or - (for classes not to be written to file) after the classname.")
 
-        # This class seems to be intended to serialize so make sure we can
+        # This class seems to be intended to be serialized so make sure we can
         if version != 0:
             try:
                 check_dictionary(classname)
             except ClassVersionError as e:
-                printMessage(filename, nr, column, f"error: {e}")
+                print_message("error", e)
 
         # and check expected version/checksum
         expected_version = get_int(options, "version")
         expected_checksum = get_int(options, "checksum")
         if expected_version is None or expected_checksum is None:
-            printMessage(filename, nr, column, f"warning: {classname} has no "
-                         "expected version and checksum")
+            print_message("warning", "no expected version and checksum, cannot spot changes to class")
             continue
 
         # And now we know what we have ... so check the version
         if version != expected_version:
-            printMessage(filename, nr, column, f"error: {classname} expected version mismatch, please update the linkdef")
-            errors += 1
+            print_message("error", "class version has changed, please update the linkdef",
+                          expected_version=expected_version, actual_Version=version)
         # And if it's non-zero also check the checksum. Zero means deactivated streamer
         elif checksum != expected_checksum and version != 0:
-            printMessage(filename, nr, column, f"error: {classname} checksum mismatch! "
-                         "Did you forget increasing the linkdef version?")
-            errors += 1
+            print_message("error", "class checksum has changed! "
+                          "Did you forget increasing the linkdef version?",
+                          expected_checksum=expected_checksum, actual_checksum=checksum)
 
     return errors == 0
 
 
 def verify_classlink_version(classname, options):
-    """This funciton verifies the version and checksum of a class from a given
+    """This function verifies the version and checksum of a class from a given
     linkdef classlink line and returns new values if they can be updated
 
     Parameters:
@@ -243,7 +253,7 @@ def verify_classlink_version(classname, options):
         # version number was negative for "no explicit number"
         elif previous_version > -1 and version > (previous_version + 1):
             raise ErrorWithExtraVariables(
-                "actual class version increased by more one compared to the "
+                "actual class version increased by more than one compared to the "
                 "previous version set in linkdef. Please increase ClassDef in single steps",
                 previous_version=previous_version, actual_version=version,
             )

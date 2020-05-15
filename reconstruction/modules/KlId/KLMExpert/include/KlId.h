@@ -199,11 +199,10 @@ namespace KlId {
     return part ->getPDG();
   }
 
-
-
-
-
-  /** find closest ECL Cluster and its distance */
+  /**
+   * Find the closest ECLCluster with a neutral hadron hypothesis, and return it with its distance.
+   * If there are no suitabile ECLClusters, a nullptr is returned.
+   */
   std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition,
       const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
@@ -223,9 +222,6 @@ namespace KlId {
           double angularDist = eclclusterPos.Angle(klmClusterPosition);
           if (angularDist < closestECLAngleDist) {
             closestECLAngleDist = angularDist;
-            // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
-            // so that after the loop the reference would always point to the last cluster in the list...
-            // if you know a more elegant solution than using the index pls tell me (Jo)
             indexOfClosestCluster = index;
           }
         }

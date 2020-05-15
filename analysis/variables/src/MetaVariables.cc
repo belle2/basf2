@@ -155,6 +155,8 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
+          if (not eventExtraInfo.isValid())
+            eventExtraInfo.create();
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);

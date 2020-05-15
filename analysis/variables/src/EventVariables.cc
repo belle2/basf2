@@ -34,6 +34,7 @@
 // database
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
+#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 
@@ -197,6 +198,24 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       return (T.getBeamFourMomentum()).E();
+    }
+
+    double getGenIPX(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> generatorBeamParameters;
+      return (generatorBeamParameters->getVertex()).X();
+    }
+
+    double getGenIPY(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> generatorBeamParameters;
+      return (generatorBeamParameters->getVertex()).Y();
+    }
+
+    double getGenIPZ(const Particle*)
+    {
+      static DBObjPtr<BeamParameters> generatorBeamParameters;
+      return (generatorBeamParameters->getVertex()).Z();
     }
 
     double getIPX(const Particle*)
@@ -510,6 +529,14 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
     REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+
+    REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
+[Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
+
+.. note:: This is normally smeared from 0.0
+)DOC");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] y coordinate of the interaction point used for the underlying **MC generation**.");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
                       "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"

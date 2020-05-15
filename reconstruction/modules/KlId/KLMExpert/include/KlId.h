@@ -6,7 +6,7 @@
  * Contributors: Jo-Frederik Krohn                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- * **************************************************************************/
+ **************************************************************************/
 
 #pragma once
 
@@ -41,7 +41,7 @@ namespace KlId {
       const TVector3& trackPos = track.getPosition();
 
       if (trackPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
         return 1;
       }
     }
@@ -60,7 +60,7 @@ namespace KlId {
       const TVector3& clusterPos = eclcluster.getClusterPosition();
 
       if (clusterPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
         return 1;
       }
     }

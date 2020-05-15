@@ -1,4 +1,4 @@
-Changes in the analysis package since release-04-01
+Changes in the analysis package since release-04-02
 ---------------------------------------------------
 
  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
@@ -17,17 +17,18 @@ Vertex Fitting
     with the mother constrained to the beam four-momentum
     (``fit_type=fourC``).
 
- * Added ``smearing`` parameter to `vertex.kFit`. 
-   When you perform vertex fit with IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), IP profile is smeared by
-   the given value. 
-   The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile.
+ * Added ``smearing`` parameter to `vertex.kFit`.
+   When you perform a vertex fit with an IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), the IP profile is
+   smeared by the given value.
+   The IP tube is defined by a neutral track pointing towards the boost direction starting from the smeared IP profile.
    Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.
 
  * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
 
  * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
    This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
-   TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
+   In principle, TreeFitter can now be used for decays for which Bremsstrahlung correction has been applied. However, there are
+   massive performance issues. Do not blindly use TreeFit but cross-check your results with KFit. Further improvements are planned.
 
 Standard Particle Lists
 +++++++++++++++++++++++

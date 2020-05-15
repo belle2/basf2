@@ -31,7 +31,7 @@ The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE
 .. Detailed changes for the analysis package first, that's
    what user will want to see
 
-.. include:: analysis/doc/whatsnew-since/release-04-01.txt
+.. include:: analysis/doc/whatsnew-since/release-04-02.txt
 
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 

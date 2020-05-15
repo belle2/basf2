@@ -36,23 +36,31 @@ args = parser.parse_args()
 RunList = args.run
 ExpList = args.exp
 
-# check the global tag first:
-# GLOBAL_TAG = "svd_Belle2_20181221"
-
 
 conditions.override_globaltags()
-conditions.globaltags = [
+# conditions.globaltags = ["svd_hotStrips_debug20200511", "svd_loadedOnFADC", "klm_alignment_testing", "online"]
+conditions.globaltags = ["svd_offlineCalibrations", "svd_loadedOnFADC", "klm_alignment_testing", "online"]
+myLocalDB = "none"
+# if you want to use the localdb and not the occupancy paylaods on a GT uncomment-out the following line:
+# conditions.globaltags =[ "svd_loadedOnFADC", "klm_alignment_testing", "online"]
+"""
     "svd_basic", "svd_loadedOnFADC",
     "data_reprocessing_prompt_rel4_patchb",
     "giulia_CDCEDepToADCConversions_rel4_patch"]
+"""
 
-myLocalDB = "run"+str(RunList[0]) + "/calibration_results/SVDOccupancyAndHotStrips/outputdb/database.txt"
+localDB_tag = ""  # "_notRegistered"
+# myLocalDB = "/home/belle2/zani/svd/current_master/exp"+str(ExpList[0])\
+# +"/run"+str(RunList[0]) + "/calibration_results"+str(localDB_tag)\
+# +"/SVDOccupancyAndHotStrips/outputdb/database.txt"
 print('Your are plotting occupancy from payloads belongin to the local DB:')
 print('')
 print(myLocalDB)
 
-conditions.testing_payloads = [str(myLocalDB)]
-
+if(myLocalDB != "none"):
+    conditions.testing_payloads = [str(myLocalDB)]
+else:
+    B2INFO("No local DB provided, monitoring payloads from GTs.")
 
 # TO BE USED before release 04, with previous database version:
 # reset_database()
@@ -62,7 +70,11 @@ conditions.testing_payloads = [str(myLocalDB)]
 # use_local_database("localDB/database.txt", "localDB", invertLogging=True)
 # use_central_database(GLOBAL_TAG)
 
-filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
+if (myLocalDB != "none"):
+    filenameLocal = "SVDLocalCalibrationMonitor_experiment" + \
+        str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
+else:
+    filenameLocal = "SVDLocalCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 filenameCoG = "SVDCoGTimeCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 filenameCluster = "SVDClusterCalibrationMonitor_experiment" + str(ExpList[0]) + "_run" + str(RunList[0]) + ".root"
 

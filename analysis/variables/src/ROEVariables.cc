@@ -236,7 +236,7 @@ namespace Belle2 {
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return roe->getNKLMClusters();
@@ -445,7 +445,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getNTracks(maskName);
@@ -472,7 +472,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getNECLClusters(maskName);
@@ -499,7 +499,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         // Get unused ECLClusters in ROE
@@ -534,7 +534,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getPhotons(maskName).size();
@@ -560,7 +560,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getHadrons(maskName).size();
@@ -595,7 +595,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getChargedParticles(maskName, abs(pdgCode)).size();
@@ -625,7 +625,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int nPart = 0;
@@ -666,7 +666,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         // Get tracks in ROE
@@ -702,7 +702,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
@@ -735,7 +735,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         auto roephotons = roe->getPhotons(maskName);
         TLorentzVector total4vector;
@@ -764,7 +764,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
@@ -792,7 +792,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->get4Vector(maskName).Mag();
@@ -819,7 +819,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -848,7 +848,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -877,7 +877,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -906,7 +906,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -935,7 +935,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -964,7 +964,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -993,7 +993,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1022,7 +1022,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1217,7 +1217,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Theta();
@@ -1247,7 +1247,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Mag();
@@ -1277,7 +1277,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Px();
@@ -1307,7 +1307,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Py();
@@ -1337,7 +1337,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Pz();
@@ -1367,7 +1367,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Energy();
@@ -1394,7 +1394,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         double pz = 0;
@@ -1438,7 +1438,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1472,7 +1472,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int n = particle->getNDaughters();
@@ -1513,7 +1513,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int n = particle->getNDaughters();

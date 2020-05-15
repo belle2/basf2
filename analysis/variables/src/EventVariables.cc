@@ -34,7 +34,6 @@
 // database
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
-#include <framework/dbobjects/BeamParameters.h>
 
 #include <analysis/utility/PCmsLabTransform.h>
 

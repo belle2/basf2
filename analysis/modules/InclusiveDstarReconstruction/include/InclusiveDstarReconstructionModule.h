@@ -33,9 +33,9 @@ namespace Belle2 {
    * to the slow pion direction.
    *
    * The decay must be specified by a DecayString of the following forms
-   * - [D*+ -> pi+ ...]
-   * - [D*+ -> pi0 ...]
-   * - [D*0 -> pi0 ...]
+   * - [D*+ -> pi+ ... ?nu ?gamma]
+   * - [D*+ -> pi0 ... ?nu ?gamma]
+   * - [D*0 -> pi0 ... ?nu ?gamma]
    * where the ellipsis is essential for truth-matching.
    *
    * Note that the inclusive reconstruction of a D* by a pi0 is ambigious as

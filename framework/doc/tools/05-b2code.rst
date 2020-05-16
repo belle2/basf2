@@ -57,6 +57,27 @@ To run on the full release directory run it without any arguments::
 
     b2code-doxygen-warnings
 
+``b2code-classversion-check``: Perform sanity checks on ROOT class versions
+---------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2code-classversion-check
+    :func: get_argument_parser
+    :prog: b2code-classversion-check
+    :nodefault:
+    :nogroupsections:
+
+ ``b2code-classversion-update``: Update linkdef information for sanity checks
+-----------------------------------------------------------------------------
+
+.. argparse::
+    :filename: framework/tools/b2code-classversion-update
+    :func: get_argument_parser
+    :prog: b2code-classversion-update
+    :nodefault:
+    :nogroupsections:
+
+
 
 ``b2code-cppcheck``: Run cppcheck static analyzer
 -------------------------------------------------

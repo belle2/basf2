@@ -155,7 +155,6 @@ import yaml
 
 from basf2 import B2ERROR, B2INFO, B2WARNING
 from conditions_db import ConditionsDB, encode_name
-from skimExpertFunctions import encodeSkimName
 from skim.registry import Registry
 
 
@@ -780,7 +779,7 @@ def make_request_dict(
         "DataDescription": [
             {
                 "": individualSkim,
-                "SkimDecayMode": encodeSkimName(individualSkim),
+                "SkimDecayMode": Registry.encode_skim_name(individualSkim),
                 "DataLevel": "udst",
             }
             for individualSkim in individualSkims

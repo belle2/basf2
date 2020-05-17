@@ -144,7 +144,7 @@ All skims must be registered and encoded by the relevant skim liaison. Registeri
 
 The skim numbering convention is defined on the `Confluence skim page`_.
 
-.. _Confluence skim page: https://confluence.desy.de/x/URdYBQ
+.. _Confluence skim page: https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimcodeconventionandskimregistry
 
 .. automodule:: skim.registry
     :members:
@@ -172,13 +172,13 @@ Monitor your jobs with ``bjobs -u USERNAME``. Once all of the submitted jobs hav
 
 This will read the output files of the test jobs, and produce tables of statistics in a variety of outputs.
 
-* A subset of the statistics printed to the screen per-skim. This output is for display only.
+* By default, a subset of the statistics are printed to the screen.
 
-* If the ``-M`` flag is provided, a Markdown table will be written to ``skimStats.md``. This table is in a format that can be copied into the comment fields of pull requests (where BitBucket will format the table nicely for you). Use this flag when asked to produce a table of stats in a pull request.
+* If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of pull requests (where BitBucket will format the table nicely for you). Use this flag when asked to produce a table of stats in a pull request.
 
-* If the ``-J`` flag is provided, a text file ``confluenceTables.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
+* If the ``-C`` flag is provided, a text file ``SkimStats.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 
-* If the ``-J`` flag is provided, then all statistics produced are printed to a JSON file ``skimStats.json``, indexed by skim, statistic, and sample label. This file is to be used by grid production tools.
+* If the ``-J`` flag is provided, then all statistics produced are printed to a JSON file ``SkimStats.json``, indexed by skim, statistic, and sample label. This file contains extra metadata about when and how the tests were run. This file is to be used by grid production tools.
 
 .. tip::
    To test your own newly-developed skim, make sure you have followed all the instructions in

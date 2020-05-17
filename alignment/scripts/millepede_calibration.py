@@ -331,10 +331,14 @@ def create(name,
         data_iov = algorithm.getRunRangeFromAllData().getIntervalOfValidity()
         init_event = (0, data_iov.getRunLow(), data_iov.getExperimentLow())
 
-        # Use [] instead of None (= use default GTs) or our input tags:
-        # GTs configured when pre_algorithm is run will be used this way
-        # (including previous iteration results!)
-        constraint_tags = []
+        # This function runs with DB chain set up
+        # TODO: we ignore the local DBs from CAF etc., that is, the constraints
+        # are always build only from last valid central GT. As constraints are only
+        # linearizations, small alignment changes have numerical neglible effects on
+        # constraint coefficients. But we can do even better -> should be not difficult
+        # but needs much more testing.
+        # NOTE: rversed (highest priority last) order expected here
+        constraint_tags = [tag for tag in reversed(basf2.conditions.globaltags)]
 
         if len(consts):
             generate_constraints(consts, timedep, constraint_tags, init_event)

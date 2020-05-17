@@ -13,30 +13,13 @@ __author__ = "P. Grace"
 
 import basf2 as b2
 import modularAnalysis as ma
-import skimExpertFunctions as expert
-
+from skim.fei import feiSLBplus
 
 path = b2.Path()
 
 fileList = ['../feiSLBplus.dst.root']
-
 ma.inputMdstList('default', fileList, path=path)
 
-from skim.fei import BplusSL, runFEIforBplusSL
-# run pre-selection cuts and FEI
-runFEIforBplusSL(path)
-
-# Include MC matching
-path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
-
-# Apply final B+ tag cuts
-BplusSLList = BplusSL(path)
-expert.skimOutputUdst('../feiSLBplus', BplusSLList, path=path)
-ma.summaryOfLists(BplusSLList, path=path)
-
-# Suppress noisy modules, and then process
-expert.setSkimLogging(path)
+skim = feiSLBplus(OutputFileName='../feiSLBplus.udst.root')
+skim(path)
 b2.process(path)
-
-# print out the summary
-print(b2.statistics)

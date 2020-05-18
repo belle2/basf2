@@ -583,7 +583,7 @@ void setunpacker()
 {
 
   const int N_LEAF = 320;
-  const int N_UNPACKER_ARRAY = 14;
+  const int N_UNPACKER_ARRAY = 15;
 
   const int run[N_UNPACKER_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
     0,    0, -1,  -1,
@@ -599,40 +599,40 @@ void setunpacker()
     5,    1, 6,   -1,
     7,    0, 7, 1560,
     7, 1561, 7, 2102,
-    7, 2103, -1,  -1
+    7, 2103, 10,  -1,
+    12,   0, 12, -1
   };
 
   /** num of leafs in data_b2l **/
   const int nLeafs[N_UNPACKER_ARRAY] = {
     37, 37, 27, 26, 26,
     26, 31, 32, 31, 32,
-    31, 31, 30, 27
+    31, 31, 30, 27, 27
   };
   /** num of leafs for others **/
   const int nLeafsExtra[N_UNPACKER_ARRAY] = {
     8,   8,  9, 11, 11,
     11, 11, 11, 11, 11,
-    11, 11, 13, 14
-    //11, 11,  8, 7
+    11, 11, 13, 14, 16
   };
   /** num of clk time window **/
   const int nClks[N_UNPACKER_ARRAY] = {
     48, 48, 48, 48, 48,
     32, 32, 32, 32, 32,
-    32, 32, 32, 32
+    32, 32, 32, 32, 32
   };
   /** num of bits **/
   const int nBits[N_UNPACKER_ARRAY] = {
     640, 640, 640, 640, 640,
     640, 640, 640, 640, 640,
-    640, 640, 640, 640
+    640, 640, 640, 640, 640
   };
 
   /** num of inputleafmap raw **/
   const int nrows[N_UNPACKER_ARRAY] = {
     45, 45, 51, 52, 52,
     52, 57, 61, 61, 61,
-    61, 61, 63, 66
+    61, 61, 63, 66, 69
   };
 
 
@@ -651,7 +651,7 @@ void setunpacker()
     "ntopslot", "finalrvc", "tttmdl",   "tdsrcp",  "tdtopp",
     "tdeclp",   "tdcdcp",   "psn3",     "ftd3",    "itd4",
     "itd3",     "cnttrg",   "cnttrg8",  "ftd4",    "psn4",
-    "etmdata"
+    "etmdata", "sepagdll1", "sepacoml1", "gdll1rev"
   };
 
 
@@ -878,6 +878,24 @@ void setunpacker()
       5,  6, 23, 17, 10,
       11, 39,  1, 16, 22,
       40
+    },
+
+    {
+      //13
+      -1, -1, 36, -1, -1,
+      33, -1, -1, -1, -1,
+      7,  8,  9, 42, -1,
+      -1, -1, -1, -1,  0,
+      31, 18, 24, 25, -1,
+      -1, -1, 26, 19, -1,
+      20, 12, 13, 14, -1,
+      -1, -1, 27, 28, 29,
+      30, 34, -1, -1, 35,
+      -1, -1, -1, 15, 21,
+      -1, 32,  2,  3,  4,
+      5,  6, 23, 17, 10,
+      11, 37,  1, 16, 22,
+      38, 39, 40, 41
     }
 
   };
@@ -1374,6 +1392,39 @@ void setunpacker()
       95, 31, // psn2
       63, 31, // psn1
       31, 31, // psn0
+    },
+
+    {
+      //13. same with 12.
+      623, 11, // rvc
+      611, 15, // cnttrg8
+      595, 2,  // tttmdl
+      592, 0,  // tdsrcp
+      591, 0,  // tdtopp
+      590, 0,  // tdeclp
+      589, 0,  // tdcdcp
+      588, 13, // toptiming
+      573, 13, // ecltiming
+      558, 13, // cdctiming
+
+      527, 15, // itd4
+      511, 31, // itd3
+      479, 31, // itd2
+      447, 31, // itd1
+      415, 31, // itd0
+      383, 31, // topslot1
+      351, 31, // ftd4
+      319, 31, // ftd3
+      287, 31, // ftd2
+      255, 31, // ftd1
+
+      223, 31, // ftd0
+      191, 31, // topslot0
+      159, 31, // psn4
+      127, 31, // psn3
+      95, 31, // psn2
+      63, 31, // psn1
+      31, 31, // psn0
     }
 
 
@@ -1382,22 +1433,22 @@ void setunpacker()
   int m_nword_header[N_UNPACKER_ARRAY] {
     3, 3, 4, 6, 6,
     6, 6, 6, 6, 6,
-    6, 6, 6, 6
+    6, 6, 6, 6, 6
   };
   int m_conf[N_UNPACKER_ARRAY] {
     0, 0, 1, 2, 3,
     4, 5, 6, 7, 6,
-    7, 7, 8, 9
+    7, 7, 8, 9, 10
   };
   int m_nword_input[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
     3, 3, 5, 5, 5,
-    5, 5, 5, 5
+    5, 5, 5, 5, 5
   };
   int m_nword_output[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
     3, 3, 3, 3, 3,
-    3, 4, 4, 5
+    3, 4, 4, 5, 5
   };
 
   const int BitMap_extra[N_UNPACKER_ARRAY][N_LEAF][3] = {
@@ -1607,6 +1658,26 @@ void setunpacker()
       2, 29,  3, //timtype
       -1, -1, -1, //cnttrg
       4, 11, 11  //etmdata
+    },
+
+    {
+      //13
+      -1, -1, -1, //evt,27
+      -1, -1, -1, //clk,28
+      0, -1, -1, //firmid,29
+      1, -1, -1, //firmver,30
+      3, 11, 11, //drvc,31
+      2,  0, 11, //finalrvc,32
+      3,  0, 11, //gdll1rvc,33
+      5,  0, 12,//coml1rvc,34
+      -1, -1, -1, //conf,35
+      2, 29,  3, //timtype,36
+      5, 12, 20, //cnttrg,37
+      4,  0, 11, //etmdata,38
+      3, 22, 10, //sepagdll1,39
+      4, 11, 16, //sepacoml1,40
+      4, 27, 5, //gdll1_rev,41
+      2, 14, 15//rvcout,42
     }
 
   };
@@ -1868,18 +1939,25 @@ void setalg()
 
   // const int N_BITS_RESERVED = 200;
 
-  const int N = 6;
+  const int N = 12;
   const int run[N][4] = { //itnitial exp, initial run, end exp, end run
     0,  0,    -1,   -1,
-    7,  0,     7, 2102,
-    7,  2103,  7, 4023,
-    7,  4024,  8, 1201,
-    8,  1202,  8,   -1,
-    10, 135,  -1,   -1
+    7,  0,     7, 2102, // 11
+    7,  2103,  7, 2367, // 12
+    7,  2368,  8, 4023, // 13
+    7,  4024,  8, 2043, // 14
+    8,  2044,  8, 2782, // 16
+    8,  2783,  8,   -1, // 17
+    10, 135,  10, 2539, // 22
+    10, 2540, 10, 4600, // 23
+    10, 4601, 12, 1659, // 24
+    12, 1660, 12, 1858, // 25
+    12, 1859, -1,   -1, // 26
   };
 
   const char* alg_file_names[] = {
-    "ftd_0024.alg", "ftd_0011.alg", "ftd_0012.alg", "ftd_0014.alg", "ftd_0015.alg", "ftd_0024.alg"
+    "ftd_0024.alg", "ftd_0011.alg", "ftd_0012.alg", "ftd_0013.alg", "ftd_0014.alg", "ftd_0016.alg",
+    "ftd_0017.alg", "ftd_0022.alg", "ftd_0023.alg", "ftd_0024.alg", "ftd_0025.alg", "ftd_0026.alg"
   };
 
   char logname[2000];

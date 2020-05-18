@@ -27,12 +27,12 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 {
   //Set module properties
 
-  setDescription("Collector module used to create the histograms needed for the SVD CoG-Time calibration");
+  setDescription("Collector module used to create the histograms needed for the SVD 6-Sample CoG, 3-Sample CoG and 3-Sample ELS Time calibration");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", std::string("SVDClustersFromTracks"));
-  addParam("SVDRecoDigitsFromTracksName", m_svdRecoDigits, "Name of the SVDRecoDigits list", std::string("SVDRecoDigitsFromTracks"));
-  addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", std::string("EventT0"));
+  addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", m_svdClusters);
+  addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
+  addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", m_svdEventInfo);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()
@@ -65,7 +65,7 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
 
   m_svdCls.isRequired(m_svdClusters);
   m_eventT0.isRequired(m_eventTime);
-  m_svdRD.isRequired(m_svdRecoDigits);
+  m_svdEI.isRequired(m_svdEventInfo);
 
   VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -108,25 +108,46 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
+  float eventT0 = 0;
+  if (m_eventT0->hasEventT0()) {
+    eventT0 = m_eventT0->getEventT0();
+    getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
+  }
   if (!m_svdCls.isValid()) {
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
     return;
   }
+
+  //get SVDEventInfo
+  StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+  std::string m_svdEventInfoName = "SVDEventInfo";
+  if (!temp_eventinfo.isOptional("SVDEventInfo"))
+    m_svdEventInfoName = "SVDEventInfoSim";
+  StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+  if (!eventinfo) B2ERROR("No SVDEventInfo!");
+
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
-    SVDCluster* cluster = m_svdCls[cl];
-    RelationVector<SVDRecoDigit> reco_rel_cluster = cluster->getRelationsTo<SVDRecoDigit>(m_svdRecoDigits);
+    // get cluster time
     float clTime = m_svdCls[cl]->getClsTime();
+
+    //remove firstFrame and triggerBin correction applied in the clusterizer
+    clTime = clTime - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
+
+    //get cluster side
     int side = m_svdCls[cl]->isUCluster();
+
+    //get VxdID
     VxdID::baseType theVxdID = (VxdID::baseType)m_svdCls[cl]->getSensorID();
     short unsigned int layer = m_svdCls[cl]->getSensorID().getLayerNumber();
+
+    //fill histograms only if EventT0 is there
     if (m_eventT0->hasEventT0()) {
-      float eventT0 = m_eventT0->getEventT0();
-      float TB = (reco_rel_cluster[0]->getModeByte()).getTriggerBin();
-      float eventT0Sync = eventT0 - 7.8625 * (3 - TB);
+
+      float eventT0Sync = eventT0 - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
+
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
       getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawCoGTimeL3V")->Fill(clTime);}
     }

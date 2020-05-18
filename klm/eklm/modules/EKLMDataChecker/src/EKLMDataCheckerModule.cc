@@ -18,10 +18,12 @@ using namespace Belle2;
 
 REG_MODULE(EKLMDataChecker)
 
-EKLMDataCheckerModule::EKLMDataCheckerModule() : Module()
+EKLMDataCheckerModule::EKLMDataCheckerModule() :
+  Module(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_GeoDat(nullptr)
 {
   setDescription("EKLM data checker module.");
-  m_GeoDat = nullptr;
 }
 
 EKLMDataCheckerModule::~EKLMDataCheckerModule()
@@ -41,7 +43,6 @@ void EKLMDataCheckerModule::beginRun()
 void EKLMDataCheckerModule::event()
 {
   const uint16_t c_ChargeError = 0x0FFF;
-  /* cppcheck-suppress variableScope */
   int i, n, strip;
   std::map<int, StripData>::iterator it;
   StripData data;
@@ -50,7 +51,7 @@ void EKLMDataCheckerModule::event()
     KLMDigit* eklmDigit = m_Digits[i];
     if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
-    strip = m_GeoDat->stripNumber(
+    strip = m_ElementNumbers->stripNumber(
               eklmDigit->getSection(), eklmDigit->getLayer(),
               eklmDigit->getSector(), eklmDigit->getPlane(),
               eklmDigit->getStrip());
@@ -79,8 +80,8 @@ static bool compareBadDigitRate(EKLMDataCheckerModule::StripData& dat1,
          (double(dat2.nBadDigits) / dat2.nDigits);
 }
 
-static bool compareStripNumber(EKLMDataCheckerModule::StripData& dat1,
-                               EKLMDataCheckerModule::StripData& dat2)
+static bool compareStripNumber(const EKLMDataCheckerModule::StripData& dat1,
+                               const EKLMDataCheckerModule::StripData& dat2)
 {
   return dat1.strip < dat2.strip;
 }
@@ -108,8 +109,8 @@ void EKLMDataCheckerModule::terminate()
     }
     sort(it2, it3, compareStripNumber);
     for (it4 = it2; it4 != it3; ++it4) {
-      m_GeoDat->stripNumberToElementNumbers(it4->strip, &section, &layer,
-                                            &sector, &plane, &strip);
+      m_ElementNumbers->stripNumberToElementNumbers(
+        it4->strip, &section, &layer, &sector, &plane, &strip);
       printf("Section %d, layer %d, sector %d, plane %d, strip %d: %.1f%% "
              "(%d/%d)\n",
              section, layer, sector, plane, strip,
@@ -124,8 +125,8 @@ void EKLMDataCheckerModule::terminate()
       for (sector = 1; sector <= m_GeoDat->getNSectors(); sector++) {
         for (plane = 1; plane <= m_GeoDat->getNPlanes(); plane++) {
           for (strip = 1; strip <= m_GeoDat->getNStrips(); strip++) {
-            stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane,
-                                                strip);
+            stripGlobal = m_ElementNumbers->stripNumber(
+                            section, layer, sector, plane, strip);
             it = m_StripDataMap.find(stripGlobal);
             if (it == m_StripDataMap.end()) {
               printf("Section %d, layer %d, sector %d, plane %d, strip %d.\n",

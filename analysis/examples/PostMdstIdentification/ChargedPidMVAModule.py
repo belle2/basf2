@@ -59,7 +59,7 @@ def argparser():
     parser.add_argument("--global_tag_append",
                         type=str,
                         nargs="+",
-                        default=["analysis_tools_release-04"],
+                        default=["analysis_tools_release-04-02"],
                         help="List of names of conditions DB global tag(s) to append on top of GT replay."
                         "NB: these GTs will have lowest priority."
                         "Pass a space-separated list of names.")
@@ -157,21 +157,21 @@ if __name__ == '__main__':
     if global_pid:
         applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                            path=path,
-                           trainingMode=Belle2.ChargedPidMVAWeights.c_Multiclass)
+                           trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
         if args.add_ecl_only:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
-                               trainingMode=Belle2.ChargedPidMVAWeights.c_ECL_Multiclass)
+                               trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass)
     elif binary_pid:
         for s, b in args.testHyposPDGCodePair:
             applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                path=path,
-                               trainingMode=Belle2.ChargedPidMVAWeights.c_Classification,
+                               trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification,
                                binaryHypoPDGCodes=(s, b))
             if args.add_ecl_only:
                 applyChargedPidMVA(particleLists=[plistname for plistname, _ in plists],
                                    path=path,
-                                   trainingMode=Belle2.ChargedPidMVAWeights.c_ECL_Classification,
+                                   trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification,
                                    binaryHypoPDGCodes=(s, b))
 
     if args.debug:

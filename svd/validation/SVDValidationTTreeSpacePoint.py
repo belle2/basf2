@@ -38,18 +38,18 @@ from ROOT import EventDataSpacePoint
 
 
 class SVDValidationTTreeSpacePoint(Module):
+    '''class to create spacepoint ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeSpacePoint, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeSpacePoint.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventDataSpacePoint class
+        '''TTrees for output data'''
         self.data = EventDataSpacePoint()
+        '''Instance of the EventDataSpacePoint class'''
 
         # Declare tree branches
         for key in EventDataSpacePoint.__dict__:
@@ -58,9 +58,6 @@ class SVDValidationTTreeSpacePoint(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Find digit with a cluster and save needed information"""

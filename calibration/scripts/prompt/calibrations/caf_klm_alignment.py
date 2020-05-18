@@ -138,6 +138,7 @@ def get_calibrations(input_data, **kwargs):
                 segment, ipar)
         index.increment()
 
+    cal_klm = millepede.create('KLMAlignment', [])
     millepede.algo.setMinEntries(500000)
     millepede.algo.ignoreUndeterminedParams(True)
     millepede.algo.invertSign()
@@ -146,8 +147,6 @@ def get_calibrations(input_data, **kwargs):
     # Calibration setup
 
     from caf.framework import Calibration, Collection
-
-    cal_klm = Calibration("KLMAlignment")
 
     ########
     # Collect on multiple input data types for one calibration
@@ -183,7 +182,7 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = SequentialRunByRun
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {"iov_coverage": output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]

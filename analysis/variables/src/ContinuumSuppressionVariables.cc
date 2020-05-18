@@ -218,10 +218,6 @@ namespace Belle2 {
     Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         double low = 0;
         double high = 0;
         try {
@@ -310,14 +306,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of the signal B and thrust axis of ROE");
     REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of the signal B and z-axis");
     REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,
-                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
+                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS,
                       "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
                       "Returns NaN if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
-                      "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+                      "Transforms the network output :math:`C\\to C`' via: :math:`C'=\\operatorname{log}((C-\\mathrm{low})/(\\mathrm{high}-C))`");
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,
                       "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
                       "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"

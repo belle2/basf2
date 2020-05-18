@@ -12,6 +12,7 @@
 
 namespace Belle2 {
 
+  /** DQM modules to monitor V0 objects */
   class V0ObjectsDQMModule : public HistoModule {
 
   public:
@@ -26,10 +27,10 @@ namespace Belle2 {
 
     void defineHisto() override final;
 
-    /* x vs. y in slices of z */
+    /** x vs. y in slices of z */
     TH2F* m_h_xvsy[32] = {nullptr};
 
-    /* x vs. z*/
+    /** x vs. z*/
     TH2F* m_h_xvsz = nullptr;
 
     /** Name of the V0 particle list */

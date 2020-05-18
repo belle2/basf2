@@ -99,6 +99,8 @@ Int_t plotEfficiencyConvertTCanvasToHist(){
   h_chK->Write();  
   h_lkhPi->Write();
   h_lkhK->Write();
+
+  rootFile->Close();
   
   return 0;
 }

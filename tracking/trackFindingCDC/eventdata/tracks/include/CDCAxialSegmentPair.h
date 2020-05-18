@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
@@ -23,7 +24,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCSegment2D;
 
     /// Class representing a pair of reconstructed axial segements in adjacent superlayer
     class CDCAxialSegmentPair  {
@@ -44,31 +44,32 @@ namespace Belle2 {
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCAxialSegmentPair const& rhs) const
       {
-        return
-          std::tie(m_startSegment, m_endSegment) ==
-          std::tie(rhs.m_startSegment, rhs.m_endSegment);
+        return (*m_startSegment == *rhs.m_startSegment) &&
+               (*m_endSegment == *rhs.m_endSegment);
       }
 
       /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCAxialSegmentPair const& rhs) const
       {
-        return
-          std::tie(m_startSegment, m_endSegment) <
-          std::tie(rhs.m_startSegment, rhs.m_endSegment);
+        if (*m_startSegment < *rhs.m_startSegment)
+          return true;
+        if (*m_startSegment > *rhs.m_startSegment)
+          return false;
+        return *m_endSegment < *rhs.m_endSegment;
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
       friend bool
       operator<(CDCAxialSegmentPair const& segmentPair, const CDCAxialSegment2D* axialSegment)
       {
-        return segmentPair.getStartSegment() < axialSegment;
+        return *segmentPair.getStartSegment() < *axialSegment;
       }
 
       /// Define reconstructed segments and segment pairs as coaligned on the start segment
       friend bool
       operator<(const CDCAxialSegment2D* axialSegment, CDCAxialSegmentPair const& segmentPair)
       {
-        return axialSegment < segmentPair.getStartSegment();
+        return *axialSegment < *segmentPair.getStartSegment();
       }
 
       /// Checks the references to the contained three segment for nullptrs.

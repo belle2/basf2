@@ -51,6 +51,7 @@
 // $Log$
 // 2017-02-23 version 1.0
 // 2019-05-13 version 2.0 for Phase 3
+// 2020-05-13 version 2.1 for Bug fixing
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -161,7 +162,7 @@ TrgEclMaster::name(void) const
 std::string
 TrgEclMaster::version(void) const
 {
-  return std::string("TrgEclMaster 1.00");
+  return std::string("TrgEclMaster 2.1");
 }
 //
 //
@@ -235,12 +236,15 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
   //
   //
   int nBin = 8000 / (TimeWindow / 2) ; //8000/125
-  double WindowStart = 0;
-  double WindowEnd = 0;
+  /* cppcheck-suppress variableScope */
+  double WindowStart;
+  /* cppcheck-suppress variableScope */
+  double WindowEnd;
   double fluctuation = ((gRandom ->Uniform(-1, 0))) * 125;
-
-  double check_window_start = 0;
-  double check_window_end = 0;
+  /* cppcheck-suppress variableScope */
+  double check_window_start;
+  /* cppcheck-suppress variableScope */
+  double check_window_end;
 
 
   for (int iBin = 0 ; iBin < nBin; iBin ++) {
@@ -446,7 +450,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       flagoverflow = 1;
     }
 
-    makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+    makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
                    bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
 
@@ -675,9 +679,9 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   phiringsum.resize(17, 0);
   setRS(HitTCId, TCHitEnergy, phiringsum, thetaringsum);
 
-  double E_br = 0;
-  double E_fwd = 0;
-  double E_bwd = 0;
+  double E_br;
+  double E_fwd;
+  double E_bwd;
   double E_phys = 0;
   double E_total = 0;
   int E_burst = 0;
@@ -817,7 +821,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     flagoverflow = 1;
   }
 
-  makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+  makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
                  bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
   //
@@ -1036,7 +1040,7 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
 }
 
 
-void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, int etot, int bhabha2D, int physics,
+void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, double etot, int bhabha2D, int physics,
                                   std::vector<int> bhabhatype, int ICN, int BGVeto, int ClusterOverflow, int bhabha3D, int lowmultibit, int bhabha3D_sel, int mumubit,
                                   int prescale, int burst)
 {

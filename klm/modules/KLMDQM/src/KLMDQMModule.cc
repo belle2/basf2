@@ -23,6 +23,10 @@ REG_MODULE(KLMDQM)
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),
+  m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
+  m_SectorArrayIndex(&(KLMSectorArrayIndex::Instance())),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_TimeRPC(nullptr),
   m_TimeScintillatorBKLM(nullptr),
   m_TimeScintillatorEKLM(nullptr),
@@ -44,10 +48,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
-  m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_Elements = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -242,7 +242,8 @@ void KLMDQMModule::event()
         continue;
       m_ChannelHits[klmSectorIndex][j]->Fill(channelIndex);
     }
-    int planeGlobal = m_Elements->planeNumber(section, layer, sector, plane);
+    int planeGlobal = m_eklmElementNumbers->planeNumber(
+                        section, layer, sector, plane);
     m_PlaneEKLM->Fill(planeGlobal);
     m_TimeScintillatorEKLM->Fill(eklmDigit->getTime());
     nEklmDigits++;

@@ -67,7 +67,7 @@ namespace Belle2 {
     void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
                 double path, double dedx,
                 double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
-                double onedcor)
+                double onedcor, int foundByTrackFinder, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
     {
 
       m_hLWire.push_back(lwire);
@@ -89,6 +89,10 @@ namespace Belle2 {
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
+      m_hFoundByTrackFinder.push_back(foundByTrackFinder);
+      m_hWeightPionHypo.push_back(weightPionHypo);
+      m_hWeightKaonHypo.push_back(weightKaonHypo);
+      m_hWeightProtHypo.push_back(weightProtHypo);
     }
 
     /** Return the track ID */
@@ -236,6 +240,15 @@ namespace Belle2 {
     /** Return the 1D correction for this hit */
     double getOneDCorrection(int i) const { return m_hOnedCor[i]; }
 
+    /** Return the TrackFinder which added the given hit to track */
+    /** Int value corresponds to values of enum Belle2::RecoHitInformation::OriginTrackFinder */
+    int getFoundByTrackFinder(int i) const { return m_hFoundByTrackFinder[i]; }
+
+    /** Return the max weights from KalmanFitterInfo */
+    double getWeightPionHypo(int i) const { return m_hWeightPionHypo[i]; }
+    double getWeightKaonHypo(int i) const { return m_hWeightKaonHypo[i]; }
+    double getWeightProtonHypo(int i) const { return m_hWeightProtHypo[i]; }
+
     /** Return the PID (chi) value */
     double getChi(int i) const { return m_cdcChi[i]; }
 
@@ -311,11 +324,15 @@ namespace Belle2 {
     std::vector<int> m_hDriftT;       /**< drift time for each hit */
     std::vector<double> m_hDriftD;    /**< drift distance for each hit */
     std::vector<double> m_hDriftDRes; /**< drift distance resolution for each hit */
+    std::vector<int> m_hFoundByTrackFinder; /**< the 'found by track finder' flag for the given hit */
+    std::vector<double> m_hWeightPionHypo;  /**< weight for pion hypothesis from KalmanFitterInfo*/
+    std::vector<double> m_hWeightKaonHypo; /**< weight for kaon hypothesis from KalmanFitterInfo*/
+    std::vector<double> m_hWeightProtHypo; /**< weight for proton hypothesis from KalmanFitterInfo*/
 
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 13); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 14); /**< Debug output for CDCDedxPID module. */
   };
 }
 #endif

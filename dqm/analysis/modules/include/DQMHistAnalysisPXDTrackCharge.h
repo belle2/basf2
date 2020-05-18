@@ -80,8 +80,17 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
     //! Final Canvases for Fit and Ref
     std::map<VxdID, TCanvas*> m_cChargeMod {};
+    //! Histogram for TrackedClusters
+    TH1F* m_hTrackedClusters = nullptr;
+    //! Final Canvas for TrackedClusters
+    TCanvas* m_cTrackedClusters = nullptr;
 
-    TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
+    /** TLine object for upper limit of track cluster charge */
+    TLine* m_line_up{};
+    /** TLine object for mean of track cluster charge */
+    TLine* m_line_mean{};
+    /** TLine object for lower limit of track cluster charge */
+    TLine* m_line_low{};
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;
@@ -89,6 +98,9 @@ namespace Belle2 {
     TFile* m_refFile = nullptr;
     /** Whether to use the color code for warnings and errors. */
     bool m_color = true;
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
 
 #ifdef _BELLE2_EPICS
     //! Place for EPICS PVs, Mean and maximum deviation

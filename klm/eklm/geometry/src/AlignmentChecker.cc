@@ -22,10 +22,11 @@
 using namespace Belle2;
 
 EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
-  m_PrintOverlaps(printOverlaps)
+  m_PrintOverlaps(printOverlaps),
+  m_GeoDat(&(EKLM::GeometryData::Instance())),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   int iPlane, iSegmentSupport;
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   const EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
   const EKLMGeometry::ElementPosition* sectorSupportPosition =
@@ -211,8 +212,8 @@ checkSegmentAlignment(int section, int layer, int sector, int plane, int segment
       return false;
   }
   ly = 0.5 * stripGeometry->getWidth();
-  for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
-    iStrip = m_GeoDat->getNStripsSegment() * (segment - 1) + i;
+  for (i = 1; i <= m_ElementNumbers->getNStripsSegment(); i++) {
+    iStrip = m_ElementNumbers->getNStripsSegment() * (segment - 1) + i;
     const EKLMGeometry::ElementPosition* stripPosition =
       m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->getLength();
@@ -315,7 +316,7 @@ bool EKLM::AlignmentChecker::checkAlignment(
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-        sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
+        sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
         const KLMAlignmentData* sectorAlignment =
           alignment->getModuleAlignment(sector);
         if (sectorAlignment == nullptr)
@@ -324,8 +325,8 @@ bool EKLM::AlignmentChecker::checkAlignment(
           return false;
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
-                                              iSegment);
+            segment = m_ElementNumbers->segmentNumber(
+                        iSection, iLayer, iSector, iPlane, iSegment);
             const KLMAlignmentData* segmentAlignmentData =
               segmentAlignment->getSegmentAlignment(segment);
             if (segmentAlignment == nullptr)

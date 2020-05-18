@@ -309,7 +309,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
     add_ecl_track_cluster_modules(path, components)
     add_ecl_cluster_properties_modules(path, components)
-    add_ecl_eip_module(path, components)
+    add_ecl_chargedpid_module(path, components)
     add_pid_module(path, components)
 
     if addClusterExpertModules:
@@ -705,7 +705,7 @@ def add_ecl_track_brem_finder(path, components=None):
         path.add_module(brem_finder)
 
 
-def add_ecl_eip_module(path, components=None):
+def add_ecl_chargedpid_module(path, components=None):
     """
     Add the ECL charged PID module to the path.
 
@@ -797,6 +797,6 @@ def prepare_cdst_analysis(path, components=None):
     add_muid_module(path, components=components)
     add_ecl_track_cluster_modules(path, components)
     add_ecl_cluster_properties_modules(path, components)
-    add_ecl_eip_module(path, components)
+    add_ecl_chargedpid_module(path, components)
     add_pid_module(path, components)
     add_ecl_track_brem_finder(path, components)

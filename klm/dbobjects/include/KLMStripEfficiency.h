@@ -33,13 +33,15 @@ namespace Belle2 {
      * Default constructor
      */
     KLMStripEfficiency()
-    {}
+    {
+    }
 
     /**
      * Default destructor
      */
     ~KLMStripEfficiency()
-    {}
+    {
+    }
 
     /**
      * Set efficiency and relative error for a single KLM strip using directly the stripId

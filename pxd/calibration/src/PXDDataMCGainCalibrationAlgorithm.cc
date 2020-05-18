@@ -326,7 +326,7 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
     for (int i = 0; i < nEntries; i += incr) {
       tree->GetEntry(i);
       double noise = gRandom->Gaus(0.0, noiseSigma);
-      signals.push_back(m_signal + noise);
+      signals.push_back(m_signal + noise); //qyliu: why we introduce noise simulation here?
     }
 
 
@@ -336,8 +336,7 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << median);
       return median;
-    }
-    if (strategy == 1) {
+    } else if (strategy == 1) {
       double median = CalculateMedian(signals);
       double landaumpv  = FitLandau(signals);
       double diff  = (landaumpv - median);
@@ -347,8 +346,14 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
       return landaumpv; //FitLandau(signals);
+    } else if (strategy == 2) {
+      double mean = 0;
+      for (auto& each : signals)
+        mean += each;
+      if (signals.size() > 0) mean = mean / signals.size();
+      return mean;
     } else {
-      B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
+      B2FATAL("strategy unavailable, use 0 for medians, 1 for landau fit and 2 for mean!");
     }
 
   } else {
@@ -373,8 +378,10 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
       return landaumpv; //FitLandau(signals);
+    } else if (strategy == 2) {
+      return hist_signals->GetMean();
     } else {
-      B2FATAL("strategy unavailable, use 0 for medians or 1 for landau fit!");
+      B2FATAL("strategy unavailable, use 0 for medians, 1 for landau fit and 2 for mean!");
     }
 
     delete hist_signals;

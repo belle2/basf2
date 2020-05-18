@@ -734,7 +734,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
 }
 
 // =================================== WRITE TO ROOT ===============================================================================
-void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
+void CurlingTrackCandSplitterModule::writeToRoot(const RootVariables& rootVariables)
 {
   m_rootGlobalPosResiduals = rootVariables.PosResiduesGlobal;
   m_rootLocalPosResiduals = rootVariables.PosResiduesLocal;

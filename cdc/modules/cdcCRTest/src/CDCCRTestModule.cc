@@ -571,7 +571,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 
     SortingRecoHitPair frontSideHit = std::make_pair(0, nullptr);;
     SortingRecoHitPair backsideSideHit = std::make_pair(0, nullptr);;
-    SortingRecoHitPair hit4extraction = std::make_pair(0, nullptr);
+    SortingRecoHitPair hit4extraction; // = std::make_pair(0, nullptr); avoid cppcheck warning.
 
     //find closest hit to hit which do not fit
     //    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice

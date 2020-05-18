@@ -128,7 +128,7 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency
-        algorithm.params = {'apply_iov': output_iov}
+        algorithm.params = {'iov_coverage': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]

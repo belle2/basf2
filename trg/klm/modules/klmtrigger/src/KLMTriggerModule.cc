@@ -259,6 +259,7 @@ void KLMTriggerModule::calcChisq()
 
     // calculate chisq
     int denom = sumXX * nHits - sumX * sumX;
+    /* cppcheck-suppress variableScope */
     double denomInversed = 0.0;
     double slopeXY = 0.0;
     double interceptXY = 0.0;

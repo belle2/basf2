@@ -70,6 +70,7 @@ namespace Belle2 {
      * @param name name of the payload, ususally the class name of the payload
      *        but can be any string identifying the payload in the database
      * @param obj instance of an object representing the correct type
+     * @param isRequired if false don't emit errors if the payload cannot be found for any run
      * @return new DBStoreEntry instance with the correct name and types set
      * */
     static DBStoreEntry fromObject(const std::string& name, const TObject* obj, bool isRequired);
@@ -192,4 +193,3 @@ namespace Belle2 {
     friend class Database;
   };
 }
-

@@ -76,7 +76,8 @@ namespace Belle2 {
      */
 
     void printBits(const int* buffer, int bufferSize);
-    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
+    void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read Merger header */
+    void readFEHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head); /** read FE header */
 
 
 

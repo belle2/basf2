@@ -18,8 +18,10 @@ now = datetime.datetime.now()
 
 
 class defaultFADCMaskedStripsImporter(basf2.Module):
+    '''default importer for FADC masked strips'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 

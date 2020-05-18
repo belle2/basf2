@@ -37,9 +37,10 @@ namespace Belle2 {
      * @param function The function name where the message was sent from.
      * @param file The file name where the message was sent from.
      * @param line The line number in the source code where the message was sent from.
+     * @param debugLevel The debug level of the message if the logLevel is c_Debug
      */
     LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-               std::string  function, std::string  file, unsigned int line, int debugLevel = 0);
+               std::string function, std::string file, unsigned int line, int debugLevel = 0);
 
     /**
      * The LogMessage constructor taking a LogVariableStream which can contains name/value pairs
@@ -50,6 +51,7 @@ namespace Belle2 {
      * @param function The function name where the message was sent from.
      * @param file The file name where the message was sent from.
      * @param line The line number in the source code where the message was sent from.
+     * @param debugLevel The debug level of the message if the logLevel is c_Debug
      */
     LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
                std::string  function, std::string  file, unsigned int line, int debugLevel = 0);

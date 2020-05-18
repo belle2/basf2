@@ -24,21 +24,6 @@ KLMTimeConversion::~KLMTimeConversion()
 {
 }
 
-void KLMTimeConversion::setTDCFrequency(double frequency)
-{
-  m_TDCPeriod = 1.0 / frequency;
-}
-
-void KLMTimeConversion::setTimeOffset(double offset)
-{
-  m_TimeOffset = offset;
-}
-
-void KLMTimeConversion::setCTimeShift(int shift)
-{
-  m_CTimeShift = shift;
-}
-
 double KLMTimeConversion::getScintillatorTime(int ctime, int triggerCTime) const
 {
   /* Relative time in TDC periods for scintillators. */
@@ -82,9 +67,3 @@ double KLMTimeConversion::getTimeSimulation(int tdc, bool scintillator) const
   (void)scintillator;
   return tdc * m_TDCPeriod + m_TimeOffset;
 }
-
-uint16_t KLMTimeConversion::getTDCByTime(double time) const
-{
-  return (time - m_TimeOffset) / m_TDCPeriod;
-}
-

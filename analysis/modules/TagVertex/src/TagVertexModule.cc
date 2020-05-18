@@ -521,25 +521,24 @@ namespace Belle2 {
 
   pair<TVector3, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
   {
+    //make a long error matrix along boost dirrection
+    TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
     TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
+    TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
 
+    //Extend error of BeamSpotCov matrix in the boost direction
     TMatrixDSym beamSpotCov = m_beamSpotDB->getCovVertex();
-    beamSpotCov(2, 2) = cut * cut; //cut on z-BeamSpot Cov
+    TMatrixD Tube = TMatrixD(beamSpotCov) + longerrorRotated;
 
-    TMatrixD Tube = rotateTensor(boostDir, beamSpotCov); //BeamSpot in CMS
-
-    TVector3 constraintCenter = m_BeamSpotCenter; // Standard algorithm needs no shift
+    // Standard algorithm needs no shift
+    TVector3 constraintCenter = m_BeamSpotCenter;
 
     // The constraint used in the Single Track Fit needs to be shifted in the boost direction.
-
     if (shiftAlongBoost > -1000) {
-      double boostAngle = atan2(boostDir[0] , boostDir[2]); // boost angle with respect from Z
-      constraintCenter = m_BeamSpotCenter +
-                         TVector3(shiftAlongBoost * sin(boostAngle), 0., shiftAlongBoost * cos(boostAngle)); // boost in the XZ plane
+      constraintCenter +=  shiftAlongBoost * boostDir;
     }
 
     return make_pair(constraintCenter,   toSymMatrix(Tube));
-
   }
 
   /** proper life time, i.e. in the rest system (in ps) */

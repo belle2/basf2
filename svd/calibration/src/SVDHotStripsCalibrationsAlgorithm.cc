@@ -73,7 +73,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 
     for (int iterStrip = 0; iterStrip < nstrips; iterStrip++) {
       float occCal = hocc->GetBinContent(iterStrip + 1);
-      B2INFO("Occupancy for" << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
+      //      B2INFO("Occupancy for" << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
 
       if (occCal > occThr) {
         vecHS[iterStrip] = 1;
@@ -82,7 +82,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     }
 
     //iterative procedure
-    B2INFO("Starting iterative procedure for hot strips finding");
+    //    B2INFO("Starting iterative procedure for hot strips finding");
     bool moreHS = true;
 
     while (moreHS && theHSFinder(stripOccAfterAbsCut, vecHS, nstrips)) {

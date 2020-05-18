@@ -253,8 +253,8 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   double fZ0Range = 10.0;     // Half range in cm
   double fD0Range = 1.0;      // Half range in cm
-  int iMomRange = 60;
-  double fMomRange = 3.0;
+  int iMomRange = 600;
+  double fMomRange = 6.0;
   int iPhiRange = 180;
   double fPhiRange = 180.0;   // Half range in deg
   double lambdaRange = 4.0;
@@ -295,8 +295,8 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
 void DQMHistoModuleBase::DefineMomentumCoordinates()
 {
-  int iMomRange = 60;
-  double fMomRange = 3.0;
+  int iMomRange = 600;
+  double fMomRange = 6.0;
 
   auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
   auto factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");

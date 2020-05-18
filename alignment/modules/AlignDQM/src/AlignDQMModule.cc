@@ -129,7 +129,8 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
 
   double fZ0Range = 10.0;     // Half range in cm
   double fD0Range = 1.0;      // Half range in cm
-  int iMomRange = 60;
+  int iMomRangeBig = 600;
+  int iMomRangeSmall = 600;
   double fMomRange = 3.0;
   int iPhiRange = 180;
   double fPhiRange = 180.0;   // Half range in deg
@@ -141,7 +142,8 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
   auto Z0 = THFAxis(100, -fZ0Range, fZ0Range, "z0 [cm]");
   auto tanLambda = THFAxis(100, -lambdaRange, lambdaRange, "Tan Lambda");
   auto omega = THFAxis(100, -omegaRange, omegaRange, "Omega");
-  auto momentum = THFAxis(2 * iMomRange, 0.0, fMomRange, "Momentum");
+  auto momentumBig = THFAxis(2 * iMomRangeBig, 0.0, fMomRange, "Momentum");
+  auto momentumSmall = THFAxis(2 * iMomRangeSmall, 0.0, fMomRange, "Momentum");
 
   auto factory = THFFactory(this);
 
@@ -156,7 +158,7 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
   m_Omega =     factory.xAxis(omega).CreateTH1F("Omega",
                                                 "Omega - the curvature of the track. It's sign is defined by the charge of the particle");
   m_TanLambda = factory.xAxis(tanLambda).CreateTH1F("TanLambda", "TanLambda - the slope of the track in the r-z plane");
-  m_MomPt =     factory.xAxis(momentum).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
+  m_MomPt =     factory.xAxis(momentumBig).yTitle("counts").CreateTH1F("TrackMomentumPt", "Track Momentum pT");
 
   helixCorrelations->cd();
 
@@ -166,7 +168,7 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
                                                               "Phi - angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi");
   m_PhiZ0 =           factory.xAxis(phi).yAxis(Z0).CreateTH2F("PhiZ0",
                                                               "Phi - angle of the transverse momentum in the r-phi plane vs. z0 of the perigee (to see primary vertex shifts along R or z)");
-  m_PhiMomPt =        factory.xAxis(phi).yAxis(momentum).CreateTH2F("PhiMomPt",
+  m_PhiMomPt =        factory.xAxis(phi).yAxis(momentumSmall).CreateTH2F("PhiMomPt",
                       "Phi - angle of the transverse momentum in the r-phi plane vs. Track momentum Pt");
   m_PhiOmega =        factory.xAxis(phi).yAxis(omega).CreateTH2F("PhiOmega",
                       "Phi - angle of the transverse momentum in the r-phi plane vs. Omega - the curvature of the track");
@@ -174,26 +176,40 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
                       "dPhi - angle of the transverse momentum in the r-phi plane vs. TanLambda - the slope of the track in the r-z plane");
   m_D0Z0 =            factory.xAxis(D0).yAxis(Z0).CreateTH2F("D0Z0",
                                                              "d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z)");
-  m_D0MomPt =         factory.xAxis(D0).yAxis(momentum).CreateTH2F("D0MomPt",
+  m_D0MomPt =         factory.xAxis(D0).yAxis(momentumSmall).CreateTH2F("D0MomPt",
                       "d0 - signed distance to the IP in r-phi vs. Track momentum Pt");
   m_D0Omega =         factory.xAxis(D0).yAxis(omega).CreateTH2F("D0Omega",
                       "d0 - signed distance to the IP in r-phi vs. Omega - the curvature of the track");
   m_D0TanLambda =     factory.xAxis(D0).yAxis(tanLambda).CreateTH2F("D0TanLambda",
                       "d0 - signed distance to the IP in r-phi vs. TanLambda - the slope of the track in the r-z plane");
-  m_Z0MomPt =         factory.xAxis(Z0).yAxis(momentum).CreateTH2F("Z0MomPt",
+  m_Z0MomPt =         factory.xAxis(Z0).yAxis(momentumSmall).CreateTH2F("Z0MomPt",
                       "z0 - the z0 coordinate of the perigee vs. Track momentum Pt");
   m_Z0Omega =         factory.xAxis(Z0).yAxis(omega).CreateTH2F("Z0Omega",
                       "z0 - the z0 coordinate of the perigee vs. Omega - the curvature of the track");
   m_Z0TanLambda =     factory.xAxis(Z0).yAxis(tanLambda).CreateTH2F("Z0TanLambda",
                       "z0 - the z0 coordinate of the perigee vs. TanLambda - the slope of the track in the r-z plane");
-  m_MomPtOmega =      factory.xAxis(momentum).yAxis(omega).CreateTH2F("MomPtOmega",
+  m_MomPtOmega =      factory.xAxis(momentumSmall).yAxis(omega).CreateTH2F("MomPtOmega",
                       "Track momentum Pt vs. Omega - the curvature of the track");
-  m_MomPtTanLambda =  factory.xAxis(momentum).yAxis(tanLambda).CreateTH2F("MomPtTanLambda",
+  m_MomPtTanLambda =  factory.xAxis(momentumSmall).yAxis(tanLambda).CreateTH2F("MomPtTanLambda",
                       "Track momentum Pt vs. TanLambda - the slope of the track in the r-z plane");
   m_OmegaTanLambda =  factory.xAxis(omega).yAxis(tanLambda).CreateTH2F("OmegaTanLambda",
                       "Omega - the curvature of the track vs. TanLambda - the slope of the track in the r-z plane");
 
   originalDirectory->cd();
+}
+
+void AlignDQMModule::DefineMomentumCoordinates()
+{
+  int iMomRange = 600;
+  double fMomRange = 3.0;
+
+  auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
+  auto factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");
+
+  m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
+  m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
+  m_MomZ = factory.CreateTH1F("TrackMomentumZ", "Track Momentum Z");
+  m_Mom = factory.xlow(.0).CreateTH1F("TrackMomentumMag", "Track Momentum Magnitude");
 }
 
 void AlignDQMModule::DefineSensors()

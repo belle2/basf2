@@ -68,6 +68,8 @@ namespace Belle2 {
     /** @{ */
     /** Define histograms with helix parameters and their correlations. */
     virtual void DefineHelixParametersAndCorrelations() override;
+    /** Define histograms with track momentum Pt. coordinates. */
+    virtual void DefineMomentumCoordinates() override;
     /** Define histograms which depend on position for individual sensors. */
     virtual void DefineSensors() override;
     /** Define histograms which depend on layerIndex */

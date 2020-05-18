@@ -41,8 +41,10 @@ void DQMEventProcessorBase::Run()
     }
 
     m_histoModule->FillTrackIndexes(m_iTrack, m_iTrackVXD, m_iTrackCDC, m_iTrackVXDCDC);
+  } catch (const std::exception& e) {
+    B2WARNING("Exception " + exc.what() + " in " + m_histoModule->getName() + " module!");
   } catch (...) {
-    B2ERROR("Unhandled exception in " + m_histoModule->getName() + " module!");
+    B2WARNING("Unhandled exception in " + m_histoModule->getName() + " module!");
   }
 }
 

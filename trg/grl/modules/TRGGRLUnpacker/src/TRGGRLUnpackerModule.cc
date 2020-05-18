@@ -33,7 +33,7 @@ TRGGRLUnpackerModule::TRGGRLUnpackerModule()
   string desc = "TRGGRLUnpackerModule(" + version() + ")";
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
-  B2INFO("TRGGRLUnpacker: Constructor done.");
+  B2DEBUG(20, "TRGGRLUnpacker: Constructor done.");
 }
 
 TRGGRLUnpackerModule::~TRGGRLUnpackerModule()

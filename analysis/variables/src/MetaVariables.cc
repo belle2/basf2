@@ -156,7 +156,7 @@ namespace Belle2 {
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
           if (not eventExtraInfo.isValid())
-            eventExtraInfo.create();
+            return std::numeric_limits<float>::quiet_NaN();
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);

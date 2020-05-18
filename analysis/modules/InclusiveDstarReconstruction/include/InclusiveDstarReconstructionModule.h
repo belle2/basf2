@@ -33,10 +33,12 @@ namespace Belle2 {
    * to the slow pion direction.
    *
    * The decay must be specified by a DecayString of the following forms
-   * - [D*+ -> pi+ ... ?nu ?gamma]
-   * - [D*+ -> pi0 ... ?nu ?gamma]
-   * - [D*0 -> pi0 ... ?nu ?gamma]
-   * where the ellipsis is essential for truth-matching.
+   * - [D*+ -> pi+]
+   * - [D*+ -> pi0]
+   * - [D*0 -> pi0]
+   * The relevant particle properties for MC matching are internally set by the module.
+   * These are: ignore radiated photons, ignore intermediate resoance, ignore missing
+   * massive particles, ignore missing neutrino and ignore missing gamma.
    *
    * Note that the inclusive reconstruction of a D* by a pi0 is ambigious as
    * the flavor of the D* cannot be determined. Therefore there are two D*
@@ -108,8 +110,6 @@ namespace Belle2 {
     std::string m_outputAntiListName;  /**< Name of the output anti-D* particle list */
     std::string m_slowPionCut;  /**< Cut to select slow pions. */
     std::string m_DstarCut;  /**< Cut for Dstar */
-
-    int m_properties; /**< Decay property: ignore massive daughter particle */
 
     int m_dstar_pdg_code; /**< PDG code of the given D* particle list */
 

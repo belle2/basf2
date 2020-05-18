@@ -43,7 +43,6 @@ InclusiveDstarReconstructionModule::InclusiveDstarReconstructionModule() : Modul
   m_dstar_pdg_code = 0;
   m_dstar_pdg_mass = 0;
   m_d_pdg_mass = 0;
-  m_properties = 0;
 }
 
 InclusiveDstarReconstructionModule::~InclusiveDstarReconstructionModule() = default;
@@ -71,9 +70,6 @@ void InclusiveDstarReconstructionModule::initialize()
 
   if (!pionCompatibleWithDstar(pion_pdg_code))
     B2ERROR("Pion PDG code " << pion_pdg_code << " not compatible with D* PDG code " <<  m_dstar_pdg_code);
-
-  // decay property: ignore missing massive particle
-  m_properties = m_decaydescriptor.getProperty();
 
   // create and register output particle list
   m_outputListName = mother->getFullName();
@@ -140,10 +136,11 @@ void InclusiveDstarReconstructionModule::event()
     */
 
     // for decay 1 and decay 2/3 with positive flavor
+    // particle properties are set to 62 (ignore: radiated photons, intermediate, massive, neutrinos, gamma)
     int output_dstar_pdg = getDstarOutputPDG(pion->getCharge(), m_dstar_pdg_code);
     Particle dstar = Particle(dstar_four_vector, output_dstar_pdg,
                               Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
-                              m_properties, pion->getArrayPointer());
+                              62, pion->getArrayPointer());
 
     Particle* new_dstar = particles.appendNew(dstar);
     if (!m_cut_dstar->check(new_dstar)) continue;
@@ -153,7 +150,7 @@ void InclusiveDstarReconstructionModule::event()
     if (pion->getCharge() == 0) {
       Particle antidstar = Particle(dstar_four_vector, -m_dstar_pdg_code,
                                     Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
-                                    m_properties, pion->getArrayPointer());
+                                    62, pion->getArrayPointer());
 
       Particle* new_antidstar = particles.appendNew(antidstar);
       if (!m_cut_dstar->check(new_antidstar)) continue;
@@ -209,7 +206,5 @@ int InclusiveDstarReconstructionModule::getDstarOutputPDG(int pion_charge, int i
       return (pion_charge < 0) ? input_dstar_pdg : -input_dstar_pdg;
     }
   }
-
-
 
 }

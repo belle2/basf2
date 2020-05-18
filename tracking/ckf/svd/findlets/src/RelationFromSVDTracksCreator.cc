@@ -46,7 +46,7 @@ void RelationFromSVDTracksCreator::exposeParameters(ModuleParamList* moduleParam
 }
 
 void RelationFromSVDTracksCreator::apply(std::vector<CKFToSVDState>& seedStates, std::vector<CKFToSVDState>& states,
-                                         std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>>& relations)
+                                         std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToSVDState>>& relations)
 {
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     if (vxdRecoTrack.getRelated<RecoTrack>(m_param_cdcTracksStoreArrayName)) {

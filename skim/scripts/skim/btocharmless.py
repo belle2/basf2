@@ -46,12 +46,12 @@ class CharmlessHad2Body(BaseSkim):
             "stdK": ["loose"],
             "stdPi": ["loose"],
         },
-        "stdPi0s": {
-            "stdPi0s": ["loose"],  # used for validation histograms
-            "loadStdSkimPi0": [],
-        },
         "stdPhotons": {
-            "stdPhotons": ["loose"],  # used for validation histograms
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["eff40_Jan2020"],
+            "loadStdSkimPi0": [],
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -348,12 +348,12 @@ class CharmlessHad3Body(BaseSkim):
             "stdK": ["loose"],
             "stdPi": ["loose"],
         },
-        "stdPi0s": {
-            "stdPi0s": ["loose"],  # used for validation histograms
-            "loadStdSkimPi0": [],
-        },
         "stdPhotons": {
-            "stdPhotons": ["loose"],  # used for validation histograms
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["eff40_Jan2020"],
+            "loadStdSkimPi0": [],
         },
         "stdV0s": {
             "stdKshorts": [],

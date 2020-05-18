@@ -39,7 +39,7 @@ TRGCDCTSFUnpackerModule::TRGCDCTSFUnpackerModule()
 
 
 
-  B2INFO("trgcdctsfunpacker: Constructor done.");
+  B2DEBUG(20, "trgcdctsfunpacker: Constructor done.");
 
 
 }

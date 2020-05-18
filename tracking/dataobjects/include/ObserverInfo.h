@@ -98,7 +98,7 @@ namespace Belle2 {
     /** sets the hits the filter has been evaluated with
      * @param newHits: vector of spacepoint which have been used in this filter
     */
-    void setHits(std::vector<SpacePointInfo>& newHits) { m_hits = newHits; };
+    void setHits(const std::vector<SpacePointInfo>& newHits) { m_hits = newHits; };
 
     /** return the MCParticle ID of the related MCParticle */
     int getMainMCParticleID() {return m_mainMCParticleID;};

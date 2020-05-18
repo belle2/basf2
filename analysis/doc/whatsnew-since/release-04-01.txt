@@ -148,6 +148,8 @@ Variables
  * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
    particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
  * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
+ * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
+ * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
 
 Modules
 +++++++

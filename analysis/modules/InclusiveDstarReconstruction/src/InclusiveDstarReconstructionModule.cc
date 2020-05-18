@@ -135,12 +135,17 @@ void InclusiveDstarReconstructionModule::event()
       with the same candidates
     */
 
+    int particle_properties = Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons
+                              + Particle::PropertyFlags::c_IsIgnoreIntermediate
+                              + Particle::PropertyFlags::c_IsIgnoreMassive
+                              + Particle::PropertyFlags::c_IsIgnoreNeutrino
+                              + Particle::PropertyFlags::c_IsIgnoreGamma;
+
     // for decay 1 and decay 2/3 with positive flavor
-    // particle properties are set to 62 (ignore: radiated photons, intermediate, massive, neutrinos, gamma)
     int output_dstar_pdg = getDstarOutputPDG(pion->getCharge(), m_dstar_pdg_code);
     Particle dstar = Particle(dstar_four_vector, output_dstar_pdg,
                               Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
-                              62, pion->getArrayPointer());
+                              particle_properties, pion->getArrayPointer());
 
     Particle* new_dstar = particles.appendNew(dstar);
     if (!m_cut_dstar->check(new_dstar)) continue;
@@ -150,7 +155,7 @@ void InclusiveDstarReconstructionModule::event()
     if (pion->getCharge() == 0) {
       Particle antidstar = Particle(dstar_four_vector, -m_dstar_pdg_code,
                                     Particle::EFlavorType::c_Flavored, {pion->getArrayIndex()},
-                                    62, pion->getArrayPointer());
+                                    particle_properties, pion->getArrayPointer());
 
       Particle* new_antidstar = particles.appendNew(antidstar);
       if (!m_cut_dstar->check(new_antidstar)) continue;

@@ -143,7 +143,6 @@ for list_tree_tuple in list_tree_tuples:
         path=main_path
     )
 
-basf2.set_module_parameters(main_path, 'InclusiveDstarReconstruction', logLevel=basf2.LogLevel.DEBUG, debugLevel=5)
 basf2.process(main_path)
 print(basf2.statistics)
 

@@ -72,6 +72,7 @@ namespace Belle2 {
   using RotationTools::rotateTensor;
   using RotationTools::rotateTensorInv;
   using RotationTools::toSymMatrix;
+  using RotationTools::toVec;
   using RotationTools::getUnitOrthogonal;
 
   //-----------------------------------------------------------------
@@ -719,12 +720,7 @@ namespace Belle2 {
     if (m_constraintType != "noConstraint") {
       TMatrixDSym tubeInv = m_constraintCov;
       tubeInv.Invert();
-      TVector3 dTagV = m_tagV - m_BeamSpotCenter;
-      TVectorD dV(0, 2,
-                  dTagV.X(),
-                  dTagV.Y(),
-                  dTagV.Z(),
-                  "END");
+      TVectorD dV = toVec(m_tagV - m_BeamSpotCenter);
       m_tagVChi2IP = tubeInv.Similarity(dV);
     }
 
@@ -895,23 +891,28 @@ namespace Belle2 {
     // MCdeltaT=tauRec-tauTag
     m_MCdeltaT = m_MCLifeTimeReco - m_MCtagLifeTime;
     if (m_MCLifeTimeReco  == -1 || m_MCtagLifeTime == -1)
-      m_MCdeltaT =  std::numeric_limits<double>::quiet_NaN();
+      m_MCdeltaT =  realNaN;
 
-    // Calculate Delta t error
-    TMatrixD RotErr = rotateTensor(boostDir, m_tagVErrMatrix);
-    m_tagVlErr = sqrt(RotErr(2, 2));
+    TVectorD bVec = toVec(boostDir);
 
-    TMatrixD RR = (TMatrixD)Breco->getVertexErrorMatrix();
-    TMatrixD RotErrBreco = rotateTensor(boostDir, RR);
-    m_deltaTErr = sqrt(RotErr(2, 2) + RotErrBreco(2, 2)) / (bg * c);
+    //TagVertex error in boost dir
+    m_tagVlErr = sqrt(m_tagVErrMatrix.Similarity(bVec));
+
+    //bReco error in boost dir
+    double bRecoErrL = sqrt(Breco->getVertexErrorMatrix().Similarity(bVec));
+
+    //Delta t error
+    m_deltaTErr =  hypot(m_tagVlErr, bRecoErrL) / (bg * c);
 
     m_tagVl = m_tagV.Dot(boostDir);
     m_truthTagVl = m_MCtagV.Dot(boostDir);
 
     // calculate tagV component and error in the direction orthogonal to the boost
     TVector3 oboost = getUnitOrthogonal(boostDir);
-    TMatrixD oRotErr = rotateTensor(oboost, m_tagVErrMatrix);
-    m_tagVolErr = sqrt(oRotErr(2, 2));
+    TVectorD oVec = toVec(oboost);
+
+    //TagVertex error in boost-orthogonal dir
+    m_tagVolErr = sqrt(m_tagVErrMatrix.Similarity(oVec));
 
     m_tagVol = m_tagV.Dot(oboost);
     m_truthTagVol = m_MCtagV.Dot(oboost);

@@ -42,6 +42,7 @@ namespace Belle2 {
 
     // from RotationTools.h
     using RotationTools::getUnitOrthogonal;
+    using RotationTools::toVec;
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
@@ -304,8 +305,7 @@ namespace Belle2 {
 
     double vertexErrBoostDirection(const Particle* part)
     {
-      TVector3 b = PCmsLabTransform().getBoostVector().Unit();
-      TVectorD bDir(0, 2, b(0), b(1), b(2), "END");
+      TVectorD bDir = toVec(PCmsLabTransform().getBoostVector().Unit());
       // sqrt(bDir^T * Mat * bDir)
       return sqrt(part->getVertexErrorMatrix().Similarity(bDir));
     }
@@ -313,8 +313,7 @@ namespace Belle2 {
 
     double vertexErrOrthBoostDirection(const Particle* part)
     {
-      TVector3 o = getUnitOrthogonal(PCmsLabTransform().getBoostVector());
-      TVectorD oDir(0, 2, o(0), o(1), o(2), "END");
+      TVectorD oDir = toVec(getUnitOrthogonal(PCmsLabTransform().getBoostVector()));
       // sqrt(oDir^T * Mat * oDir)
       return sqrt(part->getVertexErrorMatrix().Similarity(oDir));
     }

@@ -69,10 +69,14 @@ namespace Belle2 {
     return result;
   }
 
-  MCInitialParticles& InitialParticleGeneration::generate()
+  MCInitialParticles& InitialParticleGeneration::generate(bool forceGeneration)
   {
     if (!m_event) {
       m_event.create();
+    } else {
+      if (m_event->getValidFlag() && !forceGeneration) {
+        return *m_event;
+      }
     }
     if (!m_beamParams.isValid()) {
       B2FATAL("Cannot generate beam without valid BeamParameters");
@@ -82,7 +86,6 @@ namespace Belle2 {
       m_generateLER.reset();
       m_generateVertex.reset();
     }
-
     m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);

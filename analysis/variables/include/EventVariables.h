@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
@@ -109,22 +109,37 @@ namespace Belle2 {
     double getBeamE(const Particle*);
 
     /**
-     * return x coordinate of the IP
+     * return x coordinate of the IP used for MC generation
+     */
+    double getGenIPX(const Particle*);
+
+    /**
+     * return y coordinate of the IP used for MC generation
+     */
+    double getGenIPY(const Particle*);
+
+    /**
+     * return z coordinate of the IP used for MC generation
+     */
+    double getGenIPZ(const Particle*);
+
+    /**
+     * return x coordinate of the IP measured on data
      */
     double getIPX(const Particle*);
 
     /**
-     * return y coordinate of the IP
+     * return y coordinate of the IP measured on data
      */
     double getIPY(const Particle*);
 
     /**
-     * return z coordinate of the IP
+     * return z coordinate of the IP measured on data
      */
     double getIPZ(const Particle*);
 
     /**
-     * return (i,j) element of the IP covariance matrix.
+     * return (i,j) element of the IP covariance matrix measured on data
      */
     double ipCovMatrixElement(const Particle*, const std::vector<double>& element);
 

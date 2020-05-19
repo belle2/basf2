@@ -90,12 +90,12 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
     B2WARNING("No valid SVDPedestalCalibration for the requested IoV");
   if (! m_PulseShapeCal.isValid())
     B2WARNING("No valid SVDPulseShapeCalibrations for the requested IoV");
-  //  /*
+  /*
   if (!m_OccupancyCal.isValid())
-    B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
+  B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
   if (!m_HotStripsCal.isValid())
-    B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
-  //  */
+  B2WARNING("No valid SVDHotStripsCalibrations for the requested IoV");
+  */
 
   ///OCCUPANCY
   TH1F hOccupancy("occupancy_L@layerL@ladderS@sensor@view",
@@ -333,14 +333,14 @@ void SVDLocalCalibrationsMonitorModule::event()
             Ncells = currentSensorInfo->getVCells();
 
           for (m_strip = 0; m_strip < Ncells; m_strip++) {
-
-            m_occupancy = -1;
-            if (m_OccupancyCal.isValid()) {
-              m_occupancy = m_OccupancyCal.getOccupancy(theVxdID, m_side, m_strip);
-            }
-            m_hOccupancy->fill(theVxdID, m_side, m_occupancy);
-            m_h2Occupancy->fill(theVxdID, m_side, m_strip, m_occupancy);
-
+            /*
+                  m_occupancy = -1;
+                  if (m_OccupancyCal.isValid()) {
+                    m_occupancy = m_OccupancyCal.getOccupancy(theVxdID, m_side, m_strip);
+                  }
+                  m_hOccupancy->fill(theVxdID, m_side, m_occupancy);
+                  m_h2Occupancy->fill(theVxdID, m_side, m_strip, m_occupancy);
+            */
 
             m_mask = -1;
             if (m_MaskedStr.isValid())
@@ -452,12 +452,12 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   B2RESULT("******************************************");
   B2RESULT("** UNIQUE IDs of calibration DB objects **");
   B2RESULT("");
-
+  /*
   if (m_OccupancyCal.isValid())
     B2RESULT("   - SVDOccupancyCalibrations:" << m_OccupancyCal.getUniqueID());
   else
     B2WARNING("No valid SVDOccupancyCalibrations for the requested IoV");
-
+  */
   if (m_MaskedStr.isValid())
     B2RESULT("   - SVDFADCMaskedStrips:" << m_MaskedStr.getUniqueID());
   else
@@ -509,10 +509,10 @@ void SVDLocalCalibrationsMonitorModule::endRun()
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
 
             //writing the histogram list for the noises in ADC units
-            m_rootFilePtr->cd("occupancy");
-            (m_hOccupancy->getHistogram(sensor, view))->Write();
-            (m_h2Occupancy->getHistogram(sensor, view))->Write();
-
+            /*            m_rootFilePtr->cd("occupancy");
+                  (m_hOccupancy->getHistogram(sensor, view))->Write();
+                  (m_h2Occupancy->getHistogram(sensor, view))->Write();
+            */
             //writing the histogram list for the masks in ADC units
             m_rootFilePtr->cd("masked_strips");
             (m_hMask->getHistogram(sensor, view))->Write();
@@ -559,7 +559,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
 
     m_rootFilePtr->cd("expert");
     m_h2Noise->Write("h2Noise");
-    m_h2Occupancy->Write("h2Occupancy");
+    //    m_h2Occupancy->Write("h2Occupancy");
     m_h2PulseWidth->Write("h2PulseShape");
     m_h2Pedestal->Write("h2Pedestal");
     m_h2Gain->Write("h2Gain");

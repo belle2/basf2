@@ -32,7 +32,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHAerogelRayleighScatteringFit(float version, const std::string& serial, const std::string& comment, std::vector<float>& par) :
+    ARICHAerogelRayleighScatteringFit(float version, const std::string& serial, const std::string& comment,
+                                      const std::vector<float>& par) :
       m_version(version), m_serial(serial), m_comment(comment), m_par(par)
     {};
 

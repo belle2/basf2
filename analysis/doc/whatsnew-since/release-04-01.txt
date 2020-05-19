@@ -25,6 +25,10 @@ Vertex Fitting
 
  * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
 
+ * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
+   This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
+   TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -56,6 +60,8 @@ Standard Particle Lists
  * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the
    ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
  * Removed the functions ``mergedKshorts`` and ``mergedLambdas``, which returned the standard V0 lists anyway.
+ * Removed the deprecated pi0 lists ``pi0:loose`` and ``pi0:veryloose``
+ * stdPi0s and stdPhotons updated to match Jan2020 recommendations.  Naming scheme updated to indicate date of optimization.
 
 Variables
 +++++++++
@@ -142,6 +148,8 @@ Variables
  * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
    particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
  * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
+ * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
+ * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
 
 Modules
 +++++++

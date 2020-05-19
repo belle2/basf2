@@ -67,9 +67,9 @@ namespace Belle2 {
     TCanvas* m_c_mask = NULL; /**<Canvas with histograms related to channel masking*/
     TCanvas* m_c_mirror = NULL; /**<Canvas with histograms related to mirrors*/
     TCanvas* m_c_tracks = NULL; /**<Canvas with histograms related to tracks*/
-    TH2Poly* pp1 = NULL;
-    TH2Poly* pp2 = NULL;
-    TH2Poly* pflash = NULL;
+    TH2Poly* pp1 = NULL; /**<2D hitmap of number of hits per APD per event*/
+    TH2Poly* pp2 = NULL; /**<2D hitmap of number of hits per channel per event*/
+    TH2Poly* pflash = NULL; /**<2D hitmap of number of flash (>40 hits) per event*/
 
     Belle2::ARICHChannelHist* m_apdHist = NULL; /**<ARICH TObject to draw hit map for each APD*/
     Belle2::ARICHChannelHist* m_chHist = NULL; /**<ARICH TObject to draw flash map for each channel*/

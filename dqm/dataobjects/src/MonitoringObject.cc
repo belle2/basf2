@@ -18,7 +18,7 @@
 using namespace std;
 using namespace Belle2;
 
-void MonitoringObject::Print() const
+void MonitoringObject::print() const
 {
 
   KeyValuePrinter printVar(false);

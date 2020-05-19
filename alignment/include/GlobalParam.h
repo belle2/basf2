@@ -380,6 +380,7 @@ namespace Belle2 {
 
       /// Has any DB object in vector changed from last call to this function
       /// @param subset set of unique ids of objects we are interested
+      /// @param resetChangedState should this call result in hasBeenChangedInDB=true?
       bool hasBeenChangedInDB(const std::set<unsigned short>& subset, bool resetChangedState = true)
       {
         bool changed = false;

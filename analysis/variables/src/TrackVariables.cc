@@ -244,7 +244,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return trackFit->getPValue();

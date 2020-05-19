@@ -78,7 +78,7 @@ namespace {
   };
 
   /** instantiate tests for all the parameters */
-  INSTANTIATE_TEST_CASE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
+  INSTANTIATE_TEST_SUITE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
 
   /** test that capturing works if finish is not called */
   TEST_F(IOInterceptTest, LogMessagesNoFinish)

@@ -13,38 +13,13 @@ __author__ = "K. Smith"
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.standardlists.lightmesons import loadStdLightMesons
-from stdCharged import stdK, stdPi
-from stdPi0s import stdPi0s, loadStdSkimPi0
-from stdV0s import stdKshorts
-from stdPhotons import stdPhotons
-import skimExpertFunctions as expert
+from skim.btocharmless import CharmlessHad3Body
 
-charmless3neutralpath = b2.Path()
+path = b2.Path()
 
-fileList = ['../CharmlessHad3BodyNeutral.dst.root']
+fileList = ['../CharmlessHad3BodyCharged.dst.root']
+ma.inputMdstList('default', fileList, path=path)
 
-ma.inputMdstList('default', fileList, path=charmless3neutralpath)
-
-# Load particle lists
-stdPhotons('loose', path=charmless3neutralpath)
-stdK('loose', path=charmless3neutralpath)
-stdKshorts(path=charmless3neutralpath)
-stdPi('loose', path=charmless3neutralpath)
-stdPi0s('loose', path=charmless3neutralpath)
-stdPi0s('all', path=charmless3neutralpath)
-loadStdSkimPi0(path=charmless3neutralpath)
-loadStdLightMesons(path=charmless3neutralpath)
-
-# Hadronic B0 skim
-from skim.btocharmless import CharmlessHad3BodyB0List
-Had3BodyList = CharmlessHad3BodyB0List(path=charmless3neutralpath)
-expert.skimOutputUdst('../CharmlessHad3BodyNeutral.udst.root', Had3BodyList, path=charmless3neutralpath)
-ma.summaryOfLists(Had3BodyList, path=charmless3neutralpath)
-
-# Suppress noisy modules, and then process
-expert.setSkimLogging(path=charmless3neutralpath)
-b2.process(charmless3neutralpath)
-
-# print out the summary
-print(b2.statistics)
+skim = CharmlessHad3Body(OutputFileName='../CharmlessHad3BodyNeutral.udst.root')
+skim(path)
+b2.process(path)

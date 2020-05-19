@@ -27,9 +27,13 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer)
 
-KLMDigitizerModule::KLMDigitizerModule() : Module(),
+KLMDigitizerModule::KLMDigitizerModule() :
+  Module(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_ChannelSpecificSimulation(false),
-  m_EfficiencyMode(c_Plane)
+  m_EfficiencyMode(c_Plane),
+  m_Fitter(nullptr)
 {
   setDescription("KLM digitization module: create KLMDigits from BKLMSimHits and EKLMSimHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -45,9 +49,6 @@ KLMDigitizerModule::KLMDigitizerModule() : Module(),
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
-  m_Fitter = nullptr;
 }
 
 KLMDigitizerModule::~KLMDigitizerModule()

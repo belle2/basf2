@@ -57,7 +57,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   m_monObj = getMonitoringObject("pxd");
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();

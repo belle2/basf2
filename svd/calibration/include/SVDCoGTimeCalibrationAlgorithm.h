@@ -62,7 +62,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
+    std::string m_id = ""; /**< Parameter given to set the UniqueID of the payload*/
     std::optional<float> m_previousRawCoGTimeMeanL3V; /**< CoG time mean of the previous run for V side of layer 3*/
 
     float m_allowedTimeShift = 2.; /**< Allowed EventT0 shift*/

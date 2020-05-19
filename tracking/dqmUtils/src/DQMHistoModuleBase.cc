@@ -251,20 +251,24 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
   TDirectory* helixParameters = originalDirectory->mkdir("HelixPars");
   TDirectory* helixCorrelations = originalDirectory->mkdir("HelixCorrelations");
 
+  int iZ0Range = 200;
   double fZ0Range = 10.0;     // Half range in cm
+  int iD0Range = 200;
   double fD0Range = 1.0;      // Half range in cm
   int iMomRange = 600;
   double fMomRange = 6.0;
-  int iPhiRange = 180;
+  int iPhiRange = 72;
   double fPhiRange = 180.0;   // Half range in deg
-  double lambdaRange = 4.0;
-  double omegaRange = 0.1;
+  int iLambdaRange = 400;
+  double fLambdaRange = 4.0;
+  int iOmegaRange = 400;
+  double fOmegaRange = 0.1;
 
   auto phi = THFAxis(iPhiRange, -fPhiRange, fPhiRange, "#phi [deg]");
-  auto D0 = THFAxis(100, -fD0Range, fD0Range, "d0 [cm]");
-  auto Z0 = THFAxis(100, -fZ0Range, fZ0Range, "z0 [cm]");
-  auto tanLambda = THFAxis(100, -lambdaRange, lambdaRange, "Tan Lambda");
-  auto omega = THFAxis(100, -omegaRange, omegaRange, "Omega");
+  auto D0 = THFAxis(iD0Range, -fD0Range, fD0Range, "d0 [cm]");
+  auto Z0 = THFAxis(iZ0Range, -fZ0Range, fZ0Range, "z0 [cm]");
+  auto tanLambda = THFAxis(iLambdaRange, -fLambdaRange, fLambdaRange, "Tan Lambda");
+  auto omega = THFAxis(iOmegaRange, -fOmegaRange, fOmegaRange, "Omega");
   auto momentum = THFAxis(2 * iMomRange, 0.0, fMomRange, "Momentum");
 
   auto factory = THFFactory(this);

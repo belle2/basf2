@@ -135,48 +135,48 @@ class BtoXll(BaseSkim):
         }
 
     def build_lists(self, path):
-            """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
+        """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
 
-            # event level cuts: R2 and require a minimum number of tracks
-            ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
-            ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
+        # event level cuts: R2 and require a minimum number of tracks
+        ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
+        ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
 
-            ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
-                               allMoments=False,
-                               foxWolfram=True,
-                               harmonicMoments=False,
-                               cleoCones=False,
-                               thrust=False,
-                               collisionAxis=False,
-                               jets=False,
-                               sphericity=False,
-                               checkForDuplicates=False,
-                               path=path)
+        ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
 
-            # Apply event cuts R2 < 0.5 and nTracks >= 3
-            path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.5 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
 
-            # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
-            # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
-            fairTrack = 'dr < 0.5 and abs(dz) < 2'
+        # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
+        # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
+        fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-            ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
-            ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
-            # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
-            E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
+        # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
+        E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
-            # B+ reconstruction:
-            # oppositely charged leptons
-            ma.reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
-            ma.reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
-            # same charge leptons
-            ma.reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
-            ma.reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
+        # B+ reconstruction:
+        # oppositely charged leptons
+        ma.reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        # same charge leptons
+        ma.reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
 
-            ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
+        ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
-            self.SkimLists = ['B+:xll']
+        self.SkimLists = ['B+:xll']
 
 
 @fancy_skim_header

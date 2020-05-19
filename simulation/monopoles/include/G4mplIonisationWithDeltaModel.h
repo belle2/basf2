@@ -76,7 +76,7 @@ namespace Belle2 {
        * Compute cross section per electron for delta electrons emission.
        *
        * @param p Pointer to monopole definition
-       * @param kinEnergy Monopole kinetic energy value
+       * @param kineticEnergy Monopole kinetic energy value
        * @param cutEnergy Cut energy for ionisation process
        * @param maxEnergy Maximum energy of secondary electron
        * @return Cross section
@@ -91,7 +91,7 @@ namespace Belle2 {
        * Compute cross section per atom for delta electrons emission.
        *
        * @param p Pointer to monopole definition
-       * @param kinEnergy Monopole kinetic energy value
+       * @param kineticEnergy Monopole kinetic energy value
        * @param Z Atomic charge
        * @param A This argument of base function is ignored
        * @param cutEnergy Cut energy for ionisation process

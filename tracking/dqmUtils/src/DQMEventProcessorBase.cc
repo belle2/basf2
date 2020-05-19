@@ -152,8 +152,8 @@ void DQMEventProcessorBase::ProcessPXDRecoHit(RecoHitInformation* recoHitInfo)
 {
   m_position.SetX(recoHitInfo->getRelatedTo<PXDCluster>()->getU());
   m_position.SetY(recoHitInfo->getRelatedTo<PXDCluster>()->getV());
-  m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
-  m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um"));
+  m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] / Unit::um);
+  m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[1] / Unit::um);
 
   m_sensorID = recoHitInfo->getRelatedTo<PXDCluster>()->getSensorID();
   ComputeCommonVariables();
@@ -170,10 +170,10 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 {
   if (recoHitInfo->getRelatedTo<SVDCluster>()->isUCluster()) {
     m_position.SetX(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition());
-    m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
+    m_residual_um.SetX(m_rawSensorResidual->GetMatrixArray()[0] / Unit::um);
   } else {
     m_position.SetY(recoHitInfo->getRelatedTo<SVDCluster>()->getPosition());
-    m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um"));
+    m_residual_um.SetY(m_rawSensorResidual->GetMatrixArray()[0] / Unit::um);
   }
 
   m_sensorID = recoHitInfo->getRelatedTo<SVDCluster>()->getSensorID();
@@ -197,8 +197,8 @@ void DQMEventProcessorBase::ComputeCommonVariables()
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
   TVector3 globalPosition = sensorInfo->pointToGlobal(m_position, true);
 
-  m_phi_deg = globalPosition.Phi() / TMath::Pi() * 180;
-  m_theta_deg = globalPosition.Theta() / TMath::Pi() * 180;
+  m_phi_deg = globalPosition.Phi() / Unit::deg;
+  m_theta_deg = globalPosition.Theta() / Unit::deg;
 
   m_layerNumber = m_sensorID.getLayerNumber();
 

@@ -25,6 +25,16 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     RequiredStandardLists = None
     TestFiles = [get_test_file("MC13_mumuBGx1")]
 
+    def __init__(self, prescale=1, **kwargs):
+        """
+        Parameters:
+            prescale (int): the prescale for this skim
+            **kwargs: Passed to the constructor of `BaseSkim`
+        """
+        # Redefine __init__ to allow for additional optional arguments
+        super().__init__(**kwargs)
+        self.prescale = prescale
+
     def build_lists(self, path):
         # Skim label
         skim_label = 'TwoTrackLeptonsForLuminosity'
@@ -54,8 +64,12 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
             '[abs(formula(daughter(0, useCMSFrame(theta)) + daughter(1, useCMSFrame(theta)) - 3.1415927)) < 0.17453293]'
         )
 
-        two_track_cut = nTracks_cut_2 + ' and ' + deltaTheta_cut
-        track_cluster_cut = nTracks_cut_1 + ' and ' + deltaTheta_cut
+        # convert the prescale from trigger convention
+        prescale = str(float(1.0 / self.prescale))
+        prescale_logic = 'eventRandom <= ' + prescale
+
+        two_track_cut = nTracks_cut_2 + ' and ' + deltaTheta_cut + ' and ' + prescale_logic
+        track_cluster_cut = nTracks_cut_1 + ' and ' + deltaTheta_cut + ' and ' + prescale_logic
 
         # Reconstruct the event candidates with two tracks
         ma.fillParticleList('e+:' + skim_label_2, single_track_cut + ' and ' + nTracks_cut_2, path=path)

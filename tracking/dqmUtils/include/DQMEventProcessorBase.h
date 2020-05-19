@@ -68,7 +68,7 @@ namespace Belle2 {
     virtual void SetCommonPrevVariables();
 
     /**
-    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Yang half-shell, therefore it should be in the Ying half-shell if it's from PXD detector.
+    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Yang half-shell, therefore it should be in the Yin half-shell if it's from PXD detector.
     * Returns false if the sensor is in the Yang.
     *
     * Possible combinations of parameters for Yang:

@@ -186,8 +186,8 @@ namespace Belle2 {
     TH1F* m_UBResidualsSVDV = nullptr;
 
     /** half-shells */
-    /** Unbiased residuals in X for PXD for Ying */
-    TH1F* m_UBResidualsPXDX_Ying = nullptr;
+    /** Unbiased residuals in X for PXD for Yin */
+    TH1F* m_UBResidualsPXDX_Yin = nullptr;
     /** Unbiased residuals in X for PXD for Yang */
     TH1F* m_UBResidualsPXDX_Yang = nullptr;
     /** Unbiased residuals in X for PXD for Pat */
@@ -195,8 +195,8 @@ namespace Belle2 {
     /** Unbiased residuals in X for PXD for Mat */
     TH1F* m_UBResidualsSVDX_Mat = nullptr;
 
-    /** Unbiased residuals in Y for PXD for Ying */
-    TH1F* m_UBResidualsPXDY_Ying = nullptr;
+    /** Unbiased residuals in Y for PXD for Yin */
+    TH1F* m_UBResidualsPXDY_Yin = nullptr;
     /** Unbiased residuals in Y for PXD for Yang */
     TH1F* m_UBResidualsPXDY_Yang = nullptr;
     /** Unbiased residuals in Y for PXD for Pat */
@@ -204,8 +204,8 @@ namespace Belle2 {
     /** Unbiased residuals in Y for PXD for Mat */
     TH1F* m_UBResidualsSVDY_Mat = nullptr;
 
-    /** Unbiased residuals in Z for PXD for Ying */
-    TH1F* m_UBResidualsPXDZ_Ying = nullptr;
+    /** Unbiased residuals in Z for PXD for Yin */
+    TH1F* m_UBResidualsPXDZ_Yin = nullptr;
     /** Unbiased residuals in Z for PXD for Yang */
     TH1F* m_UBResidualsPXDZ_Yang = nullptr;
     /** Unbiased residuals in Z for PXD for Pat */

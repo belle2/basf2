@@ -349,17 +349,17 @@ void DQMHistoModuleBase::DefineHalfShellsVXD()
   auto residual = THFAxis(200, -residualRange, residualRange, "residual [#mum]");
   auto factory = THFFactory(this).xAxisSet(residual).yTitleSet("counts");
 
-  m_UBResidualsPXDX_Ying = factory.CreateTH1F("UBResidualsPXDX_Ying", "Unbiased residuals in X for PXD for Ying");
+  m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "Unbiased residuals in X for PXD for Yin");
   m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
   m_UBResidualsSVDX_Pat = factory.CreateTH1F("UBResidualsSVDX_Pat", "Unbiased residuals in X for SVD for Pat");
   m_UBResidualsSVDX_Mat = factory.CreateTH1F("UBResidualsSVDX_Mat", "Unbiased residuals in X for SVD for Mat");
 
-  m_UBResidualsPXDY_Ying = factory.CreateTH1F("UBResidualsPXDY_Ying", "Unbiased residuals in Y for PXD for Ying");
+  m_UBResidualsPXDY_Yin = factory.CreateTH1F("UBResidualsPXDY_Yin", "Unbiased residuals in Y for PXD for Yin");
   m_UBResidualsPXDY_Yang = factory.CreateTH1F("UBResidualsPXDY_Yang", "Unbiased residuals in Y for PXD for Yang");
   m_UBResidualsSVDY_Pat = factory.CreateTH1F("UBResidualsSVDY_Pat", "Unbiased residuals in Y for SVD for Pat");
   m_UBResidualsSVDY_Mat = factory.CreateTH1F("UBResidualsSVDY_Mat", "Unbiased residuals in Y for SVD for Mat");
 
-  m_UBResidualsPXDZ_Ying = factory.CreateTH1F("UBResidualsPXDZ_Ying", "Unbiased residuals in Z for PXD for Ying");
+  m_UBResidualsPXDZ_Yin = factory.CreateTH1F("UBResidualsPXDZ_Yin", "Unbiased residuals in Z for PXD for Yin");
   m_UBResidualsPXDZ_Yang = factory.CreateTH1F("UBResidualsPXDZ_Yang", "Unbiased residuals in Z for PXD for Yang");
   m_UBResidualsSVDZ_Pat = factory.CreateTH1F("UBResidualsSVDZ_Pat", "Unbiased residuals in Z for SVD for Pat");
   m_UBResidualsSVDZ_Mat = factory.CreateTH1F("UBResidualsSVDZ_Mat", "Unbiased residuals in Z for SVD for Mat");
@@ -526,9 +526,9 @@ void DQMHistoModuleBase::FillUBResidualsSVD(TVector3 residual_um)
 void DQMHistoModuleBase::FillHalfShellsPXD(TVector3 globalResidual_um, bool isNotYang)
 {
   if (isNotYang) {
-    m_UBResidualsPXDX_Ying->Fill(globalResidual_um.x());
-    m_UBResidualsPXDY_Ying->Fill(globalResidual_um.y());
-    m_UBResidualsPXDZ_Ying->Fill(globalResidual_um.z());
+    m_UBResidualsPXDX_Yin->Fill(globalResidual_um.x());
+    m_UBResidualsPXDY_Yin->Fill(globalResidual_um.y());
+    m_UBResidualsPXDZ_Yin->Fill(globalResidual_um.z());
   } else {
     m_UBResidualsPXDX_Yang->Fill(globalResidual_um.x());
     m_UBResidualsPXDY_Yang->Fill(globalResidual_um.y());

@@ -207,8 +207,8 @@ TH2F** DQMHistoModuleBase::CreateSensors(boost::format nameTemplate, boost::form
 
 void DQMHistoModuleBase::DefineMomentumAngles()
 {
-  m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, -TMath::Pi(), TMath::Pi(), "Mom Phi", "counts");
-  m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, TMath::Pi(), "Mom Theta", "counts");
+  m_MomPhi = Create("MomPhi", "Momentum Phi of fit", 180, -180, 180, "Mom Phi", "counts");
+  m_MomTheta = Create("MomTheta", "Momentum Theta of fit", 90, 0, 180, "Mom Theta", "counts");
   m_MomCosTheta = Create("MomCosTheta", "Cos of Momentum Theta of fit", 100, -1, 1, "Mom CosTheta", "counts");
 }
 
@@ -462,8 +462,8 @@ void DQMHistoModuleBase::FillMomentumAngles(const TrackFitResult* tfr)
   float pxy = sqrt(px * px + py * py);
   float Theta = atan2(pxy, pz);
 
-  m_MomPhi->Fill(Phi);
-  m_MomTheta->Fill(Theta);
+  m_MomPhi->Fill(Phi / Unit::deg);
+  m_MomTheta->Fill(Theta / Unit::deg);
   m_MomCosTheta->Fill(cos(Theta));
 }
 

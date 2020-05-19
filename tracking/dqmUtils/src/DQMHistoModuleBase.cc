@@ -476,11 +476,11 @@ void DQMHistoModuleBase::FillHelixParametersAndCorrelations(const TrackFitResult
   m_MomPt->Fill(tfr->getMomentum().Pt());
   m_D0->Fill(tfr->getD0());
   m_Z0->Fill(tfr->getZ0());
-  m_Phi->Fill(tfr->getPhi() * Unit::convertValueToUnit(1.0, "deg"));
+  m_Phi->Fill(tfr->getPhi() / Unit::deg);
   m_Omega->Fill(tfr->getOmega());
   m_TanLambda->Fill(tfr->getTanLambda());
 
-  m_PhiD0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getD0());
+  m_PhiD0->Fill(tfr->getPhi0() / Unit::deg, tfr->getD0());
   m_D0Z0->Fill(tfr->getZ0(), tfr->getD0());
 }
 

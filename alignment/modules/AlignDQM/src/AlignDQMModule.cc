@@ -376,10 +376,10 @@ void AlignDQMModule::FillHelixParametersAndCorrelations(const TrackFitResult* tf
 {
   DQMHistoModuleBase::FillHelixParametersAndCorrelations(tfr);
 
-  m_PhiZ0->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getZ0());
-  m_PhiMomPt->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getMomentum().Pt());
-  m_PhiOmega->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getOmega());
-  m_PhiTanLambda->Fill(tfr->getPhi0() * Unit::convertValueToUnit(1.0, "deg"), tfr->getTanLambda());
+  m_PhiZ0->Fill(tfr->getPhi0() / Unit::deg, tfr->getZ0());
+  m_PhiMomPt->Fill(tfr->getPhi0() / Unit::deg, tfr->getMomentum().Pt());
+  m_PhiOmega->Fill(tfr->getPhi0() / Unit::deg, tfr->getOmega());
+  m_PhiTanLambda->Fill(tfr->getPhi0() / Unit::deg, tfr->getTanLambda());
   m_D0MomPt->Fill(tfr->getD0(), tfr->getMomentum().Pt());
   m_D0Omega->Fill(tfr->getD0(), tfr->getOmega());
   m_D0TanLambda->Fill(tfr->getD0(), tfr->getTanLambda());
@@ -393,8 +393,8 @@ void AlignDQMModule::FillHelixParametersAndCorrelations(const TrackFitResult* tf
 
 void AlignDQMModule::FillPositionSensors(TVector3 residual_um, TVector3 position, int sensorIndex)
 {
-  float positionU_mm = position.x() * Unit::convertValueToUnit(1.0, "mm");
-  float positionV_mm = position.y() * Unit::convertValueToUnit(1.0, "mm");
+  float positionU_mm = position.x() / Unit::mm;
+  float positionV_mm = position.y() / Unit::mm;
 
   m_ResMeanPosUVSensCounts[sensorIndex]->Fill(positionU_mm, positionV_mm);
   m_ResMeanUPosUVSens[sensorIndex]->Fill(positionU_mm, positionV_mm, residual_um.x());

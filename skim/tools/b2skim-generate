@@ -19,12 +19,13 @@ def get_argument_parser():
 
     parser.add_argument(
         "skims",
-        choices=Registry.names,
+        choices=Registry.names + Registry.modules,
         nargs="+",
-        metavar="Skim",
+        metavar="Skim|Module",
         help=(
             "Skim/s to produce a steering file for. If more than one skim is provided, "
-            "then a combined steering file is produced."
+            "then a combined steering file is produced. If a module name is passed, "
+            "the combined steering file will contain all skims in that module."
         ),
     )
 
@@ -45,6 +46,30 @@ def get_argument_parser():
     return parser
 
 
+def resolve_skims(SkimsOrModules):
+    """
+    Produce an ordered list of skims, by expanding any module names into a list of skims
+    in that module.
+    
+    Raises:
+        ValueError: Raised if a skim is listed twice.
+    """
+    skims = []
+
+    for name in SkimsOrModules:
+        if name in Registry.names:
+            skims.append(name)
+        elif name in Registry.modules:
+            skims.extend(Registry.get_skims_in_module(name))
+
+    duplicates = set([skim for skim in skims if skims.count(skim) > 1])
+    if duplicates:
+        raise ValueError(
+            f"Skim{'s'*(len(duplicates)>1)} requested more than once: {', '.join(duplicates)}"
+        )
+
+    return skims
+
 def make_header():
     header = """#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
@@ -53,6 +78,7 @@ def make_header():
 
 """
     return header
+
 
 def make_imports(skims):
     # Group skims by module, so we can put together some nice import statements
@@ -99,7 +125,7 @@ ma.inputMdstList("default", skim.TestFiles, path=path)
 skim(path)
 b2.process(path)
 
-print(b2.statistics())
+print(b2.statistics)
 """
     return MainProcessing
 
@@ -108,16 +134,17 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    SteeringFileCode = make_header() + make_imports(args.skims) + make_processing(args.skims)
+    skims = resolve_skims(args.skims)
+    SteeringFileCode = make_header() + make_imports(skims) + make_processing(skims)
 
-    SkimName = args.skims[0] if len(args.skims) == 1 else ", ".join(args.skims) + " combined"
+    SkimName = skims[0] if len(skims) == 1 else ", ".join(skims) + " combined"
 
     if args.OutputFilename == "":
         # -o flag was not passed
         print(SteeringFileCode)
     elif args.OutputFilename is None:
         # -o flag was passed with no argument
-        if len(args.skims) == 1:
+        if len(skims) == 1:
             OutputFilename = f"{SkimName}.py"
         else:
             OutputFilename = f"CombinedSkim.py"

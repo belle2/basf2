@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
@@ -23,7 +24,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCSegment2D;
     class CDCTrajectory2D;
     class CDCTrajectorySZ;
 
@@ -45,28 +45,28 @@ namespace Belle2 {
       /// Equality comparision based on the pointers to the stored segments.
       bool operator==(CDCSegmentPair const& rhs) const
       {
-        return getFromSegment() == rhs.getFromSegment() and getToSegment() == rhs.getToSegment();
+        return *getFromSegment() == *rhs.getFromSegment() and * getToSegment() == *rhs.getToSegment();
       }
 
       /// Total ordering sheme comparing the segment pointers.
       bool operator<(CDCSegmentPair const& rhs) const
       {
-        return (getFromSegment() < rhs.getFromSegment() or
-                (getFromSegment() == rhs.getFromSegment() and getToSegment() < rhs.getToSegment()));
+        return (*getFromSegment() < *rhs.getFromSegment() or
+                (*getFromSegment() == *rhs.getFromSegment() and * getToSegment() < *rhs.getToSegment()));
       }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from
       /// segment
       friend bool operator<(const CDCSegmentPair& segmentPair, const CDCSegment2D* segment)
       {
-        return segmentPair.getFromSegment() < segment;
+        return *segmentPair.getFromSegment() < *segment;
       }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from
       /// segment
       friend bool operator<(const CDCSegment2D* segment, const CDCSegmentPair& segmentPair)
       {
-        return segment < segmentPair.getFromSegment();
+        return *segment < *segmentPair.getFromSegment();
       }
 
       /// Checks if both stored segments are not nullptr. Returns true if check is succeded.

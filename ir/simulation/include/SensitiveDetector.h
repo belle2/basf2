@@ -51,6 +51,7 @@ namespace Belle2 {
       /**
        * Process each step and calculate variables defined in IRSimHit.
        * @param step Current Geant4 step in the sensitive medium.
+       * @param unnamed TouchableHistory of the ReadoutGeometry, not used in ir
        * @result true if a hit was stored, o.w. false.
        */
       bool step(G4Step* aStep, G4TouchableHistory*) override;

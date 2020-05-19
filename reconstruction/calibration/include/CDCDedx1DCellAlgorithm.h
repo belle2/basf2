@@ -18,6 +18,7 @@
 #include <TLine.h>
 #include <TMath.h>
 #include <TH1F.h>
+#include <TH1D.h>
 #include <TBox.h>
 #include <TString.h>
 #include <TCanvas.h>
@@ -117,7 +118,7 @@ namespace Belle2 {
       nBinEnta0to100Per = nBinEnta0to50Per;
       nBinEnta0to100Per.insert(nBinEnta0to100Per.end(), nBinEnta50to100Per.begin(), nBinEnta50to100Per.end());
 
-      TH1F* tempEnta = new TH1F("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
+      TH1D* tempEnta = new TH1D("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
       fEntaBinValues.push_back(tempEnta->GetBinLowEdge(1)); //first and last manual
       for (unsigned int i = 0; i < nBinEnta0to100Per.size() - 1; ++i) {
         if (nBinEnta0to100Per.at(i) < nBinEnta0to100Per.at(i + 1)) {

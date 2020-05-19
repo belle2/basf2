@@ -4,10 +4,6 @@
 Skims
 =====
 
-.. warning::
-        Skim package sphinx documentation is currently in progress. What is here is correct, but you should take a look at the `confluence page <https://confluence.desy.de/display/BI/Skimming+Homepage>`_ for more information about more skims than is listed here.
-
-
 The skim package is a collection of high-level analysis scripts that reduce the data set to a manageable size by applying a simple selection.
 The input to a skim are MDST files of processed data. The output is a so-called uDST (micro-DST) which actually contains more information but fewer events.
 That is, a uDST file contains the same as an MDST but with the addition of `ParticleList`_ objects of candidates build using the `modularAnalysis` tools.

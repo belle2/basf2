@@ -102,7 +102,7 @@ namespace Belle2 {
         m_charge += aStrip.charge;
         m_6SampleTime += aStrip.time * aStrip.charge;
 
-        float tmp_sigmaSquared = aStrip.timeError / aStrip.timeError;
+        float tmp_sigmaSquared = aStrip.timeError * aStrip.timeError;
         weightSum +=  tmp_sigmaSquared;
         //FIXME: use error to weight the time of each strip in the cluster
         // it seems to yield a worst resolution vs EventT0 and an additional 1 ns bias

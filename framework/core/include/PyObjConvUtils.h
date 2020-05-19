@@ -246,8 +246,8 @@ namespace Belle2 {
     /** Helper function to loop over a python object that implements the iterator
      * concept and call a functor with each element as argument
      * @param pyObject the python object to iterate over
-     * @function any functor object which accepts a boost::python::object as its
-     *       only argument and returns true if the iteration should be continued
+     * @param function any functor object which accepts a boost::python::object as its
+     *        only argument and returns true if the iteration should be continued
      * @returns true if the iteration was completed over all elements
      */
     template<class Functor>

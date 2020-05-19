@@ -195,10 +195,9 @@ namespace Belle2 {
     return u + 1;
   }
 
-  void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len)
+  void arichBtestModule::readmwpc(unsigned int* dbuf, unsigned int len, int print1290)
   {
 
-    const int print1290 = 0;
     const int unsigned MAXV1290 = 32;
 
     unsigned int edge;
@@ -504,7 +503,6 @@ namespace Belle2 {
 
     type = hdr[0];
     //   len  = hdr[1];
-    int print = 0;
 
     gzseek(m_fp, 2 * sizeof(unsigned int), SEEK_CUR);
     switch (type) {
@@ -524,7 +522,7 @@ namespace Belle2 {
       }
       case EVENT_RECORD_TYPE: {
         gzread(m_fp, &rec, sizeof(rec));
-        print = !(rec.evtno % 10000);
+        int print = !(rec.evtno % 10000);
         time_t t = rec.time;
         if (print) {
           sprintf(msg, "EventRec run %u evt %u mstime %u, time %s", rec.runno, rec.evtno, rec.mstime, ctime(&t));

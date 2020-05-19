@@ -339,8 +339,8 @@ def fitPseudo(
 
         from modularAnalysis import fitPseudo
         from stdPi0s import stdPi0s
-        stdPi0s("loose", path=mypath)
-        fitPseudo("pi0:loose", path=mypath)
+        stdPi0s("eff40_Jan2020", path=mypath)
+        fitPseudo("pi0:eff40_Jan2020", path=mypath)
 
     Parameters:
         list_name (str): the name of the list to add the covariance matrix to

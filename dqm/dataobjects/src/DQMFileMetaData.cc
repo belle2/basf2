@@ -49,20 +49,3 @@ void DQMFileMetaData::Print(Option_t* option) const
   std::cout << printer.string();
   std::cout << "=======================\n";
 }
-
-
-std::string DQMFileMetaData::getJsonStr() const
-{
-  /*nlohmann::json metadata = {
-    {"nEvents", m_nEvents},
-    {"experiment", m_experiment},
-    {"run", m_run},
-    {"run date", m_date},
-    {"release", m_release},
-    {"isMC", m_isMC},
-    {"mcEvents", m_mcEvents},
-    {"globalTag", m_databaseGlobalTag},
-  };
-  return metadata.dump(2);*/
-
-}

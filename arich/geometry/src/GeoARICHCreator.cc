@@ -460,7 +460,6 @@ namespace Belle2 {
       //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
 
       unsigned nLayer = aeroGeo.getNLayers();
-      G4Transform3D transform = G4Translate3D(0., 0., thick / 2.);
 
       // loop over layers
       double zLayer = 0;
@@ -734,23 +733,22 @@ namespace Belle2 {
             G4ThreeVector trans(r * cos(iphi), r * sin(iphi), (thick - imgTubeLen) / 2.);
             G4RotationMatrix Ra;
             Ra.rotateZ(iphi);
-            if (iLayer == 1)
+            if (iLayer == 1) {
               new G4PVPlacement(G4Transform3D(Ra, trans),          //transformation
                                 wallLV,                            //its logical
                                 string("ARICH.") + wallName.str(), //name
                                 aerogelPlaneLV,                    //mother logical
                                 false,                             //always false
                                 icopyNumber);                      //should be set to 0 for the first volume of a given type.
-            ///////////////////////////////
+              ///////////////////////////////
 
-            // In case of individual thickness
-            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 1) or
-            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 2)
-            // of the tiles we need to define compensation volume with ARICH air.
-            // This volume situated between aerogel tile and image plane (imgTube).
-            // This volume have same shape as earogel tile but different thickness.
-            // Build Compensation tiles only one time
-            if (iLayer == 1) {
+              // In case of individual thickness
+              // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 1) or
+              // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 2)
+              // of the tiles we need to define compensation volume with ARICH air.
+              // This volume situated between aerogel tile and image plane (imgTube).
+              // This volume have same shape as earogel tile but different thickness.
+              // Build Compensation tiles only one time
               // Compensation tile shape
               double compTileUpThick = wallHeight - tileUpThick - tileDownThick;
               std::stringstream compTileName;
@@ -1190,11 +1188,11 @@ namespace Belle2 {
                                                         mm;
 
       double feb_alcooling_box1_sizeX = coolingv2Geo.getSmallSquareSize() * mm;
-      double feb_alcooling_box1_sizeY = coolingv2Geo.getSmallSquareSize() * mm;
+      double feb_alcooling_box1_sizeY = feb_alcooling_box1_sizeX;
       double feb_alcooling_box1_sizeZ = coolingv2Geo.getSmallSquareThickness() * mm;
 
       double feb_alcooling_box2_sizeX = coolingv2Geo.getBigSquareSize() * mm;
-      double feb_alcooling_box2_sizeY = coolingv2Geo.getBigSquareSize() * mm;
+      double feb_alcooling_box2_sizeY = feb_alcooling_box2_sizeX;
       double feb_alcooling_box2_sizeZ = coolingv2Geo.getBigSquareThickness() * mm;
 
       double feb_alcooling_box3_sizeX = coolingv2Geo.getRectangleW() * mm;
@@ -1210,7 +1208,7 @@ namespace Belle2 {
       //double feb_alcooling_box2_Z0 = 0.0*mm;
 
       double feb_alcooling_box3_X0 = coolingv2Geo.getRectangleDistanceFromCenter() / sqrt(2.0) * mm;
-      double feb_alcooling_box3_Y0 = coolingv2Geo.getRectangleDistanceFromCenter() / sqrt(2.0) * mm;
+      double feb_alcooling_box3_Y0 = feb_alcooling_box3_X0;
       double feb_alcooling_box3_Z0 = feb_alcooling_box1_sizeZ / 2.0 + feb_alcooling_box3_sizeZ / 2.0;
       double feb_alcooling_box3_angle = 45.0 * deg;
 

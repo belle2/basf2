@@ -69,6 +69,9 @@ namespace Belle2 {
       /** Use high precision neutron models below 20 MeV */
       void UseHighPrecisionNeutrons(G4bool);
 
+      /** Simulate neutral long-lived particles with given pdg and mass value */
+      void UseLongLivedNeutralParticles();
+
     private:
       /** Set the produciton cuts to the given value for a list of regions belonging to a sub detector
        * @param name name of the sub detector to print in messages

@@ -45,7 +45,7 @@ TRGTOPUnpackerModule::TRGTOPUnpackerModule()
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  B2INFO("TRGTOPUnpacker: Constructor done.");
+  B2DEBUG(20, "TRGTOPUnpacker: Constructor done.");
 
 
   // Parameter definitions

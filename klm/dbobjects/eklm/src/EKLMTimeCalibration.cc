@@ -18,8 +18,6 @@ using namespace Belle2;
 
 EKLMTimeCalibration::EKLMTimeCalibration()
 {
-  m_EffectiveLightSpeed = 0;
-  m_AmplitudeTimeConstant = 0;
 }
 
 EKLMTimeCalibration::~EKLMTimeCalibration()
@@ -46,29 +44,3 @@ EKLMTimeCalibration::getTimeCalibrationData(uint16_t strip) const
     return nullptr;
   return &(it->second);
 }
-
-void EKLMTimeCalibration::cleanTimeCalibrationData()
-{
-  m_data.clear();
-}
-
-float EKLMTimeCalibration::getEffectiveLightSpeed() const
-{
-  return m_EffectiveLightSpeed;
-}
-
-void EKLMTimeCalibration::setEffectiveLightSpeed(float lightSpeed)
-{
-  m_EffectiveLightSpeed = lightSpeed;
-}
-
-float EKLMTimeCalibration::getAmplitudeTimeConstant() const
-{
-  return m_AmplitudeTimeConstant;
-}
-
-void EKLMTimeCalibration::setAmplitudeTimeConstant(float amplitudeTimeConstant)
-{
-  m_AmplitudeTimeConstant = amplitudeTimeConstant;
-}
-

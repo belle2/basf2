@@ -140,6 +140,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool requireRelationTo(const PyStoreArray& toArray,
@@ -153,6 +154,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool optionalRelationTo(const PyStoreArray& toArray,

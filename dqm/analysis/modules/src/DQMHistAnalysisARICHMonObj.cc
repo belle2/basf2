@@ -194,8 +194,9 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   tracks2D->SetTitle(TString::Format("Track distribution (avg %f trk/evt)", trkevt));
   tracks2D->Draw("colz");
 
-  double sigbkg[8] = {0};
+
   if (ntracks) {
+    double sigbkg[8] = {0};
     //fit two gauses
     if (theta->GetEntries() == 0) return;
     TF1* f1 = new TF1("thcFit", "gaus(0)+gaus(3)", 0.2, 0.4);
@@ -270,7 +271,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   if (chDigit != NULL) chDigit->Scale(1. / nevt);
   chHit->Scale(1. / nevt);
   flash->Scale(1. / nevt);
-  TString hot = "";
+
   int nhot = 0, ndead = 0;
   TH2F* hotCh = new TH2F("hot", "Number of channels in APD with >0.5% occ.", 42, 0.5, 42.5, 40, 0.5, 40.5);
   TH2F* hotCh1 = new TH2F("hot1", "Number of channels in APD with >0.5% occ. after mask", 42, 0.5, 42.5, 40, 0.5, 40.5);

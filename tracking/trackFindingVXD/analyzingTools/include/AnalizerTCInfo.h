@@ -51,7 +51,7 @@ namespace Belle2 {
 
 
     /** static function for correctly creating TrackCandidates */
-    static AnalizerTCInfo createTC(bool isReference, MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
+    static AnalizerTCInfo createTC(bool isReference, const MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
     {
       AnalizerTCInfo newTC;
 

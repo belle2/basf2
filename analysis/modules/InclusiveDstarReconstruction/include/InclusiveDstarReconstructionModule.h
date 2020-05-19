@@ -36,11 +36,11 @@ namespace Belle2 {
    * - [D*+ -> pi+]
    * - [D*+ -> pi0]
    * - [D*0 -> pi0]
-   * The relevant particle properties for MC matching are internally set by the module.
-   * These are: ignore radiated photons, ignore intermediate resoance, ignore missing
+   * The particle properties relevant for MC matching are set internally by the module.
+   * These are: ignore radiated photons, ignore intermediate resonances, ignore missing
    * massive particles, ignore missing neutrino and ignore missing gamma.
    *
-   * Note that the inclusive reconstruction of a D* by a pi0 is ambigious as
+   * Note that the inclusive reconstruction of a D* by a pi0 is ambiguous as
    * the flavor of the D* cannot be determined. Therefore there are two D*
    * candidates for every pi0 with both flavors.
    */

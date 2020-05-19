@@ -140,6 +140,12 @@ namespace Belle2 {
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
                       double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
 
+
+    /** Non linearity correction for HS correction (at higher ionisation)
+     *
+     * @param ADC is the real ADC
+     **/
+    Int_t NonLinearityADCMap(const int& ADC);
     /** for all particles, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified

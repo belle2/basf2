@@ -108,6 +108,19 @@ namespace Belle2 {
       else return 1.0;
     }
 
+    /** Reset dE/dx mean value for the given bin
+     * @param bin number
+     */
+    void setMean(unsigned int layer, unsigned int bin, double value)
+    {
+      int mylayer = 0;
+      if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
+      else if (m_onedgains.size() == 56) mylayer = layer;
+
+      if (bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
+      else m_onedgains[mylayer][bin] = 1.0;
+    }
+
     /** Return dE/dx mean value for given entrance angle
      * @param continuous layer number
      * @param entrance angle (-pi/2 to pi/2)
@@ -144,6 +157,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 3); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 4); /**< ClassDef */
   };
 } // end namespace Belle2

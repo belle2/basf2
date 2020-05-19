@@ -85,7 +85,12 @@ namespace Belle2 {
     //! Final Canvas for TrackedClusters
     TCanvas* m_cTrackedClusters = nullptr;
 
-    TLine* m_line_up{}, *m_line_mean{}, *m_line_low{};
+    /** TLine object for upper limit of track cluster charge */
+    TLine* m_line_up{};
+    /** TLine object for mean of track cluster charge */
+    TLine* m_line_mean{};
+    /** TLine object for lower limit of track cluster charge */
+    TLine* m_line_low{};
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

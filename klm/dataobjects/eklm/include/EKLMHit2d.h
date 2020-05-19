@@ -46,16 +46,22 @@ namespace Belle2 {
     ~EKLMHit2d();
 
     /**
-     * Set Chi^2 of the crossing point.
-     * @param[in] chi Chi^2.
-     */
-    void setChiSq(float chi);
-
-    /**
      * Get Chi^2 of the crossing point.
      * @return Chi^2.
      */
-    float getChiSq() const;
+    float getChiSq() const
+    {
+      return m_ChiSq;
+    }
+
+    /**
+     * Set Chi^2 of the crossing point.
+     * @param[in] chisq Chi^2.
+     */
+    void setChiSq(float chisq)
+    {
+      m_ChiSq = chisq;
+    }
 
   private:
 

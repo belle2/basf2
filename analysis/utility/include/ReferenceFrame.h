@@ -51,7 +51,7 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
-     * @param  particle
+     * @param particle particle
      * @return momentum 4-vector in reference frame
      */
     virtual TLorentzVector getMomentum(const Particle* particle) const
@@ -68,7 +68,7 @@ namespace Belle2 {
 
     /**
      * Wrapper for particles
-     * @param  particle
+     * @param particle particle
      * @return Covariance matrix in reference frame
      */
     virtual TMatrixFSym getMomentumErrorMatrix(const Particle* particle) const
@@ -102,7 +102,7 @@ namespace Belle2 {
   private:
     /**
      * Push rest frame of given particle
-     * @param particle Use RestFrame of this particle
+     * @param frame Use this reference frame
      */
     static void Push(const ReferenceFrame* frame)
     {
@@ -124,8 +124,8 @@ namespace Belle2 {
   };
 
   /**
-  * Rest frame of a particle
-  */
+   * Rest frame of a particle
+   */
   class RestFrame : public ReferenceFrame {
 
   public:

@@ -119,7 +119,7 @@ namespace Belle2 {
       GlobalCalibrationManager& operator=(const GlobalCalibrationManager&);
 
       /// Update the current time ID in the GlobalLabel
-      /// @param emd current EventMetaData - generated time ID
+      /// @param event current event EventMetaData - generated time ID
       /// will be the index of the smallest slice larger than (or. equal) to EventMetaData
       int updateTimeDepGlobalLabels(const EventMetaData& event);
 

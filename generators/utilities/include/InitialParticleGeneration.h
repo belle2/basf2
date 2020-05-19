@@ -37,7 +37,7 @@ namespace Belle2 {
     explicit InitialParticleGeneration(int allowedFlags = 0): m_allowedFlags(allowedFlags | MCInitialParticles::c_generateCMS) {};
 
     /** Generate a new event */
-    MCInitialParticles& generate();
+    MCInitialParticles& generate(bool forceGeneration = false);
 
     /** Return reference to nominal beam parameters */
     const BeamParameters& getBeamParameters() const { return *m_beamParams; }

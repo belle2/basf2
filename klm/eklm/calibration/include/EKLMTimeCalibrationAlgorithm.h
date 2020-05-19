@@ -49,7 +49,10 @@ namespace Belle2 {
     /**
      * Turn on debug mode (prints histograms).
      */
-    void setDebug();
+    void setDebug()
+    {
+      m_Debug = true;
+    }
 
   private:
 

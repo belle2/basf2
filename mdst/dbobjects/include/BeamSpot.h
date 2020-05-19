@@ -52,7 +52,7 @@ namespace Belle2 {
 
     /** Set the IP position and its error matrix.
      * @param ipPosition position in BASF2 units: cm
-     * @param error covariance matrix of the vertext position.
+     * @param covariance covariance matrix of the vertex position.
      */
     void setIP(const TVector3& ipPosition, const TMatrixDSym& covariance)
     {

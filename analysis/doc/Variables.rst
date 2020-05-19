@@ -384,6 +384,14 @@ Here is a list of useful variables to work with fully-inclusive particles, which
 .. b2-variables::
    :group: For fully-inclusive particles   
 
+Specific kinematic variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This variables group is reserved for the variables for analyses of specific decays like, :math:`B \to h l \nu`, :math:`B \to h l^\pm l^\mp`, etc. 
+
+.. b2-variables::
+   :group: Specific kinematic variables   
+
 
 Belle and ``b2bii`` variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -38,8 +38,9 @@ ploter(
     tree=treeC,
     expr='cluster_clsTime',
     cut=cut_oneTH,
-    descr='Reconstructed time of the cluster for all clusters related to one TrueHit.',
-    check='Distribution peak between -20 and 20 ns.',
+    descr='Reconstructed time of the cluster for all clusters related to one TrueHit.\
+    Distribution for signal clusters.',
+    check='Distribution peak around 0.',
     isShifter=True)
 
 
@@ -55,7 +56,8 @@ ploter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=cut_oneTH,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).',
+    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=True)
 
@@ -72,7 +74,8 @@ ploter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=cut_oneTH,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).',
+    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
@@ -89,7 +92,8 @@ ploter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=cut_oneTH,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).',
+    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
@@ -106,7 +110,8 @@ ploter(
     tree=treeC,
     expr='cluster_position - truehit_position',
     cut=cut_oneTH,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).',
+    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
 
@@ -123,7 +128,8 @@ ploter(
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
     cut=cut_oneTH,
-    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.',
+    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
+    Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
     isShifter=True)
 
@@ -140,7 +146,8 @@ ploter(
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
     cut=cut_oneTH,
-    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.',
+    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
+    Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
     isShifter=False)
 
@@ -157,7 +164,8 @@ ploter(
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
     cut=cut_oneTH,
-    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.',
+    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
+    Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
     isShifter=False)
 
@@ -174,7 +182,8 @@ ploter(
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
     cut=cut_oneTH,
-    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.',
+    descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
+    Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
     isShifter=False)
 
@@ -192,8 +201,8 @@ ploter(
     expr='cluster_clsTime - truehit_time',
     cut=cut_oneTH,
     descr='Definition: (reconstructed time of the cluster) - (time of the TrueHit)\
-    for all clusters related to one TrueHit.',
-    check='Distribution between -20 and 20 ns.',
+    for all signal clusters.',
+    check='Distribution peak around 0.',
     isShifter=True)
 
 
@@ -209,7 +218,8 @@ ploter(
     tree=treeC,
     expr='cluster_charge',
     cut=cut_oneTH,
-    descr='Reconstructed charge of the cluster related to one TrueHit.',
+    descr='Reconstructed charge of the cluster related to one TrueHit.\
+    Distribution for signal clusters.',
     check='Distribution peaks around 20-40 ke.',
     isShifter=True)
 
@@ -225,7 +235,7 @@ ploter(
     tree=treeC,
     expr='cluster_snr',
     cut=cut_oneTH,
-    descr='Signal/Noise ratio of the cluster related to one TrueHit.',
+    descr='Signal/Noise ratio of the cluster related to one TrueHit. Distribution for signal clusters.',
     check='Distribution peaks around 20.',
     isShifter=True)
 
@@ -241,7 +251,8 @@ ploter(
     tree=treeC,
     expr='cluster_interstripPosition',
     cut=cut_oneTH,
-    descr='Definition: (cluster_position % strip_pitch / strip_pitch)',
+    descr='Definition: (cluster_position % strip_pitch / strip_pitch).\
+    Distribution for signal clusters.',
     check='',
     isShifter=False)
 
@@ -257,7 +268,7 @@ ploter(
     tree=treeC,
     expr='cluster_size',
     cut=cut_oneTH,
-    descr='Number of strips in the Cluster related to one TrueHit.',
+    descr='Number of strips in the Cluster related to one TrueHit. Distribution for signal clusters.',
     check='Distribution peaks in range 2-3.',
     isShifter=False)
 
@@ -271,7 +282,7 @@ plotRegions(
     expr='strip_dir',
     cutALL=cut_noV,
     cut=cut_U,
-    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    descr='Definition: (number of clusters related to TrueHit) / (number of Truehits)',
     check='Efficiency should be close to 1 in all bins.',
     isShifter=True)
 
@@ -286,7 +297,7 @@ plotRegions(
     expr='strip_dir',
     cutALL=cut_noU,
     cut=cut_V,
-    descr='(number of clusters related to TrueHit) / (number of Truehits)',
+    descr='Definition: (number of clusters related to TrueHit) / (number of Truehits).',
     check='Efficiency should be close to 1 in all bins.',
     isShifter=True)
 
@@ -302,7 +313,7 @@ plotRegions(
     cutALL=cut_noV,
     cut=cut_oneTH,
     descr='(number of clusters related to one TrueHit) / (number of clusters).\
-    Evaluates the fraction of signal cluster over the total number of clusters.',
+    Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Purity should be above 0 in all bins.',
     isShifter=True)
 
@@ -318,6 +329,6 @@ plotRegions(
     cutALL=cut_noU,
     cut=cut_oneTH,
     descr='(number of clusters related to one TrueHit) / (number of clusters).\
-    Evaluates the fraction of signal cluster over the total number of clusters.',
+    Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Purity should be above 0 in all bins.',
     isShifter=True)

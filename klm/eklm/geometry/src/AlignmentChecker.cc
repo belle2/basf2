@@ -22,11 +22,11 @@
 using namespace Belle2;
 
 EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
-  m_PrintOverlaps(printOverlaps)
+  m_PrintOverlaps(printOverlaps),
+  m_GeoDat(&(EKLM::GeometryData::Instance())),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   int iPlane, iSegmentSupport;
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   const EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
   const EKLMGeometry::ElementPosition* sectorSupportPosition =

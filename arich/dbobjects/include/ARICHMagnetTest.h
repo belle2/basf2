@@ -128,7 +128,7 @@ namespace Belle2 {
     /** Set comment
      * @param comment
      */
-    void setComment(std::string& comment) {m_comment = comment; }
+    void setComment(const std::string& comment) {m_comment = comment; }
 
     /** Return comment
      * @return comment

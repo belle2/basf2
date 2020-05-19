@@ -42,7 +42,10 @@ namespace Belle2 {
                 std::list<BKLMHit2d* >& track);
 
     //!  set the fitting mode, local system or global system
-    void  setGlobalFit(bool localOrGlobal) { m_globalFit = localOrGlobal; }
+    void  setGlobalFit(bool localOrGlobal)
+    {
+      m_globalFit = localOrGlobal;
+    }
 
   protected:
 

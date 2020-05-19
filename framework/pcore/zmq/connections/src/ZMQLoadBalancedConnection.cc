@@ -132,7 +132,7 @@ void ZMQLoadBalancedOutput::handleEvent(std::unique_ptr<ZMQNoIdMessage> message)
   timeit("event_rate");
   timeit<200>("event_rate_to[" + nextWorker + "]");
 
-  m_socket->send(ZMQMessageHelper::createZMQMessage(nextWorker), ZMQ_SNDMORE);
+  m_socket->send(ZMQMessageHelper::createZMQMessage(nextWorker), zmq::send_flags::sndmore);
   ZMQParent::send(m_socket, std::move(message));
 
   log("ready_queue_size", static_cast<long>(m_readyWorkers.size()));

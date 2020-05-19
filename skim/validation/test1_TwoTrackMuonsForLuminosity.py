@@ -15,6 +15,7 @@ from skim.lowMulti import TwoTrackLeptonsForLuminosity
 
 path = b2.Path()
 skim = TwoTrackLeptonsForLuminosity(OutputFileName="../TwoTrackMuonsForLuminosity.udst.root")
+skim.prescale = 1
 
 ma.inputMdst("default", "../TwoTrackMuonsForLuminosity.dst.root", path=path)
 skim(path)

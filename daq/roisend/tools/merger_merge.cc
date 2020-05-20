@@ -35,6 +35,7 @@ std::vector<int> hlts; // initialized on run START
 
 std::set<int> triggers;
 unsigned int event_number_max = 0;
+unsigned int missing_walk_index = 0;
 
 bool got_sigusr1 = false;
 bool got_sigusr2 = false;
@@ -76,6 +77,7 @@ void clear_triggers(void)
 {
   triggers.clear();
   event_number_max = 0;
+  missing_walk_index = 0;
 }
 
 void plot_triggers(void)
@@ -121,6 +123,11 @@ void check_event_nr(unsigned int event_number)
   } else {
     // we dont fill event_number in the if above, thus we dont have to remove it
     triggers.erase(event_number);
+  }
+  if (triggers.size() > missing_walk_index + 1 && event_number_max - *std::next(triggers.begin(), missing_walk_index + 1) > 100000) {
+    missing_walk_index++;
+  } else if (missing_walk_index > 0 && event_number_max - *std::next(triggers.begin(), missing_walk_index) < 100000) {
+    missing_walk_index--;
   }
 }
 
@@ -646,9 +653,9 @@ main(int argc, char* argv[])
       if (event_count % 10000 == 0) {
         int hltcount = hltused.size();
         int mod = *triggers.begin() % hltcount;
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u low mod %d low HLT %d\n",
-                    *triggers.begin(),
-                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+                    *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
+                    *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
       }
     }
   }

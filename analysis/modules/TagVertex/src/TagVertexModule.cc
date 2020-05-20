@@ -386,12 +386,12 @@ namespace Belle2 {
     Particle Breco2(Breco->get4Vector(), Breco->getPDGCode());
     Breco2.updateMomentum(Breco->get4Vector(), Breco->getVertex(), PerrMatrix, Breco->getPValue());
 
-    Particle BRecoRes = doVertexFitForBTube(&Breco2, "kalman");
-    if (BRecoRes.getPValue() < 0) return make_pair(vecNaN, matNaN); //problems
+    Particle* BRecoRes = doVertexFitForBTube(&Breco2, "kalman");
+    if (BRecoRes->getPValue() < 0) return make_pair(vecNaN, matNaN); //problems
 
     // simpler version of momentum
-    TVector3 pFinal = Breco->getVertex() - BRecoRes.getVertex();
-    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix() + BRecoRes.getVertexErrorMatrix());
+    TVector3 pFinal = Breco->getVertex() - BRecoRes->getVertex();
+    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix() + BRecoRes->getVertexErrorMatrix());
     // end simpler version
 
     // TODO : to be developed the extraction of the momentum from the rave fitted track
@@ -426,12 +426,12 @@ namespace Belle2 {
 
     //vertex fit will give the intersection between the beam spot and the trajectory of the B
     //(base of the BTube, or primary vtx cov matrix)
-    Particle tubecreatorBCopy = doVertexFitForBTube(Breco, "avf");
-    if (tubecreatorBCopy.getPValue() < 0) return make_pair(vecNaN, matNaN); //if problems
+    Particle* tubecreatorBCopy = doVertexFitForBTube(Breco, "avf");
+    if (tubecreatorBCopy->getPValue() < 0) return make_pair(vecNaN, matNaN); //if problems
 
 
     //get direction of B tag = opposite direction of B rec in CMF
-    TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
+    TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
 
     //if we want the true info, replace the 4vector by the true one
     if (m_useTruthInFit) {
@@ -448,17 +448,17 @@ namespace Belle2 {
 
     //To create the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
-    TMatrixDSym pv = tubecreatorBCopy.getVertexErrorMatrix();
+    TMatrixDSym pv = tubecreatorBCopy->getVertexErrorMatrix();
 
     //print some stuff if wanted
     if (m_verbose) {
       B2DEBUG(10, "Brec decay vertex before fit: " << printVector(Breco->getVertex()));
-      B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy.getVertex()));
+      B2DEBUG(10, "Brec decay vertex after fit: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec direction before fit: " << printVector((1. / Breco->getP()) * Breco->getMomentum()));
-      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy.getP()) * tubecreatorBCopy.getMomentum()));
+      B2DEBUG(10, "Brec direction after fit: " << printVector((1. / tubecreatorBCopy->getP()) * tubecreatorBCopy->getMomentum()));
       B2DEBUG(10, "IP position: " << printVector(m_BeamSpotCenter));
       B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
-      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy.getVertex()));
+      B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
       B2DEBUG(10, "BTag direction: " << printVector((1. / v4FinalNew.P())*v4FinalNew.Vect()));
       B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
@@ -476,10 +476,9 @@ namespace Belle2 {
     TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
 
     //set the constraint
-    TVector3 constraintCenter = tubecreatorBCopy.getVertex();
+    TVector3 constraintCenter = tubecreatorBCopy->getVertex();
 
     //if we want the true info, set the centre of the constraint to the primary vertex
-
     if (m_useTruthInFit) {
       const MCParticle* mcBr = Breco->getRelated<MCParticle>();
       if (mcBr) {
@@ -504,7 +503,7 @@ namespace Belle2 {
 
   pair<TVector3, TMatrixDSym> TagVertexModule::findConstraintBoost(double cut, double shiftAlongBoost) const
   {
-    //make a long error matrix along boost dirrection
+    //make a long error matrix along boost direction
     TMatrixD longerror(3, 3); longerror(2, 2) = cut * cut;
     TVector3 boostDir = PCmsLabTransform().getBoostVector().Unit();
     TMatrixD longerrorRotated = rotateTensor(boostDir, longerror);
@@ -899,22 +898,24 @@ namespace Belle2 {
     m_truthTagVol = m_MCtagV.Dot(oboost);
   }
 
-  Particle TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
+  Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
   {
     //make a copy of motherIn to not modify the original object
-    Particle mother(Particle(motherIn->get4Vector(), motherIn->getPDGCode()));
-    mother.updateMomentum(motherIn->get4Vector(), motherIn->getVertex(), motherIn->getMomentumVertexErrorMatrix(),
-                          motherIn->getPValue());
+    Particle* mother = ParticleCopy::copyParticle(motherIn);
+
+    //Particle mother(Particle(motherIn->get4Vector(), motherIn->getPDGCode()));
+    //mother.updateMomentum(motherIn->get4Vector(), motherIn->getVertex(), motherIn->getMomentumVertexErrorMatrix(),
+    //motherIn->getPValue());
 
     //Here rave is used to find the upsilon(4S) vtx as the intersection
     //between the mother B trajectory and the beam spot
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
 
     analysis::RaveVertexFitter rsg;
-    rsg.addTrack(&mother);
+    rsg.addTrack(mother);
     int nvert = rsg.fit(fitType);
     if (nvert != 1) {
-      mother.setPValue(-1); //error
+      mother->setPValue(-1); //error
       return mother;
     } else {
       rsg.updateDaughters();

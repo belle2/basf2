@@ -144,7 +144,7 @@ namespace Belle2 {
     bool doVertexFit(const Particle* Breco);
 
     /** it returns an intersection between B rec and beam spot (= origin of BTube) */
-    Particle doVertexFitForBTube(const Particle* mother, std::string fitType) const;
+    Particle* doVertexFitForBTube(const Particle* mother, std::string fitType) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
     std::pair<TVector3, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;

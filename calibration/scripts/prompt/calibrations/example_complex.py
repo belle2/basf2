@@ -176,10 +176,12 @@ def get_calibrations(input_data, **kwargs):
 
     # We make sure that the first payload begins at the start of the requested IoV.
     # This is a quirk of SequentialBoundaries strategy as there must always be one boundary to START from.
+    # You could elect to always set this yourself manually, but that seems error prone.
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]
     # Now we can add the boundaries that exist in the expert config. They are extra boundaries, so that we don't have
-    # to set the initial one every time.
+    # to set the initial one every time. If this is an empty list then we effectively run like the SingleIoV strategy.
     payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
     # Now set them all
     alg_test2.setBoundaries(vector_from_runs(payload_boundaries))  # This takes boundaries from the expert_config
 

@@ -78,7 +78,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
                 file_to_iov[file_path] = IoV(exp_low=exp_run[0], run_low=exp_run[1], exp_high=exp_run[0], run_high=exp_run[1])
         B2INFO(f"Found {len(file_to_iov)} files in '{input_name}'")
         if not file_to_iov:
-            B2ERROR("'{input_name}' has no files associated with it!")
+            B2ERROR(f"'{input_name}' has no files associated with it!")
         input_data_files[input_name] = file_to_iov
     return input_data_files
 
@@ -174,7 +174,7 @@ def run_caf(prompt_caf):
             raise RuntimeError(f"{calibration.name} failed!")
 
 
-def collect_outputdb(prompt_caf):
+def collect_outputdb(args, prompt_caf):
     """Some post processing to copy the final local DBs into one directory"""
     import shutil
     outputdb_name = "caf_outputdb_results"
@@ -182,9 +182,13 @@ def collect_outputdb(prompt_caf):
     try:
         outputdb_path.mkdir(parents=True)
     except FileExistsError as e:
-        B2ERROR(f"Final output payload directory '{outputdb_path.as_posix()}' exists! Will not overwrite. "
-                "Please remove and re-run.")
-        return 1
+        B2WARNING(f"Final output payload directory '{outputdb_path.as_posix()}' exists.")
+        if args.overwrite_db:
+            B2INFO(f"Overwrite DB set, removing '{outputdb_path.as_posix()}'...")
+            shutil.rmtree(outputdb_path)
+        else:
+            B2ERROR("Will not overwrite output db! Please move them and restart b2caf-prompt-run.")
+            return 1
     B2INFO(f"Will now copy the calibration final outputdb directories to '{outputdb_path.as_posix()}'")
     for calibration in prompt_caf.calibrations.values():
         if calibration.save_payloads:
@@ -224,6 +228,13 @@ def get_argparser():
                              "to submit any jobs."
                        )
     parser.set_defaults(dry_run=False)
+
+    parser.add_argument("--overwrite-output-db", dest="overwrite_db", action="store_true",
+                        help="Flags if the CAF process should be set up but not run. "
+                             "Good for testing if your prompt script and config files are well formed without attempting "
+                             "to submit any jobs."
+                       )
+    parser.set_defaults(overwrite_db=False)
     parser.set_defaults(expert_config={})
 
     return parser
@@ -260,7 +271,7 @@ def main():
         
     if not args.dry_run:
         run_caf(cal_fw)
-        return collect_outputdb(cal_fw)
+        return collect_outputdb(args, cal_fw)
 
 
 if __name__ == "__main__":

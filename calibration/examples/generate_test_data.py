@@ -9,7 +9,7 @@ from ROOT import Belle2
 set_log_level(LogLevel.INFO)
 
 if len(sys.argv) != 6:
-    print('Usage: basf2 1_generate.py data_output_directory experiment_number run_number_low run_number_high num_events')
+    print('Usage: basf2 generate_test_data.py data_output_directory experiment_number run_number_low run_number_high num_events')
     sys.exit(1)
 
 output_dir = sys.argv[1]

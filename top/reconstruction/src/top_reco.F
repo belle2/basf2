@@ -253,25 +253,52 @@
       REAL BFOT                 ! expected num of bg. photons [out]
 
       INTEGER I
+
+      logical start /.true./
+      real pdf_delta, x, dx, sfotd, f
+      real nfot_delta, top_signal, top_bgr
+      integer n /1000/
+      integer k, ich
+#include "TOP_PIK.fi"
       
       CALL SET_PHTIMES(.FALSE.)
 
       DO I=1,NHYP
-         CALL TOP_SET_PDF(MASS(I),T0)
-         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),BFOT,HYPID(I).EQ.HYP)
+         CALL TOP_SET_PDF(MASS(I),HYPID(I),T0)
+         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),BFOT,HYPID(I),HYP)
+         
+         if(start.and.hypid(i).eq.hyp) then
+            start=.false.
+            print*,'writing pdf of delta for PDG=',hyp,',NFOT=',
+     &           stfs,stfd,stfb
+            dx=100./n
+            x=dx/2
+            do k=1,n
+               f=0
+               do ich=0,511
+                  f=f+stfs*top_signal(x,0.050,ich,1)
+                  f=f+stfb*top_bgr(x,ich)
+                  f=f+stfd*pdf_delta(x,ich)
+               enddo
+               write(33,*) x, f
+               x=x+dx
+            enddo
+         endif
+         
       ENDDO
 
       END
 
 
-      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,BFOT,FLAG)
+      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,BFOT,HYPID,HYP)
 
       IMPLICIT NONE
       REAL PLKH
       INTEGER NFOT
       REAL SFOT
       REAL BFOT
-      LOGICAL FLAG
+      INTEGER HYPID
+      INTEGER HYP
 #include "TOP_DATA.fi"
 #include "TOP_TRACK.fi"
 #include "TOP_TDC.fi"
@@ -280,16 +307,18 @@
 #include "TOP_PMTTYPE.fi"
      
       INTEGER I, ICH, M, NUMCH, TYP
-      REAL P, T, TERR, F
-      REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
-
+      REAL PS, PD, PB, T, TERR, F
+      REAL TOP_SIGNAL, PDF_DELTA, TOP_BGR, POIS_LOG
+      
       PLKH=0.
       NFOT=0
-      SFOT=STFS+STFB
+      SFOT=STFS+STFD+STFB
       BFOT=STFB
       IF(SFOT.EQ.0) RETURN
       NUMCH=NCH(0)+NCH(1)
-      P=STFS/SFOT
+      PS=STFS/SFOT
+      PD=STFD/SFOT
+      PB=STFB/SFOT
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
@@ -300,9 +329,10 @@
             IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
             TYP=PMT_TYPE(ICH,M)
-            F=P*TOP_SIGNAL(T,TERR,ICH,TYP)+(1-P)*TOP_BGR(T,ICH)
+            F=PS*TOP_SIGNAL(T,TERR,ICH,TYP)+PD*PDF_DELTA(T,ICH)
+     &           +PB*TOP_BGR(T,ICH)
             PLKH=PLKH+LOG(F)
-            IF(FLAG) CALL STORE_PULLS(T,TERR,ICH,TYP)
+            IF(HYPID.EQ.HYP) CALL STORE_PULLS(T,TERR,ICH,TYP)
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
@@ -722,12 +752,12 @@
       IF(BETA_RQ.GT.0) THEN
          IF(BETA_RQ.NE.BETA.OR..NOT.FORCE_SCAN) THEN
             CALL SET_PHTIMES(.TRUE.)
-            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+            CALL TOP_SET_PDF(MASS,0,RTRA_T0(1)) ! TODO
          ENDIF
       ELSE
          IF(MASS.NE.MASS_HYP.OR..NOT.FORCE_SCAN) THEN
             CALL SET_PHTIMES(.TRUE.)
-            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+            CALL TOP_SET_PDF(MASS,0,RTRA_T0(1)) ! TODO
          ENDIF
       ENDIF
       SFOT=STFS+STFB
@@ -781,7 +811,7 @@
 #include "TOP_RTRA.fi"     
 
       CALL SET_PHTIMES(.TRUE.)
-      CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+      CALL TOP_SET_PDF(MASS,0,RTRA_T0(1)) ! TODO
 
       END
 

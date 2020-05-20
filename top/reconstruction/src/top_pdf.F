@@ -12,10 +12,11 @@
 ! feb-2020: change in some commons
 !-----------------------------------------------------------------------
 
-      SUBROUTINE TOP_SET_PDF(MASS,T0)
+      SUBROUTINE TOP_SET_PDF(MASS,PDG,T0)
 
       IMPLICIT NONE
       REAL MASS                 ! mass of particle hypothesis
+      INTEGER PDG               ! PDG code of particle hypothesis
       REAL T0                   ! start time for beta=1
 #include "TOP_CONS.fi"
 #include "TOP_GEO.fi"
@@ -35,7 +36,7 @@
       INTEGER NUMCH
       INTEGER NN, ICH, LR, L, K, I
       REAL ZW(0:1), ZD, ZB, ZM, DZEXT
-      REAL NORM, FOT, RIND(-1:1), SIGE_SIP
+      REAL RIND(-1:1), SIGE_SIP
       REAL PHASE_INDEX
       INTEGER MAXPIK
 
@@ -58,12 +59,18 @@
          PIK_OVFL(ICH)=0
       ENDDO
       STFS=0.
+      STFD=0.
       IF(BETA_RQ.GT.0) THEN
          MASS_HYP=0.
+         PDG_HYP=0
          BETA=BETA_RQ           ! for beta resolution studies
       ELSE
-         IF(MASS.LE.0) RETURN
+         IF(MASS.LE.0) THEN
+            PRINT*,'top_set_pdf_: error, MASS=', MASS
+            RETURN
+         ENDIF
          MASS_HYP=MASS
+         PDG_HYP=PDG
          BETA=PMOM/MASS/SQRT(1+(PMOM/MASS)**2)
       ENDIF
       TOF=(TOF_C0+T0)/BETA
@@ -89,6 +96,8 @@
       SIGE_SIP=D_E/D_THC*TH0_SIP
       CALL QE_SET_XQE(SIGE_SIP)
 
+      CALL SET_DELTA(MODUL)
+      
 !     calculate pattern
       DO L=0,1
          DZEXT=0.
@@ -137,25 +146,21 @@
 
 !     normalize 
       STFS=0.
-      NORM=0.
       DO ICH=0,NUMCH-1
          IF(.NOT.CH_MASK(ICH,MODUL)) THEN
             NUM_PIK(ICH)=0
             CYCLE
          ENDIF
-         FOT=0.                 ! kaj pa ozadje?
          DO K=1,NUM_PIK(ICH)
             PIK_NPH(K,ICH)=PIK_NPH(K,ICH)*CH_EFFI(ICH,MODUL)
-            NORM=NORM+PIK_NPH(K,ICH)
-            FOT=FOT+PIK_NPH(K,ICH)
+            STFS=STFS+PIK_NPH(K,ICH)
          ENDDO
-         STFS=STFS+(1.-EXP(-FOT))
       ENDDO
-      IF(NORM.EQ.0) RETURN
+      IF(STFS.EQ.0) RETURN
 
       DO ICH=0,NUMCH-1
          DO K=1,NUM_PIK(ICH)
-            PIK_NPH(K,ICH)=PIK_NPH(K,ICH)/NORM
+            PIK_NPH(K,ICH)=PIK_NPH(K,ICH)/STFS
          ENDDO
       ENDDO
 
@@ -669,6 +674,41 @@ c--   calculate PDF parameters
       IF(S.EQ.0) RETURN
       DO ICH=0,NUMCH-1
          PIK_BGR(ICH)=PIK_BGR(ICH)/S/(T_MAX-T_MIN)
+      ENDDO
+
+      END
+
+
+      SUBROUTINE SET_DELTA(M)
+
+      IMPLICIT NONE
+      INTEGER M                 ! module number
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+      
+      INTEGER ICH, NUMCH
+      REAL S, EFFI
+      REAL NFOT_DELTA
+
+      NUMCH=NCH(0)+NCH(1)
+      S=0.
+      EFFI=0.
+      DO ICH=0,NUMCH-1
+         IF(CH_MASK(ICH,M)) THEN
+            PIK_DELTA(ICH)=PIK_DXCH(ICH)*PIK_DYCH(ICH)*CH_EFFI(ICH,M)
+            S=S+PIK_DELTA(ICH)
+            EFFI=EFFI+CH_EFFI(ICH,M)
+         ELSE
+            PIK_DELTA(ICH)=0.
+         ENDIF
+      ENDDO
+      EFFI=EFFI/NUMCH           ! average relative efficiency
+      STFD=NFOT_DELTA(BETA,PDG_HYP)*EFFI
+      
+      IF(S.EQ.0) RETURN
+      DO ICH=0,NUMCH-1
+         PIK_DELTA(ICH)=PIK_DELTA(ICH)/S
       ENDDO
 
       END

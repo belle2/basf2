@@ -14,8 +14,7 @@ import modularAnalysis as ma
 from skim.lowMulti import TwoTrackLeptonsForLuminosity
 
 path = b2.Path()
-skim = TwoTrackLeptonsForLuminosity(OutputFileName="../TwoTrackElectronsForLuminosity.udst.root")
-skim.prescale = 1
+skim = TwoTrackLeptonsForLuminosity(prescale=1, OutputFileName="../TwoTrackElectronsForLuminosity.udst.root")
 
 ma.inputMdst("default", "../TwoTrackElectronsForLuminosity.dst.root", path=path)
 skim(path)

@@ -97,6 +97,7 @@ namespace {
       e1->setClusterId(1);
       e1->setTime(1);
       e1->setDeltaTime99(0.1);
+      e1->setConnectedRegionId(1);
       // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
@@ -107,6 +108,7 @@ namespace {
       e2->setClusterId(2);
       e2->setTime(2);
       e2->setDeltaTime99(0.2);
+      e2->setConnectedRegionId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
       e3->setTheta(0.2); // somewhere in the fwd endcap
@@ -128,6 +130,7 @@ namespace {
       e4->setClusterId(4);
       t1->addRelationTo(e4);
       e4->setIsTrack(true);
+      e4->setConnectedRegionId(1); // shares the connected region with cluster 1
 
       ECLCluster* e5 = eclclusters.appendNew(ECLCluster());
       e5->setEnergy(0.3);
@@ -514,6 +517,26 @@ namespace {
 
     // check that maximal difference to weighted average in units of uncertainty is calculated correctly
     EXPECT_FLOAT_EQ(maxDist->function(pionslist->getParticle(0)), 4.0);
+  }
+
+  TEST_F(ECLVariableTest, clusterHasOverlap)
+  {
+    // declare StoreArrays of Particles and ECLClusters
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    // create a photon from the first cluster
+    const Particle* p = particles.appendNew(Particle(eclclusters[0]));
+
+    // check overlap without any requirement on other clusters
+    const Manager::Var* clusterHasOverlapAll = Manager::Instance().getVariable("clusterHasOverlap()");
+    // cluster 4 and cluster 1 share the connected region
+    EXPECT_TRUE(clusterHasOverlapAll->function(p));
+
+    // check overlap only with neutral clusters
+    const Manager::Var* clusterHasOverlapNeutral = Manager::Instance().getVariable("clusterHasOverlap(clusterTrackMatch==0)");
+    // cluster 4 is matched to a track so it doesn't matter that it has the same connected region like cluster 1
+    EXPECT_FALSE(clusterHasOverlapNeutral->function(p));
   }
 
   class KLMVariableTest : public ::testing::Test {

@@ -365,7 +365,6 @@ namespace Belle2 {
     double pmag = Breco->getMomentumMagnitude();
     double xmag = (Breco->getVertex() - m_BeamSpotCenter).Mag();
 
-    TVector3 Pmom = (pmag / xmag) * (Breco->getVertex() - m_BeamSpotCenter);
 
     TMatrixDSym TerrMatrix = Breco->getMomentumVertexErrorMatrix();
     TMatrixDSym PerrMatrix(7);
@@ -373,7 +372,7 @@ namespace Belle2 {
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         if (i == j) {
-          PerrMatrix(i, j) = (beamSpotCov(i, j) + TerrMatrix(i, j)) * Pmom.Mag() / xmag;
+          PerrMatrix(i, j) = (beamSpotCov(i, j) + TerrMatrix(i, j)) * pmag / xmag;
         } else {
           PerrMatrix(i, j) = TerrMatrix(i, j);
         }
@@ -383,30 +382,16 @@ namespace Belle2 {
 
     PerrMatrix(3, 3) = 0.;
 
-    Particle* Breco2 = new Particle(Breco->get4Vector(), Breco->getPDGCode());
-    Breco2->updateMomentum(Breco->get4Vector(), Breco->getVertex(), PerrMatrix, Breco->getPValue());
 
-    analysis::RaveVertexFitter rsf;
-    rsf.addTrack(Breco2);
+    Particle Breco2(Breco->get4Vector(), Breco->getPDGCode());
+    Breco2.updateMomentum(Breco->get4Vector(), Breco->getVertex(), PerrMatrix, Breco->getPValue());
 
-    int nvert = rsf.fit("kalman");
-
-    TVector3 pos;
-    TMatrixDSym RerrMatrix(3);
-
-    delete Breco2;
-
-
-    if (nvert > 0) {
-      pos = rsf.getPos(0);
-      RerrMatrix = rsf.getCov(0);
-    } else {return make_pair(vecNaN, matNaN);}
+    Particle BRecoRes = doVertexFitForBTube(&Breco2, "kalman");
+    if (BRecoRes.getPValue() < 0) return make_pair(vecNaN, matNaN); //problems
 
     // simpler version of momentum
-
-    TVector3 pFinal = Breco->getVertex() - pos;
-    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix()) + RerrMatrix;
-
+    TVector3 pFinal = Breco->getVertex() - BRecoRes.getVertex();
+    TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix() + BRecoRes.getVertexErrorMatrix());
     // end simpler version
 
     // TODO : to be developed the extraction of the momentum from the rave fitted track
@@ -438,15 +423,12 @@ namespace Belle2 {
       return findConstraintBoost(cut);
     }
 
-    //make a copy of tubecreatorB so as not to modify the original object
-    Particle tubecreatorBCopy(Particle(Breco->get4Vector(), Breco->getPDGCode()));
-    tubecreatorBCopy.updateMomentum(Breco->get4Vector(), Breco->getVertex(), Breco->getMomentumVertexErrorMatrix(),
-                                    Breco->getPValue());
 
     //vertex fit will give the intersection between the beam spot and the trajectory of the B
     //(base of the BTube, or primary vtx cov matrix)
-    bool ok0 = doVertexFitForBTube(&tubecreatorBCopy);
-    if (!ok0) return make_pair(vecNaN, matNaN);
+    Particle tubecreatorBCopy = doVertexFitForBTube(Breco, "avf");
+    if (tubecreatorBCopy.getPValue() < 0) return make_pair(vecNaN, matNaN); //if problems
+
 
     //get direction of B tag = opposite direction of B rec in CMF
     TLorentzVector v4Final = tubecreatorBCopy.get4Vector();
@@ -572,7 +554,6 @@ namespace Belle2 {
 
     //nothing matched?
     if (!isReco(mcBs[0]) && !isReco(mcBs[1])) {
-      B2WARNING("TagVertexModule:: no B found in MC");
       return;
     }
 
@@ -918,21 +899,30 @@ namespace Belle2 {
     m_truthTagVol = m_MCtagV.Dot(oboost);
   }
 
-  bool TagVertexModule::doVertexFitForBTube(const Particle* mother) const
+  Particle TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
   {
+    //make a copy of motherIn to not modify the original object
+    Particle mother(Particle(motherIn->get4Vector(), motherIn->getPDGCode()));
+    mother.updateMomentum(motherIn->get4Vector(), motherIn->getVertex(), motherIn->getMomentumVertexErrorMatrix(),
+                          motherIn->getPValue());
+
     //Here rave is used to find the upsilon(4S) vtx as the intersection
     //between the mother B trajectory and the beam spot
-
     analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_BeamSpotCov);
 
     analysis::RaveVertexFitter rsg;
-    rsg.addTrack(mother);
-    int nvert = rsg.fit("avf");
-    if (nvert != 1) return false;
-
-    rsg.updateDaughters();
-    return true;
+    rsg.addTrack(&mother);
+    int nvert = rsg.fit(fitType);
+    if (nvert != 1) {
+      mother.setPValue(-1); //error
+      return mother;
+    } else {
+      rsg.updateDaughters();
+      return mother;
+    }
   }
+
+
 
   TrackFitResult TagVertexModule::getTrackWithTrueCoordinates(ParticleAndWeight const& paw) const
   {

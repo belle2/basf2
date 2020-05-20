@@ -143,8 +143,8 @@ namespace Belle2 {
     /** central method for the tag side vertex fit */
     bool doVertexFit(const Particle* Breco);
 
-    /** find intersection between B rec and beam spot (= origin of BTube) */
-    bool doVertexFitForBTube(const Particle* mother) const;
+    /** it returns an intersection between B rec and beam spot (= origin of BTube) */
+    Particle doVertexFitForBTube(const Particle* mother, std::string fitType) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
     std::pair<TVector3, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;

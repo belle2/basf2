@@ -10,7 +10,11 @@
  **************************************************************************/
 
 #pragma once
+
+#include <analysis/VariableManager/Manager.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -394,6 +398,12 @@ namespace Belle2 {
      * Returns cluster mdst array index
      */
     double eclClusterMdstIndex(const Particle* particle);
+
+    /**
+     * Returns function which returns true if the connected region of the particle's cluster is shared with another cluster.
+     * A cut on the properties of the tested clusters can be provided.
+     */
+    Manager::FunctionPtr eclClusterHasOverlap(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

@@ -17,13 +17,13 @@
 #include <framework/datastore/StoreArray.h>
 
 //analysis
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/VariableManager/Utility.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -1063,6 +1063,48 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr eclClusterHasOverlap(const std::vector<std::string>& arguments)
+    {
+      std::string cutString = "";
+
+      if (arguments.size() == 1) {
+        cutString = arguments[0];
+      }
+
+      std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+      auto func = [cut](const Particle * particle) -> double {
+
+        double connectedRegionID = eclClusterConnectedRegionID(particle);
+        if (std::isnan(connectedRegionID))
+        {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        bool foundMatch = false;
+        StoreArray<ECLCluster> clusters;
+        for (const auto& cluster : clusters)
+        {
+          const Particle testParticle(&cluster);
+          if (!cut->check(&testParticle)) {
+            continue;
+          }
+          double testConnectedRegionID = eclClusterConnectedRegionID(&testParticle);
+          if (std::isnan(testConnectedRegionID)) {
+            continue;
+          }
+          if (connectedRegionID == testConnectedRegionID) {
+            if (foundMatch) {
+              return 1;
+            } else {
+              foundMatch = true; // we will find at least one match which is the self-match
+            }
+          }
+        }
+
+        return 0;
+      };
+      return func;
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
@@ -1536,6 +1578,11 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
+    REGISTER_VARIABLE("clusterHasOverlap(cutString)", eclClusterHasOverlap, R"DOC(
+      Returns true if the connected region of the particle's cluster is shared with another cluster.
+      A cut string can be provided to ignore clusters that do not satisfy the given criteria.
+      NaN is returned if the particle has no related ECL cluster.
+      )DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");

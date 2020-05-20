@@ -38,11 +38,11 @@ ExpList = args.exp
 
 
 conditions.override_globaltags()
-# conditions.globaltags = ["svd_hotStrips_debug20200511", "svd_loadedOnFADC", "klm_alignment_testing", "online"]
-conditions.globaltags = ["svd_offlineCalibrations", "svd_loadedOnFADC", "klm_alignment_testing", "online"]
-myLocalDB = "none"
+# conditions.globaltags = ["svd_offlineCalibrations", "svd_loadedOnFADC", "Reco_master_patch_rel5", "online"]
+
+myLocalDB = None
 # if you want to use the localdb and not the occupancy paylaods on a GT uncomment-out the following line:
-# conditions.globaltags =[ "svd_loadedOnFADC", "klm_alignment_testing", "online"]
+conditions.globaltags = ["svd_loadedOnFADC", "Reco_master_patch_rel5", "online"]
 """
     "svd_basic", "svd_loadedOnFADC",
     "data_reprocessing_prompt_rel4_patchb",
@@ -50,14 +50,18 @@ myLocalDB = "none"
 """
 
 localDB_tag = ""  # "_notRegistered"
-# myLocalDB = "/home/belle2/zani/svd/current_master/exp"+str(ExpList[0])\
-# +"/run"+str(RunList[0]) + "/calibration_results"+str(localDB_tag)\
-# +"/SVDOccupancyAndHotStrips/outputdb/database.txt"
+myLocalDB = "/home/belle2/zani/svd/current_master/exp"+str(ExpList[0])\
+    + "/run"+str(RunList[0]) + "/calibration_results"+str(localDB_tag)\
+    + "/SVDOccupancyAndHotStrips/outputdb/database.txt"
 print('Your are plotting occupancy from payloads belongin to the local DB:')
 print('')
 print(myLocalDB)
+print('')
 
-if(myLocalDB != "none"):
+# -- end of localDB setup --
+
+# if(myLocalDB != "none"):
+if myLocalDB is not None:
     conditions.testing_payloads = [str(myLocalDB)]
 else:
     B2INFO("No local DB provided, monitoring payloads from GTs.")
@@ -70,7 +74,7 @@ else:
 # use_local_database("localDB/database.txt", "localDB", invertLogging=True)
 # use_central_database(GLOBAL_TAG)
 
-if (myLocalDB != "none"):
+if myLocalDB is not None:
     filenameLocal = "SVDLocalCalibrationMonitor_experiment" + \
         str(ExpList[0]) + "_run" + str(RunList[0]) + "_fromLocalDB"+str(localDB_tag)+".root"
 else:

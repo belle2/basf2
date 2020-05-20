@@ -120,22 +120,6 @@ namespace Belle2 {
     int m_eventCounter = 0; /**< event counter */
     std::vector<int> m_counters; /**< counters: how many times SAD particles are used */
 
-    struct straightElement {
-      double x0;        /**< Initial position in X */
-      double z0;        /**< Initial position in Z */
-      double l;         /**< Parameter */
-      double phi;       /**< Phi angle */
-    };
-
-    /** Sensitive Element  */
-    struct bendingElement {
-      double rt;        /**< Parameter */
-      double x0;        /**< Initial position in X  */
-      double z0;        /**< Initial position in Z  */
-      double sphi;      /**< Bending Angle */
-      double dphi;      /**< Bending Angle for torus in phi */
-    };
-
   };
 
 } // Belle2 namespace

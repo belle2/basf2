@@ -55,7 +55,7 @@ float TagVertex::getDeltaTErr()
 
 TVector3 TagVertex::getMCTagVertex()
 {
-  return m_MCtagV;
+  return m_mcTagV;
 }
 
 int TagVertex::getMCTagBFlavor()
@@ -63,14 +63,14 @@ int TagVertex::getMCTagBFlavor()
   return m_mcPDG;
 }
 
-float TagVertex::getMCDeltaT()
+float TagVertex::getMCDeltaTau()
 {
-  return m_MCdeltaT;
+  return m_mcDeltaTau;
 }
 
-float TagVertex::getMCDeltaTapprox()
+float TagVertex::getMCDeltaT()
 {
-  return m_MCdeltaTapprox;
+  return m_mcDeltaT;
 }
 
 int TagVertex::getFitType()
@@ -231,24 +231,24 @@ void TagVertex::setDeltaTErr(float DeltaTErr)
   m_deltaTErr = DeltaTErr;
 }
 
-void TagVertex::setMCTagVertex(const TVector3& MCTagVertex)
+void TagVertex::setMCTagVertex(const TVector3& mcTagVertex)
 {
-  m_MCtagV = MCTagVertex;
+  m_mcTagV = mcTagVertex;
 }
 
-void TagVertex::setMCTagBFlavor(int MCTagBFlavor)
+void TagVertex::setMCTagBFlavor(int mcTagBFlavor)
 {
-  m_mcPDG = MCTagBFlavor;
+  m_mcPDG = mcTagBFlavor;
 }
 
-void TagVertex::setMCDeltaT(float MCDeltaT)
+void TagVertex::setMCDeltaTau(float mcDeltaTau)
 {
-  m_MCdeltaT = MCDeltaT;
+  m_mcDeltaTau = mcDeltaTau;
 }
 
-void TagVertex::setMCDeltaTapprox(float MCDeltaTapprox)
+void TagVertex::setMCDeltaT(float mcDeltaT)
 {
-  m_MCdeltaTapprox = MCDeltaTapprox;
+  m_mcDeltaT = mcDeltaT;
 }
 
 void TagVertex::setFitType(float FitType)

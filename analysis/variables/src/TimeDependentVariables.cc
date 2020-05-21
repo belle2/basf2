@@ -193,6 +193,13 @@ namespace Belle2 {
       double c = Const::speedOfLight / 1000.; // cm ps-1
       return particleDeltaZ(particle) / (boost * c);
     }
+    double particleMCDeltaTau(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+      return vert->getMCDeltaTau();
+    }
+
     double particleMCDeltaT(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -200,14 +207,7 @@ namespace Belle2 {
       return vert->getMCDeltaT();
     }
 
-    double particleMCDeltaTapprox(const Particle* particle)
-    {
-      auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert) return realNaN;
-      return vert->getMCDeltaTapprox();
-    }
-
-    double particleMCDeltaL(const Particle* particle)
+    double particleMCDeltaBoost(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
@@ -215,7 +215,7 @@ namespace Belle2 {
       double beta = PCmsLabTransform().getBoostVector().Mag();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
-      return vert->getMCDeltaTapprox() * bg * c;
+      return vert->getMCDeltaT() * bg * c;
     }
 
 
@@ -928,11 +928,11 @@ namespace Belle2 {
                       R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
                       R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
-    REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
+    REGISTER_VARIABLE("mcDeltaTau", particleMCDeltaTau,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
-    REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,
+    REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
-    REGISTER_VARIABLE("mcDeltaL", particleMCDeltaL,
+    REGISTER_VARIABLE("mcDeltaBoost", particleMCDeltaBoost,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
@@ -960,9 +960,9 @@ namespace Belle2 {
                       "Returns the TagV component in the boost direction");
     REGISTER_VARIABLE("TagVOBoost", tagVOrthogonalBoostDirection,
                       "Returns the TagV component in the direction orthogonal to the boost");
-    REGISTER_VARIABLE("TagVmcLBoost", tagVTruthBoostDirection,
+    REGISTER_VARIABLE("mcTagVLBoost", tagVTruthBoostDirection,
                       "Returns the MC TagV component in the boost direction");
-    REGISTER_VARIABLE("TagVmcOBoost", tagVTruthOrthogonalBoostDirection,
+    REGISTER_VARIABLE("mcTagVOBoost", tagVTruthOrthogonalBoostDirection,
                       "Returns the MC TagV component in the direction orthogonal to the boost");
     REGISTER_VARIABLE("TagVLBoostErr", tagVErrBoostDirection,
                       "Returns the error of TagV in the boost direction");

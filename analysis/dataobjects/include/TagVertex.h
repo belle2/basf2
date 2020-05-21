@@ -43,9 +43,9 @@ namespace Belle2 {
       m_tagVertexPval = 0;
       m_deltaT = 0;
       m_deltaTErr = 0;
-      m_MCdeltaT = 0;
-      m_MCdeltaTapprox = 0;
-      m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
+      m_mcDeltaTau = 0;
+      m_mcDeltaT = 0;
+      m_mcTagV(0) = 0; m_mcTagV(1) = 0; m_mcTagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
       resetConstraintCov();
@@ -114,14 +114,14 @@ namespace Belle2 {
     int getMCTagBFlavor();
 
     /**
-     * Returns generated DeltaT
+     * Returns generated DeltaTau
      */
-    float getMCDeltaT();
+    float getMCDeltaTau();
 
     /**
-     * Returns generated DeltaT
+     * Returns mc DeltaT (in kin. approximation)
      */
-    float getMCDeltaTapprox();
+    float getMCDeltaT();
 
     /**
      * Returns fit algo type
@@ -277,22 +277,22 @@ namespace Belle2 {
     /**
      * Set generated BTag Vertex
      */
-    void setMCTagVertex(const TVector3& MCTagVertex);
+    void setMCTagVertex(const TVector3& mcTagVertex);
 
     /**
      * Set generated Btag PDG code
      */
-    void setMCTagBFlavor(int MCTagBFlavor);
+    void setMCTagBFlavor(int mcTagBFlavor);
 
     /**
      * Set generated DeltaT
      */
-    void setMCDeltaT(float DeltaT);
+    void setMCDeltaTau(float mcDeltaTau);
 
     /**
-     * Set generated DeltaTapprox
+     * Set generated DeltaT (in kin. approx.)
      */
-    void setMCDeltaTapprox(float DeltaT);
+    void setMCDeltaT(float mcDeltaT);
 
     /**
      * Set fit algo type
@@ -398,10 +398,10 @@ namespace Belle2 {
     float m_tagVertexPval;              /**< Btag vertex P value */
     float m_deltaT;                     /**< Delta t */
     float m_deltaTErr;                  /**< Delta t error */
-    TVector3 m_MCtagV;                  /**< generated Btag vertex */
+    TVector3 m_mcTagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
-    float m_MCdeltaT;                   /**< generated Delta t */
-    float m_MCdeltaTapprox;             /**< generated Delta t approximated */
+    float m_mcDeltaTau;                 /**< generated Delta t */
+    float m_mcDeltaT;                   /**< generated Delta t approximated */
     int m_FitType;                      /**< Fit algo used */
     int m_NTracks;                      /**< Number of tracks used in the fit */
     float m_tagVl;                      /**< tagV component in the boost direction  */

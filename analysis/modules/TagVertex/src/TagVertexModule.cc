@@ -85,8 +85,8 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   TagVertexModule::TagVertexModule() : Module(),
-    m_Bfield(0), m_fitTruthStatus(0), m_rollbackStatus(0), m_fitPval(0), m_MCtagLifeTime(-1), m_mcPDG(0), m_MCLifeTimeReco(-1),
-    m_deltaT(0), m_deltaTErr(0), m_MCdeltaT(0), m_MCdeltaTapprox(0),
+    m_Bfield(0), m_fitTruthStatus(0), m_rollbackStatus(0), m_fitPval(0), m_mcTagLifeTime(-1), m_mcPDG(0), m_mcLifeTimeReco(-1),
+    m_deltaT(0), m_deltaTErr(0), m_mcDeltaTau(0), m_mcDeltaT(0),
     m_shiftZ(0), m_FitType(0), m_tagVl(0),
     m_truthTagVl(0), m_tagVlErr(0), m_tagVol(0), m_truthTagVol(0), m_tagVolErr(0), m_tagVNDF(0), m_tagVChi2(0), m_tagVChi2IP(0),
     m_verbose(true)
@@ -109,7 +109,7 @@ namespace Belle2 {
              string("standard_PXD"));
     addParam("maskName", m_roeMaskName,
              "Choose ROE mask to get particles from ", string(""));
-    addParam("askMCInformation", m_MCInfo,
+    addParam("askMCInformation", m_mcInfo,
              "TRUE when requesting MC Information from the tracks performing the vertex fit", false);
     addParam("reqPXDHits", m_reqPXDHits,
              "Minimum number of PXD hits for a track to be used in the vertex fit", 0);
@@ -194,10 +194,10 @@ namespace Belle2 {
           ver->setTagVertexPval(m_fitPval);
           ver->setDeltaT(m_deltaT);
           ver->setDeltaTErr(m_deltaTErr);
-          ver->setMCTagVertex(m_MCtagV);
+          ver->setMCTagVertex(m_mcTagV);
           ver->setMCTagBFlavor(m_mcPDG);
-          ver->setMCDeltaT(m_MCdeltaT);
-          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
+          ver->setMCDeltaTau(m_mcDeltaTau);
+          ver->setMCDeltaT(m_mcDeltaT);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
@@ -222,10 +222,10 @@ namespace Belle2 {
           ver->setTagVertexPval(-1.);
           ver->setDeltaT(m_deltaT);
           ver->setDeltaTErr(m_deltaTErr);
-          ver->setMCTagVertex(m_MCtagV);
+          ver->setMCTagVertex(m_mcTagV);
           ver->setMCTagBFlavor(0.);
-          ver->setMCDeltaT(m_MCdeltaT);
-          ver->setMCDeltaTapprox(m_MCdeltaTapprox);
+          ver->setMCDeltaTau(m_mcDeltaTau);
+          ver->setMCDeltaT(m_mcDeltaT);
           ver->setFitType(m_FitType);
           ver->setNTracks(m_tagParticles.size());
           ver->setTagVl(m_tagVl);
@@ -574,10 +574,10 @@ namespace Belle2 {
         swap(mcBs[0], mcBs[1]);
     }
 
-    m_MCVertReco = mcBs[0]->getDecayVertex();
-    m_MCLifeTimeReco  = getProperLifeTime(mcBs[0]);
-    m_MCtagV = mcBs[1]->getDecayVertex();
-    m_MCtagLifeTime = getProperLifeTime(mcBs[1]);
+    m_mcVertReco = mcBs[0]->getDecayVertex();
+    m_mcLifeTimeReco  = getProperLifeTime(mcBs[0]);
+    m_mcTagV = mcBs[1]->getDecayVertex();
+    m_mcTagLifeTime = getProperLifeTime(mcBs[1]);
     m_mcPDG = mcBs[1]->getPDG();
   }
 
@@ -870,14 +870,14 @@ namespace Belle2 {
     m_deltaT  = dl / (bg * c);
 
     //Truth DeltaL & approx DeltaT in the boost direction
-    TVector3 MCdVert = m_MCVertReco - m_MCtagV;   //truth vtxReco - vtxTag
+    TVector3 MCdVert = m_mcVertReco - m_mcTagV;   //truth vtxReco - vtxTag
     double MCdl = MCdVert.Dot(boostDir);
-    m_MCdeltaTapprox = MCdl / (bg * c);
+    m_mcDeltaT = MCdl / (bg * c);
 
-    // MCdeltaT=tauRec-tauTag
-    m_MCdeltaT = m_MCLifeTimeReco - m_MCtagLifeTime;
-    if (m_MCLifeTimeReco  == -1 || m_MCtagLifeTime == -1)
-      m_MCdeltaT =  realNaN;
+    // MCdeltaTau=tauRec-tauTag
+    m_mcDeltaTau = m_mcLifeTimeReco - m_mcTagLifeTime;
+    if (m_mcLifeTimeReco  == -1 || m_mcTagLifeTime == -1)
+      m_mcDeltaTau =  realNaN;
 
     TVectorD bVec = toVec(boostDir);
 
@@ -891,7 +891,7 @@ namespace Belle2 {
     m_deltaTErr =  hypot(m_tagVlErr, bRecoErrL) / (bg * c);
 
     m_tagVl = m_tagV.Dot(boostDir);
-    m_truthTagVl = m_MCtagV.Dot(boostDir);
+    m_truthTagVl = m_mcTagV.Dot(boostDir);
 
     // calculate tagV component and error in the direction orthogonal to the boost
     TVector3 oboost = getUnitOrthogonal(boostDir);
@@ -901,7 +901,7 @@ namespace Belle2 {
     m_tagVolErr = sqrt(m_tagVErrMatrix.Similarity(oVec));
 
     m_tagVol = m_tagV.Dot(oboost);
-    m_truthTagVol = m_MCtagV.Dot(oboost);
+    m_truthTagVol = m_mcTagV.Dot(oboost);
   }
 
   Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
@@ -978,7 +978,7 @@ namespace Belle2 {
       return TVector3(0., 0., 0.);
     }
 
-    return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + m_MCtagV;
+    return paw.particle->getTrackFitResult()->getPosition() - paw.mcParticle->getProductionVertex() + m_mcTagV;
   }
 
   void TagVertexModule::resetReturnParams()
@@ -992,11 +992,11 @@ namespace Belle2 {
     m_tagV = vecNaN;
     m_tagVErrMatrix.ResizeTo(matNaN);
     m_tagVErrMatrix = matNaN;
-    m_MCtagV = vecNaN;
-    m_MCVertReco = vecNaN;
+    m_mcTagV = vecNaN;
+    m_mcVertReco = vecNaN;
     m_deltaT = realNaN;
     m_deltaTErr = realNaN;
-    m_MCdeltaT = realNaN;
+    m_mcDeltaTau = realNaN;
     m_constraintCov.ResizeTo(matNaN);
     m_constraintCov = matNaN;
     m_constraintCenter = vecNaN;

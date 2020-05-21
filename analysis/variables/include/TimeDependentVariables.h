@@ -158,18 +158,18 @@ namespace Belle2 {
     double particleDeltaTRes(const Particle* particle);
 
     /**
-     * return generated Delta T (Brec - Btag), i.e. difference of proper times (in ps)
+     * return generated Delta Tau (Brec - Btag), i.e. difference of proper times (in ps)
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
-    double particleMCDeltaT(const Particle* particle);
+    double particleMCDeltaTau(const Particle* particle);
 
     /**
      * return generated Delta T (Brec - Btag) in boost-direction kinematic approximation (in ps)
      *
      * requires that Vertex <-> Particle relation exists (returns -1111 if it doesn't)
      */
-    double particleMCDeltaTapprox(const Particle* particle);
+    double particleMCDeltaT(const Particle* particle);
 
     /**
      * return generated Delta l (Brec - Btag) in boost-direction (in cm)

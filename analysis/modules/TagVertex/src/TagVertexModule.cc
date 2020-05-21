@@ -353,6 +353,17 @@ namespace Belle2 {
     return ok;
   }
 
+
+  // get vector which is oposite to vIn in CMS ref frame
+  // Be aware that input vIn and output are in the Lab frame
+  static TLorentzVector flipVector(TLorentzVector vIn)
+  {
+    TLorentzVector vCMS = PCmsLabTransform::labToCms(vIn);
+    vCMS.SetVect(-vCMS.Vect());
+    return PCmsLabTransform::cmsToLab(vCMS);
+  }
+
+
   pair<TVector3, TMatrixDSym> TagVertexModule::findConstraint(const Particle* Breco, double cut) const
   {
     if (Breco->getPValue() < 0.) return make_pair(vecNaN, matNaN);
@@ -382,34 +393,34 @@ namespace Belle2 {
 
     PerrMatrix(3, 3) = 0.;
 
+    //Copy Breco, but use errors as are in PerrMatrix
+    Particle* Breco2 = ParticleCopy::copyParticle(Breco);
+    Breco2->setMomentumVertexErrorMatrix(PerrMatrix);
 
-    Particle Breco2(Breco->get4Vector(), Breco->getPDGCode());
-    Breco2.updateMomentum(Breco->get4Vector(), Breco->getVertex(), PerrMatrix, Breco->getPValue());
 
-    Particle* BRecoRes = doVertexFitForBTube(&Breco2, "kalman");
+    const Particle* BRecoRes = doVertexFitForBTube(Breco2, "kalman");
     if (BRecoRes->getPValue() < 0) return make_pair(vecNaN, matNaN); //problems
 
-    // simpler version of momentum
-    TVector3 pFinal = Breco->getVertex() - BRecoRes->getVertex();
+    // Overall error matrix
     TMatrixDSym errFinal = TMatrixDSym(Breco->getVertexErrorMatrix() + BRecoRes->getVertexErrorMatrix());
-    // end simpler version
 
     // TODO : to be developed the extraction of the momentum from the rave fitted track
 
-    // start rotation of the error matrix
-    TLorentzVector v4Final(pFinal, Breco->getPDGMass());
-    TLorentzVector vec = PCmsLabTransform::labToCms(v4Final);
+    // Get expected pBtag 4-momentum using transverse-momentum conservation
+    TVector3 BvertDiff = Breco->getVertex() - BRecoRes->getVertex();
+    TLorentzVector pBrecEstimate(pmag / BvertDiff.Mag() *  BvertDiff, Breco->getPDGMass());
+    TLorentzVector pBtagEstimate = flipVector(pBrecEstimate);
 
-    TMatrixD TubeZ = rotateTensorInv(v4Final.Vect(), errFinal);
+    // rotate err-matrix such that pBrecEstimate goes to eZ
+    TMatrixD TubeZ = rotateTensorInv(pBrecEstimate.Vect(), errFinal);
 
-    TubeZ(2, 2) = cut;
+    TubeZ(2, 2) = cut * cut;
     TubeZ(2, 0) = 0; TubeZ(0, 2) = 0;
     TubeZ(2, 1) = 0; TubeZ(1, 2) = 0;
 
-    vec.SetVect(-vec.Vect());
 
-    TLorentzVector vecLab = PCmsLabTransform::cmsToLab(vec);
-    TMatrixD Tube = rotateTensor(vecLab.Vect(), TubeZ);
+    // rotate err-matrix such that eZ goes to pBtagEstimate
+    TMatrixD Tube = rotateTensor(pBtagEstimate.Vect(), TubeZ);
 
     // Standard algorithm needs no shift
     return make_pair(m_BeamSpotCenter, toSymMatrix(Tube));
@@ -426,25 +437,22 @@ namespace Belle2 {
 
     //vertex fit will give the intersection between the beam spot and the trajectory of the B
     //(base of the BTube, or primary vtx cov matrix)
-    Particle* tubecreatorBCopy = doVertexFitForBTube(Breco, "avf");
+    const Particle* tubecreatorBCopy = doVertexFitForBTube(Breco, "avf");
     if (tubecreatorBCopy->getPValue() < 0) return make_pair(vecNaN, matNaN); //if problems
 
 
     //get direction of B tag = opposite direction of B rec in CMF
-    TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
+    TLorentzVector pBrec = tubecreatorBCopy->get4Vector();
 
     //if we want the true info, replace the 4vector by the true one
     if (m_useTruthInFit) {
       const MCParticle* mcBr = Breco->getRelated<MCParticle>();
       if (mcBr)
-        v4Final = mcBr->get4Vector();
+        pBrec = mcBr->get4Vector();
       else
         m_fitTruthStatus = 2;
     }
-
-    TLorentzVector vec = PCmsLabTransform::labToCms(v4Final);
-    TLorentzVector vecNew(-vec.Vect(), vec.E());
-    TLorentzVector v4FinalNew = PCmsLabTransform::cmsToLab(vecNew);
+    TLorentzVector pBtag = flipVector(pBrec);
 
     //To create the B tube, strategy is: take the primary vtx cov matrix, and add to it a cov
     //matrix corresponding to an very big error in the direction of the B tag
@@ -460,9 +468,9 @@ namespace Belle2 {
       B2DEBUG(10, "IP covariance: " << printMatrix(m_BeamSpotCov));
       B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
-      B2DEBUG(10, "BTag direction: " << printVector((1. / v4FinalNew.P())*v4FinalNew.Vect()));
-      B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
-      B2DEBUG(10, "Brec direction in CMF: " << printVector((1. / vec.P())*vec.Vect()));
+      B2DEBUG(10, "BTag direction: " << printVector((1. / pBtag.P())*pBtag.Vect()));
+      //B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
+      //B2DEBUG(10, "Brec direction in CMF: " << printVector((1. / vec.P())*vec.Vect()));
     }
 
     //make a long error matrix along BTag direction
@@ -470,7 +478,7 @@ namespace Belle2 {
 
 
     // make rotation matrix from z axis to BTag line of flight
-    TMatrixD longerrorRotated = rotateTensor(v4FinalNew.Vect(), longerror);
+    TMatrixD longerrorRotated = rotateTensor(pBtag.Vect(), longerror);
 
     //pvNew will correspond to the covariance matrix of the B tube
     TMatrixD pvNew = TMatrixD(pv) + longerrorRotated;
@@ -493,7 +501,7 @@ namespace Belle2 {
     //The following is done to do the BTube constraint with a virtual track
     //(ie KFit way)
 
-    m_tagMomentum = v4FinalNew;
+    m_tagMomentum = pBtag;
 
     m_pvCov.ResizeTo(pv);
     m_pvCov = pv;
@@ -902,10 +910,6 @@ namespace Belle2 {
   {
     //make a copy of motherIn to not modify the original object
     Particle* mother = ParticleCopy::copyParticle(motherIn);
-
-    //Particle mother(Particle(motherIn->get4Vector(), motherIn->getPDGCode()));
-    //mother.updateMomentum(motherIn->get4Vector(), motherIn->getVertex(), motherIn->getMomentumVertexErrorMatrix(),
-    //motherIn->getPValue());
 
     //Here rave is used to find the upsilon(4S) vtx as the intersection
     //between the mother B trajectory and the beam spot

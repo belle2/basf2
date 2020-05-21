@@ -469,8 +469,6 @@ namespace Belle2 {
       B2DEBUG(10, "Brec primary vertex: " << printVector(tubecreatorBCopy->getVertex()));
       B2DEBUG(10, "Brec PV covariance: " << printMatrix(pv));
       B2DEBUG(10, "BTag direction: " << printVector((1. / pBtag.P())*pBtag.Vect()));
-      //B2DEBUG(10, "BTag direction in CMF: " << printVector((1. / vecNew.P())*vecNew.Vect()));
-      //B2DEBUG(10, "Brec direction in CMF: " << printVector((1. / vec.P())*vec.Vect()));
     }
 
     //make a long error matrix along BTag direction

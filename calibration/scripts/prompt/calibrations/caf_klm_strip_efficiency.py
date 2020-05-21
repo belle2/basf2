@@ -144,7 +144,7 @@ def get_collector(input_data_name):
 
     if input_data_name == 'hlt_mumu':
         return basf2.register_module('KLMStripEfficiencyCollector',
-                                     MuonListName='mu+:all',
+                                     MuonListName='mu+:klmStripEfficiency',
                                      MinimalMatchingDigits=14,
                                      MinimalMatchingDigitsOuterLayers=4,
                                      MinimalMomentumNoOuterLayers=4.0)

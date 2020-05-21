@@ -32,6 +32,8 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   auto eclCrystalR = getObjectPtr<TH1F>("eclCrystalR");
   auto eclCrystalTheta = getObjectPtr<TH1F>("eclCrystalTheta");
   auto eclCrystalPhi = getObjectPtr<TH1F>("eclCrystalPhi");
+  auto eclCrystalDirTheta = getObjectPtr<TH1F>("eclCrystalDirTheta");
+  auto eclCrystalDirPhi = getObjectPtr<TH1F>("eclCrystalDirPhi");
   auto eclCrystalEdgeTheta = getObjectPtr<TH1F>("eclCrystalEdgeTheta");
   auto eclCrystalEdgePhi = getObjectPtr<TH1F>("eclCrystalEdgePhi");
 
@@ -43,6 +45,8 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   eclCrystalR->Write();
   eclCrystalTheta->Write();
   eclCrystalPhi->Write();
+  eclCrystalDirTheta->Write();
+  eclCrystalDirPhi->Write();
   eclCrystalEdgeTheta->Write();
   eclCrystalEdgePhi->Write();
   histfile->Close();

@@ -17,9 +17,6 @@ if __name__ == "__main__":
         "old: mcFlavorOfOtherB0 --> new: mcFlavorOfOtherB\n"
         "old: mdstSource --> new: uniqueParticleIdentifier\n"
         "old: MCDeltaT --> new: mcDeltaT\n"
-        "old: TagVmcLBoost --> new: mcTagVLBoost\n"
-        "old: TagVmcOBoost --> new: mcTagVOBoost\n"
-        "old: mcDeltaL --> new: mcDeltaBoost\n"
         "old: mc{X, Y, Z} --> new: mcDecayVertex{X, Y, Z}\n"
         "old: mcRho --> new: mcDecayVertexRho\n"
         "old: mcProdVertex{X, Y, Z} --> new: mcProductionVertex{X, Y, Z}\n"
@@ -28,6 +25,11 @@ if __name__ == "__main__":
         "old: WE_XXX, ROE_XXX, Rec_XXX --> new: weXXX, roeXXX, recXXX\n\n"
         "The variables 'decayAngle', 'daughterAngle', and 'pointingAngle' return angles in rad and no longer the corresponding "
         "cosine!\n"
+
+        "The following variables have been renamed since release-05:\n"
+        "old: TagVmcLBoost --> new: mcTagVLBoost\n"
+        "old: TagVmcOBoost --> new: mcTagVOBoost\n"
+        "old: mcDeltaL --> new: mcDeltaBoost\n"
     )
     if args.pager:
         with Pager(r'Available variables in Variable\:\:Manager'):

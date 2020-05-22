@@ -6,5 +6,5 @@ Variables
 
  * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``, 
    and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
- * Variable :b2:var:`TagVmcLBoost` renamed to :b2:var:`mcTagVLBoost` and variable :b2:var:`TagVmcOBoost` renamed to :b2:var:`mcTagVOBoost`
- * Variable :b2:var:`mcDeltaL` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
+ * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
+ * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable

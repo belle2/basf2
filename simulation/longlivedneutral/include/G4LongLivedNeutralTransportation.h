@@ -1,3 +1,4 @@
+
 //
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -59,100 +60,167 @@ class G4SafetyHelper;
 class G4CoupledTransportation;
 namespace Belle2 {
 
-  class G4LongLivedNeutralTransportation : public G4VProcess {
-    // Concrete class that does the geometrical transport
+  /** A constructor
+   *  constructor for G4LongLivedNeutralTransportation
+   */
 
-  public:  // with description
+  class G4LongLivedNeutralTransportation : public G4VProcess {
+    /**  Concrete class that does the geometrical transport */
+
+  public:
 
     G4LongLivedNeutralTransportation(G4int verbosityLevel = 1);
     ~G4LongLivedNeutralTransportation();
 
+    /**
+     * G4VProcess::AlongStepGetPhysicalInteractionLength() implementation,
+     *
+     * @param track Propagating particle track reference
+     * @param previousStepSize This argument of base function is ignored
+     * @param currentMinimumStep Current minimum step size
+     * @param currentSafety Reference to current step safety
+     * @param selection Pointer for return value of GPILSelection, which is set to default value of CandidateForSelection
+     * @return Next geometry step length
+     */
     G4double      AlongStepGetPhysicalInteractionLength(
       const G4Track& track,
       G4double  previousStepSize,
       G4double  currentMinimumStep,
       G4double& currentSafety,
       G4GPILSelection* selection
-    ); // override;
+    );
 
+    /**
+     * G4VProcess::AlongStepDoIt() implementation,
+     *
+     * @param track Propagating particle track reference
+     * @param stepData Current step reference
+     */
     G4VParticleChange* AlongStepDoIt(
       const G4Track& track,
       const G4Step& stepData
-    ); // override;
+    );
 
+    /**
+     * G4VProcess::PostStepDoIt() implementation,
+     *
+     * @param track
+     * @param stepData
+     */
     G4VParticleChange* PostStepDoIt(
       const G4Track& track,
       const G4Step&  stepData
-    ); // override;
-    // Responsible for the relocation
+    );
 
+    /**
+     * G4VProcess::PostStepGetPhysicalInteractionLength() implementation.
+     *
+     * @param track This argument of base function is ignored
+     * @param previousStepSize This argument of base function is ignored
+     * @param pForceCond Force condition by default
+     *
+     * Forces the PostStepDoIt action to be called,
+     * but does not limit the step
+     */
     G4double PostStepGetPhysicalInteractionLength(
       const G4Track&,
       G4double   previousStepSize,
       G4ForceCondition* pForceCond
-    ); // override;
-    // Forces the PostStepDoIt action to be called,
-    // but does not limit the step
+    );
+
+
 
     inline G4bool FieldExertedForce() { return fFieldExertedForce; }
+    /**< References fFieldExertedForce.*/
 
     G4PropagatorInField* GetPropagatorInField();
+    /**< Access fFieldPropagator, the assistant class that Propagate in a Field.*/
     void SetPropagatorInField(G4PropagatorInField* pFieldPropagator);
-    // Access/set the assistant class that Propagate in a Field
+    /**< Access/set the assistant class that Propagate in a Field */
 
-    inline G4double GetThresholdWarningEnergy() const;
-    inline G4double GetThresholdImportantEnergy() const;
-    inline G4int GetThresholdTrials() const;
+    inline G4double GetThresholdWarningEnergy() const; /**< Access fThreshold_Warning_Energy*/
+    inline G4double GetThresholdImportantEnergy() const; /**< Access fThreshold_Important_Energy*/
+    inline G4int GetThresholdTrials() const; /**< Access fThresholdTrials*/
+
+
 
     inline void SetThresholdWarningEnergy(G4double newEnWarn)
     {
       fThreshold_Warning_Energy = newEnWarn;
-    }
+    } /**< Set fThreshold_Warning_Energy*/
     inline void SetThresholdImportantEnergy(G4double newEnImp)
     {
       fThreshold_Important_Energy = newEnImp;
-    }
+    } /**< Set fThreshold_Important_Energy*/
     inline void SetThresholdTrials(G4int newMaxTrials)
     {
       fThresholdTrials = newMaxTrials;
-    }
-    // Get/Set parameters for killing loopers:
-    //   Above 'important' energy a 'looping' particle in field will
-    //   *NOT* be abandoned, except after fThresholdTrials attempts.
-    // Below Warning energy, no verbosity for looping particles is issued
+    }/**< Set fThresholdTrials*/
 
-    void SetHighLooperThresholds(); // Shortcut method - old values (meant for HEP)
-    void SetLowLooperThresholds(); // Set low thresholds - for low-E applications
-    void ReportLooperThresholds(); // Print values of looper thresholds
+
+    /** Get/Set parameters for killing loopers:
+     *  Above 'important' energy a 'looping' particle in field will
+     *  *NOT* be abandoned, except after fThresholdTrials attempts.
+     *  Below Warning energy, no verbosity for looping particles is issued
+     */
+
+    void SetHighLooperThresholds();
+    /** Shortcut method - old values (meant for HEP)*/
+    void SetLowLooperThresholds();
+    /** Set low thresholds - for low-E applications */
+    void ReportLooperThresholds();
+    /** Print values of looper thresholds */
 
     inline G4double GetMaxEnergyKilled() const;
+    /**< Access fMaxEnergyKilled*/
     inline G4double GetSumEnergyKilled() const;
+    /**< Access fSumEnergyKilled*/
     inline void ResetKilledStatistics(G4int report = 1);
-    // Statistics for tracks killed (currently due to looping in field)
+    /**< Statistics for tracks killed (currently due to looping in field) */
 
     inline void EnableShortStepOptimisation(G4bool optimise = true);
-    // Whether short steps < safety will avoid to call Navigator (if field=0)
+    /**< Whether short steps < safety will avoid to call Navigator (if field=0)*/
 
     static void   SetSilenceLooperWarnings(G4bool val);
-    // Do not warn (or throw exception) about 'looping' particles
+    /**< Do not warn about 'looping' particles */
     static G4bool GetSilenceLooperWarnings();
+    /**< Do not throw exception about 'looping' particles */
 
   public:  // without description
 
+    /**
+     * No operation in  AtRestGPIL.
+     */
+
     G4double AtRestGetPhysicalInteractionLength(const G4Track&,
                                                 G4ForceCondition*)
-    { return -1.0; }  // No operation in AtRestGPIL
+    { return -1.0; }
+
+    /**
+     * No operation in  AtRestDoIt.
+     */
 
     G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&)
-    { return 0; }     // No operation in AtRestDoIt
+    { return 0; }
 
     void StartTracking(G4Track* aTrack);
-    // Reset state for new (potentially resumed) track
+    /**< Reset state for new (potentially resumed) track*/
 
-    virtual void ProcessDescription(std::ostream& outFile) const; // override;
+    /**
+     * G4LongLivedNeutralTransportation::ProcessDescription()
+     *
+     * @outfile Description of process
+     */
+    virtual void ProcessDescription(std::ostream& outFile) const; //override;
+
     void PrintStatistics(std::ostream& outStr) const;
+    /**< returns current logging info of the algorithm */
 
   protected:
+
+    /**
+     * Checks whether a field exists for the "global" field manager.
+     */
 
     inline G4bool DoesGlobalFieldExist()
     {

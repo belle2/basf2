@@ -15,7 +15,6 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>

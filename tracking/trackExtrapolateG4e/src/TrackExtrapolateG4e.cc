@@ -164,14 +164,20 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
+    if (!m_COILGeometryPar.isValid()) {
+      B2FATAL("Coil geometry data are not available.");
+    } else {
+      double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      double rMinCoil = m_COILGeometryPar->getCryoRmin();
+      double halfLength = m_COILGeometryPar->getCryoLength();
+      m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+      G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
+    }
+  }
+  if (!m_BeamPipeGeo.isValid()) {
+    B2FATAL("Beam pipe geometry data are not available.");
+  } else {
+    double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 }
@@ -235,13 +241,20 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
+    if (!m_COILGeometryPar.isValid()) {
+      B2FATAL("Coil geometry data are not available.");
+    } else {
+      double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      double rMinCoil = m_COILGeometryPar->getCryoRmin();
+      double halfLength = m_COILGeometryPar->getCryoLength();
+      m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+      G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
+    }
+  }
+  if (!m_BeamPipeGeo.isValid()) {
+    B2FATAL("Beam pipe geometry data are not available.");
+  } else {
+    double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
     m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
 

@@ -183,6 +183,7 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0DeltaTCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
@@ -237,6 +238,7 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     #   collector module
     collector = basf2.register_module('TOPModuleT0LLCollector')
     collector.param('sample', sample)
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0LLAlgorithm()
@@ -388,6 +390,7 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
     collector.param('timeWindow', [t_min, t_max])
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -428,6 +431,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
 
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -497,6 +501,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         collector.param('sample', sample)
         collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
+        collector.param('granularity', 'all')
 
         #   define collection
         collection = Collection(collector=collector, input_files=inputFiles,

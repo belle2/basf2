@@ -40,7 +40,7 @@ namespace TreeFitter {
     virtual int dim() const override {return 0;} // This does not have any parameters
 
     /** add to constraint list  */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const;
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override;
 
     /** get particle type */
     int type() const override {return kFeedthroughParticle;}

@@ -204,7 +204,7 @@ namespace Belle2 {
       // generated IP corresponds to the generated vertex of the
       // first not-initial and not-virtual MCParticle
       StoreArray<MCParticle> mcps;
-      for (const auto mcp : mcps)
+      for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().X();
       return std::numeric_limits<double>::quiet_NaN();
@@ -213,7 +213,7 @@ namespace Belle2 {
     double getGenIPY(const Particle*)
     {
       StoreArray<MCParticle> mcps;
-      for (const auto mcp : mcps)
+      for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().Y();
       return std::numeric_limits<double>::quiet_NaN();
@@ -222,7 +222,7 @@ namespace Belle2 {
     double getGenIPZ(const Particle*)
     {
       StoreArray<MCParticle> mcps;
-      for (const auto mcp : mcps)
+      for (const auto& mcp : mcps)
         if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
           return mcp.getVertex().Z();
       return std::numeric_limits<double>::quiet_NaN();

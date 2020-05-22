@@ -43,6 +43,7 @@ namespace Belle2 {
     public:
       /**
        * Constructor
+       * @param moduleID module ID
        */
       explicit LaserCalibratorFit(unsigned moduleID);
 
@@ -61,7 +62,7 @@ namespace Belle2 {
       * set time fit function
       * @param method  gauss: single gaussian; cb: single Crystal Ball; cb2: double Crystal Ball
       */
-      void setFitMethod(std::string& method) {m_fitMethod = method;}
+      void setFitMethod(const std::string& method) {m_fitMethod = method;}
 
       /**
       * set x range in the fit
@@ -118,13 +119,13 @@ namespace Belle2 {
 
       /**
        * Fit process using single gaussian function
-       * @param h  hist in the fit
+       * @param channel channel number
        */
       TF1* makeGFit(unsigned channel);
 
       /**
        * Fit process using single Crystal Ball fuction
-       * @param h  hist in the fit
+       * @param channel channel number
        */
       TF1* makeCBFit(unsigned channel);
 

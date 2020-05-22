@@ -190,9 +190,12 @@ namespace Belle2 {
     double particleDeltaTBelle(const Particle* particle)
     {
       PCmsLabTransform T;
-      double boost = T.getBoostVector().Mag();
-      return particleDeltaZ(particle) / boost / Const::speedOfLight * 1e3;
+      double beta = T.getBoostVector().Mag();
+      double bg = beta / sqrt(1 - beta * beta);
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+      return particleDeltaZ(particle) / bg / c;
     }
+
     double particleMCDeltaT(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();

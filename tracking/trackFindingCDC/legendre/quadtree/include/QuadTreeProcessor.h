@@ -97,7 +97,7 @@ namespace Belle2 {
       /**
        * Fill in the items in the given vector. They are transformed to QuadTreeItems internally.
        */
-      void seed(std::vector<AData*>& datas)
+      void seed(const std::vector<AData*>& datas)
       {
         // Create the items
         for (AData* data : datas) {

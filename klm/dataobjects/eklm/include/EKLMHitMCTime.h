@@ -25,12 +25,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMHitMCTime();
+    EKLMHitMCTime()
+    {
+    }
 
     /**
      * Destructor.
      */
-    virtual ~EKLMHitMCTime();
+    virtual ~EKLMHitMCTime()
+    {
+    }
 
     /**
      * Set MC time.

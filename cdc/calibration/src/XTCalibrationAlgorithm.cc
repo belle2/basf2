@@ -247,11 +247,33 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
       }
     }
   }
+  sanitaryCheck();
   write();
   storeHisto();
   return checkConvergence();
 }
 
+void XTCalibrationAlgorithm::sanitaryCheck()
+{
+  const double tMax = 500; // max drift time (nsec)
+  for (int l = 0; l < 56; ++l) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          if (m_fitStatus[l][lr][al][th] == FitStatus::c_OK) {
+            TF1* fun = m_xtFunc[l][lr][al][th];
+            double y = fun->Eval(tMax);
+            if (y < 0) {
+              B2INFO("Strange XT function l " << l << " lr " << lr << " alpha " << al << " theta " << th
+                     << ", replaced by initial one");
+              fun->SetParameters(m_xtPrior[l][lr][al][th]);
+            }
+          }
+        }
+      }
+    }
+  }
+}
 CalibrationAlgorithm::EResult XTCalibrationAlgorithm::checkConvergence()
 {
 

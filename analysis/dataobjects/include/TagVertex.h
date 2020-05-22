@@ -352,35 +352,35 @@ namespace Belle2 {
     /**
      * Set a vector of pointers to the tracks used in the tag vtx fit
      */
-    void setVertexFitParticles(std::vector<const Particle*> const& vtxFitParticles);
+    void setVertexFitParticles(const std::vector<const Particle*>& vtxFitParticles);
 
     /**
      * Set a vector of pointers to the MC p'cles corresponding to the tracks in the tag vtx fit
      */
-    void setVertexFitMCParticles(std::vector<const MCParticle*> const& vtxFitMCParticles);
+    void setVertexFitMCParticles(const std::vector<const MCParticle*>& vtxFitMCParticles);
 
     /**
      * Set the weights used by Rave in the tag vtx fit
      */
-    void setRaveWeights(std::vector<double> const& raveWeights);
+    void setRaveWeights(const std::vector<double>& raveWeights);
 
     /**
      * Set the centre of the constraint for the tag fit
      */
 
-    void setConstraintCenter(TVector3 const& constraintCenter);
+    void setConstraintCenter(const TVector3& constraintCenter);
 
     /**
      * Set the covariance matrix of the constraint for the tag fit
      */
 
-    void setConstraintCov(TMatrixDSym const& constraintCov);
+    void setConstraintCov(const TMatrixDSym& constraintCov);
 
     /**
      * Set the type of the constraint for the tag fit
      */
 
-    void setConstraintType(std::string const& constraintType);
+    void setConstraintType(const std::string& constraintType);
 
     /**
      * Set the status of the fit performed with the truth info of the tracks

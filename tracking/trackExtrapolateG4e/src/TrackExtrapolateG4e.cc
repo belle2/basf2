@@ -140,6 +140,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_ExtInitialized = true;
 
   // Define required objects, register the new ones and relations
+  m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_extHits.registerInDataStore();
   m_tracks.registerRelationTo(m_extHits);

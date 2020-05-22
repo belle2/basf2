@@ -10,4 +10,5 @@ Variables
 Modules
 +++++++
 
-* In BtubeCreator module, functionality to check the confidence level of the fit of fully reconstructed B to the beamspot is added.
+ * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
+   beamspot is added.

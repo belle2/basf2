@@ -356,7 +356,7 @@ void FullSimModule::initialize()
   while ((*partIter)()) {
     G4ParticleDefinition* currParticle = partIter->value();
     G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
-    for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
+    for (long unsigned int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
       if (transport != nullptr) {
         //Geant4 energy unit is MeV
@@ -383,7 +383,7 @@ void FullSimModule::initialize()
       G4ProcessManager* processManager = currParticle->GetProcessManager();
       if (processManager) {
         G4ProcessVector* processList = processManager->GetProcessList();
-        for (int i = 0; i < processList->size(); ++i) {
+        for (long unsigned int i = 0; i < processList->size(); ++i) {
           if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
               ((*processList)[i]->GetProcessName() == "Scintillation") ||
               ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {

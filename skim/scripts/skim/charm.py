@@ -533,6 +533,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     RequiredStandardLists = {
         "stdCharged": {
             "stdK": ["loose"],
+            "stdPi": ["loose"],
         },
         "stdPhotons": {
             "loadStdSkimPhoton": [],

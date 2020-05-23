@@ -228,17 +228,17 @@ void DQMHistoModuleBase::DefineUBResidualsVXD()
   auto residualV = THFAxis(residualU).title("residual V [#mum]");
 
   auto factory = THFFactory(this);
-  factory.xAxisSet(residualU).yAxisSet(residualV).zTitleSet("counts");
+  factory.xAxisDefault(residualU).yAxisDefault(residualV).zTitleDefault("counts");
 
   m_UBResidualsPXD = factory.CreateTH2F("UBResidualsPXD", "Unbiased residuals for PXD");
   m_UBResidualsSVD = factory.CreateTH2F("UBResidualsSVD", "Unbiased residuals for SVD");
 
-  factory.xAxisSet(residualU).yTitleSet("counts");
+  factory.xAxisDefault(residualU).yTitleDefault("counts");
 
   m_UBResidualsPXDU = factory.CreateTH1F("UBResidualsPXDU", "Unbiased residuals in U for PXD");
   m_UBResidualsSVDU = factory.CreateTH1F("UBResidualsSVDU", "Unbiased residuals in U for SVD");
 
-  factory.xAxisSet(residualV);
+  factory.xAxisDefault(residualV);
 
   m_UBResidualsPXDV = factory.CreateTH1F("UBResidualsPXDV", "Unbiased residuals in V for PXD");
   m_UBResidualsSVDV = factory.CreateTH1F("UBResidualsSVDV", "Unbiased residuals in V for SVD");
@@ -275,7 +275,7 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   helixParameters->cd();
 
-  factory.yTitleSet("Arb. Units");
+  factory.yTitleDefault("Arb. Units");
 
   m_Z0 =        factory.xAxis(Z0).CreateTH1F("Z0", "z0 - the z coordinate of the perigee (beam spot position)");
   m_D0 =        factory.xAxis(D0).CreateTH1F("D0", "d0 - the signed distance to the IP in the r-phi plane");
@@ -288,7 +288,7 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   helixCorrelations->cd();
 
-  factory.zTitleSet("Arb. Units");
+  factory.zTitleDefault("Arb. Units");
 
   m_PhiD0 = factory.xAxis(phi).yAxis(D0).CreateTH2F("PhiD0", "d0 vs Phi - the signed distance to the IP in the r-phi plane");
   m_D0Z0 =  factory.xAxis(D0).yAxis(Z0).CreateTH2F("D0Z0",
@@ -303,7 +303,7 @@ void DQMHistoModuleBase::DefineMomentumCoordinates()
   double fMomRange = 6.0;
 
   auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
-  auto factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisDefault(momentum).yTitleDefault("counts");
 
   m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
   m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
@@ -318,7 +318,7 @@ void DQMHistoModuleBase::DefineHits()
   int iHitsInCDC = 200;
   int iHits = 200;
 
-  auto factory = THFFactory(this).xlowSet(0).xTitleSet("# hits").yTitleSet("counts");
+  auto factory = THFFactory(this).xlowDefault(0).xTitleDefault("# hits").yTitleDefault("counts");
 
   m_HitsPXD = factory.nbinsx(iHitsInPXD).xup(iHitsInPXD).CreateTH1F("NoOfHitsInTrack_PXD", "No Of Hits In Track - PXD");
   m_HitsSVD = factory.nbinsx(iHitsInSVD).xup(iHitsInSVD).CreateTH1F("NoOfHitsInTrack_SVD", "No Of Hits In Track - SVD");
@@ -331,7 +331,7 @@ void DQMHistoModuleBase::DefineTracks()
   int iTracks = 30;
 
   auto tracks = THFAxis(iTracks, 0, iTracks, "# tracks");
-  auto factory = THFFactory(this).xAxisSet(tracks).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisDefault(tracks).yTitleDefault("counts");
 
   m_TracksVXD = factory.CreateTH1F("NoOfTracksInVXDOnly", "No Of Tracks Per Event, Only In VXD");
   m_TracksCDC = factory.CreateTH1F("NoOfTracksInCDCOnly", "No Of Tracks Per Event, Only In CDC");
@@ -347,7 +347,7 @@ void DQMHistoModuleBase::DefineHalfShellsVXD()
 
   double residualRange = 400;  // in um
   auto residual = THFAxis(200, -residualRange, residualRange, "residual [#mum]");
-  auto factory = THFFactory(this).xAxisSet(residual).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisDefault(residual).yTitleDefault("counts");
 
   m_UBResidualsPXDX_Yin = factory.CreateTH1F("UBResidualsPXDX_Yin", "Unbiased residuals in X for PXD for Yin");
   m_UBResidualsPXDX_Yang = factory.CreateTH1F("UBResidualsPXDX_Yang", "Unbiased residuals in X for PXD for Yang");
@@ -425,7 +425,7 @@ void DQMHistoModuleBase::DefineSensors()
   m_UBResidualsSensor = factory.xAxis(residualU).yAxis(residualV).zTitle("counts").CreateSensorsTH2F(format("UBResiduals_%1%"),
                         format("PXD Unbiased residuals for sensor %1%"));
 
-  factory.yTitleSet("counts");
+  factory.yTitleDefault("counts");
 
   resids1D->cd();
   m_UBResidualsSensorU = factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),

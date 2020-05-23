@@ -153,7 +153,7 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
 
   helixParameters->cd();
 
-  factory.yTitleSet("Arb. Units");
+  factory.yTitleDefault("Arb. Units");
 
   m_Z0 =        factory.xAxis(Z0).CreateTH1F("Z0", "z0 - the z coordinate of the perigee (beam spot position)");
   m_D0 =        factory.xAxis(D0).CreateTH1F("D0", "d0 - the signed distance to the IP in the r-phi plane");
@@ -166,7 +166,7 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
 
   helixCorrelations->cd();
 
-  factory.zTitleSet("Arb. Units");
+  factory.zTitleDefault("Arb. Units");
 
   m_PhiD0 =           factory.xAxis(phi).yAxis(D0).CreateTH2F("PhiD0",
                                                               "Phi - angle of the transverse momentum in the r-phi plane vs. d0 - signed distance to the IP in r-phi");
@@ -208,7 +208,7 @@ void AlignDQMModule::DefineMomentumCoordinates()
   double fMomRange = 3.0;
 
   auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
-  auto factory = THFFactory(this).xAxisSet(momentum).yTitleSet("counts");
+  auto factory = THFFactory(this).xAxisDefault(momentum).yTitleDefault("counts");
 
   m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
   m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
@@ -246,7 +246,7 @@ void AlignDQMModule::DefineSensors()
 
   auto factory = THFFactory(this);
 
-  factory.xAxisSet(positionU).yAxisSet(positionV);
+  factory.xAxisDefault(positionU).yAxisDefault(positionV);
 
   resMeanUPosUV->cd();
   m_ResMeanUPosUVSens =       factory.zTitle("residual U [#mum]").CreateSensorsTH2F(format("ResMeanUPosUVSens_%1%"),
@@ -264,7 +264,7 @@ void AlignDQMModule::DefineSensors()
   m_ResMeanVPosUSens =        factory.yTitle("residual mean V [#mum]").CreateSensorsTH1F(format("ResMeanVPosUSens_%1%"),
                               format("Residual Mean V in Position U, %1%"));
 
-  factory.xAxisSet(positionV);
+  factory.xAxisDefault(positionV);
 
   resMeanUPosV->cd();
   m_ResMeanUPosVSens =        factory.yTitle("residual mean U [#mum]").CreateSensorsTH1F(format("ResMeanUPosVSens_%1%"),
@@ -273,7 +273,7 @@ void AlignDQMModule::DefineSensors()
   m_ResMeanVPosVSens =        factory.yTitle("residual mean V [#mum]").CreateSensorsTH1F(format("ResMeanVPosVSens_%1%"),
                               format("Residual Mean V in Position V, %1%"));
 
-  factory.xAxisSet(positionU).zTitleSet("counts");
+  factory.xAxisDefault(positionU).zTitleDefault("counts");
 
   resUPosU->cd();
   m_ResUPosUSens =            factory.yAxis(residualU).CreateSensorsTH2F(format("ResUPosUSensor_%1%"),
@@ -282,7 +282,7 @@ void AlignDQMModule::DefineSensors()
   m_ResVPosUSens =            factory.yAxis(residualV).CreateSensorsTH2F(format("ResVPosUSensor_%1%"),
                               format("Residual V in Position U, %1%"));
 
-  factory.xAxisSet(positionV);
+  factory.xAxisDefault(positionV);
 
   resUPosV->cd();
   m_ResUPosVSens =            factory.yAxis(residualU).CreateSensorsTH2F(format("ResUPosVSensor_%1%"),
@@ -295,7 +295,7 @@ void AlignDQMModule::DefineSensors()
   m_UBResidualsSensor =       factory.xAxis(residualU).yAxis(residualV).CreateSensorsTH2F(format("UBResiduals_%1%"),
                               format("PXD Unbiased residuals for sensor %1%"));
 
-  factory.yTitleSet("counts");
+  factory.yTitleDefault("counts");
 
   resids1D->cd();
   m_UBResidualsSensorU =      factory.xAxis(residualU).CreateSensorsTH1F(format("UBResidualsU_%1%"),
@@ -332,7 +332,7 @@ void AlignDQMModule::DefineLayers()
   auto residual = THFAxis(iYResGran, -residualRange, residualRange, "residual [#mum]");
 
   auto factory = THFFactory(this);
-  factory.xAxisSet(phi).yAxisSet(theta).zTitleSet("counts");
+  factory.xAxisDefault(phi).yAxisDefault(theta).zTitleDefault("counts");
 
   resMeanUPosUV->cd();
   m_ResMeanUPhiThetaLayer =       factory.zTitle("residual [#mum]").CreateLayersTH2F(format("ResMeanUPhiThetaLayer_%1%"),
@@ -344,14 +344,14 @@ void AlignDQMModule::DefineLayers()
   m_ResMeanPhiThetaLayerCounts =  factory.CreateLayersTH2F(format("ResCounterPhiThetaLayer_%1%"),
                                                            format("Residuals counter in Phi Theta, Layer %1%"));
 
-  factory.yAxisSet(residual);
+  factory.yAxisDefault(residual);
 
   resUPosU->cd();
   m_ResUPhiLayer =                factory.CreateLayersTH2F(format("ResUPhiLayer_%1%"), format("Residuals U in Phi, Layer %1%"));
   resVPosU->cd();
   m_ResVPhiLayer =                factory.CreateLayersTH2F(format("ResVPhiLayer_%1%"), format("Residuals V in Phi, Layer %1%"));
 
-  factory.xAxisSet(theta);
+  factory.xAxisDefault(theta);
 
   resUPosV->cd();
   m_ResUThetaLayer =              factory.CreateLayersTH2F(format("ResUThetaLayer_%1%"), format("Residuals U in Theta, Layer %1%"));
@@ -364,7 +364,7 @@ void AlignDQMModule::DefineLayers()
   m_ResMeanVThetaLayer =          factory.CreateLayersTH1F(format("ResMeanVThetaLayer_%1%"),
                                                            format("Residuals Mean V in Theta, Layer %1%"));
 
-  factory.xAxisSet(phi).yTitleSet("residual [#mum]");
+  factory.xAxisDefault(phi).yTitleDefault("residual [#mum]");
 
   resMeanUPosU->cd();
   m_ResMeanUPhiLayer =            factory.CreateLayersTH1F(format("ResMeanUPhiLayer_%1%"),

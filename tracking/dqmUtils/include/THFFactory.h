@@ -199,7 +199,7 @@ namespace Belle2 {
     }
 
     /** Permanently copies parameters for x axis from given THFAxis. */
-    THFFactory& xAxisSet(THFAxis& axis)
+    THFFactory& xAxisDefault(THFAxis& axis)
     {
       m_nbinsx.Set(axis.m_nbins);
       m_xlow.Set(axis.m_low);
@@ -210,7 +210,7 @@ namespace Belle2 {
     }
 
     /** Permanently copies parameters for y axis from given THFAxis. */
-    THFFactory& yAxisSet(THFAxis& axis)
+    THFFactory& yAxisDefault(THFAxis& axis)
     {
       m_nbinsy.Set(axis.m_nbins);
       m_ylow.Set(axis.m_low);
@@ -235,19 +235,19 @@ namespace Belle2 {
     /** Create TH2F array for sensors from given name template and title template. */
     TH2F** CreateSensorsTH2F(boost::format nameTemplate, boost::format titleTemplate);
 
-    /** @name -Set functions
+    /** @name -Default functions
      * All the following functions permanently set the value of given parameter.
      * They also return this instance so they can be chained. */
     /** @{ */
-    THFFactory& nbinsxSet(int nbinsx) {    m_nbinsx.Set(nbinsx); return *this; } /**< Sets nbinsx permanently. */
-    THFFactory& xlowSet(double xlow) {     m_xlow.Set(xlow);     return *this; } /**< Sets xlow permanently. */
-    THFFactory& xupSet(double xup) {       m_xup.Set(xup);       return *this; } /**< Sets xup permanently. */
-    THFFactory& nbinsySet(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
-    THFFactory& ylowSet(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
-    THFFactory& yupSet(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
-    THFFactory& xTitleSet(string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
-    THFFactory& yTitleSet(string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
-    THFFactory& zTitleSet(string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
+    THFFactory& nbinsxDefault(int nbinsx) {    m_nbinsx.Set(nbinsx); return *this; } /**< Sets nbinsx permanently. */
+    THFFactory& xlowDefault(double xlow) {     m_xlow.Set(xlow);     return *this; } /**< Sets xlow permanently. */
+    THFFactory& xupDefault(double xup) {       m_xup.Set(xup);       return *this; } /**< Sets xup permanently. */
+    THFFactory& nbinsyDefault(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
+    THFFactory& ylowDefault(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
+    THFFactory& yupDefault(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
+    THFFactory& xTitleDefault(string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
+    THFFactory& yTitleDefault(string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
+    THFFactory& zTitleDefault(string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
     /** @} */
 
     /** @name Named parameters

@@ -32,6 +32,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }
 
@@ -178,7 +179,7 @@ void DQMHistAnalysisIPModule::event()
     double last = m_h_last->GetEntries();
     double current = hh1->GetEntries();
     B2DEBUG(20, "Entries: " << last << "," << current);
-    if (current - last >= m_min_entries) {
+    if (current - last >= m_minEntries) {
       B2DEBUG(20, "Update Delta & Fit");
       gROOT->cd();
       TH1* delta = (TH1*)hh1->Clone();

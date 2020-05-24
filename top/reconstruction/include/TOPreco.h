@@ -95,6 +95,7 @@ namespace Belle2 {
       /**
        * Set channel mask
        * @param mask channel mask
+       * @param asicMask masked asics
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                  const TOPAsicMask& asicMask);
@@ -215,7 +216,7 @@ namespace Belle2 {
        * @param trk track
        * @param pdg PDG code for which to compute pulls. If 0 use MC true PDG.
        */
-      void reconstruct(TOPtrack& trk, int pdg = 0);
+      void reconstruct(const TOPtrack& trk, int pdg = 0);
 
       /**
        * Return status

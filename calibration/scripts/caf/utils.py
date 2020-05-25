@@ -41,6 +41,11 @@ def B2INFO_MULTILINE(lines):
 
 
 def grouper(n, iterable):
+    """
+    Parameters:
+        n (int): Maximum size of the list that gets returned.
+        iterable: The original list that we want to return groups of size `n` from.
+    """
     it = iter(iterable)
     while True:
         chunk = tuple(itertools.islice(it, n))

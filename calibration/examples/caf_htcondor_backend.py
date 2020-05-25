@@ -8,7 +8,7 @@
 from basf2 import *
 set_log_level(LogLevel.INFO)
 # set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
+# set_debug_level(30)
 
 import os
 import sys
@@ -58,8 +58,8 @@ def main(argv):
         # By default all input files are placed in one big job (-1), this allows you to specify a maxmimum so that
         # subjobs for each set of input files will be created
         cal_test.max_files_per_collector_job = 1
-        # Some backends can have arguments passed to them e.g. queue type
-        cal_test.backend_args = {'requirements': 'OpSysAndVer == "CentOS7"'}
+        # Some backends can have arguments passed to them e.g. OS type
+        cal_test.backend_args = {'requirements': 'OpSysAndVer == "CentOS7"', "extra_lines": ["request_memory = 2 GB"]}
         # The maximium iteration number you will be allowed to reach before the Calibration just completes
         cal_test.max_iterations = 2
         # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
@@ -68,7 +68,7 @@ def main(argv):
         # The interval in seconds between full updates of the remaining collector jobs, default = 300
         # Checking every subjob can be a long process when you have a lot of them so it's best not to do it too often
         # After this interval the finished/remaining collector jobs will be printed
-        cal_test.collector_full_update_interval = 60
+        cal_test.collector_full_update_interval = 30
         # Choosing an AlgorithmStrategy for each algorithm (here we just use the same for all of them)
         cal_test.strategies = SequentialRunByRun
         # The collector output file patterns you want to make sure are tracked by the CAF. By default only CollectorOutput.root

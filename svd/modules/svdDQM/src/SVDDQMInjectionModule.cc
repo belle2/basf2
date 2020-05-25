@@ -53,6 +53,9 @@ void SVDDQMInjectionModule::defineHisto()
                                    20000);
   m_hMaxOccAfterInjHER  = new TH1F("SVDMaxOccInjHER", "SVDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
                                    20000);
+  m_hBunchNumVSNStrips  = new TH2F("SVDBunchNumVSNStrips", "SVDBunchNumVSNStrips;Bunch No.;Number of fired strips", 1280, 0, 1280, 10,
+                                   0,
+                                   10000);
 
 
   // cd back to root directory
@@ -76,6 +79,7 @@ void SVDDQMInjectionModule::beginRun()
   m_hTrgOccAfterInjHER->Reset();
   m_hMaxOccAfterInjLER->Reset();
   m_hMaxOccAfterInjHER->Reset();
+  m_hBunchNumVSNStrips->Reset();
 }
 
 void SVDDQMInjectionModule::event()
@@ -135,6 +139,7 @@ void SVDDQMInjectionModule::event()
         if (counter > value) m_hMaxOccAfterInjLER->SetBinContent(bin, counter);
 
       }
+      m_hBunchNumVSNStrips->Fill(it.GetBunchNumber(0), allU + allV);
     }
 
     break;

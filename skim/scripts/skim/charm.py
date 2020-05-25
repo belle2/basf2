@@ -13,7 +13,6 @@ from functools import lru_cache
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 import vertex
 
@@ -302,6 +301,10 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
         self.SkimLists = DstList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=path)
         ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=path)
 

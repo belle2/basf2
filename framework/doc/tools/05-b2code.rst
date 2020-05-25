@@ -57,6 +57,7 @@ To run on the full release directory run it without any arguments::
 
     b2code-doxygen-warnings
 
+
 ``b2code-classversion-check``: Perform sanity checks on ROOT class versions
 ---------------------------------------------------------------------------
 
@@ -67,8 +68,9 @@ To run on the full release directory run it without any arguments::
     :nodefault:
     :nogroupsections:
 
- ``b2code-classversion-update``: Update linkdef information for sanity checks
------------------------------------------------------------------------------
+
+``b2code-classversion-update``: Update linkdef information for sanity checks
+----------------------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2code-classversion-update
@@ -110,3 +112,10 @@ However in this case a directory to check has to be provided
     :prog: b2code-parallel_processing-benchmark
     :nodefault:
     :nogroupsections:
+
+
+``b2code-sphinx-warnings``: Show all the warnings when building the documentation
+---------------------------------------------------------------------------------
+
+This script will the documentation builder ``sphinx`` and filter the output to
+just show the warnings produced.

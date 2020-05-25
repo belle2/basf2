@@ -438,10 +438,11 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     straightElement straight;
 
     for (const GearDir& slot : element.getNodes("sec")) {
-      if (name.find("X0")  != std::string::npos) {straight.x0  = slot.getLength();}
-      if (name.find("Z0")  != std::string::npos) {straight.z0  = slot.getLength();}
-      if (name.find("L")   != std::string::npos) {straight.l   = slot.getLength();}
-      if (name.find("PHI") != std::string::npos) {straight.phi = slot.getAngle();}
+      string nameSec = slot.getString("@name");
+      if (nameSec.find("X0")  != std::string::npos) {straight.x0  = slot.getLength();}
+      if (nameSec.find("Z0")  != std::string::npos) {straight.z0  = slot.getLength();}
+      if (nameSec.find("L")   != std::string::npos) {straight.l   = slot.getLength();}
+      if (nameSec.find("PHI") != std::string::npos) {straight.phi = slot.getAngle();}
     }
 
     //straight.x0 = element.getLength("X0");
@@ -468,11 +469,12 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
     bendingElement bending;
 
     for (const GearDir& slot : element.getNodes("sec")) {
-      if (name.find("RT")   != std::string::npos) {bending.rt   = slot.getLength();}
-      if (name.find("X0")   != std::string::npos) {bending.x0   = slot.getLength();}
-      if (name.find("Z0")   != std::string::npos) {bending.z0   = slot.getLength();}
-      if (name.find("SPHI") != std::string::npos) {bending.sphi = slot.getAngle();}
-      if (name.find("DPHI") != std::string::npos) {bending.dphi = slot.getAngle();}
+      string nameSec = slot.getString("@name");
+      if (nameSec.find("RT")   != std::string::npos) {bending.rt   = slot.getLength();}
+      if (nameSec.find("X0")   != std::string::npos) {bending.x0   = slot.getLength();}
+      if (nameSec.find("Z0")   != std::string::npos) {bending.z0   = slot.getLength();}
+      if (nameSec.find("SPHI") != std::string::npos) {bending.sphi = slot.getAngle();}
+      if (nameSec.find("DPHI") != std::string::npos) {bending.dphi = slot.getAngle();}
     }
 
     //bending.rt = element.getLength("RT");

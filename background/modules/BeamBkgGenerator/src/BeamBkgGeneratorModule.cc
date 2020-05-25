@@ -28,6 +28,8 @@
 
 // random generator
 #include <TRandom.h>
+
+// coordinates translation
 #include <iostream>
 #include <TGeoMatrix.h>
 #include <generators/SAD/ReaderSAD.h>
@@ -227,7 +229,6 @@ namespace Belle2 {
 
     // FarBeamLine region transformation
     if (abs(m_sad.s * Unit::m) > 4.0 * Unit::m) {
-
       // initial coordinates in SAD space
       double particlePosSADfar[] = {m_sad.x* Unit::m, -m_sad.y* Unit::m, 0.0 * Unit::m};
       double particleMomSADfar[] = {m_sad.px* Unit::GeV, -m_sad.py* Unit::GeV, pz* Unit::GeV};
@@ -245,7 +246,6 @@ namespace Belle2 {
       // calculate a new set of coordinates in Geant4 space
       m_transMatrix->LocalToMaster(particlePosSADfar, particlePosGeant4); // position
       m_transMatrix->LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
-
       // apply a new set of coordinates
       part->setMomentum(TVector3(particleMomGeant4));
       part->setProductionVertex(TVector3(particlePosGeant4));

@@ -23,7 +23,23 @@ __liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
 
 @fancy_skim_header
 class BtoXgamma(BaseSkim):
-    """"""
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^+ \\to X\\gamma` inclusive
+
+    Event-level cuts:
+
+    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} >= 3`
+
+    Cuts on photons:
+
+    * :math:`\\text{clusterE9E21}>0.9`
+    * :math:`1.4\\,\\text{GeV}<\\text{E_{\\gamma}}<3.4\\,\\text{GeV}` in CMS frame
+    """
+
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\gamma` inclusive skim."
     __contact__ = __liaison__
@@ -69,24 +85,57 @@ class BtoXgamma(BaseSkim):
 
 @fancy_skim_header
 class BtoXll(BaseSkim):
+    """
+        Reconstructed decay modes:
+
+      * :math:`B^+ \\to X e^+ e^-`
+      * :math:`B^+ \\to X e^+ e^+`
+      * :math:`B^+ \\to X \\mu^+ \\mu^-`
+      * :math:`B^+ \\to X \\mu^+ \\mu^+`
+
+
+      Event-level cuts:
+
+      * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+        :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+      * :math:`n_{\\text{tracks}} >= 3`
+
+      Cuts on electrons:
+
+      * :math:`\\text{electronID} > 0.1`
+      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+      * :math:'dr<0.5 and abs(dz)<2'
+
+      Cuts on muons:
+
+      * :math:`\\text{muonID} > 0.5`
+      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+      * :math:'dr<0.5 and abs(dz)<2'
+
+
+      Cut on dilepton energy:
+
+      * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+      """
+
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
     RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+            "stdCharged": {
+                "stdE": ["all"],
+                "stdMu": ["all"],
+                "stdPi": ["all"],
+            },
+            "stdPhotons": {
+                "stdPhotons": ["all"],
+            },
+        }
 
     def build_lists(self, path):
-        """Build the skim list for :math:`B \\to X_{(s,d)}\\ell^+\\ell^-` decays."""
+        """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
 
         # event level cuts: R2 and require a minimum number of tracks
         ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
@@ -132,6 +181,38 @@ class BtoXll(BaseSkim):
 
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
+    """
+      Reconstructed decay modes:
+
+    * :math:`B^+ \\to X e^+ \\mu^-`
+    * :math:`B^+ \\to X \\mu^+ e^-`
+    * :math:`B^+ \\to X e^+ \\mu^+`
+
+
+    Event-level cuts:
+
+    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} >= 3`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.1`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:'dr<0.5 and abs(dz)<2'
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:'dr<0.5 and abs(dz)<2'
+
+
+    Cut on dilepton energy:
+
+    * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+    """
+
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
     __contact__ = __liaison__
@@ -149,7 +230,7 @@ class BtoXll_LFV(BaseSkim):
     }
 
     def build_lists(self, path):
-        """Build the skim list for B -> X ll decays (LFV modes only, inclusive)."""
+        """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
         # Create lists for buildEventShape (basically all tracks and clusters)
         ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
         ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
@@ -193,6 +274,30 @@ class BtoXll_LFV(BaseSkim):
 
 
 class inclusiveBplusToKplusNuNu(BaseSkim):
+    """
+      Reconstructed decay modes:
+
+    * :math:`B^+ \\to K\\nu\\nu` inclusive
+
+    Track cleanup:
+    * :math:'p_t>0.1'
+    * :math:'thetaInCDCAcceptance'
+    * :math:'dr<0.5 and abs(dz)<3.0'
+
+    Event cleanup:
+    * :math:`3 < nCleanedTracks < 11`
+
+    Kaon cuts:
+    * :math:'track cleanup + event cleanup + nPXDHits>0'
+    * :math:'p_t rank=1'
+    * :math:'kaonID>0.01'
+
+    MVA info and cuts:
+    * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
+    * Global Tag: mva_inclusiveBplusToKplusNuNu
+    * :math:'mva\\_identifier>0.5'
+    """
+
     __authors__ = ["Cyrille Praz"]
     __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
     __contact__ = __liaison__
@@ -210,7 +315,7 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
         track_cleanup += ' and abs(dz) < 3.0'
         track_cleanup += ' and dr < 0.5'
 
-        # Min 3 tracks and Max 10 tracks per event.
+        # Min 4 tracks and Max 10 tracks per event.
         event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
         event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
 

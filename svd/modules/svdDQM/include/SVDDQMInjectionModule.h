@@ -16,6 +16,7 @@
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <string>
 
 namespace Belle2 {
@@ -54,6 +55,8 @@ namespace Belle2 {
 
       TH1F* m_hMaxOccAfterInjLER = nullptr;          /**< Histogram Max Occupancy after LER injection */
       TH1F* m_hMaxOccAfterInjHER = nullptr;          /**< Histogram Max Occupancy after HER injection */
+
+      TH2F* m_hBunchNumVSNStrips = nullptr;          /**< Histogram Bunch Number VS Number of strips */
 
       void initialize() override final; /**< initialize function */
 

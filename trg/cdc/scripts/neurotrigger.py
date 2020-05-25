@@ -49,11 +49,11 @@ def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     # size (number of words) of the Belle2Link header
     unpacker.param('headerSize', 3)
     # unpack the data from the 2D tracker and save its Bitstream
-    unpacker.param('unpackTracker2D', False)
+    unpacker.param('unpackTracker2D', True)
     # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
-    unpacker.param('decode2DFinderTrack', False)
+    unpacker.param('decode2DFinderTrack', True)
     # make CDCTriggerSegmentHit objects from the 2D input
-    unpacker.param('decode2DFinderInput', False)
+    unpacker.param('decode2DFinderInput', True)
     unpacker.param('NeuroNodeId', [
         [0x11000005, 0],
         [0x11000005, 1],

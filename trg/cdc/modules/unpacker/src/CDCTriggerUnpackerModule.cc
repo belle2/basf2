@@ -533,6 +533,11 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
+
+  StoreObjPtr<EventMetaData> bevt;
+  m_exp = bevt->getExperiment();
+  m_run = bevt->getRun();
+
   //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
@@ -641,6 +646,9 @@ void CDCTriggerUnpackerModule::event()
   B2DEBUG(10, padright(experimentstring, 100));
 
   setReturnValue(0);
+
+  if (m_exp < 7) B2DEBUG(20, "exp<7: skip cdctrg unpacker for DQM");
+
   // Read RawTRG data block.
   B2DEBUG(99,  m_rawTriggers.getEntries() << " COPPERs in RawTRGs");
 

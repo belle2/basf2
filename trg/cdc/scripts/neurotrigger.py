@@ -54,6 +54,11 @@ def add_neuro_unpacker(path, debug_level=4, debugout=False, **kwargs):
     unpacker.param('decode2DFinderTrack', True)
     # make CDCTriggerSegmentHit objects from the 2D input
     unpacker.param('decode2DFinderInput', True)
+    unpacker.param('2DNodeId', [
+        [0x11000001, 0],
+        [0x11000001, 1],
+        [0x11000002, 0],
+        [0x11000002, 1]])
     unpacker.param('NeuroNodeId', [
         [0x11000005, 0],
         [0x11000005, 1],

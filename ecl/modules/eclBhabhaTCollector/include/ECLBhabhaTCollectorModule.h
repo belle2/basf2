@@ -25,6 +25,7 @@ namespace Belle2 {
   class ECLCalDigit;
   class Track;
   class ECLCrystalCalib;
+  class ECLReferenceCrystalPerCrateCalib;
   class ECLCluster;
   class ECLChannelMapper;
 
@@ -96,6 +97,10 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_CrateTimeDB; /**< database object */
     std::vector<float> m_CrateTime; /**< vector obtained from DB object */
     std::vector<float> m_CrateTimeUnc; /**< uncertainty vector obtained from DB object */
+
+    /** Crystal IDs of the one reference crystal per crate from database */
+    DBObjPtr<ECLReferenceCrystalPerCrateCalib> m_RefCrystalsCalibDB; /**< database object */
+    std::vector<short> m_RefCrystalsCalib; /**< vector obtained from DB object */
 
     /**
      * Output tree with detailed event data.
@@ -207,12 +212,9 @@ namespace Belle2 {
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
 
 
-//    double m_energyDependenceTimeOffsetFitParam_p1 = 0;                /**< p1 in "energy dependence equation" */
-//    double m_energyDependenceTimeOffsetFitParam_p2 = 88449.;           /**< p2 in "energy dependence equation" */
-//    double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06;      /**< p3 in "energy dependence equation" */
-//    double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482;           /**< p4 in "energy dependence equation" */
-//    double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747;           /**< p5 in "energy dependence equation" */
-//    double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3;           /**< p6 in "energy dependence equation" */
+    /**< correction to apply to CDC event t0 values in bhabha events to correct for CDC event t0
+         bias compared to CDC event t0 in hadronic events in ns*/
+    double m_hadronEventT0_TO_bhabhaEventT0_correction;
 
 
   };

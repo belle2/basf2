@@ -10,6 +10,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -44,16 +45,19 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   m_ElectronicsTimeDB("ECLCrystalElectronicsTime"),
   m_FlightTimeDB("ECLCrystalFlightTime"),
   m_PreviousCrystalTimeDB("ECLCrystalTimeOffset"),
-  m_CrateTimeDB("ECLCrateTimeOffset")
+  m_CrateTimeDB("ECLCrateTimeOffset"),
+  m_RefCrystalsCalibDB("ECLReferenceCrystalPerCrateCalib")//,
+  //m_dbgTree_electrons(0),
+  //m_tree_evtNum(0)//,
 {
   setDescription("This module generates sum of all event times per crystal");
 
-  addParam("timeAbsMax", m_timeAbsMax, // (Time in ADC units)
+  addParam("timeAbsMax", m_timeAbsMax, // (Time in ns)
            "Events with abs(getTimeFit) > m_timeAbsMax "
            "are excluded", (short)80);
 
   addParam("minCrystal", m_minCrystal,
-           "First CellId to handle.", 1); // 1153 -- first crystal in barrel.
+           "First CellId to handle.", 1);
   addParam("maxCrystal", m_maxCrystal,
            "Last CellId to handle.", 8736);
 
@@ -67,6 +71,8 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   addParam("looseTrkD0", m_looseTrkD0, "max D0 for loose tracks (cm)", 2.);
   addParam("tightTrkD0", m_tightTrkD0, "max D0 for tight tracks (cm)", 0.5);  // beam pipe radius = 1cm in 2019
 
+  addParam("hadronEventT0_TO_bhabhaEventT0_correction", m_hadronEventT0_TO_bhabhaEventT0_correction,
+           "CDC bhabha t0 bias correction (ns)", 0.);
 
   // specify this flag if you need parallel processing
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -221,47 +227,47 @@ void ECLBhabhaTCollectorModule::prepare()
 
   auto TimevsCrysPrevCrateCalibPrevCrystCalib = new TH2F("TimevsCrysPrevCrateCalibPrevCrystCalib",
                                                          "Time t psi - ts - tcrate (previous calibs) vs crystal ID;crystal ID;Time t_psi with previous calib (ns)",
-                                                         8736, 0, 8736, nbins, min_t, max_t);
+                                                         8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib", TimevsCrysPrevCrateCalibPrevCrystCalib);
 
   auto TimevsCratePrevCrateCalibPrevCrystCalib = new TH2F("TimevsCratePrevCrateCalibPrevCrystCalib",
                                                           "Time t psi - ts - tcrate (previous calibs) vs crate ID;crate ID;Time t_psi previous calib (ns)",
-                                                          52, 1, 53, nbins, min_t, max_t);
+                                                          52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib", TimevsCratePrevCrateCalibPrevCrystCalib);
 
   auto TimevsCrysNoCalibrations = new TH2F("TimevsCrysNoCalibrations",
-                                           "Time tpsi vs crystal ID;crystal ID;Time t_psi (ns)", 8736, 0, 8736, nbins, min_t, max_t);
+                                           "Time tpsi vs crystal ID;crystal ID;Time t_psi (ns)", 8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysNoCalibrations", TimevsCrysNoCalibrations);
 
   auto TimevsCrateNoCalibrations = new TH2F("TimevsCrateNoCalibrations",
-                                            "Time tpsi vs crate ID;crate ID;Time t_psi (ns)", 52, 1, 53, nbins, min_t, max_t);
+                                            "Time tpsi vs crate ID;crate ID;Time t_psi (ns)", 52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrateNoCalibrations", TimevsCrateNoCalibrations);
 
   auto TimevsCrysPrevCrateCalibNoCrystCalib = new TH2F("TimevsCrysPrevCrateCalibNoCrystCalib",
                                                        "Time tpsi - tcrate (previous calib) vs crystal ID;crystal ID;Time t_psi including previous crate calib (ns)",
-                                                       8736, 0, 8736, nbins, min_t, max_t);
+                                                       8736, 1, 8736 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib", TimevsCrysPrevCrateCalibNoCrystCalib);
 
   auto TimevsCrateNoCrateCalibPrevCrystCalib = new TH2F("TimevsCrateNoCrateCalibPrevCrystCalib",
                                                         "Time tpsi - ts (previous calib) vs crate ID;crate ID;Time t_psi including previous crystal calib (ns)",
-                                                        52, 1, 53, nbins, min_t, max_t);
+                                                        52, 1, 52 + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib", TimevsCrateNoCrateCalibPrevCrystCalib);
 
 
-  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", 8736, 0, 8736);
+  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TsDatabase", TsDatabase);
 
-  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", 8736, 0, 8736);
+  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TsDatabaseUnc", TsDatabaseUnc);
 
-  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", 8736, 0, 8736);
+  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TcrateDatabase", TcrateDatabase);
 
-  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", 8736, 0, 8736);
+  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", 8736, 1, 8736 + 1);
   registerObject<TH1F>("TcrateUncDatabase", TcrateUncDatabase);
 
 
-  auto tcrateDatabase_ns = new TH1F("tcrateDatabase_ns", ";crate id;tcrate derived from database", 52, 0, 52);
+  auto tcrateDatabase_ns = new TH1F("tcrateDatabase_ns", ";crate id;tcrate derived from database", 52, 1, 52 + 1);
   registerObject<TH1F>("tcrateDatabase_ns", tcrateDatabase_ns);
 
 
@@ -281,9 +287,11 @@ void ECLBhabhaTCollectorModule::prepare()
                                             ";Maximum energy crystal energy / (sum) cluster energy;Number", 22, 0, 1.1);
   registerObject<TH1F>("maxEcrsytalEnergyFraction", maxEcrsytalEnergyFraction);
 
-  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 0, 8736);
+  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 1, 8736 + 1);
   registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
+  auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 0, 1);
+  registerObject<TH1F>("CDCEventT0Correction", CDCEventT0Correction);
 
 
   //=== Required data objects
@@ -292,6 +300,9 @@ void ECLBhabhaTCollectorModule::prepare()
   m_eclClusterArray.isRequired();
   m_eclCalDigitArray.isRequired();
   m_eclDigitArray.isRequired();
+
+  B2INFO("hadronEventT0_TO_bhabhaEventT0_correction = " <<  m_hadronEventT0_TO_bhabhaEventT0_correction <<
+         " ns correction to CDC event t0 will be applied");
 
 }
 
@@ -338,6 +349,33 @@ void ECLBhabhaTCollectorModule::collect()
   B2DEBUG(29, "Crate time +- uncertainty [0]= " << m_CrateTime[0] << " +- " << m_CrateTimeUnc[0]);
   B2DEBUG(29, "Crate time +- uncertainty [8735]= " << m_CrateTime[8735] << " +- " << m_CrateTimeUnc[8735]);
 
+  B2DEBUG(35, "Finished checking if previous crate time payload has changed");
+  if (m_RefCrystalsCalibDB.hasChanged()) {
+    m_RefCrystalsCalib = m_RefCrystalsCalibDB->getReferenceCrystals();
+  }
+  B2DEBUG(35, "Finished checking if reference crystal ids payload has changed");
+
+
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalTimeOffset from the database"
+          << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
+          << LogVar("Revision", m_PreviousCrystalTimeDB.getRevision()));
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrateTimeOffset from the database"
+          << LogVar("IoV", m_CrateTimeDB.getIoV())
+          << LogVar("Revision", m_CrateTimeDB.getRevision()));
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalElectronics from the database"
+          << LogVar("IoV", m_ElectronicsDB.getIoV())
+          << LogVar("Revision", m_ElectronicsDB.getRevision()));
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalElectronicsTime from the database"
+          << LogVar("IoV", m_ElectronicsTimeDB.getIoV())
+          << LogVar("Revision", m_ElectronicsTimeDB.getRevision()));
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLCrystalFlightTime from the database"
+          << LogVar("IoV", m_FlightTimeDB.getIoV())
+          << LogVar("Revision", m_FlightTimeDB.getRevision()));
+  B2DEBUG(29, "ECLBhabhaTCollector:: loaded ECLReferenceCrystalPerCrateCalib from the database"
+          << LogVar("IoV", m_RefCrystalsCalibDB.getIoV())
+          << LogVar("Revision", m_RefCrystalsCalibDB.getRevision()));
+
+
 
   // Conversion coefficient from ADC ticks to nanoseconds
   // TICKS_TO_NS ~ 0.4931 ns/clock tick
@@ -363,37 +401,45 @@ void ECLBhabhaTCollectorModule::collect()
       track of the crystal id, not the crate id.  The talg can figure out to which
       crate to associate the crystal.
   */
-  //vector <short> crystalIDReferenceForZeroTs = {2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349, 2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397, 2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445, 667, 583, 595, 607, 619, 631, 643, 655, 8256, 8172, 8184, 8196, 8208, 8220, 8232, 8244};  // orig - has bad crystals
-  vector <short> crystalIDReferenceForZeroTs = {2306, 2309, 2313, 2317, 2321, 2326, 2329, 2334, 2337, 2343, 2348, 2349, 2356, 2357, 2361, 2365, 2372, 2373, 2377, 2381, 2388, 2391, 2393, 2399, 2401, 2407, 2409, 2413, 2417, 2421, 2426, 2429, 2433, 2440, 2585, 2446, 671, 583, 595, 607, 619, 631, 643, 655, 8252, 8177, 8185, 8192, 8206, 8224, 8228, 8244};  // each crystal distribution checked and approved.
   for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
-    getObjectPtr<TH1F>("refCrysIDzeroingCrate")->Fill(crystalIDReferenceForZeroTs[crateID_temp - 1] + 0.001);
+    getObjectPtr<TH1F>("refCrysIDzeroingCrate")->Fill(m_RefCrystalsCalib[crateID_temp - 1] + 0.001);
   }
 
 
 
 
-
-  /** Record the input database constants for the first call */
+  /** Record the input database constants */
+  for (int crysID = 1; crysID <= 8736; crysID++) {
+    getObjectPtr<TH1F>("TsDatabase")->SetBinContent(crysID + 0.001, m_PreviousCrystalTime[crysID - 1]);
+    getObjectPtr<TH1F>("TsDatabaseUnc")->SetBinContent(crysID + 0.001, m_PreviousCrystalTimeUnc[crysID - 1]);
+    getObjectPtr<TH1F>("TcrateDatabase")->SetBinContent(crysID + 0.001, m_CrateTime[crysID - 1]);
+    getObjectPtr<TH1F>("TcrateUncDatabase")->SetBinContent(crysID + 0.001, m_CrateTimeUnc[crysID - 1]);
+  }
   if (m_storeCalib) {
-    for (int crysID = 0; crysID < 8736; crysID++) {
-      getObjectPtr<TH1F>("TsDatabase")->Fill(crysID + 0.001, m_PreviousCrystalTime[crysID]);
-      getObjectPtr<TH1F>("TsDatabaseUnc")->Fill(crysID + 0.001, m_PreviousCrystalTimeUnc[crysID]);
-      getObjectPtr<TH1F>("TcrateDatabase")->Fill(crysID + 0.001, m_CrateTime[crysID]);
-      getObjectPtr<TH1F>("TcrateUncDatabase")->Fill(crysID + 0.001, m_CrateTimeUnc[crysID]);
-
-      B2INFO("cid = " << crysID + 1 << ", Ts previous = " << m_PreviousCrystalTime[crysID]);
+    B2INFO("First event so print out previous ts values");
+    for (int crysID = 1; crysID <= 8736; crysID++) {
+      B2INFO("cid = " << crysID << ", Ts previous = " << m_PreviousCrystalTime[crysID - 1]);
     }
-
-    for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
-      getObjectPtr<TH1F>("tcrateDatabase_ns")->Fill(crateID_temp + 0.001, Crate_time_ns[crateID_temp - 1]);
-    }
-
-    // Use a histogram with only one bin as a counter to know the number of times the database histograms were filled.
-    //    This is mostly useful for the talg when running over multiple runs and trying to read ts values.
-    getObjectPtr<TH1F>("databaseCounter")->Fill(1.001, 1);
-
     m_storeCalib = false;
   }
+
+
+
+
+  for (int crateID_temp = 1; crateID_temp <= 52; crateID_temp++) {
+    getObjectPtr<TH1F>("tcrateDatabase_ns")->SetBinContent(crateID_temp + 0.001, Crate_time_ns[crateID_temp - 1]);
+  }
+
+  // Use a histogram with only one bin as a counter to know the number of times the database histograms were filled.
+  //    This is mostly useful for the talg when running over multiple runs and trying to read ts values.
+  getObjectPtr<TH1F>("databaseCounter")->SetBinContent(1.001, 1);
+
+
+
+  // Save what CDC event t0 correction was applied
+  getObjectPtr<TH1F>("CDCEventT0Correction")->SetBinContent(1.001, m_hadronEventT0_TO_bhabhaEventT0_correction);
+
+
 
 
   /* Getting the event t0 using the full event t0 rather than from the CDC specifically */
@@ -421,6 +467,10 @@ void ECLBhabhaTCollectorModule::collect()
     vector<EventT0::EventT0Component> evt_t0_list = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
     evt_t0 = evt_t0_list.back().eventT0;   // time value
     evt_t0_unc = evt_t0_list.back().eventT0Uncertainty;   // uncertainty on event t0
+
+
+    // Correct the CDC event t0 value for the bhabha bias
+    evt_t0 = evt_t0 + m_hadronEventT0_TO_bhabhaEventT0_correction;   // Bias not yet fixed in CDC t0 reco.
 
 
     // Get the ECL event t0 for comparison - validations
@@ -934,13 +984,13 @@ void ECLBhabhaTCollectorModule::collect()
   //== Fill output histogram.
   for (int iCharge = 0; iCharge < 2; iCharge++) {
     if (crystalCutsPassed[iCharge]) {
-      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge] - 1) + 0.001,
+      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge] , 1);
       getObjectPtr<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] - tcrate_prevCalib[iCharge], 1);
-      getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge] - 1) + 0.001, times_noPreviousCalibrations[iCharge], 1);
+      getObjectPtr<TH2F>("TimevsCrysNoCalibrations")->Fill((crystalIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCalibrations")->Fill((crateIDs[iCharge]) + 0.001, times_noPreviousCalibrations[iCharge], 1);
-      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge] - 1) + 0.001,
+      getObjectPtr<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib")->Fill((crystalIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge] - tcrate_prevCalib[iCharge], 1);
       getObjectPtr<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib")->Fill((crateIDs[iCharge]) + 0.001,
           times_noPreviousCalibrations[iCharge]  - ts_prevCalib[iCharge] , 1);

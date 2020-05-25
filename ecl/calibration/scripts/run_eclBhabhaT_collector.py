@@ -31,6 +31,10 @@ import tracking
 import rawdata
 import reconstruction
 
+from basf2 import conditions as b2conditions
+from reconstruction import prepare_cdst_analysis
+
+
 env = Belle2.Environment.Instance()
 
 ###################################################################
@@ -79,6 +83,9 @@ MIN_CRYSTAL = 1
 # Last ECL CellId to calibrate
 MAX_CRYSTAL = 8736
 
+# Bias of CDC event t0 in bhabha vs hadronic events (in ns)
+CDC_T0_BIAS_CORRECTION_OFFSET = -0.9
+
 ###################################################################
 
 components = ['CDC', 'ECL']
@@ -100,6 +107,7 @@ main.add_module("HistoManager", histoFileName=OUTPUT)
 if 'Raw' in INPUT_LIST[0]:
     add_unpackers = True
 
+
 main.add_module('Gearbox')
 
 if add_unpackers:
@@ -111,11 +119,13 @@ if add_unpackers:
     reconstruction.add_ecl_modules(main, components)
     reconstruction.add_ecl_track_matcher_module(main, components)
 
+prepare_cdst_analysis(main)  # for new 2020 cdst format
 
 # == Generate time calibration matrix from ECLDigit
 ECLBhabhaTCollectorInfo = main.add_module('ECLBhabhaTCollector', timeAbsMax=TIME_ABS_MAX,
                                           minCrystal=MIN_CRYSTAL, maxCrystal=MAX_CRYSTAL,
-                                          saveTree=SAVE_TREE)
+                                          saveTree=SAVE_TREE,
+                                          hadronEventT0_TO_bhabhaEventT0_correction=CDC_T0_BIAS_CORRECTION_OFFSET)
 
 ECLBhabhaTCollectorInfo.set_log_level(b2.LogLevel.INFO)  # OR: LogLevel.DEBUG
 ECLBhabhaTCollectorInfo.set_debug_level(36)
@@ -129,18 +139,37 @@ b2.set_log_level(b2.LogLevel.INFO)
 b2.set_debug_level(100)
 
 # == Configure database
-b2.reset_database()
-b2.use_database_chain()
+# b2.reset_database()
+# b2.use_database_chain()
+
+b2conditions.reset()
+b2conditions.override_globaltags()
+
+B2INFO("Adding Local Database {} to head of chain of local databases.")
+b2conditions.prepend_testing_payloads("localdb/database.txt")
+B2INFO("Using Global Tag {}")
+b2conditions.prepend_globaltag("ECL_testingNewPayload_RefCrystalPerCrate")
+b2conditions.prepend_globaltag("master_2020-05-13")
+b2conditions.prepend_globaltag("online_proc11")
+b2conditions.prepend_globaltag("data_reprocessing_proc11")
+b2conditions.prepend_globaltag("Reco_master_patch_rel5")
+
+
+# old method
+# use_central_database("ECL_testingNewPayload_RefCrystalPerCrate")
+# use_central_database("master_2020-05-13")
+# use_central_database("online_proc11")
+# use_central_database("data_reprocessing_proc11")
+# use_central_database("Reco_master_patch_rel5")
+#
 
 # Read in any required central databases
-# use_central_database("online")
 
-# 2 GT required for making proc 10
-b2.use_central_database("data_reprocessing_proc10")
-b2.use_central_database("data_reprocessing_prompt_rel4_patchb")
+# b2.use_central_database("data_reprocessing_proc10")
+# b2.use_central_database("data_reprocessing_prompt_rel4_patchb")
 
 # Read in any required local databases.  This may be required when doing crystal/crate iterations
-b2.use_local_database("localdb/database.txt")
+# b2.use_local_database("localdb/database.txt")
 
 
 # == Process events

@@ -26,9 +26,9 @@
 [INFO]  ParticleList : J/psi (0+1)
 [INFO]  - 25 = 443[0]
 [INFO]      o) daughter indices = 5 2
-[INFO]      o) DeltaT = 1.65582
-[INFO]      o) DeltaTErr = 0.42742
-[INFO]      o) DeltaTBelle = 1.67452
-[INFO]      o) TagVz = -0.00989839
-[INFO]      o) TagVzErr = 0.00198939
+[INFO]      o) DeltaT = 1.66314
+[INFO]      o) DeltaTErr = 0.407876
+[INFO]      o) DeltaTBelle = 1.68878
+[INFO]      o) TagVz = -0.0100209
+[INFO]      o) TagVzErr = 0.00199456
 [INFO] [ParticlePrinterModule] END   ------------------------------

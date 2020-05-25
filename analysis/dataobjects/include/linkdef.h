@@ -29,6 +29,16 @@
 #pragma link C++ class map<string, unsigned int>+;
 #pragma link C++ class vector<map<string, unsigned int> >+;
 #pragma link C++ class Belle2::Btube+;
+#pragma link C++ class Eigen::Matrix<double,3,1,0,3,1>+;
+#pragma link C++ class Eigen::PlainObjectBase<Eigen::Matrix<double,3,1,0,3,1> >+;
+#pragma link C++ class Eigen::EigenBase<Eigen::Matrix<double,3,1,0,3,1> >+;
+#pragma link C++ class Eigen::MatrixBase<Eigen::Matrix<double,3,1,0,3,1> >+;
+#pragma link C++ class Eigen::DenseStorage<double,3,3,1,0>+;
+#pragma link C++ class Eigen::DenseBase<Eigen::Matrix<double,3,1,0,3,1> >+;
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,0>+;
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,1>+;
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,3>+;
+#pragma link C++ class Eigen::internal::plain_array<double,3,0,0>+;
 
 #pragma read                                    \
   sourceClass="Belle2::Particle"                \

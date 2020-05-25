@@ -383,7 +383,7 @@ void FullSimModule::initialize()
       G4ProcessManager* processManager = currParticle->GetProcessManager();
       if (processManager) {
         G4ProcessVector* processList = processManager->GetProcessList();
-        for (long unsigned int i = 0; i < processList->size(); ++i) {
+        for (auto i = 0; i < processList->size(); ++i) {
           if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
               ((*processList)[i]->GetProcessName() == "Scintillation") ||
               ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {

@@ -235,7 +235,7 @@ namespace Belle2 {
   void
   TRGGDL::fastSimulation(void)
   {
-    B2DEBUG(100, "TRGGDL::fastSimulation starts.");
+    B2DEBUG(20, "TRGGDL::fastSimulation starts.");
     TRGDebug::enterStage("TRGGDL fastSim");
 
     if (TRGDebug::level())
@@ -322,7 +322,7 @@ namespace Belle2 {
   void
   TRGGDL::dataSimulation(void)
   {
-//  B2DEBUG(100,"TRGGDL::dataSimulation starts.");
+//  B2DEBUG(20,"TRGGDL::dataSimulation starts.");
     StoreObjPtr<EventMetaData> bevt;
     /*
     unsigned _exp = bevt->getExperiment();

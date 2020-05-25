@@ -356,7 +356,7 @@ void FullSimModule::initialize()
   while ((*partIter)()) {
     G4ParticleDefinition* currParticle = partIter->value();
     G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
-    for (long unsigned int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
+    for (auto iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
       if (transport != nullptr) {
         //Geant4 energy unit is MeV

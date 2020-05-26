@@ -114,8 +114,25 @@ However in this case a directory to check has to be provided
     :nogroupsections:
 
 
+This script will run sphinx with the appropriate arguments to build the user
+documentation and optionally only show the warnings.
+
+.. rubric:: Optional Arguments
+
+--light           Create documentation only for the light release, that is only
+                  for the packages included in a light release build.
+-t TARGET, --target TARGET
+                  Documentation format to generate. If not given the default
+                  will be "html". Available options are "html", "latex", "json"
+-h, --help        Show this help message
+-o, --output-dir  Where to put the documentation. If not given the default is
+                  the build directory in the software/release directory
+
+All other options will be forwarded to ``sphinx-build``
+
+
 ``b2code-sphinx-warnings``: Show all the warnings when building the documentation
 ---------------------------------------------------------------------------------
 
-This script will the documentation builder ``sphinx`` and filter the output to
-just show the warnings produced.
+This script will create the sphinx documentation and check whether there are any warnings.
+All extra arguments are forwarded to ``b2code-sphinx-build``.

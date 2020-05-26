@@ -1,25 +1,11 @@
 #!/bin/bash
 
-# make sure belle2 is setup
-if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
-  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
-  exit 1
-fi
-
-# take release directory or local directory as base
-SOFTWARE_DIR=${BELLE2_RELEASE_DIR:-${BELLE2_LOCAL_DIR}}
-
-# set default argument in case of no arguments: either $BELLE2_LOCAL_DIR or the
-# local directory if that is not defined
-if [ $# -eq 0 ]; then
-  set -- ${BELLE2_LOCAL_DIR:-`pwd`}
-fi
-
 # check for help argument
 echo $@ | grep -E -- "(^|\\s)(--help|-h)($|\\s)" &>/dev/null
 if [ $? -eq 0 ]; then
     cat <<EOT
 This script will create the sphinx documentation and check whether there are any warnings.
+All extra arguments are forwarded to b2code-sphinx-build.
 EOT
     exit 1;
 fi
@@ -28,6 +14,5 @@ fi
 tmpdir=`mktemp -d`
 # remove temporary directory on exit
 trap "rm -rf $tmpdir" EXIT
-# build sphinx documentation with html option 
-cat <<EOT | scons --sphinx html - 2>&1 >/dev/null | grep "WARNING" && exit 1 || exit 0
-EOT
+# build sphinx documentation with html option
+b2code-sphinx-build --output ${tmpdir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0

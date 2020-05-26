@@ -18,6 +18,7 @@
 
 namespace Belle2 {
   class ECLDsp;
+  class ECLTrig;
   class ECLWaveforms;
 
   /** The ECLCompressBGOverlay module compresses recorded waveforms
@@ -44,12 +45,14 @@ namespace Belle2 {
 
   private:
     StoreArray<ECLDsp> m_eclDsps; /**< recorded waveforms */
+    StoreArray<ECLTrig> m_eclTrigs; /**< recorded trigger time and tags */
     StoreObjPtr<ECLWaveforms> m_eclWaveforms; /**< compressed waveforms */
 
     ECL::ECLCompress* m_comp{nullptr}; /**< pointer to a compression object which do all work */
 
     /** Module parameters */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
+    unsigned int m_trgTime; /**< store or not trigger time from each crate */
     std::string m_eclWaveformsName; /**< name of background waveforms storage */
   };
 }//Belle2

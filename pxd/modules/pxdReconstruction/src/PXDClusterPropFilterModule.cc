@@ -30,7 +30,7 @@ PXDClusterPropFilterModule::PXDClusterPropFilterModule() : Module()
 
   // Parameter definitions
   addParam("PXDClustersName", m_PXDClustersName, "The name of the StoreArray of PXDClusters to be filtered", std::string(""));
-  addParam("PXDClustersName", m_PXDClustersInsideCutsName, "The name of the StoreArray of Filtered PXDClusters inside cuts",
+  addParam("PXDClustersInsideCutsName", m_PXDClustersInsideCutsName, "The name of the StoreArray of Filtered PXDClusters inside cuts",
            std::string("PXDClustersIN"));
   addParam("PXDClustersOutsideCutsName", m_PXDClustersOutsideCutsName,
            "The name of the StoreArray of Filtered PXDClusters outside cuts",

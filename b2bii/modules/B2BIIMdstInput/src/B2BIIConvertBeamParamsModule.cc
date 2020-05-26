@@ -52,6 +52,7 @@ namespace {
 }
 
 namespace Belle2 {
+  /** Register the module */
   REG_MODULE(B2BIIConvertBeamParams);
 
   B2BIIConvertBeamParamsModule::B2BIIConvertBeamParamsModule()

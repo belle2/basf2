@@ -4,13 +4,13 @@
 """
 <header>
   <contact>glazov@mail.desy.de</contact>
-  <input>EvtGenSimNoBkg.root</input>
-  <output>toCDCCKFTrackingValidation.root</output>
+  <input>EvtGenSim.root</input>
+  <output>toCDCCKFTrackingValidationBkg.root</output>
   <description>This module validates ToCDCCKF module using Y(4S) runs.</description>
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -22,14 +22,14 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 
 
-class toCDCCKFValidation(TrackingValidationRun):
+class toCDCCKFValidationBkg(TrackingValidationRun):
     """Validate the ToCDCCKF Kalman finder/filter algorithm with Y(4S) events"""
     #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     #: no background overlay
-    root_input_file = '../EvtGenSimNoBkg.root'
+    root_input_file = '../EvtGenSim.root'
 
     @staticmethod
     def finder_module(path):
@@ -88,7 +88,7 @@ class toCDCCKFValidation(TrackingValidationRun):
 
 
 def main():
-    validation_run = toCDCCKFValidation()
+    validation_run = toCDCCKFValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
 

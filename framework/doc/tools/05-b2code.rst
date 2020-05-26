@@ -113,6 +113,8 @@ However in this case a directory to check has to be provided
     :nodefault:
     :nogroupsections:
 
+``b2code-sphinx-build``: Build the sphinx documentation
+-------------------------------------------------------
 
 This script will run sphinx with the appropriate arguments to build the user
 documentation and optionally only show the warnings.

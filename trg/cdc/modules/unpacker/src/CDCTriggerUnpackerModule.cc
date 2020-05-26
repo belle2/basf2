@@ -647,7 +647,10 @@ void CDCTriggerUnpackerModule::event()
 
   setReturnValue(0);
 
-  if (m_exp < 7) B2DEBUG(20, "exp<7: skip cdctrg unpacker for DQM");
+  if (m_exp < 7) {
+    B2DEBUG(20, "exp<7: skip cdctrg unpacker for DQM");
+    return;
+  }
 
   // Read RawTRG data block.
   B2DEBUG(99,  m_rawTriggers.getEntries() << " COPPERs in RawTRGs");

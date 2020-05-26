@@ -43,6 +43,10 @@ namespace Belle2 {
 
     bool m_CreateInside = true; /**< if set, create list of inside cuts */
     bool m_CreateOutside = false; /**< if set, create list of outside cuts */
+    double m_minCharge = 0.0;  /**< minimum charge, including value */
+    double m_maxCharge = 9999.0;  /**< maximum charge, excluding value */
+    int m_minSize = 1;  /**< minimum size, including value */
+    int m_maxSize = 99;  /**< maximum size, excluding value */
 
     std::string m_PXDClustersName;  /**< The name of the StoreArray of PXDClusters to be filtered */
     std::string m_PXDClustersInsideCutsName;  /**< The name of the StoreArray of Filtered PXDClusters inside cuts */

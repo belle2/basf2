@@ -37,6 +37,11 @@ PXDClusterPropFilterModule::PXDClusterPropFilterModule() : Module()
            std::string("PXDClustersOUT"));
   addParam("CreateInside", m_CreateInside, "Create the StoreArray of PXD clusters inside of cuts", true);
   addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD clusters outside of cuts", false);
+
+  addParam("minCharge", m_minCharge , "minimum charge, including value", 0.0);
+  addParam("maxCharge", m_maxCharge , "maximum charge, excluding value", 9999.0);
+  addParam("minSize", m_minSize , "minimum size, including value", 1);
+  addParam("maxSize", m_maxSize , "maximum size, excluding value", 99);
 }
 
 void PXDClusterPropFilterModule::initialize()
@@ -56,10 +61,10 @@ void PXDClusterPropFilterModule::initialize()
   }
 }
 
-bool PXDClusterPropFilterModule::CheckCuts(const PXDCluster& thePXDCluster)
+bool PXDClusterPropFilterModule::CheckCuts(const PXDCluster& cluster)
 {
-  return true;
-  return false;
+  return cluster.getSize() >= m_minSize && cluster.getSize() < m_maxSize &&
+         cluster.getCharge() >= m_minCharge && cluster.getCharge() < m_maxCharge;
 }
 
 void PXDClusterPropFilterModule::event()

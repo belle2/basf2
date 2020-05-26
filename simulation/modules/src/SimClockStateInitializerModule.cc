@@ -44,7 +44,7 @@ SimClockStateInitializerModule::~SimClockStateInitializerModule() = default;
 
 void SimClockStateInitializerModule::initialize()
 {
-  //Register the object in the data store
+//Register the object in the data store
   m_clockStatePtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 }
 

@@ -27,7 +27,7 @@ namespace Belle2 {
     SimClockState();
 
     void    update();
-    Float_t getClockFreq(Const::EDetector detector, std::string label);
+    Float_t getClockFrequency(Const::EDetector detector, std::string label);
     Float_t getTriggerOffset(Const::EDetector detector, std::string label);
     Int_t   getRevo9Status();
 
@@ -35,7 +35,7 @@ namespace Belle2 {
 
     DBObjPtr<Clocks> m_clock;
 
-    Float_t globalClockFreq; //[MHz]
+    Float_t globalClockFrequency; //[MHz]
 
     Int_t   revo9Status;
     Int_t   revo9nbit = 1280 * 9;

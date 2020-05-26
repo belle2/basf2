@@ -57,7 +57,7 @@ namespace Belle2 {
 
     void setClockPrescale(std::string detector, std::string type, Int_t val);
 
-    void setGlobalClockFreq(Float_t val);
+    void setAcceleratorRF(Float_t val);
 
   private:
     DBImportObjPtr<Clocks> clockbase;

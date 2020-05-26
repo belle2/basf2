@@ -51,7 +51,6 @@ namespace Belle2 {
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     clockbase.import(iov);
     B2INFO("Clock importer");
-    return;
   }
 
 
@@ -70,9 +69,9 @@ namespace Belle2 {
     return result;
   }
 
-  void ClockDatabaseImporter::setGlobalClockFreq(Float_t val)
+  void ClockDatabaseImporter::setAcceleratorRF(Float_t val)
   {
-    clockbase->setGlobalClockFreq(val); // MHz
+    clockbase->setAcceleratorRF(val); // MHz
   }
 
   void ClockDatabaseImporter::setClockPrescale(string detector, string type, Int_t val)

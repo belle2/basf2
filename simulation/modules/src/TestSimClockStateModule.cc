@@ -39,10 +39,6 @@ TestSimClockStateModule::TestSimClockStateModule() : Module()
     "for different sub detectors."
   );
 
-  //Parameter definition
-
-  //  addParam("timerName",m_clockStateName,
-  //     "name of timer store object", string(""));
 }
 
 TestSimClockStateModule::~TestSimClockStateModule() = default;
@@ -57,16 +53,16 @@ void TestSimClockStateModule::initialize()
 
 void TestSimClockStateModule::event()
 {
+  //Just a couple of  printout to test the modules
+
   std::cout << "get revo9 status " << m_clockState->getRevo9Status() << std::endl;
-  std::cout << "get clock frequency TOP " << m_clockState->getClockFreq(Const::EDetector::TOP, "sampling") << std::endl;
-  std::cout << "get clock frequency SVD " << m_clockState->getClockFreq(Const::EDetector::SVD, "sampling") << std::endl;
-  std::cout << "tigger signal offsetTOP " << m_clockState->getTriggerOffset(Const::EDetector::TOP,
+  std::cout << "get clock frequency TOP " << m_clockState->getClockFrequency(Const::EDetector::TOP, "sampling") << std::endl;
+  std::cout << "get clock frequency SVD " << m_clockState->getClockFrequency(Const::EDetector::SVD, "sampling") << std::endl;
+
+  std::cout << "tigger signal offset TOP " << m_clockState->getTriggerOffset(Const::EDetector::TOP,
             "sampling") << " [ns] " << std::endl;
   std::cout << "tigger signal offset SVD " << m_clockState->getTriggerOffset(Const::EDetector::SVD,
             "sampling") << " [ns] " << std::endl;
   std::cout << "tigger signal offset ECL sampling " << m_clockState->getTriggerOffset(Const::EDetector::ECL,
             "sampling") << " [ns] " << std::endl;
-  std::cout << "tigger signal offset ECL fitting " << m_clockState->getTriggerOffset(Const::EDetector::ECL,
-            "fitting") << " [ns] " << std::endl;
-
 }

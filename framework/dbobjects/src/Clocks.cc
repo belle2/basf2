@@ -19,18 +19,21 @@ Clocks::Clocks()
 
 }
 
-Float_t  Clocks::getClockFreq(Const::EDetector detector, std::string label) const
+Float_t  Clocks::getClockFrequency(Const::EDetector detector, std::string label) const
 {
-  if (prescaleMap.count(detector) == 0) {
-    throw "Detector not found";
-  }
-  return  m_globalClockFreq / prescaleMap.at(detector).at(label);
+  return  m_AcceleratorRF / 4. / prescaleMap.at(detector).at(label);
 }
 
 
-Float_t  Clocks::getGlobalClockFreq() const
+Float_t  Clocks::getGlobalClockFrequency() const
 {
-  return  m_globalClockFreq;
+  return  m_AcceleratorRF / 4.;
+}
+
+
+Float_t  Clocks::getAcceleratorRF() const
+{
+  return  m_AcceleratorRF;
 }
 
 
@@ -50,7 +53,7 @@ void Clocks::setClockPrescale(const Const::EDetector detector, std::string label
 }
 
 
-void Clocks::setGlobalClockFreq(Float_t globalClockFreq)
+void Clocks::setAcceleratorRF(Float_t AcceleratorRF)
 {
-  m_globalClockFreq = globalClockFreq;
+  m_AcceleratorRF = AcceleratorRF;
 }

@@ -28,10 +28,11 @@ namespace Belle2 {
     Clocks();
 
     Int_t   getClockPrescale(Const::EDetector detector, std::string label) const;
-    Float_t getClockFreq(Const::EDetector detector, std::string label) const;
-    Float_t getGlobalClockFreq() const;
+    Float_t getClockFrequency(Const::EDetector detector, std::string label) const;
+    Float_t getGlobalClockFrequency() const;
+    Float_t getAcceleratorRF() const;
     void    setClockPrescale(const Const::EDetector detector, std::string, Int_t prescale);
-    void    setGlobalClockFreq(Float_t globalClockFreq);
+    void    setAcceleratorRF(Float_t AcceleratorRF);
 
   private:
 
@@ -43,7 +44,7 @@ namespace Belle2 {
     // Clocks are stored as frequency in MhZ
     std::map<Const::EDetector, std::map<std::string, float>> clocksMap;
 
-    Float_t m_globalClockFreq; //[MHz]
+    Float_t m_AcceleratorRF; //[MHz]
 
     ClassDef(Clocks, 1)
   };

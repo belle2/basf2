@@ -17,7 +17,7 @@ using namespace Belle2;
 
 SimClockState::SimClockState()
 {
-  globalClockFreq = m_clock->getGlobalClockFreq();
+  globalClockFrequency = m_clock->getGlobalClockFrequency();
 }
 
 void SimClockState::update()
@@ -25,14 +25,14 @@ void SimClockState::update()
   revo9Status = gRandom->Integer(revo9nbit);
 }
 
-Float_t SimClockState::getClockFreq(Const::EDetector detector, std::string label)
+Float_t SimClockState::getClockFrequency(Const::EDetector detector, std::string label)
 {
-  return m_clock->getClockFreq(detector, label);
+  return m_clock->getClockFrequency(detector, label);
 }
 
 Float_t SimClockState::getTriggerOffset(Const::EDetector detector, std::string label)
 {
-  return (revo9Status % m_clock->getClockPrescale(detector, label)) / (globalClockFreq * 1e-3);
+  return (revo9Status % m_clock->getClockPrescale(detector, label)) / (globalClockFrequency * 1e-3);
 }
 
 Int_t SimClockState::getRevo9Status()

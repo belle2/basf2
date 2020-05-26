@@ -9,7 +9,7 @@
 **************************************************************************/
 
 // Own include
-#include <framework/dbobjects/ClockDatabaseImporter.h>
+#include <framework/utilities/ClockDatabaseImporter.h>
 
 
 // framework - core

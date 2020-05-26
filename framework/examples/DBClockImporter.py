@@ -36,7 +36,6 @@ dbImporter.setAcceleratorRF(508.887)
 dbImporter.setClockPrescale('top', 'sampling', 6)
 dbImporter.setClockPrescale('svd', 'sampling', 4)
 dbImporter.setClockPrescale('ecl', 'sampling', 3 * 24)
-dbImporter.setClockPrescale('ecl', 'fitting', 12)
 
 # import constants
 dbImporter.importClock()

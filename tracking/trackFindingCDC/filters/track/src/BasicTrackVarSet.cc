@@ -9,7 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
+//#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
@@ -43,6 +45,10 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   statistics_accumulator tot_acc; /* time over threshold */
 
   unsigned int size = track->size();
+
+  //StoreArray<RecoTrack> cdc_tracks("CDCTrackVector"); // the name is still wrong...
+  //StoreArray<CDCTrack> cdc_tracks("CDCTrackVector");
+  unsigned int n_tracks = track->getNTracks(); //cdc_tracks.getEntries(); // returns zero if StoreArray is not filled correctly
 
   // Fill accumulators with ADC and drift circle information
   for (const CDCRecoHit3D& recoHit : *track) {
@@ -100,6 +106,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   var<named("size")>() = size;
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
+  var<named("n_tracks")>() = n_tracks;
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
   var<named("drift_length_mean")>() = toFinite(bacc::mean(drift_length_acc), 0);

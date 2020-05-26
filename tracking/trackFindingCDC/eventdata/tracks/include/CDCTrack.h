@@ -48,6 +48,18 @@ namespace Belle2 {
       /// Constructor from a two dimensional segment filling the third dimension with 0 values.
       explicit CDCTrack(const CDCSegment2D& segment);
 
+      unsigned int m_nTracks = 0;
+
+      void setNTracks(unsigned int n)
+      {
+        m_nTracks = n;
+      }
+
+      unsigned int getNTracks() const
+      {
+        return m_nTracks;
+      }
+
       /// Concats several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
 

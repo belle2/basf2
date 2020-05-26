@@ -32,6 +32,7 @@ namespace Belle2 {
     static char const* const basicTrackVarNames[] = {
       "size",
       "pt",
+      "n_tracks",
       "sz_slope",
       "drift_length_mean",
       "drift_length_variance",

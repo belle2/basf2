@@ -171,17 +171,19 @@ void PXDInjectionDQMModule::event()
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(diff2, all);
         hEOccAfterInjHER->Fill(diff2);
-        auto bin = hMaxOccAfterInjHER->FindBin(diff2);
-        auto value = hMaxOccAfterInjHER->GetBinContent(bin);
-        if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
+        if (m_createMaxHist) {
+          auto bin = hMaxOccAfterInjHER->FindBin(diff2);
+          auto value = hMaxOccAfterInjHER->GetBinContent(bin);
+          if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
+        }
         for (auto& a : hOccModAfterInjHER) {
           if (a.second) a.second->Fill(diff2, freq[a.first]);
         }
         if (m_createMaxHist) {
           for (auto& a : hMaxOccModAfterInjHER) {
             if (a.second) {
-              bin = a.second->FindBin(diff2);
-              value = a.second->GetBinContent(bin);
+              auto bin = a.second->FindBin(diff2);
+              auto value = a.second->GetBinContent(bin);
               if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
             }
           }
@@ -189,17 +191,19 @@ void PXDInjectionDQMModule::event()
       } else {
         hOccAfterInjLER->Fill(diff2, all);
         hEOccAfterInjLER->Fill(diff2);
-        auto bin = hMaxOccAfterInjLER->FindBin(diff2);
-        auto value = hMaxOccAfterInjLER->GetBinContent(bin);
-        if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
+        if (m_createMaxHist) {
+          auto bin = hMaxOccAfterInjLER->FindBin(diff2);
+          auto value = hMaxOccAfterInjLER->GetBinContent(bin);
+          if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
+        }
         for (auto& a : hOccModAfterInjLER) {
           if (a.second) a.second->Fill(diff2, freq[a.first]);
         }
         if (m_createMaxHist) {
           for (auto& a : hMaxOccModAfterInjLER) {
             if (a.second) {
-              bin = a.second->FindBin(diff2);
-              value = a.second->GetBinContent(bin);
+              auto bin = a.second->FindBin(diff2);
+              auto value = a.second->GetBinContent(bin);
               if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
             }
           }

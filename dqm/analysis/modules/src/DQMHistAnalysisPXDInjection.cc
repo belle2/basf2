@@ -198,21 +198,25 @@ void DQMHistAnalysisPXDInjectionModule::event()
 
   m_cInjectionLERPXD->Clear();
   m_cInjectionLERPXD->cd(0);
+  m_cInjectionLERPXD->Pad()->SetLogy();
   m_hInjectionLERPXD->Draw("hist");
 
   m_cInjectionHERPXD->Clear();
   m_cInjectionHERPXD->cd(0);
+  m_cInjectionHERPXD->Pad()->SetLogy();
   m_hInjectionHERPXD->Draw("hist");
 
   for (VxdID& avxdid : m_sensors) {
     m_cInjectionHERPXDMod[avxdid]->Clear();
     m_cInjectionHERPXDMod[avxdid]->cd(0);
+    m_cInjectionHERPXDMod[avxdid]->Pad()->SetLogy();
     m_hInjectionHERPXDMod[avxdid]->Draw("hist");
     m_cInjectionHERPXDModNorm[avxdid]->Clear();
     m_cInjectionHERPXDModNorm[avxdid]->cd(0);
     m_hInjectionHERPXDModNorm[avxdid]->Draw("hist");
     m_cInjectionLERPXDMod[avxdid]->Clear();
     m_cInjectionLERPXDMod[avxdid]->cd(0);
+    m_cInjectionLERPXDMod[avxdid]->Pad()->SetLogy();
     m_hInjectionLERPXDMod[avxdid]->Draw("hist");
     m_cInjectionLERPXDModNorm[avxdid]->Clear();
     m_cInjectionLERPXDModNorm[avxdid]->cd(0);

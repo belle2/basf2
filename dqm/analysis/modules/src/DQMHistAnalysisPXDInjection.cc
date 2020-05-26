@@ -64,9 +64,9 @@ void DQMHistAnalysisPXDInjectionModule::initialize()
     m_cInjectionLERPXDModNorm[avxdid] = new TCanvas(m_histogramDirectoryName + "/c_PXDInjectionLERNorm_" + bufful);
     m_cInjectionHERPXDModNorm[avxdid] = new TCanvas(m_histogramDirectoryName + "/c_PXDInjectionHERNorm_" + bufful);
     m_hInjectionLERPXDModNorm[avxdid] = new TH1F("HitInjectionLERPXDNorm_" + bufful,
-                                                 "PXD Hits after LER Injection " + buff + " normalized to 1.1.x/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+                                                 "PXD Hits after LER Injection " + buff + " normalized to 1.1.x/Time;Time in #mus;factor", 4000, 0, 20000);
     m_hInjectionHERPXDModNorm[avxdid] = new TH1F("HitInjectionHERPXDNorm_" + bufful,
-                                                 "PXD Hits after HER Injection " + buff + " normalized to 1.1.x/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+                                                 "PXD Hits after HER Injection " + buff + " normalized to 1.1.x/Time;Time in #mus;factor", 4000, 0, 20000);
   }
 
   B2DEBUG(1, "DQMHistAnalysisPXDInjection: initialized.");

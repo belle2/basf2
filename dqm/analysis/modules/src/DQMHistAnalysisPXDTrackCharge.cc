@@ -62,7 +62,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
     m_refFile = new TFile(m_refFileName.data());
   }
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -166,9 +166,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "Tracked_Clusters"; // new name
     TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters");
     if (hh2) {
-      int j = 1;
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
+        int j = 1;
         for (int i = 0; i < 64; i++) {
           auto layer = (((i >> 5) & 0x1) + 1);
           auto ladder = ((i >> 1) & 0xF);
@@ -272,20 +272,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist");
         h->Draw("same hist");
 
-        double data = 1.0; // thats useless at the moment
         canvas->Pad()->SetFrameFillColor(10);
         if (m_color) {
           if (hh1->GetEntries() < 1000) {
             // not enough Entries
             canvas->Pad()->SetFillColor(kGray);
           } else {
-            if (data < 1e-2) {
-              canvas->Pad()->SetFillColor(kRed);
-            } else if (data < 1e-4) {
-              canvas->Pad()->SetFillColor(kYellow);
-            } else {
-              canvas->Pad()->SetFillColor(kGreen);
-            }
+            canvas->Pad()->SetFillColor(kGreen);
           }
         } else {
           canvas->Pad()->SetFillColor(kWhite);// White

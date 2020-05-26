@@ -26,12 +26,12 @@ REG_MODULE(KLMChannelStatusCalibrationCollector)
 
 KLMChannelStatusCalibrationCollectorModule::KLMChannelStatusCalibrationCollectorModule() :
   CalibrationCollectorModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
   m_HitMap("KLMChannelMapHits", DataStore::c_Persistent)
 {
   setDescription("Module for KLM channel status calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
 }
 
 KLMChannelStatusCalibrationCollectorModule::~KLMChannelStatusCalibrationCollectorModule()

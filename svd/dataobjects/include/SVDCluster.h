@@ -223,7 +223,7 @@ namespace Belle2 {
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 6)
+    ClassDef(SVDCluster, 7)
 
   };
 

@@ -17,10 +17,39 @@ settings = CalibrationSettings(name="VXDCDCAlignment_stage0",
                                depends_on=[cdc_calibration])
 
 
+def create_std_path():
+    import basf2
+    import rawdata as raw
+    import reconstruction as reco
+
+    path = basf2.create_path()
+    path.add_module('Progress')
+    path.add_module('RootInput')  # , branchNames=input_branches, entrySequences=['0:5000'])
+    path.add_module('Gearbox')
+    path.add_module('Geometry')
+    raw.add_unpackers(path)
+    path.add_module('SetupGenfitExtrapolation')
+    reco.add_reconstruction(
+        path,
+        pruneTracks=False,
+        skipGeometryAdding=True,
+    )
+    tmp = basf2.create_path()
+    for m in path.modules():
+        if m.name() == "PXDPostErrorChecker":
+            m.param('CriticalErrorMask', 0)
+        if m.name() == "SVDSpacePointCreator":
+            m.param("MinClusterTime", -999)
+        tmp.add_module(m)
+    path.add_module('DAFRecoFitter')
+    return path
+
+
 def create_cosmics_path():
     import basf2
     import rawdata as raw
     import reconstruction as reco
+    import modularAnalysis as ana
 
     path = basf2.create_path()
     path.add_module('Progress')
@@ -54,6 +83,10 @@ def create_cosmics_path():
         tmp.add_module(m)
     path.add_module('SetRecoTrackMomentum', automatic=True)
     path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
+
+    ana.fillParticleList('mu+:bad', 'z0 > 57. and abs(d0) < 26.5', path=path)
+    path.add_module('SkimFilter', particleLists=['mu+:bad']).if_true(basf2.create_path())
+
     return path
 
 ################################################
@@ -88,41 +121,20 @@ def get_calibrations(input_data, **kwargs):
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    import ROOT
     from ROOT import Belle2
-    import millepede_calibration as mp2
-    import alignment
-    import modularAnalysis as ana
+    import millepede_calibration as mpc
     import basf2
 
-    cfg = mp2.create_configuration(
-        db_components=['VXDAlignment', 'CDCAlignment'],
-        constraints=[
-            alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=True)
-        ],
-        fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=True),
-        commands=[
-            'method diagonalization 3 0.1',
-            'scaleerrors 1. 1.',
-            'entries 100'],
-        reco_components=['PXD', 'SVD', 'CDC'],
-        params=dict(minPValue=0., externalIterations=0),
-        min_entries=10000)
+    import alignment.constraints
+    import alignment.parameters
 
-    with cfg.reprocess_collection(name='hlt_cosmic', path=create_cosmics_path()):
-        path = basf2.create_path()
-        ana.fillParticleList('mu+:bad', 'z0 > 57. and abs(d0) < 26.5', path=path)
-        path.add_module('SkimFilter', particleLists=['mu+:bad']).if_true(basf2.create_path())
-
-        cfg.collect_tracks('RecoTracks', path=path)
-
-    with cfg.reprocess_physics():
-        cfg.collect_tracks('RecoTracks')
-
-    cal = mp2.create_calibration(
-        cfg,
+    cal = mpc.create(
         name='VXDCDCAlignment_stage0',
+        dbobjects=['VXDAlignment', 'CDCAlignment'],
+        collections=[
+          mpc.make_collection("physics", create_std_path(), tracks=["RecoTracks"]),
+          mpc.make_collection("hlt_cosmic", create_cosmics_path(), tracks=["RecoTracks"])
+          ],
         tags=None,
         files=dict(
             physics=input_files_physics,
@@ -130,8 +142,19 @@ def get_calibrations(input_data, **kwargs):
         timedep=[],
         init_event=(
             0,
-            0,
-            1003))  # init_event used to setup geometry at particular (event, run, exp) - only needed for constraint generation
+            requested_iov.run_low,
+            requested_iov.exp_low),
+        constraints=[
+            alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
+            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False)
+        ],
+        fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=True),
+        commands=[
+            'method diagonalization 3 0.1',
+            'scaleerrors 1. 1.',
+            'entries 100'],
+        params=dict(minPValue=0., externalIterations=0),
+        min_entries=10000)
 
     basf2.set_module_parameters(cal.collections['physics'].pre_collector_path, 'RootInput', entrySequences=['0:500'])
     basf2.set_module_parameters(cal.collections['hlt_cosmic'].pre_collector_path, 'RootInput', entrySequences=['0:20000'])

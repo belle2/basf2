@@ -84,12 +84,12 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
-    Belle2::DQMFileMetaData* dqm_data;
-    Belle2::MonitoringObject* mon_mumu;
+    Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
+    Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
 
-    TCanvas* main;
-    TCanvas* resolution;
-    TCanvas* muon_val;
+    TCanvas* main = nullptr; /**< TCanvas object for main display */
+    TCanvas* resolution = nullptr; /**< TCanvas object for resolution display */
+    TCanvas* muon_val = nullptr; /**< TCanvas object for mumu values display */
 
   };
 

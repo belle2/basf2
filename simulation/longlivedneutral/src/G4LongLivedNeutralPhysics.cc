@@ -55,7 +55,7 @@ void G4LongLivedNeutralPhysics::ConstructParticle()
 
 void G4LongLivedNeutralPhysics::ConstructProcess()
 {
-  G4cout << "G4LongLivedNeutralPhysics::ConstructProcess" << G4endl;
+  B2DEBUG(20, "G4LongLivedNeutralPhysics::ConstructProcess");
 
   G4ProcessManager* pmanager = fLLPN->GetProcessManager();
 

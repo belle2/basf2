@@ -33,7 +33,7 @@ namespace Belle2 {
 
       /**
        * Sets minimal function value
-       * @param minimal value
+       * @param minVal minimal value
        */
       void setMinValue(double minVal) {m_minVal = minVal;}
 

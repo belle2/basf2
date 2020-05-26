@@ -14,10 +14,11 @@
 using namespace Belle2;
 
 EKLM::Arc2D::Arc2D(double x, double y, double radius,
-                   double angle1, double angle2) : Circle2D(x, y, radius)
+                   double angle1, double angle2) :
+  Circle2D(x, y, radius),
+  m_Angle1(angle1),
+  m_Angle2(angle2)
 {
-  m_Angle1 = angle1;
-  m_Angle2 = angle2;
 }
 
 EKLM::Arc2D::~Arc2D()

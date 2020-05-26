@@ -17,6 +17,7 @@
 using namespace Belle2;
 
 KLMDigit::KLMDigit() :
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_Subdetector(0),
   m_Section(0),
   m_Sector(0),
@@ -35,17 +36,17 @@ KLMDigit::KLMDigit() :
   m_MCTime(0),
   m_SiPMMCTime(0)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_Subdetector(KLMElementNumbers::c_EKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(simHit->getStrip()),
-  m_LastStrip(simHit->getStrip()),
+  m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),
@@ -57,10 +58,10 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_Subdetector(KLMElementNumbers::c_BKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
@@ -79,10 +80,10 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_Subdetector(KLMElementNumbers::c_BKLM),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
@@ -101,7 +102,6 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
   m_MCTime(simHit->getTime()),
   m_SiPMMCTime(0)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 unsigned int KLMDigit::getUniqueChannelID() const

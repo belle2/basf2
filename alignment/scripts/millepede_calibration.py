@@ -1,130 +1,296 @@
-from basf2 import *
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-set_log_level(LogLevel.INFO)
-
-import os
-import sys
-import multiprocessing
-
-import ROOT
-from ROOT import Belle2
-from ROOT.Belle2 import MillepedeAlgorithm
+import basf2
 
 from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
 from caf import backends
 from caf import strategies
 
-import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
-
-import copy
-
-import alignment.parameters
-import alignment.constraints
-import alignment.defaults
-
-from contextlib import contextmanager
-
-input_branches = [
-    'EventMetaData',
-    'RawTRGs',
-    'RawFTSWs',
-    'RawPXDs',
-    'RawSVDs',
-    'RawCDCs',
-    'RawTOPs',
-    'RawARICHs',
-    'RawECLs',
-    'RawKLMs']
-
-#  Default "creators" for algo, collector and main paths.
-#  Override using e.g. (see alignment/defaults.py):
-#
-#  >>> def my_path(**argk):
-#  >>>   path = create_path()
-#  >>>   ...
-#  >>>   return path
-#  >>>
-#  >>> import millepede_calibration as mpc
-#  >>> mpc.create_stdreco_path = my_path
-#  >>>
-create_algorithm = alignment.defaults.create_algorithm
-create_collector = alignment.defaults.create_collector
-create_stdreco_path = alignment.defaults.create_stdreco_path
-create_cosmics_path = alignment.defaults.create_cosmics_path
+import os
 
 
-def copy_module(module):
-    m = register_module(module.type())
-    for par in module.available_params():
-        m.param(par.name, copy.deepcopy(par.values))
+def collect(calibration, collection, input_files, output_file='CollectorOutput.root', basf2_args=None, bsub=False):
+    """
+    Standalone collection for calibration (without CAF)
+    (experimental)
+
+    Pickles the reprocessing path and collector of given collection and runs it in separate process
+    to collect calibration data in output_file from input_files.
+
+    Parameters
+    ----------
+    calibration : caf.framework.Calibration
+      The configured Millepede calibration (see create(...)) to use for collection
+    collection : str
+      Collection name which should be collected (which re-processing path and collector to use)
+    input_files : list(str)
+      List of input files for this collection job
+    output_file : str
+      Name of output collector file with data/histograms (produced by HistoManager)
+    basf2_args : dict
+      Additional arguments to pass to basf2 job
+    """
+    if basf2_args is None:
+        basf2_args = []
+
+    import pickle
+    import subprocess
+
+    main = calibration.collections[collection].pre_collector_path
+
+    tmp = basf2.Path()
+    for m in main.modules():
+        if m.name() == 'RootInput':
+            m.param('inputFileNames', input_files)
+            tmp.add_module('HistoManager', histoFileName=output_file)
+        tmp.add_module(m)
+    main = tmp
+    main.add_module(calibration.collections[collection].collector)
+
+    path_file_name = calibration.name + '.' + collection + '.path'
+    with open(path_file_name, 'bw') as serialized_path_file:
+        pickle.dump(basf2.pickle_path.serialize_path(main), serialized_path_file)
+
+    if bsub:
+        subprocess.call(["bsub", "-o", output_file + ".txt", "basf2", "--execute-path", path_file_name] + basf2_args)
+    else:
+        subprocess.call(["basf2", "--execute-path", path_file_name] + basf2_args)
+
+    return os.path.abspath(output_file)
+
+
+def calibrate(calibration, input_files=None, iteration=0):
+    """
+    Execute the algorithm from configured Millepede calibration over collected
+    files in input_files. The pre_algorithm function is run before the algorithm.
+
+    Parameters
+    ----------
+    calibration : caf.framework.Calibration
+      Configured Millepede calibration (see create(...))
+    input_files : list(str)
+      List of input collected files
+    iteration : int
+      Iteration number to pass to pre_algorithm function
+    """
+    if input_files is None:
+        input_files = ['CollectorOutput.root']
+    """
+    Execute algorithm of the Millepede calibration over
+    """
+    for algo in calibration.algorithms:
+        algo.pre_algorithm(algo, iteration)
+        algo.algorithm.setInputFileNames(input_files)
+        algo.algorithm.execute()
+        algo.algorithm.commit()
+
+
+def create_algorithm(dbobjects, min_entries=10, ignore_undetermined=True):
+    """
+    Create Belle2.MillepedeAlgorithm
+
+    Parameters
+    ----------
+    dbobjects : list(str)
+      List of DB objects to calibrate - has to match collector settings
+    min_entries : int
+      Minimum number of collected entries for calibration. Algorithm will return
+      NotEnoughData is less entries collected.
+    ignore_undetermined : bool
+      Whether undetermined parameters should be ignored or the calibration should fail if any
+    """
+    import ROOT
+    from ROOT.Belle2 import MillepedeAlgorithm
+    algorithm = MillepedeAlgorithm()
+
+    std_components = ROOT.vector('string')()
+    for component in dbobjects:
+        std_components.push_back(component)
+    algorithm.setComponents(std_components)
+
+    algorithm.ignoreUndeterminedParams(ignore_undetermined)
+    algorithm.setMinEntries(min_entries)
+
+    algorithm.invertSign(True)
+
+    return algorithm
+
+
+def create_commands():
+    """
+    Create default list of commands for Pede
+    """
+    cmds = []
+    cmds.append('method inversion 3 0.1')
+    cmds.append('skipemptycons')
+
+    import multiprocessing
+    ncpus = multiprocessing.cpu_count()
+
+    cmds.append(f'threads {ncpus} {ncpus}')
+    cmds.append('printcounts 2')
+    cmds.append('closeandreopen')
+
+    cmds.append('hugecut 50.')
+    cmds.append('chiscut 30. 6.')
+    cmds.append('outlierdownweighting 3')
+    cmds.append('dwfractioncut 0.1')
+
+    return cmds
+
+
+def create_collector(dbobjects, **argk):
+    """
+    Create MillepedeCollector module with default configuration
+
+    Parameters
+    ----------
+    dbobject : list(str)
+      List of database objects to be calibrated (global derivatives of others
+      will be disabled) - has to match algorithm settings
+    argk : dict
+      Dictionary of additional module parameters (can override defaults)
+
+    Returns
+    -------
+    MillepedeCollectorModule (configured)
+    """
+    import basf2
+    m = basf2.register_module('MillepedeCollector')
+
+    m.param('granularity', 'all')
+    # Let's enable this always - will be in effect only if BeamSpot is in dbobjects
+    m.param('calibrateVertex', True)
+    # Not yet implemeted -> alwas OFF for now
+    m.param('calibrateKinematics', False)
+    m.param('minUsedCDCHitFraction', 0.8)
+    m.param('minPValue', 0.0)
+    m.param('externalIterations', 0)
+    m.param('tracks', [])
+    m.param('fitTrackT0', True)
+    m.param('components', dbobjects)
+    m.param('useGblTree', False)
+    m.param('absFilePaths', True)
+
+    m.param(argk)
+
     return m
 
 
-def mkdict(**argk):
+def make_collection(name, path, **argk):
     """
-    Simple helper to make dictionary faster without quoting strings:
-    {'key1':val1, 'key2':val2} == mkdict(key1=val1, key2=val2)
-    """
-    return argk
+    Handy function to make a collection configuration
+    to be passed in 'collections' argument of the create(...) function
 
+    Parameters
+    ----------
+    name : str
+      Collection name
+    path : basf2.Path
+      pre-collector path
+    argk : dict
+      Dictionary of collector parameters specific for collection
 
-class CollectionConfig():
-    """
-    Simple class holding configuration for a collection
-    (pre-collector path + collector module)
-    """
-
-    def __init__(self, path, collector):
-        self.path = path
-        self.collector = collector
-
-
-class Config():
-    """
-    The main configuration object for Millepede calibration
-
-    The user should construct this object using
-
-    >>> config = create_configuration(...)
-
-    and finish the configuration of collections afterwards using class
-    methods of the Config object
-
-    Create new (physics) collection and add some data samples
-
-    with config.reprocess_physics():
-      config.collect_particles('mu+:good')
-      config.collect_particles('pi+:good')
+    Returns
+    -------
+    tuple(str, basf2.Path, dict)
 
     """
+    return (name, path, argk)
 
-    def __init__(self):
-        # : List of names of DB objects to calibrate (BeamSpot, VXDAlignment, ...)
-        self.db_components = []
-        # : List of fixed parameter labels (time indep.)
-        self.fixed = []
-        # : List of alignment.constraints.Constraints objects to generate constraint files
-        self.constraints = []
-        # : List of (additional) commands to pass to Pede
-        self.commands = dict()
-        # : The pre-configured algorithm
-        self.algo = Belle2.MillepedeAlgorithm()
-        # : The pre-configured defualt path
-        self.path = Path()
-        # : Reconstruction components (PXD, SVD, ...) to be passed to automatically generated paths
-        self.reco_components = None
-        # : The pre-configured default collector
-        self.collector = register_module('MillepedeCollector')
-        # : Additional default parameters to pass to the collector
-        self.params = dict()
-        # : The list of created data collections
-        self.collections = dict()
 
-        self._collections_context = list()
+def create(name,
+           dbobjects,
+           collections,
+           files,
+           tags=None,
+           timedep=None,
+           commands=None,
+           constraints=None,
+           fixed=None,
+           params=None,
+           init_event=None,
+           min_entries=0
+           ):
+    """
+    Create the Millepede Calibration, fully configured in one call
 
-    def set_command(self, command, spec=''):
+
+    Parameters
+    ----------
+    name : str
+        Calibration name
+    dbobjects : list(str)
+        List of database objects to calibrate, e.g. ['BeamSpot', 'VXDAlignment']
+        Note that by default all parameters of the db object are free (exceptions
+        depend on some constraint and collector configuration) and you might need to fix
+        the unwanted ones (typically higher order sensor deformations) using the 'fixed' parameter.
+
+    collections : list(tuple(str, basf2.Path, dict(...)))
+        List of collection definitions.
+        - str : collection name has to math entry in 'files' dictionary.
+        - basf2.Path : is the reprocessing path
+        - dict(...) : additional dictionary of parameters passed to the collector.
+          This has to contain the input data sample (tracks / particles / primaryVertices ...) configuration for the collector.
+          Optionally additional arguments can be specified for the collector specific for this collection.
+          (Default arguments for all collections can be set using the 'params' parameter)
+          Use make_collection(str, basf2.Path, **argk) for more convenient creation of custom collections.
+          For standard collections to use, see alignment.collections
+
+    files : dict( str -> list(str) )
+        Dictionary of lists of input file paths, key is collection name, value is list of input files
+    tags : list(str)
+        List of input global tags. Can include absolute file paths to local databases (added to the chain).
+
+    timedep : list(tuple(list(int), list(tuple(int, int, int))))
+        Time-depence configuration.
+        Each list item is 2-tuple with list of parameter numbers (use alignment.parameters to get them) and
+        the (event, run, exp) numbers at which values of these parameters can change.
+        Use with caution. Namely the first event of the lowest run in input data has to be included in (some of the)
+        event lists.
+
+    commands : list(str | tuple(str, None))
+        List of commands for Millepede. Default commands can be overriden be specifing different values for them.
+        A command can be erased completely from the default commands if instead a ('command_name', None) is passed.
+    constraints : list(alignment.Constraints)
+        List of constraints from alignment.constraints to be used.
+        Constraints are generated by the pre-algorithm function by CAF.
+        WARNING: the 'init_event' event parameter is used to initiate the generation of the constraints if 'timedep' is not set.
+    fixed : list(int)
+        List of fixed parameters (use alignment.parameters to get them)
+
+    params : common parameters to set for collectors of all collections.
+    init_event : tuple(int, int, int)
+        Initial event (event, run, exp) to intitiate constraints if timedep is not configured.
+    min_entries : int
+        Minimum entries to require by the algorithm. Returns NotEnoughData if less entries is collected.
+
+    Returns
+    ----------
+    caf.framework.Calibration object, fully configured and ready to run.
+    You might want to set/override some options to custom values, like 'max_iterations' etc.
+    """
+
+    print("----------------------------")
+    print(" Calibration: ", name, "")
+    print("----------------------------")
+
+    print("- DB Objects:")
+    for objname in dbobjects:
+        print("   ", objname)
+
+    cmds = create_commands()
+
+    _commands = dict()
+
+    def set_command(command):
+        spec = ''
+        if isinstance(command, tuple):
+            if not len(command) == 2:
+                raise AttributeError("Commands has to be strings or tuple ('command name', None) to remove the command")
+            spec = None
+            command = command[0]
         words = command.split(" ")
         cmd_name = words[0]
 
@@ -132,253 +298,29 @@ class Config():
             spec = command
 
         if spec is not None:
-            self.commands[cmd_name] = spec
-        elif cmd_name in self.commands:
-            del self.commands[cmd_name]
-
-    def reprocess_collection(self, name, path=None, collector=None, **argk):
-        return self._ctrlctx(self._reprocess_collection(name, path=path, collector=collector, **argk))
-
-    def reprocess_physics(self, path=None, collector=None, collection_name='physics', **argk):
-        if path is None:
-            path = create_stdreco_path(components=self.reco_components)
-
-        return self._ctrlctx(self._reprocess_collection(collection_name, path=path, collector=collector, **argk))
-
-    def reprocess_cosmics(self, path=None, collector=None, collection_name='cosmics', **argk):
-        if path is None:
-            path = create_cosmics_path(components=self.reco_components)
-
-        return self._ctrlctx(self._reprocess_collection(collection_name, path=path, collector=collector, **argk))
-
-    def reprocess_B0cosmics(self, path=None, collector=None, collection_name='B0cosmics', **argk):
-        if path is None:
-            path = create_cosmics_path(components=self.reco_components)
-
-        return self._ctrlctx(self._reprocess_collection(collection_name, path=path, collector=collector, **argk))
-
-    def add_path(self, path, collection=None):
-        if path is not None:
-            self._collection_from_context(collection).path.add_path(path)
-
-    def collect(self, sample_type, sample_name, path=None, collection=None):
-        self._append_param_list(sample_type, sample_name, collection)
-        self.add_path(path)
-
-    def collect_tracks(self, arrayname='RecoTracks', path=None, collection=None):
-        self.collect('tracks', arrayname, path, collection)
-
-    def collect_particles(self, listname, path=None, collection=None):
-        self.collect('particles', listname, path, collection)
-
-    def collect_vertex_decays(self, listname, path=None, collection=None, ip_constraint=False):
-        if ip_constraint:
-            self.collect('primaryVertices', listname, path, collection)
-        else:
-            self.collect('vertices', listname, path, collection)
-
-    def collect_2body_decays(
-            self,
-            listname,
-            path=None,
-            collection=None,
-            ipvertex_constraint=False,
-            ipmass_constraint=False,
-            ipboost_constraint=False,
-            mass=None,
-            width=None):
-        if ipboost_constraint and not (ipvertex_constraint and ipmass_constraint):
-            B2WARNING(
-                "When boost_constraint=True, also ip and mass constraints are set True as a full kinematic constraint"
-                "based B-Factory kinematics will be used (you can set custom inv. mass and width to be used instead of those"
-                "from BeamParameters).")
-            ipvertex_constraint = ipmass_constraint = True
-
-        if width is not None and mass is None:
-            raise AttributeError("When custom width is set, you have to provide custom mass for the mother particle, too.")
-
-        if mass is not None:
-            if width is None:
-                raise AttributeError("When custom mass is set, you have to provide custom width for the mother particle, too.")
-            else:
-                self._set_custom_masswidth(listname, mass, width, collection)
-
-        if ipboost_constraint and ipvertex_constraint and ipmass_constraint:
-            #  = all constraints ON -> full kinematic constraint
-            self.collect('primaryTwoBodyDecays', listname, path, collection)
-        elif ipmass_constraint and ipvertex_constraint:
-            self.collect('primaryMassVertexTwoBodyDecays', listname, path, collection)
-        elif ipmass_constraint:
-            self.collect('primaryMassTwoBodyDecays', listname, path, collection)
-        elif ipvertex_constraint:
-            raise AttributeError("Cannot enable only IP vertex constraint on two-body-decays. Use vertex decays with ip_constraint")
-        else:
-            #  Only invariant mass constraint derived from mother particle or set to custom value
-            self.collect('twoBodyDecays', listname, path, collection)
-
-    #  "Private" methods: ----------------------------------------------------------------------------------
-
-    def _reprocess_collection(self, name, path=None, collector=None, **argk):
-        """
-        Create a new (or replace) collection configuration.
-        @param path Path with pre-collector path
-        @param collector MillepedeCollector module to override all defaults
-        @param argk additional parameters to be passed to collector
-        """
-        #  Copy our default path if none provided, needs register_module to make
-        #  actuall deep copy
-        if path is None:
-            path = create_path()
-            for m in self.path.modules():
-                path.add_module(copy_module(m))
-
-        #  Copy the default collector with params from create_configuration(params=..., collector=...)
-        if collector is None:
-            collector = copy_module(self.collector)
-        #  Override with ad-hoc parameters for this collection
-        collector.param(argk)
-
-        self.collections[name] = CollectionConfig(path, collector)
-
-        #  Entering context... exit in _ctrlctx or never
-        #  (but may be preceded by new context) if not used in 'with' construct
-        self._collections_context.append(name)
-
-        return name
-
-    @contextmanager
-    def _ctrlctx(self, name):
-        #  Execute 'with' block with collection=collections[name] context.
-        #  Does not yield anything. Accessing the collection configurations
-        #  directly is non-standard operation (a standard user should know how
-        #  to do it if ever needed)
-        yield
-
-        #  Exiting context
-        self._collections_context.pop()
-
-    def _collection_from_context(self, collection_name=None):
-        if not len(self._collections_context) and collection_name is None:
-            collection_name = 'default'
-        if collection_name is None:
-            collection_name = self._collections_context[-1]
-
-        if collection_name not in self.collections:
-            B2WARNING("Creating default collection config")
-            self.collections[collection_name] = CollectionConfig(self.path, self.collector)
-
-        return self.collections[collection_name]
-
-    def _append_param_list(self, param, value, collection=None):
-        collector = self._collection_from_context(collection).collector
-        for par in collector.available_params():
-            if par.name == param:
-                val = copy.deepcopy(par.values)
-                val.append(value)
-                collector.param(param, val)
-                break
-
-    def _append_param_dict(self, param, key, value, collection=None):
-        collector = self._collection_from_context(collection).collector
-        for par in collector.available_params():
-            if par.name == param:
-                val = copy.deepcopy(par.values)
-                val[key] = value
-                collector.param(param, val)
-                break
-
-    def _set_custom_masswidth(self, listname, mass, width, collection=None):
-        if mass is None or width is None:
-            raise AttributeError('Please set both, mass and width for custom configuration.')
-        self._append_param_dict('customMassConfig', listname, (mass, width), collection)
-
-    def dump(self):
-        import inspect
-        attrs = self.__dict__
-        for name, val in attrs.items():
-            if name == 'path':
-                #  print_path(val)
-                pass
-            elif name == 'collections':
-                for colname, col in val.items():
-                    p = create_path()
-                    p.add_path(col.path)
-                    p.add_module(col.collector)
-                    print_path(p)
-                    #  print_params(col.collector)
-            elif name == 'fixed':
-                print(name, ':', str([str(i) for i in val[:10]] + ['...']))
-            else:
-                print(name, '=', str(val))
-
-
-def create_configuration(db_components,
-                         constraints=None, fixed=None, commands=None, params=None,
-                         ignore_undetermined=True, min_entries=0,
-                         reco_components=None,
-                         granularity='all', min_pval=0,
-                         algo=None, path=None, collector=None):
-    c = Config()
-    c.db_components = db_components
-    c.fixed = fixed
-    c.constraints = constraints
-
-    cmds = []
-    cmds.append('method inversion 3 0.1')
-    cmds.append('skipemptycons')
-    cmds.append('threads 40 40')
-    cmds.append('matiter 1')
-    cmds.append('scaleerrors 1. 1.')
-    cmds.append('entries 2 2')
-    cmds.append('printcounts 2')
-    #  cmds.append('histprint')
-    cmds.append('monitorresiduals')
-    cmds.append('closeandreopen')
-    cmds.append('hugecut 50.')
-    cmds.append('chiscut 30. 6.')
-    cmds.append('outlierdownweighting 3')
-    cmds.append('dwfractioncut 0.1')
-    cmds.append('presigmas 1.')
+            _commands[cmd_name] = spec
+        elif cmd_name in _commands:
+            del _commands[cmd_name]
 
     for cmd in cmds:
-        c.set_command(cmd)
+        set_command(cmd)
 
     for cmd in commands:
-        c.set_command(cmd)
+        set_command(cmd)
 
-    if algo is None:
-        algo = create_algorithm(db_components, ignore_undetermined=ignore_undetermined, min_entries=min_entries)
+    algo = create_algorithm(dbobjects, min_entries=min_entries)
 
-    c.reco_components = reco_components
-    if path is None:
-        path = create_stdreco_path(reco_components)
-
-    if collector is None:
-        collector = create_collector(db_components, granularity=granularity, minPValue=min_pval)
-
-    if params is not None:
-        collector.param(params)
-
-    c.algo = algo
-    c.path = path
-    c.collector = collector
-    c.params = params
-
-    c.collections = dict()
-
-    return c
-
-
-def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, timedep=None, init_event=None):
-    algo = Belle2.MillepedeAlgorithm(cfg.algo)
-
-    for cmd_name, cmd in cfg.commands.items():
+    print("- Commands:")
+    for cmd_name, cmd in _commands.items():
+        print("   ", cmd)
         algo.steering().command(cmd)
 
-    consts = cfg.constraints
+    print("- Constraints:")
+    consts = constraints
     if len(consts):
         algo.steering().command('FortranFiles')
         for const in consts:
+            print("   ", const.filename)
             algo.steering().command(const.filename)
 
     def gen_constraints(algorithm, iteration):
@@ -388,18 +330,30 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
 
     algo.steering().command('Parameters')
 
-    #  def fix(label_sets):
-    #     for labels in label_sets:
-    #         for label in labels:
-    #             cfg.algo.steering().command('{} 0.0 -1.'.format(str(label)))
-
     def fix(labels):
         for label in labels:
             algo.steering().command('{} 0.0 -1.'.format(str(label)))
 
-    fix(cfg.fixed)
+    print("- Fixed parameters:", len(fixed))
+    fix(fixed)
 
     algo.setTimedepConfig(timedep)
+
+    print("- Tags:")
+
+    def make_database_chain(tags):
+        import os
+        chain = []
+        for tag in tags:
+            if os.path.exists(tag):
+                print("   Local:", os.path.abspath(tag))
+                chain.append(LocalDatabase(os.path.abspath(tag)))
+            else:
+                print("   Global:", tag)
+                chain.append(CentralDatabase(tag))
+        return chain
+
+    dbchain = make_database_chain(tags) if tags is not None else None
 
     #  Note the default collector and path are ignored
     #  The user is supposed to add at least one own collection
@@ -408,29 +362,42 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
                               algorithms=algo,
                               input_files=None,
                               pre_collector_path=None,
-                              database_chain=[CentralDatabase(tag) for tag in tags] if tags is not None else None,
+                              database_chain=dbchain,
                               output_patterns=None,
                               max_files_per_collector_job=1,
                               backend_args=None
                               )
+    print("- Overriden common collector parameters:")
+    for parname, parval in params.items():
+        print("    ", parname, ":", parval)
 
-    for colname, col in cfg.collections.items():
-        collector = copy_module(col.collector)
+    print("- Collections:")
+    for colname, path, args in collections:
+        filelist = []
+        if colname in files:
+            filelist = files[colname]
+
+        print(f"  - {colname} ({len(filelist)} files)")
+
+        collector = create_collector(dbobjects)
+        if params is not None:
+            collector.param(params)
 
         for const in consts:
             const.configure_collector(collector)
 
         collector.param('timedepConfig', timedep)
 
-        filelist = []
-        if colname in files:
-            filelist = files[colname]
+        for argname, argval in args.items():
+            print("    ", argname, " : ", argval)
+
+        collector.param(args)
 
         collection = Collection(collector=collector,
                                 input_files=filelist,
-                                pre_collector_path=col.path,
+                                pre_collector_path=path,
                                 max_files_per_collector_job=1,
-                                database_chain=[CentralDatabase(tag) for tag in tags] if tags is not None else None)
+                                database_chain=dbchain)
 
         calibration.add_collection(colname, collection)
 
@@ -439,91 +406,6 @@ def create_calibration(cfg, name='MillepedeCalibration', tags=None, files=None, 
 
     calibration.pre_algorithms = gen_constraints
 
+    print("----------------------------")
+
     return calibration
-
-
-if __name__ == '__main__':
-    cfg = create_configuration(
-      db_components=['VXDAlignment'],
-      constraints=[alignment.constraints.VXDHierarchyConstraints(), alignment.constraints.CDCWireConstraints()],
-      fixed=alignment.parameters.vxd_sensors() + alignment.parameters.vxd_ladders(),
-      commands=['method diagonalization 3 0.1', 'scaleerrors 1. 1.'],
-      params=dict(minPValue=0.001, externalIterations=0))
-
-    cfg.reprocess_physics(tracks=['RecoTracks'])
-    cfg.reprocess_cosmics(tracks=['RecoTracks'], minPValue=0.0001)
-    cfg.reprocess_B0cosmics(tracks=['RecoTracks'])
-
-    with cfg.reprocess_physics(collection_name='dimuon_skim'):
-
-        import modularAnalysis as ana
-        path = create_path()
-        ana.fillParticleList('mu+:mu_dimuon', 'abs(formula(z0)) < 0.5 and abs(d0) < 0.5 and nTracks == 2', writeOut=True, path=path)
-        ana.reconstructDecay('Z0:mumu -> mu-:mu_dimuon mu+:mu_dimuon', '', writeOut=True, path=path)
-        ana.reconstructDecay(
-            'Z0:mumu_4mom -> mu-:mu_dimuon mu+:mu_dimuon',
-            'InvM > 10.5296 and InvM < 10.6296',
-            writeOut=True,
-            path=path)
-
-        #  WARNING/TODO/NOTE/WTF? Now this even makes all GBL composite trajectory fits to fail! on MC!
-        #  What has changed in vertex fitters?? (Rave in particular)
-        #  However without any vertex fit, it works fine (albeit on ideal MC - have to check the data)
-        #  ana.vertexRaveDaughtersUpdate('Z0:mumu', 0.001, path=path)
-        #  ana.vertexRaveDaughtersUpdate('Z0:mumu_4mom', 0.001, path=path)
-        ana.vertexRave('Z0:mumu', 0.001, path=path)
-        ana.vertexRave('Z0:mumu_4mom', 0.001, path=path)
-
-        cfg.add_path(path)
-
-        cfg.collect_tracks('RecoTracks')
-
-        cfg.collect_particles('mu+:mu_dimuon')
-        cfg.collect_particles('pi+:good')
-
-        cfg.collect_vertex_decays('Z0:mumu', ip_constraint=False)
-        cfg.collect_vertex_decays('Z0:mumu', ip_constraint=True)
-
-        #  Note this sets custom mass and width for all lists of the same name (probably a feature not a bug).
-        #  You should have all lists distinct anyway, this is just for testing and I am lazy :-)
-        cfg.collect_2body_decays(
-            'Z0:mumu_4mom',
-            ipvertex_constraint=True,
-            ipmass_constraint=True,
-            ipboost_constraint=True,
-            mass=10.579,
-            width=0.05)
-        #  All other constraint are versions of mass and/or ip constraint (boost constraint only in full constraint)
-        cfg.collect_2body_decays('Z0:mumu_4mom', ipvertex_constraint=True, ipmass_constraint=True, ipboost_constraint=False)
-        cfg.collect_2body_decays('Z0:mumu_4mom', ipvertex_constraint=False, ipmass_constraint=True, ipboost_constraint=False)
-
-        cfg.collect_2body_decays('Z0:mumu_4mom', ipvertex_constraint=False, ipmass_constraint=False, ipboost_constraint=False)
-
-    cfg.dump()
-
-    cal = create_calibration(
-      cfg,
-      name='MyCalib',
-      tags=[tag for tag in conditions.default_globaltags],
-      files={'dimuon_skim': [os.path.abspath(f) for f in Belle2.Environment.Instance().getInputFilesOverride()]},
-      timedep=[([], [(0, 0, 0)])])
-
-    # import pprint
-    # pp = pprint.PrettyPrinter(indent=4)
-    #  for key, item in cfg.__dict__.items():
-    #  try:
-    #  if len(item) > 10:
-    # item = str(item[:10]) + ' ... '
-    #  except:
-    #  pass
-    # pp.pprint((key, item))
-
-    cal_fw = CAF()
-    cal_fw.add_calibration(cal)
-    cal_fw.backend = backends.LSF()
-
-    #  Try to guess if we are at KEKCC and change the backend to Local if not
-    if multiprocessing.cpu_count() < 10:
-        cal_fw.backend = backends.Local(1)
-
-    cal_fw.run()

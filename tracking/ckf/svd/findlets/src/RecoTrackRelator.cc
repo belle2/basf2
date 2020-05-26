@@ -27,7 +27,7 @@ void RecoTrackRelator::exposeParameters(ModuleParamList* moduleParamList, const 
 }
 
 void RecoTrackRelator::apply(const std::vector<CKFToSVDResult>& results,
-                             std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD)
+                             std::vector<TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>>& relationsCDCToSVD)
 {
   for (const CKFToSVDResult& result : results) {
     const TrackFindingCDC::Weight weight = m_overlapFilter(result);

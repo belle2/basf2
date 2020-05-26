@@ -21,10 +21,14 @@ REG_MODULE(KLMStripEfficiencyCollector)
 
 KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_GeometryBKLM(nullptr),
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
   m_MatchingFile(nullptr),
   m_MatchingTree(nullptr),
-  m_MatchedStrip(0)
+  m_MatchingHitData( {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
+                   m_MatchedStrip(0)
 {
   setDescription("Module for KLM strip efficiency data collection.");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
@@ -44,10 +48,6 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("Debug", m_Debug, "Debug mode.", false);
   addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
-  m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
-  m_MatchingHitData = {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr};
 }
 
 KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()

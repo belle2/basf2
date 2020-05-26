@@ -39,7 +39,8 @@ namespace Belle2 {
     }
 
     /** Constructor. needs the first parameter is outer hit, second is center hit, third is inner hit. Parameters in TVector3-format, Optional parameter is the strength of the magnetic field in Tesla*/
-    ThreeHitFilters(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit, double magneticFieldStrength = 1.5):
+    ThreeHitFilters(const TVector3& outerHit, const TVector3& centerHit, const TVector3& innerHit,
+                    const double magneticFieldStrength = 1.5):
       m_circleCenterCalculated(false),
       m_radiusCalculated(false),
       m_radius(0.),
@@ -60,7 +61,7 @@ namespace Belle2 {
     ~ThreeHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outerHit, TVector3& centerHit, TVector3& innerHit)
+    void resetValues(const TVector3& outerHit, const TVector3& centerHit, const TVector3& innerHit)
     {
       m_radiusCalculated = false;
       m_circleCenterCalculated = false;
@@ -83,7 +84,7 @@ namespace Belle2 {
      * If no value is given, magnetic field is assumed to be Belle2-Detector standard of 1.5T.
      * pT[GeV/c] = 0.299710*B[T]*r[m] = 0.299710*B[T]*r[cm]/100 = 0.00299710B[T]*r[cm]
      */
-    void resetMagneticField(double magneticFieldStrength = 1.5) { m_magneticFieldFactor = magneticFieldStrength * 0.00299710; }
+    void resetMagneticField(const double magneticFieldStrength = 1.5) { m_magneticFieldFactor = magneticFieldStrength * 0.00299710; }
 
 
 
@@ -258,7 +259,7 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none. used by calcAngleRZ and calcHelixFit (angleXY could use it too, but this one profits from other optimizations instead) */
-    double calcAngle2D(TVector3& vecA, TVector3& vecB)
+    double calcAngle2D(const TVector3& vecA, const TVector3& vecB)
     {
       double angle = ((vecA[0] * vecB[0] + vecA[1] * vecB[1]) / sqrt(vecA.Perp2() * vecB.Perp2()));
       return filterNan(angle);
@@ -267,7 +268,7 @@ namespace Belle2 {
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians
      * WARNING it is radians, which is incompatible to fullAngle3D (°))
      */
-    double fullAngle2D(TVector3& vecA, TVector3& vecB)
+    double fullAngle2D(const TVector3& vecA, const TVector3& vecB)
     {
       return acos(calcAngle2D(vecA, vecB));
       //return filterNan(angle);
@@ -276,7 +277,7 @@ namespace Belle2 {
 
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter, returning unit: radius in [cm] (positive value)*/
-    double calcRadius(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter)
+    double calcRadius(const TVector3& a, const TVector3& b, const TVector3& c, const TVector3& circleCenter)
     {
       return ((circleCenter - a).Perp() + (circleCenter - b).Perp() + (circleCenter - c).Perp()) /
              3.;   // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
@@ -285,7 +286,7 @@ namespace Belle2 {
 
 
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
-    void calcCircleCenter(TVector3& a, TVector3& b, TVector3& c, TVector3& circleCenter)
+    void calcCircleCenter(const TVector3& a, const TVector3& b, const TVector3& c, TVector3& circleCenter)
     {
       // calculates the intersection point using Cramer's rule.
       // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule
@@ -312,12 +313,13 @@ namespace Belle2 {
 
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature. first vector should be outer hit, second = center hit, third is inner hit*/
-    int calcSign(TVector3& a, TVector3& b, TVector3& c);
+    int calcSign(const TVector3& a, const TVector3& b, const TVector3& c);
 
 
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. +1 represents a left-oriented curvature, -1 means having a right-oriented curvature. 0 means it is approximately straight. first vector should be outer hit, second = center hit, third is inner hit*/
-    int calcSign(TVector3& a, TVector3& b, TVector3& c, TVector3& sigma_a, TVector3& sigma_b, TVector3& sigma_c)
+    int calcSign(const TVector3& a, const TVector3& b, const TVector3& c, const TVector3& sigma_a, const TVector3& sigma_b,
+                 const TVector3& sigma_c)
     {
       TVector3 c2b = b - c;   c2b.SetZ(0.);
       TVector3 b2a = a - b;   b2a.SetZ(0.);

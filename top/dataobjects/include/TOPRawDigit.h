@@ -62,8 +62,9 @@ namespace Belle2 {
     /**
      * Usefull constructor
      * @param scrodID SCROD ID
+     * @param dataType data type
      */
-    explicit TOPRawDigit(unsigned short scrodID, EDataTypes dataType):
+    TOPRawDigit(unsigned short scrodID, EDataTypes dataType):
       m_scrodID(scrodID), m_dataType(dataType)
     {}
 
@@ -169,14 +170,14 @@ namespace Belle2 {
 
     /**
      * Sets number of global clock tics since last revo9 flag (production firmware only)
-     * @param revo9counter
+     * @param revo9Counter counter state
      */
     void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
 
     /**
      * Sets beam orbit synchronisation phase (production firmware only)
      * 9-state count: valid values are 0 - 8
-     * @param beam orbit sunchronisation phase
+     * @param phase beam orbit sunchronisation phase
      */
     void setPhase(unsigned short phase) {m_phase = phase;}
 

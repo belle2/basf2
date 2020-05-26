@@ -55,6 +55,7 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
+    //! Clean up PVs
     void cleanPVs(void);
 
     //! PXD Hits

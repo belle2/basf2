@@ -235,7 +235,7 @@ namespace Belle2 {
      */
     static constexpr int getTotalModuleNumber()
     {
-      return EKLMElementNumbers::getMaximalSectorNumber() +
+      return EKLMElementNumbers::getMaximalSectorGlobalNumber() +
              BKLMElementNumbers::getMaximalLayerGlobalNumber();
     }
 

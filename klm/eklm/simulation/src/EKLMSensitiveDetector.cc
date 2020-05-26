@@ -27,11 +27,10 @@
 
 using namespace Belle2;
 
-EKLM::EKLMSensitiveDetector::
-EKLMSensitiveDetector(G4String name)
-  : Simulation::SensitiveDetectorBase(name, Const::KLM)
+EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name) :
+  Simulation::SensitiveDetectorBase(name, Const::KLM),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");

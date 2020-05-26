@@ -42,7 +42,9 @@ namespace Belle2 {
     BKLMHit1d& operator=(const BKLMHit1d&);
 
     //! Destructor
-    virtual ~BKLMHit1d() {}
+    virtual ~BKLMHit1d()
+    {
+    }
 
     //! Determine whether this 1D hit is in RPC or scintillator
     //! @return whether this 1D hit is in RPC (true) or scintillator (false)
@@ -111,15 +113,24 @@ namespace Belle2 {
     //! Get detector-module identifier
     //! @return detector-module identifier
     //! @sa BKLMStatus.h
-    int getModuleID() const { return m_ModuleID; }
+    int getModuleID() const
+    {
+      return m_ModuleID;
+    }
 
     //! Get reconstructed hit time
     //! @return reconstructed hit time (ns)
-    float getTime() const { return m_Time; }
+    float getTime() const
+    {
+      return m_Time;
+    }
 
     //! Get energy deposition
     //! @return energy deposition (MeV)
-    float getEnergyDeposit() const { return m_EnergyDeposit; }
+    float getEnergyDeposit() const
+    {
+      return m_EnergyDeposit;
+    }
 
   private:
 

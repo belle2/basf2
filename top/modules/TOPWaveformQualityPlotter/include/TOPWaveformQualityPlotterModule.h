@@ -65,13 +65,13 @@ namespace Belle2 {
      * Draws the full waveforms onto the TProfiles
      * @param rawwave the raw waveform
      */
-    void drawWaveforms(const TOPRawWaveform&);
+    void drawWaveforms(const TOPRawWaveform& rawwave);
 
     /**
      * Fills the debugging 1D histograms and hitmaps
      * @param rawwave the raw waveform
      */
-    void basicDebuggingPlots(const TOPRawWaveform&);
+    void basicDebuggingPlots(const TOPRawWaveform& rawwave);
 
   private:
     int m_iEvent = -1;             /**< keeps track of iterations within run */

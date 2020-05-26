@@ -79,7 +79,10 @@ namespace Belle2 {
       /**
        * Get line segments.
        */
-      LineSegment2D** getLineSegments() const;
+      LineSegment2D** getLineSegments() const
+      {
+        return m_LineSegments;
+      }
 
     private:
 

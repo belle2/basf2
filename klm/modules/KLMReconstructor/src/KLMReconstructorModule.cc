@@ -68,6 +68,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
   m_PromptTime(0),
   m_PromptWindow(0),
   m_bklmGeoPar(nullptr),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),
   m_eklmTransformData(nullptr),
@@ -83,7 +84,6 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()
@@ -154,6 +154,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
   for (int index = 0; index < m_Digits.getEntries(); ++index) {
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
+    if (digit->isMultiStrip())
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
@@ -241,6 +243,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
+    if (m_Digits[i]->isMultiStrip())
       continue;
     if (m_Digits[i]->isGood())
       digitVector.push_back(m_Digits[i]);

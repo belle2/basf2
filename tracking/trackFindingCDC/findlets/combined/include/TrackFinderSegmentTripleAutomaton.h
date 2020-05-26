@@ -63,7 +63,8 @@ namespace Belle2 {
       SegmentTripleCreator m_segmentTripleCreator;
 
       /// Instance of the segment triple relation creator
-      WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter> m_segmentTripleRelationCreator;
+      WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter, WeightedRelation>
+      m_segmentTripleRelationCreator;
 
       /// Instance of the cellular automaton creating  creating tracks over segment triple
       TrackCreatorSegmentTripleAutomaton m_trackCreatorSegmentTripleAutomaton;

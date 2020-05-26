@@ -31,13 +31,14 @@ use_local_database("localDB/localDB.txt")
 # and then run the importer
 dbImporter = ClockDatabaseImporter()
 
-dbImporter.setGlobalClockFreq(508.887/4.)
+dbImporter.setAcceleratorRF(508.887)
 
 dbImporter.setClockPrescale('top', 'sampling', 6)
 dbImporter.setClockPrescale('svd', 'sampling', 4)
 dbImporter.setClockPrescale('ecl', 'sampling', 3 * 24)
-dbImporter.setClockPrescale('ecl', 'fitting', 3)
-dbImporter.setClockPrescale('klm', 'dummy', 5)
+dbImporter.setClockPrescale('ecl', 'fitting', 12)
 
 # import constants
 dbImporter.importClock()
+
+#  LocalWords:  setAcceleratorRF

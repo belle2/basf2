@@ -1,0 +1,34 @@
+[INFO] Steering file: analysis/tests/tdcpv_variables.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: mu- (mu+)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: pi- (pi+)
+[INFO]    -> MDST source: Tracks
+[INFO]    -> With cuts  : 
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
+[INFO]    -> MDST source: ECLClusters
+[INFO]    -> With cuts  : 
+[INFO] ParticleVertexFitter: Performing vertex fit on J/psi using KFit
+[INFO] TagVertexModule : magnetic field = 1.45279
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : J/psi (0+1)
+[INFO] [ParticlePrinterModule] END   ------------------------------
+[INFO] [ParticlePrinterModule] START ------------------------------
+[INFO]  ParticleList : J/psi (0+1)
+[INFO]  - 25 = 443[0]
+[INFO]      o) daughter indices = 5 2
+[INFO]      o) DeltaT = 1.66314
+[INFO]      o) DeltaTErr = 0.407876
+[INFO]      o) DeltaTBelle = 1.68878
+[INFO]      o) TagVz = -0.0100209
+[INFO]      o) TagVzErr = 0.00199456
+[INFO] [ParticlePrinterModule] END   ------------------------------

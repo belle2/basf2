@@ -188,9 +188,10 @@ namespace Belle2 {
 
     double particleDeltaTBelle(const Particle* particle)
     {
-      double boost =  PCmsLabTransform().getBoostVector().Mag();
+      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
-      return particleDeltaZ(particle) / (boost * c);
+      return particleDeltaZ(particle) / bg / c;
     }
     double particleMCDeltaTau(const Particle* particle)
     {

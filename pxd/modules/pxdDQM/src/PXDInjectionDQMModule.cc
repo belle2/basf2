@@ -36,7 +36,7 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("PXDClusterName", m_PXDClustersName, "Name of PXD clusters", std::string(""));
   addParam("eachModule", m_eachModule, "create for each module", false);
   addParam("offlineStudy", m_offlineStudy, "use finest binning and larger range", false);
-  addParam("useClusters", m_useClusters, "use cluster instead of raw hits", true);
+  addParam("useClusters", m_useClusters, "use cluster instead of raw hits", false);
 }
 
 void PXDInjectionDQMModule::defineHisto()

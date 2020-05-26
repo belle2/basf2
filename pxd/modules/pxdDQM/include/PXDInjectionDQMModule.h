@@ -44,6 +44,7 @@ namespace Belle2 {
       bool m_eachModule{false}; ///< create a histo per module
       bool m_offlineStudy{false}; ///< create histos with much finer binning and larger range
       bool m_useClusters{false}; ///< use PXDClusters instead of Raw Hits
+      bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
@@ -65,9 +66,6 @@ namespace Belle2 {
 
       TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
       TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
-
-      std::map<VxdID, TH1F*> hEOccModAfterInjLER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      std::map<VxdID, TH1F*> hEOccModAfterInjHER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
       TH1F* hMaxOccAfterInjLER{};          /**< Histogram Max Occupancy after LER injection */
       TH1F* hMaxOccAfterInjHER{};          /**< Histogram Max Occupancy after HER injection */

@@ -14,7 +14,6 @@ __authors__ = [
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from variables import variables as vm
-from validation_tools.metadata import create_validation_histograms
 
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
@@ -72,6 +71,10 @@ class LeptonicUntagged(BaseSkim):
         self.SkimLists = lepList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"], "", path=path)
 
         ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)

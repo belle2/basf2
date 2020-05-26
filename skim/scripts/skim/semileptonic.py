@@ -12,7 +12,6 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 
 
@@ -113,6 +112,10 @@ class PRsemileptonicUntagged(BaseSkim):
         self.SkimLists = ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"]
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.cutAndCopyLists("B0:PRSemileptonic_semileptonic",
                            ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"], "", path=path)
 
@@ -234,6 +237,10 @@ class SLUntagged(BaseSkim):
         self.SkimLists = b0List + bplusList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.cutAndCopyLists("B+:SLUntagged",
                            ["B+:SLUntagged_0", "B+:SLUntagged_1", "B+:SLUntagged_2", "B+:SLUntagged_3"],
                            "", path=path)

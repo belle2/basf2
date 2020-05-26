@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 #include <tracking/ckf/general/findlets/TrackLoader.h>
@@ -106,7 +106,7 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToSVDState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
     /// Vector for storing the filtered results

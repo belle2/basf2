@@ -33,8 +33,10 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("PXDINJ"));
   addParam("PXDRawHitsName", m_PXDRawHitsName, "Name of PXD raw hits", std::string(""));
+  addParam("PXDClusterName", m_PXDClustersName, "Name of PXD clusters", std::string(""));
   addParam("eachModule", m_eachModule, "create for each module", false);
   addParam("offlineStudy", m_offlineStudy, "use finest binning and larger range", false);
+  addParam("useClusters", m_useClusters, "use cluster instead of raw hits", true);
 }
 
 void PXDInjectionDQMModule::defineHisto()
@@ -113,7 +115,11 @@ void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
-  m_storeRawHits.isRequired(m_PXDRawHitsName);
+  if (m_useClusters) {
+    m_storeClusters.isRequired(m_PXDClustersName);
+  } else {
+    m_storeRawHits.isRequired(m_PXDRawHitsName);
+  }
 }
 
 void PXDInjectionDQMModule::beginRun()
@@ -145,12 +151,19 @@ void PXDInjectionDQMModule::event()
     auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
     if (difference != 0x7FFFFFFF) {
-      // count raw pixel hits per module, only if necessary
+      // count raw pixel hits or clusters per module, only if necessary
       unsigned int all = 0;
       std::map <VxdID, int> freq;// count the number of RawHits per sensor
-      for (auto& p : m_storeRawHits) {
-        freq[p.getSensorID()]++;
-        all++;
+      if (m_useClusters) {
+        for (auto& p : m_storeClusters) {
+          freq[p.getSensorID()]++;
+          all++;
+        }
+      } else {
+        for (auto& p : m_storeRawHits) {
+          freq[p.getSensorID()]++;
+          all++;
+        }
       }
       float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {

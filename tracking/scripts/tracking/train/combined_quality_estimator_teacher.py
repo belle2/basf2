@@ -379,11 +379,23 @@ class GenerateSimTask(Basf2PathTask):
         """
         basf2.set_random_seed(self.random_seed)
         path = basf2.create_path()
+        if self.experiment_number in [1002, 1003]:
+            runNo = 0
+        elif self.experiment_number == 12:
+            runNo = 2300
         path.add_module(
-            "EventInfoSetter", evtNumList=[self.n_events], runList=[0], expList=[self.experiment_number]
+            "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
         )
+        # import generators as ge
+        # import beamparameters as bp
+        # beamparameters = bp.add_beamparameters(path, "Y4S")
+        # beamparameters.param("covVertex", [(14.8e-4)**2, (1.5e-4)**2, (360e-4)**2])
+        # ge.add_babayaganlo_generator(path=path, finalstate='ee', minenergy=0.15, minangle=10.0)
         path.add_module("EvtGenInput")
-        bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # if self.experiment_number == 8:
+        bkg_files = self.bkgfiles_dir
+        # else:
+        #    bkg_files = background.get_background_files(self.bkgfiles_dir)
         if self.experiment_number == 1002:
             # remove KLM because of bug in backround files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
@@ -525,16 +537,43 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         postfix = random_seed[6:]
         if 'cdc' not in postfix:
             postfix += '_cdc'
-        return 'qe_records_N' + str(n_events) + postfix + '.root'
+        if 'DATA__' in random_seed:
+            return 'qe_records_DATA_cdc.root'
+        else:
+            return 'qe_records_N' + str(n_events) + postfix + '.root'
+
+    def get_input_files(self, n_events=None, random_seed=None):
+        if n_events is None:
+            n_events = self.n_events
+        if random_seed is None:
+            random_seed = self.random_seed
+        if "USE_EX" in random_seed:
+            # return ['datafiles/generated_mc_N' + str(n_events) + random_seed[6:] + '.root']
+            return ['datafiles/generated_mc_N' + str(n_events) + '_MC13b_GTs_r1060' + random_seed[6:] + '.root']
+        elif "DATA__" in random_seed:
+            # ['/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT1.f00001.root',
+            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT2.f00002.root',
+            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT3.f00003.root',
+            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT4.f00004.root',
+            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT5.f00005.root', ]
+            return ['/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT1.f00001.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT2.f00002.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT3.f00003.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT4.f00004.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT5.f00005.root']
+        else:
+            return self.get_input_file_names(GenerateSimTask.output_file_name(
+                GenerateSimTask, n_events=n_events, random_seed=random_seed[7:]))
 
     def requires(self):
         """
         Generate list of luigi Tasks that this Task depends on.
         """
-        if "USE_EX" in self.random_seed:
-            yield CheckExistingFile(
-                filename='datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root',
-                )
+        if "USE_EX" in self.random_seed or "DATA__" in self.random_seed:
+            for filename in self.get_input_files():
+                yield CheckExistingFile(
+                    filename=filename,
+                    )
         else:
             yield GenerateSimTask(
                 bkgfiles_dir=MasterTask.bkgfiles_by_exp[self.experiment_number],
@@ -556,24 +595,32 @@ class CDCQEDataCollectionTask(Basf2PathTask):
         Create basf2 path with CDC standalone tracking and CDC QE with recording filter for MVA feature collection.
         """
         path = basf2.create_path()
-        if "USE_EX" in self.random_seed:
-            inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root']
-        else:
-            inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
-                GenerateSimTask, n_events=self.n_events, random_seed=self.random_seed[7:]))
+        # if "USE_EX" in self.random_seed:
+        #    #inputFileNames = ['datafiles/generated_mc_N' + str(self.n_events) + self.random_seed[6:] + '.root']
+        #    inputFileNames = ['/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01968/sub00/physics.0008.01968.HLT1.f00001.root']
+        # else:
+        #    inputFileNames = self.get_input_file_names(GenerateSimTask.output_file_name(
+        #        GenerateSimTask, n_events=self.n_events, random_seed=self.random_seed[7:]))
+        inputFileNames = self.get_input_files()
         path.add_module(
             "RootInput",
             inputFileNames=inputFileNames,
         )
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
-        tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
+        if 'DATA__' in self.random_seed:
+            filter_choice = "recording_data"
+            from rawdata import add_unpackers
+            add_unpackers(path, components=['CDC'])
+        else:
+            filter_choice = "recording"
+            tracking.add_hit_preparation_modules(path)  # only needed for simulated hits
         tracking.add_cdc_track_finding(path, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
             path,
             name="TFCDC_TrackQualityEstimator",
-            filter="recording",
+            filter=filter_choice,
             filterParameters={
                 "rootFileName": self.get_output_file_name(self.get_records_file_name())
             },
@@ -1978,70 +2025,90 @@ class MasterTask(b2luigi.WrapperTask):
         for experiment_number, exclude_variables, cdc_training_target, fast_bdt_option in itertools.product(
                 experiment_numbers, exclude_variables_combinations, cdc_training_targets, fast_bdt_options
         ):
-            yield QEWeightsLocalDBCreatorTask(
-                n_events_training=self.n_events_training,
-                use_existing_files=use_existing_files,
-                experiment_number=experiment_number,
-                exclude_variables=exclude_variables,
-                cdc_training_target=cdc_training_target,
-                fast_bdt_option=fast_bdt_option,
-            )
-
-            if b2luigi.get_setting("run_validation_tasks", default=True):
-                yield FullTrackQEValidationPlotsTask(
+            # if test_selected_task is activated, only run the following tasks:
+            if b2luigi.get_setting("test_selected_task", default=False):
+                yield CDCQEDataCollectionTask(
+                    num_processes=self.num_processes,
+                    n_events=self.n_events_training,
+                    experiment_number=experiment_number,
+                    random_seed='REPROC_train_cdc',
+                )
+            # otherwise perform the full run:
+            else:
+                yield QEWeightsLocalDBCreatorTask(
                     n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
                     use_existing_files=use_existing_files,
                     experiment_number=experiment_number,
-                    cdc_training_target=cdc_training_target,
                     exclude_variables=exclude_variables,
-                    fast_bdt_option=fast_bdt_option,
-                )
-                yield CDCQEValidationPlotsTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    use_existing_files=use_existing_files,
-                    experiment_number=experiment_number,
-                    training_target=cdc_training_target,
-                    fast_bdt_option=fast_bdt_option,
-                )
-                yield VXDQEValidationPlotsTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    use_existing_files=use_existing_files,
-                    experiment_number=experiment_number,
+                    cdc_training_target=cdc_training_target,
                     fast_bdt_option=fast_bdt_option,
                 )
 
-            if b2luigi.get_setting("run_mva_evaluate", default=True):
-                # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
-                #  requires a latex installation to work
-                yield FullTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    use_existing_files=use_existing_files,
-                    experiment_number=experiment_number,
-                    cdc_training_target=cdc_training_target,
-                    exclude_variables=exclude_variables,
-                    fast_bdt_option=fast_bdt_option,
-                )
-                yield CDCTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    use_existing_files=use_existing_files,
-                    experiment_number=experiment_number,
-                    fast_bdt_option=fast_bdt_option,
-                    training_target=cdc_training_target,
-                )
-                yield VXDTrackQEEvaluationTask(
-                    n_events_training=self.n_events_training,
-                    n_events_testing=self.n_events_testing,
-                    use_existing_files=use_existing_files,
-                    experiment_number=experiment_number,
-                    fast_bdt_option=fast_bdt_option,
-                )
+                if b2luigi.get_setting("run_validation_tasks", default=True):
+                    yield FullTrackQEValidationPlotsTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        cdc_training_target=cdc_training_target,
+                        exclude_variables=exclude_variables,
+                        fast_bdt_option=fast_bdt_option,
+                    )
+                    yield CDCQEValidationPlotsTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        training_target=cdc_training_target,
+                        fast_bdt_option=fast_bdt_option,
+                    )
+                    yield VXDQEValidationPlotsTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        fast_bdt_option=fast_bdt_option,
+                    )
+
+                if b2luigi.get_setting("run_mva_evaluate", default=True):
+                    # Evaluate trained weightfiles via basf2_mva_evaluate.py on separate testdatasets
+                    #  requires a latex installation to work
+                    yield FullTrackQEEvaluationTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        cdc_training_target=cdc_training_target,
+                        exclude_variables=exclude_variables,
+                        fast_bdt_option=fast_bdt_option,
+                    )
+                    yield CDCTrackQEEvaluationTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        fast_bdt_option=fast_bdt_option,
+                        training_target=cdc_training_target,
+                    )
+                    yield VXDTrackQEEvaluationTask(
+                        n_events_training=self.n_events_training,
+                        n_events_testing=self.n_events_testing,
+                        use_existing_files=use_existing_files,
+                        experiment_number=experiment_number,
+                        fast_bdt_option=fast_bdt_option,
+                    )
 
 
 if __name__ == "__main__":
+    basf2.conditions.reset()
+    # basf2.conditions.prepend_globaltag("release-04-00-03")
+    basf2.conditions.prepend_globaltag("online_proc10")
+    basf2.conditions.prepend_globaltag("data_reprocessing_proc10")
+    basf2.conditions.prepend_globaltag("mc_production_MC13b")
+    # basf2.conditions.prepend_globaltag("online_proc11")
+    # basf2.conditions.prepend_globaltag("data_reprocessing_proc11")
+    # basf2.conditions.prepend_globaltag("mc_production_MC13b_proc11")
+    basf2.conditions.prepend_globaltag("klm_alignment_testing")
+    # basf2.conditions.prepend_globaltag("mc_production_MC13a_rev1")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)

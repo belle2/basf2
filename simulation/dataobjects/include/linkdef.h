@@ -9,6 +9,5 @@
 #pragma link C++ class Belle2::BeamBackHit+;
 #pragma link C++ class Belle2::MCParticleTrajectory+;
 #pragma link C++ class Belle2::MCTrajectoryPoint+;
-#pragma link C++ class Belle2::SimClockState+;
 
 #endif

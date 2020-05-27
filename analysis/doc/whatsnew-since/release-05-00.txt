@@ -8,6 +8,9 @@ Variables
 
    .. warning:: this no longer dumps all possible trigger names instead please see `b2hlt_triggers` for a list of all possible names.
 
+   .. seealso:: ``b2hlt_triggers print --database online --format full-identifiers``
+
+
  * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``,
    and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`

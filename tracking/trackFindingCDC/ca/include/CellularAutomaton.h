@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      *  Implements the weighted cellular automaton algorithm
      */
-    template<class ACellHolder, template<class> class WeightedRelationClass>
+    template<class ACellHolder, template<class ...> class WeightedRelationClass>
     class CellularAutomaton {
 
     private:

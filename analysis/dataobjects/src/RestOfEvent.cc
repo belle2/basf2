@@ -253,7 +253,8 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
   if (!mask->isValid()) {
     return false; //We should have particles here!
   }
-  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite) {
+  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+      particleV0->getParticleSource() != Particle::EParticleSourceObject::c_V0) {
     return false;
   }
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();

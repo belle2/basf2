@@ -1,0 +1,22 @@
+# EventType: 1110020001
+# Descriptor: [B0 -> pi+ pi-]
+# NickName: Bd_pipi
+# Documentation: Charmless B decay and TDCPV studies. Generated values:  Acp = 0.3097 Scp = -0.6713 (PDG 2019) 
+# Tested: Yes
+# PhysicsWG: BTOCHARMLESS, TDCPV
+# Responsible: F. Abudinen
+# Email: fernando.abudinen@ts.infn.it
+# Cuts: None
+# Date: 23/05/2020
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000   pi+ pi-   SSS_CP 1.6  dm 1 0.549249 -2.41269 0.756508 0.00347013;
+Enddecay
+CDecay anti-B0sig
+
+End
+

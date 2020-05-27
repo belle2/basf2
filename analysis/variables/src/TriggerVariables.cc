@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
@@ -49,13 +49,8 @@ namespace Belle2 {
           swtcr = swtr->getResult(triggerIdentifier);
         }
       } catch (const std::out_of_range&) {
-        // then the trigger identifier is wrong
-        std::string err = "The trigger identifier \"" + triggerIdentifier;
-        err += "\" was not found. Maybe you misspelled it?\n";
-        err += "Here are all possible trigger identifiers: \n";
-        auto res = swtr->getResults();
-        for (auto& re : res) err += re.first + "\n";
-        B2FATAL(err);
+        // then the trigger identifier is wrong -- silently return nan
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
     };
@@ -304,7 +299,7 @@ namespace Belle2 {
         DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(triggerIdentifier);
         if (not downloadedCut)
         {
-          B2FATAL("There is no trigger with the given name " << triggerIdentifier << "!");
+          return std::numeric_limits<double>::quiet_NaN();
         }
 
         return double(downloadedCut->getPreScaleFactor());
@@ -341,20 +336,23 @@ namespace Belle2 {
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "defined as reject (-1), accept (1), or noResult (0). Note "
                       "that the meanings of these change depending if using trigger "
-                      "or the skim stage, hence expert.");
+                      "or the skim stage, hence expert."
+                      "If the trigger identifier is not found, returns NaN.");
     REGISTER_VARIABLE("SoftwareTriggerResultNonPrescaled(triggerIdentifier)", softwareTriggerResultNonPrescaled,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "if this trigger would not be prescaled."
                       "Please note, this is not the final HLT decision! "
                       "It is defined as reject (-1), accept (1), or noResult (0). Note "
                       "that the meanings of these change depending if using trigger "
-                      "or the skim stage, hence expert.");
+                      "or the skim stage, hence expert."
+                      "If the trigger identifier is not found, returns NaN.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
                       "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
     REGISTER_VARIABLE("SoftwareTriggerPrescaling(triggerIdentifier)", softwareTriggerPrescaling,
                       "[Eventbased] return the prescaling for the specific software trigger identifier. "
                       "Please note, this prescaling is taken from the currently setup database. It only corresponds "
-                      "to the correct HLT prescale if you are using the online database!");
+                      "to the correct HLT prescale if you are using the online database!"
+                      "If the trigger identifier is not found, returns NaN.");
     //-------------------------------------------------------------------------
   }
 }

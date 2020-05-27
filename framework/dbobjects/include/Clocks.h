@@ -36,15 +36,15 @@ namespace Belle2 {
 
   private:
 
-    // Map of clocks derived from the global clock.
-    // Clocks are stored as integer divisor of the global clock
+    /** Map of clocks derived from the global clock. /
+    /  Clocks are stored as integer divisor of the global clock */
     std::map<Const::EDetector, std::map<std::string, int>> prescaleMap;
 
-    // Map of clocks not  derived from the global clock.
-    // Clocks are stored as frequency in MhZ
+    /** Map of clocks not derived from the global clock.
+    /  Clocks are stored as frequency in MhZ */
     std::map<Const::EDetector, std::map<std::string, float>> clocksMap;
 
-    Float_t m_AcceleratorRF; //[MHz]
+    Float_t m_AcceleratorRF; /** [MHz] */
 
     ClassDef(Clocks, 1)
   };

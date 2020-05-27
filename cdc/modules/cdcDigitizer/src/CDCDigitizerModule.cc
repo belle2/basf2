@@ -69,8 +69,6 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
   addParam("DoSmearing", m_doSmearing,
            "If false, drift length will not be smeared.", true);
 
-  //  addParam("2015AprRun", m_2015AprRun, "Cosmic runs in April 2015 (i.e. only super-layer #4 on) ?", false);
-
   addParam("TrigTimeJitter", m_trigTimeJitter,
            "Magnitude (w) of trigger timing jitter (ns). The trigger timing is randuminzed uniformly in a time window of [-w/2, +w/2].",
            0.);
@@ -283,25 +281,6 @@ void CDCDigitizerModule::event()
     m_wireID = m_aCDCSimHit->getWireID();
     //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
-    // Reject totally-dead wire; to be replaced by isDeadWire() in future
-    if (m_cdcgp->isBadWire(m_wireID)) {
-      //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
-      continue;
-    }
-    // Reject partly-dead wire as well
-    double eff = 1.;
-    if (m_cdcgp->isDeadWire(m_wireID, eff)) {
-      //      std::cout << "wid,eff= " << m_wireID << " " << eff << std::endl;
-      if (eff < gRandom->Uniform()) continue;
-    }
-
-    /*    // Special treatment for cosmic runs in April 2015
-    if (m_2015AprRun) {
-      if (m_wireID.getISuperLayer() != 4) continue;
-      if (m_wireID.getIWire() > 15)       continue;
-    }
-    */
-
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_boardID    = m_cdcgp->getBoardID(m_wireID);
     //    B2DEBUG(29, "m_boardID= " << m_boardID);
@@ -438,6 +417,35 @@ void CDCDigitizerModule::event()
       continue;
     }
 
+    // add one hit per trigger time window to the trigger signal map
+    unsigned short trigWindow = floor((hitDriftTime - m_tMin) * m_tdcBinWidthInv / 32);
+    iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
+    if (iterSignalMapTrg == signalMapTrg.end()) {
+      //      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
+      //                                    SignalInfo(iHits, hitDriftTime, hitdE)));
+      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
+                                    SignalInfo(iHits, hitDriftTime, adcCount)));
+    } else {
+      if (hitDriftTime < iterSignalMapTrg->second.m_driftTime) {
+        iterSignalMapTrg->second.m_driftTime = hitDriftTime;
+        iterSignalMapTrg->second.m_simHitIndex = iHits;
+      }
+      //      iterSignalMapTrg->second.m_charge += hitdE;
+      iterSignalMapTrg->second.m_charge += adcCount;
+    }
+
+    // Reject totally-dead wire; to be replaced by isDeadWire() in future
+    if (m_cdcgp->isBadWire(m_wireID)) {
+      //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
+      continue;
+    }
+    // Reject partly-dead wire as well
+    double eff = 1.;
+    if (m_cdcgp->isDeadWire(m_wireID, eff)) {
+      //      std::cout << "wid,eff= " << m_wireID << " " << eff << std::endl;
+      if (eff < gRandom->Uniform()) continue;
+    }
+
     // For TOT simulation, calculate drift length from In to the wire, and Out to the wire. The calculation is apprximate ignoring wire sag (this would be ok because TOT simulation is not required to be so accurate).
     const double a = bwpAlign.X();
     const double b = bwpAlign.Y();
@@ -503,22 +511,6 @@ void CDCDigitizerModule::event()
               iterSignalMap->second.m_minDriftL);
     }
 
-    // add one hit per trigger time window to the trigger signal map
-    unsigned short trigWindow = floor((hitDriftTime - m_tMin) * m_tdcBinWidthInv / 32);
-    iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
-    if (iterSignalMapTrg == signalMapTrg.end()) {
-      //      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
-      //                                    SignalInfo(iHits, hitDriftTime, hitdE)));
-      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
-                                    SignalInfo(iHits, hitDriftTime, adcCount)));
-    } else {
-      if (hitDriftTime < iterSignalMapTrg->second.m_driftTime) {
-        iterSignalMapTrg->second.m_driftTime = hitDriftTime;
-        iterSignalMapTrg->second.m_simHitIndex = iHits;
-      }
-      //      iterSignalMapTrg->second.m_charge += hitdE;
-      iterSignalMapTrg->second.m_charge += adcCount;
-    }
   } // end loop over SimHits.
 
   //--- Now Store the results into CDCHits and

@@ -171,7 +171,6 @@ void PXDInjectionDQMModule::event()
           all++;
         }
       }
-
       float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
       if (it.GetIsHER(0)) {
         hOccAfterInjHER->Fill(diff2, all);
@@ -194,8 +193,16 @@ void PXDInjectionDQMModule::event()
           }
         }
         if (hOccAfterInjHERGate) {
-          for (auto& p : m_storeRawHits) {
-            hOccAfterInjHERGate->Fill(difference, p.getRow() / 4);
+          if (m_useClusters) {
+            // Cluster does not contain VCellID, need to change histogramm completely
+            // -> doesnt work with clusters!
+//             for (auto& p : m_storeClusters) {
+//               hOccAfterInjHERGate->Fill(difference, p.getVCellID() / 4);
+//             }
+          } else {
+            for (auto& p : m_storeRawHits) {
+              hOccAfterInjHERGate->Fill(difference, p.getRow() / 4);
+            }
           }
         }
       } else {
@@ -220,13 +227,21 @@ void PXDInjectionDQMModule::event()
 
         }
         if (hOccAfterInjLERGate) {
-          for (auto& p : m_storeRawHits) {
-            hOccAfterInjLERGate->Fill(difference, p.getRow() / 4);
-          }
+          if (m_useClusters) {
+            // Cluster does not contain VCellID, need to change histogramm completely
+            // -> doesnt work with clusters!
+//             for (auto& p : m_storeClusters) {
+//               hOccAfterInjLERGate->Fill(difference, p.getVCellID() / 4);
+//             }
+          } else
+            for (auto& p : m_storeRawHits) {
+              hOccAfterInjLERGate->Fill(difference, p.getRow() / 4);
+            }
         }
       }
     }
-
-    break;
   }
+
+  break;
+}
 }

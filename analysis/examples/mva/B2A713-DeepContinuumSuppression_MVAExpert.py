@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -9,7 +8,7 @@
 # mdst files and reconstructs B->KsPi0 decays, applies the MVAExpert module,
 # and writes out flat NTuples containing all variables used in the deep continuum
 # suppression training + the (transformed) network output distribution.
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # This module requires the weightfile produced in B2A712 (Deep_Feed_Forward.xml).
@@ -21,12 +20,15 @@
 #
 ################################################################################
 
-from modularAnalysis import *
+import basf2
+import modularAnalysis as ma
+from vertex import TagV
 import variables as v
 import glob
+import sys
 import numpy as np
 
-set_log_level(LogLevel.ERROR)
+basf2.set_log_level(basf2.LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
 if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
@@ -51,57 +53,59 @@ else:
 outfile = 'MVAExpert_fullNTuple_' + step + '.root'
 # ---------------------------------------------------------------------------------------------
 
-# Perform analysis.
-inputMdstList('default', input)
+main = basf2.create_path()
 
-analysis_main.add_module('ProgressBar')
+# Perform analysis.
+ma.inputMdstList('default', input, path=main)
+
+main.add_module('ProgressBar')
 
 # Build B candidate like in B2A701-ContinuumSuppression_Input.py
-fillParticleList('gamma', 'goodGamma == 1')
+ma.fillParticleList('gamma', 'goodGamma == 1', path=main)
 
-fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5')
+ma.fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=main)
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516')
-reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152')
-reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2')
+ma.reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=main)
+ma.reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=main)
+ma.reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=main)
 
-matchMCTruth('B0')
-buildRestOfEvent('B0')
+ma.matchMCTruth('B0', path=main)
+ma.buildRestOfEvent('B0', path=main)
 
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-appendROEMasks('B0', [cleanMask])
+ma.appendROEMasks('B0', [cleanMask], path=main)
 
-buildContinuumSuppression('B0', 'cleanMask')
+ma.buildContinuumSuppression('B0', 'cleanMask', path=main)
 
 # Accept only correctly reconstructed B candidates as signal
-applyCuts('B0', 'isSignal or isContinuumEvent')
+ma.applyCuts('B0', 'isSignal or isContinuumEvent', path=main)
 
 # Tag B candidate for Vertex information
-TagV('B0')
+TagV('B0', path=main)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
-roe_path = create_path()
+roe_path = basf2.create_path()
 
-deadEndPath = create_path()
+deadEndPath = basf2.create_path()
 
-signalSideParticleFilter('B0', '', roe_path, deadEndPath)
+ma.signalSideParticleFilter('B0', '', roe_path, deadEndPath)
 
 # Build particle lists for low level variables
-fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
-fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
-fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
-fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
-fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
-fillParticleList('pi-:chargedMsignal', 'isInRestOfEvent == 0', path=roe_path)
+ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
+ma.fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
+ma.fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
+ma.fillParticleList('pi-:chargedMsignal', 'isInRestOfEvent == 0', path=roe_path)
 
 v.variables.addAlias('cmsp', 'useCMSFrame(p)')
 
-rankByHighest('gamma:roe', 'cmsp', path=roe_path)
-rankByHighest('gamma:signal', 'cmsp', path=roe_path)
-rankByHighest('pi+:chargedProe', 'cmsp', path=roe_path)
-rankByHighest('pi+:chargedPsignal', 'cmsp', path=roe_path)
-rankByHighest('pi-:chargedMroe', 'cmsp', path=roe_path)
-rankByHighest('pi-:chargedMsignal', 'cmsp', path=roe_path)
+ma.rankByHighest('gamma:roe', 'cmsp', path=roe_path)
+ma.rankByHighest('gamma:signal', 'cmsp', path=roe_path)
+ma.rankByHighest('pi+:chargedProe', 'cmsp', path=roe_path)
+ma.rankByHighest('pi+:chargedPsignal', 'cmsp', path=roe_path)
+ma.rankByHighest('pi-:chargedMroe', 'cmsp', path=roe_path)
+ma.rankByHighest('pi-:chargedMsignal', 'cmsp', path=roe_path)
 
 # Define traditional Continuum Suppression Variables
 contVars = [
@@ -185,9 +189,9 @@ roe_path.add_module('MVAExpert', listNames=['B0'], extraInfoName='Deep_CS', iden
 expertVars = ['extraInfo(Deep_CS)', 'transformedNetworkOutput(Deep_CS,0.1,1.0)']
 
 # Create output file with all sets of variables.
-variablesToNtuple('B0', variables + expertVars, treename='tree', filename=outfile, path=roe_path)
+ma.variablesToNtuple('B0', variables + expertVars, treename='tree', filename=outfile, path=roe_path)
 
-analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-process(analysis_main)
-print(statistics)
+basf2.process(main)
+print(basf2.statistics)

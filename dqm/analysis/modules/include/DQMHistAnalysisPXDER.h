@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisPXDERModule();
     /* Destructor */
-    ~DQMHistAnalysisPXDERModule() override final;
+    ~DQMHistAnalysisPXDERModule();
 
   private:
 
@@ -212,7 +212,7 @@ namespace Belle2 {
 
     /**
      * Get a histogram by name (DEPRECATED), better use function from base class!
-     * @param histogram The name of the histogram.
+     * @param histoname The name of the histogram.
      * @return The pointer to the histogram, or nullptr if not found.
      */
     TH1* GetHisto(TString histoname);

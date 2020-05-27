@@ -10,13 +10,6 @@
 
 #pragma once
 
-/* KLM headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-
-/* Belle 2 headers. */
-#include <framework/database/DBImportObjPtr.h>
-
 namespace Belle2 {
 
   /**
@@ -51,28 +44,19 @@ namespace Belle2 {
      */
     void importSimulationParameters();
 
-    /**
-     * Import electronics map.
-     * @param[in] electronicsMap EKLM electronics map.
-     */
-    void importElectronicsMap(const EKLMElectronicsMap* electronicsMap);
-
   private:
 
-    /** Electronics map. */
-    DBImportObjPtr<EKLMElectronicsMap> m_ElectronicsMap;
-
     /** Low experiment. */
-    int m_ExperimentLow;
+    int m_ExperimentLow = 0;
 
     /** Low run. */
-    int m_RunLow;
+    int m_RunLow = 0;
 
     /** High experiment. */
-    int m_ExperimentHigh;
+    int m_ExperimentHigh = -1;
 
     /** High run. */
-    int m_RunHigh;
+    int m_RunHigh = -1;
 
   };
 

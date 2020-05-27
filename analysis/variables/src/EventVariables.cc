@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sam Cunliffe     *
  *       for the EventKinematics variables: Ami Rostomyan,                *
  *                                          Michel Villanueva             *
  *                                                                        *
@@ -57,12 +57,34 @@ namespace Belle2 {
       return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
+    double isChargedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 521) return 1.0;
+      }
+      return 0.0;
+    }
+
+    double isUnmixedBEvent(const Particle*)
+    {
+      StoreArray<MCParticle> mcParticles;
+      std::vector<int> bPDGs;
+      for (const auto& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (abs(pdg_no) == 511) bPDGs.push_back(pdg_no);
+      }
+      if (bPDGs.size() == 2) {
+        return bPDGs[0] * bPDGs[1] < 0;
+      }
+      return std::numeric_limits<float>::quiet_NaN();
+    }
+
+
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
-      if (!mcParticles) {
-        return 0.0;
-      }
       for (const MCParticle& mcp : mcParticles) {
         int pdg_no = mcp.getPDG();
         if (mcp.getMother() == nullptr &&
@@ -80,10 +102,6 @@ namespace Belle2 {
     double nMCParticles(const Particle*)
     {
       StoreArray<MCParticle> mcps;
-      if (!mcps)  {
-        B2DEBUG(19, "Cannot find MCParticles array.");
-        return 0.0;
-      }
       return mcps.getEntries();
     }
 
@@ -179,6 +197,35 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       return (T.getBeamFourMomentum()).E();
+    }
+
+    double getGenIPX(const Particle*)
+    {
+      // generated IP corresponds to the generated vertex of the
+      // first not-initial and not-virtual MCParticle
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().X();
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double getGenIPY(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Y();
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double getGenIPZ(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Z();
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double getIPX(const Particle*)
@@ -442,11 +489,17 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event");
 
-    REGISTER_VARIABLE("EventType", eventType, "EventType (0 MC, 1 Data)");
+    REGISTER_VARIABLE("EventType", eventType, "[Eventbased] EventType (0 MC, 1 Data)");
     REGISTER_VARIABLE("isContinuumEvent", isContinuumEvent,
                       "[Eventbased] true if event doesn't contain an Y(4S)");
     REGISTER_VARIABLE("isNotContinuumEvent", isNotContinuumEvent,
                       "[Eventbased] 1.0 if event does contain an Y(4S) and therefore is not a continuum Event");
+
+    REGISTER_VARIABLE("isChargedBEvent", isChargedBEvent,
+                      "[Eventbased] true if event contains a charged B-meson");
+    REGISTER_VARIABLE("isUnmixedBEvent", isUnmixedBEvent,
+                      R"DOC([Eventbased] true if event contains opposite flavor neutral B-mesons,
+false in case of same flavor B-mesons and NaN if an event has no generated neutral B)DOC");
 
     REGISTER_VARIABLE("nTracks", nTracks,
                       "[Eventbased] number of tracks in the event");
@@ -476,11 +529,25 @@ namespace Belle2 {
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Beam momentum Pz (lab)");
 
-    REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
+    REGISTER_VARIABLE("IPX", getIPX, R"DOC(
+[Eventbased] x coordinate of the measured interaction point.
 
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
+.. note:: For old data and uncalibrated MC files this will return 0.0.
+
+.. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
+)DOC");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+
+    REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
+[Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
+Returns NAN for data.
+
+.. note:: This is normally smeared from 0.0
+)DOC");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] y coordinate of the interaction point used for the underlying **MC generation**.");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
                       "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
@@ -528,6 +595,9 @@ namespace Belle2 {
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,
-                      "[Eventbased][Calibration] Event T0 relative to trigger time in ns");
+                      "[Eventbased][Calibration] The Event t0, measured in ns, is the time of the event relative to the\n"
+                      "trigger time. The event time can be measured by several sub-detectors including the CDC, ECL, and TOP.\n"
+                      "This Event t0 variable is the final combined value of all the event time measurements.\n"
+                      "(Currently only the CDC and ECL are used in this combination.)");
   }
 }

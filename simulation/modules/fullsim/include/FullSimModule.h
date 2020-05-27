@@ -112,6 +112,7 @@ namespace Belle2 {
     double m_cdcProductionCut;             /*!< Secondary production threshold in CDC envelope. */
     double m_arichtopProductionCut;        /*!< Secondary production threshold in ARICH and TOP envelopes. */
     double m_eclProductionCut;             /*!< Secondary production threshold in ECL envelopes. */
+    double m_klmProductionCut;             /*!< Secondary production threshold in BKLM and EKLM envelopes. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
@@ -135,6 +136,9 @@ namespace Belle2 {
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+    std::vector<float> m_absorbers;        /**< The absorbers defined at given radii where tracks across them will be destroyed.
+                                                This set is used in the PXD only simulation for PXD gain calibration.*/
+
 
 
   private:

@@ -239,14 +239,14 @@ c masses not equal     @    (if_w.EQ.1 .AND. (iwm.EQ.7 .OR. iwp.EQ.7)) ) THEN
         do i=1,mm_nrchan
           densit(i) = densit(i)/dtot
           if(densit(i).gt.0.02d0) then
-        write(6,*) '      prob(',i,')=',densit(i),' !max=',top(i)/dtop
+CC        write(6,*) '      prob(',i,')=',densit(i),' !max=',top(i)/dtop
           endif
         enddo
 
-        write(6,*)'all channels'
+CC        write(6,*)'all channels'
 
         do i=1,mm_nrchan
-        write(6,*) '      prob(',i,')=',densit(i),' !max=',top(i)/dtop
+CC        write(6,*) '      prob(',i,')=',densit(i),' !max=',top(i)/dtop
         enddo
 ! by jacobians
         dtop=0d0
@@ -258,20 +258,20 @@ c masses not equal     @    (if_w.EQ.1 .AND. (iwm.EQ.7 .OR. iwp.EQ.7)) ) THEN
           if(top_jac(i).gt.dtop) dtop =top_jac(i) 
         enddo
 
-        write(6,*)'by jacobians........'
+CC        write(6,*)'by jacobians........'
         do i=1,mm_nrchan
           densit_jac(i) = densit_jac(i)/dtot
           if(densit_jac(i).gt.0.02d0) then
-        write(6,*) '      prob(',i,')=',densit_jac(i)
-     $            ,' !max=',top_jac(i)/dtop
+CC        write(6,*) '      prob(',i,')=',densit_jac(i)
+CC     $            ,' !max=',top_jac(i)/dtop
           endif
         enddo
 
-        write(6,*)'all channels'
+CC        write(6,*)'all channels'
 
         do i=1,mm_nrchan
-        write(6,*) '      prob(',i,')=',densit_jac(i)
-     $           ,' !max=',top_jac(i)/dtop
+CC        write(6,*) '      prob(',i,')=',densit_jac(i)
+CC     $           ,' !max=',top_jac(i)/dtop
         enddo
 
       ELSE
@@ -303,16 +303,16 @@ c
       dimension q123(4),q124(4),q134(4),q234(4)
       dimension iflav(4)
 
-      write(nout,*) '===OVERVEIGHTED EVT. NR: NEVTRU=',NEVTRU,'===='
-      write(nout,*) '===generated with channel: ikan=',ikan_mon,'===='
+CC      write(nout,*) '===OVERVEIGHTED EVT. NR: NEVTRU=',NEVTRU,'===='
+CC      write(nout,*) '===generated with channel: ikan=',ikan_mon,'===='
       CALL DUMPL(nout,P1,P2,P3,P4,effbeam1,effbeam2,sphot,nphot)
 c      write(nout,*) 'Note: this event should be outside your detector'
 c      write(nout,*) 'if not, increase wtmax (?) and/or check manual ?'
 c      write(nout,*) 'final state: ',IFLAV
-      write(nout,*) 'wtu= wtmod*wtmod4f/wtmax=',wtovr/wtmax
-      write(nout,*) 'wtu_max=                 ',wtu,'    ... so far'
-      write(nout,*) '-----------'
-      write(nout,*) ' wtmod4f=',wtmod4f,' wtmod=',wtmod
+CC      write(nout,*) 'wtu= wtmod*wtmod4f/wtmax=',wtovr/wtmax
+CC      write(nout,*) 'wtu_max=                 ',wtu,'    ... so far'
+CC      write(nout,*) '-----------'
+CC      write(nout,*) ' wtmod4f=',wtmod4f,' wtmod=',wtmod
 
       CALL writer(nout2,ikan_mon,effbeam1,effbeam2,p1,p2,p3,p4)
 
@@ -342,12 +342,12 @@ c      write(nout,*) 'final state: ',IFLAV
       xm134=sqrt(abs(dmas2(q134)))
       xm234=sqrt(abs(dmas2(q234)))
 
-      write(nout,'(3(A,G14.4))') 't12 =',real(xm12),'t13 =',real(xm13)
-     $              ,'t14 =',real(xm14)
-      write(nout,'(3(A,G14.4))') 't23 =',real(xm23),'t24 =',real(xm24)
-     $              ,'t34 =',real(xm34)
-      write(nout,'(4(A,G14.4))')'t123=',real(xm123),'t124=',real(xm124)
-     $              ,'t134=',real(xm134),'t234=',real(xm234) 
+CC      write(nout,'(3(A,G14.4))') 't12 =',real(xm12),'t13 =',real(xm13)
+CC     $              ,'t14 =',real(xm14)
+CC      write(nout,'(3(A,G14.4))') 't23 =',real(xm23),'t24 =',real(xm24)
+CC     $              ,'t34 =',real(xm34)
+CC      write(nout,'(4(A,G14.4))')'t123=',real(xm123),'t124=',real(xm124)
+CC     $              ,'t134=',real(xm134),'t234=',real(xm234) 
       do k=1,4
 
         q123(k)=p4(k)-effbeam1(k)
@@ -362,8 +362,8 @@ c      write(nout,*) 'final state: ',IFLAV
       xm134=sqrt(abs(dmas2(q134)))
       xm234=sqrt(abs(dmas2(q234)))
 
-      write(nout,'(4(A,G14.4))')'t4  =',real(xm123),'t3  =',real(xm124)
-     $         ,'t2  =',real(xm134),'t1  =',real(xm234 )
+CC      write(nout,'(4(A,G14.4))')'t4  =',real(xm123),'t3  =',real(xm124)
+CC     $         ,'t2  =',real(xm134),'t1  =',real(xm234 )
       do k=1,4
         q12(k)=p1(k)+p2(k)
         q13(k)=p1(k)+p3(k)
@@ -392,28 +392,28 @@ c      write(nout,*) 'final state: ',IFLAV
       xm234=sqrt(dmas2(q234))
 
       xmtot=sqrt(dmas2(qtot))
-      write(nout,'(3(A,G14.4))') ' m12 =',real(xm12)
-     $       ,' m13 =',real(xm13),' m14 =',real(xm14)
-      write(nout,'(3(A,G14.4))') ' m23 =',real(xm23)
-     $       ,' m24 =',real(xm24),' m34 =',real(xm34)
-      write(nout,'(4(A,G14.4))') ' m123=',real(xm123)
-     $       ,' m124=',real(xm124),' m134=',real(xm134)
-     $                 ,' m234=',real(xm234) 
-      write(nout,'(A,G14.4)') ' m1234=',real(xmtot)
+CC      write(nout,'(3(A,G14.4))') ' m12 =',real(xm12)
+CC     $       ,' m13 =',real(xm13),' m14 =',real(xm14)
+CC      write(nout,'(3(A,G14.4))') ' m23 =',real(xm23)
+CC     $       ,' m24 =',real(xm24),' m34 =',real(xm34)
+CC      write(nout,'(4(A,G14.4))') ' m123=',real(xm123)
+CC     $       ,' m124=',real(xm124),' m134=',real(xm134)
+CC     $                 ,' m234=',real(xm234) 
+CC      write(nout,'(A,G14.4)') ' m1234=',real(xmtot)
 
       cthe1=cos(angle(effbeam1,p1))
       cthe2=cos(angle(effbeam1,p2))
       cthe3=cos(angle(effbeam1,p3))
       cthe4=cos(angle(effbeam1,p4))
-      write(nout,3100)
-     @    'decay c1e-,c2-n,c3n,c4e+ ',cthe1,cthe2,cthe3,cthe4
+CC      write(nout,3100)
+CC     @    'decay c1e-,c2-n,c3n,c4e+ ',cthe1,cthe2,cthe3,cthe4
 
       DO i = 1,mm_nrchan,5
-        write(nout,'(A7,I3,A1,I3,A1,5g16.7)')'jacob. ',i,'-',i+4,'=',
-     $  real(faki_mon(i)),real(faki_mon(i+1)),real(faki_mon(i+2))
-     $               ,real(faki_mon(i+3)),real(faki_mon(i+4))
+CC        write(nout,'(A7,I3,A1,I3,A1,5g16.7)')'jacob. ',i,'-',i+4,'=',
+CC     $  real(faki_mon(i)),real(faki_mon(i+1)),real(faki_mon(i+2))
+CC     $               ,real(faki_mon(i+3)),real(faki_mon(i+4))
       ENDDO
-       write(nout,*) '        ============================'
+CC       write(nout,*) '        ============================'
 
 !ms        WLAMBD=SPRIM**2+S1**2+S2**2-2*SPRIM*S1-2*SPRIM*S2-2*S1*S2
 cc        wlambd=max(0d0,(sprim-s1-s2)**2 -4*s1*s2)
@@ -452,9 +452,9 @@ c
 
       CALL set_eff_beams(svar,amel,effbeam1,effbeam2)
 
-      write(nout,*) '================ WW_DUMPER ==================='
-      write(nout,*) '--> wtcort = ',wtcort
-      write(nout,*) '-----------'
+CC      write(nout,*) '================ WW_DUMPER ==================='
+CC      write(nout,*) '--> wtcort = ',wtcort
+CC      write(nout,*) '-----------'
       CALL DUMPL(nout,P1,P2,P3,P4,effbeam1,effbeam2,sphot,nphot)
 
       do k=1,4
@@ -483,12 +483,12 @@ c
       xm134=sqrt(abs(dmas2(q134)))
       xm234=sqrt(abs(dmas2(q234)))
 
-      write(nout,'(3(A,G14.4))') 't12 =',real(xm12),'t13 =',real(xm13)
-     $              ,'t14 =',real(xm14)
-      write(nout,'(3(A,G14.4))') 't23 =',real(xm23),'t24 =',real(xm24)
-     $              ,'t34 =',real(xm34)
-      write(nout,'(4(A,G14.4))')'t123=',real(xm123),'t124=',real(xm124)
-     $              ,'t134=',real(xm134),'t234=',real(xm234) 
+CC      write(nout,'(3(A,G14.4))') 't12 =',real(xm12),'t13 =',real(xm13)
+CC     $              ,'t14 =',real(xm14)
+CC      write(nout,'(3(A,G14.4))') 't23 =',real(xm23),'t24 =',real(xm24)
+CC     $              ,'t34 =',real(xm34)
+CC      write(nout,'(4(A,G14.4))')'t123=',real(xm123),'t124=',real(xm124)
+CC     $              ,'t134=',real(xm134),'t234=',real(xm234) 
       do k=1,4
 
         q123(k)=p4(k)-effbeam1(k)
@@ -503,8 +503,8 @@ c
       xm134=sqrt(abs(dmas2(q134)))
       xm234=sqrt(abs(dmas2(q234)))
 
-      write(nout,'(4(A,G14.4))')'t4- =',real(xm123),'t3- =',real(xm124)
-     $         ,'t2- =',real(xm134),'t1- =',real(xm234 )
+CC      write(nout,'(4(A,G14.4))')'t4- =',real(xm123),'t3- =',real(xm124)
+CC     $         ,'t2- =',real(xm134),'t1- =',real(xm234 )
 
       do k=1,4
 
@@ -520,8 +520,8 @@ c
       xm134=sqrt(abs(dmas2(q134)))
       xm234=sqrt(abs(dmas2(q234)))
 
-      write(nout,'(4(A,G14.4))')'t4+ =',real(xm123),'t3+ =',real(xm124)
-     $         ,'t2+  =',real(xm134),'t1+  =',real(xm234 )
+CC      write(nout,'(4(A,G14.4))')'t4+ =',real(xm123),'t3+ =',real(xm124)
+CC     $         ,'t2+  =',real(xm134),'t1+  =',real(xm234 )
 
       do k=1,4
         q12(k)=p1(k)+p2(k)
@@ -551,23 +551,23 @@ c
       xm234=sqrt(dmas2(q234))
 
       xmtot=sqrt(dmas2(qtot))
-      write(nout,'(3(A,G14.4))') ' m12 =',real(xm12)
-     $       ,' m13 =',real(xm13),' m14 =',real(xm14)
-      write(nout,'(3(A,G14.4))') ' m23 =',real(xm23)
-     $       ,' m24 =',real(xm24),' m34 =',real(xm34)
-      write(nout,'(4(A,G14.4))') ' m123=',real(xm123)
-     $       ,' m124=',real(xm124),' m134=',real(xm134)
-     $                 ,' m234=',real(xm234) 
-      write(nout,'(A,G14.4)') ' m1234=',real(xmtot)
+CC      write(nout,'(3(A,G14.4))') ' m12 =',real(xm12)
+CC     $       ,' m13 =',real(xm13),' m14 =',real(xm14)
+CC      write(nout,'(3(A,G14.4))') ' m23 =',real(xm23)
+CC     $       ,' m24 =',real(xm24),' m34 =',real(xm34)
+CC      write(nout,'(4(A,G14.4))') ' m123=',real(xm123)
+CC     $       ,' m124=',real(xm124),' m134=',real(xm134)
+CC     $                 ,' m234=',real(xm234) 
+CC      write(nout,'(A,G14.4)') ' m1234=',real(xmtot)
 
       cthe1=cos(angle(effbeam1,p1))
       cthe2=cos(angle(effbeam1,p2))
       cthe3=cos(angle(effbeam1,p3))
       cthe4=cos(angle(effbeam1,p4))
-      write(nout,3100)
-     @    'decay c1e-,c2-n,c3n,c4e+ ',cthe1,cthe2,cthe3,cthe4
+CC      write(nout,3100)
+CC     @    'decay c1e-,c2-n,c3n,c4e+ ',cthe1,cthe2,cthe3,cthe4
 
-       write(nout,*) '        ============================'
+CC       write(nout,*) '        ============================'
 
  3100 format(a26,4g22.14)   
 

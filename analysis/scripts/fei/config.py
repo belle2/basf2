@@ -39,7 +39,7 @@ FeiConfiguration.b2bii.__doc__ = "If true, it is assumed that we run on converte
 FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   "and the algorithm will be able to apply this training."
-FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
+FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
 
 
@@ -78,7 +78,7 @@ DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
-DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
+DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 -> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
@@ -233,7 +233,7 @@ class Particle(object):
         decayModeID = len(self.channels)
         self.channels.append(DecayChannel(name=self.identifier + '_' + str(decayModeID),
                                           label=removeJPsiSlash(self.identifier + ' ==> ' + ' '.join(daughters)),
-                                          decayString=self.identifier + '_' + str(decayModeID) + ' ==> ' + ' '.join(daughters),
+                                          decayString=self.identifier + '_' + str(decayModeID) + ' -> ' + ' '.join(daughters),
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,

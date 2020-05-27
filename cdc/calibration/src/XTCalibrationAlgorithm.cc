@@ -55,11 +55,11 @@ void XTCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  int lay;
-  float dt;
-  float dx;
-  float Pval, alpha, theta;
-  float ndf;
+  UChar_t lay;
+  Float_t dt;
+  Float_t dx;
+  Float_t Pval, alpha, theta;
+  Float_t ndf;
 
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("t", &dt);
@@ -80,9 +80,9 @@ void XTCalibrationAlgorithm::createHisto()
 
   int al = 0;
   int th = 0;
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     /* protect in case |alpha|>90 */
     if (fabs(alpha > 90)) {
@@ -247,11 +247,33 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
       }
     }
   }
+  sanitaryCheck();
   write();
   storeHisto();
   return checkConvergence();
 }
 
+void XTCalibrationAlgorithm::sanitaryCheck()
+{
+  const double tMax = 500; // max drift time (nsec)
+  for (int l = 0; l < 56; ++l) {
+    for (int lr = 0; lr < 2; ++lr) {
+      for (int al = 0; al < m_nAlphaBins; ++al) {
+        for (int th = 0; th < m_nThetaBins; ++th) {
+          if (m_fitStatus[l][lr][al][th] == FitStatus::c_OK) {
+            TF1* fun = m_xtFunc[l][lr][al][th];
+            double y = fun->Eval(tMax);
+            if (y < 0) {
+              B2INFO("Strange XT function l " << l << " lr " << lr << " alpha " << al << " theta " << th
+                     << ", replaced by initial one");
+              fun->SetParameters(m_xtPrior[l][lr][al][th]);
+            }
+          }
+        }
+      }
+    }
+  }
+}
 CalibrationAlgorithm::EResult XTCalibrationAlgorithm::checkConvergence()
 {
 
@@ -376,13 +398,12 @@ void XTCalibrationAlgorithm::write()
               for (int i = 0; i < 8; ++i) {
                 par[i] = m_xtPrior[l][lr][al][th][i];
               }
-            } else { // if modes are different, simple xt is used.
-              par[0] = 0; par[1] = 0.004; par[2] = 0; par[3] = 0; par[4] = 0; par[5] = 0; par[6] = m_par6[l]; par[7] = 0.00001;
+            } else {
+              B2FATAL("XT mode before/after calibration is different!");
             }
 
-
           } else {
-            if (par[1] < 0) {
+            if (par[1] < 0) { // if negative c1, privious xt is kept.
               for (int i = 0; i < 8; ++i) {
                 par[i] = m_xtPrior[l][lr][al][th][i];
               }

@@ -28,10 +28,15 @@ namespace Belle2 {
        */
       CDCCrudeT0CollectorModule();
 
+      /// initialization
       void prepare() override;
+      /// collection
       void collect() override;
+      /// start of run action
       void startRun() override;
+      /// end of run action
       void closeRun() override;
+      /// finalization
       void finish() override;
 
     private:

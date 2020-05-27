@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -9,7 +8,7 @@
 # mdst files and creates flat NTuples of B->KsPi0 decays, which are used in
 # tutorials B2A712 AND B2A713 for training, testing, and applying the MVAExpert.
 # It's useful to have a look at B2A701-ContinuumSuppression_Input.py first.
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The new variables are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:
@@ -20,15 +19,17 @@
 ################################################################################
 
 import basf2
-from modularAnalysis import *
+import modularAnalysis as ma
+from vertex import TagV
 import glob
 import os
+import sys
 import numpy as np
 import variables as v
 from root_pandas import read_root, to_root
 import pandas
 
-set_log_level(LogLevel.ERROR)
+basf2.set_log_level(basf2.LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
 if (len(sys.argv) < 2 or sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']):
@@ -65,56 +66,56 @@ outfile = step + '.root'
 # Perform analysis.
 firstpath = basf2.Path()
 
-inputMdstList('default', input, path=firstpath)
+ma.inputMdstList('default', input, path=firstpath)
 
 firstpath.add_module('ProgressBar')
 
 # Build B candidate like in B2A701-ContinuumSuppression_Input.py
-fillParticleList('gamma', 'goodGamma == 1', path=firstpath)
+ma.fillParticleList('gamma', 'goodGamma == 1', path=firstpath)
 
-fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=firstpath)
+ma.fillParticleList('pi+:good', 'chiProb > 0.001 and pionID > 0.5', path=firstpath)
 
-reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=firstpath)
-reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=firstpath)
-reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=firstpath)
+ma.reconstructDecay('K_S0 -> pi+:good pi-:good', '0.480<=M<=0.516', path=firstpath)
+ma.reconstructDecay('pi0  -> gamma gamma', '0.115<=M<=0.152', path=firstpath)
+ma.reconstructDecay('B0   -> K_S0 pi0', '5.2 < Mbc < 5.3 and -0.3 < deltaE < 0.2', path=firstpath)
 
-matchMCTruth('B0', path=firstpath)
-buildRestOfEvent('B0', path=firstpath)
+ma.matchMCTruth('B0', path=firstpath)
+ma.buildRestOfEvent('B0', path=firstpath)
 
 cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
-appendROEMasks('B0', [cleanMask], path=firstpath)
+ma.appendROEMasks('B0', [cleanMask], path=firstpath)
 
-buildContinuumSuppression('B0', 'cleanMask', path=firstpath)
+ma.buildContinuumSuppression('B0', 'cleanMask', path=firstpath)
 
 # Accept only correctly reconstructed B candidates as signal
-applyCuts('B0', 'isSignal or isContinuumEvent', path=firstpath)
+ma.applyCuts('B0', 'isSignal or isContinuumEvent', path=firstpath)
 
 # Tag B candidate for Vertex information
 TagV('B0', path=firstpath)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
-roe_path = create_path()
+roe_path = basf2.create_path()
 
-deadEndPath = create_path()
+deadEndPath = basf2.create_path()
 
-signalSideParticleFilter('B0', '', roe_path, deadEndPath)
+ma.signalSideParticleFilter('B0', '', roe_path, deadEndPath)
 
 # Build particle lists for low level variables
-fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
-fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
-fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
-fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
-fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
-fillParticleList('pi-:chargedMsignal', 'isInRestOfEvent == 0', path=roe_path)
+ma.fillParticleList('gamma:roe', 'isInRestOfEvent == 1 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('gamma:signal', 'isInRestOfEvent == 0 and goodGamma == 1', path=roe_path)
+ma.fillParticleList('pi+:chargedProe', 'isInRestOfEvent == 1', path=roe_path)
+ma.fillParticleList('pi+:chargedPsignal', 'isInRestOfEvent == 0', path=roe_path)
+ma.fillParticleList('pi-:chargedMroe', 'isInRestOfEvent == 1', path=roe_path)
+ma.fillParticleList('pi-:chargedMsignal', 'isInRestOfEvent == 0', path=roe_path)
 
 v.variables.addAlias('cmsp', 'useCMSFrame(p)')
 
-rankByHighest('gamma:roe', 'cmsp', path=roe_path)
-rankByHighest('gamma:signal', 'cmsp', path=roe_path)
-rankByHighest('pi+:chargedProe', 'cmsp', path=roe_path)
-rankByHighest('pi+:chargedPsignal', 'cmsp', path=roe_path)
-rankByHighest('pi-:chargedMroe', 'cmsp', path=roe_path)
-rankByHighest('pi-:chargedMsignal', 'cmsp', path=roe_path)
+ma.rankByHighest('gamma:roe', 'cmsp', path=roe_path)
+ma.rankByHighest('gamma:signal', 'cmsp', path=roe_path)
+ma.rankByHighest('pi+:chargedProe', 'cmsp', path=roe_path)
+ma.rankByHighest('pi+:chargedPsignal', 'cmsp', path=roe_path)
+ma.rankByHighest('pi-:chargedMroe', 'cmsp', path=roe_path)
+ma.rankByHighest('pi-:chargedMsignal', 'cmsp', path=roe_path)
 
 # Define traditional Continuum Suppression Variables
 contVars = [
@@ -156,7 +157,7 @@ vertex_variables = ['distance', 'dphi', 'dcosTheta']
 cluster_specific_variables = ['clusterNHits', 'clusterTiming', 'clusterE9E25', 'clusterReg', 'isInRestOfEvent']
 track_specific_variables = ['kaonID', 'electronID', 'muonID', 'protonID', 'pValue', 'nCDCHits', 'isInRestOfEvent', 'charge']
 
-# Aliases from normal coordinates to thrustframe coordinates (see confluence page)
+# Aliases from normal coordinates to thrustframe coordinates
 for variablename in basic_variables + vertex_variables:
     v.variables.addAlias('thrustsig' + variablename, 'useBThrustFrame(' + variablename + ',Signal)')
 
@@ -193,13 +194,13 @@ for rank in range(5):
             variables.append('{}_{}{}'.format(variable, shortcut, rank))
 
 # Create output file.
-variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
+ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
-analysis_main.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
-process(analysis_main)
-print(statistics)
+basf2.process(firstpath)
+print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 df = read_root(outfile)

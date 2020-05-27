@@ -1,7 +1,8 @@
 #ifndef _Belle2_Writer_hh
 #define _Belle2_Writer_hh
 
-#include "daq/slc/base/IOException.h"
+#include <cstddef>
+#include <string>
 
 namespace Belle2 {
 

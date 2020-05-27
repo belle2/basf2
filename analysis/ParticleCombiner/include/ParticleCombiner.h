@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -54,7 +55,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce combinations with the given sizes of each particle list
-     * @param sizes the sizes of the particle lists to combine
+     * @param _sizes the sizes of the particle lists to combine
      */
     void init(const std::vector<unsigned int>& _sizes);
 
@@ -95,7 +96,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
-     * @param numberOfLists Number of Particle Lists which shall be combined
+     * @param _numberOfLists Number of Particle Lists which shall be combined
      */
     void init(unsigned int _numberOfLists);
 
@@ -134,13 +135,20 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
+     * @param decaydescriptor
+     * @param cutParameter
+     */
+    explicit ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter = "");
+
+    /**
+     * Initialises the generator to produce the given type of sublist
      */
     void init();
 
     /**
      * Loads the next combination. Returns false if there is no next combination
      */
-    bool loadNext();
+    bool loadNext(bool loadAntiParticle = true);
 
     /**
      * Returns the particle
@@ -247,17 +255,8 @@ namespace Belle2 {
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
-    bool m_isUnspecified; /**< True if the particle is marked as unspecified by using "@" */
-    /** Ignore radiated photons? */
-    bool m_isIgnoreRadiatedPhotons;
-    /** Ignore intermediate particles or resonances? */
-    bool m_isIgnoreIntermediate;
-    /** Ignore missing massive final state particles? */
-    bool m_isIgnoreMassive;
-    /** Ignore missing neutrino? */
-    bool m_isIgnoreNeutrino;
-    /** Ignore missing gamma? */
-    bool m_isIgnoreGamma;
+    int m_properties; /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    std::vector<int> m_daughterProperties; /**< Daughter's particle properties. */
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

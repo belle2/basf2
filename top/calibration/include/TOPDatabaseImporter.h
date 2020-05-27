@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <Python.h>
 #include <string>
 #include <vector>
 
@@ -273,7 +274,7 @@ namespace Belle2 {
 
     /**
      * Example of exporting TTS histograms
-     * @param outFilefileName : name of the root file where data will be saved
+     * @param outFileName name of the root file where data will be saved
      */
     void exportPmtTTSHisto(std::string outFileName = "RetrievedHistos.root");
 
@@ -408,6 +409,20 @@ namespace Belle2 {
      */
     void correctTOPPmtQE();
 
+    /**
+     * payload TOPCalTimeWalk
+     * import parameters for time-walk correction and electronic time resolution tuning
+     * @param list Python list of parameters of time-walk calibration curve [ns]
+     * @param a electronic time resolution: noise term excess parameter [ns]
+     * @param b electronic time resolution: quadratic term parameter [ns]
+     * @param firstExp first experiment number of IOV
+     * @param firstRun first run number of IOV
+     * @param lastExp first experiment number of IOV
+     * @param lastRun last run number of IOV
+     */
+    void importTimeWalk(PyObject* list, double a, double b,
+                        int firstExp = 0, int firstRun = 0,
+                        int lastExp = -1, int lastRun = -1);
     /**
      * for testing purposes only! - will be removed ...
      */

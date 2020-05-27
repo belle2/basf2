@@ -1,7 +1,6 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#################################################################################
 #
 # evaluates the CoG corrections, create a localDB
 # with the corrections and a root file to check
@@ -14,7 +13,6 @@
 # this script can be launched with launch_calibration_cog.sh in the
 # B2SVD project, svd_CoGHitTime_calibration repository
 #
-#################################################################################
 
 
 from basf2 import *
@@ -44,12 +42,32 @@ gROOT.SetBatch(True)
 
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
+    """
+    Python class used for evaluating the CoG corrections, create a localDB,
+    creating a localDB with the corrections and a root file to check the corrections
+    """
 
     def notApplyCorrectForCDCLatency(self, mode):
+        """
+        Function that allows to set if apply the CDC latency correction
+
+        parameters:
+             mode (bool):
+             - if True -> not apply correction
+             - if False -> apply correction
+        """
+        #: parameter that allows to apply or not the CDC latency correction
         self.notApplyCDCLatencyCorrection = mode
         print("Not Correct for CDC latency: " + str(mode) + " " + str(self.notApplyCDCLatencyCorrection))
 
     def fillLists(self, mode_byte_object, svdClusters_rel_RecoTracks_cl):
+        """
+        Function that fill the lists needed for the CoG corrections
+
+        parameters:
+             mode_byte_object (modeByte): modeByte that contains the information about the TB
+             svdClusters_rel_RecoTracks_cl (SVDCluster): cluster related to tracks
+        """
 
         timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
         snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
@@ -73,7 +91,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
             # print(str(tZero_err))
@@ -91,29 +109,43 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             snrHist.Fill(snrCluster)
 
             self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += 1
-            # n = self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += 1
-            # n = n + 1
-            # self.nList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = n
-
             self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += timeCluster
-            # cog = self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] += timeCluster
-            # cog = cog + timeCluster
-            # self.sumCOGList[layerIndex][ladderIndex][sensorIndex][sideIndex][TBIndex] = cog
 
+            #: counts the number of clusters
             self.NTOT = self.NTOT + 1
 
     def set_localdb(self, localDB):
+        """
+        Function that allows to set the localDB
+
+        parameters:
+             localDB (str): Name of the localDB used
+        """
+        #: set the name of the localDB used
         self.localdb = localDB
 
     def initialize(self):
+        """
+        Initialize object (histograms, lists, ...) used by the class
+        """
+
+        #: name of the output file
         self.outputFileName = "CoGCorrectionMonitor_" + self.localdb + ".root"
 
+        #: lists used to create the histograms for each TB :
+        #: residuals
         self.resList = []
+        #: scatterplot t0 vs cog
         self.spList = []
+        #: cog
         self.cogList = []
+        #: t0
         self.cdcList = []
+        #: Cluster SNR
         self.snrList = []
+        #: number of clusters
         self.nList = []
+        #: sum of CoG times
         self.sumCOGList = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
@@ -220,51 +252,67 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                                 TH1F("snr" + "_" + str(k) + "." + str(s) + "." + str(t), " ", 100, 0, 100))
                             self.nList[li][ldi][si][s].append(0)
                             self.sumCOGList[li][ldi][si][s].append(0)
-
+        #: distribution of EventT0
         self.EventT0Hist = TH1F("EventT0", " ", 200, -100, 100)
+        #: alpha parameter vs TB, for U side
         self.AlphaUTB = TH2F("alphaVsTB_U", " ", 400, 0.5, 2, 4, 0, 4)
         self.AlphaUTB.GetXaxis().SetTitle("alpha")
         self.AlphaUTB.GetYaxis().SetTitle("trigger bin")
+        #: alpha parameter vs TB, for V side
         self.AlphaVTB = TH2F("alphaVsTB_V", " ", 400, 0.5, 2, 4, 0, 4)
         self.AlphaVTB.GetXaxis().SetTitle("alpha")
         self.AlphaVTB.GetYaxis().SetTitle("trigger bin")
+        #: beta parameter vs TB, for U side
         self.BetaUTB = TH2F("betaVsTB_U", " ", 200, -100, 100, 4, 0, 4)
         self.BetaUTB.GetXaxis().SetTitle("beta (ns)")
         self.BetaUTB.GetYaxis().SetTitle("trigger bin")
+        #: beta parameter vs TB, for V side
         self.BetaVTB = TH2F("betaVsTB_V", " ", 200, -100, 100, 4, 0, 4)
         self.BetaVTB.GetXaxis().SetTitle("beta (ns)")
         self.BetaVTB.GetYaxis().SetTitle("trigger bin")
 
+        #: mean of the residuals distribution vs TB, for V side
         self.MeanHistVTB = TH2F("meanHistVsTB_V", " ", 100, -10, 10, 4, 0, 4)
         self.MeanHistVTB.GetXaxis().SetTitle("distribution mean (ns)")
         self.MeanHistVTB.GetYaxis().SetTitle("trigger bin")
+        #: mean of the residuals distribution vs TB, for U side
         self.MeanHistUTB = TH2F("meanHistVsTB_U", " ", 100, -10, 10, 4, 0, 4)
         self.MeanHistUTB.GetXaxis().SetTitle("distribution mean (ns)")
         self.MeanHistUTB.GetYaxis().SetTitle("trigger bin")
+        #: RMS of the residuals distribution vs TB, for V side
         self.RMSHistVTB = TH2F("rmsHistVsTB_V", " ", 100, 0, 10, 4, 0, 4)
         self.RMSHistVTB.GetXaxis().SetTitle("distribution RMS (ns)")
         self.RMSHistVTB.GetYaxis().SetTitle("trigger bin")
+        #: RMS of the residuals distribution vs TB, for U side
         self.RMSHistUTB = TH2F("rmsHistVsTB_U", " ", 100, 0, 10, 4, 0, 4)
         self.RMSHistUTB.GetXaxis().SetTitle("distribution RMS (ns)")
         self.RMSHistUTB.GetYaxis().SetTitle("trigger bin")
+        #: mean of the residuals distribution vs TB, for V side (from gaussian fit)
         self.MeanFitVTB = TH2F("meanFitVsTB_V", " ", 100, -10, 10, 4, 0, 4)
         self.MeanFitVTB.GetXaxis().SetTitle("fit mean (ns)")
         self.MeanFitVTB.GetYaxis().SetTitle("trigger bin")
+        #: mean of the residuals distribution vs TB, for U side (from gaussian fit)
         self.MeanFitUTB = TH2F("meanFitVsTB_U", " ", 100, -10, 10, 4, 0, 4)
         self.MeanFitUTB.GetXaxis().SetTitle("fit mean (ns)")
         self.MeanFitUTB.GetYaxis().SetTitle("trigger bin")
+        #: RMS of the residuals distribution vs TB, for U side (from gaussian fit)
         self.RMSFitUTB = TH2F("rmsFitVsTB_U", " ", 100, 0, 10, 4, 0, 4)
         self.RMSFitUTB.GetXaxis().SetTitle("fit sigma (ns)")
         self.RMSFitUTB.GetYaxis().SetTitle("trigger bin")
+        #: RMS of the residuals distribution vs TB, for V side (from gaussian fit)
         self.RMSFitVTB = TH2F("rmsFitVsTB_V", " ", 100, 0, 10, 4, 0, 4)
         self.RMSFitVTB.GetXaxis().SetTitle("fit sigma (ns)")
         self.RMSFitVTB.GetYaxis().SetTitle("trigger bin")
 
+        #: gaus function used for fitting distributions
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
 
         self.NTOT = 0
 
     def event(self):
+        """
+        Function that allows to cicle on the events
+        """
         svd_evt_info = Belle2.PyStoreObj('SVDEventInfo')
         mode_byte = svd_evt_info.getModeByte()
         timeClusterU = 0
@@ -272,8 +320,10 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         sideIndex = 0
         TBIndexU = 0
         TBIndexV = 0
+        #: counts the number of events
         self.Evt = self.Evt + 1
 
+        #: registers PyStoreObj EventT0
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
@@ -283,6 +333,9 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             self.fillLists(mode_byte, svdCluster)
 
     def terminate(self):
+        """
+        Terminates te class and produces the output rootfile
+        """
 
         tfile = TFile(self.outputFileName, 'recreate')
         iov = Belle2.IntervalOfValidity.always()

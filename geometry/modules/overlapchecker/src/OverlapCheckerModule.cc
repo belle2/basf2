@@ -51,7 +51,15 @@ OverlapCheckerModule::OverlapCheckerModule()
   setDescription("Checks the geometry for overlaps.");
 
   //Parameter definition
-  addParam("points", m_points, "Number of test points.", m_points);
+  addParam("points", m_points, R"DOC(
+Number of test points we will generate on randomly on the surface of each geometry volume and then check for all of them that
+
+1. The points are inside the mother volume
+2. The points are not inside any neighbor volume
+
+The higher the number the more precise the check for overlaps becomes, and the slower it gets.
+See also https://questions.belle2.org/question/7264/ )DOC",
+           m_points);
   addParam("tolerance", m_tolerance, "Tolerance of overlap check.", m_tolerance);
   addParam("maxErrors", m_maxErrors, "Number of overlap errors per volume before continuing with next volume", m_maxErrors);
   addParam("maxDepth", m_maxDepth, "Maximum depth to go into the geometry tree, 0 means no maximum", m_maxDepth);
@@ -121,7 +129,7 @@ void OverlapCheckerModule::handleOverlap(const std::string& geant4Message)
       if (std::regex_search(geant4Message, nameMatch, nameRegex)) {
         const std::string& name = nameMatch[1].str();
         // By looping over all sisters
-        for (int i = 0; i < volume->GetMotherLogical()->GetNoDaughters(); ++i) {
+        for (size_t i = 0; i < volume->GetMotherLogical()->GetNoDaughters(); ++i) {
           G4VPhysicalVolume* sister = volume->GetMotherLogical()->GetDaughter(i);
           // ignoring the ones which don't match the name
           if (name != sister->GetName()) continue;
@@ -171,7 +179,7 @@ bool OverlapCheckerModule::checkVolume(G4VPhysicalVolume* volume, const std::str
 
   //Check the daughter volumes for overlaps
   G4LogicalVolume* logicalVolume = volume->GetLogicalVolume();
-  for (int iDaughter = 0; iDaughter < logicalVolume->GetNoDaughters(); iDaughter++) {
+  for (size_t iDaughter = 0; iDaughter < logicalVolume->GetNoDaughters(); iDaughter++) {
     G4VPhysicalVolume* daughter = logicalVolume->GetDaughter(iDaughter);
     // check if we already checked this particular volume, if so skip it
     auto it = m_seen.insert(daughter);

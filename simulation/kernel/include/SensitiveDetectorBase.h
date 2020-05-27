@@ -54,12 +54,14 @@ namespace Belle2 {
        * MCParticles might change at the end of the event. During simulation,
        * the TrackID should be used as index of the MCParticle
        * @param name Name of the relation to register
+       * @param ignoreAction
        */
       static void registerMCParticleRelation(const std::string& name,
                                              RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight);
 
       /** Overload to make it easer to register MCParticle relations
        * @param relation RelationArray to register
+       * @param ignoreAction
        */
       static void registerMCParticleRelation(const RelationArray& relation,
                                              RelationArray::EConsolidationAction ignoreAction = RelationArray::c_negativeWeight) { registerMCParticleRelation(relation.getName(), ignoreAction); }

@@ -11,8 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
 
@@ -51,14 +50,29 @@ namespace Belle2 {
      */
     virtual ~BKLMDigitAnalyzerModule() override;
 
+    /**
+     * Initializer.
+     */
     virtual void initialize() override;
 
+    /**
+     * Called when entering a new run.
+     */
     virtual void beginRun() override;
 
+    /**
+     * This method is called for each event.
+     */
     virtual void event() override;
 
+    /**
+     * This method is called if the current run ends.
+     */
     virtual void endRun() override;
 
+    /**
+     * This method is called at the end of the event processing.
+     */
     virtual void terminate() override;
 
 
@@ -67,16 +81,16 @@ namespace Belle2 {
     //! Run number of the current data set
     int m_runNumber;
 
-    //! Input BKLMDigits
-    StoreArray<BKLMDigit> m_digit;
+    //! Input KLMDigits
+    StoreArray<KLMDigit> m_digit;
 
-    //! Input raw BKLMDigits
+    //! Input raw BLMDigits
     StoreArray<KLMDigitRaw> m_digitRaw;
 
     //!  Input BKLMDigits whose time is out of range
-    StoreArray<BKLMDigitOutOfRange> m_digitOutOfRange;
+    StoreArray<KLMDigit> m_digitOutOfRange;
 
-    //! Output data array of analyzed BKLMDigit information
+    //! Output data array of analyzed KLMDigit information
     StoreArray<KLMDigitEventInfo> m_digitEventInfo;
 
     //! Output filename
@@ -86,7 +100,7 @@ namespace Belle2 {
     TFile* m_outputRootFile;
 
     //! Pointer to ROOT tree with extra info
-    TTree* m_extraInfo{nullptr};
+    TTree* m_extraInfo = nullptr;
 
     //! Pointer to ROOT list of histograms
     TList* m_histoList;
@@ -112,8 +126,6 @@ namespace Belle2 {
     //! Pointer to TDC-difference 1D histogram of each channel for each sector and view
     TH1F* m_histoCTimeDiff[2][8][2];
 
-    //TH2F* m_histoCharge[2][8][2][2];
-
     //! Convert a number of type T into a string
     template <typename T>
     std::string toString(T val)
@@ -125,11 +137,11 @@ namespace Belle2 {
 
     //! Create a ROOT 1D histogram
     TH1F* createTH1(const char* name, const char* title, Int_t nBinsX, Double_t minX, Double_t maxX, const char* titleX,
-                    const char* titleY, bool drawStat, TList* histoList = NULL);
+                    const char* titleY, bool drawStat, TList* histoList = nullptr);
 
     //! Create a ROOT 2D histogram
     TH2F* createTH2(const char* name, const char* title, Int_t nBinsX, Double_t minX, Double_t maxX, const char* titleX, Int_t nBinsY,
-                    Double_t minY, Double_t maxY, const char* titleY, bool drawStat, TList* histoList = NULL);
+                    Double_t minY, Double_t maxY, const char* titleY, bool drawStat, TList* histoList = nullptr);
   };
 
 }

@@ -97,13 +97,15 @@ def BS13d_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=None):
+def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=None,
+                           new_cdst_format=True):
     '''
     Returns calibration object for carrier shift calibration of BS13d with processed data.
     :param inputFiles: A list of input files in cdst data format
     :param time_offset: time offset [ns]
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   create path
@@ -111,9 +113,20 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
 
     #   add basic modules
     main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator',
-                    useAsicShiftCalibration=False, useChannelT0Calibration=False)
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        main.add_module('TOPTimeRecalibrator',
+                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator',
+                        useAsicShiftCalibration=False, useChannelT0Calibration=False)
 
     #   collector module
     collector = basf2.register_module('TOPAsicShiftsBS13dCollector',
@@ -138,12 +151,14 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
     return cal
 
 
-def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None):
+def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
+                                new_cdst_format=True):
     '''
     Returns calibration object for rough module T0 calibration with method DeltaT
     :param inputFiles: A list of input files in cdst data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   create path
@@ -151,13 +166,24 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None):
 
     #   add basic modules
     main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+                        subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0DeltaTCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0DeltaTAlgorithm()
@@ -178,13 +204,15 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
+def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None,
+                            new_cdst_format=True):
     '''
     Returns calibration object for final module T0 calibration with method LL
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   create path
@@ -192,14 +220,25 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
 
     #   add basic modules
     main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+                        subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPModuleT0LLCollector')
     collector.param('sample', sample)
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPModuleT0LLAlgorithm()
@@ -220,12 +259,14 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     return cal
 
 
-def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None):
+def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
+                            new_cdst_format=True):
     '''
     Returns calibration object for common T0 calibration with method BF
     :param inputFiles: A list of input files in cdst data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   create path
@@ -233,10 +274,20 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None):
 
     #   add basic modules
     main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+                        subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPCommonT0BFCollector')
@@ -260,13 +311,15 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None):
     return cal
 
 
-def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
+def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localDBs=None,
+                            new_cdst_format=True):
     '''
     Returns calibration object for common T0 calibration with method LL
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   create path
@@ -274,10 +327,20 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
 
     #   basic modules
     main.add_module('RootInput')
-    main.add_module('TOPGeometryParInitializer')
-    main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
-    main.add_module('TOPChannelMasker')
-    main.add_module('TOPBunchFinder', usePIDLikelihoods=True, subtractRunningOffset=False)
+    if new_cdst_format:
+        main.add_module('Gearbox')
+        main.add_module('Geometry')
+        main.add_module('Ext')
+        main.add_module('TOPUnpacker')
+        main.add_module('TOPRawDigitConverter')
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+    else:
+        main.add_module('TOPGeometryParInitializer')
+        main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
+        main.add_module('TOPChannelMasker')
+        main.add_module('TOPBunchFinder', usePIDLikelihoods=True,
+                        subtractRunningOffset=False)
 
     #   collector module
     collector = basf2.register_module('TOPCommonT0LLCollector')
@@ -327,6 +390,7 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
     collector.param('timeWindow', [t_min, t_max])
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -367,6 +431,7 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
 
     #   collector module
     collector = basf2.register_module('TOPPulseHeightCollector')
+    collector.param('granularity', 'all')
 
     #   algorithm
     algorithm = TOP.TOPPulseHeightAlgorithm()
@@ -388,15 +453,15 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
 
 
 def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
-                     recalibrate=True, globalTags=None, localDBs=None):
+                     globalTags=None, localDBs=None, new_cdst_format=True):
     '''
     Returns calibration object for alignment of TOP modules.
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :fixedParameters: a list of parameters to be fixed (parameter names: basf2 -m TOPAlignmentCollector)
-    :recalibrate: on True recalibrate time and reconstruct bunch again
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
+    :param new_cdst_format: True or False for new or old cdst format, respectively
     '''
 
     #   define calibration
@@ -416,20 +481,27 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
 
         #   add basic modules
         main.add_module('RootInput')
-        main.add_module('TOPGeometryParInitializer')
-        if recalibrate:
+        if new_cdst_format:
+            main.add_module('Gearbox')
+            main.add_module('Geometry')
+            main.add_module('Ext')
+            main.add_module('TOPUnpacker')
+            main.add_module('TOPRawDigitConverter')
+            main.add_module('TOPChannelMasker')
+            main.add_module('TOPBunchFinder', subtractRunningOffset=False)
+        else:
+            main.add_module('TOPGeometryParInitializer')
             main.add_module('TOPTimeRecalibrator', subtractBunchTime=False)
             main.add_module('TOPChannelMasker')
             main.add_module('TOPBunchFinder',
                             usePIDLikelihoods=True, subtractRunningOffset=False)
-        else:
-            main.add_module('TOPChannelMasker')
 
         #   collector module
         collector = basf2.register_module('TOPAlignmentCollector')
         collector.param('sample', sample)
         collector.param('parFixed', fixedParameters)
         collector.param('targetModule', slot)
+        collector.param('granularity', 'all')
 
         #   define collection
         collection = Collection(collector=collector, input_files=inputFiles,

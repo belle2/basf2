@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # ######################################################
 #
@@ -28,7 +27,6 @@ import simulation as si
 import reconstruction as re
 import glob
 import os.path
-import sys
 
 
 # check if the required input file exists (from B2A101 example)

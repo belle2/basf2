@@ -43,7 +43,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getPulseShapeDiscriminationMVA();
         } else {
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();
@@ -57,7 +57,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getNumberOfHadronDigits();
         } else
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -130,7 +130,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
         ClusterUtils clutls;
-        TLorentzVector p4Cluster = clutls.Get4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
+        TLorentzVector p4Cluster = clutls.GetCluster4MomentumFromCluster(cluster, particle->getECLClusterEHypothesisBit());
 
         return frame.getMomentum(p4Cluster).E();
       }
@@ -378,24 +378,6 @@ namespace Belle2 {
       return std::numeric_limits<float>::quiet_NaN();
     }
 
-    double eclClusterHypothesisId(const Particle* particle)
-    {
-      // Hypothesis ID is deprecated, this function should be removed in release-05.
-      const ECLCluster* cluster = particle->getECLCluster();
-      if (cluster) {
-        if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
-            and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-          return 56.0;
-        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-          return 5.0;
-        else if (cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
-          return 6.0;
-        else
-          return -1.0;
-      }
-      return std::numeric_limits<float>::quiet_NaN();
-    }
-
     double eclClusterHasNPhotonsHypothesis(const Particle* particle)
     {
       const ECLCluster* cluster = particle->getECLCluster();
@@ -433,7 +415,7 @@ namespace Belle2 {
           return cluster->isTriggerCluster();
         } else {
           B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
-          return -1.;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();
@@ -579,39 +561,27 @@ namespace Belle2 {
       }
 
       double numer = 0, denom = 0;
-      double time, deltatime;
       int numberOfClusterDaughters = 0;
 
-      /*
-                                      ** TODO !!! **
-       Use Martin Ritter's 1337 Particle::forEachDaughter once pull-request #2119 is merged.
-      */
-      std::stack<const Particle*> stacked;
-      stacked.push(particle);
-      while (!stacked.empty()) {
-        const Particle* current = stacked.top();
-        stacked.pop();
-
-        const ECLCluster* cluster = current->getECLCluster();
-        if (cluster) {
+      auto weightedECLTimeAverage = [&numer, &denom, &numberOfClusterDaughters](const Particle * p) {
+        const ECLCluster* cluster = p->getECLCluster();
+        if (cluster and not cluster->hasFailedFitTime()) {
           numberOfClusterDaughters ++;
 
-          time = cluster->getTime();
+          double time = cluster->getTime();
           B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
-          deltatime = cluster->getDeltaTime99();
+          double deltatime = cluster->getDeltaTime99();
           B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
           numer += time / pow(deltatime, 2);
           B2DEBUG(11, "numer[" << numberOfClusterDaughters << "] = " << numer);
           denom += 1 / pow(deltatime, 2);
           B2DEBUG(11, "denom[" << numberOfClusterDaughters << "] = " << denom);
-        } else {
-          const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = current->getNDaughters();
-          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-            stacked.push(daughters[iDaughter]);
-          }
         }
-      }
+        return false;
+      };
+
+      particle->forEachDaughter(weightedECLTimeAverage, true, true);
+
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();
@@ -634,39 +604,32 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
 
-      double averageECLTime, maxTimeDiff = -1;
-      double time, deltatime, maxTimeDiff_temp;
+      double maxTimeDiff = -DBL_MAX;
       int numberOfClusterDaughters = 0;
 
-      averageECLTime = weightedAverageECLTime(particle);
+      double averageECLTime = weightedAverageECLTime(particle);
 
-      std::stack<const Particle*> stacked;
-      stacked.push(particle);
-      while (!stacked.empty()) {
-        const Particle* current = stacked.top();
-        stacked.pop();
+      auto maxTimeDifference = [&maxTimeDiff, &numberOfClusterDaughters, &averageECLTime](const Particle * p) {
 
-        const ECLCluster* cluster = current->getECLCluster();
+        const ECLCluster* cluster = p->getECLCluster();
         if (cluster) {
           numberOfClusterDaughters ++;
 
-          time = cluster->getTime();
+          double time = cluster->getTime();
           B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
-          deltatime = cluster->getDeltaTime99();
+          double deltatime = cluster->getDeltaTime99();
           B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
-          maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
+          double maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
           B2DEBUG(11, "maxTimeDiff_temp[" << numberOfClusterDaughters << "] = " << maxTimeDiff_temp);
           if (maxTimeDiff_temp > maxTimeDiff)
             maxTimeDiff = maxTimeDiff_temp;
           B2DEBUG(11, "maxTimeDiff[" << numberOfClusterDaughters << "] = " << maxTimeDiff);
-        } else {
-          const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = current->getNDaughters();
-          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-            stacked.push(daughters[iDaughter]);
-          }
         }
-      }
+        return false;
+      };
+
+      particle->forEachDaughter(maxTimeDifference, true, true);
+
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();
@@ -1274,11 +1237,14 @@ as function of true photon energy, true photon direction and beam background lev
     | Precision: :math:`16` bit
 )DOC");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming, R"DOC(
-Returns ECL cluster's timing. Photon timing is given by the fitted time
-of the recorded waveform of the highest energetic crystal in a cluster.
-After all corrections (including Time-Of-Flight) and calibrations, photons from the interaction point (IP)
-should have a time that corresponds to the event trigger time :math:`t_{0}`
-(For MC, this is currently not simulated and such photons are designed to have a time of :math:`t = 0\,` nano second).
+Returns the time of the ECL cluster. It is calculated as the Photon timing minus the Event t0.
+Photon timing is given by the fitted time of the recorded waveform of the highest energy crystal in the
+cluster. After all calibrations and corrections (including Time-Of-Flight), photons from the interaction 
+point (IP) should have a Photon timing that corresponds to the Event t0, :math:`t_{0}`.  The Event t0 is the 
+time of the event and may be measured by a different sub-detector (see Event t0 documentation). For an ECL 
+cluster produced at the interation point in time with the event, the cluster time should be consistent with zero 
+within the uncertainties. Special values are returned if the fit for the Photon timing fails (see 
+documentation for `clusterHasFailedTiming`). (For MC, the calibrations and corrections are not fully simulated).
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1429,14 +1395,16 @@ to a plane perpendicular to the shower axis.
 Returns lateral energy distribution (shower variable). It is defined as following:
 
 .. math::
-    S = \frac{\sum_{i=3}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=3}^{n} w_{i} E_{i} r^2_{i} + w_{0} E_{0} r^2_{0} + w_{1} E_{1} r^2_{0}}
+    S = \frac{\sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}{(w_{0} E_{0} + w_{1} E_{1}) r^2_{0} + \sum_{i=2}^{n} w_{i} E_{i} r^2_{i}}
 
-where :math:`E_{i} = (E_0, E_1, ...)` are the single crystal energies sorted by energy, :math:`w_{i}` is
-the crystal weight, :math:`r_{i}` is the distance of the :math:`i`-th digit to the shower center projected to
-a plane perpendicular to the shower axis, and :math:`r_{0} \approx 5\,cm` is the distance between two crystals.
+where :math:`E_{i} = (E_{0}, E_{1}, ...)` are the single crystal energies sorted by energy
+(:math:`E_{0}` is the highest energy and :math:`E_{1}` the second highest), :math:`w_{i}`
+is the crystal weight, :math:`r_{i}` is the distance of the :math:`i`-th digit to the
+shower center projected to a plane perpendicular to the shower axis,
+and :math:`r_{0} \approx 5\,cm` is the distance between two crystals.
 
-clusterLAT peaks around 0.3 for radially symmetrical electromagnetic showers and is larger for hadronic events,
-and electrons with a close-by radiative or Bremsstrahlung photon.
+clusterLAT peaks around 0.3 for radially symmetrical electromagnetic showers and is larger
+for hadronic events, and electrons with a close-by radiative or Bremsstrahlung photon.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1499,16 +1467,6 @@ Computed only using cluster digits with energy :math:`> 50\,` MeV and good offli
 )DOC");
     REGISTER_VARIABLE("clusterClusterID", eclClusterId, R"DOC(
 Returns ECL cluster ID of this ECL cluster within the connected region (CR) to which it belongs to.
-)DOC");
-    REGISTER_VARIABLE("clusterHypothesis", eclClusterHypothesisId, R"DOC(
-Emulates the deprecated hypothesis ID of this ECL cluster in as-backward-compatible way as possible.
-
-Returns 5 for the nPhotons hypothesis, 6 for the neutralHadron hypothesis.
-Since release-04-00-00, it will be possible for a cluster to have both hypotheses so if both are set it will return 56.
-
-.. warning::
-   This variable is a legacy variable and will be removed in release-05-00-00. 
-   You probably want to use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron` instead of this variable.
 )DOC");
     REGISTER_VARIABLE("clusterHasNPhotons", eclClusterHasNPhotonsHypothesis, R"DOC(
 Returns 1.0 if cluster has the 'N photons' hypothesis (historically called 'N1'),

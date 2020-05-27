@@ -113,17 +113,13 @@ namespace Belle2 {
     bool valid = decaydescriptor.init(decayString);
     if (!valid)
       B2ERROR("Invalid input DecayString: " << decayString);
-    m_isIgnoreRadiatedPhotons = decaydescriptor.isIgnoreRadiatedPhotons();
-    m_isIgnoreIntermediate = decaydescriptor.isIgnoreIntermediate();
-    m_isIgnoreMassive = decaydescriptor.isIgnoreMassive();
-    m_isIgnoreNeutrino = decaydescriptor.isIgnoreNeutrino();
-    m_isIgnoreGamma = decaydescriptor.isIgnoreGamma();
 
+    m_properties = decaydescriptor.getProperty();
 
     // Mother particle
     const DecayDescriptorParticle* mother = decaydescriptor.getMother();
     m_pdgCode = mother->getPDGCode();
-    m_isUnspecified = mother->isUnspecified();
+    m_properties |= mother->getProperty();
 
     // Daughters
     m_numberOfLists = decaydescriptor.getNDaughters();
@@ -134,6 +130,64 @@ namespace Belle2 {
       const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList> list(daughter->getFullName());
       m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
+    }
+
+    m_cut = Variable::Cut::compile(cutParameter);
+
+    m_isSelfConjugated = decaydescriptor.isSelfConjugated();
+
+    // check if input lists can contain copies
+    // remember (list_i, list_j) pairs, where list_i and list_j can contain copies
+    m_inputListsCollide = false;
+    m_collidingLists.clear();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      const DecayDescriptorParticle* daughter_i = decaydescriptor.getDaughter(i)->getMother();
+      for (unsigned int j = i + 1; j < m_numberOfLists; ++j) {
+        const DecayDescriptorParticle* daughter_j = decaydescriptor.getDaughter(j)->getMother();
+
+        if (abs(daughter_i->getPDGCode()) != abs(daughter_j->getPDGCode()))
+          continue;
+
+        if (daughter_i->getLabel() != daughter_j->getLabel()) {
+          m_inputListsCollide = true;
+          m_collidingLists.emplace_back(i, j);
+        }
+      }
+    }
+
+  }
+
+
+  ParticleGenerator::ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter) : m_iParticleType(0),
+    m_listIndexGenerator(),
+    m_particleIndexGenerator()
+  {
+    bool valid = decaydescriptor.isInitOK();
+    if (!valid)
+      B2ERROR("Given decaydescriptor failed to initialized");
+
+    m_properties = decaydescriptor.getProperty();
+
+    // Mother particle
+    const DecayDescriptorParticle* mother = decaydescriptor.getMother();
+    m_pdgCode = mother->getPDGCode();
+    m_properties |= mother->getProperty();
+
+    // Daughters
+    m_numberOfLists = decaydescriptor.getNDaughters();
+    for (unsigned int i = 0; i < m_numberOfLists; ++i) {
+      // Get the mother of the subdecaystring of the ith daughter
+      // eg. "B -> [D -> K pi] [tau -> pi pi pi]". The 0th daughter is the
+      // *decaystring* D -> K pi whose mother is the D.
+      const DecayDescriptorParticle* daughter = decaydescriptor.getDaughter(i)->getMother();
+      StoreObjPtr<ParticleList> list(daughter->getFullName());
+      m_plists.push_back(list);
+
+      int daughterProperty = daughter->getProperty();
+      m_daughterProperties.push_back(daughterProperty);
     }
 
     m_cut = Variable::Cut::compile(cutParameter);
@@ -266,20 +320,29 @@ namespace Belle2 {
   }
 
 
-  bool ParticleGenerator::loadNext()
+  bool ParticleGenerator::loadNext(bool loadAntiParticle)
   {
 
     bool loadedNext = false;
+    /**
+     * Three cases are distinguished:
+     * First, particles matching the flavor specified in the decay string are used to form combinations.
+     * Secondly, the anti-particles of flavored particles are used, but only if requested.
+     * Lastly, self-conjugated particles are handled specifically.
+     */
     while (true) {
-      switch (m_iParticleType) {
-        case 0: loadedNext = loadNextParticle(false); break; //Particles
-        case 1: loadedNext = loadNextParticle(true); break; //Anti-Particles
-        case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
-        default: return false;
+      if (m_iParticleType == 0) {
+        loadedNext = loadNextParticle(false);
+      } else if (m_iParticleType == 1 and loadAntiParticle) {
+        loadedNext = loadNextParticle(true);
+      } else if (m_iParticleType == 2) {
+        loadedNext = loadNextSelfConjugatedParticle();
+      } else {
+        return false;
       }
-      if (loadedNext)
-        return true;
-      ++m_iParticleType;
+
+      if (loadedNext) return true;
+      else ++m_iParticleType;
 
       if (m_iParticleType == 2) {
         std::vector<unsigned int> sizes(m_numberOfLists);
@@ -385,23 +448,15 @@ namespace Belle2 {
     }
     const TLorentzVector vec(px, py, pz, E);
 
-    int property = Particle::PropertyFlags::c_Ordinary;
-    if (m_isUnspecified) property |= Particle::PropertyFlags::c_IsUnspecified;
-    if (m_isIgnoreRadiatedPhotons) property |= Particle::PropertyFlags::c_isIgnoreRadiatedPhotons;
-    if (m_isIgnoreIntermediate) property |= Particle::PropertyFlags::c_isIgnoreIntermediate;
-    if (m_isIgnoreMassive) property |= Particle::PropertyFlags::c_isIgnoreMassive;
-    if (m_isIgnoreNeutrino) property |= Particle::PropertyFlags::c_isIgnoreNeutrino;
-    if (m_isIgnoreGamma) property |= Particle::PropertyFlags::c_isIgnoreGamma;
-
     switch (m_iParticleType) {
       case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices,
-                                property,
+                                m_properties, m_daughterProperties,
                                 m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");
     }
@@ -490,7 +545,7 @@ namespace Belle2 {
         //
         // auto cluster = p->getECLCluster();
         // if (cluster) { // then do stuff
-        if (p->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+        if (p->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
           nECLSource++;
           auto* cluster = p->getECLCluster();
           connectedregions.push_back(cluster->getConnectedRegionId());

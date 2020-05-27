@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -46,7 +45,6 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
-from stdPhotons import stdPhotons
 import stdCharged as stdc
 from stdPi0s import stdPi0s
 
@@ -67,8 +65,8 @@ stdc.stdK(listtype='loose', path=my_path)
 # creates "mu+:loose" ParticleList (and c.c.)
 stdc.stdMu(listtype='loose', path=my_path)
 
-# creates "pi0:looseFit" ParticleList
-stdPi0s(listtype='looseFit',
+# creates "pi0:eff40_Jan2020Fit" ParticleList
+stdPi0s(listtype='eff40_Jan2020Fit',
         path=my_path)
 
 # 1. reconstruct D0 in multiple decay modes
@@ -76,7 +74,7 @@ ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     cut='1.8 < M < 1.9',
                     dmID=1,
                     path=my_path)
-ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_Jan2020Fit',
                     cut='1.8 < M < 1.9',
                     dmID=2,
                     path=my_path)
@@ -112,7 +110,7 @@ ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
                     cut="",
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='Upsilon(4S)',
                 path=my_path)
 
@@ -131,7 +129,7 @@ b_vars = vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=d_vars,
                                    decay_string='B- -> ^D0 pi-') + \
     vu.create_aliases(list_of_variables=['decayModeID'],
-                      wrapper='daughter(0,extraInfo(variable))',
+                      wrapper='daughter(0,extraInfo({variable}))',
                       prefix="D")
 mu_vars = vc.mc_truth
 nu_vars = d_vars

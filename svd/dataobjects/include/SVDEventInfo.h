@@ -74,6 +74,15 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_modeByte; }
 
+    /** returns the time shift between SVD reference
+     *  and FTSW (Trigger) reference:
+     *  time in FTSW reference = time in SVD reference + time shift
+     *  for clusters, additional information of the first frame is
+     *  used to improve the precision
+     */
+    float getSVD2FTSWTimeShift(int firstFrame) const
+    { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event
      */
@@ -117,6 +126,7 @@ namespace Belle2 {
     bool m_TriggerTypeMatch; /**< flag telling if the SVDTriggerType object is the same for each FADCs in the event */
     bool m_Xtalk = false;    /**< information on the x-talk */
 
+    /**class def needed by root*/
     ClassDef(SVDEventInfo, 1);
 
   }; //class

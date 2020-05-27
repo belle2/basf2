@@ -20,10 +20,10 @@
 //ROOT
 #include <TCanvas.h>
 #include <TLine.h>
-#include <TLegend.h>
-#include <THStack.h>
-#include <TWbox.h>
+#include <TGraphErrors.h>
 #include <TH1F.h>
+#include <TH2F.h>
+#include <TLatex.h>
 
 namespace Belle2 {
 
@@ -54,48 +54,68 @@ namespace Belle2 {
 
   private:
 
+    /** Parameters for hit map histograms. */
+    std::vector<double> m_HitMapThresholds{};
+    /** Options for waveform histograms. */
+    std::vector<std::string> m_WaveformOption{};
+    /** Maximum boundary for crate time offsets. */
+    double m_CrateTimeOffsetsMax;
+    /** Maximum of fails for logic test. */
+    int m_LogicTestMax;
+
+    /** Vector for crates IDs w/ low statistics. */
+    std::vector<short> m_low{};
+
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
-    TLine* m_line1 = nullptr;
+    TLine* m_lower_boundary_trigtag2 = nullptr;
     /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
-    TLine* m_line2 = nullptr;
-    /** TLine to show lower boundary for 'pedmean_cellid' histogram. */
-    TLine* m_line3 = nullptr;
-    /** TLine to show upper boundary for 'pedmean_cellid' histogram. */
-    TLine* m_line4 = nullptr;
+    TLine* m_upper_boundary_trigtag2 = nullptr;
 
-    /** Statistics control flag for time crate histograms from current run. */
-    Int_t stat[52] = {};
-    /** Statistics control flag for time crate histograms from reference run. */
-    Int_t stat_ref[52] = {};
-
-    /** TCanvas  for adc_flag. */
-    TCanvas* c_adc_flag_title = nullptr;
+    /** TLine to show lower boundary for 'crate_time_offsets' graph. */
+    TLine* m_lower_boundary_time_offsets = nullptr;
+    /** TLine to show upper boundary for 'crate_time_offsets' graph. */
+    TLine* m_upper_boundary_time_offsets = nullptr;
 
     /** TCanvas for time offsets. */
     TCanvas* c_crate_time_offsets = nullptr;
 
-    /** THStack for time offsets. */
-    THStack* hs = nullptr;
-    /** TLegend for time offsets. */
-    TLegend* m_leg = nullptr;
-
-    /** TWbox to show large time offset in TLegend. */
-    TWbox* box1 = nullptr;
-    /** TWbox to show low statistics case in TLegend. */
-    TWbox* box2 = nullptr;
-
     /** Histogram showing signal times from ECL crates (Thr. = 1 GeV). */
     TH1* h_time_crate_Thr1GeV = nullptr;
-    /** Histogram for time offsets (current run). */
-    TH1F* h_crate_time_offsets = nullptr;
-    /** Histogram for time offsets (reference run). */
-    TH1F* h_crate_time_offsets_ref = nullptr;
+    /** Graph for time offsets. */
+    TGraphErrors* h_crate_time_offsets = nullptr;
 
-    /** Find TCanvas by name. */
-    TCanvas* findCanv(TString);
-    /** Fill time offsets histogram and statistics control flag. */
-    void timeCrate(TH1F*, Int_t*);
+    /** TCanvas for ECL logic summary. */
+    TCanvas* c_logic_summary = nullptr;
+    /** Histogram for ECL logic summary. */
+    TH2F* h_logic_summary = nullptr;
 
+    /** TCanvas for quality .*/
+    TCanvas* c_quality_analysis = nullptr;
+    /** TCanvas for quality_other .*/
+    TCanvas* c_quality_other_analysis = nullptr;
+    /**TCanvas for bad_quality .*/
+    TCanvas* c_bad_quality_analysis = nullptr;
+    /** TCanvas for trigtag1 .*/
+    TCanvas* c_trigtag1_analysis = nullptr;
+    /** TCanvas for trigtag2 .*/
+    TCanvas* c_trigtag2_analysis = nullptr;
+    /** TCanvas for adc_hits .*/
+    TCanvas* c_adc_hits_analysis = nullptr;
+    /** TCanvas for ampfail_quality .*/
+    TCanvas* c_ampfail_quality_analysis = nullptr;
+    /** TCanvas for timefail_quality .*/
+    TCanvas* c_timefail_quality_analysis = nullptr;
+    /** TCanvas for quality_fit_data .*/
+    TCanvas* c_quality_fit_data_analysis = nullptr;
+
+    /** Vector of TCanvases for hit map .*/
+    std::vector<TCanvas*> c_cid_analysis{};
+
+    /**Vector of TCanvases for waveforms .*/
+    std::vector<TCanvas*> c_wf_analysis{};
+
+    /** Normalize histograms. */
+    void normalize(TCanvas*, const std::string&, const Double_t&);
   };
 } // end namespace Belle2
 

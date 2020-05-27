@@ -12,7 +12,7 @@
 #include <klm/eklm/modules/EKLMTimeCalibration/EKLMTimeCalibrationCollectorModule.h>
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/gearbox/Unit.h>
@@ -26,16 +26,17 @@ using namespace Belle2;
 REG_MODULE(EKLMTimeCalibrationCollector)
 
 EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_TransformData(nullptr),
+  m_GeoDat(nullptr),
+  m_ev( {0, 0, 0}),
+      m_Strip(0)
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("UseEventT0", m_UseEventT0, "Calibrate relatively to event T0.",
            false);
-  m_ev = {0, 0, 0};
-  m_Strip = 0;
-  m_TransformData = nullptr;
-  m_GeoDat = nullptr;
 }
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
@@ -48,7 +49,7 @@ void EKLMTimeCalibrationCollectorModule::prepare()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_EKLMHit2ds.isRequired();
   m_Tracks.isRequired();
-  StoreArray<EKLMDigit> eklmDigits;
+  StoreArray<KLMDigit> eklmDigits;
   m_EKLMHit2ds.requireRelationTo(eklmDigits);
   StoreArray<ExtHit> extHits;
   m_Tracks.requireRelationTo(extHits);
@@ -97,22 +98,23 @@ void EKLMTimeCalibrationCollectorModule::collect()
   }
   n = m_EKLMHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    RelationVector<EKLMDigit> digits =
-      m_EKLMHit2ds[i]->getRelationsTo<EKLMDigit>();
+    RelationVector<KLMDigit> digits =
+      m_EKLMHit2ds[i]->getRelationsTo<KLMDigit>();
     if (digits.size() != 2)
-      B2FATAL("Wrong number of related EKLMDigits.");
+      B2FATAL("Wrong number of related KLMDigits.");
     /*
      * This is possible if the threshold was crossed, but the pedestal level
      * has been estimated incorrectly.
      */
-    if (digits[0]->getNPE() == 0 || digits[1]->getNPE() == 0)
+    if (digits[0]->getNPhotoelectrons() == 0 || digits[1]->getNPhotoelectrons() == 0)
       continue;
     for (j = 0; j < 2; j++) {
       entryHit[j] = nullptr;
       exitHit[j] = nullptr;
-      vol = m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
-                                  digits[j]->getSector(), digits[j]->getPlane(),
-                                  digits[j]->getStrip());
+      vol = m_ElementNumbers->stripNumber(
+              digits[j]->getSection(), digits[j]->getLayer(),
+              digits[j]->getSector(), digits[j]->getPlane(),
+              digits[j]->getStrip());
       itLower = mapExtHit.lower_bound(vol);
       itUpper = mapExtHit.upper_bound(vol);
       for (it = itLower; it != itUpper; ++it) {
@@ -157,11 +159,11 @@ void EKLMTimeCalibrationCollectorModule::collect()
       hitLocal = (*tr) * hitGlobal;
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
-      m_ev.npe = digits[j]->getNPE();
-      m_Strip =
-        m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
-                              digits[j]->getSector(), digits[j]->getPlane(),
-                              digits[j]->getStrip());
+      m_ev.npe = digits[j]->getNPhotoelectrons();
+      m_Strip = m_ElementNumbers->stripNumber(
+                  digits[j]->getSection(), digits[j]->getLayer(),
+                  digits[j]->getSector(), digits[j]->getPlane(),
+                  digits[j]->getStrip());
       calibrationData->Fill();
     }
   }

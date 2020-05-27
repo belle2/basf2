@@ -50,8 +50,8 @@ ft.flavorTagger(
     weightFiles='B2nunubarBGx1',
     path=cp_val_path)
 
-vx.vertexRave(list_name='B0:jpsiks', conf_level=0.0,
-              decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
+vx.raveFit(list_name='B0:jpsiks', conf_level=0.0,
+           decay_string='B0:jpsiks -> [J/psi:mumu -> ^mu+ ^mu-] K_S0', constraint='', path=cp_val_path)
 vx.TagV(list_name='B0:jpsiks', MCassociation='breco', path=cp_val_path)
 
 # Select variables that will be stored to ntuple
@@ -83,7 +83,7 @@ ma.variablesToNtuple(decayString='B0:jpsiks',
 ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 
 # Process the events
-ma.process(cp_val_path)
+b2.process(cp_val_path)
 
 # print out the summary
 print(b2.statistics)

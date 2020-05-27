@@ -78,7 +78,7 @@ def get_popular_revision_combinations(work_folder):
         # If we didn't care about the order:
         # return list(map(list, set(map(tuple, lstlst))))
         # would do the job. But we do care, or at least it is very
-        # relevant which revision is first (beceause it gets taken
+        # relevant which revision is first (because it gets taken
         # as reference)
         ret = []
         for lst in lstlst:
@@ -89,8 +89,7 @@ def get_popular_revision_combinations(work_folder):
     # Return value
     ret = [
         # All revisions
-        # todo: remove this limitation if we find way too avoid too lengthy file names
-        ["reference"] + available[:9],
+        ["reference"] + sorted(available),
 
         # Latest X + reference
         ["reference", atindex_or_none(available_releases, 0)],
@@ -98,18 +97,17 @@ def get_popular_revision_combinations(work_folder):
         ["reference", atindex_or_none(available_nightlies, 0)],
 
         # All latest + reference
-        ["reference"] + sorted(
+        ["reference"] + sorted(list(filter(
+            None,
             [
                 atindex_or_none(available_releases, 0),
                 atindex_or_none(available_builds, 0),
-                atindex_or_none(available_nightlies, 0),
-            ],
-            key=lambda x: "" if x is None else x,
-        ),
+                atindex_or_none(available_nightlies, 0)
+            ]
+        ))),
 
         # All nightlies + reference
-        # todo: remove this limitation if we find way too avoid too lengthy file names
-        ["reference"] + available_nightlies[:9]
+        ["reference"] + sorted(available_nightlies)
     ]
 
     # Remove all Nones from the sublists
@@ -121,12 +119,6 @@ def get_popular_revision_combinations(work_folder):
 
     # Remove duplicates
     ret = remove_duplicates_lstlst(ret)
-
-    # If we only generated new results for one package, we want to avoid the
-    # case of only having the reference selected, because it will regenerate
-    # plots for all packages and making testing very slow.
-    if ["reference"] in ret:
-        ret.remove(["reference"])
 
     if not ret:
         sys.exit("No revisions seem to be available. Exit.")

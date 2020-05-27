@@ -101,8 +101,9 @@ void TRGCDCTSFDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   char c_name[100];
   sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
@@ -150,9 +151,12 @@ void TRGCDCTSFDQMModule::event()
   }
   h_nhit->Fill(nhit);
 
-  int id = 0;
-  int v  = 0;
-  int rt = 0;
+  /* cppcheck-suppress variableScope */
+  int id;
+  /* cppcheck-suppress variableScope */
+  int v ;
+  /* cppcheck-suppress variableScope */
+  int rt;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     id = entAry[ii]->m_trackerhit0id;
     v  = entAry[ii]->m_trackerhit0v;

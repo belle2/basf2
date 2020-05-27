@@ -35,6 +35,7 @@ PXDDQMEfficiencyNtupleModule::PXDDQMEfficiencyNtupleModule() : Module(), m_vxdGe
   // setPropertyFlags(c_ParallelProcessingCertified);// for ntuple not certified!!!
 
   // Parameter definitions
+  addParam("ntupleName", m_ntupleName, "name of ntuple file", std::string("test.root"));
   addParam("pxdClustersName", m_pxdClustersName, "name of StoreArray with PXD cluster", std::string(""));
   addParam("recoTracksName", m_recoTracksName, "name of StoreArray with RecoTracks", std::string(""));
   addParam("tracksName", m_tracksName, "name of StoreArray with Tracks", std::string(""));
@@ -72,7 +73,7 @@ void PXDDQMEfficiencyNtupleModule::terminate()
 
 void PXDDQMEfficiencyNtupleModule::initialize()
 {
-  m_file = new TFile("test.root", "recreate");
+  m_file = new TFile(m_ntupleName.data(), "recreate");
   if (m_file) m_file->cd();
   m_tuple = new TNtuple("effcontrol", "effcontrol",
                         "vxdid:u:v:p:pt:distu:distv:sigu:sigv:dist:inroi:clborder:cldead:matched:z0:d0:svdhits:charge:phi:costheta");
@@ -142,140 +143,73 @@ void PXDDQMEfficiencyNtupleModule::event()
       //Traditional (aka the person before did it like this) method
       //If there is a way to find out sensors crossed by a track directly, that would most likely be faster
 
-      //true = track intersects current sensor
-      double sigu(-9999);
-      double sigv(-9999);
-      {
-        sigu = intercept.getSigmaU();
-        sigv = intercept.getSigmaV();
+      double sigu = intercept.getSigmaU();
+      double sigv = intercept.getSigmaV();
 
-        double u_fit = intercept.getCoorU();
-        double v_fit = intercept.getCoorV();
+      double u_fit = intercept.getCoorU();
+      double v_fit = intercept.getCoorV();
 
-        int ucell_fit = info.getUCellID(u_fit); // check wie overflow!!!
-        int vcell_fit = info.getVCellID(v_fit); // Check wie overflow
+      int ucell_fit = info.getUCellID(u_fit); // check wie overflow!!!
+      int vcell_fit = info.getVCellID(v_fit); // Check wie overflow
 
-        bool closeToBoarder = false;
-        if (isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
-          closeToBoarder = true;
-        }
+      bool closeToBoarder = false;
+      if (isCloseToBorder(ucell_fit, vcell_fit, m_maskedDistance)) {
+        closeToBoarder = true;
+      }
 
-        bool closeToDead = false;
-        if (isDeadPixelClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
-          closeToDead = true;
-        }
+      bool closeToDead = false;
+      if (isDeadPixelClose(ucell_fit, vcell_fit, m_maskedDistance, aVxdID)) {
+        closeToDead = true;
+      }
 
-        bool fitInsideROI = false;
-        if (m_ROIs.isValid()) {
-          //Check if the intersection is inside a ROI
-          //If not, even if measured the cluster was thrown away->Not PXD's fault
-          for (auto& roit : m_ROIs) {
-            if (aVxdID != roit.getSensorID()) {
-              continue; //ROI on other sensor
-            }
+      bool fitInsideROI = false;
+      if (m_ROIs.isValid()) {
+        //Check if the intersection is inside a ROI
+        //If not, even if measured the cluster was thrown away->Not PXD's fault
+        for (auto& roit : m_ROIs) {
+          if (aVxdID != roit.getSensorID()) {
+            continue; //ROI on other sensor
+          }
 
-            if (ucell_fit < roit.getMaxUid()
-                && ucell_fit > roit.getMinUid()
-                && vcell_fit < roit.getMaxVid()
-                && vcell_fit > roit.getMinVid()) {
-              fitInsideROI = true;
-            }
+          if (ucell_fit < roit.getMaxUid()
+              && ucell_fit > roit.getMinUid()
+              && vcell_fit < roit.getMaxVid()
+              && vcell_fit > roit.getMinVid()) {
+            fitInsideROI = true;
           }
         }
-
-        //Now check if the sensor measured a hit here
-
-        int bestcluster = findClosestCluster(aVxdID, TVector3(u_fit, v_fit, 0));
-        double du_clus = 0;
-        double dv_clus = 0;
-        double d_clus = 0;
-        float charge = 0;
-        bool matched = false;
-        if (bestcluster >= 0) {
-          double u_clus = m_pxdclusters[bestcluster]->getU();
-          double v_clus = m_pxdclusters[bestcluster]->getV();
-
-          //is the closest cluster close enough to the track to count as measured?
-          TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
-          du_clus = u_fit - u_clus;
-          dv_clus = v_fit - v_clus;
-          d_clus = dist_clus.Mag();
-          charge = m_pxdclusters[bestcluster]->getCharge();
-          matched = true;
-        }
-        float fill[22] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
-                          float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
-                          float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
-                          float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track->getNumberOfSVDHits()),
-                          charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta())
-                         };
-        m_tuple->Fill(fill);
       }
+
+      //Now check if the sensor measured a hit here
+
+      int bestcluster = findClosestCluster(aVxdID, TVector3(u_fit, v_fit, 0));
+      double du_clus = 0;
+      double dv_clus = 0;
+      double d_clus = 0;
+      float charge = 0;
+      bool matched = false;
+      if (bestcluster >= 0) {
+        double u_clus = m_pxdclusters[bestcluster]->getU();
+        double v_clus = m_pxdclusters[bestcluster]->getV();
+
+        //is the closest cluster close enough to the track to count as measured?
+        TVector3 dist_clus(u_fit - u_clus, v_fit - v_clus, 0);
+        du_clus = u_fit - u_clus;
+        dv_clus = v_fit - v_clus;
+        d_clus = dist_clus.Mag();
+        charge = m_pxdclusters[bestcluster]->getCharge();
+        matched = true;
+      }
+      float fill[22] = {float((int)aVxdID), float(u_fit), float(v_fit), float(trackstate.getMom().Mag()), float(trackstate.getMom().Pt()),
+                        float(du_clus), float(dv_clus), float(sigu), float(sigv), float(d_clus),
+                        float(fitInsideROI), float(closeToBoarder), float(closeToDead), float(matched),
+                        float(ptr2->getZ0()), float(ptr2->getD0()), float(a_track->getNumberOfSVDHits()),
+                        charge, float(trackstate.getMom().Phi()), float(trackstate.getMom().CosTheta())
+                       };
+      m_tuple->Fill(fill);
     }
   }
 }
-
-
-
-TVector3 PXDDQMEfficiencyNtupleModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack,
-                                                        bool& isgood,
-                                                        double& du, double& dv)
-{
-  //will be set true if the intersect was found
-  isgood = false;
-
-  TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
-
-  genfit::MeasuredStateOnPlane gfTrackState = aTrack.getMeasuredStateOnPlaneFromFirstHit();
-
-  //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
-  try {
-    // get sensor plane
-    TVector3 zeroVec(0, 0, 0);
-    TVector3 uVec(1, 0, 0);
-    TVector3 vVec(0, 1, 0);
-
-    genfit::DetPlane* sensorPlane = new genfit::DetPlane();
-    sensorPlane->setO(pxdSensorInfo.pointToGlobal(zeroVec, m_useAlignment));
-    sensorPlane->setUV(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment), pxdSensorInfo.vectorToGlobal(vVec, m_useAlignment));
-
-    //boost pointer (will be deleted automatically ?!?!?)
-    genfit::SharedPlanePtr sensorPlaneSptr(sensorPlane);
-
-    // do extrapolation
-    gfTrackState.extrapolateToPlane(sensorPlaneSptr);
-  } catch (genfit::Exception& gfException) {
-    B2WARNING("Fitting failed: " << gfException.getExcString());
-    isgood = false;
-    return intersec;
-  } catch (...) {
-    B2WARNING("Fitting failed: for some reason");
-    isgood = false;
-    return intersec;
-  }
-
-  //local position
-  intersec = pxdSensorInfo.pointToLocal(gfTrackState.getPos(), m_useAlignment);
-
-  //try to get the momentum
-  B2DEBUG(1, "Fitted momentum on the plane p = " << gfTrackState.getMom().Mag());
-
-  // no tolerance currently! Maybe one should be added!
-  double tolerance = 0.0;
-  bool inside = pxdSensorInfo.inside(intersec.X(), intersec.Y(), tolerance, tolerance);
-
-  // get intersection point in local coordinates with covariance matrix
-  TMatrixDSym covMatrix = gfTrackState.getCov(); // 5D with elements q/p,u',v',u,v in plane system
-
-  // get ROI by covariance matrix and local intersection point
-  du = std::sqrt(covMatrix(3, 3));
-  dv = std::sqrt(covMatrix(4, 4));
-
-  if (inside) isgood = true;
-
-  return intersec;
-}
-
 
 int
 PXDDQMEfficiencyNtupleModule::findClosestCluster(const VxdID& avxdid, TVector3 intersection)

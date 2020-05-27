@@ -16,8 +16,6 @@ from modularAnalysis import variablesToNtuple
 from modularAnalysis import fillParticleList
 from modularAnalysis import fillConvertedPhotonsList
 from modularAnalysis import loadGearbox
-from modularAnalysis import vertexKFit
-from modularAnalysis import vertexRave
 from modularAnalysis import printVariableValues
 from stdCharged import *
 
@@ -68,7 +66,7 @@ else:
                            skimType, dataType, belleLevel)
 
 mypath = create_path()
-b2biiConversion.convertBelleMdstToBelleIIMdst(url, applyHadronBJSkim=True, path=mypath)
+b2biiConversion.convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
 loadGearbox(mypath)
 
 

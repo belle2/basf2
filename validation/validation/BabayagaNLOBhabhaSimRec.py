@@ -3,7 +3,7 @@
 
 """
 <header>
-  <output>BabagagaNLOBhabhaSimRec.root</output>
+  <output>BabayagaNLOBhabhaSimRec.root</output>
   <cacheable/>
   <contact>Software team b2soft@mail.desy.de</contact>
   <description>

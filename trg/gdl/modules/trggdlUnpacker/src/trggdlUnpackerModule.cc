@@ -34,7 +34,8 @@ TRGGDLUnpackerModule::TRGGDLUnpackerModule()
   addParam("trgReadoutBoardSearch", m_trgReadoutBoardSearch,
            "Print trigger readout board included in the data.",
            false);
-  B2INFO("trggdlunpacker: Constructor done.");
+  addParam("print_dbmap", m_print_dbmap, "Print Database Bit Map", false);
+  B2DEBUG(20, "trggdlunpacker: Constructor done.");
 }
 
 void TRGGDLUnpackerModule::initialize()
@@ -87,6 +88,55 @@ void TRGGDLUnpackerModule::initialize()
       BitMap_extra[i][1] = m_dbunpacker->getBitMap_extra(i, 1);
       BitMap_extra[i][2] = m_dbunpacker->getBitMap_extra(i, 2);
     }
+
+    if (m_print_dbmap) {
+
+      int aBitMap[320][2] = {0};
+      int aBitMap_extra[100][3] = { -1};
+      for (int i = 0; i < n_leafsExtra; i++) {
+        aBitMap_extra[i][0] = m_dbunpacker->getBitMap_extra(i, 0);
+        aBitMap_extra[i][1] = m_dbunpacker->getBitMap_extra(i, 1);
+        aBitMap_extra[i][2] = m_dbunpacker->getBitMap_extra(i, 2);
+      }
+
+      for (int i = 0; i < 200; i++) {
+        LeafBitMap[i] = m_dbunpacker->getLeafMap(i);
+        std::cout << "LeafBitMap[" << i << "] = " << m_dbunpacker->getLeafMap(i) << std::endl;
+        strcpy(LeafNames[i], m_dbunpacker->getLeafnames(i));
+        std::cout << "LeafNames[" << i << "] = " << m_dbunpacker->getLeafnames(i) << std::endl;
+      }
+      for (int i = 0; i < n_leafs; i++) {
+        aBitMap[i][0] = m_dbunpacker->getBitMap(i, 0);
+        aBitMap[i][1] = m_dbunpacker->getBitMap(i, 1);
+      }
+      for (int i = 0; i < 320; i++) {
+        int bin = m_dbunpacker->getLeafMap(i) + 1;
+        if (0 < bin && bin <= n_leafs) {
+          std::cout << "leaf(" << i
+                    << "), bin(" << bin
+                    << "), LeafNames[leaf](" << LeafNames[i]
+                    << "), BitMap[bin-1][0](" << aBitMap[bin - 1][0]
+                    << "), BitMap[bin-1][1](" << aBitMap[bin - 1][1]
+                    << ")" << std::endl;
+        }
+      }
+      // for leafsExtra
+      for (int i = 0; i < 320; i++) {
+        int bin = m_dbunpacker->getLeafMap(i) + 1;
+        int j = bin - n_leafs - 1;
+        if (n_leafs < bin && bin <= n_leafs + n_leafsExtra) {
+          std::cout << "i(" << i
+                    << "), bin(" << bin
+                    << "), LeafNames[leaf](" << LeafNames[i]
+                    << "), BitMap_extra[j][0](buf[" << aBitMap_extra[j][0]
+                    << "]), BitMap_extra[j][1](downto " << aBitMap_extra[j][1]
+                    << "), BitMap_extra[j][2](" << aBitMap_extra[j][2]
+                    << " bit length)" << std::endl;
+        }
+      }
+
+    }
+
   }
 
 }

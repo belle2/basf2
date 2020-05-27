@@ -26,7 +26,7 @@ namespace Belle2 {
     class PxPyPzMFitObject : public ParticleFitObject {
     public:
 
-      PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, CLHEP::HepSymMatrix& covmatrix);
+      PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, const CLHEP::HepSymMatrix& covmatrix);
 
       // Copy constructor
       PxPyPzMFitObject(const PxPyPzMFitObject& rhs               ///< right hand side

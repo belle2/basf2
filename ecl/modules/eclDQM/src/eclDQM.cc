@@ -17,6 +17,7 @@
 
 //Boost
 #include <boost/format.hpp>
+#include <boost/range/combine.hpp>
 
 //FRAMEWORK
 #include <framework/core/HistoModule.h>
@@ -30,6 +31,10 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+
+//TRG
+#include <mdst/dataobjects/TRGSummary.h>
 
 //ROOT
 #include <TProfile.h>
@@ -39,6 +44,7 @@
 
 //STL
 #include <iostream>
+#include <iterator>
 
 //NAMESPACE(S)
 using namespace Belle2;
@@ -46,21 +52,26 @@ using namespace ECL;
 
 REG_MODULE(ECLDQM)
 
-ECLDQMModule::ECLDQMModule() : HistoModule()
+ECLDQMModule::ECLDQMModule()
+  : HistoModule(),
+    m_calibrationThrApsd("ECL_FPGA_StoreWaveform")
 {
   //Set module properties.
   setDescription("ECL Data Quality Monitor");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify parallel processing.
+
+  m_WaveformOption = {"psd", "logic", "rand", "dphy", "other"};
+
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "histogram directory in ROOT file", std::string("ECL"));
-  addParam("NHitsUpperThr1", m_NHitsUpperThr1, "Upper threshold of number of hits in event", 10000);
-  addParam("NHitsUpperThr2", m_NHitsUpperThr2, "Upper threshold of number of hits in event (w/ Thr=10 MeV)", 1000);
   addParam("EnergyUpperThr", m_EnergyUpperThr, "Upper threshold of energy deposition in event, [GeV]", 20.0 * Belle2::Unit::GeV);
-  addParam("PedestalMeanUpperThr", m_PedestalMeanUpperThr, "Upper threshold of pedestal distribution", 15000.);
-  addParam("PedestalMeanLowerThr", m_PedestalMeanLowerThr, "Lower threshold of pedestal distribution", -15000.);
-
-  addParam("PedestalRmsInclude", m_PedestalRmsInclude, "If true, save histogram with pedestal rms error values.", true);
-  addParam("PedestalRmsUpperThr", m_PedestalRmsUpperThr, "Upper threshold of pedestal rms error distribution", 1000.);
+  addParam("HitThresholds", m_HitThresholds, "Thresholds to display hit occupancy, MeV", std::vector<double> {0, 5, 10, 50});
+  addParam("TotalEnergyThresholds", m_TotalEnergyThresholds, "Thresholds to display total energy, MeV", std::vector<double> {0, 5, 7});
+  addParam("TimingThresholds", m_TimingThresholds, "Thresholds (MeV) to display ECL timing", std::vector<double> {5, 10, 50});
+  addParam("HitNumberUpperlimits", m_HitNumberUpperLimits,
+           "Upper limit (# of hits) to display hit multiplicity", std::vector<double> {10000, 1000, 700, 200});
+  addParam("WaveformOption", m_WaveformOption, "Option (all,psd,logic,rand,dphy,other) to display waveform flow",
+           m_WaveformOption);
 }
 
 ECLDQMModule::~ECLDQMModule()
@@ -79,97 +90,80 @@ void ECLDQMModule::defineHisto()
   dirDAQ->cd();
 
   //1D histograms creation.
-
-  h_cid = new TH1F("cid", "Crystal ID", 8736, 1, 8737);
-  h_cid->GetXaxis()->SetTitle("Cell ID");
-  h_cid->SetOption("LIVE");
-
-  h_cid_Thr5MeV = new TH1F("cid_Thr5MeV", "Crystal ID (Thr = 5 MeV)", 8736, 1, 8737);
-  h_cid_Thr5MeV->GetXaxis()->SetTitle("Cell ID");
-  h_cid_Thr5MeV->SetOption("LIVE");
-
-  h_cid_Thr10MeV = new TH1F("cid_Thr10MeV", "Crystal ID (Thr  = 10 MeV)", 8736, 1, 8737);
-  h_cid_Thr10MeV->GetXaxis()->SetTitle("Cell ID");
-  h_cid_Thr10MeV->SetOption("LIVE");
-
-  h_cid_Thr50MeV = new TH1F("cid_Thr50MeV", "Crystal ID (Thr = 50 MeV)", 8736, 1, 8737);
-  h_cid_Thr50MeV->GetXaxis()->SetTitle("Cell ID");
-  h_cid_Thr50MeV->SetOption("LIVE");
-
-  h_ncev = new TH1F("ncev", "Number of hits in event", (int)(m_NHitsUpperThr1 / 10), 0, m_NHitsUpperThr1);
-  h_ncev->GetXaxis()->SetTitle("Number of hits");
-  h_ncev->SetOption("LIVE");
-
-  h_ncev_Thr10MeV = new TH1F("ncev_Thr10MeV", "Number of hits in event (Thr = 10 MeV)", m_NHitsUpperThr2, 0, m_NHitsUpperThr2);
-  h_ncev_Thr10MeV->GetXaxis()->SetTitle("Number of hits");
-  h_ncev_Thr10MeV->SetOption("LIVE");
-
-  h_edep = new TH1F("edep", "Energy deposition in event", (int)(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
-  h_edep->GetXaxis()->SetTitle("energy, [GeV]");
-  h_edep->SetOption("LIVE");
-
-  h_edep_Thr5MeV = new TH1F("edep_Thr5MeV", "Energy deposition in event with Thr = 5 MeV", (int)(100 * m_EnergyUpperThr), 0,
-                            m_EnergyUpperThr);
-  h_edep_Thr5MeV->GetXaxis()->SetTitle("energy, [GeV]");
-  h_edep_Thr5MeV->SetOption("LIVE");
-
-  h_edep_Thr7MeV = new TH1F("edep_Thr7MeV", "Energy deposition in event with Thr = 7 MeV", (int)(100 * m_EnergyUpperThr), 0,
-                            m_EnergyUpperThr);
-  h_edep_Thr7MeV->GetXaxis()->SetTitle("energy, [GeV]");
-  h_edep_Thr7MeV->SetOption("LIVE");
-
-  h_time_barrel_Thr5MeV = new TH1F("time_barrel_Thr5MeV", "Reconstructed time for ECL barrel with Thr = 5 MeV", 206, -1030,
-                                   1030);
-  h_time_barrel_Thr5MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_barrel_Thr5MeV->SetOption("LIVE");
-
-  h_time_endcaps_Thr5MeV = new TH1F("time_endcaps_Thr5MeV", "Reconstructed time for ECL endcaps with Thr = 5 MeV", 206, -1030,
-                                    1030);
-  h_time_endcaps_Thr5MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_endcaps_Thr5MeV->SetOption("LIVE");
-
-  h_time_barrel_Thr10MeV = new TH1F("time_barrel_Thr10MeV", "Reconstructed time for ECL barrel with Thr = 10 MeV", 206, -1030,
-                                    1030);
-  h_time_barrel_Thr10MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_barrel_Thr10MeV->SetOption("LIVE");
-
-  h_time_endcaps_Thr10MeV = new TH1F("time_endcaps_Thr10MeV", "Reconstructed time for ECL endcaps with Thr = 10 MeV", 206, -1030,
-                                     1030);
-  h_time_endcaps_Thr10MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_endcaps_Thr10MeV->SetOption("LIVE");
-
-  h_time_barrel_Thr50MeV = new TH1F("time_barrel_Thr50MeV", "Reconstructed time for ECL barrel with Thr = 50 MeV", 206, -1030,
-                                    1030);
-  h_time_barrel_Thr50MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_barrel_Thr50MeV->SetOption("LIVE");
-
-  h_time_endcaps_Thr50MeV = new TH1F("time_endcaps_Thr50MeV", "Reconstructed time for ECL endcaps with Thr = 50 MeV", 206, -1030,
-                                     1030);
-  h_time_endcaps_Thr50MeV->GetXaxis()->SetTitle("time [ns]");
-  h_time_endcaps_Thr50MeV->SetOption("LIVE");
+  h_evtot = new TH1F("event", "Total event bank", 1, 0, 1);
+  h_evtot->SetOption("LIVE");
 
   h_quality = new TH1F("quality", "Fit quality flag (0-good, 1- large amplitude, 2 - w/o time,  3 - bad chi2)", 4, 0, 4);
   h_quality->GetXaxis()->SetTitle("Flag number");
   h_quality->SetFillColor(kPink - 4);
   h_quality->SetOption("LIVE");
 
+  h_quality_other = new TH1F("quality_other", "Fit quality flag for waveform type 'other'", 4, 0, 4);
+  h_quality_other->GetXaxis()->SetTitle("Flag number");
+  h_quality_other->SetFillColor(kPink - 4);
+  h_quality_other->SetOption("LIVE");
+
+  h_bad_quality = new TH1F("bad_quality", "Fraction of Cell IDs w/ bad quality flag (=3) above Thr. = 1 GeV", 8736, 1, 8737);
+  h_bad_quality->GetXaxis()->SetTitle("Cell IDs");
+  h_bad_quality->SetOption("LIVE");
+
   h_trigtag1 = new TH1F("trigtag1", "Trigger tag flag # 1", 2, 0, 2);
   h_trigtag1->GetXaxis()->SetTitle("Trigger tag flag #1");
   h_trigtag1->SetOption("LIVE");
   h_trigtag1->SetFillColor(kPink - 4);
 
-  h_adc_flag = new TH1F("adc_flag", "Flag of ADC samples", 3, 0, 3);
-  h_adc_flag->GetXaxis()->SetTitle("Flag of ADC samples");
-  h_adc_flag->SetOption("LIVE");
-  h_adc_flag->SetFillColor(kPink - 4);
-
-  h_adc_hits = new TH1F("adc_hits", "Fraction of ADC samples in event (w/o 8736 ADC samples)", 250, 0, 5);
-  h_adc_hits->GetXaxis()->SetTitle("Fraction of ADC samples");
+  h_adc_hits = new TH1F("adc_hits", "Fraction of hits above ADC threshold", 1001, 0, 1.001);
+  h_adc_hits->GetXaxis()->SetTitle("fraction");
   h_adc_hits->SetOption("LIVE");
 
-  h_adc_waveforms = new TH1F("adc_waveforms", "ADC waveforms occupancy vs Create ID", 52, 1, 53);
-  h_adc_waveforms->GetXaxis()->SetTitle("Crate ID");
-  h_adc_waveforms->SetOption("LIVE");
+  for (const auto& id : m_HitThresholds) {
+    std::string h_name, h_title;
+    h_name = str(boost::format("cid_Thr%1%MeV") % id);
+    h_title = str(boost::format("Crystal ID (SW Thr  = %1% MeV)") % id);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    h->GetXaxis()->SetTitle("Cell ID");
+    h->SetOption("LIVE");
+    h_cids.push_back(h);
+  }
+
+  for (const auto& id : m_TotalEnergyThresholds) {
+    std::string h_name, h_title;
+    h_name = str(boost::format("edep_Thr%1%MeV") % id);
+    h_title = str(boost::format("Total energy (SW Thr = %1% MeV)") % id);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), (int)(100 * m_EnergyUpperThr), 0, m_EnergyUpperThr);
+    h->GetXaxis()->SetTitle("energy, [GeV]");
+    h->SetOption("LIVE");
+    h_edeps.push_back(h);
+  }
+
+  for (const auto& id : m_TimingThresholds) {
+    std::string h_bar_name, h_bar_title;
+    std::string h_end_name, h_end_title;
+    h_bar_name = str(boost::format("time_barrel_Thr%1%MeV") % id);
+    h_bar_title = str(boost::format("Reconstructed time for ECL barrel (sw Thr = %1% MeV)") % id);
+    h_end_name = str(boost::format("time_endcaps_Thr%1%MeV") % id);
+    h_end_title = str(boost::format("Reconstructed time for ECL endcaps (sw Thr = %1% MeV)") % id);
+    TH1F* h_time_barrel = new TH1F(h_bar_name.c_str(), h_bar_title.c_str(), 206, -1030, 1030);
+    TH1F* h_time_endcap = new TH1F(h_end_name.c_str(), h_end_title.c_str(), 206, -1030, 1030);
+    h_time_barrel->GetXaxis()->SetTitle("time, [nsec]");
+    h_time_endcap->GetXaxis()->SetTitle("time, [nsec]");
+    h_time_barrel->SetOption("LIVE");
+    h_time_endcap->SetOption("LIVE");
+    h_time_barrels.push_back(h_time_barrel);
+    h_time_endcaps.push_back(h_time_endcap);
+  }
+
+  for (const auto& id : boost::combine(m_HitThresholds, m_HitNumberUpperLimits)) {
+    double id1 = 0, id2 = 0;
+    boost::tie(id1, id2) = id;
+    std::string h_name, h_title;
+    h_name = str(boost::format("ncev_Thr%1%MeV") % id1);
+    h_title = str(boost::format("Number of hits in event (sw Thr = %1% MeV)") % id1);
+    TH1F* h = new TH1F(h_name.c_str(), h_title.c_str(), id2, 0, id2);
+    h->GetXaxis()->SetTitle("Number of hits");
+    h->SetOption("LIVE");
+    h_ncevs.push_back(h);
+  }
 
   for (int i = 0; i < ECL_CRATES; i++) {
     int crate = i + 1;
@@ -182,6 +176,36 @@ void ECLDQMModule::defineHisto()
     h_time_crate_Thr1GeV.push_back(h);
   }
 
+  for (const auto& id : m_WaveformOption) {
+    if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other")
+      B2WARNING("Waveform Options are not correctly assigned. They must be 'all', 'psd', 'logic', 'rand', 'dphy', 'other'!");
+    std::string h_title;
+    std::string h_cell_name;
+    if (id == "other") h_title = str(boost::format("Waveforms for %1%") % (id));
+    else h_title = str(boost::format("Fraction of waveforms for %1%") % (id));
+    h_cell_name = str(boost::format("wf_cid_%1%") % (id));
+    TH1F* h_cell = new TH1F(h_cell_name.c_str(), h_title.c_str(), 8736, 1, 8737);
+    h_cell->GetXaxis()->SetTitle("Cell ID");
+    h_cell->SetOption("LIVE");
+    if (id == "psd") {
+      h_cell_psd_norm = new TH1F("psd_cid", "Normalization to psd hits for cid", 8736, 1, 8737);
+      h_cell_psd_norm->SetOption("LIVE");
+    }
+    if (id == "logic") {
+      h_evtot_logic = new TH1F("event_logic", "Event bank for logic", 1, 0, 1);
+      h_evtot_logic->SetOption("LIVE");
+    }
+    if (id == "rand") {
+      h_evtot_rand = new TH1F("event_rand", "Event bank for rand", 1, 0, 1);
+      h_evtot_rand->SetOption("LIVE");
+    }
+    if (id == "dphy") {
+      h_evtot_dphy = new TH1F("event_dphy", "Event bank for dphy", 1, 0, 1);
+      h_evtot_dphy->SetOption("LIVE");
+    }
+    h_cells.push_back(h_cell);
+  }
+
   //2D histograms creation.
 
   h_trigtag2_trigid = new TH2F("trigtag2_trigid", "Trigger tag flag # 2 vs. Crate ID", 52, 1, 53, 11, -1, 10);
@@ -189,19 +213,22 @@ void ECLDQMModule::defineHisto()
   h_trigtag2_trigid->GetYaxis()->SetTitle("Trigger tag flag #2");
   h_trigtag2_trigid->SetOption("LIVE");
 
-  h_pedmean_cellid = new TH2F("pedmean_cellid", "Pedestal Average vs. Cell ID", 8736, 1, 8737, 200, m_PedestalMeanLowerThr,
-                              m_PedestalMeanUpperThr);
+  h_pedmean_cellid = new TProfile("pedmean_cellid", "Pedestal vs. Cell ID", 8736, 1, 8737);
   h_pedmean_cellid->GetXaxis()->SetTitle("Cell ID");
   h_pedmean_cellid->GetYaxis()->SetTitle("Pedestal Average");
   h_pedmean_cellid->SetOption("LIVE");
 
-  if (m_PedestalRmsInclude) {
-    h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal rms error vs. Cell ID",
-                                   8736, 1, 8737);
-    h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
-    h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
-    h_pedrms_cellid->SetOption("LIVE");
-  }
+  h_pedrms_cellid = new TProfile("pedrms_cellid", "Pedestal rms error vs. Cell ID",
+                                 8736, 1, 8737);
+  h_pedrms_cellid->GetXaxis()->SetTitle("Cell ID");
+  h_pedrms_cellid->GetYaxis()->SetTitle("Pedestal rms error");
+  h_pedrms_cellid->SetOption("LIVE");
+
+  h_pedrms_thetaid = new TProfile("pedrms_thetaid", "Pedestal rms error vs. Theta ID",
+                                  68, 0, 68);
+  h_pedrms_thetaid->GetXaxis()->SetTitle("Theta ID");
+  h_pedrms_thetaid->GetYaxis()->SetTitle("Pedestal rms error");
+  h_pedrms_thetaid->SetOption("LIVE");
 
   h_trigtime_trigid = new TH2F("trigtime_trigid", "Trigger time vs. Crate ID", 52, 1, 53, 145, 0, 145);
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID");
@@ -220,54 +247,78 @@ void ECLDQMModule::initialize()
   m_ECLCalDigits.isOptional();
   m_ECLTrigs.isOptional();
   m_ECLDsps.isOptional();
-  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  m_l1Trigger.isOptional();
+
+  if (!mapper.initFromDB()) B2FATAL("ECL DQM: Can't initialize eclChannelMapper");
+
+  ecltot.resize(m_TotalEnergyThresholds.size());
+  nhits.resize(m_HitNumberUpperLimits.size());
+
+  m_geom = ECLGeometryPar::Instance();
+
+  v_totalthrApsd.resize((m_calibrationThrApsd->getCalibVector()).size());
+  for (size_t i = 0; i < v_totalthrApsd.size(); i++) v_totalthrApsd[i] = (int)(m_calibrationThrApsd->getCalibVector())[i];
 }
 
 void ECLDQMModule::beginRun()
 {
-  for (int i = 0; i < ECL_CRATES; i++) h_time_crate_Thr1GeV[i]->Reset();
-  h_cid->Reset();
-  h_cid_Thr5MeV->Reset();
-  h_cid_Thr10MeV->Reset();
-  h_cid_Thr50MeV->Reset();
-  h_ncev->Reset();
-  h_ncev_Thr10MeV->Reset();
-  h_edep->Reset();
-  h_edep_Thr5MeV->Reset();
-  h_edep_Thr7MeV->Reset();
-  h_time_barrel_Thr5MeV->Reset();
-  h_time_endcaps_Thr5MeV->Reset();
-  h_time_barrel_Thr10MeV->Reset();
-  h_time_endcaps_Thr10MeV->Reset();
-  h_time_barrel_Thr50MeV->Reset();
-  h_time_endcaps_Thr50MeV->Reset();
+  h_evtot->Reset();
+  h_evtot_logic->Reset();
+  h_evtot_rand->Reset();
+  h_evtot_dphy->Reset();
   h_quality->Reset();
+  h_quality_other->Reset();
+  h_bad_quality->Reset();
   h_trigtag1->Reset();
-  h_adc_flag->Reset();
   h_adc_hits->Reset();
-  h_adc_waveforms->Reset();
+  h_cell_psd_norm->Reset();
+  std::for_each(h_cids.begin(), h_cids.end(), [](auto & it) {it->Reset();});
+  std::for_each(h_edeps.begin(), h_edeps.end(), [](auto & it) {it->Reset();});
+  std::for_each(h_time_barrels.begin(), h_time_barrels.end(), [](auto & it) {it->Reset();});
+  std::for_each(h_time_endcaps.begin(), h_time_endcaps.end(), [](auto & it) {it->Reset();});
+  std::for_each(h_ncevs.begin(), h_ncevs.end(), [](auto & it) {it->Reset();});
+  std::for_each(h_cells.begin(), h_cells.end(), [](auto & it) {it->Reset();});
+  for (int i = 0; i < ECL_CRATES; i++) h_time_crate_Thr1GeV[i]->Reset();
   h_trigtag2_trigid->Reset();
   h_pedmean_cellid->Reset();
-  if (m_PedestalRmsInclude) h_pedrms_cellid->Reset();
+  h_pedrms_cellid->Reset();
+  h_pedrms_thetaid->Reset();
   h_trigtime_trigid->Reset();
 }
 
 void ECLDQMModule::event()
 {
-  int NHitsEvent = m_ECLCalDigits.getEntries();
   int trigtag1 = 0;
-  int flagtag = 1;
-  double ecletot = 0.;
-  double ecltot_Thr5MeV = 0.;
-  double ecltot_Thr7MeV = 0.;
-  int NHitsEventThr10MeV = 0;
-  double adc_flag_bin[3] = {0., 0., 0.};
+  int NDigits = 0;
+  for (auto& value : ecltot) value = 0;
+  for (auto& value : nhits) value = 0;
 
+  if (m_eventmetadata.isValid()) {
+    m_iEvent = m_eventmetadata->getEvent();
+    h_evtot->Fill(0);
+    for (const auto& id : m_WaveformOption) {
+      if (id == "logic" && m_iEvent % 1000 == 999) h_evtot_logic->Fill(0);
+      if (id == "rand" && m_l1Trigger.isValid() &&
+          m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) h_evtot_rand->Fill(0);
+      if (id == "dphy" && m_l1Trigger.isValid() &&
+          m_l1Trigger->testInput("bha_delay")) h_evtot_dphy->Fill(0);
+    }
+  } else m_iEvent = -1;
 
-  if (m_eventmetadata) m_iEvent = m_eventmetadata->getEvent();
-  else m_iEvent = -1;
-
-  for (auto& aECLDigit : m_ECLDigits) h_quality->Fill(aECLDigit.getQuality());  //Fit quality histogram filling.
+  for (auto& aECLDigit : m_ECLDigits) {
+    int i = aECLDigit.getCellId() - 1;
+    h_quality->Fill(aECLDigit.getQuality());  //Fit quality histogram filling.
+    if (aECLDigit.getAmp() > 2.e04 && aECLDigit.getQuality() == 3) h_bad_quality->Fill(aECLDigit.getCellId());
+    if (aECLDigit.getAmp() >= (v_totalthrApsd[i] / 4 * 4)) NDigits ++;
+    for (const auto& id : m_WaveformOption) {
+      if (id != "psd") continue;
+      else if (id == "psd" && (m_iEvent % 1000 == 999 ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                               aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
+      h_cell_psd_norm->Fill(aECLDigit.getCellId());
+    }
+  }
 
   for (auto& aECLTrig : m_ECLTrigs) {
     double itrg = aECLTrig.getTimeTrig();
@@ -279,83 +330,97 @@ void ECLDQMModule::event()
     h_trigtag2_trigid->Fill(aECLTrig.getTrigId(), aECLTrig.getTrigTagQualityFlag()); //Trigger tag flag #2 histogram filling.
   }
 
-  if (m_ECLTrigs.getEntries() > 0) trigtag1 /= m_ECLTrigs.getEntries();
-
-  int compar = (65535 & m_iEvent);
-  if (compar == trigtag1) flagtag = 0;
-  h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  if (m_ECLTrigs.getEntries() > 0) {
+    int flagtag = 1;
+    trigtag1 /= m_ECLTrigs.getEntries();
+    int compar = (65535 & m_iEvent);
+    if (compar == trigtag1) flagtag = 0;
+    h_trigtag1->Fill(flagtag);  //Trigger tag flag #1 histogram filling.
+  }
 
   for (auto& aECLCalDigit : m_ECLCalDigits) {
     int cid        = aECLCalDigit.getCellId();
     double energy  = aECLCalDigit.getEnergy(); //get calibrated energy.
     double timing  = aECLCalDigit.getTime();   //get calibrated time.
 
-    h_cid->Fill(cid); //Cell ID histogram filling.
-
-    if (energy > 0.005) {
-      h_cid_Thr5MeV->Fill(cid); //Cell ID histogram filling.
-      if (cid > ECL_FWD_CHANNELS
-          && cid < ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrel_Thr5MeV->Fill(timing);
-      else h_time_endcaps_Thr5MeV->Fill(timing); //Time histogram filling.
+    for (const auto& id : m_HitThresholds) {
+      auto scale = id / 1000.;
+      auto index = std::distance(m_HitThresholds.begin(), std::find(m_HitThresholds.begin(), m_HitThresholds.end(), id));
+      if (energy > scale)  {
+        h_cids[index]->Fill(cid);
+        nhits[index] += 1;
+      }
     }
 
-    if (energy > 0.010)  {
-      NHitsEventThr10MeV++;
-      h_cid_Thr10MeV->Fill(cid); //Cell ID histogram filling.
-      if (cid > ECL_FWD_CHANNELS
-          && cid < ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrel_Thr10MeV->Fill(timing);
-      else h_time_endcaps_Thr10MeV->Fill(timing); //Time histogram filling.
+    for (const auto& id : m_TotalEnergyThresholds) {
+      auto scale = id / 1000.;
+      auto index = std::distance(m_TotalEnergyThresholds.begin(), std::find(m_TotalEnergyThresholds.begin(),
+                                 m_TotalEnergyThresholds.end(), id));
+      if (energy > scale) ecltot[index] += energy;
     }
 
-    if (energy > 0.050) {
-      h_cid_Thr50MeV->Fill(cid); //Cell ID histogram filling.
-      if (cid > ECL_FWD_CHANNELS
-          && cid < ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrel_Thr50MeV->Fill(timing);
-      else h_time_endcaps_Thr50MeV->Fill(timing); //Time histogram filling.
+    for (const auto& id : m_TimingThresholds) {
+      auto scale = id / 1000.;
+      auto index = std::distance(m_TimingThresholds.begin(), std::find(m_TimingThresholds.begin(), m_TimingThresholds.end(), id));
+      if (energy > scale) {
+        if (cid > ECL_FWD_CHANNELS && cid <= ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrels[index]->Fill(timing);
+        else h_time_endcaps[index]->Fill(timing);
+      }
     }
 
     if (energy > 1.000) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
-
-    ecletot += energy;
-    if (energy > 0.005) ecltot_Thr5MeV += energy;
-    if (energy > 0.007) ecltot_Thr7MeV += energy;
   }
 
-  h_edep->Fill(ecletot); //Energy histogram filling.
-  h_edep_Thr5MeV->Fill(ecltot_Thr5MeV); //Energy deposition with Thr = 5 MeV
-  h_edep_Thr7MeV->Fill(ecltot_Thr7MeV); //Energy deposition with Thr = 7 MeV
-  h_ncev->Fill(NHitsEvent); //Multiplicity histogram filling.
-  h_ncev_Thr10MeV->Fill(NHitsEventThr10MeV); //Multiplicity histogram filling.
+  for (auto& h : h_edeps) {
+    auto index = std::distance(h_edeps.begin(), std::find(h_edeps.begin(), h_edeps.end(), h));
+    h->Fill(ecltot[index]);
+  }
+
+  for (auto& h : h_ncevs) {
+    auto index = std::distance(h_ncevs.begin(), std::find(h_ncevs.begin(), h_ncevs.end(), h));
+    h->Fill(nhits[index]);
+  }
 
   for (auto& aECLDsp : m_ECLDsps)  {
     int i = aECLDsp.getCellId() - 1; //get number of Cell ID in m_DspArray.
     aECLDsp.getDspA(m_DspArray[i]);
     m_PedestalMean[i] = 0;
     m_PedestalRms[i] = 0;
+
     for (int j = 0; j < 16; j++) m_PedestalMean[i] += m_DspArray[i][j];
     m_PedestalMean[i] /= 16;
     h_pedmean_cellid->Fill(aECLDsp.getCellId(), m_PedestalMean[i]); //Pedestal Avg histogram filling.
 
-    if (m_PedestalRmsInclude) {
-      for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
-      m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
-      h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal rms histogram filling.
-    }
+    for (int j = 0; j < 16; j++) m_PedestalRms[i] += pow(m_DspArray[i][j] - m_PedestalMean[i], 2);
+    m_PedestalRms[i] = sqrt(m_PedestalRms[i] / 15.);
+    h_pedrms_cellid->Fill(aECLDsp.getCellId(), m_PedestalRms[i]); //Pedestal rms histogram filling.
+    m_geom->Mapping(i);
+    h_pedrms_thetaid->Fill(m_geom->GetThetaID(), m_PedestalRms[i]);
 
-    if (m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS && m_ECLDigits.getEntries() > 0) {
-      int iCrate = mapper.getCrateID(aECLDsp.getCellId());
-      h_adc_waveforms->Fill(iCrate, 1);
+    ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
+
+    for (const auto& id : m_WaveformOption) {
+      auto index = std::distance(m_WaveformOption.begin(), std::find(m_WaveformOption.begin(), m_WaveformOption.end(), id));
+      if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
+      else if (id == "psd" && (m_iEvent % 1000 == 999 ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
+                               (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                               !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
+      else if (id == "logic" && m_iEvent % 1000 != 999) continue;
+      else if (id == "rand" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
+                                m_l1Trigger->getTimType() != TRGSummary::ETimingType::TTYP_RAND)) continue;
+      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !m_l1Trigger.isValid() ||
+                                !m_l1Trigger->testInput("bha_delay"))) continue;
+      else if (id == "other" && (m_iEvent % 1000 == 999 ||
+                                 (m_l1Trigger.isValid() &&  m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND) ||
+                                 (m_l1Trigger.isValid() &&  m_l1Trigger->testInput("bha_delay")) ||
+                                 (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
+      h_cells[index]->Fill(aECLDsp.getCellId());
+      if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());
     }
   }
-  h_adc_flag->Fill(0); //ADC flag histogram filling.
-  if (m_ECLDsps.getEntries() == ECL_TOTAL_CHANNELS) h_adc_flag->Fill(1); //ADC flag histogram filling.
-  if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS) h_adc_flag->Fill(2); //ADC flag histogram filling.
-  for (int i = 0; i < 3; i++) adc_flag_bin[i] = h_adc_flag->GetBinContent(i + 1);
-  std::string adc_flag_title = str(boost::format("Flag of ADC samples (%1%, %2%)") % (adc_flag_bin[1] / adc_flag_bin[0]) %
-                                   (adc_flag_bin[2] / adc_flag_bin[0]));
-  h_adc_flag->SetTitle(adc_flag_title.c_str());
-  if (m_ECLDsps.getEntries() > 0 && m_ECLDsps.getEntries() < ECL_TOTAL_CHANNELS && m_ECLDigits.getEntries() > 0)
-    h_adc_hits->Fill((double)m_ECLDsps.getEntries() / (double)m_ECLDigits.getEntries()); //ADC hits histogram filling.
+  if (m_ECLDigits.getEntries() > 0)
+    h_adc_hits->Fill((double)NDigits / (double)m_ECLDigits.getEntries()); //Fraction of hits above ADC threshold
 }
 
 void ECLDQMModule::endRun()

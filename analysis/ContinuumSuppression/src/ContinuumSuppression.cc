@@ -118,7 +118,7 @@ namespace Belle2 {
           continue;
         }
         Particle charged_particle(track, charged);
-        if (charged_particle.getParticleType() == Particle::c_Track) {
+        if (charged_particle.getParticleSource() == Particle::c_Track) {
           TLorentzVector p_cms = T.rotateLabToCms() * charged_particle.get4Vector();
 
           p3_cms_all.push_back(p_cms.Vect());

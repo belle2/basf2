@@ -12,16 +12,16 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
-KLMElementNumbers::KLMElementNumbers()
+KLMElementNumbers::KLMElementNumbers() :
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMElementNumbers::~KLMElementNumbers()
@@ -32,6 +32,19 @@ const KLMElementNumbers& KLMElementNumbers::Instance()
 {
   static KLMElementNumbers klmElementNumbers;
   return klmElementNumbers;
+}
+
+uint16_t KLMElementNumbers::channelNumber(
+  int subdetector, int section, int sector, int layer, int plane,
+  int strip) const
+{
+  switch (subdetector) {
+    case c_BKLM:
+      return channelNumberBKLM(section, sector, layer, plane, strip);
+    case c_EKLM:
+      return channelNumberEKLM(section, sector, layer, plane, strip);
+  }
+  B2FATAL("Incorrect subdetector number: " << subdetector);
 }
 
 uint16_t KLMElementNumbers::channelNumberBKLM(
@@ -56,7 +69,7 @@ uint16_t KLMElementNumbers::channelNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  channel = m_ElementNumbersEKLM->stripNumber(
+  channel = m_eklmElementNumbers->stripNumber(
               section, layer, sector, plane, strip);
   return channel;
 }
@@ -107,7 +120,7 @@ void KLMElementNumbers::channelNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->stripNumberToElementNumbers(
+    m_eklmElementNumbers->stripNumberToElementNumbers(
       localChannel, section, layer, sector, plane, strip);
   }
 }
@@ -128,7 +141,7 @@ uint16_t KLMElementNumbers::planeNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  planeGlobal = m_ElementNumbersEKLM->planeNumber(
+  planeGlobal = m_eklmElementNumbers->planeNumber(
                   section, layer, sector, plane);
   return planeGlobal;
 }
@@ -158,8 +171,16 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  module = m_ElementNumbersEKLM->sectorNumber(section, layer, sector);
+  module = m_eklmElementNumbers->sectorNumber(section, layer, sector);
   return module;
+}
+
+uint16_t KLMElementNumbers::moduleNumberByChannel(uint16_t channel) const
+{
+  int subdetector, section, sector, layer, plane, strip;
+  channelNumberToElementNumbers(channel, &subdetector, &section, &sector,
+                                &layer, &plane, &strip);
+  return moduleNumber(subdetector, section, sector, layer);
 }
 
 void KLMElementNumbers::moduleNumberToElementNumbers(
@@ -179,7 +200,7 @@ void KLMElementNumbers::moduleNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->sectorNumberToElementNumbers(
+    m_eklmElementNumbers->sectorNumberToElementNumbers(
       localModule, section, layer, sector);
   }
 }
@@ -208,7 +229,7 @@ uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
 uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
 {
   uint16_t sect;
-  sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(section, sector);
+  sect = m_eklmElementNumbers->sectorNumberKLMOrder(section, sector);
   return sect;
 }
 
@@ -218,4 +239,12 @@ int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
     return layer;
   else
     return BKLMElementNumbers::getMaximalLayerNumber() + layer;
+}
+
+int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
+{
+  if (subdetector == c_BKLM)
+    return 0;
+  else
+    return 1;
 }

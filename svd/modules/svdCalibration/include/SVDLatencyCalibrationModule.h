@@ -64,7 +64,7 @@ namespace Belle2 {
     TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
 
-    SVDHistograms<TH1F>* m_histo_maxAmplitude = nullptr; /**vector of histograms containing the max bin distribution*/
+    SVDHistograms<TH1F>* m_histo_maxAmplitude = nullptr; /**<vector of histograms containing the max bin distribution*/
 
     std::string m_shapersListName; /**< shapers list name */
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/

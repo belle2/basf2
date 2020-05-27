@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
@@ -47,10 +47,16 @@ namespace Belle2 {
       static GeometryPar* instance(const BKLMGeometryPar&);
 
       //! Get the beam background study flag
-      bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
+      bool doBeamBackgroundStudy(void) const
+      {
+        return m_DoBeamBackgroundStudy;
+      }
 
       //! Get the beam background study flag
-      BkgSensitiveDetector* getBkgSensitiveDetector(void) const { return m_BkgSensitiveDetector; }
+      BkgSensitiveDetector* getBkgSensitiveDetector(void) const
+      {
+        return m_BkgSensitiveDetector;
+      }
 
       //! Get the inner radius of specified layer
       double getLayerInnerRadius(int layer) const;
@@ -87,28 +93,49 @@ namespace Belle2 {
 
       //! Get the sign (+/-1) of scintillator-envelope's shift along y axis within its enclosing module for MPPC placement
       //! -1: shift envelope along -y to place MPPCs at +y, +1: shift envelope along +y to place MPPCs at -y
-      int getScintEnvelopeOffsetSign(int layer) const { return m_ScintEnvelopeOffsetSign[layer - 1]; }
+      int getScintEnvelopeOffsetSign(int layer) const
+      {
+        return m_ScintEnvelopeOffsetSign[layer - 1];
+      }
 
       //! Get the radial offset of the scintillator detector module's active envelope due to difference in polystyrene-sheet thicknesses
       double getPolystyreneOffsetX(void) const;
 
       //! Get the thickness of the inactive TiO2-polystyrene coating on top (broad) surface of a scintillator strip
-      double getScintTiO2ThicknessTop(void) const { return m_ScintTiO2ThicknessTop; }
+      double getScintTiO2ThicknessTop(void) const
+      {
+        return m_ScintTiO2ThicknessTop;
+      }
 
       //! Get the thickness of the inactive TiO2-polystyrene coating on side (short) surface of a scintillator strip
-      double getScintTiO2ThicknessSide(void) const { return m_ScintTiO2ThicknessSide; }
+      double getScintTiO2ThicknessSide(void) const
+      {
+        return m_ScintTiO2ThicknessSide;
+      }
 
       //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
-      double getScintHalfHeight(void) const { return 0.5 * m_ScintHeight; }
+      double getScintHalfHeight(void) const
+      {
+        return 0.5 * m_ScintHeight;
+      }
 
       //! Get the height of the entire volume of a scintillator strip (including TiO2 coating)
-      double getScintHalfWidth(void) const { return 0.5 * m_ScintWidth; }
+      double getScintHalfWidth(void) const
+      {
+        return 0.5 * m_ScintWidth;
+      }
 
       //! Get the radius of the cylindrical central bore in a scintillator strip
-      double getScintBoreRadius(void) const { return m_ScintBoreRadius; }
+      double getScintBoreRadius(void) const
+      {
+        return m_ScintBoreRadius;
+      }
 
       //! Get the radius of the cylindrical central WLS fiber in a scintillator strip
-      double getScintFiberRadius(void) const { return m_ScintFiberRadius; }
+      double getScintFiberRadius(void) const
+      {
+        return m_ScintFiberRadius;
+      }
 
       //! Get the radial midpoint of the gap of specified layer
       double getGapMiddleRadius(int layer) const;
@@ -120,115 +147,220 @@ namespace Belle2 {
       double getActiveMiddleRadius(int section, int sector, int layer) const;
 
       //! Get the flip (180-degrees about z axis) of a particular BKLM module
-      bool getModuleFlip(int section, int sector, int layer) const { return m_IsFlipped[section][sector - 1][layer - 1]; }
+      bool getModuleFlip(int section, int sector, int layer) const
+      {
+        return m_IsFlipped[section][sector - 1][layer - 1];
+      }
 
       //! Get the global rotation angle about z of the entire BKLM
-      double getRotation(void) const { return m_Rotation; }
+      double getRotation(void) const
+      {
+        return m_Rotation;
+      }
 
       //! Get the global shift along a of the entire BKLM
-      double getOffsetZ(void) const { return m_OffsetZ; }
+      double getOffsetZ(void) const
+      {
+        return m_OffsetZ;
+      }
 
       //! Get the starting angle of the BKLM's polygon shape
-      double getPhi(void) const { return m_Phi; }
+      double getPhi(void) const
+      {
+        return m_Phi;
+      }
 
       //! Get the outer radius of the solenoid
-      double getSolenoidOuterRadius(void) const { return m_SolenoidOuterRadius; }
+      double getSolenoidOuterRadius(void) const
+      {
+        return m_SolenoidOuterRadius;
+      }
 
       //! Get the number of sectors of the BKLM
-      int getNSector(void) const { return m_NSector; }
+      int getNSector(void) const
+      {
+        return m_NSector;
+      }
 
       //! Get the half-length along z of the BKLM
-      double getHalfLength(void) const { return m_HalfLength; }
+      double getHalfLength(void) const
+      {
+        return m_HalfLength;
+      }
 
       //! Get the radius of the inscribed circle of the outer polygon
-      double getOuterRadius(void) const { return m_OuterRadius; }
+      double getOuterRadius(void) const
+      {
+        return m_OuterRadius;
+      }
 
       //! Get the number of modules in one sector
-      int getNLayer(void) const { return m_NLayer; }
+      int getNLayer(void) const
+      {
+        return m_NLayer;
+      }
 
       //! Get the nominal height of a layer's structural iron
-      double getIronNominalHeight(void) const { return m_IronNominalHeight; }
+      double getIronNominalHeight(void) const
+      {
+        return m_IronNominalHeight;
+      }
 
       //! Get the actual height of a layer's structural iron
-      double getIronActualHeight(void) const { return m_IronActualHeight; }
+      double getIronActualHeight(void) const
+      {
+        return m_IronActualHeight;
+      }
 
       //! Get the radius of the inner tangent circle of gap 0 (innermost)
-      double getGap1InnerRadius(void) const { return m_Gap1InnerRadius; }
+      double getGap1InnerRadius(void) const
+      {
+        return m_Gap1InnerRadius;
+      }
 
       //! Get the nominal height of the innermost gap
-      double getGap1NominalHeight(void) const { return m_Gap1NominalHeight; }
+      double getGap1NominalHeight(void) const
+      {
+        return m_Gap1NominalHeight;
+      }
 
       //! Get the actual height of the innermost gap
-      double getGap1ActualHeight(void) const { return m_Gap1ActualHeight; }
+      double getGap1ActualHeight(void) const
+      {
+        return m_Gap1ActualHeight;
+      }
 
       //! Get the width (at the outer radius) of the adjacent structural iron on either side of innermost gap
-      double getGap1IronWidth(void) const { return m_Gap1IronWidth; }
+      double getGap1IronWidth(void) const
+      {
+        return m_Gap1IronWidth;
+      }
 
       //! Get the length along z of the module gap
-      double getGapLength(void) const { return m_GapLength; }
+      double getGapLength(void) const
+      {
+        return m_GapLength;
+      }
 
       //! Get the nominal height of the outer gaps
-      double getGapNominalHeight(void) const { return m_GapNominalHeight; }
+      double getGapNominalHeight(void) const
+      {
+        return m_GapNominalHeight;
+      }
 
       //! Get the actual height of the outer gaps
-      double getGapActualHeight(void) const { return m_GapActualHeight; }
+      double getGapActualHeight(void) const
+      {
+        return m_GapActualHeight;
+      }
 
       //! Get the width (at the outer radius) of the adjacent structural iron on either side of a gap
-      double getGapIronWidth(void) const { return m_GapIronWidth; }
+      double getGapIronWidth(void) const
+      {
+        return m_GapIronWidth;
+      }
 
       //! Get the radius of the inner tangent circle of gap 1 (next-to-innermost)
-      double getGapInnerRadius(void) const { return m_GapInnerRadius; }
+      double getGapInnerRadius(void) const
+      {
+        return m_GapInnerRadius;
+      }
 
       //! Get the number of z-measuring cathode strips in an RPC module
-      int getNZStrips(bool isChimney) const { return (isChimney ? m_NZStripsChimney : m_NZStrips); }
+      int getNZStrips(bool isChimney) const
+      {
+        return (isChimney ? m_NZStripsChimney : m_NZStrips);
+      }
 
       //! Get the number of phi-measuring cathode strips in an RPC module
       int getNPhiStrips(int layer) const;
 
       //! Get the number of z-measuring scintillators in a scintillator module
-      int getNZScints(bool isChimney) const { return (isChimney ? m_NZScintsChimney : m_NZScints); }
+      int getNZScints(bool isChimney) const
+      {
+        return (isChimney ? m_NZScintsChimney : m_NZScints);
+      }
 
       //! Get the number of phi-measuring scintillators in a scintillator module
       int getNPhiScints(int layer) const;
 
       //! Get the length along z of the module
-      double getModuleLength(void) const { return m_ModuleLength; }
+      double getModuleLength(void) const
+      {
+        return m_ModuleLength;
+      }
 
       //! Get the length along z of the module
-      double getModuleLengthChimney(void) const { return m_ModuleLengthChimney; }
+      double getModuleLengthChimney(void) const
+      {
+        return m_ModuleLengthChimney;
+      }
 
       //! Get the height of the module's aluminum cover (2 per module)
-      double getModuleCoverHeight(void) const { return m_ModuleCoverHeight; }
+      double getModuleCoverHeight(void) const
+      {
+        return m_ModuleCoverHeight;
+      }
 
       //! Get the height of the module's readout or ground copper plane (4 per module)
-      double getModuleCopperHeight(void) const { return m_ModuleCopperHeight; }
+      double getModuleCopperHeight(void) const
+      {
+        return m_ModuleCopperHeight;
+      }
 
       //! Get the height of the module's transmission-line foam (2 per module)
-      double getModuleFoamHeight(void) const { return m_ModuleFoamHeight; }
+      double getModuleFoamHeight(void) const
+      {
+        return m_ModuleFoamHeight;
+      }
 
       //! Get the height of the module's insulating mylar (2 per module)
-      double getModuleMylarHeight(void) const { return m_ModuleMylarHeight; }
+      double getModuleMylarHeight(void) const
+      {
+        return m_ModuleMylarHeight;
+      }
 
       //! Get the height of the module's glass electrode (4 per module)
-      double getModuleGlassHeight(void) const { return m_ModuleGlassHeight; }
+      double getModuleGlassHeight(void) const
+      {
+        return m_ModuleGlassHeight;
+      }
 
       //! Get the height of the module's gas gap (2 per module)
-      double getModuleGasHeight(void) const { return m_ModuleGasHeight; }
+      double getModuleGasHeight(void) const
+      {
+        return m_ModuleGasHeight;
+      }
 
       //! Get the height of the module
-      double getModuleHeight(void) const { return m_ModuleHeight; }
+      double getModuleHeight(void) const
+      {
+        return m_ModuleHeight;
+      }
 
       //! Get the width of the module's perimeter aluminum frame
-      double getModuleFrameWidth(void) const { return m_ModuleFrameWidth; }
+      double getModuleFrameWidth(void) const
+      {
+        return m_ModuleFrameWidth;
+      }
 
       //! Get the thickness of the module's perimeter aluminum frame
-      double getModuleFrameThickness(void) const { return m_ModuleFrameThickness; }
+      double getModuleFrameThickness(void) const
+      {
+        return m_ModuleFrameThickness;
+      }
 
       //! Get the width of the module's gas-gap's perimeter spacer
-      double getModuleGasSpacerWidth(void) const { return m_ModuleGasSpacerWidth; }
+      double getModuleGasSpacerWidth(void) const
+      {
+        return m_ModuleGasSpacerWidth;
+      }
 
       //! Get the size of the border between a detector module's perimeter and electrode
-      double getModuleElectrodeBorder(void) const { return m_ModuleElectrodeBorder; }
+      double getModuleElectrodeBorder(void) const
+      {
+        return m_ModuleElectrodeBorder;
+      }
 
       //! Get the size of the chimney hole in the specified layer
       const CLHEP::Hep3Vector getChimneyHalfSize(int layer) const;
@@ -237,73 +369,136 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getChimneyPosition(int layer) const;
 
       //! Get the thickness of the chimney cover plate
-      double getChimneyCoverThickness(void) const { return m_ChimneyCoverThickness; }
+      double getChimneyCoverThickness(void) const
+      {
+        return m_ChimneyCoverThickness;
+      }
 
       //! Get the inner radius of the chimney housing
-      double getChimneyHousingInnerRadius(void) const { return m_ChimneyHousingInnerRadius; }
+      double getChimneyHousingInnerRadius(void) const
+      {
+        return m_ChimneyHousingInnerRadius;
+      }
 
       //! Get the outer radius of the chimney housing
-      double getChimneyHousingOuterRadius(void) const { return m_ChimneyHousingOuterRadius; }
+      double getChimneyHousingOuterRadius(void) const
+      {
+        return m_ChimneyHousingOuterRadius;
+      }
 
       //! Get the inner radius of the chimney radiation shield
-      double getChimneyShieldInnerRadius(void) const { return m_ChimneyShieldInnerRadius; }
+      double getChimneyShieldInnerRadius(void) const
+      {
+        return m_ChimneyShieldInnerRadius;
+      }
 
       //! Get the outer radius of the chimney radiation shield
-      double getChimneyShieldOuterRadius(void) const { return m_ChimneyShieldOuterRadius; }
+      double getChimneyShieldOuterRadius(void) const
+      {
+        return m_ChimneyShieldOuterRadius;
+      }
 
       //! Get the inner radius of the chimney pipe
-      double getChimneyPipeInnerRadius(void) const { return m_ChimneyPipeInnerRadius; }
+      double getChimneyPipeInnerRadius(void) const
+      {
+        return m_ChimneyPipeInnerRadius;
+      }
 
       //! Get the outer radius of the chimney pipe
-      double getChimneyPipeOuterRadius(void) const { return m_ChimneyPipeOuterRadius; }
+      double getChimneyPipeOuterRadius(void) const
+      {
+        return m_ChimneyPipeOuterRadius;
+      }
 
       //! Get the thickness of the radial rib that supports the solenoid / inner detectors
-      double getRibThickness(void) const { return m_RibThickness; }
+      double getRibThickness(void) const
+      {
+        return m_RibThickness;
+      }
 
       //! Get the width of the cable-services channel at each end
-      double getCablesWidth(void) const { return m_CablesWidth; }
+      double getCablesWidth(void) const
+      {
+        return m_CablesWidth;
+      }
 
       //! Get the width of the brace in the middle of the cable-services channel
-      double getBraceWidth(void) const { return m_BraceWidth; }
+      double getBraceWidth(void) const
+      {
+        return m_BraceWidth;
+      }
 
       //! Get the width of the brace in the middle of the cable-services channel in the chimney sector
-      double getBraceWidthChimney(void) const { return m_BraceWidthChimney; }
+      double getBraceWidthChimney(void) const
+      {
+        return m_BraceWidthChimney;
+      }
 
       //! Get the size of the layer-0 support plate
       const CLHEP::Hep3Vector getSupportPlateHalfSize(bool) const;
 
       //! Get the width of the layer-0 support plate's bracket
-      double getBracketWidth(void) const { return m_BracketWidth; }
+      double getBracketWidth(void) const
+      {
+        return m_BracketWidth;
+      }
 
       //! Get the thickness of the layer-0 support plate's bracket
-      double getBracketThickness(void) const { return m_BracketThickness; }
+      double getBracketThickness(void) const
+      {
+        return m_BracketThickness;
+      }
 
       //! Get the length of the layer-0 support plate's bracket
-      double getBracketLength(void) const { return m_BracketLength; }
+      double getBracketLength(void) const
+      {
+        return m_BracketLength;
+      }
 
       //! Get the width of the layer-0 support plate's bracket's rib
-      double getBracketRibWidth(void) const { return m_BracketRibWidth; }
+      double getBracketRibWidth(void) const
+      {
+        return m_BracketRibWidth;
+      }
 
       //! Get the thickness of the layer-0 support plate's bracket's rib
-      double getBracketRibThickness(void) const { return m_BracketRibThickness; }
+      double getBracketRibThickness(void) const
+      {
+        return m_BracketRibThickness;
+      }
 
       //! Get the inner radius of the layer-0 support plate's bracket
-      double getBracketInnerRadius(void) const { return m_BracketInnerRadius; }
+      double getBracketInnerRadius(void) const
+      {
+        return m_BracketInnerRadius;
+      }
 
       //! Get the position of a layer-0 support plate's bracket
       double getBracketZPosition(int, bool) const;
 
       //! Get the angular width of the layer-0 support plate's bracket's cutout
-      double getBracketCutoutDphi(void) const { return m_BracketCutoutDphi; }
+      double getBracketCutoutDphi(void) const
+      {
+        return m_BracketCutoutDphi;
+      }
 
       //! Get the number of preamplifier readout stations
-      int getNReadoutStation(void) const { return m_NReadoutStation; }
+      int getNReadoutStation(void) const
+      {
+        return m_NReadoutStation;
+      }
 
       //! Get the selector for phi (true) or z (false) readout station
-      bool getReadoutStationIsPhi(int station) const { return m_ReadoutStationIsPhi[station - 1]; }
+      bool getReadoutStationIsPhi(int station) const
+      {
+        return m_ReadoutStationIsPhi[station - 1];
+      }
 
       //! Get the position of each readout station
-      double getReadoutStationPosition(int station) const { return m_ReadoutStationPosition[station - 1]; }
+      double getReadoutStationPosition(int station) const
+      {
+        return m_ReadoutStationPosition[station - 1];
+      }
 
       //! Get the size (dx,dy,dz) of the readout container
       const CLHEP::Hep3Vector getReadoutContainerHalfSize(void) const;
@@ -315,31 +510,55 @@ namespace Belle2 {
       const CLHEP::Hep3Vector getReadoutPreamplifierHalfSize(void) const;
 
       //! Get the number of preamplifier positions along the length of the carrier card
-      int getNReadoutPreamplifierPosition(void) const { return m_ReadoutPreamplifierPosition.size(); }
+      int getNReadoutPreamplifierPosition(void) const
+      {
+        return m_ReadoutPreamplifierPosition.size();
+      }
 
       //! Get the position of a preamplifier along the length of the carrier card
-      double getReadoutPreamplifierPosition(int preamp) const { return m_ReadoutPreamplifierPosition[preamp - 1]; }
+      double getReadoutPreamplifierPosition(int preamp) const
+      {
+        return m_ReadoutPreamplifierPosition[preamp - 1];
+      }
 
       //! Get the size (dx,dy,dz) of the readout connectors pair
       const CLHEP::Hep3Vector getReadoutConnectorsHalfSize(void) const;
 
       //! Get the position of the readout connectors pair along the length of the carrier card
-      double getReadoutConnectorsPosition(void) const { return m_ReadoutConnectorsPosition; }
+      double getReadoutConnectorsPosition(void) const
+      {
+        return m_ReadoutConnectorsPosition;
+      }
 
       //! Get the MPPC housing radius
-      double getMPPCHousingRadius(void) const { return m_MPPCHousingRadius; }
+      double getMPPCHousingRadius(void) const
+      {
+        return m_MPPCHousingRadius;
+      }
 
       //! Get the MPPC housing half-length
-      double getMPPCHousingHalfLength(void) const { return 0.5 * m_MPPCHousingLength; }
+      double getMPPCHousingHalfLength(void) const
+      {
+        return 0.5 * m_MPPCHousingLength;
+      }
 
       //! Get the MPPC half-length
-      double getMPPCHalfLength(void) const { return 0.5 * m_MPPCLength; }
+      double getMPPCHalfLength(void) const
+      {
+        return 0.5 * m_MPPCLength;
+      }
 
       //! Get the MPPC half-width
-      double getMPPCHalfWidth(void) const { return 0.5 * m_MPPCWidth; }
+      double getMPPCHalfWidth(void) const
+      {
+        return 0.5 * m_MPPCWidth;
+      }
 
       //! Get the MPPC half-height
-      double getMPPCHalfHeight(void) const { return 0.5 * m_MPPCHeight; }
+      double getMPPCHalfHeight(void) const
+      {
+        return 0.5 * m_MPPCHeight;
+      }
 
       //! Determine if the sensitive detectors in a given layer are RPCs (=true) or scintillators (=false)
       bool hasRPCs(int layer) const;

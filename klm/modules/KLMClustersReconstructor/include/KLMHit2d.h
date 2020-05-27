@@ -11,8 +11,8 @@
 #pragma once
 
 /* Belle 2 headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 
 namespace Belle2 {
 
@@ -43,17 +43,26 @@ namespace Belle2 {
     /**
      * Whether hit is in BKLM.
      */
-    bool inBKLM() const;
+    bool inBKLM() const
+    {
+      return m_bklmHit;
+    }
 
     /**
      * Get BKLM hit.
      */
-    BKLMHit2d* getBKLMHit2d() const;
+    BKLMHit2d* getBKLMHit2d() const
+    {
+      return m_bklmHit2d;
+    }
 
     /**
      * Get EKLM hit.
      */
-    EKLMHit2d* getEKLMHit2d() const;
+    EKLMHit2d* getEKLMHit2d() const
+    {
+      return m_eklmHit2d;
+    }
 
     /**
      * Get hit position.

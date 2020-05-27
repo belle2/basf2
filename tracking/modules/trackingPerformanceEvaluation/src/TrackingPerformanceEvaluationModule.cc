@@ -835,7 +835,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   const TrackFitResult* fitResult = theTrack.getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   bool hasPXDhit = false;
   bool isTrueHit = false;

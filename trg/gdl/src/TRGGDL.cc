@@ -156,13 +156,13 @@ namespace Belle2 {
   {
     if (_debugLevel > 19) {
       for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
-        B2INFO("TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
+        B2DEBUG(20, "TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
       }
       for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
-        B2INFO("TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
+        B2DEBUG(20, "TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
       }
       for (int i = 0; i < db_algs->getnalgs(); i++) {
-        B2INFO("TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
       }
     }
     //if it is firmware simulation, do the cofigurnation
@@ -235,7 +235,7 @@ namespace Belle2 {
   void
   TRGGDL::fastSimulation(void)
   {
-    B2INFO("TRGGDL::fastSimulation starts.");
+    B2DEBUG(20, "TRGGDL::fastSimulation starts.");
     TRGDebug::enterStage("TRGGDL fastSim");
 
     if (TRGDebug::level())
@@ -322,7 +322,7 @@ namespace Belle2 {
   void
   TRGGDL::dataSimulation(void)
   {
-//  B2INFO("TRGGDL::dataSimulation starts.");
+//  B2DEBUG(20,"TRGGDL::dataSimulation starts.");
     StoreObjPtr<EventMetaData> bevt;
     /*
     unsigned _exp = bevt->getExperiment();

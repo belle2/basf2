@@ -43,7 +43,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # moved to cosmics/collision as we need different cuts
             # path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
-            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ')
+            path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
         # SVD
         if components is None or 'SVD' in components:
             # SVD DATA FORMAT

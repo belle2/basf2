@@ -73,6 +73,7 @@ namespace Belle2 {
       /**
        * Constructor
        * @param svdShaperDigitsName name of the input SVDShaperDigits collection
+       * @param thrCharge cut on cluster energy in electrons
        */
       explicit SVDHitRateCounter(const std::string& svdShaperDigitsName, double thrCharge):
         m_svdShaperDigitsName(svdShaperDigitsName), m_thrCharge(thrCharge)

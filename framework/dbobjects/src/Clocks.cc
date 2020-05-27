@@ -45,10 +45,6 @@ Int_t Clocks::getClockPrescale(Const::EDetector detector, std::string label) con
 
 void Clocks::setClockPrescale(const Const::EDetector detector, std::string label, Int_t prescale)
 {
-
-  if (prescaleMap.count(detector) == 0) {
-    prescaleMap[detector] = std::map<std::string, int>();
-  }
   prescaleMap[detector][label] = prescale;
 }
 

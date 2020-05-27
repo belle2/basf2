@@ -31,12 +31,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-
 // DB objects
 #include <framework/dbobjects/Clocks.h>
-
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -53,28 +49,23 @@ namespace Belle2 {
     B2INFO("Clock importer");
   }
 
-
-  Const::EDetector  ClockDatabaseImporter::parseDetectors(const std::string val)
+  Const::EDetector  ClockDatabaseImporter::parseDetectors(std::string const val)
   {
-    Const::EDetector result;
-
-    if (val == "svd")        result = Const::SVD;
-    else if (val == "cdc")   result = Const::CDC;
-    else if (val == "top")   result = Const::TOP;
-    else if (val == "arich") result = Const::ARICH;
-    else if (val == "ecl")   result = Const::ECL;
-    else if (val == "klm")   result = Const::KLM;
+    if (val == "svd")        return Const::SVD;
+    else if (val == "cdc")   return Const::CDC;
+    else if (val == "top")   return Const::TOP;
+    else if (val == "arich") return Const::ARICH;
+    else if (val == "ecl")   return Const::ECL;
+    else if (val == "klm")   return Const::KLM;
     else B2ERROR("Unknown detector component: " << val);
-
-    return result;
   }
 
   void ClockDatabaseImporter::setAcceleratorRF(Float_t val)
   {
-    clockbase->setAcceleratorRF(val); // MHz
+    clockbase->setAcceleratorRF(val); /** MHz */
   }
 
-  void ClockDatabaseImporter::setClockPrescale(string detector, string type, Int_t val)
+  void ClockDatabaseImporter::setClockPrescale(std::string const detector, std::string type, Int_t val)
   {
     clockbase->setClockPrescale(parseDetectors(detector), type, val);
   }

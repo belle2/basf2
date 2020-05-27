@@ -53,7 +53,7 @@ namespace Belle2 {
                      int lastExp = -1, int lastRun = -1);
 
 
-    Const::EDetector parseDetectors(const std::string val);
+    Const::EDetector parseDetectors(std::string val);
 
     void setClockPrescale(std::string detector, std::string type, Int_t val);
 

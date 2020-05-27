@@ -63,10 +63,14 @@ def getAllSamples(mcCampaign):
     if mcCampaignNumber > 12:
         mcSamples += [
             f"{mcCampaign}_ggBGx1",
-            # f"{mcCampaign}_eeBGx1",
+            f"{mcCampaign}_eeBGx1",
             f"{mcCampaign}_mumuBGx1",
             f"{mcCampaign}_eeeeBGx1",
             f"{mcCampaign}_eemumuBGx1",
+            f"{mcCampaign}_eeBGx0",
+            f"{mcCampaign}_mumuBGx0",
+            f"{mcCampaign}_eeeeBGx0",
+            f"{mcCampaign}_eemumuBGx0",
         ]
 
     dataSamples = [

@@ -534,10 +534,6 @@ void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
 
-  StoreObjPtr<EventMetaData> bevt;
-  m_exp = bevt->getExperiment();
-  m_run = bevt->getRun();
-
   //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
@@ -633,6 +629,16 @@ void CDCTriggerUnpackerModule::terminate()
     delete bits;
   }
 }
+
+void CDCTriggerUnpackerModule::beginRun()
+{
+
+  StoreObjPtr<EventMetaData> bevt;
+  m_exp = bevt->getExperiment();
+  m_run = bevt->getRun();
+
+}
+
 
 void CDCTriggerUnpackerModule::event()
 {

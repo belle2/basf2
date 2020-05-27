@@ -242,6 +242,9 @@ namespace Belle2 {
     /** Delete dynamically allocated variables */
     virtual void terminate() override;
 
+    /** begin Run */
+    virtual void beginRun();
+
     /** convert raw data (in B2L buffer to bitstream) */
     virtual void event() override;
 

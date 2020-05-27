@@ -30,8 +30,8 @@ from optparse import OptionParser
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
-                  'Email': 'giacomo.depietro@roma3.infn.it'}
+CONTACT_PERSON = {'Name': 'Martin Laurenza',
+                  'Email': 'martina.laurenza@roma3.infn.it'}
 
 
 def main():
@@ -43,7 +43,7 @@ def main():
 
     option_parser = OptionParser()
     option_parser.add_option('-i', '--input-file', dest='input_file',
-                             default='../muon-BKLMValidation.root',
+                             default='../muon-KLMValidation.root',
                              help='Root file with Ext/Muid/BKLM/EKLM validation data.'
                              )
     option_parser.add_option('-o', '--output-file', dest='output_file',
@@ -102,8 +102,7 @@ def draw_bklmhists(file_chain):
     section = TH1F('Forward', 'Section for BKLMHit2ds', 2, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.getSection()>>Forward', '')
     section.GetXaxis().SetTitle('0=backward  1=forward')
-    section.GetListOfFunctions().Add(TNamed('Description',
-                                            'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
+    section.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
     section.GetListOfFunctions().Add(TNamed('Check', 'Somewhat more hits in the backward'))
     section.GetListOfFunctions().Add(TNamed('Contact', contact))
     section.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
@@ -113,8 +112,8 @@ def draw_bklmhists(file_chain):
     isOnTrack = TH1F('IsOnTrack', 'IsOnTrack for BKLMHit2ds', 2, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.isOnTrack()>>IsOnTrack', '')
     isOnTrack.GetXaxis().SetTitle('0=not associated with Track  1=associated with Track')
-    isOnTrack.GetListOfFunctions().Add(TNamed('Description',
-                                              'Flag indicating if a muon hit is associated with a CDC Track by Muid'))
+    isOnTrack.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if a muon hit
+                                              is associated with a CDC Track by Muid'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Check', 'Mostly associated'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Contact', contact))
     isOnTrack.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
@@ -183,23 +182,14 @@ def draw_bklmhists(file_chain):
     timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeSci.Write()
 
-    r = TH1F('r', 'r for BKLMHit2ds', 30, 200.0, 350.0)
-    file_chain.Draw('BKLMHit2ds.getGlobalPosition().Perp()>>r', '')
-    r.GetXaxis().SetTitle('r (cm)')
-    r.GetListOfFunctions().Add(TNamed('Description', 'Radial position of muon hit'))
-    r.GetListOfFunctions().Add(TNamed('Check', 'Comb-like downward-sloping distribution (a la layers)'))
-    r.GetListOfFunctions().Add(TNamed('Contact', contact))
-    r.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
-    r.Write()
-
-    z = TH1F('z', 'z for BKLMHit2ds', 100, -200.0, 300.0)
-    file_chain.Draw('BKLMHit2ds.getGlobalPosition().Z()>>z', '')
-    z.GetXaxis().SetTitle('z (cm)')
-    z.GetListOfFunctions().Add(TNamed('Description', 'Axial position of muon hit'))
-    z.GetListOfFunctions().Add(TNamed('Check', 'Broad peak near zero with dip at 47 cm (forward-backward boundary)'))
-    z.GetListOfFunctions().Add(TNamed('Contact', contact))
-    z.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
-    z.Write()
+    nPE = TH1F('nGenPE', 'Generated PE in BKLM', 50, 0.0, 100)
+    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1')
+    nPE.GetXaxis().SetTitle('# generated PE')
+    nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
+    nPE.GetListOfFunctions().Add(TNamed('Check', ''))
+    nPE.GetListOfFunctions().Add(TNamed('Contact', contact))
+    nPE.GetListOfFunctions().Add(TNamed('MetaOptions', ''))
+    nPE.Write()
 
     # Expert plots
 

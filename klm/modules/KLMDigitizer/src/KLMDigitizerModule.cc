@@ -66,7 +66,6 @@ void KLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
     /* Nothing to do. */
   } else if (m_SimulationMode == "ChannelSpecific") {
@@ -123,6 +122,7 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM strip efficiency data are not available.");
   if (m_ChannelSpecificSimulation)
     checkChannelParameters();
+  m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
 }
 
 /*
@@ -461,9 +461,9 @@ void KLMDigitizerModule::event()
 
 void KLMDigitizerModule::endRun()
 {
+  delete m_Fitter;
 }
 
 void KLMDigitizerModule::terminate()
 {
-  delete m_Fitter;
 }

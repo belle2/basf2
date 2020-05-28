@@ -16,8 +16,10 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 
+
 //analysis
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
@@ -1063,7 +1065,7 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr eclClusterHasOverlap(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments)
     {
       std::string cutString = "";
 
@@ -1074,30 +1076,39 @@ namespace Belle2 {
       std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
       auto func = [cut](const Particle * particle) -> double {
 
-        double connectedRegionID = eclClusterConnectedRegionID(particle);
-        if (std::isnan(connectedRegionID))
+        if (particle->getPDGCode() != Const::photon.getPDGCode())
         {
+          B2WARNING("The variable photonHasOverlap can only be calculated for photons. Returning NaN.");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
-        bool foundMatch = false;
-        StoreArray<ECLCluster> clusters;
-        for (const auto& cluster : clusters)
+        double connectedRegionID = eclClusterConnectedRegionID(particle);
+        unsigned mdstArrayIndex = particle->getMdstArrayIndex();
+
+        StoreObjPtr<ParticleList> particlelist("gamma:all");
+        if (!(particlelist.isValid()))
         {
-          const Particle testParticle(&cluster);
-          if (!cut->check(&testParticle)) {
+          B2WARNING("The variable photonHasOverlap can only be calculated if the list of all photons 'gamma:all' exists. "
+          "Returning NaN");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        for (unsigned int i = 0; i < particlelist->getListSize(); i++)
+        {
+          const Particle* part = particlelist->getParticle(i);
+
+          // skip the particle itself
+          if (part->getMdstArrayIndex() == mdstArrayIndex) {
             continue;
           }
-          double testConnectedRegionID = eclClusterConnectedRegionID(&testParticle);
-          if (std::isnan(testConnectedRegionID)) {
+
+          // skip photons that do not fulfill the provided criteria
+          if (!cut->check(part)) {
             continue;
           }
-          if (connectedRegionID == testConnectedRegionID) {
-            if (foundMatch) {
-              return 1;
-            } else {
-              foundMatch = true; // we will find at least one match which is the self-match
-            }
+
+          if (connectedRegionID == eclClusterConnectedRegionID(part)) {
+            return 1;
           }
         }
 
@@ -1578,10 +1589,11 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
-    REGISTER_VARIABLE("clusterHasOverlap(cutString)", eclClusterHasOverlap, R"DOC(
-      Returns true if the connected region of the particle's cluster is shared with another cluster.
-      A cut string can be provided to ignore clusters that do not satisfy the given criteria.
-      NaN is returned if the particle has no related ECL cluster.
+    REGISTER_VARIABLE("photonHasOverlap(cutString)", photonHasOverlap, R"DOC(
+      Returns true if the connected region of the particle's cluster is shared by another photon.
+      A cut string can be provided to ignore photons that do not satisfy the given criteria.
+      The variable can only be calculated for photons and only if the ParticleList of all photons has been created beforehand.
+      Otherwise, NaN is returned.
       )DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first

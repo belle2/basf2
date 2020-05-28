@@ -400,10 +400,10 @@ namespace Belle2 {
     double eclClusterMdstIndex(const Particle* particle);
 
     /**
-     * Returns function which returns true if the connected region of the particle's cluster is shared with another cluster.
-     * A cut on the properties of the tested clusters can be provided.
+     * Returns function which returns true if the connected region of the particle's cluster is shared by another photon.
+     * A cut on the properties of the other photons can be provided.
      */
-    Manager::FunctionPtr eclClusterHasOverlap(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

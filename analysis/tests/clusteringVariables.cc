@@ -122,6 +122,7 @@ namespace {
       e3->setClusterId(3);
       e3->setTime(3);
       e3->setDeltaTime99(0.3);
+      e3->setConnectedRegionId(1); // shares the connected region with cluster 1
 
       // aaand add clusters related to the tracks
       ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
@@ -130,7 +131,6 @@ namespace {
       e4->setClusterId(4);
       t1->addRelationTo(e4);
       e4->setIsTrack(true);
-      e4->setConnectedRegionId(1); // shares the connected region with cluster 1
 
       ECLCluster* e5 = eclclusters.appendNew(ECLCluster());
       e5->setEnergy(0.3);
@@ -519,24 +519,41 @@ namespace {
     EXPECT_FLOAT_EQ(maxDist->function(pionslist->getParticle(0)), 4.0);
   }
 
-  TEST_F(ECLVariableTest, clusterHasOverlap)
+  TEST_F(ECLVariableTest, photonHasOverlap)
   {
     // declare StoreArrays of Particles and ECLClusters
     StoreArray<Particle> particles;
     StoreArray<ECLCluster> eclclusters;
 
-    // create a photon from the first cluster
-    const Particle* p = particles.appendNew(Particle(eclclusters[0]));
+    // create a photon list
+    StoreObjPtr<ParticleList> gammalist("gamma:all");
 
-    // check overlap without any requirement on other clusters
-    const Manager::Var* clusterHasOverlapAll = Manager::Instance().getVariable("clusterHasOverlap()");
-    // cluster 4 and cluster 1 share the connected region
-    EXPECT_TRUE(clusterHasOverlapAll->function(p));
+    // register the photon list in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
 
-    // check overlap only with neutral clusters
-    const Manager::Var* clusterHasOverlapNeutral = Manager::Instance().getVariable("clusterHasOverlap(clusterTrackMatch==0)");
-    // cluster 4 is matched to a track so it doesn't matter that it has the same connected region like cluster 1
-    EXPECT_FALSE(clusterHasOverlapNeutral->function(p));
+    // initialise the photon list
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // check overlap without any requirement on other photons
+    const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap()");
+    // cluster 3 and cluster 1 share the connected region
+    EXPECT_TRUE(photonHasOverlapAll->function(particles[0]));
+
+    // check overlap with photons in barrel
+    const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2)");
+    // cluster 3 is in the forward end cap so it doesn't matter that it has the same connected region like cluster 1
+    EXPECT_FALSE(photonHasOverlapBarrel->function(particles[0]));
   }
 
   class KLMVariableTest : public ::testing::Test {

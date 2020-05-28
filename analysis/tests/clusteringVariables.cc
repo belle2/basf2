@@ -322,6 +322,36 @@ namespace {
       }
   }
 
+  TEST_F(ECLVariableTest, ECLThetaAndPhiId)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> clusters;
+    StoreArray<ECLCluster> eclclusters;
+    // make a particle from cluster #1
+    const Particle* p = particles.appendNew(Particle(eclclusters[0]));
+
+    // get the variables to test
+    const Manager::Var* clusterThetaID = Manager::Instance().getVariable("clusterThetaID");
+    const Manager::Var* clusterPhiID = Manager::Instance().getVariable("clusterPhiID");
+
+    {
+      clusters[0]->setMaxECellId(1);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0); // FIXME
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0); // FIXME
+    }
+    {
+      clusters[0]->setMaxECellId(6903);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52); // FIXME
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134); // FIXME
+    }
+    {
+      clusters[0]->setMaxECellId(8457);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65); // FIXME
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8); // FIXME
+    }
+  }
+
+
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
     // we need the particles, tracks, and ECLClusters StoreArrays

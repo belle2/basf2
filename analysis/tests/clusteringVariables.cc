@@ -336,18 +336,18 @@ namespace {
 
     {
       clusters[0]->setMaxECellId(1);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0); // FIXME
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0); // FIXME
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0);
     }
     {
       clusters[0]->setMaxECellId(6903);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52); // FIXME
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134); // FIXME
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134);
     }
     {
       clusters[0]->setMaxECellId(8457);
-      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65); // FIXME
-      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8); // FIXME
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8);
     }
   }
 

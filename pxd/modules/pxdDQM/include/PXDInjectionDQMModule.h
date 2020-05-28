@@ -45,6 +45,7 @@ namespace Belle2 {
       bool m_offlineStudy{false}; ///< create histos with much finer binning and larger range
       bool m_useClusters{false}; ///< use PXDClusters instead of Raw Hits
       bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
+      bool m_createGateHist{false};///< create per gate hits 2d histogram
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
@@ -75,6 +76,9 @@ namespace Belle2 {
 
       TH2F* hOccAfterInjLERGate{};          /**< Occupancy after LER injection per Gate */
       TH2F* hOccAfterInjHERGate{};          /**< Occupancy after HER injection per Gate */
+
+      std::map<VxdID, TH2F*> hOccModAfterInjLERGate{};         /**< Occupancy after LER injection per Gate per Module */
+      std::map<VxdID, TH2F*> hOccModAfterInjHERGate{};          /**< Occupancy after HER injection per Gate per Module */
 
       void initialize() override final; /**< initialize function */
 

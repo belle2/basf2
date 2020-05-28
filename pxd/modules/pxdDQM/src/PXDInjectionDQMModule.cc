@@ -38,6 +38,7 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("offlineStudy", m_offlineStudy, "use finest binning and larger range", false);
   addParam("useClusters", m_useClusters, "use cluster instead of raw hits", false);
   addParam("createMaxHist", m_createMaxHist, "create histo with max occupancy (not mp save!!!)", false);
+  addParam("createGateHist", m_createGateHist, "create 2d histo with gate against occupancy", true);
 
 }
 
@@ -60,9 +61,10 @@ void PXDInjectionDQMModule::defineHisto()
       hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (0.5 #mus bins)", 100000, 0,
                                      50000);
     }
-    hOccAfterInjLERGate  = new TH2F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
-    hOccAfterInjHERGate  = new TH2F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 50, 150, 192, 0, 192);
-
+    if (m_createGateHist) {
+      hOccAfterInjLERGate  = new TH2F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 0, 10000, 192, 0, 192);
+      hOccAfterInjHERGate  = new TH2F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 0, 10000, 192, 0, 192);
+    }
   } else {
     hOccAfterInjLER  = new TH1F("PXDOccInjLER", "PXDOccInjLER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
     hOccAfterInjHER  = new TH1F("PXDOccInjHER", "PXDOccInjHER/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
@@ -72,7 +74,10 @@ void PXDInjectionDQMModule::defineHisto()
       hMaxOccAfterInjLER  = new TH1F("PXDMaxOccInjLER", "PXDMaxOccInjLER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
       hMaxOccAfterInjHER  = new TH1F("PXDMaxOccInjHER", "PXDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0, 20000);
     }
-
+    if (m_createGateHist) {
+      hOccAfterInjLERGate  = new TH2F("PXDOccInjLERGate", "PXDOccInjLERGate;Time;Gate", 1000, 0, 10000, 192, 0, 192);
+      hOccAfterInjHERGate  = new TH2F("PXDOccInjHERGate", "PXDOccInjHERGate;Time;Gate", 1000, 0, 10000, 192, 0, 192);
+    }
   }
 
   if (m_eachModule) {
@@ -99,6 +104,14 @@ void PXDInjectionDQMModule::defineHisto()
           hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
                                                    "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (0.5 #mus bins)", 100000, 0, 50000);
         }
+        if (m_createGateHist) {
+          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + bufful, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+                                                     192, 0,
+                                                     192);
+          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + bufful, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+                                                     192, 0,
+                                                     192);
+        }
       } else {
         hOccModAfterInjLER[avxdid] = new TH1F("PXDOccInjLER_" + bufful,
                                               "PXDOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
@@ -109,6 +122,14 @@ void PXDInjectionDQMModule::defineHisto()
                                                    "PXDMaxOccModInjLER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
           hMaxOccModAfterInjHER[avxdid] = new TH1F("PXDMaxOccInjHER_" + bufful,
                                                    "PXDMaxOccModInjHER " + buff + "/Time;Time in #mus;Count/Time (5 #mus bins)", 4000, 0, 20000);
+        }
+        if (m_createGateHist) {
+          hOccModAfterInjLERGate[avxdid]  = new TH2F("PXDOccInjLERGate_" + bufful, "PXDOccInjLERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+                                                     192, 0,
+                                                     192);
+          hOccModAfterInjHERGate[avxdid]  = new TH2F("PXDOccInjHERGate_" + bufful, "PXDOccInjHERGate " + buff + ";Time;Gate", 1000, 0, 10000,
+                                                     192, 0,
+                                                     192);
         }
       }
     }
@@ -202,6 +223,7 @@ void PXDInjectionDQMModule::event()
           } else {
             for (auto& p : m_storeRawHits) {
               hOccAfterInjHERGate->Fill(difference, p.getRow() / 4);
+              hOccModAfterInjHERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
             }
           }
         }
@@ -233,15 +255,16 @@ void PXDInjectionDQMModule::event()
 //             for (auto& p : m_storeClusters) {
 //               hOccAfterInjLERGate->Fill(difference, p.getVCellID() / 4);
 //             }
-          } else
+          } else {
             for (auto& p : m_storeRawHits) {
               hOccAfterInjLERGate->Fill(difference, p.getRow() / 4);
+              hOccModAfterInjLERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
             }
+          }
         }
       }
     }
-  }
 
-  break;
-}
+    break;
+  }
 }

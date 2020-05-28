@@ -202,20 +202,6 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
   originalDirectory->cd();
 }
 
-void AlignDQMModule::DefineMomentumCoordinates()
-{
-  int iMomRange = 600;
-  double fMomRange = 3.0;
-
-  auto momentum = THFAxis(2 * iMomRange, -fMomRange, fMomRange, "Momentum");
-  auto factory = THFFactory(this).xAxisDefault(momentum).yTitleDefault("counts");
-
-  m_MomX = factory.CreateTH1F("TrackMomentumX", "Track Momentum X");
-  m_MomY = factory.CreateTH1F("TrackMomentumY", "Track Momentum Y");
-  m_MomZ = factory.CreateTH1F("TrackMomentumZ", "Track Momentum Z");
-  m_Mom = factory.xlow(.0).CreateTH1F("TrackMomentumMag", "Track Momentum Magnitude");
-}
-
 void AlignDQMModule::DefineSensors()
 {
   TDirectory* originalDirectory = gDirectory;

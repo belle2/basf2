@@ -218,12 +218,12 @@ void PXDInjectionDQMModule::event()
             // Cluster does not contain VCellID, need to change histogramm completely
             // -> doesnt work with clusters!
 //             for (auto& p : m_storeClusters) {
-//               hOccAfterInjHERGate->Fill(difference, p.getVCellID() / 4);
+//               hOccAfterInjHERGate->Fill(diff2, p.getVCellID() / 4);
 //             }
           } else {
             for (auto& p : m_storeRawHits) {
-              hOccAfterInjHERGate->Fill(difference, p.getRow() / 4);
-              hOccModAfterInjHERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
+              hOccAfterInjHERGate->Fill(diff2, p.getRow() / 4);
+              hOccModAfterInjHERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
             }
           }
         }
@@ -253,12 +253,12 @@ void PXDInjectionDQMModule::event()
             // Cluster does not contain VCellID, need to change histogramm completely
             // -> doesnt work with clusters!
 //             for (auto& p : m_storeClusters) {
-//               hOccAfterInjLERGate->Fill(difference, p.getVCellID() / 4);
+//               hOccAfterInjLERGate->Fill(diff2, p.getVCellID() / 4);
 //             }
           } else {
             for (auto& p : m_storeRawHits) {
-              hOccAfterInjLERGate->Fill(difference, p.getRow() / 4);
-              hOccModAfterInjLERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
+              hOccAfterInjLERGate->Fill(diff2, p.getRow() / 4);
+              hOccModAfterInjLERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
             }
           }
         }

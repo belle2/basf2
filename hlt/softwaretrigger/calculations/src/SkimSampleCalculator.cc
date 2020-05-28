@@ -246,8 +246,10 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
+  bool Jpsi_tag = nJpsi != 0;
+
   calculationResult["maxAngleTTLE"] = maxAngleTTLE;
-  calculationResult["nJpsi"] = nJpsi;
+  calculationResult["Jpsi"] = Jpsi_tag;
 
   //maxAngleGGLE
   double maxAngleGGLE = -10.;
@@ -604,5 +606,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
   }
 
-  calculationResult["nKshort"] = nKshort;
+  bool Kshort_tag = nKshort != 0;
+
+  calculationResult["Kshort"] = Kshort_tag;
 }

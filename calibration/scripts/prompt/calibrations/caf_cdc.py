@@ -71,8 +71,8 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = 10
     min_events_per_file = 1000
 
-    max_events_per_calibration = 200000  # for t0, tw calib.100k events for each skim
-    max_events_per_calibration_for_xt_sr = 1000000  # for xt, sr calib. 1 M events for each skim
+    max_events_per_calibration = 200000  # for t0, tw calib. 200k events for each skim
+    max_events_per_calibration_for_xt_sr = 1000000  # for xt, sr calib. 1M events for each skim
     max_events_per_file = 5000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)

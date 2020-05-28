@@ -1068,13 +1068,16 @@ namespace Belle2 {
     Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments)
     {
       std::string cutString = "";
-
-      if (arguments.size() == 1) {
+      if (arguments.size() > 0) {
         cutString = arguments[0];
       }
-
       std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
-      auto func = [cut](const Particle * particle) -> double {
+
+      std::string particlelistname = "gamma:all";
+      if (arguments.size() > 1) {
+        particlelistname = arguments[1];
+      }
+      auto func = [cut, particlelistname](const Particle * particle) -> double {
 
         if (particle->getPDGCode() != Const::photon.getPDGCode())
         {
@@ -1085,11 +1088,11 @@ namespace Belle2 {
         double connectedRegionID = eclClusterConnectedRegionID(particle);
         unsigned mdstArrayIndex = particle->getMdstArrayIndex();
 
-        StoreObjPtr<ParticleList> particlelist("gamma:all");
+        StoreObjPtr<ParticleList> particlelist(particlelistname);
         if (!(particlelist.isValid()))
         {
-          B2WARNING("The variable photonHasOverlap can only be calculated if the list of all photons 'gamma:all' exists. "
-          "Returning NaN");
+          B2WARNING("The provided particle list " << particlelistname << " does not exist."
+          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN");
           return std::numeric_limits<double>::quiet_NaN();
         }
 
@@ -1589,11 +1592,13 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
-    REGISTER_VARIABLE("photonHasOverlap(cutString)", photonHasOverlap, R"DOC(
+    REGISTER_VARIABLE("photonHasOverlap(cutString, particlelistname)", photonHasOverlap, R"DOC(
       Returns true if the connected region of the particle's cluster is shared by another photon.
       A cut string can be provided to ignore photons that do not satisfy the given criteria.
-      The variable can only be calculated for photons and only if the ParticleList of all photons has been created beforehand.
-      Otherwise, NaN is returned.
+      By default, the ParticleList ``gamma:all`` is used for the comparison.
+      However, one can customize the name of the ParticleList via a second argument.
+      If no second argument is given and ``gamma:all`` does not exist or if the variable is requested for
+      a particle that is not a photon, NaN is returned.
       )DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first

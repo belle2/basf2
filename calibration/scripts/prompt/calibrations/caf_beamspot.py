@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""
+Airflow script to perform BeamSpot calibration.
+"""
 
 from prompt import CalibrationSettings
 
@@ -9,7 +10,7 @@ from prompt import CalibrationSettings
 settings = CalibrationSettings(name="BeamSpot Calibrations",
                                expert_username="casarosa",
                                description=__doc__,
-                               input_data_formats=["cdst"],
+                               input_data_formats=["mdst"],
                                input_data_names=["hlt_mumu"],
                                depends_on=[])
 
@@ -65,7 +66,6 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     import ROOT
-    from ROOT import Belle2, TFile
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
@@ -79,8 +79,8 @@ def get_calibrations(input_data, **kwargs):
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    muSelection = 'p>1.0'
-    muSelection += ' and abs(dz)<2.0 and dr<0.5'
+    muSelection = '[p>1.0]'
+    muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)

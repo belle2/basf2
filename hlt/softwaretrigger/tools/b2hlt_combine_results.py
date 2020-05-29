@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     # loop over SWTRs
     sum_out = pd.DataFrame()
+    df_counter = 0  # counte the number of added dataframes
     for fi in args.input:
 
         # might have swtr files with no events selected: skip these
@@ -52,6 +53,14 @@ if __name__ == "__main__":
             sum_out = swtr
         else:
             sum_out = sum_out.add(swtr)
+        df_counter += 1
+
+    # the prescale values were also added up, to get the correct prescale values back
+    # calculate the average of the sum for each trigger line
+    for col in sum_out.head():
+        if col.find('software_trigger_cut_') >= 0 and sum_out[col][4] > 0:
+            print('{}: {}'.format(col, sum_out[col][4]))
+            sum_out.at[4, col] = sum_out[col][4]/df_counter
 
     root_pandas.to_root(sum_out, key='software_trigger_results', path=args.output)
     # uproot.newtree doesn't work in the current externals version but when it does this can be root free

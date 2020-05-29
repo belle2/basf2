@@ -11,6 +11,7 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/ScopeGuard.h>
 
 namespace Belle2 {
 
@@ -69,14 +70,10 @@ namespace Belle2 {
     return result;
   }
 
-  MCInitialParticles& InitialParticleGeneration::generate(bool forceGeneration)
+  MCInitialParticles& InitialParticleGeneration::generate()
   {
     if (!m_event) {
       m_event.create();
-    } else {
-      if (m_event->getValidFlag() && !forceGeneration) {
-        return *m_event;
-      }
     }
     if (!m_beamParams.isValid()) {
       B2FATAL("Cannot generate beam without valid BeamParameters");
@@ -102,4 +99,35 @@ namespace Belle2 {
     return *m_event;
   }
 
+  TVector3 InitialParticleGeneration::updateVertex(bool force)
+  {
+    if (!m_beamParams.isValid()) {
+      B2FATAL("Cannot generate beam without valid BeamParameters");
+    }
+    if (!m_event) {
+      // generate a new mc initial particle without smearing except for the vertex
+      auto flagGuard = ScopeGuard::guardValue(m_allowedFlags, BeamParameters::c_smearVertex);
+      generate();
+      return m_event->getVertex();
+    }
+    if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearVertex) or
+        (m_event->hasGenerationFlags(BeamParameters::c_smearVertex) and not force)) {
+      // already has a smeared vertex or smearing disallowed. nothing to do
+      return {0, 0, 0};
+    }
+    // Ok, now we need to just update the vertex, make sure the parameters are up to date ...
+    if (m_beamParams.hasChanged()) {
+      m_generateHER.reset();
+      m_generateLER.reset();
+      m_generateVertex.reset();
+    }
+    // Add the smear vertex flag
+    m_event->setGenerationFlags(m_event->getGenerationFlags() | BeamParameters::c_smearVertex);
+    // And generate a vertex ...
+    auto previous = m_event->getVertex();
+    auto vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
+    m_event->setVertex(vtx);
+    // Everything done
+    return vtx - previous;
+  }
 } //Belle2 namespace

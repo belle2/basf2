@@ -125,6 +125,8 @@ void DQMHistAnalysisIPModule::beginRun()
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
+
+  if (m_h_last) m_h_last->Reset();
 }
 
 void DQMHistAnalysisIPModule::event()

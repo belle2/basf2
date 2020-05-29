@@ -82,10 +82,21 @@ MC13_uubarBGx0:
 
 ## MC13 low multiplicity
 
-MC13_eeBGx1:
-  location:
-  total_input_files:
-  average_events_per_file:
+# MC13_eeBGx0:
+#   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeBGx0.root
+
+MC13_eeeeBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx0.root
+
+MC13_eemumuBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eemumuBGx0.root
+
+MC13_mumuBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx0.root
+
+
+# MC13_eeBGx1:
+#   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeBGx1.root
 
 MC13_eeeeBGx1:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx1.root

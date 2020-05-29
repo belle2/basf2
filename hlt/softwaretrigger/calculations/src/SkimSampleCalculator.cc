@@ -226,6 +226,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // maxAngleTTLE
   double maxAngleTTLE = -10.;
   int nJpsi = 0;
+  double Jpsi = 0.;
+  const double jPsiMasswindow = 0.11;
   if (m_pionParticles->getListSize() >= 2) {
     for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
       Particle* par1 = m_pionParticles->getParticle(i);
@@ -235,9 +237,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         TLorentzVector V4p2 = par2->get4Vector();
         TLorentzVector V4pSum = V4p1 + V4p2;
         const auto chSum = par1->getCharge() + par2->getCharge();
-        double mSum = V4pSum.M();
-        double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
-        if (abs(JpsidM) < 0.11 && chSum == 0)  nJpsi++;
+        const double mSum = V4pSum.M();
+        const double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
+        if (abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
         const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
         const double temp = V3p1.Angle(V3p2);
@@ -246,10 +248,10 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
-  bool Jpsi_tag = nJpsi != 0;
+  if (nJpsi != 0) Jpsi = 1;
 
   calculationResult["maxAngleTTLE"] = maxAngleTTLE;
-  calculationResult["Jpsi"] = Jpsi_tag;
+  calculationResult["Jpsi"] = Jpsi;
 
   //maxAngleGGLE
   double maxAngleGGLE = -10.;
@@ -599,14 +601,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // nKshort
   int nKshort = 0;
+  double Kshort = 0.;
   for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
-    Particle* mergeKsCand = m_KsParticles->getParticle(i);
-    double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
-    double KsCandMass = mergeKsCand->getMass();
+    const Particle* mergeKsCand = m_KsParticles->getParticle(i);
+    const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+    const double KsCandMass = mergeKsCand->getMass();
     if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
   }
 
-  bool Kshort_tag = nKshort != 0;
+  if (nKshort != 0) Kshort = 1;
 
-  calculationResult["Kshort"] = Kshort_tag;
+  calculationResult["Kshort"] = Kshort;
 }

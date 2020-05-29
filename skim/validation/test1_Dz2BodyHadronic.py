@@ -11,36 +11,13 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import skimExpertFunctions as expert
+from skim.charm import DstToD0Pi_D0ToHpJm
 
-from stdCharged import stdE, stdK, stdPi
+path = b2.Path()
 
-b2.set_log_level(b2.LogLevel.INFO)
+fileList = ["../WG6_DstToD0pi_D0ToKpi.dst.root"]
+ma.inputMdstList('default', fileList, path=path)
 
-fileList = [
-    './WG6_DstToD0pi_D0ToKpi.dst.root'
-]
-
-# create path
-path = b2.create_path()
-
-ma.inputMdstList('MC9', fileList, path=path)
-
-stdPi('loose', path=path)
-stdK('loose', path=path)
-stdPi('all', path=path)
-stdK('all', path=path)
-stdE('all', path=path)
-
-
-from skim.charm import DstToD0PiD0ToHpJm
-DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(path)
-
-expert.skimOutputUdst('../WG6_DstToD0ToKpi.udst.root', DstToD0PiD0ToHpJmList, path=path)
-ma.summaryOfLists(DstToD0PiD0ToHpJmList, path=path)
-
-
-expert.setSkimLogging(path)
+skim = DstToD0Pi_D0ToHpJm(OutputFileName='../WG6_DstToD0ToKpi.udst.root')
+skim(path)
 b2.process(path)
-
-print(b2.statistics)

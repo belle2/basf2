@@ -287,8 +287,9 @@ if analysis:
 # process the package directories
 else:
     # loop over directory entries and select package directories
-    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
-    sphinx_exclude_pattern |= set(exclude_dirs)
+    exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
+    exclude_filetypes = {'**/*.ipynb'}
+    sphinx_exclude_pattern |= exclude_dirs | exclude_filetypes
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:

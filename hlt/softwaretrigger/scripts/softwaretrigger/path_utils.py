@@ -1,6 +1,7 @@
 import basf2
 from softwaretrigger import constants
 import modularAnalysis
+import stdV0s
 from geometry import check_components
 import reconstruction
 
@@ -118,6 +119,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
+    stdV0s.stdKshorts(path=path, fitter='KFit')
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

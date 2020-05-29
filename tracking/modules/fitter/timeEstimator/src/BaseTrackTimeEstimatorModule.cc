@@ -157,7 +157,7 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
   }
 }
 
-double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingSeedInformation(RecoTrack& recoTrack,
+double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingSeedInformation(const RecoTrack& recoTrack,
     const Const::ChargedStable& particleHypothesis) const
 {
   // If the flight length is clear, just use the s = v * t relation.

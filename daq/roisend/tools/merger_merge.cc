@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <map>
 #include <set>
+#include <vector>
 #include <arpa/inet.h>
 
 #include "daq/roisend/util.h"
@@ -29,9 +30,12 @@ using namespace std;
 
 std::map<int, std::string> myconn;
 std::map<int, unsigned int> mycount;
+std::set<int> hltused; // we want a sorted list
+std::vector<int> hlts; // initialized on run START
 
 std::set<int> triggers;
 unsigned int event_number_max = 0;
+unsigned int missing_walk_index = 0;
 
 bool got_sigusr1 = false;
 bool got_sigusr2 = false;
@@ -73,24 +77,37 @@ void clear_triggers(void)
 {
   triggers.clear();
   event_number_max = 0;
+  missing_walk_index = 0;
 }
 
 void plot_triggers(void)
 {
+  int hltcount = hltused.size();
+  std::map<int, int> modmissing;
+  hlts.clear();
+  for (auto h : hltused) hlts.push_back(h);
   if (!triggers.empty()) {
     ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
                 *(--triggers.end()),
                 triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
     for (auto& it : triggers) {
-      ERR_FPRINTF(stderr, "[INFO] Miss trig %u\n", it);
-      if (i++ == 100) {
-        ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
-        break;
+      int mod = it % hltcount;
+      modmissing[hlts[mod]]++;
+      if (i < 100) {
+        ERR_FPRINTF(stderr, "[INFO] Miss trig %u (%d) HLT%d\n", it, mod, hlts[mod]);
+        i++;
+        if (i == 100) {
+          ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
+          i++;
+        }
       }
     }
   } else {
     ERR_FPRINTF(stderr, "[RESULT] merger_merge: missing triggers 0\n");
+  }
+  for (auto m : modmissing) {
+    ERR_FPRINTF(stderr, "[INFO] merger_merge: missing triggers from HLT%d: %d\n", m.first, m.second);
   }
 }
 
@@ -106,6 +123,11 @@ void check_event_nr(unsigned int event_number)
   } else {
     // we dont fill event_number in the if above, thus we dont have to remove it
     triggers.erase(event_number);
+  }
+  if (triggers.size() > missing_walk_index + 1 && event_number_max - *std::next(triggers.begin(), missing_walk_index + 1) > 100000) {
+    missing_walk_index++;
+  } else if (missing_walk_index > 0 && event_number_max - *std::next(triggers.begin(), missing_walk_index) < 100000) {
+    missing_walk_index--;
   }
 }
 
@@ -273,7 +295,7 @@ MM_get_packet(const int sd_acc, unsigned char* buf)
     return -2;
   }
 
-  /// TODO: check teh first word to be the correct magic, but for TCP/IP this is overkill
+  /// TODO: check the first word to be the correct magic, but for TCP/IP this is overkill
   /// anyway unclear how to recover from a misalignment in data stream
 
   size_t n_bytes_from_hltout = 2 * sizeof(unsigned int) + ntohl(header[1]);// OFFSET_LENGTH = 1
@@ -494,6 +516,12 @@ main(int argc, char* argv[])
 
       LOG_FPRINTF(stderr, "[INFO] %d is IP <%s>\n", t, address);
       myconn[t] = address;
+      // Assume IP4 and take last decimal as HLT number
+      char* ptr = strrchr(address, '.');
+      if (ptr) {
+        int nr = atoi(ptr + 1);
+        hltused.insert(nr);
+      }
 
       fflush(stdout);
       FD_SET(t, &allset);
@@ -565,19 +593,21 @@ main(int argc, char* argv[])
           }
 
           if (runnr > current_runnr) {
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: run number increases: got %d current %d trig %d\n", runnr, current_runnr,
+                        eventnr);
             print_stat();
             clear_triggers();
             current_runnr = runnr;
           } else if (runnr < current_runnr) {
             // got some event from old run
-            ERR_FPRINTF(stderr, "[WARNING] merger_merge: Got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
+            ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
                         eventnr);
           }
 
           if (runnr == current_runnr) {
             // seperate if, as we might set it in the if above
             check_event_nr(eventnr);
-          }
+          } // if we end the if here, we will send out old events to ONSEN!
 
           n_bytes_to_onsen = n_bytes_from_hltout;
           while (1) {
@@ -616,12 +646,16 @@ main(int argc, char* argv[])
             LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] sent event to ONSEN\n", event_count);
             dump_binary(stderr, ptr_head_to_onsen, n_bytes_to_onsen);
           }
+          // } // if we end if here, we will NOT send old events to onsen, but only after we received the first new event
         }
       }
       event_count++;
       if (event_count % 10000 == 0) {
-        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
-                    *(--triggers.end()), triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
+        int hltcount = hltused.size();
+        int mod = *triggers.begin() % hltcount;
+        ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+                    *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
+                    *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
       }
     }
   }

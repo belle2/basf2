@@ -25,7 +25,7 @@
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 
 #include <string>
 #include <vector>
@@ -111,7 +111,7 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToPXDState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToPXDState>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToPXDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToPXDResult> m_results;
     /// Vector for storing the filtered results

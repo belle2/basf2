@@ -42,9 +42,12 @@ namespace Belle2 {
     std::string getName() const { return m_name; }
     /** Return the number of rays necessary to perform the scan */
     virtual int getNRays() const = 0;
-    /** Get the origin and direction for the next scan particle.
-     * @param[out] origin Origin of the next scan particle
-     * @param[out[ direction Direction of the next scan particle
+
+    /**
+     * Belle2::MaterialScanBase::createNext() implemention
+     * Get the origin and direction for the next scan particle.
+     * @param origin Origin of the next scan particle
+     * @param direction Direction of the next scan particle
      * @return false if the scan is finished
      */
     virtual bool createNext(G4ThreeVector& origin, G4ThreeVector& direction) = 0;
@@ -163,6 +166,7 @@ namespace Belle2 {
      * @param rootFile pointer to the ROOT File containing the histograms
      * @param origin Origin for the spherical scan
      * @param params Parameters of the scan
+     * @param doCosTheta
      */
     MaterialScanSpherical(TFile* rootFile, const G4ThreeVector& origin, const ScanParams& params, bool doCosTheta):
       MaterialScan2D(rootFile, "Spherical", doCosTheta ? "cos(#theta);#phi [deg]" : "#theta [deg];#phi [deg]", params), m_origin(origin),

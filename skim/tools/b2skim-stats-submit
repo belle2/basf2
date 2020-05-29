@@ -67,6 +67,10 @@ def getAllSamples(mcCampaign):
             f"{mcCampaign}_mumuBGx1",
             f"{mcCampaign}_eeeeBGx1",
             f"{mcCampaign}_eemumuBGx1",
+            # f"{mcCampaign}_eeBGx0",
+            f"{mcCampaign}_mumuBGx0",
+            f"{mcCampaign}_eeeeBGx0",
+            f"{mcCampaign}_eemumuBGx0",
         ]
 
     dataSamples = [
@@ -75,6 +79,9 @@ def getAllSamples(mcCampaign):
         "proc9_exp8",
         "proc10_exp7",
         "proc10_exp8",
+        "proc11_exp7",
+        "proc11_exp8",
+        "proc11_exp10",
     ]
 
     return mcSamples, dataSamples
@@ -101,15 +108,15 @@ def required_length(*, min=None, max=None):
         def __call__(self, parser, args, values, option_string=None):
             if min is not None and max is None:
                 if len(values) < min:
-                    msg = "Argument '{self.dest}' requires at least {min} arguments."
+                    msg = f"Argument '{self.dest}' requires at least {min} arguments."
                     raise argparse.ArgumentTypeError(msg)
             elif min is None and max is not None:
                 if len(values) > max:
-                    msg = "Argument '{self.dest}' requires at most {max} arguments."
+                    msg = f"Argument '{self.dest}' requires at most {max} arguments."
                     raise argparse.ArgumentTypeError(msg)
             elif min is not None and max is not None:
                 if len(values) < min or len(values) > max:
-                    msg = "Argument '{self.dest}' requires between {min} and {max} arguments."
+                    msg = f"Argument '{self.dest}' requires between {min} and {max} arguments."
                     raise argparse.ArgumentTypeError(msg)
             setattr(args, self.dest, values)
 

@@ -47,19 +47,10 @@ void SmearPrimaryVertexModule::initialize()
 void SmearPrimaryVertexModule::event()
 {
   StoreArray<MCParticle> mcParticles(m_MCParticlesName);
-  /* Generate the primary beams. */
-  MCInitialParticles& initial = m_Initial.generate();
-  TVector3 shift;
-  bool primaryVertexFound = false;
+  // smear the primary vertex if not already done
+  TVector3 shift = m_Initial.updateVertex();
+  if (shift == TVector3{0, 0, 0}) return;
   for (MCParticle& mcParticle : mcParticles) {
-    /* Skip an MCParticle if it is flagged as c_Initial or c_IsVirtual. */
-    if (mcParticle.hasStatus(MCParticle::c_Initial) or mcParticle.hasStatus(MCParticle::c_IsVirtual))
-      continue;
-    if (not primaryVertexFound) {
-      /* Save the previous primary vertex. */
-      shift = initial.getVertex() - mcParticle.getProductionVertex();
-      primaryVertexFound = true;
-    }
     /* Shift the production vertex. */
     mcParticle.setProductionVertex(mcParticle.getProductionVertex() + shift);
     /* Shift also the decay vertex only if the MCParticle has a daughter. */

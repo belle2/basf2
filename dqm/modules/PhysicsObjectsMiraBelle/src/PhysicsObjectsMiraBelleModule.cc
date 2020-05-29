@@ -30,14 +30,8 @@
 #include <TDirectory.h>
 #include <map>
 
-//avoid having to wrap everything in the namespace explicitly
-//only permissible in .cc files!
 using namespace Belle2;
 
-//this line registers the module with the framework and actually makes it available
-//in steering files or the the module list (basf2 -m).
-//Note that the 'Module' part of the class name is missing, this is also the way it
-//will be called in the module list.
 REG_MODULE(PhysicsObjectsMiraBelle)
 
 PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
@@ -115,7 +109,7 @@ void PhysicsObjectsMiraBelleModule::initialize()
   REG_HISTOGRAM
 
   StoreObjPtr<SoftwareTriggerResult> result;
-  result.isRequired();
+  result.isOptional();
 }
 
 void PhysicsObjectsMiraBelleModule::beginRun()
@@ -152,13 +146,13 @@ void PhysicsObjectsMiraBelleModule::event()
 
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
-    B2ERROR("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    B2WARNING("SoftwareTriggerResult object not available but needed to select events for the histograms.");
     return;
   }
 
   const std::map<std::string, int>& results = result->getResults();
   if (results.find(m_triggerIdentifier) == results.end()) {
-    B2ERROR("PhysicsObjectsMiraBelle: Can't find trigger identifier: " << m_triggerIdentifier);
+    B2WARNING("PhysicsObjectsMiraBelle: Can't find trigger identifier: " << m_triggerIdentifier);
     return;
   }
 

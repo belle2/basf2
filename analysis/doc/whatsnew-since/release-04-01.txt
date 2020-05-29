@@ -117,10 +117,10 @@ Variables
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
    of these variables, e.g. by doing ``TagTrackAverage(TagTrackTrueDistanceToTagV)`` 
- * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
+ * Added ``mcDeltaL`` describing the true distance between Sig and Tag
    vertices in the Y(4S) boost direction
- * Added :b2:var:`mcDeltaTapprox` to get :b2:var:`mcDeltaT` in the kinematic
-   approximation, i.e. based on :b2:var:`mcDeltaL` variable
+ * Added ``mcDeltaTapprox`` to get :b2:var:`mcDeltaT` in the kinematic
+   approximation, i.e. based on ``mcDeltaL`` variable
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
@@ -148,6 +148,8 @@ Variables
  * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
    particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
  * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
+ * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
+ * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
 
 Modules
 +++++++

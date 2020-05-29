@@ -145,6 +145,17 @@ void KLMDQMModule::defineHisto()
         "_sector_" + std::to_string(klmSector.getSector()) +
         "_" + std::to_string(j);
       std::string title = "Sector " + std::to_string(klmSector.getSector());
+      if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
+        if (klmSector.getSection() == BKLMElementNumbers::c_BackwardSection)
+          title += " -- BB" + std::to_string(klmSector.getSector() - 1);
+        else
+          title += " -- BF" + std::to_string(klmSector.getSector() - 1);
+      } else {
+        if (klmSector.getSection() == EKLMElementNumbers::c_BackwardSection)
+          title += " -- EB" + std::to_string(klmSector.getSector() - 1);
+        else
+          title += " -- EF" + std::to_string(klmSector.getSector() - 1);
+      }
       m_ChannelHits[sectorIndex][j] = new TH1F(
         name.c_str(), title.c_str(),
         firstChannelNumbers[i + 1] - firstChannelNumbers[i],

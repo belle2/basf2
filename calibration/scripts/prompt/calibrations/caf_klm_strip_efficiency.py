@@ -128,7 +128,7 @@ def get_calibrations(input_data, **kwargs):
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency
-        algorithm.params = {'apply_iov': output_iov}
+        algorithm.params = {'iov_coverage': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]
@@ -144,7 +144,7 @@ def get_collector(input_data_name):
 
     if input_data_name == 'hlt_mumu':
         return basf2.register_module('KLMStripEfficiencyCollector',
-                                     MuonListName='mu+:all',
+                                     MuonListName='mu+:klmStripEfficiency',
                                      MinimalMatchingDigits=14,
                                      MinimalMatchingDigitsOuterLayers=4,
                                      MinimalMomentumNoOuterLayers=4.0)

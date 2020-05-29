@@ -47,25 +47,37 @@ namespace Belle2 {
      * Get hit local position x coordinate.
      * @return Hit x coordinate.
      */
-    float getLocalPositionX() const;
+    float getLocalPositionX() const
+    {
+      return m_localX;
+    }
 
     /**
      * Get hit local position y coordinate.
      * @return Hit y coordinate.
      */
-    float getLocalPositionY() const;
+    float getLocalPositionY() const
+    {
+      return m_localY;
+    }
 
     /**
      * Get hit local position z coordinate.
      * @return Hit z coordinate.
      */
-    float getLocalPositionZ() const;
+    float getLocalPositionZ() const
+    {
+      return m_localZ;
+    }
 
     /**
      * Get ihit local position.
      * @return Hit coordinates.
      */
-    TVector3 getLocalPosition() const;
+    TVector3 getLocalPosition() const
+    {
+      return TVector3(m_localX, m_localY, m_localZ);
+    }
 
   protected:
 

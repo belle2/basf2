@@ -18,11 +18,12 @@ using namespace Belle2;
 
 REG_MODULE(EKLMDataChecker)
 
-EKLMDataCheckerModule::EKLMDataCheckerModule() : Module()
+EKLMDataCheckerModule::EKLMDataCheckerModule() :
+  Module(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_GeoDat(nullptr)
 {
   setDescription("EKLM data checker module.");
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_GeoDat = nullptr;
 }
 
 EKLMDataCheckerModule::~EKLMDataCheckerModule()
@@ -79,8 +80,8 @@ static bool compareBadDigitRate(EKLMDataCheckerModule::StripData& dat1,
          (double(dat2.nBadDigits) / dat2.nDigits);
 }
 
-static bool compareStripNumber(EKLMDataCheckerModule::StripData& dat1,
-                               EKLMDataCheckerModule::StripData& dat2)
+static bool compareStripNumber(const EKLMDataCheckerModule::StripData& dat1,
+                               const EKLMDataCheckerModule::StripData& dat2)
 {
   return dat1.strip < dat2.strip;
 }

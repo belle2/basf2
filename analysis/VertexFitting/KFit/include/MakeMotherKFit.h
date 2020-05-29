@@ -129,7 +129,7 @@ namespace Belle2 {
 
     private:
       /** Make a matrix to calculate error matrix of the mother particle.
-       * @param e error matrix container
+       * @param Ec error matrix container
        */
       void calculateError(CLHEP::HepSymMatrix* Ec) const;
       /** Make delMdelC to calculate error matrix of the mother particle.

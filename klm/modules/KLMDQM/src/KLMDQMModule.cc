@@ -23,6 +23,10 @@ REG_MODULE(KLMDQM)
 
 KLMDQMModule::KLMDQMModule() :
   HistoModule(),
+  m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
+  m_SectorArrayIndex(&(KLMSectorArrayIndex::Instance())),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_TimeRPC(nullptr),
   m_TimeScintillatorBKLM(nullptr),
   m_TimeScintillatorEKLM(nullptr),
@@ -44,10 +48,6 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryNameBKLM", m_HistogramDirectoryNameBKLM,
            "Directory for BKLM DQM histograms in ROOT file.",
            std::string("BKLM"));
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
-  m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -145,6 +145,17 @@ void KLMDQMModule::defineHisto()
         "_sector_" + std::to_string(klmSector.getSector()) +
         "_" + std::to_string(j);
       std::string title = "Sector " + std::to_string(klmSector.getSector());
+      if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
+        if (klmSector.getSection() == BKLMElementNumbers::c_BackwardSection)
+          title += " -- BB" + std::to_string(klmSector.getSector() - 1);
+        else
+          title += " -- BF" + std::to_string(klmSector.getSector() - 1);
+      } else {
+        if (klmSector.getSection() == EKLMElementNumbers::c_BackwardSection)
+          title += " -- EB" + std::to_string(klmSector.getSector() - 1);
+        else
+          title += " -- EF" + std::to_string(klmSector.getSector() - 1);
+      }
       m_ChannelHits[sectorIndex][j] = new TH1F(
         name.c_str(), title.c_str(),
         firstChannelNumbers[i + 1] - firstChannelNumbers[i],

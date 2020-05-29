@@ -19,7 +19,10 @@ param_eventinfosetter = {'expList': [1],
 
 
 class Check_info(Module):
+    ''' check the SVDEventInfo object'''
+
     def event(self):
+        '''print the SVDEventInfo to string in each event'''
         eventInfo = Belle2.PyStoreObj('SVDEventInfo')
         B2INFO(eventInfo.toString())
 

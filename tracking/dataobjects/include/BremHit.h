@@ -47,13 +47,13 @@ namespace Belle2 {
     }
 
     /** Set the radiation position. */
-    void setPosition(TVector3& position) {m_position = position;}
+    void setPosition(const TVector3& position) {m_position = position;}
 
     /** Set the radiated energy. */
-    void setBremEnergy(double bremEnergy) {m_bremEnergy = bremEnergy;}
+    void setBremEnergy(const double bremEnergy) {m_bremEnergy = bremEnergy;}
 
     /** Set the distance between the extrapolation and the bremCluster position. */
-    void setClusterDistance(double distance) {m_clusterDistance = distance;}
+    void setClusterDistance(const double distance) {m_clusterDistance = distance;}
 
     /** Return the radiation position. */
     TVector3 getPosition() const

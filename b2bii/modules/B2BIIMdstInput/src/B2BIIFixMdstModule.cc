@@ -147,7 +147,7 @@
 namespace Belle2 {
 
   REG_MODULE(B2BIIFixMdst)
-
+  /** Nomial beam energy */
 #define NOMINAL_ENERGY 5.290024915
 
   double B2BIIFixMdstModule::s_benergy_value = NOMINAL_ENERGY;

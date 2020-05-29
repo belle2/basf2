@@ -19,8 +19,8 @@ class testSVDShaperDigitOrdering(basf2.Module):
 
     """Module to check SVDShaperDigit ordering."""
 
-    # initialize
     def __init__(
+        '''initialize'''
         self,
     ):
 

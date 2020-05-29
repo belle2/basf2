@@ -43,7 +43,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getPulseShapeDiscriminationMVA();
         } else {
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();
@@ -57,7 +57,7 @@ namespace Belle2 {
         if (eclClusterHasPulseShapeDiscrimination(particle)) {
           return cluster->getNumberOfHadronDigits();
         } else
-          return -1.0;
+          return std::numeric_limits<float>::quiet_NaN();
       }
       return std::numeric_limits<float>::quiet_NaN();
     }
@@ -415,7 +415,7 @@ namespace Belle2 {
           return cluster->isTriggerCluster();
         } else {
           B2WARNING("Particle has an associated ECLCluster but the ECLTriggerClusterMatcher module has not been run!");
-          return -1.;
+          return std::numeric_limits<float>::quiet_NaN();
         }
       }
       return std::numeric_limits<float>::quiet_NaN();
@@ -561,39 +561,27 @@ namespace Belle2 {
       }
 
       double numer = 0, denom = 0;
-      double time, deltatime;
       int numberOfClusterDaughters = 0;
 
-      /*
-                                      ** TODO !!! **
-       Use Martin Ritter's 1337 Particle::forEachDaughter once pull-request #2119 is merged.
-      */
-      std::stack<const Particle*> stacked;
-      stacked.push(particle);
-      while (!stacked.empty()) {
-        const Particle* current = stacked.top();
-        stacked.pop();
-
-        const ECLCluster* cluster = current->getECLCluster();
-        if (cluster) {
+      auto weightedECLTimeAverage = [&numer, &denom, &numberOfClusterDaughters](const Particle * p) {
+        const ECLCluster* cluster = p->getECLCluster();
+        if (cluster and not cluster->hasFailedFitTime()) {
           numberOfClusterDaughters ++;
 
-          time = cluster->getTime();
+          double time = cluster->getTime();
           B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
-          deltatime = cluster->getDeltaTime99();
+          double deltatime = cluster->getDeltaTime99();
           B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
           numer += time / pow(deltatime, 2);
           B2DEBUG(11, "numer[" << numberOfClusterDaughters << "] = " << numer);
           denom += 1 / pow(deltatime, 2);
           B2DEBUG(11, "denom[" << numberOfClusterDaughters << "] = " << denom);
-        } else {
-          const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = current->getNDaughters();
-          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-            stacked.push(daughters[iDaughter]);
-          }
         }
-      }
+        return false;
+      };
+
+      particle->forEachDaughter(weightedECLTimeAverage, true, true);
+
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();
@@ -616,39 +604,32 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
       }
 
-      double averageECLTime, maxTimeDiff = -1;
-      double time, deltatime, maxTimeDiff_temp;
+      double maxTimeDiff = -DBL_MAX;
       int numberOfClusterDaughters = 0;
 
-      averageECLTime = weightedAverageECLTime(particle);
+      double averageECLTime = weightedAverageECLTime(particle);
 
-      std::stack<const Particle*> stacked;
-      stacked.push(particle);
-      while (!stacked.empty()) {
-        const Particle* current = stacked.top();
-        stacked.pop();
+      auto maxTimeDifference = [&maxTimeDiff, &numberOfClusterDaughters, &averageECLTime](const Particle * p) {
 
-        const ECLCluster* cluster = current->getECLCluster();
+        const ECLCluster* cluster = p->getECLCluster();
         if (cluster) {
           numberOfClusterDaughters ++;
 
-          time = cluster->getTime();
+          double time = cluster->getTime();
           B2DEBUG(10, "time[" << numberOfClusterDaughters << "] = " << time);
-          deltatime = cluster->getDeltaTime99();
+          double deltatime = cluster->getDeltaTime99();
           B2DEBUG(10, "deltatime[" << numberOfClusterDaughters << "] = " << deltatime);
-          maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
+          double maxTimeDiff_temp = fabs((time - averageECLTime) / deltatime);
           B2DEBUG(11, "maxTimeDiff_temp[" << numberOfClusterDaughters << "] = " << maxTimeDiff_temp);
           if (maxTimeDiff_temp > maxTimeDiff)
             maxTimeDiff = maxTimeDiff_temp;
           B2DEBUG(11, "maxTimeDiff[" << numberOfClusterDaughters << "] = " << maxTimeDiff);
-        } else {
-          const std::vector<Particle*> daughters = current->getDaughters();
-          nDaughters = current->getNDaughters();
-          for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
-            stacked.push(daughters[iDaughter]);
-          }
         }
-      }
+        return false;
+      };
+
+      particle->forEachDaughter(maxTimeDifference, true, true);
+
       if (numberOfClusterDaughters < 1) {
         B2WARNING("There are no clusters or cluster matches amongst the daughters of the provided particle!");
         return std::numeric_limits<float>::quiet_NaN();

@@ -79,9 +79,3 @@ err_mem1:
 G4TriangularPrism::~G4TriangularPrism()
 {
 }
-
-G4VSolid* G4TriangularPrism::getSolid()
-{
-  return m_is;
-}
-

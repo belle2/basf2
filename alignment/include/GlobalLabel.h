@@ -222,6 +222,7 @@ namespace Belle2 {
 
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
+    //! @param paramId id of the parameter of the element
     void construct(gidTYPE elementId, gidTYPE paramId);
 
   public:

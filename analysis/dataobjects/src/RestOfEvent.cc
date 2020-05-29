@@ -203,7 +203,8 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
       maskedParticles.push_back(particle);
     }
     // don't lose a possible V0 particle
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+        particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
       maskedParticles.push_back(particle);
     }
   }

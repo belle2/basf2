@@ -133,7 +133,7 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
   double fD0Range = 1.0;      // Half range in cm
   int iMomRangeBig = 600;
   int iMomRangeSmall = 60;
-  double fMomRange = 3.0;
+  double fMomRange = 6.0;
   int iPhiRange = 180;
   double fPhiRange = 180.0;   // Half range in deg
   int iLambdaRange = 100;

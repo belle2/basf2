@@ -1,43 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# --------------------------------------------------------------------------------
-# Import clocks payloads
-# --------------------------------------------------------------------------------
+"""
+Import clocks payloads
+"""
 
-from basf2 import *
-import ROOT
-from ROOT.Belle2 import ClockDatabaseImporter
-import os
-import sys
-import glob
-import subprocess
-from fnmatch import fnmatch
+from ROOT import Belle2
 
-# Create path
-main = create_path()
+clocks = Belle2.HardwareClockSettings()
+clocks.setAcceleratorRF(508.887)
+clocks.setClockPrescale(Belle2.Const.EDetector.TOP, "sampling", 6)
+clocks.setClockPrescale(Belle2.Const.EDetector.SVD, "sampling", 4)
+clocks.setClockPrescale(Belle2.Const.EDetector.SVD, "sampling", 3 * 24)
 
-# Event info setter - execute single event
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1])
-main.add_module(eventinfosetter)
-
-# process single event
-process(main)
-
-# define a local database (will be created automatically, if doesn't exist)
-use_local_database("localDB/localDB.txt")
-
-# and then run the importer
-dbImporter = ClockDatabaseImporter()
-
-dbImporter.setAcceleratorRF(508.887)
-
-dbImporter.setClockPrescale('top', 'sampling', 6)
-dbImporter.setClockPrescale('svd', 'sampling', 4)
-dbImporter.setClockPrescale('ecl', 'sampling', 3 * 24)
-
-# import constants
-dbImporter.importClock()
-
-#  LocalWords:  setAcceleratorRF
+iov = Belle2.IntervalOfValidity.always()
+db = Belle2.Database.Instance()
+db.storeData("HardwareClockSettings", clocks, iov)

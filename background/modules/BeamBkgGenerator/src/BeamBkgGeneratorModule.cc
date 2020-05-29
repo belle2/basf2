@@ -63,8 +63,6 @@ namespace Belle2 {
     addParam("ringName", m_ringName, "name of the superKEKB ring (LER or HER)");
     addParam("realTime", m_realTime,
              "equivalent superKEKB running time to generate sample [ns].");
-
-    m_transMatrix = NULL;
   }
 
   BeamBkgGeneratorModule::~BeamBkgGeneratorModule()
@@ -237,15 +235,16 @@ namespace Belle2 {
       double particleMomGeant4[] = {0.0, 0.0, 0.0};
 
       // create a transformation matrix for a given ring
+      TGeoHMatrix transMatrix; /**< Transformation matrix from SAD space into geant4 space. */
       if (m_ringName == "LER") {
-        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s * Unit::m));
+        transMatrix = m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s * Unit::m);
       } else {
-        m_transMatrix = new TGeoHMatrix(m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s * Unit::m));
+        transMatrix = m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s * Unit::m);
       }
 
       // calculate a new set of coordinates in Geant4 space
-      m_transMatrix->LocalToMaster(particlePosSADfar, particlePosGeant4); // position
-      m_transMatrix->LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
+      transMatrix.LocalToMaster(particlePosSADfar, particlePosGeant4); // position
+      transMatrix.LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
       // apply a new set of coordinates
       part->setMomentum(TVector3(particleMomGeant4));
       part->setProductionVertex(TVector3(particlePosGeant4));

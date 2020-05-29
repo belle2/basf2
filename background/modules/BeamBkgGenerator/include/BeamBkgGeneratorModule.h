@@ -67,12 +67,9 @@ namespace Belle2 {
      */
     virtual void terminate() override;
 
-  protected:
+  private:
 
     ReaderSAD m_readerSAD;     /**< The SAD reader object for the SAD data. */
-    TGeoHMatrix* m_transMatrix; /**< Transformation matrix from SAD space into geant4 space. */
-
-  private:
 
     /**
      * Pick up particle randomly from the SAD file according to its rate

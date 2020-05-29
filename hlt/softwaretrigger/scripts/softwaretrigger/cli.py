@@ -194,10 +194,6 @@ def print_function(args):
         for base_identifier, cuts in df.groupby("Base Identifier"):
             for _, cut in cuts.iterrows():
                 print(cut["Base Identifier"], cut["Cut Identifier"])
-    elif args.format == "full-identifiers":
-        for base_identifier, cuts in df.groupby("Base Identifier"):
-            for _, cut in cuts.iterrows():
-                print('software_trigger_cut&' + cut["Base Identifier"] + '&' + cut["Cut Identifier"])
     elif args.format == "human-readable":
         print("Currently, the following menus and triggers are in the database")
         for base_identifier, cuts in df.groupby("Base Identifier"):
@@ -396,7 +392,7 @@ top in the localdb will be shown.
                                          """)
     print_parser.add_argument("--database", help="Which database to print. Defaults to 'online,localdb:latest'.",
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
-    choices = ["human-readable", "json", "list", "pandas", "full-identifiers"]
+    choices = ["human-readable", "json", "list", "pandas"]
     try:
         from tabulate import tabulate
         choices += ['jira', 'grid']

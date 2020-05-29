@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedx1DCell(short version, std::vector<std::vector<double>>& onedgains): m_version(version), m_onedgains(onedgains) {};
+    CDCDedx1DCell(short version, const std::vector<std::vector<double>>& onedgains): m_version(version), m_onedgains(onedgains) {};
 
     /**
      * Destructor
@@ -157,6 +157,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 4); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 5); /**< ClassDef */
   };
 } // end namespace Belle2

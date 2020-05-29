@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedx2DCell(short version, std::vector<TH2F>& twodgains): m_version(version), m_twodgains(twodgains) {};
+    CDCDedx2DCell(short version, const std::vector<TH2F>& twodgains): m_version(version), m_twodgains(twodgains) {};
 
     /**
      * Destructor
@@ -151,6 +151,6 @@ namespace Belle2 {
     short m_version; /**< version number for 2D correction */
     std::vector<TH2F> m_twodgains; /**< 2D histograms of doca/enta gains, layer dependent */
 
-    ClassDef(CDCDedx2DCell, 4); /**< ClassDef */
+    ClassDef(CDCDedx2DCell, 5); /**< ClassDef */
   };
 } // end namespace Belle2

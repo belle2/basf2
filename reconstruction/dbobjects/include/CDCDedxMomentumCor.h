@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    explicit CDCDedxMomentumCor(std::vector<double>& momcor): m_momcor(momcor) {};
+    explicit CDCDedxMomentumCor(const std::vector<double>& momcor): m_momcor(momcor) {};
 
     /**
      * Destructor
@@ -92,6 +92,6 @@ namespace Belle2 {
 
     std::vector<double> m_momcor; /**< dE/dx gains in momentum bins */
 
-    ClassDef(CDCDedxMomentumCor, 4); /**< ClassDef */
+    ClassDef(CDCDedxMomentumCor, 5); /**< ClassDef */
   };
 } // end namespace Belle2

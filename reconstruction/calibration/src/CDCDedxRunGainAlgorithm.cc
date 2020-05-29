@@ -84,12 +84,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 
   //Fit absolute run
   status = "";
-  double RunGainAbs = 1.0, RunGainAbsErr = 0.0;
   FitGaussianWRange(hDedxAbs, status);
   if (status != "FitOK") RunGainAbs = 1.0;
   else {
     RunGainAbs = hDedxAbs->GetFunction("gaus")->GetParameter(1);
-    RunGainAbsErr = hDedxAbs->GetFunction("gaus")->GetParError(1);
+    Double_t RunGainAbsErr = hDedxAbs->GetFunction("gaus")->GetParError(1);
     hDedxAbs->SetTitle(Form("dE/dx abs, Run %d, Fit %s, Fit-mean %0.03f#pm%0.03f", expRun.second, status.Data(), RunGainAbs,
                             RunGainAbsErr));
   }

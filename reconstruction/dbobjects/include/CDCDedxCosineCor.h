@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    explicit CDCDedxCosineCor(std::vector<double>& cosgains): m_cosgains(cosgains) {};
+    explicit CDCDedxCosineCor(const std::vector<double>& cosgains): m_cosgains(cosgains) {};
 
     /**
      * Destructor
@@ -116,6 +116,6 @@ namespace Belle2 {
   private:
     std::vector<double> m_cosgains; /**< dE/dx gains in cos(theta) bins */
 
-    ClassDef(CDCDedxCosineCor, 7); /**< ClassDef */
+    ClassDef(CDCDedxCosineCor, 8); /**< ClassDef */
   };
 } // end namespace Belle2

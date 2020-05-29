@@ -371,12 +371,29 @@ namespace Belle2 {
                       "Returns ETimingType time type.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
-    REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,
-                      "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
-                      "defined as reject (-1), accept (1), or noResult (0). Note "
-                      "that the meanings of these change depending if using trigger "
-                      "or the skim stage, hence expert."
-                      "If the trigger identifier is not found, returns NaN.");
+    REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(
+[Eventbased] [Expert] returns the SoftwareTriggerCutResult, defined as reject (-1), accept (1), or noResult (0). 
+If the trigger identifier is not found, returns NaN.
+
+For example:
+
+.. code-block:: 
+
+    SoftwareTriggerResult(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV)
+
+which is equivalent to
+
+.. code-block::
+
+    SoftwareTriggerResult(software_trigger_cut&filter&1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV)
+
+
+.. warning:: the meanings of these change depending if using trigger or the skim stage, hence expert.
+
+.. seealso:: ``b2hlt_triggers`` for possible triggerIdentifiers.
+
+        )DOC");
+
     REGISTER_VARIABLE("SoftwareTriggerResultNonPrescaled(triggerIdentifier)", softwareTriggerResultNonPrescaled,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "if this trigger would not be prescaled."

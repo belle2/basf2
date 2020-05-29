@@ -60,11 +60,6 @@ namespace Belle2 {
 
     // Methods:
     /**
-     * Get the ParticleSourceObject of the input particle list
-     * @returns ParticleSource, which is used in RestOfEvent methods
-     */
-    Particle::EParticleSourceObject getListType();
-    /**
      * Update ROE masks by excluding or keeping particles
      * @param Pointer to RestOfEvent object for update
      * @param Reference to particle collection

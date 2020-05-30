@@ -169,8 +169,9 @@ void KLMDQMModule::defineHisto()
   /* Masked channels per sector:
    * it is defined here, but filled by the analysis module. */
   uint16_t totalSectors = m_SectorArrayIndex->getNSectors();
+  B2INFO("Total sectors: " << totalSectors);
   m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
-                                       totalSectors, -0.5, totalSectors - 1.5);
+                                       totalSectors, -0.5, totalSectors - 0.5);
   for (KLMChannelIndex& klmSector : klmSectors) {
     std::string label;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
@@ -186,7 +187,7 @@ void KLMDQMModule::defineHisto()
     }
     uint16_t sector = klmSector.getKLMSectorNumber();
     uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
-    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex, label.c_str());
+    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
   }
   m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */

@@ -191,7 +191,6 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
     B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
     return;
   }
-  histogram->Reset();
   canvas->Clear();
   canvas->cd();
   if (m_NewMaskedChannels.size() > 0) {

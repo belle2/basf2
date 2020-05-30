@@ -27,6 +27,9 @@
 #include <TText.h>
 #include <TLine.h>
 
+/* C++ headers. */
+#include <vector>
+
 namespace Belle2 {
 
   /**
@@ -75,12 +78,12 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector    Subdetector.
-     * @param[in]  section        Section.
-     * @param[in]  sector         Sector.
-     * @param[in]  histogram      Histogram.
-     * @param[in]  canvas         Canvas.
-     * @param[out] latex          TLatex to draw messages.
+     * @param[in]  subdetector  Subdetector.
+     * @param[in]  section      Section.
+     * @param[in]  sector       Sector.
+     * @param[in]  histogram    Histogram.
+     * @param[in]  canvas       Canvas.
+     * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector,
@@ -88,19 +91,31 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the number of hits in plane.
-     * @param[in]  histName  Histogram name.
+     * @param[in] histName  Histogram name.
      */
     void processPlaneHistogram(const std::string& histName);
 
     /**
+     * Fill histogram containing masked channels per sector.
+     * @param[in] histName  Histogram name.
+     */
+    void fillMaskedChannelsHistogram(const std::string& histName);
+
+    /**
      * Find TCanvas that matches a given name.
-     * @param[in]  canvasName   name of the desired TCanvas.
-     * @param[out] TCanvas*     matching TCanvas.
+     * @param[in]  canvasName  Name of the desired TCanvas.
+     * @param[out] TCanvas*    Matching TCanvas.
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Vector of new channels to be masked. */
+    std::vector<uint16_t> m_NewMaskedChannels;
+
+    /** Vector of channels already masked. */
+    std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

@@ -18,6 +18,9 @@
 #include <TClass.h>
 #include <TROOT.h>
 
+/* C++ headers. */
+#include <algorithm>
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisKLM)
@@ -55,6 +58,8 @@ void DQMHistAnalysisKLMModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No KLM electronics map.");
+  m_NewMaskedChannels.clear();
+  m_MaskedChannels.clear();
 }
 
 void DQMHistAnalysisKLMModule::endRun()
@@ -137,12 +142,25 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
-    if ((nEvents > average * 10) && (nEvents > 50)) {
+    std::string channelStatus = "Normal";
+    if ((nEvents > average * 100) && (nEvents > 50)) {
+      channelStatus = "Masked";
+      std::vector<uint16_t>::iterator ite = std::find(m_MaskedChannels.begin(),
+                                                      m_MaskedChannels.end(),
+                                                      channelNumber);
+      if (ite == m_MaskedChannels.end())
+        m_NewMaskedChannels.push_back(channelNumber);
+    } else if ((nEvents > average * 10) && (nEvents > 50)) {
+      channelStatus = "Hot";
+    }
+    if (channelStatus != "Normal") {
       const KLMElectronicsChannel* electronicsChannel =
         m_ElectronicsMap->getElectronicsChannel(channelNumber);
       if (electronicsChannel == nullptr)
         B2FATAL("Incomplete BKLM electronics map.");
-      str = "Hot channel: HSLB ";
+      if (channelStatus == "Masked")
+        histogram->SetBinContent(i, 0);
+      str = channelStatus + " channel: HSLB ";
       if (channelSubdetector == KLMElementNumbers::c_BKLM) {
         str += BKLMElementNumbers::getHSLBName(electronicsChannel->getCopper(),
                                                electronicsChannel->getSlot());
@@ -157,6 +175,45 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       y -= 0.05;
     }
   }
+  canvas->Modified();
+}
+
+void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
+  const std::string& histName)
+{
+  TH1* histogram = findHist("KLM/" + histName);
+  if (histogram == nullptr) {
+    B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");
+    return;
+  }
+  TCanvas* canvas = findCanvas("KLM/c_" + histName);
+  if (canvas == nullptr) {
+    B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
+    return;
+  }
+  histogram->Reset();
+  canvas->Clear();
+  canvas->cd();
+  if (m_NewMaskedChannels.size() > 0) {
+    int channelSubdetector, channelSection, channelSector;
+    int layer, plane, strip;
+    for (uint16_t channel : m_NewMaskedChannels) {
+      m_ElementNumbers->channelNumberToElementNumbers(
+        channel, &channelSubdetector, &channelSection, &channelSector,
+        &layer, &plane, &strip);
+      uint16_t sectorNumber;
+      if (channelSubdetector == KLMElementNumbers::c_BKLM)
+        sectorNumber = m_ElementNumbers->sectorNumberBKLM(channelSection, channelSector);
+      else
+        sectorNumber = m_ElementNumbers->sectorNumberEKLM(channelSection, channelSector);
+      uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sectorNumber);
+      histogram->Fill(sectorIndex);
+      m_MaskedChannels.push_back(channel);
+    }
+  }
+  m_NewMaskedChannels.clear();
+  histogram->SetStats(false);
+  histogram->Draw();
   canvas->Modified();
 }
 
@@ -268,6 +325,7 @@ void DQMHistAnalysisKLMModule::event()
         klmSector.getSector(), histogram, canvas, latex);
     }
   }
+  fillMaskedChannelsHistogram("masked_channels");
   processPlaneHistogram("plane_bklm_phi");
   processPlaneHistogram("plane_bklm_z");
   processPlaneHistogram("plane_eklm");

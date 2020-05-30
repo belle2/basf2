@@ -52,7 +52,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_inputList; /**< ParticleList which contains information that will be used for updating */
 
     std::vector<std::string> m_maskNamesForUpdating; /**< Container for all mask names which will be updated */
-
+    std::set<Particle::EParticleSourceObject> m_encounteredSources;
     std::string m_selection; /**< Cut string which will be used for updating masks */
     std::shared_ptr<Variable::Cut> m_cut; /**< Cut object which performs the cuts */
     bool m_discard; /**< Update the ROE mask by passing or discarding particles in the provided particle list. Default is to pass. */

@@ -78,8 +78,9 @@ namespace Belle2 {
     std::vector<const Particle*> compositeParticlesToUpdate;
     for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
       const Particle* partWithInfo = m_inputList->getParticle(j);
+      Particle::EParticleSourceObject mdstSource = partWithInfo->getParticleSource();
+      m_encounteredSources.insert(mdstSource);
       if (m_cut->check(partWithInfo)) {
-        Particle::EParticleSourceObject mdstSource = partWithInfo->getParticleSource();
         if (mdstSource == Particle::EParticleSourceObject::c_Track) {
           particlesFromTracksToUpdate.push_back(partWithInfo);
         } else if (mdstSource == Particle::EParticleSourceObject::c_ECLCluster) {
@@ -92,13 +93,13 @@ namespace Belle2 {
         }
       }
     }
-    if (particlesFromTracksToUpdate.size() > 0) {
+    if (m_encounteredSources.count(Particle::EParticleSourceObject::c_Track) > 0) {
       updateMasksWithParticles(roe, particlesFromTracksToUpdate, Particle::EParticleSourceObject::c_Track);
     } else { // If we have a track-based particle in the particle list there can not be any other mdst source
-      if (particlesFromECLClustersToUpdate.size() > 0) {
+      if (m_encounteredSources.count(Particle::EParticleSourceObject::c_ECLCluster) > 0) {
         updateMasksWithParticles(roe, particlesFromECLClustersToUpdate, Particle::EParticleSourceObject::c_ECLCluster);
       }
-      if (particlesFromKLMClustersToUpdate.size() > 0) {
+      if (m_encounteredSources.count(Particle::EParticleSourceObject::c_KLMCluster) > 0) {
         updateMasksWithParticles(roe, particlesFromKLMClustersToUpdate, Particle::EParticleSourceObject::c_KLMCluster);
       }
       updateMasksWithV0(roe, compositeParticlesToUpdate); // in updateMasksWithV0 it is checked whether the vector is empty

@@ -33,6 +33,7 @@ KLMDQMModule::KLMDQMModule() :
   m_PlaneBKLMPhi(nullptr),
   m_PlaneBKLMZ(nullptr),
   m_PlaneEKLM(nullptr),
+  m_MaskedChannelsPerSector(nullptr),
   m_bklmHit2dsZ(nullptr),
   m_BklmDigitsNumber(nullptr),
   m_KlmDigitsNumber(nullptr)
@@ -165,6 +166,29 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
+  /* Masked channels per sector:
+   * it is defined here, but filled by the analysis module. */
+  uint16_t totalSectors = m_SectorArrayIndex->getNSectors();
+  m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
+                                       totalSectors, -0.5, totalSectors - 1.5);
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    std::string label;
+    if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
+      if (klmSector.getSection() == BKLMElementNumbers::c_BackwardSection)
+        label = "BB" + std::to_string(klmSector.getSector() - 1);
+      else
+        label = "BF" + std::to_string(klmSector.getSector() - 1);
+    } else {
+      if (klmSector.getSection() == EKLMElementNumbers::c_BackwardSection)
+        label = "EB" + std::to_string(klmSector.getSector() - 1);
+      else
+        label = "EF" + std::to_string(klmSector.getSector() - 1);
+    }
+    uint16_t sector = klmSector.getKLMSectorNumber();
+    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex, label.c_str());
+  }
+  m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */
   m_BklmDigitsNumber = new TH1F("bklm_digits", "Number of BKLM Digits",
                                 250.0, 0.0, 250.0);

@@ -3,7 +3,8 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Leo Piilonen, Vipin Gaur                *
+ * Contributors: Kirill Chilikin, Leo Piilonen, Vipin Gaur,               *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

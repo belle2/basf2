@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Beam Spot Monitor Script
+Beam Spot Calibration Check Script
 one file for all BeamSpot payload in the local database
 usage:
 > basf2 beamSpotMonitor.py current_localDB

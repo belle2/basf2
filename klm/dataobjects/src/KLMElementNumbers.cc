@@ -253,12 +253,14 @@ std::string KLMElementNumbers::getSectorDAQName(int subdetector, int section, in
 {
   std::string name;
   if (subdetector == c_BKLM) {
+    BKLMElementNumbers::checkSector(sector);
     if (section == BKLMElementNumbers::c_BackwardSection)
       name = "BB" + std::to_string(sector - 1);
     if (section == BKLMElementNumbers::c_ForwardSection)
       name = "BF" + std::to_string(sector - 1);
   }
   if (subdetector == c_EKLM) {
+    m_ElementNumbersEKLM->checkSector(sector);
     if (section == EKLMElementNumbers::c_BackwardSection)
       name = "EB" + std::to_string(sector - 1);
     if (section == EKLMElementNumbers::c_ForwardSection)

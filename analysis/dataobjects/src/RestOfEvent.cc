@@ -71,7 +71,8 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     }
   }
   for (const int index : source) {
-    if (allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite && unpackComposite) {
+    if ((allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+         allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_V0) && unpackComposite) {
       auto fsdaughters = allParticles[index]->getFinalStateDaughters();
       for (auto* daughter : fsdaughters) {
         result.push_back(daughter);

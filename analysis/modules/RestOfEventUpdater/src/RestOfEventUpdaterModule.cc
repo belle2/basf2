@@ -68,7 +68,7 @@ namespace Belle2 {
       B2WARNING("ROE list is not valid somehow, ROE masks are not updated!");
       return;
     }
-
+    std::set<Particle::EParticleSourceObject> encounteredSources;
     // Particle lists can contain Particles from different mdst sources
     // Thus, we split them based on their mdst source
     // Only particles surviving the provided cut are considered
@@ -79,7 +79,7 @@ namespace Belle2 {
     for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
       const Particle* partWithInfo = m_inputList->getParticle(j);
       Particle::EParticleSourceObject mdstSource = partWithInfo->getParticleSource();
-      m_encounteredSources.insert(mdstSource);
+      encounteredSources.insert(mdstSource);
       if (m_cut->check(partWithInfo)) {
         if (mdstSource == Particle::EParticleSourceObject::c_Track) {
           particlesFromTracksToUpdate.push_back(partWithInfo);
@@ -93,13 +93,13 @@ namespace Belle2 {
         }
       }
     }
-    if (m_encounteredSources.count(Particle::EParticleSourceObject::c_Track) > 0) {
+    if (encounteredSources.count(Particle::EParticleSourceObject::c_Track) > 0) {
       updateMasksWithParticles(roe, particlesFromTracksToUpdate, Particle::EParticleSourceObject::c_Track);
     } else { // If we have a track-based particle in the particle list there can not be any other mdst source
-      if (m_encounteredSources.count(Particle::EParticleSourceObject::c_ECLCluster) > 0) {
+      if (encounteredSources.count(Particle::EParticleSourceObject::c_ECLCluster) > 0) {
         updateMasksWithParticles(roe, particlesFromECLClustersToUpdate, Particle::EParticleSourceObject::c_ECLCluster);
       }
-      if (m_encounteredSources.count(Particle::EParticleSourceObject::c_KLMCluster) > 0) {
+      if (encounteredSources.count(Particle::EParticleSourceObject::c_KLMCluster) > 0) {
         updateMasksWithParticles(roe, particlesFromKLMClustersToUpdate, Particle::EParticleSourceObject::c_KLMCluster);
       }
       updateMasksWithV0(roe, compositeParticlesToUpdate); // in updateMasksWithV0 it is checked whether the vector is empty

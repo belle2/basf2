@@ -5,6 +5,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TVector3.h>
 
@@ -39,13 +40,37 @@ namespace Belle2 {
     void initializeCuts(double beamPipeRadius,
                         double vertexChi2CutOutside);
 
+    /// set V0 fitter mode.
+    /// switch the mode of fitAndStore function.
+    ///   0: original (default)
+    ///   1: original with vertexFitWithRecoTracks function
+    void setFitterMode(int fitterMode);
+
     /// Fit V0 with given hypothesis and store if fit was successful.
-    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
+    {
+      if (m_v0FitterMode == 0) return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
+      else if (m_v0FitterMode == 1) return fitAndStore1(trackPlus, trackMinus, v0Hypothesis);
+      else                        return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
+    }
+
+    /// original fitAndStore function
+    bool fitAndStore0(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+
+    /// original with vertexFitWithRecoTracks function
+    bool fitAndStore1(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
+
 
     /// Get track hypotheses for a given v0 hypothesis.
-    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
+    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
 
   private:
+
+    /// fit V0 vertex using RecoTrack's as inputs
+    bool vertexFitWithRecoTracks(const Track* trackPlus, const Track* trackMinus,
+                                 RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
+                                 const Const::ParticleType& v0Hypothesis);
+
 
     /** Starting point: point closest to axis where either track is defined
      * This is intended to reject tracks that curl away before
@@ -93,6 +118,7 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
+    int    m_v0FitterMode;  /// 0: original, 1: original with new function
   };
 
 }

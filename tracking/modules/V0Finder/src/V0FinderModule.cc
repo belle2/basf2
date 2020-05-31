@@ -53,6 +53,9 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
 
+  addParam("v0FitterMode", m_v0FitterMode,
+           "designate which fitAndStore function is called in V0Fitter.\n"
+           "    0: original, 1: original with vertexFitWithRecoTracks function", 0);
 
   addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
            " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeKshort);
@@ -71,6 +74,7 @@ void V0FinderModule::initialize()
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
 
   m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+  m_v0Fitter->setFitterMode(m_v0FitterMode);
 
   // safeguard for users that try to break the code
   if (std::get<0>(m_MassRangeKshort) > std::get<1>(m_MassRangeKshort)) {

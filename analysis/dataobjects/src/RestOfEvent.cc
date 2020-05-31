@@ -219,7 +219,7 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
   if (!mask) {
     B2FATAL("ROE Mask does not exist!");
   }
-  std::vector<const Particle*> allROEParticles = getParticles(name);
+  std::vector<const Particle*> allROEParticles = getParticles(name, false);
   std::vector<int> indicesToErase;
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* maskParticle : allROEParticles) {

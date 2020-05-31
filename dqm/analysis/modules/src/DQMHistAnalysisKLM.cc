@@ -29,6 +29,15 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   : DQMHistAnalysisModule(),
     m_eklmStripLayer{nullptr}
 {
+  setDescription("Module used to analyze KLM DQM histograms.");
+  addParam("ThresholdForMasked", m_ThresholdForMasked,
+           "Threshold X for masked channels: if a channel has an occupancy X times larger than the average, it will be masked.", 100);
+  addParam("ThresholdForHot", m_ThresholdForHot,
+           "Threshold Y for hot channels: if a channel has an occupancy Y times larger than the average, it will be marked as hot (but not masked).",
+           10);
+  addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
+           50);
+
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
@@ -48,6 +57,10 @@ DQMHistAnalysisKLMModule::~DQMHistAnalysisKLMModule()
 
 void DQMHistAnalysisKLMModule::initialize()
 {
+  if (m_ThresholdForHot > m_ThresholdForMasked)
+    B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
+            << LogVar("Threshold for hot channels", m_ThresholdForHot)
+            << LogVar("Threshold for masked channels", m_ThresholdForMasked));
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -75,7 +88,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int i, n;
   std::map<uint16_t, double> moduleHitMap;
   std::map<uint16_t, double>::iterator it;
-  double nEvents, average;
+  double nHits, nHitsPerModule, average;
   int channelSubdetector, channelSection, channelSector;
   int layer, plane, strip;
   std::string str;
@@ -87,8 +100,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   for (i = 1; i <= n; i++) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nEvents = histogram->GetBinContent(i);
-    average = average + nEvents;
+    nHitsPerModule = histogram->GetBinContent(i);
+    average = average + nHitsPerModule;
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
@@ -100,9 +113,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
                         subdetector, section, sector, layer);
     it = moduleHitMap.find(module);
     if (it == moduleHitMap.end())
-      moduleHitMap.insert(std::pair<uint16_t, double>(module, nEvents));
+      moduleHitMap.insert(std::pair<uint16_t, double>(module, nHitsPerModule));
     else
-      it->second += nEvents;
+      it->second += nHitsPerModule;
   }
   unsigned int activeModuleChannels = 0;
   for (it = moduleHitMap.begin(); it != moduleHitMap.end(); ++it) {
@@ -138,19 +151,19 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   for (i = 1; i <= n; ++i) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nEvents = histogram->GetBinContent(i);
+    nHits = histogram->GetBinContent(i);
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
     std::string channelStatus = "Normal";
-    if ((nEvents > average * 100) && (nEvents > 50)) {
+    if ((nHits > average * m_ThresholdForMasked) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Masked";
       std::vector<uint16_t>::iterator ite = std::find(m_MaskedChannels.begin(),
                                                       m_MaskedChannels.end(),
                                                       channelNumber);
       if (ite == m_MaskedChannels.end())
         m_NewMaskedChannels.push_back(channelNumber);
-    } else if ((nEvents > average * 10) && (nEvents > 50)) {
+    } else if ((nHits > average * m_ThresholdForHot) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Hot";
     }
     if (channelStatus != "Normal") {

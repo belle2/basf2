@@ -111,6 +111,15 @@ namespace Belle2 {
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
+    /** Threshold for masked channels. */
+    int m_ThresholdForMasked;
+
+    /** Threshold for hot channels. */
+    int m_ThresholdForHot;
+
+    /** Minimal number of hits for flagging. */
+    int m_MinHitsForFlagging;
+
     /** Vector of new channels to be masked. */
     std::vector<uint16_t> m_NewMaskedChannels;
 

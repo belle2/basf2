@@ -19,7 +19,7 @@ def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 CAF_simplest.py <data directory>")
+        print("Usage: basf2 caf_boundary_strategy.py <data directory>")
         sys.exit(1)
 
     ###################################################

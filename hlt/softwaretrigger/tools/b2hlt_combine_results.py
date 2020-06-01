@@ -9,9 +9,12 @@ import os
 import uproot
 import root_pandas
 import pandas as pd
+import numpy as np
 
 __author__ = "Sam Cunliffe"
 __email__ = "sam.cunliffe@desy.de"
+
+PRESCALE = 4
 
 
 def get_parser():
@@ -30,6 +33,18 @@ def get_parser():
     return parser
 
 
+def get_prescales(df):
+    """Get prescale values from a data frame
+
+    Returns:
+        a list of the prescale values of each trigger line
+    """
+    prescales = []
+    for col in df.columns:
+        if col.find('software_trigger_cut_') >= 0 and df[col][PRESCALE] > 0:
+            prescales.append(df[col][PRESCALE])
+    return prescales
+
 if __name__ == "__main__":
 
     args = get_parser().parse_args()
@@ -40,7 +55,8 @@ if __name__ == "__main__":
 
     # loop over SWTRs
     sum_out = pd.DataFrame()
-    df_counter = 0  # count the number of added dataframes
+    total_events = []  # number of total events in each data frame
+    prescales = []  # prescale values of the trigger lines in each data frame
     for fi in args.input:
 
         # might have swtr files with no events selected: skip these
@@ -53,14 +69,28 @@ if __name__ == "__main__":
             sum_out = swtr
         else:
             sum_out = sum_out.add(swtr)
-        df_counter += 1
+        total_events.append(swtr['total_events'][0])
+        prescales.append(get_prescales(swtr))
 
     # the prescale values were also added up, to get the correct prescale values back,
     # calculate the average prescale of the sum for each trigger line
-    for col in sum_out.head():
+    prescales = np.array(prescales)
+    total_events = np.array(total_events)
+    overall_total_events = np.sum(total_events)
+    i = 0  # index the trigger lines
+
+    for col in sum_out.columns:
+        # loop over all trigger lines
         if col.find('software_trigger_cut_') >= 0 and sum_out[col][4] > 0:
-            print('{}: {}'.format(col, sum_out[col][4]))
-            sum_out.at[4, col] = sum_out[col][4]/df_counter
+            average_prescale = 0
+            for j, prescale in enumerate(prescales[:, i]):
+                # loop over the values of each data frame and calculate an average
+                # prescale value regarding the number of total events in the data frame
+                average_prescale += total_events[j]/overall_total_events*prescale
+            average_prescale = np.round(average_prescale, 3)
+            # overwrite the wrong added up prescale value with the calculated average value
+            sum_out.at[PRESCALE, col] = average_prescale
+            i += 1
 
     root_pandas.to_root(sum_out, key='software_trigger_results', path=args.output)
     # uproot.newtree doesn't work in the current externals version but when it does this can be root free

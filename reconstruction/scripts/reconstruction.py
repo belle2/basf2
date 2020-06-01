@@ -592,7 +592,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'KLM' in components:
+    if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
         muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
 

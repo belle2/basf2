@@ -248,3 +248,28 @@ int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
   else
     return 1;
 }
+
+std::string KLMElementNumbers::getSectorDAQName(int subdetector, int section, int sector) const
+{
+  std::string name;
+  if (subdetector == c_BKLM) {
+    BKLMElementNumbers::checkSector(sector);
+    if (section == BKLMElementNumbers::c_BackwardSection)
+      name = "BB" + std::to_string(sector - 1);
+    if (section == BKLMElementNumbers::c_ForwardSection)
+      name = "BF" + std::to_string(sector - 1);
+  }
+  if (subdetector == c_EKLM) {
+    m_eklmElementNumbers->checkSector(sector);
+    if (section == EKLMElementNumbers::c_BackwardSection)
+      name = "EB" + std::to_string(sector - 1);
+    if (section == EKLMElementNumbers::c_ForwardSection)
+      name = "EF" + std::to_string(sector - 1);
+  }
+  if (name.empty())
+    B2FATAL("Invalid KLM sector."
+            << LogVar("Subdetector", subdetector)
+            << LogVar("Section", section)
+            << LogVar("Sector", sector));
+  return name;
+}

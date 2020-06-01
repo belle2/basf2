@@ -137,6 +137,9 @@ namespace Belle2 {
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
 
+    /** Masked channels per sector. */
+    TH1F* m_MaskedChannelsPerSector;
+
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;
 

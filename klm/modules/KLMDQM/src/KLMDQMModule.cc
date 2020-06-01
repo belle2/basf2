@@ -33,6 +33,7 @@ KLMDQMModule::KLMDQMModule() :
   m_PlaneBKLMPhi(nullptr),
   m_PlaneBKLMZ(nullptr),
   m_PlaneEKLM(nullptr),
+  m_MaskedChannelsPerSector(nullptr),
   m_bklmHit2dsZ(nullptr),
   m_BklmDigitsNumber(nullptr),
   m_KlmDigitsNumber(nullptr)
@@ -144,18 +145,8 @@ void KLMDQMModule::defineHisto()
         "_section_" + std::to_string(klmSector.getSection()) +
         "_sector_" + std::to_string(klmSector.getSector()) +
         "_" + std::to_string(j);
-      std::string title = "Sector " + std::to_string(klmSector.getSector());
-      if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM) {
-        if (klmSector.getSection() == BKLMElementNumbers::c_BackwardSection)
-          title += " -- BB" + std::to_string(klmSector.getSector() - 1);
-        else
-          title += " -- BF" + std::to_string(klmSector.getSector() - 1);
-      } else {
-        if (klmSector.getSection() == EKLMElementNumbers::c_BackwardSection)
-          title += " -- EB" + std::to_string(klmSector.getSector() - 1);
-        else
-          title += " -- EF" + std::to_string(klmSector.getSector() - 1);
-      }
+      std::string title = "Sector " + std::to_string(klmSector.getSector()) + " -- " +
+                          m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
       m_ChannelHits[sectorIndex][j] = new TH1F(
         name.c_str(), title.c_str(),
         firstChannelNumbers[i + 1] - firstChannelNumbers[i],
@@ -165,6 +156,19 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
+  /* Masked channels per sector:
+   * it is defined here, but filled by the analysis module. */
+  uint16_t totalSectors = m_SectorArrayIndex->getNElements();
+  B2INFO("Total sectors: " << totalSectors);
+  m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
+                                       totalSectors, -0.5, totalSectors - 0.5);
+  for (KLMChannelIndex& klmSector : klmSectors) {
+    std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
+    uint16_t sector = klmSector.getKLMSectorNumber();
+    uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
+  }
+  m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */
   m_BklmDigitsNumber = new TH1F("bklm_digits", "Number of BKLM Digits",
                                 250.0, 0.0, 250.0);

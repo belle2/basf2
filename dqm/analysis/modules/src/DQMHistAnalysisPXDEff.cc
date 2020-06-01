@@ -41,6 +41,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
+  addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -103,6 +104,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAll->SetConfidenceLevel(m_confidence);
 
 //   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
   m_hEffAll->Paint("AP");

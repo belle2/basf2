@@ -170,8 +170,8 @@ Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::s
   }
   if (mode == "vertextrack") {
     return getDocaTrackVertex(p2, p1);
-  } else {
-    // if(mode == "vertextrack")
+  }
+  if (mode == "trackvertex") {
     return getDocaTrackVertex(p1, p2);
   }
 }
@@ -186,8 +186,8 @@ TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std:
 
   if (mode == "vertextrack") {
     return getDocaTrackVertexError(p2, p1);
-  } else {
-    // if(mode == "vertextrack")
+  }
+  if (mode == "trackvertex") {
     return getDocaTrackVertexError(p1, p2);
   }
 }

@@ -45,8 +45,8 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module()
   addParam("decayString", m_decayString, "", std::string(""));
   addParam("mode", m_mode,
            "Specifies how the distance is calculated:\n"
-           "vertextrack: calculate the distance of closest approach between a track and a vertex, taking the first candidate as vertex, default\n"
-           "trackvertex: calculate the distance of closest approach between a track and a vertex, taking the first candidate as track,\n"
+           "vertextrack: calculate the distance of closest approach between a track and a vertex, taking the first candidate as vertex,\n"
+           "trackvertex: calculate the distance of closest approach between a track and a vertex, taking the first candidate as track, default\n"
            "2tracks: calculates the distance of closest approach between two tracks,\n"
            "2vertices: calculates the distance between two vertices,\n"
            "vertexbtube: calculates the distance of closest approach between a vertex and a Btube,\n"
@@ -168,11 +168,12 @@ Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::s
   if (mode == "2vertices") {
     return getDistanceVertices(p1, p2);
   }
-  if (mode == "trackvertex") {
+  if (mode == "vertextrack") {
     return getDocaTrackVertex(p2, p1);
+  } else {
+    // if(mode == "vertextrack")
+    return getDocaTrackVertex(p1, p2);
   }
-  //if(mode == "vertextrack")
-  return getDocaTrackVertex(p1, p2);
 }
 TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std::string& mode)
 {
@@ -182,11 +183,13 @@ TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std:
   if (mode == "2vertices") {
     return getDistanceVerticesErrors(p1, p2);
   }
-  if (mode == "trackvertex") {
+
+  if (mode == "vertextrack") {
     return getDocaTrackVertexError(p2, p1);
+  } else {
+    // if(mode == "vertextrack")
+    return getDocaTrackVertexError(p1, p2);
   }
-  //  if(mode == "vertextrack"){
-  return getDocaTrackVertexError(p1, p2);
 }
 
 Eigen::Vector3d getDocaBtubeVertex(const Particle* pVertex, const Btube* tube)

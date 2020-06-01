@@ -132,11 +132,39 @@ void CDCCalibrationCollectorModule::collect()
 
 
   const int nTr = recoTracks.getEntries();
+
+  // Skip events which have number of charged tracks <= 1.
+  int nCTracks  = 0;
+  for (int i = 0; i < nTr; ++i) {
+    RecoTrack* track = recoTracks[i];
+    if (track->getDirtyFlag()) continue;
+    if (!track->getTrackFitStatus()->isFitted()) continue;
+    const genfit::FitStatus* fs = track->getTrackFitStatus();
+    if (!fs || !fs->isFitConverged()) continue; //not fully convergence
+
+    const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
+    if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
+    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResult(Const::muon);
+    if (!fitresult) {
+      B2WARNING("track was fitted but Relation not found");
+      continue;
+    }
+
+    short charge = fitresult->getChargeSign();
+    if (fabs(charge) > 0) {
+      nCTracks++;
+    }
+  }
+  if (nCTracks <= 1) {
+    return ;
+  } else {
+    getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
+  }
+
+
   const int nHits = cdcHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
-  int nCTracks  = 0;
-
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
@@ -175,11 +203,6 @@ void CDCCalibrationCollectorModule::collect()
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
 
-    short charge = fitresult->getChargeSign();
-    if (fabs(charge) > 0) {
-      nCTracks++;
-    }
-
     // Rejection of suspicious cosmic tracks.
     // phi0 of cosmic track must be negative in our definition!
     if (m_isCosmic == true && phi0 > 0.0) continue;
@@ -191,7 +214,7 @@ void CDCCalibrationCollectorModule::collect()
     } catch (...) {
     }
   }
-  getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
+
 }
 
 void CDCCalibrationCollectorModule::finish()

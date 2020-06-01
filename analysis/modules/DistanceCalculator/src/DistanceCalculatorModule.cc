@@ -45,8 +45,8 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module()
   addParam("decayString", m_decayString, "", std::string(""));
   addParam("mode", m_mode,
            "Specifies how the distance is calculated:\n"
-           "vertextrack: calculate the distance of closest approach between a track and a vertex, taking the first candidate as vertex,\n"
-           "trackvertex: calculate the distance of closest approach between a track and a vertex, taking the first candidate as track, default\n"
+           "vertextrack: calculate the distance of closest approach between a track and a vertex, taking the first candidate as vertex, default\n"
+           "trackvertex: calculate the distance of closest approach between a track and a vertex, taking the first candidate as track,\n"
            "2tracks: calculates the distance of closest approach between two tracks,\n"
            "2vertices: calculates the distance between two vertices,\n"
            "vertexbtube: calculates the distance of closest approach between a vertex and a Btube,\n"

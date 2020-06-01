@@ -74,7 +74,7 @@ Eigen::Vector3d getDocaTrackVertex(const Particle* pTrack, const Particle* pVert
   Eigen::Vector3d p(pVertex->getX(), pVertex->getY(), pVertex->getZ());
   Eigen::Vector3d v_dir = v.normalized();
   Eigen::Vector3d r = p - p_ray;
-  return r - r.dot(v_dir) * v_dir;
+  return r.dot(v_dir) * v_dir - r;
 }
 
 TMatrixFSym getDocaTrackVertexError(const Particle* pTrack, const Particle* pVertex)
@@ -151,7 +151,7 @@ Eigen::Vector3d getDistanceVertices(const Particle* p1, const Particle* p2)
 {
   Eigen::Vector3d p1v(p1->getX(), p1->getY(), p1->getZ());
   Eigen::Vector3d p2v(p2->getX(), p2->getY(), p2->getZ());
-  Eigen::Vector3d r = p1v - p2v;
+  Eigen::Vector3d r = p2v - p1v;
   return r;
 }
 TMatrixFSym getDistanceVerticesErrors(const Particle* p1, const Particle* p2)
@@ -168,11 +168,12 @@ Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::s
   if (mode == "2vertices") {
     return getDistanceVertices(p1, p2);
   }
-  if (mode == "trackvertex") {
+  if (mode == "vertextrack") {
     return getDocaTrackVertex(p2, p1);
   }
-  //if(mode == "vertextrack")
-  return getDocaTrackVertex(p1, p2);
+  if (mode == "trackvertex") {
+    return getDocaTrackVertex(p1, p2);
+  }
 }
 TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std::string& mode)
 {
@@ -182,11 +183,13 @@ TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std:
   if (mode == "2vertices") {
     return getDistanceVerticesErrors(p1, p2);
   }
-  if (mode == "trackvertex") {
+
+  if (mode == "vertextrack") {
     return getDocaTrackVertexError(p2, p1);
   }
-  //  if(mode == "vertextrack"){
-  return getDocaTrackVertexError(p1, p2);
+  if (mode == "trackvertex") {
+    return getDocaTrackVertexError(p1, p2);
+  }
 }
 
 Eigen::Vector3d getDocaBtubeVertex(const Particle* pVertex, const Btube* tube)
@@ -196,7 +199,7 @@ Eigen::Vector3d getDocaBtubeVertex(const Particle* pVertex, const Btube* tube)
   Eigen::Vector3d p(pVertex->getX(), pVertex->getY(), pVertex->getZ());
   Eigen::Vector3d v_dir = v.normalized();
   Eigen::Vector3d r = p - p_ray;
-  return r - r.dot(v_dir) * v_dir;
+  return r.dot(v_dir) * v_dir - r;
 }
 
 TMatrixFSym getDocaBtubeVertexError(const Particle* pVertex, const Btube* tube)
@@ -252,18 +255,18 @@ Eigen::Vector3d getBtubeDistance(const Particle* p, const Btube* t, const std::s
   if (mode == "vertexbtube") {
     return getDocaBtubeVertex(p, t);
   }
-  //  if (mode == "trackbtube") {
-  return getDocaBtubeTrack(p, t);
-  //}
+  if (mode == "trackbtube") {
+    return getDocaBtubeTrack(p, t);
+  }
 }
 TMatrixFSym getBtubeDistanceErrors(const Particle* p, const Btube* t, const std::string& mode)
 {
   if (mode == "vertexbtube") {
     return getDocaBtubeVertexError(p, t);
   }
-  //if (mode == "trackbtube") {
-  return getDocaBtubeTrackError(p, t);
-  //}
+  if (mode == "trackbtube") {
+    return getDocaBtubeTrackError(p, t);
+  }
 }
 
 void DistanceCalculatorModule::event()
@@ -308,6 +311,7 @@ void DistanceCalculatorModule::event()
     }
     particle->writeExtraInfo("CalculatedDistance", DistanceMag);
     particle->writeExtraInfo("CalculatedDistanceError", dist_err);
+    //The Distance vector always points from the "vertex" to the "track/btube", if a single vertex is involved. In case of two vertices, it points from the "first" vertex to the "second" vertex. For two tracks or one track and btube, the direction is along "first track x second track" or "track x btube"
     particle->writeExtraInfo("CalculatedDistanceVector_X", Distance(0));
     particle->writeExtraInfo("CalculatedDistanceVector_Y", Distance(1));
     particle->writeExtraInfo("CalculatedDistanceVector_Z", Distance(2));

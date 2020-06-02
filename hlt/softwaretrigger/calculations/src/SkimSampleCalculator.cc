@@ -39,7 +39,8 @@ void SkimSampleCalculator::requireStoreArrays()
   m_gammaParticles.isRequired();
   m_pionHadParticles.isRequired();
   m_pionTauParticles.isRequired();
-  m_KsParticles.isRequired();
+  m_KsParticles.isOptional();
+
 };
 
 void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -602,11 +603,14 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // nKshort
   int nKshort = 0;
   double Kshort = 0.;
-  for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
-    const Particle* mergeKsCand = m_KsParticles->getParticle(i);
-    const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
-    const double KsCandMass = mergeKsCand->getMass();
-    if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+
+  if (m_KsParticles.isValid()) {
+    for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
+      const Particle* mergeKsCand = m_KsParticles->getParticle(i);
+      const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+      const double KsCandMass = mergeKsCand->getMass();
+      if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+    }
   }
 
   if (nKshort != 0) Kshort = 1;

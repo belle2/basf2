@@ -329,7 +329,6 @@ void ShaperDSP_t::init(const double* s, double unitscale)
                 / (1.2140 - 0.79645 * t02 + 0.63440 * t02 * t02);
   }
 
-  _ccc *= unitscale;
   _cs0 *= unitscale;
   _cc0 *= unitscale;
   _cs1 *= unitscale;

@@ -6,6 +6,9 @@
  * Program that record  cavariance matrices and other                     *
  * parameters in root file that needs for simulation                      *
  *                                                                        *
+ * NOTE: This tool is now deprecated, please use eclDigitizerConfigGen    *
+ *       instead                                                          *
+ *                                                                        *
  * Contributors: Alexander Bobrov (a.v.bobrov@inp.nsk.su) ,               *
  * Guglielmo De Nardo                                                     *
  *                                                                        *

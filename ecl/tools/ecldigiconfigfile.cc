@@ -27,6 +27,7 @@
 #include <vector>
 #include <cassert>
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -398,6 +399,7 @@ int main(int argc, char** argv)
 
 {
   assert(argc == 4 || argc == 1);
+  B2WARNING("This tool is now deprecated, please use eclDigitizerConfigGen instead");
   if (argc == 1) {
     cout << "Usage " << endl;
     cout << argv[0] << " <type>  <covar_mat_path> <parameters_path>" << endl;

@@ -13,7 +13,7 @@ Variables
 Modules
 +++++++
 
-  * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a :ref:`DecayString` of the
-    form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
+ * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
+   :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
  * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
    beamspot is added.

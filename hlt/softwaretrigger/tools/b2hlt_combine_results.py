@@ -14,7 +14,7 @@ import numpy as np
 __author__ = "Sam Cunliffe"
 __email__ = "sam.cunliffe@desy.de"
 
-PRESCALE = 4
+PRESCALE_ROW = 4
 
 
 def get_parser():
@@ -41,8 +41,8 @@ def get_prescales(df):
     """
     prescales = []
     for col in df.columns:
-        if col.find('software_trigger_cut_') >= 0 and df[col][PRESCALE] > 0:
-            prescales.append(df[col][PRESCALE])
+        if col.find('software_trigger_cut_') >= 0 and df[col][PRESCALE_ROW] > 0:
+            prescales.append(df[col][PRESCALE_ROW])
     return prescales
 
 if __name__ == "__main__":
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     for col in sum_out.columns:
         # loop over all trigger lines
-        if col.find('software_trigger_cut_') >= 0 and sum_out[col][4] > 0:
+        if col.find('software_trigger_cut_') >= 0 and sum_out[col][PRESCALE_ROW] > 0:
             average_prescale = 0
             for j, prescale in enumerate(prescales[:, i]):
                 # loop over the values of each data frame and calculate an average
@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 average_prescale += total_events[j]/overall_total_events*prescale
             average_prescale = np.round(average_prescale, 3)
             # overwrite the wrong added up prescale value with the calculated average value
-            sum_out.at[PRESCALE, col] = average_prescale
+            sum_out.at[PRESCALE_ROW, col] = average_prescale
             i += 1
 
     root_pandas.to_root(sum_out, key='software_trigger_results', path=args.output)

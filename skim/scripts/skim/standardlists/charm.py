@@ -12,9 +12,27 @@
 #  *                                                                         *
 #  ***************************************************************************/
 
-import basf2 as b2
 import modularAnalysis as ma
-import vertex as vx
+
+
+def loadPiForBtoHadrons(path):
+    """
+    Creates a ``pi+:GoodTrack`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm}`.
+
+    Parameters
+        path (basf2.Path): Skim path to be processed.
+    """
+    ma.fillParticleList("pi+:GoodTrack", "abs(dr) < 2 and abs(dz) < 5", path=path)
+
+
+def loadKForBtoHadrons(path):
+    """
+    Creates a ``K+:GoodTrack`` list, with cuts :math:`|dr|<2~{\\rm cm}` and :math:`|dz|<5~{\\rm cm}`.
+
+    Parameters
+        path (basf2.Path): Skim path to be processed.
+    """
+    ma.fillParticleList("K+:GoodTrack", "abs(dr) < 2 and abs(dz) < 5", path=path)
 
 
 def loadStdD0(path):
@@ -22,18 +40,18 @@ def loadStdD0(path):
     Creates a 'D0:all' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K-:all pi+:all',
-      2. 'K-:all pi+:all pi+:all pi-:all',
-      3. 'K-:all pi+:all pi0:bth_skim',
-      4. 'K_S0:merged pi+:all pi-:all'.
+      1. 'K-:GoodTrack pi+:GoodTrack',
+      2. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi-:GoodTrack',
+      3. 'K-:GoodTrack pi+:GoodTrack pi0:bth_skim',
+      4. 'K_S0:merged pi+:GoodTrack pi-:GoodTrack'.
 
     @param path     modules are added to this path
     """
     D0Cuts = '1.7 < M < 2.0'
-    D0_Channels = ['K-:all pi+:all',
-                   'K-:all pi+:all pi+:all pi-:all',
-                   'K-:all pi+:all pi0:bth_skim',
-                   'K_S0:merged pi+:all pi-:all',
+    D0_Channels = ['K-:GoodTrack pi+:GoodTrack',
+                   'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi-:GoodTrack',
+                   'K-:GoodTrack pi+:GoodTrack pi0:bth_skim',
+                   'K_S0:merged pi+:GoodTrack pi-:GoodTrack',
                    ]
 
     D0List = []
@@ -49,11 +67,11 @@ def loadStdD0_Kpi(path=None):
     Creates a 'D0:Kpi' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K-:all pi+:all',
+      1. 'K-:GoodTrack pi+:GoodTrack',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kpi -> K-:all pi+:all', cut='1.7 < M < 2.0', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D0:Kpi -> K-:GoodTrack pi+:GoodTrack', cut='1.7 < M < 2.0', dmID=1, path=path)
     return ['D0:Kpi']
 
 
@@ -62,11 +80,11 @@ def loadStdD0_Kpipipi(path=None):
     Creates a 'D0:Kpipipi' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      2. 'K-:all pi+:all pi+:all pi-:all',
+      2. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi-:GoodTrack',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kpipipi -> K-:all pi+:all pi+:all pi-:all',
+    ma.reconstructDecay(decayString='D0:Kpipipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi-:GoodTrack',
                         cut='1.7 < M < 2.0', dmID=2, path=path)
     return ['D0:Kpipipi']
 
@@ -76,11 +94,11 @@ def loadStdD0_Kpipi0(path=None):
     Creates a 'D0:Kpipi0' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      3. 'K-:all pi+:all pi0:bth_skim',
+      3. 'K-:GoodTrack pi+:GoodTrack pi0:bth_skim',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:all pi+:all pi0:bth_skim', cut='1.7 < M < 2.0', dmID=3, path=path)
+    ma.reconstructDecay(decayString='D0:Kpipi0 -> K-:GoodTrack pi+:GoodTrack pi0:bth_skim', cut='1.7 < M < 2.0', dmID=3, path=path)
     return ['D0:Kpipi0']
 
 
@@ -89,11 +107,11 @@ def loadStdD0_Kspipi(path=None):
     Creates a 'D0:Kspipi' list, with an invariant mass in the range :math:`1.7 < M < 2.0~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      4. 'K_S0:merged pi+:all pi-:all'.
+      4. 'K_S0:merged pi+:GoodTrack pi-:GoodTrack'.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kspipi -> K_S0:merged pi+:all pi-:all', cut='1.7 < M < 2.0', dmID=4, path=path)
+    ma.reconstructDecay(decayString='D0:Kspipi -> K_S0:merged pi+:GoodTrack pi-:GoodTrack', cut='1.7 < M < 2.0', dmID=4, path=path)
     return ['D0:Kspipi']
 
 
@@ -102,20 +120,20 @@ def loadD0_hh_loose(path):
     Creates a 'D0:hh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K+:all pi-:all',
-      2. 'K-:all pi+:all',
-      3. 'pi+:all pi-:all',
-      4. 'K+:all K-:all'.
+      1. 'K+:GoodTrack pi-:GoodTrack',
+      2. 'K-:GoodTrack pi+:GoodTrack',
+      3. 'pi+:GoodTrack pi-:GoodTrack',
+      4. 'K+:GoodTrack K-:GoodTrack'.
 
     @param path     modules are added to this path
     """
 
     Dcuts = '1.5 < M < 2.2'
     D0_hh_Channels = [
-        'K+:all pi-:all',
-        'K-:all pi+:all',
-        'pi+:all pi-:all',
-        'K+:all K-:all'
+        'K+:GoodTrack pi-:GoodTrack',
+        'K-:GoodTrack pi+:GoodTrack',
+        'pi+:GoodTrack pi-:GoodTrack',
+        'K+:GoodTrack K-:GoodTrack'
     ]
     D0_hh_List = []
     for chID, channel in enumerate(D0_hh_Channels):
@@ -130,8 +148,8 @@ def loadD0_Kshh_loose(path):
     Creates a 'D0:Kshh' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K_S0:merged pi+:all pi-:all',
-      2. 'K_S0:merged K+:all K-:all'.
+      1. 'K_S0:merged pi+:GoodTrack pi-:GoodTrack',
+      2. 'K_S0:merged K+:GoodTrack K-:GoodTrack'.
 
     @param path     modules are added to this path
     """
@@ -139,8 +157,8 @@ def loadD0_Kshh_loose(path):
     Dcuts = '1.5 < M < 2.2'
 
     D0_Channels = [
-        'K_S0:merged pi+:all pi-:all',
-        'K_S0:merged K+:all K-:all'
+        'K_S0:merged pi+:GoodTrack pi-:GoodTrack',
+        'K_S0:merged K+:GoodTrack K-:GoodTrack'
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
@@ -175,7 +193,7 @@ def loadD0_Kspi0_loose(path):
 def loadD0_Kspipipi0(path):
     """
     Creates a 'D0:Kspipipi0' list, with an invariant mass in the range :math:`1.5 < M < 2.2~{\\rm GeV}/c^2`,
-    from the 'K_S0:merged', 'pi+:all', 'pi-:all' and 'pi0:bth_skim' lists.
+    from the 'K_S0:merged', 'pi+:GoodTrack', 'pi-:GoodTrack' and 'pi0:bth_skim' lists.
 
     @param path     modules are added to this path
     """
@@ -183,7 +201,7 @@ def loadD0_Kspipipi0(path):
     Dcuts = '1.8 < M < 1.9'
 
     D0_Channels = [
-        'K_S0:merged pi+:all pi-:all pi0:bth_skim'
+        'K_S0:merged pi+:GoodTrack pi-:GoodTrack pi0:bth_skim'
     ]
     D0List = []
     for chID, channel in enumerate(D0_Channels):
@@ -198,18 +216,18 @@ def loadStdDplus(path):
     Creates a 'D+:all' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K-:all pi+:all pi+:all',
-      2. 'K_S0:merged pi+:all',
-      3. 'K_S0:merged pi+:all pi0:bth_skim',
-      4. 'K-:all pi+:all pi+:all pi0:bth_skim'.
+      1. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
+      2. 'K_S0:merged pi+:GoodTrack',
+      3. 'K_S0:merged pi+:GoodTrack pi0:bth_skim',
+      4. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi0:bth_skim'.
 
     @param path     modules are added to this path
     """
     DplusCuts = '1.8 < M < 1.9'
-    Dplus_Channels = ['K-:all pi+:all pi+:all',
-                      'K_S0:merged pi+:all',
-                      'K_S0:merged pi+:all pi0:bth_skim',
-                      'K-:all pi+:all pi+:all pi0:bth_skim',
+    Dplus_Channels = ['K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
+                      'K_S0:merged pi+:GoodTrack',
+                      'K_S0:merged pi+:GoodTrack pi0:bth_skim',
+                      'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi0:bth_skim',
                       ]
 
     DplusList = []
@@ -225,11 +243,11 @@ def loadStdDplus_Kpipi(path=None):
     Creates a 'D+:Kpipi' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      1. 'K-:all pi+:all pi+:all',
+      1. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kpipi -> K-:all pi+:all pi+:all', cut='1.8 < M < 1.9', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D+:Kpipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=1, path=path)
     return ['D+:Kpipi']
 
 
@@ -238,11 +256,11 @@ def loadStdDplus_Kspi(path=None):
     Creates a 'D+:Kspi' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      2. 'K_S0:merged pi+:all',
+      2. 'K_S0:merged pi+:GoodTrack',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:all', cut='1.8 < M < 1.9', dmID=2, path=path)
+    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=2, path=path)
     return ['D+:Kspi']
 
 
@@ -251,11 +269,11 @@ def loadStdDplus_Kspipi0(path=None):
     Creates a 'D+:Kspipi0' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      3. 'K_S0:merged pi+:all pi0:bth_skim',
+      3. 'K_S0:merged pi+:GoodTrack pi0:bth_skim',
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kspipi0 -> K_S0:merged pi+:all pi0:bth_skim', cut='1.8 < M < 1.9',
+    ma.reconstructDecay(decayString='D+:Kspipi0 -> K_S0:merged pi+:GoodTrack pi0:bth_skim', cut='1.8 < M < 1.9',
                         dmID=3, path=path)
     return ['D+:Kspipi0']
 
@@ -265,11 +283,11 @@ def loadStdDplus_Kpipipi0(path=None):
     Creates a 'D+:Kpipipi0' list, with an invariant mass in the range :math:`1.8 < M < 1.9~{\\rm GeV}/c^2`,
     from the following particles lists:
 
-      4. 'K-:all pi+:all pi+:all pi0:bth_skim'.
+      4. 'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi0:bth_skim'.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kpipipi0 -> K-:all pi+:all pi+:all pi0:bth_skim', cut='1.8 < M < 1.9',
+    ma.reconstructDecay(decayString='D+:Kpipipi0 -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi0:bth_skim', cut='1.8 < M < 1.9',
                         dmID=3, path=path)
     return ['D+:Kpipipi0']
 
@@ -278,13 +296,13 @@ def loadStdDstar0(path):
     """
     Create a list of 'D*0:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
 
-      - 'D0:all pi0:loose'
+      - 'D0:all pi0:eff40_Jan2020'
       - 'D0:all gamma:loose'
 
     @param path     modules are added to this path
     """
     Dstar0Cuts = 'massDifference(0) < 0.16'
-    D_Channels = ['D0:all pi0:loose',
+    D_Channels = ['D0:all pi0:eff40_Jan2020',
                   'D0:all gamma:loose']
 
     DList = []
@@ -361,14 +379,14 @@ def loadStdDstar0_D0pi0_Kspipi(path=None):
 def loadStdDstarPlus(path):
     """
     Create a list of 'D*++:all' list, with an invariant mass cut :math:`1.95 < M < 2.05 GeV`, from the following particles lists:
-      - 'D0:all pi+:all'
-      - 'D+:all pi0:loose'
+      - 'D0:all pi+:GoodTrack'
+      - 'D+:all pi0:eff40_Jan2020'
 
     @param path     modules are added to this path
     """
     DstarPlusCuts = 'massDifference(0) < 0.16'
-    D_Channels = ['D0:all pi+:all',
-                  'D+:all pi0:loose']
+    D_Channels = ['D0:all pi+:GoodTrack',
+                  'D+:all pi0:eff40_Jan2020']
 
     DList = []
     for chID, channel in enumerate(D_Channels):
@@ -380,13 +398,13 @@ def loadStdDstarPlus(path):
 
 def loadStdDstarPlus_D0pi_all(path=None):
     """
-    Creates a 'D*+:all' list combining the 'D0:all' and 'pi+:all' list by requiring the mass difference between D*+ and D0
+    Creates a 'D*+:all' list combining the 'D0:all' and 'pi+:GoodTrack' list by requiring the mass difference between D*+ and D0
     to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
 
     @param path     modules are added to this path
     """
     DstarPlusCuts = 'massDifference(0) < 0.16'
-    DstarPlus_Channels = ['D0:all pi+:all',
+    DstarPlus_Channels = ['D0:all pi+:GoodTrack',
                           ]
 
     DstarPlusList = []
@@ -399,43 +417,43 @@ def loadStdDstarPlus_D0pi_all(path=None):
 
 def loadStdDstarPlus_D0pi_Kpi(path=None):
     """
-    Creates a 'D*+:D0_Kpi' list combining the 'D0:Kpi' and 'pi+:all' lists by requiring the mass difference between D*0 and D0
+    Creates a 'D*+:D0_Kpi' list combining the 'D0:Kpi' and 'pi+:GoodTrack' lists by requiring the mass difference between D*0 and D0
     to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D*+:D0_Kpi -> D0:Kpi pi+:all', cut='massDifference(0) < 0.16', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D*+:D0_Kpi -> D0:Kpi pi+:GoodTrack', cut='massDifference(0) < 0.16', dmID=1, path=path)
     return ['D*+:D0_Kpi']
 
 
 def loadStdDstarPlus_D0pi_Kpipipi(path=None):
     """
-    Creates a 'D*+:D0_Kpipipi' list combining the 'D0:Kpipipi' and 'pi+:all' lists by requiring the mass difference
+    Creates a 'D*+:D0_Kpipipi' list combining the 'D0:Kpipipi' and 'pi+:GoodTrack' lists by requiring the mass difference
     between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D*+:D0_Kpipipi -> D0:Kpipipi pi+:all', cut='massDifference(0) < 0.16', dmID=2, path=path)
+    ma.reconstructDecay(decayString='D*+:D0_Kpipipi -> D0:Kpipipi pi+:GoodTrack', cut='massDifference(0) < 0.16', dmID=2, path=path)
     return ['D*+:D0_Kpipipi']
 
 
 def loadStdDstarPlus_D0pi_Kpipi0(path=None):
     """
-    Creates a 'D*+:D0_Kpipi0' list combining the 'D0:Kpipi0' and 'pi+:all' lists by requiring the mass difference
+    Creates a 'D*+:D0_Kpipi0' list combining the 'D0:Kpipi0' and 'pi+:GoodTrack' lists by requiring the mass difference
     between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D*+:D0_Kpipi0 -> D0:Kpipi0 pi+:all', cut='massDifference(0) < 0.16', dmID=3, path=path)
+    ma.reconstructDecay(decayString='D*+:D0_Kpipi0 -> D0:Kpipi0 pi+:GoodTrack', cut='massDifference(0) < 0.16', dmID=3, path=path)
     return ['D*+:D0_Kpipi0']
 
 
 def loadStdDstarPlus_D0pi_Kspipi(path=None):
     """
-    Creates a 'D*+:D0_Kspipi' list combining the 'D0:Kspipi' and 'pi+:all' lists by requiring the mass difference
+    Creates a 'D*+:D0_Kspipi' list combining the 'D0:Kspipi' and 'pi+:GoodTrack' lists by requiring the mass difference
     between D*0 and D0 to be in the range :math:`\\Delta M < 0.16~{\\rm GeV}/c^2`.
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D*+:D0_Kspipi -> D0:Kspipi pi+:all', cut='massDifference(0) < 0.16', dmID=4, path=path)
+    ma.reconstructDecay(decayString='D*+:D0_Kspipi -> D0:Kspipi pi+:GoodTrack', cut='massDifference(0) < 0.16', dmID=4, path=path)
     return ['D*+:D0_Kspipi']

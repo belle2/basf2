@@ -41,6 +41,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
+  addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
+  addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
+  addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -53,9 +56,13 @@ DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 
 void DQMHistAnalysisPXDEffModule::initialize()
 {
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  B2DEBUG(99, "DQMHistAnalysisPXDEffModule: initialized.");
 
-  //collect the list of all PXD Modules in the geometry here
+  m_monObj = getMonitoringObject("pxd");
+
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
@@ -99,6 +106,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAll->SetConfidenceLevel(m_confidence);
 
 //   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
   m_hEffAll->Paint("AP");
@@ -193,6 +201,10 @@ void DQMHistAnalysisPXDEffModule::event()
   bool warn_flag = false;
   double all = 0.0;
 
+  double imatch = 0.0, ihit = 0.0;
+  int ieff = 0;
+//   int ccnt = 1;
+
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     VxdID& aModule = m_PXDModules[i];
     int j = i + 1;
@@ -201,21 +213,31 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, 0);
       m_hEffAll->SetPassedEvents(j, 0);
     } else {
-      double imatch, ihit;
-      imatch = mapMatches[aModule]->Integral();
-      ihit = mapHits[aModule]->Integral();
+      double nmatch = mapMatches[aModule]->Integral();
+      double nhit = mapHits[aModule]->Integral();
+      if (nmatch > 10 && nhit > 10) { // could be zero, too
+        imatch += nmatch;
+        ihit +=  nhit;
+        ieff++; // only count in modules working
+        double var_e = nmatch / nhit; // can never be zero
+        if (j == 6) continue; // wrkaround for 1.3.2 module
+        m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
+                              var_e);
+      }
+
       all += ihit;
-      m_hEffAll->SetTotalEvents(j, ihit);
-      m_hEffAll->SetPassedEvents(j, imatch);
+      m_hEffAll->SetTotalEvents(j, nhit);
+      m_hEffAll->SetPassedEvents(j, nmatch);
 
       if (j == 6) continue; // wrkaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+
       error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // error if upper error value is below limit
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_errorlevel); // error if upper error value is below limit
       warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.92); // (and not only the actual eff value)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_warnlevel); // (and not only the actual eff value)
     }
   }
 
@@ -283,6 +305,10 @@ void DQMHistAnalysisPXDEffModule::event()
 
   m_cEffAll->Modified();
   m_cEffAll->Update();
+
+  double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
+  m_monObj->setVariable("efficiency", var_efficiency);
+  m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
   double data = 0;

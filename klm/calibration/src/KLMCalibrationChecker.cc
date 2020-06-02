@@ -37,9 +37,9 @@ using namespace Belle2;
 
 KLMCalibrationChecker::KLMCalibrationChecker() :
   m_experiment(0),
-  m_run(0)
+  m_run(0),
+  m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMCalibrationChecker::~KLMCalibrationChecker()
@@ -54,29 +54,6 @@ void KLMCalibrationChecker::setExperimentRun(int experiment, int run)
     m_EventMetaData->setExperiment(experiment);
     m_EventMetaData->setRun(run);
   }
-}
-
-void KLMCalibrationChecker::setTestingPayload(
-  const std::string& testingPayloadName)
-{
-  m_testingPayloadName = testingPayloadName;
-}
-
-void KLMCalibrationChecker::setGlobalTag(const std::string& globalTagName)
-{
-  m_GlobalTagName = globalTagName;
-}
-
-void KLMCalibrationChecker::setAlignmentResultsFile(
-  const std::string& alignmentResultsFile)
-{
-  m_AlignmentResultsFile = alignmentResultsFile;
-}
-
-void KLMCalibrationChecker::setStripEfficiencyResultsFile(
-  const std::string& stripEfficiencyResultsFile)
-{
-  m_StripEfficiencyResultsFile = stripEfficiencyResultsFile;
 }
 
 void KLMCalibrationChecker::initializeDatabase()

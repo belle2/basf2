@@ -60,7 +60,9 @@ class skimSVDBurstEventsModule(basf2.Module):
         """constructor"""
 
         super().__init__()
+
         self.nMaxStrips = 5000
+        '''max number of strips for NON-BURST events'''
 
     def set_nMaxStrips(self, user_nMaxStrips):
         """set the max strips, otherwise 5000"""
@@ -68,6 +70,7 @@ class skimSVDBurstEventsModule(basf2.Module):
         self.nMaxStrips = user_nMaxStrips
 
     def event(self):
+        '''event'''
 
         strips = Belle2.PyStoreArray('SVDShaperDigits')
 
@@ -141,14 +144,15 @@ class skimSVDTriggerBinEventsModule(basf2.Module):
 
         super().__init__()
         self.tb = 99  # no selection of TB
-        """ trigger bin to select"""
+        ''' trigger bin to select'''
 
     def set_tb(self, user_tb):
-        "set the trigger bin, otherwise 99, i.e. no selection"
+        '''set the trigger bin, otherwise 99, i.e. no selection'''
 
         self.tb = user_tb
 
     def event(self):
+        '''event'''
 
         if int(self.tb) == 99:
             self.return_value(1)

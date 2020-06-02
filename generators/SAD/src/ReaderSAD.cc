@@ -21,6 +21,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <TRandom3.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -436,10 +437,18 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
 
     straightElement straight;
 
-    straight.x0 = element.getLength("X0");
-    straight.z0 = element.getLength("Z0");
-    straight.l = element.getLength("L");
-    straight.phi = element.getLength("PHI");
+    for (const GearDir& slot : element.getNodes("sec")) {
+      string nameSec = slot.getString("@name");
+      if (nameSec.find("X0")  != std::string::npos) {straight.x0  = slot.getLength();}
+      if (nameSec.find("Z0")  != std::string::npos) {straight.z0  = slot.getLength();}
+      if (nameSec.find("L")   != std::string::npos) {straight.l   = slot.getLength();}
+      if (nameSec.find("PHI") != std::string::npos) {straight.phi = slot.getAngle();}
+    }
+
+    //straight.x0 = element.getLength("X0");
+    //straight.z0 = element.getLength("Z0");
+    //straight.l = element.getLength("L");
+    //straight.phi = element.getLength("PHI");
 
     straights[name] = straight;
   }
@@ -459,11 +468,20 @@ TGeoHMatrix ReaderSAD::SADtoGeant(ReaderSAD::AcceleratorRings accRing, double s)
 
     bendingElement bending;
 
-    bending.rt = element.getLength("RT");
-    bending.x0 = element.getLength("X0");
-    bending.z0 = element.getLength("Z0");
-    bending.sphi = element.getLength("SPHI");
-    bending.dphi = element.getLength("DPHI");
+    for (const GearDir& slot : element.getNodes("sec")) {
+      string nameSec = slot.getString("@name");
+      if (nameSec.find("RT")   != std::string::npos) {bending.rt   = slot.getLength();}
+      if (nameSec.find("X0")   != std::string::npos) {bending.x0   = slot.getLength();}
+      if (nameSec.find("Z0")   != std::string::npos) {bending.z0   = slot.getLength();}
+      if (nameSec.find("SPHI") != std::string::npos) {bending.sphi = slot.getAngle();}
+      if (nameSec.find("DPHI") != std::string::npos) {bending.dphi = slot.getAngle();}
+    }
+
+    //bending.rt = element.getLength("RT");
+    //bending.x0 = element.getLength("X0");
+    //bending.z0 = element.getLength("Z0");
+    //bending.sphi = element.getLength("SPHI");
+    //bending.dphi = element.getLength("DPHI");
 
     bendings[name] = bending;
   }

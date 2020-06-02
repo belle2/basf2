@@ -136,7 +136,7 @@ namespace Belle2 {
       }
     }
 
-    void TextTracer::printTraceValues(BaseFitter& fitter)
+    void TextTracer::printTraceValues(const BaseFitter& fitter)
     {
       for (auto& traceValue : fitter.traceValues) {
         std::string name = traceValue.first;

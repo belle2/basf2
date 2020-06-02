@@ -50,7 +50,7 @@ namespace Belle2 {
        * This set is used in the PXD only simulation for PXD gain calibration.
        * @param vec The c++ vector with the radii of absorbers in cm
        */
-      void setAbsorbersR(std::vector<float>& vec) { m_absorbers = vec; };
+      void setAbsorbersR(const std::vector<float>& vec) { m_absorbers = vec; };
 
       /** The method will be called at each step during simulation.
        * @param step The pointer of current step.

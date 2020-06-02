@@ -1,0 +1,23 @@
+# EventType: 1210030000
+# Descriptor: [B+ -> K+ K- K+]
+# NickName: Bu_KpKmKp
+# Documentation: BtoCharmless Phase 3 data validation studies.
+# Tested: Yes
+# PhysicsWG: BtoCharmless
+# Responsible: Riccardo Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 20200114
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0    K+     K-     K+        PHSP;
+Enddecay
+CDecay B-sig
+
+End
+

@@ -27,7 +27,7 @@ namespace Belle2 {
     class TimeItResult {
     public:
       /// Constructor from a series of timings.
-      explicit TimeItResult(std::vector<std::chrono::duration<double> >& timeSpans) :
+      explicit TimeItResult(const std::vector<std::chrono::duration<double> >& timeSpans) :
         m_timeSpans(timeSpans)
       {}
 

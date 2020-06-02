@@ -167,7 +167,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
     var<named("cluster_1_size")>() = calculateSize(*firstCluster);
     var<named("cluster_2_size")>() = calculateSize(*secondCluster);
     var<named("mean_rest_cluster_size")>() = meanOver(allStates, calculateSize);
-    var<named("min_rest_cluster_size")>() = meanOver(allStates, calculateSize);
+    var<named("min_rest_cluster_size")>() = minOver(allStates, calculateSize);
     var<named("std_rest_cluster_size")>() = stdOver(allStates, calculateSize);
 
     var<named("cluster_1_snr")>() = calculateSNR(*firstCluster);

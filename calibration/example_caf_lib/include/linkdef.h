@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::TestCalibrationAlgorithm-;
+#pragma link C++ class Belle2::TestBoundarySettingAlgorithm-;
 #pragma link C++ class Belle2::TestDBAccessAlgorithm-;
 
 #endif

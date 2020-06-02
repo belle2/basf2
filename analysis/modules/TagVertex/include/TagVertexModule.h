@@ -100,23 +100,28 @@ namespace Belle2 {
                            * 0 fit performed with measured parameters
                            * 1 fit performed with true parameters
                            * 2 unable to recover truth parameters */
+    bool m_useRollBack;  /**< Set to true if the tag fit is to be made with the tag track position rolled back to mother B */
+    int m_rollbackStatus; /**< Store info about whether the fit was performed with the rolled back tracks
+                           * 0 fit performed with measured parameters
+                           * 1 fit performed with rolled back parameters
+                           * 2 unable to recover truth parameters */
     double m_fitPval;             /**< P value of the tag side fit result */
     TVector3 m_tagV;              /**< tag side fit result */
     TMatrixDSym m_tagVErrMatrix;  /**< Error matrix of the tag side fit result */
-    TVector3 m_MCtagV;            /**< generated tag side vertex */
-    double   m_MCtagLifeTime;     /**< generated tag side life time of B-decay */
+    TVector3 m_mcTagV;            /**< generated tag side vertex */
+    double   m_mcTagLifeTime;     /**< generated tag side life time of B-decay */
     int m_mcPDG;                  /**< generated tag side B flavor */
-    TVector3 m_MCVertReco;        /**< generated Breco decay vertex */
-    double m_MCLifeTimeReco;      /**< generated Breco life time */
+    TVector3 m_mcVertReco;        /**< generated Breco decay vertex */
+    double m_mcLifeTimeReco;      /**< generated Breco life time */
     double m_deltaT;              /**< reconstructed DeltaT */
     double m_deltaTErr;           /**< reconstructed DeltaT error */
-    double m_MCdeltaT;            /**< generated DeltaT */
-    double m_MCdeltaTapprox;      /**< generated DeltaT with z-coordinate approximation */
+    double m_mcDeltaTau;            /**< generated DeltaT */
+    double m_mcDeltaT;            /**< generated DeltaT with boost-direction approximation */
     TMatrixDSym m_constraintCov;  /**< constraint to be used in the tag vertex fit */
     TVector3 m_constraintCenter;  /**< centre position of the constraint for the tag Vertex fit */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_BeamSpotCov;    /**< size of the beam spot == covariance matrix on the beam spot position */
-    bool m_MCInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
+    bool m_mcInfo;                /**< true if user wants to retrieve MC information out from the tracks used in the fit */
     double m_shiftZ;              /**< parameter for testing the systematic error from the IP measurement*/
     DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object*/
     int m_FitType;                /**< fit algo used  */
@@ -138,8 +143,8 @@ namespace Belle2 {
     /** central method for the tag side vertex fit */
     bool doVertexFit(const Particle* Breco);
 
-    /** find intersection between B rec and beam spot (= origin of BTube) */
-    bool doVertexFitForBTube(const Particle* mother) const;
+    /** it returns an intersection between B rec and beam spot (= origin of BTube) */
+    Particle* doVertexFitForBTube(const Particle* mother, std::string fitType) const;
 
     /** calculate the constraint for the vertex fit on the tag side using Breco information*/
     std::pair<TVector3, TMatrixDSym> findConstraint(const Particle* Breco, double cut) const;
@@ -244,7 +249,20 @@ namespace Belle2 {
     /**
      * This finds the point on the true particle trajectory closest to the measured track position
      */
-    static TVector3 getTruePoca(ParticleAndWeight const& paw) ;
+    static TVector3 getTruePoca(ParticleAndWeight const& paw);
+
+    /**
+     * If the fit has to be done with the rolled back tracks, Rave or KFit is fed with a track where the
+     * position of track is shifted by the vector difference of mother B and production point of track
+     * from truth info
+     * The function below takes care of that.
+     */
+    TrackFitResult getTrackWithRollBackCoordinates(ParticleAndWeight const& paw);
+
+    /**
+     * This shifts the position of tracks by the vector difference of mother B and production point of track from truth info
+     */
+    TVector3 getRollBackPoca(ParticleAndWeight const& paw);
   };
 
   /**

@@ -122,6 +122,7 @@ public:
    * operator override for ostream modifier functions like std::endl who are directly
    * applied to the underlying string stream.
    */
+  // cppcheck-suppress constParameter ; no, this cannot be const otherwise e.g. std::endl doesn't work
   LogVariableStream& operator<<(__basic_ostream_type & (*__pf)(__basic_ostream_type&))
   {
     // execute provided function on the string stream

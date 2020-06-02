@@ -62,7 +62,7 @@ namespace Belle2 {
      * @param hname Name of the histogram
      * @return The pointer to the histogram, or nullptr if not found.
      */
-    TH1* find_histo_in_canvas(TString);
+    TH1* find_histo_in_canvas(TString hname);
     //! Module functions to be called from main process
     void initialize() override final;
 

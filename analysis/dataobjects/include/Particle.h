@@ -166,7 +166,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
+     * @param properties particle property
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
@@ -333,12 +333,14 @@ namespace Belle2 {
     /**
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(int particleIndex, const bool updateType = true)
     {
@@ -666,7 +668,7 @@ namespace Belle2 {
     /**
      * Returns a vector of StoreArray indices of given MDST dataobjects
      *
-     * @param EParticleSourceObject corresponding to a given MDST dataobject
+     * @param type EParticleSourceObject corresponding to a given MDST dataobject
      * @return vector of StoreArray indices of a given MDST dataobjects
      */
     std::vector<int> getMdstArrayIndices(EParticleSourceObject type) const;
@@ -979,7 +981,7 @@ namespace Belle2 {
 
     /**
      * Generate the PDG code with correct sign, using the charge
-     * @param charge of the particle
+     * @param chargedSign charge of the particle
      * @param chargedStable Type of charged particle
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);

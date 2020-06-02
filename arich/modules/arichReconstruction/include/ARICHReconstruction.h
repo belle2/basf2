@@ -65,7 +65,7 @@ namespace Belle2 {
     void transformTrackToLocal(ARICHTrack& arichTrack, bool align);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
-    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
+    int likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
 
     //! Sets track position resolution (from tracking)
     void setTrackPositionResolution(double pRes);

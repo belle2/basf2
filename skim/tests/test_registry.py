@@ -7,8 +7,8 @@ from pathlib import Path
 import unittest
 
 from basf2 import find_file
-from skim.registry import Registry, combined_skims
-import skimExpertFunctions as expert
+from skim.registry import Registry
+from skimExpertFunctions import BaseSkim
 
 __authors__ = ["Sam Cunliffe", "Phil Grace"]
 
@@ -48,15 +48,26 @@ class TestSkimCodes(unittest.TestCase):
             len(Registry.names), len(set(Registry.names)), "Duplicated skim name"
         )
 
+    def test_invalid_names(self):
+        """Check that that no registered skims have invalid names."""
+        for name in Registry.names:
+            self.assertFalse(
+                name.startswith("Base"),
+                (
+                    f"Invalid skim name in registry: {name}. Registed skim names cannot"
+                    " begin with 'Base'; this word is reserved for subclassing purposes."
+                ),
+            )
+
     def test_encode(self):
         """Check that we raise a LookupError if the skim name doesn't exist."""
         with self.assertRaises(LookupError):
-            expert.encodeSkimName("SomeNonExistentSkimName")
+            Registry.encode_skim_name("SomeNonExistentSkimName")
 
     def test_decode(self):
         """Check that we raise a LookupError if the skim code doesn't exist."""
         with self.assertRaises(LookupError):
-            expert.decodeSkimName("1337")
+            Registry.decode_skim_code("1337")
 
     def test_modules_exist(self):
         """Check that all modules listed in registry exist in skim/scripts/skim/."""
@@ -70,6 +81,13 @@ class TestSkimCodes(unittest.TestCase):
                 ),
             )
 
+    def test_clashing_skim_and_module_names(self):
+        """Check that there is no overlap between skim and module names."""
+        duplicates = set(Registry.modules).intersection(Registry.names)
+        self.assertEqual(
+            set(), duplicates, f"Name used for both a skim and a module: {', '.join(duplicates)}"
+        )
+
     def test_skims_exist(self):
         """Check that the registry is correct about the location of every skim.
 
@@ -78,17 +96,24 @@ class TestSkimCodes(unittest.TestCase):
         """
         for ModuleName in Registry.modules:
             SkimModule = import_module(f"skim.{ModuleName}")
-            for SkimName in Registry.get_expected_skims_in_module(ModuleName):
-                # TODO: remove this `if` statement when all skims are fully implemented
-                if SkimName not in ["LeptonicUntagged", "SinglePhotonDark"]:
-                    continue
-
+            for SkimName in Registry.get_skims_in_module(ModuleName):
                 # Check the skim is defined in the module
-                self.assertIn(SkimName, SkimModule.__dict__.keys())
+                self.assertIn(
+                    SkimName,
+                    SkimModule.__dict__.keys(),
+                    (
+                        f"Registry lists {SkimName} as existing in skim.{ModuleName}, "
+                        "but no such skim found!"
+                    ),
+                )
 
                 # Check that it is defined as a subclass of BaseSkim
                 SkimClass = getattr(SkimModule, SkimName)
-                self.assertIsSubclass(SkimClass, expert.BaseSkim)
+                self.assertIsSubclass(
+                    SkimClass,
+                    BaseSkim,
+                    f"Skim {SkimName} must be defined as a subclass of BaseSkim.",
+                )
 
     def test_undocumented_skims(self):
         """Check that every skim defined in a module is listed in the registry.
@@ -104,9 +129,11 @@ class TestSkimCodes(unittest.TestCase):
                 obj[0]
                 for obj in getmembers(SkimModule, isclass)
                 if (
-                    issubclass(obj[1], expert.BaseSkim)
-                    and obj[1] is not expert.BaseSkim
+                    issubclass(obj[1], BaseSkim)
+                    and obj[1] is not BaseSkim
                     and obj[0] != "CombinedSkim"
+                    # Allow "Base" at beginning of skims, for subclassing
+                    and not obj[0].startswith("Base")
                 )
             ]
 
@@ -132,24 +159,6 @@ class TestSkimCodes(unittest.TestCase):
                         f"skim/scripts/skim/{ModuleName}.py, but listed in registry as "
                         f"belonging to skim/scripts/skim/{ExpectedModuleName}.py."
                     ),
-                )
-
-    def test_combined_skims(self):
-        for CombinedName, skimlist in combined_skims.items():
-            # Check for duplicated values in list
-            self.assertEqual(
-                len(skimlist),
-                len(set(skimlist)),
-                f"Duplicated skim in combined skim {CombinedName}."
-            )
-
-            # Check the combined skims only contain valid skim names
-            for skim in skimlist:
-                self.assertIn(
-                    skim,
-                    Registry.names,
-                    (f"Skim {skim} in combined skim {CombinedName} is not a "
-                     "registered skim.")
                 )
 
 

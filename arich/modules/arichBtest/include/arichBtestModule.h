@@ -77,7 +77,7 @@ namespace Belle2 {
     //! Skip the data part of the record
     int skipdata(gzFile fp);
     //! Read the MWPC information from the data buffer
-    void readmwpc(unsigned int* dbuf, unsigned int len);
+    void readmwpc(unsigned int* dbuf, unsigned int len, int print = 0);
     //! Read the HAPD hits from the data buffer
     int readhapd(unsigned int len, unsigned int* data);
     //! Read the data from the file (can be compressed)

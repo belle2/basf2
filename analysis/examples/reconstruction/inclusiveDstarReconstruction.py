@@ -24,35 +24,76 @@ mA.inputMdstList(
 list_tree_tuples = list()
 
 # MC Truth
-mA.fillParticleListFromMC("pi-:from_mc", cut="[dr < 2] and [abs(dz) < 4]", addDaughters=True, path=main_path)
-mA.addInclusiveDstarReconstruction("pi-:from_mc", "D*-:Dstcharged_slowPicharged_MC", "[useCMSFrame(p) < 0.2]", main_path)
+mA.fillParticleListFromMC("pi+:from_mc", cut="[dr < 2] and [abs(dz) < 4]", addDaughters=True, path=main_path)
+mA.addInclusiveDstarReconstruction(
+    "D*+:Dstcharged_slowPicharged_MC -> pi+:from_mc",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
 
 mA.fillParticleListFromMC("pi0:from_mc", "", addDaughters=True, path=main_path)
-mA.addInclusiveDstarReconstruction("pi0:from_mc", "D*-:Dstcharged_slowPizero_MC", "[useCMSFrame(p) < 0.2]", main_path)
-mA.addInclusiveDstarReconstruction("pi0:from_mc", "D*0:Dstzero_slowPizero_MC", "[useCMSFrame(p) < 0.2]", main_path)
+mA.addInclusiveDstarReconstruction(
+    "D*+:Dstcharged_slowPizero_MC -> pi0:from_mc",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.addInclusiveDstarReconstruction(
+    "D*0:Dstzero_slowPizero_MC -> pi0:from_mc",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.matchMCTruth("D*+:Dstcharged_slowPizero_MC", path=main_path)
+mA.matchMCTruth("D*0:Dstzero_slowPizero_MC", path=main_path)
+mA.matchMCTruth("D*+:Dstcharged_slowPicharged_MC", path=main_path)
 
-list_tree_tuples.append(("D*-:Dstcharged_slowPicharged_MC", "Dstcharged_slowPicharged_MC"))
-list_tree_tuples.append(("D*-:Dstcharged_slowPizero_MC", "Dstcharged_slowPizero_MC"))
+list_tree_tuples.append(("D*+:Dstcharged_slowPicharged_MC", "Dstcharged_slowPicharged_MC"))
+list_tree_tuples.append(("D*+:Dstcharged_slowPizero_MC", "Dstcharged_slowPizero_MC"))
 list_tree_tuples.append(("D*0:Dstzero_slowPizero_MC", "Dstzero_slowPizero_MC"))
 
 # Reco Level
-mA.fillParticleList("pi-:slow", cut="[dr < 2] and [abs(dz) < 4]", path=main_path)
-mA.matchMCTruth("pi-:slow", path=main_path)
-mA.addInclusiveDstarReconstruction("pi-:slow", "D*-:Dstcharged_slowPicharged", "[useCMSFrame(p) < 0.2]", main_path)
-mA.matchMCTruth("D*-:Dstcharged_slowPicharged", main_path)
+mA.fillParticleList("pi+:slow", cut="[dr < 2] and [abs(dz) < 4]",  path=main_path)
+mA.matchMCTruth("pi+:slow", path=main_path)
 
-stdPi0s.stdPi0s("eff60", main_path)
-mA.matchMCTruth("pi0:eff60", main_path)
-mA.addInclusiveDstarReconstruction("pi0:eff60", "D*-:Dstcharged_slowPizero", "[useCMSFrame(p) < 0.2]", main_path)
-mA.matchMCTruth("D*-:Dstcharged_slowPizero", main_path)
-mA.addInclusiveDstarReconstruction("pi0:eff60", "D*0:Dstzero_slowPizero", "[useCMSFrame(p) < 0.2]", main_path)
-mA.matchMCTruth("D*0:Dstzero_slowPizero", main_path)
+mA.addInclusiveDstarReconstruction(
+    "D*+:Dstcharged_slowPicharged -> pi+:slow",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.matchMCTruth("D*+:Dstcharged_slowPicharged", path=main_path)
 
-list_tree_tuples.append(("D*-:Dstcharged_slowPicharged", "Dstcharged_slowPicharged"))
-list_tree_tuples.append(("D*-:Dstcharged_slowPizero", "Dstcharged_slowPizero"))
+mA.addInclusiveDstarReconstruction(
+    "D*-:Dstcharged_slowPicharged_negative -> pi-:slow",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.matchMCTruth("D*-:Dstcharged_slowPicharged_negative", path=main_path)
+
+stdPi0s.stdPi0s("eff60_Jan2020", path=main_path)
+mA.matchMCTruth("pi0:eff60_Jan2020", path=main_path)
+
+mA.addInclusiveDstarReconstruction(
+    "D*+:Dstcharged_slowPizero -> pi0:eff60_Jan2020",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.matchMCTruth("D*+:Dstcharged_slowPizero", path=main_path)
+
+mA.addInclusiveDstarReconstruction(
+    "D*0:Dstzero_slowPizero -> pi0:eff60_Jan2020",
+    slowPionCut="[useCMSFrame(p) < 2]",
+    DstarCut="useCMSFrame(p) < 2",
+    path=main_path)
+mA.matchMCTruth("D*0:Dstzero_slowPizero", path=main_path)
+
+list_tree_tuples.append(("D*+:Dstcharged_slowPicharged", "Dstcharged_slowPicharged"))
+list_tree_tuples.append(("D*-:Dstcharged_slowPicharged_negative", "Dstcharged_slowPicharged_negative"))
+list_tree_tuples.append(("D*+:Dstcharged_slowPizero", "Dstcharged_slowPizero"))
 list_tree_tuples.append(("D*0:Dstzero_slowPizero", "Dstzero_slowPizero"))
 
 dstar_variables = [
+    "isSignal",
+    "PDG",
+    "daughter(0, PDG)",
     "E",
     "p",
     "pt",

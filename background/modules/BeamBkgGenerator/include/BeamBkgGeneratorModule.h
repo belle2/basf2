@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric , Andrii Natochii                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TRotation.h>
+#include <generators/SAD/ReaderSAD.h>
 
 namespace Belle2 {
 
@@ -105,6 +106,7 @@ namespace Belle2 {
     TTree* m_tree = 0;  /**< root tree pointer */
     SADTree m_sad;      /**< TTree entry data */
     TRotation m_rotation; /**< rotation from SAD to Belle II frame */
+    ReaderSAD m_readerSAD;     /**< the transformation from SAD to Belle II system for the far beamline */
     int m_ring = 0 ; /**< ring number, 1-HER, 2-LER */
     std::vector<int> m_sectionOrdering; /**< superKEKB section ordering */
 

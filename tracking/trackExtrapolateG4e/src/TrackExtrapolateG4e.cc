@@ -960,6 +960,12 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     return extState;
   }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+  // check for a valid track fit
+  if (!recoTrack->wasFitSuccessful(trackRep)) {
+    B2WARNING("RecoTrack fit failed for cardinal representation: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
     extState.pdgCode *= charge;

@@ -13,86 +13,20 @@
 
 using namespace Belle2;
 
-EKLMHitBase::EKLMHitBase()
+EKLMHitBase::EKLMHitBase() :
+  m_Section(-1),
+  m_Layer(-1),
+  m_Sector(-1)
 {
-  m_PDG = -1;
-  m_Time = -1;
-  m_EDep = -1;
-  m_Section = -1;
-  m_Layer = -1;
-  m_Sector = -1;
 }
 
 EKLMHitBase::~EKLMHitBase()
 {
 }
 
-EKLMHitBase::EKLMHitBase(int Section, int Layer, int Sector)
+EKLMHitBase::EKLMHitBase(int section, int layer, int sector) :
+  m_Section(section),
+  m_Layer(layer),
+  m_Sector(sector)
 {
-  m_PDG = -1;
-  m_Time = -1;
-  m_EDep = -1;
-  m_Section = Section;
-  m_Layer = Layer;
-  m_Sector = Sector;
-}
-
-int EKLMHitBase::getSection() const
-{
-  return m_Section;
-}
-
-void EKLMHitBase::setSection(int Section)
-{
-  m_Section = Section;
-}
-
-int EKLMHitBase::getLayer() const
-{
-  return m_Layer;
-}
-
-void EKLMHitBase::setLayer(int Layer)
-{
-  m_Layer = Layer;
-}
-
-int EKLMHitBase::getSector() const
-{
-  return m_Sector;
-}
-
-void EKLMHitBase::setSector(int Sector)
-{
-  m_Sector = Sector;
-}
-
-int EKLMHitBase::getPDG() const
-{
-  return m_PDG;
-}
-
-void EKLMHitBase::setPDG(int PDG)
-{
-  m_PDG = PDG;
-}
-
-float EKLMHitBase::getTime() const
-{
-  return m_Time;
-}
-
-void EKLMHitBase::setTime(float Time)
-{
-  m_Time = Time;
-}
-
-float EKLMHitBase::getEnergyDeposit() const
-{
-  return m_EDep;
-}
-
-void EKLMHitBase::setEnergyDeposit(float EnergyDeposit)
-{
-  m_EDep = EnergyDeposit;
 }

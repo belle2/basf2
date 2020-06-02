@@ -18,11 +18,12 @@ using namespace Belle2;
 
 REG_MODULE(KLMPacker)
 
-KLMPackerModule::KLMPackerModule() : Module()
+KLMPackerModule::KLMPackerModule() :
+  Module(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
   setDescription("KLM raw data packer (creates RawKLM from KLMDigits).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMPackerModule::~KLMPackerModule()

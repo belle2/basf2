@@ -389,7 +389,7 @@ namespace Belle2 {
 
   inline int ARICHGeometryPar::getNphiTiles(int nRing)
   {
-    if (nRing > 5) return 0;
+    if (nRing > 4) return 0;
     return m_tileNphi[nRing];
   }
 

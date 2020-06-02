@@ -24,7 +24,7 @@ class defaultELSTimeCalibrationImporter_pol1TBdep(basf2.Module):
     """1st order pol importer for ELS3 (TB dep)"""
 
     def beginRun(self):
-        """do everything here"""
+        '''do everything here'''
 
         iov = Belle2.IntervalOfValidity.always()
 

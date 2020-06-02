@@ -166,10 +166,12 @@ namespace Belle2 {
     bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
 
     /**
-    * update the map of daughter and tracks, find out which tracks belong to each daughter.
-    * @param ui store the tracks ID of each daughter
-    * @param l represent the tracks ID
-    * @param p pointer to particle
+     * update the map of daughter and tracks, find out which tracks belong to each daughter.
+     * @param l represent the tracks ID
+     * @param pars map of all parameters
+     * @param pard vector of parameters
+     * @param allparticles vector of all particles
+     * @param daughter pointer to particle
      */
     void updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
                                      std::vector<Particle*>&  allparticles, const Particle* daughter);
@@ -204,7 +206,7 @@ namespace Belle2 {
 
     /**
      * Fit using Rave
-     * @param p pointer to particle
+     * @param mother pointer to particle
      * @return true for successful fit and update of mother
      */
     bool doRaveFit(Particle* mother);

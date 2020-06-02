@@ -60,7 +60,7 @@ namespace Belle2 {
      * This function is the basis for returning in the variables for software trigger result.
      * Also hidden in a anonymous namespace.
      */
-    double extractSoftwareTriggerResultImplementation(bool nonPrescaled, std::string& triggerIdentifier, const Particle*)
+    double extractSoftwareTriggerResultImplementation(bool nonPrescaled, const std::string& triggerIdentifier, const Particle*)
     {
       // get trigger result object
       StoreObjPtr<SoftwareTriggerResult> swtr;

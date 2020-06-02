@@ -34,28 +34,26 @@
 namespace Belle2 {
   namespace {
     /**
-     * This function checks if we have a valid software trigger result identifier.
-     * It is hidden in a anonymous namespace -- only needed in this file.
+     * There are two ways to write a trigger identifier, either:
+     *
+     *    "software_trigger_cut&base_identifier&cut_identifier"
+     *
+     * or the format provided by the CLI `hlt_triggers print --list` :
+     *
+     *    "base_identifier cut_identifier" // with a space
+     *
+     * In case the latter is provided by the user, then convert to the former.
+     * In case of the former, do nothing. Return the input (idempotent function).
+     *
+     * This function is hidden in a anonymous namespace -- only needed in this file.
      */
-    bool validIdentifier(const std::string& identifier, StoreObjPtr<SoftwareTriggerResult> swtr)
+    std::string fullFormatIdentifier(const std::string& identifier)
     {
-      try {
-        swtr->getResult(identifier);
-      } catch (const std::out_of_range&) {
-        return false;
-      }
-      return true;
-    }
-
-    /**
-     * Convert the short format trigger identifier into the full format.
-     * Also hidden in a anonymous namespace.
-     */
-    std::string fullFormatIdentifier(const std::string& shortFormat)
-    {
-      std::string out = shortFormat;
+      std::string out = identifier;
       boost::replace_all(out, " ", "&");
-      return "software_trigger_cut&" + out;
+      if (identifier.substr(0, 21) != "software_trigger_cut&")
+        out = "software_trigger_cut&" + out;
+      return out;
     }
 
     /**
@@ -68,22 +66,17 @@ namespace Belle2 {
       StoreObjPtr<SoftwareTriggerResult> swtr;
       if (!swtr) return std::numeric_limits<float>::quiet_NaN();
 
-      // check the trigger ID provided
-      if (not validIdentifier(triggerIdentifier, swtr)) {
-        // we might have been provided with the short format
-        triggerIdentifier = fullFormatIdentifier(triggerIdentifier);
-        if (not validIdentifier(triggerIdentifier, swtr)) {
-          // otherwise the trigger identifier is just wrong -- silently return nan
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }
-
-      // then get the result
+      // check that the trigger ID provided by the user exists in the SWTR
       SoftwareTriggerCutResult swtcr;
-      if (nonPrescaled) {
-        swtcr = swtr->getNonPrescaledResult(triggerIdentifier);
-      } else {
-        swtcr = swtr->getResult(triggerIdentifier);
+      try {
+        if (nonPrescaled) {
+          swtcr = swtr->getNonPrescaledResult(fullFormatIdentifier(triggerIdentifier));
+        } else {
+          swtcr = swtr->getResult(fullFormatIdentifier(triggerIdentifier));
+        }
+      } catch (const std::out_of_range&) {
+        // then the trigger identifier is wrong -- silently return nan
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
     };
@@ -322,7 +315,6 @@ namespace Belle2 {
        *
        * This workflow will probably improve later: but for now parse the args
        * to check we have one name, then check the database object is valid.
-       * If not then maybe the user entered the human-friendly name so try that.
        * If not return NAN.
        */
       if (args.size() != 1)
@@ -331,17 +323,10 @@ namespace Belle2 {
 
       auto outputFunction = [triggerIdentifier](const Particle*) -> double {
 
-        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(triggerIdentifier);
-        if (downloadedCut)
-          return double(downloadedCut->getPreScaleFactor());
-
-        // we might have been provided with the short format
-        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut_(fullFormatIdentifier(triggerIdentifier));
-        if (downloadedCut_)
-          return double(downloadedCut_->getPreScaleFactor());
-
-        // otherwise the trigger identifier is just wrong -- silently return nan
-        return std::numeric_limits<double>::quiet_NaN();
+        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullFormatIdentifier(triggerIdentifier));
+        if (not downloadedCut)
+          return std::numeric_limits<double>::quiet_NaN();
+        return double(downloadedCut->getPreScaleFactor());
       };
 
       return outputFunction;

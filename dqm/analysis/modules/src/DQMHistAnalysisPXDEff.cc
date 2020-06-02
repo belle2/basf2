@@ -41,6 +41,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
+  addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
+  addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
+  addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -103,6 +106,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAll->SetConfidenceLevel(m_confidence);
 
 //   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
   m_hEffAll->Paint("AP");
@@ -231,9 +235,9 @@ void DQMHistAnalysisPXDEffModule::event()
       /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
 
       error_flag |= (ihit > 10)
-                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.90); // error if upper error value is below limit
+                    && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_errorlevel); // error if upper error value is below limit
       warn_flag |= (ihit > 10)
-                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < 0.92); // (and not only the actual eff value)
+                   && (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) < m_warnlevel); // (and not only the actual eff value)
     }
   }
 

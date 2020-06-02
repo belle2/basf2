@@ -1,45 +1,14 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-//
-// ------------------------------------------------------------
-//  GEANT 4  include file implementation
-//
-// ------------------------------------------------------------
-//
-// This class is a process responsible for the transportation of
-// a particle, ie the geometrical propagation that encounters the
-// geometrical sub-volumes of the detectors.
-//
-// It is also tasked with the key role of proposing the "isotropic safety",
-//   which will be used to update the post-step point's safety.
-//
-// =======================================================================
-// Created:  19 March 1997, J. Apostolakis
-// =======================================================================
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sascha Dreyer                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// modified from GEANT4 G4Transportation class
 
 #include "G4TransportationProcessType.hh"
 
@@ -132,31 +101,8 @@ void
 G4LongLivedNeutralTransportation::PrintStatistics(std::ostream& outStr) const
 {
   outStr << " G4LongLivedNeutralTransportation: Statistics for looping particles " << G4endl;
-  if (fSumEnergyKilled > 0.0 || fNumLoopersKilled > 0) {
-    outStr << "   Sum of energy of looping tracks killed: "
-           <<  fSumEnergyKilled / CLHEP::MeV << " MeV "
-           << " from " << fNumLoopersKilled << "  tracks "  << G4endl
-           <<  "  Sum of energy of non-electrons        : "
-           << fSumEnergyKilled_NonElectron / CLHEP::MeV << " MeV "
-           << "  from " << fNumLoopersKilled_NonElectron << " tracks "
-           << G4endl;
-    outStr << "   Max energy of  *any type*  looper killed: " << fMaxEnergyKilled
-           << "    its PDG was " << fMaxEnergyKilledPDG  << G4endl;
-    if (fMaxEnergyKilled_NonElectron > 0.0) {
-      outStr << "   Max energy of non-electron looper killed: "
-             << fMaxEnergyKilled_NonElectron
-             << "    its PDG was " << fMaxEnergyKilled_NonElecPDG << G4endl;
-    }
-    if (fMaxEnergySaved > 0.0) {
-      outStr << "   Max energy of loopers 'saved':  " << fMaxEnergySaved << G4endl;
-      outStr << "   Sum of energy of loopers 'saved': "
-             <<  fSumEnergySaved << G4endl;
-      outStr << "   Sum of energy of unstable loopers 'saved': "
-             << fSumEnergyUnstableSaved << G4endl;
-    }
-  } else {
-    outStr << " No looping tracks found or killed. " << G4endl;
-  }
+  outStr << " No looping tracks found or killed. " << G4endl;
+
 }
 
 //////////////////////////////////////////////////////////////////////////

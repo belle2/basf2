@@ -18,19 +18,28 @@ namespace Belle2 {
   class G4LongLivedNeutralDecay : public G4VRestDiscreteProcess {
 
   public:
-    /**  Constructor
+    /**
+     * Constructor
+     * @param processName decay process name
      */
     G4LongLivedNeutralDecay(const G4String& processName = "LongLivedNeutralDecay");
 
-    /**  Destructor
+    /**
+     * Destructor
      */
     virtual ~G4LongLivedNeutralDecay();
 
   private:
-    //  copy constructor
+    /**
+     * Copy Constructor
+     * @param right copy reference
+     */
     G4LongLivedNeutralDecay(const G4LongLivedNeutralDecay& right);
 
-    //  Assignment Operation (generated)
+    /**
+      * Assignment Operator
+      * @param right assign reference
+     */
     G4LongLivedNeutralDecay& operator=(const G4LongLivedNeutralDecay& right);
 
   public:
@@ -92,7 +101,6 @@ namespace Belle2 {
      *
      * No operation in AtRestDoIt.
      */
-
     virtual G4double AtRestGetPhysicalInteractionLength(
       const G4Track& track,
       G4ForceCondition* condition
@@ -107,7 +115,6 @@ namespace Belle2 {
      * Forces the PostStepDoIt action to be called, so that it can do the relocation if it is needed,
      * but does not limit the step.
      */
-
     virtual G4double PostStepGetPhysicalInteractionLength(
       const G4Track& track,
       G4double   previousStepSize,
@@ -151,7 +158,6 @@ namespace Belle2 {
      *   2: More */
 
   protected:
-    // HighestValue.
 
     const G4double HighestValue; /**< Remainder of life time at rest */
 
@@ -161,6 +167,13 @@ namespace Belle2 {
 
   };
 
+  /**
+   * G4VProcess::AtRestDoIt() implementation,
+   * Proposes particle change by DecayIt method at rest
+   *
+   * @param aTrack Propagating particle track reference
+   * @param aStep Current step reference
+   */
   inline
   G4VParticleChange* G4LongLivedNeutralDecay::AtRestDoIt(
     const G4Track& aTrack,
@@ -170,11 +183,12 @@ namespace Belle2 {
     return DecayIt(aTrack, aStep);
   }
 
+
   inline
   G4double G4LongLivedNeutralDecay::GetRemainderLifeTime() const
   {
     return fRemainderLifeTime;
-  }
+  }/**< Returns remaining lifetime */
 
 }
 

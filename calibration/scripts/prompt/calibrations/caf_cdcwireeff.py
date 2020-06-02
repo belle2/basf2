@@ -11,7 +11,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                expert_username="uchida",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["hlt_mumu", "hlt_hadron"],
+                               input_data_names=["hlt_mumu"],
                                depends_on=[])
 
 
@@ -27,23 +27,18 @@ def get_calibrations(input_data, **kwargs):
     from prompt.utils import filter_by_max_files_per_run
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
-    file_to_iov_hadron = input_data["hlt_hadron"]
 
     max_files_per_run = 10
     min_events_per_file = 1
 
     max_events_per_calibration = 10000000
-    max_events_per_file = 100000
+    max_events_per_file = 10000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
-    reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
-    input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
-
-    input_file_dict = {"hlt_mumu": reduced_file_to_iov_mumu, "hlt_hadron": reduced_file_to_iov_hadron}
+    input_file_dict = {"hlt_mumu": reduced_file_to_iov_mumu}
 
     # Get the overall IoV we want to cover, including the end values
     requested_iov = kwargs.get("requested_iov", None)
@@ -53,18 +48,18 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # wire efficiency
-    cal6 = CDCCalibration(name='wire_eff',
-                          algorithms=[wire_algo()],
-                          input_file_dict=input_file_dict,
-                          max_iterations=4
-                          )
+    cal = CDCCalibration(name='wire_eff',
+                         algorithms=[wire_algo()],
+                         input_file_dict=input_file_dict,
+                         max_iterations=4
+                         )
 
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal6.algorithms:
+    for algorithm in cal.algorithms:
         algorithm.params = {"apply_iov": output_iov}
 
-    return [cal6]
+    return [cal]
 
 
 #################################################
@@ -100,7 +95,7 @@ def pre_collector(max_events=None):
     from reconstruction import add_reconstruction
     add_reconstruction(reco_path,
                        add_trigger_calculation=False,
-                       trackFitHypotheses=[13],
+                       trackFitHypotheses=[13],  # muon hypothesis but should give the same result with pion
                        pruneTracks=False)
 
     for module in reco_path.modules():
@@ -127,7 +122,8 @@ def collector(bField=True, is_cosmic=False):
                           calExpectedDriftTime=True,
                           eventT0Extraction=True,
                           bField=bField,
-                          isCosmic=is_cosmic
+                          isCosmic=is_cosmic,
+                          effStudy=True
                           )
     return col
 
@@ -158,7 +154,7 @@ class CDCCalibration(Calibration):
                  input_file_dict,
                  max_iterations=5,
                  dependencies=None,
-                 max_events=5000):
+                 max_events=10000000):
         for algo in algorithms:
             algo.setHistFileName(name)
 

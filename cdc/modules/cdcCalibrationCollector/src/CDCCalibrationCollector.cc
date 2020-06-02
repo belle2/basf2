@@ -56,6 +56,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
+  addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);
 }
 
 CDCCalibrationCollectorModule::~CDCCalibrationCollectorModule()
@@ -75,38 +76,44 @@ void CDCCalibrationCollectorModule::prepare()
   m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
+  if (!m_effStudy) { // by default collects calibration data
+    auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
+    m_tree->Branch<float>("x_mea", &x_mea);
+    m_tree->Branch<float>("x_u", &x_u);
+    m_tree->Branch<float>("x_b", &x_b);
+    m_tree->Branch<float>("alpha", &alpha);
+    m_tree->Branch<float>("theta", &theta);
+    m_tree->Branch<float>("t", &t);
+    m_tree->Branch<unsigned short>("adc", &adc);
+    //  m_tree->Branch<int>("boardID", &boardID);
+    m_tree->Branch<int>("lay", &lay);
+    m_tree->Branch<float>("weight", &weight);
+    m_tree->Branch<int>("IWire", &IWire);
+    m_tree->Branch<float>("Pval", &Pval);
+    m_tree->Branch<float>("ndf", &ndf);
+    if (m_storeTrackParams) {
+      m_tree->Branch<float>("d0", &d0);
+      m_tree->Branch<float>("z0", &z0);
+      m_tree->Branch<float>("phi0", &phi0);
+      m_tree->Branch<float>("tanL", &tanL);
+      m_tree->Branch<float>("omega", &omega);
+    }
 
-  auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-  m_tree->Branch<float>("x_mea", &x_mea);
-  m_tree->Branch<float>("x_u", &x_u);
-  m_tree->Branch<float>("x_b", &x_b);
-  m_tree->Branch<float>("alpha", &alpha);
-  m_tree->Branch<float>("theta", &theta);
-  m_tree->Branch<float>("t", &t);
-  m_tree->Branch<unsigned short>("adc", &adc);
-  //  m_tree->Branch<int>("boardID", &boardID);
-  m_tree->Branch<int>("lay", &lay);
-  m_tree->Branch<float>("weight", &weight);
-  m_tree->Branch<int>("IWire", &IWire);
-  m_tree->Branch<float>("Pval", &Pval);
-  m_tree->Branch<float>("ndf", &ndf);
-  if (m_storeTrackParams) {
-    m_tree->Branch<float>("d0", &d0);
-    m_tree->Branch<float>("z0", &z0);
-    m_tree->Branch<float>("phi0", &phi0);
-    m_tree->Branch<float>("tanL", &tanL);
-    m_tree->Branch<float>("omega", &omega);
+    if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
+      m_tree->Branch<float>("t_fit", &t_fit);
+    }
+
+    registerObject<TTree>("tree", m_tree);
   }
+  if (m_effStudy) { //if m_effStudy is changed to true prepares to only run wire efficiency study
+    auto m_efftree  = new TTree(m_effTreeName.c_str(), "tree for wire efficiency");
+    m_efftree->Branch<unsigned short>("layerID", &layerID);
+    m_efftree->Branch<unsigned short>("wireID", &wireID);
+    m_efftree->Branch<float>("z", &z);
+    m_efftree->Branch<bool>("isFound", &isFound);
 
-  if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
-    m_tree->Branch<float>("t_fit", &t_fit);
+    registerObject<TTree>("efftree", m_efftree);
   }
-
-  auto m_efftree  = new TTree(m_effTreeName.c_str(), "tree for wire efficiency");
-  m_efftree->Branch<unsigned short>("layerID", &layerID);
-  m_efftree->Branch<unsigned short>("wireID", &wireID);
-  m_efftree->Branch<float>("z", &z);
-  m_efftree->Branch<bool>("isFound", &isFound);
 
   auto m_hNDF = new TH1F("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
   auto m_hPval = new TH1F("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
@@ -114,8 +121,6 @@ void CDCCalibrationCollectorModule::prepare()
   auto m_hNTracks = new TH1F("hNTracks", "Number of tracks", 50, 0, 10);
   auto m_hOccupancy = new TH1F("hOccupancy", "occupancy", 100, 0, 1.0);
 
-  registerObject<TTree>("tree", m_tree);
-  registerObject<TTree>("efftree", m_efftree);
   registerObject<TH1F>("hNDF", m_hNDF);
   registerObject<TH1F>("hPval", m_hPval);
   registerObject<TH1F>("hEventT0", m_hEventT0);
@@ -156,6 +161,7 @@ void CDCCalibrationCollectorModule::collect()
       wiresInCDCTrack.push_back(eWireID);
     }
   }
+  // WireID collection finished
 
   const int nTr = recoTracks.getEntries();
   const int nHits = cdcHits.getEntries();
@@ -212,14 +218,18 @@ void CDCCalibrationCollectorModule::collect()
 
     //cut at Pt
     if (fitresult->getTransverseMomentum() < m_minimumPt) continue;
-    try {
-      harvest(track);
-    } catch (...) {
+    if (!m_effStudy) { // all harvest to fill the tree if collecting calibration info
+      try {
+        harvest(track);
+      } catch (...) {
+      }
     }
-    // Request tracks coming from IP
-    if (fitresult->getD0() > 2 || fitresult->getZ0() > 5) continue;
-    const Helix helixFit = fitresult->getHelix();
-    buildEfficiencies(wiresInCDCTrack, helixFit);
+    if (m_effStudy) { // call buildEfficiencies for efficiency study
+      // Request tracks coming from IP
+      if (fitresult->getD0() > 2 || fitresult->getZ0() > 5) continue;
+      const Helix helixFit = fitresult->getHelix();
+      buildEfficiencies(wiresInCDCTrack, helixFit);
+    }
   }
   getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
 }

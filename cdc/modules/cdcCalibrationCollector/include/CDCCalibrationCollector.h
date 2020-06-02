@@ -114,6 +114,7 @@ namespace Belle2 {
       bool m_storeTrackParams = true;          /**< Store Track parameter or not. */
       bool m_eventT0Extraction = true;         /**< use Event T0 extract t0 or not. */
       bool m_isCosmic = false;                 /**< true when we process cosmic events, else false (collision). */
+      bool m_effStudy = false;                 /**< When true module collects info only necessary for wire eff study. */
 
       unsigned short wireID;                   /** wireID for hit-level wire monitoring*/
       unsigned short layerID;                  /** layerID for hit-level wire monitoring*/

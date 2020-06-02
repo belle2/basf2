@@ -190,7 +190,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
     B2INFO("Bad wires for " << layerNo << " recorded");
   }
   m_badWireList->outputToFile("wireFile.txt");
-  TFile* wireList = new TFile("wireList", "RECREATE");
+  TFile* wireList = new TFile("wireList.root", "RECREATE");
   m_badWireList->Write();
   wireList->Close();
   B2INFO("Bad wire list sucessfully saved.");

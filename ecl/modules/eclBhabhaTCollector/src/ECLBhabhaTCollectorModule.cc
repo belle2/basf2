@@ -756,6 +756,31 @@ void ECLBhabhaTCollectorModule::collect()
             }
 
 
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // If we drop the information about the second highest energy crystal we could use
+            //    m_eclClusterArray[ic]->getMaxECellId()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             B2DEBUG(30,  "calDigit(ir" << ir << ") time = " << calDigit->getTime() << "ns , with E = " << tempE << " GeV");
             time_ECLCaldigits_bothClusters.push_back(calDigit->getTime());
             cid_ECLCaldigits_bothClusters.push_back(tempCrysID);
@@ -913,11 +938,6 @@ void ECLBhabhaTCollectorModule::collect()
 
   // Now find energy clusters independently of the tracks
   //------------------------------------------------------------------------
-
-  vector<double> goodClusters_E;
-
-
-
 
   double clusterE_minCut = 0.06;  // GeV
   int nclust = m_eclClusterArray.getEntries();

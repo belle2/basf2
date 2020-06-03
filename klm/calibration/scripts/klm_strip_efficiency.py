@@ -14,7 +14,8 @@ from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
-from klm_strategies_common import calibration_result_string
+from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
+                                  calibration_result_string
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
@@ -101,44 +102,10 @@ class KLMStripEfficiency(AlgorithmStrategy):
         # Iterate over experiment run lists.
         number_of_experiments = len(runs_to_execute)
         for i_exp, run_list in enumerate(runs_to_execute, start=1):
-
-            # Set the lowest experiment and run numbers.
-            if iov_coverage and i_exp == 1:
-                lowest_exprun = ExpRun(iov_coverage.exp_low,
-                                       iov_coverage.run_low)
-                if lowest_exprun > run_list[0]:
-                    basf2.B2WARNING(
-                        f'The lowest run {run_list[0]} of input data is '
-                        f'smaller than the lowest run {lowest_exprun} of '
-                        'the requested IOV coverage. The IOV coverage is '
-                        'extended.')
-                    lowest_exprun = run_list[0]
-            else:
-                lowest_exprun = run_list[0]
-                # Start from the beginning of experiments except the first one.
-                if (i_exp > 1):
-                    lowest_exprun.run = 0
-
-            # Set the highest experiment and run numbers.
-            if iov_coverage and i_exp == number_of_experiments:
-                highest_exprun = ExpRun(iov_coverage.exp_high,
-                                        iov_coverage.run_high)
-                if (highest_exprun < run_list[-1] and
-                    not ((iov_coverage.exp_high == -1) or
-                         (iov_coverage.exp_high == run_list[-1].exp and
-                          iov_coverage.run_high == -1))):
-                    basf2.B2WARNING(
-                        f'The highest run {run_list[-1]} of input data is '
-                        f'larger than the highest run {highest_exprun} of '
-                        'the requested IOV coverage. The IOV coverage is '
-                        'extended.')
-                    highest_exprun = run_list[-1]
-            else:
-                highest_exprun = run_list[-1]
-                # Extend the IOV to the end of experiments except the last one.
-                if (i_exp < number_of_experiments):
-                    highest_exprun.run = -1
-
+            lowest_exprun = get_lowest_exprun(number_of_experiments, i_exp,
+                                              run_list, iov_coverage)
+            highest_exprun = get_highest_exprun(number_of_experiments, i_exp,
+                                                run_list, iov_coverage)
             self.process_experiment(run_list[0].exp, run_list, iteration,
                                     lowest_exprun, highest_exprun)
 

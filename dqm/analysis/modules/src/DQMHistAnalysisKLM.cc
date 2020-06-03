@@ -72,6 +72,8 @@ void DQMHistAnalysisKLMModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No KLM electronics map.");
+  m_DeadBarrelModules.clear();
+  m_DeadEndcapModules.clear();
   m_NewMaskedChannels.clear();
   m_MaskedChannels.clear();
 }

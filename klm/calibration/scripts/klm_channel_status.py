@@ -3,17 +3,18 @@
 """Custom calibration strategy for KLM channel status."""
 
 import collections
+import numpy
 import os
 
 import basf2
-from ROOT import Belle2
+import ROOT
 
 from caf.utils import ExpRun, IoV, AlgResult
 from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
-from ROOT.Belle2 import KLMChannelStatusAlgorithm
+from ROOT.Belle2 import KLMChannelStatusAlgorithm, KLMChannelIndex
 from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
                                   calibration_result_string
 
@@ -158,3 +159,114 @@ class KLMChannelStatus(AlgorithmStrategy):
                                               algorithm_results, '', None])
             result_str = calibration_result_string(result)
             basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))
+
+        # Sort by run number.
+        run_data.sort(key=lambda x: x[0])
+        run_data_klm_excluded.sort(key=lambda x: x[0])
+
+        # Create a tree with number of events.
+        save_channel_hit_map = False
+        save_module_hit_map = True
+        save_sector_hit_map = True
+        f_hit_map = ROOT.TFile('hit_map.root', 'recreate')
+        run = numpy.zeros(1, dtype=int)
+        calibration_result = numpy.zeros(1, dtype=int)
+        module = numpy.zeros(1, dtype=int)
+        subdetector = numpy.zeros(1, dtype=int)
+        section = numpy.zeros(1, dtype=int)
+        sector = numpy.zeros(1, dtype=int)
+        layer = numpy.zeros(1, dtype=int)
+        plane = numpy.zeros(1, dtype=int)
+        strip = numpy.zeros(1, dtype=int)
+        hits_total = numpy.zeros(1, dtype=int)
+        hits_module = numpy.zeros(1, dtype=int)
+        active_channels = numpy.zeros(1, dtype=int)
+        hit_map_channel = ROOT.TTree('hit_map_channel', '')
+        hit_map_channel.Branch('run', run, 'run/I')
+        hit_map_channel.Branch('calibration_result', calibration_result,
+                               'calibration_result/I')
+        hit_map_channel.Branch('channel', module, 'channel/I')
+        hit_map_channel.Branch('subdetector', subdetector, 'subdetector/I')
+        hit_map_channel.Branch('section', section, 'section/I')
+        hit_map_channel.Branch('sector', sector, 'sector/I')
+        hit_map_channel.Branch('layer', layer, 'layer/I')
+        hit_map_channel.Branch('plane', plane, 'plane/I')
+        hit_map_channel.Branch('strip', strip, 'strip/I')
+        hit_map_channel.Branch('hits_total', hits_total, 'hits_total/I')
+        hit_map_channel.Branch('hits_channel', hits_module, 'hits_channel/I')
+        hit_map_module = ROOT.TTree('hit_map_module', '')
+        hit_map_module.Branch('run', run, 'run/I')
+        hit_map_module.Branch('calibration_result', calibration_result,
+                              'calibration_result/I')
+        hit_map_module.Branch('module', module, 'module/I')
+        hit_map_module.Branch('subdetector', subdetector, 'subdetector/I')
+        hit_map_module.Branch('section', section, 'section/I')
+        hit_map_module.Branch('sector', sector, 'sector/I')
+        hit_map_module.Branch('layer', layer, 'layer/I')
+        hit_map_module.Branch('hits_total', hits_total, 'hits_total/I')
+        hit_map_module.Branch('hits_module', hits_module, 'hits_module/I')
+        hit_map_module.Branch('active_channels', active_channels, 'active_channels/I')
+        hit_map_sector = ROOT.TTree('hit_map_sector', '')
+        hit_map_sector.Branch('run', run, 'run/I')
+        hit_map_sector.Branch('calibration_result', calibration_result,
+                              'calibration_result/I')
+        hit_map_sector.Branch('sector_global', module, 'sector_global/I')
+        hit_map_sector.Branch('subdetector', subdetector, 'subdetector/I')
+        hit_map_sector.Branch('section', section, 'section/I')
+        hit_map_sector.Branch('sector', sector, 'sector/I')
+        hit_map_sector.Branch('hits_total', hits_total, 'hits_total/I')
+        hit_map_sector.Branch('hits_sector', hits_module, 'hits_sector/I')
+        for i in range(0, len(run_data)):
+            run[0] = run_data[i][0]
+            calibration_result[0] = run_data[i][1]
+            hits_total[0] = run_data[i][3].getTotalHitNumber()
+            # Channel hit map.
+            if (save_channel_hit_map):
+                index = KLMChannelIndex(KLMChannelIndex.c_IndexLevelStrip)
+                index2 = KLMChannelIndex(KLMChannelIndex.c_IndexLevelStrip)
+                while (index != index2.end()):
+                    module[0] = index.getKLMChannelNumber()
+                    subdetector[0] = index.getSubdetector()
+                    section[0] = index.getSection()
+                    sector[0] = index.getSector()
+                    layer[0] = index.getLayer()
+                    plane[0] = index.getPlane()
+                    strip[0] = index.getStrip()
+                    hits_module[0] = run_data[i][3].getHitMapChannel(). \
+                        getChannelData(int(module[0]))
+                    hit_map_channel.Fill()
+                    index.increment()
+            # Module hit map.
+            if (save_module_hit_map):
+                index = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+                index2 = KLMChannelIndex(KLMChannelIndex.c_IndexLevelLayer)
+                while (index != index2.end()):
+                    module[0] = index.getKLMModuleNumber()
+                    subdetector[0] = index.getSubdetector()
+                    section[0] = index.getSection()
+                    sector[0] = index.getSector()
+                    layer[0] = index.getLayer()
+                    hits_module[0] = run_data[i][3].getHitMapModule(). \
+                        getChannelData(int(module[0]))
+                    active_channels[0] = run_data[i][3]. \
+                        getModuleActiveChannelMap(). \
+                        getChannelData(int(module[0]))
+                    hit_map_module.Fill()
+                    index.increment()
+            # Sector hit map.
+            if (save_sector_hit_map):
+                index = KLMChannelIndex(KLMChannelIndex.c_IndexLevelSector)
+                index2 = KLMChannelIndex(KLMChannelIndex.c_IndexLevelSector)
+                while (index != index2.end()):
+                    module[0] = index.getKLMSectorNumber()
+                    subdetector[0] = index.getSubdetector()
+                    section[0] = index.getSection()
+                    sector[0] = index.getSector()
+                    hits_module[0] = run_data[i][3].getHitMapSector(). \
+                        getChannelData(int(module[0]))
+                    hit_map_sector.Fill()
+                    index.increment()
+        hit_map_channel.Write()
+        hit_map_module.Write()
+        hit_map_sector.Write()
+        f_hit_map.Close()

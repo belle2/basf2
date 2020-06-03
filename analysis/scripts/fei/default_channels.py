@@ -45,6 +45,7 @@ def get_default_channels(
     @param hadronic whether to include hadronic B decays (default is True)
     @param semileptonic whether to include semileptonic B decays (default is True)
     @param KLong whether to include K_long decays into the training (default is False)
+    @param baryonic whether to include baryons into the training (default is False)
     @param chargedB whether to recombine charged B mesons (default is True)
     @param neutralB whether to recombine neutral B mesons (default is True)
     @param convertedFromBelle whether to use Belle variables which is necessary for b2bii converted data (default is False)
@@ -947,6 +948,7 @@ def get_default_channels(
     # D_s*
     BS.addChannel(['D_s*-', 'K+'])
     BS.addChannel(['D_s*-', 'pi+'])
+
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
 
@@ -983,7 +985,6 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D*+', 'K_S0', 'pi0'])  # K*0
 
     BS.addChannel(['J/psi', 'K_S0'])
-    BS.addChannel(['J/psi', 'pi0'])
     BS.addChannel(['J/psi', 'pi+', 'pi-'])
     BS.addChannel(['J/psi', 'K+', 'K-']),
     BS.addChannel(['J/psi', 'K_S0', 'K-', 'pi+']),
@@ -1001,7 +1002,6 @@ def get_default_channels(
     if baryonic:
         particles.append(proton)
     particles.append(muon)
-    particles.append(electron)
     particles.append(electron)
     particles.append(gamma)
 

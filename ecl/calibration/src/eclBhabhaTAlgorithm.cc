@@ -190,7 +190,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   std::vector<float> currentUncCrate = crateTimeObject->getCalibUncVector();
 
   //..Print out a few values for quality control
-  B2INFO("Values read from database.  Write out for their validation vs values from tcol");
+  B2INFO("Values read from database.  Write out for their values for comparison against those from tcol");
   for (int ic = 0; ic < 8736; ic += 500) {
     B2INFO("ts: cellID " << ic + 1 << " " << currentValuesCrys[ic] << " +/- " << currentUncCrys[ic]);
     B2INFO("tcrate: cellID " << ic + 1 << " " << currentValuesCrate[ic] << " +/- " << currentUncCrate[ic]);

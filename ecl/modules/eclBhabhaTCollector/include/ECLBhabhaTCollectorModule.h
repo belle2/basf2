@@ -180,7 +180,7 @@ namespace Belle2 {
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
     StoreArray<ECLCluster> m_eclClusterArray; /**< Required input array of ECLClusters */
 
-    std::vector<float> m_EperCrys; /**< ECL digit energy for each crystal */
+    std::vector<float> m_EperCrys; /**< ECL cal digit energy for each crystal */
     std::vector<int> m_eclCalDigitID; /**< ECL cal digit id sorter */
     std::vector<int> m_eclDigitID; /**< ECL digit id sorter */
 

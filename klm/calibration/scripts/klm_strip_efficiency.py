@@ -70,7 +70,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         self.queue = queue
 
         basf2.B2INFO(f'Setting up {self.__class__.__name__} strategy '
-                     'for {self.algorithm.name}')
+                     f'for {self.algorithm.name}')
         # Add all the necessary parameters for a strategy to run.
         machine_params = {}
         machine_params["database_chain"] = self.database_chain
@@ -89,7 +89,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm.
         basf2.B2INFO(f'Beginning execution of {self.algorithm.name} using '
-                     'strategy {self.__class__.__name__}')
+                     f'strategy {self.__class__.__name__}')
 
         # Select of runs for calibration.
         runs = self.algorithm.algorithm.getRunListFromAllData()
@@ -102,7 +102,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
         # Remove the ignored runs.
         if self.ignored_runs:
             basf2.B2INFO(f'Removing the ignored_runs from the runs '
-                         'to execute for {self.algorithm.name}')
+                         f'to execute for {self.algorithm.name}')
             runs_to_execute.difference_update(set(self.ignored_runs))
 
         # Creation of sorted run list split by experiment.

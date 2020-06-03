@@ -159,25 +159,6 @@ b2conditions.prepend_globaltag("data_reprocessing_proc11")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
 
 
-# old method
-# use_central_database("ECL_testingNewPayload_RefCrystalPerCrate")
-# use_central_database("master_2020-05-13")
-# use_central_database("online_proc11")
-# use_central_database("data_reprocessing_proc11")
-# use_central_database("Reco_master_patch_rel5")
-#
-
-# Read in any required central databases
-# use_central_database("online")
-
-# 2 GT required for making proc 10
-# use_central_database("data_reprocessing_proc10")
-# use_central_database("data_reprocessing_prompt_rel4_patchb")
-
-# Read in any required local databases.  This may be required when doing crystal/crate iterations
-# use_local_database("localdb/database.txt")
-
-
 # == Process events
 # process(main, max_event=350000)  # reasonable stats for one crate
 # process(main, max_event=600000)  # reasonable stats for crystal calibs for proc10

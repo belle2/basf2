@@ -354,8 +354,10 @@ namespace Belle2 {
   }
 
 
-  // get vector which is oposite to vIn in CMS ref frame
-  // Be aware that input vIn and output are in the Lab frame
+  /*
+   * Get vector which is opposite to vIn in CMS ref frame
+   * Be aware that input vIn and output are in the Lab frame
+   */
   static TLorentzVector flipVector(TLorentzVector vIn)
   {
     TLorentzVector vCMS = PCmsLabTransform::labToCms(vIn);

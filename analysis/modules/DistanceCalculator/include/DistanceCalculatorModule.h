@@ -12,10 +12,14 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <string>
+#include <TMatrixFSym.h>
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
+#include <analysis/dataobjects/Btube.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 
@@ -41,10 +45,17 @@ namespace Belle2 {
 
   private:
 
+    void getDistance(const Particle* p1, const Particle* p2);
+    void getDistanceErrors(const Particle* p1, const Particle* p2);
+    void getBtubeDistance(const Particle* p, const Btube* t);
+    void getBtubeDistanceErrors(const Particle* p, const Btube* t);
+
     std::string m_listName; /**< name of particle list */
     std::string m_decayString;  /**< decay string */
     DecayDescriptor m_decayDescriptor;  /**< decay descriptor which specifies which particles are used to calculate the distance */
     std::string m_mode; /**< option string */
+    Eigen::Vector3d m_distance; /**< distance between two objects (tracks or Btube and vertex or two vertices) */
+    TMatrixFSym m_distanceCovMatrix; /**< covariance matrix of distance */
   };
 }
 

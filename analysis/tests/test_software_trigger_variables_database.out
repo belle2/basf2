@@ -9,29 +9,14 @@
 [INFO]      o) SoftwareTriggerPrescaling(software_trigger_cut&filter&1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 200
 [INFO]      o) SoftwareTriggerResult(INVALID_INPUT) = nan
 [ERROR] Cannot find payload in any of the configured global tags
-	name = INVALID_INPUT
-	globaltags = mc_production_MC13a_rev1, release-04-00-03
-	experiment = 1003
-	run = 0
-[ERROR] Cannot find payload in any of the configured global tags
 	name = software_trigger_cut&INVALID_INPUT
 	globaltags = mc_production_MC13a_rev1, release-04-00-03
 	experiment = 1003
 	run = 0
 [INFO]      o) SoftwareTriggerPrescaling(INVALID_INPUT) = nan
 [INFO]      o) SoftwareTriggerResult(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 0
-[ERROR] Cannot find payload in any of the configured global tags
-	name = filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV
-	globaltags = mc_production_MC13a_rev1, release-04-00-03
-	experiment = 1003
-	run = 0
 [INFO]      o) SoftwareTriggerPrescaling(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 200
 [INFO]      o) SoftwareTriggerResult(this is not a valid trigger identifier) = nan
-[ERROR] Cannot find payload in any of the configured global tags
-	name = this is not a valid trigger identifier
-	globaltags = mc_production_MC13a_rev1, release-04-00-03
-	experiment = 1003
-	run = 0
 [ERROR] Cannot find payload in any of the configured global tags
 	name = software_trigger_cut&this&is&not&a&valid&trigger&identifier
 	globaltags = mc_production_MC13a_rev1, release-04-00-03

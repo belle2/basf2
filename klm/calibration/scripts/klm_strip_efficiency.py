@@ -14,23 +14,7 @@ from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
-
-
-def calibration_result_string(result):
-    """
-    Convert calibration result to text message.
-    """
-    if (result == 0):
-        res = 'successful'
-    elif (result == 1):
-        res = 'iteration is necessary'
-    elif (result == 2):
-        res = 'not enough data'
-    elif (result == 3):
-        res = 'failure'
-    elif (result == 4):
-        res = 'undefined'
-    return res
+from klm_strategies_common import calibration_result_string
 
 
 class KLMStripEfficiency(AlgorithmStrategy):

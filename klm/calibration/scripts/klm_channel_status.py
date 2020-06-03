@@ -14,6 +14,7 @@ from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMChannelStatusCalibrationAlgorithm
+from klm_strategies_common import calibration_result_string
 
 
 def calibration_result_string(result):
@@ -70,7 +71,7 @@ class KLMChannelStatus(AlgorithmStrategy):
         self.queue = queue
 
         basf2.B2INFO(f'Setting up {self.__class__.__name__} strategy '
-                     'for {self.algorithm.name}')
+                     f'for {self.algorithm.name}')
         # Add all the necessary parameters for a strategy to run.
         machine_params = {}
         machine_params['database_chain'] = self.database_chain
@@ -82,8 +83,6 @@ class KLMChannelStatus(AlgorithmStrategy):
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states.
         basf2.B2INFO(f'Starting AlgorithmMachine of {self.algorithm.name}')
-        self.algorithm.algorithm.setCalibrationStage(
-            KLMChannelStatusAlgorithm.c_EfficiencyMeasurement)
         # This sets up the logging and database chain and assigns all
         # input files from collector jobs.
         self.machine.setup_algorithm(iteration=iteration)
@@ -166,8 +165,7 @@ class KLMChannelStatus(AlgorithmStrategy):
         else:
             self.send_final_state(self.FAILED)
 
-    def execute_over_run_list(self, run_list, iteration, forced_calibration,
-                              output_file):
+    def execute_over_run_list(self, run_list, iteration, forced_calibration):
         """
         Execute over run list.
         """
@@ -177,8 +175,6 @@ class KLMChannelStatus(AlgorithmStrategy):
             self.first_execution = False
         self.machine.algorithm.algorithm.setForcedCalibration(
             forced_calibration)
-        if (output_file is not None):
-            self.machine.algorithm.algorithm.setOutputFileName(output_file)
         self.machine.execute_runs(runs=run_list, iteration=iteration,
                                   apply_iov=None)
         if (self.machine.result.result == AlgResult.ok.value) or \
@@ -192,3 +188,24 @@ class KLMChannelStatus(AlgorithmStrategy):
         """
         Process runs from experiment.
         """
+        # Run lists. They have the following format: run number,
+        # calibration result code, ExpRun, algorithm results,
+        # merge information, payload.
+        run_data = []
+        run_data_klm_excluded = []
+
+        # Initial run.
+        for exp_run in experiment_runs:
+            self.execute_over_run_list([exp_run], iteration, False)
+            result = self.machine.result.result
+            # algorithm_results = KLMChannelStatusCalibrationAlgorithm.Results(
+            #    self.machine.algorithm.algorithm.getResults())
+            algorithm_results = self.machine.algorithm.algorithm
+            if (algorithm_results.getTotalHitNumber() > 0):
+                run_data.append([exp_run.run, result, [exp_run],
+                                 algorithm_results, '', None])
+            else:
+                run_data_klm_excluded.append([exp_run.run, result, [exp_run],
+                                              algorithm_results, '', None])
+            result_str = calibration_result_string(result)
+            basf2.B2INFO('Run %d: %s.' % (exp_run.run, result_str))

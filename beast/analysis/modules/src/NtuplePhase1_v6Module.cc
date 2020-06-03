@@ -1187,14 +1187,14 @@ namespace Belle2 {
     double Nb_LER = 0;
     if (Ib_LER > 0) Nb_LER = Ib_LER * 3000. / TMath::C() / (1.6e-19);
 
-    double RLR_HER = 0;
+    //double RLR_HER = 0;
     if (m_beast.SKB_HER_lifetime != 0 && m_beast.SKB_HER_lifetime->size() > 0 && Nb_HER > 0) {
-      RLR_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
+      double RLR_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
       m_beast.SKB_HER_RLR.push_back(RLR_HER);
     }
-    double RLR_LER = 0;
+    //double RLR_LER = 0;
     if (m_beast.SKB_LER_lifetime != 0 && m_beast.SKB_LER_lifetime->size() > 0 && Nb_LER > 0) {
-      RLR_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
+      double RLR_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
       m_beast.SKB_LER_RLR.push_back(RLR_LER);
     }
 

@@ -119,7 +119,7 @@ namespace Belle2 {
         double ch_woAu[100];
         double phi[100];
         double r[100];
-        int dimr_pin = 0;
+        //int dimr_pin = 0;
         if (phase == 1) {
           int dimwAu = 0;
           for (int wAu : activeParams.getArray("Ch_wAu", {0})) {
@@ -170,6 +170,7 @@ namespace Belle2 {
             phi[dimPhi] = Phi  - 90. * CLHEP::deg;
             dimPhi++;
           }
+          int dimr_pin = 0;
           for (double r_pin : activeParams.getArray("r_pin", {0})) {
             r_pin *= CLHEP::cm;
             r[dimr_pin] = r_pin;

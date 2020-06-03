@@ -122,8 +122,8 @@ def get_default_channels(
                         PreCutConfiguration(userCut=charged_user_cut,
                                             bestCandidateMode='highest',
                                             bestCandidateVariable='electronID' if not convertedFromBelle else 'eIDBelle',
-                                            bestCandidateCut=15),
-                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
+                                            bestCandidateCut=10),
+                        PostCutConfiguration(bestCandidateCut=5, value=0.01))
     electron.addChannel(['e+:FSP'])
 
     muon = Particle('mu+',
@@ -594,7 +594,7 @@ def get_default_channels(
               'useRestFrame(daughter({}, p))',
               'useRestFrame(daughter({}, distance))',
               'decayAngle({})', 'daughterAngle({},{})', 'cosAngleBetweenMomentumAndVertexVector',
-              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'daughter({},extraInfo(decayModeID))', 'deltaE']
+              'dr', 'dz', 'dx', 'dy', 'distance', 'significanceOfDistance', 'deltaE', 'daughter({},extraInfo(decayModeID))']
 
     hadronic_user_cut = 'Mbc > 5.2 and abs(deltaE) < 0.5'
     if B_extra_cut is not None:

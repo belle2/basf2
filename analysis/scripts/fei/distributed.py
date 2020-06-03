@@ -60,6 +60,7 @@ try:
 except ModuleNotFoundError:
     print("B2BII not found, can't use process_urls for training.")
     b2biifound = False
+import fei
 
 
 def getCommandLineOptions():

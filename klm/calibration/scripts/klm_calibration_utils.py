@@ -22,9 +22,6 @@ def get_channel_status_pre_collector_path(entry_sequence=""):
         main.add_module('RootInput',
                         entrySequences=[entry_sequence])
 
-    main.add_module('Gearbox')
-    main.add_module('Geometry')
-
     # KLM unpacker.
     add_unpackers(main, components=['KLM'])
 
@@ -43,9 +40,6 @@ def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     if entry_sequence:
         main.add_module('RootInput',
                         entrySequences=[entry_sequence])
-
-    main.add_module('Gearbox')
-    main.add_module('Geometry')
 
     # Unpackers and reconstruction.
     add_unpackers(main)
@@ -81,9 +75,6 @@ def get_alignment_pre_collector_path_physics(entry_sequence=""):
     if entry_sequence:
         main.add_module('RootInput',
                         entrySequences=[entry_sequence])
-
-    main.add_module('Gearbox')
-    main.add_module('Geometry')
 
     # Unpackers and reconstruction.
     add_unpackers(main)

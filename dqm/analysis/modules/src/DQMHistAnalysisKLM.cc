@@ -255,7 +255,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   const double histRangeNDC = histMaxNDC - histMinNDC;
   int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
   double xAlarm = 0.15;
-  double yAlarm = 0.85;
+  double yAlarm = 0.8;
   TH1* histogram = findHist("KLM/" + histName);
   if (histogram == nullptr) {
     B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");

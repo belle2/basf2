@@ -9,6 +9,28 @@ from reconstruction import add_cosmics_reconstruction, add_reconstruction, prepa
 import modularAnalysis as ma
 
 
+def get_channel_status_pre_collector_path(entry_sequence=""):
+    """
+    Parameters:
+        entry_sequence  (str): A single entry sequence e.g. '0:100' to help limit processed events.
+
+    Returns:
+        basf2.Path:  A reconstruction path to run before the collector. Used for raw cosmic input files.
+    """
+    main = basf2.create_path()
+    if entry_sequence:
+        main.add_module('RootInput',
+                        entrySequences=[entry_sequence])
+
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+
+    # KLM unpacker.
+    add_unpackers(main, components=['KLM'])
+
+    return main
+
+
 def get_alignment_pre_collector_path_cosmic(entry_sequence=""):
     """
     Parameters:

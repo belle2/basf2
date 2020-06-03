@@ -699,7 +699,7 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
     """
     stages = [
         [p for p in particles if p.name in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
-        [p for p in particles if p.name in ['pi0', 'J/psi', 'Lambda0', 'phi']],
+        [p for p in particles if p.name in ['pi0', 'J/psi', 'Lambda0']],
         [p for p in particles if p.name in ['K_S0', 'Sigma+']],
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],

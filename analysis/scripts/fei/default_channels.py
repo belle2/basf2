@@ -899,6 +899,10 @@ def get_default_channels(
         B0_KL.addChannel(['J/psi', 'K_L0'])
         B0_KL.addChannel(['J/psi', 'K_L0', 'pi+', 'pi-'])
 
+    """
+    BEGIN B_s0 RECO:
+    """
+
     # Use deltaE + Mbc - m_(B_s) instead of deltaE since Bs has only one peak here (vs. 3 in deltaE)
     Bs_vars = ['formula(deltaE+Mbc-5.3669)' if x == 'deltaE' else x for x in B_vars]
 
@@ -920,6 +924,7 @@ def get_default_channels(
                                       bestCandidateCut=20),
                   PostCutConfiguration(bestCandidateCut=20))
 
+    # D_s & D*
     BS.addChannel(['D_s-', 'D_s+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D_s-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*-', 'D_s*+'], preCutConfig=tight_precut)
@@ -936,13 +941,13 @@ def get_default_channels(
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
 
+    # D_s
     BS.addChannel(['D_s-', 'K+'])
     BS.addChannel(['D_s-', 'pi+'])
 
+    # D_s*
     BS.addChannel(['D_s*-', 'K+'])
     BS.addChannel(['D_s*-', 'pi+'])
-
-    BS.addChannel(['J/psi', 'phi'])       # K+K- NR added below
 
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
@@ -968,6 +973,7 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'], preCutConfig=tight_precut)
 
+    # These are from belle decfile
     BS.addChannel(['D_s*-', 'pi+', 'pi0'], preCutConfig=tight_precut)          # rho+
     BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'], preCutConfig=tight_precut)     # K*+
     BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
@@ -986,13 +992,16 @@ def get_default_channels(
     BS.addChannel(['J/psi', 'pi-', 'pi+', 'pi0'])  # Eta
     BS.addChannel(['J/psi', 'pi+', 'pi-', 'pi-', 'pi+', 'pi0'])  # Etaprime
 
+    """
+    END B_s0 RECO:
+    """
+
     particles = []
     particles.append(pion)
     particles.append(kaon)
     if baryonic:
         particles.append(proton)
     particles.append(muon)
-    particles.append(electron)
     particles.append(electron)
     particles.append(gamma)
 
@@ -1045,7 +1054,6 @@ def get_default_channels(
 
     if strangeB:
         particles.append(BS)
-        particles.append(phi)
 
     return particles
 

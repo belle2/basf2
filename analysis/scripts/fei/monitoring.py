@@ -241,7 +241,6 @@ class MonitoringNTuple(object):
     """
     Reads the ntuple named variables from a ROOT file
     """
-
     def __init__(self, filename):
         """
         Reads ntuple from the given file
@@ -264,7 +263,6 @@ class MonitoringModuleStatistics(object):
     Reads the module statistics for a single particle from the outputted root file
     and puts them into a more accessible format
     """
-
     def __init__(self, particle):
         """
         Reads the module statistics from the file named Monitor_ModuleStatistics.root
@@ -541,7 +539,6 @@ class MonitoringParticle(object):
     Monitoring object containing all the monitoring information
     about a single particle
     """
-
     def __init__(self, particle):
         """
         Read the monitoring information of the given particle

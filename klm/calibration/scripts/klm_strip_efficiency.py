@@ -45,7 +45,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
     #: The parameters of Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.
-    usable_params = {"iov_coverage": IoV}
+    usable_params = {'iov_coverage': IoV}
 
     def __init__(self, algorithm):
         """
@@ -73,15 +73,15 @@ class KLMStripEfficiency(AlgorithmStrategy):
                      f'for {self.algorithm.name}')
         # Add all the necessary parameters for a strategy to run.
         machine_params = {}
-        machine_params["database_chain"] = self.database_chain
-        machine_params["dependent_databases"] = self.dependent_databases
-        machine_params["output_dir"] = self.output_dir
-        machine_params["output_database_dir"] = self.output_database_dir
-        machine_params["input_files"] = self.input_files
-        machine_params["ignored_runs"] = self.ignored_runs
+        machine_params['database_chain'] = self.database_chain
+        machine_params['dependent_databases'] = self.dependent_databases
+        machine_params['output_dir'] = self.output_dir
+        machine_params['output_database_dir'] = self.output_database_dir
+        machine_params['input_files'] = self.input_files
+        machine_params['ignored_runs'] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states.
-        basf2.B2INFO(f"Starting AlgorithmMachine of {self.algorithm.name}")
+        basf2.B2INFO(f'Starting AlgorithmMachine of {self.algorithm.name}')
         self.algorithm.algorithm.setCalibrationStage(
             KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement)
         # This sets up the logging and database chain and assigns all
@@ -111,8 +111,8 @@ class KLMStripEfficiency(AlgorithmStrategy):
 
         # Get IOV coverage,
         iov_coverage = None
-        if "iov_coverage" in self.algorithm.params:
-            iov_coverage = self.algorithm.params["iov_coverage"]
+        if 'iov_coverage' in self.algorithm.params:
+            iov_coverage = self.algorithm.params['iov_coverage']
 
         # Iterate over experiment run lists.
         number_of_experiments = len(runs_to_execute)

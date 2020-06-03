@@ -524,13 +524,18 @@ namespace {
     // declare StoreArrays of Particles and ECLClusters
     StoreArray<Particle> particles;
     StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
 
-    // create a photon list
+    // create a photon and the pion lists
     StoreObjPtr<ParticleList> gammalist("gamma:all");
+    StoreObjPtr<ParticleList> pionlist("pi+:all");
+    StoreObjPtr<ParticleList> piminuslist("pi-:all");
 
-    // register the photon list in the datastore
+    // register the particle lists in the datastore
     DataStore::Instance().setInitializeActive(true);
     gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    pionlist.registerInDataStore(DataStore::c_DontWriteOut);
+    piminuslist.registerInDataStore(DataStore::c_DontWriteOut);
     DataStore::Instance().setInitializeActive(false);
 
     // initialise the photon list
@@ -545,13 +550,33 @@ namespace {
       }
     }
 
+    // initialize the pion lists
+    pionlist.create();
+    pionlist->initialize(211, pionlist.getName());
+    piminuslist.create();
+    piminuslist->initialize(-211, piminuslist.getName());
+    piminuslist->bindAntiParticleList(*(pionlist));
+
+    // fill the pion list with the tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
+      pionlist->addParticle(p);
+    }
+
+    // check overlap without any arguments
+    const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");
+    // the track list e-:all is missing so NaN is returned
+    EXPECT_TRUE(std::isnan(photonHasOverlapNoArgs->function(particles[0])));
+
     // check overlap without any requirement on other photons
-    const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap()");
+    const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap(, gamma:all, pi+:all)");
     // cluster 3 and cluster 1 share the connected region
     EXPECT_TRUE(photonHasOverlapAll->function(particles[0]));
+    // photonHasOverlap is designed for photons, so calling it for a pion returns NaN
+    EXPECT_TRUE(std::isnan(photonHasOverlapAll->function(particles[3])));
 
     // check overlap with photons in barrel
-    const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2)");
+    const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2, gamma:all, pi+:all)");
     // cluster 3 is in the forward end cap so it doesn't matter that it has the same connected region like cluster 1
     EXPECT_FALSE(photonHasOverlapBarrel->function(particles[0]));
   }

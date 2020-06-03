@@ -107,16 +107,6 @@ b2conditions.prepend_globaltag("online_proc11")
 b2conditions.prepend_globaltag("data_reprocessing_proc11")
 b2conditions.prepend_globaltag("Reco_master_patch_rel5")
 
-# old method
-# reset_database()
-# use_database_chain()
-# use_central_database("ECL_testingNewPayload_RefCrystalPerCrate")
-# use_central_database("master_2020-05-13")
-# use_central_database("online_proc11")
-# use_central_database("data_reprocessing_proc11")
-# use_central_database("Reco_master_patch_rel5")
-# use_local_database("localdb/database.txt")
-
 
 if (combineRuns):
     print("Combining all runs' histograms for a single calibration")

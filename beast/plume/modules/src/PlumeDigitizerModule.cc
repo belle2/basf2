@@ -110,7 +110,7 @@ void PlumeDigitizerModule::setResponseModel()
 
 void PlumeDigitizerModule::getXMLData()
 {
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PLUME\"]/Content/");
+  //GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PLUME\"]/Content/");
 
   //get the location of the sensors
 //  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {

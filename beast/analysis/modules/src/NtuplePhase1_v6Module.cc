@@ -270,8 +270,8 @@ namespace Belle2 {
     if (m_input_Z[2] == 0) m_input_Z_scaling[2] = 0;
     if (m_input_Z[3] == 0) m_input_Z_scaling[3] = 0;
 
-    double volume = 0.;
-    double rho = 0.;
+    double volume;
+    double rho;
     double mass = 0.;
     const double RadConv = 6.24e7; // 1 mrad = 6.24e7 MeV/kg
 
@@ -1055,16 +1055,17 @@ namespace Belle2 {
 
     m_tree->GetEntry(m_eventCount);
 
-    double Zeff_LER = 0;
+    double Zeff_LER = 2.7;
     if (m_beast.SKB_LER_Zeff_D02 != 0 && m_beast.SKB_LER_Zeff_D02->size() > 0) Zeff_LER = m_beast.SKB_LER_Zeff_D02->at(0);
     //cout << "Zeff_DO2 " << Zeff_LER << endl;
     double Zeff_LC = 1;
     double Zeff_LB = 1;
-    if (Zeff_LER == 0) {
-      Zeff_LER = 2.7;
-      //Zeff_LC = 1.0;
-      //Zeff_LB = 1.0;
-    } else if (Zeff_LER > 0 && Zeff_LER < 40) {
+    //if (Zeff_LER == 0) {
+    //Zeff_LER = 2.7;
+    //Zeff_LC = 1.0;
+    //Zeff_LB = 1.0;
+    //} else
+    if (Zeff_LER > 0 && Zeff_LER < 40) {
       Zeff_LC = fctRate_LC->Eval(Zeff_LER) / fctRate_LC->Eval(7) / m_input_Z_scaling[1];
       Zeff_LB = fctRate_LB->Eval(Zeff_LER) / fctRate_LB->Eval(7) / m_input_Z_scaling[3];
     }
@@ -1082,16 +1083,16 @@ namespace Belle2 {
     double I_LER = 0;
     if (m_beast.SKB_LER_current != 0 && m_beast.SKB_LER_current->size() > 0) I_LER = m_beast.SKB_LER_current->at(0);
     if (m_input_I_LER[1] > 0) I_LER += gRandom->Gaus(0, m_input_I_LER[1]);
-    double P_HER = 0;
+    /*double P_HER = 0;
     if (m_beast.SKB_HER_pressure_average != 0
         && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection[0];
-    if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
-    double P_LER = 0;
-    if (m_beast.SKB_LER_pressure_average != 0
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[0];*/
+    //if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
+    //double P_LER = 0;
+    /*if (m_beast.SKB_LER_pressure_average != 0
         && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(
-                0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];
-    if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+                0) * 0.00750062 * 1e9 * m_input_GasCorrection[1];*/
+    //if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double P_corrected_HER = 0;
     if (m_beast.SKB_HER_pressure_average_corrected != 0
         && m_beast.SKB_HER_pressure_average_corrected->size() > 0) P_corrected_HER = m_beast.SKB_HER_pressure_average_corrected->at(
@@ -1162,18 +1163,18 @@ namespace Belle2 {
     */
     if (I_HER < 0) I_HER = 0;
     if (I_LER < 0) I_LER = 0;
-    if (P_HER < 0) P_HER = 0;
-    if (P_LER < 0) P_LER = 0;
+    //if (P_HER < 0) P_HER = 0;
+    //if (P_LER < 0) P_LER = 0;
     if (P_corrected_HER < 0) P_corrected_HER = 0;
     if (P_corrected_LER < 0) P_corrected_LER = 0;
 
     if (m_input_data_SingleBeam == "LER") {
       I_HER = 0;
-      P_HER = 0;
+      //P_HER = 0;
       P_corrected_HER = 0;
     } else if (m_input_data_SingleBeam == "HER") {
       I_LER = 0;
-      P_LER = 0;
+      //P_LER = 0;
       P_corrected_LER = 0;
     }
 

@@ -6,7 +6,7 @@ if [ ! -f "$RAWDATA" ]; then
     exit 1
 fi
 
-b2code-memoryusage -m record -p ${OUTPUT_DIR}/bream_reco_monitor-memory.npz -- basf2 -p ${NCPUS} \
+b2code-memoryusage -m record -p ${OUTPUT_DIR}/beam_reco_monitor-memory.npz -- basf2 -p ${NCPUS} \
     ${BELLE2_RELEASE_DIR}/hlt/operation/phase3/global/hlt/evp_scripts/beam_reco_monitor.py -- \
     UNUSED UNUSED 6666 \
     --input-file ${RAWDATA} \

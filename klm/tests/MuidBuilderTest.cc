@@ -245,7 +245,7 @@ namespace Belle2 {
     std::bitset<30> bitExtPattern(std::string("1111111000000000000111"));
     unsigned int extPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
     std::bitset<30> bitHitPattern(std::string("1100111000000000000101"));
-    unsigned int hitPattern = static_cast<unsigned int>(bitExtPattern.to_ulong());
+    unsigned int hitPattern = static_cast<unsigned int>(bitHitPattern.to_ulong());
     /* Test the forward endcap. */
     bool isForward = true;
     bool escaped = false;
@@ -269,7 +269,7 @@ namespace Belle2 {
       m_muid->setExtBKLMEfficiencyValue(layer, efficiency);
     for (int layer = 0; layer < EKLMElementNumbers::getMaximalLayerNumber(); ++layer)
       m_muid->setExtEKLMEfficiencyValue(layer, efficiency);
-    std::vector<float> logLVector = { -44.5906, -1.07438, -17.565, -18.8431, -25.3259, -34.5714};
+    std::vector<float> logLVector = { -38.1205, -2.43391, -16.0512, -17.094, -23.4617, -31.9516};
     for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
       m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));
@@ -282,7 +282,7 @@ namespace Belle2 {
     outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, escaped, lastBarrelLayer, lastEndcapLayer);
     m_muid->setIsForward(isForward);
     m_muid->setOutcome(outcome);
-    logLVector = { -50.8586, -1.44044, -18.5049, -20.8389, -26.4896, -33.4034};
+    logLVector = { -43.7474, -2.51744, -16.6359, -18.5523, -23.8643, -29.9728};
     for (size_t i = 0; i < m_pdgVectorMinus.size(); ++i) {
       m_muidBuilder = new MuidBuilder(m_pdgVectorMinus.at(i));
       float logL = std::log(m_muidBuilder->getPDF(m_muid));

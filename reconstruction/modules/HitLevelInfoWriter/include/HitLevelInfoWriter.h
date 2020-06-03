@@ -177,6 +177,11 @@ namespace Belle2 {
     double h_wireGain[kMaxHits] = {}; /**< calibration hit gain */
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */
+    double h_WeightPionHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightKaonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightProtonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+
+    int h_foundByTrackFinder[kMaxHits] = {}; /**< the 'found by track finder' flag for the given hit */
 
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */

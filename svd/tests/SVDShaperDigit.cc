@@ -109,6 +109,7 @@ namespace Belle2 {
       EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
+    /** test sample trimming*/
     TEST(SVDShaperDigit, SampleTrimming)
     {
       // Create an arbitrary 6-digit
@@ -129,6 +130,7 @@ namespace Belle2 {
       }
     }
 
+    /**test sample trimming*/
     TEST(SVDShaperDigit, TrimmingFunction)
     {
 

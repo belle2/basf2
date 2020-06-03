@@ -13,22 +13,16 @@
 
 using namespace Belle2;
 
-EKLMAlignmentHit::EKLMAlignmentHit()
+EKLMAlignmentHit::EKLMAlignmentHit() :
+  m_DigitIdentifier(0)
 {
-  m_DigitIdentifier = 0;
 }
 
-EKLMAlignmentHit::EKLMAlignmentHit(int digitIdentifier)
+EKLMAlignmentHit::EKLMAlignmentHit(int digitIdentifier) :
+  m_DigitIdentifier(digitIdentifier)
 {
-  m_DigitIdentifier = digitIdentifier;
 }
 
 EKLMAlignmentHit::~EKLMAlignmentHit()
 {
 }
-
-int EKLMAlignmentHit::getDigitIdentifier() const
-{
-  return m_DigitIdentifier;
-}
-

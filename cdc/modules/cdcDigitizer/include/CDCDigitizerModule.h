@@ -188,7 +188,6 @@ namespace Belle2 {
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
-    //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
@@ -244,6 +243,7 @@ namespace Belle2 {
 
     /** Structure for saving the x-talk information. */
     struct XTalkInfo {
+      /** Constructor that initializes all members. */
       XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
         m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
       unsigned short m_tdc; /**< TDC count */

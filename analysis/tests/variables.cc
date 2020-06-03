@@ -3482,7 +3482,7 @@ namespace {
 
 
 
-  TEST_F(MetaVariableTest, daughterAngleInBetween)
+  TEST_F(MetaVariableTest, daughterAngle)
   {
     StoreArray<Particle> particles;
 
@@ -3528,20 +3528,20 @@ namespace {
 
 
     // Test the invariant mass of several combinations
-    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleInBetween(0, 1)");
+    const Manager::Var* var = Manager::Instance().getVariable("daughterAngle(0, 1)");
     double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     // this should be a generic combinations
-    var = Manager::Instance().getVariable("daughterAngleInBetween(0:0, 1:0)");
+    var = Manager::Instance().getVariable("daughterAngle(0:0, 1:0)");
     v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween( 1, -1)");
+    var = Manager::Instance().getVariable("daughterAngle( 1, -1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween(1, 0:1:0:0:1)");
+    var = Manager::Instance().getVariable("daughterAngle(1, 0:1:0:0:1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
@@ -4403,7 +4403,7 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
+    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 

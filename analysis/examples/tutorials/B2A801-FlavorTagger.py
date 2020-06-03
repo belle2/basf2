@@ -83,10 +83,6 @@ ma.reconstructDecay(decayString='J/psi:mumu -> mu+:all mu-:all', cut='dM<0.11', 
 ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
 ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
 
-# reconstruct Ks from standard pi+ particle list
-ma.fillParticleList(decayString='pi+:all', cut='', path=cp_val_path)
-ma.reconstructDecay(decayString='K_S0:pipi -> pi+:all pi-:all', cut='dM<0.25', path=cp_val_path)
-
 # reconstruct B0 -> J/psi Ks decay
 ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2 and abs(deltaE)<0.15', path=cp_val_path)
 
@@ -97,10 +93,7 @@ ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 ma.buildRestOfEvent(target_list_name='B0:sig',
                     path=cp_val_path)
 
-# Temporarily, we use the analysis GT with the flavor tagger payloads for release-03-02-00.
-# This will NOT be needed once we retrain with MC13!
-
-b2.conditions.append_globaltag("analysis_tools_release-03-02-00")
+b2.conditions.append_globaltag("analysis_tools_release-04-02")
 
 # The default working directory is '.'
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.

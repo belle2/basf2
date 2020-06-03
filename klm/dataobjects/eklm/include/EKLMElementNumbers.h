@@ -37,14 +37,9 @@ namespace Belle2 {
     };
 
     /**
-     * Constructor.
+     * Instantiation.
      */
-    EKLMElementNumbers();
-
-    /**
-     * Destructor.
-     */
-    virtual ~EKLMElementNumbers();
+    static const EKLMElementNumbers& Instance();
 
     /**
      * Check if section number is correct.
@@ -176,7 +171,7 @@ namespace Belle2 {
      * @param[out] plane       Plane number.
      */
     void planeNumberToElementNumbers(
-      int planeGlobal, int* section, int* layer, int* sector, int* segment)
+      int planeGlobal, int* section, int* layer, int* sector, int* plane)
     const;
 
     /**
@@ -395,6 +390,18 @@ namespace Belle2 {
     {
       return m_NStripsSegment;
     }
+
+  private:
+
+    /**
+     * Constructor.
+     */
+    EKLMElementNumbers();
+
+    /**
+     * Destructor.
+     */
+    ~EKLMElementNumbers();
 
   protected:
 

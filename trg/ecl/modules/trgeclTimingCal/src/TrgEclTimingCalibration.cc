@@ -294,6 +294,7 @@ int TRGECLTimingCalModule::Solve_Matrix()
 
   // Solve Ax = b
   TVectorD x = lu.Solve(vec_b, b_solve);
+  /* cppcheck-suppress variableScope */
   int ix = 0;
   if (b_solve) {
     for (int i = 0; i < nTC_tot; i++) {

@@ -18,8 +18,6 @@
 // Modofied to be suitable to Belle II style
 // $Log$
 
-using namespace std;
-
 
 // system include files
 #include <iostream>

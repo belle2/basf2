@@ -102,8 +102,8 @@ def get_strip_efficiency_pre_collector_path(entry_sequence="", raw_format=True):
         main.add_module('Geometry')
 
     # Fill muon particle list
-    ma.fillParticleList('mu+:all',
-                        '1 < p and p < 11 and abs(d0) < 2 and abs(z0) < 5',
+    ma.fillParticleList('mu+:klmStripEfficiency',
+                        '[1 < p] and [p < 11] and [abs(d0) < 2] and [abs(z0) < 5]',
                         path=main)
 
     return main

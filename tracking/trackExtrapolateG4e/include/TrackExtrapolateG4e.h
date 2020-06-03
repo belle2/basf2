@@ -24,7 +24,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
@@ -436,8 +436,8 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
     //! ECL clusters
     StoreArray<ECLCluster> m_eclClusters;

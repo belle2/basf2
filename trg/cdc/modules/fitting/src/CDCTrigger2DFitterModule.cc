@@ -142,7 +142,7 @@ CDCTrigger2DFitterModule::event()
       }
     }
     if (nHits < m_minHits) {
-      B2INFO("Not enough hits to do 2D fit (" << m_minHits << " needed, got " << nHits << ")");
+      B2DEBUG(20, "Not enough hits to do 2D fit (" << m_minHits << " needed, got " << nHits << ")");
       continue;
     }
 

@@ -308,7 +308,7 @@ namespace Belle2 {
       }
 
       /** Fill parameters of planar deformation to vector */
-      void setSurfaceParameters(std::vector<double> planarParameters)
+      void setSurfaceParameters(const std::vector<double>& planarParameters)
       {
         m_surfaceDeformationParameters = planarParameters;
       }

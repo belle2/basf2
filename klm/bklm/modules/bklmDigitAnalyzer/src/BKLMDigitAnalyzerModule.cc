@@ -221,7 +221,7 @@ void BKLMDigitAnalyzerModule::endRun()
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
 
   // Save the .root file
-  if (m_outputRootFile != NULL) {
+  if (m_outputRootFile != nullptr) {
     m_outputRootFile->cd();
 
     m_extraInfo->Write();

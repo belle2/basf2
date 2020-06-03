@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -65,10 +65,7 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->addParameter("onlyUseTracksWithSVD", m_param_onlyUseTracksWithSVD,
                                 "Only use tracks which have an SVD hit associated.",
                                 m_param_onlyUseTracksWithSVD);
-  moduleParamList->addParameter("reverseSeedState",
-                                m_param_reverseSeed,
-                                "Reverse the seed.",
-                                m_param_reverseSeed);
+  moduleParamList->addParameter("reverseSeedState", m_param_reverseSeed, "Reverse the seed.", m_param_reverseSeed);
 
   // Default values
   moduleParamList->getParameter<std::string>("advanceHighFilter").setDefaultValue("advance");
@@ -82,6 +79,8 @@ void CKFToPXDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
   moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("sensor");
+  moduleParamList->getParameter<std::string>("preSeedFilter").setDefaultValue("loose");
+  moduleParamList->getParameter<std::string>("preHitFilter").setDefaultValue("loose");
 
   moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("PXDSpacePoints");
 

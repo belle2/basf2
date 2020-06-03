@@ -151,9 +151,12 @@ void TRGCDCTSFDQMModule::event()
   }
   h_nhit->Fill(nhit);
 
-  int id = 0;
-  int v  = 0;
-  int rt = 0;
+  /* cppcheck-suppress variableScope */
+  int id;
+  /* cppcheck-suppress variableScope */
+  int v ;
+  /* cppcheck-suppress variableScope */
+  int rt;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     id = entAry[ii]->m_trackerhit0id;
     v  = entAry[ii]->m_trackerhit0v;

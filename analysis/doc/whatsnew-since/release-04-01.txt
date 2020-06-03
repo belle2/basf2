@@ -25,6 +25,10 @@ Vertex Fitting
 
  * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
 
+ * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
+   This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
+   TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
+
 Standard Particle Lists
 +++++++++++++++++++++++
 
@@ -56,6 +60,8 @@ Standard Particle Lists
  * Moved the KlId check from :b2:mod:`ParticleLoader` to `stdKlongs`. This modification does not change the definition of the
    ``K_L0:all`` list and, in general, of the user-defined :math:`K_{L}^0` lists.
  * Removed the functions ``mergedKshorts`` and ``mergedLambdas``, which returned the standard V0 lists anyway.
+ * Removed the deprecated pi0 lists ``pi0:loose`` and ``pi0:veryloose``
+ * stdPi0s and stdPhotons updated to match Jan2020 recommendations.  Naming scheme updated to indicate date of optimization.
 
 Variables
 +++++++++
@@ -63,17 +69,14 @@ Variables
   .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors.
      To study the failures use the meta variable `ifNANgiveX`, which replaces nan with a value of your choice.
 
- * Rename ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
- * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`, :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
- * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
- * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`, :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
- * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`, :b2:var:`mcProductionVertexFromIPY`, and :b2:var:`mcProductionVertexFromIPZ`.
- * Renamed ``mcDistance`` to :b2:var:`mcDecayVertexFromIPDistance`.  
- * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
+ .. warning:: The variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and :b2:var:`pointingAngle` now return an angle instead of a cosine.
+
  * Renamed ``mcDX``, ``mcDY``, ``mcDZ``, and ``mcDRho`` to :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY`,
    :b2:var:`mcDecayVertexFromIPZ`, and :b2:var:`mcDecayVertexFromIPRho`.
+ * Renamed ``mdstSource`` to :b2:var:`uniqueParticleIdentifier`.
+ * Renamed ``MCDeltaT`` to :b2:var:`mcDeltaT`
  * Renamed ``mcX``, ``mcY``, ``mcZ``, and ``mcRho`` to :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`,
-   :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.  
+   :b2:var:`mcDecayVertexZ`, and :b2:var:`mcDecayVertexRho`.
  * Renamed ``mcProdVertexX``, ``mcProdVertexY``, and ``mcProdVertexZ`` to :b2:var:`mcProductionVertexX`,
    :b2:var:`mcProductionVertexY`, and :b2:var:`mcProductionVertexZ`.
  * Renamed ``mcProdVertexDX``, ``mcProdVertexDY``, and ``mcProdVertexDZ`` to :b2:var:`mcProductionVertexFromIPX`,
@@ -101,29 +104,29 @@ Variables
    only. The variable gives access to the signal B rest frame in semi-leptonic decays, where the four momentum
    of the signal B can not be entirely reconstructed due to the presence of neutrinos in the decay.
  * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to
-   count 
-   specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the
-   mean value of a variable.
+   count specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs
+   the mean value of a variable.
  * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
  * Added two new variables :b2:var:`pidMostLikelyPDG` which is the PDG code of the most likely hypothesis for this track, and
    :b2:var:`pidIsMostLikely` which returns true if the particle *is* under its most likely hypothesis.
  * Added PID prior hypothesis to the :b2:var:`pidMostLikelyPDG` and the :b2:var:`pidIsMostLikely` variables.
  * Added several variables that related to the quality of the tag B vertex fit and the tracks used in that fit:
    :b2:var:`TagVNFitTracks`, :b2:var:`TagVDistanceToConstraint`, :b2:var:`TagVDistanceToConstraintErr`,
-   :b2:var:`TagTrackMomentumX` (Y,Z), :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
+   :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumX`, :b2:var:`TagTrackMomentumZ`,
+   :b2:var:`TagTrackRaveWeight`, :b2:var:`TagTrackDistanceToConstraint`,
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
-   :b2:var:`TagTrackTrueDistanceToTagV`
-
- * Added :b2:var:`mcDeltaL` describing the true distance between Sig and Tag
-   vertexes in the Y(4S) boost direction
- * Added :b2:var:`mcDeltaTapprox` to get :b2:var:`mcDeltaT` in the kinematic
-   approximation, i.e. based on :b2:var:`mcDeltaL` variable
-
- * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
+   :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
+   of these variables, e.g. by doing ``TagTrackAverage(TagTrackTrueDistanceToTagV)`` 
+ * Added ``mcDeltaL`` describing the true distance between Sig and Tag
+   vertices in the Y(4S) boost direction
+ * Added ``mcDeltaTapprox`` to get :b2:var:`mcDeltaT` in the kinematic
+   approximation, i.e. based on ``mcDeltaL`` variable
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
  * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
+ * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
+   functionality of the latter.
  * Removed the variable ``SigMBF``, which was supposed to return the mass significance before a vertex fit but was only a
    pseudo-significance.
 
@@ -137,23 +140,25 @@ Variables
    analysis-level using `modularAnalysis.reconstructDecay`).
  * Removed ``isExtendedSignal`` whose exact behavior is mirrored by `isSignalAcceptWrongFSPs`.
  * Added the new variable collection ``event_kinematics`` which contains all variables available after running the
-   `EventKinematics` module. 
-
+   `EventKinematics` module.
  * Added :b2:var:`unmask`, which unmasks certain indicated bits in a variable (set certain bits in a variable to zero).
  * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match errors.
  * Removed the previously deprecated variable ``clusterHypothesis``.
- * Added a new variable util ``create_isSignal_alias`` which creates customized :b2:var:`isSignal`, accepting certain match
-   errors.
+ * Added :b2:var:`firstCDCLayer`, returns the ID of the CDC layer closest to the IP with a hit attributed to the particles track 
+ * Added the new variable collection ``cluster_average``. It contains the cluster variables that can only be executed for
+   particles with daughters, currently :b2:var:`maxWeightedDistanceFromAverageECLTime` and :b2:var:`weightedAverageECLTime`.
+ * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
+ * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
+ * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
 
 Modules
 +++++++
 
- * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
-   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
-   on a first-come, first-served basis, i.e. the order of the input particles
-   matters. Now, the new parameter ``variable`` can be provided to determine
-   which duplicate should be preferred. The logic is the same as for the
-   :b2:mod:`BestCandidateSelection` module.
+ * When merging ParticleLists using the :b2:mod:`ParticleListManipulator` (`modularAnalysis.copyLists`) duplicates (not
+   multiple candidates) are removed on a first-come, first-served basis, i.e. the order of the input particles matters.
+   Now, the new parameter ``variable`` can be provided to determine which duplicate should be preferred. The logic is the
+   same as for the :b2:mod:`BestCandidateSelection` module. Furthermore, duplicates, which differ only by the order of
+   their daughter particles, are now identified.
  * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
    cluster with the hadron hypothesis as well as KLM cluster are used as source.
  * Tweaks to the :b2:mod:`ParticleLoader` for how it creates particles from V0s, it now preserves the link to the mdst object.
@@ -209,6 +214,10 @@ Modules
    and not anymore as ``TrackFitResult``. This should have no effect to users.
  * Added a warning to the `ParticleCombiner` module for decay strings violating electric charge conservation which can be turned
    off by setting ``allowChargeViolation=True``.
+ * In :b2:mod:`TagVertex` module, added the possibility to perform vertex fit with the tag particle tracks rolled back to their primary vertex points. The
+   option :code:`useRollBack = True` switches that on.
+ * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
+   charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
 
 Utilities and core objects
 ++++++++++++++++++++++++++
@@ -218,3 +227,8 @@ Utilities and core objects
  * Added a ``getTrackFitResult`` method to Particle.
  * Added a function to retrieve electric charge of a particle based on its pdg code.
  * Added a ``RotationTools.h`` file with few functions related to rotation
+
+Tutorials and Examples
+++++++++++++++++++++++
+
+ * Added a tutorial about creating aliases (``examples/VariableManager/variableAliases.py``)

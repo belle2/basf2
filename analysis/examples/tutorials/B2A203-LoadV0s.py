@@ -62,9 +62,9 @@ pi0_vars = vc.kinematics + \
 
 v0_vars = vc.kinematics + \
     vc.inv_mass + \
-    vc.vertex +\
+    vc.vertex + \
     vc.mc_truth + \
-    ['chiProb'] +\
+    ['chiProb'] + \
     vu.create_daughter_aliases(pi0_vars, 0) +\
     vu.create_daughter_aliases(pi0_vars, 1)
 

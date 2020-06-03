@@ -39,13 +39,13 @@ ma.fillParticleList(
     path=path)
 ma.reconstructDecay(
     'B+:sig_e -> gamma e+',
-    '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
+    '1.000 < M < 6.000 and cos(useRestFrame(daughterAngle(0, 1))) < 0.6',
     dmID=1,
     writeOut=True,
     path=path)
 ma.reconstructDecay(
     'B+:sig_mu -> gamma mu+',
-    '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
+    '1.000 < M < 6.000 and cos(useRestFrame(daughterAngle(0, 1))) < 0.6',
     dmID=2,
     writeOut=True,
     path=path)

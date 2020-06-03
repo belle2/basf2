@@ -412,7 +412,7 @@ void TRGGDLDQMModule::endRun()
 
 void TRGGDLDQMModule::event()
 {
-
+  /* cppcheck-suppress variableScope */
   static unsigned nvcd = 0;
   static bool begin_run = true;
 

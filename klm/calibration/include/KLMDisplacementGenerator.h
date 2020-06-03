@@ -11,6 +11,7 @@
 #pragma once
 
 /* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
@@ -136,6 +137,9 @@ namespace Belle2 {
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
+
+    /** EKLM element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

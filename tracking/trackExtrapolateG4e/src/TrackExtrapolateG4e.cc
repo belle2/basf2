@@ -25,7 +25,6 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
-#include <klm/eklm/geometry/GeometryData.h>
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -322,11 +321,11 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM channel status data are not available.");
     if (!m_klmStripEfficiency.isValid())
       B2FATAL("KLM strip efficiency data are not available.");
-    if (!m_muidParameters.isValid())
-      B2FATAL("Muid parameters are not available.");
+    if (!m_klmLikelihoodParameters.isValid())
+      B2FATAL("KLM likelihood parameters are not available.");
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
-      if (m_muidParameters.hasChanged()) { /* Clear m_MuidBuilderMap if MuidParameters payload changed. */
+      if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
         for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
           delete muidBuilder;
         m_MuidBuilderMap.clear();
@@ -938,7 +937,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_EKLM:
       detID = Const::EDetector::EKLM;
-      copyID = EKLM::GeometryData::Instance().stripNumber(
+      copyID = EKLMElementNumbers::Instance().stripNumber(
                  touch->GetVolume(7)->GetCopyNo(),
                  touch->GetVolume(6)->GetCopyNo(),
                  touch->GetVolume(5)->GetCopyNo(),
@@ -961,6 +960,12 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     return extState;
   }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+  // check for a valid track fit
+  if (!recoTrack->wasFitSuccessful(trackRep)) {
+    B2WARNING("RecoTrack fit failed for cardinal representation: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
     extState.pdgCode *= charge;

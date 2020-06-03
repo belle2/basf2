@@ -33,106 +33,141 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMSimHit();
+    EKLMSimHit()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMSimHit();
+    ~EKLMSimHit()
+    {
+    }
 
     /**
      * Get track ID
      * @return Track ID.
      */
-    int getTrackID() const;
+    int getTrackID() const
+    {
+      return m_trackID;
+    }
 
     /**
      * Set track ID.
      * @param[in] track track ID.
      */
-    void setTrackID(int track);
+    void setTrackID(int track)
+    {
+      m_trackID = track;
+    }
 
     /**
      * Get ID of parent track.
      * @return Track ID.
      */
-    int getParentTrackID() const;
+    int getParentTrackID() const
+    {
+      return m_parentTrackID;
+    }
 
     /**
      * Set ID of parent track.
      * @param[in] track track ID.
      */
-    void setParentTrackID(int track);
+    void setParentTrackID(int track)
+    {
+      m_parentTrackID = track;
+    }
 
     /**
      * Get volume identifier.
      * @return Identifier.
      */
-    int getVolumeID() const;
+    int getVolumeID() const
+    {
+      return m_volid;
+    }
 
     /**
      * Set volume identifier.
      * @param[in] id Identifier.
      */
-    void setVolumeID(int id);
+    void setVolumeID(int id)
+    {
+      m_volid = id;
+    }
 
     /**
      * Get plane number.
      * @return Plane number.
      */
-    int getPlane() const;
+    int getPlane() const
+    {
+      return m_Plane;
+    }
 
     /**
      * Set plane number.
-     * @param[in] Plane Plane number.
+     * @param[in] plane Plane number.
      */
-    void setPlane(int Plane);
+    void setPlane(int plane)
+    {
+      m_Plane = plane;
+    }
 
     /**
      * Get strip number.
      * @return Strip number.
      */
-    int getStrip() const;
+    int getStrip() const
+    {
+      return m_Strip;
+    }
 
     /**
      * Set strip number.
-     * @param[in] Strip Strip number.
+     * @param[in] strip Strip number.
      */
-    void setStrip(int Strip);
-
-
-
-
+    void setStrip(int strip)
+    {
+      m_Strip = strip;
+    }
 
     /**
      * Get hit time (implementation of base class function)
      * @return hit time
      */
-    float getGlobalTime() const override { return getTime(); }
+    float getGlobalTime() const override
+    {
+      return getTime();
+    }
 
     /**
      * Shift SimHit in time (implementation of base class function)
      * @param delta time shift.
      */
-    void shiftInTime(float delta) override { setTime(getTime() + delta); }
-
+    void shiftInTime(float delta) override
+    {
+      setTime(getTime() + delta);
+    }
 
   private:
 
     /** Track ID. */
-    int m_trackID;
+    int m_trackID = -1;
 
     /** Parent track ID. */
-    int m_parentTrackID;
+    int m_parentTrackID = -1;
 
     /** Volume identifier. */
-    int m_volid;
+    int m_volid = -1;
 
     /** Number of plane. */
-    int m_Plane;
+    int m_Plane = -1;
 
     /** Number of strip. */
-    int m_Strip;
+    int m_Strip = -1;
 
     /** Class version. */
     ClassDefOverride(Belle2::EKLMSimHit, 2);

@@ -76,6 +76,9 @@ namespace Belle2 {
 
   private:
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 

@@ -16,7 +16,7 @@ using namespace Belle2;
 REG_MODULE(EventT0DQM)
 
 //---------------------------------
-EventT0DQMModule::EventT0DQMModule(): HistoModule()
+EventT0DQMModule::EventT0DQMModule(): HistoModule(), m_L1TimingSrc(0)
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for event t0 for bhabha, mu mu, and hadron samples seeded by different trigger times.");

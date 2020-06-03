@@ -29,7 +29,9 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    BKLMSimulationPar() {};
+    BKLMSimulationPar()
+    {
+    }
 
     //! Constructor
     explicit BKLMSimulationPar(const GearDir&);
@@ -41,28 +43,52 @@ namespace Belle2 {
     void read(const GearDir&);
 
     //! Get the maximum global time for a recorded sim hit
-    double getHitTimeMax(void) const { return m_HitTimeMax; }
+    double getHitTimeMax(void) const
+    {
+      return m_HitTimeMax;
+    }
 
     //! Get number of divisions for phi strips
-    int getNPhiDivision(void)  const {return m_NPhiDiv;}
+    int getNPhiDivision(void)  const
+    {
+      return m_NPhiDiv;
+    }
 
     //! Get number of divisions for z strips
-    int getNZDivision(void)  const {return m_NZDiv;}
+    int getNZDivision(void)  const
+    {
+      return m_NZDiv;
+    }
 
     //! Get the maximum multiplicity in the RPC strip cumulative prob density functions
-    int getMaxMultiplicity(void) const { return c_MAX_NHIT; }
+    int getMaxMultiplicity(void) const
+    {
+      return c_MAX_NHIT;
+    }
 
     //! Get number of kind of mutiplicity for phistrips
-    int getNPhiMultiplicity(int division) const {return m_NPhiMultiplicity[division];}
+    int getNPhiMultiplicity(int division) const
+    {
+      return m_NPhiMultiplicity[division];
+    }
 
     //! Get number of kind of mutiplicity for zstrips
-    int getNZMultiplicity(int division) const {return m_NZMultiplicity[division];}
+    int getNZMultiplicity(int division) const
+    {
+      return m_NZMultiplicity[division];
+    }
 
     //! Get weight table for phi
-    double getPhiWeight(int division, int nmutiplicity) const { return m_PhiWeight[division][nmutiplicity]; }
+    double getPhiWeight(int division, int nmutiplicity) const
+    {
+      return m_PhiWeight[division][nmutiplicity];
+    }
 
     //! Get weight table for z
-    double getZWeight(int division, int nmutiplicity) const { return m_ZWeight[division][nmutiplicity]; }
+    double getZWeight(int division, int nmutiplicity) const
+    {
+      return m_ZWeight[division][nmutiplicity];
+    }
 
     //! Get the RPC phi-strip cumulative prob density function
     double getPhiMultiplicityCDF(double stripDiv, int mult) const;
@@ -99,7 +125,8 @@ namespace Belle2 {
     //! RPC zStrip weight table
     double m_ZWeight[c_NDIV + 1][c_MAX_NHIT];
 
-    ClassDef(BKLMSimulationPar, 3);  /**< ClassDef, must be the last term before the closing {}*/
+    /** Class version. */
+    ClassDef(BKLMSimulationPar, 3);
 
   };
 

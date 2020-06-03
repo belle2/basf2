@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor with section, layer and sector initializations.
      */
-    EKLMHitBase(int Section, int Layer, int Sector);
+    EKLMHitBase(int section, int layer, int sector);
 
     /**
      * Destructor.
@@ -41,84 +41,120 @@ namespace Belle2 {
      * Get section number.
      * @return Section number.
      */
-    int getSection() const;
+    int getSection() const
+    {
+      return m_Section;
+    }
 
     /**
      * Set section number.
      * @param[in] Section Section number.
      */
-    void setSection(int Section);
+    void setSection(int Section)
+    {
+      m_Section = Section;
+    }
 
     /**
      * Get layer number.
      * @return Layer number.
      */
-    int getLayer() const;
+    int getLayer() const
+    {
+      return m_Layer;
+    }
 
     /**
      * Set layer number.
-     * @param[in] nLayer Layer number.
+     * @param[in] layer Layer number.
      */
-    void setLayer(int nLayer);
+    void setLayer(int layer)
+    {
+      m_Layer = layer;
+    }
 
     /**
      * Get sector number.
      * @return Sector number.
      */
-    int getSector() const;
+    int getSector() const
+    {
+      return m_Sector;
+    }
 
     /**
      * Set sector number.
-     * @param[in] nSector Sector number.
+     * @param[in] sector Sector number.
      */
-    void setSector(int nSector);
+    void setSector(int sector)
+    {
+      m_Sector = sector;
+    }
 
     /**
      * Get energy deposit.
      * @return Energy deposit.
      */
-    float getEnergyDeposit() const;
+    float getEnergyDeposit() const
+    {
+      return m_EDep;
+    }
 
     /**
      * Set EnergyDeposit.
      * @param[in] eDep Energy deposit.
      */
-    void setEnergyDeposit(float eDep);
+    void setEnergyDeposit(float eDep)
+    {
+      m_EDep = eDep;
+    }
 
     /**
      * Get hit time.
      * @return Hit time.
      */
-    float getTime() const;
+    float getTime() const
+    {
+      return m_Time;
+    }
 
     /**
      * Set hit time.
      * @param[in] time hit time.
      */
-    void setTime(float time);
+    void setTime(float time)
+    {
+      m_Time = time;
+    }
 
     /**
      * Get the lund code of the (leading) particle.
      * @return Particle code.
      */
-    int getPDG() const;
+    int getPDG() const
+    {
+      return m_PDG;
+    }
 
     /**
      * Set the lund code of the (leading) particle
-     * @param[in] PDG Particle code.
+     * @param[in] pdg Particle code.
      */
-    void setPDG(int PDG);
+    void setPDG(int pdg)
+    {
+      m_PDG = pdg;
+    }
 
   protected:
 
     /** PDG code of the (leading) particle. */
-    int m_PDG;
+    int m_PDG = -1;
 
     /** Time of the hit. */
-    float m_Time;
+    float m_Time = -1;
 
     /** Energy deposition. */
-    float m_EDep;
+    float m_EDep = -1;
 
     /** Number of section. */
     int m_Section;

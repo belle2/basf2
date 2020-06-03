@@ -17,6 +17,8 @@
 #pragma link C++ class Belle2::ECLDigitWaveformParameters;
 #pragma link C++ class Belle2::ECLDigitWaveformParametersForMC;
 #pragma link C++ class Belle2::ECLChargedPidPDFs+;
+#pragma link C++ enum Belle2::ECLChargedPidPDFs::InputVar+; //implicit
+#pragma link C++ class Belle2::ECLChargedPidPDFs::VarTransfoSettings+; //implicit
 #pragma link C++ class Belle2::PackedAutoCovariance; // implicit
 #pragma link C++ class Belle2::ECLAutoCovariance;
 #pragma link C++ class Belle2::ECLTrackClusterMatchingThresholds;
@@ -26,4 +28,5 @@
 #pragma link C++ class Belle2::ECLChannelMap+;
 #pragma link C++ class Belle2::ECLCrystalLocalRunCalib;
 #pragma link C++ class Belle2::ECLLocalRunCalibRef;
+#pragma link C++ class Belle2::ECLLeakageCorrections;
 #endif

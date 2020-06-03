@@ -30,8 +30,10 @@ apvClockTimeUnits = '16'  # in RFC units, it is a string as the xml field where 
 
 
 class defaultSVDConfigParametersImporter(basf2.Module):
+    '''default importer for the detector configuration'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 

@@ -91,7 +91,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
             # print(str(tZero_err))

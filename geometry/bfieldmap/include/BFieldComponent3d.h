@@ -117,7 +117,7 @@ namespace Belle2 {
      * @param minR    The left (min) border of the magnetic field map region in r [m] -> [cm].
      * @param maxR    The right (max) border of the magnetic field map region in r [m] -> [cm].
      * @param errBr   The size of the error on Br, Br_new = errBr*Br [fraction].
-     * @param errBPhi The size of the error on Bphi, Bphi_new = errBphi*Bphi [fraction].
+     * @param errBphi The size of the error on Bphi, Bphi_new = errBphi*Bphi [fraction].
      * @param errBz   The size of the error on Bz, Bz_new = errBz*Bz [fraction].
      */
     void setErrorRegionR(double minR = -1., double maxR = -1., double errBr = 0.0, double errBphi = 0.0, double errBz = 0.0)
@@ -129,7 +129,7 @@ namespace Belle2 {
     void mirrorPhi(bool mirrorPhi = 0.) { m_mirrorPhi = mirrorPhi; }
 
     /**
-     * @param mapEnable Flag to switch on/off interpolation
+     * @param interpolate Flag to switch on/off interpolation
      */
     void doInterpolation(bool interpolate = true) { m_interpolate = interpolate; }
 

@@ -69,8 +69,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
 
       /**
        * Simulate EKLM strip.
@@ -78,8 +78,8 @@ namespace Belle2 {
        * @param[in] end      End of hit range.
        */
       void simulate(
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
-        std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.
@@ -114,11 +114,11 @@ namespace Belle2 {
 
       /**
        * Generate photoelectrons.
-       * @param[in]     stripLen    Strip length.
-       * @param[in]     distSiPM    Distance from hit to SiPM.
-       * @param[in]     nPE         Number of photons to be simulated.
-       * @param[in]     timeShift   Time of hit.
-       * @param[in]     isReflected Whether the hits are reflected or not.
+       * @param[in] stripLen    Strip length.
+       * @param[in] distSiPM    Distance from hit to SiPM.
+       * @param[in] nPhotons    Number of photons to be simulated.
+       * @param[in] timeShift   Time of hit.
+       * @param[in] isReflected Whether the hits are reflected or not.
        */
       void generatePhotoelectrons(double stripLen, double distSiPM,
                                   int nPhotons, double timeShift,

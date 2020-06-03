@@ -23,8 +23,6 @@
 // $Log$
 
 
-using namespace std;
-
 
 // system include files
 #include <iostream>
@@ -69,7 +67,7 @@ namespace Belle2 {
     parts = new Part_cont [20];
     pppp = new TLorentzVector [30];
 
-    ifstream infile(parameterFile);
+    std::ifstream infile(parameterFile);
     if (!infile) {
       B2FATAL("Can't open input file: " << parameterFile);
     } else {
@@ -189,32 +187,32 @@ namespace Belle2 {
     totalCrossSectionForMC = 0.;
 
     // Load Differential Cross Section table
-    ifstream infile(diffcrosssectionFile);
+    std::ifstream infile(diffcrosssectionFile);
     if (!infile) {
       B2FATAL("Can't open W-list input file") ;
     } else {
-      double w; // W [GeV]
+      double i_w; // W [GeV]
       double diffCrossSection; // Number of events for given W
 
       double previousW = 0.;
       double previousDCS = 0.; // Diff(erential) Cross Section
-      while (infile >> w >> diffCrossSection) {
-        if (w > 9000. || w < 0.) continue;
-        diffCrossSectionOfW[w] = diffCrossSection;
+      while (infile >> i_w >> diffCrossSection) {
+        if (i_w > 9000. || i_w < 0.) continue;
+        diffCrossSectionOfW[i_w] = diffCrossSection;
 
         // Calculate total cross section up to the bin.
         // This will be used for importance sampling. NOT CORRECT cross section
         if (diffCrossSection > previousDCS and previousDCS != 0) {
           // If current diffCrossSection is higher than previous and not first time, use diffCrossSection
-          totalCrossSectionForMC += (w - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
+          totalCrossSectionForMC += (i_w - previousW) * diffCrossSection * 1.01; // For safety, 1 % higher value is set
         } else {
           // If previous diffCrossSection is higher than current or first time, use previousDCS
-          totalCrossSectionForMC += (w - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
+          totalCrossSectionForMC += (i_w - previousW) * previousDCS * 1.01;// For safety, 1 % higher value is set
         }
         // Store current cross section with w
-        WOfCrossSectionForMC[totalCrossSectionForMC] = w;
+        WOfCrossSectionForMC[totalCrossSectionForMC] = i_w;
 
-        previousW = w;
+        previousW = i_w;
         previousDCS = diffCrossSection;
       }
 
@@ -238,7 +236,7 @@ namespace Belle2 {
 
       // Load Wlist_table
 
-      ifstream infile(wlistFile);
+      std::ifstream infile(wlistFile);
       if (!infile) {
         B2FATAL("Can't open W-list input file") ;
       } else {
@@ -294,6 +292,8 @@ namespace Belle2 {
 
 
       return prew;
+    } else {
+      B2FATAL("Undefined mode for wtable. Can be 1 or 0. Called with  " << mode) ;
     }
   }
 
@@ -319,6 +319,7 @@ namespace Belle2 {
     imode = 0;
 
     double xxx = tpgetd(0, rs, dmin, dmax, q2max);
+    B2DEBUG(20, "Local variable xxx=" << xxx << " created but not used");
     tpgetz(0);
 
     B2DEBUG(20, "In Treps, W has been set to be " << std::setprecision(5) <<
@@ -653,6 +654,7 @@ namespace Belle2 {
 
   double TrepsB::tpgetq(double _s, double z, double _q2max)
   {
+    B2DEBUG(20, "Parameter _s=" << _s << " given but not used");
     // get one Q2 value
     double q2min = me * me * z * z / (1. - z);
     double rk = 1. / log(_q2max / q2min);
@@ -763,7 +765,7 @@ namespace Belle2 {
 
   double TrepsB::tpxint(double r, double _rs, double _q2max) const
   {
-    const double alpppi = 0.002322816 ;
+    // const double alpppi = 0.002322816 ;
 
     double y = sqrt(r * _rs);
     double z = sqrt(_rs / r);
@@ -828,12 +830,14 @@ namespace Belle2 {
   double TrepsB::tpform(double _q2, double _w) const
   {
     //form factor effect
+    B2DEBUG(20, "Parameters _q2=" << _q2 << " and _w=" << _w << " are given but not used");
     double dis = 1.0 ;
     return dis ;
   }
 
   double TrepsB::tpangd(double _z, double _w)
   {
+    B2DEBUG(20, "Parameters _z=" << _z << " and _w=" << _w << " are given but not used");
     double c = 1.0 ;
     return c;
   }
@@ -846,6 +850,10 @@ namespace Belle2 {
     // be canceled.
     // CAUTION!: The 4-momenta of particles are represented in the e+e- c.m. system
     //
+    B2DEBUG(20, "User decision routine for extra generation condition is not used."
+            << " _pe(" << _pe.Px() << "," << _pe.Py() << "," << _pe.Pz() << "), "
+            << " _pp(" << _pp.Px() << "," << _pp.Py() << "," << _pp.Pz() << "), "
+            << " *part at " << part << " and _npart = " << _npart << " are given but not used");
     return 1 ;
   }
 
@@ -853,6 +861,9 @@ namespace Belle2 {
                       TLorentzVector _pe, TLorentzVector _pp,
                       Part_gen* part, int n) const
   {
+    B2DEBUG(20, "iev = " << iev << " _pe(" << _pe.Px() << "," << _pe.Py() << "," << _pe.Pz() << "), "
+            << " _pp(" << _pp.Px() << "," << _pp.Py() << "," << _pp.Pz() << "), "
+            << " *part at " << part << " and n = " << n << " are given but not used");
   }
 
   void TrepsB::print_event() const

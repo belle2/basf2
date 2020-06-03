@@ -37,12 +37,12 @@ namespace Belle2 {
      * Please note that the CollectionItems are therefore const whereas the CollectorItems are not. All the passed
      * WeightedRelations lists must be sorted.
      */
-    template <class ACollectorItem, class ACollectionItem>
+    template <class ACollectorItem, class ACollectionItem, template<class, class> class WeightedRelationClass>
     class BestMatchSelector :
-      public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
+      public Findlet<WeightedRelationClass<ACollectorItem, const ACollectionItem>> {
     public:
       /// Shortcut class name for a weighted relation between a collector item and a collection item.
-      using WeightedRelationItem = WeightedRelation<ACollectorItem, const ACollectionItem>;
+      using WeightedRelationItem = WeightedRelationClass<ACollectorItem, const ACollectionItem>;
 
       /// The parent class
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;

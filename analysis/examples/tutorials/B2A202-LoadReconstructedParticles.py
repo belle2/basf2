@@ -7,8 +7,8 @@
 # This tutorial demonstrates how to load reconstructed
 # final state particles as Particles:
 # - Tracks are loaded as e/mu/pi/K/p Particles
-# - neutral ECLClusters are loaded as photons
-# - neutral KLMClusters are loaded as Klongs
+# - neutral ECLClusters are loaded as photons, Klongs or neutrons
+# - neutral KLMClusters are loaded as Klongs or neutrons
 #
 # Create ParticleList for each final state
 # particle type as well.
@@ -39,11 +39,11 @@ ma.inputMdst(environmentType='default',
 # print contents of the DataStore before loading Particles
 ma.printDataStore(path=my_path)
 
-# create and fill gamma/e/mu/pi/K/p ParticleLists
+# create and fill gamma/e/mu/pi/K/p/n ParticleLists
 # second argument are the selection criteria: '' means no cut, take all
 #
 # note that you can give any name to your lists e.g. 'gamma:mycandidates',
-# except for the name 'all' which is the only name that is reseved for lists
+# except for the name 'all' which is the only name that is reserved for lists
 # with no cuts
 ma.fillParticleList(decayString='gamma:all', cut='', path=my_path)
 ma.fillParticleList(decayString='e-:all', cut='', path=my_path)
@@ -51,6 +51,7 @@ ma.fillParticleList(decayString='mu-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='pi-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='K-:all', cut='', path=my_path)
 ma.fillParticleList(decayString='anti-p-:all', cut='', path=my_path)
+ma.fillParticleList(decayString='anti-n0:all', cut='', path=my_path)
 
 # alternatively, we can create and fill final state Particle lists only
 # with candidates that pass certain PID requirements
@@ -67,8 +68,8 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # (-> for more details about V0s have a look at B2A203-LoadV0s.py)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(prioritiseV0=True, path=my_path)
-stdPi0s(listtype='looseFit', path=my_path)
-stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' us recommended at the moment
+stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
+stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' is recommended at the moment
 
 # print contents of the DataStore after loading Particles
 ma.printDataStore(path=my_path)
@@ -87,13 +88,19 @@ ma.printList('K-:good', False, path=my_path)
 ma.printList('anti-p-:all', False, path=my_path)
 ma.printList('anti-p-:good', False, path=my_path)
 ma.printList('K_S0:merged', False, path=my_path)
-ma.printList('pi0:looseFit', False, path=my_path)
+ma.printList('pi0:eff40_Jan2020Fit', False, path=my_path)
 ma.printList('K_L0:allklm', False, path=my_path)
+ma.printList('n0:all', False, path=my_path)
 
 
 # Select variables that we want to store to ntuple
-# You can either use preselected variable groups from variableCollections:
-# Or use your own lists. Both options are shown here.
+# You can either use preselected variable groups from variableCollections
+# or use your own lists. Both options are shown here.
+# For more information on the VariableManager, VariableCollections, etc.,
+# please refer to the dedicated VariableManager examples.
+
+# Note: vc.<collection> is a list (of variables); multiple lists are
+# concatenated with the + operator.
 
 charged_particle_variables = vc.reco_stats + \
     vc.kinematics + \
@@ -122,6 +129,9 @@ pi0_variables = vc.mc_truth + \
 K0l_variables = vc.kinematics + \
     vc.mc_kinematics + \
     vc.klm_cluster
+
+n0_variables = K0l_variables + \
+    ['isFromECL', 'isFromKLM']
 
 # Saving variables to ntuple
 output_file = 'B2A202-LoadReconstructedParticles.root'
@@ -155,11 +165,16 @@ ma.variablesToNtuple(decayString='K_L0:allklm',
                      treename='klong',
                      filename=output_file,
                      path=my_path)
+ma.variablesToNtuple(decayString='n0:all',
+                     variables=n0_variables,
+                     treename='neutron',
+                     filename=output_file,
+                     path=my_path)
 
 # Note here, that since we want to get info about gammas from pi0,
-# we convert names of te variables from the gamma list in the way that they will
+# we convert names of the variables from the gamma list in the way that they will
 # correspond to given gammas.
-ma.variablesToNtuple(decayString='pi0:looseFit',
+ma.variablesToNtuple(decayString='pi0:eff40_Jan2020Fit',
                      variables=pi0_variables + vu.create_aliases_for_selected(gamma_variables, 'pi0 -> ^gamma ^gamma'),
                      filename=output_file,
                      treename='pi0',

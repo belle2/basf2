@@ -261,3 +261,71 @@ def add_cosmics_svd_ckf(path, cdc_reco_tracks, svd_reco_tracks, use_mc_truth=Fal
 
                     seedHitJumping=3,
                     **module_parameters).set_name(f"CDCToSVDSpacePointCKF_{direction}")
+
+
+def add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks, pxd_reco_tracks, use_mc_truth=False, use_best_results=5,
+                        filter_cut=0.03, overlap_cut=0.2, use_best_seeds=10,  direction="backward"):
+    """
+    Convenience function to add the PXD ckf to the path with cosmics settings valid for phase2 and 3.
+    :param path: The path to add the module to
+    :param svd_cdc_reco_tracks: The name of the already created CDC reco tracks
+    :param pxd_reco_tracks: The name to output the SVD reco tracks to
+    :param use_mc_truth: Use the MC information in the CKF
+    :param use_best_results: CKF parameter for useNResults
+    :param filter_cut: CKF parameter for MVA filter
+    :param overlap_cut: CKF parameter for MVA overlap filter
+    :param use_best_seeds: CKF parameter for useBestNInSeed
+    :param direction: where to extrapolate to. Valid options are forward and backward
+    """
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module("PXDSpacePointCreator")
+
+    if direction == "forward":
+        reverse_seed = True
+    else:
+        reverse_seed = False
+
+    if use_mc_truth:
+        module_parameters = dict(
+            firstHighFilter="truth",
+            secondHighFilter="all",
+            thirdHighFilter="all",
+
+            filter="truth",
+            useBestNInSeed=1
+        )
+    else:
+        module_parameters = dict(
+            hitFilter="all",
+            seedFilter="all",
+            preHitFilter="all",
+            preSeedFilter="all",
+
+            firstHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_1",
+                                       "direction": direction},
+            firstHighUseNStates=use_best_seeds,
+
+            secondHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_2"},
+            secondHighUseNStates=use_best_seeds,
+
+            thirdHighFilterParameters={"cut": filter_cut, "identifier": "ckf_ToPXDStateFilter_3"},
+            thirdHighUseNStates=use_best_seeds,
+
+            filterParameters={"cut": overlap_cut, "identifier": "ckf_PXDTrackCombination"},
+            useBestNInSeed=use_best_results,
+        )
+
+    path.add_module("ToPXDCKF",
+                    inputRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    outputRecoTrackStoreArrayName=pxd_reco_tracks,
+                    outputRelationRecoTrackStoreArrayName=svd_cdc_reco_tracks,
+                    relatedRecoTrackStoreArrayName=pxd_reco_tracks,
+
+                    advanceHighFilterParameters={"direction": direction},
+                    reverseSeed=reverse_seed,
+
+                    writeOutDirection=direction,
+                    relationCheckForDirection=direction,
+
+                    seedHitJumping=1,
+                    **module_parameters).set_name(f"ToPXDCKF_{direction}")

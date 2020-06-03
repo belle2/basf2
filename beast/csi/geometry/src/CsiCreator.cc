@@ -275,7 +275,7 @@ namespace Belle2 {
       double AdjZ = enclosureContent.getLength("ShiftZ") * CLHEP::cm;
 
       G4Transform3D zsh = G4Translate3D(0, 0, zshift);
-      G4Transform3D invzsh = G4Translate3D(0, 0, -zshift);
+      //G4Transform3D invzsh = G4Translate3D(0, 0, -zshift);
       G4Transform3D m1 = G4RotateZ3D(Phi1);
       G4Transform3D m2 = G4RotateY3D(Theta);
       G4Transform3D m3 = G4RotateZ3D(Phi2);

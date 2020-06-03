@@ -361,10 +361,12 @@ namespace Belle2 {
         B2FATAL("The Variables cosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
 
       PCmsLabTransform T;
-      // Hardcoded value, how to bypass this?
-      double e_Beam = 1.0579400E+1 / 2.0; // GeV
+      double e_Beam = T.getCMSEnergy() / 2.0; // GeV
       double m_B = part->getPDGMass();
-
+      // if this is a continuum run, use an approximate Y(4S) CMS energy
+      if (e_Beam * e_Beam - m_B * m_B < 0) {
+        e_Beam = 1.0579400E+1 / 2.0; // GeV
+      }
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
       TLorentzVector p = T.rotateLabToCms() * part->get4Vector();
@@ -493,7 +495,7 @@ namespace Belle2 {
 
         return sum.M();
       } else {
-        return part->getMass();
+        return part->getMass(); // !
       }
     }
 
@@ -1028,8 +1030,18 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("ImpactXY"  , ImpactXY , "The impact parameter of the given particle in the xy plane");
 
-    REGISTER_VARIABLE("M", particleMass,
-                      "invariant mass (determined from particle's 4-momentum vector)");
+    REGISTER_VARIABLE("M", particleMass, R"DOC(
+The particle's mass.
+
+Note that this is context-dependent variable and can take different values depending on the situation. This should be the "best" value possible with the information provided.
+
+- If this particle is track- or cluster- based, then this is the value of the mass hypothesis.
+- If this particle is an MC particle then this is the mass of that particle.
+- If this particle is composite, then *initially* this takes the value of the invariant mass of the daughters.
+- If this particle is composite and a *mass or vertex fit* has been performed then this may be updated by the fit.
+
+  * You will see a difference between this mass and the :b2:var:`InvM`.
+  )DOC");
     REGISTER_VARIABLE("dM", particleDMass, "mass minus nominal mass");
     REGISTER_VARIABLE("Q", particleQ, "released energy in decay");
     REGISTER_VARIABLE("dQ", particleDQ,
@@ -1037,12 +1049,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("Mbc", particleMbc, "beam constrained mass");
     REGISTER_VARIABLE("deltaE", particleDeltaE, "energy difference");
     REGISTER_VARIABLE("M2", particleMassSquared,
-                      "invariant mass squared (determined from particle's 4-momentum vector)");
+                      "The particle's mass squared.");
 
     REGISTER_VARIABLE("InvM", particleInvariantMassFromDaughters,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors)");
+                      "invariant mass (determined from particle's daughter 4-momentum vectors). If this particle has no daughters, defaults to :b2:var:`M`.");
     REGISTER_VARIABLE("InvMLambda", particleInvariantMassLambda,
-                      "invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
+                      "Invariant mass (determined from particle's daughter 4-momentum vectors), assuming the first daughter is a pion and the second daughter is a proton.\n"
                       "If the particle has not 2 daughters, it returns just the mass value.");
 
     REGISTER_VARIABLE("ErrM", particleInvariantMassError,

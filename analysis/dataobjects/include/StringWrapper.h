@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Set string.
      *
-     * @param the new string.
+     * @param inputstring the new string.
      */
     void setString(const std::string& inputstring)
     {

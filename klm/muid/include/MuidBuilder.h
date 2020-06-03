@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
 /* Belle 2 headers. */
@@ -83,13 +83,13 @@ namespace Belle2 {
      * Calculate the longitudinal PDF for a given hypothesis.
      * @param[in] muid KLMMuidLikelihood dataobject.
      */
-    double getPDFLayer(const KLMMuidLikelihood* muid) const;
+    double getLongitudinalPDF(const KLMMuidLikelihood* muid) const;
 
     /**
      * Calculate the transverse PDF for a given hypothesis.
      * @param[in] muid KLMMuidLikelihood dataobject.
      */
-    double getPDFRchisq(const KLMMuidLikelihood* muid) const;
+    double getTransversePDF(const KLMMuidLikelihood* muid) const;
 
     /**
      * Longitudinal PDF.
@@ -142,10 +142,10 @@ namespace Belle2 {
     double m_ReducedChiSquaredDx;
 
     /**
-     * Muid parameters.
+     * Likelihood parameters.
      */
-    DBObjPtr<MuidParameters> m_MuidParameters;
+    DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
   };
 
-} // end of namespace Belle2
+}

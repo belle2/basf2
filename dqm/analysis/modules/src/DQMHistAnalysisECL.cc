@@ -118,7 +118,7 @@ void DQMHistAnalysisECLModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisECL: beginRun called.");
 }
 
-void DQMHistAnalysisECLModule::normalize(TCanvas* c, const std::string&  h_name, Double_t& weight)
+void DQMHistAnalysisECLModule::normalize(TCanvas* c, const std::string&  h_name, const Double_t& weight)
 {
   c->Clear();
   c->cd();

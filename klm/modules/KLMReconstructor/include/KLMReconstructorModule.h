@@ -18,9 +18,9 @@
 #include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
-#include <klm/dbobjects/bklm/BKLMTimeWindow.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
+#include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
@@ -95,6 +95,18 @@ namespace Belle2 {
      */
     double getTime(KLMDigit* d, double dist);
 
+    /** Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits. */
+    double m_CoincidenceWindow;
+
+    /** Nominal time of prompt BKLMHit2ds. */
+    double m_PromptTime;
+
+    /** Half-width of the time window relative to the prompt time for BKLMHit2ds. */
+    double m_PromptWindow;
+
+    /** KLM time window. */
+    DBObjPtr<KLMTimeWindow> m_TimeWindow;
+
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
 
@@ -103,29 +115,11 @@ namespace Belle2 {
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
 
-    /**
-     * Half-width of time coincidence window for KLMDigits used to create
-     * EKLMHit2ds or BKLMHit1ds and BKLMHit1ds used to create BKLMHit2ds (ns).
-     */
-    double m_CoincidenceWindow;
-
-    /** Nominal time of prompt BKLMHit2ds (ns). */
-    double m_bklmPromptTime;
-
-    /** Half-width window of BKLMHit2ds relative to m_PrompTime (ns). */
-    double m_bklmPromptWindow;
-
     /** Perform alignment correction (true) or not (false). */
     bool m_bklmIfAlign;
 
-    /** Load timing window from database (true) or not (false). */
-    bool m_bklmLoadTimingFromDB;
-
     /** Ignore scintillators (to debug their electronics mapping). */
     bool m_bklmIgnoreScintillators;
-
-    /** BKLM time window. */
-    DBObjPtr<BKLMTimeWindow> m_bklmTiming;
 
     /** BKLM 1d hits. */
     StoreArray<BKLMHit1d> m_bklmHit1ds;
@@ -140,6 +134,9 @@ namespace Belle2 {
      * necessary to turn this check off for debugging.
      */
     bool m_eklmCheckSegmentIntersection;
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;

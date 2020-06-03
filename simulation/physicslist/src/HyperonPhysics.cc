@@ -29,6 +29,7 @@
 #include "G4GeneratorPrecompoundInterface.hh"
 #include "G4HadronElastic.hh"
 
+#include "G4ChipsHyperonElasticXS.hh"
 #include "G4ChipsHyperonInelasticXS.hh"
 #include "G4SystemOfUnits.hh"
 
@@ -80,7 +81,8 @@ void HyperonPhysics::ConstructProcess()
   m_ftfp->SetMinEnergy(4 * GeV);
   m_ftfp->SetMaxEnergy(100 * TeV);
 
-  // Inelastic cross section set
+  // Cross section sets
+  G4ChipsHyperonElasticXS* chipsElastic = new G4ChipsHyperonElasticXS;
   G4ChipsHyperonInelasticXS* chipsInelastic = new G4ChipsHyperonInelasticXS;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -92,6 +94,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* lamProcEl = new G4HadronElasticProcess;
   lamProcEl->RegisterMe(elModel);
+  lamProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(lamProcEl);
 
   // inelastic
@@ -110,6 +113,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* spProcEl = new G4HadronElasticProcess;
   spProcEl->RegisterMe(elModel);
+  spProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(spProcEl);
 
   // inelastic
@@ -128,6 +132,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* smProcEl = new G4HadronElasticProcess;
   smProcEl->RegisterMe(elModel);
+  smProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(smProcEl);
 
   // inelastic
@@ -150,6 +155,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* xzProcEl = new G4HadronElasticProcess;
   xzProcEl->RegisterMe(elModel);
+  xzProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(xzProcEl);
 
   // inelastic
@@ -168,6 +174,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* xmProcEl = new G4HadronElasticProcess;
   xmProcEl->RegisterMe(elModel);
+  xmProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(xmProcEl);
 
   // inelastic
@@ -190,6 +197,7 @@ void HyperonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* omProcEl = new G4HadronElasticProcess;
   omProcEl->RegisterMe(elModel);
+  omProcEl->AddDataSet(chipsElastic);
   procMan->AddDiscreteProcess(omProcEl);
 
   // inelastic

@@ -343,7 +343,7 @@ class IoVSet:
         # we can add a set to a set :D
         if isinstance(iov, IoVSet):
             for element in iov:
-                self.add(element)
+                self.add(element, allow_overlaps)
             return
         # make sure it's actually an IoV, this will raise an error on failure
         if not isinstance(iov, IntervalOfValidity):
@@ -351,7 +351,7 @@ class IoVSet:
         # and now check for all existing iovs ... (but use a copy since we modify the set)
         for existing in list(self.__iovs):
             # if there's an overlap to the new iov
-            if not allow_overlaps and existing & iov:
+            if (not allow_overlaps) and (existing & iov):
                 raise ValueError(f"Overlap between {existing} and {iov}")
             # and if they can be combined to a bigger iov
             combined = existing.union(iov, self.__allow_startone)
@@ -371,7 +371,7 @@ class IoVSet:
         self.__iovs.add(iov)
 
     def remove(self, iov):
-        """Remove and iov or a set of iovs from this set
+        """Remove an iov or a set of iovs from this set
 
         After this operation the set will not be valid for the given iov or set
         of iovs:

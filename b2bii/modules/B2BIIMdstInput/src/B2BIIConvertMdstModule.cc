@@ -596,7 +596,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixP(i, j) = error7x7P[i][j];
 
-        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP);
         daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
                                  TVector3(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, 0.5);
@@ -619,7 +619,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
-        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeP.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -651,7 +651,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixM(i, j) = error7x7M[i][j];
 
-        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM);
         daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
                                  TVector3(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, 0.5);
@@ -674,7 +674,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
-        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeM.getMass(), dauPivot,
                            helixParam,  error5x5,

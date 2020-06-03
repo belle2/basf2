@@ -76,6 +76,7 @@ namespace Belle2 {
 
     /** Structure for saving the x-talk information. */
     struct XTalkInfo {
+      /** Constructor that initializes all members. */
       XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
         m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
       unsigned short m_tdc; /**< TDC count */

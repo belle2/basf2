@@ -14,7 +14,7 @@
 """
 <header>
     <input>muon-BKLMValidation.root</input>
-    <contact>giacomo.depietro@roma3.infn.it</contact>
+    <contact>martina.laurenza@roma3.infn.it</contact>
     <description>Create validation plots for BKLM</description>
 </header>
 """
@@ -164,7 +164,7 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 200, -5.0, 5.0)
+    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -2.0, 2.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
     timeRPC.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in RPCs'))

@@ -1145,7 +1145,7 @@ namespace Belle2 {
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
       std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
-      unsigned short m_boardAndChannelToWire[nBoards][48];
+      unsigned short m_boardAndChannelToWire[nBoards][48]; /*!< array relating board-channel-id and wire-id. */
 
       //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 

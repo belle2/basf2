@@ -387,7 +387,8 @@ class ComparisonPlot(Plot):
         #: the filename of the pdf file plotted with the comparison graphs
         self.pdf_filename = pdf_filename
 
-        #: path were the png and pdf files are located
+        #: path were the png and pdf files are located (relative to the html
+        #: directory; has to end with trailing '/'!)
         self.plot_path = plot_path
 
         #: Warnings ("no contact" person etc.)
@@ -425,7 +426,7 @@ class ComparisonNTuple(NTuple):
         #: name of contact person
         self.contact = contact
         #: path to the json file which contains the individual numbers of
-        #: the ntuple
+        #: the ntuple (must be relative to html dir!)
         self.json_file_path = json_file_path
 
 

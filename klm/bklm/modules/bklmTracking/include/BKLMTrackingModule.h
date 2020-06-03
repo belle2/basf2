@@ -81,7 +81,7 @@ namespace Belle2 {
   private:
 
     //! bklm GeometryPar
-    bklm::GeometryPar*   m_GeoPar = NULL;
+    bklm::GeometryPar* m_GeoPar = nullptr;
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;

@@ -199,6 +199,14 @@ namespace {
     EXPECT_TRUE(iov1.trimOverlap(iov2, false));
     EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 10));
     EXPECT_TRUE(iov2 == IntervalOfValidity(3, 11, 4, -1));
+
+    // Validity is larger than we want on the lower edge
+    iov1 = IntervalOfValidity(11, 0, 12, 86);
+    // Want to trim off everything below exp=12
+    iov2 = IntervalOfValidity(0, 0, 11, -1);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, false));
+    EXPECT_EQ(iov1, IntervalOfValidity(12, 0, 12, 86));
+    EXPECT_EQ(iov2, IntervalOfValidity(0, 0, 11, -1));
   }
 
   /** Test database access via DBObjPtr */

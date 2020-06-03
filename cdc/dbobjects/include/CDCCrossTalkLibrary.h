@@ -91,7 +91,6 @@ namespace Belle2 {
         val = gRandom->Integer(size);
       }
 
-      size_t count = 0;
       asicChannels rec;
       bool recNotSet = true;
       if (size == 0) {
@@ -115,6 +114,7 @@ namespace Belle2 {
           }
         }
       } else {
+        size_t count = 0;
         for (auto p = pADC.first; p != pADC.second; ++p) {
           if (count == val) {
             rec = p->record;

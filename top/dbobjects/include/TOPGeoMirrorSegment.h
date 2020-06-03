@@ -121,6 +121,16 @@ namespace Belle2 {
     const GeoOpticalSurface& getCoatingSurface() const {return m_coatingSurface;}
 
     /**
+     * Returns mirror reflectivity at given photon energy
+     * @param energy photon energy in [eV]
+     * @return reflectivity
+     */
+    double getMirrorReflectivity(double energy) const
+    {
+      return TOPGeoBase::getReflectivity(m_coatingSurface, energy);
+    }
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */

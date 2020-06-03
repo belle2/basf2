@@ -532,14 +532,14 @@ namespace Belle2 {
     // B2BII PID
     VARIABLE_GROUP("PID_belle");
     REGISTER_VARIABLE("atcPIDBelle(i,j)", atcPIDBelle,
-                      "returns Belle's PID atc variable: atc_pid(3,1,5,i,j).prob().\n"
-                      "Parameters i,j are signal and backgroud hypotesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
+                      "returns Belle's PID atc variable: ``atc_pid(3,1,5,i,j).prob()``.\n"
+                      "Parameters i,j are signal and backgroud hypothesis: (0 = electron, 1 = muon, 2 = pion, 3 = kaon, 4 = proton)");
     REGISTER_VARIABLE("muIDBelle", muIDBelle,
-                      "returns Belle's PID Muon_likelihood() variable.");
+                      "returns Belle's PID ``Muon_likelihood()`` variable.");
     REGISTER_VARIABLE("muIDBelleQuality", muIDBelleQuality,
-                      "returns true if Belle's PID Muon_likelihood() is usable (reliable).");
+                      "returns true if Belle's PID ``Muon_likelihood()`` is usable (reliable).");
     REGISTER_VARIABLE("eIDBelle", eIDBelle,
-                      "returns Belle's electron ID (eid(3,-1,5).prob()) variable.");
+                      "returns Belle's electron ID ``eid(3,-1,5).prob()`` variable.");
 
   }
 }

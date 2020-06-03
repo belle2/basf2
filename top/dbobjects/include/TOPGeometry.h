@@ -97,6 +97,13 @@ namespace Belle2 {
     void appendTTS(const TOPNominalTTS& tts) {m_tts[tts.getPMTType()] = tts;}
 
     /**
+     * Appends photon detection efficiency tuning factor of a particular PMT type
+     * @param type PMT type
+     * @param factor tuning factor
+     */
+    void appendPDETuningFactor(unsigned type, double factor) {m_tuneFactorsPDE[type] = factor;}
+
+    /**
      * Sets nominal time-to-digit conversion parameters
      * @param nominalTDC nominal TDC parameters
      */
@@ -184,6 +191,19 @@ namespace Belle2 {
     const TOPNominalTTS& getTTS(unsigned type) const;
 
     /**
+     * Returns photon detection efficiency tuning factor of a given PMT type
+     * @param type PMT type
+     * @return tuning factor
+     */
+    double getPDETuningFactor(unsigned type) const;
+
+    /**
+     * Check for empty PDE tuning factors
+     * @return true if empty
+     */
+    bool arePDETuningFactorsEmpty() const {return m_tuneFactorsPDE.empty();}
+
+    /**
      * Returns PMT dependent time transition spreads
      * @return a map of PMT dependent time transition spreads
      */
@@ -269,8 +289,9 @@ namespace Belle2 {
     TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
     TOPWavelengthFilter m_wavelengthFilter; /**< transmittance of wavelength filter */
     std::map<unsigned, TOPNominalTTS> m_tts; /**< TTS of PMT types */
+    std::map<unsigned, float> m_tuneFactorsPDE; /**< PDE tuning factors of PMT types */
 
-    ClassDefOverride(TOPGeometry, 7); /**< ClassDef */
+    ClassDefOverride(TOPGeometry, 8); /**< ClassDef */
 
   };
 

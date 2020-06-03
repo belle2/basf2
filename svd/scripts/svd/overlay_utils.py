@@ -17,48 +17,75 @@
 #
 # IMPORTANT: default paths are for KEKCC only!!
 #
-# examples are in svd/examples/overlayUtils.py
+# examples are in svd/examples/runOverlay.py
 #
 ######
 
 from basf2 import *
 from ROOT import Belle2
+import basf2
 
 
 def prepare_svd_overlay(path, inputFiles, outputFileTag="overlay"):
     """
-    This function reads a list of inout files and prepare them to be used in overlay_svd_data
+    This function reads a list of input files and prepare them to be used in overlay_svd_data
     @param inputFiles: list of input files to be processed
     @param outputFileTag: tag added just before the .root
     """
 
     for inputfile in inputFiles:
 
-        splittext = inputfile.split(".root")
+        basf2.conditions.reset()
+        basf2.conditions.override_globaltags()
+        basf2.conditions.globaltags = ['svd_basic', "online"]
+        splittext = ""
+        if(str(outputFileTag) == "ZS3"):
+            splittext = inputfile.split(".root")
+        else:
+            splittext = inputfile.split("_ZS3.root")
         outputfile = splittext[0]+"_"+str(outputFileTag)+".root"
         main = create_path()
         main.add_module("RootInput", inputFileNames=inputfile)
-        main.add_module("RootOutput", branchNames="SVDShaperDigits", outputFileName=outputfile)
+        if(str(outputFileTag) == "ZS3"):
+            main.add_module("SVDUnpacker", svdShaperDigitListName="SVDShaperDigitsZS3")
+
+        zs = 3
+        if (str(outputFileTag) == "overlayZS5"):
+            zs = 5
+
+        if not (str(outputFileTag) == "ZS3"):
+            main.add_module("SVDZeroSuppressionEmulator",
+                            SNthreshold=zs,
+                            ShaperDigits='SVDShaperDigitsZS3',
+                            ShaperDigitsIN='SVDShaperDigits',
+                            FADCmode=True)
+            main.add_module("RootOutput", branchNames=["SVDEventInfo", "SVDShaperDigitsZS3"], outputFileName=outputfile)
+        else:
+            main.add_module("RootOutput", branchNames=["SVDShaperDigits"], outputFileName=outputfile)
         print_path(main)
         process(main)
 
 
-def overlay_svd_data(path, datatype="cosmics", overlayfiles=""):
+def overlay_svd_data(path, datatype="randomTrigger", overlayfiles=""):
     """
     This function overlay events from data to the standard simulation
-    @param datatype: must be chosen among {xTalk, cosmics, user-defined}
+    @param datatype: must be chosen among {xTalk, cosmics,randomTrigger, randomTriggerZS5,  user-defined}
     @param overlayfiles: if the datatype is user-defiled, the user can specify rootfiles to be overlaied to simulation
     """
 
-    if not (str(datatype) == "xTalk" or str(datatype) == "cosmics" or str(datatype) == "user-defined"):
+    if not (str(datatype) == "xTalk" or str(datatype) == "cosmics" or str(datatype) ==
+            "randomTrigger" or str(datatype) == "randomTriggerZS5" or str(datatype) == "user-defined"):
         print("ERROR in SVDOverlay: the specified datatype ("+str(datatype) +
               ") is not recognized, choose among: xTalk, cosmics or user-defined")
         return
 
     overlayDir = "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/"
 
-    if str(datatype) == "xTalk" or str(datatype) == "cosmics":
+    if str(datatype) == "xTalk" or str(datatype) == "cosmics" or str(datatype) == "randomTrigger":
         overlayfiles = str(overlayDir)+str(datatype)+"/*_overlay.root"
+
+    if str(datatype) == "randomTriggerZS5":
+        overlayfiles = str(overlayDir)+"randomTrigger/*_overlayZS5.root"
 
     print(" ** SVD OVERLAY UTIL CALLED **")
     print(" -> overlaying the following files to simulation: ")

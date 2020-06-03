@@ -26,6 +26,7 @@ KLMChannelStatusAlgorithm::Results::Results()
 KLMChannelStatusAlgorithm::Results::Results(const Results& results)
 {
   m_ModuleStatus = new KLMChannelStatus(*results.m_ModuleStatus);
+  m_ChannelStatus = new KLMChannelStatus(*results.m_ChannelStatus);
   m_HitMapChannel = results.m_HitMapChannel;
   m_HitMapModule = results.m_HitMapModule;
   m_HitMapSector = results.m_HitMapSector;
@@ -43,6 +44,8 @@ KLMChannelStatusAlgorithm::Results::~Results()
 {
   if (m_ModuleStatus != nullptr)
     delete m_ModuleStatus;
+  if (m_ChannelStatus != nullptr)
+    delete m_ChannelStatus;
 }
 
 KLMChannelStatusAlgorithm::KLMChannelStatusAlgorithm() :
@@ -53,8 +56,6 @@ KLMChannelStatusAlgorithm::KLMChannelStatusAlgorithm() :
 
 KLMChannelStatusAlgorithm::~KLMChannelStatusAlgorithm()
 {
-  if (m_ChannelStatus != nullptr)
-    delete m_ChannelStatus;
 }
 
 CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
@@ -86,18 +87,18 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
       m_Results.m_HitNumberEKLM += hits;
   }
   clearCalibrationData();
-  if (m_ChannelStatus != nullptr)
-    delete m_ChannelStatus;
-  m_ChannelStatus = new KLMChannelStatus();
-  m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
+  if (m_Results.m_ChannelStatus != nullptr)
+    delete m_Results.m_ChannelStatus;
+  m_Results.m_ChannelStatus = new KLMChannelStatus();
+  m_Results.m_ChannelStatus->setStatusAllChannels(KLMChannelStatus::c_Undetermined);
   /* If there are no hits, then mark all channels as dead. */
   KLMChannelIndex klmChannels;
   if (m_Results.m_TotalHitNumber == 0) {
     for (KLMChannelIndex& klmChannel : klmChannels) {
       channel = klmChannel.getKLMChannelNumber();
-      m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
+      m_Results.m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
     }
-    saveCalibration(m_ChannelStatus, "KLMChannelStatus");
+    saveCalibration(m_Results.m_ChannelStatus, "KLMChannelStatus");
     return CalibrationAlgorithm::c_OK;
   }
   /* Fill module and sector hit maps. */
@@ -131,7 +132,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
     if (moduleHits == 0) {
       for (; klmChannel != klmNextModule; ++klmChannel) {
         channel = klmChannel.getKLMChannelNumber();
-        m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
+        m_Results.m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
       }
       m_Results.m_ModuleActiveChannelMap.setChannelData(module, 0);
       continue;
@@ -151,7 +152,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
       maxHits = 0;
       for (; klmChannel != klmNextModule; ++klmChannel) {
         channel = klmChannel.getKLMChannelNumber();
-        if (m_ChannelStatus->getChannelStatus(channel) ==
+        if (m_Results.m_ChannelStatus->getChannelStatus(channel) ==
             KLMChannelStatus::c_Hot)
           continue;
         hits = m_Results.m_HitMapChannel.getChannelData(channel);
@@ -178,7 +179,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   m_Results.m_HitNumberEKLMNoHot = 0;
   for (KLMChannelIndex& klmChannel : klmChannels) {
     channel = klmChannel.getKLMChannelNumber();
-    if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
+    if (m_Results.m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
       continue;
     module = klmChannel.getKLMModuleNumber();
     sector = klmChannel.getKLMSectorNumber();
@@ -243,7 +244,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
     unsigned int activeChannels = 0;
     for (; klmChannel != klmNextModule; ++klmChannel) {
       channel = klmChannel.getKLMChannelNumber();
-      if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
+      if (m_Results.m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
         continue;
       hits = m_Results.m_HitMapChannel.getChannelData(channel);
       if (hits > 0)
@@ -269,7 +270,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   }
   if (notEnoughData)
     return CalibrationAlgorithm::c_NotEnoughData;
-  saveCalibration(m_ChannelStatus, "KLMChannelStatus");
+  saveCalibration(m_Results.m_ChannelStatus, "KLMChannelStatus");
   return CalibrationAlgorithm::c_OK;
 }
 
@@ -306,14 +307,16 @@ bool KLMChannelStatusAlgorithm::markHotChannel(
   unsigned int hits = m_Results.m_HitMapChannel.getChannelData(channel);
   if (activeChannels == 1) {
     if (hits >= m_MinimalHitNumberSingleHotChannel) {
-      m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
+      m_Results.m_ChannelStatus->setChannelStatus(
+        channel, KLMChannelStatus::c_Hot);
       return true;
     }
   } else {
     double r = hits / (double(moduleHits - hits) / (activeChannels - 1));
     if (hits >= m_MinimalHitNumberHotChannel &&
         r > m_MinimalHitNumberRatioHotChannel) {
-      m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Hot);
+      m_Results.m_ChannelStatus->setChannelStatus(
+        channel, KLMChannelStatus::c_Hot);
       return true;
     }
   }
@@ -323,10 +326,14 @@ bool KLMChannelStatusAlgorithm::markHotChannel(
 void KLMChannelStatusAlgorithm::calibrateChannel(uint16_t channel)
 {
   unsigned int hits = m_Results.m_HitMapChannel.getChannelData(channel);
-  if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
+  if (m_Results.m_ChannelStatus->getChannelStatus(channel) ==
+      KLMChannelStatus::c_Hot)
     return;
-  if (hits > 0)
-    m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Normal);
-  else
-    m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
+  if (hits > 0) {
+    m_Results.m_ChannelStatus->setChannelStatus(
+      channel, KLMChannelStatus::c_Normal);
+  } else {
+    m_Results.m_ChannelStatus->setChannelStatus(
+      channel, KLMChannelStatus::c_Dead);
+  }
 }

@@ -341,10 +341,10 @@ class KLMStripEfficiency(AlgorithmStrategy):
                     run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
                         self.machine.algorithm.algorithm.getResults())
                     result_str = calibration_result_string(run_data[i][1])
+                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                     if (run_data[i][1] != 0):
                         basf2.B2FATAL('Forced calibration of run %d failed.' %
                                       (run_data[i][0]))
-                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                 if (run_for_merging >= 0):
                     merge_runs(run_data, i, run_for_merging, True)
             else:
@@ -470,7 +470,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
             # The last run will be overwritten when writing the result.
             run_data[i][5].front().iov = \
                 Belle2.IntervalOfValidity(experiment, first_run, experiment, -1)
-            # If the calibration result is different, write the previous run.
+            # Write the previous run.
             if (i > 0):
                 iov = run_data[previous_run][5].front().iov
                 if (previous_run == 0):

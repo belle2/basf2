@@ -51,6 +51,14 @@ namespace Belle2 {
       ~Results();
 
       /**
+       * Get channel status (last calibration).
+       */
+      KLMChannelStatus& getChannelStatus() const
+      {
+        return *m_ChannelStatus;
+      }
+
+      /**
        * Get module status (last calibration).
        */
       KLMChannelStatus& getModuleStatus() const
@@ -134,6 +142,9 @@ namespace Belle2 {
 
       /** Module status. */
       KLMChannelStatus* m_ModuleStatus = nullptr;
+
+      /** Channel status. */
+      KLMChannelStatus* m_ChannelStatus = nullptr;
 
       /** Channel hit map. */
       KLMChannelMapValue<unsigned int> m_HitMapChannel;
@@ -254,13 +265,6 @@ namespace Belle2 {
       m_MinimalAverageHitNumber = minimalAverageHitNumber;
     }
 
-    /**
-     * Get channel status (last calibration).
-     */
-    KLMChannelStatus& getChannelStatus() const
-    {
-      return *m_ChannelStatus;
-    }
 
     /**
      * Get results.
@@ -340,9 +344,6 @@ namespace Belle2 {
 
     /** Calibration results. */
     Results m_Results;
-
-    /** Channel status. */
-    KLMChannelStatus* m_ChannelStatus = nullptr;
 
   };
 

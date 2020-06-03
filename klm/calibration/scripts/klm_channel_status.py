@@ -198,9 +198,8 @@ class KLMChannelStatus(AlgorithmStrategy):
         for exp_run in experiment_runs:
             self.execute_over_run_list([exp_run], iteration, False)
             result = self.machine.result.result
-            # algorithm_results = KLMChannelStatusAlgorithm.Results(
-            #    self.machine.algorithm.algorithm.getResults())
-            algorithm_results = self.machine.algorithm.algorithm
+            algorithm_results = KLMChannelStatusAlgorithm.Results(
+                self.machine.algorithm.algorithm.getResults())
             if (algorithm_results.getTotalHitNumber() > 0):
                 run_data.append([exp_run.run, result, [exp_run],
                                  algorithm_results, '', None])

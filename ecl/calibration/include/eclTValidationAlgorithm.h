@@ -28,26 +28,8 @@ namespace Belle2 {
       /**..Constructor */
       eclTValidationAlgorithm();
 
-
-
-
-
-
-      /**..Constructor */
+      /**..Constructor - main one as it allows user to choose which collector data to analyse*/
       eclTValidationAlgorithm(std::string physicsProcessCollectorName);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       /**..Destructor */
       virtual ~eclTValidationAlgorithm() {}

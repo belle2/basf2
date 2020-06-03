@@ -22,19 +22,19 @@ namespace Belle2 {
   /**
    * KLM channel status calibration algorithm.
    */
-  class KLMChannelStatusCalibrationAlgorithm : public CalibrationAlgorithm {
+  class KLMChannelStatusAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
      * Constructor.
      */
-    KLMChannelStatusCalibrationAlgorithm();
+    KLMChannelStatusAlgorithm();
 
     /**
      * Destructor.
      */
-    ~KLMChannelStatusCalibrationAlgorithm();
+    ~KLMChannelStatusAlgorithm();
 
     /**
      * Calibration.

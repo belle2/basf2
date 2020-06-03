@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/calibration/KLMChannelStatusCalibrationAlgorithm.h>
+#include <klm/calibration/KLMChannelStatusAlgorithm.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
@@ -19,13 +19,13 @@
 
 using namespace Belle2;
 
-KLMChannelStatusCalibrationAlgorithm::KLMChannelStatusCalibrationAlgorithm() :
+KLMChannelStatusAlgorithm::KLMChannelStatusAlgorithm() :
   CalibrationAlgorithm("KLMChannelStatusCalibrationCollector"),
   m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
 }
 
-KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
+KLMChannelStatusAlgorithm::~KLMChannelStatusAlgorithm()
 {
   if (m_ChannelStatus != nullptr)
     delete m_ChannelStatus;
@@ -33,7 +33,7 @@ KLMChannelStatusCalibrationAlgorithm::~KLMChannelStatusCalibrationAlgorithm()
     delete m_ModuleStatus;
 }
 
-CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
+CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
 {
   uint16_t channel, module, sector;
   unsigned int hits, moduleHits, maxHits;
@@ -245,7 +245,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusCalibrationAlgorithm::calibrate()
   return CalibrationAlgorithm::c_OK;
 }
 
-void KLMChannelStatusCalibrationAlgorithm::calibrateSector(
+void KLMChannelStatusAlgorithm::calibrateSector(
   uint16_t sector, double averageHitsActiveSector)
 {
   unsigned int hits = m_HitMapSectorNoHot.getChannelData(sector);
@@ -260,7 +260,7 @@ void KLMChannelStatusCalibrationAlgorithm::calibrateSector(
   }
 }
 
-void KLMChannelStatusCalibrationAlgorithm::calibrateModule(uint16_t module)
+void KLMChannelStatusAlgorithm::calibrateModule(uint16_t module)
 {
   unsigned int hits = m_HitMapModule.getChannelData(module);
   if (hits >= m_MinimalModuleHitNumber)
@@ -269,7 +269,7 @@ void KLMChannelStatusCalibrationAlgorithm::calibrateModule(uint16_t module)
     m_ModuleStatus->setChannelStatus(module, KLMChannelStatus::c_Dead);
 }
 
-bool KLMChannelStatusCalibrationAlgorithm::markHotChannel(
+bool KLMChannelStatusAlgorithm::markHotChannel(
   uint16_t channel, unsigned int moduleHits, int activeChannels)
 {
   unsigned int hits = m_HitMapChannel.getChannelData(channel);
@@ -289,7 +289,7 @@ bool KLMChannelStatusCalibrationAlgorithm::markHotChannel(
   return false;
 }
 
-void KLMChannelStatusCalibrationAlgorithm::calibrateChannel(uint16_t channel)
+void KLMChannelStatusAlgorithm::calibrateChannel(uint16_t channel)
 {
   unsigned int hits = m_HitMapChannel.getChannelData(channel);
   if (m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)

@@ -13,7 +13,7 @@ from caf.utils import runs_overlapping_iov, runs_from_vector
 from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
-from ROOT.Belle2 import KLMChannelStatusCalibrationAlgorithm
+from ROOT.Belle2 import KLMChannelStatusAlgorithm
 from klm_strategies_common import calibration_result_string
 
 
@@ -198,7 +198,7 @@ class KLMChannelStatus(AlgorithmStrategy):
         for exp_run in experiment_runs:
             self.execute_over_run_list([exp_run], iteration, False)
             result = self.machine.result.result
-            # algorithm_results = KLMChannelStatusCalibrationAlgorithm.Results(
+            # algorithm_results = KLMChannelStatusAlgorithm.Results(
             #    self.machine.algorithm.algorithm.getResults())
             algorithm_results = self.machine.algorithm.algorithm
             if (algorithm_results.getTotalHitNumber() > 0):

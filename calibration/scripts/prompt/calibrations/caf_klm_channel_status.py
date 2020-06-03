@@ -93,9 +93,9 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     import ROOT
-    from ROOT.Belle2 import KLMChannelStatusCalibrationAlgorithm
+    from ROOT.Belle2 import KLMChannelStatusAlgorithm
 
-    alg = KLMChannelStatusCalibrationAlgorithm()
+    alg = KLMChannelStatusAlgorithm()
 
     ###################################################
     # Calibration setup

@@ -49,7 +49,7 @@ KLMChannelStatusAlgorithm::Results::~Results()
 }
 
 KLMChannelStatusAlgorithm::KLMChannelStatusAlgorithm() :
-  CalibrationAlgorithm("KLMChannelStatusCalibrationCollector"),
+  CalibrationAlgorithm("KLMChannelStatusCollector"),
   m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
 }

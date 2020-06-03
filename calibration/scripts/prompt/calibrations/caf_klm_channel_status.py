@@ -143,5 +143,5 @@ def get_collector(input_data_name):
     """
 
     if input_data_name == 'raw':
-        return basf2.register_module('KLMChannelStatusCalibrationCollector')
+        return basf2.register_module('KLMChannelStatusCollector')
     raise Exception("Unknown input data name used when setting up collector")

@@ -16,6 +16,7 @@
 
 /* ROOT headers. */
 #include <TDirectory.h>
+#include <TLatex.h>
 
 using namespace Belle2;
 
@@ -84,16 +85,16 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorEKLM->SetOption("LIVE");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
-                            "BKLM plane occupancy (phi readout)",
+                            "BKLM plane occupancy (#phi readout)",
                             240, 0.5, 240.5);
   m_PlaneBKLMPhi->GetXaxis()->SetTitle("Layer number");
   m_PlaneBKLMPhi->SetOption("LIVE");
   m_PlaneBKLMZ = new TH1F("plane_bklm_z",
-                          "BKLM plane occupancy (Z readout)",
+                          "BKLM plane occupancy (z readout)",
                           240, 0.5, 240.5);
   m_PlaneBKLMZ->GetXaxis()->SetTitle("Layer number");
   m_PlaneBKLMZ->SetOption("LIVE");
-  m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy", 208, 0.5, 208.5);
+  m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy (both readouts)", 208, 0.5, 208.5);
   m_PlaneEKLM->GetXaxis()->SetTitle("Plane number");
   m_PlaneEKLM->SetOption("LIVE");
   /* Number of hits per channel. */

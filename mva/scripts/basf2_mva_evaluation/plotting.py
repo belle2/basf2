@@ -1291,8 +1291,6 @@ if __name__ == '__main__':
         return data.reindex(numpy.random.permutation(data.index))
 
     import seaborn
-    import pandas
-
     # Set nice searborn settings
     seaborn.set(font_scale=3)
     seaborn.set_style('whitegrid')

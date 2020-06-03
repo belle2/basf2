@@ -300,6 +300,9 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
+      alarm = "Call the KLM experts immediately!";
+      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+      canvas->Update();
     }
   } else {
     /* First draw the vertical lines and the sector names. */
@@ -332,6 +335,9 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
         yAlarm -= 0.05;
       }
+      alarm = "Call the KLM experts immediately!";
+      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+      canvas->Update();
     }
   }
 }
@@ -386,6 +392,7 @@ void DQMHistAnalysisKLMModule::event()
     }
   }
   fillMaskedChannelsHistogram("masked_channels");
+  latex.SetTextColor(kWhite);
   processPlaneHistogram("plane_bklm_phi", latex);
   processPlaneHistogram("plane_bklm_z", latex);
   processPlaneHistogram("plane_eklm", latex);

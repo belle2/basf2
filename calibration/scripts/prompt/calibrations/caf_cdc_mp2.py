@@ -64,6 +64,7 @@ def get_calibrations(input_data, **kwargs):
     import basf2
     from prompt.utils import filter_by_max_files_per_run
     import alignment
+    import alignment.constraints
     # Gets the input files and IoV objects associated with the files.
     file_to_iov_mumu = input_data["hlt_mumu"]
     file_to_iov_hadron = input_data["hlt_hadron"]
@@ -93,32 +94,25 @@ def get_calibrations(input_data, **kwargs):
     # The actuall IoV we want for any prompt request is open-ended
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     import millepede_calibration as mp2
-    cfg = mp2.create_configuration(
-        db_components=['CDCTimeZeros'],
+    cal = mp2.create(
+        name='tz0',
+        dbobjects=['CDCTimeZeros'],
+        collections=[
+            mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
+            mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
+        files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
+        tags=None,
+        timedep=[],
         constraints=[alignment.constraints.CDCTimeZerosConstraint()],
         fixed=[],
-        commands=[
-            'method inversion 1 0.1',
-            'threads 25 1',
-            'chiscut 30. 6.',
-            'entries 100',
-            'scaleerrors 1. 1.'],
-        reco_components=None,
+        commands=['method inversion 1 0.1',
+                  'threads 25 1',
+                  'chiscut 30. 6.',
+                  'entries 100',
+                  'scaleerrors 1. 1.'],
         params=dict(minPValue=0., externalIterations=0),
         min_entries=10000)
 
-    with cfg.reprocess_collection(name='hlt_mumu', path=pre_collector()):
-        cfg.collect_tracks('RecoTracks')
-    with cfg.reprocess_collection(name='hlt_hadron', path=pre_collector()):
-        cfg.collect_tracks('RecoTracks')
-
-    cal = mp2.create_calibration(
-        cfg,
-        name='tz0',
-        tags=None,
-        files=dict(
-            hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
-        timedep=[])
     basf2.set_module_parameters(cal.collections['hlt_mumu'].pre_collector_path, 'RootInput', entrySequences=[f'0:{3000}'])
     basf2.set_module_parameters(cal.collections['hlt_hadron'].pre_collector_path, 'RootInput', entrySequences=[f'0:{3000}'])
     cal.max_iterations = 3

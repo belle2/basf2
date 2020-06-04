@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <Eigen/Dense>
 #include <iostream>
 
 using namespace std;
@@ -29,7 +30,7 @@ REG_MODULE(DistanceCalculator)
 //-----------------------------------------------------------------
 
 DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
-  m_distance(0), m_distanceCovMatrix(0)
+  m_distanceCovMatrix(0)
 {
   // Set module properties
   setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between two tracks, distance of closest approach between a vertex/track and Btube");
@@ -46,6 +47,8 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
            "vertexbtube: calculates the distance of closest approach between a vertex and a Btube,\n"
            "trackbtube: calculates the distance of closest approach between a track and a Btube",
            std::string("vertextrack"));
+
+  m_distance = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(3);
 }
 
 DistanceCalculatorModule::~DistanceCalculatorModule()
@@ -148,6 +151,7 @@ Eigen::Vector3d getDistanceVertices(const Particle* p1, const Particle* p2)
   Eigen::Vector3d r = p2v - p1v;
   return r;
 }
+
 TMatrixFSym getDistanceVerticesErrors(const Particle* p1, const Particle* p2)
 {
   TMatrixFSym err_r = p1->getVertexErrorMatrix() + p2->getVertexErrorMatrix();

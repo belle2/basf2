@@ -16,7 +16,6 @@
 #include <TMatrixFSym.h>
 
 #include <Eigen/Core>
-#include <Eigen/Geometry>
 
 #include <analysis/dataobjects/Btube.h>
 #include <analysis/dataobjects/Particle.h>

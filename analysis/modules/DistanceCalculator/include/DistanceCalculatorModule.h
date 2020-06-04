@@ -53,7 +53,7 @@ namespace Belle2 {
     std::string m_decayString;  /**< decay string */
     DecayDescriptor m_decayDescriptor;  /**< decay descriptor which specifies which particles are used to calculate the distance */
     std::string m_mode; /**< option string */
-    Eigen::Vector3d m_distance; /**< distance between two objects (tracks or Btube and vertex or two vertices) */
+    Eigen::Vector3d m_distance; /**< distance between two objects (track/vertex/Btube and vertex/track) */
     TMatrixFSym m_distanceCovMatrix; /**< covariance matrix of distance */
   };
 }

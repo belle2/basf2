@@ -71,6 +71,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_U->Branch("svdStripTime", &m_svdStripTime);
+  m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_U->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_U->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_U->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
@@ -109,6 +110,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
+  m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_V->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_V->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
@@ -227,6 +229,7 @@ void SVDPerformanceTTreeModule::event()
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+
           const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
           double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
           double svdZ_1 = svdGlobal_1(2);
@@ -271,6 +274,7 @@ void SVDPerformanceTTreeModule::event()
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
+          m_svdStripPosition.clear();
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
@@ -280,6 +284,7 @@ void SVDPerformanceTTreeModule::event()
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+              m_svdStripPosition.push_back(svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID()));
             }
 
           m_t_U->Fill();
@@ -331,6 +336,7 @@ void SVDPerformanceTTreeModule::event()
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
+          m_svdStripPosition.clear();
 
 
           //retrieve relations and set strip charges and times
@@ -342,6 +348,7 @@ void SVDPerformanceTTreeModule::event()
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+              m_svdStripPosition.push_back(svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID()));
             }
 
           m_t_V->Fill();

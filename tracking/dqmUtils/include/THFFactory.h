@@ -115,6 +115,8 @@ namespace Belle2 {
   * This class unites some parameters for THFFactory which describe one axis of histogram. Those parameters are nbins, low, up and title. */
   class THFAxis {
   public:
+    /** Constructor. */
+    THFAxis() {}
 
     /** Constructor.
     * @param nbins - number of bins along the axis

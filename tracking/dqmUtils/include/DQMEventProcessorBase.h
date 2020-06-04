@@ -94,56 +94,56 @@ namespace Belle2 {
     static bool IsNotMat(int ladderNumber, int layerNumber);
 
     /** DQM histogram module on which the Fill- functions are called to fill histograms. */
-    DQMHistoModuleBase* m_histoModule;
+    DQMHistoModuleBase* m_histoModule = nullptr;
     /** StoreArray name where Tracks are written. */
-    string m_tracksStoreArrayName;
+    string m_tracksStoreArrayName = "";
     /** StoreArray name where RecoTracks are written. */
-    string m_recoTracksStoreArrayName;
+    string m_recoTracksStoreArrayName = "";
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */
-    int m_iTrack;
+    int m_iTrack = 0;
     /** index of track where are VXD hits and aren't CDC hits (with valid TrackFitResult and related RecoTrack) */
-    int m_iTrackVXD;
+    int m_iTrackVXD = 0;
     /** index of track where are CDC hits and aren't VXD hits (with valid TrackFitResult and related RecoTrack) */
-    int m_iTrackCDC;
+    int m_iTrackCDC = 0;
     /** index of track where are both VXD hits and CDC hits (with valid TrackFitResult and related RecoTrack) */
-    int m_iTrackVXDCDC;
+    int m_iTrackVXDCDC = 0;
 
     /** RecoTrack related to currently processed Track */
-    RecoTrack* m_recoTrack;
+    RecoTrack* m_recoTrack = nullptr;
     /** Determines if the hit is not the first hit in the current track */
     bool m_isNotFirstHit = false;
 
     /** unbiased residual for the hit obtained from the sensor so its length is different for PXD and SVD sensors */
     TVectorT<double>* m_rawSensorResidual = nullptr;
     /** ID of the current sensor */
-    VxdID m_sensorID;
+    VxdID m_sensorID = VxdID(0);
     /** ID of the prewious sensor*/
-    VxdID m_sensorIDPrev;
+    VxdID m_sensorIDPrev = VxdID(0);
 
     /** local coordinates of the hit position (u, v, w) */
-    TVector3 m_position;
+    TVector3 m_position = TVector3();
     /** unbiased residual for the hit in micrometers in local coordinates (u, v, w) */
-    TVector3 m_residual_um;
+    TVector3 m_residual_um = TVector3();
     /** unbiased residual for the hit in micrometers in global coordinates (x, y, z) */
-    TVector3 m_globalResidual_um;
+    TVector3 m_globalResidual_um = TVector3();
     /** global phi in degrees of the hit */
-    float m_phi_deg;
+    float m_phi_deg = .0;
     /** global phi in degrees of the previous hit*/
-    float m_phiPrev_deg;
+    float m_phiPrev_deg = .0;
     /** global theta in degrees of the hit */
-    float m_theta_deg;
+    float m_theta_deg = .0;
     /** global theta in degrees of the previous hit*/
-    float m_thetaPrev_deg;
+    float m_thetaPrev_deg = .0;
     /** number of the layer of the hit */
-    int m_layerNumber;
+    int m_layerNumber = 0;
     /** number of the layer of the previous hit */
-    int m_layerNumberPrev;
+    int m_layerNumberPrev = 0;
     /** index of the layer of the hit */
-    int m_layerIndex;
+    int m_layerIndex = 0;
     /** index of the layer of the previous hit */
-    int m_correlationIndex;
+    int m_correlationIndex = 0;
     /** index of the sensor of the hit */
-    int m_sensorIndex;
+    int m_sensorIndex = 0;
   };
 }

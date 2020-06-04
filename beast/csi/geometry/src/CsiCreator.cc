@@ -53,7 +53,7 @@ namespace Belle2 {
 
     CsiCreator::CsiCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     CsiCreator::~CsiCreator()
@@ -63,6 +63,8 @@ namespace Belle2 {
 
     void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       //Print the type (not used for now)
       B2DEBUG(200, "CsI Geometry Type: " << type);

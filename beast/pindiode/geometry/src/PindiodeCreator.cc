@@ -48,7 +48,7 @@ namespace Belle2 {
 
     PindiodeCreator::PindiodeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     PindiodeCreator::~PindiodeCreator()
@@ -58,6 +58,9 @@ namespace Belle2 {
 
     void PindiodeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //Visualization Attributes
       //G4VisAttributes *invis = new G4VisAttributes(G4Colour(1,1,1));
       //invis->SetColor(0,0,0,0);

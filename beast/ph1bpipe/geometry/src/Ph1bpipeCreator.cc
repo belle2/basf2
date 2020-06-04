@@ -48,7 +48,7 @@ namespace Belle2 {
 
     Ph1bpipeCreator::Ph1bpipeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     Ph1bpipeCreator::~Ph1bpipeCreator()
@@ -58,6 +58,9 @@ namespace Belle2 {
 
     void Ph1bpipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //Beam pipes 6 pillars
       double pillar_height = 61.9 * CLHEP::cm / 2.;
       double pillar_length = 3. * CLHEP::cm;

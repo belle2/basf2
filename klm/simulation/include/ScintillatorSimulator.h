@@ -10,11 +10,11 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMHitMCTime.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dbobjects/EKLMChannelData.h>
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHitMCTime.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dbobjects/eklm/EKLMChannelData.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/simulation/ScintillatorFirmware.h>
 
@@ -68,16 +68,18 @@ namespace Belle2 {
        * @param[in] firstHit First hit in this strip.
        * @param[in] end      End of hit range.
        */
-      void simulate(std::multimap<uint16_t, BKLMSimHit*>::iterator& firstHit,
-                    std::multimap<uint16_t, BKLMSimHit*>::iterator& end);
+      void simulate(
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const BKLMSimHit*>::iterator& end);
 
       /**
        * Simulate EKLM strip.
        * @param[in] firstHit First hit in this strip.
        * @param[in] end      End of hit range.
        */
-      void simulate(std::multimap<uint16_t, EKLMSimHit*>::iterator& firstHit,
-                    std::multimap<uint16_t, EKLMSimHit*>::iterator& end);
+      void simulate(
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& firstHit,
+        const std::multimap<uint16_t, const EKLMSimHit*>::iterator& end);
 
       /**
        * Get fit data.
@@ -93,12 +95,12 @@ namespace Belle2 {
       /**
        * Get number of photoelectrons (fit result).
        */
-      double getNPE();
+      double getNPhotoelectrons();
 
       /**
        * Get generated number of photoelectrons.
        */
-      int getGeneratedNPE();
+      int getNGeneratedPhotoelectrons();
 
       /**
        * Get total energy deposited in the strip (sum over ssimulation hits).
@@ -112,11 +114,11 @@ namespace Belle2 {
 
       /**
        * Generate photoelectrons.
-       * @param[in]     stripLen    Strip length.
-       * @param[in]     distSiPM    Distance from hit to SiPM.
-       * @param[in]     nPE         Number of photons to be simulated.
-       * @param[in]     timeShift   Time of hit.
-       * @param[in]     isReflected Whether the hits are reflected or not.
+       * @param[in] stripLen    Strip length.
+       * @param[in] distSiPM    Distance from hit to SiPM.
+       * @param[in] nPhotons    Number of photons to be simulated.
+       * @param[in] timeShift   Time of hit.
+       * @param[in] isReflected Whether the hits are reflected or not.
        */
       void generatePhotoelectrons(double stripLen, double distSiPM,
                                   int nPhotons, double timeShift,

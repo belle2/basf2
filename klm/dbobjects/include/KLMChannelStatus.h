@@ -10,12 +10,12 @@
 
 #pragma once
 
+/* ROOT headers. */
+#include <TObject.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TObject.h>
 
 namespace Belle2 {
 
@@ -78,10 +78,10 @@ namespace Belle2 {
     void setStatusAllChannels(enum ChannelStatus status);
 
     /**
-     * Get number of active strips in the specified EKLM sector.
-     * @param[in] sectorGlobal Sector global number.
+     * Get number of active strips in the specified KLM module.
+     * @param[in] module Module number.
      */
-    int getActiveStripsEKLMSector(int sectorGlobal) const;
+    int getActiveStripsInModule(uint16_t module) const;
 
     /**
      * Operator ==.

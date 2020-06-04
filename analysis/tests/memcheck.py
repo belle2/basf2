@@ -4,6 +4,9 @@
 """This script is used in the nightly build to check for memory issues with valgrind.
 It is run as a test to make sure the memcheck does not fail because of issues in the script."""
 
+from b2test_utils import skip_test_if_light
+skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import
+
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim
@@ -12,7 +15,7 @@ from ROOT import Belle2
 from modularAnalysis import reconstructDecay, rankByHighest, buildRestOfEvent, buildContinuumSuppression, matchMCTruth, \
     variablesToNtuple
 from stdCharged import stdPi, stdMu
-from vertex import vertexTree, TagV
+from vertex import treeFit, TagV
 from flavorTagger import flavorTagger
 from rawdata import add_packers, add_unpackers
 import glob
@@ -54,9 +57,8 @@ main.add_module('EvtGenInput', userDECFile=find_file('decfiles/dec/1111440100.de
 
 # detector simulation
 bg = None
-# temporarily disable background overlay until new background files are produced
-# if 'BELLE2_BACKGROUND_DIR' in os.environ:
-#    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
 # trigger simulation
@@ -86,7 +88,7 @@ reconstructDecay('J/psi:mumu -> mu+:loose mu-:loose', cut='3.0 < M < 3.2', path=
 reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', cut='5.2 < M < 5.4', path=main)
 
 # perform B0 kinematic vertex fit and keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexTree('B0:jpsiks', 0.0, path=main)
+treeFit('B0:jpsiks', 0.0, path=main)
 
 # order candidates by chi2 probability
 rankByHighest('B0:jpsiks', 'chiProb', path=main)
@@ -109,7 +111,7 @@ TagV('B0:jpsiks', 'breco', path=main)
 # select variables that we want to store to ntuple
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']
 b_vars = ['nTracks', 'Mbc', 'deltaE', 'p', 'E', 'useCMSFrame(p)', 'useCMSFrame(E)',
-          'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'MCDeltaT'] + \
+          'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'mcDeltaT'] + \
     ['daughter(0,daughter(0,%s))' % var for var in fs_vars]
 
 # save variables to ntuple
@@ -121,8 +123,6 @@ add_unpackers(main)
 for module in main.modules():
     if module.type() == 'SVDUnpacker':
         module.param('silentlyAppend', True)
-    if module.name() in ['SVDDataFormatCheck', '__ROISVDDataFormatCheck', '__ROISVDCoGTimeEstimator', 'SVDCoGTimeEstimator']:
-        module.param('SVDEventInfo', 'SVDEventInfoSim')
 
 # gather profiling information
 main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName='rss_profile.png').set_log_level(LogLevel.INFO)

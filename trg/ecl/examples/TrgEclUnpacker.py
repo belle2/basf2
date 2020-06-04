@@ -14,17 +14,19 @@ import sys
 argvs = sys.argv  # get arg
 argc = len(argvs)  # of arg
 
-if argc != 2:
-    sys.exit("ReadEclTrgUnpacker.py> # of arg is strange.\n 1.rootname\n Exit.")
-
-if argc == 2:
+if argc == 3:
     f_in_root = argvs[1]
+    f_out_root = argvs[2]
+
+if f_in_root[-6:] == ".sroot":
+    input = register_module('SeqRootInput')
+if f_in_root[-5:] == ".root":
+    input = register_module('RootInput')
 
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
 # input
-input = register_module('RootInput')
 # unpacker
 unpacker = register_module('TRGECLUnpacker')
 # output
@@ -38,7 +40,7 @@ main.add_module(input)
 main.add_module(unpacker)
 
 input.param("inputFileName", f_in_root)
-output.param("outputFileName", "ecltrg_unpacker.root")
+output.param("outputFileName", f_out_root)
 
 # main.add_module(output);
 main.add_module(
@@ -46,8 +48,7 @@ main.add_module(
     branchNames=[
         "TRGECLUnpackerStores",
         "TRGECLUnpackerEvtStores",
-        "TRGECLUnpackerSumStores",
-        "TRGECLClusters"])
+        "TRGECLUnpackerSumStores"])
 
 # Process all events
 process(main)

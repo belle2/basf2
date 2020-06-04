@@ -10,14 +10,14 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <string>
-
-/* Belle2 headers. */
-#include <calibration/CalibrationCollectorModule.h>
+/* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/calibration/EKLMTimeCalibrationAlgorithm.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -62,6 +62,9 @@ namespace Belle2 {
 
     /** Use enent T0 or not. */
     bool m_UseEventT0;
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
 
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;

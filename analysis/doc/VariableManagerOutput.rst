@@ -76,6 +76,7 @@ You can write several trees to the same file by calling the module several times
 As with many modules, there is a `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToNtuple
+   :noindex:
 
 .. _v2ebt:
 
@@ -105,6 +106,7 @@ Here is an example of use:
 Here is the full function documentation of the `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToHistogram
+   :noindex:
 
 .. _v2hdf5:
 

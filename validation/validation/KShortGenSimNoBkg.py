@@ -20,7 +20,7 @@ set_random_seed(1337)
 main = create_path()
 
 main.add_module('EventInfoSetter',
-                evtNumList=[500],
+                evtNumList=[1500],
                 runList=[1],
                 expList=[0]
                 )

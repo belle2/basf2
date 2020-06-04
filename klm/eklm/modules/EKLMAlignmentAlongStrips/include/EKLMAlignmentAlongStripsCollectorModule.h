@@ -10,11 +10,13 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <calibration/CalibrationCollectorModule.h>
+/* KLM headers. */
 #include <klm/eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+
+/* Belle 2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
 
@@ -67,6 +69,9 @@ namespace Belle2 {
 
   private:
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
@@ -74,7 +79,7 @@ namespace Belle2 {
     EKLM::TransformData* m_TransformData;
 
     /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EKLMDigits;
+    StoreArray<KLMDigit> m_KLMDigits;
 
     /** Tracks. */
     StoreArray<Track> m_Tracks;

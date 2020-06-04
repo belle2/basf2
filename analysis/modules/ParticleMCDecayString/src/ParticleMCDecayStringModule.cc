@@ -14,7 +14,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/StringWrapper.h>
-#include <analysis/utility/MCMatching.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
@@ -36,13 +35,12 @@ namespace Belle2 {
   {
     setDescription("Creates the Monte Carlo decay string of a Particle and its daughters. "
                    "The MC decay string of the particle is hashed and saved as a 32bit pattern in the extra info field decayHash of the particle.  "
-                   "The MC decay string of the particel + its daughters is hashed as well and saved as another 32bit pattern in the extra info field decayHashExtended of the particle.  "
+                   "The MC decay string of the particle + its daughters is hashed as well and saved as another 32bit pattern in the extra info field decayHashExtended of the particle.  "
                    "The mapping hash <-> MC decay string in saved in a TTree by this module.  "
                    "The 32bit pattern must be saved as a float (because our extra info field, variable manager and ntuple output only supports float) "
                    "but they just represent 32 bits of a hash!  "
                    "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  "
-                   "Details on the MC decay string format can be found here: "
-                   "https://confluence.desy.de/display/BI/Physics+MCDecayString");
+                   "Details on the MC decay string format can be found here: `MCDecayString`");
     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
     addParam("fileName", m_fileName, "Filename in which the hash strings are saved, if empty the strings are not saved",
@@ -167,7 +165,7 @@ namespace Belle2 {
         if (writeError) {
           //m_file deleted first so we have a chance of closing it (though that will probably fail)
           delete m_file;
-          B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
+          B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
         }
 
         B2INFO("Closing file " << m_fileName);

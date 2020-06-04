@@ -5,7 +5,9 @@ import sys
 import os
 import basf2
 from ROOT import Belle2
+from b2test_utils import skip_test_if_light
 
+skip_test_if_light()  # light builds don't contain the particlegun
 basf2.set_random_seed("something important")
 
 path = basf2.Path()

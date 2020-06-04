@@ -3,17 +3,15 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 #include <string>
+
 namespace TreeFitter {
 
 

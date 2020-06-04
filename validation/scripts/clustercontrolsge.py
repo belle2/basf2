@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
 import subprocess
 import stat
 import shutil
+
+# ours
 import validationfunctions
+from validationscript import Script
 
 
 class Cluster:
@@ -52,7 +56,7 @@ class Cluster:
         # actual log file name
         self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,'
                                'h_fsize={requirement_storage}G '
-                               '-o {logfile} -e {logfile} -q {queuename} -V')
+                               '-oo {logfile} -q {queuename} -V')
 
         #: required vmem by the job in GB, required on DESY NAF, otherwise
         #: jobs get killed due to memory consumption
@@ -109,7 +113,7 @@ class Cluster:
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
     # noinspection PyMethodMayBeStatic
-    def adjust_path(self, path):
+    def adjust_path(self, path: str):
         """!
         This method can be used if path names are different on submission
         and execution hosts.
@@ -128,7 +132,7 @@ class Cluster:
 
         return True
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -215,9 +219,9 @@ class Cluster:
                 job.status = 'failed'
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
-            os.system(f'rm {tmp_name}')
+            os.unlink(tmp_name)
 
-    def is_job_finished(self, job):
+    def is_job_finished(self, job: Script):
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
@@ -252,9 +256,9 @@ class Cluster:
             return [False, 0]
 
     # noinspection PyMethodMayBeStatic
-    def terminate(self, job):
+    def terminate(self, job: Script):
         """!
         Terminate a running job, not support with this backend so ignore the
         call.
         """
-        pass
+        self.logger.error("Script termination not supported.")

@@ -10,12 +10,12 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Transform3D.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+/* KLM headers. */
 #include <klm/eklm/geometry/GeometryData.h>
+#include <klm/dataobjects/KLMDigit.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Transform3D.h>
 
 /**
  * @file
@@ -126,14 +126,14 @@ namespace Belle2 {
        * @param[in] hit Hit.
        * @return Transformation.
        */
-      const HepGeom::Transform3D* getStripLocalToGlobal(EKLMDigit* hit) const;
+      const HepGeom::Transform3D* getStripLocalToGlobal(KLMDigit* hit) const;
 
       /**
        * Get strip global to local transformation by hit.
        * @param[in] hit Hit.
        * @return Transformation.
        */
-      const HepGeom::Transform3D* getStripGlobalToLocal(EKLMDigit* hit) const;
+      const HepGeom::Transform3D* getStripGlobalToLocal(KLMDigit* hit) const;
 
       /**
        * Get strip transformation.
@@ -174,7 +174,7 @@ namespace Belle2 {
        *                      check off for debugging).
        * @return True if strips intersect.
        */
-      bool intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+      bool intersection(KLMDigit* hit1, KLMDigit* hit2,
                         HepGeom::Point3D<double>* cross,
                         double* d1, double* d2, double* sd,
                         bool segments = true) const;
@@ -205,6 +205,9 @@ namespace Belle2 {
        * @param[in,out] dat Transformation data.
        */
       void transformsToGlobal();
+
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;

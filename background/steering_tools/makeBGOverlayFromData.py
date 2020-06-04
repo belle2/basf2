@@ -81,7 +81,7 @@ compress.if_false(emptypath)
 # Output: digitized hits only
 output = basf2.register_module('RootOutput')
 output.param('branchNames', ['PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-                             'ARICHDigits', 'ECLWaveforms', 'BKLMDigits', 'EKLMDigits'])
+                             'ARICHDigits', 'ECLWaveforms', 'KLMDigits'])
 main.add_module(output)
 
 # Process events

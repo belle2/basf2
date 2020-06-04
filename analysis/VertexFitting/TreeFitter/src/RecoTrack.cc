@@ -3,18 +3,18 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/Track.h>
+
 #include <TMath.h>
 
 namespace TreeFitter {
@@ -24,7 +24,7 @@ namespace TreeFitter {
   RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
     m_bfield(0),
-    m_trackfit(particle->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(particle->getPDGCode())))),
+    m_trackfit(particle->getTrackFitResult()),
     m_cached(false),
     m_flt(0),
     m_params(5),

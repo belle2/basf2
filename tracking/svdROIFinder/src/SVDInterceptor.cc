@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/MeasurementFactory.h>
 #include <genfit/AbsTrackRep.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/svdROIFinder/SVDInterceptor.h>
 #include <vxd/geometry/GeoCache.h>

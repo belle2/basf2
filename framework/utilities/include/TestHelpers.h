@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <string>
-#include <cmath>
 
 namespace Belle2 {
   /** Some utilities to help with writing unit tests.

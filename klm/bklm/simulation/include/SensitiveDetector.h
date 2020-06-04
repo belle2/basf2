@@ -10,11 +10,12 @@
 
 #pragma once
 
-#include <simulation/kernel/SensitiveDetectorBase.h>
+/* KLM headers. */
+#include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
-
-#include <klm/bklm/dbobjects/BKLMSimulationPar.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 
@@ -38,7 +39,9 @@ namespace Belle2 {
       bool step(G4Step*, G4TouchableHistory*) override;
 
       //! Tidy up at the end of each event
-      void EndOfEvent(G4HCofThisEvent*) override {}
+      void EndOfEvent(G4HCofThisEvent*) override
+      {
+      }
 
     private:
 

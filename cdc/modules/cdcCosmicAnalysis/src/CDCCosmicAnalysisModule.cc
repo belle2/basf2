@@ -177,7 +177,7 @@ void CDCCosmicAnalysisModule::event()
 
     double ndf = fs->getNdf();
     if (!m_bField)  // in case of no magnetic field, #track par=4 instead of 5.
-      ndf = +1;
+      ndf += 1;
 
     double Chi2 = fs->getChi2();
     double TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));

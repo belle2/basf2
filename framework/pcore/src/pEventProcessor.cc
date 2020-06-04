@@ -7,7 +7,6 @@
  */
 
 #include <framework/pcore/pEventProcessor.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RingBuffer.h>
 #include <framework/pcore/RxModule.h>

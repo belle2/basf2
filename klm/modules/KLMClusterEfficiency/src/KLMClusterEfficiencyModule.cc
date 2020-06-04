@@ -8,16 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
+/* Own header. */
+#include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
+
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+
+/* ROOT headers. */
+#include <TCanvas.h>
 #include <TH2F.h>
 #include <TMarker.h>
-#include <TCanvas.h>
 #include <TStyle.h>
-
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
-#include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 
 using namespace Belle2;
 

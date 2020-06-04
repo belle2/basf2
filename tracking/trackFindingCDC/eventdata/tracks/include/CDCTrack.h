@@ -189,7 +189,7 @@ namespace Belle2 {
       }
 
       /// Set the multivariate quality indicator in [0, 1] attached the CDCTrack.
-      void setQualityIndicator(float qualityIndicator)
+      void setQualityIndicator(const float qualityIndicator)
       {
         m_qualityIndicator = qualityIndicator;
       }

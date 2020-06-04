@@ -9,8 +9,9 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/logging/Logger.h>
-#include <cfloat>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
 
@@ -196,7 +197,7 @@ namespace Belle2 {
      * @returns the position of the last edge below the input value
      */
     // cppcheck-suppress unusedPrivateFunction
-    short findBinFast(float value, std::vector<float> array) const;
+    short findBinFast(float val, std::vector<float> array) const;
 
     /**
      * This function returns the position of a number in a sorted array of bin edges,

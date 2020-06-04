@@ -65,6 +65,11 @@ namespace Belle2 {
     addParam("PDGCode", m_PDGCode,
              "PDG code of hypothesis to construct pulls (0 means: use MC truth)",
              211);
+    addParam("TOPDigitCollectionName", m_topDigitCollectionName,
+             "Name of the collection of TOPDigits", string(""));
+    addParam("TOPLikelihoodCollectionName", m_topLikelihoodCollectionName,
+             "Name of the produced collection of TOPLikelihoods", string(""));
+    addParam("TOPPullCollectionName", m_topPullCollectionName, "Name of the collection of produced TOPPulls", string(""));
 
   }
 
@@ -78,7 +83,7 @@ namespace Belle2 {
   {
     // input
 
-    m_digits.isRequired();
+    m_digits.isRequired(m_topDigitCollectionName);
     m_tracks.isRequired();
     m_extHits.isRequired();
     m_barHits.isOptional();
@@ -86,12 +91,12 @@ namespace Belle2 {
 
     // output
 
-    m_likelihoods.registerInDataStore();
+    m_likelihoods.registerInDataStore(m_topLikelihoodCollectionName);
     m_likelihoods.registerRelationTo(m_extHits);
     m_likelihoods.registerRelationTo(m_barHits);
     m_tracks.registerRelationTo(m_likelihoods);
 
-    m_topPulls.registerInDataStore(DataStore::c_DontWriteOut);
+    m_topPulls.registerInDataStore(m_topPullCollectionName, DataStore::c_DontWriteOut);
     m_tracks.registerRelationTo(m_topPulls, DataStore::c_Event, DataStore::c_DontWriteOut);
 
     // check for module debug level

@@ -34,6 +34,7 @@ namespace Belle2 {
   class ECLSimHit;
   class ECLDigit;
   class ECLDsp;
+  class ECLDspWithExtraMCInfo;
   class ECLTrig;
   class ECLWaveforms;
 
@@ -46,6 +47,7 @@ namespace Belle2 {
    * of amplitude, time and quality.
    * The initial parameters of fit and algorithm are same as hardware.
    * This module outputs two array which are ECLDsp and ECLDigit.
+   * An additional array with more MC information for ECLDsp studies is created upon user request.
 
      \correlationdiagram
      ECLHit = graph.data('ECLHit')
@@ -56,6 +58,7 @@ namespace Belle2 {
      graph.relation(ECLDigitizer, ECLHit)
      graph.relation(ECLDigitizer, ECLDigit)
      graph.relation(ECLDigitizer, ECLDsp)
+     graph.relation(ECLDigitizer, ECLDspWithExtraMCInfo)
      \endcorrelationdiagram
 
    */
@@ -128,6 +131,9 @@ namespace Belle2 {
     /** Storage for calibration constants */
     std::vector<calibration_t> m_calib;
 
+    /** Storage for waveform saving thresholds*/
+    std::vector<double> m_Awave;
+
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
@@ -161,6 +167,7 @@ namespace Belle2 {
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
+    StoreArray<ECLDspWithExtraMCInfo>    m_eclDspsWithExtraMCInfo;/**<  generated waveforms with extra MC information*/
     StoreArray<ECLTrig>   m_eclTrigs;/**< trigger information */
 
     /** Module parameters */
@@ -168,8 +175,11 @@ namespace Belle2 {
     bool m_calibration;  /**< calibration flag */
     bool m_inter; /**< internuclear counter effect */
     bool m_waveformMaker; /**< produce only waveform digits */
+    bool m_storeDspWithExtraMCInfo;  /**< DSP with extra info flag */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
     int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
+    double m_WaveformThresholdOverride; /**< If gt 0, value will override ECL_FPGA_StoreWaveform and apply value (in GeV) as threshold for all crystals for waveform saving*/
+    double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2

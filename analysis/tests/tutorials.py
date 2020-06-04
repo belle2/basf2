@@ -14,8 +14,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = ['B2A701-ContinuumSuppression_Input.py',  # BII-4246
-                        'B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
+    broken_tutorials = ['B2A702-ContinuumSuppression_MVATrain.py',  # BII-4246
                         'B2A703-ContinuumSuppression_MVAExpert.py',  # BII-4246
                         'B2A503-ReadDecayHash.py',  # BII-4254
                         ]
@@ -39,7 +38,7 @@ class TutorialsTest(unittest.TestCase):
                         # on stderr so it's not split from output of unittest
                         # done like this since we don't want to decode/encode utf8
                         sys.stdout.buffer.write(result.stdout)
-#                    self.assertEqual(result.returncode, 0)
+                    self.assertEqual(result.returncode, 0)
 
 
 if __name__ == '__main__':

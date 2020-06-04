@@ -10,14 +10,8 @@
  **************************************************************************/
 #include <tracking/modules/BeamSpotCollector/BeamSpotCollectorModule.h>
 
-#include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/VertexVariables.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
-#include <TLorentzVector.h>
-#include <TStyle.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -170,8 +164,10 @@ void BeamSpotCollectorModule::collect()
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
   const auto& frame = ReferenceFrame::GetCurrent();
 
-
   if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
+
+    if (Y4SParticles->getListSize() > 1)
+      return;
 
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
 

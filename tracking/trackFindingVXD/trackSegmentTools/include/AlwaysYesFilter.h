@@ -10,12 +10,6 @@
 
 #pragma once
 
-// includes - rootStuff:
-#include <TObject.h>
-
-// includes - stl:
-#include <vector>
-
 // includes - tf-related stuff
 #include "FilterBase.h"
 

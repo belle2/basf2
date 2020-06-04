@@ -10,11 +10,7 @@
 
 #include <analysis/utility/DecayTree.h>
 
-#include <framework/logging/Logger.h>
-
-#include <iostream>
-#include <sstream>
-#include <cassert>
+#include <stdexcept>
 
 using namespace Belle2;
 
@@ -83,9 +79,9 @@ std::vector<DecayNode> DecayTree::build_tree(const std::string& decaystring, boo
   nodes.reserve(5);
 
   for (; m_i < N; ++m_i) {
-    // Skip ' ', '^' and "-->"
-    if (decaystring[m_i] == ' ' or decaystring[m_i] == '>' or (m_i - 1 < N and decaystring[m_i] == '-' and (decaystring[m_i + 1] == '-'
-                                                               or decaystring[m_i + 1] == '>'))) {
+    // Skip ' ', '^' and "->"
+    if (decaystring[m_i] == ' ' or decaystring[m_i] == '>' or (m_i + 1 < N and decaystring[m_i] == '-'
+                                                               and decaystring[m_i + 1] == '>')) {
       continue;
     }
 

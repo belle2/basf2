@@ -67,7 +67,7 @@ namespace Belle2 {
       /**
        * Constructor from a histogram
        */
-      Chi2MinimumFinder1D(const std::shared_ptr<TH1D> h);
+      explicit Chi2MinimumFinder1D(const std::shared_ptr<TH1D> h);
 
       /**
        * Set chi^2 values to zero

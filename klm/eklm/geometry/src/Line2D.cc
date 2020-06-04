@@ -8,34 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/geometry/Circle2D.h>
+/* Own header. */
 #include <klm/eklm/geometry/Line2D.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/Circle2D.h>
 
 using namespace Belle2;
 
-EKLM::Line2D::Line2D(double x, double y, double vecx, double vecy)
+EKLM::Line2D::Line2D(double x, double y, double vecx, double vecy) :
+  m_Point(x, y, 0),
+  m_Vector(vecx, vecy, 0)
 {
-  m_Point.setX(x);
-  m_Point.setY(y);
-  m_Point.setZ(0);
-  m_Vector.setX(vecx);
-  m_Vector.setY(vecy);
-  m_Vector.setZ(0);
 }
 
 EKLM::Line2D::~Line2D()
 {
-}
-
-const HepGeom::Point3D<double>& EKLM::Line2D::getInitialPoint() const
-{
-  return m_Point;
-}
-
-const HepGeom::Vector3D<double>& EKLM::Line2D::getVector() const
-{
-  return m_Vector;
 }
 
 int EKLM::Line2D::

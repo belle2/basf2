@@ -8,12 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmTracking/BKLMTrackingModule.h>
-#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
+
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
+
+/* Belle 2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -117,7 +122,7 @@ void BKLMTrackingModule::event()
     runTracking(0, -1, -1, -1);
     if (m_storeTracks.getEntries() > 0)
       thereIsATrack = true;
-  } else if (m_studyEffi) {
+  } else {
     for (int iSection = 0; iSection < 2; iSection++) {
       for (int iSector = 0; iSector < 8; iSector++) {
         for (int iLayer = 0; iLayer < 15; iLayer++) {

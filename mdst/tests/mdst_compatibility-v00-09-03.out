@@ -2,6 +2,7 @@
 [INFO] The random number seed is set to "1"
 [INFO] Starting event processing, random seed is set to '1'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v00-09-03.root
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 Untested method EventMetaData::addErrorFlag
 Untested method EventMetaData::isEndOfData
 Untested method EventMetaData::setEndOfData
@@ -30,6 +31,8 @@ Untested method EventLevelTrackingInfo::setNCDCHitsNotAssigned
 Untested method EventLevelTrackingInfo::setNCDCHitsNotAssignedPostCleaning
 Untested method EventLevelTrackingInfo::setNCDCSegments
 Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
+Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
+Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
@@ -420,7 +423,6 @@ V0#2:
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
 TrackFitResult#0:
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltag is ${default_globaltag}

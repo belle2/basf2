@@ -4,13 +4,14 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     "framework",
     "analysis_utility",
-    "tracking_dataobjects",
     "mdst_dbobjects",
     "analysis_dataobjects",
     "analysis_ClusterUtility",
     "mdst_dataobjects",
-    'reconstruction_dataobjects'
-]
+    'reconstruction_dataobjects',
+    'analysis_ContinuumSuppression',
+    'analysis'
+]   
 
 Return('env')
 

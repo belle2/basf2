@@ -10,14 +10,16 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
-
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+/* KLM headers. */
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+/* C++ headers. */
+#include <map>
 
 namespace Belle2 {
 
@@ -74,11 +76,14 @@ namespace Belle2 {
 
   private:
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
     /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    StoreArray<KLMDigit> m_Digits;
 
     /** Map of strip data information. */
     std::map<int, struct StripData> m_StripDataMap;

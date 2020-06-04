@@ -23,7 +23,6 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <functional>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

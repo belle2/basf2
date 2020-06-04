@@ -73,7 +73,8 @@ namespace Belle2 {
       enum E_VXDHierarchyType {
         c_None = 0,
         c_Flat = 1,
-        c_Full = 2
+        c_HalfShells = 2,
+        c_Full = 3
       };
       /// What type of hierarchy to use for VXD?
       static E_VXDHierarchyType s_hierarchyType;
@@ -379,6 +380,7 @@ namespace Belle2 {
 
       /// Has any DB object in vector changed from last call to this function
       /// @param subset set of unique ids of objects we are interested
+      /// @param resetChangedState should this call result in hasBeenChangedInDB=true?
       bool hasBeenChangedInDB(const std::set<unsigned short>& subset, bool resetChangedState = true)
       {
         bool changed = false;

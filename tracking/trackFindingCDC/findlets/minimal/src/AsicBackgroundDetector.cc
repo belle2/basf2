@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <framework/logging/Logger.h>
 #include <iostream>
 
 using namespace Belle2;
@@ -98,8 +99,19 @@ void AsicBackgroundDetector::applyAsicFilter(std::vector<CDCWireHit*>& wireHits)
     return;
   };
 
+  if (wireHits.size() > 8) {
+    B2ERROR("Number of hits per asic should not exceed 8, observe too many hits." << LogVar("nHits", wireHits.size()));
+    /// This is abnormal situation, detected for few runs, related to CDC unpacker. Hits are to be marked as background.
+    for (auto& hit : wireHits) {
+      (*hit)->setBackgroundFlag();
+      (*hit)->setTakenFlag();
+    }
+    return;
+  }
+
   B2ASSERT("Number of hits per asic should be above 0 and can not exceed 8",
            (wireHits.size() <= 8) && (wireHits.size() > 0));
+
   // compute median time:
   vector<short> times;
   for (auto& hit : wireHits) {

@@ -33,8 +33,6 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCTrack;
-    class CDCSegment2D;
 
     // Guard to prevent repeated instantiations
     extern template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;

@@ -12,7 +12,6 @@
 
 #include <tracking/dataobjects/ROIrawID.h>
 #include "TObject.h"
-#include <stdio.h>
 #include <stdint.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
 

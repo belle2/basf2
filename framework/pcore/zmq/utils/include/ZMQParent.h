@@ -9,11 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/logging/Logger.h>
 
 #include <zmq.hpp>
-#include <optional>
 #include <string>
 #include <memory>
 #include <thread>

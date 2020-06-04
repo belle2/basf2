@@ -9,9 +9,6 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/EventKinematics.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 

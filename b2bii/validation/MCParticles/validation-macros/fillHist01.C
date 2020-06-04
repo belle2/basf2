@@ -181,7 +181,7 @@
          fillset( "ProdVertexY", "basf2", "MCParticles.m_productionVertex_y*10", "MCParticles.m_productionVertex_y*10>-4800&&MCParticles.m_productionVertex_y*10<5000") ;
       }
 
-      if (setIndex<0||setIndex==++index) {
+      if (setIndex<0||setIndex==index) {
          bookset( "ProdVertexZ", "basf2", "Production Vertex (Z)", 100, -10000, 10000) ;
          fillset( "ProdVertexZ", "basf2", "MCParticles.m_productionVertex_z*10", "MCParticles.m_productionVertex_z*10>-10000&&MCParticles.m_productionVertex_z*10<10000") ;
       }
@@ -242,5 +242,3 @@
       }
 
    } //fillset
-
-

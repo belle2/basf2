@@ -105,6 +105,7 @@ void CDCDedxValidationModule::event()
       continue;
     }
 
+    if (dedxTrack->getNLayerHits() <= 20) continue;
 
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
     if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {

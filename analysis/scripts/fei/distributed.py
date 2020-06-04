@@ -7,7 +7,7 @@
  This script can be used to train the FEI on a cluster like available at KEKCC
  All you need is a basf2 steering file (see analysis/examples/FEI/ ) and some MC O(100) million
  The script will automatically create some directories
-  - collection containing weightfiles, monitoring files and other stuff
+  - collection containing weight files, monitoring files and other stuff
   - jobs containing temporary files during the training (can be deleted afterwards)
 
  The distributed script automatically spawns jobs on the cluster (or local machine),
@@ -15,7 +15,7 @@
  Since a FEI training requires multiple runs over the same MC, it does so multiple times.
  The output of a run is passed as input to the next run (so your script has to use RootInput and RootOutput).
 
- In between it calls the do_trainings function of the FEI, to train the mutlivariate classifiers of the FEI
+ In between it calls the do_trainings function of the FEI, to train the multivariate classifiers of the FEI
  at each stage.
 
  At the end it produces summary outputs using printReporting.py and latexReporting.py
@@ -24,12 +24,12 @@
 
  If your training fails for some reason (e.g. a job fails on the cluster),
  the FEI will stop, you can fix the problem and resume the training using the -x option.
- This requires some expert knowledge, because you have to know howto fix the occured problem
+ This requires some expert knowledge, because you have to know how to fix the occurred problem
  and at which step you have to resume the training.
 
- After the training the weightfiles will be stored in the localdb in the collection directory
+ After the training the weight files will be stored in the localdb in the collection directory
  You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
- Alternatively you can just copy the localdb to somehwere and use it directly.
+ Alternatively you can just copy the localdb to somewhere and use it directly.
 
  Example:
  python3 ~/release/analysis/scripts/fei/distributed.py
@@ -44,7 +44,6 @@
 """
 
 
-import shutil
 import subprocess
 import sys
 import os
@@ -54,7 +53,13 @@ import time
 import stat
 import shutil
 import pickle
-
+import json
+try:
+    import b2biiConversion
+    b2biifound = True
+except ModuleNotFoundError:
+    print("B2BII not found, can't use process_urls for training.")
+    b2biifound = False
 import fei
 
 
@@ -70,7 +75,7 @@ def getCommandLineOptions():
     parser.add_argument('-n', '--nJobs', dest='nJobs', type=int, default=100,
                         help='Number of jobs')
     parser.add_argument('-d', '--data', dest='data', type=str, required=True, action='append', nargs='+',
-                        help='Data files in bash expansion syntax')
+                        help='Data files in bash expansion syntax or as process_url')
     parser.add_argument('-x', '--skip-to', dest='skip', type=str, default='',
                         help='Skip setup of directories')
     parser.add_argument('-o', '--once', dest='once', action='store_true',
@@ -87,15 +92,16 @@ def get_job_script(args, i):
     The file will run basf2 on the provided MC or the previous output
     using the provided steering file.
     """
-    job_script = """
-        if [ -f "{d}/jobs/{i}/basf2_input.root" ]; then
-          INPUT="{d}/jobs/{i}/basf2_input.root"
+    job_script = f"""
+        if [ -f "{args.directory}/jobs/{i}/basf2_input.root" ]; then
+          INPUT="{args.directory}/jobs/{i}/basf2_input.root"
         else
-          INPUT="{d}/jobs/{i}/input_*.root"
+          INPUT="{args.directory}/jobs/{i}/input_*.root"
         fi
-        time basf2 -l error {d}/collection/basf2_steering_file.py -i "$INPUT" -o {d}/jobs/{i}/basf2_output.root {pipes}
+        time basf2 -l error {args.directory}/collection/basf2_steering_file.py -i "$INPUT" \
+        -o {args.directory}/jobs/{i}/basf2_output.root &> my_output_hack.log || touch basf2_job_error
         touch basf2_finished_successfully
-    """.format(d=args.directory, i=str(i), pipes="&> my_output_hack.log || touch basf2_job_error")
+    """
     return job_script
 
 
@@ -107,17 +113,25 @@ def setup(args):
     os.chdir(args.directory)
     # Search and partition data files into even chunks
     data_files = []
+
     for x in args.data:
         for y in x:
-            data_files += glob.glob(y)
-    print('Found {} MC files'.format(len(data_files)))
+            if (y.startswith("http://") or y.startswith("https://")) and b2biifound:
+                data_files += b2biiConversion.parse_process_url(y)
+            else:
+                data_files += glob.glob(y)
+    print(f'Found {len(data_files)} MC files')
+    file_sizes = []
+    for file in data_files:
+        file_sizes.append(os.stat(file).st_size)
+    data_files_sorted = [x for _, x in sorted(zip(file_sizes, data_files))]
     n = int(len(data_files) / args.nJobs)
     if n < 1:
-        raise RuntimeError('Too few MC files {} for the given number of jobs {}'.format(len(data_files), args.nJobs))
-    data_chunks = [data_files[i:i + n] for i in range(0, len(data_files), n)]
+        raise RuntimeError(f'Too few MC files {len(data_files)} for the given number of jobs {args.nJobs}')
+    data_chunks = [data_files_sorted[i::args.nJobs] for i in range(args.nJobs)]
 
     # Create needed directories
-    print('Create environment in {}'.format(args.directory))
+    print(f'Create environment in {args.directory}')
     shutil.rmtree('collection', ignore_errors=True)
     shutil.rmtree('jobs', ignore_errors=True)
     os.mkdir('collection')
@@ -125,43 +139,58 @@ def setup(args):
     os.mkdir('collection/B2BII_MC_database')
     os.mkdir('jobs')
     if args.large_dir:
-        os.mkdir(args.large_dir)
+        if not os.path.isdir(args.large_dir):
+            raise RuntimeError('Large dir does not exist. Please make sure it does.')
 
     shutil.copyfile(args.steering, 'collection/basf2_steering_file.py')
 
     for i in range(args.nJobs):
         # Create job directory
-        os.mkdir('jobs/{}'.format(i))
-        with open('jobs/{}/basf2_script.sh'.format(i), 'w') as f:
+        os.mkdir(f'jobs/{i}')
+        with open(f'jobs/{i}/basf2_script.sh', 'w') as f:
             f.write(get_job_script(args, i))
-            os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR)
+            os.chmod(f.fileno(), stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
         # Symlink initial input data files
         for j, data_input in enumerate(data_chunks[i]):
-            os.symlink(data_input, 'jobs/{}/input_{}.root'.format(i, j))
+            os.symlink(data_input, f'jobs/{i}/input_{j}.root')
         # Symlink weight directory and basf2_path
-        os.symlink(args.directory + '/collection/localdb', 'jobs/{}/localdb'.format(i))
-        os.symlink(args.directory + '/collection/B2BII_MC_database', 'jobs/{}/B2BII_MC_database'.format(i))
+        os.symlink(args.directory + '/collection/localdb', f'jobs/{i}/localdb')
+        os.symlink(args.directory + '/collection/B2BII_MC_database', f'jobs/{i}/B2BII_MC_database')
 
 
 def create_report(args):
     """
+    Dumps Summary.pickle to JSON for easy inspection.
     Create all the reports for the FEI training and the individual mva trainings.
-    This will onyl work if
+    This will only work if
       1) Monitoring mode is used (see FeiConfiguration)
       2) Latex works on your system
       3) The system has enough memory to hold the training data for the mva classifiers
     If this fails you can also copy the collection directory somewhere and
     execute the commands by hand.
     """
-    import fei.core
     os.chdir(args.directory + '/collection')
+    with open('Summary.pickle', 'rb') as file:
+        summary = pickle.load(file)
+
+    summary_dict = {particle.identifier:
+                    {'mvaConfig': particle.mvaConfig._asdict(),
+                     'channels': [{field: (value._asdict() if field in ['mvaConfig', 'preCutConfig'] else value) for
+                                   field, value in channel._asdict().items()} for channel in particle.channels],
+                     'preCutConfig': particle.preCutConfig._asdict(),
+                     'postCutConfig': particle.postCutConfig._asdict()}
+                    for particle in summary[0]}
+    summary_dict.update({'feiConfig': summary[1]._asdict()})
+
+    with open('Summary.json', 'w') as summary_json_file:
+        json.dump(summary_dict, summary_json_file, indent=4)
+
     ret = subprocess.call('basf2 fei/printReporting.py > ../summary.txt', shell=True)
     ret = subprocess.call('basf2 fei/latexReporting.py ../summary.tex', shell=True)
     for i in glob.glob("*.xml"):
         if not fei.core.Teacher.check_if_weightfile_is_fake(i):
-            subprocess.call("basf2_mva_evaluate.py -id '{i}.xml' -data '{i}.root' "
-                            "--treename variables -o '../{i}.pdf'".format(i=i[:-4]),
-                            shell=True)
+            subprocess.call(f"basf2_mva_evaluate.py -id '{i[:-4]}.xml' -data '{i[:-4]}.root' "
+                            f"--treename variables -o '../{i[:-4]}.pdf'", shell=True)
     os.chdir(args.directory)
     return ret == 0
 
@@ -174,8 +203,8 @@ def submit_job(args, i):
     """
     # Synchronize summaries
     if os.path.isfile(args.directory + '/collection/Summary.pickle'):
-        shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
-    os.chdir(args.directory + '/jobs/{}/'.format(i))
+        shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + f'/jobs/{i}/Summary.pickle')
+    os.chdir(args.directory + f'/jobs/{i}/')
     if args.site == 'kekcc':
         ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kekcc2':
@@ -186,7 +215,7 @@ def submit_job(args, i):
         subprocess.Popen(['bash', './basf2_script.sh'])
         ret = 0
     else:
-        raise RuntimeError('Given site {} is not supported'.format(args.site))
+        raise RuntimeError(f'Given site {args.site} is not supported')
     os.chdir(args.directory)
     return ret == 0
 
@@ -205,15 +234,15 @@ def do_trainings(args):
     for i in range(args.nJobs):
         for weightfile_on_disk, _ in weightfiles:
             os.symlink(args.directory + '/collection/' + weightfile_on_disk,
-                       args.directory + '/jobs/{}/'.format(i) + weightfile_on_disk)
+                       args.directory + f'/jobs/{i}/' + weightfile_on_disk)
     # Check if some xml files are missing
     xmlfiles = glob.glob("*.xml")
     for i in range(args.nJobs):
         for xmlfile in xmlfiles:
-            if not os.path.isfile(args.directory + '/jobs/{}/'.format(i) + xmlfile):
+            if not os.path.isfile(args.directory + f'/jobs/{i}/' + xmlfile):
                 print("Added missing symlink to ", xmlfile, " in job directory ", i)
                 os.symlink(args.directory + '/collection/' + xmlfile,
-                           args.directory + '/jobs/{}/'.format(i) + xmlfile)
+                           args.directory + f'/jobs/{i}/' + xmlfile)
     os.chdir(args.directory)
 
 
@@ -226,7 +255,7 @@ def jobs_finished(args):
     failed = glob.glob(args.directory + '/jobs/*/basf2_job_error')
 
     if len(failed) > 0:
-        raise RuntimeError('basf2 execution failed! Error occurred in: {}'.format(str(failed)))
+        raise RuntimeError(f'basf2 execution failed! Error occurred in: {str(failed)}')
 
     return len(finished) == args.nJobs
 
@@ -255,8 +284,8 @@ def merge_root_files(args):
         print('Merge the following files', rootfiles)
         for f in rootfiles:
             output = args.directory + '/collection/' + f
-            inputs = [args.directory + '/jobs/{}/'.format(i) + f for i in range(args.nJobs)]
-            ret = subprocess.call(['fei_merge_files', output] + inputs)
+            inputs = [args.directory + f'/jobs/{i}/' + f for i in range(args.nJobs)]
+            ret = subprocess.call(['analysis-fei-mergefiles', output] + inputs)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
             # Replace mcParticlesCount.root with merged file in all directories
@@ -343,7 +372,7 @@ if __name__ == '__main__':
         elif args.skip == 'run':
             start = 0
         else:
-            raise RuntimeError('Unkown skip parameter {}'.format(args.skip))
+            raise RuntimeError(f'Unknown skip parameter {args.skip}')
 
         if start == 7:
             import sys
@@ -355,13 +384,13 @@ if __name__ == '__main__':
             print('Submitting jobs')
             for i in range(args.nJobs):
                 # The user wants to resubmit jobs, this means the training of some jobs failed
-                # We check which jobs contained an error flag, and where not successful
+                # We check which jobs contained an error flag, and were not successful
                 # These jobs are submitted again, other jobs are skipped (continue)
                 if start >= 6:
-                    error_file = args.directory + '/jobs/{}/basf2_job_error'.format(i)
-                    success_file = args.directory + '/jobs/{}/basf2_finished_successfully'.format(i)
+                    error_file = args.directory + f'/jobs/{i}/basf2_job_error'
+                    success_file = args.directory + f'/jobs/{i}/basf2_finished_successfully'
                     if os.path.isfile(error_file) or not os.path.isfile(success_file):
-                        print("Delete " + error_file + " and resubmit job")
+                        print(f"Delete {error_file} and resubmit job")
                         if os.path.isfile(error_file):
                             os.remove(error_file)
                         if os.path.isfile(success_file):
@@ -369,9 +398,10 @@ if __name__ == '__main__':
                     else:
                         continue
                 # Reset Summary file
-                shutil.copyfile(args.directory + '/collection/Summary.pickle', args.directory + '/jobs/{}/Summary.pickle'.format(i))
+                shutil.copyfile(os.path.join(args.directory, 'collection/Summary.pickle'),
+                                os.path.join(args.directory, f'jobs/{i}/Summary.pickle'))
                 if not submit_job(args, i):
-                    raise RuntimeError('Error during submiting job')
+                    raise RuntimeError('Error during submitting job')
 
         if start >= 4:
             print('Wait for jobs to end')
@@ -395,14 +425,14 @@ if __name__ == '__main__':
         # So we have to setup the whole directory (this will override any existing training)
         setup(args)
 
-    # The main loop, which steers the whole FEI traiing on a batch system
+    # The main loop, which steers the whole FEI training on a batch system
     # 1. We check if the FEI still requires further steps
     # 2. We do all necessary trainings which we can perform at this point in time
-    # 3. We submit new jobs whihc will use the new trainings to reconstruct the hierarchy further
+    # 3. We submit new jobs which will use the new trainings to reconstruct the hierarchy further
     # 4. We wait until all jobs finished
     # 5. We merge the output of the jobs
     # 6. We update the inputs of the jobs (input of next stage is the output of the current stage)
-    # 7. We clean the job directories so they can be used during the enxt stage again.
+    # 7. We clean the job directories so they can be used during the next stage again.
     while is_still_training(args):
         print('Do available trainings')
         do_trainings(args)

@@ -9,42 +9,20 @@
     <interval>nightly</interval>
 </header>
 """
-__author__ = "N. Rout"
+__author__ = [
+    "N. Dash",
+    "N. Rout"
+]
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi
-from stdCharged import stdK
-from stdPi0s import loadStdSkimPi0
-from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+import basf2 as b2
+import modularAnalysis as ma
+from skim.btocharm import BtoD0h_Kshh
 
-
-path = Path()
-
-skimCode = encodeSkimName('BtoDh_Kshh')
+path = b2.Path()
 
 fileList = ['../BtoDh_Kshh.dst.root']
+ma.inputMdstList('default', fileList, path=path)
 
-inputMdstList('default', fileList, path=path)
-
-# Load particle lists
-stdPi('all', path=path)
-stdK('all', path=path)
-stdKshorts(path=path)
-
-
-# Kshh skim
-from skim.btocharm import loadDkshh, BsigToDhToKshhList
-loadDkshh(path=path)
-BtoDhList = BsigToDhToKshhList(path=path)
-skimOutputUdst(skimCode, BtoDhList, path=path)
-summaryOfLists(BtoDhList, path=path)
-
-# Suppress noisy modules, and then process
-setSkimLogging(path)
-process(path)
-
-# print out the summary
-print(statistics)
+skim = BtoD0h_Kshh()
+skim(path)
+b2.process(path)

@@ -47,12 +47,32 @@ gROOT.SetBatch(True)
 
 
 class SVDCoGTimeCalibrationImporterModule(basf2.Module):
+    """
+    Python class used for checking SVD CoG Calibration stored in a localDB,
+    creating a localDB with the correction and a root file to check the corrections
+    """
 
     def notApplyCorrectForCDCLatency(self, mode):
+        """
+        Function that allows to set if apply the CDC latency correction
+
+        parameters:
+             mode (bool):
+             - if True -> not apply correction
+             - if False -> apply correction
+        """
+        #: parameter that allows to apply or not the CDC latency correction
         self.notApplyCDCLatencyCorrection = mode
         print("Not Correct for CDC latency: " + str(mode) + " " + str(self.notApplyCDCLatencyCorrection))
 
     def fillLists(self, svdRecoDigits_rel_Clusters, svdClusters_rel_RecoTracks_cl):
+        """
+        Function that fill the lists needed for the CoG corrections
+
+        parameters:
+             svdRecoDigits_rel_Clusters (SVDRecoDigit): reco digits related to clusters
+             svdClusters_rel_RecoTracks_cl (SVDCluster): cluster related to tracks
+        """
 
         timeCluster = svdClusters_rel_RecoTracks_cl.getClsTime()
         snrCluster = svdClusters_rel_RecoTracks_cl.getSNR()
@@ -76,7 +96,7 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()
             tZero_err = 5.1
-            tZeroSync = tZero - 7.8625 * (3 - TBIndex)
+            tZeroSync = tZero - 4000./509 * (3 - TBIndex)
             et0 = self.EventT0Hist
             et0.Fill(tZeroSync)
             # print(str(tZero_err))
@@ -112,32 +132,59 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             self.sumCDCCOGList3[layerIndex][ladderIndex][sensorIndex][sideIndex] += tZeroSync * \
                 timeCluster * timeCluster * timeCluster
 
+            #: counts the number of clusters
             self.NTOT = self.NTOT + 1
 
     def set_localdb(self, localDB):
+        """
+        Function that allows to set the localDB
+
+        parameters:
+             localDB (str): Name of the localDB used
+        """
+        #: set the name of the localDB used
         self.localdb = localDB
 
     def initialize(self):
+        """
+        Initialize object (histograms, lists, ...) used by the class
+        """
+
+        #: name of the output file
         self.outputFileName = "CoGCorrectionMonitor_" + self.localdb + ".root"
 
+        #: lists used to create the histograms for each TB :
+        #: residuals
         self.resList = []
+        #: scatterplot t0 vs cog
         self.spList = []
+        #: cog
         self.cogList = []
+        #: t0
         self.cdcList = []
+        #: Cluster SNR
         self.snrList = []
-
+        #: number of clusters
         self.nList = []
-
+        #: sum of CoG times
         self.sumCOGList = []
+        #: sum of CoG times squared
         self.sumCOGList2 = []
+        #: sum of CoG times to the third
         self.sumCOGList3 = []
+        #: sum of CoG times to the fourth
         self.sumCOGList4 = []
+        #: sum of CoG times to the fifth
         self.sumCOGList5 = []
+        #: sum of CoG times to the sixth
         self.sumCOGList6 = []
-
+        #: sum of t0 times
         self.sumCDCList = []
+        #: sum of t0*cog
         self.sumCDCCOGList = []
+        #: sum of t0*cog squared
         self.sumCDCCOGList2 = []
+        #: sum of t0 times to the third
         self.sumCDCCOGList3 = []
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
@@ -319,21 +366,28 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                         self.sumCDCCOGList2[li][ldi][si].append(0)
                         self.sumCDCCOGList3[li][ldi][si].append(0)
 
+        #: distribution of EventT0
         self.EventT0Hist = TH1F("EventT0", " ", 200, -100, 100)
-
+        #: gaus function used for fitting distributions
         self.gaus = TF1("gaus", 'gaus(0)', -150, 100)
+        #: third order polynomial function used for fitting distributions
         self.pol = TF1("pol", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -150, 150)
 
         self.NTOT = 0
 
     def event(self):
+        """
+        Function that allows to cicle on the events
+        """
         timeClusterU = 0
         timeClusterV = 0
         sideIndex = 0
         TBIndexU = 0
         TBIndexV = 0
+        #: counts the number of events
         self.Evt = self.Evt + 1
 
+        #: registers PyStoreObj EventT0
         self.cdcEventT0 = Belle2.PyStoreObj(cdc_Time0)
         svdCluster_list = Belle2.PyStoreArray(svd_Clusters)
         svdRecoDigit_list = Belle2.PyStoreArray(svd_recoDigits)
@@ -343,6 +397,9 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
             self.fillLists(svdRecoDigit, svdCluster)
 
     def terminate(self):
+        """
+        Terminates te class and produces the output rootfile
+        """
 
         tfile = TFile(self.outputFileName, 'recreate')
         iov = Belle2.IntervalOfValidity.always()
@@ -426,7 +483,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
                             q = 0
                             q_err = 0
 
-                        T0MEAN = self.EventT0Hist.GetMean()
+                        # T0MEAN = self.EventT0Hist.GetMean()
+                        T0MEAN = cdc.GetMean()
                         '''
                         print(
                             "Mean of the CoG corrected distribution: " +

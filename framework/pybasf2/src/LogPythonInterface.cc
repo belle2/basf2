@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2018 Belle II Collaboration                          *
+ * Copyright(C) 2010-2020 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Thomas Kuhr                               *
@@ -12,13 +12,13 @@
 
 #include <framework/pybasf2/LogPythonInterface.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionJSON.h>
 #include <framework/logging/LogConnectionUDP.h>
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
+#include <framework/logging/LogSystem.h>
 
 #include <framework/core/Environment.h>
 
@@ -60,6 +60,11 @@ void LogPythonInterface::setPackageLogConfig(const std::string& package, const L
   LogSystem::Instance().addPackageLogConfig(package, config);
 }
 
+void LogPythonInterface::setMaxMessageRepetitions(unsigned repetitions)
+{
+  LogSystem::Instance().setMaxMessageRepetitions(repetitions);
+}
+
 LogConfig::ELogLevel LogPythonInterface::getLogLevel()
 {
   return LogSystem::Instance().getLogConfig()->getLogLevel();
@@ -83,6 +88,11 @@ int LogPythonInterface::getLogInfo(LogConfig::ELogLevel level)
 LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
 {
   return LogSystem::Instance().getPackageLogConfig(package);
+}
+
+unsigned LogPythonInterface::getMaxMessageRepetitions() const
+{
+  return LogSystem::Instance().getMaxMessageRepetitions();
 }
 
 void LogPythonInterface::addLogJSON(bool complete)
@@ -135,11 +145,21 @@ bool LogPythonInterface::getPythonLoggingEnabled() const
   return LogConnectionConsole::getPythonLoggingEnabled();
 }
 
+void LogPythonInterface::setEscapeNewlinesEnabled(bool enabled) const
+{
+  LogConnectionConsole::setEscapeNewlinesEnabled(enabled);
+}
+
+bool LogPythonInterface::getEscapeNewlinesEnabled() const
+{
+  return LogConnectionConsole::getEscapeNewlinesEnabled();
+}
+
 /** Return dict containing message counters */
 dict LogPythonInterface::getLogStatistics()
 {
   dict returnDict;
-  LogSystem& logSys = LogSystem::Instance();
+  const LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
     auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);
@@ -298,9 +318,23 @@ These fields can be used as a bitmask to configure the appearance of log message
   .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
   .add_property("abort_level", &LogConfig::getAbortLevel, &LogConfig::setAbortLevel,
                 "set or get the severity which causes program abort")
-  .def("set_log_level", &LogConfig::setLogLevel, args("log_level"), "set the log level")
-  .def("set_debug_level", &LogConfig::setDebugLevel, args("debug_level"), "set the debug level")
-  .def("set_abort_level", &LogConfig::setAbortLevel, args("abort_level"), "set the severity which causes program abort")
+  .def("set_log_level", &LogConfig::setLogLevel, args("log_level"), R"DOC(
+Set the minimum log level to be shown. Messages with a log level below this value will not be shown at all.
+
+.. warning: Message with a level of `ERROR <LogLevel.ERROR>` or higher will always be shown and cannot be silenced.
+)DOC")
+  .def("set_debug_level", &LogConfig::setDebugLevel, args("debug_level"), R"DOC(
+Set the maximum debug level to be shown. Any messages with log level `DEBUG <LogLevel.DEBUG>` and a larger debug level will not be shown.
+
+.. seealso: the documentation of `DEBUG <LogLevel.DEBUG>` for suitable values
+)DOC")
+  .def("set_abort_level", &LogConfig::setAbortLevel, args("abort_level"), R"DOC(
+Set the severity which causes program abort.
+
+This can be set to a `LogLevel` which will cause the processing to be aborted if
+a message with the given level or higher is encountered. The default is
+`FATAL <LogLevel.FATAL>`. It cannot be set any higher but can be lowered.
+)DOC")
   .def("set_info", &LogConfig::setLogInfo, args("log_level", "log_info"),
        "set the bitmask of LogInfo members to show when printing messages for a given log level")
   .def("get_info", &LogConfig::getLogInfo, args("log_level"),
@@ -333,12 +367,28 @@ consistent error reporting throughout the framework
 .. seealso::
 
    For all features, see :download:`b2logging.py </framework/examples/b2logging.py>`)")
-  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel,
-                "Attribute for setting/getting the current `log level <basf2.LogLevel>`. Messages with a lower level are ignored.")
+  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel, R"DOC(
+Attribute for setting/getting the current `log level <basf2.LogLevel>`.
+Messages with a lower level are ignored.
+
+.. warning: Message with a level of `ERROR <LogLevel.ERROR>` or higher will always be shown and cannot be silenced.
+)DOC")
   .add_property("debug_level", &LogPythonInterface::getDebugLevel, &LogPythonInterface::setDebugLevel,
                 "Attribute for getting/setting the debug level. If debug messages are enabled, their level needs to be at least this high to be printed. Defaults to 100.")
   .add_property("abort_level", &LogPythonInterface::getAbortLevel, &LogPythonInterface::setAbortLevel,
                 "Attribute for setting/getting the `log level <basf2.LogLevel>` at which to abort processing. Defaults to `FATAL <LogLevel.FATAL>` but can be set to a lower level in rare cases.")
+  .add_property("max_repetitions", &LogPythonInterface::getMaxMessageRepetitions, &LogPythonInterface::setMaxMessageRepetitions, R"DOC(
+Set the maximum amount of times log messages with the same level and message text
+(excluding variables) will be repeated before it is suppressed. Suppressed messages
+will still be counted but not shown for the remainder of the processing.
+
+This affects messages with the same text but different ref:`logging_logvariables`.
+If the same log message is repeated frequently with different variables all of
+these will be suppressed after the given amount of repetitions.
+
+.. versionadded:: release-05-00-00
+)DOC")
+
   .def("set_package", &LogPythonInterface::setPackageLogConfig, args("package", "config"),
        "Set `basf2.LogConfig` for given package, see also `package() <basf2.LogPythonInterface.package>`.")
   .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>(), args("package"),
@@ -411,6 +461,13 @@ to a buffer. This setting affects all log connections to the
 console.
 
 .. versionadded:: release-03-00-00)DOCSTRING")
+  .add_property("enable_escape_newlines", &LogPythonInterface::getEscapeNewlinesEnabled,
+                &LogPythonInterface::setEscapeNewlinesEnabled, R"DOCSTRING(
+Enable or disable escaping of newlines in log messages to the console. If this
+is set to true than any newline character in log messages printed to the console
+will be replaced by a "\n" to ensure that every log messages fits exactly on one line.
+
+.. versionadded:: release-04-02-00)DOCSTRING")
   ;
 
   //Expose Logging object

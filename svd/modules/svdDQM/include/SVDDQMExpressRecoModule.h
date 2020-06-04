@@ -13,9 +13,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -35,6 +38,8 @@ namespace Belle2 {
 
     /** Module function initialize */
     void initialize() override final;
+    /** Module function terminate */
+    void terminate() override final;
     /** Module function beginRun */
     void beginRun() override final;
     /** Module function event */
@@ -48,27 +53,34 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = true;
+
+    /** parameter to change the range of the time histograms*/
+    bool m_isSVDTimeCalibrated = false;
+
+    /** Store Object for reading the trigger decision. */
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+    /** if true skip events rejected by HLT (default)*/
+    bool m_skipRejectedEvents = true;
+
     /** list of cumulative histograms */
-    TList* m_cumHistos = nullptr;
+    TList* m_histoList = nullptr;
 
     /** experiment number*/
     int m_expNumber = 0;
     /** run number*/
     int m_runNumber = 0;
 
-    /** Flag to show all histos in DQM, default = 0 */
+    /** Flag to show all histos in DQM, default = 0 (do not show)*/
     int m_ShowAllHistos = 0;
 
-    /** cut for accepting to hitmap histogram, using strips only, default = 0 ADU (was 22 ADU) */
+    /** cut for accepting strips to hitmap histogram default = 0 ADU*/
     float m_CutSVDCharge = 0.0;
-    /** cut for accepting clusters to hitmap histogram, default = 5 ke- */
-    float m_CutSVDClusterCharge = 0.0;
 
-    /** No of FADCs, for Phase2: 5,
-     *  TODO add to VXD::GeoCache& geo = VXD::Ge... geo.getFADCs() for
-     *  keep universal code for Phase 2 and 3
-    */
-    // int c_nFADC = 5;
+    /** cut for accepting clusters to hitmap histogram, default = 0 ke- */
+    float m_CutSVDClusterCharge = 0.0;
 
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
@@ -197,8 +209,6 @@ namespace Belle2 {
     TH1F** m_hitMapUCl = nullptr;
     /** Hitmaps clusters for v */
     TH1F** m_hitMapVCl = nullptr;
-
-
 
   };
 

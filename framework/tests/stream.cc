@@ -1,5 +1,4 @@
 #include <framework/utilities/Stream.h>
-#include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/DataStore.h>
@@ -23,6 +22,7 @@ namespace {
     relCont->setToName("b");
     relCont->setFromDurability(DataStore::c_Event);
     relCont->setToDurability(DataStore::c_Event);
+    // cppcheck-suppress constVariable ; cppcheck doesn't understand the weird new placement clonesarry thing
     TClonesArray& relations = relCont->elements();
     //let's make this a bit larger (very small objects are never compressed)
     for (int i = 0; i < 100; i++)
@@ -47,7 +47,7 @@ namespace {
   /** common content checks for data retrieved from Gearbox. */
   void checkGbContents()
   {
-    Gearbox& gb = Gearbox::getInstance();
+    const Gearbox& gb = Gearbox::getInstance();
 
     checkObject(dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer")));
 

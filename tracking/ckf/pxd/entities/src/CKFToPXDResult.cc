@@ -30,7 +30,7 @@ void CKFToPXDResult::addToRecoTrack(RecoTrack& recoTrack) const
   for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
     RelationVector<PXDCluster> relatedClusters = spacePoint->getRelationsTo<PXDCluster>();
     for (const PXDCluster& cluster : relatedClusters) {
-      recoTrack.addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
+      recoTrack.addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_SVDtoPXDCKF);
       sortingParameter++;
     }
   }

@@ -101,9 +101,9 @@ mcparticleprinter.param('maxLevel', -1)
 # ...FullSim...
 # Turn off physics processes
 # "physics.mac" is located at "trg/examples/".
-# g4sim.param('UICommands',['/control/execute physics.mac'])
+# g4sim.param('UICommandsAtIdle',['/control/execute physics.mac'])
 # or below line can be used when trgcdc.py is not in trg/examples directory //JB
-# g4sim.param('UICommands', ['/control/execute ' +
+# g4sim.param('UICommandsAtIdle', ['/control/execute ' +
 #                            os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None), "trg/cdc/examples/physics.mac")])
 
 # ...BeamBkgMixer...

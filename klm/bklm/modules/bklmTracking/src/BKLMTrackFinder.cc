@@ -8,9 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "klm/bklm/modules/bklmTracking/BKLMTrackFinder.h"
+/* Own header. */
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
+
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
-#include "klm/bklm/dataobjects/BKLMHit2d.h"
 
 using namespace Belle2;
 using namespace std;
@@ -21,11 +26,10 @@ BKLMTrackFinder::BKLMTrackFinder()
 {
 }
 
-BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter)
+BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter) :
+  m_Fitter(fitter),
+  m_globalFit(false)
 {
-  m_Fitter = fitter;
-  m_globalFit = false;
-  //m_Fitter->setGlobalFit(m_globalFit);
 }
 
 //! Destructor
@@ -41,7 +45,7 @@ void BKLMTrackFinder::registerFitter(BKLMTrackFitter* fitter)
 }
 
 //! find associated hits and do fit
-bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
+bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
                              std::list<BKLMHit2d*>& hits,
                              std::list<BKLMHit2d*>& track)
 {

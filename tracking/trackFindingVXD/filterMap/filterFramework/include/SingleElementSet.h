@@ -14,8 +14,6 @@
 #include <TBranch.h>
 #include <TTree.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /** Represents a set containing a single element;

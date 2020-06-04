@@ -434,7 +434,7 @@ void VRMLWriterModule::descendAndDescribe(G4VPhysicalVolume* physVol, const std:
   // Descend to the leaves of the tree
   G4LogicalVolume* logVol = physVol->GetLogicalVolume();
   int lvIndex = std::find(lvStore->begin(), lvStore->end(), logVol) - lvStore->begin();
-  for (int daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
+  for (size_t daughter = 0; daughter < logVol->GetNoDaughters(); ++daughter) {
     G4VPhysicalVolume* dPhysVol = logVol->GetDaughter(daughter);
     (*m_PVIndex)[lvIndex].push_back(std::find(pvStore->begin(), pvStore->end(), dPhysVol) - pvStore->begin());
     describePhysicalVolume(dPhysVol);

@@ -31,6 +31,7 @@ namespace Belle2 {
   class TrackFitResult;
   class MCParticle;
   class PIDLikelihood;
+  class V0;
 
   /**
    * Class to store reconstructed particles.
@@ -61,7 +62,7 @@ namespace Belle2 {
    * Additional private members are needed in order to make composite particles
    * (via combinations):
    *  - mdst index of an object from which the FS particle is created
-   *  - type of the object from which the particle is created (see EParticleType)
+   *  - source of the object from which the particle is created (see EParticleSourceObject)
    *  - flavor type (unflavored/flavored) of a decay or flavor type of FS particle
    *
    * Finally, it is possible to store user-defined floating-point values using addExtraInfo() and getExtraInfo(), identified by a string key.
@@ -74,13 +75,13 @@ namespace Belle2 {
   public:
 
     /**
-     * particle type enumerators (to be completed when all Mdst dataobjects are defined)
+     * particle source enumerators
      */
-    enum EParticleType {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_MCParticle, c_Composite};
+    enum EParticleSourceObject {c_Undefined, c_Track, c_ECLCluster, c_KLMCluster, c_V0, c_MCParticle, c_Composite};
 
     /** describes flavor type, see getFlavorType(). */
     enum EFlavorType {
-      c_Unflavored = 0, /**< Is its own antiparticle or we don't know wether it is a particle/antiparticle. */
+      c_Unflavored = 0, /**< Is its own antiparticle or we don't know whether it is a particle/antiparticle. */
       c_Flavored = 1, /**< Is either particle or antiparticle. */
     };
 
@@ -104,11 +105,14 @@ namespace Belle2 {
     enum PropertyFlags {
       c_Ordinary = 0, /** Ordinary particles */
       c_IsUnspecified = 1, /**< Is the particle unspecified by marking @ ? */
-      c_isIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
-      c_isIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
-      c_isIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
-      c_isIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
-      c_isIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+      c_IsIgnoreRadiatedPhotons = 2, /**< Is the particle MC matched with the ignore radiated photon flag set?*/
+      c_IsIgnoreIntermediate = 4, /**< Is the particle MC matched with the ignore intermediate resonances flag set?*/
+      c_IsIgnoreMassive = 8, /**< Is the particle MC matched with the ignore missing massive particle flag set?*/
+      c_IsIgnoreNeutrino = 16, /**< Is the particle MC matched with the ignore missing neutrino flag set?*/
+      c_IsIgnoreGamma = 32, /**< Is the particle MC matched with the ignore missing gamma flag set?*/
+      c_IsIgnoreBrems = 64, /**< Is the particle MC matched with the ignore added Brems gamma flag set?*/
+      c_IsIgnoreMisID = 128, /**< Is the particle MC matched with the ignore MisID flag set? */
+      c_IsIgnoreDecayInFlight = 256, /**< Is the particle MC matched with the ignore DecayInFlight flag set?*/
     };
 
     /**
@@ -131,13 +135,13 @@ namespace Belle2 {
      * @param momentum Lorentz vector
      * @param pdgCode PDG code
      * @param flavorType flavor type
-     * @param particleType particle type
+     * @param particleType particle source
      * @param mdstIndex mdst index
      */
     Particle(const TLorentzVector& momentum,
              const int pdgCode,
              EFlavorType flavorType,
-             const EParticleType particleType,
+             const EParticleSourceObject particleType,
              const unsigned mdstIndex);
 
     /**
@@ -162,7 +166,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @param flavorType decay flavor type
      * @param daughterIndices indices of daughters in StoreArray<Particle>
-     * @param particle property
+     * @param properties particle property
      * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
      */
     Particle(const TLorentzVector& momentum,
@@ -170,6 +174,25 @@ namespace Belle2 {
              EFlavorType flavorType,
              const std::vector<int>& daughterIndices,
              int properties,
+             TClonesArray* arrayPointer = nullptr);
+
+    /**
+     * Constructor for composite particles.
+     * All other private members are set to their default values (0).
+     * @param momentum Lorentz vector
+     * @param pdgCode PDG code
+     * @param flavorType decay flavor type
+     * @param daughterIndices indices of daughters in StoreArray<Particle>
+     * @param particle property
+     * @param daughter particle properties
+     * @param arrayPointer pointer to store array which stores the daughters, if the particle itself is stored in the same array the pointer can be automatically determined
+     */
+    Particle(const TLorentzVector& momentum,
+             const int pdgCode,
+             EFlavorType flavorType,
+             const std::vector<int>& daughterIndices,
+             int properties,
+             const std::vector<int>& daughterProperties,
              TClonesArray* arrayPointer = nullptr);
 
     /**
@@ -190,10 +213,22 @@ namespace Belle2 {
      *        This can be different as chargedStable as we don't fit all tracks with
      *        all hypothesis.
      */
+    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
     Particle(const int trackArrayIndex,
              const TrackFitResult* trackFit,
              const Const::ChargedStable& chargedStable,
              const Const::ChargedStable& chargedStableUsedForFit);
+
+    /**
+     * Constructor from a reconstructed Track given as TrackFitResult.
+     * To be used to create Particle objects from tracks with full control over
+     * the hypothesis (e.g. V0 daughters).
+     * @param trackArrayIndex track StoreArray index
+     * @param trackFit pointer to TrackFitResult object
+     * @param chargedStable Type of charged particle
+     */
+    Particle(int trackArrayIndex, const TrackFitResult* trackFit,
+             const Const::ChargedStable& chargedStable);
 
     /**
      * Constructor of a photon from a reconstructed ECL cluster that is not matched to any charged track.
@@ -298,20 +333,23 @@ namespace Belle2 {
     /**
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(const Particle* daughter, const bool updateType = true);
 
     /**
      * Appends index of daughter to daughters index array
      * @param particleIndex index of daughter in StoreArray<Particle>
+     * @param updateType bool to set whether particle type should be updated
      */
     void appendDaughter(int particleIndex, const bool updateType = true)
     {
       if (updateType) {
         // is it a composite particle or fsr corrected?
-        m_particleType = c_Composite;
+        m_particleSource = c_Composite;
       }
       m_daughterIndices.push_back(particleIndex);
+      m_daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
 
     /**
@@ -347,12 +385,12 @@ namespace Belle2 {
     }
 
     /**
-     * Returns particle type as defined with enum EParticleType
+     * Returns particle source as defined with enum EParticleSourceObject
      * @return particle type
      */
-    EParticleType getParticleType() const
+    EParticleSourceObject getParticleSource() const
     {
-      return m_particleType;
+      return m_particleSource;
     }
 
     /**
@@ -577,12 +615,21 @@ namespace Belle2 {
     }
 
     /**
-     * Retruns a vector of store array indices of daughter particles
+     * Returns a vector of store array indices of daughter particles
      * @return vector of store array indices of daughter particle
      */
     const std::vector<int>& getDaughterIndices() const
     {
       return m_daughterIndices;
+    }
+
+    /**
+     * Returns a vector of properties of daughter particles
+     * @return vector of daughter properties
+     */
+    const std::vector<int>& getDaughterProperties() const
+    {
+      return m_daughterProperties;
     }
 
     /**
@@ -594,7 +641,7 @@ namespace Belle2 {
 
     /** Apply a function to all daughters of this particle
      *
-     * @param function function object to run on each daugther. If this
+     * @param function function object to run on each daughter. If this
      *    function returns true the processing will be stopped immeddiately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
@@ -621,10 +668,10 @@ namespace Belle2 {
     /**
      * Returns a vector of StoreArray indices of given MDST dataobjects
      *
-     * @param EParticleType corresponding to a given MDST dataobject
+     * @param type EParticleSourceObject corresponding to a given MDST dataobject
      * @return vector of StoreArray indices of a given MDST dataobjects
      */
-    std::vector<int> getMdstArrayIndices(EParticleType type) const;
+    std::vector<int> getMdstArrayIndices(EParticleSourceObject type) const;
 
     /**
      * Returns true if final state ancessors of oParticle overlap
@@ -649,9 +696,12 @@ namespace Belle2 {
      * M1 and M4 are copies since both conditions are fulfilled.
      *
      * @param oParticle pointer to other particle
+     * @param doDetailedComparison if true, this means that particles of different PDG codes,
+     *        but created from the same track or cluster will be indicated as copies.
+     *        Returns B2FATAL in case of comparison of c_MCParticle type to a non c_MCParticle.
      * @return true if particles are copies of each-other, otherwise false
      */
-    bool isCopyOf(const Particle* oParticle) const;
+    bool isCopyOf(const Particle* oParticle, bool doDetailedComparison = false) const;
 
     /**
      * Returns the pointer to the Track object that was used to create this Particle (ParticleType == c_Track).
@@ -659,6 +709,21 @@ namespace Belle2 {
      * @return const pointer to the Track
      */
     const Track* getTrack() const;
+
+    /**
+     * Returns the pointer to the TrackFitResult that was used to create this Particle (ParticleType == c_Track).
+     * NULL pointer is returned, if the Particle was not made from Track.
+     * @return const pointer to the TrackFitResult
+     */
+    const TrackFitResult* getTrackFitResult() const;
+
+    /**
+     * Returns the pointer to the V0 object that was used to create this
+     * Particle (if ParticleType == c_V0). NULL pointer is returned if the
+     * Particle was not made from a V0.
+     * @return const pointer to the V0
+     */
+    const V0* getV0() const;
 
     /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which
@@ -812,6 +877,16 @@ namespace Belle2 {
       }
     }
 
+    /**
+    * Explores the decay tree of the particle and returns the (grand^n)daughter identified by a generalized index.
+    * The generalized index consists of a colon-separated list of daughter indexes, starting from the root particle:
+    * 0:1:3 identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle.
+    * @param generalizedIndex the generalized index of the particle to be returned
+    * @return a particle in the decay tree of the root particle.
+    */
+    const Particle* getParticleFromGeneralizedIndexString(const std::string& generalizedIndex) const;
+
+
   private:
 
     // persistent data members
@@ -828,12 +903,13 @@ namespace Belle2 {
     float m_pValue;   /**< chi^2 probability of the fit. Default is nan */
     std::vector<int> m_daughterIndices;  /**< daughter particle indices */
     EFlavorType m_flavorType;  /**< flavor type. */
-    EParticleType m_particleType;  /**< particle type */
+    EParticleSourceObject m_particleSource;  /**< (mdst) source of particle */
     unsigned m_mdstIndex;  /**< 0-based index of MDST store array object */
     int m_properties; /**< particle property */
+    std::vector<int> m_daughterProperties; /**< daughter particle properties */
 
     /**
-     * Identifier that can be used to identify whether the particle is unqiue
+     * Identifier that can be used to identify whether the particle is unique
      * or is a copy or representation of another. For example a kaon and pion
      * particles constructed from the same Track are representations of the
      * same physical object in the detector and cannot be used in the reconstruction
@@ -903,10 +979,19 @@ namespace Belle2 {
      */
     void setMdstArrayIndex(const int arrayIndex);
 
-    ClassDef(Particle, 10); /**< Class to store reconstructed particles. */
+    /**
+     * Generate the PDG code with correct sign, using the charge
+     * @param chargedSign charge of the particle
+     * @param chargedStable Type of charged particle
+     */
+    int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
+
+    ClassDef(Particle, 12); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
+    // v11: added m_daughterProperties
+    // v12: renamed EParticleType m_particleType to EParticleSourceObject m_particleSource
 
     friend class ParticleSubset;
   };

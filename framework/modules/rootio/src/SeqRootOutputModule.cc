@@ -8,11 +8,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #include <cmath>
-#include <fcntl.h>
 
 #include <TClass.h>
 #include <TList.h>

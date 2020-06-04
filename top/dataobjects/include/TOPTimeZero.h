@@ -43,7 +43,7 @@ namespace Belle2 {
      * Sets histograms
      * @param chi2 chi^2 versus t0 used to find minimum
      * @param pdf PDF projected to time axis
-     * @param time distribution of hits
+     * @param hits time distribution of hits
      */
     void setHistograms(const TH1F& chi2, const TH1F& pdf, const TH1F& hits)
     {

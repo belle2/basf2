@@ -9,8 +9,7 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'hlt_softwaretrigger_dataobjects',
     'hlt',
-    'klm_eklm_dataobjects',
-    'klm_bklm_dataobjects',
+    'klm_dataobjects',
     'ecl_dataobjects'
     ]
 

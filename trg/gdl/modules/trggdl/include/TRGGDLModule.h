@@ -15,11 +15,15 @@
 #define TRGGDLModule_H
 
 #include <string>
-#include "framework/core/Module.h"
+// #include "framework/core/Module.h"
+#include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include "trg/gdl/TRGGDL.h"
+#include <TDirectory.h>
+#include <TH1I.h>
+#include <TH2I.h>
 
 namespace Belle2 {
 
@@ -27,7 +31,8 @@ namespace Belle2 {
 /// requires sub-trigger simulation data (CDC, ECL, TOP, and KLM). The
 /// output is GDL response.
 
-  class TRGGDLModule : public Module {
+//class TRGGDLModule : public Module {
+  class TRGGDLModule : public HistoModule {
 
   public:
 
@@ -53,14 +58,21 @@ namespace Belle2 {
     /// Called when processing ended.
     virtual void terminate() override;
 
+    //! Define Histogram
+    virtual void defineHisto() override;
+
   public:
 
     /// returns version of TRGGDLModule.
     std::string version(void) const;
 
   private: // Parameters
-    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo; /**< required input for TRGGRLInfo */
-    StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
+
+    /**< required input for TRGGRLInfo */
+    StoreObjPtr<TRGGRLInfo> m_TRGGRLInfo;
+
+    /**< output for TRGSummary */
+    StoreObjPtr<TRGSummary> m_TRGSummary;
 
     /// Debug level.
     int _debugLevel;
@@ -79,11 +91,29 @@ namespace Belle2 {
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
+    /// Switch for algorithm source. False when using local .alg file.
+    bool _algFromDB;
+
+    // Phase
     std::string _Phase;
+
+    // Path to algorithm file
+    std::string _algFilePath;
+
   private:
 
     /// A pointer to a TRGGDL;
     static TRGGDL* _gdl;
+
+  protected:
+
+    TDirectory* oldDir = nullptr;
+    TDirectory* newDir = nullptr;
+
+    TH1I* h_inp = nullptr;
+    TH1I* h_ftd = nullptr;
+    TH1I* h_psn = nullptr;
+
   };
 
 } // namespace Belle2

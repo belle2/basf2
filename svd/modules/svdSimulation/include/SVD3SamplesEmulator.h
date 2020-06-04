@@ -17,6 +17,7 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <string>
 
@@ -51,11 +52,13 @@ namespace Belle2 {
     virtual void initialize() override;
 
   private:
-
-    std::string m_shaperDigitInput;  /**< StoreArray with the 6-samples input shaperdigits with DAQMode = 2*/
+    StoreArray<SVDShaperDigit> m_ShaperDigit; /**< StoreArray with the 6-samples input shaperdigits with DAQMode = 2*/
+    std::string m_shaperDigitInputName;  /**< name of the input ShaperDigits StoreArray */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;  /**<storage for SVDEventInfo object required for the module */
+    StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo3samples; /**<storage for SVDEventInfo object produced for 3 samples */
     Int_t m_startingSample = 0;  /**< Starting sample from which select the three samples of the initial six*/
     std::string m_outputArrayName;  /**< StoreArray with the 3-samples output shaperdigits, with DAQMode = 1*/
-
+    std::string m_svdEventInfoName; /**< Name of the SVDEventInfo object */
   };
 }
 

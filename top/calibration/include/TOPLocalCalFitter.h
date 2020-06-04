@@ -58,16 +58,34 @@ namespace Belle2 {
         m_TTSData = TTSData;
       }
 
-      /** Sets the fitter to monitoring mode. on top of the MC propagation times,
-       *  also the light paths fractions and the tail parameters
-       *  will be loaded from the Fit constraint file and fixed in the fit. These parameters
-       *  are taken from a previous, high-statistics fit.
-       *  This mode must be used if the dataset to be fitted is smaller than 1M events.
+      /** Sets the fitter mode. The options are 'calibration' (default), 'monitoring' or 'MC'.
+       *  The mode affects the number of parameters that are fixed.
+       *  Use calibration if you are fitting a large sample (1 M  events or more) to derive  a set of channelT0 calibrations.
+       *  Use monitoring if you are fitting a smaller sample. The light path fractions and the tail parameters
+       *  will be constrained according to the constraint file you passed to the fitter (usually teh result fo a high-statistics fit).
+       *  Use MC to fit the MC sample and calculate a new set of prism corrections. No parameter is fixed, but the
+       *  tail components are removed form the fit.
        */
-      void setMonitoringFit(bool isMonitoringFit = true)
+      void setFitMode(const std::string& fitterMode)
       {
-        m_isMonitoringFit = isMonitoringFit;
+        if (fitterMode == "calibration")
+          B2INFO("Fitter set to calibration mode");
+        else if (fitterMode == "monitoring")
+          B2INFO("Fitter set to monitoring mode");
+        else if (fitterMode == "MC")
+          B2INFO("Fitter set to MC mode");
+        else
+          B2ERROR("Unknown fitter type " << fitterMode  << ". The valid options are calibration, monitoring or MC");
+
+        m_fitterMode = fitterMode;
       }
+
+      /** Enables the fit amplitude bins.  */
+      void fitInAmpliduteBins(bool isFitInAmplitudeBins)
+      {
+        m_isFitInAmplitudeBins = isFitInAmplitudeBins;
+      }
+
 
     protected:
 
@@ -86,20 +104,26 @@ namespace Belle2 {
       /** Fits the two pulsers */
       void fitPulser(TH1*, TH1*);
 
-      /**..Run algorithm on events */
+      /** Calculates the commonT0 calibration after the fits have been done.
+       *  It also saves the constants in a localDB and in the output tree
+       */
+      void calculateChennelT0();
+
+      /** Runs the algorithm on events. Currently, it always returns c_OK despite of the actual result of the fitting procedure.
+       *  This is not an issue since this moduleis not intended to be used in the automatic calibration. */
       virtual EResult calibrate() override;
 
     private:
 
-      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit*/
+      int m_minEntries = 50; /**<  Minimum number of entries to perform the fit. Currently not used*/
       std::string m_output = "laserFitResult.root"; /**< Name of the output file */
       std::string m_fitConstraints =
         "/group/belle2/group/detector/TOP/calibration/MCreferences/LaserMCParameters.root"; /**< File with the TTS parametrization*/
       std::string m_TTSData =
-        "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with teh Fit constraints and MC info */
-      bool m_isMonitoringFit =
-        false; /**< Set to True if you are analyzing runs with low statistics and you want to fix the fit parameters from a high-stat run*/
-
+        "/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrization.root"; /**< File with the Fit constraints and MC info */
+      std::string m_fitterMode = "calibration";/**< Fit mode. Can be 'calibration', 'monitoring' or 'MC' */
+      bool m_isFitInAmplitudeBins = false; /**< Enables the fit in amplitude bins */
+      std::vector<float> m_binEdges = {50, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520, 550, 580, 610, 640, 670, 700, 800, 900, 1000, 1200, 1500, 2000}; /**< Amplitude bins */
       TFile* m_inputTTS = nullptr; /**< File containing m_treeTTS */
       TFile* m_inputConstraints = nullptr; /**< File containing m_treeConstraints */
 
@@ -108,6 +132,8 @@ namespace Belle2 {
         nullptr; /**< Input to the fitter. A tree containing the laser MC corrections and all the paraeters to be fixed in the fit*/
       TFile* m_histFile = nullptr; /**< Output of the fitter. The file containing the output trees and histograms*/
       TTree* m_fitTree = nullptr; /**< Output of the fitter. The tree containg the fit results. */
+      TTree* m_timewalkTree =
+        nullptr; /**< Output of the fitter. The tree containg the fit results to be used to study timewalk and asymptotic time resolution. */
 
 
       // Variables for the TTS parametrization tree
@@ -120,17 +146,20 @@ namespace Belle2 {
       short m_pixelCol = 0; /**< Pixel column */
 
       // Variables for the MC truth infos
-      //short m_channelConstraints = 0; /**< Channel number (0-512) */
       float m_peakTimeConstraints = 0; /**< Time of the main laser peak in the MC simulation (aka MC correction)  */
       float m_deltaTConstraints = 0; /**< Distance between the main and the secondary laser peak */
       float m_fractionConstraints = 0; /**< Fraction of the main peak*/
-      //float m_extraTimeConstraints = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
-      //float m_extraTimeSigma = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
-      //float m_backgroundTimeConstraints = 0; /**< Position of the guassian used to describe the long tail of the timing distribution */
-      //float m_backgroundSigmaConstraints = 0; /**< Width of the guassian used to describe the long tail of the timing distribution */
+      float m_timeExtraConstraints = 0; /**< Position of the guassian used to describe the extra peak on the timing distribution tail */
+      float m_sigmaExtraConstraints = 0; /**< Width of the guassian used to describe the extra peak on the timing distribution tail */
+      float m_alphaExtraConstraints = 0.; /**< alpha parameter of the tail of the extra peak. */
+      float m_nExtraConstraints = 0.; /**< parameter n of the tail of the extra peak */
+      float m_timeBackgroundConstraints = 0.; /**< Position of the gaussian used to describe the background, w/ respect to peakTime */
+      float m_sigmaBackgroundConstraints = 0.; /**< Sigma of the gaussian used to describe the background */
 
 
       // Variables for the output tree
+      float m_binLowerEdge = 0; /**< Lower edge of the amplitude bin in which this fit is performed */
+      float m_binUpperEdge = 0; /**< Upper edge of the amplitude bin in which this fit is performed */
       short m_channel = 0; /**< Channel number (0-511)*/
       short m_slot = 0; /**< Slot ID (1-16)*/
       short m_row = 0; /**< Pixel row */
@@ -140,7 +169,8 @@ namespace Belle2 {
         0; /**< Time difference between the main peak and the secondary peak. Can be either fixed to the MC value or fitted. */
       float m_sigma = 0.; /**< Gaussian time resolution, fitted */
       float m_fraction = 0.; /**< Fraction of events in the secondary peak*/
-      float m_yieldLaser = 0.; /**< Toral number of laser hits from the fitting function integral */
+      float m_yieldLaser = 0.; /**< Total number of laser hits from the fitting function integral */
+      float m_histoIntegral = 0.; /**< Integral of the fitted histogram */
 
       float m_peakTimeErr = 0; /**< Statistical error on peakTime*/
       float m_deltaTErr = 0; /**< Statistical error on deltaT */

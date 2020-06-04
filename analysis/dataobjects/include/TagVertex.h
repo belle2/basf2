@@ -3,7 +3,7 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Li Gioi, Stefano Lacaprara                         *
+ * Contributors: Luigi Li Gioi, Stefano Lacaprara, Thibaud Humair         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,10 +13,13 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <TMatrixFSym.h>
+#include <TMatrixDSym.h>
+#include <string>
 
-#include <vector>
-#include <set>
+// DataObjects
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
 
@@ -40,10 +43,12 @@ namespace Belle2 {
       m_tagVertexPval = 0;
       m_deltaT = 0;
       m_deltaTErr = 0;
-      m_MCdeltaT = 0;
-      m_MCtagV(0) = 0; m_MCtagV(1) = 0; m_MCtagV(2) = 0;
+      m_mcDeltaTau = 0;
+      m_mcDeltaT = 0;
+      m_mcTagV(0) = 0; m_mcTagV(1) = 0; m_mcTagV(2) = 0;
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
+      resetConstraintCov();
       m_FitType = 0;
       m_NTracks = -1;
       m_tagVl = 0;
@@ -55,6 +60,10 @@ namespace Belle2 {
       m_tagVNDF = 0;
       m_tagVChi2 = 0;
       m_tagVChi2IP = 0;
+      m_constraintType = "";
+      m_constraintCenter(0) = 0; m_constraintCenter(1) = 0, m_constraintCenter(2) = 0;
+      m_fitTruthStatus = 0;
+      m_rollbackStatus = 0;
     }
 
     // get methods
@@ -67,12 +76,22 @@ namespace Belle2 {
     /**
      * Returns BTag Vertex (3x3) error matrix
      */
-    TMatrixFSym getTagVertexErrMatrix();
+    TMatrixDSym getTagVertexErrMatrix();
 
     /**
      * Returns BTag Vertex P value
      */
     float getTagVertexPval();
+
+    /**
+     * Returns a ptr to the particle constructed from the tag vtx track indexed by trackIndex
+     */
+    const Particle* getVtxFitParticle(unsigned int trackIndex);
+
+    /**
+     * Returns a ptr to the MC particle matched to the tag vtx track indexed by trackIndex
+     */
+    const MCParticle* getVtxFitMCParticle(unsigned int trackIndex);
 
     /**
      * Returns DeltaT
@@ -95,7 +114,12 @@ namespace Belle2 {
     int getMCTagBFlavor();
 
     /**
-     * Returns generated DeltaT
+     * Returns generated DeltaTau
+     */
+    float getMCDeltaTau();
+
+    /**
+     * Returns mc DeltaT (in kin. approximation)
      */
     float getMCDeltaT();
 
@@ -105,9 +129,20 @@ namespace Belle2 {
     int getFitType() ;
 
     /**
+     * get the constraint type used in the tag fit
+     */
+
+    std::string getConstraintType();
+
+    /**
      * Returns number of tracks used in the fit
      */
     int getNTracks() ;
+
+    /**
+     * Returns number of tracks used in the fit (not counting the ones removed because they come from Kshorts)
+     */
+    int getNFitTracks() ;
 
     /**
      * Returns the tagV component in the boost direction
@@ -154,7 +189,63 @@ namespace Belle2 {
      */
     float getTagVChi2IP() ;
 
+    /**
+     *
+     *  Returns the position of the constraint, ie centre of the constraint ellipse
+     */
 
+    TVector3 getConstraintCenter();
+
+    /**
+     * Get the covariance matrix of the constraint for the tag fit
+     */
+
+    TMatrixDSym getConstraintCov();
+
+    /**
+     * Returns the position vector (X, Y, Z) of the tag track indexed by trackindex
+     */
+
+    TVector3 getVtxFitTrackPosition(unsigned int trackIndex);
+
+    /**
+     * Returns the momentum vector of the tag track indexed by trackindex
+     */
+
+    TVector3 getVtxFitTrackP(unsigned int trackIndex);
+
+    /**
+     * Returns one of the 3 components of the momentum of tag track indexed by trackindex
+     */
+    double getVtxFitTrackPComponent(unsigned int trackIndex, unsigned int component);
+
+    /**
+     * Returns the longitudinal distance from the IP to the POCA of the tag track indexed by trackIndex
+     */
+
+    double getVtxFitTrackZ0(unsigned int trackIndex);
+
+    /**
+     * Returns the radial distance from the IP to the POCA of the tag track indexed by trackIndex
+     */
+
+    double getVtxFitTrackD0(unsigned int trackIndex);
+
+    /**
+     * Returns the weight assigned by Rave to the track indexed by trackIndex
+     */
+
+    double getRaveWeight(unsigned int trackIndex);
+
+    /**
+     * Get the status of the fit performed with the truth info of the tracks
+     */
+    int getFitTruthStatus();
+
+    /**
+     * Get the status of the fit performed with the rolled back tracks
+     */
+    int getRollBackStatus();
 
     // set methods
 
@@ -166,7 +257,7 @@ namespace Belle2 {
     /**
      *  Set BTag Vertex (3x3) error matrix
      */
-    void setTagVertexErrMatrix(const TMatrixFSym& TagVertexErrMatrix);
+    void setTagVertexErrMatrix(const TMatrixDSym& TagVertexErrMatrix);
 
     /**
      * Set BTag Vertex P value
@@ -186,17 +277,22 @@ namespace Belle2 {
     /**
      * Set generated BTag Vertex
      */
-    void setMCTagVertex(const TVector3& MCTagVertex);
+    void setMCTagVertex(const TVector3& mcTagVertex);
 
     /**
      * Set generated Btag PDG code
      */
-    void setMCTagBFlavor(int MCTagBFlavor);
+    void setMCTagBFlavor(int mcTagBFlavor);
 
     /**
      * Set generated DeltaT
      */
-    void setMCDeltaT(float DeltaT);
+    void setMCDeltaTau(float mcDeltaTau);
+
+    /**
+     * Set generated DeltaT (in kin. approx.)
+     */
+    void setMCDeltaT(float mcDeltaT);
 
     /**
      * Set fit algo type
@@ -253,17 +349,59 @@ namespace Belle2 {
      */
     void setTagVChi2IP(float TagVChi2IP) ;
 
+    /**
+     * Set a vector of pointers to the tracks used in the tag vtx fit
+     */
+    void setVertexFitParticles(const std::vector<const Particle*>& vtxFitParticles);
 
+    /**
+     * Set a vector of pointers to the MC p'cles corresponding to the tracks in the tag vtx fit
+     */
+    void setVertexFitMCParticles(const std::vector<const MCParticle*>& vtxFitMCParticles);
+
+    /**
+     * Set the weights used by Rave in the tag vtx fit
+     */
+    void setRaveWeights(const std::vector<double>& raveWeights);
+
+    /**
+     * Set the centre of the constraint for the tag fit
+     */
+
+    void setConstraintCenter(const TVector3& constraintCenter);
+
+    /**
+     * Set the covariance matrix of the constraint for the tag fit
+     */
+
+    void setConstraintCov(const TMatrixDSym& constraintCov);
+
+    /**
+     * Set the type of the constraint for the tag fit
+     */
+
+    void setConstraintType(const std::string& constraintType);
+
+    /**
+     * Set the status of the fit performed with the truth info of the tracks
+     */
+    void setFitTruthStatus(int truthStatus);
+
+    /**
+     * Set the status of the fit performed with the rolled back tracks
+     */
+    void setRollBackStatus(int backStatus);
 
   private:
     TVector3 m_tagVertex;               /**< Btag vertex */
-    TMatrixFSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
+    TMatrixDSym m_tagVertexErrMatrix;   /**< Btag vertex (3x3) error matrix */
     float m_tagVertexPval;              /**< Btag vertex P value */
     float m_deltaT;                     /**< Delta t */
     float m_deltaTErr;                  /**< Delta t error */
-    TVector3 m_MCtagV;                  /**< generated Btag vertex */
+    TVector3 m_mcTagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
-    float m_MCdeltaT;                   /**< generated Delta t */
+    float m_mcDeltaTau;                 /**< generated Delta t */
+    float m_mcDeltaT;                   /**< generated Delta t approximated */
     int m_FitType;                      /**< Fit algo used */
     int m_NTracks;                      /**< Number of tracks used in the fit */
     float m_tagVl;                      /**< tagV component in the boost direction  */
@@ -275,6 +413,16 @@ namespace Belle2 {
     float m_tagVNDF;                    /**< Number of degrees of freedom in the tag vertex fit */
     float m_tagVChi2;                   /**< chi^2 value of the tag vertex fit result */
     float m_tagVChi2IP;                 /**< IP component of chi^2 value of the tag vertex fit result */
+    std::vector<const Particle*> m_vtxFitParticles; /**< pointers to the tracks used by rave to fit the vertex */
+    std::vector<const MCParticle*> m_vtxFitMCParticles; /**< pointers to the MC p'cles corresponding to the tracks in the tag vtx fit */
+    int m_NFitTracks;                   /**< Number of tracks used by Rave to fit the vertex */
+    std::vector<double> m_raveWeights;  /**< weights of each track in the Rave tag vtx fit */
+    std::string m_constraintType;       /**< Type of the constraint used for the tag vertex fit (noConstraint, IP, Boost, Tube) */
+    TVector3 m_constraintCenter;        /**< centre of the constraint */
+    TMatrixDSym m_constraintCov;        /**< covariance matrix associated to the constraint, ie size of the constraint */
+    int m_fitTruthStatus;               /**< status of the fit when fitted with the truth info of the tracks */
+    int m_rollbackStatus;               /**< status of the fit when fitted with rolled back tracks */
+
 
     /**
      * Resets 3x3 tag vertex error matrix
@@ -282,10 +430,17 @@ namespace Belle2 {
      */
     void resetTagVertexErrorMatrix();
 
-    ClassDef(TagVertex, 3) /**<
+    /**
+     * Resets 3x3 constraint error matrix
+     * All elements are set to 0.0
+     */
+    void resetConstraintCov();
+
+    ClassDef(TagVertex, 4) /**<
+           4. Add info related to fit tracks, rave weights
            3. Add NDF, Chi2, Chi2IP
-                             2. Name to contain "Tag"
-                             1. class definition
+           2. Name to contain "Tag"
+           1. class definition
                              */
 
   };

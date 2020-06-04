@@ -23,6 +23,18 @@
 #include "trg/trg/SignalVector.h"
 #include "trg/trg/SignalBundle.h"
 
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <trg/grl/dataobjects/TRGGRLInfo.h>
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBInputBits.h>
+#include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
+#include <mdst/dataobjects/TRGSummary.h>
+
+#include <TH1I.h>
+
 namespace HepGeom {
   template <class T> class Point3D;
 }
@@ -49,7 +61,10 @@ namespace Belle2 {
                              unsigned simulationMode = 0,
                              unsigned fastSimulationMode = 0,
                              unsigned firmwareSimulationMode = 0,
-                             const std::string& Phase = "Phase");
+                             const std::string& Phase = "Phase",
+                             bool algFromDB = true,
+                             const std::string& algFilePath = "ftd.alg",
+                             int debugLevel = 0);
 
     /// returns TRGGDL object. TRGGDL should be created with specific
     /// configuration before calling this function.
@@ -62,7 +77,10 @@ namespace Belle2 {
            unsigned simulationMode,
            unsigned fastSimulationMode,
            unsigned firmwareSimulationMode,
-           const std::string& Phase);
+           const std::string& Phase,
+           bool algFromDB = true,
+           const std::string& algFilePath = "ftd.alg",
+           int debugLevel = 0);
 
     /// Destructor
     virtual ~TRGGDL();
@@ -119,9 +137,7 @@ namespace Belle2 {
     /// updates TRGGDL information.
     void update(bool mcAnalysis = true);
 
-  public:// Utility functions
-
-  public:// TRG information
+  public:
 
     /// returns the system clock.
     const TRGClock& systemClock(void) const;
@@ -139,7 +155,16 @@ namespace Belle2 {
     static TRGState timingDecision(const TRGState& input,
                                    TRGState& registers,
                                    bool& logicStillActive);
-    int doprescale(int f);
+    bool doprescale(int f);
+
+    bool isFiredFTDL(std::vector<bool> input, std::string alg);
+
+    std::vector<bool> getInpBits(void) {return _inpBits;}
+
+    std::vector<bool> getFtdBits(void) {return _ftdBits;}
+
+    std::vector<bool> getPsnBits(void) {return _psnBits;}
+
   private:
 
     /// updates TRGGDL information for MC.
@@ -151,6 +176,9 @@ namespace Belle2 {
     /// Firmware simulation
     void firmwareSimulation(void);
 
+    /// Data simulation
+    void dataSimulation(void);
+
     /// Read input data definition.
     void getInput(std::ifstream& ifs);
 
@@ -159,6 +187,24 @@ namespace Belle2 {
 
     /// Read algorithm data definition.
     void getAlgorithm(std::ifstream& ifs);
+
+    /// Accumulate bit info in histogram
+    void accumulateInp(TH1I*);
+
+    /// Accumulate bit info in histogram
+    void accumulateFtd(TH1I*);
+
+    /// Accumulate bit info in histogram
+    void accumulatePsn(TH1I*);
+
+    /// Returns fired/not for input bits.
+    bool isFiredInput(int n) {return _inpBits[n];}
+
+    /// Returns fired/not for ftdl bits.
+    bool isFiredFtdl(int n) {return _ftdBits[n];}
+
+    /// Returns fired/not for psnm bits.
+    bool isFiredPsnm(int n) {return _psnBits[n];}
 
   private:
 
@@ -182,6 +228,9 @@ namespace Belle2 {
 
     //Phase
     std::string _Phase;
+
+    // Path to algorithm file
+    std::string _algFilePath;
 
     /// GDL trigger system clock.
     const TRGClock& _clock;
@@ -212,6 +261,24 @@ namespace Belle2 {
 
     /// Timing output signal bundle.
     TRGSignalBundle* _tosb;
+
+    /**Data base of GDL input bits**/
+    DBObjPtr<TRGGDLDBInputBits> m_InputBitsDB;
+    DBObjPtr<TRGGDLDBFTDLBits>  m_FTDLBitsDB;
+    DBObjPtr<TRGGDLDBPrescales> m_PrescalesDB;
+    DBObjPtr<TRGGDLDBAlgs> db_algs;
+
+    ///
+    std::vector<bool> _inpBits;
+    std::vector<bool> _ftdBits;
+    std::vector<bool> _psnBits;
+    std::vector<std::string> _inpBitNames;
+    std::vector<std::string> _oupBitNames;
+
+    int getNbitsOup(void) {return _oupBitNames.size();}
+    int getNbitsInp(void) {return _inpBitNames.size();}
+
+    bool _algFromDB;
 
     friend class TRGGDLModule;
   };

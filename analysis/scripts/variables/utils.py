@@ -2,27 +2,34 @@
 # -*- coding: utf-8 -*-
 import functools
 import collections
+import re
 from variables import variables as _variablemanager
 from variables import std_vector as _std_vector
+from typing import Iterable, Union, List, Tuple, Optional
 
 
-def create_aliases(list_of_variables, wrapper, prefix):
+def create_aliases(list_of_variables: Iterable[str], wrapper: str, prefix: str) -> List[str]:
     """
     The function creates aliases for variables from the variables list with given wrapper
     and returns list of the aliases.
 
-    >>> list_of_variables = ['M','p']
+    If the variables in the list have arguments (like ``useLabFrame(p)``) all
+    non-alphanumeric characters in the variable will be replaced by underscores
+    (for example ``useLabFrame_x``) for the alias name.
+
+    >>> list_of_variables = ['M','p','matchedMC(useLabFrame(px))']
     >>> wrapper = 'daughter(1,{variable})'
     >>> prefix = 'pref'
     >>> print(create_aliases(list_of_variables, wrapper, prefix))
-    ['pref_M', 'pref_p']
+    ['pref_M', 'pref_p', 'pref_matchedMC_useLabFrame_px']
     >>> from variables import variables
     >>> variables.printAliases()
-    [INFO] =========================
-    [INFO] Following aliases exists:
-    [INFO] 'pref_M' --> 'daughter(1,M)'
-    [INFO] 'pref_p' --> 'daughter(1,p)'
-    [INFO] =========================
+    [INFO] =====================================
+    [INFO] The following aliases are registered:
+    [INFO] pref_M                        --> daughter(1,M)
+    [INFO] pref_matchedMC_useLabFrame_px --> daughter(1,matchedMC(useLabFrame(px)))
+    [INFO] pref_p                        --> daughter(1,p)
+    [INFO] =====================================
 
     Parameters:
         list_of_variables (list(str)): list of variable names
@@ -33,14 +40,18 @@ def create_aliases(list_of_variables, wrapper, prefix):
     Returns:
         list(str): new variables list
     """
-    aliases = [f"{prefix}_{e}" for e in list_of_variables]
-    for var, alias in zip(list_of_variables, aliases):
-        _variablemanager.addAlias(alias, wrapper.format(variable=var))
+    replacement = re.compile('[^a-zA-Z0-9]+')
+    aliases = []
+    for var in list_of_variables:
+        # replace all non-safe characters for alias name with _ (but remove from the end)
+        safe = replacement.sub("_", var).strip("_")
+        aliases.append(f"{prefix}_{safe}")
+        _variablemanager.addAlias(aliases[-1], wrapper.format(variable=var))
 
     return aliases
 
 
-def get_hierarchy_of_decay(decay_string):
+def get_hierarchy_of_decay(decay_string: str) -> List[List[Tuple[int, str]]]:
     """
     This function returns paths of the particles selected in decay string. For
     each selected particle return a list of (index, name) tuples which indicate
@@ -81,16 +92,23 @@ def get_hierarchy_of_decay(decay_string):
     return selected_particles
 
 
-def create_daughter_aliases(list_of_variables, indices, prefix="", include_indices=True):
+def create_daughter_aliases(
+        list_of_variables: Iterable[str],
+        indices: Union[int, Iterable[int]],
+        prefix="", include_indices=True
+) -> List[str]:
     """Create Aliases for all variables for a given daughter hierarchy
 
     Arguments:
         list_of_variables (list(str)): list of variables to create aliases for
-        indices (int): index of the daughter, grand-daughter, grand-grand-daughter,
+        indices (int or list(int)): index of the daughter, grand-daughter, grand-grand-daughter,
             and so forth
         prefix (str): optional prefix to prepend to the aliases
         include_indices(bool): if set to True (default) the aliases will contain
             the daughter indices as dX_dY_dZ...
+
+    Returns:
+        list(str): new variables list
 
     * create aliases for the second daughter as "d1_E", "d1_M" (daughters start at 0)
 
@@ -150,6 +168,7 @@ class DecayParticleNode:
     For each node of the tree we safe the name of the particle, whether it is
     selected and a dictionary of all children (as mapping decayIndex -> Node)
     """
+
     def __init__(self, name):
         """Just set default values"""
         #: name of the particle
@@ -271,9 +290,15 @@ class DecayParticleNode:
         return top
 
 
-def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
-                                use_names=True, always_include_indices=False,
-                                use_relative_indices=False):
+def create_aliases_for_selected(
+        list_of_variables: List[str],
+        decay_string: str,
+        prefix: Optional[Union[str, List[str]]] = None,
+        *,
+        use_names=True,
+        always_include_indices=False,
+        use_relative_indices=False
+) -> List[str]:
     """
     The function creates list of aliases for given variables so that they are calculated for
     particles selected in decay string. That is for each particle selected in
@@ -453,7 +478,10 @@ def create_aliases_for_selected(list_of_variables, decay_string, prefix=None, *,
     return alias_list
 
 
-def create_mctruth_aliases(list_of_variables, prefix="mc"):
+def create_mctruth_aliases(
+        list_of_variables: Iterable[str],
+        prefix="mc"
+) -> List[str]:
     """
     The function wraps variables from the list with 'matchedMC()'.
 
@@ -478,7 +506,7 @@ def create_mctruth_aliases(list_of_variables, prefix="mc"):
     return create_aliases(list_of_variables, 'matchedMC({variable})', prefix)
 
 
-def add_collection(list_of_variables, collection_name):
+def add_collection(list_of_variables: Iterable[str], collection_name: str) -> str:
     """
     The function creates variable collection from the given list of variables
     It wraps the `VariableManager.addCollection` method which is not particularly user-friendly.
@@ -501,3 +529,42 @@ def add_collection(list_of_variables, collection_name):
 
     _variablemanager.addCollection(collection_name, _std_vector(*tuple(list_of_variables)))
     return collection_name
+
+
+def create_isSignal_alias(aliasName, flags):
+    """
+    Make a `VariableManager` alias for a customized :b2:var:`isSignal`, which accepts specified mc match errors.
+
+    .. seealso:: see :doc:`MCMatching` for a definition of the mc match error flags.
+
+    The following code defines a new variable ``isSignalAcceptMissingGammaAndMissingNeutrino``, which is same
+    as :b2:var:`isSignal`, but also accepts missing gamma and missing neutrino
+
+    >>> create_isSignal_alias("isSignalAcceptMissingGammaAndMissingNeutrino", [16, 8])
+
+    Logically, this
+    ``isSignalAcceptMissingGammaAndMissingNeutrino`` =
+    :b2:var:`isSignalAcceptMissingGamma` || :b2:var:`isSignalAcceptMissingNeutrino`.
+
+    In the example above, create_isSignal_alias() creates ``isSignalAcceptMissingGammaAndMissingNeutrino`` by
+    unmasking (setting bits to zero)
+    the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
+
+    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/software/
+    browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
+
+    Parameters:
+        aliasName (str): the name of the alias to be set
+        flags (list(int)): a list of the bits to unmask
+    """
+
+    mask = 0
+    for flag in flags:
+        if isinstance(flag, int):
+            mask |= flag
+        else:
+            informationString = "The type of input flags of create_isSignal_alias() should be integer."
+            informationString += "Now one of the input flags is " + str(int) + " ."
+            raise ValueError(informationString)
+
+    _variablemanager.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))

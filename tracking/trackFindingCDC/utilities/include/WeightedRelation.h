@@ -11,13 +11,10 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
-
 #include <algorithm>
 #include <utility>
 #include <type_traits>
 #include <cassert>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -48,20 +45,20 @@ namespace Belle2 {
       /// Operator for ordering of relations.
       bool operator<(const WeightedRelation<From, To>& rhs) const
       {
-        return (getFrom() < rhs.getFrom() or
-                (not(rhs.getFrom() < getFrom()) and
+        return (*getFrom() < *rhs.getFrom() or
+                (not(*rhs.getFrom() < *getFrom()) and
                  // highest weight first
                  (getWeight() > rhs.getWeight() or
                   (not(rhs.getWeight() > getWeight()) and
-                   (getTo() < rhs.getTo())))));
+                   (*getTo() < *rhs.getTo())))));
       }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
       friend bool operator<(const std::pair<From*, Weight>& weightedPtr,
                             const WeightedRelation<From, To>& weightedRelation)
       {
-        return (weightedPtr.first < weightedRelation.getFrom() or
-                (not(weightedRelation.getFrom() < weightedPtr.first) and
+        return (*weightedPtr.first < *weightedRelation.getFrom() or
+                (not(*weightedRelation.getFrom() < *weightedPtr.first) and
                  // highest weight first
                  (weightedPtr.second > weightedRelation.getWeight())));
       }
@@ -70,8 +67,8 @@ namespace Belle2 {
       friend bool operator<(const WeightedRelation<From, To>& weightedRelation,
                             const std::pair<From*, Weight>& weightedPtr)
       {
-        return (weightedRelation.getFrom() < weightedPtr.first or
-                (not(weightedPtr.first < weightedRelation.getFrom()) and
+        return (*weightedRelation.getFrom() < *weightedPtr.first or
+                (not(*weightedPtr.first < *weightedRelation.getFrom()) and
                  // highest weight first
                  (weightedRelation.getWeight() > weightedPtr.second)));
       }
@@ -79,13 +76,13 @@ namespace Belle2 {
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(const From* ptrFrom, const WeightedRelation<From, To>& weightedRelation)
       {
-        return ptrFrom < weightedRelation.getFrom();
+        return *ptrFrom < *weightedRelation.getFrom();
       }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(const WeightedRelation<From, To>& weightedRelation, const From* ptrFrom)
       {
-        return weightedRelation.getFrom() < ptrFrom;
+        return *weightedRelation.getFrom() < *ptrFrom;
       }
 
       /// Getter for the pointer to the from side object

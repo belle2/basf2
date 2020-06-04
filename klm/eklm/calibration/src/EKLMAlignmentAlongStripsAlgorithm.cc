@@ -8,18 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
+/* Own header. */
+#include <klm/eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/GeometryData.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/calibration/EKLMAlignmentAlongStripsAlgorithm.h>
-#include <klm/eklm/geometry/GeometryData.h>
 
 using namespace Belle2;
 
 static bool compareSegmentSignificance(
-  std::pair<int, double>& first, std::pair<int, double>& second)
+  const std::pair<int, double>& first, const std::pair<int, double>& second)
 {
   return first.second > second.second;
 }
@@ -46,6 +48,7 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   int**** *nHits, *** *averageHits;
   double nHitsSegment, nHitsAverage, nSigma;
   bool found;
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   struct Event* event = nullptr;
   std::shared_ptr<TTree> t_in = getObjectPtr<TTree>("calibration_data");
@@ -83,7 +86,7 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
   n = t_in->GetEntries();
   for (i = 0; i < n; i++) {
     t_in->GetEntry(i);
-    segment = (event->strip - 1) / geoDat->getNStripsSegment();
+    segment = (event->strip - 1) / elementNumbers->getNStripsSegment();
     nHits[event->section - 1][event->layer - 1][event->sector - 1]
     [event->plane - 1][segment]++;
     averageHits[event->section - 1][event->layer - 1]
@@ -104,9 +107,9 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           for (iSegment = 0; iSegment < nSegments; iSegment++) {
-            segmentGlobal = geoDat->segmentNumber(iSection + 1, iLayer + 1,
-                                                  iSector + 1, iPlane + 1,
-                                                  iSegment + 1);
+            segmentGlobal = elementNumbers->segmentNumber(
+                              iSection + 1, iLayer + 1, iSector + 1, iPlane + 1,
+                              iSegment + 1);
             nHitsSegment = nHits[iSection][iLayer][iSector][iPlane][iSegment];
             nHitsAverage = averageHits[iSection][iLayer]
                            [getAveragedPlane(iSector + 1, iPlane + 1)]
@@ -129,8 +132,8 @@ CalibrationAlgorithm::EResult EKLMAlignmentAlongStripsAlgorithm::calibrate()
        ++it) {
     if (it->second < 3.0)
       break;
-    geoDat->segmentNumberToElementNumbers(it->first, &iSection, &iLayer,
-                                          &iSector, &iPlane, &iSegment);
+    elementNumbers->segmentNumberToElementNumbers(
+      it->first, &iSection, &iLayer, &iSector, &iPlane, &iSegment);
     printf("Segment %d (section %d, layer %d, sector %d, plane %d, segment %d):"
            " %.1f sigma\n", it->first, iSection, iLayer, iSector, iPlane,
            iSegment, it->second);

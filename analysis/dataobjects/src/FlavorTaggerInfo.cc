@@ -15,7 +15,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 

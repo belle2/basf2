@@ -10,13 +10,15 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Transform3D.h>
+/* KLM headers. */
+#include <klm/dbobjects/eklm/EKLMGeometry.h>
 
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMGeometry.h>
+/* Belle 2 headers. */
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/gearbox/GearDir.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Transform3D.h>
 
 /**
  * @file
@@ -64,24 +66,36 @@ namespace Belle2 {
        * Get strip length.
        * @param[in] strip Strip number.
        */
-      double getStripLength(int strip) const;
+      double getStripLength(int strip) const
+      {
+        return m_StripPosition[strip - 1].getLength();
+      }
 
       /**
        * Get number of strips with different lengths.
        */
-      int getNStripsDifferentLength() const;
+      int getNStripsDifferentLength() const
+      {
+        return m_nStripDifferent;
+      }
 
       /**
        * Get index in length-based array.
        * @param[in] positionIndex index in position-based array.
        */
-      int getStripLengthIndex(int positionIndex) const;
+      int getStripLengthIndex(int positionIndex) const
+      {
+        return m_StripAllToLen[positionIndex];
+      }
 
       /**
        * Get index in position-based array.
-       * @param[in] positionIndex index in position-based array.
+       * @param[in] lengthIndex index in length-based array.
        */
-      int getStripPositionIndex(int lengthIndex) const;
+      int getStripPositionIndex(int lengthIndex) const
+      {
+        return m_StripLenToAll[lengthIndex];
+      }
 
       /**
        * Check if z coordinate may be in EKLM.

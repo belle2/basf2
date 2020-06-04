@@ -54,6 +54,9 @@ namespace Belle2 {
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};
 
+    /** Debug Level **/
+    int _debugLevel;
+
   };
 
 }

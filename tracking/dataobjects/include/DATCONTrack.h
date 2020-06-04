@@ -10,12 +10,8 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <root/TObject.h>
-#include <root/TVector3.h>
 #include <root/TMath.h>
-
 
 namespace Belle2 {
   /**

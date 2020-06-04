@@ -54,5 +54,6 @@
 #pragma link C++ class Belle2::TOPWavelengthFilter+;
 #pragma link C++ class Belle2::TOPCalAsicShift+;
 #pragma link C++ class Belle2::TOPFrontEndSetting+;
+#pragma link C++ class Belle2::TOPCalTimeWalk+;
 
 #endif

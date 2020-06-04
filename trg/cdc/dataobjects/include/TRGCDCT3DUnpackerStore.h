@@ -808,6 +808,23 @@ namespace Belle2 {
     /**m_etf_in leaf*/
     int m_etf_valid;
 
+    /**m_t2dfittertrk0_rho leaf*/
+    int m_t2dfittertrk0_rho;
+    /**m_t2dfittertrk0_phi0 leaf*/
+    int m_t2dfittertrk0_phi0;
+    /**m_t2dfittertrk1_rho leaf*/
+    int m_t2dfittertrk1_rho;
+    /**m_t2dfittertrk1_phi0 leaf*/
+    int m_t2dfittertrk1_phi0;
+    /**m_t2dfittertrk2_rho leaf*/
+    int m_t2dfittertrk2_rho;
+    /**m_t2dfittertrk2_phi0 leaf*/
+    int m_t2dfittertrk2_phi0;
+    /**m_t2dfittertrk3_rho leaf*/
+    int m_t2dfittertrk3_rho;
+    /**m_t2dfittertrk3_phi0 leaf*/
+    int m_t2dfittertrk3_phi0;
+
     /**extra leafs*/
     int m_firmid;
     /**extra leafs*/

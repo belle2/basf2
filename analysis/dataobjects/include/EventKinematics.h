@@ -13,8 +13,6 @@
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
-#include <vector>
-#include <set>
 
 namespace Belle2 {
 
@@ -41,42 +39,42 @@ namespace Belle2 {
     /**
      * Add the missing momentum vector in lab.
      *
-     * @param TVector3 missing momentum
+     * @param missingMomentum missing momentum vector
      */
     void addMissingMomentum(const TVector3& missingMomentum);
 
     /**
      * Add the missing momentum vector in CMS.
      *
-     * @param TVector3 missing momentum
+     * @param missingMomentumCMS missing momentum vector
      */
     void addMissingMomentumCMS(const TVector3& missingMomentumCMS);
 
     /**
      * Add missing energy in CMS.
      *
-     * @param Float missing energy
+     * @param missingEnergyCMS missing energy
      */
     void addMissingEnergyCMS(float missingEnergyCMS);
 
     /**
      * Add missing mass squared.
      *
-     * @param Float missing mass squared
+     * @param missingMass2 missing mass squared
      */
     void addMissingMass2(float missingMass2);
 
     /**
      * Add visible energy of the event in CMS.
      *
-     * @param Float visible energy
+     * @param visibleEnergyCMS visible energy
      */
     void addVisibleEnergyCMS(float visibleEnergyCMS);
 
     /**
      * Add total energy of photons in the event.
      *
-     * @param Float visible energy
+     * @param totalPhotonsEnergy total photon energy
      */
     void addTotalPhotonsEnergy(float totalPhotonsEnergy);
 

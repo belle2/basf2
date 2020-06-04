@@ -14,7 +14,8 @@
 #include <tracking/modules/cosmicsTrackMerger/PhiRecoTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
+
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 
 #include <tracking/modules/cosmicsTrackMerger/CellularRecoTrack.h>
 #include <tracking/dataobjects/RecoTrack.h>
@@ -48,13 +49,15 @@ namespace Belle2 {
 
   private:
     /// Creator of the track relations for linking
-    TrackFindingCDC::WeightedRelationCreator<const CellularRecoTrack, PhiRecoTrackRelationFilter> m_trackRelationCreator;
+    TrackFindingCDC::WeightedRelationCreator<const CellularRecoTrack, PhiRecoTrackRelationFilter, TrackFindingCDC::WeightedRelationPointerComparison>
+    m_trackRelationCreator;
 
     /// Instance of the cellular automaton path finder
-    TrackFindingCDC::MultipassCellularPathFinder<const CellularRecoTrack> m_cellularPathFinder;
+    TrackFindingCDC::MultipassCellularPathFinder<const CellularRecoTrack, TrackFindingCDC::WeightedRelationPointerComparison>
+    m_cellularPathFinder;
 
     /// Memory for the relations between tracks to be followed on linking
-    std::vector<TrackFindingCDC::WeightedRelation<const CellularRecoTrack> > m_trackRelations;
+    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<const CellularRecoTrack> > m_trackRelations;
 
     /// Memory for the track paths generated from the graph.
     std::vector<TrackFindingCDC::Path<const CellularRecoTrack>> m_trackPaths;

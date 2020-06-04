@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* External headers. */
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {
@@ -35,182 +35,290 @@ namespace Belle2 {
     /**
      * Get ADC range.
      */
-    int getADCRange() const;
+    int getADCRange() const
+    {
+      return m_ADCRange;
+    }
 
     /**
      * Set ADC range.
      */
-    void setADCRange(int range);
+    void setADCRange(int range)
+    {
+      m_ADCRange = range;
+    }
 
     /**
      * Get ADC sampling frequency in GHz.
      */
-    float getADCSamplingFrequency() const;
+    float getADCSamplingFrequency() const
+    {
+      return 1.0 / m_ADCSamplingTime;
+    }
 
     /**
      * Set ADC sampling frequency in GHz.
      */
-    void setADCSamplingFrequency(float frequency);
+    void setADCSamplingFrequency(float frequency)
+    {
+      m_ADCSamplingTime = 1.0 / frequency;
+    }
 
     /**
      * Get ADC sampling time in ns.
      */
-    float getADCSamplingTime() const;
+    float getADCSamplingTime() const
+    {
+      return m_ADCSamplingTime;
+    }
 
     /**
      * Set ADC sampling time in ns.
      */
-    void setADCSamplingTime(float time);
+    void setADCSamplingTime(float time)
+    {
+      m_ADCSamplingTime = time;
+    }
 
     /**
      * Get number of digitizations (points) in one sample.
      */
-    int getNDigitizations() const;
+    int getNDigitizations() const
+    {
+      return m_NDigitizations;
+    }
 
     /**
      * Set number of digitizations (points) in one sample.
      */
-    void setNDigitizations(int digitizations);
+    void setNDigitizations(int digitizations)
+    {
+      m_NDigitizations = digitizations;
+    }
 
     /**
      * Get ADC pedestal.
      */
-    float getADCPedestal() const;
+    float getADCPedestal() const
+    {
+      return m_ADCPedestal;
+    }
 
     /**
      * Set ADC pedestal.
      */
-    void setADCPedestal(float pedestal);
+    void setADCPedestal(float pedestal)
+    {
+      m_ADCPedestal = pedestal;
+    }
 
     /**
      * Get ADC photoelectron amplitude.
      */
-    float getADCPEAmplitude() const;
+    float getADCPEAmplitude() const
+    {
+      return m_ADCPEAmplitude;
+    }
 
     /**
      * Set ADC photoelectron amplitude.
      */
-    void setADCPEAmplitude(float amplitude);
+    void setADCPEAmplitude(float amplitude)
+    {
+      m_ADCPEAmplitude = amplitude;
+    }
 
     /**
      * Get ADC readout corresponding to saturation.
      */
-    int getADCThreshold() const;
+    int getADCThreshold() const
+    {
+      return m_ADCThreshold;
+    }
 
     /**
      * Set ADC readout corresponding to saturation.
      */
-    void setADCThreshold(int threshold);
+    void setADCThreshold(int threshold)
+    {
+      m_ADCThreshold = threshold;
+    }
 
     /**
      * Get ADC readout corresponding to saturation.
      */
-    int getADCSaturation() const;
+    int getADCSaturation() const
+    {
+      return m_ADCSaturation;
+    }
 
     /**
      * Set ADC readout corresponding to saturation.
      */
-    void setADCSaturation(int saturation);
+    void setADCSaturation(int saturation)
+    {
+      m_ADCSaturation = saturation;
+    }
 
     /**
      * Get number of photoelectrons / 1 MeV.
      */
-    float getNPEperMeV() const;
+    float getNPEperMeV() const
+    {
+      return m_NPEperMeV;
+    }
 
     /**
      * Set number of photoelectrons / 1 MeV.
      */
-    void setNPEperMeV(float npe);
+    void setNPEperMeV(float npe)
+    {
+      m_NPEperMeV = npe;
+    }
 
     /**
      * Get cosine of maximal light capture angle (by fiber).
      */
-    float getMinCosTheta() const;
+    float getMinCosTheta() const
+    {
+      return m_MinCosTheta;
+    }
 
     /**
      * Set cosine of maximal light capture angle (by fiber).
      */
-    void setMinCosTheta(float minCosTheta);
+    void setMinCosTheta(float minCosTheta)
+    {
+      m_MinCosTheta = minCosTheta;
+    }
 
     /**
      * Get mirror reflective index.
      */
-    float getMirrorReflectiveIndex() const;
+    float getMirrorReflectiveIndex() const
+    {
+      return m_MirrorReflectiveIndex;
+    }
 
     /**
      * Set mirror reflective index.
      */
-    void setMirrorReflectiveIndex(float reflectiveIndex);
+    void setMirrorReflectiveIndex(float reflectiveIndex)
+    {
+      m_MirrorReflectiveIndex = reflectiveIndex;
+    }
 
     /**
      * Get scintillator deexcitation time.
      */
-    float getScintillatorDeExcitationTime() const;
+    float getScintillatorDeExcitationTime() const
+    {
+      return m_ScintillatorDeExcitationTime;
+    }
 
     /**
      * Set scintillator deexcitation time.
      */
-    void setScintillatorDeExcitationTime(float time);
+    void setScintillatorDeExcitationTime(float time)
+    {
+      m_ScintillatorDeExcitationTime = time;
+    }
 
     /**
      * Get fiber deexcitation time.
      */
-    float getFiberDeExcitationTime() const;
+    float getFiberDeExcitationTime() const
+    {
+      return m_FiberDeExcitationTime;
+    }
 
     /**
      * Set fiber deexcitation time.
      */
-    void setFiberDeExcitationTime(float time);
+    void setFiberDeExcitationTime(float time)
+    {
+      m_FiberDeExcitationTime = time;
+    }
 
     /**
      * Get speed of light in fiber.
      */
-    float getFiberLightSpeed() const;
+    float getFiberLightSpeed() const
+    {
+      return m_FiberLightSpeed;
+    }
 
     /**
      * Set speed of light in fiber.
      */
-    void setFiberLightSpeed(float lightSpeed);
+    void setFiberLightSpeed(float lightSpeed)
+    {
+      m_FiberLightSpeed = lightSpeed;
+    }
 
     /**
      * Get attenuation length in fiber.
      */
-    float getAttenuationLength() const;
+    float getAttenuationLength() const
+    {
+      return m_AttenuationLength;
+    }
 
     /**
      * Set attenuation length in fiber.
      */
-    void setAttenuationLength(float length);
+    void setAttenuationLength(float length)
+    {
+      m_AttenuationLength = length;
+    }
 
     /**
      * Get attenuation frequency of a single photoelectron pulse.
      */
-    float getPEAttenuationFrequency() const;
+    float getPEAttenuationFrequency() const
+    {
+      return m_PEAttenuationFrequency;
+    }
 
     /**
      * Set attenuation frequency of a single photoelectron pulse.
      */
-    void setPEAttenuationFrequency(float frequency);
+    void setPEAttenuationFrequency(float frequency)
+    {
+      m_PEAttenuationFrequency = frequency;
+    }
 
     /**
      * Get mean for SiPM backgrounds.
      */
-    float getMeanSiPMNoise() const;
+    float getMeanSiPMNoise() const
+    {
+      return m_MeanSiPMNoise;
+    }
 
     /**
      * Set mean for SiPM backgrounds.
      */
-    void setMeanSiPMNoise(int noise);
+    void setMeanSiPMNoise(int noise)
+    {
+      m_MeanSiPMNoise = noise;
+    }
 
     /**
      * Check if background is enabled in fitting.
      */
-    bool getEnableConstBkg() const;
+    bool getEnableConstBkg() const
+    {
+      return m_EnableConstBkg;
+    }
 
     /**
      * Set if background is enabled in fitting.
      */
-    void setEnableConstBkg(bool enable);
+    void setEnableConstBkg(bool enable)
+    {
+      m_EnableConstBkg = enable;
+    }
 
   private:
 

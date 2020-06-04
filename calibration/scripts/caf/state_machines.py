@@ -39,6 +39,7 @@ from .backends import Job
 from .backends import LSF
 from .backends import PBS
 from .backends import Local
+from .runners import AlgorithmsRunner
 
 
 class State():
@@ -428,6 +429,8 @@ class CalibrationMachine(Machine):
         self.collector_backend = None
         #: Results of each iteration for all algorithms of this calibration
         self._algorithm_results = {}
+        #: Final state of the algorithm runner for the current iteration
+        self._runner_final_state = None
         #: IoV to be executed, currently will loop over all runs in IoV
         self.iov_to_calibrate = iov_to_calibrate
         #: root directory for this Calibration
@@ -460,9 +463,9 @@ class CalibrationMachine(Machine):
                                    self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
                             after=self.automatic_transition,
-                            conditions=self._no_failed_iov)
+                            conditions=self._runner_not_failed)
         self.add_transition("fail", "running_algorithms", "algorithms_failed",
-                            conditions=self._any_failed_iov)
+                            conditions=self._runner_failed)
         self.add_transition("iterate", "algorithms_completed", "init",
                             conditions=[self._require_iteration,
                                         self._below_max_iterations],
@@ -581,35 +584,19 @@ class CalibrationMachine(Machine):
         if self._collector_jobs_ready():
             return any([job.status == "failed" for job in self._collector_jobs.values()])
 
-    def _no_failed_iov(self):
+    def _runner_not_failed(self):
         """
         Returns:
-            bool: If no result in the current iteration results list has a failed algorithm code we return True.
+            bool: If AlgorithmsRunner succeeded return True.
         """
-        return not self._any_failed_iov(log_failures=False)
+        return not self._runner_failed()
 
-    def _any_failed_iov(self, **kwargs):
+    def _runner_failed(self):
         """
         Returns:
-            bool: If any result in the current iteration results list has a failed algorithm code we return True.
+            bool: If AlgorithmsRunner failed return True.
         """
-        log_failures = kwargs["log_failures"]
-
-        failed_results = defaultdict(list)
-        iteration_results = self._algorithm_results[self.iteration]
-        for algorithm_name, results in iteration_results.items():
-            for result in results:
-                if result.result == AlgResult.failure.value or result.result == AlgResult.not_enough_data.value:
-                    failed_results[algorithm_name].append(result)
-        if failed_results:
-            if log_failures:
-                for algorithm_name, results in failed_results.items():
-                    B2WARNING("Failed results found in {} - {}".format(self.calibration.name, algorithm_name))
-                    for result in results:
-                        if result.result == AlgResult.failure.value:
-                            B2ERROR("c_Failure returned for {}".format(result.iov))
-                        elif result.result == AlgResult.not_enough_data.value:
-                            B2WARNING("c_NotEnoughData returned for {}".format(result.iov))
+        if self._runner_final_state == AlgorithmsRunner.FAILED:
             return True
         else:
             return False
@@ -726,7 +713,7 @@ class CalibrationMachine(Machine):
                 continue
         else:
             if "fail" in possible_transitions:
-                getattr(self, "fail")(log_failures=True)
+                getattr(self, "fail")()
             else:
                 raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
@@ -975,6 +962,7 @@ class CalibrationMachine(Machine):
             # results. But here we had an actual exception so we just force into failure instead.
             self._state = State("algorithms_failed")
         self._algorithm_results[self.iteration] = algs_runner.results
+        self._runner_final_state = algs_runner.final_state
 
     def _prepare_final_db(self):
         """
@@ -1051,6 +1039,7 @@ class AlgorithmMachine(Machine):
                             after=self._execute_over_iov)
         self.add_transition("complete", "running_algorithm", "completed")
         self.add_transition("fail", "running_algorithm", "failed")
+        self.add_transition("fail", "ready", "failed")
         self.add_transition("setup_algorithm", "completed", "ready")
         self.add_transition("setup_algorithm", "failed", "ready")
 
@@ -1137,8 +1126,8 @@ class AlgorithmMachine(Machine):
         B2INFO('Output log file at {}'.format(log_file))
         basf2.reset_log()
         basf2.set_log_level(basf2.LogLevel.INFO)
-#        set_log_level(basf2.LogLevel.DEBUG)
-#        set_debug_level(100)
+#        basf2.set_log_level(basf2.LogLevel.DEBUG)
+#        basf2.set_debug_level(100)
         basf2.log_to_file(log_file)
 
     def _change_working_dir(self, **kwargs):

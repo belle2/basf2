@@ -21,29 +21,51 @@ TrackQETrainingDataCollectorModule::TrackQETrainingDataCollectorModule() : Modul
   setDescription("Module to collect training data for a specified qualityEstimator and store it in a root file.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the recoTrack StoreArray.",
-           std::string("RecoTracks"));
-  addParam("SVDCDCRecoTracksStoreArrayName", m_svdCDCRecoTracksStoreArrayName, "Name of the SVD-CDC StoreArray.",
-           std::string("SVDCDCRecoTracks"));
-  addParam("SVDPlusCDCStandaloneRecoTracksStoreArrayName", m_svdPlusCDCStandaloneRecoTracksStoreArrayName,
+  addParam("recoTracksStoreArrayName",
+           m_recoTracksStoreArrayName,
+           "Name of the recoTrack StoreArray.",
+           m_recoTracksStoreArrayName);
+
+  addParam("SVDCDCRecoTracksStoreArrayName",
+           m_svdCDCRecoTracksStoreArrayName,
+           "Name of the SVD-CDC StoreArray.",
+           m_svdCDCRecoTracksStoreArrayName);
+
+  addParam("SVDPlusCDCStandaloneRecoTracksStoreArrayName",
+           m_svdPlusCDCStandaloneRecoTracksStoreArrayName,
            "Name of the combined CDC-SVD StoreArray with tracks added from the CDC to SVD CKF.",
-           std::string("SVDPlusCDCStandaloneRecoTracks"));
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the CDC StoreArray.",
-           std::string("CDCRecoTracks"));
-  addParam("SVDRecoTracksStoreArrayName", m_svdRecoTracksStoreArrayName, "Name of the SVD StoreArray.",
-           std::string("SVDRecoTracks"));
-  addParam("PXDRecoTracksStoreArrayName", m_pxdRecoTracksStoreArrayName, "Name of the PXD StoreArray.",
-           std::string("PXDRecoTracks"));
-  addParam("TrainingDataOutputName", m_TrainingDataOutputName, "Name of the output rootfile.",
-           std::string("QETrainingOutput.root"));
-  addParam("collectEventFeatures", m_param_collectEventFeatures, "Whether to use eventwise features.",
-           false);
+           m_svdPlusCDCStandaloneRecoTracksStoreArrayName);
+
+  addParam("CDCRecoTracksStoreArrayName",
+           m_cdcRecoTracksStoreArrayName,
+           "Name of the CDC StoreArray.",
+           m_cdcRecoTracksStoreArrayName);
+
+  addParam("SVDRecoTracksStoreArrayName",
+           m_svdRecoTracksStoreArrayName,
+           "Name of the SVD StoreArray.",
+           m_svdRecoTracksStoreArrayName);
+
+  addParam("PXDRecoTracksStoreArrayName",
+           m_pxdRecoTracksStoreArrayName,
+           "Name of the PXD StoreArray.",
+           m_pxdRecoTracksStoreArrayName);
+
+  addParam("TrainingDataOutputName",
+           m_TrainingDataOutputName,
+           "Name of the output rootfile.",
+           m_TrainingDataOutputName);
+
+  addParam("collectEventFeatures",
+           m_collectEventFeatures,
+           "Whether to use eventwise features.",
+           m_collectEventFeatures);
 }
 
 void TrackQETrainingDataCollectorModule::initialize()
 {
   m_recoTracks.isRequired(m_recoTracksStoreArrayName);
-  if (m_param_collectEventFeatures) {
+  if (m_collectEventFeatures) {
     m_eventInfoExtractor = std::make_unique<EventInfoExtractor>(m_variableSet);
   }
   m_recoTrackExtractor = std::make_unique<RecoTrackExtractor>(m_variableSet);
@@ -89,7 +111,7 @@ void TrackQETrainingDataCollectorModule::event()
       svdRecoTrackPtr = svdPlusCDCStandaloneRecoTrackPtr->getRelatedTo<RecoTrack>(m_svdRecoTracksStoreArrayName);
     }
 
-    if (m_param_collectEventFeatures) {
+    if (m_collectEventFeatures) {
       m_eventInfoExtractor->extractVariables(m_recoTracks, recoTrack);
     }
     m_recoTrackExtractor->extractVariables(recoTrack);

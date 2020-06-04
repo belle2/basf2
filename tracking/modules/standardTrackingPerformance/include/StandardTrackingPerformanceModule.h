@@ -19,9 +19,6 @@ class TFile;
 
 namespace Belle2 {
   class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class RecoTrack;
 
   template< class T >
   class StoreArray;

@@ -17,7 +17,6 @@
 
 #include <framework/geometry/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
 
-#include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
 
@@ -275,6 +274,6 @@ namespace Belle2 {
     template <class TrueHit>
     void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
-    void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
+    void writeToRoot(const RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };
 }

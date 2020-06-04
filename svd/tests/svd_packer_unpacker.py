@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from svd import add_svd_simulation, changeSVDEventInfoNameForPacker
+from svd import add_svd_simulation
 from ROOT import Belle2
 import os
 import numpy
@@ -100,8 +100,6 @@ Packer.param('NodeID', nodeid)
 Packer.param('svdShaperDigitListName', 'SVDShaperDigits')
 Packer.param('rawSVDListName', 'SVDRaw')
 main.add_module(Packer)
-
-changeSVDEventInfoNameForPacker(main)
 
 unPacker = register_module('SVDUnpacker')
 unPacker.param('rawSVDListName', 'SVDRaw')

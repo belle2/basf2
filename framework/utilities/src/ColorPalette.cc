@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <array>
-#include <exception>
 
 namespace Belle2::TangoPalette {
   const char* getHex(const std::string& tangoName, int tangoId)

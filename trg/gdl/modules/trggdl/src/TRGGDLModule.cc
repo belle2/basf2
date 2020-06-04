@@ -38,21 +38,23 @@ namespace Belle2 {
     return string("TRGGDLModule 0.00");
   }
 
-  TRGGDLModule::TRGGDLModule()
-    : Module::Module(),
-      _debugLevel(0),
-      _configFilename("TRGGDLConfig.dat"),
-      _simulationMode(1),
-      _fastSimulationMode(0),
-      _firmwareSimulationMode(0),
-      _Phase("Phase2")
+  TRGGDLModule::TRGGDLModule() : HistoModule(),
+//TRGGDLModule::TRGGDLModule()
+//  : Module::Module(),
+    _debugLevel(0),
+    _configFilename("TRGGDLConfig.dat"),
+    _simulationMode(1),
+    _fastSimulationMode(0),
+    _firmwareSimulationMode(0),
+    _Phase("Phase2"),
+    _algFilePath("ftd.alg")
   {
 
     string desc = "TRGGDLModule(" + version() + ")";
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("DebugLevel", _debugLevel, "TRGGDL debug level", _debugLevel);
+    addParam("debugLevel", _debugLevel, "Debug Level", _debugLevel);
     addParam("Belle2Phase", _Phase, "Phase2 or Phase3", _Phase);
     addParam("ConfigFile",
              _configFilename,
@@ -71,6 +73,16 @@ namespace Belle2 {
              "TRGGDL firmware simulation mode",
              _firmwareSimulationMode);
 
+    addParam("algFromDB",
+             _algFromDB,
+             "Set false when alg is taken from local file.",
+             true);
+
+    addParam("algFilePath",
+             _algFilePath,
+             ".alg file path",
+             _algFilePath);
+
     B2DEBUG(100, "TRGGDLModule ... created");
   }
 
@@ -83,14 +95,36 @@ namespace Belle2 {
     B2DEBUG(100,  "TRGGDLModule ... destructed ");
   }
 
+  void TRGGDLModule::defineHisto()
+  {
+
+    oldDir = gDirectory;
+    newDir = gDirectory;
+    oldDir->mkdir("TRGGDLModule");
+    newDir->cd("TRGGDLModule");
+
+    h_inp  = new TH1I("hTRGGDL_inp", "input bits from TRGGDLModule", 200, 0, 200);
+    h_ftd  = new TH1I("hTRGGDL_ftd", "ftdl  bits from TRGGDLModule", 200, 0, 200);
+    h_psn  = new TH1I("hTRGGDL_psn", "psnm  bits from TRGGDLModule", 200, 0, 200);
+
+    oldDir->cd();
+
+  }
+
   void
   TRGGDLModule::initialize()
   {
 
+    REG_HISTOGRAM
+    defineHisto();
+
+//  m_TRGSummary.isRequired();
     TRGDebug::level(_debugLevel);
 
-    B2DEBUG(100, "TRGGDLModule::initialize ... options");
-    m_TRGGRLInfo.isRequired("TRGGRLObjects");
+    B2INFO("TRGGDLModule::initialize. simulationMode=" << _simulationMode);
+    if (_simulationMode != 3) {
+      m_TRGGRLInfo.isRequired("TRGGRLObjects");
+    }
     m_TRGSummary.registerInDataStore();
   }
 
@@ -107,14 +141,21 @@ namespace Belle2 {
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
-                               _Phase);
+                               _Phase,
+                               _algFromDB,
+                               _algFilePath,
+                               _debugLevel);
     } else if (cfn != _gdl->configFile()) {
       _gdl = TRGGDL::getTRGGDL(cfn,
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
-                               _Phase);
+                               _Phase,
+                               _algFromDB,
+                               _algFilePath,
+                               _debugLevel);
     }
+    if (_debugLevel > 9) printf("TRGGDLModule::beginRun() ends.\n");
 
     B2DEBUG(100, "TRGGDLModule ... beginRun called  configFile = " << cfn);
   }
@@ -122,20 +163,28 @@ namespace Belle2 {
   void
   TRGGDLModule::event()
   {
-    TRGDebug::enterStage("TRGGDLModule event");
+
+    if (_debugLevel > 9) printf("TRGGDLModule::event() starts.\n");
+
+    newDir->cd();
+
     //...GDL simulation...
     _gdl->update(true);
     _gdl->simulate();
+    _gdl->accumulateInp(h_inp);
+    _gdl->accumulateFtd(h_ftd);
+    _gdl->accumulatePsn(h_psn);
 
+    //StoreObjPtr<TRGSummary> m_TRGSummary; /**< output for TRGSummary */
     int result_summary = 0;
-    StoreObjPtr<TRGSummary> gdlResult;
-    if (gdlResult)
-      result_summary = gdlResult->getTRGSummary(0);
-
+    if (m_TRGSummary) {
+      result_summary = m_TRGSummary->getTRGSummary(0);
+    } else {
+      B2WARNING("TRGGDLModule.cc: TRGSummary not found. Check it!!!!");
+    }
     setReturnValue(result_summary);
 
-    TRGDebug::leaveStage("TRGGDLModule event");
-
+    oldDir->cd();
   }
 
   void

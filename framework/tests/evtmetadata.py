@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
-set_random_seed("something important")
+basf2.set_random_seed("something important")
 
 
-class NoopModule(Module):
+class NoopModule(basf2.Module):
 
     """Doesn't do anything."""
 
 
-class EvtMetaDataTest(Module):
+class EvtMetaDataTest(basf2.Module):
 
     """Prints EventMetaData objects and stops event processing in event 3."""
 
@@ -20,18 +20,18 @@ class EvtMetaDataTest(Module):
         """constructor."""
 
         # need to call super() _if_ we reimplement the constructor
-        super(EvtMetaDataTest, self).__init__()
-        B2INFO('event\trun\texp')
+        super().__init__()
+        basf2.B2INFO('event\trun\texp')
 
     def initialize(self):
         """reimplementation of Module::initialize()."""
 
-        B2INFO('EvtMetaDataTest::initialize()')
+        basf2.B2INFO('EvtMetaDataTest::initialize()')
 
     def beginRun(self):
         """reimplementation of Module::beginRun()."""
 
-        B2INFO('EvtMetaDataTest::beginRun()')
+        basf2.B2INFO('EvtMetaDataTest::beginRun()')
 
     def event(self):
         """reimplementation of Module::event()."""
@@ -39,12 +39,12 @@ class EvtMetaDataTest(Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
 
         if not evtmetadata:
-            B2ERROR('No EventMetaData found')
+            basf2.B2ERROR('No EventMetaData found')
         else:
             event = evtmetadata.obj().getEvent()
             run = evtmetadata.obj().getRun()
             exp = evtmetadata.obj().getExperiment()
-            B2INFO(str(event) + '\t' + str(run) + '\t' + str(exp))
+            basf2.B2INFO(f"{event}\t{run}\t{exp}")
             if event == 4:
                 # stop event processing.
                 evtmetadata.obj().setEndOfData()
@@ -52,19 +52,19 @@ class EvtMetaDataTest(Module):
     def endRun(self):
         """reimplementation of Module::endRun()."""
 
-        B2INFO('EvtMetaDataTest::endRun()')
+        basf2.B2INFO('EvtMetaDataTest::endRun()')
 
     def terminate(self):
         """reimplementation of Module::terminate()."""
 
-        B2INFO('EvtMetaDataTest::terminate()')
+        basf2.B2INFO('EvtMetaDataTest::terminate()')
 
 
 # Normal steering file part begins here
 
 for skipNEvents in range(10):
     # Create main path
-    main = create_path()
+    main = basf2.Path()
 
     # not used for anything, just checking wether the master module
     # can be found if it's not the first module in the path.
@@ -83,7 +83,7 @@ for skipNEvents in range(10):
 
     main.add_module(EvtMetaDataTest())
 
-    process(main)
+    basf2.process(main)
 
 
 # test skipping to specific events
@@ -98,9 +98,9 @@ skipToEvents = [
 ]
 
 for event in skipToEvents:
-    B2INFO("skipping to exp={0}, run={1}, evt={2}".format(*event))
-    main = create_path()
+    basf2.B2INFO("skipping to exp={0}, run={1}, evt={2}".format(*event))
+    main = basf2.Path()
     main.add_module("EventInfoSetter", evtNumList=[3, 3, 3, 3], expList=[0, 0, 0, 1],
                     runList=[0, 1, 2, 0], skipToEvent=event)
     main.add_module(EvtMetaDataTest())
-    process(main)
+    basf2.process(main)

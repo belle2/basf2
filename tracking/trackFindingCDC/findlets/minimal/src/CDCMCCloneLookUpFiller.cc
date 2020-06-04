@@ -12,9 +12,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCCloneLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/dataobjects/RecoTrack.h>
-
-
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

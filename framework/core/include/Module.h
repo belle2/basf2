@@ -15,9 +15,7 @@
 #include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
 
-#include <framework/core/FrameworkExceptions.h>
 #include <framework/logging/LogConfig.h>
-#include <framework/logging/Logger.h>
 
 #include <list>
 #include <string>

@@ -50,7 +50,7 @@
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
-ExtManager* ExtManager::m_Manager = NULL;
+ExtManager* ExtManager::m_Manager = nullptr;
 
 //! Class to handle G4Exception raised during PropagateOneStep()
 class StepExceptionHandler: public G4VExceptionHandler {
@@ -63,7 +63,7 @@ public:
   virtual bool Notify(const char* origin, const char* code, G4ExceptionSeverity, const char* description)
   {
     // Is this an exception for low-momentum track that would over-curl in B field?
-    if (strstr(description, "Error returned: 3") != NULL) {
+    if (strstr(description, "Error returned: 3") != nullptr) {
       B2DEBUG(1, "In " << origin << ", " << code << ": " << description);
     } else {
       B2ERROR("In " << origin << ", " << code << ": " << description);
@@ -74,27 +74,27 @@ public:
 
 ExtManager* ExtManager::GetManager()
 {
-  if (m_Manager == NULL) m_Manager = new ExtManager;
+  if (m_Manager == nullptr) m_Manager = new ExtManager;
   return m_Manager;
 }
 
 ExtManager::ExtManager() :
-  m_Propagator(NULL),
-  m_G4RunMgr(NULL),
-  m_TrackingAction(NULL),
-  m_SteppingAction(NULL),
-  m_MagneticField(NULL),
-  m_UncachedField(NULL),
-  m_MagFldEquation(NULL),
-  m_Stepper(NULL),
-  m_ChordFinder(NULL),
-  m_StdStepper(NULL),
-  m_ForwardEquationOfMotion(NULL),
-  m_BackwardEquationOfMotion(NULL),
-  m_VisManager(NULL)
+  m_G4State(G4StateManager::GetStateManager()->GetCurrentState()),
+  m_Propagator(nullptr),
+  m_G4RunMgr(nullptr),
+  m_TrackingAction(nullptr),
+  m_SteppingAction(nullptr),
+  m_MagneticField(nullptr),
+  m_UncachedField(nullptr),
+  m_MagFldEquation(nullptr),
+  m_Stepper(nullptr),
+  m_ChordFinder(nullptr),
+  m_StdStepper(nullptr),
+  m_ForwardEquationOfMotion(nullptr),
+  m_BackwardEquationOfMotion(nullptr),
+  m_VisManager(nullptr)
 {
   // This flag will be PreInit if FullSimModule is not present
-  m_G4State = G4StateManager::GetStateManager()->GetCurrentState();
   G4ErrorPropagatorData::GetErrorPropagatorData()->SetState(G4ErrorState_PreInit);
   // Create a private handler for G4Exceptions during PropagateOneStep
   m_StepExceptionHandler = new StepExceptionHandler();

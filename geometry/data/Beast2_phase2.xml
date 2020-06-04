@@ -72,7 +72,7 @@
   <xi:include href="../beast/qcsmonitor/QCSMONITOR-phase2.xml"/>
 
   <!-- VXD Tracking and MUID muon identification -->
-  <Tracking>
-    <xi:include href="../tracking/MuidParameters.xml"/>
-  </Tracking>
+  <Muid>
+    <xi:include href="../klm/MuidParameters.xml"/>
+  </Muid>
 </Detector>

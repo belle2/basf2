@@ -12,12 +12,13 @@
 
 #include <framework/utilities/HTML.h>
 
+#include <TClass.h>
+#include <TClassRef.h>
 #include <TDataType.h>
 #include <TDataMember.h>
-#include <TClass.h>
-#include <TStreamerInfo.h>
-#include <TStreamerElement.h>
 #include <TROOT.h>
+#include <TStreamerElement.h>
+#include <TVirtualStreamerInfo.h>
 
 #include <string>
 
@@ -77,7 +78,7 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
   const Int_t kline  = 1024;
   Int_t cdate = 0;
   Int_t ctime = 0;
-  UInt_t* cdatime = 0;
+  UInt_t* cdatime;
   char line[kline];
 
   TDataType* membertype;

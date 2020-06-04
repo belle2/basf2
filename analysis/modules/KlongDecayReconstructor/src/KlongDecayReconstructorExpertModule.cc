@@ -22,7 +22,6 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
-#include <analysis/utility/ParticleCopy.h>
 
 #include <memory>
 
@@ -143,14 +142,14 @@ namespace Belle2 {
     int numberOfCandidates = 0;
     while (m_generator->loadNext()) {
 
-      Particle&& particle = m_generator->getCurrentParticle();
+      Particle particle = m_generator->getCurrentParticle();
 
       bool is_physical = true;
 
       const std::vector<Particle*> daughters = particle.getDaughters();
 
       if (daughters.size() < 2)
-        B2FATAL("Reconstructing particle as a daughter of a decay with less then 2 daughters!");
+        B2FATAL("Reconstructing particle as a daughter of a decay with less than 2 daughters!");
 
       if (daughters.size() > 3)
         B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
@@ -197,9 +196,8 @@ namespace Belle2 {
       }
 
       Particle* newParticle = particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
 
-      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+      outputList->addParticle(newParticle);
       newParticle->addExtraInfo("decayModeID", m_decayModeID);
 
     } //while

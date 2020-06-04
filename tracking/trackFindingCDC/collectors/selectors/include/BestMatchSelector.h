@@ -12,17 +12,14 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
 #include <algorithm>
 #include <vector>
-#include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
   namespace TrackFindingCDC {
     /**
      * Selector to remove all relations in the list, which share the same collection item - except the one which the
@@ -40,12 +37,12 @@ namespace Belle2 {
      * Please note that the CollectionItems are therefore const whereas the CollectorItems are not. All the passed
      * WeightedRelations lists must be sorted.
      */
-    template <class ACollectorItem, class ACollectionItem>
+    template <class ACollectorItem, class ACollectionItem, template<class, class> class WeightedRelationClass>
     class BestMatchSelector :
-      public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
+      public Findlet<WeightedRelationClass<ACollectorItem, const ACollectionItem>> {
     public:
       /// Shortcut class name for a weighted relation between a collector item and a collection item.
-      using WeightedRelationItem = WeightedRelation<ACollectorItem, const ACollectionItem>;
+      using WeightedRelationItem = WeightedRelationClass<ACollectorItem, const ACollectionItem>;
 
       /// The parent class
       using Super = Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>>;

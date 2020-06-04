@@ -14,7 +14,7 @@
 """
 <header>
     <input>muon-BKLMValidation.root</input>
-    <contact>giacomo.depietro@roma3.infn.it</contact>
+    <contact>martina.laurenza@roma3.infn.it</contact>
     <description>Create validation plots for BKLM</description>
 </header>
 """
@@ -127,7 +127,7 @@ def draw_bklmhists(file_chain):
     sector.GetListOfFunctions().Add(TNamed('Description', 'Sector number of muon hit'))
     sector.GetListOfFunctions().Add(TNamed('Check', 'Roughly flat in sectors 1-8'))
     sector.GetListOfFunctions().Add(TNamed('Contact', contact))
-    sector.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    sector.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     sector.SetMinimum(0.0)
     sector.Write()
 
@@ -138,7 +138,7 @@ def draw_bklmhists(file_chain):
     layer.GetListOfFunctions().Add(TNamed('Check',
                                           'First peak at layer 1 and second (higher) peak at layer 2, with tail above those'))
     layer.GetListOfFunctions().Add(TNamed('Contact', contact))
-    layer.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    layer.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.0,pvalue-error=0.01'))
     layer.SetMinimum(0.0)
     layer.Write()
 
@@ -149,7 +149,7 @@ def draw_bklmhists(file_chain):
     phistrip.GetListOfFunctions().Add(TNamed('Check',
                                              'Roughly flat for 1-36 (all layers) and then for 37-48 (layers 6-15)'))
     phistrip.GetListOfFunctions().Add(TNamed('Contact', contact))
-    phistrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    phistrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     phistrip.SetMinimum(0.0)
     phistrip.Write()
 
@@ -160,17 +160,17 @@ def draw_bklmhists(file_chain):
     zstrip.GetListOfFunctions().Add(TNamed('Check',
                                            'Downward-sloping for 1-48 (all layers), shoulder for 49-54 (layers 1-2)'))
     zstrip.GetListOfFunctions().Add(TNamed('Contact', contact))
-    zstrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    zstrip.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 200, -5.0, 5.0)
+    timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -2.0, 2.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
     timeRPC.GetListOfFunctions().Add(TNamed('Description', 'Time of muon hit in RPCs'))
     timeRPC.GetListOfFunctions().Add(TNamed('Check', 'Narrow peak at 0 ns'))
     timeRPC.GetListOfFunctions().Add(TNamed('Contact', contact))
-    timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
     timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 100, -5.0, 15.0)
@@ -180,7 +180,7 @@ def draw_bklmhists(file_chain):
     timeSci.GetListOfFunctions().Add(TNamed('Check',
                                             'Broad peak mainly between 2 ns and 8 ns, with the mean around 3.5 ns'))
     timeSci.GetListOfFunctions().Add(TNamed('Contact', contact))
-    timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    timeSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeSci.Write()
 
     r = TH1F('r', 'r for BKLMHit2ds', 30, 200.0, 350.0)
@@ -189,7 +189,7 @@ def draw_bklmhists(file_chain):
     r.GetListOfFunctions().Add(TNamed('Description', 'Radial position of muon hit'))
     r.GetListOfFunctions().Add(TNamed('Check', 'Comb-like downward-sloping distribution (a la layers)'))
     r.GetListOfFunctions().Add(TNamed('Contact', contact))
-    r.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    r.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     r.Write()
 
     z = TH1F('z', 'z for BKLMHit2ds', 100, -200.0, 300.0)
@@ -198,18 +198,18 @@ def draw_bklmhists(file_chain):
     z.GetListOfFunctions().Add(TNamed('Description', 'Axial position of muon hit'))
     z.GetListOfFunctions().Add(TNamed('Check', 'Broad peak near zero with dip at 47 cm (forward-backward boundary)'))
     z.GetListOfFunctions().Add(TNamed('Contact', contact))
-    z.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.99,pvalue-error=0.90'))
+    z.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     z.Write()
 
     # Expert plots
 
-    edep = TH1F('EDep', 'Energy deposition for BKLMHit2ds', 50, 0.0, 25.0)
-    file_chain.Draw('BKLMHit2ds.getEDep()*1000.0>>EDep', '')
+    edep = TH1F('EnergyDeposit', 'Energy deposition for BKLMHit2ds', 50, 0.0, 25.0)
+    file_chain.Draw('BKLMHit2ds.getEnergyDeposit()*1000.0>>EnergyDeposit', '')
     edep.GetXaxis().SetTitle('E (keV)')
     edep.GetListOfFunctions().Add(TNamed('Description', 'dE/dx energy deposition of muon hit'))
     edep.GetListOfFunctions().Add(TNamed('Check', 'Peak near 3 keV'))
     edep.GetListOfFunctions().Add(TNamed('Contact', contact))
-    edep.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=0.99,pvalue-error=0.90'))
+    edep.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=1.00,pvalue-error=0.01'))
     edep.Write()
 
     xy = TH2F('xy', 'y vs x for BKLMHit2ds', 140, -350.0, 350.0, 140, -350.0, 350.0)

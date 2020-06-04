@@ -48,11 +48,8 @@
 #include <tracking/trackFindingVXD/filterMap/map/CompactSecIDs.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 
+#include <TFile.h>
 #include <TString.h>
-//#include <unordered_map>
-#include <set>
-
-#include <functional>
 
 namespace Belle2 {
 

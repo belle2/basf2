@@ -79,6 +79,8 @@ namespace Belle2 {
     TLine* m_line2 = nullptr;
     /** The text for the conditions of the nornal window. */
     TPaveText* m_text1 = nullptr;
+    /** The text for the conditions of the nornal window. */
+    TPaveText* m_text2 = nullptr;
   };
 } // end namespace Belle2
 

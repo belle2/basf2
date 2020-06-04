@@ -16,15 +16,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 
 #include <iostream>
 

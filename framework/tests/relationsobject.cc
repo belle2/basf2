@@ -248,8 +248,8 @@ namespace {
     // Check if the "ALL" parameter also works
     StoreEntry* storeEntry = nullptr;
     int index = -1;
-    auto allRelations = DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
-                                                               TObject::Class(), "ALL", "");
+    DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
+                                           TObject::Class(), "ALL", "");
 
     //adding relations to NULL is safe and doesn't do anything
     (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr), 1.0, relationName);

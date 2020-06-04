@@ -37,7 +37,7 @@ class LatexObject(object):
         """
         return self
 
-    def save(self, filename, compile=True):
+    def save(self, filename, compile=False):
         """
         Saves the latex-code into a file, adds preamble and end of document,
         and compiles the code if requested.
@@ -53,7 +53,6 @@ class LatexObject(object):
             \usepackage{amssymb}
             \usepackage{graphicx}
             \usepackage{caption}
-            \usepackage{subcaption}
             \usepackage{lmodern}
             \usepackage{placeins}
             \usepackage{multicol}

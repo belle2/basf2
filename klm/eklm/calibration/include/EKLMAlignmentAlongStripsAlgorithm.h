@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {

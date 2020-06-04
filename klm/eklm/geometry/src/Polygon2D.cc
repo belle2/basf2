@@ -8,16 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/geometry/Polygon2D.h>
+
+/* Belle 2 headers. */
 #include <framework/core/RandomNumbers.h>
 
 using namespace Belle2;
 
-EKLM::Polygon2D::Polygon2D(const HepGeom::Point3D<double>* points, int n)
+EKLM::Polygon2D::Polygon2D(const HepGeom::Point3D<double>* points, int n) :
+  m_nPoints(n)
 {
   int i;
-  m_nPoints = n;
   m_LineSegments = new LineSegment2D*[n];
   for (i = 0; i < n; i++) {
     if (i < n - 1)
@@ -98,9 +100,3 @@ bool EKLM::Polygon2D::hasIntersection(const Polygon2D& polygon) const
     return true;
   return false;
 }
-
-EKLM::LineSegment2D** EKLM::Polygon2D::getLineSegments() const
-{
-  return m_LineSegments;
-}
-

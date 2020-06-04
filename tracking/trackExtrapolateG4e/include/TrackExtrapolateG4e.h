@@ -8,24 +8,33 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TRACKEXTRAPOLATEG4E_H
-#define TRACKEXTRAPOLATEG4E_H
+#pragma once
 
+/* Tracking headers. */
+#include <tracking/dataobjects/ExtHit.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/TrackClusterSeparation.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <framework/database/DBObjPtr.h>
-#include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/bklm/geometry/GeometryPar.h>
-#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <tracking/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMStripEfficiency.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
-#include <G4TouchableHandle.hh>
+/* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
 #include <G4ThreeVector.hh>
+#include <G4TouchableHandle.hh>
 
+/* C++ headers. */
+#include <map>
 #include <string>
 #include <vector>
 
@@ -36,12 +45,13 @@ class G4StepPoint;
 
 namespace Belle2 {
 
-  class Track;
-  class RecoTrack;
-  class Muid;
-  class MuidPar;
-  class KLMCluster;
   class ECLCluster;
+  class KLMCluster;
+  class KLMMuidHit;
+  class KLMMuidLikelihood;
+  class MuidBuilder;
+  class Track;
+
   namespace Simulation {
     class ExtCylSurfaceTarget;
     class ExtManager;
@@ -137,20 +147,20 @@ namespace Belle2 {
     double chi2;
   };
 
-  /** geant4e-based track extrapolation
-     *
-     * This class extrapolates tracks outward from the outer perimeter of the CDC
-     * using geant4e.
-     *
-     * This class requires a valid geometry in memory (gGeoManager). Therefore,
-     * a geometry building module should have been executed before this module is called.
-     *
-     * This class has the same functions as a module - and these are called from
-     * the ExtModule's so-named functions - but also has an entry that can be
-     * called to extrapolate a single user-defined track.
-     *
-     */
-
+  /**
+   * geant4e-based track extrapolation.
+   *
+   * This class extrapolates tracks outward from the outer perimeter of the CDC
+   * using geant4e.
+   *
+   * This class requires a valid geometry in memory (gGeoManager). Therefore,
+   * a geometry building module should have been executed before this module is called.
+   *
+   * This class has the same functions as a module - and these are called from
+   * the ExtModule's so-named functions - but also has an entry that can be
+   * called to extrapolate a single user-defined track.
+   *
+   */
   class TrackExtrapolateG4e {
 
   public:
@@ -160,36 +170,6 @@ namespace Belle2 {
 
     //! destructor
     ~TrackExtrapolateG4e();
-
-    //! Assign the Tracks collection name before initialization
-    void setTracksColName(std::string& tracksColName) { m_TracksColName = &tracksColName; }
-
-    //! Assign the RecoTracks collection name before initialization
-    void setRecoTracksColName(std::string& recoTracksColName) { m_RecoTracksColName = &recoTracksColName; }
-
-    //! Assign the ExtHits collection name before initialization
-    void setExtHitsColName(std::string& extHitsColName) { m_ExtHitsColName = &extHitsColName; }
-
-    //! Assign the Muids collection name before initialization
-    void setMuidsColName(std::string& muidsColName) { m_MuidsColName = &muidsColName; }
-
-    //! Assign the MuidHits collection name before initialization
-    void setMuidHitsColName(std::string& muidHitsColName) { m_MuidHitsColName = &muidHitsColName; }
-
-    //! Assign the BKLMHits collection name before initialization
-    void setBKLMHitsColName(std::string& bklmHitsColName) { m_BKLMHitsColName = &bklmHitsColName; }
-
-    //! Assign the EKLMHits collection name before initialization
-    void setEKLMHitsColName(std::string& eklmHitsColName) { m_EKLMHitsColName = &eklmHitsColName; }
-
-    //! Assign the KLMClusters collection name before initialization
-    void setKLMClustersColName(std::string& klmClustersColName) { m_KLMClustersColName = &klmClustersColName; }
-
-    //! Assign the ECLClusters collection name before initialization
-    void setECLClustersColName(std::string& eclClustersColName) { m_ECLClustersColName = &eclClustersColName; }
-
-    //! Assign the TrackClusterSeparations collection name before initialization
-    void setTrackClusterSeparationsColName(std::string& trackClusterSeparationsColName) { m_TrackClusterSeparationsColName = &trackClusterSeparationsColName; }
 
     //! Initialize for track extrapolation by the EXT module.
     //! @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
@@ -233,13 +213,11 @@ namespace Belle2 {
     //! @param position Starting point of the extrapolation (cm).
     //! @param momentum Momentum of the track at the starting point (GeV/c).
     //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
-    //! @param extHitsColName (not used).
     void extrapolate(int pdgCode,
                      double tof,
                      const G4ThreeVector& position,
                      const G4ThreeVector& momentum,
-                     const G4ErrorSymMatrix& covariance,
-                     const std::string& extHitsColName);
+                     const G4ErrorSymMatrix& covariance);
 
     //! Performs muon identification for a single track (specified in genfit2 units).
     //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
@@ -299,7 +277,7 @@ namespace Belle2 {
                       const std::pair<ECLCluster*, G4ThreeVector>&, double, double);
 
     //! Create another MUID extrapolation hit for a track candidate
-    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, Muid*, std::vector<std::map<const Track*, double> >*);
+    bool createMuidHit(ExtState&, G4ErrorFreeTrajState&, KLMMuidLikelihood*, std::vector<std::map<const Track*, double> >*);
 
     //! Find the intersection point of the track with the crossed BKLM plane
     bool findBarrelIntersection(ExtState&, const G4ThreeVector&, Intersection&);
@@ -317,7 +295,7 @@ namespace Belle2 {
     void adjustIntersection(Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
-    void finishTrack(const ExtState&, Muid*, bool);
+    void finishTrack(const ExtState&, KLMMuidLikelihood*, bool);
 
     //! Stores pointer to the singleton class
     static TrackExtrapolateG4e* m_Singleton;
@@ -352,36 +330,6 @@ namespace Belle2 {
     //! Minimum kinetic energy in MeV for extrapolation to continue
     double m_MinKE;
 
-    //! Pointer to name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string* m_TracksColName;
-
-    //! Pointer to name of the RecoTrack collection of the reconstructed tracks to be extrapolated
-    std::string* m_RecoTracksColName;
-
-    //! Pointer to name of the extHit collection of the extrapolation hits
-    std::string* m_ExtHitsColName;
-
-    //! Pointer to name of the muid collection of the muon identification information
-    std::string* m_MuidsColName;
-
-    //! Pointer to name of the muidHit collection of the extrapolation hits
-    std::string* m_MuidHitsColName;
-
-    //! Pointer to name of the BKLM 2D hits collection
-    std::string* m_BKLMHitsColName;
-
-    //! Pointer to name of the EKLM 2D hits collection
-    std::string* m_EKLMHitsColName;
-
-    //! Pointer to name of the KLMCluster collection
-    std::string* m_KLMClustersColName;
-
-    //! Pointer to name of the ECLCluster collection
-    std::string* m_ECLClustersColName;
-
-    //! Pointer to name of the TrackClusterSeparation collection
-    std::string* m_TrackClusterSeparationsColName;
-
     //! Pointer to the ExtManager singleton
     Simulation::ExtManager* m_ExtMgr;
 
@@ -390,9 +338,6 @@ namespace Belle2 {
 
     //!  ChargedStable hypotheses for MUID
     const std::vector<Const::ChargedStable>* m_HypothesesMuid;
-
-    //! Pointer to an empty string
-    std::string* m_DefaultName;
 
     //! Default ChargedStable hypotheses (needed as call argument but not used)
     std::vector<Const::ChargedStable>* m_DefaultHypotheses;
@@ -431,22 +376,23 @@ namespace Belle2 {
     int m_OutermostActiveBarrelLayer;
 
     //! BKLM RPC phi-measuring strip position variance (cm^2) by layer
-    double m_BarrelPhiStripVariance[NLAYER + 1];
+    double m_BarrelPhiStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM RPC z-measuring strip position variance (cm^2) by layer
-    double m_BarrelZStripVariance[NLAYER + 1];
+    double m_BarrelZStripVariance[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! BKLM scintillator strip position variance (cm^2)
     double m_BarrelScintVariance;
 
     //! hit-plane radius (cm) at closest distance to IP of each barrel end | sector | layer
-    double m_BarrelModuleMiddleRadius[2][NSECTOR + 1][NLAYER + 1];
+    double m_BarrelModuleMiddleRadius[2][BKLMElementNumbers::getMaximalSectorNumber() + 1]
+    [BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! normal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPerp[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPerp[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! azimuthal unit vector of each barrel sector
-    G4ThreeVector m_BarrelSectorPhi[NSECTOR + 1];
+    G4ThreeVector m_BarrelSectorPhi[BKLMElementNumbers::getMaximalSectorNumber() + 1];
 
     //! maximum radius (cm) of the endcaps
     double m_EndcapMaxR;
@@ -470,70 +416,59 @@ namespace Belle2 {
     double m_EndcapScintVariance;
 
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
-    double m_EndcapModuleMiddleZ[NLAYER + 1];
-
-    //! experiment number for the current set of particle-hypothesis PDFs
-    int m_ExpNo;
+    double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
 
+    //! PDF for the charged final state particle hypotheses
+    std::map<int, MuidBuilder*> m_MuidBuilderMap;
+
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
-
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
-
-    //! Conditions-database object for KLM strip efficiency
-    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
-
-    //! Conditions-database object for KLM channel status (updated at start of each run)
-    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
-
-    //! Flag to indicate that the KLM channel status is valid for the given run
-    bool m_klmChannelStatusValid;
 
     //! EKLM transformation data.
     const EKLM::TransformDataGlobalAligned* m_eklmTransformData;
 
-    //! probability density function for positive-muon hypothesis
-    MuidPar* m_MuonPlusPar;
+    //! Conditions-database object for KLM channel status
+    DBObjPtr<KLMChannelStatus> m_klmChannelStatus;
 
-    //! probability density function for negative-muon hypothesis
-    MuidPar* m_MuonMinusPar;
+    //! Conditions-database object for KLM strip efficiency
+    DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! probability density function for positive-pion hypothesis
-    MuidPar* m_PionPlusPar;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
-    //! probability density function for negative-pion hypothesis
-    MuidPar* m_PionMinusPar;
+    //! ECL clusters
+    StoreArray<ECLCluster> m_eclClusters;
 
-    //! probability density function for positive-kaon hypothesis
-    MuidPar* m_KaonPlusPar;
+    //! Ext hits
+    StoreArray<ExtHit> m_extHits;
 
-    //! probability density function for negative-kaon hypothesis
-    MuidPar* m_KaonMinusPar;
+    //! BKLM 2d hits
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
 
-    //! probability density function for proton hypothesis
-    MuidPar* m_ProtonPar;
+    //! EKLM 2d hits
+    StoreArray<EKLMHit2d> m_eklmHit2ds;
 
-    //! probability density function for antiproton hypothesis
-    MuidPar* m_AntiprotonPar;
+    //! KLM clusters
+    StoreArray<KLMCluster> m_klmClusters;
 
-    //! probability density function for deuteron hypothesis
-    MuidPar* m_DeuteronPar;
+    //! KLM muid hits
+    StoreArray<KLMMuidHit> m_klmMuidHits;
 
-    //! probability density function for antideuteron hypothesis
-    MuidPar* m_AntideuteronPar;
+    //! KLM muid likelihoods
+    StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
 
-    //! probability density function for electron hypothesis
-    MuidPar* m_ElectronPar;
+    //! Reco tracks
+    StoreArray<RecoTrack> m_recoTracks;
 
-    //! probability density function for positron hypothesis
-    MuidPar* m_PositronPar;
+    //! Tracks
+    StoreArray<Track> m_tracks;
+
+    //! Track cluster sepration
+    StoreArray<TrackClusterSeparation> m_trackClusterSeparations;
 
   };
 
 } // end of namespace Belle2
-
-#endif // TRACKEXTRAPOLATEG4E_H

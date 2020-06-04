@@ -7,14 +7,19 @@
 
 /* Data objects. */
 #pragma link C++ class Belle2::KLMChannelMapValue<unsigned int>+;
+#pragma link C++ class Belle2::KLMDigit+;
 #pragma link C++ class Belle2::KLMDigitEventInfo+;
 #pragma link C++ class Belle2::KLMDigitRaw+;
+#pragma link C++ class Belle2::KLMMuidHit+;
+#pragma link C++ class Belle2::KLMMuidLikelihood+;
 #pragma link C++ class Belle2::KLMScintillatorFirmwareFitResult+;
 
 /* Element numbers and indices. */
 #pragma link C++ class Belle2::KLMChannelArrayIndex-;
 #pragma link C++ class Belle2::KLMChannelIndex-;
 #pragma link C++ class Belle2::KLMElementNumbers-;
+#pragma link C++ class Belle2::KLMModuleArrayIndex-;
+#pragma link C++ class Belle2::KLMPlaneArrayIndex-;
 #pragma link C++ class Belle2::KLMSectorArrayIndex-;
 
 #endif

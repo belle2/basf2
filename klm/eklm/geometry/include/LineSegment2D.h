@@ -10,11 +10,11 @@
 
 #pragma once
 
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-
-/* Belle2 headers. */
+/* KLM headers. */
 #include <klm/eklm/geometry/Line2D.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
 
 namespace Belle2 {
 
@@ -69,8 +69,8 @@ namespace Belle2 {
 
       /**
        * Find intersections with an arc.
-       * @param[in]  arc          Arc.
-       * @param[out] intersection Intersections.
+       * @param[in]  arc           Arc.
+       * @param[out] intersections Intersections.
        * @return Number of intersections (0, 1 or 2).
        */
       int findIntersection(const Arc2D& arc,

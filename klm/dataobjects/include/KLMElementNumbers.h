@@ -10,8 +10,12 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
 
@@ -39,6 +43,18 @@ namespace Belle2 {
      * Instantiation.
      */
     static const KLMElementNumbers& Instance();
+
+    /**
+     * Get channel number
+     * @param[in] subdetector Sundetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     * @param[in] layer       Layer.
+     * @param[in] plane       Plane.
+     * @param[in] strip       Strip.
+     */
+    uint16_t channelNumber(int subdetector, int section, int sector, int layer,
+                           int plane, int strip) const;
 
     /**
      * Get channel number for BKLM.
@@ -117,6 +133,26 @@ namespace Belle2 {
       int* layer, int* plane, int* strip) const;
 
     /**
+     * Get plane number for BKLM.
+     * @param[in] section Forward (1) or backward (0) BKLM.
+     * @param[in] sector  Sector (1-based).
+     * @param[in] layer   Layer (1-based).
+     * @param[in] plane   Plane (0-based).
+     */
+    uint16_t planeNumberBKLM(int section, int sector, int layer,
+                             int plane) const;
+
+    /**
+     * Get channel number for EKLM.
+     * @param[in] section Section number.
+     * @param[in] sector  Sector number.
+     * @param[in] layer   Layer number.
+     * @param[in] plane   Plane number.
+     */
+    uint16_t planeNumberEKLM(int section, int sector, int layer,
+                             int plane) const;
+
+    /**
      * Get module number.
      * @param[in] subdetector Subdetector.
      * @param[in] section     Section.
@@ -141,6 +177,12 @@ namespace Belle2 {
      * @param[in] layer   Layer number.
      */
     uint16_t moduleNumberEKLM(int section, int sector, int layer) const;
+
+    /**
+     * Get module number by channel number.
+     * @param[in] channel Channel.
+     */
+    uint16_t moduleNumberByChannel(uint16_t channel) const;
 
     /**
      * Get element numbers by module number.
@@ -174,6 +216,46 @@ namespace Belle2 {
      */
     uint16_t sectorNumberEKLM(int section, int sector) const;
 
+    /**
+     * Get extrapolation layer number
+     * (BKLM - from 1 to 15, EKLM - from 16 to 29).
+     * @param[in] subdetector Subdetector.
+     * @param[in] layer       Layer.
+     */
+    int getExtrapolationLayer(int subdetector, int layer) const;
+
+    /**
+     * Get maximal extrapolation layer.
+     */
+    static constexpr int getMaximalExtrapolationLayer()
+    {
+      return EKLMElementNumbers::getMaximalLayerNumber() +
+             BKLMElementNumbers::getMaximalLayerNumber();
+    }
+
+    /**
+     * Get total number of modules.
+     */
+    static constexpr int getTotalModuleNumber()
+    {
+      return EKLMElementNumbers::getMaximalSectorGlobalNumber() +
+             BKLMElementNumbers::getMaximalLayerGlobalNumber();
+    }
+
+    /**
+     * Get minimal plane number.
+     * @param[in] subdetector Subdetector.
+     */
+    int getMinimalPlaneNumber(int subdetector) const;
+
+    /**
+     * Get DAQ name for a given sector.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     */
+    std::string getSectorDAQName(int subdetector, int section, int sector) const;
+
   private:
 
     /**
@@ -190,7 +272,7 @@ namespace Belle2 {
     static constexpr uint16_t m_BKLMOffset = 0x8000;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

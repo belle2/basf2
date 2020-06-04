@@ -23,7 +23,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
@@ -64,7 +63,8 @@ namespace Belle2 {
       SegmentTripleCreator m_segmentTripleCreator;
 
       /// Instance of the segment triple relation creator
-      WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter> m_segmentTripleRelationCreator;
+      WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter, WeightedRelation>
+      m_segmentTripleRelationCreator;
 
       /// Instance of the cellular automaton creating  creating tracks over segment triple
       TrackCreatorSegmentTripleAutomaton m_trackCreatorSegmentTripleAutomaton;

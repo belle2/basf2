@@ -60,7 +60,7 @@ namespace Belle2 {
         return std::get<EventHeader>(timeTable).at(timeid);
       }
 
-      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, GlobalParamVector& vector)
+      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector)
       {
         PayloadsTable payloadsTable;
 
@@ -230,13 +230,10 @@ namespace Belle2 {
           for (auto& iovBlock : row.second) {
             for (auto& payload : iovBlock.second) {
               auto eventTuple = std::make_tuple((int)payload.first.getExperiment(), (int)payload.first.getRun(), (int)payload.first.getEvent());
-              if (eventPayloads.find(eventTuple) == eventPayloads.end()) {
-                eventPayloads[eventTuple] = std::vector<std::shared_ptr<GlobalParamSetAccess>>();
-              }
-              eventPayloads[eventTuple].push_back(payload.second);
-//               DBStore::Instance().update(payload.first);
-//               DBStore::Instance().updateEvent(payload.first.getEvent());
-//               payload.second->loadFromDBObjPtr();
+              auto iter_and_inserted = eventPayloads.insert(
+              {eventTuple, std::vector<std::shared_ptr<GlobalParamSetAccess>>()}
+              );
+              iter_and_inserted.first->second.push_back(payload.second);
             }
           }
         }

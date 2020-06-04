@@ -10,12 +10,9 @@
 #pragma once
 
 #include <framework/pcore/ProcHelper.h>
-#include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/zmq/sockets/ZMQClient.h>
 #include <framework/pcore/zmq/utils/StreamHelper.h>
 
-#include <zmq.hpp>
-#include <memory>
 #include <string>
 #include <map>
 

@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
 import subprocess
 import stat
 import shutil
+import re
+import traceback
+from typing import Tuple
+
+# ours
+from validationscript import Script
 
 
 class Cluster:
@@ -47,11 +54,6 @@ class Cluster:
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 
-        #: The command to submit a job. 'LOGFILE' will be replaced by the
-        #: actual log file name
-        #: self.submit_command = 'qsub -cwd -o LOGFILE -e LOGFILE -q medium -V'
-        self.submit_command = 'bsub -o LOGFILE -e LOGFILE -q l'
-
         #: The path, where the help files are being created
         #: Maybe there should be a special subfolder for them?
         self.path = os.getcwd()
@@ -86,13 +88,10 @@ class Cluster:
         self.logger.debug(f'Setting up the following release: {self.b2setup}')
 
         # Define the folder in which the log of the cluster messages will be
-        # stored (same folder like the log for validate_basf2.py)
+        # stored
         clusterlog_dir = './html/logs/__general__/'
         if not os.path.exists(clusterlog_dir):
             os.makedirs(clusterlog_dir)
-
-        #: The file object to which all cluster messages will be written
-        self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
     # noinspection PyMethodMayBeStatic
     def adjust_path(self, path):
@@ -114,7 +113,7 @@ class Cluster:
 
         return True
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -135,7 +134,6 @@ class Cluster:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        # Path where log file is supposed to be created
         log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
 
         # Remove any left over done files
@@ -143,7 +141,6 @@ class Cluster:
         if os.path.isfile(donefile_path):
             os.remove(donefile_path)
 
-        # Now we need to distinguish between .py and .C files:
         extension = os.path.splitext(job.path)[1]
         if extension == '.C':
             # .c files are executed with root
@@ -159,7 +156,7 @@ class Cluster:
         # revision. The execute the command (i.e. run basf2 or ROOT on a
         # steering file). Write the return code of that into a *.done file.
         # Delete the helpfile-shellscript.
-        tmp_name = self.path + '/' + 'script_' + job.name + '.sh'
+        tmp_name = self._get_tmp_name(job)
         with open(tmp_name, 'w+') as tmp_file:
             tmp_file.write('#!/bin/bash \n\n' +
                            'BELLE2_NO_TOOLS_CHECK=1 \n' +
@@ -175,64 +172,125 @@ class Cluster:
         os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
         # Prepare the command line command for submission to the cluster
-        params = self.submit_command.replace('LOGFILE',
-                                             log_file).split() + [tmp_name]
+        params = [
+            "bsub", "-oo", log_file, "-q", "l", tmp_name,
+        ]
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))
 
-        # Submit it to the cluster. The steering
-        # file output will be written to 'log_file' (see above).
-        # If we are performing a dry run, don't send anything to the cluster
-        # and just create the *.done file right away and delete the *.sh file.
         if not dry:
-            process = subprocess.Popen(params, stdout=self.clusterlog,
-                                       stderr=subprocess.STDOUT)
-
-            # Check whether the submission succeeded
-            if process.wait() != 0:
+            try:
+                proc = subprocess.run(
+                    params,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+            except subprocess.CalledProcessError:
                 job.status = 'failed'
+                self.logger.error("Failed to submit job. Here's the traceback:")
+                self.logger.error(traceback.format_exc())
+                self.logger.error("Will attempt to cleanup job files.")
+                self._cleanup(job)
+                return
+            else:
+                if proc.stdout.strip():
+                    self.logger.debug(
+                        f"Stdout of job submission: '{proc.stdout.strip()}'."
+                    )
+                if proc.stderr.strip():
+                    self.logger.debug(
+                        f"Stderr of job submission: '{proc.stderr.strip()}'."
+                    )
+
+                # Submission succeeded. Get Job ID by parsing output, so that
+                # we can terminate the job later.
+                res = re.search("Job <([0-9]*)> is submitted", proc.stdout)
+                if res:
+                    job.job_id = res.group(1)
+                else:
+                    self.logger.error(
+                        f"Could not find job id! Will not be able to terminate"
+                        f" this job, even if necessary. "
+                    )
         else:
             os.system(f'echo 0 > {self.path}/script_{job.name}.done')
-            os.system(f'rm {tmp_name}')
+            self._cleanup(job)
 
-    def is_job_finished(self, job):
+    def _cleanup(self, job: Script) -> None:
+        """ Clean up after job has finished. """
+        tmp_name = self._get_tmp_name(job)
+        os.unlink(tmp_name)
+
+    def _get_tmp_name(self, job: Script) -> str:
+        """ Name of temporary file used for job submission. """
+        return self.path + '/' + 'script_' + job.name + '.sh'
+
+    def is_job_finished(self, job: Script) -> Tuple[bool, int]:
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
         Also deletes the .done-File once it has returned True.
 
         @param job: The job of which we want to know if it finished
-        @return: True if the job has finished, otherwise False
+        @return: (True if the job has finished, exit code). If we can't find the
+            exit code in the '.done'-file, the returncode will be -666.
+            If the job is not finished, the exit code is returned as 0.
         """
 
-        # If there is a file indicating the job is done, that is its name:
         donefile_path = f"{self.path}/script_{job.name}.done"
 
-        # Check if such a file exists. If so, this means that the job has
-        # finished.
         if os.path.isfile(donefile_path):
-
-            # Read the returncode/exit_status for the job from the *.done-file
+            # Job finished.
+            # Read the returncode/exit_status
             with open(donefile_path) as f:
                 try:
                     returncode = int(f.read().strip())
                 except ValueError:
                     returncode = -666
 
-            # Delete the *.done file
             os.remove(donefile_path)
 
-            # Return that the job is finished + the return code for it
-            return [True, returncode]
+            return True, returncode
 
-        # If no such file exists, the job has not yet finished
         else:
-            return [False, 0]
+            # If no such file exists, the job has not yet finished
+            return False, 0
 
-    # noinspection PyMethodMayBeStatic
-    def terminate(self, job):
-        """! Terminate a running job, not support with this backend so
-        ignore the call
+    def terminate(self, job: Script):
+        """! Terminate a running job
         """
-        pass
+        if job.job_id:
+            params = ["bkill", job.job_id]
+            self.logger.debug(subprocess.list2cmdline(params))
+            try:
+                proc = subprocess.run(
+                    params,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    universal_newlines=True,
+                )
+            except subprocess.CalledProcessError:
+                job.status = 'failed'
+                self.logger.error(
+                    f"Probably wasn't able to cancel job. Here's the traceback:"
+                )
+                self.logger.error(traceback.format_exc())
+            else:
+                if proc.stdout.strip():
+                    self.logger.debug(
+                        f"Stdout of job termination: '{proc.stdout.strip()}'."
+                    )
+                if proc.stderr.strip():
+                    self.logger.debug(
+                        f"Stderr of job termination: '{proc.stderr.strip()}'."
+                    )
+            finally:
+                self._cleanup(job)
+        else:
+            self.logger.error(
+                "Termination of the job corresponding to steering file "
+                f"{job.path} has been requested, but no job id is available."
+                f" Can't do anything."
+            )

@@ -15,7 +15,6 @@
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // mdst dataobjects
 #include <mdst/dataobjects/KlId.h>
@@ -24,14 +23,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
-
 // std
 #include <iostream>
-#include <algorithm>
-#include <cmath>
 
 using namespace std;
 

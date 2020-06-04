@@ -3,6 +3,7 @@
 ! M. Staric, sep-2015
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
+! feb-2020: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_ALIGNMENT(NP,PAR,STEP,UM,DPAR,COV,IER)
@@ -70,7 +71,11 @@ c--   returns log likelihood for given alignment parameters
       INTEGER MDN
       REAL DX, DY, DZ, RX, RY, RZ, T0
       REAL GET_LOGL
-
+      LOGICAL DGEO_FLAG_SAVE
+      REAL QBAR_TRS_SAVE(3), QBAR_ROT_SAVE(3,3)
+      REAL REFIND_SF, GET_REFIND_SF
+      INTEGER I, K
+      
       IF(NPAR.LT.7) THEN
          TOP_LOGL=0
          OK=.FALSE.
@@ -78,6 +83,19 @@ c--   returns log likelihood for given alignment parameters
       ENDIF
       
       MDN=RTRA_MOD(1)
+
+      ! save alignment as set from database 
+      DGEO_FLAG_SAVE=DGEO_FLAG(MDN)
+      IF(DGEO_FLAG_SAVE) THEN
+         DO I=1,3
+            QBAR_TRS_SAVE(I)=QBAR_TRS(I,MDN)
+            DO K=1,3
+               QBAR_ROT_SAVE(I,K)=QBAR_ROT(I,K,MDN)
+            ENDDO
+         ENDDO
+      ENDIF
+
+      ! set temporary alignment
       DX=PAR(1)
       DY=PAR(2)
       DZ=PAR(3)
@@ -86,16 +104,28 @@ c--   returns log likelihood for given alignment parameters
       RZ=PAR(6)
       T0=PAR(7)
       IF(NPAR.EQ.8) THEN
+         REFIND_SF=GET_REFIND_SF()
          CALL SET_REFIND_SF(1.0+PAR(8))
       ENDIF
-      
       CALL SET_ALIGNMENT(MDN,DX,DY,DZ,RX,RY,RZ)
+
+      ! reconstruct log likelihood
       CALL TOP_RECO
       TOP_LOGL=GET_LOGL(T0,T_MIN,T_MAX,0.0)
       OK=RTRA_FLAG(1).EQ.1
-      DGEO_FLAG(MDN)=.FALSE.    ! turn off alignment
+
+      ! put back alignment as set from database 
+      DGEO_FLAG(MDN)=DGEO_FLAG_SAVE
+      IF(DGEO_FLAG_SAVE) THEN
+         DO I=1,3
+            QBAR_TRS(I,MDN)=QBAR_TRS_SAVE(I)
+            DO K=1,3
+               QBAR_ROT(I,K,MDN)=QBAR_ROT_SAVE(I,K)
+            ENDDO
+         ENDDO
+      ENDIF
       IF(NPAR.EQ.8) THEN
-         CALL SET_REFIND_SF(1.0)
+         CALL SET_REFIND_SF(REFIND_SF)
       ENDIF
       
       END

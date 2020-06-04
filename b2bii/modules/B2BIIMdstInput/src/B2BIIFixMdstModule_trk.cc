@@ -169,7 +169,7 @@
 #include "belle_legacy/ip/IpProfile.h"
 
 // kfitter
-#include <analysis/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 namespace Belle2 {
 
@@ -1420,19 +1420,20 @@ namespace Belle2 {
 // Begin of scale_error() implementation
 ////////////////////////////////////////////////////////////////////////
 
-  static int SE_Message_Level; /* 0: none, 1: warning, 2: info */
-  static int SE_Reprocess_Version = 0;
+  static int SE_Message_Level; /**< Message level of scale_error(). 0: none, 1: warning, 2: info */
+  static int SE_Reprocess_Version = 0; /**< Reprocess verison used in scale_error() */
 
 
-  typedef void (*cal_scale_error_func_t)(double scale[5], const double pt, const double tanl);
+  typedef void (*cal_scale_error_func_t)(double scale[5], const double pt, const double tanl); /**< Function pointer type */
 
+  /** Structure type cal_scale_error_func_set_t */
   struct cal_scale_error_func_set_t {
-    cal_scale_error_func_t m_hadMC;
-    cal_scale_error_func_t m_cosMC;
-    cal_scale_error_func_t m_cosDATA;
+    cal_scale_error_func_t m_hadMC; /**< For hadronic MC */
+    cal_scale_error_func_t m_cosMC; /**< For cosmic MC */
+    cal_scale_error_func_t m_cosDATA; /**< For cosmic data */
   };
 
-
+  /** Operator definition for cal_scale_error_func_set_t */
   static bool operator==(const cal_scale_error_func_set_t& lhs, const cal_scale_error_func_set_t& rhs)
   {
     return (lhs.m_hadMC == rhs.m_hadMC) && (lhs.m_cosMC == rhs.m_cosMC) && (lhs.m_cosDATA == rhs.m_cosDATA);
@@ -1443,7 +1444,7 @@ namespace Belle2 {
     return !(lhs == rhs);
   }*/
 
-// Dummy function
+  /** Dummy function */
   static void null_scale(double[5], double, double)
   {
     return;
@@ -1452,6 +1453,7 @@ namespace Belle2 {
   /*****                *****/
   /***** misc functions *****/
   /*****                *****/
+  /** Get event ID */
   static void
   get_event_id(int* no_exp, int* no_run, int* no_evt, int* no_frm, int* expmc)
   {
@@ -1468,7 +1470,7 @@ namespace Belle2 {
     }
   }
 
-
+  /** Check if event is already scaled */
   static bool
   is_already_scaled(void)
   {
@@ -1501,20 +1503,21 @@ namespace Belle2 {
   /*****                     *****/
   /***** misc math functions *****/
   /*****                     *****/
+  /** vfunc */
   inline double
   vfunc(const double x, const double x1, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            (x - x1) * a2 + yc ;
   }
-
+  /** cupfunc */
   inline double
   cupfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
     return x < x1 ? (x - x1) * a1 + yc :
            x > x2 ? (x - x2) * a2 + yc : yc;
   }
-
+  /** rootfunc */
   inline double
   rootfunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2)
   {
@@ -1522,6 +1525,7 @@ namespace Belle2 {
            x > x2 ? (x2 - x1) * a2 + yc : (x - x1) * a2 + yc;
   }
 
+  /** lambdafunc */
   inline double
   lambdafunc(const double x, const double x1, const double x2, const double yc, const double a1, const double a2, const double a3)
   {
@@ -1539,6 +1543,7 @@ namespace Belle2 {
 // Scale error for Exp.7-23 Cosmic MC
 // old day by somebody
 //
+  /** Scale error for Exp.7-23 Cosmic MC */
   static void
   cal_scale_error_EXP0723_cosmic_mc(double scale[5], const double pt, const double /*tanl*/)
   {
@@ -1554,6 +1559,7 @@ namespace Belle2 {
 // Scale error for Exp.25-27 Cosmic MC
 // old day by somebody
 //
+  /** Scale error for Exp.25-27 Cosmic MC */
   static void
   cal_scale_error_EXP2527_cosmic_mc(double scale[5], const double pt, const double /*tanl*/)
   {
@@ -1569,6 +1575,7 @@ namespace Belle2 {
 // Scale error for Exp.31 Cosmic MC
 // July 09th, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.31 Cosmic MC */
   static void
   cal_scale_error_EXP31_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1589,6 +1596,7 @@ namespace Belle2 {
 // Scale error for Exp.35 Cosmic MC for caseB
 // February 3rd, 2010, by Takeo Higuchi
 //
+  /** Scale error for Exp.33 Cosmic MC */
   static void
   cal_scale_error_EXP33_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1619,6 +1627,7 @@ namespace Belle2 {
 // Scale error for Exp.35 Cosmic MC for caseB
 // February 3rd, 2010, by Takeo Higuchi
 //
+  /** Scale error for Exp.35 Cosmic MC */
   static void
   cal_scale_error_EXP35_cosmic_mc(double scale[5], double pt, double tanl)
   {
@@ -1639,6 +1648,7 @@ namespace Belle2 {
 // Scale error for Exp.37 Cosmic MC
 // July 21st, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.37 Cosmic MC */
   static void
   cal_scale_error_EXP37_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1655,6 +1665,7 @@ namespace Belle2 {
 // (Made from Exp.39 Cosmic MC. Confirmed for exp39,41)
 // April, 20th, 2005, by KUSAKA Akito
 //
+  /** Scale error for Exp.39,41 Cosmic MC */
   static void
   cal_scale_error_EXP3941_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1670,6 +1681,7 @@ namespace Belle2 {
 // Scale error for Exp.43 Cosmic MC
 // Sep., 12th, 2005, by KUSAKA Akito
 //
+  /** Scale error for Exp.43 Cosmic MC */
   static void
   cal_scale_error_EXP43_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1685,6 +1697,7 @@ namespace Belle2 {
 // Scale error for Exp.45 Cosmic MC
 // May., 27th, 2006, by fmiyuki
 //
+  /** Scale error for Exp.45 Cosmic MC */
   static void
   cal_scale_error_EXP45_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1700,6 +1713,7 @@ namespace Belle2 {
 // Scale error for Exp.47 Cosmic MC
 // May., 27th, 2006, by fmiyuki
 //
+  /** Scale error for Exp.47 Cosmic MC */
   static void
   cal_scale_error_EXP47_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1715,6 +1729,7 @@ namespace Belle2 {
 // Scale error for Exp.49 Cosmic MC
 // May., 27th, 2006, by fmiyuki
 //
+  /** Scale error for Exp.49 Cosmic MC */
   static void
   cal_scale_error_EXP49_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1730,6 +1745,7 @@ namespace Belle2 {
 // Scale error for Exp.51 Cosmic MC
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.51 Cosmic MC */
   static void
   cal_scale_error_EXP51_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1745,6 +1761,7 @@ namespace Belle2 {
 // Scale error for Exp.53 Cosmic MC
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.53 Cosmic MC */
   static void
   cal_scale_error_EXP53_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1760,6 +1777,7 @@ namespace Belle2 {
 // Scale error for Exp.55 Cosmic MC
 // June 21st, 2007 by higuchit
 //
+  /** Scale error for Exp.55 Cosmic MC */
   static void
   cal_scale_error_EXP55_cosmic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -1775,6 +1793,7 @@ namespace Belle2 {
 // Scale error for Exp.61-65 Cosmic MC
 // March 4th, 2009 by higuchit
 //
+  /** Scale error for Exp.61-65 Cosmic MC */
   static void
   cal_scale_error_EXP6165_cosmic_mc(double scale[5], double pt, double tanl)
   {
@@ -1797,6 +1816,7 @@ namespace Belle2 {
 // Scale error for Exp.67 Cosmic MC
 // October 8th, 2009 by higuchit
 //
+  /** Scale error for Exp.67 Cosmic MC */
   static void
   cal_scale_error_EXP67_cosmic_mc(double scale[5], double pt, double tanl)
   {
@@ -1822,6 +1842,7 @@ namespace Belle2 {
 // Scale error for Exp.71 Cosmic MC
 // May 12th, 2010 by higuchit
 //
+  /** Scale error for Exp.69-71 Cosmic MC */
   static void
   cal_scale_error_EXP6971_cosmic_mc(double scale[5], double pt, double tanl)
   {
@@ -1845,6 +1866,7 @@ namespace Belle2 {
 // Scale error for Exp.7-23 Cosmic data
 // old day by somebody
 //
+  /** Scale error for Exp.7-23 Cosmic data */
   static void
   cal_scale_error_EXP0723_cosmic_data(double scale[5], const double pt, const double /*tanl*/)
   {
@@ -1860,6 +1882,7 @@ namespace Belle2 {
 // Scale error for Exp.25-27 Cosmic data
 // old day by somebody
 //
+  /** Scale error for Exp.25-27 Cosmic data */
   static void
   cal_scale_error_EXP2527_cosmic_data(double scale[5], const double pt, const double /*tanl*/)
   {
@@ -1875,6 +1898,7 @@ namespace Belle2 {
 // Scale error for Exp.31 Cosmic data
 // July 9th, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.31 Cosmic data */
   static void
   cal_scale_error_EXP31_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -1894,6 +1918,7 @@ namespace Belle2 {
 // Scale error for Exp.35 Cosmic data for caseB
 // February 3rd, 2010, by Takeo Higuchi
 //
+  /** Scale error for Exp.33 Cosmic data */
   static void
   cal_scale_error_EXP33_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -1923,6 +1948,7 @@ namespace Belle2 {
 // Scale error for Exp.35 Cosmic data for caseB
 // February 3rd, 2010, by Takeo Higuchi
 //
+  /** Scale error for Exp.35 Cosmic data */
   static void
   cal_scale_error_EXP35_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -1942,6 +1968,7 @@ namespace Belle2 {
 // Scale error for Exp.37 Cosmic data
 // July 21st, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.37 Cosmic data */
   static void
   cal_scale_error_EXP37_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -1957,6 +1984,7 @@ namespace Belle2 {
 // Scale error for Exp.39,41 Cosmic data
 // April 20th, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.39-41 Cosmic data */
   static void
   cal_scale_error_EXP3941_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -1972,6 +2000,7 @@ namespace Belle2 {
 // Scale error for Exp.43 Cosmic data
 // Sep., 12th, 2005 by KUSAKA Akito
 //
+  /** Scale error for Exp.43 Cosmic data */
   static void
   cal_scale_error_EXP43_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -1987,6 +2016,7 @@ namespace Belle2 {
 // Scale error for Exp.45+47 Cosmic data
 // May., 29th, 2006 by fmiyuki
 //
+  /** Scale error for Exp.45,47 Cosmic data */
   static void
   cal_scale_error_EXP4547_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -2002,6 +2032,7 @@ namespace Belle2 {
 // Scale error for Exp.49 Cosmic data
 // May., 27th, 2006 by fmiyuki
 //
+  /** Scale error for Exp.49 Cosmic data */
   static void
   cal_scale_error_EXP49_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -2017,6 +2048,7 @@ namespace Belle2 {
 // Scale error for Exp.51 Cosmic data
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.51 Cosmic data */
   static void
   cal_scale_error_EXP51_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -2039,6 +2071,7 @@ namespace Belle2 {
 // Scale error for Exp.53 Cosmic data
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.53 Cosmic data */
   static void
   cal_scale_error_EXP53_cosmic_data(double scale[5], double pt, double /*tanl*/)
   {
@@ -2054,6 +2087,7 @@ namespace Belle2 {
 // Scale error for Exp.55 Cosmic data
 // June 21st, 2007 by higuchit
 //
+  /** Scale error for Exp.55 Cosmic data */
   static void
   cal_scale_error_EXP55_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -2076,6 +2110,7 @@ namespace Belle2 {
 // Scale error for Exp.61-65 Cosmic data
 // March 4th, 2009 by higuchit
 //
+  /** Scale error for Exp.61-65 Cosmic data */
   static void
   cal_scale_error_EXP6165_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -2098,6 +2133,7 @@ namespace Belle2 {
 // Scale error for Exp.67 Cosmic data
 // October 8th, 2009 by higuchit
 //
+  /** Scale error for Exp.67 Cosmic data */
   static void
   cal_scale_error_EXP67_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -2123,6 +2159,7 @@ namespace Belle2 {
 // Scale error for Exp.71 Cosmic data
 // May 12th, 2010 by higuchit
 //
+  /** Scale error for Exp.69,71 Cosmic data */
   static void
   cal_scale_error_EXP6971_cosmic_data(double scale[5], double pt, double tanl)
   {
@@ -2146,6 +2183,7 @@ namespace Belle2 {
 // Scale error for Exp.7-23 Hadron MC
 // old day by somebody
 //
+  /** Scale error for Exp.7-23 Hadron MC */
   static void
   cal_scale_error_EXP0723_hadronic_mc(double scale[5], const double pt, const double tanl)
   {
@@ -2168,6 +2206,7 @@ namespace Belle2 {
 // Scale error for Exp.25-27 Hadron MC
 // old day by somebody
 //
+  /** Scale error for Exp.25-27 Hadron MC */
   static void
   cal_scale_error_EXP2527_hadronic_mc(double scale[5], const double pt, const double tanl)
   {
@@ -2190,6 +2229,7 @@ namespace Belle2 {
 // Scale error for Exp.31 Hadron MC
 // July 9th, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.31 Hadron MC */
   static void
   cal_scale_error_EXP31_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2210,6 +2250,7 @@ namespace Belle2 {
 // July 09th, 2004, modification on scale[2](pt) for low pt.
 // July 09th, 2004, modification on scale[3](tanl) for high tanl.
 //
+  /** Scale error for Exp.33,35 Hadron MC */
   static void
   cal_scale_error_EXP33_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2239,6 +2280,7 @@ namespace Belle2 {
 // Scale error for Exp.35 Hadron MC
 // February 3rd, 2010, by Takeo Higuchi for caseB
 //
+  /** Scale error for Exp.33,35 Hadron MC */
   static void
   cal_scale_error_EXP35_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2249,6 +2291,7 @@ namespace Belle2 {
 // Scale error for Exp.37 Hadron MC
 // July 21st, 2004, by KUSAKA Akito
 //
+  /** Scale error for Exp.37 Hadron MC */
   static void
   cal_scale_error_EXP37_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2268,6 +2311,7 @@ namespace Belle2 {
 // (Made from Exp.39 Hadron MC. Confirmed for exp39,41)
 // April 20th, by KUSAKA Akito
 //
+  /** Scale error for Exp.39,41 Hadron MC */
   static void
   cal_scale_error_EXP3941_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2283,6 +2327,7 @@ namespace Belle2 {
 // Scale error for Exp.43 Hadron MC
 // Sep. 12th, 2005 by KUSAKA Akito
 //
+  /** Scale error for Exp.43 Hadron MC */
   static void
   cal_scale_error_EXP43_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2298,6 +2343,7 @@ namespace Belle2 {
 // Scale error for Exp.45 Hadron MC
 // May. 27th, 2006 by fmiyuki
 //
+  /** Scale error for Exp.45 Hadron MC */
   static void
   cal_scale_error_EXP45_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2316,6 +2362,7 @@ namespace Belle2 {
 // Scale error for Exp.47 Hadron MC
 // May. 27th, 2006 by fmiyuki
 //
+  /** Scale error for Exp.47 Hadron MC */
   static void
   cal_scale_error_EXP47_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2331,6 +2378,7 @@ namespace Belle2 {
 // Scale error for Exp.49 Hadron MC
 // May. 27th, 2006 by fmiyuki
 //
+  /** Scale error for Exp.49 Hadron MC */
   static void
   cal_scale_error_EXP49_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2347,6 +2395,7 @@ namespace Belle2 {
 // Scale error for Exp.51 Hadron MC
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.51 Hadron MC */
   static void
   cal_scale_error_EXP51_hadronic_mc(double scale[5], double pt, double tanl)
   {
@@ -2365,6 +2414,7 @@ namespace Belle2 {
 // Scale error for Exp.53 Hadron MC
 // May 24th, 2007 by higuchit
 //
+  /** Scale error for Exp.53 Hadron MC */
   static void
   cal_scale_error_EXP53_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2380,6 +2430,7 @@ namespace Belle2 {
 // Scale error for Exp.55 Hadron MC
 // June 21st, 2007 by higuchit
 //
+  /** Scale error for Exp.55 Hadron MC */
   static void
   cal_scale_error_EXP55_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2395,6 +2446,7 @@ namespace Belle2 {
 // Scale error for Exp.61-65 Hadron MC
 // March 4th, 2009 by higuchit
 //
+  /** Scale error for Exp.61-65 Hadron MC */
   static void
   cal_scale_error_EXP6165_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2410,6 +2462,7 @@ namespace Belle2 {
 // Scale error for Exp.67 Hadron MC
 // October 8th, 2009 by higuchit
 //
+  /** Scale error for Exp.67 Hadron MC */
   static void
   cal_scale_error_EXP67_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2428,6 +2481,7 @@ namespace Belle2 {
 // Scale error for Exp.71 Hadron MC
 // May 12th, 2010 by higuchit
 //
+  /** Scale error for Exp.69,71 Hadron MC */
   static void
   cal_scale_error_EXP6971_hadronic_mc(double scale[5], double pt, double /*tanl*/)
   {
@@ -2444,91 +2498,109 @@ namespace Belle2 {
   /***** scale error core *****/
   /*****                  *****/
   static const struct cal_scale_error_func_set_t
+  /** Scale error for Exp.7-23 */
     EXP0723_scale = {
     cal_scale_error_EXP0723_hadronic_mc,
     cal_scale_error_EXP0723_cosmic_mc,
     cal_scale_error_EXP0723_cosmic_data,
   },
+  /** Scale error for Exp.25-27 */
   EXP2527_scale = {
     cal_scale_error_EXP2527_hadronic_mc,
     cal_scale_error_EXP2527_cosmic_mc,
     cal_scale_error_EXP2527_cosmic_data
   },
+  /** Scale error for Exp.31 */
   EXP31_scale = {
     cal_scale_error_EXP31_hadronic_mc,
     cal_scale_error_EXP31_cosmic_mc,
     cal_scale_error_EXP31_cosmic_data
   },
+  /** Scale error for Exp.33 */
   EXP33_scale = {
     cal_scale_error_EXP33_hadronic_mc,
     cal_scale_error_EXP33_cosmic_mc,
     cal_scale_error_EXP33_cosmic_data
   },
+  /** Scale error for Exp.35 */
   EXP35_scale = {
     cal_scale_error_EXP35_hadronic_mc,
     cal_scale_error_EXP35_cosmic_mc,
     cal_scale_error_EXP35_cosmic_data
   },
+  /** Scale error for Exp.37 */
   EXP37_scale = {
     cal_scale_error_EXP37_hadronic_mc,
     cal_scale_error_EXP37_cosmic_mc,
     cal_scale_error_EXP37_cosmic_data
   },
+  /** Scale error for Exp.39,41 */
   EXP3941_scale = {
     cal_scale_error_EXP3941_hadronic_mc,
     cal_scale_error_EXP3941_cosmic_mc,
     cal_scale_error_EXP3941_cosmic_data
   },
+  /** Scale error for Exp.43 */
   EXP43_scale = {
     cal_scale_error_EXP43_hadronic_mc,
     cal_scale_error_EXP43_cosmic_mc,
     cal_scale_error_EXP43_cosmic_data
   },
+  /** Scale error for Exp.45 */
   EXP45_scale = {
     cal_scale_error_EXP45_hadronic_mc,
     cal_scale_error_EXP45_cosmic_mc,
     cal_scale_error_EXP4547_cosmic_data
   },
+  /** Scale error for Exp.47 */
   EXP47_scale = {
     cal_scale_error_EXP47_hadronic_mc,
     cal_scale_error_EXP47_cosmic_mc,
     cal_scale_error_EXP4547_cosmic_data
   },
+  /** Scale error for Exp.49 */
   EXP49_scale = {
     cal_scale_error_EXP49_hadronic_mc,
     cal_scale_error_EXP49_cosmic_mc,
     cal_scale_error_EXP49_cosmic_data
   },
+  /** Scale error for Exp.51 */
   EXP51_scale = {
     cal_scale_error_EXP51_hadronic_mc,
     cal_scale_error_EXP51_cosmic_mc,
     cal_scale_error_EXP51_cosmic_data
   },
+  /** Scale error for Exp.53 */
   EXP53_scale = {
     cal_scale_error_EXP53_hadronic_mc,
     cal_scale_error_EXP53_cosmic_mc,
     cal_scale_error_EXP53_cosmic_data
   },
+  /** Scale error for Exp.55 */
   EXP55_scale = {
     cal_scale_error_EXP55_hadronic_mc,
     cal_scale_error_EXP55_cosmic_mc,
     cal_scale_error_EXP55_cosmic_data
   },
+  /** Scale error for Exp.61-65 */
   EXP6165_scale = {
     cal_scale_error_EXP6165_hadronic_mc,
     cal_scale_error_EXP6165_cosmic_mc,
     cal_scale_error_EXP6165_cosmic_data
   },
+  /** Scale error for Exp.67 */
   EXP67_scale = {
     cal_scale_error_EXP67_hadronic_mc,
     cal_scale_error_EXP67_cosmic_mc,
     cal_scale_error_EXP67_cosmic_data
   },
+  /** Scale error for Exp.69-71 */
   EXP6971_scale = {
     cal_scale_error_EXP6971_hadronic_mc,
     cal_scale_error_EXP6971_cosmic_mc,
     cal_scale_error_EXP6971_cosmic_data
   },
+  /** Dummy scale */
   DUMMY_scale = {
     null_scale,
     null_scale,
@@ -2536,7 +2608,7 @@ namespace Belle2 {
   };
 
 
-
+  /** Get scale error fucntion for different Exp */
   static cal_scale_error_func_set_t
   get_scale_error_func_for_exprun(const int no_exp, const int /*no_run*/)
   {
@@ -2560,7 +2632,7 @@ namespace Belle2 {
       // ( 69==no_exp || 71==no_exp ) ? EXP6971_scale : DUMMY_scale;
       (69 <= no_exp && 73 >= no_exp) ? EXP6971_scale : DUMMY_scale;
   }
-
+  /** Calculate scale error */
   static void
   cal_scale_error
   (double scale[5],
@@ -2979,7 +3051,7 @@ namespace Belle2 {
 // Add Mdst_trk_extra and Mdst_vee_extra
 // to Mdst_trk and Mdst_vee2, respectively.
 //=======================================================
-
+  /** recsim_mdst_propgt from legacy C code */
   extern "C"
   void recsim_mdst_propgt_(float*, float[], float[], float[],
                            float[], float[], int*);
@@ -3255,9 +3327,9 @@ namespace Belle2 {
 //from the module smear_trk originally coded by Marko Staric.
 //=======================================================================
 
-  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]);
-  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]);
-  static void smear_charged();
+  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Scale error */
+  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Smear MC tracks */
+  static void smear_charged(); /**< Smear tracks in Mdst_Charged */
 
 //==========================
   void B2BIIFixMdstModule::smear_trk()

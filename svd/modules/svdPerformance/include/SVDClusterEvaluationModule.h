@@ -212,7 +212,6 @@ namespace Belle2 {
 
     bool isRelatedToTrack(SVDIntercept* inter); /**< is the intercept related to a track */
 
-    bool fitResiduals(TH1F* res); /**< is the fit to residuals good? */
   };
 }
 

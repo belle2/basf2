@@ -11,46 +11,15 @@
 """
 __author__ = "P. Grace"
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK, stdE, stdMu
-from stdPi0s import *
-from stdV0s import *
-from skim.standardlists.charm import *
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+from skim.semileptonic import SLUntagged
 
-
-SLpath = Path()
+path = b2.Path()
 
 fileList = ['../SLUntagged.dst.root']
+ma.inputMdstList('default', fileList, path=path)
 
-inputMdstList('default', fileList, path=SLpath)
-
-stdPi('loose', path=SLpath)
-stdK('loose', path=SLpath)
-stdPi('all', path=SLpath)
-stdE('all', path=SLpath)
-stdMu('all', path=SLpath)
-
-stdPi0s('loose', path=SLpath)  # for skim.standardlists.charm
-stdPhotons('loose', path=SLpath)
-stdKshorts(path=SLpath)
-
-loadStdD0(path=SLpath)
-loadStdDplus(path=SLpath)
-loadStdDstar0(path=SLpath)
-loadStdDstarPlus(path=SLpath)
-
-# SL Skim
-from skim.semileptonic import SemileptonicList
-SLList = SemileptonicList(SLpath)
-skimOutputUdst('../SLUntagged', SLList, path=SLpath)
-
-summaryOfLists(SLList, path=SLpath)
-
-
-setSkimLogging(path=SLpath)
-process(SLpath)
-
-# print out the summary
-print(statistics)
+skim = SLUntagged(OutputFileName='../SLUntagged.udst.root')
+skim(path)
+b2.process(path)

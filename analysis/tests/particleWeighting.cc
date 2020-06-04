@@ -1,6 +1,5 @@
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
 #include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
 

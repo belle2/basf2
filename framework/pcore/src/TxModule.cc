@@ -15,8 +15,6 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
-#include <cstdlib>
-
 using namespace std;
 using namespace Belle2;
 

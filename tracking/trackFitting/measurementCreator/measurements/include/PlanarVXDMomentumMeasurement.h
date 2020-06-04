@@ -15,8 +15,6 @@
 #include <tracking/vxdMomentumEstimation/VXDMomentumEstimationTools.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <framework/dataobjects/Helix.h>
-
 
 namespace Belle2 {
   /**

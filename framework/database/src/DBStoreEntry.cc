@@ -13,7 +13,6 @@
 #include <framework/database/IntraRunDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <algorithm>
 #include <iomanip>
 #include <TFile.h>
 #include <TClonesArray.h>

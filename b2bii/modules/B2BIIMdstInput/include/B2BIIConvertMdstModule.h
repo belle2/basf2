@@ -20,7 +20,6 @@
 // Belle objects (Panther tables)
 #include "belle_legacy/tables/belletdf.h"
 #include "belle_legacy/tables/mdst.h"
-#include "belle_legacy/tables/ecl.h"
 
 #include "belle_legacy/helix/Helix.h"
 
@@ -34,14 +33,12 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
 
 // Replace BeamParameters
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
-
-#include <ecl/dataobjects/ECLHit.h>
-#include <tracking/dataobjects/ExtHit.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -68,6 +65,9 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 
 // enable nisKsFinder (needs externals > v00-07-01)
 #define HAVE_NISKSFINDER
+
+// enable goodLambda (needs externals >= v01-08-00)
+#define HAVE_GOODLAMBDA
 
 namespace Belle2 {
 
@@ -104,18 +104,19 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIConvertMdstModule();
+    /** Destructor */
     virtual ~B2BIIConvertMdstModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    virtual void beginRun() override; /**< Called when the current run begins. */
+    virtual void event() override; /**< Called for each event */
+    virtual void endRun() override; /**<  Called when the current run is finished.*/
+    virtual void terminate() override; /**< Terminates the module.*/
 
     // Data members
   private:
@@ -141,9 +142,11 @@ namespace Belle2 {
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
 
-    bool m_convertECLCrystalEnergies; /**< Flag to switch on conversion of Datecl_mc_ehits objects into ECLHits */
+    bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
 
-    bool m_convertExtHits; /**< Flag to switch on conversion of Mdst_ecl_trk into ExtHits */
+    bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
+
+    bool m_convertRecTrg; /**< Flag to switch on conversion of rectrg_summary3 */
 
     /**
      * E9/E25 threshold value
@@ -158,6 +161,16 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
+
+    /**
+     * Reads and converts m_final from rectrg_summary3
+     */
+    void convertRecTrgTable();
+
+    /**
+     * Reads and converts all entries of evtcls Panther table
+     */
+    void convertEvtclsTable();
 
     /**
      * Reads and converts all entries of Gen_hepevt Panther table to MCParticle dataobjects and adds them to StoreArray<MCParticle>.
@@ -200,16 +213,6 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
-    /**
-     * Reads and converts all entries of Datecl_mc_ehits Panther table to ECLHit dataobjects and adds them to StoreArray<ECLHit>.
-     */
-    void convertECLHitTable();
-
-    /**
-     * Reads and converts all entries of Mdst_ecl_trk Panther table to ExtHit dataobjects and adds them to StoreArray<ExtHit>.
-     */
-    void convertExtHitTable();
-
     /** Stores beam parameters (energy, angles) in CollisionInvariantMass and CollisionBoostVector (currently in the DataStore). */
     void convertBeamEnergy();
 
@@ -242,16 +245,6 @@ namespace Belle2 {
      * If running on MC, the Track -> MCParticle relation is set as well.
      */
     void convertMdstChargedObject(const Belle::Mdst_charged& belleTrack, Track* track);
-
-    /**
-     * Converts Datecl_mc_ehits record to ECLHit object.
-     */
-    void convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit);
-
-    /**
-     * Converts Mdst_ecl_trk record to ExtHit object.
-     */
-    void convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit);
 
     /**
      * Creates TrackFitResult and fills it.
@@ -331,7 +324,7 @@ namespace Belle2 {
     double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    /* calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    /** calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
     double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
@@ -400,23 +393,20 @@ namespace Belle2 {
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** ECL hits */
-    StoreArray<ECLHit> m_eclHits;
-
-    /** Ext hits */
-    StoreArray<ExtHit> m_extHits;
+    /** Event Extra Info*/
+    StoreObjPtr<EventExtraInfo> m_evtInfo;
 
     /** BeamSpot for IP */
     OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
-    BeamSpot m_beamSpot;
+    BeamSpot m_beamSpot; /**< Interaction Point of the beam */
 
     /** CollisionBoostVector for boost vector*/
     OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
-    CollisionBoostVector m_collisionBoostVector;
+    CollisionBoostVector m_collisionBoostVector; /**< CollisionBoostVector for bosst vector of the beam */
 
     /** CollisionInvariantMass for Invariant Mass of Beam*/
     OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
-    CollisionInvariantMass m_collisionInvM;
+    CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order

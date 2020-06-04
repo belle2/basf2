@@ -189,7 +189,9 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det)
             "identifier (possibly a subdetector):" << det);
     return 0;
   }
-
+  if (det > TEST) {
+    B2ERROR("Const::DetectorSet::getBit(): Invalid detector ID");
+  }
   return (1 << (det - 1));
 }
 

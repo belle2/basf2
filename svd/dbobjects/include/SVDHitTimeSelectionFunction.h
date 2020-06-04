@@ -16,6 +16,7 @@
 #include <framework/logging/Logger.h>
 namespace Belle2 {
 
+  /** class to contain the cut on svd hit time at SP creation step*/
   class SVDHitTimeSelectionFunction : public TObject {
 
   public:
@@ -30,6 +31,14 @@ namespace Belle2 {
       return (this->*f)(svdTime, svdTimeError, t0, t0Error) ;
     }
 
+    /** returns whether the uCluster time is compatible with the vClsuter time */
+    bool areClustersInTime(double uTime, double vTime)
+    {
+      if (abs(uTime - vTime) > m_maxUVTimeDifference)
+        return false;
+      return true;
+    }
+    float m_maxUVTimeDifference = 100; /**< max time difference of U and V clusters*/
 
     /** constructor */
     SVDHitTimeSelectionFunction()
@@ -75,8 +84,11 @@ namespace Belle2 {
     /** returns the  minimum cluster time */
     float getNsigma() { return m_nSigma; };
 
-
-
+    //max U-V time difference
+    /** set m_maxUVTimeDifference */
+    void setMaxUVTimeDifference(double timeDiff) { m_maxUVTimeDifference = timeDiff; }
+    /** get m_maxUVTimeDifference */
+    float getMaxUVTimeDifference() { return m_maxUVTimeDifference; }
   private:
 
     /** function parameters & implementations*/
@@ -111,7 +123,7 @@ namespace Belle2 {
     static std::vector < selFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDHitTimeSelectionFunction, 2) /**< needed by root*/
+    ClassDef(SVDHitTimeSelectionFunction, 3) /**< needed by root*/
   };
 
 }

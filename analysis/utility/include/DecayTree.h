@@ -13,11 +13,7 @@
 #include <analysis/utility/DecayNode.h>
 
 #include <vector>
-#include <list>
 #include <string>
-#include <algorithm>
-#include <memory>
-
 
 namespace Belle2 {
 

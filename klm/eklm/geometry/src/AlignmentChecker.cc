@@ -8,20 +8,25 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+/* Own header. */
 #include <klm/eklm/geometry/AlignmentChecker.h>
+
+/* KLM headers. */
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/Polygon2D.h>
+
+/* Belle 2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
 EKLM::AlignmentChecker::AlignmentChecker(bool printOverlaps) :
-  m_PrintOverlaps(printOverlaps)
+  m_PrintOverlaps(printOverlaps),
+  m_GeoDat(&(EKLM::GeometryData::Instance())),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   int iPlane, iSegmentSupport;
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   const EKLMGeometry::SectorSupportGeometry* sectorSupportGeometry =
     m_GeoDat->getSectorSupportGeometry();
   const EKLMGeometry::ElementPosition* sectorSupportPosition =
@@ -77,7 +82,7 @@ EKLM::AlignmentChecker::~AlignmentChecker()
 
 bool EKLM::AlignmentChecker::
 checkSectorAlignment(int section, int layer, int sector,
-                     const EKLMAlignmentData* sectorAlignment) const
+                     const KLMAlignmentData* sectorAlignment) const
 {
   int iPlane, iSegmentSupport, iSegment, j;
   double lx, ly;
@@ -86,7 +91,7 @@ checkSectorAlignment(int section, int layer, int sector,
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos;
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
     m_GeoDat->getSegmentSupportGeometry();
-  EKLMAlignmentData segmentAlignment(0, 0, 0);
+  KLMAlignmentData segmentAlignment(0, 0, 0, 0, 0, 0);
   for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
     for (iSegmentSupport = 1; iSegmentSupport <= m_GeoDat->getNSegments() + 1;
          iSegmentSupport++) {
@@ -115,10 +120,10 @@ checkSectorAlignment(int section, int layer, int sector,
       if (iPlane == 1)
         t = HepGeom::Rotate3D(180. * CLHEP::deg,
                               HepGeom::Vector3D<double>(1., 1., 0.)) * t;
-      t = HepGeom::Translate3D(sectorAlignment->getDx() * CLHEP::cm / Unit::cm,
-                               sectorAlignment->getDy() * CLHEP::cm / Unit::cm,
+      t = HepGeom::Translate3D(sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm,
+                               sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
                                0) *
-          HepGeom::RotateZ3D(sectorAlignment->getDalpha() *
+          HepGeom::RotateZ3D(sectorAlignment->getDeltaGamma() *
                              CLHEP::rad / Unit::rad) * t;
       for (j = 0; j < 4; j++)
         supportRectangle[j] = t * supportRectangle[j];
@@ -190,8 +195,8 @@ checkSectorAlignment(int section, int layer, int sector,
 
 bool EKLM::AlignmentChecker::
 checkSegmentAlignment(int section, int layer, int sector, int plane, int segment,
-                      const EKLMAlignmentData* sectorAlignment,
-                      const EKLMAlignmentData* segmentAlignment,
+                      const KLMAlignmentData* sectorAlignment,
+                      const KLMAlignmentData* segmentAlignment,
                       bool calledFromSectorCheck) const
 {
   /* cppcheck-suppress variableScope */
@@ -207,8 +212,8 @@ checkSegmentAlignment(int section, int layer, int sector, int plane, int segment
       return false;
   }
   ly = 0.5 * stripGeometry->getWidth();
-  for (i = 1; i <= m_GeoDat->getNStripsSegment(); i++) {
-    iStrip = m_GeoDat->getNStripsSegment() * (segment - 1) + i;
+  for (i = 1; i <= m_ElementNumbers->getNStripsSegment(); i++) {
+    iStrip = m_ElementNumbers->getNStripsSegment() * (segment - 1) + i;
     const EKLMGeometry::ElementPosition* stripPosition =
       m_GeoDat->getStripPosition(iStrip);
     lx = 0.5 * stripPosition->getLength();
@@ -224,19 +229,19 @@ checkSegmentAlignment(int section, int layer, int sector, int plane, int segment
     stripRectangle[3].setX(lx);
     stripRectangle[3].setY(-ly);
     stripRectangle[3].setZ(0);
-    t = HepGeom::Translate3D(segmentAlignment->getDx() * CLHEP::cm / Unit::cm,
-                             segmentAlignment->getDy() * CLHEP::cm / Unit::cm,
+    t = HepGeom::Translate3D(segmentAlignment->getDeltaU() * CLHEP::cm / Unit::cm,
+                             segmentAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
                              0) *
         HepGeom::Translate3D(stripPosition->getX(), stripPosition->getY(), 0) *
-        HepGeom::RotateZ3D(segmentAlignment->getDalpha() *
+        HepGeom::RotateZ3D(segmentAlignment->getDeltaGamma() *
                            CLHEP::rad / Unit::rad);
     if (plane == 1)
       t = HepGeom::Rotate3D(180. * CLHEP::deg,
                             HepGeom::Vector3D<double>(1., 1., 0.)) * t;
-    t = HepGeom::Translate3D(sectorAlignment->getDx() * CLHEP::cm / Unit::cm,
-                             sectorAlignment->getDy() * CLHEP::cm / Unit::cm,
+    t = HepGeom::Translate3D(sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm,
+                             sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
                              0) *
-        HepGeom::RotateZ3D(sectorAlignment->getDalpha() *
+        HepGeom::RotateZ3D(sectorAlignment->getDeltaGamma() *
                            CLHEP::rad / Unit::rad) * t;
     for (j = 0; j < 4; j++)
       stripRectangle[j] = t * stripRectangle[j];
@@ -303,30 +308,32 @@ checkSegmentAlignment(int section, int layer, int sector, int plane, int segment
 }
 
 bool EKLM::AlignmentChecker::checkAlignment(
-  const EKLMAlignment* alignment) const
+  const EKLMAlignment* alignment,
+  const EKLMSegmentAlignment* segmentAlignment) const
 {
   int iSection, iLayer, iSector, iPlane, iSegment, sector, segment;
-  const EKLMAlignmentData* sectorAlignment, *segmentAlignment;
   for (iSection = 1; iSection <= m_GeoDat->getNSections(); iSection++) {
     for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
          iLayer++) {
       for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-        sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-        sectorAlignment = alignment->getSectorAlignment(sector);
+        sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
+        const KLMAlignmentData* sectorAlignment =
+          alignment->getModuleAlignment(sector);
         if (sectorAlignment == nullptr)
           B2FATAL("Incomplete alignment data.");
         if (!checkSectorAlignment(iSection, iLayer, iSector, sectorAlignment))
           return false;
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
-                                              iSegment);
-            segmentAlignment = alignment->getSegmentAlignment(segment);
+            segment = m_ElementNumbers->segmentNumber(
+                        iSection, iLayer, iSector, iPlane, iSegment);
+            const KLMAlignmentData* segmentAlignmentData =
+              segmentAlignment->getSegmentAlignment(segment);
             if (segmentAlignment == nullptr)
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iSection, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,
-                                       segmentAlignment, false))
+                                       segmentAlignmentData, false))
               return false;
           }
         }

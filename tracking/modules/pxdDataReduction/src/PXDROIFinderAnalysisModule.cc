@@ -10,15 +10,12 @@
 
 #include <tracking/modules/pxdDataReduction/PXDROIFinderAnalysisModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationArray.h>
+#include <framework/datastore/RelationIndex.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>

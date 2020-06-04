@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -127,8 +126,8 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
-     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle. It is somewhere between -1 and 1
-     * if only a single massless particle like a neutrino is missing in the reconstruction.
+     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle.
+     * It is somewhere between -1 and 1 if only a single massless particle like a neutrino is missing in the reconstruction.
      */
     double cosThetaBetweenParticleAndNominalB(const Particle* part);
 
@@ -137,8 +136,6 @@ namespace Belle2 {
      * of the event, as calculate by the EventShapeCalculator module.
      */
     double cosToThrustOfEvent(const Particle* part);
-
-
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
@@ -166,7 +163,7 @@ namespace Belle2 {
     /**
      * return mass (determined from particle's daughter 4-momentum vectors)
      */
-    double particleInvariantMass(const Particle* part);
+    double particleInvariantMassFromDaughters(const Particle* part);
 
     /**
      * return mass (determined from particle's daughter 4-momentum vectors under proton mass assumption)
@@ -174,19 +171,14 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
+     * return uncertainty of the invariant mass
      */
     double particleInvariantMassError(const Particle* part);
 
     /**
-     * return signed deviation of particle's invariant mass from its nominal mass
+     * return signed deviation of particle's invariant mass from its nominal mass in units of uncertainty on the invariant mass
      */
     double particleInvariantMassSignificance(const Particle* part);
-
-    /**
-     * return signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass
-     */
-    double particleInvariantMassBeforeFitSignificance(const Particle* part);
 
     /**
      * return mass squared (determined from particle's 4-momentum vector)
@@ -267,7 +259,7 @@ namespace Belle2 {
 
     /**
      *
-     * return invarian mass squared of the system recoiling against given Particle
+     * return invariant mass squared of the system recoiling against given Particle
      */
     double recoilMassSquared(const Particle* particle);
 

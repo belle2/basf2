@@ -78,7 +78,7 @@ namespace Belle2 {
 
     std::string m_outputFilename; /** Filename of root file containing cross-talk strip calibration payload */
 
-    TFile* m_histogramFile; /**Pointer to root TFile containing histograms for calibration payload */
+    TFile* m_histogramFile = nullptr; /**Pointer to root TFile containing histograms for calibration payload */
     std::map<std::string, TH1F* > m_sensorHistograms; /**< map to store cross-talk strip histograms */
 
     //calibration objects

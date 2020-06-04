@@ -31,12 +31,17 @@ if __name__ == "__main__":
     parser.add_argument("--format", help="Choose the format how to print the trigger cuts. "
                         "To get access to more options please install the tabulate package using pip",
                         choices=choices, default="categorized")
+    parser.add_argument("--override-globaltags", dest="override", action="store_true", default=False,
+                        help="Use this option in case the data file does not provide globaltag information. "
+                             "The only case where this should occur is when analyzing raw data.")
 
     args = parser.parse_args()
 
     if args.input:
         # The prescales are only valid when using the online database!
         basf2.reset_database()
+        if args.override:
+            basf2.conditions.override_globaltags()
         basf2.use_central_database("online")
 
         path = basf2.Path()

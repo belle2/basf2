@@ -97,10 +97,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
     branch_names.remove("RawTRGs")
     branch_names.remove("RawFTSWs")
 
-    for module in path.modules():
-        if module.name() in["SVDDataFormatCheck", "__ROISVDCoGTimeEstimator"]:
-            module.param('SVDEventInfo', 'SVDEventInfoSim')
-
     path.add_module("RootOutput", outputFileName=output_file_name, branchNames=branch_names)
 
     basf2.process(path)
@@ -126,12 +122,12 @@ def test_script(script_location, input_file_name, temp_dir):
     histos_file_name = os.path.join(temp_dir, f"{random_seed}_histos.root")
     output_file_name = os.path.join(temp_dir, f"{random_seed}_output.root")
     # TODO: should we use the default global tag here?
-    central_database = basf2.get_default_global_tags()
+    globaltags = list(basf2.conditions.default_globaltags)
     num_processes = 1
 
     os.chdir(os.path.dirname(script_location))
     cmd = [sys.executable, script_location,
-           "--central-db-tag", central_database,
+           "--central-db-tag"] + globaltags + [
            "--input-file", os.path.abspath(input_file_name),
            "--histo-output-file", os.path.abspath(histos_file_name),
            "--output-file", os.path.abspath(output_file_name),

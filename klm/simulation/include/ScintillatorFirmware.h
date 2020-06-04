@@ -10,6 +10,7 @@
 
 #pragma once
 
+/* KLM headers. */
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 
 /**

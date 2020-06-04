@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include <TFile.h>
-
 namespace Belle2 {
   /** The SecMapTrainerBaseModule
    * this module analyzes a big number of events (pGun or evtGen) to create raw sectorMaps which are needed for the VXDTF 2.0.

@@ -10,18 +10,22 @@
 
 #pragma once
 
-/* External headers. */
-#include <TH1F.h>
-
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
+
+/* Belle 2 headers. */
+#include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -74,16 +78,6 @@ namespace Belle2 {
 
   private:
 
-    /**
-     * Define EKLM histograms.
-     */
-    void defineHistoEKLM();
-
-    /**
-     * Define BKLM histograms.
-     */
-    void defineHistoBKLM();
-
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -92,15 +86,6 @@ namespace Belle2 {
 
     /** Directory for BKLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryNameBKLM;
-
-    /** name of BKLMDigit store array. */
-    std::string m_inputDigitsName;
-
-    /** Name of BKLMHit2d store array. */
-    std::string m_inputHitsName2d;
-
-    /** Name of BKLMHit1d store array. */
-    std::string m_inputHitsName1d;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
@@ -112,10 +97,16 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_Elements;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
-    /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
+
+    /** BKLM 1d hits. */
+    StoreArray<BKLMHit1d> m_BklmHit1ds;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_BklmHit2ds;
 
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;
@@ -125,6 +116,15 @@ namespace Belle2 {
 
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
+
+    /** Plane occupancy: BKLM, phi readout. */
+    TH1F* m_PlaneBKLMPhi;
+
+    /** Plane occupancy: BKLM, z readout. */
+    TH1F* m_PlaneBKLMZ;
+
+    /** Plane occupancy: EKLM. */
+    TH1F* m_PlaneEKLM;
 
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
@@ -137,20 +137,17 @@ namespace Belle2 {
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
 
-    /** Sector number. */
-    TH1F* m_eklmSector;
+    /** Masked channels per sector. */
+    TH1F* m_MaskedChannelsPerSector;
 
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;
 
-    /** Sector and layer number occupancy for phi-readout hits */
-    TH1F* m_bklmSectorLayerPhi;
-
-    /** Sector and layer number occupancy for Z-readout hits */
-    TH1F* m_bklmSectorLayerZ;
-
     /** Number of BKLM Digits. */
-    TH1F* m_bklmDigitsN;
+    TH1F* m_BklmDigitsNumber;
+
+    /** Number of KLM Digits. */
+    TH1F* m_KlmDigitsNumber;
 
   };
 

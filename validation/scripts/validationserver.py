@@ -1,25 +1,31 @@
-import cherrypy
+# std
+from typing import Dict, Any, List, Tuple
 from glob import glob
 import json
-import json_objects
+import functools
+import time
+import datetime
+from multiprocessing import Process, Queue
 import os.path
 import argparse
 import logging
 import sys
 import queue
 import webbrowser
-import datetime
-from multiprocessing import Process, Queue
+
+# 3rd
+import cherrypy
+
+# ours
+import json_objects
 from validationplots import create_plots
 import validationfunctions
 import validationpath
-import functools
-import time
 
-g_plottingProcesses = {}
+g_plottingProcesses = {}  # type: Dict[str, Tuple[Process, Queue, Dict[str, Any]]]
 
 
-def get_revision_label_from_json_filename(json_filename):
+def get_revision_label_from_json_filename(json_filename: str) -> str:
     """
     Gets the label of a revision from the path to the revision.json file
     for example results/r121/revision.json
@@ -32,7 +38,7 @@ def get_revision_label_from_json_filename(json_filename):
     return last_folder
 
 
-def get_json_object_list(results_folder, json_file_name):
+def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
     """
     Searches one folder's sub-folder for json files of a
     specific name and returns a combined list of the
@@ -57,7 +63,7 @@ def get_json_object_list(results_folder, json_file_name):
     return found_rev_labels
 
 
-def deliver_json(file_name):
+def deliver_json(file_name: str):
     """
     Simply load & parse a json file and return the
     python objects
@@ -68,7 +74,7 @@ def deliver_json(file_name):
     return data
 
 
-def create_revision_key(revision_names):
+def create_revision_key(revision_names: List[str]) -> str:
     """
     Create a string key out of a revision list, which is handed to tho browser
     in form of a progress key
@@ -76,7 +82,7 @@ def create_revision_key(revision_names):
     return functools.reduce(lambda x, y: x + "-" + y, revision_names, "")
 
 
-def check_plotting_status(progress_key):
+def check_plotting_status(progress_key: str):
     """
     Check the plotting status via the supplied progress_key
     """
@@ -84,7 +90,8 @@ def check_plotting_status(progress_key):
     if progress_key not in g_plottingProcesses:
         return None
 
-    process, qu, last_status = g_plottingProcesses[progress_key]
+    process, qu, last_status = \
+        g_plottingProcesses[progress_key]
 
     # read latest message
     try:
@@ -101,10 +108,20 @@ def check_plotting_status(progress_key):
     return last_status
 
 
+# todo: remove this, once we're certain that the bug was fixed!
+def warn_wrong_directory():
+    if not os.getcwd().endswith("html"):
+        print(f"ERROR: Expected to be in HTML directory, but my current "
+              f"working directory is {os.getcwd()}; abspath: {os.getcwd()}.")
+
+
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names, results_folder):
+def start_plotting_request(revision_names: List[str], results_folder: str) -> str:
     """
     Start a new comparison between the supplied revisions
+
+    Returns:
+        revision key
     """
 
     rev_key = create_revision_key(revision_names)
@@ -126,7 +143,7 @@ def start_plotting_request(revision_names, results_folder):
             False,
             qu,
             # go one folder up, because this function
-            # expects the work dir, which then contains
+            # expects the work dir, which contains
             # the results folder
             os.path.dirname(results_folder)
         )
@@ -149,17 +166,14 @@ class ValidationRoot(object):
 
     """
 
-    def __init__(self, results_folder, comparison_folder):
+    def __init__(self, working_folder):
         """
         class initializer, which takes the path to the folders containing the
         validation run results and plots (aka comparison)
         """
 
-        #: folder where the results of one revision run are located
-        self.results_folder = results_folder
-
-        #: folder where the comparison plots and json result files are located
-        self.comparison_folder = comparison_folder
+        #: html folder that contains plots etc.
+        self.working_folder = working_folder
 
         #: Date when this object was instantiated
         self.last_restart = datetime.datetime.now()
@@ -179,7 +193,10 @@ class ValidationRoot(object):
         """
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug('Creating plots for revisions: ' + str(rev_list))
-        progress_key = start_plotting_request(rev_list, self.results_folder)
+        progress_key = start_plotting_request(
+            rev_list,
+            validationpath.get_results_folder(self.working_folder),
+        )
         return {"progress_key": progress_key}
 
     @cherrypy.expose
@@ -189,6 +206,28 @@ class ValidationRoot(object):
         the default url is used (like http://localhost:8080/)
         """
         raise cherrypy.HTTPRedirect("/static/validation.html")
+
+    @cherrypy.expose
+    def plots(self, *args):
+        """
+        Serve file from the html/plot directory.
+        :param args: For the request /plots/a/b/c, these will be the strings
+            "a", "b", "c"
+        """
+
+        warn_wrong_directory()
+
+        if len(args) < 3:
+            raise cherrypy.HTTPError(404)
+
+        tag_folder = os.path.relpath(
+            validationpath.get_html_plots_tag_comparison_folder(
+                self.working_folder, args[:-2]
+            ),
+            validationpath.get_html_folder(self.working_folder)
+        )
+        path = os.path.join(tag_folder, *args[-2:])
+        return cherrypy.lib.static.serve_file(path)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -213,7 +252,7 @@ class ValidationRoot(object):
 
         # get list of available revision
         rev_list = get_json_object_list(
-            self.results_folder,
+            validationpath.get_results_folder(self.working_folder),
             validationpath.file_name_results_json
         )
 
@@ -228,7 +267,7 @@ class ValidationRoot(object):
         # load and combine
         for r in rev_list:
             full_path = os.path.join(
-                self.results_folder,
+                validationpath.get_results_folder(self.working_folder),
                 r,
                 validationpath.file_name_results_json
             )
@@ -325,21 +364,27 @@ class ValidationRoot(object):
         comparison
         """
 
-        # todo: ensure this file is not outside of the webserver
-        full_path = os.path.join(
-            self.comparison_folder,
-            comparison_label,
+        warn_wrong_directory()
+
+        # todo: Make this independent of our working directory!
+        path = os.path.join(
+            os.path.relpath(
+                validationpath.get_html_plots_tag_comparison_folder(
+                    self.working_folder, comparison_label.split(",")
+                ),
+                validationpath.get_html_folder(self.working_folder)
+            ),
             "comparison.json"
         )
 
         # check if this comparison actually exists
-        if not os.path.isfile(full_path):
+        if not os.path.isfile(path):
             raise cherrypy.HTTPError(
                 404,
-                f"Json Comparison file {full_path} does not exist"
+                f"Json Comparison file {path} does not exist"
             )
 
-        return deliver_json(full_path)
+        return deliver_json(path)
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -348,6 +393,9 @@ class ValidationRoot(object):
         Returns:
             JSON file containing git versions and time of last restart
         """
+
+        warn_wrong_directory()
+
         # note: for some reason %Z doesn't work like this, so we use
         # time.tzname for the time zone.
         return {
@@ -550,8 +598,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     if not dry_run:
         cherrypy.quickstart(
             ValidationRoot(
-                results_folder=results_folder,
-                comparison_folder=comparison_folder
+                working_folder=cwd_folder
             ),
             '/',
             cherry_config

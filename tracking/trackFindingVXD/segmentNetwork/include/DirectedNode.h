@@ -11,9 +11,6 @@
 
 #include <vector>
 
-#include <framework/logging/Logger.h>
-
-
 namespace Belle2 {
 
   /** The Node-Class.

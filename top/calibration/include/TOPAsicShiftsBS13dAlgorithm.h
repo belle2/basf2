@@ -33,9 +33,16 @@ namespace Belle2 {
 
       /**
        * Sets minimal function value
-       * @param minimal value
+       * @param minVal minimal value
        */
       void setMinValue(double minVal) {m_minVal = minVal;}
+
+      /**
+       * Sets size of the window on reference time distribution.
+       * To remove window set size to 0.
+       * @param size window size
+       */
+      void setWindowSize(int size) {m_winSize = size;}
 
       /**
        * Sets the search range
@@ -56,6 +63,12 @@ namespace Belle2 {
        * algorithm implementation
        */
       virtual EResult calibrate() final;
+
+      /**
+       * Sets the position of a window containing maximum number of entries
+       * of reference time distribution.
+       */
+      void setWindow();
 
       /**
        * Returns measured time distribution at x or minVal for outside-range or empty bins
@@ -84,6 +97,10 @@ namespace Belle2 {
 
       // other
       std::vector<double> m_timeReference; /**< reference time distribution */
+      int m_winSize = 21; /**< size of the window on reference time distribution */
+      int m_i0 = 0; /**< first bin of the window on reference time distribution */
+      int m_i1 = 0; /**< last bin of the window on reference time distribution */
+      std::vector<int> m_lastEntries; /**< number of histogram entries */
 
     };
 

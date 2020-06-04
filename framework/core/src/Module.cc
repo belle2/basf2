@@ -314,6 +314,7 @@ namespace {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
+// cppcheck-suppress unknownMacro
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_value_overloads, if_value, 2, 3)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_false_overloads, if_false, 1, 2)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(if_true_overloads, if_true, 1, 2)
@@ -428,9 +429,16 @@ Parameters:
   properties (int): bitmask of `ModulePropFlags` to check for.
 )DOCSTRING")
   .def("set_property_flags", &Module::setPropertyFlags, args("property_mask"),
-       "Set module properties in the form of an OR combination of `ModulePropFlags`.")
-  .def("if_value", &Module::if_value, (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       R"DOCSTRING(Sets a conditional sub path which will be executed after this
+       "Set module properties in the form of an OR combination of `ModulePropFlags`.");
+  {
+    // python signature is too crowded, make ourselves
+    docstring_options subOptions(true, false, false); //userdef, py sigs, c++ sigs
+    module
+    .def("if_value", &Module::if_value,
+         (bp::arg("expression"), bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOCSTRING(if_value(expression, condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this
 module if the return value set in the module passes the given ``expression``.
 
 Modules can define a return value (int or bool) using ``setReturnValue()``,
@@ -456,14 +464,22 @@ Parameters:
   condition_path (Path): path to execute in case the expression is fulfilled
   after_condition_path (AfterConditionPath): What to do once the ``condition_path`` has been executed.
 )DOCSTRING")
-  .def("if_false", &Module::if_false, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       "Sets a conditional sub path which will be executed after this module if "
-       "the return value of the module evaluates to False. This is equivalent to "
-       "calling `if_value` with ``expression=\"<1\"``")
-  .def("if_true", &Module::if_true, (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
-       "Sets a conditional sub path which will be executed after this module if "
-       "the return value of the module evaluates to True. It is equivalent to "
-       "calling `if_value` with ``expression=\">=1\"``")
+    .def("if_false", &Module::if_false,
+         (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOC(if_false(condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this module if
+the return value of the module evaluates to False. This is equivalent to
+calling `if_value` with ``expression=\"<1\"``)DOC")
+    .def("if_true", &Module::if_true,
+         (bp::arg("condition_path"), bp::arg("after_condition_path")= Module::EAfterConditionPath::c_End),
+         R"DOC(if_true(condition_path, after_condition_path=AfterConditionPath.END)
+
+Sets a conditional sub path which will be executed after this module if
+the return value of the module evaluates to True. It is equivalent to
+calling `if_value` with ``expression=\">=1\"``)DOC");
+  }
+  module
   .def("has_condition", &Module::hasCondition,
        "Return true if a conditional path has been set for this module "
        "using `if_value`, `if_true` or `if_false`")

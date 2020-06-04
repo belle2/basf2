@@ -58,9 +58,9 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-    TList* m_histoList_digits; /**< list of histograms for the strips*/
-    TList* m_histoList_clusters; /**< list of histograms for the clusters*/
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
+    TList* m_histoList_digits = nullptr; /**< list of histograms for the strips*/
+    TList* m_histoList_clusters = nullptr; /**< list of histograms for the clusters*/
 
   private:
 

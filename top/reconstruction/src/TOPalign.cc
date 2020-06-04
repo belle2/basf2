@@ -23,6 +23,7 @@ extern "C" {
                  int*, int*, int*, int*);
   void set_pdf_opt_(int*, int*, int*);
   void top_alignment_(int*, float*, float*, double*, float*, float*, int*);
+  int rtra_get_nfot_(int*);
 }
 
 using namespace std;
@@ -108,6 +109,7 @@ namespace Belle2 {
 
     int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis)
     {
+      m_numPhotons = -1;
       if (track.getModuleID() != m_moduleID) return -3;
 
       // pass track parameters to fortran code
@@ -147,6 +149,8 @@ namespace Belle2 {
       if (ier < 0) return ier;
 
       m_numTracks++;
+      int K = 1;
+      m_numPhotons = rtra_get_nfot_(&K);
       if (ier != 0) return ier;
 
       for (size_t i = 0; i < dpar.size(); i++) {

@@ -119,9 +119,9 @@
     <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
 
-  <!-- VXD Tracking and MUID muon identification -->
-  <Tracking>
-    <xi:include href="../tracking/MuidParameters.xml"/>
-  </Tracking>
+  <!-- MUID muon identification -->
+  <Muid>
+    <xi:include href="../klm/MuidParameters.xml"/>
+  </Muid>
 
 </Detector>

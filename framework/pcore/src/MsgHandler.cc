@@ -14,8 +14,6 @@
 #include <TMessage.h>
 #include <RZip.h>
 
-#include <cstdlib>
-
 using namespace std;
 using namespace Belle2;
 

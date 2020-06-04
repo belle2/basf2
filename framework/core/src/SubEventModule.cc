@@ -11,7 +11,6 @@
 #include <framework/core/SubEventModule.h>
 
 #include <framework/core/ModuleManager.h>
-#include <framework/core/Environment.h>
 #include <framework/core/ProcessStatistics.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/datastore/DataStore.h>

@@ -26,13 +26,12 @@
 namespace Belle2 {
 
 
-  /* Calculates the probability of a cluster originating from signal hit */
-
+  /** Calculates the probability of a cluster originating from signal hit */
   class SVDClusterQualityEstimatorModule : public Module {
 
   public:
 
-    /* Constructor */
+    /** Constructor */
     SVDClusterQualityEstimatorModule();
 
     /** Init the module.*/
@@ -54,7 +53,7 @@ namespace Belle2 {
 
     std::string m_inputPDF; /**< File path of root file containing pdf histograms */
 
-    TFile* m_calibrationFile; /**< Pointer to root TFile containing PDF histograms */
+    TFile* m_calibrationFile = nullptr; /**< Pointer to root TFile containing PDF histograms */
 
     bool m_useQualityEstimator; /**< Standard is true. Can be turned off in case accessing pdf root file is causing errors */
 

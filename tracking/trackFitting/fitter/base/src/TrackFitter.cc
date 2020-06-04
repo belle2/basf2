@@ -15,7 +15,6 @@
 #include <genfit/FitStatus.h>
 #include <genfit/AbsFitter.h>
 #include <genfit/DAF.h>
-#include <genfit/RKTrackRep.h>
 #include <genfit/KalmanFitterInfo.h>
 
 using namespace Belle2;

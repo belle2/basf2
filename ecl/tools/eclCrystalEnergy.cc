@@ -25,10 +25,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
-#include <framework/database/ConditionsDatabase.h>
+#include <framework/database/Configuration.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <iostream>
 #include <TFile.h>
@@ -77,18 +74,13 @@ int main(int argc, char** argv)
 
 
   //------------------------------------------------------------------------
-  /** Specify database. Last one specified is first one used */
-  Database::reset();
-  bool resetIovs = false;
-  DatabaseChain::createInstance(resetIovs);
-  ConditionsDatabase::createDefaultInstance(gtName, LogConfig::c_Debug);
-  LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
+  /** Specify database. Localdb is used if present, otherwise specified GT */
+  auto& conf = Conditions::Configuration::getInstance();
+  conf.prependGlobalTag(gtName);
+  conf.prependTestingPayloadLocation("localdb/database.txt");
 
   /** Create the DBObjPtr for the payloads that we want to read from the DB */
-  DBObjPtr<Belle2::ECLCrystalCalib> Cosmic("ECLCrystalEnergyCosmic");
-  DBObjPtr<Belle2::ECLCrystalCalib> MuMu("ECLCrystalEnergyMuMu");
   DBObjPtr<Belle2::ECLCrystalCalib> GammaGamma("ECLCrystalEnergyGammaGamma");
-  DBObjPtr<Belle2::ECLCrystalCalib> Bhabha5x5("ECLCrystalEnergyee5x5");
   DBObjPtr<Belle2::ECLCrystalCalib> Existing("ECLCrystalEnergy");
 
   /** Populate database contents */
@@ -96,25 +88,10 @@ int main(int argc, char** argv)
 
   //------------------------------------------------------------------------
   /** Get the vectors from the input payload */
-  std::vector<float> CosmicCalib;
-  std::vector<float> CosmicCalibUnc;
-  CosmicCalib = Cosmic->getCalibVector();
-  CosmicCalibUnc = Cosmic->getCalibUncVector();
-
-  std::vector<float> MuMuCalib;
-  std::vector<float> MuMuCalibUnc;
-  MuMuCalib = MuMu->getCalibVector();
-  MuMuCalibUnc = MuMu->getCalibUncVector();
-
   std::vector<float> GammaGammaCalib;
   std::vector<float> GammaGammaCalibUnc;
   GammaGammaCalib = GammaGamma->getCalibVector();
   GammaGammaCalibUnc = GammaGamma->getCalibUncVector();
-
-  std::vector<float> Bhabha5x5Calib;
-  std::vector<float> Bhabha5x5CalibUnc;
-  Bhabha5x5Calib = Bhabha5x5->getCalibVector();
-  Bhabha5x5CalibUnc = Bhabha5x5->getCalibUncVector();
 
   std::vector<float> ExistingCalib;
   std::vector<float> ExistingCalibUnc;

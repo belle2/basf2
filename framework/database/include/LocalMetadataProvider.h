@@ -9,15 +9,9 @@
 **************************************************************************/
 #pragma once
 
-#include <sqlite3.h>
 #include <string>
-#include <stdexcept>
-#include <vector>
-#include <sstream>
-#include <iostream>
 
 #include <framework/database/MetadataProvider.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/sqlite.h>
 
 namespace Belle2::Conditions {

@@ -3,26 +3,21 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <TMath.h>
-#include <TVector.h>
 
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-
-#include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
 
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
-
 
 namespace TreeFitter {
 
@@ -70,7 +65,7 @@ namespace TreeFitter {
 
   bool FitManager::fit()
   {
-    const int nitermax = 10;
+    const int nitermax = 100;
     const int maxndiverging = 3;
     double dChisqConv = m_prec;
     m_chiSquare = -1;
@@ -100,7 +95,7 @@ namespace TreeFitter {
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 5);
+          setExtraInfo(m_particle, "failed", 1);
         } else {
           if (m_niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
@@ -123,11 +118,11 @@ namespace TreeFitter {
         }
       }
       if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 4);
+        setExtraInfo(m_particle, "failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 3);
+        setExtraInfo(m_particle, "failed", 4);
         m_status = VertexStatus::Failed;
       }
     }
@@ -164,6 +159,7 @@ namespace TreeFitter {
     return m_decaychain->tauIndex(particle);
   }
 
+  // cppcheck-suppress constParameter ; returncov is clearly changed in the function
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
@@ -308,7 +304,7 @@ namespace TreeFitter {
 
     if (pb && pb->tauIndex() >= 0 && pb->mother()) {
       const int momindex = pb->momIndex();
-
+      const int tauIndex = pb->tauIndex();
       const Eigen::Matrix<double, 1, 3> mom_vec = m_fitparams->getStateVector().segment(momindex, 3);
 
       const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
@@ -318,6 +314,10 @@ namespace TreeFitter {
 
       const double lenErr = std::get<1>(lenTuple);
       comb_cov(0, 0) = lenErr * lenErr;
+      comb_cov(1, 0) = m_fitparams->getCovariance()(momindex, tauIndex);
+      comb_cov(2, 0) = m_fitparams->getCovariance()(momindex + 1, tauIndex);
+      comb_cov(3, 0) = m_fitparams->getCovariance()(momindex + 2, tauIndex);
+
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
       const double mass = pb->pdgMass();
@@ -330,9 +330,9 @@ namespace TreeFitter {
 
       Eigen::Matrix<double, 1, 4> jac = Eigen::Matrix<double, 1, 4>::Zero();
       jac(0) =  1. / mom * mBYc;
-      jac(1) = -1. * mom_vec(0) / mom3 * mBYc;
-      jac(2) = -1. * mom_vec(1) / mom3 * mBYc;
-      jac(3) = -1. * mom_vec(2) / mom3 * mBYc;
+      jac(1) = -1. * len * mom_vec(0) / mom3 * mBYc;
+      jac(2) = -1. * len * mom_vec(1) / mom3 * mBYc;
+      jac(3) = -1. * len * mom_vec(2) / mom3 * mBYc;
 
       const double tErr2 = jac * comb_cov.selfadjointView<Eigen::Lower>() * jac.transpose();
       // time in nanosec

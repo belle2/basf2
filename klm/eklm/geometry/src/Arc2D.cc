@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/eklm/geometry/Arc2D.h>
 
 using namespace Belle2;
 
 EKLM::Arc2D::Arc2D(double x, double y, double radius,
-                   double angle1, double angle2) : Circle2D(x, y, radius)
+                   double angle1, double angle2) :
+  Circle2D(x, y, radius),
+  m_Angle1(angle1),
+  m_Angle2(angle2)
 {
-  m_Angle1 = angle1;
-  m_Angle2 = angle2;
 }
 
 EKLM::Arc2D::~Arc2D()

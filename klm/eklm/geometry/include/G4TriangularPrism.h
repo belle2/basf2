@@ -10,10 +10,10 @@
 
 #pragma once
 
-/* External headers. */
+/* Geant4 headers. */
+#include <G4Box.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4Tubs.hh>
-#include <G4Box.hh>
 
 namespace Belle2 {
 
@@ -26,6 +26,7 @@ namespace Belle2 {
 
     /**
      * Constructor.
+     * @param[in] name      Name of the volume.
      * @param[in] r1        First point radius.
      * @param[in] phi1      First point angle.
      * @param[in] r2        Second point radius.
@@ -63,7 +64,10 @@ namespace Belle2 {
      * deleted when is is not necessary. If it is used in Geant geometry,
      * do not delete it.
      */
-    G4VSolid* getSolid();
+    G4VSolid* getSolid()
+    {
+      return m_is;
+    }
 
   private:
 

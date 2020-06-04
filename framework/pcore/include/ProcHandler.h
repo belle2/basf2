@@ -68,6 +68,9 @@ namespace Belle2 {
      */
     static int EvtProcID();
 
+    /// Set the process ID of this process
+    static void setProcessID(int processID);
+
     /** Get a name for this process. (input, event, output...). */
     static std::string getProcessName();
 

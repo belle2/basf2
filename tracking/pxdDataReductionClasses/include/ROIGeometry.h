@@ -10,16 +10,9 @@
 
 #pragma once
 
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <list>
-
-//class ROIDetPlane;
-
 
 namespace Belle2 {
 

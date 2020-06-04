@@ -8,14 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
+/* Own header. */
 #include <klm/simulation/ScintillatorFirmware.h>
 
 using namespace Belle2;
 
-KLM::ScintillatorFirmware::ScintillatorFirmware(int nPoints)
+KLM::ScintillatorFirmware::ScintillatorFirmware(int nPoints) :
+  m_nPoints(nPoints)
 {
-  m_nPoints = nPoints;
 }
 
 KLM::ScintillatorFirmware::~ScintillatorFirmware()

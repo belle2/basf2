@@ -10,13 +10,10 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
-#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <string>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   /// Give a weight based on the mc truth information (1 or NAN)
   class MCTruthEclSeedFilter : public BaseCDCStateFilter {

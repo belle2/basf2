@@ -139,7 +139,7 @@ namespace Belle2 {
 
   private:
 
-    void printConfiguration();
+    void printConfiguration(); /**< print the configuration of the check of the calibration VS a reference calibration*/
 
     const int m_apvColors[6] = { 1, 2, 8 , kBlue, 6, 28}; /**< color palette*/
     void   setAPVHistoStyles(SVDAPVHistograms<TH1F>* m_APVhistos); /**< set style of APV histograms*/

@@ -9,18 +9,17 @@
  **************************************************************************/
 
 #include <analysis/variables/MCTruthVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/TauPairDecay.h>
 #include <analysis/utility/MCMatching.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -37,47 +36,9 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-    double isSignalWithoutProperty(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      int status = MCMatching::getMCErrors(part, mcparticle, false);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
-    }
-
-    double isExtendedSignal(const Particle* part)
-    {
-      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
-      if (mcparticle == nullptr)
-        return 0.0;
-
-      int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      status &= (~MCMatching::c_MisID);
-      status &= (~MCMatching::c_AddedWrongParticle);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -86,13 +47,10 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_MisID);
       status &= (~MCMatching::c_AddedWrongParticle);
 
@@ -127,7 +85,7 @@ namespace Belle2 {
     double isCloneTrack(const Particle* particle)
     {
       // neutrals and composites don't make sense
-      if (!Const::chargedStableSet.contains(Const::ParticleType(particle->getPDGCode())))
+      if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
         return std::numeric_limits<double>::quiet_NaN();
       // get mcparticle weight (mcmatch weight)
       auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
@@ -142,9 +100,9 @@ namespace Belle2 {
       qq.push(particle);
       while (!qq.empty()) {
         auto d = qq.front(); // get daughter
-        qq.pop();            // remove the daugher from the queue
-        if (isCloneTrack(d)) return 1.0;
-        size_t nDau = d->getNDaughters(); // number of daughers of daughters
+        qq.pop();            // remove the daughter from the queue
+        if (isCloneTrack(d) == 1.0) return 1.0;
+        size_t nDau = d->getNDaughters(); // number of daughters of daughters
         for (size_t iDau = 0; iDau < nDau; iDau++)
           qq.push(d->getDaughter(iDau));
       }
@@ -207,11 +165,11 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       const MCParticle* mcmother = mcparticle->getMother();
       if (mcmother == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       double p = mcmother->getMomentum().Mag();
       return p;
@@ -227,7 +185,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (!mcparticle)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       double m_ID = mcparticle->getArrayIndex();
       return m_ID;
@@ -237,14 +195,10 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
-      //status &= (~MCMatching::c_DecayInFlight);
+      //remove the following bits
       status &= (~MCMatching::c_MissNeutrino);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
@@ -254,13 +208,10 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
-      status &= (~MCMatching::c_MissingResonance);
+      //remove the following bits
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
 
@@ -271,14 +222,11 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
+      //remove the following bits
       status &= (~MCMatching::c_MissGamma);
-      status &= (~MCMatching::c_MissingResonance);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -287,17 +235,27 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-      //remove the following bits, these are usually ok
-      status &= (~MCMatching::c_MissFSR);
-      status &= (~MCMatching::c_MissPHOTOS);
+      //remove the following bits
       status &= (~MCMatching::c_MissGamma);
-      status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
       status &= (~MCMatching::c_MissNeutrino);
+
+      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+    }
+
+    double isSignalAcceptBremsPhotons(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return 0.0;
+
+      int status = MCMatching::getMCErrors(part, mcparticle);
+      //remove the following bits
+      status &= (~MCMatching::c_AddedRecoBremsPhoton);
 
       return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
     }
@@ -306,7 +264,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getPDG();
     }
@@ -314,11 +272,6 @@ namespace Belle2 {
     double particleMCErrors(const Particle* part)
     {
       return MCMatching::getMCErrors(part);
-    }
-
-    double particleMCErrorsWithoutProperty(const Particle* part)
-    {
-      return MCMatching::getMCErrors(part, nullptr, false);
     }
 
     double particleNumberOfMCMatch(const Particle* particle)
@@ -335,7 +288,7 @@ namespace Belle2 {
       if (relWithWeight.first) {
         return relWithWeight.second;
       } else {
-        return 0.0;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -343,7 +296,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getDecayTime();
     }
@@ -352,7 +305,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
       return mcparticle->getLifetime();
     }
@@ -361,79 +314,95 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Px();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Px();
     }
 
     double particleMCMatchPY(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Py();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Py();
     }
 
     double particleMCMatchPZ(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Pz();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Pz();
     }
 
     double particleMCMatchPT(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Pt();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Pt();
     }
 
     double particleMCMatchE(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getEnergy();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).E();
     }
 
     double particleMCMatchP(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Mag();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).P();
     }
 
     double particleMCMatchTheta(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Theta();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Theta();
     }
 
     double particleMCMatchPhi(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return -999.0;
+        return std::numeric_limits<double>::quiet_NaN();
 
-      return mcparticle->getMomentum().Phi();
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TLorentzVector mcpP4 = mcparticle->get4Vector();
+      return frame.getMomentum(mcpP4).Phi();
     }
 
     double particleMCRecoilMass(const Particle* part)
     {
       StoreArray<MCParticle> mcparticles;
       if (mcparticles.getEntries() < 1)
-        return -999;
+        return std::numeric_limits<double>::quiet_NaN();
 
       TLorentzVector pInitial = mcparticles[0]->get4Vector();
       TLorentzVector pDaughters;
@@ -441,7 +410,7 @@ namespace Belle2 {
       for (auto daughter : daughters) {
         const MCParticle* mcD = daughter->getRelatedTo<MCParticle>();
         if (mcD == nullptr)
-          return -999;
+          return std::numeric_limits<double>::quiet_NaN();
 
         pDaughters += mcD->get4Vector();
       }
@@ -455,7 +424,7 @@ namespace Belle2 {
       if (mcp) {
         return mcp->getSecondaryPhysicsProcess();
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -465,7 +434,7 @@ namespace Belle2 {
       if (mcp) {
         return mcp->getStatus();
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -479,7 +448,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -493,7 +462,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -507,7 +476,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -521,7 +490,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -535,7 +504,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -549,7 +518,7 @@ namespace Belle2 {
         else
           return 0;
       } else {
-        return -1;
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
@@ -609,8 +578,8 @@ namespace Belle2 {
 
     double isReconstructible(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -625,8 +594,8 @@ namespace Belle2 {
 
     double seenInPXD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -635,8 +604,8 @@ namespace Belle2 {
 
     double seenInSVD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -645,8 +614,8 @@ namespace Belle2 {
 
     double seenInCDC(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -655,8 +624,8 @@ namespace Belle2 {
 
     double seenInTOP(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -665,8 +634,8 @@ namespace Belle2 {
 
     double seenInECL(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -675,8 +644,8 @@ namespace Belle2 {
 
     double seenInARICH(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -685,8 +654,8 @@ namespace Belle2 {
 
     double seenInKLM(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -701,12 +670,12 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       int nChildren = p->getNDaughters();
       if (arguments[0] >= nChildren) {
-        return -999;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       const Particle*   daugP   = p->getDaughter(arguments[0]);
@@ -715,7 +684,7 @@ namespace Belle2 {
         // This is a strange case.
         // The particle, p, has the related MC particle, but i-th daughter does not have the related MC Particle.
         B2WARNING("No MCParticle is associated to the i-th daughter");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       if (nChildren == 1) {
@@ -741,7 +710,7 @@ namespace Belle2 {
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp) {
         B2WARNING("No MCParticle is associated to the particle");
-        return -1;
+        return std::numeric_limits<int>::quiet_NaN();
       }
 
       return MCMatching::countMissingParticle(p, mcp, PDGcodes);
@@ -771,7 +740,7 @@ namespace Belle2 {
        * this particle.
        *
        * Note that for track-based particles this is different from the mc match
-       * of the partcle (which it inherits from the mc match of the track)
+       * of the particle (which it inherits from the mc match of the track)
        */
       const MCParticle* matchedToParticle = particle->getMCParticle();
       if (!matchedToParticle) return std::numeric_limits<float>::quiet_NaN();
@@ -787,7 +756,7 @@ namespace Belle2 {
         if (mcps[i]->getArrayIndex() == matchedToIndex)
           return mcps.weight(i);
 
-      return -1.0;
+      return std::numeric_limits<float>::quiet_NaN();
     }
 
     double particleClusterBestMCMatchWeight(const Particle* particle)
@@ -859,19 +828,14 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
                       "It behaves according to DecayStringGrammar.");
-    REGISTER_VARIABLE("isSignalWithoutProperty", isSignalWithoutProperty,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise. \n"
-                      "It does not consider the missing particle flags of PropertyFlags of the particle.");
-    REGISTER_VARIABLE("isExtendedSignal", isExtendedSignal,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
-                      "Misidentification of charged FSP is allowed. \n"
-                      "It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
                       "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
                       "Misidentification of charged FSP is allowed.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 otherwise");
-
+    REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
+                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 otherwise.\n"
+                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
@@ -902,7 +866,7 @@ namespace Belle2 {
                       isSignalAcceptMissing,
                       "same as isSignal, but also accept missing particle");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "return 1 if the partice is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
+                      "return 1 if the particle is misidentified: one or more of the final state particles have the wrong PDG code assignment (including wrong charge), 0 in all other cases.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
                       "return 1 if the charge of the particle is wrongly assigned, 0 in all other cases");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
@@ -913,33 +877,30 @@ namespace Belle2 {
                       "The PDG code of matched MCParticle, 0 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcErrors", particleMCErrors,
                       "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags)");
-    REGISTER_VARIABLE("mcErrorsWithoutProperty", particleMCErrors,
-                      "The bit pattern indicating the quality of MC match (see MCMatching::MCErrorFlags) \n"
-                      "The ignore particle flags of Particle::PropertyFlags which is set by decayString grammar are not considered.");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight,
                       "The weight of the Particle -> MCParticle relation (only for the first Relation = largest weight).");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch,
                       "The number of relations of this Particle to MCParticle.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime,
-                      "The decay time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The decay time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,
-                      "The life time of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The life time of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX,
-                      "The px of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The px of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,
-                      "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The py of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
-                      "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The pz of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPT", particleMCMatchPT,
-                      "The pt of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The pt of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcE", particleMCMatchE,
-                      "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The energy of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcP", particleMCMatchP,
-                      "The total momentum of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The total momentum of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,
-                      "The phi of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The phi of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,
-                      "The theta of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
+                      "The theta of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
 
@@ -947,35 +908,35 @@ namespace Belle2 {
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,
                       "Returns the secondary physics process flag.");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns status bits of related MCParticle or - 1 if MCParticle relation is not set.");
+                      "Returns status bits of related MCParticle or NaN if MCParticle relation is not set.");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
-                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle,"
-                      "-1 if Particle is not related to MCParticle.");
+                      "Returns 1 if Particle is related to primary MCParticle, 0 if Particle is related to non - primary MCParticle, "
+                      "NaN if Particle is not related to MCParticle.");
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
-                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to virtual MCParticle, 0 if Particle is related to non - virtual MCParticle, "
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
-                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to initial MCParticle, 0 if Particle is related to non - initial MCParticle, "
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcISR", particleMCISRParticle,
-                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to ISR MCParticle, 0 if Particle is related to non - ISR MCParticle, "
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
-                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to FSR MCParticle, 0 if Particle is related to non - FSR MCParticle ,"
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
-                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle,"
-                      "-1 if Particle is not related to MCParticle.")
+                      "Returns 1 if Particle is related to Photos MCParticle, 0 if Particle is related to non - Photos MCParticle, "
+                      "NaN if Particle is not related to MCParticle.")
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
                       "[Eventbased] Returns the event weight produced by the event generator")
 
     REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
-                      "Returns number of steps to i-th daughter from the particle at generator level."
-                      "-1 if the no MCParticle is associated to the particle or i-th daughter."
-                      "-999 if i-th daughter does not exist.");
+                      "Returns number of steps to i-th daughter from the particle at generator level. "
+                      "NaN if no MCParticle is associated to the particle or i-th daughter. "
+                      "NaN if i-th daughter does not exist.");
     REGISTER_VARIABLE("genNMissingDaughter(PDG)", genNMissingDaughter,
-                      "Returns the number of missing daughters having assigned PDG codes."
-                      "-1 if the no MCParticle is associated to the particle.")
+                      "Returns the number of missing daughters having assigned PDG codes. "
+                      "NaN if no MCParticle is associated to the particle.")
     REGISTER_VARIABLE("Eher", getHEREnergy, R"DOC(
 [Eventbased] The nominal HER energy used by the generator.
 
@@ -1030,7 +991,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
                       "returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("isMC", isMC,
-                      "Returns 1 if run on MC and 0 for data.");
+                      "[Eventbased] Returns 1 if run on MC and 0 for data.");
 
   }
 }

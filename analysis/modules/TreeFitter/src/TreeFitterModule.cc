@@ -19,15 +19,13 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
-
-#include <framework/geometry/BFieldManager.h>
 
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 
-#include <framework/particledb/EvtGenDatabasePDG.h>
 using namespace Belle2;
 
 REG_MODULE(TreeFitter)
@@ -204,9 +202,9 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[40;97m              , ., _\"__ \\__./ .\"                                                \033[0m");
   B2INFO("\033[40;97m          ___       __ |  y     , ..,     \033[97;40mThank you for using TreeFitter.       \033[0m");
   B2INFO("\033[40;97m         /)'\\    ''''| u  \\ %W%W%%;                                             \033[0m");
-  B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____”            \033[97;40mCite:                                 \033[0m");
+  B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____”            \033[97;40mPlease cite both:                     \033[0m");
   B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40mhttps://arxiv.org/abs/1901.11198  \033[0m");
-  B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"                                            \033[0m");
+  B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"       \033[97;40m   10.1016/j.nima.2005.06.078        \033[0m");
   B2INFO("\033[40;97m           &&%%&    (| Uo /        '\"     \033[97;40mEmail:                                \033[0m");
   B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@desy.de         \033[0m");
   B2INFO("\033[40;97m  ._______________.-‘____””—.____.           \033[97;40mjo-frederik.krohn@desy.de          \033[0m");

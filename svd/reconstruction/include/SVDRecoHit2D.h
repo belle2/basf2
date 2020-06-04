@@ -58,7 +58,8 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
+    explicit SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = nullptr, float sigmaU = -1,
+                          float sigmaV = -1);
 
 
     /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray

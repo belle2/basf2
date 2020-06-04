@@ -173,7 +173,7 @@ namespace Belle2::Conditions {
     m_session = std::make_unique<CurlSession>();
     m_session->curl = curl_easy_init();
     if (!m_session->curl) {
-      B2FATAL("Cannot intialize libcurl");
+      B2FATAL("Cannot initialize libcurl");
     }
     m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
@@ -203,6 +203,11 @@ namespace Belle2::Conditions {
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYSTATUS, 0L);
+    // Don't cache DNS entries, ask the system every time we need to connect ...
+    curl_easy_setopt(m_session->curl, CURLOPT_DNS_CACHE_TIMEOUT, 0L);
+    // and shuffle the addresses so we try a different node, otherwise we might
+    // always get the same address due to system caching and RFC 3484
+    curl_easy_setopt(m_session->curl, CURLOPT_DNS_SHUFFLE_ADDRESSES, 1L);
     auto version = getUserAgent();
     curl_easy_setopt(m_session->curl, CURLOPT_USERAGENT, version.c_str());
     return true;
@@ -278,7 +283,7 @@ namespace Belle2::Conditions {
       // flush output
       buffer.exceptions(oldExceptionMask);
       buffer.flush();
-      // and check for errors which occured during download ...
+      // and check for errors which occurred during download ...
       if (res != CURLE_OK) {
         size_t len = strlen(m_session->errbuf);
         const std::string error = len ? m_session->errbuf : curl_easy_strerror(res);
@@ -308,7 +313,7 @@ namespace Belle2::Conditions {
       break;
     }
     // all fine
-    B2DEBUG(37, "Download finished succesfully." << LogVar("url", url));
+    B2DEBUG(37, "Download finished successfully." << LogVar("url", url));
     return true;
   }
 } // namespace Belle2::Conditions

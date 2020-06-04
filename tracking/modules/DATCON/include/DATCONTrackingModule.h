@@ -19,7 +19,6 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>

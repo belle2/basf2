@@ -11,7 +11,6 @@
 #include <tracking/modules/vxdtfQualityEstimator/VXDQualityEstimatorMVAModule.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorTripletFit.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorCircleFit.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRandom.h>
 #include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorRiemannHelixFit.h>
 #include <framework/geometry/BFieldManager.h>
 
@@ -26,19 +25,31 @@ VXDQualityEstimatorMVAModule::VXDQualityEstimatorMVAModule() : Module()
   setDescription("The quality estimator module for SpacePointTrackCandidates.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("EstimationMethod", m_EstimationMethod,
-           "Identifier which estimation method to use. Valid identifiers are: [tripletFit, circleFit, helixFit]", std::string(""));
+  addParam("EstimationMethod",
+           m_EstimationMethod,
+           "Identifier which estimation method to use. Valid identifiers are: [tripletFit, circleFit, helixFit]",
+           m_EstimationMethod);
 
-  addParam("SpacePointTrackCandsStoreArrayName", m_SpacePointTrackCandsStoreArrayName,
-           "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.", std::string(""));
+  addParam("SpacePointTrackCandsStoreArrayName",
+           m_SpacePointTrackCandsStoreArrayName,
+           "Name of StoreArray containing the SpacePointTrackCandidates to be estimated.",
+           m_SpacePointTrackCandsStoreArrayName);
 
-  addParam("WeightFileIdentifier", m_WeightFileIdentifier,
-           "Identifier of weightfile in Database or local root/xml file.", std::string(""));
 
-  addParam("UseTimingInfo", m_UseTimingInfo,
-           "Whether to use timing information available in the weight file", bool(false));
+  addParam("WeightFileIdentifier",
+           m_weightFileIdentifier,
+           "Identifier of weightfile in Database or local root/xml file.",
+           m_weightFileIdentifier);
 
-  addParam("ClusterInformation", m_ClusterInformation, "How to compile information from clusters ['Average']", std::string(""));
+  addParam("UseTimingInfo",
+           m_UseTimingInfo,
+           "Whether to use timing information available in the weight file",
+           m_UseTimingInfo);
+
+  addParam("ClusterInformation",
+           m_ClusterInformation,
+           "How to compile information from clusters ['Average']",
+           m_ClusterInformation);
 }
 
 void VXDQualityEstimatorMVAModule::initialize()
@@ -53,7 +64,7 @@ void VXDQualityEstimatorMVAModule::initialize()
     m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, m_UseTimingInfo);
   }
 
-  m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);
+  m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 
   // create pointer to chosen estimator
@@ -71,19 +82,19 @@ void VXDQualityEstimatorMVAModule::beginRun()
 {
   m_mvaExpert->beginRun();
   // BField is required by all QualityEstimators
-  double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
+  const double bFieldZ = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
   m_estimator->setMagneticFieldStrength(bFieldZ);
 }
 
 void VXDQualityEstimatorMVAModule::event()
 {
   // assign a QI computed using the selected QualityEstimator for each given SpacePointTrackCand
-  for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
-    if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
+  for (SpacePointTrackCand& spacePointTrackCand : m_spacePointTrackCands) {
+    if (not spacePointTrackCand.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
       continue;
     }
 
-    std::vector<SpacePoint const*> const sortedHits = aTC.getSortedHits();
+    std::vector<SpacePoint const*> const sortedHits = spacePointTrackCand.getSortedHits();
 
     if (m_ClusterInformation == "Average") {
       m_clusterInfoExtractor->extractVariables(sortedHits);
@@ -93,7 +104,7 @@ void VXDQualityEstimatorMVAModule::event()
 
     m_qeResultsExtractor->extractVariables(m_estimator->estimateQualityAndProperties(sortedHits));
 
-    float qi = m_mvaExpert->predict();
-    aTC.setQualityIndicator(qi);
+    const float qi = m_mvaExpert->predict();
+    spacePointTrackCand.setQualityIndicator(qi);
   }
 }

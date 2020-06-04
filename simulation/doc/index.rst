@@ -2,9 +2,71 @@
 Simulation
 ==========
 
-simulation
-===========
+.. _Geant4: https://geant4.web.cern.ch/
+
+The core of the simulation library is `Geant4`_, which is an external library. A simulation library module, **FullSim**, was created as a wrapper for the ``basf2`` - Geant4 interface. The default input parameters for FullSim are stored in two places,
+
+* `simulation/scripts/simulation.py <https://stash.desy.de/projects/B2/repos/software/browse/simulation/scripts/simulation.py>`_ and
+* `simulation/modules/fullsim/src/FullSimModule.cc <https://stash.desy.de/projects/B2/repos/software/browse/simulation/modules/fullsim/src/FullSimModule.cc>`_.
+
+Geant4 version in the externals library
+=======================================
+
+The Geant4 version information is stored in the variable ``G4Version`` in the Geant4 source code `global/management/include/G4Version.hh <https://geant4.kek.jp/lxr/source/global/management/include/G4Version.hh>`_.
+ 
+The history of Geant4 version information in the ``basf2`` external library is as follows:
+
++------------------------+----------------+
+|   externals version    | Geant4 version |
++========================+================+
+| v01-01-01 and later    |    10.1.2      |
++------------------------+----------------+
+| v00-04-00 to v01-00-00 |     9.6.2      |
++------------------------+----------------+
+| v00-02-02 to v00-03-04 |     9.5.1      |
++------------------------+----------------+
+| v00-02-00 to v00-02-01 |     9.5.0      |
++------------------------+----------------+
+| v00-00-05 to v00-01-05 |     9.4.1      |
++------------------------+----------------+
+| v00-00-01 to v00-00-04 |     9.3.0      |
++------------------------+----------------+
+
+Physics list for Geant4
+=======================
+
+``basf2`` have two options for the input physics list for Geant4. 
+
+The default physics list
+""""""""""""""""""""""""
+
+Until November 29, 2013, the default physics list parameter for FullSim was set as *QGSP_VERT*. After this day, the parameter was changed to *FTFP_BERT*, the popular physics list for high energy physics. 
+
+Belle2PhysicsList
+"""""""""""""""""
+
+The second one is *Belle2PhysicsList*, optimized for the Belle II needs by the Geant4 experts. The details on the *Belle2PhysicsList* are explained below.
+
+.. toctree::
+
+   Belle2PhysicsList 
+
+Secondary particles
+===================
+
+For the details on secondary particles produced by Geant4, please refer to `this confluence page <https://confluence.desy.de/display/BI/Software+SecondaryParticles>`_.
+
+
+Functions in simulation.py
+==========================
+
 .. automodule:: simulation
    :members:
    :undoc-members:
+
+
+FullSimTiming
+=============
+
+This module is used to count the CPU time consumed by each subdetector during simulation. The externals library should be compiled in the debug mode for the job execution, so usually only experts use this module.
 

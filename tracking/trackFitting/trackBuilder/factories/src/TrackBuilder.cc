@@ -12,13 +12,11 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
 #include <genfit/FitStatus.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>

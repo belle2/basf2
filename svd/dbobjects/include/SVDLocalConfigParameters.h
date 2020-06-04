@@ -78,7 +78,7 @@ namespace Belle2 {
      * @param std::string coeff+ [RFC]
      *
      */
-    void setCalibrationTimeInRFCUnits(std::string calibrationTimeUnits)
+    void setCalibrationTimeInRFCUnits(const std::string& calibrationTimeUnits)
     {
       m_calibrationTimeUnits = calibrationTimeUnits;
     }
@@ -89,7 +89,7 @@ namespace Belle2 {
      * @param std::string
      *
      */
-    void setCalibDate(std::string date)
+    void setCalibDate(const std::string& date)
     {
       m_calibDate = date;
     }

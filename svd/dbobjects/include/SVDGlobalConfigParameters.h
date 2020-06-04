@@ -120,7 +120,7 @@ namespace Belle2 {
      * @param std::string coeff + units [RFC]
      *
      */
-    void setAPVClockInRFCUnits(std::string APVClockUnits)
+    void setAPVClockInRFCUnits(const std::string& APVClockUnits)
     {
       m_APVClockInRFCUnits = APVClockUnits;
     }

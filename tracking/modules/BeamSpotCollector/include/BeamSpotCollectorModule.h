@@ -10,14 +10,8 @@
  ***************************************************************************/
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <string>
 #include "TH1F.h"
-#include "TPaveStats.h"
 
 namespace Belle2 {
   /**

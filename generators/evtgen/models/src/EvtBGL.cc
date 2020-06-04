@@ -3,16 +3,19 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
+ *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <stdlib.h>
 #include "EvtGenBase/EvtParticle.hh"
+#include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtSemiLeptonicScalarAmp.hh"
+#include "EvtGenBase/EvtSemiLeptonicVectorAmp.hh"
 #include <string>
 
 #include "generators/evtgen/EvtGenModelRegister.h"
@@ -118,8 +121,16 @@ void EvtBGL::init()
 
       ::abort();
     }
-  }  else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL (N=3) model handles only scalar meson daughters at this moment. Sorry." << endl;
+  }  else if (d1type == EvtSpinType::VECTOR) {
+    if (getNArg() == 6) {
+      bglffmodel = new EvtBGLFF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5));
+      calcamp = new EvtSemiLeptonicVectorAmp;
+    } else {
+      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL model for vector meson daughters needs 6 arguments. Sorry." << endl;
+      ::abort();
+    }
+  } else {
+    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "BGL model handles only scalar and vector meson daughters. Sorry." << endl;
     ::abort();
   }
 

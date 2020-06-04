@@ -23,13 +23,13 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <TClonesArray.h>
 
 #include <nlohmann/json.hpp>
 
-#include <ctime>
 #include <memory>
 #include <regex>
 
@@ -422,7 +422,6 @@ void RootOutputModule::fillFileMetaData()
 void RootOutputModule::terminate()
 {
   closeFile();
-  MetadataService::Instance().addRootOutputFile(m_outputFileName, &m_outputFileMetaData);
 }
 
 void RootOutputModule::closeFile()
@@ -454,11 +453,15 @@ void RootOutputModule::closeFile()
   }
   dir->cd();
 
+  const std::string filename = m_file->GetName();
   if (m_outputSplitSize) {
-    B2INFO(getName() << ": Finished writing file." << LogVar("filename", m_file->GetName()));
+    B2INFO(getName() << ": Finished writing file." << LogVar("filename", filename));
   }
   delete m_file;
   m_file = nullptr;
+
+  // and now add it to the metadata service as it's fully written
+  MetadataService::Instance().addRootOutputFile(filename, &m_outputFileMetaData);
 
   // reset some variables
   for (auto & entry : m_entries) {

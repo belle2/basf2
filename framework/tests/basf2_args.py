@@ -1,29 +1,33 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-from ROOT import Belle2
+import basf2
+import b2test_utils
+import subprocess
 import os
 
-assert 0 == os.system('basf2 --info')
+# disable pager when running these interactively
+os.environ['PAGER'] = "cat"
 
-assert 0 == os.system('basf2 --version')
+success = [
+    ['--info'],
+    ['--version'],
+    ['--help'],
+    ['-m', 'RootOutput'],
+    ['--dry-run', 'root_input.py', '-i', 'miep.root'],
+    ['--dry-run', 'root_input.py'],
+]
+error = [
+    ['-m', 'NonExistingModule'],
+    ['--thisdoesntexist'],
+    ['/this/path/doesnt/exist.py'],
+    ['h͌̉e̳̞̞͆ͨ̏͋̕c͟o͛҉̟̰̫͔̟̪̠m̴̀ͯ̿͌ͨ̃͆e̡̦̦͖̳͉̗ͨͬ̑͌̃ͅt̰̝͈͚͍̳͇͌h̭̜̙̦̣̓̌̃̓̀̉͜'],
+]
 
-assert 0 == os.system('basf2 --help')
+test_dir = basf2.find_file("/framework/tests")
+with b2test_utils.working_directory(test_dir):
+    for arguments in success:
+        assert 0 == subprocess.run(['basf2'] + arguments).returncode
 
-assert 0 == os.system('basf2 -m RootOutput')
-
-testdir = Belle2.FileSystem.findFile('/framework/tests/')
-os.chdir(testdir)
-assert 0 == os.system('basf2 root_input.py --dry-run -i miep.root')
-assert 0 == os.system('basf2 --dry-run root_input.py')
-# TODO: check output from --dry-run to see if it changes
-
-
-# some failing things
-# exact return code of system() not defined, just unsuccesful
-assert 0 != os.system('basf2 -m NonExistingModule')
-
-assert 0 != os.system('basf2 --thisdoesntexist')
-
-assert 0 != os.system('basf2 /this/path/doesnot/exist.py')
+    for arguments in error:
+        assert 0 != subprocess.run(['basf2'] + arguments).returncode

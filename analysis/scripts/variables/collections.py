@@ -14,17 +14,13 @@ cluster = [
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'clusterTrigger',
-    'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -48,9 +44,6 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'eclExtPhi',
-    'eclExtPhiId',
-    'eclExtTheta',
     'goodBelleGamma',
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
@@ -60,6 +53,12 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: Cluster averages
+cluster_average = [
+    'maxWeightedDistanceFromAverageECLTime',
+    'weightedAverageECLTime'
 ]
 
 #: KLM cluster information
@@ -110,9 +109,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -153,7 +152,7 @@ flight_info = [
 ]
 
 #: MC true flight info variables
-mc_flight_info = utils.create_mctruth_aliases(flight_info)
+mc_flight_info = ['mcFlightTime', 'mcFlightDistance']
 
 #: Replacement for Vertex tuple tool
 vertex = [
@@ -182,14 +181,14 @@ vertex = [
 
 #: Replacement for MCVertex tuple tool
 mc_vertex = [
-    'mcX',
-    'mcY',
-    'mcZ',
-    'mcDistance',
-    'mcRho',
-    'mcProdVertexX',
-    'mcProdVertexY',
-    'mcProdVertexZ'
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
+    'mcDecayVertexFromIPDistance',
+    'mcDecayVertexRho',
+    'mcProductionVertexX',
+    'mcProductionVertexY',
+    'mcProductionVertexZ'
 ]
 
 #: CPV and Tag-side related variables
@@ -218,9 +217,11 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
-    'TagVmcLBoost',
-    'TagVmcOBoost',
+    'mcDeltaTau',
+    'mcDeltaT',
+    'mcDeltaBoost',
+    'mcTagVLBoost',
+    'mcTagVOBoost',
     'mcLBoost',
     'mcOBoost',
     'mcTagVx',
@@ -245,7 +246,7 @@ reco_stats = [
 inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
 event_level_tracking = [
@@ -287,6 +288,24 @@ event_shape = [
     "aplanarity",
     "thrust",
     "thrustAxisCosTheta",
+]
+
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
 ]
 
 # now register all the variables declared in this file as collections

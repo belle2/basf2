@@ -9,25 +9,24 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdMu
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdMu, stdPi
 
 # create a new path
-ISRskimpath = Path()
+ISRskimpath = b2.Path()
 
 filelist = ['../ISRpipimumu.udst.root']
-inputMdstList('default', filelist, path=ISRskimpath)
+ma.inputMdstList('default', filelist, path=ISRskimpath)
 
 # use standard final state particle lists
 stdMu('95eff', path=ISRskimpath)
 stdPi('95eff', path=ISRskimpath)
 # [ee -> ISR pi+pi- [J/psi -> mu+mu-]] decay
-reconstructDecay('J/psi:mumu -> mu+:95eff mu-:95eff', '2.9 < M < 3.3', path=ISRskimpath)
-reconstructDecay('vpho:myCombinations -> J/psi:mumu pi+:95eff pi-:95eff', '', path=ISRskimpath)
+ma.reconstructDecay('J/psi:mumu_validation -> mu+:95eff mu-:95eff', '2.9 < M < 3.3', path=ISRskimpath)
+ma.reconstructDecay('vpho:myCombinations -> J/psi:mumu_validation pi+:95eff pi-:95eff', '', path=ISRskimpath)
 
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='ISRpipimumu_Validation.root',
     decayString='vpho:myCombinations',
     variables=[
@@ -44,5 +43,5 @@ variablesToHistogram(
          -1,
          1)
     ], path=ISRskimpath)
-process(ISRskimpath)
-print(statistics)
+b2.process(ISRskimpath)
+print(b2.statistics)

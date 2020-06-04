@@ -8,12 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMETRY_UTILITIES_H
-#define GEOMETRY_UTILITIES_H
+#pragma once
 
 #include <list>
 #include <string>
-//class G4Colour;
+
 class G4LogicalVolume;
 class G4Polycone;
 
@@ -143,4 +142,3 @@ namespace Belle2 {
 
   }
 } //Belle2 namespace
-#endif

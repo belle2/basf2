@@ -23,8 +23,9 @@ main = create_path()
 # specify number of events to be generated
 main.add_module('EventInfoSetter', evtNumList=[10000], runList=[1], expList=[1003])
 
-# generate BBbar events
-main.add_module('Cosmics')
+# Generate cosmic events.
+# Set initial radius to 350 cm to include KLM (excluded by default).
+main.add_module('Cosmics', cylindricalR=350)
 
 # detector simulation
 add_simulation(main)

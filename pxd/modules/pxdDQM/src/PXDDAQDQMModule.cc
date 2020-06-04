@@ -12,6 +12,7 @@
 
 #include <TDirectory.h>
 #include <TAxis.h>
+#include <boost/format.hpp>
 #include <string>
 
 using namespace std;

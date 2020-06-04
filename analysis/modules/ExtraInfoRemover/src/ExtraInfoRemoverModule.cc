@@ -12,6 +12,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
 
+#include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
 using namespace Belle2;

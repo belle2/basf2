@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

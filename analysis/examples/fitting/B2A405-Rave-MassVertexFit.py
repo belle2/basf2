@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -29,8 +28,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import vertexRave
-from modularAnalysis import massVertexRave
+from vertex import raveFit
 from modularAnalysis import variablesToExtraInfo
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
@@ -67,13 +65,13 @@ variablesToExtraInfo("D0:kpi", variables={'M': 'M_before_vertex_fit'}, path=my_p
 # Second, creating alias for the extra info variable
 vm.addAlias("M_BeforeFit", "extraInfo(M_before_vertex_fit)")
 # Now, do the fit keeping candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D0:kpi', 0.0, path=my_path)
+raveFit('D0:kpi', 0.0, path=my_path)
 
 # perform mass constrained D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
 variablesToExtraInfo("D0:kpi_mass", variables={'M': 'M_before_vertex_fit'}, path=my_path)
 # no need to create alias again
-massVertexRave('D0:kpi_mass', 0.0, path=my_path)
+raveFit('D0:kpi_mass', 0.0, fit_type='massvertex', path=my_path)
 
 # reconstruct two D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -83,17 +81,17 @@ reconstructDecay('D*+:1 -> D0:kpi pi+:all',
 reconstructDecay('D*+:2 -> D0:kpi_mass pi+:all',
                  '0.0 <= Q < 0.02 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
 
-# perform D*+ kinematic vertex fit using the D0 and the pi+
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:1', 0.0, path=my_path)
-
-# perform D*+ kinematic beam spot constrined vertex fit using the D0 and the pi+
-# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:2', 0.0, '', 'ipprofile', path=my_path)
-
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 matchMCTruth('D*+:1', path=my_path)
 matchMCTruth('D*+:2', path=my_path)
+
+# perform D*+ kinematic vertex fit using the D0 and the pi+
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+raveFit('D*+:1', 0.0, path=my_path)
+
+# perform D*+ kinematic beam spot constrained vertex fit using the D0 and the pi+
+# keep candidates only passing C.L. value of the fit > 0.0 (no cut)
+raveFit('D*+:2', 0.0, constraint='ipprofile', path=my_path)
 
 
 # Select variables that we want to store to ntuple

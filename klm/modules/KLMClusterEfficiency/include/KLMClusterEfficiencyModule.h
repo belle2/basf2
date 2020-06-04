@@ -10,15 +10,15 @@
 
 #pragma once
 
-/* External headers. */
-#include <TFile.h>
-#include <TTree.h>
-
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
 

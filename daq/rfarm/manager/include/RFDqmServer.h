@@ -9,15 +9,10 @@
 //-
 
 #include <string>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
-#include "daq/rfarm/manager/RFNSM.h"
 
 #include "daq/rfarm/manager/RFServerBase.h"
 

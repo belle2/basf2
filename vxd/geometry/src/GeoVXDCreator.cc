@@ -494,11 +494,12 @@ namespace Belle2 {
         if (it == vxdGeometryPar.getSensorMap().end()) {
           B2FATAL("Invalid SensorTypeID " << p.getSensorTypeID() << ", please check the definition of " << sensorID);
         }
-        VXDGeoSensorPar& s = it->second;
 
         //Now create all the other components and place the Sensor
-        if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) readSubComponents(s.getComponents() , GearDir(content,
-              "Components/"), vxdGeometryPar);
+        if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) {
+          VXDGeoSensorPar& s = it->second;
+          readSubComponents(s.getComponents() , GearDir(content, "Components/"), vxdGeometryPar);
+        }
         // Read alignment for sensor
         string pathSensor = (boost::format("Align[@component='%1%']/") % sensorID).str();
         GearDir paramsSensor(GearDir(content, "Alignment/"), pathSensor);

@@ -23,7 +23,7 @@ namespace Belle2 {
 // Open a file
     void openFileA(std::ifstream& ifs, const std::string& fileName0)
     {
-      std::string fileName1 = "/cdc/data/" + fileName0;
+      std::string fileName1 = "/data/cdc/" + fileName0;
       std::string fileName = FileSystem::findFile(fileName1, true);
 
       if (fileName == "") {
@@ -42,7 +42,7 @@ namespace Belle2 {
 // Open a file using boost (to be able to read a gzipped file)
     void openFileB(boost::iostreams::filtering_istream& ifs, const std::string& fileName0)
     {
-      std::string fileName1 = "/cdc/data/" + fileName0;
+      std::string fileName1 = "/data/cdc/" + fileName0;
       std::string fileName = FileSystem::findFile(fileName1, true);
 
       if (fileName == "") {

@@ -13,9 +13,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-
-#include <analysis/dataobjects/ParticleList.h>
 
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -167,6 +164,7 @@ namespace Belle2 {
 
     bool m_writeOut;  /**< toggle particle list btw. transient/persistent */
     bool m_addDaughters; /**< toggle addition of the bottom part of the particle's decay chain */
+    bool m_skipNonPrimaryDaughters; /**< toggle skip of secondary MC daughters */
     std::string m_roeMaskName; /**< ROE mask name to load */
     std::string m_sourceParticleListName; /**< Particle list name from which we need to get related ROEs */
     bool m_useMissing; /**< Use missing momentum to build a particle */

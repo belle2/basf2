@@ -10,11 +10,15 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* KLM headers. */
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
+#include <klm/dbobjects/KLMTimeWindow.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 
 namespace Belle2 {
 
@@ -58,6 +62,12 @@ namespace Belle2 {
     void importTimeConversion(const KLMTimeConversion* timeConversion);
 
     /**
+     * Import KLM time window parameters.
+     * @param[in] timeWindow Time window.
+     */
+    void importTimeWindow(KLMTimeWindow* timeWindow);
+
+    /**
      * Load strip efficiencies.
      *
      * @param[out] stripEfficiency
@@ -75,19 +85,56 @@ namespace Belle2 {
      */
     void importStripEfficiency(const KLMStripEfficiency* stripEfficiency);
 
+    /**
+     * Import alignment.
+     * @param[in] bklmAlignment        BKLM alignment.
+     * @param[in] eklmAlignment        EKLM alignment.
+     * @param[in] eklmSegmentAlignment EKLM segment alignment.
+     * @param[in] displacement         Import displacement payload.
+     */
+    void importAlignment(const BKLMAlignment* bklmAlignment,
+                         const EKLMAlignment* eklmAlignment,
+                         const EKLMSegmentAlignment* eklmSegmentAlignment,
+                         bool displacement = false);
+
   private:
 
+    /**
+     * Import BKLM alignment.
+     * @param[in] bklmAlignment BKLM alignment.
+     * @param[in] displacement  Import displacement payload.
+     */
+    void importBKLMAlignment(const BKLMAlignment* bklmAlignment,
+                             bool displacement = false);
+
+    /**
+     * Import EKLM alignment.
+     * @param[in] eklmAlignment EKLM alignment.
+     * @param[in] displacement  Import displacement payload.
+     */
+    void importEKLMAlignment(const EKLMAlignment* eklmAlignment,
+                             bool displacement = false);
+
+    /**
+     * Import EKLM segment alignment.
+     * @param[in] eklmSegmentAlignment EKLM segment alignment.
+     * @param[in] displacement         Import displacement payload.
+     */
+    void importEKLMSegmentAlignment(
+      const EKLMSegmentAlignment* eklmSegmentAlignment,
+      bool displacement = false);
+
     /** Low experiment. */
-    int m_ExperimentLow;
+    int m_ExperimentLow = 0;
 
     /** Low run. */
-    int m_RunLow;
+    int m_RunLow = 0;
 
     /** High experiment. */
-    int m_ExperimentHigh;
+    int m_ExperimentHigh = -1;
 
     /** High run. */
-    int m_RunHigh;
+    int m_RunHigh = -1;
 
   };
 

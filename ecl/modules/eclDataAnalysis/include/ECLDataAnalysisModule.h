@@ -82,8 +82,9 @@ namespace Belle2 {
     std::string m_rootFileName; /**< name of the root file */
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
-    bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
-    bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doPureCsI; /**< if true, info on pureCsI upgrade is stored*/
+    bool m_doHits; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doDigits; /**< if true, info on Digits and CalDigits is stored*/
 
     //dataStore objects
     StoreArray<Track> m_tracks;  /**< Tracks storeArray */
@@ -496,6 +497,7 @@ namespace Belle2 {
     std::vector<int>*
     m_eclShowerMCFFlightMatch; /**< Int, 1 if primary particle flight direction is "well" reconstructed in ECL, 0 otherwise, DEBUG PURPOSE*/
     std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
+    std::vector<double>*   m_eclShowerNumberOfCrystalsForEnergy; /**< Number of crystals used for energy calculation*/
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */

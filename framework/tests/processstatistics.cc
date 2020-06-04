@@ -1,5 +1,4 @@
 #include <framework/core/ProcessStatistics.h>
-#include <framework/logging/Logger.h>
 #include <framework/core/Module.h>
 
 #include <gtest/gtest.h>

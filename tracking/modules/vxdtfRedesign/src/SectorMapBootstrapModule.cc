@@ -14,12 +14,8 @@
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
 //#include "tracking/dataobjects/VXDTFSecMap.h"
-#include "tracking/dataobjects/FilterID.h"
 #include "tracking/dataobjects/SectorMapConfig.h"
 #include <tracking/spacePointCreation/SpacePoint.h>
-
-#include "framework/gearbox/Const.h"
-#include "framework/datastore/StoreObjPtr.h"
 
 // needed for complicated parameter types to not get an undefined reference error
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -31,7 +27,6 @@
 #include <TFile.h>
 #include <TTree.h>
 
-#include <math.h>
 #include <algorithm>
 #include <fstream>
 
@@ -240,7 +235,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
            nSectorsInV = config.vSectorDivider.size();
 
   // retrieve the full list of sensors from the geometry
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> listOfSensors = geometry.getListOfSensors();
   for (VxdID aSensorId : listOfSensors) {
 

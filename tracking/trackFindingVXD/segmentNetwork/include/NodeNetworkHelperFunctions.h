@@ -10,13 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
-#include <tracking/trackFindingVXD/segmentNetwork/VoidMetaInfo.h>
-#include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 
 #include <fstream>
 #include <string>
-#include <sstream>
 
 namespace Belle2 {
 

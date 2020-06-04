@@ -16,6 +16,7 @@
 
 namespace Belle2 {
 
+  /** template class for scalar (one per side) calibrations */
   template <class T >
   class SVDCalibrationsScalar {
 

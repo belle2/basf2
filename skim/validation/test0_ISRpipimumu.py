@@ -9,28 +9,28 @@
 </header>
 """
 
-from basf2 import *
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
 from ROOT import Belle2
 import glob
 
-set_random_seed(12345)
+b2.set_random_seed(12345)
 
 # background (collision) files
 bg = glob.glob('./BG/[A-Z]*.root')
 
 # create a new path
-ISRskimpath = Path()
+ISRskimpath = b2.Path()
 
 # specify number of events to be generated
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter = b2.register_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [5000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 ISRskimpath.add_module(eventinfosetter)
 
-evtgeninput = register_module('EvtGenInput')
+evtgeninput = b2.register_module('EvtGenInput')
 evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/2411440000.dec'))
 ISRskimpath.add_module(evtgeninput)
 
@@ -45,5 +45,5 @@ output_filename = "../ISRpipimumu.dst.root"
 add_mdst_output(ISRskimpath, filename=output_filename)
 
 # process events and print call statistics
-process(ISRskimpath)
-print(statistics)
+b2.process(ISRskimpath)
+print(b2.statistics)

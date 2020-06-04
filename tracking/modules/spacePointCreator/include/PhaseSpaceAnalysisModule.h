@@ -13,7 +13,6 @@
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 // ROOT
 #include <TFile.h>
@@ -24,7 +23,7 @@
 
 // boost
 #include <boost/any.hpp>
-#include <boost/iterator/iterator_concepts.hpp>
+
 namespace Belle2 {
 
   /**

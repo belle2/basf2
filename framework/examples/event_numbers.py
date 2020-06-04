@@ -17,10 +17,10 @@
 # Example steering file - 2011 Belle II Collaboration
 ######################################################
 
-from basf2 import *
+from basf2 import Path, process
 
 # Create main path
-main = create_path()
+main = Path()
 # EventInfoSetter - generate event numbers
 main.add_module('EventInfoSetter',
                 expList=[71, 71, 73, 73, 73],

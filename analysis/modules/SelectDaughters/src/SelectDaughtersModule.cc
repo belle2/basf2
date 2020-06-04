@@ -10,25 +10,12 @@
 
 #include <analysis/modules/SelectDaughters/SelectDaughtersModule.h>
 
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// utilities
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ParticleCopy.h>
-
 // Magnetic field
 #include <framework/geometry/BFieldManager.h>
-
-#include <TMath.h>
-
-
 
 using namespace std;
 

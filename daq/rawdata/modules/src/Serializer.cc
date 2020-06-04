@@ -8,7 +8,14 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/Serializer.h>
 #include <daq/rawdata/modules/DeSerializer.h>
+
+#include <netinet/tcp.h>
+
 #include <sys/uio.h>
+
+#include <csignal>
+#include <fcntl.h>
+
 using namespace std;
 using namespace Belle2;
 

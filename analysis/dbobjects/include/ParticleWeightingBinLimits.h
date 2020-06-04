@@ -14,7 +14,7 @@
 namespace Belle2 {
 
   /**
-   * Just pair of numners - min and max values of bin border
+   * Just pair of numbers - min and max values of bin border
    */
   class ParticleWeightingBinLimits {
     double m_lowerLimit; /**< lower limit */

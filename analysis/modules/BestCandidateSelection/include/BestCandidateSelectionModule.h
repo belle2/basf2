@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/dataobjects/ParticleList.h>

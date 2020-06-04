@@ -22,7 +22,6 @@ namespace Belle2 {
   class DatabaseRepresentationOfWeightfile;
   namespace MVA {
     class Expert;
-    class SingleDataset;
     class Weightfile;
   }
 

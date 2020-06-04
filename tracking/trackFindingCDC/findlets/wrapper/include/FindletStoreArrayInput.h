@@ -12,12 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/core/Module.h>
-
-#include <tuple>
 #include <type_traits>
 
 namespace Belle2 {

@@ -1,3 +1,5 @@
+.. _DeepFlavorTagger: 
+
 Deep Flavor Tagger
 ==================
 
@@ -49,15 +51,10 @@ The scheme of the input parameters are shown below:
   :align: center
 
 
-The output of the algorithm :math:`O(tag)`can be interpreted as a probability to have a :math:`B^\_{tag}^0`. The range of
-the output is :math:`[0, 1]`. If it is likely that the tagside of an event is related to a :math:`\bar{B}_{tag}^0` the
-output is in the regime of 0. The value 0.5 corresponds to a random decision.
-
-It can easily transformed to  ``qr`` with
-
-::
-
-   qr = 2 * O(tag) - 1.
+The output of the algorithm is the variable ``'DNN_qrCombined'``, which corresponds to the tag-side :math:`B` flavor :math:`q_{\rm DNN}` 
+times the dilution factor :math:`r_{\rm DNN}`. The range of ``'DNN_qrCombined'`` is :math:`[-1, 1]`. 
+The output is close to :math:`-1` if the tag side of an event is likely to be related to a :math:`\bar{B}^0`, 
+and close to :math:`1` for a :math:`B^0`. The value :math:`0` corresponds to a random decision.
 
 
 How to use
@@ -65,71 +62,36 @@ How to use
 
 The usage of the Deep Flavor Tagger is pretty simple and straight forward.
 
-At first, you have to be sure, that you have downloaded the correct weight file from the database.
-
-::
-
-   # for now
-   b2conditionsdb download analysis_tools_release-03-01-00 -f official_rel010204_roeB0Flavor_mine380_maxe500_seed1241  # for b2bii
-   b2conditionsdb download analysis_tools_release-03-01-00 -f mc12b_roeB0Flavor_mine380_maxe500_seed1237  # for belle2 (mc12b)
-
-::
-
-   # in the near future
-   b2conditionsdb download analysis_tools_release-<current release> -f FlavorTagger_Belle_B2nunubarBGx1DNN_1 # for b2bii
-   b2conditionsdb download analysis_tools_release-<current release> -f FlavorTagger_Belle2_B2nunubarBGx1DNN_1  # for belle2
-
-There are also currently efforts to integrate the database functions directly in the classifier to make the usage even
-more user-friendly.
-
-The files will be available in the working directory at
-
-::
-
-   centraldb/dbstore_FlavorTagger_Belle_B2nunubarBGx1DNN_1.root # for b2bii
-   centraldb/dbstore_FlavorTagger_Belle2_B2nunubarBGx1DNN_1.root # for belle2
-
-
-In your *steering file* you have to import the the interface to the Flavor Tagger
+In your *steering file*, you first have to import the interface to the Deep Flavor Tagger
 
 ::
 
     from dft.DeepFlavorTagger import DeepFlavorTagger
 
-After reconstructing your signal B meson , make sure that you build the rest of event:
+After reconstructing your signal :math:`B` meson, make sure that you build the rest of event:
 
 ::
 
     ma.buildRestOfEvent('B0:sig', path=path)
 
-To apply with basic functionality, considering the weight file name is ``FlavorTagger_Belle2_B2nunubarBGx1DNN_1``
-
-.. note::
-    if available, the algorithm can also be used with .xml weight files e.g.
-    ``FlavorTagger_Belle2_B2nunubarBGx1DNN_1.xml``
-
+To use the Deep Flavor Tagger with basic functionality on Belle II data or MC, use
 
 ::
 
     DeepFlavorTagger('B0:sig',
-                     mode='expert',
                      uniqueIdentifier='FlavorTagger_Belle2_B2nunubarBGx1DNN_1',
-                     output_variable='network_output',
                      path=path)
 
-The output variable will be available as extra info to the signal particle list 'B0:sig' and can for example be
-written out with the following command. It is probably also helpful for MC studies, to write out the MC truth of the
-tag side.
+.. note::
+    For development purposes, the algorithm can also be used with local .xml weight files e.g.
+    ``FlavorTagger_Belle2_B2nunubarBGx1DNN_1.xml``
+
+
+To use on Belle data or MC with ``b2bii``, you need a special identifier and a special set of variables:
 
 ::
 
-    ma.variablesToNtuple(decayString='B0:sig',
-                         variables=['qrCombined', 'extraInfo(network_output)'],
-                         path=path)
-
-To use the flavor tagger with b2bii you have to select a different set of variables:
-
-::
+    BELLE_IDENTIFIER='FlavorTagger_Belle_B2nunubarBGx1DNN_1'
 
     BELLE_FLAVOR_TAG_VARIABLES = [
         'useCMSFrame(p)',
@@ -146,9 +108,10 @@ To use the flavor tagger with b2bii you have to select a different set of variab
         'chiProb',
     ]
 
-    DeepFlavorTagger(..., variable_list=BELLE_FLAVOR_TAG_VARIABLES)
+    DeepFlavorTagger(..., uniqueIdentifier=BELLE_IDENTIFIER, 
+                          variable_list=BELLE_FLAVOR_TAG_VARIABLES)
 
-Studies have shown, that we can reduce a certain kind of bias, with applying additional rest of event cuts, you can do
+Studies have shown, that we can reduce a certain kind of bias, by applying additional rest of event cuts, you can do
 this with the following argument. You can basically treat this like cuts in an RoE mask.
 
 ::
@@ -156,6 +119,17 @@ this with the following argument. You can basically treat this like cuts in an R
     DeepFlavorTagger(..., additional_roe_filter='dr < 2 and abs(dz) < 4')
 
 
+Finally, do not forget to save the output variable ``'DNN_qrCombined'`` into your ntuples.
+It is probably also helpful for MC studies, to write out the MC truth flavor of the
+tag side ``'mcFlavorOfOtherB'``.
+
+
+
+::
+
+    ma.variablesToNtuple(decayString='B0:sig',
+                         variables=['DNN_qrCombined', 'mcFlavorOfOtherB'],
+                         path=path)
 
 
 Functions

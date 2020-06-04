@@ -17,6 +17,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <TH1D.h>
 
 namespace Belle2 {
   /**
@@ -37,71 +38,32 @@ namespace Belle2 {
     virtual ~CDCDedxRunGainAlgorithm() {}
 
     /**
-    * reading input file and storing values in vectors
+    * function to decide merged vs relative run-gains
     */
-    void setBadRunsdatafile(const std::string& fPath, const std::string& fName)
-    {
-
-      m_badRunFPath = fPath;
-      m_badRunFName = fName;
-      isRmBadruns = true;
-
-      printf("INF0: Taking bad run list file from: %s/%s \n", m_badRunFPath.data(), m_badRunFName.data());
-
-      std::ifstream inputfile;
-      inputfile.open(Form("%s/%s", m_badRunFPath.data(), m_badRunFName.data()));
-      if (inputfile.fail()) {
-        printf("%s\n", "input file of bad runs does not exits or corrupted!");
-        return;
-      }
-
-      int badrun = -999, nBadruns = 0;
-      double avgmean = 1.0;
-      printf("--- List of Bad runs \n");
-      while (true) {
-        nBadruns++;
-        inputfile >> badrun >> avgmean;
-        if (inputfile.eof()) break;
-        printf("%d) Bad Run # = %d, Running avg mean = %0.03f\n", nBadruns, badrun, avgmean);
-        listofbadruns.push_back(badrun);
-        rmeanOfbadrun.push_back(avgmean);
-      }
-      inputfile.close();
-    }
+    void setMergePayload(bool value = true) {isMergePayload = value;}
 
     /**
-    * get path of input bad run file
+    * function to store new payload after full calibration
     */
-    std::string getBadRunFilePath() const {return m_badRunFPath;}
+    void generateNewPayloads(double RunGainConst, double ExistingRG);
 
     /**
-    * get name of input bad run file
+    * function to hand flag for monitoring plotting
     */
-    std::string getBadRunFileName() const {return m_badRunFName;}
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
     /**
-    * Check if run is listed as bad
+    * function to perform fit run by run
     */
-    void CheckRunStatus(Int_t irun, bool& status, double& rmean)
-    {
-      for (unsigned int j = 0; j < listofbadruns.size(); ++j) {
-        if (listofbadruns.at(j) == irun) {
-          printf("This is bad run %d \n", irun);
-          rmean = rmeanOfbadrun.at(j);
-          status = true;
-          break;
-        }
-      }
-    }
+    void FitGaussianWRange(TH1D*& temphist, TString& status);
 
     /**
     * function to make flag active for plotting
     */
-    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+    void setFitWidth(double value = 2.5) {fSigLim = value;}
 
 
   protected:
-
     /**
      * Run algorithm
      */
@@ -110,14 +72,10 @@ namespace Belle2 {
 
   private:
 
-    std::string m_badRunFPath; /**< path of bad run file */
-    std::string m_badRunFName; /**< name of bad run file */
-    bool isRmBadruns; /**< if bad runs consideration */
     bool isMakePlots; /**< produce plots for status */
-
-    std::vector<int> listofbadruns; /**< vector of bad ru list */
-    std::vector<double> rmeanOfbadrun; /**< vector of runing avg mean*/
-
+    bool isMergePayload; /**< merge payload at the of calibration */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
+    double fSigLim = 2.5;
 
   };
 } // namespace Belle2

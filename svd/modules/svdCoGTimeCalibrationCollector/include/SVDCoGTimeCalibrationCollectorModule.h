@@ -8,6 +8,9 @@
  *                                                                         *
  * This software is provided "as is" without any warranty.                 *
  ***************************************************************************/
+
+#pragma once
+
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <framework/datastore/DataStore.h>
@@ -34,14 +37,14 @@
 #include <framework/logging/Logger.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDRecoDigit.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 namespace Belle2 {
   /**
-   * This collects the position
-   * and the dimension of the beamspot using mu+mu- events for
-   * calibration of the SVDCoGTimeCalibration using CAF
+   * Collector module used to create the histograms needed for the
+   * SVD CoG-Time calibration
    */
   class SVDCoGTimeCalibrationCollectorModule : public CalibrationCollectorModule {
 
@@ -66,44 +69,32 @@ namespace Belle2 {
      */
     void collect() override final;
 
-    /**
-     * End-of-run action.
-     */
-    void closeRun() override final;
-
-    /**
-     * Termination action.
-     */
-    void finish() override;
-
   private:
 
-    /** SVDCluster */
-    std::string m_svdClusters;
-    StoreArray<SVDCluster> m_svdCls;
+    /**EventMetaData */
+    StoreObjPtr<EventMetaData> m_emdata; /**< EventMetaData store object pointer*/
 
-    /** SVDRecoDigits */
-    std::string m_svdRecoDigits;
-    StoreArray<SVDRecoDigit> m_svdRD;
+    /**SVDEventInfo */
+    std::string m_svdEventInfo = "SVDEventInfo"; /**< Name of the SVDEventInfo store array used as parameter of the module*/
+    StoreObjPtr<SVDEventInfo> m_svdEI; /**< SVDEventInfo store object pointer*/
 
-    /** EventT0 */
-    std::string m_eventTime;
-    StoreObjPtr<EventT0> m_eventT0;
 
-    /** SVDHistograms */
-    SVDHistograms<TH2F>* m_hEventT0vsCoG = NULL;
+    /**SVDCluster */
+    std::string m_svdClusters = "SVDClustersFromTracks"; /**< Name of the SVDClusters store array used as parameter of the module*/
+    StoreArray<SVDCluster> m_svdCls; /**< SVDClusters store array*/
 
-    /** Tree */
-    std::string m_tree;
-    TTree* m_histogramTree = NULL;
-    TH2F* m_hist = NULL;
-    int m_layer = 0;
-    int m_ladder = 0;
-    int m_sensor = 0;
-    int m_side = 0;
+    /**EventT0 */
+    std::string m_eventTime = "EventT0"; /**< Name of the EventT0 store object pointer used as parameter of the module*/
+    StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
 
-    TH1F* m_hEventT0 = NULL;
+    /**SVDHistograms */
+    SVDHistograms<TH2F>* m_hEventT0vsCoG = NULL; /**< Scatter plot t0 vs t_raw (CoG)*/
+    SVDHistograms<TH1F>* m_hEventT0 = NULL; /**< EventT0 synchronized distribution*/
+    SVDHistograms<TH1F>* m_hEventT0nosync = NULL; /**< EventT0 NOT synchroinized distribution*/
+
+    TH1F* m_hEventT0FromCDST = NULL; /**< EventT0 distribution read by the cDST*/
+    TH1F* m_hEventT0FromCDSTSync = NULL; /**< EventT0 distribution read by the cDST and then synchronized*/
+    TH1F* m_hRawCoGTimeL3V = NULL; /**< Raw_CoG distribution of layer3 V-side */
   };
 
 } // end namespace Belle2
-

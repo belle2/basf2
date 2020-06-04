@@ -12,7 +12,8 @@
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/SelectionVariable.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
+
+#include <cmath>
 
 #define ANGLE3DFULL_NAME Angle3DFull
 

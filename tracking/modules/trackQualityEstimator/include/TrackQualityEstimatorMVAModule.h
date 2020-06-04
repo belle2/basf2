@@ -46,21 +46,23 @@ namespace Belle2 {
 
   private:
     /// Name of the recoTrack StoreArray
-    std::string m_recoTracksStoreArrayName;
+    std::string m_recoTracksStoreArrayName = "RecoTracks";
     /// Name of the SVD-CDC StoreArray
-    std::string m_svdcdcRecoTracksStoreArrayName;
+    std::string m_svdcdcRecoTracksStoreArrayName = "SVDCDCRecoTracks";
     /// Name of the CDC StoreArray
-    std::string m_cdcRecoTracksStoreArrayName;
+    std::string m_cdcRecoTracksStoreArrayName = "CDCRecoTracks";
     /// Name of the SVD StoreArray
-    std::string m_svdRecoTracksStoreArrayName;
+    std::string m_svdRecoTracksStoreArrayName = "SVDRecoTracks";
     /// Name of the PXD StoreArray
-    std::string m_pxdRecoTracksStoreArrayName;
+    std::string m_pxdRecoTracksStoreArrayName = "PXDRecoTracks";
+    /** Name of the StoreArray with mdst Tracks from track fit */
+    std::string m_tracksStoreArrayName = "Tracks";
 
     /** identifier of weightfile in Database or local root/xml file */
-    std::string m_WeightFileIdentifier;
+    std::string m_weightFileIdentifier = "trackfitting_MVATrackQualityIndicator";
 
     /// Parameter to enable event-wise features
-    bool m_param_collectEventFeatures = false;
+    bool m_collectEventFeatures = false;
 
     /// Store Array of the recoTracks
     StoreArray<RecoTrack> m_recoTracks;

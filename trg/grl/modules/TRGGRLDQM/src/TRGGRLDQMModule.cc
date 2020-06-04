@@ -150,8 +150,8 @@ void TRGGRLDQMModule::beginRun()
 
 void TRGGRLDQMModule::initialize()
 {
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 }
 
 void TRGGRLDQMModule::endRun()

@@ -75,7 +75,7 @@ namespace Belle2 {
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
 
-    /* class def needed by root */
+    /** class def needed by root */
     ClassDef(SVDDatabaseImporter, 1);
   };
 

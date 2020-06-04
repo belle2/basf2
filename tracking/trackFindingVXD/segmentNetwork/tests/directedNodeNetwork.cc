@@ -14,14 +14,10 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 

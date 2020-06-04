@@ -14,7 +14,6 @@
 #include <iostream>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
@@ -160,17 +159,6 @@ namespace Belle2 {
     /** No default constructor */
     SVDOnlineToOfflineMap() = delete;
 
-    /** Return a pointer to a new SVDDigit whose VxdID, isU and cellID is set
-     * @param FADC is FADC number from the SVDRawCopper data.
-     * @param APV25 is the APV25 number from the SVDRawCopper data.
-     * @param channel is the APV25 channel number from the SVDRawCopper data.
-     * @return a pointer to the new SVDDigit owned by the caller whose
-     * Position is 0
-     * FIXME: There should be no such function in this mapping class, no dependence
-     * on SVDDigit and its interface.
-     */
-    SVDDigit* NewDigit(unsigned char FADC, unsigned char APV25,
-                       unsigned char channel, float charge, float time);
 
     /** Return a pointer to a new SVDShpaerDigit whose VxdID, isU and cellID is set
      * @param FADC is FADC number from the SVDRawCopper data.

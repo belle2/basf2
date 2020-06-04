@@ -11,8 +11,8 @@
 #include <tracking/modules/svdROIFinder/SVDROIDQMModule.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include "time.h"
-#include "TDirectory.h"
+#include <TDirectory.h>
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

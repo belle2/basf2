@@ -1,7 +1,7 @@
 from pybasf2 import B2WARNING
 
 from basf2 import register_module, create_path
-from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
+from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
@@ -59,7 +59,7 @@ def add_hit_preparation_modules(path, components=None):
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
-                                    reco_tracks="RecoTracks"):
+                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -68,6 +68,8 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found tracks.
     """
     # Correct time seed
     path.add_module("IPTrackTimeEstimator",
@@ -75,6 +77,10 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # track fitting
     path.add_module("DAFRecoFitter", recoTracksStoreArrayName=reco_tracks).set_name(
         "Combined_DAFRecoFitter")
+    # Add MVA classifier that uses information not included in the calculation of the fit p-value
+    # to add a track quality indicator for classification of fake vs. MC-matched tracks
+    if add_mva_quality_indicator:
+        path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 Tracks from the genfit Tracks
     # The following particle hypothesis will be fitted: Pion, Kaon and Proton
     # Muon fit is working but gives very similar as the Pion due to the closeness of masses
@@ -84,6 +90,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
+
     # V0 finding
     path.add_module('V0Finder', RecoTracks=reco_tracks)
 
@@ -258,6 +265,30 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
 
 
+def add_pxd_cr_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
+                             add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
+    """Add the pxd track finding to the path"""
+    if not is_pxd_used(components):
+        return
+
+    if use_mc_truth:
+        # MC CKF needs MC matching information
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
+                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=input_reco_tracks)
+
+    add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                        direction="backward", use_mc_truth=use_mc_truth, **kwargs)
+
+    if add_both_directions:
+        add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                            direction="forward", use_mc_truth=use_mc_truth, **kwargs)
+
+    path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=input_reco_tracks,
+                    VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
+
+
 def add_svd_track_finding(
         path,
         components,
@@ -270,8 +301,9 @@ def add_svd_track_finding(
         temporary_svd_cdc_reco_tracks="SVDPlusCDCStandaloneRecoTracks",
         use_svd_to_cdc_ckf=True,
         prune_temporary_tracks=True,
-        use_vxdtf2_quality_estimator=False,
-        **kwargs):
+        add_mva_quality_indicator=False,
+        **kwargs,
+):
     """
     Add SVD track finding to the path.
 
@@ -296,6 +328,10 @@ def add_svd_track_finding(
     :param use_svd_to_cdc_ckf: Whether to enable the CKF extrapolation from the SVD into the CDC.
            That CKF application is not affected by ``svd_ckf_mode``.
     :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
+    :param add_mva_quality_indicator: Add the VVXDQualityEstimatorMVA module to set the quality indicator
+           property for tracks from VXDTF2 standalone tracking
+           (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+           -> setting this option to 'True' will have some influence on the final track collection)
     """
 
     if not is_svd_used(components):
@@ -304,7 +340,7 @@ def add_svd_track_finding(
     if not input_reco_tracks:
         # We do not have an input track store array. So lets just add vxdtf track finding
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=output_reco_tracks,
-                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
+                                     add_mva_quality_indicator=add_mva_quality_indicator)
         return
 
     if use_mc_truth:
@@ -316,7 +352,7 @@ def add_svd_track_finding(
 
     if svd_ckf_mode == "VXDTF2_before":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
-                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
+                                     add_mva_quality_indicator=add_mva_quality_indicator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -325,7 +361,7 @@ def add_svd_track_finding(
 
     elif svd_ckf_mode == "VXDTF2_before_with_second_ckf":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
-                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
+                                     add_mva_quality_indicator=add_mva_quality_indicator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -352,7 +388,7 @@ def add_svd_track_finding(
                         use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
 
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
-                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
+                                     add_mva_quality_indicator=add_mva_quality_indicator)
         add_ckf_based_merger(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                              use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
@@ -361,7 +397,7 @@ def add_svd_track_finding(
 
     elif svd_ckf_mode == "VXDTF2_alone":
         add_vxd_track_finding_vxdtf2(path, components=["SVD"], reco_tracks=temporary_reco_tracks,
-                                     use_vxdtf2_quality_estimator=use_vxdtf2_quality_estimator)
+                                     add_mva_quality_indicator=add_mva_quality_indicator)
         path.add_module('VXDCDCTrackMerger',
                         CDCRecoTrackColName=input_reco_tracks,
                         VXDRecoTrackColName=temporary_reco_tracks)
@@ -411,8 +447,8 @@ def add_svd_track_finding(
 
 
 def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
-                          use_second_hits=False, use_cdc_quality_estimator=False,
-                          cdc_quality_estimator_weightfile=None):
+                          use_second_hits=False, add_mva_quality_indicator=False,
+                          reattach_hits=False):
     """
     Convenience function for adding all cdc track finder modules
     to the path.
@@ -423,10 +459,16 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param path: basf2 path
     :param output_reco_tracks: Name of the output RecoTracks. Defaults to RecoTracks.
     :param use_second_hits: If true, the second hit information will be used in the CDC track finding.
-    :param use_cdc_quality_estimator: Add the TFCDC_TrackQualityEstimator to set the CDC quality
-           indicator for the ``output_reco_tracks``
+    :param add_mva_quality_indicator: Add the TFCDC_TrackQualityEstimator module to set the CDC quality
+           indicator property of the CDC ``output_reco_tracks``
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
+    :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
+                          to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
+    # add EventLevelTrackinginfo for logging errors
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
+
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
@@ -487,22 +529,32 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                         inputTracks=output_tracks,
                         MinimalHitsBySuperLayerId={0: 15})
 
-    if use_cdc_quality_estimator:
-        # Add mva method to set a quality indicator for the CDC tracks
-        cdc_qe_module = path.add_module(
+    if add_mva_quality_indicator:
+        # Add CDC-specific mva method to set the quality indicator for the CDC tracks
+        path.add_module(
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
+            filterParameters={"cut": 0.0},
             deleteTracks=False,
+            resetTakenFlag=False
         )
-        if cdc_quality_estimator_weightfile is not None:
-            # Set a custom weight file identifier/path instead of default
-            cdc_qe_module.param("filterParameters", {"identifier": cdc_quality_estimator_weightfile})
 
     # Export CDCTracks to RecoTracks representation
     path.add_module("TFCDC_TrackExporter",
                     inputTracks=output_tracks,
-                    RecoTracksStoreArrayName=output_reco_tracks)
+                    RecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching" if reattach_hits else output_reco_tracks)
+
+    if reattach_hits:
+        # The ReattachCDCWireHitsToRecoTracks module (below) requires the SetupGenfitExtrapolation module
+        if 'SetupGenfitExtrapolation' not in path:
+            # Prepare Genfit extrapolation
+            path.add_module('SetupGenfitExtrapolation')
+
+        # Loop over low-ADC/TOT CDCWireHits and RecoTracks and reattach the hits to the tracks if they are close enough
+        path.add_module("ReattachCDCWireHitsToRecoTracks",
+                        inputRecoTracksStoreArrayName="CDCRecoTracksBeforeReattaching",
+                        outputRecoTracksStoreArrayName=output_reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",
@@ -714,7 +766,7 @@ def add_vxd_track_finding_vxdtf2(
     custom_setup_name=None,
     min_SPTC_quality=0.,
     filter_overlapping=True,
-    use_vxdtf2_quality_estimator=False,
+    add_mva_quality_indicator=False,
 ):
     """
     Convenience function for adding all vxd track finder Version 2 modules
@@ -738,8 +790,8 @@ def add_vxd_track_finding_vxdtf2(
     :param min_SPTC_quality: minimal qualityIndicator value to keeps SPTCs after the QualityEstimation.
                                  0 means no cut. Default: 0
     :param filter_overlapping: Whether to use SVDOverlapResolver, Default: True
-    :param use_vxdtf2_quality_estimator: Whether to use the MVA Quality Estimator, if weight file is
-           available. Default: False.
+    :param add_mva_quality_indicator: Whether to use the MVA Quality Estimator module for VXDTF2 tracks to set the
+           quality_indicator property of the found ``reco_tracks``. Default: False.
     """
     ##########################
     # some setting for VXDTF2
@@ -759,6 +811,16 @@ def add_vxd_track_finding_vxdtf2(
     # VXDTF2 Step 0
     # Preparation
     #################
+
+    # setup the event level tracking info to log errors and stuff
+    nameTrackingInfoModule = "RegisterEventLevelTrackingInfo" + suffix
+    nameEventTrackingInfo = "EventLevelTrackingInfo" + suffix
+    if nameTrackingInfoModule not in path:
+        # Use modified name of module and created StoreObj as module might be added twice (PXDDataReduction)
+        registerEventlevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
 
     nameSPs = 'SpacePoints' + suffix
 
@@ -790,10 +852,12 @@ def add_vxd_track_finding_vxdtf2(
         spacePointArrayNames += ["PXD" + nameSPs]
 
     nameSegNet = 'SegmentNetwork' + suffix
+
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
+    segNetProducer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(segNetProducer)
 
     #################
@@ -811,6 +875,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
+    trackFinder.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(trackFinder)
 
     if useTwoStepSelection:
@@ -830,18 +895,10 @@ def add_vxd_track_finding_vxdtf2(
         pxdSVDCut.param('SpacePointTrackCandsStoreArrayName', nameSPTCs)
         path.add_module(pxdSVDCut)
 
-    if use_vxdtf2_quality_estimator:
-        vxdtf_quality_estimator_weightfile = (
-            'tracking/data/VXDQE_weight_files/MVE_QE_weights_noTiming_03August2018.xml'
-        )
-
+    if add_mva_quality_indicator:
         path.add_module(
             "VXDQualityEstimatorMVA",
-            WeightFileIdentifier=vxdtf_quality_estimator_weightfile,
-            EstimationMethod="tripletFit",
             SpacePointTrackCandsStoreArrayName=nameSPTCs,
-            UseTimingInfo=False,
-            ClusterInformation="Average",
         )
     else:
         path.add_module(

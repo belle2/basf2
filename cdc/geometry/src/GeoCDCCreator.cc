@@ -22,11 +22,13 @@
 #include <boost/format.hpp>
 
 #include <G4Material.hh>
+#include <G4ProductionCuts.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Torus.hh>
 #include <G4Trd.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4VSolid.hh>
 
 #include <G4Polycone.hh>
@@ -169,11 +171,15 @@ namespace Belle2 {
                        mother.getNNodes(), motherZ.data(),
                        motherRmin.data(), motherRmax.data());
       logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
-      physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm, geo.getGlobalOffsetY() * CLHEP::cm,
-                                                        geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc, "physicalCDC",
-                                       &topVolume, false,
-                                       0);
+      physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm,
+                                                        geo.getGlobalOffsetY() * CLHEP::cm,
+                                                        geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc,
+                                       "physicalCDC", &topVolume, false, 0);
 
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("CDCEnvelope");
+      logical_cdc->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(logical_cdc);
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const auto& wall : geo.getOuterWalls()) {
@@ -340,7 +346,9 @@ namespace Belle2 {
           const auto& epLayerFwdIn = endplate.getEndPlateLayer(nEPLayer / 2);
           const auto& epLayerFwdOut = endplate.getEndPlateLayer(nEPLayer - 1);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+          //    const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+          int iSLayerMinus1 = iSLayer - 1; //avoid cpp-check warning
+          const auto& fieldLayerIn = geo.getFieldLayer(iSLayerMinus1); //avoid cpp-check warning
           rmin_sensitive_left = epLayerBwdIn.getRmax();
           rmax_sensitive_left = epLayerBwdOut.getRmax();
           zback_sensitive_left = senseLayer.getZbwd();

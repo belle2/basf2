@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import json
 from ROOT import Belle2
 
 algo = Belle2.TestCalibrationAlgorithm()
@@ -20,17 +20,25 @@ for name in d:
 # Can use python lists/tuples to define the runs whose data you want to use [(exp,run), ...]
 # IoV of the payloads will be calculated from this input list
 print("Result of calibration =", algo.execute([(1, 1), (1, 2)]))
+output_json_string = algo.dumpOutputJson()
+print(f"Output JSON was {output_json_string}")
 # localdb isn't updated until you call this
 # algo.commit()
 
 # Can run over all collected data and auto define the IoV of the payloads
 print("Result of calibration =", algo.execute())
+output_json_string = algo.dumpOutputJson()
+print(f"Output JSON was {output_json_string}")
 # Can commit multiple times in one process since the payloads are cleared at the start
 # of each execution
 # algo.commit()
 
+# Can set the input JSON from a previous execution's output JSON
+algo.loadInputJson(output_json_string)
 # Could also define an IoV for your calibrations at the start of execution
 iov = Belle2.IntervalOfValidity.always()
 print("Result of calibration =", algo.execute([], 0, iov))
+output_json_string = algo.dumpOutputJson()
+print(f"Output JSON was {output_json_string}")
 # IoV is applied to payloads during execution and gets used during commit
 algo.commit()

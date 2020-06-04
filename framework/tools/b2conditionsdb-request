@@ -71,8 +71,12 @@ def get_argument_parser():
                                help='File containing detailed instructions/information for the global tag manager')
     parser.add_argument('--issue', type=str, default=None,
                         help='Identifier of an existing jira issue for the request')
-    parser.add_argument('--password', type=str,
-                        help='Password to authenticate the request')
+    auth_group = parser.add_mutually_exclusive_group()
+    auth_group.add_argument('--password', type=str,
+                            help='Password to authenticate the request')
+    auth_group.add_argument('--oauth', default=False, action='store_true',
+                            help='Authenticate via oauth. '
+                            'This is should only be used for automated updates running within the DAQ network.')
     parser.add_argument('--confirm', default=False, action='store_true',
                         help='Confirm that the given information is correct and that the payloads should be uploaded')
     parser.add_argument('payloads', help='Name of the testing payload storage file')
@@ -156,7 +160,7 @@ if __name__ == "__main__":
                 "# When finished, save and quit."
             )
             if input_editor.editor_command_list[0] in ['vi', 'vim']:
-                editor_help_comment += "#\nIf in vim: Use :wq to save and quit or :q! to discard changes."
+                editor_help_comment += "\n# If in vim: Use :wq to save and quit or :q! to discard changes."
             input_editor.initial_content = editor_help_comment
             data['details'] = input_editor.input()
         else:
@@ -190,7 +194,12 @@ Details:""")
 
     data['user'] = os.environ['BELLE2_USER']
     password = args.password
-    if not password:
+    if args.oauth and password:
+        password = password.split()
+        if len(password) != 2:
+            sys.stderr.write('ERROR: The password has to be the access token and secret separated by a space in case of oauth.\n')
+            sys.exit(1)
+    if not password and not args.oauth:
         while True:
             username = input('\nConfirm your DESY user name by pressing enter or type the correct one [%s]: ' % data['user'])
             if username != '':

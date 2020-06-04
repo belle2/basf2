@@ -20,7 +20,6 @@
 #include <framework/pcore/ProcHandler.h>
 
 #include <TFile.h>
-#include <TList.h>
 #include <TTree.h>
 #include <string>
 

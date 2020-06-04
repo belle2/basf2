@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,13 +17,17 @@
 #include <analysis/VertexFitting/TreeFitter/RecoComposite.h>
 #include <analysis/VertexFitting/TreeFitter/RecoResonance.h>
 #include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
+#include <analysis/VertexFitting/TreeFitter/FeedthroughParticle.h>
+#include <analysis/VertexFitting/TreeFitter/InternalTrack.h>
 
 #include <analysis/VertexFitting/TreeFitter/RecoPhoton.h>
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/Resonance.h>
 #include <analysis/VertexFitting/TreeFitter/Origin.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <iostream>
+
+#include <framework/geometry/BFieldManager.h>
+
 namespace TreeFitter {
 
   ParticleBase::ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) :
@@ -156,15 +160,18 @@ namespace TreeFitter {
                                   forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
-
+    } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
+      if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> feedthrough
+        rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
+      } else { // Got gammas -> Internal track
+        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Always mass-constrain brems tracks
+      }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||
                particle->getECLCluster() ||
                particle->getKLMCluster()) { // external particles and final states
-
       if (particle->getTrack()) {
         rc = new RecoTrack(particle, mother);
-
       } else if (particle->getECLCluster()) {
         rc = new RecoPhoton(particle, mother);
 
@@ -252,13 +259,13 @@ namespace TreeFitter {
 
   ErrCode ParticleBase::initCovariance(FitParams& fitparams) const
   {
-    // this is very sensitive and can heavily affect the efficency of the fit
+    // this is very sensitive and can heavily affect the efficiency of the fit
     ErrCode status;
 
     const int posindex = posIndex();
     if (posindex >= 0) {
       for (int i = 0; i < 3; ++i) {
-        fitparams.getCovariance()(posindex + i, posindex + i) = 1.;
+        fitparams.getCovariance()(posindex + i, posindex + i) = 1;
       }
     }
 
@@ -275,6 +282,15 @@ namespace TreeFitter {
       fitparams.getCovariance()(tauindex, tauindex) = 1.;
     }
     return status;
+  }
+
+  const ParticleBase* ParticleBase::mother() const
+  {
+    const ParticleBase* rc = m_mother;
+    while (rc && rc->type() == kFeedthroughParticle) {
+      rc = rc->mother();
+    }
+    return rc;
   }
 
   std::string ParticleBase::parname(int thisindex) const
@@ -335,7 +351,7 @@ namespace TreeFitter {
   ErrCode ParticleBase::projectGeoConstraint(const FitParams& fitparams, Projection& p) const
   {
     assert(m_config);
-    // only allow 2d for head of tree particles that are beam cosntraint
+    // only allow 2d for head of tree particles that are beam constrained
     const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
     const int posindexmother = mother()->posIndex();
     const int posindex = posIndex();
@@ -483,12 +499,18 @@ namespace TreeFitter {
     /** be aware that the signs here are important
      * E-|p|-m extracts a negative mass and messes with the momentum !
      * */
-    p.getResiduals()(0) = -mass2 + E * E - px * px - py * py - pz * pz;
+    p.getResiduals()(0) = mass2 - E * E + px * px + py * py + pz * pz;
 
-    p.getH()(0, momindex)     = -2.0 * px;
-    p.getH()(0, momindex + 1) = -2.0 * py;
-    p.getH()(0, momindex + 2) = -2.0 * pz;
-    p.getH()(0, momindex + 3) = 2.0 * E;
+    p.getH()(0, momindex)     = 2.0 * px;
+    p.getH()(0, momindex + 1) = 2.0 * py;
+    p.getH()(0, momindex + 2) = 2.0 * pz;
+    p.getH()(0, momindex + 3) = -2.0 * E;
+
+    // TODO 0 in most cases -> needs special treatment if width=0 to not crash chi2 calculation
+    // const double width = TDatabasePDG::Instance()->GetParticle(particle()->getPDGCode())->Width();
+    // transport  measurement uncertainty into residual system
+    // f' = sigma_x^2 * (df/dx)^2
+    // p.getV()(0) = width * width * 4 * mass2;
 
     return ErrCode(ErrCode::Status::success);
   }
@@ -529,16 +551,16 @@ namespace TreeFitter {
       const int mother_ps_index = mother()->posIndex();
       const int dim  = m_config->m_originDimension; // TODO can we configure this to be particle specific?
 
-      // tau has different meaning depending on the dimension of the cosntraint
+      // tau has different meaning depending on the dimension of the constraint
       // 2-> use x-y projection
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
         fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
       mom = fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
 
-// if an intermediate vertex is not well defined by a track or so it will be initialised with 0
-// same for the momentum of for example B0, it might be initialsed with 0
-// in those cases use pdg value
+      // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
+      // same for the momentum of for example B0, it might be initialised with 0
+      // in those cases use pdg value
       const double mom_norm = mom.norm();
       const double dot = std::abs(vertex_dist.dot(mom));
       const double tau = dot / mom_norm;
@@ -547,10 +569,6 @@ namespace TreeFitter {
       } else {
         fitparams.getStateVector()(tauindex) = tau;
       }
-
-
-
-
     }
 
     return ErrCode(ErrCode::Status::success);

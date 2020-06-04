@@ -6,7 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SVDCluster+;
-#pragma link C++ class Belle2::SVDDigit+;
 #pragma link C++ class Belle2::SVDModeByte;
 #pragma link C++ class Belle2::SVDDAQDiagnostic+;
 #pragma link C++ class Belle2::SVDRecoDigit+;

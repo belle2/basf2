@@ -9,25 +9,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <cmath>
-#include <string>
-
-/* External headers. */
-#include <CLHEP/Units/SystemOfUnits.h>
-#include <G4Box.hh>
-#include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
-#include <G4PVPlacement.hh>
-#include <G4UnionSolid.hh>
-
-/* Belle2 headers. */
-#include <klm/eklm/geometry/G4TriangularPrism.h>
+/* Own header. */
 #include <klm/eklm/geometry/GeoEKLMCreator.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/G4TriangularPrism.h>
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
+
+/* Belle 2 headers. */
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <geometry/utilities.h>
+
+/* Geant4 headers. */
+#include <G4Box.hh>
+#include <G4Polyhedra.hh>
+#include <G4PVPlacement.hh>
+#include <G4Region.hh>
+#include <G4Tubs.hh>
+#include <G4UnionSolid.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Units/SystemOfUnits.h>
+
+/* C++ headers. */
+#include <cmath>
+#include <string>
 
 using namespace Belle2;
 
@@ -52,6 +59,7 @@ EKLM::GeoEKLMCreator::GeoEKLMCreator()
   m_LogVol.groove = nullptr;
   m_LogVol.scint = nullptr;
   m_LogVol.segmentsup = nullptr;
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_Sensitive = nullptr;
 }
 
@@ -1030,7 +1038,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
     m_GeoDat->getPlasticSheetGeometry();
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
-  nStrip = m_GeoDat->getNStripsSegment();
+  nStrip = m_ElementNumbers->getNStripsSegment();
   elements = new G4VSolid*[nStrip];
   t = new HepGeom::Transform3D[nStrip];
   /* Transformations. */
@@ -1079,7 +1087,7 @@ void EKLM::GeoEKLMCreator::createStripSegmentLogicalVolume(int iSegment)
   char name[128];
   G4VSolid** strips;
   HepGeom::Transform3D* t;
-  nStrip = m_GeoDat->getNStripsSegment();
+  nStrip = m_ElementNumbers->getNStripsSegment();
   strips = new G4VSolid*[nStrip];
   t = new HepGeom::Transform3D[nStrip];
   for (i = 0; i < nStrip; i++) {
@@ -1874,8 +1882,8 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     createScintillator(i);
   }
   for (i = 0; i < m_GeoDat->getNSegments(); i++) {
-    imin = i * m_GeoDat->getNStripsSegment();
-    imax = (i + 1) * m_GeoDat->getNStripsSegment();
+    imin = i * m_ElementNumbers->getNStripsSegment();
+    imax = (i + 1) * m_ElementNumbers->getNStripsSegment();
     for (m_CurVol.strip = imin + 1; m_CurVol.strip <= imax; m_CurVol.strip++)
       createStrip(m_LogVol.stripSegment[i]);
   }
@@ -1885,9 +1893,14 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     createStripSegment(i);
   }
   /* Create other volumes. */
+  /* Set up region for production cuts. */
+  G4Region* aRegion = new G4Region("EKLMEnvelope");
   for (m_CurVol.section = 1; m_CurVol.section <= m_GeoDat->getNSections();
        m_CurVol.section++) {
     section = createSection(&topVolume);
+    /* Assign same region to each section. */
+    section->SetRegion(aRegion);
+    aRegion->AddRootLogicalVolume(section);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();
          m_CurVol.layer++) {
       if (detectorLayer(m_CurVol.section, m_CurVol.layer)) {

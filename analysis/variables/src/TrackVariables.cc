@@ -13,12 +13,12 @@
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -26,7 +26,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <iostream>
@@ -35,23 +34,22 @@
 
 using namespace std;
 
-namespace {
-
-  Belle2::TrackFitResult const* getTrackFitResultFromParticle(Belle2::Particle const* particle)
-  {
-    const Belle2::Track* track = particle->getTrack();
-    if (!track) {
-      return nullptr;
-    }
-
-    const Belle2::TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(abs(
-                                               particle->getPDGCode())));
-    return trackFit;
-  }
-}
-
 namespace Belle2 {
   namespace Variable {
+
+    // An helper function to get track fit results
+    // Not registered in variable mananger
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) {
+        return nullptr;
+      }
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         particle->getPDGCode())));
+      return trackFit;
+    }
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -107,6 +105,15 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
+    }
+
+    double trackFirstCDCLayer(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
     double trackLastCDCLayer(const Particle* part)
@@ -237,7 +244,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return trackFit->getPValue();
@@ -428,13 +435,77 @@ namespace Belle2 {
       return elti->hasAnErrorFlag();
     }
 
+    double getHelixParameterPullAtIndex(const Particle* particle, const int index)
+    {
+
+      if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const Belle2::Track* track = particle->getTrack();
+      if (!track) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const Belle2::TrackFitResult* trackfit =  track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                                  particle->getPDGCode())));
+      if (!trackfit) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
+      const TMatrixDSym measCovariance = measHelix.getCovariance();
+      const TVector3 mcProdVertex = mcparticle->getVertex();
+      const TVector3 mcMomentum = mcparticle->getMomentum();
+
+      const double BzAtProdVertex = Belle2::BFieldManager::getField(TVector3(mcProdVertex.X(), mcProdVertex.Y(),
+                                    mcProdVertex.Z())).Z() / Belle2::Unit::T;
+      const double mcParticleCharge = mcparticle->getCharge();
+      const Belle2::Helix mcHelix = Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+
+      const std::vector<double> mcHelixPars = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
+      const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
+      const std::vector<double> measErrSquare = {measCovariance[0][0], measCovariance[1][1], measCovariance[2][2], measCovariance[3][3], measCovariance[4][4]};
+
+      return (mcHelixPars.at(index) - measHelixPars.at(index)) / std::sqrt(measErrSquare.at(index));
+    }
+
+    double getHelixD0Pull(const Particle* part)
+    {
+      return getHelixParameterPullAtIndex(part, 0);
+    }
+
+    double getHelixPhi0Pull(const Particle* part)
+    {
+      return getHelixParameterPullAtIndex(part, 1);
+    }
+
+    double getHelixOmegaPull(const Particle* part)
+    {
+      return getHelixParameterPullAtIndex(part, 2);
+    }
+
+    double getHelixZ0Pull(const Particle* part)
+    {
+      return getHelixParameterPullAtIndex(part, 3);
+    }
+    double getHelixTanLambdaPull(const Particle* part)
+    {
+      return getHelixParameterPullAtIndex(part, 4);
+    }
+
+
     VARIABLE_GROUP("Tracking");
+    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "mc-meas/err_meas for d0");
+    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "mc-meas/err_meas for phi0");
+    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "mc-meas/err_meas for omega");
+    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "mc-meas/err_meas for z0");
+    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "mc-meas/err_meas for tanLambda");
+
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
+    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track");
     REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
     REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");

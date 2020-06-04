@@ -8,12 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
+/* Own header. */
+#include <klm/dbobjects/KLMChannelStatus.h>
+
+/* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -55,30 +57,28 @@ void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
     setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
-int KLMChannelStatus::getActiveStripsEKLMSector(int sectorGlobal) const
+int KLMChannelStatus::getActiveStripsInModule(uint16_t module) const
 {
   int active;
-  int nPlanes, nStrips;
-  int section, layer, sector, plane, strip;
-  const EKLM::ElementNumbersSingleton* eklmElementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
+  int subdetector, section, layer, sector;
   const KLMElementNumbers* elementNumbers =
     &(KLMElementNumbers::Instance());
-  nPlanes = eklmElementNumbers->getMaximalPlaneNumber();
-  nStrips = eklmElementNumbers->getMaximalStripNumber();
-  eklmElementNumbers->sectorNumberToElementNumbers(
-    sectorGlobal, &section, &layer, &sector);
+  elementNumbers->moduleNumberToElementNumbers(
+    module, &subdetector, &section, &layer, &sector);
+  KLMChannelIndex klmModule(subdetector, section, layer, sector, 1, 1);
+  klmModule.setIndexLevel(KLMChannelIndex::c_IndexLevelLayer);
+  KLMChannelIndex klmNextModule(klmModule);
+  ++klmNextModule;
+  KLMChannelIndex klmChannel(klmModule);
+  klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
   active = 0;
-  for (plane = 1; plane <= nPlanes; ++plane) {
-    for (strip = 1; strip <= nStrips; ++strip) {
-      uint16_t channel = elementNumbers->channelNumberEKLM(
-                           section, sector, layer, plane, strip);
-      enum ChannelStatus status = getChannelStatus(channel);
-      if (status == c_Unknown)
-        B2FATAL("Incomplete KLM channel data.");
-      if (status != c_Dead)
-        active++;
-    }
+  for (; klmChannel != klmNextModule; ++klmChannel) {
+    uint16_t channel = klmChannel.getKLMChannelNumber();
+    ChannelStatus status = getChannelStatus(channel);
+    if (status == c_Unknown)
+      B2FATAL("Incomplete KLM channel data.");
+    if (status != c_Dead)
+      active++;
   }
   return active;
 }

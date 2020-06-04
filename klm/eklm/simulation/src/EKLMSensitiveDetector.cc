@@ -8,25 +8,29 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-#include <G4Step.hh>
-
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMSimulationParameters.h>
-#include <klm/eklm/geometry/GeometryData.h>
+/* Own header. */
 #include <klm/eklm/simulation/EKLMSensitiveDetector.h>
+
+/* KLM headers. */
+#include <klm/dbobjects/eklm/EKLMSimulationParameters.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+/* Geant4 headers. */
+#include <G4Step.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
+
 using namespace Belle2;
 
-EKLM::EKLMSensitiveDetector::
-EKLMSensitiveDetector(G4String name)
-  : Simulation::SensitiveDetectorBase(name, Const::KLM)
+EKLM::EKLMSensitiveDetector::EKLMSensitiveDetector(G4String name) :
+  Simulation::SensitiveDetectorBase(name, Const::KLM),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_GeoDat = &(EKLM::GeometryData::Instance());
   DBObjPtr<EKLMSimulationParameters> simPar;
   if (!simPar.isValid())
     B2FATAL("EKLM simulation parameters are not available.");
@@ -53,7 +57,8 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   sector = hist->GetVolume(stripLevel + 4)->GetCopyNo();
   plane = hist->GetVolume(stripLevel + 3)->GetCopyNo();
   strip = hist->GetVolume(stripLevel)->GetCopyNo();
-  stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane, strip);
+  stripGlobal = m_ElementNumbers->stripNumber(
+                  section, layer, sector, plane, strip);
   const G4double eDep = aStep->GetTotalEnergyDeposit();
   /* Do not record hits without deposited energy. */
   if (eDep <= 0)
@@ -83,7 +88,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setPosition(gpos.x() / CLHEP::mm * Unit::mm,
                    gpos.y() / CLHEP::mm * Unit::mm,
                    gpos.z() / CLHEP::mm * Unit::mm);
-  hit->setEDep(eDep);
+  hit->setEnergyDeposit(eDep);
   hit->setPDG(track.GetDefinition()->GetPDGEncoding());
   hit->setTime(hitTime);
   hit->setStrip(strip);

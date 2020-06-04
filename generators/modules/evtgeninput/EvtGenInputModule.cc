@@ -40,6 +40,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("ParentParticle", m_parentParticle, "Parent Particle Name", string("Upsilon(4S)"));
   addParam("InclusiveType", m_inclusiveType, "inclusive decay type (0: generic, 1: inclusive, 2: inclusive (charge conjugate)", 0);
+  addParam("CoherentMixing", m_coherentMixing, "decay the neutral B meson pairs coherently or non-coherently", true);
   addParam("InclusiveParticle", m_inclusiveParticle, "Inclusive Particle Name", string(""));
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
@@ -141,7 +142,7 @@ void EvtGenInputModule::initializeGenerator()
 {
 
   //setup the DECAY files:
-  m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName);
+  m_Ievtgen.setup(m_DECFileName, m_parentParticle, m_userDECFileName, m_coherentMixing);
 
   if (m_inclusiveType == 0) m_inclusiveParticle = "";
   if (m_inclusiveType != 0 && EvtPDL::getId(m_inclusiveParticle).getId() == -1) {

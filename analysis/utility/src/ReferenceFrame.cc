@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/ReferenceFrame.h>
-#include <framework/logging/Logger.h>
 
 #include <TMatrixD.h>
 

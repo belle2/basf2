@@ -14,10 +14,8 @@
 #include <TQObject.h>
 
 #include <string>
-#include <utility>
 #include <vector>
 
-class TEveBox;
 class TEveElement;
 class TEveElementList;
 class TGButton;
@@ -26,7 +24,6 @@ class TGPictureButton;
 class TGLabel;
 class TGNumberEntry;
 class TGTextEntry;
-class TTimer;
 struct Event_t;
 
 namespace Belle2 {

@@ -63,7 +63,7 @@ def check(ntupleName, treeName):
 
 
 # Define bin ranges. Bins may be of different size
-# They shouldn't event cover the whole paerameter space
+# They shouldn't event cover the whole parameter space
 bins_x = [make_1D_bin("p", 0, 2),
           make_1D_bin("p", 2, 3),
           make_1D_bin("p", 3, 4)]
@@ -72,8 +72,8 @@ bins_y = [make_1D_bin("pz", 0, 1),
           make_1D_bin("pz", 1, 5)]
 
 
-# Here whould be input from the experts.
-# We don't have real caolibration tables yet
+# Here would be input from the experts.
+# We don't have real calibration tables yet
 # So we use randomized info.
 # Bin IDs will be automatically assigned as follows:
 #
@@ -95,7 +95,7 @@ for xbin in bins_x:
         weightInfo["SystErr"] = float(10)
         tableIDNotSpec.append([weightInfo, make_2D_bin(xbin, ybin)])
 
-# Now let's assign binIDs manually (to be able to assigne identical IDs for different bins)
+# Now let's assign binIDs manually (to be able to assign identical IDs for different bins)
 # Let's do this structure of bins (out-of-range bin -1 is assigned later):
 #
 #    p|0-2|2-3|3-4|
@@ -171,11 +171,11 @@ with b2test_utils.clean_working_directory():
     # use the MC truth information to generate pion lists
     ma.fillParticleListFromMC('pi+:gen', '', path=main)
 
-    # ID of weight table is taked from B2A904
+    # ID of weight table is taken from B2A904
     weight_table_id = "ParticleReweighting:TestMomentum"
 
     # We know what weight info will be added (see B2A904),
-    # so we add aliases and add it ot tools
+    # so we add aliases and add it to tools
     variables.addAlias('Weight', 'extraInfo(' + weight_table_id + '_Weight)')
     variables.addAlias('StatErr', 'extraInfo(' + weight_table_id + '_StatErr)')
     variables.addAlias('SystErr', 'extraInfo(' + weight_table_id + '_SystErr)')
@@ -196,4 +196,4 @@ with b2test_utils.clean_working_directory():
 
     check(ntupleName, treeName)
 
-B2RESULT("Weight were applied corectly")
+B2RESULT("Weights were applied correctly")

@@ -6,13 +6,15 @@
 #include <stdlib.h>
 
 #include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/BufferedReader.h>
-#include <daq/slc/system/BufferedWriter.h>
-#include <daq/slc/system/StreamSizeCounter.h>
+#include <daq/slc/nsm/NSMHandlerException.h>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
+
+#include <nsm2/nsmlib2.h>
+#include <nsm2/nsmsys2.h>
+
+#include <arpa/inet.h>
 
 using namespace Belle2;
 

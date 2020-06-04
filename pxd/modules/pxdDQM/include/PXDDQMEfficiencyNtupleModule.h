@@ -18,10 +18,11 @@
 
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
+#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 
+#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 
 //root stuff
 #include "TVector3.h"
@@ -33,8 +34,9 @@
 namespace Belle2 {
 
   /**
-   * Creates the basic histograms for PXD Efficiency DQM
-   * Simplified and adopted version of the testbeam pxd efficiency module
+   * Creates Ntuples for PXD Efficiency analysis
+   *
+   * relies on PXD intercepts from the interceptor module which needs to be run before.´
    */
   class PXDDQMEfficiencyNtupleModule : public Module {
 
@@ -64,20 +66,13 @@ namespace Belle2 {
 
 
   private:
-    /** helper functions to do some of the calculations*/
-    /* returns the space point in local coordinates where the track hits the sensor:
-      sensorInfo: info of the sensor under investigation
-      aTrack: the track to be tested
-      isgood: flag which is false if some error occured (do not use the point if false)
-      du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
-     */
-    TVector3 getTrackInterSec(VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    /* helper functions to do some of the calculations*/
     /** find the closest cluster*/
-    int findClosestCluster(VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/
-    bool isDeadPixelClose(int u, int v, int checkDistance, VxdID& moduleID);
+    bool isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
 
     /// if true alignment will be used!
     bool m_useAlignment;
@@ -85,13 +80,18 @@ namespace Belle2 {
     /// the geometry
     VXD::GeoCache& m_vxdGeometry;
 
+    std::string m_ntupleName; ///< name output file
     std::string m_pxdClustersName; ///< name of the store array of pxd clusters
     std::string m_tracksName; ///< name of the store array of tracks
+    std::string m_recoTracksName; ///< name of the store array of recotracks
     std::string m_ROIsName; ///< name of the store array of ROIs
+    std::string m_PXDInterceptListName; /**< intercept list name*/
 
     StoreArray<PXDCluster> m_pxdclusters; ///< store array of pxd clusters
-    StoreArray<RecoTrack> m_tracks; ///< store array of tracks
+    StoreArray<Track> m_tracks; ///< store array of tracks
+    StoreArray<RecoTrack> m_recoTracks; ///< store array of reco tracks
     StoreArray<ROIid> m_ROIs; ///< store array of ROIs
+    StoreArray<PXDIntercept> m_intercepts; ///< store array of PXD Intercepts
 
     double m_pcut; ///< pValue-Cut for tracks
     double m_momCut; ///< Cut on fitted track momentum

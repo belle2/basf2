@@ -20,8 +20,6 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <numeric>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

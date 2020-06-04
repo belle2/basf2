@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* External headers. */
+/* ROOT headers. */
 #include <TObject.h>
 
 namespace Belle2 {
@@ -35,19 +35,28 @@ namespace Belle2 {
     /**
      * Set TDC frequency.
      */
-    void setTDCFrequency(double frequency);
+    void setTDCFrequency(double frequency)
+    {
+      m_TDCPeriod = 1.0 / frequency;
+    }
 
     /**
      * Set time offset.
      * @param[in] offset Offset in ns.
      */
-    void setTimeOffset(double offset);
+    void setTimeOffset(double offset)
+    {
+      m_TimeOffset = offset;
+    }
 
     /**
      * Set CTIME shift.
      * @param[in] shift Shift in bits.
      */
-    void setCTimeShift(int shift);
+    void setCTimeShift(int shift)
+    {
+      m_CTimeShift = shift;
+    }
 
     /**
      * Get time for scintillator.
@@ -74,7 +83,10 @@ namespace Belle2 {
     /**
      * Get TDC by time.
      */
-    uint16_t getTDCByTime(double time) const;
+    uint16_t getTDCByTime(double time) const
+    {
+      return (time - m_TimeOffset) / m_TDCPeriod;
+    }
 
   private:
 

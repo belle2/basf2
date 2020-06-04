@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

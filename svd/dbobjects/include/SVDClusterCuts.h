@@ -53,7 +53,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDClusterCuts, 1); /** needed by root*/
+    ClassDef(SVDClusterCuts, 1); /**< needed by root*/
 
   };
 

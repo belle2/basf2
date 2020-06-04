@@ -84,11 +84,20 @@ namespace Belle2 {
                                  144, -0.5, 143.5);
     h_trackPerEvent = new TH1D("trackPerEvent", "Number of tracks in ARICH per event; # of tracks;Events", 6, -0.5, 5.5);
 
-    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
+    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB ID;Hits", 72, 0.5, 72 + 0.5);
+    h_bitsPerMergerNorm = new TH2D("bitsPerMergerNorm", "Normalised number of hits in each bit in each Merger;Bit;MB ID;Hits", 5,
+                                   -1 - 0.5,
+                                   4 - 0.5, 72, 0.5, 72 + 0.5); // copy of h_bits, normalised to number of connected Hapds and to sum(bit1, bit2)
+    h_bitsPerHapdMerger = new TH2D("bitsPerHapdMerger",
+                                   "Number of hits in each bit in each Hapd sorted by mergers;Bit;HAPD unsorted;Hits", 5, -1 - 0.5,
+                                   4 - 0.5, 432, 1, 432);
+
     h_aerogelHit = new TH1D("aerogelHit", "Number track associated hits in each aerogel tile;Aerogel slot ID;Hits", 125, -0.5,
                             125 - 0.5);
     h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 5, -1 - 0.5,
                       4 - 0.5); //Bin at -1 is added to set minimum 0 without SetMinimum(0) due to bugs in jsroot on DQM server.
+    h_bitsPerChannel = new TH2D("bitsPerChannel", "Number of hits in each bit in each chanenel;Bit;channel #;Hits", 4, - 0.5,
+                                4 - 0.5, 420 * 144, -0.5, 420 * 144 - 0.5); // copy of h_bits
     h_hitsPerTrack2D = new TH2D("hitsPerTrack2D", "2D distribution of track associated hits;X[cm];Y[cm];Hits", 230, -115, 115, 230,
                                 -115, 115);
     h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 230, -115, 115, 230, -115, 115);
@@ -132,6 +141,8 @@ namespace Belle2 {
     h_chipDigit->SetOption("LIVE");
     h_hapdDigit->SetOption("LIVE");
     h_mergerHit->SetOption("LIVE");
+    h_bitsPerMergerNorm->SetOption("LIVE");
+    h_bitsPerHapdMerger->SetOption("LIVE");
 
     h_aerogelHit->SetOption("LIVE");
     h_bits->SetOption("LIVE");
@@ -157,8 +168,11 @@ namespace Belle2 {
     h_chipHit->SetMinimum(0);
     h_hapdHit->SetMinimum(0);
     h_mergerHit->SetMinimum(0);
+    h_bitsPerMergerNorm->SetMinimum(0);
+    h_bitsPerHapdMerger->SetMinimum(0);
     h_aerogelHit->SetMinimum(0);
     h_bits->SetMinimum(0);
+    h_bitsPerChannel->SetMinimum(0);
     h_hitsPerTrack2D->SetMinimum(0);
     h_tracks2D->SetMinimum(0);
     h_flashPerAPD->SetMinimum(0);
@@ -207,9 +221,12 @@ namespace Belle2 {
     h_chipHit->Reset();
     h_hapdHit->Reset();
     h_mergerHit->Reset();
+    h_bitsPerMergerNorm->Reset();
+    h_bitsPerHapdMerger->Reset();
 
     h_aerogelHit->Reset();
     h_bits->Reset();
+    h_bitsPerChannel->Reset();
     h_hitsPerTrack2D->Reset();
     h_tracks2D->Reset();
     h_aerogelHits3D->Reset();
@@ -253,13 +270,27 @@ namespace Belle2 {
     std::vector<int> apds(420 * 4, 0);
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
-      for (int i = 0; i < 8; i++) {
-        if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
-        else if (!bits) h_bits->Fill(8);
-      }
-      // fill occupancy histograms for raw data
       int moduleID  = digit.getModuleID();
       int channelID = digit.getChannelID();
+      int mergerID = arichMergerMap->getMergerID(moduleID);
+      int febSlot = arichMergerMap->getFEBSlot(moduleID);
+      unsigned binID = (mergerID - 1) * N_FEB2MERGER + (febSlot);
+
+      for (int i = 0; i < 8; i++) {
+        if ((bits & (1 << i)) && !(bits & ~(1 << i))) {
+          h_bits->Fill(i);
+          h_bitsPerChannel->Fill(i, (moduleID - 1) * 144 + channelID);
+          h_bitsPerMergerNorm->Fill(i, mergerID);
+          h_bitsPerHapdMerger->Fill(i, binID);
+        } else if (!bits) {
+          h_bits->Fill(8);
+          h_bitsPerChannel->Fill(8, (moduleID - 1) * 144 + channelID);
+          h_bitsPerMergerNorm->Fill(8, mergerID);
+          h_bitsPerHapdMerger->Fill(8, binID);
+        }
+      }
+
+      // fill occupancy histograms for raw data
       h_chDigit  ->Fill((moduleID - 1) * 144 + channelID);
       int chip = (moduleID - 1) * 4   + channelID / 36;
       h_chipDigit->Fill(chip);
@@ -390,6 +421,7 @@ namespace Belle2 {
   void ARICHDQMModule::endRun()
   {
 
+    DBObjPtr<ARICHMergerMapping> arichMergerMap;
     if (h_theta->GetEntries() < 200) return;
     TF1* f1 = new TF1("arichFitFunc", "gaus(0)+pol1(3)", 0.25, 0.4);
     f1->SetParameters(0.8 * h_theta->GetMaximum(), 0.323, 0.016, 0, 0);
@@ -400,11 +432,30 @@ namespace Belle2 {
     f1->SetParName(4, "p1");
     h_theta->Fit(f1, "R");
 
+    //Normalise bins in histogram bitsPerMergerNorm
+    for (int mergerID = 1; mergerID < 73; ++mergerID) {
+      double NHapd = 0;
+      for (int febSlot = 1; febSlot < 7; ++febSlot) {
+        if (arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
+      }
+
+      double bin_value[5];
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits and save values
+        bin_value[i - 1] = h_bitsPerMergerNorm->GetBinContent(i, mergerID);
+      }
+
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits again and set bin content
+        h_bitsPerMergerNorm->SetBinContent(i, mergerID,
+                                           bin_value[i - 1] / (bin_value[3] + bin_value[2]) / NHapd); // normalise with sum of bit1 and bit2, and number of connected HAPDs
+      }
+    }
+
+
   }
 
   void ARICHDQMModule::terminate()
   {
   }
 }
-
-

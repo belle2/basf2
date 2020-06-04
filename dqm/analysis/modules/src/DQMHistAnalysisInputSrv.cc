@@ -7,8 +7,9 @@
 // based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
-
 #include <dqm/analysis/modules/DQMHistAnalysisInputSrv.h>
+
+#include <TKey.h>
 #include <TSystem.h>
 
 using namespace std;

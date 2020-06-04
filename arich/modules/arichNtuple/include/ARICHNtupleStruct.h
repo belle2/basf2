@@ -21,25 +21,19 @@ namespace Belle2 {
      * Structure for particle hypothesis dependent arrays
      */
     struct ParticlesArray {
-      Float_t e;   /**< for electron */
-      Float_t mu;  /**< for muon */
-      Float_t pi;  /**< for pion */
-      Float_t K;   /**< for kaon */
-      Float_t p;   /**< for proton */
-      Float_t d;   /**< for deuteron */
-
-      /**
-       * Default constructor
-       */
-      ParticlesArray(): e(0), mu(0), pi(0), K(0), p(0), d(0)
-      {}
+      Float_t e{0};   /**< for electron */
+      Float_t mu{0};  /**< for muon */
+      Float_t pi{0};  /**< for pion */
+      Float_t K{0};   /**< for kaon */
+      Float_t p{0};   /**< for proton */
+      Float_t d{0};   /**< for deuteron */
 
       /**
        * Clear the structure: set elements to zero
        */
       void clear()
       {
-        e = mu = pi = K = p = d = 0;
+        *this = ParticlesArray();
       }
     };
 
@@ -48,27 +42,20 @@ namespace Belle2 {
      * Structure for track parameters at ARICH
      */
     struct TrackHit {
-      Int_t PDG;    /**< PDG code */
-      Float_t x;    /**< impact point, x component */
-      Float_t y;    /**< impact point, y component */
-      Float_t z;    /**< impact point, z component */
-      Float_t p;     /**< momentum magnitude */
-      Float_t theta; /**< momentum polar angle */
-      Float_t phi;   /**< momentum azimuthal angle */
-
-      /**
-       * Default constructor
-       */
-      TrackHit(): PDG(0), x(0), y(0), z(0), p(0), theta(0), phi(0)
-      {}
+      Int_t PDG{0};    /**< PDG code */
+      Float_t x{0};    /**< impact point, x component */
+      Float_t y{0};    /**< impact point, y component */
+      Float_t z{0};    /**< impact point, z component */
+      Float_t p{0};     /**< momentum magnitude */
+      Float_t theta{0}; /**< momentum polar angle */
+      Float_t phi{0};   /**< momentum azimuthal angle */
 
       /**
        * Clear the structure: set elements to zero
        */
       void clear()
       {
-        PDG = 0;
-        x = y = z = p = theta = phi = 0;
+        *this = TrackHit();
       }
 
     };
@@ -78,114 +65,56 @@ namespace Belle2 {
      * Structure of a flat ntuple
      */
     struct ARICHTree {
-      Int_t evt; /**< event number */
-      Int_t run; /**< run number */
-      Int_t exp; /**< exp number */
+      Int_t evt{0}; /**< event number */
+      Int_t run{0}; /**< run number */
+      Int_t exp{0}; /**< exp number */
 
-      Short_t charge;    /**< charge */
-      Float_t pValue; /**< p-value of Track fit */
-      Float_t z0;     /**< track z0 */
-      Float_t d0;     /**< track d0 */
+      Short_t charge{0};    /**< charge */
+      Float_t pValue{0}; /**< p-value of Track fit */
+      Float_t z0{0};     /**< track z0 */
+      Float_t d0{0};     /**< track d0 */
 #ifdef ALIGNMENT_USING_BHABHA
-      Float_t eop;    /**< E/p for bhabha */
-      Float_t e9e21;    /**< E9/E21 for bhabha */
-      Float_t etot;    /**< total energy of ECL clusters */
+      Float_t eop {0};  /**< E/p for bhabha */
+      Float_t e9e21{0};    /**< E9/E21 for bhabha */
+      Float_t etot{0};    /**< total energy of ECL clusters */
 #endif
 
-      Int_t PDG;       /**< PDG code of related MCParticle */
-      Int_t motherPDG; /**< PDG code of related mother MCParticle */
-      Int_t status;    /**< track status (add proper description)*/
-      Short_t primary; /**< is a primary particle (from related MCParticle) */
-      Short_t seen;    /**< is seen in ARICH (from related MCParticle) */
-      Float_t rhoProd; /**< production vertex (cylindrical coordinate r) of MCParticle */
-      Float_t zProd;   /**< production vertex (cylindrical coordinate z) of MCParticle */
-      Float_t phiProd; /**< production vertex (cylindrical coordinate phi) of MCParticle */
-      Float_t rhoDec;  /**< decay vertex (cylindrical coordinate r) of MCParticle */
-      Float_t zDec;    /**< decay vertex (cylindrical coordinate z) of MCParticle */
-      Float_t phiDec;  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
-      Int_t scatter;     /**< 1 if particle scattered (i.e. has daughter with same PDG) */
+      Int_t PDG{0};       /**< PDG code of related MCParticle */
+      Int_t motherPDG{0}; /**< PDG code of related mother MCParticle */
+      Int_t status{0};    /**< track status (add proper description)*/
+      Short_t primary{0}; /**< is a primary particle (from related MCParticle) */
+      Short_t seen{0};    /**< is seen in ARICH (from related MCParticle) */
+      Float_t rhoProd{0}; /**< production vertex (cylindrical coordinate r) of MCParticle */
+      Float_t zProd{0};   /**< production vertex (cylindrical coordinate z) of MCParticle */
+      Float_t phiProd{0}; /**< production vertex (cylindrical coordinate phi) of MCParticle */
+      Float_t rhoDec{0};  /**< decay vertex (cylindrical coordinate r) of MCParticle */
+      Float_t zDec{0};    /**< decay vertex (cylindrical coordinate z) of MCParticle */
+      Float_t phiDec{0};  /**< decay vertex (cylindrical coordinate phi) of MCParticle */
+      Int_t scatter{0};     /**< 1 if particle scattered (i.e. has daughter with same PDG) */
 
-      Int_t detPhot;      /**< number of detected photons */
-      Int_t nCDC;      /**< number of track CDC hits */
-      Bool_t inAcc;     /**< track in detector acceptance, i.e. > 0 expected photons for electron ring */
-      ParticlesArray numBkg;       /**< number of expected background photons */
-      ParticlesArray expPhot;      /**< number of expected photons (signal + bkg) */
-      ParticlesArray logL;   /**< log likelihoods */
+      Int_t detPhot{0};      /**< number of detected photons */
+      Int_t nCDC{0};      /**< number of track CDC hits */
+      Bool_t inAcc{0};     /**< track in detector acceptance, i.e. > 0 expected photons for electron ring */
+      ParticlesArray numBkg{0};       /**< number of expected background photons */
+      ParticlesArray expPhot{0};      /**< number of expected photons (signal + bkg) */
+      ParticlesArray logL{0};   /**< log likelihoods */
 
 
-      TrackHit recHit;  /**< extrapolated Track hit */
-      TrackHit mcHit;  /**< related MC particle hit */
-      Int_t nRec; /**< number of reconstructed photons */
+      TrackHit recHit{0};  /**< extrapolated Track hit */
+      TrackHit mcHit{0};  /**< related MC particle hit */
+      Int_t nRec{0}; /**< number of reconstructed photons */
       std::vector<Belle2::ARICHPhoton>  photons; /** vector of reconstructed photons */
-      Float_t winHit[2];                         /** track hit on hapd window (x,y coordinates) */
-      Int_t trgtype; /**< event trigger type */
-
-
-
-      /**
-       * Default constructor
-       */
-      ARICHTree(): evt(0), run(0), exp(0), charge(0), pValue(0), z0(0), d0(0), PDG(0), motherPDG(0),
-#ifdef ALIGNMENT_USING_BHABHA
-        eop(0), e9e21(0), etot(0),
-#endif
-        status(0), primary(0), seen(0), rhoProd(0), zProd(0), phiProd(0), rhoDec(0), zDec(0),
-        phiDec(0), scatter(0), nRec(0), nCDC(0), inAcc(0)
-      {
-
-      }
+      Float_t winHit[2] {0};                        /** track hit on hapd window (x,y coordinates) */
+      Int_t trgtype{0}; /**< event trigger type */
 
       /**
        * Clear the structure: set elements to zero
        */
       void clear()
       {
-        evt = 0;
-        run = 0;
-        exp = 0;
-        trgtype = 0;
-
-        pValue = 0;
-        z0 = 0;
-        d0 = 0;
-        charge = 0;
-
-#ifdef ALIGNMENT_USING_BHABHA
-        eop = 0;
-        e9e21 = 0;
-        etot = 0;
-#endif
-
-        PDG = 0;
-        motherPDG = 0;
-        status = 0;
-        primary = 0;
-        seen = 0;
-        rhoProd = 0;
-        zProd = 0;
-        phiProd = 0;
-        rhoDec = 0;
-        zDec = 0;
-        phiDec = 0;
-        scatter = 0;
-        nRec = 0;
-        detPhot = 0;
-        nCDC = 0;
-        inAcc = 0;
-
-        numBkg.clear();
-        expPhot.clear();
-        logL.clear();
-
-        recHit.clear();
-        mcHit.clear();
-        photons.clear();
-
-        winHit[0] = 0.; winHit[1] = 0.;
+        *this = ARICHTree();
       }
     };
 
   } // ARICH namestace
 } // Belle2 namespace
-
-

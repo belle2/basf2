@@ -20,6 +20,8 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+// framework timer
+#include <framework/utilities/Utils.h>
 
 // DB objects
 #include <cdc/dataobjects/WireID.h>
@@ -37,9 +39,12 @@
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
 #include <cdc/dbobjects/CDCWireHitRequirements.h>
+#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-
+#include <TFile.h>
+#include <TTreeReader.h>
+#include <TH1F.h>
 #include <iostream>
 #include <fstream>
 
@@ -229,14 +234,15 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   bw.construct();
 
   int iL(0), iC(0), nRead(0);
+  double effi(0.);
 
   while (true) {
-    stream >> iL >> iC;
+    stream >> iL >> iC >> effi;
     if (stream.eof()) break;
     ++nRead;
-    bw->setWire(WireID(iL, iC));
+    bw->setWire(WireID(iL, iC), effi);
     //      if (m_debug) {
-    //  std::cout << iL << " " << iC << std::endl;
+    //  std::cout << iL << " " << iC << " " << effi << std::endl;
     //      }
   }
   stream.close();
@@ -922,6 +928,128 @@ void CDCDatabaseImporter::printCDCWireHitRequirements() const
     dbWireHitReq->dump();
   } else {
     B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for the current run.");
+  }
+}
+
+void CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileName) const
+{
+  DBImportObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLibrary;
+  dbCDCCrossTalkLibrary.construct();
+
+  TFile fIn = TFile(rootFileName.c_str());
+  TTreeReader reader("my_ttree", &fIn);
+  TTreeReaderValue<UChar_t> Board(reader, "Board");
+  TTreeReaderValue<UChar_t> Channel(reader, "Channel");
+  TTreeReaderValue<Short_t> Asic_ADC0(reader, "Asic_ADC0");
+  TTreeReaderValue<Short_t> Asic_TDC0(reader, "Asic_TDC0");
+  TTreeReaderValue<Short_t> Asic_TOT0(reader, "Asic_TOT0");
+  TTreeReaderValue<Short_t> Asic_ADC1(reader, "Asic_ADC1");
+  TTreeReaderValue<Short_t> Asic_TDC1(reader, "Asic_TDC1");
+  TTreeReaderValue<Short_t> Asic_TOT1(reader, "Asic_TOT1");
+  TTreeReaderValue<Short_t> Asic_ADC2(reader, "Asic_ADC2");
+  TTreeReaderValue<Short_t> Asic_TDC2(reader, "Asic_TDC2");
+  TTreeReaderValue<Short_t> Asic_TOT2(reader, "Asic_TOT2");
+  TTreeReaderValue<Short_t> Asic_ADC3(reader, "Asic_ADC3");
+  TTreeReaderValue<Short_t> Asic_TDC3(reader, "Asic_TDC3");
+  TTreeReaderValue<Short_t> Asic_TOT3(reader, "Asic_TOT3");
+  TTreeReaderValue<Short_t> Asic_ADC4(reader, "Asic_ADC4");
+  TTreeReaderValue<Short_t> Asic_TDC4(reader, "Asic_TDC4");
+  TTreeReaderValue<Short_t> Asic_TOT4(reader, "Asic_TOT4");
+  TTreeReaderValue<Short_t> Asic_ADC5(reader, "Asic_ADC5");
+  TTreeReaderValue<Short_t> Asic_TDC5(reader, "Asic_TDC5");
+  TTreeReaderValue<Short_t> Asic_TOT5(reader, "Asic_TOT5");
+  TTreeReaderValue<Short_t> Asic_ADC6(reader, "Asic_ADC6");
+  TTreeReaderValue<Short_t> Asic_TDC6(reader, "Asic_TDC6");
+  TTreeReaderValue<Short_t> Asic_TOT6(reader, "Asic_TOT6");
+  TTreeReaderValue<Short_t> Asic_ADC7(reader, "Asic_ADC7");
+  TTreeReaderValue<Short_t> Asic_TDC7(reader, "Asic_TDC7");
+  TTreeReaderValue<Short_t> Asic_TOT7(reader, "Asic_TOT7");
+
+  while (reader.Next()) {
+    asicChannels record{
+      asicChannel{*Asic_TDC0, *Asic_ADC0, *Asic_TOT0},
+      asicChannel{*Asic_TDC1, *Asic_ADC1, *Asic_TOT1},
+      asicChannel{*Asic_TDC2, *Asic_ADC2, *Asic_TOT2},
+      asicChannel{*Asic_TDC3, *Asic_ADC3, *Asic_TOT3},
+      asicChannel{*Asic_TDC4, *Asic_ADC4, *Asic_TOT4},
+      asicChannel{*Asic_TDC5, *Asic_ADC5, *Asic_TOT5},
+      asicChannel{*Asic_TDC6, *Asic_ADC6, *Asic_TOT6},
+      asicChannel{*Asic_TDC7, *Asic_ADC7, *Asic_TOT7}
+    };
+    // Determine ADC of the signal
+    UChar_t asicCh = *Channel % 8;
+    Short_t ADC = record[asicCh].ADC;
+    dbCDCCrossTalkLibrary->addAsicRecord(asicCh, ADC, record);
+  }
+
+  // Now also get the x-talk probability
+  double probs[8196];
+  TH1F* prob;
+  fIn.GetObject("ProbXTalk", prob);
+  for (size_t a = 1; a <= 8196; a += 1) {
+    probs[a - 1] = prob->GetBinContent(a);
+  }
+  fIn.Close();
+  dbCDCCrossTalkLibrary->setPCrossTalk(probs);
+
+  dbCDCCrossTalkLibrary->dump(0);
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbCDCCrossTalkLibrary.import(iov);
+  B2RESULT("CDCCrossTalkLibrary requirements imported to database.");
+}
+
+void CDCDatabaseImporter::printCDCCrossTalkLibrary() const
+{
+  DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
+  if (dbCDCCrossTalkLib.isValid()) {
+    dbCDCCrossTalkLib->dump(1);
+  } else {
+    B2ERROR("DBObjPtr<CDCCrossTalkLibrary> not valid for the current run.");
+  }
+}
+
+void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
+{
+  DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
+
+  if (dbCDCCrossTalkLib.isValid()) {
+
+    if (! spotChecks) {
+      B2INFO("Performing CDCCrossTalkLibrary checks");
+      auto timer = new Utils::Timer("CDCCrossTalkLibrary checks took"); // use "new" to avoid cpp-check warning
+      int counter = 0;
+      int size = 0;
+      for (Short_t ADC = 0; ADC < 8196; ADC += 1) {
+        for (Short_t channel = 0; channel < 48; channel += 1) {
+          for (size_t rep = 0; rep < 100; rep += 1) {
+            auto xtalk = dbCDCCrossTalkLib->getLibraryCrossTalk(channel, 4999, ADC, 5, 0, false);
+            counter += 1;
+            size += xtalk.size();
+          }
+        }
+      }
+      B2INFO("CDCCrossTalkLibrary called " << counter << " times. Total number of cross talk hits " << size);
+      delete timer;
+      return;
+    }
+
+
+    Short_t ADC_spot_checks[5] = {2, 100, 500, 1000, 5000};
+    for (auto ADC :  ADC_spot_checks) {
+      B2INFO("CHECK ADC=" << ADC);
+
+      size_t NRep = ADC < 50 ? 100 : 10;
+      for (size_t rep = 0; rep < NRep; rep += 1) {
+        auto xtalk = dbCDCCrossTalkLib->getLibraryCrossTalk(0, 4999, ADC, 5, 0, true);
+        B2INFO("Size = " << xtalk.size());
+        for (auto [channel, rec] : xtalk) {
+          B2INFO("Channel:" << channel << " TDC,ADC,TOT:" << rec.TDC << "," << rec.ADC << "," << rec.TOT);
+        }
+      }
+    }
+  } else {
+    B2ERROR("DBObjPtr<CDCCrossTalkLibrary> not valid for the current run.");
   }
 }
 

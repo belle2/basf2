@@ -7,6 +7,7 @@ from ROOT import Belle2
 from pxd import add_pxd_packer, add_pxd_unpacker
 from svd import add_svd_packer, add_svd_unpacker
 from iov_conditional import make_conditional_at
+from neurotrigger import add_neuro_2d_unpackers
 
 
 def add_packers(path, components=None):
@@ -35,7 +36,6 @@ def add_packers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcpacker = register_module('CDCPacker')
-        cdcpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
         path.add_module(cdcpacker)
 
     # ECL
@@ -55,10 +55,8 @@ def add_packers(path, components=None):
 
     # KLM
     if components is None or 'KLM' in components:
-        bklmpacker = register_module('BKLMRawPacker')
-        path.add_module(bklmpacker)
-        eklmpacker = register_module('EKLMRawPacker')
-        path.add_module(eklmpacker)
+        klmpacker = register_module('KLMPacker')
+        path.add_module(klmpacker)
 
 
 def add_unpackers(path, components=None):
@@ -87,7 +85,7 @@ def add_unpackers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcunpacker = register_module('CDCUnpacker')
-        cdcunpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
+        cdcunpacker.param('enableStoreCDCRawHit', True)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 
@@ -125,6 +123,8 @@ def add_unpackers(path, components=None):
         path.add_module(trgeclunpacker)
         trggrlunpacker = register_module('TRGGRLUnpacker')
         path.add_module(trggrlunpacker)
+        trgtopunpacker = register_module('TRGTOPUnpacker')
+        path.add_module(trgtopunpacker)
 
         nmod_tsf = [0, 1, 2, 3, 4, 5, 6]
         for mod_tsf in nmod_tsf:
@@ -135,31 +135,7 @@ def add_unpackers(path, components=None):
             path.add_module('TRGCDCT3DUnpacker', T3DMOD=mod_t3d)
 
         # unpacker for neurotrigger
-        neurounpacker = register_module('CDCTriggerUnpacker')
-        neurounpacker.param('headerSize', 3)
-        # unpack the data from the 2D tracker and save its Bitstream
-        neurounpacker.param('unpackTracker2D', False)
-        # make CDCTriggerTrack and CDCTriggerSegmentHit objects from the 2D output
-        neurounpacker.param('decode2DFinderTrack', True)
-        # make CDCTriggerSegmentHit objects from the 2D input
-        neurounpacker.param('decode2DFinderInput', True)
-        neurounpacker.param('2DNodeId', [
-            [0x11000001, 0],
-            [0x11000001, 1],
-            [0x11000002, 0],
-            [0x11000002, 1],
-        ])
-        neurounpacker.param('NeuroNodeId', [
-            [0x11000005, 0],
-            [0x11000005, 1],
-            [0x11000006, 0],
-            [0x11000006, 1],
-        ])
-        neurounpacker.param('unpackNeuro', True)
-        neurounpacker.param('decodeNeuro', True)
-        neurounpacker.param('delayNNOutput', [9, 9, 9, 9])
-        neurounpacker.param('delayNNSelect', [4, 4, 4, 4])
-        path.add_module(neurounpacker)
+        add_neuro_2d_unpackers(path)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

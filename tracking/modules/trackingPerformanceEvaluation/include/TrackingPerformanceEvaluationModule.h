@@ -13,8 +13,6 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <TTree.h>
-#include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -25,13 +23,8 @@
 
 // forward declarations
 namespace Belle2 {
-  class MCParticle;
   class Track;
   class TrackFitResult;
-
-  template< class T >
-  class StoreArray;
-
 
   /** This module takes the MCParticles, the Tracks, the RecoTrack,
    *  and the MCRecoTracks input and produce a root file containing various histograms

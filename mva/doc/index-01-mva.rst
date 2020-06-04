@@ -30,14 +30,21 @@ Use cases
 Use cases include:
 
 - Analysis:
+
     - Full Event Interpretation, over 100 classifiers have to be trained without user interaction and have to be loaded from the database automatically if a user wants to apply the FEI to MC or data
     - Flavor Tagger
     - Continuum Suppression
+
 - Tracking:
+
     - Track finding in CDC and VXD, classifiers should be retrained automatically using the newest MC, maybe even run-dependent, and automatically loaded and applied on MC and data during the reconstruction phase
+
 - ECL:
+
     - Classification and regression tasks
+
 - BKLM:
+
     - KLong ID
 
 Interface

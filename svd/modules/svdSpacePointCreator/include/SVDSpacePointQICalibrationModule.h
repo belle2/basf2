@@ -70,7 +70,7 @@ namespace Belle2 {
     int m_maxClusterSize = 5; /**<max numnber of strips the PDF are separated into*/
     bool m_useLegacyNaming = true; /**<use legacy pdf naming*/
 
-    std::string m_outputFileName = "";
+    std::string m_outputFileName = "";/**<output file name*/
 
     std::string m_nameOfInstance =
       ""; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */

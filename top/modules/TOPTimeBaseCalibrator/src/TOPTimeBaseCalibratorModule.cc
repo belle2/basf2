@@ -667,7 +667,7 @@ namespace Belle2 {
     if (fabs(m_dchi2dxv) < m_change_xstep) m_xstep = m_new_xstep;
   }
 
-  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval)
+  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, const std::vector<double>& xxval)
   {
     double sum1 = 0.0;
     double sum2 = 0.0; //sum od dt and dt**2

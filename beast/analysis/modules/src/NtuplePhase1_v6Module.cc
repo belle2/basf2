@@ -279,13 +279,15 @@ namespace Belle2 {
     TDirectory* dirh = gDirectory;
     TFile* fh[6];
     int iter = 0;
-    for (const TString& fileName : m_inputHistoFileNames) {
+    for (const string& fileNameTmp : m_inputHistoFileNames) {
+      const TString& fileName = (TString)fileNameTmp;
       fh[iter] = TFile::Open(fileName, "READ");
       if (!fh[iter] or !fh[iter]->IsOpen()) {
         B2FATAL("Couldn't open input file " + fileName);
       }
       if (fileName.Contains("Touschek") || fileName.Contains("Coulomb") || fileName.Contains("Brems")) {
-        for (const TString& HistoRateName : m_inputRateHistoNames) {
+        for (const string& HistoRateNameTmp : m_inputRateHistoNames) {
+          const TString& HistoRateName = (TString)HistoRateNameTmp;
 
           TH1F* h1D;
           if (HistoRateName.Contains("csi")) h1D = (TH1F*)fh[iter]->Get(TString::Format("csi_rate_%d", m_DayBin));
@@ -355,7 +357,8 @@ namespace Belle2 {
           }
           delete h1D;
         }
-        for (const TString& HistoDoseName : m_inputDoseHistoNames) {
+        for (const string& HistoDoseNameTmp : m_inputDoseHistoNames) {
+          const TString& HistoDoseName = (TString)HistoDoseNameTmp;
 
           int imax = 0;
           if (HistoDoseName.Contains("csi")) imax = 18;
@@ -522,7 +525,8 @@ namespace Belle2 {
         }
       }
       if (fileName.Contains("Coulomb") || fileName.Contains("Brems")) {
-        for (const TString& HistoRateName : m_inputRateHistoNamesVrs) {
+        for (const string& HistoRateNameTmp : m_inputRateHistoNamesVrs) {
+          const TString& HistoRateName = (TString)HistoRateNameTmp;
 
           TH2F* h2D;
           if (HistoRateName.Contains("csi")) h2D = (TH2F*)fh[iter]->Get(TString::Format("csi_rs_drate_%d", m_DayBin));
@@ -585,7 +589,8 @@ namespace Belle2 {
           delete h2D;
         }
 
-        for (const TString& HistoDoseName : m_inputDoseHistoNamesVrs) {
+        for (const string& HistoDoseNameTmp : m_inputDoseHistoNamesVrs) {
+          const TString& HistoDoseName = (TString)HistoDoseNameTmp;
           int imax = 0;
           if (HistoDoseName.Contains("csi")) imax = 18;
           if (HistoDoseName.Contains("bgo")) imax = 8;

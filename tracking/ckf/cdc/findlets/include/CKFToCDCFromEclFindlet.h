@@ -17,7 +17,6 @@
 #include <tracking/ckf/cdc/findlets/CDCCKFResultStorer.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFDuplicateRemover.h>
 
-#include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -25,8 +24,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class RecoTrack;
-
   class ModuleParamList;
 
   /// Main findlet of the ToCDCCKF module

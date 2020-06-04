@@ -8,6 +8,8 @@
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/rawdata/modules/DeSerializer.h>
 
+#include <sys/mman.h>
+
 //#define MAXEVTSIZE 400000000
 
 using namespace std;

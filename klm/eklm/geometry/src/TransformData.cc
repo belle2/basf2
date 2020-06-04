@@ -8,11 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+/* Own header. */
+#include <klm/eklm/geometry/TransformData.h>
+
+/* KLM headers. */
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
-#include <klm/eklm/geometry/TransformData.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
@@ -25,8 +30,8 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   int iSection, iLayer, iSector, iPlane, iSegment, iStrip, sector, segment;
   int nSections, nLayers, nSectors, nPlanes, nStrips, nSegments, nStripsSegment;
   int nDetectorLayers;
-  std::string payload;
   AlignmentChecker alignmentChecker(true);
+  m_ElementNumbers = &(EKLMElementNumbers::Instance());
   m_GeoDat = &(GeometryData::Instance());
   nSections = m_GeoDat->getNSections();
   nSectors = m_GeoDat->getNSectors();
@@ -34,7 +39,7 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   nPlanes = m_GeoDat->getNPlanes();
   nStrips = m_GeoDat->getNStrips();
   nSegments = m_GeoDat->getNSegments();
-  nStripsSegment = m_GeoDat->getNStripsSegment();
+  nStripsSegment = m_ElementNumbers->getNStripsSegment();
   m_Section = new HepGeom::Transform3D[nSections];
   m_Layer = new HepGeom::Transform3D*[nSections];
   m_Sector = new HepGeom::Transform3D** [nSections];
@@ -102,24 +107,29 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
   }
   /* Read alignment data from the database and modify transformations. */
   if (displacementType != c_None) {
-    if (displacementType == c_Displacement)
+    std::string payload, segmentPayload;
+    if (displacementType == c_Displacement) {
       payload = "EKLMDisplacement";
-    else
+      segmentPayload = "EKLMSegmentDisplacement";
+    } else {
       payload = "EKLMAlignment";
+      segmentPayload = "EKLMSegmentAlignment";
+    }
     DBObjPtr<EKLMAlignment> alignment(payload);
+    DBObjPtr<EKLMSegmentAlignment> segmentAlignment(segmentPayload);
     if (!alignment.isValid())
       B2FATAL("No EKLM displacement (alignment) data.");
     if (displacementType == c_Displacement) {
-      if (!alignmentChecker.checkAlignment(&(*alignment)))
+      if (!alignmentChecker.checkAlignment(&(*alignment), &(*segmentAlignment)))
         B2FATAL("EKLM displacement data are incorrect, overlaps exist.");
     }
     for (iSection = 1; iSection <= nSections; iSection++) {
       nDetectorLayers = m_GeoDat->getNDetectorLayers(iSection);
       for (iLayer = 1; iLayer <= nDetectorLayers; iLayer++) {
         for (iSector = 1; iSector <= nSectors; iSector++) {
-          sector = m_GeoDat->sectorNumber(iSection, iLayer, iSector);
-          const EKLMAlignmentData* sectorAlignment =
-            alignment->getSectorAlignment(sector);
+          sector = m_ElementNumbers->sectorNumber(iSection, iLayer, iSector);
+          const KLMAlignmentData* sectorAlignment =
+            alignment->getModuleAlignment(sector);
           if (sectorAlignment == nullptr)
             B2FATAL("Incomplete EKLM displacement (alignment) data.");
           for (iPlane = 1; iPlane <= nPlanes; iPlane++) {
@@ -127,43 +137,44 @@ EKLM::TransformData::TransformData(bool global, Displacement displacementType)
             if (iPlane == 1) {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
-                  sectorAlignment->getDy() * CLHEP::cm / Unit::cm,
-                  sectorAlignment->getDx() * CLHEP::cm / Unit::cm, 0) *
-                HepGeom::RotateZ3D(-sectorAlignment->getDalpha() *
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(-sectorAlignment->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
             } else {
               m_PlaneDisplacement[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1] =
                 HepGeom::Translate3D(
-                  sectorAlignment->getDx() * CLHEP::cm / Unit::cm,
-                  sectorAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
-                HepGeom::RotateZ3D(sectorAlignment->getDalpha() *
+                  sectorAlignment->getDeltaU() * CLHEP::cm / Unit::cm,
+                  sectorAlignment->getDeltaV() * CLHEP::cm / Unit::cm, 0) *
+                HepGeom::RotateZ3D(sectorAlignment->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
             }
             for (iSegment = 1; iSegment <= nSegments; iSegment++) {
-              segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
-                                                iPlane, iSegment);
-              const EKLMAlignmentData* segmentAlignment =
-                alignment->getSegmentAlignment(segment);
-              if (segmentAlignment == nullptr)
+              segment = m_ElementNumbers->segmentNumber(
+                          iSection, iLayer, iSector, iPlane, iSegment);
+              const KLMAlignmentData* segmentAlignmentData =
+                segmentAlignment->getSegmentAlignment(segment);
+              if (segmentAlignmentData == nullptr)
                 B2FATAL("Incomplete EKLM displacement (alignment) data.");
               m_Segment[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
               [iSegment - 1] =
                 HepGeom::Translate3D(
-                  segmentAlignment->getDx() * CLHEP::cm / Unit::cm,
-                  segmentAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
+                  segmentAlignmentData->getDeltaU() * CLHEP::cm / Unit::cm,
+                  segmentAlignmentData->getDeltaV() * CLHEP::cm / Unit::cm, 0) *
                 m_Segment[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [iSegment - 1] *
-                HepGeom::RotateZ3D(segmentAlignment->getDalpha() *
+                HepGeom::RotateZ3D(segmentAlignmentData->getDeltaGamma() *
                                    CLHEP::rad / Unit::rad);
               for (iStrip = 1; iStrip <= nStripsSegment; iStrip++) {
                 m_Strip[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [nStripsSegment * (iSegment - 1) + iStrip - 1] =
                   HepGeom::Translate3D(
-                    segmentAlignment->getDx() * CLHEP::cm / Unit::cm,
-                    segmentAlignment->getDy() * CLHEP::cm / Unit::cm, 0) *
+                    segmentAlignmentData->getDeltaU() * CLHEP::cm / Unit::cm,
+                    segmentAlignmentData->getDeltaV() * CLHEP::cm / Unit::cm,
+                    0) *
                   m_Strip[iSection - 1][iLayer - 1][iSector - 1][iPlane - 1]
                   [nStripsSegment * (iSegment - 1) + iStrip - 1] *
-                  HepGeom::RotateZ3D(segmentAlignment->getDalpha() *
+                  HepGeom::RotateZ3D(segmentAlignmentData->getDeltaGamma() *
                                      CLHEP::rad / Unit::rad);
               }
             }
@@ -315,14 +326,14 @@ getStripTransform(int section, int layer, int sector, int plane, int strip) cons
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripLocalToGlobal(EKLMDigit* hit) const
+EKLM::TransformData::getStripLocalToGlobal(KLMDigit* hit) const
 {
   return &(m_Strip[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
 }
 
 const HepGeom::Transform3D*
-EKLM::TransformData::getStripGlobalToLocal(EKLMDigit* hit) const
+EKLM::TransformData::getStripGlobalToLocal(KLMDigit* hit) const
 {
   return &(m_StripInverse[hit->getSection() - 1][hit->getLayer() - 1]
            [hit->getSector() - 1][hit->getPlane() - 1][hit->getStrip() - 1]);
@@ -336,7 +347,7 @@ EKLM::TransformData::getStripGlobalToLocal(int section, int layer, int sector,
            [strip - 1]);
 }
 
-bool EKLM::TransformData::intersection(EKLMDigit* hit1, EKLMDigit* hit2,
+bool EKLM::TransformData::intersection(KLMDigit* hit1, KLMDigit* hit2,
                                        HepGeom::Point3D<double>* cross,
                                        double* d1, double* d2, double* sd,
                                        bool segments) const
@@ -463,7 +474,7 @@ int EKLM::TransformData::getStripsByIntersection(
   sector = getSectorByPosition(section, intersection);
   nPlanes = m_GeoDat->getNPlanes();
   nSegments = m_GeoDat->getNSegments();
-  nStripsSegment = m_GeoDat->getNStripsSegment();
+  nStripsSegment = m_ElementNumbers->getNStripsSegment();
   stripWidth = m_GeoDat->getStripGeometry()->getWidth() / CLHEP::cm * Unit::cm;
   minY = -stripWidth / 2;
   maxY = (double(nStripsSegment) - 0.5) * stripWidth;
@@ -516,7 +527,8 @@ int EKLM::TransformData::getStripsByIntersection(
      */
     if (fabs(x) > 0.5 * l)
       return -1;
-    stripGlobal = m_GeoDat->stripNumber(section, layer, sector, plane, strip);
+    stripGlobal = m_ElementNumbers->stripNumber(
+                    section, layer, sector, plane, strip);
     if (plane == 1)
       *strip1 = stripGlobal;
     else

@@ -12,10 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
   /**

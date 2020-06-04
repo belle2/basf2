@@ -1,68 +1,81 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2 as b2
 import os
 
 # ---------------------------------------------------------------
-# example of using OpticalGun to simulate laser light source
-# laser source at the mirror (inside bar) emitting toward PMT's
+# Example of usage of the OpticalGun module.
+# It simulates two sources at the left and right side of prism,
+# outside quartz, pointed towards the PMTs
+#
+# Contibutors: Marko Staric
+#              Umberto Tamponi
 # ---------------------------------------------------------------
 
+
 # Create path
-main = create_path()
+main = b2.create_path()
+
 
 # Set number of events to generate
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10])
-main.add_module(eventinfosetter)
+main.add_module('EventInfoSetter',
+                expList=[1003],  # 0 for nominal phase 3, 1002 for phase II, 1003 for early phase III
+                evtNumList=[10])
 
-# Gearbox: access to database (xml files)
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
+# Gearbox
+main.add_module('Gearbox')
 
 # Geometry
-geometry = register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+main.add_module('Geometry')
 
-# Optical gun
-opticalgun = register_module('OpticalGun')
-opticalgun.param('angularDistribution', 'Lambertian')
-opticalgun.param('alpha', 30.0)
-opticalgun.param('startTime', 0)
-opticalgun.param('pulseWidth', 10.0e-3)
-opticalgun.param('numPhotons', 10)
-opticalgun.param('diameter', 10.0e-3)
-opticalgun.param('barID', 5)  # if nonzero, local (bar) frame, otherwise Belle II
-opticalgun.param('x', 22.4)
-opticalgun.param('y', 0.0)
-opticalgun.param('z', 128.0)
-opticalgun.param('phi', 0.0)
-opticalgun.param('theta', 180.0)
-opticalgun.param('psi', 0.0)
-main.add_module(opticalgun)
+# Optical sources
+main.add_module('OpticalGun',
+                maxAlpha=45.0,
+                na=0.5,
+                startTime=0,
+                pulseWidth=10.0e-3,  # laser time Jitter, in ns
+                numPhotons=10,
+                diameter=10.0e-3,  # source diameter in cm
+                slotID=5,  # if nonzero, local (slot) referenc frame is used, otherwise Belle II
+                x=-22.6,
+                y=0.0,
+                z=-129.9,
+                phi=0.0,
+                theta=180.0,
+                psi=0.0,
+                angularDistribution='Gaussian')
+main.add_module('OpticalGun',
+                maxAlpha=45.0,
+                na=0.5,
+                startTime=0,
+                pulseWidth=10.0e-3,
+                numPhotons=10,
+                diameter=10.0e-3,
+                slotID=5,
+                x=22.6,
+                y=0.0,
+                z=-129.9,
+                phi=0.0,
+                theta=180.0,
+                psi=0.0,
+                angularDistribution='Gaussian')
 
 # Simulation
-simulation = register_module('FullSim')
-main.add_module(simulation)
+main.add_module('FullSim')
 
 # TOP digitization
-topdigi = register_module('TOPDigitizer')
-main.add_module(topdigi)
+main.add_module('TOPDigitizer')
 
 # Output
-output = register_module('RootOutput')
-output.param('outputFileName', 'opticalGun.root')
-main.add_module(output)
+main.add_module('RootOutput',
+                outputFileName='opticalGun.root')
 
 # Show progress of processing
-progress = register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

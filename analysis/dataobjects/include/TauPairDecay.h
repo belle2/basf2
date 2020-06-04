@@ -12,8 +12,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 
-#include <set>
-
 namespace Belle2 {
 
 
@@ -45,7 +43,7 @@ namespace Belle2 {
      *
      * @param mmode ID of generated decay.
      */
-    void addTauMinusIdMode(int pmode);
+    void addTauMinusIdMode(int mmode);
 
     /**
      * Add prong of positive tau decay
@@ -57,7 +55,7 @@ namespace Belle2 {
     /**
      * Add prong of negative tau decay
      *
-     * @param mmode prong of generated tau decay.
+     * @param mprong prong of generated tau decay.
      */
     void addTauMinusMcProng(int mprong);
 

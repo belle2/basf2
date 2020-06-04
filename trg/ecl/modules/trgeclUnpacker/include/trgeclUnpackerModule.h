@@ -73,6 +73,9 @@ namespace Belle2 {
     /** Unpacker main function.*/
     virtual void checkBuffer(int*, int);
 
+    /** Unpacker main function for upto version 136.*/
+    virtual void checkBuffer_v136(int*, int);
+
   protected :
     /** Event number */
     int n_basf2evt;

@@ -4,7 +4,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,14 +14,9 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
-#include <analysis/ClusterUtility/ClusterUtils.h>
-
 #include <analysis/VertexFitting/TreeFitter/RecoKlong.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-
-#include <framework/gearbox/Const.h>
 
 namespace TreeFitter {
 

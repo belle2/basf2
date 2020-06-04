@@ -541,8 +541,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   TH2F* checkU = nullptr;
   TH2F* checkV = nullptr;
 
-  Int_t minY = 0;
-  Int_t maxY = 0;
+  Int_t minY;
+  Int_t maxY;
 
   Float_t leftLine = 0;
   Float_t rightLine = 0;
@@ -553,8 +553,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     refV = m_h2NoiseREF->getHistogram(theVxdID, 0);
     checkU = m_h2NoiseCHECK->getHistogram(theVxdID, 1);
     checkV = m_h2NoiseCHECK->getHistogram(theVxdID, 0);
-    minY = refU->GetYaxis()->GetXmin();
-    maxY = refU->GetYaxis()->GetXmax();
+    //    minY = refU->GetYaxis()->GetXmin();
+    //    maxY = refU->GetYaxis()->GetXmax();
     minY = 0;
     maxY = 6;
     leftLine = -m_cutNoise_out;
@@ -582,8 +582,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     refV = m_h2PedestalREF->getHistogram(theVxdID, 0);
     checkU = m_h2PedestalCHECK->getHistogram(theVxdID, 1);
     checkV = m_h2PedestalCHECK->getHistogram(theVxdID, 0);
-    minY = refU->GetYaxis()->GetXmin();
-    maxY = refU->GetYaxis()->GetXmax();
+    //    minY = refU->GetYaxis()->GetXmin();
+    //    maxY = refU->GetYaxis()->GetXmax();
     minY = 250;
     maxY = 500;
     leftLine = -m_cutPedestal_out;

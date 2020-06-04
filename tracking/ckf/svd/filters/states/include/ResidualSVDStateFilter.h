@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 #include <framework/gearbox/Unit.h>
 

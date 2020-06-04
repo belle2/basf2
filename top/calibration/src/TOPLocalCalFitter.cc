@@ -21,8 +21,11 @@
 #include "math.h"
 #include <limits>
 #include <framework/logging/Logger.h>
+#include <top/dbobjects/TOPCalChannelT0.h>
 
-using namespace std;
+
+
+//using namespace std;
 using namespace Belle2;
 using namespace TOP;
 
@@ -127,13 +130,24 @@ void  TOPLocalCalFitter::loadMCInfoTrees()
   m_treeTTS->SetBranchAddress("pixelRow", &m_pixelRow);
   m_treeTTS->SetBranchAddress("pixelCol", &m_pixelCol);
 
-  B2INFO("Getting the laser fit parameters from " << m_fitConstraints);
-  m_inputConstraints->cd();
-  m_inputConstraints->GetObject("fitTree", m_treeConstraints);
-  m_treeConstraints->SetBranchAddress("peakTime", &m_peakTimeConstraints);
-  m_treeConstraints->SetBranchAddress("deltaT", &m_deltaTConstraints);
-  m_treeConstraints->SetBranchAddress("fraction", &m_fractionConstraints);
-
+  if (m_fitterMode == "MC")
+    std::cout << "Running in MC mode, not constraints will be set" << std::endl;
+  else {
+    B2INFO("Getting the laser fit parameters from " << m_fitConstraints);
+    m_inputConstraints->cd();
+    m_inputConstraints->GetObject("fitTree", m_treeConstraints);
+    m_treeConstraints->SetBranchAddress("peakTime", &m_peakTimeConstraints);
+    m_treeConstraints->SetBranchAddress("deltaT", &m_deltaTConstraints);
+    m_treeConstraints->SetBranchAddress("fraction", &m_fractionConstraints);
+    if (m_fitterMode == "monitoring") {
+      m_treeConstraints->SetBranchAddress("timeExtra", &m_timeExtraConstraints);
+      m_treeConstraints->SetBranchAddress("sigmaExtra", &m_sigmaExtraConstraints);
+      m_treeConstraints->SetBranchAddress("alphaExtra", &m_alphaExtraConstraints);
+      m_treeConstraints->SetBranchAddress("nExtra", &m_nExtraConstraints);
+      m_treeConstraints->SetBranchAddress("timeBackground", &m_timeBackgroundConstraints);
+      m_treeConstraints->SetBranchAddress("sigmaBackground", &m_sigmaBackgroundConstraints);
+    }
+  }
   return;
 }
 
@@ -173,12 +187,55 @@ void  TOPLocalCalFitter::setupOutputTreeAndFile()
   m_fitTree->Branch<float>("firstPulserSigma", &m_firstPulserSigma);
   m_fitTree->Branch<float>("secondPulserTime", &m_secondPulserTime);
   m_fitTree->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
-  m_fitTree->Branch<float>("channelT0", &m_channelT0);
-  m_fitTree->Branch<float>("channelT0Err", &m_channelT0Err);
   m_fitTree->Branch<short>("fitStatus", &m_fitStatus);
 
   m_fitTree->Branch<float>("chi2", &m_chi2);
   m_fitTree->Branch<float>("rms", &m_rms);
+
+
+  if (m_isFitInAmplitudeBins) {
+    m_timewalkTree = new TTree("timewalkTree", "timewalkTree");
+
+    m_timewalkTree->Branch<float>("binLowerEdge", &m_binLowerEdge);
+    m_timewalkTree->Branch<float>("binUpperEdge", &m_binUpperEdge);
+    m_timewalkTree->Branch<short>("channel", &m_channel);
+    m_timewalkTree->Branch<short>("slot", &m_slot);
+    m_timewalkTree->Branch<short>("row", &m_row);
+    m_timewalkTree->Branch<short>("col", &m_col);
+    m_timewalkTree->Branch<float>("histoIntegral", &m_histoIntegral);
+    m_timewalkTree->Branch<float>("peakTime", &m_peakTime);
+    m_timewalkTree->Branch<float>("peakTimeErr", &m_peakTimeErr);
+    m_timewalkTree->Branch<float>("deltaT", &m_deltaT);
+    m_timewalkTree->Branch<float>("deltaTErr", &m_deltaTErr);
+    m_timewalkTree->Branch<float>("sigma", &m_sigma);
+    m_timewalkTree->Branch<float>("sigmaErr", &m_sigmaErr);
+    m_timewalkTree->Branch<float>("fraction", &m_fraction);
+    m_timewalkTree->Branch<float>("fractionErr", &m_fractionErr);
+    m_timewalkTree->Branch<float>("yieldLaser", &m_yieldLaser);
+    m_timewalkTree->Branch<float>("yieldLaserErr", &m_yieldLaserErr);
+    m_timewalkTree->Branch<float>("timeExtra", &m_timeExtra);
+    m_timewalkTree->Branch<float>("sigmaExtra", &m_sigmaExtra);
+    m_timewalkTree->Branch<float>("nExtra", &m_nExtra);
+    m_timewalkTree->Branch<float>("alphaExtra", &m_alphaExtra);
+    m_timewalkTree->Branch<float>("yieldLaserExtra", &m_yieldLaserExtra);
+    m_timewalkTree->Branch<float>("timeBackground", &m_timeBackground);
+    m_timewalkTree->Branch<float>("sigmaBackground", &m_sigmaBackground);
+    m_timewalkTree->Branch<float>("yieldLaserBackground", &m_yieldLaserBackground);
+
+    m_timewalkTree->Branch<float>("fractionMC", &m_fractionMC);
+    m_timewalkTree->Branch<float>("deltaTMC", &m_deltaTMC);
+    m_timewalkTree->Branch<float>("peakTimeMC", &m_peakTimeMC);
+    m_timewalkTree->Branch<float>("firstPulserTime", &m_firstPulserTime);
+    m_timewalkTree->Branch<float>("firstPulserSigma", &m_firstPulserSigma);
+    m_timewalkTree->Branch<float>("secondPulserTime", &m_secondPulserTime);
+    m_timewalkTree->Branch<float>("secondPulserSigma", &m_secondPulserSigma);
+    m_timewalkTree->Branch<short>("fitStatus", &m_fitStatus);
+
+    m_timewalkTree->Branch<float>("chi2", &m_chi2);
+    m_timewalkTree->Branch<float>("rms", &m_rms);
+
+  }
+
   return;
 }
 
@@ -189,7 +246,11 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
 {
 
   // loads the TTS infos and the fit constraint for the given channel and slot
-  m_treeConstraints->GetEntry(iChannel);
+  if (m_fitterMode == "monitoring")
+    m_treeConstraints->GetEntry(iChannel + 512 * iSlot);
+  else if (m_fitterMode == "calibration") // The MC-based constraint file has only slot 1 at the moment
+    m_treeConstraints->GetEntry(iChannel);
+
   m_treeTTS->GetEntry(iChannel + 512 * iSlot);
   // finds the maximum of the hit timing histogram and adjust the histogram range around it (3 ns window)
   double maxpos = h_profile->GetBinCenter(h_profile->GetMaximumBin());
@@ -208,7 +269,10 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   // par[1] = sigma
   laser.SetParameter(1, 0.1);
   laser.SetParLimits(1, 0.05, 0.25);
-
+  if (m_fitterMode == "MC") {
+    laser.SetParameter(1, 0.02);
+    laser.SetParLimits(1, 0., 0.04);
+  }
   // par[2] = fraction of the main peak respect to the total
   laser.SetParameter(2, m_fractionConstraints);
   laser.SetParLimits(2, 0.5, 1.);
@@ -229,6 +293,8 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   laser.FixParameter(5, m_mean2);
   // par[6] is the relative contribution of the second TTS gaussian
   laser.FixParameter(6, m_f1);
+  if (m_fitterMode == "MC")
+    laser.FixParameter(6, 0);
 
   // par[7] is the PDF normalization, = integral*bin width
   laser.SetParameter(7,  integral * 0.005);
@@ -254,11 +320,37 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   laser.SetParameter(13,  0.01 * integral * 0.005);
   laser.SetParLimits(13,  0., 0.2 * integral * 0.005);
 
-  // if it's a monitoring fit, fix a buch more parameters. THIS IS WORK IN PROGRESS
-  if (m_isMonitoringFit) {
+  // if it's a monitoring fit, fix a buch more parameters.
+  if (m_fitterMode == "monitoring") {
     laser.FixParameter(2, m_fractionConstraints);
     laser.FixParameter(3, m_deltaTConstraints);
+    laser.FixParameter(8, m_timeExtraConstraints);
+    laser.FixParameter(9, m_sigmaExtraConstraints);
+    laser.FixParameter(14, m_alphaExtraConstraints);
+    laser.FixParameter(15, m_nExtraConstraints);
+    laser.FixParameter(11, m_timeBackgroundConstraints);
+    laser.FixParameter(12, m_sigmaBackgroundConstraints);
   }
+
+
+  // if it's a MC fit, fix a buch more parameters.
+  if (m_fitterMode == "MC") {
+    laser.SetParameter(2, 0.8);
+    laser.SetParLimits(2, 0., 1.);
+    laser.SetParameter(3, -0.1);
+    laser.SetParLimits(3, -0.4, -0.);
+    // The following are just random reasonable number, only to pin-point the tail components to some value and remove them form the fit
+    laser.FixParameter(8, 0);
+    laser.FixParameter(9, 0.1);
+    laser.FixParameter(14, -2.);
+    laser.FixParameter(15, 2);
+    laser.FixParameter(11, 1.);
+    laser.FixParameter(12, 0.1);
+    laser.FixParameter(13, 0.);
+    laser.FixParameter(10, 0.);
+  }
+
+
 
   // make the plot of the fit function nice setting 2000 sampling points
   laser.SetNpx(2000);
@@ -324,8 +416,6 @@ void  TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1* h_profile)
   m_timeBackground = laser.GetParameter(11);
   m_sigmaBackground = laser.GetParameter(12);
   m_yieldLaserBackground = laser.GetParameter(13) / 0.005;
-  m_channelT0 = m_peakTime - m_peakTimeMC;
-  m_channelT0Err = m_peakTimeErr;
   m_chi2 = laser.GetChisquare() / laser.GetNDF();
 
   // copy some MC information to the output tree
@@ -386,6 +476,61 @@ void  TOPLocalCalFitter::determineFitStatus()
 }
 
 
+void TOPLocalCalFitter::calculateChennelT0()
+{
+  int nEntries = m_fitTree->GetEntries();
+  if (nEntries != 8192) {
+    B2ERROR("fitTree does not contain an entry wit a fit result for each channel. Found " << nEntries <<
+            " instead of 8192. Perhaps you tried to run the commonT0 calculation before finishing the fitting?");
+    return;
+  }
+
+  // Create and fill the TOPCalChannelT0 object.
+  // This part is mostly copy-pasted from the DB importer used up to Jan 2020
+  auto* channelT0 = new TOPCalChannelT0();
+  short nCal[16] = {0};
+  for (int i = 0; i < nEntries; i++) {
+    m_fitTree->GetEntry(i);
+    channelT0->setT0(m_slot, m_channel, m_peakTime - m_peakTimeMC, m_peakTimeErr);
+    if (m_fitStatus == 0) {
+      nCal[m_slot - 1]++;
+    } else {
+      channelT0->setUnusable(m_slot, m_channel);
+    }
+  }
+
+  // Normalize the constants
+  channelT0->suppressAverage();
+
+  // create the localDB
+  saveCalibration(channelT0);
+
+  short nCalTot = 0;
+  B2INFO("Summary: ");
+  for (int iSlot = 1; iSlot < 17; iSlot++) {
+    B2INFO("--> Number of calibrated channels on Slot " << iSlot << " : " << nCal[iSlot - 1] << "/512");
+    B2INFO("--> Cal on ch 1, 256 and 511:    " << channelT0->getT0(iSlot, 0) << ", " << channelT0->getT0(iSlot,
+           257) << ", " << channelT0->getT0(iSlot, 511));
+    nCalTot += nCal[iSlot - 1];
+  }
+
+  B2RESULT("Channel T0 calibration constants imported to database, calibrated channels: " << nCalTot << "/ 8192");
+
+
+  // Loop again on the output tree to save the constants there too, adding two more branches.
+  TBranch* channelT0Branch = m_fitTree->Branch<float>("channelT0", &m_channelT0);
+  TBranch* channelT0ErrBranch = m_fitTree->Branch<float>("channelT0Err", &m_channelT0Err);
+
+  for (int i = 0; i < nEntries; i++) {
+    m_fitTree->GetEntry(i);
+    m_channelT0 = channelT0->getT0(m_slot, m_channel);
+    m_channelT0Err = channelT0->getT0Error(m_slot, m_channel);
+    channelT0Branch->Fill();
+    channelT0ErrBranch->Fill();
+  }
+  return ;
+
+}
 
 
 
@@ -400,18 +545,54 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
 
   // Loads the tree with the hits
   auto hitTree = getObjectPtr<TTree>("hitTree");
-  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 20000, -60, 40.); // 10 ps bins
-  hitTree->Draw("hitTime:(channel+(slot-1)*512)>>h_hitTime", "dVdt > 80 && amplitude > 80 && refTimeValid");
+  TH2F* h_hitTime = new TH2F("h_hitTime", " ", 512 * 16, 0., 512 * 16, 22000, -70, 40.); // 5 ps bins
+
+  float amplitude, hitTime;
+  short channel, slot;
+  bool refTimeValid;
+  hitTree->SetBranchAddress("amplitude", &amplitude);
+  hitTree->SetBranchAddress("hitTime", &hitTime);
+  hitTree->SetBranchAddress("channel", &channel);
+  hitTree->SetBranchAddress("slot", &slot);
+  hitTree->SetBranchAddress("refTimeValid", &refTimeValid);
+
+  // An attempt to speed things up looping over the tree only once.
+  std::vector<TH2F*> h_hitTimeLaserHistos = {};
+  for (int iLowerEdge = 0; iLowerEdge < (int)m_binEdges.size() - 1; iLowerEdge++) {
+    TH2F* h_hitTimeLaser = new TH2F(("h_hitTimeLaser_" + std::to_string(iLowerEdge + 1)).c_str(), " ", 512 * 16, 0., 512 * 16, 14000,
+                                    -70, 0.); // 5 ps bins
+    h_hitTimeLaserHistos.push_back(h_hitTimeLaser);
+  }
+
+  for (unsigned int i = 0; i < hitTree->GetEntries(); i++) {
+    auto onepc = (unsigned int)(hitTree->GetEntries() / 100);
+    if (i % onepc == 0)
+      std::cout << "processing hit " << i << " of " << hitTree->GetEntries() << " (" << i / (onepc * 10) << " %)" << std::endl;
+    hitTree->GetEntry(i);
+    auto it = std::lower_bound(m_binEdges.cbegin(),  m_binEdges.cend(), amplitude);
+    int iLowerEdge = std::distance(m_binEdges.cbegin(), it) - 1;
+
+    if (iLowerEdge >= 0 && iLowerEdge < static_cast<int>(m_binEdges.size()) - 1 && refTimeValid)
+      h_hitTimeLaserHistos[iLowerEdge]->Fill(channel + (slot - 1) * 512, hitTime);
+    if (amplitude > 80. &&  refTimeValid)
+      h_hitTime->Fill(channel + (slot - 1) * 512, hitTime);
+  }
 
   m_histFile->cd();
+  h_hitTime->Write();
 
   for (short iSlot = 0; iSlot < 16; iSlot++) {
-    B2INFO("fitting slot " << iSlot + 1);
+    std::cout << "fitting slot " << iSlot + 1 << std::endl;
     for (short iChannel = 0; iChannel < 512; iChannel++) {
       TH1D* h_profile = h_hitTime->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(iChannel)).c_str(),
                                                iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
-      h_profile->GetXaxis()->SetRangeUser(-100, -5);
+      if (m_fitterMode == "MC")
+        h_profile->GetXaxis()->SetRangeUser(-10, -10);
+      else
+        h_profile->GetXaxis()->SetRangeUser(-65,
+                                            -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
       fitChannel(iSlot, iChannel, h_profile);
+
       determineFitStatus();
 
       // Now let's fit the pulser
@@ -434,7 +615,43 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
     h_hitTime->Write();
   }
 
+  calculateChennelT0();
+
   m_fitTree->Write();
+
+
+  if (m_isFitInAmplitudeBins) {
+    std::cout << "Fitting in bins" << std::endl;
+    for (int iLowerEdge = 0; iLowerEdge < (int)m_binEdges.size() - 1; iLowerEdge++) {
+      m_binLowerEdge = m_binEdges[iLowerEdge];
+      m_binUpperEdge = m_binEdges[iLowerEdge + 1];
+      std::cout << "Fitting the amplitude interval (" <<  m_binLowerEdge << ", " << m_binUpperEdge << " )" << std::endl;
+
+      for (short iSlot = 0; iSlot < 16; iSlot++) {
+        std::cout << "   Fitting slot " << iSlot + 1 << std::endl;
+        for (short iChannel = 0; iChannel < 512; iChannel++) {
+          TH1D* h_profile = h_hitTimeLaserHistos[iLowerEdge]->ProjectionY(("profile_" + std::to_string(iSlot + 1) + "_" + std::to_string(
+                              iChannel) + "_"  + std::to_string(iLowerEdge)).c_str(),
+                            iSlot * 512 + iChannel + 1, iSlot * 512 + iChannel + 1);
+          if (m_fitterMode == "MC")
+            h_profile->GetXaxis()->SetRangeUser(-10, -10);
+          else
+            h_profile->GetXaxis()->SetRangeUser(-65,
+                                                -5); // if you will even change it, make sure not to include the h_hitTime overflow bins in this range
+          fitChannel(iSlot, iChannel, h_profile);
+          m_histoIntegral = h_profile->Integral();
+          determineFitStatus();
+
+          m_timewalkTree->Fill();
+          h_profile->Write();
+        }
+      }
+    }
+
+    m_timewalkTree->Write();
+  }
+
   m_histFile->Close();
+
   return c_OK;
 }

@@ -45,7 +45,7 @@ namespace Belle2 {
     int m_nFtbTrailer; /**<FTB trailer*/
 
     std::string    m_outputFileName; /**< Name of output file. */
-    std::ofstream* m_outputFile;     /**< output file. */
+    std::ofstream* m_outputFile = nullptr;     /**< output file. */
 
     std::string    m_svdRawName; /**raw name*/
 

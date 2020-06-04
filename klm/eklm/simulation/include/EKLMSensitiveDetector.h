@@ -10,11 +10,13 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <simulation/kernel/SensitiveDetectorBase.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/geometry/GeometryData.h>
+/* KLM headers. */
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <simulation/kernel/SensitiveDetectorBase.h>
 
 namespace Belle2 {
 
@@ -49,8 +51,8 @@ namespace Belle2 {
 
     private:
 
-      /** Geometry data. */
-      const EKLM::GeometryData* m_GeoDat;
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Simulation hits. */
       StoreArray<EKLMSimHit> m_SimHits;

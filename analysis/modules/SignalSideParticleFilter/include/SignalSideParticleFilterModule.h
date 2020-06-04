@@ -13,9 +13,6 @@
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Utility.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <string>
 #include <memory>
 

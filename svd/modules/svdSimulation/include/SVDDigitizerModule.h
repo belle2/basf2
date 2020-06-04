@@ -100,29 +100,29 @@ namespace Belle2 {
 
       // 1. Collections
       /** Name of the collection for the MCParticles */
-      std::string m_storeMCParticlesName;
+      std::string m_storeMCParticlesName = "";
       /** Name of the collection for the SVDSimhits */
-      std::string m_storeSimHitsName;
+      std::string m_storeSimHitsName = "";
       /** Name of the collection for the SVDTrueHits */
-      std::string m_storeTrueHitsName;
+      std::string m_storeTrueHitsName = "";
       /** Name of the relation between MCParticles and SVDSimHits */
-      std::string m_relMCParticleSimHitName;
+      std::string m_relMCParticleSimHitName = "";
       /** Name of the relation between SVDTrueHits and SVDSimHits */
-      std::string m_relTrueHitSimHitName;
+      std::string m_relTrueHitSimHitName = "";
       /** Name of the collection for the SVDShaperDigits */
-      std::string m_storeShaperDigitsName;
+      std::string m_storeShaperDigitsName = "";
       /** Name of the relation between SVDShaperDigits and MCParticles */
-      std::string m_relShaperDigitMCParticleName;
+      std::string m_relShaperDigitMCParticleName = "";
       /** Name of the relation between SVDShaperDigits and SVDTrueHits */
-      std::string m_relShaperDigitTrueHitName;
+      std::string m_relShaperDigitTrueHitName = "";
       /** Name of the SVDEventInfo object */
-      std::string m_svdEventInfoName;
+      std::string m_svdEventInfoName = "SVDEventInfoSim";
 
       // 2. Physics
       /** Max. Segment length to use for charge drifting */
-      double m_segmentLength;
+      double m_segmentLength = 0.020;
       /** Width of diffusion cloud for simple drift model (in sigmas) */
-      double m_widthOfDiffusCloud;
+      double m_widthOfDiffusCloud = 3.0;
 
       // 3. Noise
       /** Whether or not to apply poisson fluctuation of charge */
@@ -136,13 +136,13 @@ namespace Belle2 {
       /** Keek digit if at least m_nSamplesOverZS are over threshold */
       unsigned short m_nSamplesOverZS = 1;
       /** (derived from SNAdjacent) Fraction of noisy strips per sensor. */
-      double m_noiseFraction;
+      double m_noiseFraction = 0.01;
 
       // 4. Timing
       /** Shaping time of the APV25 shapers.*/
-      double m_shapingTime;
+      double m_shapingTime = 250.0;
       /** Interval between two waveform samples (30 ns). */
-      double m_samplingTime;
+      double m_samplingTime = 16000. / 509.;
       /** Randomize event times?
        * If set to true, event times will be randomized uniformly from
        * m_minTimeFrame to m_maxTimeFrame.
@@ -161,13 +161,13 @@ namespace Belle2 {
       /** Time window start.
        * Starting from this time, signal samples are taken in samplingTime intervals.
        */
-      double m_startSampling;
+      double m_startSampling = -2.0;
 
       // 5. Reporting
       /** Name of the ROOT filename to output statistics */
-      std::string m_rootFilename;
+      std::string m_rootFilename = "";
       /** Store waveform data in the reporting file? */
-      bool m_storeWaveforms;
+      bool m_storeWaveforms = false;
       /** Name of the tab-delimited listing of signals */
       std::string m_signalsList = "";
 
@@ -177,43 +177,43 @@ namespace Belle2 {
       Sensors m_sensors;
 
       /** Pointer to the SVDSimhit currently digitized */
-      const SVDSimHit*   m_currentHit;
+      const SVDSimHit*   m_currentHit = nullptr;
       /** Index of the particle which caused the current hit */
-      int                m_currentParticle;
+      int                m_currentParticle = -1;
       /** Index of the TrueHit the current hit belongs to */
-      int                m_currentTrueHit;
+      int                m_currentTrueHit = -1;
       /** Pointer to the sensor in which the current hit occurred */
-      Sensor*            m_currentSensor;
+      Sensor*            m_currentSensor = NULL;
       /** Pointer to the SensorInfo of the current sensor */
-      const SensorInfo*  m_currentSensorInfo;
+      const SensorInfo*  m_currentSensorInfo = nullptr;
       /** Time of the current SimHit.. */
-      double m_currentTime;
+      double m_currentTime = 0;
       /** Thickness of current sensor (read from m_currentSensorInfo).*/
-      double m_sensorThickness;
+      double m_sensorThickness = 0.03;
       /** The depletion voltage of the Silicon sensor */
-      double m_depletionVoltage;
+      double m_depletionVoltage = 40;
       /** The bias voltage on the sensor */
-      double m_biasVoltage;
+      double m_biasVoltage = 100;
       /** The backplane capacitanceU wrt. the strips. */
-      double m_backplaneCapacitanceU;
+      double m_backplaneCapacitanceU = 0.1; //pF/cm
       /** The interstrip capacitanceU for the sensor. */
-      double m_interstripCapacitanceU;
+      double m_interstripCapacitanceU = 0.7; //pF/cm
       /** The coupling capacitanceU for the sensor. */
-      double m_couplingCapacitanceU;
+      double m_couplingCapacitanceU = 15; //pF/cm
       /** The backplane capacitanceV wrt. the strips. */
-      double m_backplaneCapacitanceV;
+      double m_backplaneCapacitanceV = 0.4; //pF/cm
       /** The interstrip capacitanceV for the sensor. */
-      double m_interstripCapacitanceV;
+      double m_interstripCapacitanceV = 0.7; //pF/cm
       /** The coupling capacitanceV for the sensor. */
-      double m_couplingCapacitanceV;
+      double m_couplingCapacitanceV = 30; //pF/cm
       /** ADU equivalent charge for u-strips. */
-      double m_aduEquivalentU;
+      //      double m_aduEquivalentU;
       /** ADU equivalent charge for v-strips. */
-      double m_aduEquivalentV;
+      //      double m_aduEquivalentV;
       /** Electronic noise for u-strips. */
-      double m_elNoiseU;
+      double m_elNoiseU = 500; //e-
       /** Electronic noise for v-strips. */
-      double m_elNoiseV;
+      double m_elNoiseV = 500; //e-
 
       //run-dependent MC payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/

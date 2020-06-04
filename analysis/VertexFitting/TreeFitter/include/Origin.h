@@ -4,18 +4,16 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Jo-Frederik Krohn                                         *
+ * Contributor: wouter Hulsbergen, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-#include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 
 namespace TreeFitter {
 

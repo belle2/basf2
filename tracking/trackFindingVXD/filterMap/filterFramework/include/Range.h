@@ -16,8 +16,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /** Represents a range of arithmetic types.

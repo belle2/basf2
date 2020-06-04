@@ -14,9 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/Path.h>
-
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
@@ -54,7 +51,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegment3D, WeightedRelation> m_cellularPathFinder;
     };
   }
 }

@@ -12,9 +12,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-using boost::format;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------

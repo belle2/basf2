@@ -7,6 +7,8 @@
 //-
 #include <daq/dqm/modules/MonitorData.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <rawdata/dataobjects/RawCOPPER.h>
 
 using namespace std;
 using namespace Belle2;

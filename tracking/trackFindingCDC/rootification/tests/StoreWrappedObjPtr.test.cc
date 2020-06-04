@@ -18,13 +18,11 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 
 #include <boost/python.hpp>
 #include <gtest/gtest.h>
-#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

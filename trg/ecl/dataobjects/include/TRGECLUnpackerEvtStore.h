@@ -54,6 +54,15 @@ namespace Belle2 {
     //! Cluster energy of this hit.
     int e_cl_energy[6];
 
+    //! Cluster CM 1GeV Flag of this hit.
+    int e_cl_1gev[6];
+
+    //! Cluster CM 2GeV Flag of this hit.
+    int e_cl_2gev[6];
+
+    //! Cluster Bhabha Flag of this hit.
+    int e_cl_bha[6];
+
     //! Number of Cluster of this hit.
     int e_ncl;
 
@@ -173,6 +182,30 @@ namespace Belle2 {
       }
     }
 
+    //! The mothod to set 1GeV Flag
+    void setCLF1GeV(int cl_1gev[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_1gev[i] = cl_1gev[i];
+      }
+    }
+
+    //! The mothod to set 2GeV Flag
+    void setCLF2GeV(int cl_2gev[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_2gev[i] = cl_2gev[i];
+      }
+    }
+
+    //! The mothod to set Bha Flag
+    void setCLFBha(int cl_bha[6])
+    {
+      for (int i = 0; i < 6; i++) {
+        e_cl_bha[i] = cl_bha[i];
+      }
+    }
+
     //! The mothod to set Number of Cluster
     void setNCL(int ncl) {e_ncl = ncl;}
 
@@ -272,6 +305,15 @@ namespace Belle2 {
     //! The mothod to get Cluster energy
     const int* getCLEnergy() const {return e_cl_energy;}
 
+    //! The mothod to get 1GeV Flag
+    const int* getCL1GeV() const {return e_cl_1gev;}
+
+    //! The mothod to get 2GeV Flag
+    const int* getCL2GeV() const {return e_cl_2gev;}
+
+    //! The mothod to get Bhabha Flag
+    const int* getCLBha() const {return e_cl_bha;}
+
     //! The mothod to get Number of Cluster
     int getNCL() const {return e_ncl;}
 
@@ -351,6 +393,9 @@ namespace Belle2 {
       memset(e_cl_phi,     0, sizeof(e_cl_phi));
       memset(e_cl_time,    0, sizeof(e_cl_time));
       memset(e_cl_energy,  0, sizeof(e_cl_energy));
+      memset(e_cl_1gev,    0, sizeof(e_cl_1gev));
+      memset(e_cl_2gev,    0, sizeof(e_cl_2gev));
+      memset(e_cl_bha,     0, sizeof(e_cl_bha));
       e_ncl          = 0;
       e_low_multi    = 0;
       e_b2bhabhav    = 0;
@@ -388,6 +433,9 @@ namespace Belle2 {
       int cl_phi[6],
       int cl_time[6],
       int cl_energy[6],
+      int cl_1gev[6],
+      int cl_2gev[6],
+      int cl_bha[6],
       int ncl,
       int low_multi,
       int b2bhabhav,
@@ -424,6 +472,9 @@ namespace Belle2 {
         e_cl_phi[i]     = cl_phi[i];
         e_cl_time[i]    = cl_time[i];
         e_cl_energy[i]  = cl_energy[i];
+        e_cl_1gev[i]    = cl_1gev[i];
+        e_cl_2gev[i]    = cl_2gev[i];
+        e_cl_bha[i]     = cl_bha[i];
       }
       e_ncl          = ncl;
       e_low_multi    = low_multi;

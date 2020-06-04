@@ -35,7 +35,7 @@ but completely useless to any other application.
 
 Unlike the CS variables, the event shape variables are calculated starting from lists of particles
 (usually a list of all the good tracks and a list of the good photons) intended to describe the whole event. While the CS variables are
-candidate-based (in a given event each B candidate will have different daughters and a different :doc:`Rest Of Event`, and therefore different CS variables),
+candidate-based (in a given event each B candidate will have different daughters and a different :doc:`RestOfEvent`, and therefore different CS variables),
 the event shape variables are event-based.
 
 In summary, the event shape variables are suitable for:
@@ -51,6 +51,7 @@ To access the event shape variables you have to append the EventShapeCalculator 
 making them available to the `VariableManager`. You can do this simply adding the `modularAnalysis.buildEventShape()` function to your analysis path:
 
 .. autofunction:: modularAnalysis.buildEventShape
+   :noindex:
 
 
 This is a very minimal implementation of the event shape in a steering file:

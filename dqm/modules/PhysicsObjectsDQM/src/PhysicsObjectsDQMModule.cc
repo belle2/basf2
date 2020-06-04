@@ -43,10 +43,10 @@ void PhysicsObjectsDQMModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("PhysicsObjects")->cd();
 
-  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 20, 0.48, 0.52);
+  m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 500, 0.0, 1.0);
   m_h_mKS0->SetXTitle("M(K_{S}^{0}) [GeV]");
 
-  m_h_mPI0 = new TH1F("mPI0", "PI0 Invariant Mass", 25, 0.10, 0.15);
+  m_h_mPI0 = new TH1F("mPI0", "PI0 Invariant Mass", 125, 0.0, 0.25);
   m_h_mPI0->SetXTitle("M(#pi^{0}) [GeV]");
 
   m_h_R2 = new TH1F("R2", "Event Level R2", 36, 0, 1.2);
@@ -61,7 +61,7 @@ void PhysicsObjectsDQMModule::initialize()
   REG_HISTOGRAM
 
   StoreObjPtr<SoftwareTriggerResult> result;
-  result.isRequired();
+  result.isOptional();
 }
 
 
@@ -87,13 +87,13 @@ void PhysicsObjectsDQMModule::event()
 {
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
-    B2ERROR("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    B2WARNING("SoftwareTriggerResult object not available but needed to select events for the histograms.");
     return;
   }
 
   const std::map<std::string, int>& results = result->getResults();
   if (results.find(m_triggerIdentifier) == results.end()) {
-    B2ERROR("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
     return;
   }
 

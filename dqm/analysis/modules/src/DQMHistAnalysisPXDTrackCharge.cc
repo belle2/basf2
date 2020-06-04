@@ -18,9 +18,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-using boost::format;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -57,12 +54,15 @@ DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
+
+  m_monObj = getMonitoringObject("pxd");
+
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
   }
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -79,7 +79,20 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
+  m_cTrackedClusters = new TCanvas((m_histogramDirectoryName + "/c_TrackedClusters").data());
+  m_hTrackedClusters = new TH1F("Tracked_Clusters", "Tracked Clusters/Event;Module", 40, 0, 40);
+  m_hTrackedClusters->Draw();
+  auto ax = m_hTrackedClusters->GetXaxis();
+  if (ax) {
+    ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+    for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+      TString ModuleName = (std::string)m_PXDModules[i];
+      ax->SetBinLabel(i + 1, ModuleName);
+    }
+  } else B2ERROR("no axis");
+
   m_cCharge = new TCanvas((m_histogramDirectoryName + "/c_TrackCharge").data());
+  m_monObj->addCanvas(m_cCharge);
 
   m_gCharge = new TGraphErrors();
   m_gCharge->SetName("Track_Cluster_Charge");
@@ -145,6 +158,53 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   bool enough = false;
 
+  {
+    m_cTrackedClusters->Clear();
+    m_cTrackedClusters->cd();
+    m_hTrackedClusters->Reset();
+
+    std::string name = "Tracked_Clusters"; // new name
+    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters");
+    if (hh2) {
+      auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
+      if (scale > 0) {
+        int j = 1;
+        for (int i = 0; i < 64; i++) {
+          auto layer = (((i >> 5) & 0x1) + 1);
+          auto ladder = ((i >> 1) & 0xF);
+          auto sensor = ((i & 0x1) + 1);
+
+          auto id = Belle2::VxdID(layer, ladder, sensor);
+          // Check if sensor exist
+          if (Belle2::VXD::GeoCache::getInstance().validSensorID(id)) {
+            m_hTrackedClusters->SetBinContent(j, hh2->GetBinContent(i + 1) / scale);
+            j++;
+          }
+        }
+      }
+      m_hTrackedClusters->SetName(name.data());
+      m_hTrackedClusters->SetTitle("Tracked Clusters/Event");
+      m_hTrackedClusters->SetFillColor(kWhite);
+      m_hTrackedClusters->SetStats(kFALSE);
+      m_hTrackedClusters->SetLineStyle(1);// 2 or 3
+      m_hTrackedClusters->SetLineColor(kBlue);
+      m_hTrackedClusters->Draw("hist");
+
+      TH1* href2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
+
+      if (href2) {
+        href2->SetLineStyle(3);// 2 or 3
+        href2->SetLineColor(kBlack);
+        href2->Draw("same,hist");
+      }
+
+      auto tt = new TLatex(5.5, 0.1, "1.3.2 Module is broken, please ignore");
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
+  }
+
   m_gCharge->Set(0);
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -174,14 +234,16 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         }
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.5, m_fLandau->GetParameter(1));
+        m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
         m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
+                              m_fLandau->GetParError(1));
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
 
       if (hist2) {
-        B2INFO("Draw Normalized " << hist2->GetName());
+//         B2INFO("Draw Normalized " << hist2->GetName());
         hist2->SetLineStyle(3);// 2 or 3
         hist2->SetLineColor(kBlack);
 
@@ -210,20 +272,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist");
         h->Draw("same hist");
 
-        double data = 1.0;
         canvas->Pad()->SetFrameFillColor(10);
         if (m_color) {
           if (hh1->GetEntries() < 1000) {
             // not enough Entries
             canvas->Pad()->SetFillColor(kGray);
           } else {
-            if (data < 1e-2) {
-              canvas->Pad()->SetFillColor(kRed);
-            } else if (data < 1e-4) {
-              canvas->Pad()->SetFillColor(kYellow);
-            } else {
-              canvas->Pad()->SetFillColor(kGreen);
-            }
+            canvas->Pad()->SetFillColor(kGreen);
           }
         } else {
           canvas->Pad()->SetFillColor(kWhite);// White
@@ -265,7 +320,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge) {
+  if (m_gCharge && enough) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);
@@ -285,11 +340,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->Draw();
     m_line_low->Draw();
 
-#ifdef _BELLE2_EPICS
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
-#endif
+    m_monObj->setVariable("trackcharge", mean, diff);
   }
+
+#ifdef _BELLE2_EPICS
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+#endif
 
   int status = 0;
 

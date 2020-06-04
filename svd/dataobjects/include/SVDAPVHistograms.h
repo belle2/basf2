@@ -23,6 +23,7 @@
 
 namespace Belle2 {
 
+  /** template class for the APV Histograms*/
   template < class H > // H is an histogram
   class SVDAPVHistograms: public TObject {
 
@@ -32,7 +33,7 @@ namespace Belle2 {
       SVDAPVHistograms(H()) {};
 
     /** Use @param template to initialize all the histograms*/
-    SVDAPVHistograms(const H& templateAPV);
+    explicit SVDAPVHistograms(const H& templateAPV);
 
     /** clean everything in the destructor */
     ~SVDAPVHistograms() { clean(); };
@@ -114,22 +115,23 @@ namespace Belle2 {
 
 
   private:
-    // A t_SVDView is a vector of H that will have length = # APV chips.
-    // Index 0 for the V side, index 1 for the U side
-    // Please, please, pleaseeeee use SVDAPVHistograms<...>::UIndex
-    // and SVDAPVHistograms<...>::VIndex instead of  1 and 0 for better
-    // code readibility
+    /** A t_SVDView is a vector of H that will have length = # APV chips.
+     * Index 0 for the V side, index 1 for the U side
+     * Please, please, pleaseeeee use SVDAPVHistograms<...>::UIndex
+     * and SVDAPVHistograms<...>::VIndex instead of  1 and 0 for better
+     * code readibility
+     */
     typedef std::vector< H* > t_Views; /**< a vector of H, length = # APV chips*/
 
     typedef std::vector< t_Views > t_SVDSensor; /**< a vector of vector of H, length = 2 */
 
-    // A t_SVDLadder is a vector of t_SVDSensors
-    typedef std::vector< t_SVDSensor > t_SVDLadder; //**< a vector of vector of vector of H, length = # svd sensors */
+    /** A t_SVDLadder is a vector of t_SVDSensors */
+    typedef std::vector< t_SVDSensor > t_SVDLadder; /**< a vector of vector of vector of H, length = # svd sensors */
 
-    // A t_SVDLayer is a vector of t_SVDLadders
+    /** A t_SVDLayer is a vector of t_SVDLadders*/
     typedef std::vector< t_SVDLadder > t_SVDLayer; /**< a vector of vector of vector of vector of H, length = # ladders*/
 
-    // The t_SVD is a vector of t_SVDLayers
+    /** The t_SVD is a vector of t_SVDLayers*/
     typedef std::vector< t_SVDLayer > t_SVD; /**< a vector of vector of vector of vector of vector of H, length = # layers*/
 
     t_SVD m_histograms; /**< the vector of vector ... that contains all histograms */
@@ -165,10 +167,10 @@ namespace Belle2 {
 
           for (int view = VIndex ; view < UIndex + 1; view++) {
             int nAPV = 6;
-            unsigned int viewNumber = 2;
+            unsigned int viewNumber = 3;
 
-            if (m_histograms[layerNumber][ladderNumber][view].size() <= viewNumber)
-              m_histograms[layerNumber][ladderNumber][sensorNumber].resize(viewNumber + 1);
+            if (m_histograms[layerNumber][ladderNumber][view].size() < viewNumber)
+              m_histograms[layerNumber][ladderNumber][sensorNumber].resize(viewNumber);
             m_histograms[layerNumber][ladderNumber][sensorNumber][view].resize(nAPV);
             for (int apv = 0; apv < nAPV; apv ++) {
 

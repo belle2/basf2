@@ -50,6 +50,9 @@ void SVDDataFormatCheckModule::initialize()
   m_storeShaper.isRequired(m_storeShaperDigitsName);
   m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
+
   //there only if reconstructing data
   m_storeDAQ.isOptional(m_storeDAQName);
 

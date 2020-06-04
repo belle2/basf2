@@ -18,7 +18,6 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>

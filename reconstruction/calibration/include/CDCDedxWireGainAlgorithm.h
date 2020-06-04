@@ -43,36 +43,14 @@ namespace Belle2 {
     virtual ~CDCDedxWireGainAlgorithm() {}
 
     /**
-    * reading input file and storing bad wire values in vectors
+    * function to decide merge vs relative gains
     */
-    void setBadWiresdatafile(const std::string& fPath, const std::string& fName)
-    {
+    void setMergePayload(bool value = true) {isMergePayload = value;}
 
-      m_badWireFPath = fPath;
-      m_badWireFName = fName;
-      isRmBadwires = true;
-
-      printf("INF0: Taking bad wire list file from: %s/%s \n", m_badWireFPath.data(), m_badWireFName.data());
-
-      std::ifstream inputfile;
-      inputfile.open(Form("%s/%s", m_badWireFPath.data(), m_badWireFName.data()));
-      if (inputfile.fail()) {
-        printf("%s\n", "input file of bad wires does not exits or corrupted!");
-      }
-
-      int ibadwire = -999, nBadwires = 0;
-      printf("--- List of Bad wires \n");
-      while (true) {
-        nBadwires++;
-        inputfile >> ibadwire;
-        if (inputfile.eof()) break;
-        printf("%d),  Global Wire ID # = %d\n", nBadwires, ibadwire);
-        listofbadwires.push_back(ibadwire);
-      }
-
-      std::sort(listofbadwires.begin(), listofbadwires.end());
-      inputfile.close();
-    }
+    /**
+    * function to finally store new payload after full calibration
+    */
+    void generateNewPayloads(std::vector<double> dedxTruncmean);
 
     /**
     * funtion to set flag active for plotting
@@ -98,10 +76,9 @@ namespace Belle2 {
      */
     std::string m_badWireFPath; /**< path of bad wire file */
     std::string m_badWireFName; /**< name of bad wire file */
-    bool isRmBadwires; /**< if bad wire consideration */
     bool isMakePlots; /**< produce plots for status */
+    bool isMergePayload; /**< merge payload at the of calibration */
 
-    std::vector<int> listofbadwires; /**< vector of bad ru list */
-
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
   };
 } // namespace Belle2

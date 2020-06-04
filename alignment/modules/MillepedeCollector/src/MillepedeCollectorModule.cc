@@ -21,7 +21,7 @@
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
-#include <alignment/reconstruction/BKLMRecoHit.h>
+#include <alignment/reconstruction/AlignableBKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -132,8 +132,8 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
   addParam("minUsedCDCHitFraction", m_minUsedCDCHitFraction, "Minimum used CDC hit fraction to write out a trajectory",
            double(0.85));
 
-  addParam("hierarchyType", m_hierarchyType, "Type of (VXD only now) hierarchy: 0 = None, 1 = Flat, 2 = Full",
-           int(2));
+  addParam("hierarchyType", m_hierarchyType, "Type of (VXD only now) hierarchy: 0 = None, 1 = Flat, 2 = Half-Shells, 3 = Full",
+           int(3));
   addParam("enablePXDHierarchy", m_enablePXDHierarchy, "Enable PXD in hierarchy (flat or full)",
            bool(true));
   addParam("enableSVDHierarchy", m_enableSVDHierarchy, "Enable SVD in hierarchy (flat or full)",
@@ -228,6 +228,8 @@ void MillepedeCollectorModule::prepare()
   else if (m_hierarchyType == 1)
     Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Flat;
   else if (m_hierarchyType == 2)
+    Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_HalfShells;
+  else if (m_hierarchyType == 3)
     Belle2::alignment::VXDGlobalParamInterface::s_hierarchyType = VXDGlobalParamInterface::c_Full;
 
   Belle2::alignment::VXDGlobalParamInterface::s_enablePXD = m_enablePXDHierarchy;
@@ -1130,8 +1132,8 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
   }
 
   if (bklmHits.isOptional()) {
-    genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, BKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, BKLMRecoHit> (bklmHits.getPtr());
+    genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
+    <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 
@@ -1174,7 +1176,11 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
     genfit::StateOnPlane vertexSOP(gfTrack.getCardinalRep());
     B2Vector3D vertexRPhiDir(vertexPos[0], vertexPos[1], 0);
     B2Vector3D vertexZDir(0, 0, vertexPos[2]);
-    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    //FIXME: This causes problem to current GBL version in genfit -> needs update of GBL to re-enable
+    // genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexRPhiDir, vertexZDir));
+    //This works instead fine:
+    genfit::SharedPlanePtr vertexPlane(new genfit::DetPlane(vertexPos, vertexMom));
+
     vertexSOP.setPlane(vertexPlane);
     vertexSOP.setPosMom(vertexPos, vertexMom);
     TMatrixDSym vertexCov(5);
@@ -1403,9 +1409,12 @@ std::pair<TMatrixD, TMatrixD> MillepedeCollectorModule::getTwoBodyToLocalTransfo
                                        sign * c1 * sin(theta) * cos(phi),
                                        0.);
 
-    B2Vector3D dpdM = R * B2Vector3D(0.,
-                                     0.,
-                                     0.5 * sign * M / (2. * c2) * cos(phi));
+    double dc1dM = m * M / (2. * sqrt(M * M - 4. * m * m));
+    double dc2dM = M * (4. * m * m * p * p + pow(M, 4)) / (2 * M * M * M * sqrt((M * M - 4. * m * m) * (p * p + M * M)));
+
+    B2Vector3D dpdM = R * B2Vector3D(sign * sin(theta) * cos(phi) * dc1dM,
+                                     sign * sin(theta) * sin(phi) * dc1dM,
+                                     sign * cos(theta) * dc2dM);
 
     TMatrixD dpdz(3, 6);
     dpdz(0, 0) = dpdpx(0); dpdz(0, 1) = dpdpy(0); dpdz(0, 2) = dpdpz(0); dpdz(0, 3) = dpdtheta(0); dpdz(0, 4) = dpdphi(0);

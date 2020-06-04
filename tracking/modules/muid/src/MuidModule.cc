@@ -8,18 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <tracking/modules/muid/MuidModule.h>
+
+/* Tracking headers. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 #include <simulation/kernel/ExtManager.h>
 
-#include <vector>
-
+/* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <CLHEP/Units/PhysicalConstants.h>
 
-#include <globals.hh>
+/* Geant4 headers. */
 #include <G4UImanager.hh>
+
+/* C++ headers. */
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -28,16 +34,6 @@ REG_MODULE(Muid)
 
 MuidModule::MuidModule() :
   Module(),
-  m_TracksColName(""),
-  m_RecoTracksColName(""),
-  m_ExtHitsColName(""),
-  m_MuidsColName(""),
-  m_MuidHitsColName(""),
-  m_BKLMHitsColName(""),
-  m_EKLMHitsColName(""),
-  m_KLMClustersColName(""),
-  m_ECLClustersColName(""),
-  m_TrackClusterSeparationsColName(""),
   m_MeanDt(0.0),
   m_MaxDt(0.0),
   m_MinPt(0.0),
@@ -59,18 +55,6 @@ MuidModule::MuidModule() :
   setDescription("Identifies muons by extrapolating tracks from CDC to KLM using geant4e");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("pdgCodes", m_PDGCodes, "Positive-charge PDG codes for extrapolation hypotheses", m_PDGCodes);
-  addParam("TracksColName", m_TracksColName, "Name of collection holding the reconstructed tracks", string(""));
-  addParam("RecoTracksColName", m_RecoTracksColName, "Name of collection holding the reconstructed tracks (RecoTrack)", string(""));
-  addParam("ExtHitsColName", m_ExtHitsColName, "Name of collection holding the extHits from the extrapolation", string(""));
-  addParam("MuidsColName", m_MuidsColName, "Name of collection holding the muon identification information from the extrapolation",
-           string(""));
-  addParam("MuidHitsColName", m_MuidHitsColName, "Name of collection holding the muidHits from the extrapolation", string(""));
-  addParam("BKLMHitsColName", m_BKLMHitsColName, "Name of collection holding the reconstructed 2D hits in barrel KLM", string(""));
-  addParam("EKLMHitsColName", m_EKLMHitsColName, "Name of collection holding the reconstructed 2D hits in endcap KLM", string(""));
-  addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
-  addParam("ECLClustersColName", m_ECLClustersColName, "Name of collection holding the ECLClusters", string(""));
-  addParam("TrackClusterSeparationsColName", m_TrackClusterSeparationsColName,
-           "Name of collection holding the TrackClusterSeparations", string(""));
   addParam("MeanDt", m_MeanDt, "[ns] Mean hit-trigger time for coincident hits (default 0)", double(0.0));
   // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
   // approximately. The time window can be readjusted after completion of
@@ -156,22 +140,10 @@ void MuidModule::initialize()
   }
 
   // Initialize the extrapolator engine for MUID (vs EXT)
-  // *NOTE* that MinPt, MinKE, TracksColName, RecoTracksColName and ExtHitsColName are shared by MUID and EXT; only last caller wins
-  m_Extrapolator->setTracksColName(m_TracksColName);
-  m_Extrapolator->setRecoTracksColName(m_RecoTracksColName);
-  m_Extrapolator->setExtHitsColName(m_ExtHitsColName);
-  m_Extrapolator->setMuidsColName(m_MuidsColName);
-  m_Extrapolator->setMuidHitsColName(m_MuidHitsColName);
-  m_Extrapolator->setBKLMHitsColName(m_BKLMHitsColName);
-  m_Extrapolator->setEKLMHitsColName(m_EKLMHitsColName);
-  m_Extrapolator->setKLMClustersColName(m_KLMClustersColName);
-  m_Extrapolator->setECLClustersColName(m_ECLClustersColName);
-  m_Extrapolator->setTrackClusterSeparationsColName(m_TrackClusterSeparationsColName);
+  // *NOTE* that MinPt and MinKE are shared by MUID and EXT; only last caller wins
   m_Extrapolator->initialize(m_MeanDt, m_MaxDt, m_MaxDistSqInVariances, m_MaxKLMTrackClusterDistance,
                              m_MaxECLTrackClusterDistance, m_MinPt, m_MinKE, m_addHitsToRecoTrack, m_Hypotheses);
-
   return;
-
 }
 
 void MuidModule::beginRun()
@@ -181,7 +153,6 @@ void MuidModule::beginRun()
 
 void MuidModule::event()
 {
-  //m_Extrapolator->event(true);
   m_Extrapolator->event(true);
 }
 

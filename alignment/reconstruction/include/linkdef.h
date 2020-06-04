@@ -9,7 +9,7 @@
 #pragma link C++ class Belle2::AlignableSVDRecoHit+;
 #pragma link C++ class Belle2::AlignableSVDRecoHit2D+;
 #pragma link C++ class Belle2::AlignableCDCRecoHit+;
-#pragma link C++ class Belle2::BKLMRecoHit+;
+#pragma link C++ class Belle2::AlignableBKLMRecoHit+;
 #pragma link C++ class Belle2::AlignableEKLMRecoHit+;
 
 //#pragma link C++ class Belle2::GblMultipleScatteringController+;

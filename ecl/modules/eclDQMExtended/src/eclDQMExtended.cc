@@ -64,7 +64,8 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
     m_ECLDspDataArray1("ECLDSPPars1"),
     m_ECLDspDataArray2("ECLDSPPars2"),
     m_calibrationThrA0("ECL_FPGA_LowAmp"),
-    m_calibrationThrAhard("ECL_FPGA_HitThresh")
+    m_calibrationThrAhard("ECL_FPGA_HitThresh"),
+    m_calibrationThrAskip("ECL_FPGA_StoreDigit")
 
 {
 
@@ -79,11 +80,9 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
            "directory for DSP coeffs", std::string("/hsm/belle2/bdata/users/dmitry/dsp/"));
   addParam("RunName", m_RunName,
            "Name of run with DSP files", std::string("run0000/"));
-
   addParam("SaveDetailedFitData", m_SaveDetailedFitData, "Save detailed data "
            "(ampdiff_{cellid,shaper}, timediff_{cellid,shaper} histograms) for "
            "failed fits.", false);
-
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -202,6 +201,14 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_qualityfail_crateid->GetXaxis()->SetTitle("Crate ID");
   h_qualityfail_crateid->SetOption("LIVE");
 
+  h_fail_shaperid = new TH1F("fail_shaperid", "Shaper IDs w/ failed logic", 624, 1, 625);
+  h_fail_shaperid->GetXaxis()->SetTitle("Shaper ID");
+  h_fail_shaperid->SetOption("LIVE");
+
+  h_fail_crateid = new TH1F("fail_crateid", "Crate IDs w/ failed logic", 52, 1, 53);
+  h_fail_crateid->GetXaxis()->SetTitle("Crate ID");
+  h_fail_crateid->SetOption("LIVE");
+
 
   //2D histograms creation.
 
@@ -279,11 +286,11 @@ void ECLDQMEXTENDEDModule::initialize()
   StoreArray<ECLDsp> ECLDsps;
   ECLDsps.isOptional();
 
-  if (!mapper.initFromDB()) B2FATAL("ECL Display:: Can't initialize eclChannelMapper");
+  if (!mapper.initFromDB()) B2FATAL("ECL DQM logic test FATAL:: Can't initialize eclChannelMapper");
 
   if (m_InitKey == "DB")  initDspfromDB();
   else if (m_InitKey == "File") initDspfromFile();
-  else B2FATAL(" No way to initialize DSP coeffs!!! Please choose InitKey = DB or InitKey = File");
+  else B2FATAL("ECL DQM logic test FATAL: No way to initialize DSP coeffs!!! Please choose InitKey = DB or InitKey = File");
 }
 
 void ECLDQMEXTENDEDModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<short int>& constants)
@@ -326,7 +333,7 @@ int ECLDQMEXTENDEDModule::conversion(int cellID)
 short int* ECLDQMEXTENDEDModule::vectorsplit(std::vector<short int>& vectorFrom, int iChannel)
 {
   size_t size = vectorFrom.size();
-  if (size % 16) B2ERROR("Split is impossible!" << LogVar("Vector size", size));
+  if (size % 16) B2ERROR("ECL DQM logic test error: Split is impossible!" << LogVar("Vector size", size));
   return (vectorFrom.data() + (size / 16) * (iChannel - 1));
 }
 
@@ -337,6 +344,7 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
 
   callbackCalibration(m_calibrationThrA0, v_totalthrA0);
   callbackCalibration(m_calibrationThrAhard, v_totalthrAhard);
+  callbackCalibration(m_calibrationThrAskip, v_totalthrAskip);
 
   for (const auto& dspdata : m_ECLDspDataArray0) { //iCrate = 1, ..., 18
     iShaper++;
@@ -379,7 +387,8 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
   const boost::filesystem::path MainDir(m_DSPDirectoryName);
   const boost::filesystem::path RunSubDir(m_RunName);
   const std::regex Filter(".*(crate)([0-9]{2})/.*(dsp)([0-9]{2})(.dat)");
-  if (!exists(MainDir / RunSubDir)) B2ERROR("Directory w/ DSP files don't exist" << LogVar("Directory", MainDir / RunSubDir));
+  if (!exists(MainDir / RunSubDir)) B2FATAL("ECL DQM logic test FATAL: Directory w/ DSP files don't exist" << LogVar("Directory",
+                                              MainDir / RunSubDir));
   for (boost::filesystem::directory_entry& x : boost::filesystem::recursive_directory_iterator(MainDir / RunSubDir)) {
     if (!std::regex_match(x.path().string(), Filter) || !boost::filesystem::is_regular_file(x.path())) continue;
     int iCrate = atoi(std::regex_replace(x.path().string(), Filter, "$2").c_str());
@@ -390,13 +399,13 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
     } else if (iCrate > 44) {
       if (iShaperPosition > 8) continue;
     }
-    ECLDspData* dspdata = readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
+    ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
     callbackCalibration(dspdata, map_vec, map_coef);
     map_container_vec[iShaper] = map_vec;
     map_container_coef[iShaper] = map_coef;
     callbackCalibration(m_calibrationThrA0, v_totalthrA0);
     callbackCalibration(m_calibrationThrAhard, v_totalthrAhard);
-
+    callbackCalibration(m_calibrationThrAskip, v_totalthrAskip);
   }
 }
 
@@ -407,7 +416,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int iChannelPosition = mapper.getShaperChannel(cellID);
   short int* f, *f1, *fg41, *fg43, *fg31, *fg32, *fg33;
   int k_a, k_b, k_c, k_1, k_2, k_16, chi_thres;
-  int A0, Ahard;
+  int A0, Ahard, Askip;
 
   map_vec = map_container_vec[iShaper];
   f    = vectorsplit(map_vec["F"], iChannelPosition);
@@ -429,15 +438,19 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
 
   A0 = (int)v_totalthrA0[cellID - 1];
   Ahard = (int)v_totalthrAhard[cellID - 1];
+  Askip = (int)v_totalthrAskip[cellID - 1];
 
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
 
 
-  lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0, Ahard, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres, m_AmpFit, m_TimeFit,
-         m_QualityFit);
+  auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
+                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres);
+  m_AmpFit = result.amp;
+  m_TimeFit = result.time;
+  m_QualityFit = result.quality;
 
-  if (m_QualityFit == 2) m_TimeFit = 0;
+  if (result.skip_thr || result.hit_thr) m_QualityFit += 4;
 }
 
 void ECLDQMEXTENDEDModule::beginRun()
@@ -481,23 +494,47 @@ void ECLDQMEXTENDEDModule::beginRun()
 
 void ECLDQMEXTENDEDModule::event()
 {
+  StoreArray<ECLDsp> ECLDsps;
+  StoreArray<ECLTrig> ECLTrigs;
   StoreArray<ECLDigit> ECLDigits;
 
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 
-  for (auto& aECLDigit : ECLDigits) {
-    m_AmpData = aECLDigit.getAmp();
-    m_TimeData = aECLDigit.getTimeFit();
-    m_QualityData = aECLDigit.getQuality();
-    m_CellId = aECLDigit.getCellId();
-    m_TrigTime = aECLDigit.getRelationsTo<ECLTrig>()[0]->getTimeTrig();
-    ECLDsp* aECLDsp = aECLDigit.getRelated<ECLDsp>();
+  for (auto& aECLDsp : ECLDsps) {
+    m_CellId = aECLDsp.getCellId();
+    std::vector<int> DspArray = aECLDsp.getDspA();
+    if (!ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
+    for (auto& aECLTrig : ECLTrigs) {
+      if (aECLTrig.getTrigId() == mapper.getCrateID(m_CellId)) {
+        m_TrigTime = aECLTrig.getTimeTrig();
+        break;
+      }
+    }
 
-    if (aECLDsp) {
+    emulator(m_CellId, m_TrigTime, DspArray);
+    ECLDigit* aECLDigit = aECLDsp.getRelated<ECLDigit>();
 
-      std::vector<int> DspArray = aECLDsp->getDspA();
-      emulator(m_CellId, m_TrigTime, DspArray);
+    if ((m_AmpFit < (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
+      if (m_AmpFit != -128)
+        B2ERROR("ECL DQM logic test error: ECL Digit exists for A_emulator < Thr_skip"
+                << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
+                << LogVar("A_emulator", m_AmpFit)
+                << LogVar("A_data", aECLDigit->getAmp()));
+      else B2WARNING("ECL DQM logic test warning: A_emulator == -128");
+    }
+
+    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
+      B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
+              << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
+              << LogVar("A_emulator", m_AmpFit)
+              << LogVar("Quality_emulator", m_QualityFit));
+
+    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
+
+      m_AmpData = aECLDigit->getAmp();
+      m_TimeData = aECLDigit->getTimeFit();
+      m_QualityData = aECLDigit->getQuality();
 
       if (m_AmpFit != m_AmpData) {
         for (int i = 0; i < 4; i++) if (m_QualityData == i && m_TimeFit == m_TimeData) h_time_ampfail[i]->Fill(m_TimeData);
@@ -548,10 +585,14 @@ void ECLDQMEXTENDEDModule::event()
         h_timeflag_qualityfail->Fill(m_QualityData, iTimeflag_qualityfail);
         h_quality_fit_data->Fill(m_QualityFit, m_QualityData);
       }
+      if (m_AmpFit != m_AmpData || m_TimeFit != m_TimeData || m_QualityFit != m_QualityData) {
+        h_fail_shaperid->Fill(conversion(m_CellId));
+        h_fail_crateid->Fill(mapper.getCrateID(m_CellId));
+      }
       h_ampfail_quality->Fill(-1);
       h_timefail_quality->Fill(-1);
-    } //aECLDsp
-  }  //aECLDigit
+    } //aECLDigit
+  }  //aECLDsp
 } //event
 
 

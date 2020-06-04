@@ -66,6 +66,7 @@ namespace Belle2 {
     std::string m_userDECFileName; /**<  Standard input user decay file. */
     std::string m_parentParticle;  /**<  Standard input parent particle. */
     int m_inclusiveType;        /**< Inclusive type 0 : generic, 1 : m_inclusiveParticle inclusive, 2 : m_inclusiveParticle + c.c. inclusive */
+    bool m_coherentMixing = true;        /**< Decay the B's in coherent or incoherent mode*/
     std::string m_inclusiveParticle; /**< inclusive Particle */
     int m_maxTries; /**< Maximum number of tries for generating the parent particle */
     EvtId m_parentId; /**< EvtGen Id of the parent particle we want to generate */

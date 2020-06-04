@@ -18,6 +18,7 @@
 
 namespace Belle2 {
 
+  /** class for digital (0/1) calibration values per srtip*/
   class SVDCalibrationsBitmap {
 
   public:

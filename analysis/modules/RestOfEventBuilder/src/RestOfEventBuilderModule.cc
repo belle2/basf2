@@ -12,19 +12,16 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
-
-#include <iostream>
 
 using namespace Belle2;
 
@@ -49,6 +46,7 @@ RestOfEventBuilderModule::RestOfEventBuilderModule() : Module()
   addParam("particleListsInput", m_particleListsInput, "List of the particle lists, which serve as a source of particles", emptyList);
   addParam("createNestedROE", m_createNestedROE, "A switch to create nested ROE", false);
   addParam("nestedROEMask", m_nestedMask, "A switch to create nested ROE", std::string(""));
+  addParam("fromMC", m_fromMC, "A switch to create MC ROE", false);
   m_nestedROEArrayName = "NestedRestOfEvents";
 }
 
@@ -81,7 +79,6 @@ void RestOfEventBuilderModule::event()
 
 }
 
-
 void RestOfEventBuilderModule::createNestedROE()
 {
   // input target Particle
@@ -112,7 +109,7 @@ void RestOfEventBuilderModule::createNestedROE()
     for (auto* outerROEParticle : outerROEParticles) {
       bool toAdd = true;
       for (auto* daughter : fsdaughters) {
-        if (RestOfEvent::compareParticles(outerROEParticle, daughter)) {
+        if (outerROEParticle->isCopyOf(daughter, true)) {
           toAdd = false;
           break;
         }
@@ -142,7 +139,7 @@ void RestOfEventBuilderModule::createROE()
       return;
 
     // create RestOfEvent object
-    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode());
+    RestOfEvent* roe = roeArray.appendNew(particle->getPDGCode(), false, m_fromMC);
 
     // create relation: Particle <-> RestOfEvent
     particle->addRelationTo(roe);
@@ -164,6 +161,7 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
   }
   unsigned int nExcludedParticles = 0;
   std::vector<const Particle* > particlesToAdd;
+  B2DEBUG(10, "nLists: " << nParticleLists);
   for (int i_pl = 0; i_pl != nParticleLists; ++i_pl) {
 
     std::string particleListName = m_particleListsInput[i_pl];
@@ -176,8 +174,17 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
       for (auto* storedParticleDaughter : storedParticleDaughters) {
         bool toAdd = true;
+        if ((m_fromMC and storedParticleDaughter->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
+            or (!m_fromMC and storedParticleDaughter->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle)) {
+          B2FATAL("The value of fromMC parameter is not consisted with the type of provided particles, MC vs Reco");
+        }
+        // Remove non primary MCParticles
+        if (m_fromMC and !storedParticleDaughter->getMCParticle()->hasStatus(MCParticle::c_PrimaryParticle)) {
+          nExcludedParticles++;
+          continue;
+        }
         for (auto* daughter : fsdaughters) {
-          if (RestOfEvent::compareParticles(storedParticleDaughter, daughter)) {
+          if (storedParticleDaughter->isCopyOf(daughter, true)) {
             B2DEBUG(10, "Ignoring Particle with PDG " << daughter->getPDGCode() << " index " <<
                     storedParticleDaughter->getArrayIndex() << " to " << daughter->getArrayIndex());
             B2DEBUG(10, "Is copy " << storedParticleDaughter->isCopyOf(daughter));
@@ -187,7 +194,6 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
           }
         }
         if (toAdd) {
-          //roe->addParticle(storedParticle);
           particlesToAdd.push_back(storedParticleDaughter);
         }
       }
@@ -239,9 +245,9 @@ void RestOfEventBuilderModule::printEvent()
 
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
-  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
-  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_ECLCluster);
+  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_KLMCluster);
+  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
 

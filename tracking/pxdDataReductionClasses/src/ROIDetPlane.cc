@@ -10,6 +10,10 @@
 
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 using namespace std;
 

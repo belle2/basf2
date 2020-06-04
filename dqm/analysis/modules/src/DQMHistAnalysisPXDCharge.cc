@@ -15,9 +15,6 @@
 using namespace std;
 using namespace Belle2;
 
-
-using boost::format;
-
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -51,7 +48,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -171,7 +168,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_hCharge) {
+  if (m_hCharge && enough) {
     double currentMin, currentMax;
     m_hCharge->Draw("");
 //     m_line1->Draw();
@@ -182,12 +179,12 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
     if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
+  }
 
 #ifdef _BELLE2_EPICS
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+  SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&diff), "ca_set failure");
 #endif
-  }
   int status = 0;
 
   if (!enough) {

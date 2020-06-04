@@ -122,6 +122,7 @@ public:
    * operator override for ostream modifier functions like std::endl who are directly
    * applied to the underlying string stream.
    */
+  // cppcheck-suppress constParameter ; no, this cannot be const otherwise e.g. std::endl doesn't work
   LogVariableStream& operator<<(__basic_ostream_type & (*__pf)(__basic_ostream_type&))
   {
     // execute provided function on the string stream
@@ -185,11 +186,11 @@ public:
    * Return the content of the stream as string. First the stringstream part
    * and then a list of the variables
    */
-  std::string str() const
+  std::string str(bool showVariables = true) const
   {
     // little optimization, so we don't need to copy the whole string
     // in the cases where there are no variables ...
-    if (m_variables.size() == 0) {
+    if (m_variables.size() == 0 or !showVariables) {
       return m_stringStream.str();
     }
 

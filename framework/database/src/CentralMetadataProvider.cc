@@ -11,9 +11,6 @@
 #include <framework/database/CentralMetadataProvider.h>
 #include <framework/logging/Logger.h>
 
-#include <numeric>
-#include <iomanip>
-
 using json = nlohmann::json;
 
 namespace Belle2::Conditions {

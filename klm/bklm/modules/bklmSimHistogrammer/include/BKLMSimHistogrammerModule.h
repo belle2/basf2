@@ -10,21 +10,28 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+
+/* Belle 2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include "TFile.h"
-#include "TH1D.h"
-#include "TH1I.h"
-#include "TH2D.h"
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH1I.h>
+#include <TH2D.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
 
   class BKLMSimHit;
-  class BKLMDigit;
+  class KLMDigit;
 
   //! Convert BKLM raw simulation hits to digitizations
   class BKLMSimHistogrammerModule : public Module {
@@ -126,7 +133,7 @@ namespace Belle2 {
     //! BKLMSimHit StoreArray
     StoreArray<BKLMSimHit> simHits;
     //! digits StoreArray
-    StoreArray<BKLMDigit> digits;
+    StoreArray<KLMDigit> digits;
     //! mcParticles StoreArray
     StoreArray<MCParticle> mcParticles;
     //! hits2D StoreArray

@@ -12,20 +12,12 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <string>
-#include <vector>
-#include <tuple>
 #include <memory>
-
 
 namespace Belle2 {
   class Particle;
@@ -79,6 +71,10 @@ namespace Belle2 {
     int m_maximumNumberOfCandidates; /**< maximum number of reconstructed candidates */
 
     bool m_ignoreIfTooManyCandidates;  /**< drop all candidates if max. number of candidate reached */
+
+    bool m_chargeConjugation; /**< boolean to control whether charge conjugated decay should be reconstructed as well */
+
+    bool m_allowChargeViolation; /**< switch to turn on and off the requirement of electric charge conservation */
 
   };
 

@@ -10,8 +10,9 @@
 
 #pragma once
 
-/* Belle2 headers. */
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
+/* KLM headers. */
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 #include <klm/eklm/geometry/Arc2D.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/LineSegment2D.h>
@@ -64,7 +65,7 @@ namespace Belle2 {
        * @return true Alignment is correct (no overlaps).
        */
       bool checkSectorAlignment(int section, int layer, int sector,
-                                const EKLMAlignmentData* sectorAlignment) const;
+                                const KLMAlignmentData* sectorAlignment) const;
 
       /**
        * Check segment alignment.
@@ -81,16 +82,18 @@ namespace Belle2 {
        */
       bool checkSegmentAlignment(int section, int layer, int sector, int plane,
                                  int segment,
-                                 const EKLMAlignmentData* sectorAlignment,
-                                 const EKLMAlignmentData* segmentAlignment,
+                                 const KLMAlignmentData* sectorAlignment,
+                                 const KLMAlignmentData* segmentAlignment,
                                  bool calledFromSectorCheck) const;
 
       /**
        * Check alignment.
-       * @param[in] alignment Alignment data.
+       * @param[in] alignment        Alignment data.
+       * @param[in] segmentAlignment Segment alignment data.
        * @return true Alignment is correct (no overlaps).
        */
-      bool checkAlignment(const EKLMAlignment* alignment) const;
+      bool checkAlignment(const EKLMAlignment* alignment,
+                          const EKLMSegmentAlignment* segmentAlignment) const;
 
     private:
 
@@ -99,6 +102,9 @@ namespace Belle2 {
 
       /** Geometry data. */
       const GeometryData* m_GeoDat;
+
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Sector support edge: corner 1 line. */
       LineSegment2D* m_LineCorner1;

@@ -20,8 +20,8 @@ CDCDedxWireGainAlgorithm::CDCDedxWireGainAlgorithm() :
   CalibrationAlgorithm("CDCDedxElectronCollector"),
   m_badWireFPath(""),
   m_badWireFName(""),
-  isRmBadwires(false),
-  isMakePlots(true)
+  isMakePlots(true),
+  isMergePayload(true)
 {
   // Set module properties
   setDescription("A calibration algorithm for CDC dE/dx wire gains");
@@ -112,6 +112,9 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     }
   }
 
+  const auto expRun = getRunList()[0];
+  updateDBObjPtrs(1, expRun.second, expRun.first);
+
   double iWireTruncMean[14336]; //initialisation of wire gains
   for (Int_t jwire = 0; jwire < 14336; jwire++) iWireTruncMean[jwire] = 1.0;
 
@@ -183,14 +186,9 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
     for (Int_t jwire = fromWire; jwire < toWire; jwire++) {
       countwire++;
-      bool IsSkip = false;
-      for (unsigned int kwire = 0; kwire < listofbadwires.size(); ++kwire) {
-        if (jwire == listofbadwires.at(kwire)) {
-          IsSkip = true;
-          break;
-        }
-      }
-      if (IsSkip)continue;
+
+      //Checking if previous wiregain was = 0 for this wire
+      if (m_DBWireGains->getWireGain(jwire) == 0)continue;
 
       if (iWireTruncMean[jwire] >= 0.) {
         LayerMeanSum[iLayer] += iWireTruncMean[jwire];
@@ -206,23 +204,14 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   if (ScaleFactorAvg <= 0)ScaleFactorAvg = 1.0;
 
   //voting all wires with scale factor calculated from outer layer
-  for (Int_t jwire = 0; jwire < 14336; jwire++) iWireTruncMean[jwire] /= ScaleFactorAvg;
-
-  //setting wire gain to 0 for bad wires
-  if (isRmBadwires)for (unsigned int kwire = 0; kwire < listofbadwires.size();
-                          ++kwire) iWireTruncMean[listofbadwires.at(kwire)] = 0.0;
-
-  //Storing final version of wiregain constants
   std::vector<double> dedxTruncmean;
-  for (unsigned int kwire = 0; kwire < 14336; ++kwire) {
-    dedxTruncmean.push_back(iWireTruncMean[kwire]);
-    std::cout << kwire <<  " WireGain for this = " << iWireTruncMean[kwire] << std::endl;
+  for (Int_t jwire = 0; jwire < 14336; jwire++) {
+    iWireTruncMean[jwire] /= ScaleFactorAvg;
+    if (m_DBWireGains->getWireGain(jwire) == 0.0)iWireTruncMean[jwire] = 0.0;
+    dedxTruncmean.push_back(iWireTruncMean[jwire]);
   }
 
-  B2INFO("dE/dx Calibration done for " << dedxTruncmean.size() << " CDC wires");
-  CDCDedxWireGain* gains = new CDCDedxWireGain(dedxTruncmean);
-  saveCalibration(gains, "CDCDedxWireGain");
-
+  generateNewPayloads(dedxTruncmean);
 
   delete htempPerWire;
   if (isMakePlots) {
@@ -232,4 +221,25 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   }
 
   return c_OK;
+}
+
+
+void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTruncmean)
+{
+
+  if (isMergePayload) {
+    const auto expRun = getRunList()[0];
+    updateDBObjPtrs(1, expRun.second, expRun.first);
+    // bool refchange = m_DBWireGains.hasChanged();
+    B2INFO("Saving new wiregains for (Exp, Run) : (" << expRun.first << "," << expRun.second << ")");
+    for (unsigned int iwire = 0; iwire < 14336; iwire++) {
+      B2INFO("Wire Gain for wire [" << iwire << "], Previous = " << m_DBWireGains->getWireGain(iwire) << ", Relative = " <<
+             dedxTruncmean.at(iwire) << ", Merged = " << m_DBWireGains->getWireGain(iwire)*dedxTruncmean.at(iwire));
+      dedxTruncmean.at(iwire) *= (double)m_DBWireGains->getWireGain(iwire);
+    }
+  }
+
+  B2INFO("dE/dx Calibration done for " << dedxTruncmean.size() << " CDC wires");
+  CDCDedxWireGain* gains = new CDCDedxWireGain(dedxTruncmean);
+  saveCalibration(gains, "CDCDedxWireGain");
 }

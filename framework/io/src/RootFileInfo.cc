@@ -15,7 +15,6 @@
 
 #include <TTree.h>
 #include <TFile.h>
-#include <TBranchElement.h>
 
 namespace Belle2::RootIOUtilities {
   RootFileInfo::RootFileInfo(const std::string& filename)

@@ -15,7 +15,6 @@
 
 #include <chrono>
 #include <set>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;

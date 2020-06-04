@@ -19,9 +19,6 @@
 
 //stl-stuff
 #include <string>
-#include <algorithm>
-
-
 
 namespace Belle2 {
   namespace Tracking {

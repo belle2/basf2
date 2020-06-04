@@ -1,11 +1,15 @@
 /* Nanae Taniguchi 2017.07.12 */
 /* Nanae Taniguchi 2018.02.06 */
 /* Nanae Taniguchi 2019.02.17 */
+/* Junhao Yin 2019.11 */
 
 #ifndef CDCDQM7MODULE_H
 #define CDCDQM7MODULE_H
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 
 #include <vector>
 #include "TH1F.h"
@@ -29,9 +33,13 @@ namespace Belle2 {
 
     //! Module functions
     void initialize() override;
+    //! action at runbegin
     void beginRun() override;
+    //! action per each event
     void event() override;
+    //! action at run end
     void endRun() override;
+    //! termination action
     void terminate() override;
 
     //! function to define histograms
@@ -51,6 +59,14 @@ namespace Belle2 {
     TH1D* h_occ = nullptr;/**<occupancy*/
     TH1D* h_occ_L[56] = {nullptr}; /**<occupancy-layer-dep.*/
 
+    TH1D* h_hit_cell = nullptr;/**<hits-of-cell*/
+
+    TH1D* h_EoccAfterInjLER = nullptr; /**<nhits after LER injection. */
+    TH1D* h_EoccAfterInjHER = nullptr; /**<nhits after HER injection. */
+    TH1D* h_occAfterInjLER = nullptr; /**<occupancy after LER injection. */
+    TH1D* h_occAfterInjHER = nullptr; /**<occupancy after HER injection. */
+
+    StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
 
   };
 }

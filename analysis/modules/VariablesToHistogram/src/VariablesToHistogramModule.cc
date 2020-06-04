@@ -12,15 +12,12 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/utilities/RootFileCreationManager.h>
 
-#include <algorithm>
-#include <cmath>
 #include <memory>
 
 using namespace std;

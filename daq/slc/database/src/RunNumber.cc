@@ -1,7 +1,5 @@
 #include "daq/slc/database/RunNumber.h"
 
-#include <iostream>
-
 using namespace Belle2;
 
 RunNumber::RunNumber()

@@ -1,42 +1,33 @@
 #ifndef EVEVISUALIZATION_H
 #define EVEVISUALIZATION_H
 
-#include <display/ObjectInfo.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TEveStraightLineSet.h>
 #include <TVector3.h>
-#include <TString.h>
 #include <TEveTrack.h>
 
 #include <string>
@@ -52,7 +43,6 @@ class TEveTrackPropagator;
 
 namespace Belle2 {
   class DisplayData;
-  class VisualRepMap;
   class EveVisBField;
 
   /** Produces visualisation for MCParticles, simhits, genfit::Tracks, geometry and other things.
@@ -215,7 +205,7 @@ namespace Belle2 {
     void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
     /** show outline of track segments. */
-    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
+    void addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);

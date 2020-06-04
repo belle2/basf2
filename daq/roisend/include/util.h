@@ -5,10 +5,7 @@
 #define UTIL_H
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <errno.h>
-
 
 #define ERROR(func) { fprintf(stderr, "[ERROR] %s:%d: "#func"(): %s\n", __FILE__, __LINE__, strerror(errno));}
 

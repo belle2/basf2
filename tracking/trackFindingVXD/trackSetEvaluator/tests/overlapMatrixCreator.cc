@@ -10,7 +10,6 @@
 
 #include <gtest/gtest.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapMatrixCreator.h>
 
 using namespace std;

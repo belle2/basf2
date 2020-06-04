@@ -8,15 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
+/* Belle 2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
-
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/Muid.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
+/* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
@@ -197,23 +199,18 @@ void BKLMAnaModule::event()
     if (trkphi < 0) trkphi =  trkphi + 360.0;
     RelationVector<BKLMHit2d> relatedHit2D = track->getRelationsTo<BKLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
-    RelationVector<Muid> Muids = track->getRelationsTo<Muid>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
       ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM) continue;
-      int copyid = exthit->getCopyID();
-      int section = ((copyid & BKLM_END_MASK) >> BKLM_END_BIT);
-      int sector = ((copyid & BKLM_SECTOR_MASK) >> BKLM_SECTOR_BIT) + 1;
-      int layer = ((copyid & BKLM_LAYER_MASK) >> BKLM_LAYER_BIT) + 1;
-      //int plane = (copyid & BKLM_PLANE_MASK) >> BKLM_PLANE_BIT;//only for sci
-      //do we need to require Muid ?
+      int module = exthit->getCopyID();
+      int section = BKLMElementNumbers::getSectionByModule(module);
+      int sector = BKLMElementNumbers::getSectorByModule(module);
+      int layer = BKLMElementNumbers::getLayerByModule(module);
       bool crossed = false; // should be only once ?
-      for (unsigned int mu = 0; mu < Muids.size(); mu++) {
-        Muid* muid =  Muids[mu];
-        int extPattern = muid->getExtLayerPattern();
-        if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
-        if (crossed) break;
-      }
+      KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
+      if (!muid) continue;
+      int extPattern = muid->getExtLayerPattern();
+      if ((extPattern & (1 << (layer - 1))) != 0)  crossed = true;
       if (!crossed) continue;
 
       TVector3 extMom = exthit->getMomentum();

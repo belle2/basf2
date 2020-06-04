@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
 
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

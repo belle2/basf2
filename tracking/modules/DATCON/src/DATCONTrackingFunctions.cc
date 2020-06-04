@@ -10,6 +10,8 @@
 
 #include <tracking/modules/DATCON/DATCONTrackingModule.h>
 
+#include <tracking/gfbfield/GFGeant4Field.h>
+
 using namespace std;
 using namespace Belle2;
 

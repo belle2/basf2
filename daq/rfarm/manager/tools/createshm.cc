@@ -5,12 +5,9 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 7 - Apr - 2015
 //-
-#include <string>
-#include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "daq/rfarm/manager/RFSharedMem.h"
 

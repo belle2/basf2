@@ -1606,7 +1606,9 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   if (mConstD.at("JB") == 1) {cout << "<<<z0>>>" << endl; mSignalStorage["z0"].dump();}
 
   // Constrain z0 to [-30,30]
+  /* cppcheck-suppress variableScope */
   double z0Min = -30;
+  /* cppcheck-suppress variableScope */
   double z0Max = 30;
   // Calculate z0Max and z0Min
   if (mSignalStorage.find("z0Min") == mSignalStorage.end()) {
@@ -1685,7 +1687,9 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   //cout<<"<<<cotMax>>>"<<endl; mSignalStorage["cotMax"].dump();
   //cout<<"<<<cot_c>>>"<<endl; mSignalStorage["cot_c"].dump();
   // Reduce number of bits for z0 to 11 bits and cot to 11 bits
+  /* cppcheck-suppress variableScope */
   int z0Bits = 11;
+  /* cppcheck-suppress variableScope */
   int cotBits = 11;
   {
     int z0Shift = mSignalStorage["z0_c"].getBitsize() - z0Bits;
@@ -1788,8 +1792,11 @@ void Fitter3DUtility::rSFit(std::map<std::string, double> const& mConstD,
   if (mConstD.at("JB") == 1) {cout << "<<<zChi2>>>" << endl; mSignalStorage["zChi2"].dump();}
 
   // Constrain zChi2 to [0, 100]
+  /* cppcheck-suppress variableScope */
   double zChi2Min = 0;
+  /* cppcheck-suppress variableScope */
   double zChi2Max = 100;
+  /* cppcheck-suppress variableScope */
   int zChi2Bits = 4;
   // Calculate zChi2Max and zChi2Min
   if (mSignalStorage.find("zChi2Min") == mSignalStorage.end()) {

@@ -11,9 +11,7 @@
 #include <tracking/ckf/svd/utilities/SVDKalmanStepper.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 #include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
 

@@ -9,13 +9,11 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
-#include <analysis/VariableManager/Utility.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <TMatrixFSym.h>
@@ -65,19 +63,20 @@ namespace TestUtilities {
     };
 
     /**
-     * Helper method to get EParticleType from PDG code
+     * Helper method to get EParticleSourceObject from PDG code
      */
-    Belle2::Particle::EParticleType getType(const Belle2::DecayDescriptorParticle* particleDescription)
+    Belle2::Particle::EParticleSourceObject getType(const Belle2::DecayDescriptorParticle* particleDescription)
     {
       int pdg = abs(particleDescription->getPDGCode());
-      // Emmm, I still do not know how to make it in an elegant way
-      if (pdg == 211 || pdg == 11 || pdg == 321 || pdg == 13 || pdg == 2212) {
-        return Belle2::Particle::EParticleType::c_Track;
+      if (pdg == Belle2::Const::pion.getPDGCode() || pdg == Belle2::Const::electron.getPDGCode()
+          || pdg == Belle2::Const::kaon.getPDGCode() || pdg == Belle2::Const::muon.getPDGCode()
+          || pdg == Belle2::Const::proton.getPDGCode()) {
+        return Belle2::Particle::EParticleSourceObject::c_Track;
       }
-      if (pdg == 22) {
-        return Belle2::Particle::EParticleType::c_ECLCluster;
+      if (pdg == Belle2::Const::photon.getPDGCode()) {
+        return Belle2::Particle::EParticleSourceObject::c_ECLCluster;
       }
-      return Belle2::Particle::EParticleType::c_Composite;
+      return Belle2::Particle::EParticleSourceObject::c_Composite;
     }
 
     /**
@@ -86,11 +85,11 @@ namespace TestUtilities {
     const Belle2::Particle* createParticle(const Belle2::DecayDescriptor* particleDescriptor, const TLorentzVector& momentum,
                                            const TVector3& vertex)
     {
-      Belle2::Particle::EParticleType type = getType(particleDescriptor->getMother());
-      if (type == Belle2::Particle::EParticleType::c_Track) {
+      Belle2::Particle::EParticleSourceObject type = getType(particleDescriptor->getMother());
+      if (type == Belle2::Particle::EParticleSourceObject::c_Track) {
         return createCharged(particleDescriptor, momentum, vertex);
       }
-      if (type == Belle2::Particle::EParticleType::c_ECLCluster) {
+      if (type == Belle2::Particle::EParticleSourceObject::c_ECLCluster) {
         return createPhoton(momentum);
       }
       Belle2::StoreArray<Belle2::Particle> myParticles;
@@ -149,7 +148,8 @@ namespace TestUtilities {
       const float pValue = 0.5;
       const float bField = 1.5;
       TMatrixDSym cov6(6);
-      int chargefactor = (particleDescription->getPDGCode() == 11 || particleDescription->getPDGCode() == 13) ? -1 : 1;
+      int chargefactor = (abs(particleDescription->getPDGCode()) == Belle2::Const::electron.getPDGCode()
+                          || abs(particleDescription->getPDGCode()) == Belle2::Const::muon.getPDGCode()) ? -1 : 1;
       const int charge = (particleDescription->getPDGCode()) / abs(particleDescription->getPDGCode()) * chargefactor;
       unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
       Belle2::StoreArray<Belle2::TrackFitResult> myTrackFits;

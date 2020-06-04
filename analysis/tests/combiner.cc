@@ -19,7 +19,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 
 #include <utility>
 #include <algorithm>

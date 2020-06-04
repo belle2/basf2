@@ -10,8 +10,6 @@
 
 #include <framework/pcore/zmq/processModules/ZMQRxWorkerModule.h>
 
-#include <framework/pcore/ProcHandler.h>
-
 #include <framework/pcore/zmq/messages/ZMQMessageFactory.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 #include <framework/core/Environment.h>

@@ -18,14 +18,11 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 
 #include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
@@ -62,7 +59,7 @@ namespace Belle2 {
       FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
+      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter, WeightedRelation> m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;

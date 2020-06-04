@@ -320,15 +320,16 @@ void SVDB4CommissioningPlotsModule::endRun()
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();
+            (h_clusterTrkSize->getHistogram(sensor, view))->Write();
             (h_clusterTrkEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTrkTime->getHistogram(sensor, view))->Write();
             (h_clusterTrkInterstripPos->getHistogram(sensor, view))->Write();
             dir_clusterNotAssigned_layer->cd();
             (h_clusterCharge->getHistogram(sensor, view))->Write();
             (h_clusterSNR->getHistogram(sensor, view))->Write();
+            (h_clusterSize->getHistogram(sensor, view))->Write();
             (h_clusterEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTime->getHistogram(sensor, view))->Write();
-
           }
     }
 

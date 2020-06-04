@@ -1,14 +1,12 @@
 #include <daq/rfarm/event/hltsocket/HLTSocket.h>
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <errno.h>
 #include <signal.h>
 

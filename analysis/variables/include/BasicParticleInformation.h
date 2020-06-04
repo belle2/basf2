@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <vector>
 
 namespace Belle2 {
@@ -36,14 +35,19 @@ namespace Belle2 {
     double particleIsFromTrack(const Particle* part);
 
     /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
+     * return 1 if this particle was created from a V0, 0 otherwise
+     */
+    double particleIsFromV0(const Particle* part);
+
+    /**
+     * returns StoreArray index (0-based) of the MDST object from which the Particle was created
      */
     double particleMdstArrayIndex(const Particle* part);
 
     /**
-     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
+     * returns unique identifier for identification of the final state particle
      */
-    double particleMdstSource(const Particle* part);
+    double uniqueParticleIdentifier(const Particle* part);
 
     /**
      * returns 1 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), 0 if not

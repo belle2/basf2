@@ -18,10 +18,7 @@
 #define PUT_NAME_FUNCTION(Y) static const std::string name(void) {return STRING_NAME(Y); };
 
 #include <string>
-#include <typeinfo>
 #include <functional>
-#include <TBranch.h>
-#include <TTree.h>
 
 namespace Belle2 {
   /** Base class of the selection variable objects used for pair filtering

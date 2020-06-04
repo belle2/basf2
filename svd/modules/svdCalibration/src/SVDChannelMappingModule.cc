@@ -485,11 +485,11 @@ void SVDChannelMappingModule::createHistosDictionaries()
                                );
         m_histoList_clusters->Add(tmp2D);
 
-        itSvdSensors++;
+        ++itSvdSensors;
       }
-      itSvdLadders++;
+      ++itSvdLadders;
     }
-    itSvdLayers++;
+    ++itSvdLayers;
   }
 
 }

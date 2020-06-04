@@ -3,28 +3,33 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Leo Piilonen                            *
+ * Contributors: Kirill Chilikin, Leo Piilonen, Vipin Gaur,               *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #pragma once
 
-/* External headers. */
+/* DQM headers. */
+#include <dqm/analysis/modules/DQMHistAnalysis.h>
+
+/* Belle 2 headers. */
+#include <framework/database/DBObjPtr.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMChannelArrayIndex.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
+
+/* ROOT headers. */
 #include <TCanvas.h>
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
 
-/* Belle2 headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
-#include <framework/database/DBObjPtr.h>
-#include <klm/dataobjects/KLMChannelArrayIndex.h>
-#include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/dataobjects/KLMSectorArrayIndex.h>
+/* C++ headers. */
+#include <vector>
 
 namespace Belle2 {
 
@@ -74,35 +79,53 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector    Subdetector.
-     * @param[in]  section        Section.
-     * @param[in]  sector         Sector.
-     * @param[in]  histogram      Histogram.
-     * @param[in]  canvas         Canvas.
-     * @param[out] latex          TLatex to draw messages.
+     * @param[in]  subdetector  Subdetector.
+     * @param[in]  section      Section.
+     * @param[in]  sector       Sector.
+     * @param[in]  histogram    Histogram.
+     * @param[in]  canvas       Canvas.
+     * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector,
       TH1* histogram, TCanvas* canvas, TLatex& latex);
 
     /**
-     * Process one BKLM sector+layer histogram.
-     * @param[in]  histName  Histogram name.
+     * Process histogram containing the number of hits in plane.
+     * @param[in] histName  Histogram name.
      */
-    void processBKLMSectorLayerHistogram(const std::string& histName);
+    void processPlaneHistogram(const std::string& histName);
+
+    /**
+     * Fill histogram containing masked channels per sector.
+     * @param[in] histName  Histogram name.
+     */
+    void fillMaskedChannelsHistogram(const std::string& histName);
 
     /**
      * Find TCanvas that matches a given name.
-     * @param[in]  canvasName   name of the desired TCanvas.
-     * @param[out] TCanvas*     matching TCanvas.
+     * @param[in]  canvasName  Name of the desired TCanvas.
+     * @param[out] TCanvas*    Matching TCanvas.
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
-    /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
-    /** EKLM electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
+    /** Threshold for masked channels. */
+    int m_ThresholdForMasked;
+
+    /** Threshold for hot channels. */
+    int m_ThresholdForHot;
+
+    /** Minimal number of hits for flagging. */
+    int m_MinHitsForFlagging;
+
+    /** Vector of new channels to be masked. */
+    std::vector<uint16_t> m_NewMaskedChannels;
+
+    /** Vector of channels already masked. */
+    std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
@@ -114,17 +137,17 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** EKLM strip number within a layer. */
     TCanvas* m_eklmStripLayer[
       EKLMElementNumbers::getMaximalLayerGlobalNumber()];
 
-    /** TLine for BKLM sector boundary in histogram. */
-    TLine* m_sectorLine[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
+    /** TLine for boundary in plane histograms. */
+    TLine m_PlaneLine;
 
-    /** TText for BKLM sector name in histogram. */
-    TText* m_sectorText[BKLMElementNumbers::getMaximalSectorGlobalNumber()];
+    /** TText for names in plane histograms. */
+    TText m_PlaneText;
 
   };
 

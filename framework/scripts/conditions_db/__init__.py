@@ -18,8 +18,9 @@ import json
 import urllib
 from versioning import upload_global_tag, jira_global_tag_v2
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait as futures_wait
 import hashlib
+import itertools
 
 
 def encode_name(name):
@@ -35,18 +36,31 @@ def file_checksum(filename):
     return md5hash.hexdigest()
 
 
+def chunks(container, chunk_size):
+    """Cut a container in chunks of max. chunk_size"""
+    it = iter(container)
+    while True:
+        chunk = tuple(itertools.islice(it, chunk_size))
+        if not chunk:
+            return
+        yield chunk
+
+
 class PayloadInformation:
     """Small container class to help compare payload information for efficient
     comparison between globaltags"""
 
     @classmethod
-    def from_json(cls, payload, iov):
+    def from_json(cls, payload, iov=None):
         """Set all internal members from the json information of the payload and the iov.
 
         Arguments:
             payload (dict): json information of the payload as returned by REST api
             iov (dict): json information of the iov as returned by REST api
         """
+        if iov is None:
+            iov = {"payloadIovId": None, "expStart": None, "runStart": None, "expEnd": None, "runEnd": None}
+
         return cls(
             payload['payloadId'],
             payload['basf2Module']['name'],
@@ -78,6 +92,11 @@ class PayloadInformation:
         self.base_url = base_url
         #: payload url
         self.payload_url = payload_url
+
+    @property
+    def url(self):
+        """Return the full url to the payload on the server"""
+        return urllib.parse.urljoin(self.base_url + '/', self.payload_url)
 
     def __hash__(self):
         """Make object hashable"""
@@ -155,7 +174,14 @@ class ConditionsDB:
             B2INFO("Getting Conditions Database servers from Environment:")
             for i, url in enumerate(base_url_list, 1):
                 B2INFO(f"  {i}. {url}")
-        return base_url_list
+        # try to escalate to https for all given urls
+        full_list = []
+        for url in base_url_list:
+            if url.startswith("http://"):
+                full_list.append("https" + url[4:])
+            # but keep the http in case of connection problems
+            full_list.append(url)
+        return full_list
 
     def __init__(self, base_url=None, max_connections=10, retries=3):
         """
@@ -343,8 +369,22 @@ class ConditionsDB:
 
     def get_all_iovs(self, globalTag, exp=None, run=None, message=None):
         """
-        Return list of all payloads in gt where each element is a named
-        tuple with (name, revision, payloadId, iovId, iov)
+        Return list of all payloads in the given globaltag where each element is
+        a `PayloadInformation` instance
+
+        Parameters:
+            gobalTag (str): name of the globaltag
+            exp (int): if given limit the list of payloads to the ones valid for
+                the given exp,run combination
+            run (int): if given limit the list of payloads to the ones valid for
+                the given exp,run combination
+            message (str): additional message to show when downloading the
+                payload information. Will be directly appended to
+                "Obtaining lists of iovs for globaltag {globalTag}"
+
+        Warning:
+            Both, exp and run, need to be given at the same time. Just supplying
+            an experiment or a run number will not work
         """
         globalTag = encode_name(globalTag)
         if message is None:
@@ -565,6 +605,7 @@ class ConditionsDB:
 
         # first create a list of payloads
         from conditions_db.testing_payloads import parse_testing_payloads_file
+        B2INFO(f"Reading payload list from {filename}")
         entries = parse_testing_payloads_file(filename)
         if entries is None:
             B2ERROR(f"Problems with testing payload storage file {filename}, exiting")
@@ -573,6 +614,8 @@ class ConditionsDB:
         if not entries:
             B2INFO(f"No payloads found in {filename}, exiting")
             return True
+
+        B2INFO(f"Found {len(entries)} iovs to upload")
 
         # time to get the id for the globaltag
         tagId = self.get_globalTagInfo(global_tag)
@@ -610,7 +653,7 @@ class ConditionsDB:
                 if payload_id is None:
                     return False
 
-                B2INFO(f"Created new payload {entry.payload} for {entry.module} (md5:{entry.checksum})")
+                B2INFO(f"Created new payload {payload_id} for {entry.module} (md5:{entry.checksum})")
 
             for entry in entries:
                 entry.payload = payload_id
@@ -641,12 +684,30 @@ class ConditionsDB:
             # the full payload list. And write a message as each completes
             if not ignore_existing:
                 B2INFO("Downloading information about existing payloads and iovs...")
-                payloads_future = pool.submit(self.check_payloads, payloads.keys())
-                payloads_future.add_done_callback(lambda x: B2INFO("got info on existing payloads"))
-                iovs_future = pool.submit(self.get_iovs, global_tag)
-                iovs_future.add_done_callback(lambda x: B2INFO("got info on existing iovs"))
-                existing_payloads = payloads_future.result()
-                existing_iovs = iovs_future.result()
+                futures = []
+                existing_iovs = {}
+                existing_payloads = {}
+
+                def create_future(iter, func, callback=None):
+                    fn = pool.submit(iter, func)
+                    if callback is not None:
+                        fn.add_done_callback(callback)
+                    futures.append(fn)
+
+                def update_iovs(iovs):
+                    existing_iovs.update(iovs.result())
+                    B2INFO(f"Found {len(existing_iovs)} existing iovs in {global_tag}")
+
+                def update_payloads(payloads):
+                    existing_payloads.update(payloads.result())
+                    B2INFO(f"Found {len(existing_payloads)} existing payloads")
+
+                create_future(self.get_iovs, global_tag, update_iovs)
+                # checking existing payloads should not be done with too many at once
+                for chunk in chunks(payloads.keys(), 1000):
+                    create_future(self.check_payloads, chunk, update_payloads)
+
+                futures_wait(futures)
 
             # upload payloads
             failed_payloads = sum(0 if result else 1 for result in pool.map(upload_payload, payloads.items()))
@@ -664,11 +725,11 @@ class ConditionsDB:
             if failed_iovs > 0:
                 B2ERROR(f"{failed_iovs} IoVs could not be created")
 
-            # update revision numbers
-            if uploaded_entries is not None:
-                self.get_revisions(uploaded_entries)
+        # update revision numbers
+        if uploaded_entries is not None:
+            self.get_revisions(uploaded_entries)
 
-            return failed_payloads + failed_iovs == 0
+        return failed_payloads + failed_iovs == 0
 
     def staging_request(self, filename, normalize, data, password):
         """
@@ -676,27 +737,32 @@ class ConditionsDB:
 
         Parameters:
           filename (str): filename of the testing payload storage file that should be uploaded
-          normalize (bool/str): if True the payload root files will be normalized to have the same checksum for the same content,
-                                if normalize is a string in addition the file name in the root file metadata will be set to it
+          normalize (bool/str): if True the payload root files will be
+            normalized to have the same checksum for the same content, if
+            normalize is a string in addition the file name in the root file
+            metadata will be set to it
           data (dict): a dictionary with the information provided by the user:
-            task: category of globaltag, either master, online, prompt, data, mc, or analysis
-            tag: the globaltage name
-            request: type of request, either Update, New, or Modification. The latter two imply task == master because
+
+            * task: category of globaltag, either master, online, prompt, data, mc, or analysis
+            * tag: the globaltage name
+            * request: type of request, either Update, New, or Modification. The latter two imply task == master because
               if new payload classes are introduced or payload classes are modified then they will first be included in
               the master globaltag. Here a synchronization of code and payload changes has to be managed.
               If new or modified payload classes should be included in other globaltags they must already be in a release.
-            pull-request: number of the pull request containing new or modified payload classes, only for request == New or Modified
-            backward-compatibility: description of what happens if the old payload is encountered by the updated code,
+            * pull-request: number of the pull request containing new or modified payload classes,
+              only for request == New or Modified
+            * backward-compatibility: description of what happens if the old payload is encountered by the updated code,
               only for request == Modified
-            forward-compatibility: description of what happens if a new payload is encountered by the existing code,
+            * forward-compatibility: description of what happens if a new payload is encountered by the existing code,
               only for request == Modified
-            release: the required release version
-            reason: the reason for the request
-            description: a detailed description for the globaltag manager
-            issue: identifier of an existing jira issue (optional)
-            user: name of the user
-            time: time stamp of the request
-          password (str): the password for access to jira
+            * release: the required release version
+            * reason: the reason for the request
+            * description: a detailed description for the globaltag manager
+            * issue: identifier of an existing jira issue (optional)
+            * user: name of the user
+            * time: time stamp of the request
+
+          password: the password for access to jira or the access token and secret for oauth access
 
         Returns:
           True if the upload and jira issue creation/upload was successful
@@ -738,11 +804,11 @@ class ConditionsDB:
 |*Type of request*       | {data['request']} |
 """
             if 'pull-request' in data.keys():
-                description += f"|*Pull request* | \#{data['pull-request']} |\n"
+                description += f"|*Pull request* | \\#{data['pull-request']} |\n"
             if 'backward-compatibility' in data.keys():
-                description += f"|*Backward compatibility* | \#{data['backward-compatibility']} |\”"
+                description += f"|*Backward compatibility* | \\#{data['backward-compatibility']} |\n"
             if 'forward-compatibility' in data.keys():
-                description += f"|*Forward compatibility* | \#{data['forward-compatibility']} |\”"
+                description += f"|*Forward compatibility* | \\#{data['forward-compatibility']} |\n"
             description += '|*Details* |' + ''.join(data['details']) + ' |\n'
 
         # add information about uploaded payloads/IoVs
@@ -763,8 +829,17 @@ class ConditionsDB:
                 issue["issuetype"] = {"name": "Task"}
 
             B2INFO(f"Creating jira issue for {data['task']} globaltag request")
-            response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password),
-                                     json={'fields': issue})
+            if isinstance(password, str):
+                response = requests.post('https://agira.desy.de/rest/api/latest/issue', auth=(data['user'], password),
+                                         json={'fields': issue})
+            else:
+                fields = {'issue': json.dumps(issue)}
+                if 'user' in data.keys():
+                    fields['user'] = data['user']
+                if password:
+                    fields['token'] = password[0]
+                    fields['secret'] = password[1]
+                response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)
             if response.status_code in range(200, 210):
                 B2INFO(f"Issue successfully created: https://agira.desy.de/browse/{response.json()['key']}")
             else:
@@ -773,14 +848,36 @@ class ConditionsDB:
 
         # comment on an existing issue
         else:
+            # Let's make sure all assignees of new issues are added as watchers
+            # in that case, otherwise they might never find out
+            new_issue_config = jira_global_tag_v2(data['task'])
+            if isinstance(new_issue_config, dict) and "assignee" in new_issue_config:
+                user = new_issue_config['assignee'].get('name', None)
+                if user is not None and isinstance(password, str):
+                    response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/watchers',
+                                             auth=(data['user'], password), json=user)
+                    if response.status_code in range(200, 210):
+                        B2INFO(f"Added {user} as watcher to {issue}")
+                    else:
+                        B2WARNING(f"Could not add {user} as watcher to {issue}: {response.status_code}")
+
             B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
-            response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
-                                     auth=(data['user'], password), json={'body': description})
+            if isinstance(password, str):
+                response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
+                                         auth=(data['user'], password), json={'body': description})
+            else:
+                fields = {'id': issue, 'user': user, 'comment': description}
+                if password:
+                    fields['token'] = password[0]
+                    fields['secret'] = password[1]
+                response = requests.post('https://b2-master.belle2.org/cgi-bin/jira_issue.py', data=fields)
             if response.status_code in range(200, 210):
                 B2INFO(f"Issue successfully updated: https://agira.desy.de/browse/{issue}")
             else:
                 B2ERROR('The commenting of the issue failed: ' + requests.status_codes._codes[response.status_code][0])
                 return False
+
+        return True
 
 
 def require_database_for_test(timeout=60, base_url=None):

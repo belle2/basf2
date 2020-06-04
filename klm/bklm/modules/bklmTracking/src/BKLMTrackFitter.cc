@@ -8,12 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cfloat>
+/* Own header. */
+#include <klm/bklm/modules/bklmTracking/BKLMTrackFitter.h>
 
-#include "klm/bklm/modules/bklmTracking/BKLMTrackFitter.h"
+/* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
+
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Matrix/DiagMatrix.h>
+#include <CLHEP/Matrix/Matrix.h>
+
+/* C++ headers. */
+#include <cfloat>
 
 using namespace std;
 using namespace CLHEP;
@@ -36,14 +46,12 @@ BKLMTrackFitter::BKLMTrackFitter():
   m_Chi2(0.0),
   m_NumHit(0),
   m_globalFit(false),
+  m_SectorPar(4, 0),
+  m_SectorErr(4, 0),
+  m_GlobalPar(4, 0),
+  m_GlobalErr(4, 0),
   m_GeoPar(nullptr)
 {
-  HepVector     iniPar(4, 0);
-  HepSymMatrix  iniErr(4, 0);
-  m_GlobalPar = iniPar;
-  m_SectorPar = iniPar;
-  m_GlobalErr = iniErr;
-  m_SectorErr = iniErr;
 }
 
 //! Destructor

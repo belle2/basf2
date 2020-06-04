@@ -1,11 +1,11 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
-from stdCharged import *
-from stdPhotons import *
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
+from skim.taupair import TauThrust
 
 """
 <header>
@@ -15,28 +15,27 @@ from stdPhotons import *
 </header>
 """
 
-tauthrustskim = Path()
+tauthrustskim = b2.Path()
 
-inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
+ma.inputMdst('default', '../TauThrust.udst.root', path=tauthrustskim)
 
 stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
 
 # set variables
-from skim.taupair import *
-SetTauThrustSkimVariables(path=tauthrustskim)
+TauThrust().additional_setup(path=tauthrustskim)
 
 # the variables that are printed out are:
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauThrust_Validation.root',
     decayString='',
-    variables=[('nGoodTracks', 7, 1, 8),
-               ('visibleEnergyOfEventCMS', 60, 0, 12),
+    variables=[('nGoodTracksThrust', 7, 1, 8),
+               ('visibleEnergyOfEventCMS', 40, 0, 12),
                ('thrust', 50, 0.75, 1)],
     path=tauthrustskim
 )
-process(tauthrustskim)
-print(statistics)
+b2.process(tauthrustskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"
@@ -45,7 +44,7 @@ import ROOT
 
 f = ROOT.TFile.Open('TauThrust_Validation.root', 'update')
 
-f.Get('nGoodTracks').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
+f.Get('nGoodTracksThrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
 f.Get('visibleEnergyOfEventCMS').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
 f.Get('thrust').GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
 

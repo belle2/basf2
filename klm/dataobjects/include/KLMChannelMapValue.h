@@ -10,16 +10,18 @@
 
 #pragma once
 
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TNamed.h>
+
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-/* External headers. */
-#include <TNamed.h>
-
-/* Belle2 headers. */
-#include <framework/logging/Logger.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
 
 namespace Belle2 {
 

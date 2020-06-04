@@ -10,7 +10,6 @@
 #include <framework/pcore/EvtMessage.h>
 
 #include <new>
-#include <cstdlib>
 #include <cstring>
 
 #include <sys/time.h>

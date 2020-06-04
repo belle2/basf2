@@ -8,28 +8,19 @@
  *   This file tests the variables used for flavor tagging.     *
  ****************************************************************/
 
-#include <analysis/variables/FlavorTaggingVariables.h>
-
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/MCMatching.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Gearbox.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -38,9 +29,7 @@
 #include <gtest/gtest.h>
 
 #include <TMatrixFSym.h>
-#include <TRandom3.h>
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -373,8 +362,10 @@ namespace {
     ASSERT_EQ(output1, 1.0);
 
     /** We consider also as correctly matched those particles with the mc error flags
-    * MissFSR, MissingResonance and MissPHOTOS. 1 + 2 + 1024 = 1027. */
+    * MissFSR, MissingResonance and MissPHOTOS. 1 + 2 + 1024 = 1027,
+    * if c_isIgnoreRadiatedPhotons and c_isIgnoreIntermediate are set to the properties, 2 + 4 = 6  */
     savedB0->setExtraInfo(MCMatching::c_extraInfoMCErrors, 1027);
+    savedB0->setProperty(6);
     double output2 = var -> function(savedB0);
     ASSERT_EQ(output2, 1.0);
 

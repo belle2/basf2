@@ -10,22 +10,12 @@
 
 #include <analysis/modules/RestOfEventUpdater/RestOfEventUpdaterModule.h>
 
-
-#include <analysis/variables/Variables.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h> //
-#include <framework/dataobjects/EventMetaData.h> //
 
 #include <framework/logging/Logger.h>
 
 #include <iostream>
-#include <utility>
 
 using namespace std;
 
@@ -49,15 +39,12 @@ namespace Belle2 {
     // Add parameters
     std::vector<std::string> emptyMaskVector;
     std::string emptyCutString;
-    std::vector<double> defaultFractionsVector = {0, 0, 1, 0, 0, 0};
 
     addParam("particleList", m_inputListName, "Name of the ParticleList which contains information that will be used for updating");
     addParam("updateMasks", m_maskNamesForUpdating, "List of all mask names which will be updated", emptyMaskVector);
     addParam("cutString", m_selection, "Cut string which will be used for updating masks", emptyCutString);
     addParam("discard", m_discard,
              "Update the ROE mask by passing or discarding particles in the provided particle list, default is to pass", false);
-    addParam("fractions", m_fractions, "A-priori fractions used to update (default: pion always, empty vector: no change)",
-             defaultFractionsVector);
   }
 
   void RestOfEventUpdaterModule::initialize()
@@ -81,24 +68,44 @@ namespace Belle2 {
       B2WARNING("ROE list is not valid somehow, ROE masks are not updated!");
       return;
     }
-    Particle::EParticleType listType = getListType();
-
-    // Apply cuts on input list
-    std::vector<const Particle*> particlesToUpdate;
+    std::set<Particle::EParticleSourceObject> encounteredSources;
+    // Particle lists can contain Particles from different mdst sources
+    // Thus, we split them based on their mdst source
+    // Only particles surviving the provided cut are considered
+    std::vector<const Particle*> particlesFromTracksToUpdate;
+    std::vector<const Particle*> particlesFromECLClustersToUpdate;
+    std::vector<const Particle*> particlesFromKLMClustersToUpdate;
+    std::vector<const Particle*> compositeParticlesToUpdate;
     for (unsigned j = 0; j < m_inputList->getListSize(); j++) {
       const Particle* partWithInfo = m_inputList->getParticle(j);
+      Particle::EParticleSourceObject mdstSource = partWithInfo->getParticleSource();
+      encounteredSources.insert(mdstSource);
       if (m_cut->check(partWithInfo)) {
-        particlesToUpdate.push_back(partWithInfo);
+        if (mdstSource == Particle::EParticleSourceObject::c_Track) {
+          particlesFromTracksToUpdate.push_back(partWithInfo);
+        } else if (mdstSource == Particle::EParticleSourceObject::c_ECLCluster) {
+          particlesFromECLClustersToUpdate.push_back(partWithInfo);
+        } else if (mdstSource == Particle::EParticleSourceObject::c_KLMCluster) {
+          particlesFromKLMClustersToUpdate.push_back(partWithInfo);
+        } else if (mdstSource == Particle::EParticleSourceObject::c_Composite or
+                   mdstSource == Particle::EParticleSourceObject::c_V0) {
+          compositeParticlesToUpdate.push_back(partWithInfo);
+        }
       }
     }
-    if (listType != Particle::EParticleType::c_Composite) {
-      updateMasksWithParticles(roe, particlesToUpdate, listType);
-    }
-
-    if (listType == Particle::EParticleType::c_Composite) {
-      updateMasksWithV0(roe, particlesToUpdate);
+    if (encounteredSources.count(Particle::EParticleSourceObject::c_Track) > 0) {
+      updateMasksWithParticles(roe, particlesFromTracksToUpdate, Particle::EParticleSourceObject::c_Track);
+    } else { // If we have a track-based particle in the particle list there can not be any other mdst source
+      if (encounteredSources.count(Particle::EParticleSourceObject::c_ECLCluster) > 0) {
+        updateMasksWithParticles(roe, particlesFromECLClustersToUpdate, Particle::EParticleSourceObject::c_ECLCluster);
+      }
+      if (encounteredSources.count(Particle::EParticleSourceObject::c_KLMCluster) > 0) {
+        updateMasksWithParticles(roe, particlesFromKLMClustersToUpdate, Particle::EParticleSourceObject::c_KLMCluster);
+      }
+      updateMasksWithV0(roe, compositeParticlesToUpdate); // in updateMasksWithV0 it is checked whether the vector is empty
     }
   }
+
   void RestOfEventUpdaterModule::updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe,
                                                    std::vector<const Particle*>& particlesToUpdate)
   {
@@ -117,10 +124,10 @@ namespace Belle2 {
         roe->updateMaskWithV0(maskToUpdate, particleV0);
       }
     }
-
   }
+
   void RestOfEventUpdaterModule::updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe,
-                                                          std::vector<const Particle*>& particlesToUpdate, Particle::EParticleType listType)
+                                                          std::vector<const Particle*>& particlesToUpdate, Particle::EParticleSourceObject listType)
   {
     for (auto& maskToUpdate : m_maskNamesForUpdating) {
       if (maskToUpdate == "") {
@@ -134,28 +141,4 @@ namespace Belle2 {
 
     }
   }
-
-  Particle::EParticleType RestOfEventUpdaterModule::getListType()
-  {
-    int pdgCode = m_inputList->getPDGCode();
-    if (pdgCode == Const::pion.getPDGCode()) {
-      return Particle::EParticleType::c_Track;
-    }
-    if (pdgCode == Const::photon.getPDGCode()) {
-      return Particle::EParticleType::c_ECLCluster;
-    }
-    if (pdgCode == Const::Klong.getPDGCode()) {
-      return Particle::EParticleType::c_KLMCluster;
-    }
-    //add converted photon support
-    if (pdgCode == Const::Kshort.getPDGCode() or pdgCode == Const::Lambda.getPDGCode()) {
-      return Particle::EParticleType::c_Composite;
-    }
-    B2WARNING("Unknown PDG code of particle list!");
-    return Particle::EParticleType::c_Undefined;
-  }
-
-
 }
-
-

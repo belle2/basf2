@@ -275,7 +275,7 @@ void PXDDigitizerModule::event()
       }
     } else {
       // Don't warn if this is a background SimHit
-      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+      if (m_currentHit->getBackgroundTag() == BackgroundMetaData::bg_none)
         B2WARNING(
           "Could not find MCParticle which produced PXDSimhit " << i);
       m_currentParticle = -1;
@@ -564,7 +564,7 @@ void PXDDigitizerModule::saveDigits()
       charge = charge - round(pedestal);
 
       // Zero Suppression in DHP
-      if (charge < m_chargeThreshold)
+      if (charge <= m_chargeThreshold)
         continue;
 
       // Check if the readout digits is coming from a gated row

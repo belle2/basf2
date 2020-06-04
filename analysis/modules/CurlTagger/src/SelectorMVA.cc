@@ -10,13 +10,11 @@
 
 #include <analysis/modules/CurlTagger/SelectorMVA.h>
 
-#include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/TrackVariables.h>
 #include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/Variables.h>
 
 //Root includes
-#include "TLorentzVector.h"
 #include "TVector3.h"
 
 using namespace Belle2;

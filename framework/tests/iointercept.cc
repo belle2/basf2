@@ -78,7 +78,7 @@ namespace {
   };
 
   /** instantiate tests for all the parameters */
-  INSTANTIATE_TEST_CASE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
+  INSTANTIATE_TEST_SUITE_P(Params, IOInterceptParamTest, ::testing::ValuesIn(logconvert_params));
 
   /** test that capturing works if finish is not called */
   TEST_F(IOInterceptTest, LogMessagesNoFinish)
@@ -106,6 +106,7 @@ namespace {
     }
     std::cout << "this will not be captured" << std::endl;
     {
+      // cppcheck-suppress unreadVariable ; cppcheck doesn't realize this has side effects.
       auto guard = IOIntercept::start_intercept(logmessages);
       std::cerr << "this is my error";
     }

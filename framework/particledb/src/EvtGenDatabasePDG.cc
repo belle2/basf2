@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <cstring>

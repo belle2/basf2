@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/ckf/pxd/filters/states/BasePXDStateFilter.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <tracking/ckf/pxd/utilities/PXDKalmanStepper.h>
 
 namespace Belle2 {

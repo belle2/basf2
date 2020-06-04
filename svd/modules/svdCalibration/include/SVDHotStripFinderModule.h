@@ -69,6 +69,7 @@ namespace Belle2 {
     /** Clean up anything you created in initialize(). */
     virtual void terminate() override;
 
+  private:
 
     /* user-defined parameters */
     StoreArray<SVDShaperDigit> m_storeDigits; /**< shaper digits store array*/
@@ -83,7 +84,7 @@ namespace Belle2 {
     bool m_verbose; /**< False by default, it allows to switch on the printing of all found HS.*/
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
     //dbobject related parameters
     float m_zs; /**< zero suppression cut for the input shaper digits */
@@ -92,22 +93,13 @@ namespace Belle2 {
     int m_lastExp; /**< last valid experiment */
     int m_lastRun; /**<last valid run */
 
-  private:
-    //define your own data members here
-
-
 
     static const int m_nLayers = 4;// to avoid empty layers we start from 0
     static const int m_nLadders = 16;
     static const int m_nSensors = 5;
     static const int m_nSides = 2;
 
-    const int nBins = 1500;
-
-    unsigned int sensorsOnLayer[4];
-
-
-    TList* m_histoList_occu;/**< occupancy for low charge clusters */
+    TList* m_histoList_occu = nullptr;/**< occupancy for low charge clusters */
 
     SVDHistograms<TH1F>* hm_occupancy = nullptr; /**< strip occupancy per sensor*/
     SVDHistograms<TH1F>* hm_hot_strips = nullptr; /**< hot strips per sensor*/
@@ -122,12 +114,12 @@ namespace Belle2 {
 
     SVDSummaryPlots* m_hHotStripsSummary = nullptr; /**< hot strip summary  histo */
 
-    TH1F*  h_tot_dqm;   /* number of hot strips per sensor */
-    TH1F*  h_tot_dqm1;  /* number of hot strips per sensor  for layer 3*/
-    TH1F*  h_tot_dist;  /* relative occupancy histogram */
-    TH1F*  h_tot_dist1; /* absolute occupany histogram */
-    TH2F*  h_tot_dist12; /* 2d distributiuons of occupancies */
-    TH1F*  h_nevents;  /* number of events counting */
+    TH1F*  h_tot_dqm = nullptr;   /**< number of hot strips per sensor */
+    TH1F*  h_tot_dqm1 = nullptr;  /**< number of hot strips per sensor  for layer 3*/
+    TH1F*  h_tot_dist = nullptr;  /**< relative occupancy histogram */
+    TH1F*  h_tot_dist1 = nullptr; /**< absolute occupany histogram */
+    TH2F*  h_tot_dist12 = nullptr; /**< 2d distributiuons of occupancies */
+    TH1F*  h_nevents = nullptr;  /**< number of events counting */
 
 
     //list of functions to create histograms:

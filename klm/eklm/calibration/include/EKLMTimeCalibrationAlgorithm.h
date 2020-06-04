@@ -10,7 +10,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Belle 2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -49,7 +49,10 @@ namespace Belle2 {
     /**
      * Turn on debug mode (prints histograms).
      */
-    void setDebug();
+    void setDebug()
+    {
+      m_Debug = true;
+    }
 
   private:
 

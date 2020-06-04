@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
-#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

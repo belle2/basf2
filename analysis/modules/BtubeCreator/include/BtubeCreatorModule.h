@@ -55,6 +55,7 @@ namespace Belle2 {
 
     std::string m_listName;  /**< name of particle list */
     std::string m_decayString;          /**< specifies which daughter particles will be used as reference to create Btube*/
+    bool m_associateBtubeToBselected; /**< whether to associate the Btube with the selected B*/
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
@@ -69,6 +70,7 @@ namespace Belle2 {
      * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);  /**< does the vertex fit with RAVE :  adaptive vertex fitter mode */
+    void addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, TLorentzVector TLV); /**< fills extrainfos to the particle */
     bool m_verbose;  /**< run fit with a lot of B2INFOs for debugging */
   };
 }

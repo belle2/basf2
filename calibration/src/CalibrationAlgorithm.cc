@@ -487,3 +487,66 @@ namespace Belle2 {
     return objOutputPtr;
   }
 }
+
+bool CalibrationAlgorithm::loadInputJson(const std::string& jsonString)
+{
+  try {
+    auto jsonInput = nlohmann::json::parse(jsonString);
+    // Input string has an object (dict) as the top level object?
+    if (jsonInput.is_object()) {
+      m_jsonExecutionInput = jsonInput;
+      return true;
+    } else {
+      B2ERROR("JSON input string isn't an object type i.e. not a '{}' at the top level.");
+      return false;
+    }
+  } catch (nlohmann::json::parse_error&) {
+    B2ERROR("Parsing of JSON input string failed");
+    return false;
+  }
+}
+
+const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vector<ExpRun> runs, int iteration)
+{
+  m_boundaries.clear();
+  if (m_inputFileNames.empty()) {
+    B2ERROR("There aren't any input files set. Please use CalibrationAlgorithm::setInputFiles()");
+    return m_boundaries;
+  }
+  // Reset the internal execution data just in case something is hanging around
+  m_data.reset();
+  if (runs.empty()) {
+    // Want to loop over all runs we could possibly know about
+    runs = getRunListFromAllData();
+  }
+  // Let's check that we have some now
+  if (runs.empty()) {
+    B2ERROR("No collected data in input files.");
+    return m_boundaries;
+  }
+  // In order to find run boundaries we must have collected with data granularity == 'run'
+  if (strcmp(getGranularity().c_str(), "all") == 0) {
+    B2ERROR("The data is collected with granularity='all' (exp=-1,run=-1), and we can't use that to find run boundaries.");
+    return m_boundaries;
+  }
+  m_data.setIteration(iteration);
+  // User defined setup function
+  boundaryFindingSetup(runs, iteration);
+  std::vector<ExpRun> runList;
+  // Loop over run list and call derived class "isBoundaryRequired" member function
+  for (auto currentRun : runs) {
+    runList.push_back(currentRun);
+    m_data.setRequestedRuns(runList);
+    // After here, the getObject<...>(...) helpers start to work
+    if (isBoundaryRequired(currentRun)) {
+      m_boundaries.push_back(currentRun);
+    }
+    // Only want run-by-run
+    runList.clear();
+    // Don't want memory hanging around
+    m_data.clearCalibrationData();
+  }
+  m_data.reset();
+  boundaryFindingTearDown();
+  return m_boundaries;
+}

@@ -159,10 +159,10 @@ namespace Belle2 {
 
     /** user supplied point we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_point;
-    // @{
-    /** user supplied line we're trying to find the nearest helix point to */
-    static TVector3 minimize_distance_to_line_a, minimize_distance_to_line_b;
-    //@}
+    /** first user supplied line we're trying to find the nearest helix point to */
+    static TVector3 minimize_distance_to_line_a;
+    /** second user supplied line we're trying to find the nearest helix point to */
+    static TVector3 minimize_distance_to_line_b;
     /** keep a 'this' pointer around for minimization */
     static HelixHelper const* helix_object;
   };

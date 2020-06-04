@@ -3,18 +3,15 @@
  * right(C) 2018 - Belle II Collaboration                                 *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-
 #include <analysis/dataobjects/Particle.h>
-#include <vector>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 #include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
-#include <Eigen/Core>
 
 namespace TreeFitter {
   class DecayChain;

@@ -35,7 +35,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   //Parameter definition for SVDModeByte, TriggerType and cross-talk
-  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string(""));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string("SVDEventInfoSim"));
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
   addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples", int(2));

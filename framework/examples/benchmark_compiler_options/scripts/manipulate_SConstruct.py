@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from basf2 import *
-from ROOT import Belle2
-sconstruct_path = Belle2.FileSystem.findFile('site_scons/SConstruct')
+from basf2 import find_file
+sconstruct_path = find_file('site_scons/SConstruct')
 # sconstruct_path = '../site_scons/SConstruct'
 
 fobj = open(sconstruct_path, 'r')

@@ -8,15 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
+/* Own header. */
+#include <klm/modules/KLMChannelStatusCalibration/KLMChannelStatusCalibrationCollectorModule.h>
+
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
+#include <klm/dataobjects/KLMChannelMapValue.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TH1.h>
 #include <TTree.h>
-
-/* Belle2 headers. */
-#include <klm/dataobjects/KLMChannelIndex.h>
-#include <klm/dataobjects/KLMChannelMapValue.h>
-#include <klm/modules/KLMChannelStatusCalibration/KLMChannelStatusCalibrationCollectorModule.h>
 
 using namespace Belle2;
 
@@ -24,12 +26,12 @@ REG_MODULE(KLMChannelStatusCalibrationCollector)
 
 KLMChannelStatusCalibrationCollectorModule::KLMChannelStatusCalibrationCollectorModule() :
   CalibrationCollectorModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
   m_HitMap("KLMChannelMapHits", DataStore::c_Persistent)
 {
   setDescription("Module for KLM channel status calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
 }
 
 KLMChannelStatusCalibrationCollectorModule::~KLMChannelStatusCalibrationCollectorModule()
@@ -38,8 +40,7 @@ KLMChannelStatusCalibrationCollectorModule::~KLMChannelStatusCalibrationCollecto
 
 void KLMChannelStatusCalibrationCollectorModule::prepare()
 {
-  m_BKLMDigits.isRequired();
-  m_EKLMDigits.isRequired();
+  m_KLMDigits.isRequired();
   m_HitMap.registerInDataStore();
   m_HitMap.create();
   m_HitMap->setDataAllChannels(0);
@@ -49,16 +50,11 @@ void KLMChannelStatusCalibrationCollectorModule::prepare()
 
 void KLMChannelStatusCalibrationCollectorModule::collect()
 {
-  for (BKLMDigit& digit : m_BKLMDigits) {
-    uint16_t channel = m_ElementNumbers->channelNumberBKLM(
-                         digit.getSection(), digit.getSector(), digit.getLayer(),
-                         digit.isPhiReadout(), digit.getStrip());
-    m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
-  }
-  for (EKLMDigit& digit : m_EKLMDigits) {
-    uint16_t channel = m_ElementNumbers->channelNumberEKLM(
-                         digit.getSection(), digit.getSector(), digit.getLayer(),
-                         digit.getPlane(), digit.getStrip());
+  for (KLMDigit& digit : m_KLMDigits) {
+    uint16_t channel =
+      m_ElementNumbers->channelNumber(
+        digit.getSubdetector(), digit.getSection(), digit.getSector(),
+        digit.getLayer(), digit.getPlane(), digit.getStrip());
     m_HitMap->setChannelData(channel, m_HitMap->getChannelData(channel) + 1);
   }
 }

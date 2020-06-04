@@ -13,14 +13,10 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
-
-namespace genfit {
-  class TrackPoint;
-}
 
 namespace Belle2 {
   /**
@@ -81,13 +77,19 @@ namespace Belle2 {
       // of the TrackFinderMCRTruh
       c_MCTrackFinderAuxiliaryHit,
       c_invalidTrackFinder,
-      c_LegendreTrackFinder,
+      // non CKF-based track finders
+      c_CDCTrackFinder,
       c_LocalTrackFinder,
       c_SegmentTrackCombiner,
       c_VXDTrackFinder,
-      // CDC hit finders using a CKF (seeded from SVD or ECL)
+      // track finders based on CKF
       c_SVDtoCDCCKF,
       c_ECLtoCDCCKF,
+      c_CDCtoSVDCKF,
+      c_SVDtoPXDCKF,
+      // CDC hit finder implemented in the ReattachCDCWireHitsToRecoTracks module:
+      // looks for CDC hits that are close to RecTracks, but that were rejected by the ADC/TOT based filter.
+      c_ReattachCDCWireHitsToRecoTracks,
       // Belle I's track finder
       c_Trasan,
       c_other

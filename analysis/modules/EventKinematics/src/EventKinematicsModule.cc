@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/modules/EventKinematics/EventKinematicsModule.h>
 
@@ -17,7 +16,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
@@ -115,7 +113,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
-      if ((part->getParticleType() == Particle::EParticleType::c_ECLCluster)
+      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster)
           and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 

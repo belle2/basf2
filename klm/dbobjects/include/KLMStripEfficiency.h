@@ -10,15 +10,15 @@
 
 #pragma once
 
-// basf2 headers
+/* KLM headers. */
 #include <klm/dataobjects/KLMElementNumbers.h>
+
+/* ROOT headers. */
+#include <TObject.h>
 
 /* C++ headers. */
 #include <cstdint>
 #include <map>
-
-// ROOT headers
-#include <TObject.h>
 
 namespace Belle2 {
 
@@ -33,7 +33,15 @@ namespace Belle2 {
      * Default constructor
      */
     KLMStripEfficiency()
-    {}
+    {
+    }
+
+    /**
+     * Default destructor
+     */
+    ~KLMStripEfficiency()
+    {
+    }
 
     /**
      * Set efficiency and relative error for a single KLM strip using directly the stripId

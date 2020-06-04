@@ -50,12 +50,13 @@ BtubeCreatorModule::BtubeCreatorModule() : Module(),
 
   // Parameter definitions
   addParam("listName", m_listName, "name of mother particle list", string(""));
+  addParam("confidenceLevel", m_confidenceLevel, "Confidence level to accept the fit.", 0.001);
   addParam("decayString", m_decayString,
            "decay string of the mother particle, the selected daughter specifies which daughter will be used as reference to create Btube",
            string(""));
-  addParam("confidenceLevel", m_confidenceLevel,
-           "required confidence level of fit to keep particles in the list. Note that even with confidenceLevel == 0.0, errors during the fit might discard Particles in the list. confidenceLevel = -1 if an error occurs during the fit",
-           0.);
+  addParam("associateBtubeToBselected", m_associateBtubeToBselected,
+           "whether to associate the Btube with the selected B",
+           false);
   addParam("verbosity", m_verbose, "print statements", true);
 }
 
@@ -126,144 +127,140 @@ void BtubeCreatorModule::event()
     bool ok0 = doVertexFit(tubecreatorBCopy);
 
     if (ok0) {
-      particle->setVertex(tubecreatorBCopy->getVertex());
-      particle->setMomentumVertexErrorMatrix(tubecreatorBCopy->getMomentumVertexErrorMatrix());
+      if (tubecreatorBCopy->getPValue() < m_confidenceLevel) {
+        toRemove.push_back(particle->getArrayIndex());
+      } else {
+        particle->setVertex(tubecreatorBCopy->getVertex());
+        particle->setMomentumVertexErrorMatrix(tubecreatorBCopy->getMomentumVertexErrorMatrix());
 
-      tubecreatorB->writeExtraInfo("prod_vtx_x", tubecreatorBCopy->getVertex()[0]);
-      tubecreatorB->writeExtraInfo("prod_vtx_y", tubecreatorBCopy->getVertex()[1]);
-      tubecreatorB->writeExtraInfo("prod_vtx_z", tubecreatorBCopy->getVertex()[2]);
-      tubecreatorB->writeExtraInfo("prod_vtx_cov00", tubecreatorBCopy->getVertexErrorMatrix()(0, 0));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov01", tubecreatorBCopy->getVertexErrorMatrix()(0, 1));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov02", tubecreatorBCopy->getVertexErrorMatrix()(0, 2));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov10", tubecreatorBCopy->getVertexErrorMatrix()(1, 0));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov11", tubecreatorBCopy->getVertexErrorMatrix()(1, 1));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov12", tubecreatorBCopy->getVertexErrorMatrix()(1, 2));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov20", tubecreatorBCopy->getVertexErrorMatrix()(2, 0));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov21", tubecreatorBCopy->getVertexErrorMatrix()(2, 1));
-      tubecreatorB->writeExtraInfo("prod_vtx_cov22", tubecreatorBCopy->getVertexErrorMatrix()(2, 2));
+        tubecreatorB->writeExtraInfo("prod_vtx_x", tubecreatorBCopy->getVertex()[0]);
+        tubecreatorB->writeExtraInfo("prod_vtx_y", tubecreatorBCopy->getVertex()[1]);
+        tubecreatorB->writeExtraInfo("prod_vtx_z", tubecreatorBCopy->getVertex()[2]);
+        tubecreatorB->writeExtraInfo("prod_vtx_cov00", tubecreatorBCopy->getVertexErrorMatrix()(0, 0));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov01", tubecreatorBCopy->getVertexErrorMatrix()(0, 1));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov02", tubecreatorBCopy->getVertexErrorMatrix()(0, 2));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov10", tubecreatorBCopy->getVertexErrorMatrix()(1, 0));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov11", tubecreatorBCopy->getVertexErrorMatrix()(1, 1));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov12", tubecreatorBCopy->getVertexErrorMatrix()(1, 2));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov20", tubecreatorBCopy->getVertexErrorMatrix()(2, 0));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov21", tubecreatorBCopy->getVertexErrorMatrix()(2, 1));
+        tubecreatorB->writeExtraInfo("prod_vtx_cov22", tubecreatorBCopy->getVertexErrorMatrix()(2, 2));
 
-      tubecreatorB->writeExtraInfo("Px_after_avf", (tubecreatorBCopy->get4Vector()).Px());
-      tubecreatorB->writeExtraInfo("Py_after_avf", (tubecreatorBCopy->get4Vector()).Py());
-      tubecreatorB->writeExtraInfo("Pz_after_avf", (tubecreatorBCopy->get4Vector()).Pz());
-      tubecreatorB->writeExtraInfo("E_after_avf", (tubecreatorBCopy->get4Vector()).E());
+        tubecreatorB->writeExtraInfo("Px_after_avf", (tubecreatorBCopy->get4Vector()).Px());
+        tubecreatorB->writeExtraInfo("Py_after_avf", (tubecreatorBCopy->get4Vector()).Py());
+        tubecreatorB->writeExtraInfo("Pz_after_avf", (tubecreatorBCopy->get4Vector()).Pz());
+        tubecreatorB->writeExtraInfo("E_after_avf", (tubecreatorBCopy->get4Vector()).E());
 
-      Eigen::Matrix<double, 3, 1> tubecreatorBOriginpos(tubecreatorBCopy->getVertex()[0], tubecreatorBCopy->getVertex()[1],
-                                                        tubecreatorBCopy->getVertex()[2]);
-      TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
-      PCmsLabTransform T;
-      TLorentzVector vec = T.rotateLabToCms() * v4Final;
-      TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
-      TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
+        Eigen::Matrix<double, 3, 1> tubecreatorBOriginpos(tubecreatorBCopy->getVertex()[0], tubecreatorBCopy->getVertex()[1],
+                                                          tubecreatorBCopy->getVertex()[2]);
+        TLorentzVector v4Final = tubecreatorBCopy->get4Vector();
+        PCmsLabTransform T;
+        TLorentzVector vec = T.rotateLabToCms() * v4Final;
+        TLorentzVector vecNew(-1 * vec.Px(), -1 * vec.Py(), -1 * vec.Pz(), vec.E());
+        TLorentzVector v4FinalNew = T.rotateCmsToLab() * vecNew;
 
-      if (m_verbose) {
-        B2DEBUG(10, "beamspot center :");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
-                  20) << m_BeamSpotCenter.Y() << "," << std::fixed << std::setprecision(20) << m_BeamSpotCenter.Z() << "}");
-        B2DEBUG(10, "beamspot cov :");
+        if (m_verbose) {
+          B2DEBUG(10, "beamspot center :");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_BeamSpotCenter.X() << "," << std::fixed << std::setprecision(
+                    20) << m_BeamSpotCenter.Y() << "," << std::fixed << std::setprecision(20) << m_BeamSpotCenter.Z() << "}");
+          B2DEBUG(10, "beamspot cov :");
 
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(0,
-                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0,
-                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(1,
-                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1,
-                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
-                0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
-                    1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2, 2) << "}");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(0,
+                  0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0,
+                      1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(0, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  m_beamSpotCov(1,
+                  0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1,
+                      1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(1, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
+                  0) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2,
+                      1) << "," << std::fixed << std::setprecision(20) << m_beamSpotCov(2, 2) << "}");
+        }
+        TMatrixFSym pp = (tubecreatorBCopy->getMomentumErrorMatrix()).GetSub(0, 2, 0, 2, "S");
+        double pe = tubecreatorBCopy->getMomentumErrorMatrix()(2, 2);
+        TMatrixFSym pv = tubecreatorBCopy->getVertexErrorMatrix();
+
+        // start rotation
+
+        double theta = v4FinalNew.Theta();
+        double phi = v4FinalNew.Phi();
+
+        double st = TMath::Sin(theta);
+        double ct = TMath::Cos(theta);
+        double sp = TMath::Sin(phi);
+        double cp = TMath::Cos(phi);
+
+        TMatrix r2z(3, 3);  r2z(2, 2) = 1;
+        r2z(0, 0) = cp; r2z(0, 1) = -1 * sp;
+        r2z(1, 0) = sp; r2z(1, 1) = cp;
+
+        TMatrix r2y(3, 3);  r2y(1, 1) = 1;
+        r2y(0, 0) = ct; r2y(0, 2) = st;
+        r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
+
+        TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
+        TMatrix r2t(3, 3); r2t.Transpose(r2);
+
+        TMatrix longerror(3, 3); longerror(2, 2) = 1000;
+        TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
+        TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
+
+        TMatrix pvNew(3, 3);
+        pvNew += pv;
+        pvNew += longerrorRotated;
+
+        TMatrixFSym errNew(7);
+        errNew.SetSub(0, 0, pp);
+        errNew.SetSub(4, 4, pvNew);
+        errNew(3, 3) = pe;
+
+        TMatrixFSym tubeMat(3);
+        tubeMat.SetSub(0, 0, pvNew);
+
+        TMatrixFSym tubeMatCenterError(3);
+        tubeMatCenterError.SetSub(0, 0, pv);
+
+        if (m_verbose) {
+          B2DEBUG(10, "B origin error matrix  :  ");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
+                  1) << "," << std::fixed << std::setprecision(20) << pv(0, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(1, 0) << "," << std::fixed << std::setprecision(20) << pv(1,
+                  1) << "," << std::fixed << std::setprecision(20) << pv(1, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(2, 0) << "," << std::fixed << std::setprecision(20) << pv(2,
+                  1) << "," << std::fixed << std::setprecision(20) << pv(2, 2) << "}");
+
+          B2DEBUG(10, "B tube error matrix  :  ");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
+                  1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
+                  1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "},");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
+                  1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}");
+
+          B2DEBUG(10, "B origin  ");
+          B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[0] << "," << std::fixed <<
+                  std::setprecision(
+                    20) << tubecreatorBCopy->getVertex()[1] << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[2] << "}");
+        }
+
+        tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
+
+        Btube* tubeconstraint = tubeArray.appendNew(Btube());
+        if (m_associateBtubeToBselected) {
+          tubecreatorB->addRelationTo(tubeconstraint);
+        } else {
+          otherB->addRelationTo(tubeconstraint);
+        }
+
+        tubeconstraint->setTubeCenter(tubecreatorBOriginpos);
+        tubeconstraint->setTubeMatrix(tubeMat);
+        tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
+
+        if (m_associateBtubeToBselected) {
+          addextrainfos(tubecreatorB, tubecreatorBCopy, pvNew, v4FinalNew);
+        } else {
+          addextrainfos(otherB, tubecreatorBCopy, pvNew, v4FinalNew);
+        }
       }
-      TMatrixFSym pp = (tubecreatorBCopy->getMomentumErrorMatrix()).GetSub(0, 2, 0, 2, "S");
-      double pe = tubecreatorBCopy->getMomentumErrorMatrix()(2, 2);
-      TMatrixFSym pv = tubecreatorBCopy->getVertexErrorMatrix();
-
-      // start rotation
-
-      double theta = v4FinalNew.Theta();
-      double phi = v4FinalNew.Phi();
-
-      double st = TMath::Sin(theta);
-      double ct = TMath::Cos(theta);
-      double sp = TMath::Sin(phi);
-      double cp = TMath::Cos(phi);
-
-      TMatrix r2z(3, 3);  r2z(2, 2) = 1;
-      r2z(0, 0) = cp; r2z(0, 1) = -1 * sp;
-      r2z(1, 0) = sp; r2z(1, 1) = cp;
-
-      TMatrix r2y(3, 3);  r2y(1, 1) = 1;
-      r2y(0, 0) = ct; r2y(0, 2) = st;
-      r2y(2, 0) = -1 * st; r2y(2, 2) = ct;
-
-      TMatrix r2(3, 3);  r2.Mult(r2z, r2y);
-      TMatrix r2t(3, 3); r2t.Transpose(r2);
-
-      TMatrix longerror(3, 3); longerror(2, 2) = 1000;
-      TMatrix longerror_temp(3, 3); longerror_temp.Mult(r2, longerror);
-      TMatrix longerrorRotated(3, 3); longerrorRotated.Mult(longerror_temp, r2t);
-
-      TMatrix pvNew(3, 3);
-      pvNew += pv;
-      pvNew += longerrorRotated;
-
-      TMatrixFSym errNew(7);
-      errNew.SetSub(0, 0, pp);
-      errNew.SetSub(4, 4, pvNew);
-      errNew(3, 3) = pe;
-
-      TMatrixFSym tubeMat(3);
-      tubeMat.SetSub(0, 0, pvNew);
-
-      TMatrixFSym tubeMatCenterError(3);
-      tubeMatCenterError.SetSub(0, 0, pv);
-
-      if (m_verbose) {
-        B2DEBUG(10, "B origin error matrix  :  ");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(0, 0) << "," << std::fixed << std::setprecision(20) << pv(0,
-                1) << "," << std::fixed << std::setprecision(20) << pv(0, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(1, 0) << "," << std::fixed << std::setprecision(20) << pv(1,
-                1) << "," << std::fixed << std::setprecision(20) << pv(1, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pv(2, 0) << "," << std::fixed << std::setprecision(20) << pv(2,
-                1) << "," << std::fixed << std::setprecision(20) << pv(2, 2) << "}");
-
-        B2DEBUG(10, "B tube error matrix  :  ");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(0, 0) << "," << std::fixed << std::setprecision(20) << pvNew(0,
-                1) << "," << std::fixed << std::setprecision(20) << pvNew(0, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) <<  pvNew(1, 0) << "," << std::fixed << std::setprecision(20) << pvNew(1,
-                1) << "," << std::fixed << std::setprecision(20) << pvNew(1, 2) << "},");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << pvNew(2, 0) << "," << std::fixed << std::setprecision(20) << pvNew(2,
-                1) << "," << std::fixed << std::setprecision(20) << pvNew(2, 2) << "}");
-
-        B2DEBUG(10, "B origin  ");
-        B2DEBUG(10, "{" << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[0] << "," << std::fixed <<
-                std::setprecision(
-                  20) << tubecreatorBCopy->getVertex()[1] << "," << std::fixed << std::setprecision(20) << tubecreatorBCopy->getVertex()[2] << "}");
-      }
-
-      tubecreatorBCopy->setMomentumVertexErrorMatrix(errNew);
-
-      Btube* tubeconstraint = tubeArray.appendNew(Btube());
-      otherB->addRelationTo(tubeconstraint);
-      tubeconstraint->setTubeCenter(tubecreatorBOriginpos);
-      tubeconstraint->setTubeMatrix(tubeMat);
-      tubeconstraint->setTubeCenterErrorMatrix(tubeMatCenterError);
-
-      otherB->writeExtraInfo("TubePosX", tubecreatorBCopy->getVertex()[0]);
-      otherB->writeExtraInfo("TubePosY", tubecreatorBCopy->getVertex()[1]);
-      otherB->writeExtraInfo("TubePosZ", tubecreatorBCopy->getVertex()[2]);
-
-      otherB->writeExtraInfo("TubeCov00", pvNew(0, 0));
-      otherB->writeExtraInfo("TubeCov01", pvNew(0, 1));
-      otherB->writeExtraInfo("TubeCov02", pvNew(0, 2));
-      otherB->writeExtraInfo("TubeCov10", pvNew(1, 0));
-      otherB->writeExtraInfo("TubeCov11", pvNew(1, 1));
-      otherB->writeExtraInfo("TubeCov12", pvNew(1, 2));
-      otherB->writeExtraInfo("TubeCov20", pvNew(2, 0));
-      otherB->writeExtraInfo("TubeCov21", pvNew(2, 1));
-      otherB->writeExtraInfo("TubeCov22", pvNew(2, 2));
-
-      otherB->writeExtraInfo("TubeDirX", v4FinalNew.Px());
-      otherB->writeExtraInfo("TubeDirY", v4FinalNew.Py());
-      otherB->writeExtraInfo("TubeDirZ", v4FinalNew.Pz());
-
     }
     if (!ok0) toRemove.push_back(particle->getArrayIndex());
   }
@@ -282,6 +279,29 @@ bool BtubeCreatorModule::doVertexFit(Particle* mother)
 
   if (nvert == 1) {
     rsg.updateDaughters();
+    double pValue = rsg.getPValue();
+    mother->setPValue(pValue);
   } else {return false;}
   return true;
+}
+
+void BtubeCreatorModule::addextrainfos(Particle* daughter, Particle* copy, TMatrix mat, TLorentzVector TLV)
+{
+  daughter->writeExtraInfo("TubePosX", copy->getVertex()[0]);
+  daughter->writeExtraInfo("TubePosY", copy->getVertex()[1]);
+  daughter->writeExtraInfo("TubePosZ", copy->getVertex()[2]);
+
+  daughter->writeExtraInfo("TubeCov00", mat(0, 0));
+  daughter->writeExtraInfo("TubeCov01", mat(0, 1));
+  daughter->writeExtraInfo("TubeCov02", mat(0, 2));
+  daughter->writeExtraInfo("TubeCov10", mat(1, 0));
+  daughter->writeExtraInfo("TubeCov11", mat(1, 1));
+  daughter->writeExtraInfo("TubeCov12", mat(1, 2));
+  daughter->writeExtraInfo("TubeCov20", mat(2, 0));
+  daughter->writeExtraInfo("TubeCov21", mat(2, 1));
+  daughter->writeExtraInfo("TubeCov22", mat(2, 2));
+
+  daughter->writeExtraInfo("TubeDirX", TLV.Px());
+  daughter->writeExtraInfo("TubeDirY", TLV.Py());
+  daughter->writeExtraInfo("TubeDirZ", TLV.Pz());
 }

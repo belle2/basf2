@@ -11,8 +11,6 @@
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <framework/logging/Logger.h>
-
 #include <gtest/gtest.h>
 
 using namespace Belle2;

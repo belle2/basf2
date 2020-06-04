@@ -17,7 +17,6 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   /**
@@ -93,16 +92,17 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
+      // cppcheck-suppress knownConditionTrueFalse
       while (m_reducedChi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
-        if (not fitting) {return fitting;}
+        if (not fitting) {return false;}
         if (m_reducedChi2 > qualityCut) {
-          B2DEBUG(100, "Refitting without sp with index " << m_shittiest.second
+          B2DEBUG(20, "Refitting without sp with index " << m_shittiest.second
                   << " and chi2 contribution " << m_shittiest.first << "...");
           m_spacePoints.erase(m_spacePoints.begin() + m_shittiest.second);
           rejected++;
         }
-        if (rejected > maxRejected) { B2DEBUG(100, "Rejected " << rejected << "!"); return false; }
+        if (rejected > maxRejected) { B2DEBUG(20, "Rejected " << rejected << "!"); return false; }
       }
       return fitting;
     }
@@ -177,9 +177,9 @@ namespace Belle2 {
     bool doLineFit(int minSPs)
     {
       int nHits = m_spacePoints.size();
-      B2DEBUG(100, "Trying fit with " << nHits << " hits...");
+      B2DEBUG(20, "Trying fit with " << nHits << " hits...");
       // Aborting fit and returning false if the minimal number of SpacePoints required is not met.
-      if (nHits < minSPs) { B2DEBUG(100, "Only " << nHits << " hits!"); return false; };
+      if (nHits < minSPs) { B2DEBUG(20, "Only " << nHits << " hits!"); return false; };
 
       Eigen::Matrix<double, 3, 1> average = Eigen::Matrix<double, 3, 1>::Zero(3, 1);
       Eigen::Matrix<double, Eigen::Dynamic, 3> data = Eigen::Matrix<double, Eigen::Dynamic, 3>::Zero(nHits, 3);
@@ -253,7 +253,7 @@ namespace Belle2 {
       }
 
       m_reducedChi2 *= 1. / nHits;
-      B2DEBUG(100, "Reduced chi2 result is " << m_reducedChi2 << "...");
+      B2DEBUG(20, "Reduced chi2 result is " << m_reducedChi2 << "...");
       return true;
     }
 

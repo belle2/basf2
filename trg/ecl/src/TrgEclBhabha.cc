@@ -308,10 +308,10 @@ bool TrgEclBhabha::GetBhabha01() // veto bhabha
   BhabhaComb.clear();
   BhabhaComb.resize(18, 0);
 
-  BtoBFlag = false;
-
+  BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+      BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);
@@ -332,7 +332,6 @@ bool TrgEclBhabha::GetBhabha01() // veto bhabha
       if (dphi > 180) {dphi = 360 - dphi;}
       int thetaSum = theta1 + theta2;
 
-
       if (dphi > _3DBhabhaVetoAngle[0] && thetaSum > _3DBhabhaVetoAngle[2] && thetaSum <  _3DBhabhaVetoAngle[3]) {BtoBFlag = true;}
       if ((ClusterEnergy[icluster] * 100.) > _3DBhabhaVetoThreshold[0] * energy1
           && (ClusterEnergy[jcluster] * 100.) > _3DBhabhaVetoThreshold[0] * (energy2)
@@ -342,7 +341,6 @@ bool TrgEclBhabha::GetBhabha01() // veto bhabha
       }
 
     }
-
 
 
 
@@ -393,10 +391,10 @@ bool TrgEclBhabha::GetBhabha02() // selection bhabha
   BhabhaComb.clear();
   BhabhaComb.resize(18, 0);
 
-  BtoBFlag = false;
-
+  BhabhaFlag = false;
   for (int icluster = 0; icluster < ncluster ; icluster++) {
     for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+      BtoBFlag = false;
 
       if (icluster == jcluster) {continue;}
       int lut1 = _database->Get3DBhabhaLUT(MaxTCId[icluster]);

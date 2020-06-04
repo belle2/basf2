@@ -92,9 +92,12 @@ void G4MonopolePhysics::ConstructProcess()
     pmanager[0]->AddProcess(new G4MonopoleTransportation(fMpl), -1, 0, 0);
     pmanager[1]->RemoveProcess(0);
     pmanager[1]->AddProcess(new G4MonopoleTransportation(fApl), -1, 0, 0);
-  }
-
-  if (magn != 0.0) {
+//
+//  commented out the following 3 lines,
+//  to supress a cppcheck [duplicateCondition] warning for the if condition
+//  }
+//
+//  if (magn != 0.0) {
     G4double chg = sqrt(magn * magn + elec * elec);//TODO properly combine electric and magnetic ionisation
     G4mplIonisation* mplioni = new G4mplIonisation(chg);
     mplioni->SetDEDXBinning(nbin);

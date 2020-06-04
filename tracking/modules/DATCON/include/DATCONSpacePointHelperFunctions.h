@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
@@ -23,9 +22,6 @@
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
 
 #include <unordered_map>
-
-#include <type_traits>
-
 
 namespace Belle2 {
 

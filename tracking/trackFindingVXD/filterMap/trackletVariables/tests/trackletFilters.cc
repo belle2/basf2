@@ -15,14 +15,10 @@
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXY.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggXYWithSigma.h>
 #include <tracking/trackFindingVXD/filterMap/trackletVariables/ZiggZaggRZ.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
-
-#include <math.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -63,7 +59,6 @@ namespace VXDTFtrackletFilterTest {
     VXD::SensorInfoBase sensorInfoBase = createSensorInfo(aVxdID, X, Y, Z);
 
     PXDCluster aCluster = PXDCluster(aVxdID, 0., 0., 0.1, 0.1, 0, 0, 1, 1, 1, 1, 1, 1);
-    SpacePoint testPoint = SpacePoint(&aCluster, &sensorInfoBase);
 
     return SpacePoint(&aCluster, &sensorInfoBase);
   }

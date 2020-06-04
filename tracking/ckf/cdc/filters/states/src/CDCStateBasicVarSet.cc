@@ -10,9 +10,6 @@
 #include <tracking/ckf/cdc/filters/states/CDCStateBasicVarSet.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
-#include <tracking/ckf/cdc/entities/CDCCKFPath.h>
-
-#include <mdst/dataobjects/MCParticle.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 

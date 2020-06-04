@@ -17,7 +17,6 @@ from collections import OrderedDict
 import multiprocessing
 import basf2
 import subprocess
-import unittest
 import re
 from . import logfilter
 
@@ -32,6 +31,11 @@ def skip_test(reason, py_case=None):
 
     Useful if the test depends on some external condition like a web service and
     missing this dependency should not fail the test run.
+
+    Parameters:
+        reason (str): the reason to skip the test.
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
     """
     if py_case:
         py_case.skipTest(reason)
@@ -49,7 +53,7 @@ def require_file(filename, data_type="", py_case=None):
 
     Parameters:
         filename (str): relative filename to look for, either in a central place or in the current working directory
-        data_type (str): case insensitive data type to fine.  Either empty string or one of `""examples"`` or ``"validation"``.
+        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"`` or ``"validation"``.
         py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
 
     Returns:
@@ -99,10 +103,12 @@ def configure_logging_for_tests(user_replacements=None):
     1. Simplify log message to be just ``[LEVEL] message``
     2. Disable error summary, just additional noise
     3. Intercept all log messages and replace
+
         * the current working directory in log messaged with ``${cwd}``
         * the current default globaltags with ``${default_globaltag}``
         * the contents of the following environment varibles with their name
           (or the listed replacement string):
+
             - :envvar:`BELLE2_TOOLS`
             - :envvar:`BELLE2_RELEASE_DIR` with ``BELLE2_SOFTWARE_DIR``
             - :envvar:`BELLE2_LOCAL_DIR` with ``BELLE2_SOFTWARE_DIR``
@@ -116,6 +122,8 @@ def configure_logging_for_tests(user_replacements=None):
 
     Warning:
         This function should be called **after** switching directory to replace the correct directory name
+
+    .. versionadded:: release-04-00-00
     """
     basf2.logging.reset()
     basf2.logging.enable_summary(False)
@@ -131,7 +139,7 @@ def configure_logging_for_tests(user_replacements=None):
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
-    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:
@@ -246,7 +254,7 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
         tool(str): executable to call
         toolname(str): human readable name of the tool
         package(str): package to run over. Also the first argument to the tool
-        filter(lambda): function which gets called for each line of output and
+        filter: function which gets called for each line of output and
            if it returns True the line will be ignored.
         toolopts(list(str)): extra options to pass to the tool.
     """
@@ -328,3 +336,18 @@ def get_object_with_name(object_name, root=None):
         return get_object_with_name(object_name, get_object_with_name(namespace, root=root))
 
     return getattr(root, object_name)
+
+
+def skip_test_if_light(py_case=None):
+    """
+    Skips the test if we are running in a light build (maybe this test tests
+    some generation example or whatever)
+
+    Parameters:
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
+    """
+    try:
+        import generators
+    except ModuleNotFoundError:
+        skip_test(reason="We're in a light build.", py_case=py_case)

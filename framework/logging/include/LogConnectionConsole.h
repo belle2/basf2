@@ -54,12 +54,17 @@ namespace Belle2 {
     static bool getPythonLoggingEnabled() { return s_pythonLoggingEnabled; }
     /** Set whether console logging via pyhthon is enabled */
     static void setPythonLoggingEnabled(bool enabled) { s_pythonLoggingEnabled = enabled; }
+    /** Check whether we want to escape newlines on console */
+    static bool getEscapeNewlinesEnabled() { return s_escapeNewlinesEnabled; }
+    /** Set whether we want to escape newlines on console */
+    static void setEscapeNewlinesEnabled(bool enabled) { s_escapeNewlinesEnabled = enabled; }
     /** Make sure output is flushed on abort */
     void finalizeOnAbort() override;
   private:
     int m_fd;  /**< The output stream used for sending the log message.*/
     bool m_color; /**< Flag for color output.*/
     static bool s_pythonLoggingEnabled; /**< Flag to indicate whether log messages should be sent to python sys.stdout */
+    static bool s_escapeNewlinesEnabled; /**< Flag to indicate whether newlines should be replaced by '\n' in the output */
   };
 
 } // end namespace Belle2

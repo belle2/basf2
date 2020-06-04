@@ -9,16 +9,12 @@
  **************************************************************************/
 
 #pragma once
-#include <TBranch.h>
+
 #include <TTree.h>
 #include <string>
 #include <type_traits>
-#include <iostream>
-
-#include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
-
 
 namespace Belle2 {
   /**

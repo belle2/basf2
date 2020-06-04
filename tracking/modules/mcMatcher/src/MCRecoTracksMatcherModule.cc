@@ -18,9 +18,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // hit types
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
 

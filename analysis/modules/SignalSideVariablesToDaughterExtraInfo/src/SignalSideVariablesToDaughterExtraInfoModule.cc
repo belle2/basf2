@@ -10,6 +10,7 @@
 
 #include <analysis/modules/SignalSideVariablesToDaughterExtraInfo/SignalSideVariablesToDaughterExtraInfoModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>

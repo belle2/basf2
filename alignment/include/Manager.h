@@ -10,6 +10,29 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+#include <map>
+#include <Geant4/G4Transform3D.hh>
+#include <root/TMatrixD.h>
+#include <genfit/StateOnPlane.h>
+#include <root/TGeoMatrix.h>
+#include <set>
+
+#include <framework/logging/Logger.h>
+
+#include <mdst/dbobjects/BeamSpot.h>
+#include <alignment/dbobjects/VXDAlignment.h>
+#include <alignment/dbobjects/CDCCalibration.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
+
+#include <cdc/dbobjects/CDCTimeZeros.h>
+#include <cdc/dbobjects/CDCTimeWalks.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
+
 #include <alignment/GlobalParam.h>
 #include <alignment/GlobalTimeLine.h>
 #include <alignment/Hierarchy.h>
@@ -96,7 +119,7 @@ namespace Belle2 {
       GlobalCalibrationManager& operator=(const GlobalCalibrationManager&);
 
       /// Update the current time ID in the GlobalLabel
-      /// @param emd current EventMetaData - generated time ID
+      /// @param event current event EventMetaData - generated time ID
       /// will be the index of the smallest slice larger than (or. equal) to EventMetaData
       int updateTimeDepGlobalLabels(const EventMetaData& event);
 

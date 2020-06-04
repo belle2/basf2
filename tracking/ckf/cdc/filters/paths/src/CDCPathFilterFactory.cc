@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 

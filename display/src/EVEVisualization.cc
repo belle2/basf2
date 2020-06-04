@@ -22,15 +22,17 @@
 #include <display/VisualRepMap.h>
 #include <display/EveGeometry.h>
 #include <display/EveVisBField.h>
+#include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <klm/bklm/dataobjects/BKLMSimHitPosition.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -64,7 +66,6 @@
 #include <TEveTrackPropagator.h>
 #include <TGeoEltu.h>
 #include <TGeoMatrix.h>
-#include <TGeoNode.h>
 #include <TGeoManager.h>
 #include <TGeoSphere.h>
 #include <TGeoTube.h>
@@ -1672,7 +1673,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   }
 }
 
-void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   TEveStraightLineSet* shape = new TEveStraightLineSet();
@@ -1759,7 +1760,7 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
   shape->SetTitle(ObjectInfo::getTitle(hit) +
                   TString::Format("\nPriority: %d\nLeft/Right: %d",
                                   hit->getPriorityPosition(), hit->getLeftRight()));
-  addToGroup("CDCTriggerSegmentHits", shape);
+  addToGroup(collectionName, shape);
   addObject(hit, shape);
 }
 

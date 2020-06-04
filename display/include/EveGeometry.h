@@ -1,9 +1,11 @@
 #pragma once
 
-#include <Rtypes.h>
+#include <RtypesCore.h>
+
+#include <string>
+#include <vector>
 
 class TEveElement;
-class TPRegexp;
 
 namespace Belle2 {
   /** Handles manipulation of detector geometry for the display. */

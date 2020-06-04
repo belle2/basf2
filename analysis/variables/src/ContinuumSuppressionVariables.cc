@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/variables/ContinuumSuppressionVariables.h>
-#include <analysis/variables/ParameterVariables.h>
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
@@ -24,19 +23,14 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include <TLorentzVector.h>
-#include <TVectorF.h>
 #include <TVector3.h>
 
 #include <cmath>
-
-#include <boost/lexical_cast.hpp>
 
 
 namespace Belle2 {
@@ -89,67 +83,47 @@ namespace Belle2 {
 
     double R2(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getR2();
-
-      return result;
+      return qq->getR2();
     }
 
     double thrustBm(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getThrustBm();
-
-      return result;
+      return qq->getThrustBm();
     }
 
     double thrustOm(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getThrustOm();
-
-      return result;
+      return qq->getThrustOm();
     }
 
     double cosTBTO(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getCosTBTO();
-
-      return result;
+      return qq->getCosTBTO();
     }
 
     double cosTBz(const Particle* particle)
     {
-      double result = -1.0;
-
       const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
       if (!qq)
-        return result;
+        return std::numeric_limits<float>::quiet_NaN();
 
-      result = qq->getCosTBz();
-
-      return result;
+      return qq->getCosTBz();
     }
 
     Manager::FunctionPtr KSFWVariables(const std::vector<std::string>& arguments)
@@ -166,6 +140,7 @@ namespace Belle2 {
         }
         int index = -1;
 
+        // all possible names
         std::vector<std::string> names = {"mm2",   "et",
                                           "hso00", "hso01", "hso02", "hso03", "hso04",
                                           "hso10", "hso12", "hso14",
@@ -173,16 +148,30 @@ namespace Belle2 {
                                           "hoo0",  "hoo1",  "hoo2",  "hoo3",  "hoo4"
                                          };
 
+        // find the index of the name
         for (unsigned i = 0; i < names.size(); ++i) {
           if (variableName == names[i])
             index = i;
         }
 
+        // throw helfpul error if name provided was not in allowed list
+        if (index == -1) {
+          std::string allowed = "";
+          for (auto n : names)
+            allowed += n + ", ";
+          B2FATAL("Variable name provided: " << variableName << " is not one of the allowed options. Please choose from one of:" << allowed);
+        }
+
         auto func = [index, useFS1](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          if (!qq) return std::numeric_limits<double>::quiet_NaN();
+
+          // get the KSFW moments
           std::vector<float> ksfw = qq->getKsfwFS0();
           if (useFS1)
             ksfw = qq->getKsfwFS1();
+
+          if (ksfw.size() == 0) B2FATAL("Could not find any KSFW moments");
           return ksfw.at(index);
         };
         return func;
@@ -194,8 +183,15 @@ namespace Belle2 {
     Manager::FunctionPtr CleoConesCS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1 || arguments.size() == 2) {
+
+        int coneNumber = 0;
+        try {
+          coneNumber = Belle2::convertString<int>(arguments[0]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("The first argument of the CleoConeCS meta function must be an integer!");
+        }
+
         bool useROE = false;
-        auto coneNumber = arguments[0];
         if (arguments.size() == 2) {
           if (arguments[1] == "ROE") {
             useROE = true;
@@ -206,10 +202,12 @@ namespace Belle2 {
 
         auto func = [coneNumber, useROE](const Particle * particle) -> double {
           const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>();
+          if (!qq)
+            return std::numeric_limits<double>::quiet_NaN();
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
             cleoCones = qq->getCleoConesROE();
-          return cleoCones.at(stoi(coneNumber) - 1);
+          return cleoCones.at(coneNumber - 1);
         };
         return func;
       } else {
@@ -220,32 +218,36 @@ namespace Belle2 {
     Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         double low = 0;
         double high = 0;
         try {
           low  = Belle2::convertString<double>(arguments[1]);
           high = Belle2::convertString<double>(arguments[2]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be doubles!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("Second and third argument of transformedNetworkOutput meta function must be doubles!");
         }
+
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName, low, high](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
+              return eventExtraInfo->getExtraInfo(extraInfoName);
+            } else {
+              return std::numeric_limits<double>::quiet_NaN();
+            }
           }
-          return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          if (particle->hasExtraInfo(extraInfoName))
+          {
+            return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          } else {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function transformedNetworkOutput");
       }
     }
 
@@ -267,6 +269,8 @@ namespace Belle2 {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           const Particle* Bparticle = roe->getRelated<Particle>();
           const ContinuumSuppression* qq = Bparticle->getRelatedTo<ContinuumSuppression>();
+          if (!qq)
+            return std::numeric_limits<double>::quiet_NaN();
           double isinROE = isInRestOfEvent(particle);
           TVector3 newZ;
           if (modeisSignal or (modeisAuto and isinROE < 0.5))
@@ -295,21 +299,21 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "Event-Level Reduced Fox-Wolfram moment R2");
+    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("R2"          , R2          , "Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Magnitude of the signal B thrust axis");
     REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");
     REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of the signal B and thrust axis of ROE");
     REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of the signal B and z-axis");
     REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,
-                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
+                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS,
                       "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
+                      "Returns NaN if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
-                      "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+                      "Transforms the network output :math:`C\\to C`' via: :math:`C'=\\operatorname{log}((C-\\mathrm{low})/(\\mathrm{high}-C))`");
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,
                       "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
                       "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"

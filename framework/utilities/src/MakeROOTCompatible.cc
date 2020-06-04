@@ -11,7 +11,6 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <regex>
 

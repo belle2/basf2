@@ -6,7 +6,7 @@ from ROOT import Belle2
 
 
 def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
-                    thetaDef='avg', zDef='min', trueEventTime=False):
+                    thetaDef='avg', zDef='min'):
     """
     This function adds the CDC trigger modules to a path.
     @path              modules are added to this path
@@ -23,10 +23,8 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
     @thetaDef          theta definition for the CDCTriggerTrackCombiner
     @zDef              z definition for the CDCTriggerTrackCombiner
                        (for details see module description)
-    @trueEventTime     since the event time finder is not yet finalized,
-                       the true event time can be used instead.
-                       recommended especially for tests on single tracks.
     """
+
     if SimulationMode == 1:
         # TSF
         path.add_module('CDCTriggerTSF',
@@ -43,19 +41,24 @@ def add_cdc_trigger(path, SimulationMode=1, shortTracks=False, lowPt=False,
             minPt = 0.3
         path.add_module('CDCTrigger2DFinder',
                         minHits=4, minHitsShort=minHitsShort, minPt=minPt)
-        # ETF
-        path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
+
+        # Old ETF
+        # path.add_module('CDCTriggerETF', trueEventTime=trueEventTime)
+        # ETF priority fastest timings among 2D Tracks
+        path.add_module('CDCTriggerHoughETF')
+
         # fitters
         path.add_module('CDCTrigger2DFitter')
         path.add_module('CDCTrigger3DFitter')
         # neurotrigger
         if shortTracks:
-            B2WARNING("shortTracks=True is deprecated and no longer supported! "
-                      "Network weights will now be loaded from the database. "
-                      "If you really want to use shorttracks, load the specific network "
-                      "weights in the Neurotrigger module!")
+            B2ERROR("shortTracks=True is deprecated and no longer supported! "
+                    "Network weights will now be loaded from the database. "
+                    "If you really want to use shorttracks, load the specific network "
+                    "weights in the Neurotrigger module!")
             exit()
         path.add_module('CDCTriggerNeuro')
+
         path.add_module('CDCTriggerTrackCombiner',
                         thetaDefinition=thetaDef, zDefinition=zDef)
     elif SimulationMode == 2:

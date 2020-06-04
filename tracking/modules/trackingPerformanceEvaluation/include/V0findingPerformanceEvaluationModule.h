@@ -13,26 +13,14 @@
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
-#include <TTree.h>
-#include <TFile.h>
-#include <TList.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH3F.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/MCParticleInfo.h>
-#include <tracking/dataobjects/V0ValidationVertex.h>
 
 // forward declarations
 namespace Belle2 {
-
-  class MCParticle;
-  class V0;
-
-  template< class T >
-  class StoreArray;
 
   /** This module takes the MCParticles, the V0 candidates input and produce a root file
    *  containing various histograms showing the performance of the

@@ -30,13 +30,13 @@ SVDStripNoiseMap::SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr):
 }
 
 SVDStripNoiseMap::SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr,
-                                   const string noisefilename):
+                                   const string& noisefilename):
   m_onl2offl_map_ptr(onl2offl_map_ptr)
 {
   this->initializeMap(noisefilename);
 }
 
-int SVDStripNoiseMap::initializeMap(const string noisefilename)
+int SVDStripNoiseMap::initializeMap(const string& noisefilename)
 {
 
   B2INFO("initializeMap()");
@@ -126,7 +126,8 @@ int SVDStripNoiseMap::initializeMap(const string noisefilename)
         return -1;
       }
 
-      B2INFO("Sensor ID: " << svd_sensor_id << " Module: " << module << " VxdID: " << vxd_id.getID() << " (FADC ID: " << fadc_id << ", APV: " << apv << ", STRIP: " << strip << ") " << ((good == 0) ? "BAD" : "   ") << " ped: " << pedestal << ", noi: " << noise);
+      B2INFO("Sensor ID: " << svd_sensor_id << " Module: " << module << " VxdID: " << vxd_id.getID() << " (FADC ID: " << fadc_id <<
+             ", APV: " << apv << ", STRIP: " << strip << ") " << ((good == 0) ? "BAD" : "   ") << " ped: " << pedestal << ", noi: " << noise);
 
       m_pedestalMap [svd_sensor_id][strip] = pedestal;
       m_noiseMap    [svd_sensor_id][strip] = gaus_noise;

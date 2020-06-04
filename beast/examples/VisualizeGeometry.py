@@ -25,10 +25,10 @@ g4sim = register_module('FullSim')
 eventinfosetter.param('evtNumList', [1])
 
 g4sim.param('EnableVisualization', True)
-g4sim.param('UICommands', ['/vis/open VRML2FILE', '/vis/drawVolume',
-                           '/vis/scene/add/axes 0 0 0 31 mm',
-                           '/vis/scene/add/trajectories smooth',
-                           '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
+g4sim.param('UICommandsAtIdle', ['/vis/open VRML2FILE', '/vis/drawVolume',
+                                 '/vis/scene/add/axes 0 0 0 31 mm',
+                                 '/vis/scene/add/trajectories smooth',
+                                 '/vis/modeling/trajectories/create/drawByCharge'])  # Use VRML2 backend
 # Draw the geometry
 # Draw coordinate axes at the origin with a length of 100mm in each direction
 # Draw simulated tracks

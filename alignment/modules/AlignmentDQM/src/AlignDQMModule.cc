@@ -21,8 +21,6 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
 
-#include <genfit/MeasurementOnPlane.h>
-
 #include <TDirectory.h>
 #include <TVectorD.h>
 
@@ -132,6 +130,9 @@ void AlignDQMModule::defineHisto()
   /** helix parameters and their corellations: */
   TDirectory* DirAlignHelixParameters = DirAlign->mkdir("HelixPars");
   TDirectory* DirAlignHelixCorrelations = DirAlign->mkdir("HelixCorrelations");
+
+  // half-shells
+  TDirectory* DirAlignHalfShells = DirAlign->mkdir("HalfShells");
 
   float fMomRange = 3.0;
   int iMomRange = 60;
@@ -361,6 +362,97 @@ void AlignDQMModule::defineHisto()
   m_UBResidualsSVDV = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
   m_UBResidualsSVDV->GetXaxis()->SetTitle("residual [#mum]");
   m_UBResidualsSVDV->GetYaxis()->SetTitle("counts");
+
+  // half-shells
+  DirAlignHalfShells->cd();
+  // X
+  // Unbiased residuals in X for PXD for Ying
+  name = "Alig_UBResidualsPXDX_Ying";
+  title = "Unbiased residuals in X for PXD for Ying";
+  m_UBResidualsPXDX_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDX_Ying->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDX_Ying->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in X for PXD for Yang
+  name = "Alig_UBResidualsPXDX_Yang";
+  title = "Unbiased residuals in X for PXD for Yang";
+  m_UBResidualsPXDX_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDX_Yang->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDX_Yang->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in X for SVD for Pat
+  name = "Alig_UBResidualsSVDX_Pat";
+  title = "Unbiased residuals in X for SVD for Pat";
+  m_UBResidualsSVDX_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDX_Pat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDX_Pat->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in X for SVD for Mat
+  name = "Alig_UBResidualsSVDX_Mat";
+  title = "Unbiased residuals in X for SVD for Mat";
+  m_UBResidualsSVDX_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDX_Mat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDX_Mat->GetYaxis()->SetTitle("counts");
+
+  // Y
+  // Unbiased residuals in Y for PXD for Ying
+  name = "Alig_UBResidualsPXDY_Ying";
+  title = "Unbiased residuals in Y for PXD for Ying";
+  m_UBResidualsPXDY_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDY_Ying->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDY_Ying->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Y for PXD for Yang
+  name = "Alig_UBResidualsPXDY_Yang";
+  title = "Unbiased residuals in Y for PXD for Yang";
+  m_UBResidualsPXDY_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDY_Yang->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDY_Yang->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Y for SVD for Pat
+  name = "Alig_UBResidualsSVDY_Pat";
+  title = "Unbiased residuals in Y for SVD for Pat";
+  m_UBResidualsSVDY_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDY_Pat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDY_Pat->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Y for SVD for Mat
+  name = "Alig_UBResidualsSVDY_Mat";
+  title = "Unbiased residuals in Y for SVD for Mat";
+  m_UBResidualsSVDY_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDY_Mat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDY_Mat->GetYaxis()->SetTitle("counts");
+
+  // Z
+  // Unbiased residuals in Z for PXD for Ying
+  name = "Alig_UBResidualsPXDZ_Ying";
+  title = "Unbiased residuals in Z for PXD for Ying";
+  m_UBResidualsPXDZ_Ying = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDZ_Ying->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDZ_Ying->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Z for PXD for Yang
+  name = "Alig_UBResidualsPXDZ_Yang";
+  title = "Unbiased residuals in Z for PXD for Yang";
+  m_UBResidualsPXDZ_Yang = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsPXDZ_Yang->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsPXDZ_Yang->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Z for SVD for Pat
+  name = "Alig_UBResidualsSVDZ_Pat";
+  title = "Unbiased residuals in Z for SVD for Pat";
+  m_UBResidualsSVDZ_Pat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDZ_Pat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDZ_Pat->GetYaxis()->SetTitle("counts");
+
+  // Unbiased residuals in Z for SVD for Mat
+  name = "Alig_UBResidualsSVDZ_Mat";
+  title = "Unbiased residuals in Z for SVD for Mat";
+  m_UBResidualsSVDZ_Mat = new TH1F(name.c_str(), title.c_str(), 200, -ResidualRange, ResidualRange);
+  m_UBResidualsSVDZ_Mat->GetXaxis()->SetTitle("residual [#mum]");
+  m_UBResidualsSVDZ_Mat->GetYaxis()->SetTitle("counts");
+
+  DirAlign->cd();
 
   if (gTools->getNumberOfLayers() == 0) {
     B2WARNING("Missing geometry for VXD, VXD-DQM related are skiped.");
@@ -913,6 +1005,22 @@ void AlignDQMModule::beginRun()
   if (m_UBResidualsPXDV != NULL) m_UBResidualsPXDV->Reset();
   if (m_UBResidualsSVDV != NULL) m_UBResidualsSVDV->Reset();
 
+  // half-shells
+  if (m_UBResidualsPXDX_Ying != NULL) m_UBResidualsPXDX_Ying->Reset();
+  if (m_UBResidualsPXDX_Yang != NULL) m_UBResidualsPXDX_Yang->Reset();
+  if (m_UBResidualsSVDX_Pat != NULL) m_UBResidualsSVDX_Pat->Reset();
+  if (m_UBResidualsSVDX_Mat != NULL) m_UBResidualsSVDX_Mat->Reset();
+
+  if (m_UBResidualsPXDY_Ying != NULL) m_UBResidualsPXDY_Ying->Reset();
+  if (m_UBResidualsPXDY_Yang != NULL) m_UBResidualsPXDY_Yang->Reset();
+  if (m_UBResidualsSVDY_Pat != NULL) m_UBResidualsSVDY_Pat->Reset();
+  if (m_UBResidualsSVDY_Mat != NULL) m_UBResidualsSVDY_Mat->Reset();
+
+  if (m_UBResidualsPXDZ_Ying != NULL) m_UBResidualsPXDZ_Ying->Reset();
+  if (m_UBResidualsPXDZ_Yang != NULL) m_UBResidualsPXDZ_Yang->Reset();
+  if (m_UBResidualsSVDZ_Pat != NULL) m_UBResidualsSVDZ_Pat->Reset();
+  if (m_UBResidualsSVDZ_Mat != NULL) m_UBResidualsSVDZ_Mat->Reset();
+
   for (VxdID layer : geo.getLayers()) {
     int i = gTools->getLayerIndex(layer.getLayerNumber());
     if (m_TRClusterHitmap[i] != NULL) m_TRClusterHitmap[i]->Reset();
@@ -1016,9 +1124,6 @@ void AlignDQMModule::event()
         // add p-value:
         float pValue = theRC[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
-        // add residuals:
-        int iHit = 0;
-        int iHitPrew = 0;
 
         VxdID sensorIDPrew;
 
@@ -1033,8 +1138,10 @@ void AlignDQMModule::event()
         int iLayerPrev = 0;
         int iLayer = 0;
 
+        bool isNotFirstHit = false;
+
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : theRC[0]->getRecoHitInformations(true)) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
@@ -1045,11 +1152,9 @@ void AlignDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
-
           bool biased = false;
-          if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
-          TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
+          if (!theRC[0]->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()) continue;
+          TVectorD resUnBias = theRC[0]->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()->getResidual(0, biased).getState();
           IsSVDU = -1;
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
             posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
@@ -1063,12 +1168,12 @@ void AlignDQMModule::event()
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
-            if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+            if (isNotFirstHit && ((iLayer - iLayerPrev) == 1)) {
               int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
               m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
               m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-              iHitPrew = iHit;
-            }
+            } else
+              isNotFirstHit = true;
             iLayerPrev = iLayer;
             fPosSPUPrev = fPosSPU;
             fPosSPVPrev = fPosSPV;
@@ -1083,6 +1188,20 @@ void AlignDQMModule::event()
             m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
             m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
             m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
+
+            // half-shells
+            TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
+            auto globalResidual = info.vectorToGlobal(localResidual, true);
+
+            if (IsNotYang(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
+              m_UBResidualsPXDX_Ying->Fill(globalResidual.x());
+              m_UBResidualsPXDY_Ying->Fill(globalResidual.y());
+              m_UBResidualsPXDZ_Ying->Fill(globalResidual.z());
+            } else {
+              m_UBResidualsPXDX_Yang->Fill(globalResidual.x());
+              m_UBResidualsPXDY_Yang->Fill(globalResidual.y());
+              m_UBResidualsPXDZ_Yang->Fill(globalResidual.z());
+            }
 
             posU *= Unit::convertValueToUnit(1.0, "mm");
             posV *= Unit::convertValueToUnit(1.0, "mm");
@@ -1127,12 +1246,12 @@ void AlignDQMModule::event()
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate
-                if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+                if (isNotFirstHit && ((iLayer - iLayerPrev) == 1)) {
                   int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
                   m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
                   m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-                  iHitPrew = iHit;
-                }
+                } else
+                  isNotFirstHit = true;
                 iLayerPrev = iLayer;
                 fPosSPUPrev = fPosSPU;
                 fPosSPVPrev = fPosSPV;
@@ -1145,6 +1264,20 @@ void AlignDQMModule::event()
                 m_UBResidualsSensorU[index]->Fill(ResidUPlaneRHUnBias);
                 m_UBResidualsSensorV[index]->Fill(ResidVPlaneRHUnBias);
                 m_TRClusterHitmap[indexLayer]->Fill(fPosSPU, fPosSPV);
+
+                // half-shells
+                TVector3 localResidual(ResidUPlaneRHUnBias, ResidVPlaneRHUnBias, 0);
+                auto globalResidual = info.vectorToGlobal(localResidual, true);
+
+                if (IsNotMat(sensorID.getLadderNumber(), sensorID.getLayerNumber())) {
+                  m_UBResidualsSVDX_Pat->Fill(globalResidual.x());
+                  m_UBResidualsSVDY_Pat->Fill(globalResidual.y());
+                  m_UBResidualsSVDZ_Pat->Fill(globalResidual.z());
+                } else {
+                  m_UBResidualsSVDX_Mat->Fill(globalResidual.x());
+                  m_UBResidualsSVDY_Mat->Fill(globalResidual.y());
+                  m_UBResidualsSVDZ_Mat->Fill(globalResidual.z());
+                }
 
                 posU *= Unit::convertValueToUnit(1.0, "mm");
                 posV *= Unit::convertValueToUnit(1.0, "mm");
@@ -1173,7 +1306,6 @@ void AlignDQMModule::event()
               sensorIDPrew = sensorID;
             }
           }
-          iHit++;
         }
       }
       if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;
@@ -1225,6 +1357,33 @@ void AlignDQMModule::event()
   }
 }
 
+bool AlignDQMModule::IsNotYang(int ladderNumber, int layerNumber)
+{
+  switch (layerNumber) {
+    case 1:
+      return ladderNumber < 5 || ladderNumber > 8;
+    case 2:
+      return ladderNumber < 7 || ladderNumber > 12;
+    default:
+      return true;
+  }
+}
+
+bool AlignDQMModule::IsNotMat(int ladderNumber, int layerNumber)
+{
+  switch (layerNumber) {
+    case 3:
+      return ladderNumber < 3 || ladderNumber > 5;
+    case 4:
+      return ladderNumber < 4 || ladderNumber > 8;
+    case 5:
+      return ladderNumber < 5 || ladderNumber > 10;
+    case 6:
+      return ladderNumber < 6 || ladderNumber > 13;
+    default:
+      return true;
+  }
+}
 
 void AlignDQMModule::endRun()
 {

@@ -10,8 +10,6 @@
 #include <tracking/trackFindingCDC/mva/MVAExpert.h>
 
 /** Impl Declaration **/
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
-
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>

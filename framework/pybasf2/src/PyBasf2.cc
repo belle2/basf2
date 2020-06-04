@@ -16,11 +16,13 @@
 #include <framework/pybasf2/ProcessStatisticsPython.h>
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
+#include <framework/core/PyObjROOTUtils.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/ModuleParamInfoPython.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/database/Database.h>
+#include <framework/io/RootFileInfo.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -77,6 +79,12 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
   return *fileMetaData;
 }
 
+object getFileMetadata(const std::string& filename)
+{
+  RootIOUtilities::RootFileInfo fileInfo(filename);
+  return createROOTObjectPyCopy(fileInfo.getFileMetaData());
+}
+
 //-----------------------------------
 //   Define the pybasf2 python module
 //-----------------------------------
@@ -93,8 +101,10 @@ BOOST_PYTHON_MODULE(pybasf2)
   Database::exposePythonAPI();
   FileMetaData::exposePythonAPI();
   def("update_file_metadata", &updateFileMetaData);
+  def("get_file_metadata", &getFileMetadata, R"DOC(
+Return the FileMetaData object for the given output file.
+)DOC");
 }
 
 //register the module during library load
 REGISTER_PYTHON_MODULE(pybasf2)
-

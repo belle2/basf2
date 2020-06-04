@@ -9,6 +9,9 @@
 
 #include <daq/rfarm/event/modules/rawinputModule.h>
 
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+
 #include "TSystem.h"
 
 using namespace std;

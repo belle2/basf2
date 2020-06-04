@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
-import ROOT
+import basf2
 from ROOT import Belle2
 import unittest
 
@@ -132,8 +131,8 @@ class PythonDataStoreTests(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    B2INFO("Following error messages are expected, please ignore.")
+    basf2.B2INFO("Following error messages are expected, please ignore.")
     unittest.main()
-    B2INFO("Previous errors are expected, please ignore.")
+    basf2.B2INFO("Previous errors are expected, please ignore.")
 
 # @endcond

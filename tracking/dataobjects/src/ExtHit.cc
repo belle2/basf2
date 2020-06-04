@@ -10,8 +10,6 @@
 
 #include <tracking/dataobjects/ExtHit.h>
 
-#include <framework/logging/Logger.h>
-
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 
@@ -26,6 +24,7 @@ ExtHit::ExtHit() :
   m_DetectorID(Const::EDetector::invalidDetector),
   m_CopyID(0),
   m_Status(EXT_FIRST),
+  m_BackwardPropagation(false),
   m_TOF(0.0)
 {
   m_Position[0] = 0.0;
@@ -40,13 +39,14 @@ ExtHit::ExtHit() :
 }
 
 // Constructor with initial values
-ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, double tof,
+ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation, double tof,
                const TVector3& position, const TVector3& momentum, const TMatrixDSym& covariance) :
   RelationsObject(),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),
   m_CopyID(copyID),
   m_Status(status),
+  m_BackwardPropagation(backwardPropagation),
   m_TOF(tof)
 {
   m_Position[0] = position.X();
@@ -64,13 +64,14 @@ ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatu
 }
 
 // Constructor with initial values
-ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, double tof,
+ExtHit::ExtHit(int pdgCode, Const::EDetector detectorID, int copyID, ExtHitStatus status, bool backwardPropagation, double tof,
                const G4ThreeVector& position, const G4ThreeVector& momentum, const G4ErrorSymMatrix& covariance) :
   RelationsObject(),
   m_PdgCode(pdgCode),
   m_DetectorID(detectorID),
   m_CopyID(copyID),
   m_Status(status),
+  m_BackwardPropagation(backwardPropagation),
   m_TOF(tof)
 {
   m_Position[0] = position.x();

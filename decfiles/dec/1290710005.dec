@@ -1,0 +1,26 @@
+# EventType: 1290710005
+# Descriptor: [B+ -> Xu0 l+ nu]cc
+# NickName: Bu_Xulnu=non-resonant-BLNP
+# Documentation: non-resonances decays of charged b->ulv (l=e,mu) for hybrid modelling. Higher excited states are included in non-resonance.
+# BLNP Model (based on hep-ph/0504071 by Bjorn O. Lange, Matthias Neubert and Gil Paz)
+# Definition of parameters: b, Lambda, muh, mui, mubar, itype(1=exponential, 2=Gaussian), isubl(1=nominal), flag1~3 (power corrections in the expansion in terms of 1/(mB - P+))
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Lu Cao
+# Email: cao@physik.uni-bonn.de, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20192011
+
+#
+Decay Upsilon(4S)
+0.5 B+sig  B-                          VSS;
+0.5 B-sig B+                          VSS;
+Enddecay
+#
+Decay B+sig
+0.002206   Xu0    e+    nu_e      PHOTOS   VUB_BLNP 3.95 0.72 2.3 2.0 2.0 1 1 1 1 1; #[central values based on hep-ph/0504071]
+0.002206   Xu0    mu+   nu_mu     PHOTOS   VUB_BLNP 3.95 0.72 2.3 2.0 2.0 1 1 1 1 1; #[central values based on hep-ph/0504071]
+Enddecay
+CDecay B-sig
+#
+End

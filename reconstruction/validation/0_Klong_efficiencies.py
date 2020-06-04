@@ -11,49 +11,47 @@
 </header>
 """
 
-from basf2 import *
-from simulation import *
-from reconstruction import *
-from ROOT import Belle2
+import basf2 as b2
+import simulation as sim
+import reconstruction as rec
+
+import os
 import glob
-from generators import add_evtgen_generator
-set_random_seed('#fa1afe1')
 
-main = create_path()
+bg = None
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+else:
+    b2.B2FATAL('The variable BELLE2_BACKGROUND_DIR is not set!')
 
-noEvents = 1000
+b2.set_random_seed('L1V0RN0')
 
-bkg = glob.glob('/sw/belle2/bkg/*.root')
-# bkg = '~/bkg/*.root'
+main = b2.create_path()
 
-main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=noEvents)
+main.add_module('EventInfoSetter',
+                expList=0,
+                runList=0,
+                evtNumList=1000)
 
-generator = register_module('ParticleGun')
-generator.param('nTracks', 5)
-generator.param('momentumGeneration', 'uniform')
-generator.param('momentumParams', [0.05, 5.0])
-generator.param('pdgCodes', [130, 321, 311, 2212, 2112, 211, 13, 11])
-main.add_module(generator)
+main.add_module('ParticleGun',
+                nTracks=5,
+                momentumGeneration='uniform',
+                momentumParams=[0.05, 5.0],
+                pdgCodes=[130, 321, 311, 2212, 2112, 211, 13, 11])
 
-# add_evtgen_generator(main, finalstate='mixed')
-# bkginput = register_module('BGOverlayInput')
-# bkginput.param('inputFileNames', bkg)
-# main.add_module(bkginput)
+sim.add_simulation(path=main,
+                   bkgfiles=bg)
 
-add_simulation(main, bkgfiles=bkg)
-# add_simulation(main)
+rec.add_reconstruction(path=main)
 
-add_reconstruction(main)
+# Run a module to generate histograms for PID performances
+main.add_module('KlongValidation',
+                outputName='K_long_full_validation_sample.root',
+                KlIdCut=0.1)
 
-# run a module to generate histograms to test pid performance
-validation = register_module('KlongValidation')
-validation.param('outPath', 'K_long_full_validation_sample.root'.format(noEvents))
-validation.param("KlId_cut", 0.1)
-main.add_module(validation)
+# add_mdst_output(main, True, 'Klong_validation_check.root')
 
-add_mdst_output(main, True, 'Klong_validation_check.root')
+main.add_module('Progress')
 
-main.add_module(register_module('ProgressBar'))
-
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -8,20 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* C++ headers. */
-#include <string>
-
-/* External headers. */
-#include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Units/SystemOfUnits.h>
-
-/* Belle2 headers. */
-#include <klm/eklm/geometry/Circle2D.h>
+/* Own header. */
 #include <klm/eklm/geometry/GeometryData.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/Circle2D.h>
 #include <klm/eklm/geometry/Line2D.h>
+
+/* Belle 2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/Database.h>
 #include <framework/logging/Logger.h>
+
+/* CLHEP headers. */
+#include <CLHEP/Geometry/Point3D.h>
+#include <CLHEP/Units/SystemOfUnits.h>
+
+/* C++ headers. */
+#include <string>
 
 using namespace Belle2;
 
@@ -481,9 +485,9 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
   gd.append("/EKLM");
   /* Numbers of elements. */
   m_NSections = gd.getInt("NSections");
-  checkSection(m_NSections);
+  m_ElementNumbers->checkSection(m_NSections);
   m_NLayers = gd.getInt("NLayers");
-  checkLayer(m_NLayers);
+  m_ElementNumbers->checkLayer(m_NLayers);
   m_NDetectorLayers = new int[m_NSections];
   m_NDetectorLayers[0] = gd.getInt("NDetectorLayersBackward");
   checkDetectorLayerNumber(1, m_NDetectorLayers[0]);
@@ -492,14 +496,14 @@ void EKLM::GeometryData::initializeFromGearbox(const GearDir* gearDir)
     checkDetectorLayerNumber(2, m_NDetectorLayers[1]);
   }
   m_NSectors = gd.getInt("NSectors");
-  checkSector(m_NSectors);
+  m_ElementNumbers->checkSector(m_NSectors);
   m_NPlanes = gd.getInt("NPlanes");
-  checkPlane(m_NPlanes);
+  m_ElementNumbers->checkPlane(m_NPlanes);
   m_NSegments = gd.getInt("NSegments");
-  checkSegment(m_NSegments);
+  m_ElementNumbers->checkSegment(m_NSegments);
   m_NSegmentSupportElementsSector = (m_NSegments + 1) * m_NPlanes;
   m_NStrips = gd.getInt("NStrips");
-  checkStrip(m_NStrips);
+  m_ElementNumbers->checkStrip(m_NStrips);
   /* Geometry parameters. */
   m_SolenoidZ = gd.getLength("SolenoidZ") * CLHEP::cm;
   readEndcapStructureGeometry(gd);
@@ -632,26 +636,6 @@ void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
   Database::Instance().storeData("EKLMGeometry", m_Geometry, iov);
 }
 
-double EKLM::GeometryData::getStripLength(int strip) const
-{
-  return m_StripPosition[strip - 1].getLength();
-}
-
-int EKLM::GeometryData::getStripLengthIndex(int positionIndex) const
-{
-  return m_StripAllToLen[positionIndex];
-}
-
-int EKLM::GeometryData::getStripPositionIndex(int lengthIndex) const
-{
-  return m_StripLenToAll[lengthIndex];
-}
-
-int EKLM::GeometryData::getNStripsDifferentLength() const
-{
-  return m_nStripDifferent;
-}
-
 bool EKLM::GeometryData::hitInEKLM(double z) const
 {
   double zMm;
@@ -727,9 +711,10 @@ EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
 {
   double y;
   y = m_StripPosition[n].getY();
-  if (n % m_NStripsSegment == 0)
+  if (n % m_ElementNumbers->getNStripsSegment() == 0)
     y = y + 0.5 * m_PlasticSheetGeometry.getDeltaL();
-  else if (n % m_NStripsSegment == m_NStripsSegment - 1)
+  else if (n % m_ElementNumbers->getNStripsSegment() ==
+           m_ElementNumbers->getNStripsSegment() - 1)
     y = y - 0.5 * m_PlasticSheetGeometry.getDeltaL();
   *t = HepGeom::Translate3D(m_StripPosition[n].getX(), y, 0.0);
 }

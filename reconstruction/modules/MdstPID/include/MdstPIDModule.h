@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MDSTPIDMODULE
-#define MDSTPIDMODULE
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,7 +21,7 @@
 #include <reconstruction/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <tracking/dataobjects/Muid.h>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 #include <string>
 
@@ -34,7 +33,7 @@ namespace Belle2 {
   class CDCDedxLikelihood;
   class VXDDedxLikelihood;
   class ECLPidLikelihood;
-  class Muid;
+  class KLMMuidLikelihood;
 
   /**
    * a module to fill PIDLikelihoods
@@ -93,7 +92,7 @@ namespace Belle2 {
     StoreArray<CDCDedxLikelihood> m_cdcDedxLikelihoods; /**< Optional array for CDCDedxLikelihoods */
     StoreArray<VXDDedxLikelihood> m_vxdDedxLikelihoods; /**< Optional array for VXDDedxLikelihoods */
     StoreArray<ECLPidLikelihood> m_eclLikelihoods; /**< Optional array for ECLPidLikelihoods */
-    StoreArray<Muid> m_muid; /**< Optional array for Muid */
+    StoreArray<KLMMuidLikelihood> m_muid; /**< Optional array for KLMMuidLikelihood */
 
     /**
      * Set TOP log likelihoods and corresponding reconstruction flag
@@ -127,17 +126,15 @@ namespace Belle2 {
 
     /**
      * Set KLM log likelihoods and corresponding reconstruction flag
-     * @param muid Muid pointer
+     * @param muid KLMMuidLikelihood pointer
      */
-    void setLikelihoods(const Muid* muid);
+    void setLikelihoods(const KLMMuidLikelihood* muid);
 
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
 
   };
 
 } // Belle2 namespace
-
-#endif
 
 
 

@@ -10,8 +10,6 @@
 #include <tracking/ckf/cdc/filters/pathPairs/MCTruthCDCPathPairFilter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-
 using namespace Belle2;
 
 namespace {

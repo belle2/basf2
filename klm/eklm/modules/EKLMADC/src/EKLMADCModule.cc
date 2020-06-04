@@ -8,14 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* External headers. */
-#include <TH1F.h>
-
-/* Belle2 headers. */
-#include <framework/gearbox/Unit.h>
-#include <klm/eklm/geometry/GeometryData.h>
+/* Own header. */
 #include <klm/eklm/modules/EKLMADC/EKLMADCModule.h>
+
+/* KLM headers. */
+#include <klm/eklm/geometry/GeometryData.h>
 #include <klm/simulation/ScintillatorSimulator.h>
+
+/* Belle 2 headers. */
+#include <framework/gearbox/Unit.h>
+
+/* ROOT headers. */
+#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -23,8 +27,12 @@ REG_MODULE(EKLMADC)
 
 static const char MemErr[] = "Memory allocation error.";
 
-EKLMADCModule::EKLMADCModule() : Module(),
-  m_fout(nullptr), m_SciSimPar(nullptr), m_hDir(nullptr), m_hRef(nullptr)
+EKLMADCModule::EKLMADCModule() :
+  Module(),
+  m_fout(nullptr),
+  m_SciSimPar(nullptr),
+  m_hDir(nullptr),
+  m_hRef(nullptr)
 {
   setDescription("Standalone generation and studies of ADC output.");
   setPropertyFlags(c_ParallelProcessingCertified);

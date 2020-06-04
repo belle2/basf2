@@ -147,7 +147,8 @@ namespace Belle2 {
             r[dimy] = sqrt(x_pos[dimy] * x_pos[dimy] + y_pos[dimy] * y_pos[dimy]);
             double Phi = 0;
             if (x_pos[dimy] >= 0) Phi = TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg();
-            else if (x_pos[dimy] < 0) Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
+            else Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
+            //else if (x_pos[dimy] < 0) Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
             phi[dimy] = Phi * CLHEP::deg  - 90. * CLHEP::deg;
             dimy++;
           }

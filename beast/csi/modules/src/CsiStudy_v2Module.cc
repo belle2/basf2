@@ -190,7 +190,8 @@ void CsiStudy_v2Module::event()
     double sad_ssraw = MetaHit.getssraw();
     double ssraw = 0;
     if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;
-    else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
+    else ssraw = 3000. + sad_ssraw / 100.;
+    //else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
     ring_section = section_ordering[(int)((ssraw) / 250.)] - 1;
     //ring_section = MetaHit.getring_section() - 1;
   }

@@ -246,7 +246,7 @@ void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector
   auto* regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(cutValue * cm);
   bool foundOne{false};
-  for (const auto regionName : regions) {
+  for (const auto& regionName : regions) {
     auto* region = theRegionStore->GetRegion(regionName, false);
     if (!region) {
       B2WARNING("Cannot find Geant4 region for sub detector. Probably detector not present?"

@@ -7,7 +7,7 @@ from prompt.utils import events_in_basf2_file
 
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="CDC Tracking",
+settings = CalibrationSettings(name="CDC bad wires",
                                expert_username="uchida",
                                description=__doc__,
                                input_data_formats=["raw"],

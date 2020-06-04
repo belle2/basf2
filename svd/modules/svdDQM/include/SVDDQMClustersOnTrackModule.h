@@ -21,6 +21,8 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <framework/dataobjects/EventT0.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -52,10 +54,18 @@ namespace Belle2 {
 
   private:
 
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = true;
+
+    /** parameter to change the range of the time histograms*/
+    bool m_isSVDTimeCalibrated = false;
+
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
+    StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
+
     /** StoreArray of the Tracks*/
     StoreArray<Track> m_storeTracks;
-    /** SVDEventInfo useful if we want to select a particular TB*/
-    StoreObjPtr<SVDEventInfo> m_svdEvtInfo;
+
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
 
@@ -98,6 +108,10 @@ namespace Belle2 {
     /** v MaxBin of strips related to tracks for all sensors*/
     TH1F* m_stripMaxBinVAll = nullptr;
 
+    /** u Time of clusters related to tracks vs EventT0 */
+    TH2F* m_clsTrkTimeUEvtT0 = nullptr;
+    /** v Time of clusters related to tracks vs EventT0 */
+    TH2F* m_clsTrkTimeVEvtT0 = nullptr;
     /** u Time of clusters related to tracks for layer 3 sensors */
     TH1F* m_clsTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors */

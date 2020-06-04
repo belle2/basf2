@@ -28,6 +28,7 @@ from dft import DeepFlavorTagger
 import vertex as vx
 import variables.collections as vc
 import variables.utils as vu
+from ROOT import Belle2
 import argparse
 import sys
 import os
@@ -90,12 +91,21 @@ def setEnvironment(belleOrBelle2Flag="Belle2"):
 
     if belleOrBelle2Flag == "Belle":
 
+        from b2biiConversion import convertBelleMdstToBelleIIMdst
+
         os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
         os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
         environmentType = "Belle"
 
-    ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
+        inputFileList = []
+        for iFile in Belle2.Environment.Instance().getInputFilesOverride():
+            inputFileList.append(str(iFile))
+
+        convertBelleMdstToBelleIIMdst(inputBelleMDSTFile=inputFileList, path=cp_val_path)
+
+    else:
+        ma.inputMdstList(environmentType=environmentType, filelist=[], path=cp_val_path)
 
 
 def reconstructB2JpsiKs_mu(belleOrBelle2Flag='Belle2'):
@@ -151,8 +161,8 @@ def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
         target_list_name = 'B0:sig'
         ma.fillParticleList('pi+:mdst', '', path=cp_val_path)
         ma.fillParticleList('gamma:mdst', '', path=cp_val_path)
-        ma.fillParticleList('K_L0:mdst', '', path=cp_val_path)
-        inputParticlelists = ['pi+:mdst', 'gamma:mdst', 'K_L0:mdst']
+        # ma.fillParticleList('K_L0:mdst', '', path=cp_val_path)
+        inputParticlelists = ['pi+:mdst', 'gamma:mdst']
         roeBuilder = b2.register_module('RestOfEventBuilder')
         roeBuilder.set_name('ROEBuilder_' + target_list_name)
         roeBuilder.param('particleList', target_list_name)
@@ -179,6 +189,8 @@ def applyCPVTools(mode='Expert'):
             weightFiles='B2' + decayChannelTrainedOn + mcType,
             combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
             belleOrBelle2=belleOrBelle2Flag,
+            useOnlyLocalWeightFiles=True,
+            downloadFromDatabaseIfNotFound=False,
             workingDirectory=workingDirectory,
             samplerFileId=str(fileNumber),
             path=cp_val_path)
@@ -198,23 +210,24 @@ def applyCPVTools(mode='Expert'):
 
         # # Preliminar DNN Identifier has to be set by hand when validating
         # # The standard name should be however
-        # dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1DNN_1"
-        #
-        # DeepFlavorTagger.DeepFlavorTagger('B0:sig',
-        #         mode='expert',
-        #         working_dir='',
-        #         uniqueIdentifier=dnnIdentifier,
-        #         output_variable='dnn_output',
-        #         path=cp_val_path)
-
-        # vu._variablemanager.addAlias('DNN_qrCombined', 'formula(2*extraInfo(dnn_output) - 1)')
+        # This is temporary till the DNN gets retrained.
+        dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1OptimizedForDataDNN"
+        if belleOrBelle2Flag == "Belle":
+            dnnIdentifier = "FlavorTagger_" + belleOrBelle2Flag + "_B2nunubarBGx1DNN"
+        b2.conditions.append_globaltag("analysis_tools_release-03-02-00")
+        DeepFlavorTagger.DeepFlavorTagger('B0:sig',
+                                          mode='expert',
+                                          working_dir='',
+                                          uniqueIdentifier=dnnIdentifier,
+                                          path=cp_val_path)
 
     if doVertex or mode == 'Expert':
 
         if doVertex:
             if decayChannel == "JPsiKs":
-                vx.vertexRave(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-                              constraint='', path=cp_val_path)
+                # vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+                #         constraint='', path=cp_val_path)
+                vx.vertexTree(list_name='B0:sig', conf_level=-2, path=cp_val_path)
             vx.TagV(list_name='B0:sig', MCassociation='breco', path=cp_val_path)
             print("TagV will be used")
 
@@ -239,7 +252,7 @@ def applyCPVTools(mode='Expert'):
                 vu.create_aliases_for_selected(list_of_variables=vertex_vars,
                                                decay_string='B0 -> [^J/psi -> ^mu+ ^mu-] [^K_S0 -> ^pi+ ^pi-]')
         if mode == 'Expert':
-            bvars += ft.flavor_tagging  # + ['DNN_qrCombined', 'extraInfo(dnn_output)']
+            bvars += ft.flavor_tagging + ['DNN_qrCombined', 'extraInfo(dnn_output)']
         else:
             vu._variablemanager.addAlias('qrMC', 'isRelatedRestOfEventB0Flavor')
             bvars += ['qrMC']

@@ -104,6 +104,14 @@ namespace Belle2 {
           B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
+
+        if (! clusterCal.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
+          B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
+                  ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
+          continue;
+        }
+
+
         foundCombinations.push_back({uCluster, vCluster});
 
 

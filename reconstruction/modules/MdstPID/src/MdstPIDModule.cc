@@ -170,8 +170,8 @@ namespace Belle2 {
     if (muid->getOutcome() == MuidElementNumbers::c_NotReached)
       return; // track extrapolation didn't reach KLM
 
-    if (muid->getJunkPDFValue() != 0)
-      return; // unclassifiable track (all likelihoods were zero)
+    if (muid->getJunkPDFValue())
+      return; // unclassifiable track (all likelihoods were zero), extremely rare
 
     for (const auto& chargedStable : Const::chargedStableSet) {
       m_pid->setLogLikelihood(Const::KLM, chargedStable, muid->getLogL(chargedStable.getPDGCode()));

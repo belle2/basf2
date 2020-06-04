@@ -1511,6 +1511,9 @@ void CDCGeometryPar::setChMap()
     const int iBd = cm.getBoardID();
     const WireID wID(isl, il, iw);
     m_wireToBoard.insert(pair<WireID, unsigned short>(wID, iBd));
+    const int iCh = cm.getBoardChannel();
+    m_wireToChannel.insert(pair<WireID, unsigned short>(wID, iCh));
+    m_boardAndChannelToWire[iBd][iCh] = wID.getEWire();
   }
 }
 
@@ -2347,7 +2350,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 
     //    double minTime0 = minTime;
     //higher-order corr. using Newton method; trial to minimize x^2
-    double  edm = 10.;   //(cm)
+    double  edm; //  = 10.;   //(cm)  (SG: fix to avoid cpp-check warning)
     //      const double epsi4t = 0.01; //(ns)
     //    const double epsi4x = 1.e-5; //(cm)
     const double epsi4x = 5.e-6; //(cm)

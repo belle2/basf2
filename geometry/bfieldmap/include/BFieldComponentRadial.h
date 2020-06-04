@@ -106,7 +106,7 @@ namespace Belle2 {
      * @param srmin minimum radius for the gap in endyoke [cm].
      * @param zyoke minimum Z of endyoke [cm].
      * @param gaph height of the gap in endyoke [cm].
-     * param iront thickness of iron plate in endyoke [cm].
+     * @param iront thickness of iron plate in endyoke [cm].
      */
     void setKlmParameters(double srmin, double zyoke, double gaph, double iront)
     {

@@ -29,7 +29,7 @@
 using namespace Belle2;
 
 const unsigned long long GB = 1000 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 2 * GB;
+const unsigned long long MAX_FILE_SIZE = 8 * GB;
 const char* g_table = "datafiles";
 unsigned int g_streamersize = 0;
 char* g_streamerinfo = new char[1000000];

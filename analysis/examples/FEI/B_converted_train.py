@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Example which can be used to train the FEI
 
@@ -13,8 +12,6 @@ import basf2 as b2
 import modularAnalysis as ma
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
 import fei
 

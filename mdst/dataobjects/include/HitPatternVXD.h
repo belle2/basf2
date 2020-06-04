@@ -77,7 +77,7 @@ namespace Belle2 {
 
     /**
      * Set the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      * @param uHits
      * @param vHits
      */
@@ -85,14 +85,14 @@ namespace Belle2 {
 
     /**
      * Get the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      * @return Pair of (u, v) hits in the SVD layer.
      */
     std::pair<const unsigned short, const unsigned short> getSVDLayer(const unsigned short layerId) const;
 
     /**
      * Reset the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      */
     void resetSVDLayer(const unsigned short layerId);
 
@@ -128,7 +128,7 @@ namespace Belle2 {
 
     /**
      * Set the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param nHits 0-3 hits possible
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
@@ -137,7 +137,7 @@ namespace Belle2 {
 
     /**
      * Get the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
      * @return Number of hits in the PXD layer.
@@ -146,7 +146,7 @@ namespace Belle2 {
 
     /**
      * Reset the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
      */

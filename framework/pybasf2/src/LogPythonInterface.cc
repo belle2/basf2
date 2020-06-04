@@ -145,11 +145,21 @@ bool LogPythonInterface::getPythonLoggingEnabled() const
   return LogConnectionConsole::getPythonLoggingEnabled();
 }
 
+void LogPythonInterface::setEscapeNewlinesEnabled(bool enabled) const
+{
+  LogConnectionConsole::setEscapeNewlinesEnabled(enabled);
+}
+
+bool LogPythonInterface::getEscapeNewlinesEnabled() const
+{
+  return LogConnectionConsole::getEscapeNewlinesEnabled();
+}
+
 /** Return dict containing message counters */
 dict LogPythonInterface::getLogStatistics()
 {
   dict returnDict;
-  LogSystem& logSys = LogSystem::Instance();
+  const LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
     auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);
@@ -451,6 +461,13 @@ to a buffer. This setting affects all log connections to the
 console.
 
 .. versionadded:: release-03-00-00)DOCSTRING")
+  .add_property("enable_escape_newlines", &LogPythonInterface::getEscapeNewlinesEnabled,
+                &LogPythonInterface::setEscapeNewlinesEnabled, R"DOCSTRING(
+Enable or disable escaping of newlines in log messages to the console. If this
+is set to true than any newline character in log messages printed to the console
+will be replaced by a "\n" to ensure that every log messages fits exactly on one line.
+
+.. versionadded:: release-04-02-00)DOCSTRING")
   ;
 
   //Expose Logging object

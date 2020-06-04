@@ -169,8 +169,14 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             if intersects:
                 n_intersecting_mc_tracks += 1
 
+        mc_particle = track_match_look_up.getRelatedMCParticle(reco_track)
+        mc_is_primary = False
+        if mc_particle:
+            mc_is_primary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
+
         return dict(
             is_matched=is_matched,
+            is_matchedPrimary=is_matched and mc_is_primary,
             is_clone=is_clone,
             is_background=is_background,
             is_ghost=is_ghost,
@@ -211,6 +217,19 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         outlier_z_score=5.0,
         lower_bound=-1.73,
         upper_bound=3.27,
+        bins=50
+    )
+
+    #: Make profile of the clone rate versus seed phi0
+    #: Rename the quantities to names that display nicely by root latex translation
+    save_clone_rate_by_seed_phi0_profile = refiners.save_profiles(
+        select={
+            'is_clone': 'clone rate',
+            'seed_phi0_estimate': 'seed #phi',
+        },
+        y='clone rate',
+        y_binary=True,
+        outlier_z_score=5.0,
         bins=50
     )
 
@@ -298,15 +317,183 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         ]
     )
 
+    #: Hit efficiency in each sub detector by the true pt value
+    save_hit_efficiency_by_pt_profile = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "pt_truth": "true p_{t}",
+            "mc_pxd_hit_efficiency": "pxd hit efficiency",
+            "mc_svd_hit_efficiency": "svd hit efficiency",
+            "mc_cdc_hit_efficiency": "cdc hit efficiency",
+        },
+        y=[
+            "pxd hit efficiency",
+            "svd hit efficiency",
+            "cdc hit efficiency",
+        ]
+    )
+
+    #: Hit purity in each sub detector by the true pt value
+    save_hit_purity_by_pt_profile = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "pt_truth": "true p_{t}",
+            "pxd_hit_purity": "pxd hit purity",
+            "svd_hit_purity": "svd hit purity",
+            "cdc_hit_purity": "cdc hit purity",
+        },
+        y=[
+            "pxd hit purity",
+            "svd hit purity",
+            "cdc hit purity",
+        ]
+    )
+
+    #: Hit counts in each sub detector by the true tanlambda value
+    save_hit_counts_by_tanlambda_profile = refiners.save_profiles(
+        filter_on="is_matched",
+        select={
+            "tan_lambda_truth": "true tan #lambda",
+            "n_pxd_hits": "pxd hits",
+            "n_svd_hits": "svd hits",
+            "n_cdc_hits": "cdc hits",
+        },
+        y=[
+            "pxd hits",
+            "svd hits",
+            "cdc hits",
+        ]
+    )
+
+    #: Hit efficiency in each sub detector by the true tanlambda value
+    save_hit_efficiency_by_tanlambda_profile = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "tan_lambda_truth": "true tan #lambda",
+            "mc_pxd_hit_efficiency": "pxd hit efficiency",
+            "mc_svd_hit_efficiency": "svd hit efficiency",
+            "mc_cdc_hit_efficiency": "cdc hit efficiency",
+        },
+        y=[
+            "pxd hit efficiency",
+            "svd hit efficiency",
+            "cdc hit efficiency",
+        ]
+    )
+
+    #: Hit purity in each sub detector by the true tanlambda value
+    save_hit_purity_by_tanlambda_profile = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "tan_lambda_truth": "true tan #lambda",
+            "pxd_hit_purity": "pxd hit purity",
+            "svd_hit_purity": "svd hit purity",
+            "cdc_hit_purity": "cdc hit purity",
+        },
+        y=[
+            "pxd hit purity",
+            "svd hit purity",
+            "cdc hit purity",
+        ]
+    )
+
+    #: Save simple FOM
+    save_hit_efficiency = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit efficiency in the subdetectors",
+        key="hit efficiency",
+        select="mc_hit_efficiency",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_pxd_hit_efficiency = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit efficiency in the subdetectors",
+        key="pxd hit efficiency",
+        select="mc_pxd_hit_efficiency",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_svd_hit_efficiency = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit efficiency in the subdetectors",
+        key="svd hit efficiency",
+        select="mc_svd_hit_efficiency",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_cdc_hit_efficiency = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit efficiency in the subdetectors",
+        key="cdc hit efficiency",
+        select="mc_cdc_hit_efficiency",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_hit_purity = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit purity in the subdetectors",
+        key="hit purity",
+        select="hit_purity",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_pxd_hit_purity = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit purity in the subdetectors",
+        key="pxd hit purity",
+        select="pxd_hit_purity",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_svd_hit_purity = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit purity in the subdetectors",
+        key="svd hit purity",
+        select="svd_hit_purity",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
+    #: Save simple FOM
+    save_cdc_hit_purity = refiners.save_fom(
+        name="{module.id}_subdetector_figures_of_merit",
+        title="Overview figures in {module.title}",
+        description="Hit purity in the subdetectors",
+        key="cdc hit purity",
+        select="cdc_hit_purity",
+        aggregation=np.nanmean,
+        filter_on="is_matchedPrimary"
+    )
+
     #: Creates a distribution of p values from the Genfit track fit for match pr tracks.
     save_p_value_histogram = refiners.save_histograms(
         filter_on="is_matched",
         select={"p_value": "Genfit p value"},
         description="""
-The distribution of p values from the Genfit track fit.
-If all errors are propagated correctly the distribution should be flat.
-Generally some peaking behvaiour towards zero is too be expected if the errors are underestimated.
-""",
+                    The distribution of p values from the Genfit track fit.
+                    If all errors are propagated correctly the distribution should be flat.
+                    Generally some peaking behvaiour towards zero is too be expected if the errors are underestimated.
+                    """,
         check="The distribution should be flat."
     )
 

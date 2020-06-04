@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -26,12 +25,11 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import KFit
+from vertex import kFit
 from stdCharged import stdMu
 from stdV0s import stdKshorts
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
-import variables.utils as vu
 
 # create path
 my_path = b2.create_path()
@@ -56,8 +54,8 @@ reconstructDecay('B0:iptube20um -> J/psi:mm K_S0:merged', cut='5.27<Mbc<5.29 and
 
 # perform B0 vertex fit using only muons from J/psi
 # fit one list with iptube constraint, the other with smeared iptube constraint.
-KFit('B0:iptube', 0.0, 'vertex', constraint='iptube', decay_string='B0 -> [J/psi -> ^mu- ^mu+] K_S0', smearing=0.0, path=my_path)
-KFit(
+kFit('B0:iptube', 0.0, 'vertex', constraint='iptube', decay_string='B0 -> [J/psi -> ^mu- ^mu+] K_S0', smearing=0.0, path=my_path)
+kFit(
     'B0:iptube20um',
     0.0,
     'vertex',

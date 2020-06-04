@@ -23,6 +23,7 @@
 #include <TGraphErrors.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TLatex.h>
 
 namespace Belle2 {
 
@@ -57,15 +58,22 @@ namespace Belle2 {
     std::vector<double> m_HitMapThresholds{};
     /** Options for waveform histograms. */
     std::vector<std::string> m_WaveformOption{};
+    /** Maximum boundary for crate time offsets. */
+    double m_CrateTimeOffsetsMax;
+    /** Maximum of fails for logic test. */
+    int m_LogicTestMax;
+
+    /** Vector for crates IDs w/ low statistics. */
+    std::vector<short> m_low{};
 
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_lower_boundary_trigtag2 = nullptr;
     /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
     TLine* m_upper_boundary_trigtag2 = nullptr;
 
-    //TLine to show lower boundary for 'crate_time_offsets' graph. */
+    /** TLine to show lower boundary for 'crate_time_offsets' graph. */
     TLine* m_lower_boundary_time_offsets = nullptr;
-    //TLine to show upper boundary for 'crate_time_offsets' graph. */
+    /** TLine to show upper boundary for 'crate_time_offsets' graph. */
     TLine* m_upper_boundary_time_offsets = nullptr;
 
     /** TCanvas for time offsets. */
@@ -81,10 +89,33 @@ namespace Belle2 {
     /** Histogram for ECL logic summary. */
     TH2F* h_logic_summary = nullptr;
 
-    /** Find TCanvas by name. */
-    TCanvas* findCanv(TString);
+    /** TCanvas for quality .*/
+    TCanvas* c_quality_analysis = nullptr;
+    /** TCanvas for quality_other .*/
+    TCanvas* c_quality_other_analysis = nullptr;
+    /**TCanvas for bad_quality .*/
+    TCanvas* c_bad_quality_analysis = nullptr;
+    /** TCanvas for trigtag1 .*/
+    TCanvas* c_trigtag1_analysis = nullptr;
+    /** TCanvas for trigtag2 .*/
+    TCanvas* c_trigtag2_analysis = nullptr;
+    /** TCanvas for adc_hits .*/
+    TCanvas* c_adc_hits_analysis = nullptr;
+    /** TCanvas for ampfail_quality .*/
+    TCanvas* c_ampfail_quality_analysis = nullptr;
+    /** TCanvas for timefail_quality .*/
+    TCanvas* c_timefail_quality_analysis = nullptr;
+    /** TCanvas for quality_fit_data .*/
+    TCanvas* c_quality_fit_data_analysis = nullptr;
+
+    /** Vector of TCanvases for hit map .*/
+    std::vector<TCanvas*> c_cid_analysis{};
+
+    /**Vector of TCanvases for waveforms .*/
+    std::vector<TCanvas*> c_wf_analysis{};
+
     /** Normalize histograms. */
-    void normalize(std::string, std::string, Double_t);
+    void normalize(TCanvas*, const std::string&, const Double_t&);
   };
 } // end namespace Belle2
 

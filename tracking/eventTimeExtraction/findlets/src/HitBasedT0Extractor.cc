@@ -265,9 +265,10 @@ void HitBasedT0Extractor::apply(std::vector<CDCWireHit>& inputWireHits)
                 "T0 fit has too large error " << fitted_t0_error);
       } else {
 
-        // Add we have assumed that the event time at the stage of the wire hit creation was 0,
-        // we do not need to add or substract something here!
-        EventT0::EventT0Component eventT0Component(fitted_t0, fitted_t0_error, Const::CDC, "hit based", norm_chi2);
+        // Since drift times are corrected for EventT0 (in RealisticTDCCountTranslator), if any other T0 modules were executed before, add the EventT0 offset back.
+        // This leads to "absolute" event T0 determination which should be consistent with other T0 modules.
+        double lastEventT0 = m_eventT0->hasEventT0() ? m_eventT0->getEventT0() : 0;
+        EventT0::EventT0Component eventT0Component(fitted_t0 + lastEventT0, fitted_t0_error, Const::CDC, "hit based", norm_chi2);
         m_eventT0->addTemporaryEventT0(eventT0Component);
         m_eventT0->setEventT0(eventT0Component);
         m_wasSuccessful = true;

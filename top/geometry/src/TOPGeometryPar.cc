@@ -99,10 +99,13 @@ namespace Belle2 {
       }
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
+        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
       }
       if ((*m_geoDB)->getTTSes().empty()) {
-        B2WARNING("TOPGeometry: old payload found, nominal TTS will be used");
+        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
+      }
+      if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
+        B2WARNING("TOPGeometry: old payload revision (before bugfix and update of optical properties)");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -208,8 +211,8 @@ namespace Belle2 {
       auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
       auto channel = getChannelMapper().getChannel(pixelID);
 
-      double RQE = 1.0;
-      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+      double RQE = geo->getPDETuningFactor(getPMTType(moduleID, pmtID));
+      if (m_channelRQE.isValid()) RQE *= m_channelRQE->getRQE(moduleID, channel);
 
       return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) * RQE;
 
@@ -220,9 +223,10 @@ namespace Belle2 {
     {
 
       auto channel = getChannelMapper().getChannel(pixelID);
+      auto pmtID = getChannelMapper().getPmtID(pixelID);
 
-      double RQE = 1.0;
-      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+      double RQE = getGeometry()->getPDETuningFactor(getPMTType(moduleID, pmtID));
+      if (m_channelRQE.isValid()) RQE *= m_channelRQE->getRQE(moduleID, channel);
 
       double thrEffi = 1.0;
       if (m_thresholdEff.isValid()) thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
@@ -295,9 +299,17 @@ namespace Belle2 {
         }
       }
 
+      std::map<std::string, const TOPPmtInstallation*> map;
+      for (const auto& pmt : m_pmtInstalled) {
+        map[pmt.getSerialNumber()] = &pmt;
+      }
+      const auto* geo = getGeometry();
+
       std::vector<float> envelopeQE;
       for (const auto& pmt : m_pmtQEData) {
         float ce = pmt.getCE(m_BfieldOn);
+        auto pmtInstalled = map[pmt.getSerialNumber()];
+        if (pmtInstalled) ce *= geo->getPDETuningFactor(pmtInstalled->getType());
         if (pmt.getLambdaFirst() == lambdaFirst and pmt.getLambdaStep() == lambdaStep) {
           const auto& envelope = pmt.getEnvelopeQE();
           if (envelopeQE.size() < envelope.size()) {
@@ -741,6 +753,7 @@ namespace Belle2 {
       GearDir pmtTTSParams(content, "TTSofPMTs");
       for (const GearDir& ttsPar : pmtTTSParams.getNodes("TTSpar")) {
         int type = ttsPar.getInt("type");
+        double tuneFactor = ttsPar.getDouble("PDEtuneFactor");
         TOPNominalTTS tts("TTS of " + ttsPar.getString("@name") + " PMT");
         tts.setPMTType(type);
         for (const GearDir& Gauss : ttsPar.getNodes("Gauss")) {
@@ -750,6 +763,7 @@ namespace Belle2 {
         }
         tts.normalize();
         geo->appendTTS(tts);
+        geo->appendPDETuningFactor(type, tuneFactor);
       }
 
       // nominal TDC

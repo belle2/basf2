@@ -17,9 +17,17 @@
 
 using namespace Belle2;
 
+
+TVector3 DistanceTools::poca(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
+{
+  TVector3 trackDir(trackP.Unit());
+  TVector3 r(vtxPos - trackPos);
+  return trackPos + r.Dot(trackDir) * trackDir;
+}
+
 TVector3 DistanceTools::trackToVtxVec(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos)
 {
-  TVector3 trackDir((1. / trackP.Mag()) * trackP);
+  TVector3 trackDir(trackP.Unit());
   TVector3 r(vtxPos - trackPos);
   return r - (r.Dot(trackDir)) * trackDir;
 }
@@ -38,7 +46,7 @@ TMatrixDSym DistanceTools::trackToVtxCovmat(TVector3 const& trackP,
   }
 
   TMatrixDSym rCovMat(trackPosCovMat + vtxPosCovMat);
-  TVector3 trackDir((1. / trackP.Mag()) * trackP);
+  TVector3 trackDir(trackP.Unit());
   //d_j = r_j - v_j * v_k r_k
   //Jij = del_i d_j = delta_ij - v_i * v_j
   //Since the vector of closest approach is a linear function of r, its

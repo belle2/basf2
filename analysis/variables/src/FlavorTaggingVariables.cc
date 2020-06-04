@@ -108,7 +108,7 @@ namespace Belle2 {
           // Here we skip tracks with 0 charge
           if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
           Particle particle(track, charged);
-          if (particle.getParticleType() == Particle::c_Track) {
+          if (particle.getParticleSource() == Particle::c_Track) {
             TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
             if (p_cms != p_cms) continue;
             if (p_cms.Rho() > P_MAX) continue;
@@ -596,7 +596,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < Y->getListSize(); ++i)
         {
           const auto& oParticle = Y->getParticle(i);
-          result = particle->overlapsWith(oParticle);
+          result = (double)particle->overlapsWith(oParticle);
           if (result == 1.0)
             return 1;
         }

@@ -55,7 +55,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce combinations with the given sizes of each particle list
-     * @param sizes the sizes of the particle lists to combine
+     * @param _sizes the sizes of the particle lists to combine
      */
     void init(const std::vector<unsigned int>& _sizes);
 
@@ -96,7 +96,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
-     * @param numberOfLists Number of Particle Lists which shall be combined
+     * @param _numberOfLists Number of Particle Lists which shall be combined
      */
     void init(unsigned int _numberOfLists);
 
@@ -135,7 +135,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
-     * @param DecayDescriptor
+     * @param decaydescriptor
      * @param cutParameter
      */
     explicit ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter = "");
@@ -148,7 +148,7 @@ namespace Belle2 {
     /**
      * Loads the next combination. Returns false if there is no next combination
      */
-    bool loadNext();
+    bool loadNext(bool loadAntiParticle = true);
 
     /**
      * Returns the particle

@@ -83,6 +83,7 @@ namespace Belle2 {
        * This function will convert a Gearbox representation of the geometry to
        * an object containing all necessary parameters
        * @param detectorDir GearDir pointing to the top element of the geometry parameters
+       * @param iov Interval of validity for the created object
        */
       GeoConfiguration createGeometryConfig(const GearDir& detectorDir, const IntervalOfValidity& iov);
 

@@ -13,20 +13,25 @@
 
 namespace Belle2 {
 
+  /** Declaration of class B2BIIMCParticlesMonitor */
   class B2BIIMCParticlesMonitorModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
-    /**    Constructor */
+    /** Constructor */
     B2BIIMCParticlesMonitorModule();
     /** Destructor */
     virtual ~B2BIIMCParticlesMonitorModule();
 
-    /** Module functions */
+    /** Initialize the module */
     virtual void initialize() override;
+    /** Called when a new run is started */
     virtual void beginRun() override;
+    /** Called for each event */
     virtual void event() override;
+    /** Called when the current run finished */
     virtual void endRun() override;
+    /** Terminates the module */
     virtual void terminate() override;
 
     /** function to define histograms */

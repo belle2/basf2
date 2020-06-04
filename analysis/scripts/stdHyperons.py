@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from basf2 import B2ERROR
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
-from vertex import treeFit, vertexKFit, massVertexKFit
+from vertex import treeFit, kFit
 
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
@@ -37,7 +37,7 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
     elif b2bii:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
-        vertexKFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
+        kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
@@ -51,9 +51,9 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
 
     # stdXi-
     if fitter == 'KFit':
-        massVertexKFit('Lambda0:reco', 0.0, '', path=path)
+        kFit('Lambda0:reco', 0.0, fit_type='massvertex', path=path)
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
-        vertexKFit('Xi-:reco', conf_level=0.0, path=path)
+        kFit('Xi-:reco', conf_level=0.0, path=path)
     elif fitter == 'TreeFit':
         reconstructDecay('Xi-:reco -> Lambda0:reco pi-:all', '1.295 < M < 1.35', path=path)
         treeFit('Xi-:reco', conf_level=0.0, massConstraint=[3122], path=path)
@@ -113,7 +113,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
         [ [ daughter(1,clusterReg) == 1 and daughter(1,E) > 0.05 ] or [ daughter(1,clusterReg) == 3 and daughter(1,E) > 0.05 ]  or \
         [ daughter(1,clusterReg) == 2 and  daughter(1,E) > 0.03 ] ]',
             path=path)
-        vertexKFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
+        kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
@@ -174,7 +174,7 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
     elif b2bii:
         stdPi('all', path=path)
         # Rough Lambda0 cuts from J. Yelton Observations of an Excited Omega- Baryon
-        vertexKFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
+        kFit('Lambda0:mdst', conf_level=0.0, path=path)  # Re-vertexing, recover vertex variables and error matrix
         cutAndCopyList(
             'Lambda0:reco',
             'Lambda0:mdst',
@@ -189,9 +189,9 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
     stdK('all', path=path)
     # stdOmega-
     if fitter == 'KFit':
-        massVertexKFit('Lambda0:reco', 0.0, '', path=path)
+        kFit('Lambda0:reco', 0.0, fit_type='massvertex', path=path)
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
-        vertexKFit('Omega-:reco', conf_level=0.0, path=path)
+        kFit('Omega-:reco', conf_level=0.0, path=path)
     elif fitter == 'TreeFit':
         reconstructDecay('Omega-:reco -> Lambda0:reco K-:all', '1.622 < M < 1.722', path=path)
         treeFit('Omega-:reco', conf_level=0.0, massConstraint=[3122], path=path)

@@ -21,8 +21,6 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
 
-#include <genfit/MeasurementOnPlane.h>
-
 #include <TDirectory.h>
 #include <TVectorD.h>
 
@@ -1126,9 +1124,6 @@ void AlignDQMModule::event()
         // add p-value:
         float pValue = theRC[0]->getTrackFitStatus()->getPVal();
         m_PValue->Fill(pValue);
-        // add residuals:
-        int iHit = 0;
-        int iHitPrew = 0;
 
         VxdID sensorIDPrew;
 
@@ -1143,8 +1138,10 @@ void AlignDQMModule::event()
         int iLayerPrev = 0;
         int iLayer = 0;
 
+        bool isNotFirstHit = false;
+
         int IsSVDU = -1;
-        for (auto recoHitInfo : theRC[0]->getRecoHitInformations()) {  // over recohits
+        for (auto recoHitInfo : theRC[0]->getRecoHitInformations(true)) {  // over recohits
           if (!recoHitInfo) {
             B2DEBUG(200, "No genfit::pxd recoHitInfo is missing.");
             continue;
@@ -1155,11 +1152,9 @@ void AlignDQMModule::event()
                 (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_SVD)))
             continue;
 
-          auto& genfitTrack = RecoTrackGenfitAccess::getGenfitTrack(*theRC[0]);
-
           bool biased = false;
-          if (!genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()) continue;
-          TVectorD resUnBias = genfitTrack.getPointWithMeasurement(iHit)->getFitterInfo()->getResidual(0, biased).getState();
+          if (!theRC[0]->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()) continue;
+          TVectorD resUnBias = theRC[0]->getCreatedTrackPoint(recoHitInfo)->getFitterInfo()->getResidual(0, biased).getState();
           IsSVDU = -1;
           if (recoHitInfo->getTrackingDetector() == RecoHitInformation::c_PXD) {
             posU = recoHitInfo->getRelatedTo<PXDCluster>()->getU();
@@ -1173,12 +1168,12 @@ void AlignDQMModule::event()
             fPosSPV = ral.Theta() / TMath::Pi() * 180;
             ResidUPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
-            if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+            if (isNotFirstHit && ((iLayer - iLayerPrev) == 1)) {
               int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
               m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
               m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-              iHitPrew = iHit;
-            }
+            } else
+              isNotFirstHit = true;
             iLayerPrev = iLayer;
             fPosSPUPrev = fPosSPU;
             fPosSPVPrev = fPosSPV;
@@ -1251,12 +1246,12 @@ void AlignDQMModule::event()
               fPosSPV = ral.Theta() / TMath::Pi() * 180;
               ResidVPlaneRHUnBias = resUnBias.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
               if (sensorIDPrew == sensorID) { // evaluate
-                if ((iHitPrew < iHit) && (fPosSPUPrev != 0) && (fPosSPVPrev != 0) && ((iLayer - iLayerPrev) == 1)) {
+                if (isNotFirstHit && ((iLayer - iLayerPrev) == 1)) {
                   int index = gTools->getLayerIndex(sensorID.getLayerNumber()) - gTools->getFirstLayer();
                   m_TRClusterCorrelationsPhi[index]->Fill(fPosSPUPrev, fPosSPU);
                   m_TRClusterCorrelationsTheta[index]->Fill(fPosSPVPrev, fPosSPV);
-                  iHitPrew = iHit;
-                }
+                } else
+                  isNotFirstHit = true;
                 iLayerPrev = iLayer;
                 fPosSPUPrev = fPosSPU;
                 fPosSPVPrev = fPosSPV;
@@ -1311,7 +1306,6 @@ void AlignDQMModule::event()
               sensorIDPrew = sensorID;
             }
           }
-          iHit++;
         }
       }
       if (((nPXD > 0) || (nSVD > 0)) && (nCDC > 0)) iTrackVXDCDC++;

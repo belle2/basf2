@@ -449,6 +449,7 @@ namespace Belle2 {
     if (m_mBool["debugEfficiency"]) {
       // Notify when efficiency is not 1.
       for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
+        /* cppcheck-suppress variableScope */
         TCTrack& aTrack = * trackList[iTrack];
         // Find number of super layers that have priority layer hit.
         int nPriorityHitSL = 0;

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 
 namespace Belle2 {
@@ -18,15 +18,17 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Relate the SVD and CDC tracks in the given relations also in the store array.
-  class RelationApplier : public TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> {
+  class RelationApplier : public
+    TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>> {
   public:
     /// The parent findlet
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>;
+    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>>;
 
     void initialize() final;
 
     /// Copy the relations to the store array
-    void apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToSVD) final;
+    void apply(const std::vector<TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>>&
+               relationsCDCToSVD) final;
 
     /// Expose parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

@@ -78,29 +78,29 @@ void CDCCalibrationCollectorModule::prepare()
 
   if (!m_effStudy) { // by default collects calibration data
     auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-    m_tree->Branch<float>("x_mea", &x_mea);
-    m_tree->Branch<float>("x_u", &x_u);
-    m_tree->Branch<float>("x_b", &x_b);
-    m_tree->Branch<float>("alpha", &alpha);
-    m_tree->Branch<float>("theta", &theta);
-    m_tree->Branch<float>("t", &t);
-    m_tree->Branch<unsigned short>("adc", &adc);
+    m_tree->Branch<Float_t>("x_mea", &x_mea);
+    m_tree->Branch<Float_t>("x_u", &x_u);
+    m_tree->Branch<Float_t>("x_b", &x_b);
+    m_tree->Branch<Float_t>("alpha", &alpha);
+    m_tree->Branch<Float_t>("theta", &theta);
+    m_tree->Branch<Float_t>("t", &t);
+    m_tree->Branch<UShort_t>("adc", &adc);
     //  m_tree->Branch<int>("boardID", &boardID);
-    m_tree->Branch<int>("lay", &lay);
-    m_tree->Branch<float>("weight", &weight);
-    m_tree->Branch<int>("IWire", &IWire);
-    m_tree->Branch<float>("Pval", &Pval);
-    m_tree->Branch<float>("ndf", &ndf);
+    m_tree->Branch<UChar_t>("lay", &lay);
+    m_tree->Branch<Float_t>("weight", &weight);
+    m_tree->Branch<UShort_t>("IWire", &IWire);
+    m_tree->Branch<Float_t>("Pval", &Pval);
+    m_tree->Branch<Float_t>("ndf", &ndf);
     if (m_storeTrackParams) {
-      m_tree->Branch<float>("d0", &d0);
-      m_tree->Branch<float>("z0", &z0);
-      m_tree->Branch<float>("phi0", &phi0);
-      m_tree->Branch<float>("tanL", &tanL);
-      m_tree->Branch<float>("omega", &omega);
+      m_tree->Branch<Float_t>("d0", &d0);
+      m_tree->Branch<Float_t>("z0", &z0);
+      m_tree->Branch<Float_t>("phi0", &phi0);
+      m_tree->Branch<Float_t>("tanL", &tanL);
+      m_tree->Branch<Float_t>("omega", &omega);
     }
 
     if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
-      m_tree->Branch<float>("t_fit", &t_fit);
+      m_tree->Branch<Float_t>("t_fit", &t_fit);
     }
 
     registerObject<TTree>("tree", m_tree);
@@ -164,11 +164,39 @@ void CDCCalibrationCollectorModule::collect()
   // WireID collection finished
 
   const int nTr = recoTracks.getEntries();
+
+  // Skip events which have number of charged tracks <= 1.
+  int nCTracks  = 0;
+  for (int i = 0; i < nTr; ++i) {
+    RecoTrack* track = recoTracks[i];
+    if (track->getDirtyFlag()) continue;
+    if (!track->getTrackFitStatus()->isFitted()) continue;
+    const genfit::FitStatus* fs = track->getTrackFitStatus();
+    if (!fs || !fs->isFitConverged()) continue; //not fully convergence
+
+    const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
+    if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
+    const Belle2::TrackFitResult* fitresult = b2track->getTrackFitResult(Const::muon);
+    if (!fitresult) {
+      B2WARNING("track was fitted but Relation not found");
+      continue;
+    }
+
+    short charge = fitresult->getChargeSign();
+    if (fabs(charge) > 0) {
+      nCTracks++;
+    }
+  }
+  if (nCTracks <= 1) {
+    return ;
+  } else {
+    getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
+  }
+
+
   const int nHits = cdcHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
-  int nCTracks  = 0;
-
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
@@ -207,11 +235,6 @@ void CDCCalibrationCollectorModule::collect()
     omega = fitresult->getOmega();
     phi0 = fitresult->getPhi0() * 180 / M_PI;
 
-    short charge = fitresult->getChargeSign();
-    if (fabs(charge) > 0) {
-      nCTracks++;
-    }
-
     // Rejection of suspicious cosmic tracks.
     // phi0 of cosmic track must be negative in our definition!
     if (m_isCosmic == true && phi0 > 0.0) continue;
@@ -231,7 +254,7 @@ void CDCCalibrationCollectorModule::collect()
       buildEfficiencies(wiresInCDCTrack, helixFit);
     }
   }
-  getObjectPtr<TH1F>("hNTracks")->Fill(nCTracks);
+
 }
 
 void CDCCalibrationCollectorModule::finish()

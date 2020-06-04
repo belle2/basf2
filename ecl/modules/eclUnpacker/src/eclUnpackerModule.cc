@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily, Mikhail Remnev                          *
+ * Contributors: Vasily Shebalin, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,9 @@
 //STL
 #include <iomanip>
 
+//Framework
+#include <framework/dataobjects/EventMetaData.h>
+
 //Rawdata
 #include <rawdata/dataobjects/RawECL.h>
 
@@ -21,7 +24,8 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include "ecl/utility/ECLChannelMapper.h"
+#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/utility/ECLDspUtilities.h>
 
 using namespace std;
 using namespace Belle2;
@@ -78,16 +82,15 @@ ADC_NUM*SAMPLES_NUM |                                                           
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_EvtNum(0),
+  m_globalEvtNum(0),
+  m_localEvtNum(0),
   m_bufPtr(0),
   m_bufPos(0),
   m_bufLength(0),
   m_bitPos(0),
   m_storeTrigTime(0),
   m_storeUnmapped(0),
-  m_tagsReportedMask(0),
-  m_phasesReportedMask(0),
-  m_badHeaderReportedMask(0),
+  m_unpackingParams("ECLUnpackingParameters", false),
   m_eclDigits("", DataStore::c_Event),
   m_debugLevel(0)
 {
@@ -103,8 +106,8 @@ ECLUnpackerModule::ECLUnpackerModule() :
   addParam("storeTrigTime", m_storeTrigTime,         "Store trigger time",              false);
   addParam("storeUnmapped", m_storeUnmapped,         "Store ECLDsp for channels that don't "
            "exist in ECL mapping", false);
-
-  m_EvtNum = 0;
+  addParam("useUnpackingParameters", m_useUnpackingParameters,
+           "Use ECLUnpackingParameters payload", true);
 }
 
 ECLUnpackerModule::~ECLUnpackerModule()
@@ -135,6 +138,7 @@ void ECLUnpackerModule::initialize()
 
 void ECLUnpackerModule::beginRun()
 {
+  m_evtNumReportedMask    = 0;
   m_tagsReportedMask      = 0;
   m_phasesReportedMask    = 0;
   m_badHeaderReportedMask = 0;
@@ -142,6 +146,9 @@ void ECLUnpackerModule::beginRun()
   // changes in ECL mapping between runs.
   if (!m_eclMapper.initFromDB()) {
     B2FATAL("ECL Unpacker: Can't initialize eclChannelMapper!");
+  }
+  if (!m_unpackingParams.isValid() && m_useUnpackingParameters) {
+    B2FATAL("ECL Unpacker: Can't access ECLUnpackingParameters payload");
   }
 }
 
@@ -152,6 +159,11 @@ void ECLUnpackerModule::event()
   m_eclDsps.clear();
   m_eclTrigs.clear();
 
+  if (m_eventMetaData.isValid()) {
+    m_globalEvtNum = m_eventMetaData->getEvent();
+  } else {
+    m_globalEvtNum = -1;
+  }
 
   int nRawEclEntries = m_rawEcl.getEntries();
 
@@ -163,13 +175,12 @@ void ECLUnpackerModule::event()
     }
   }
 
-  m_EvtNum++;
+  m_localEvtNum++;
 
 }
 
 void ECLUnpackerModule::endRun()
 {
-  //TODO
 }
 
 void ECLUnpackerModule::terminate()
@@ -257,7 +268,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     // pointer to data from COPPER/FINESSE
     m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
-    B2DEBUG_eclunpacker(21, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
+    B2DEBUG_eclunpacker(21, "***** iEvt " << m_localEvtNum << " node " << std::hex << nodeID);
 
     // dump buffer data
     for (int i = 0; i < m_bufLength; i++) {
@@ -344,6 +355,12 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
           triggerTag0 |= (1 << 16);
         }
 
+        if (m_globalEvtNum >= 0) {
+          if (triggerTag != (m_globalEvtNum & 0xFFFF)) {
+            doEvtNumReport(iCrate, triggerTag, m_globalEvtNum);
+          }
+        }
+
         value = readNextCollectorWord();
         adcMask = value & 0xFFFF; // mask for channels with ADC data
         adcHighMask = (value >> 16) & 0xFFFF;
@@ -363,7 +380,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
           cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
-          if (cellID < 1) continue; // channel is not connected to crystal
+          if (!isDSPValid(cellID, iCrate, iShaper, iChannel, dspAmplitude, dspTime, dspQualityFlag)) continue;
 
           // fill eclDigits data object
           B2DEBUG_eclunpacker(23, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
@@ -442,9 +459,42 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 
             if (cellID > 0 || m_storeUnmapped) {
               ECLDsp* newEclDsp = m_eclDsps.appendNew(cellID, eclWaveformSamples);
+
+              if (m_useUnpackingParameters) {
+                // Check run-dependent unpacking parameters
+                auto params = m_unpackingParams->get(iCrate, iShaper, iChannel);
+                if (params & ECL_OFFLINE_ADC_FIT) {
+                  auto result = ECLDspUtilities::shapeFitter(cellID, eclWaveformSamples, triggerPhase0);
+                  if (result.quality == 2) result.time = 0;
+
+                  bool found = false;
+                  for (auto& newEclDigit : m_eclDigits) {
+                    if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
+                      newEclDigit.setAmp(result.amp);
+                      newEclDigit.setTimeFit(result.time);
+                      newEclDigit.setQuality(result.quality);
+                      newEclDigit.setChi(result.chi2);
+                      found = true;
+                      break;
+                    }
+                  }
+                  if (!found) {
+                    ECLDigit* newEclDigit = m_eclDigits.appendNew();
+                    newEclDigit->setCellId(cellID);
+                    newEclDigit->setAmp(result.amp);
+                    newEclDigit->setTimeFit(result.time);
+                    newEclDigit->setQuality(result.quality);
+                    newEclDigit->setChi(result.chi2);
+                    if (m_storeTrigTime) newEclDigit->addRelationTo(eclTrig);
+                  }
+                }
+              }
               // Add relation from ECLDigit to ECLDsp
               for (auto& newEclDigit : m_eclDigits) {
-                if (newEclDsp->getCellId() == newEclDigit.getCellId()) newEclDigit.addRelationTo(newEclDsp);
+                if (newEclDsp->getCellId() == newEclDigit.getCellId()) {
+                  newEclDigit.addRelationTo(newEclDsp);
+                  break;
+                }
               }
             }
 
@@ -486,17 +536,46 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
       B2ERROR("Corrupted data from ECL collector");
     }
 
-  }// loop ove FINESSes
+  }// loop over FINESSEs
 
 }
 
+bool ECLUnpackerModule::isDSPValid(int cellID, int crate, int shaper, int channel, int, int, int quality)
+{
+  // Channel is not connected to crystal
+  if (cellID < 1) return false;
+
+  if (m_useUnpackingParameters) {
+    // Check if data for this channel should be discarded in current run.
+    auto params = m_unpackingParams->get(crate, shaper, channel);
+    if (params & ECL_DISCARD_DSP_DATA) {
+      if (params & ECL_KEEP_GOOD_DSP_DATA) {
+        if (quality == 0) return true;
+      }
+      return false;
+    }
+  }
+
+  return true;
+}
+
+void ECLUnpackerModule::doEvtNumReport(unsigned int iCrate, int tag, int evt_number)
+{
+  if (!evtNumReported(iCrate)) {
+    B2ERROR("ECL trigger tag is inconsistent with event number."
+            << LogVar("crate", iCrate)
+            << LogVar("trigger tag", tag)
+            << LogVar("event number", evt_number));
+    m_evtNumReportedMask |= 1L << (iCrate - 1);
+  }
+}
 void ECLUnpackerModule::doTagsReport(unsigned int iCrate, int tag0, int tag1)
 {
   if (!tagsReported(iCrate)) {
     B2ERROR("Different trigger tags. ECL data is corrupted for whole run probably."
             << LogVar("crate", iCrate)
             << LogVar("trigger tag0", tag0) << LogVar("trigger tag1", tag1));
-    m_tagsReportedMask |= 1 << (iCrate - 1);
+    m_tagsReportedMask |= 1L << (iCrate - 1);
   }
 }
 void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phase1)
@@ -505,7 +584,7 @@ void ECLUnpackerModule::doPhasesReport(unsigned int iCrate, int phase0, int phas
     B2ERROR("Different trigger phases. ECL data is corrupted for whole run probably."
             << LogVar("crate", iCrate)
             << LogVar("trigger phase0", phase0) << LogVar("trigger phase1", phase1));
-    m_phasesReportedMask |= 1 << (iCrate - 1);
+    m_phasesReportedMask |= 1L << (iCrate - 1);
   }
 }
 void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
@@ -513,7 +592,7 @@ void ECLUnpackerModule::doBadHeaderReport(unsigned int iCrate)
   if (!badHeaderReported(iCrate)) {
     B2ERROR("Bad shaper header."
             << LogVar("crate", iCrate));
-    m_badHeaderReportedMask |= 1 << (iCrate - 1);
+    m_badHeaderReportedMask |= 1L << (iCrate - 1);
   }
 }
 

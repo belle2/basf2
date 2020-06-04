@@ -11,13 +11,14 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMAlignment.h>
+#include <klm/dbobjects/bklm/BKLMAlignment.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMScintillatorDigitizationParameters.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dbobjects/EKLMAlignment.h>
-#include <klm/eklm/dbobjects/EKLMSegmentAlignment.h>
+#include <klm/dbobjects/KLMTimeWindow.h>
+#include <klm/dbobjects/eklm/EKLMAlignment.h>
+#include <klm/dbobjects/eklm/EKLMSegmentAlignment.h>
 
 namespace Belle2 {
 
@@ -59,6 +60,12 @@ namespace Belle2 {
      * @param[in] timeConversion Time conversion parameters.
      */
     void importTimeConversion(const KLMTimeConversion* timeConversion);
+
+    /**
+     * Import KLM time window parameters.
+     * @param[in] timeWindow Time window.
+     */
+    void importTimeWindow(KLMTimeWindow* timeWindow);
 
     /**
      * Load strip efficiencies.
@@ -118,16 +125,16 @@ namespace Belle2 {
       bool displacement = false);
 
     /** Low experiment. */
-    int m_ExperimentLow;
+    int m_ExperimentLow = 0;
 
     /** Low run. */
-    int m_RunLow;
+    int m_RunLow = 0;
 
     /** High experiment. */
-    int m_ExperimentHigh;
+    int m_ExperimentHigh = -1;
 
     /** High run. */
-    int m_RunHigh;
+    int m_RunHigh = -1;
 
   };
 

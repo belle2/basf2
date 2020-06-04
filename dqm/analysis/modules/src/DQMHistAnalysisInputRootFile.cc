@@ -15,7 +15,7 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
+#include <iostream>
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -86,12 +86,13 @@ void DQMHistAnalysisInputRootFileModule::event()
   }
 
   std::vector<TH1*> hs;
-
+  unsigned long long int ts = 0;
   m_file->cd();
   TIter next(m_file->GetListOfKeys());
   TKey* key = NULL;
   while ((key = (TKey*)next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
+    if (ts == 0) ts = key->GetDatime().Convert();
     if (!cl->InheritsFrom("TDirectory")) continue;
     TDirectory* d = (TDirectory*)key->ReadObj();
     std::string dirname = d->GetName();
@@ -110,9 +111,10 @@ void DQMHistAnalysisInputRootFileModule::event()
     if (!pass) continue;
 
     d->cd();
-    TIter dnext(d->GetListOfKeys());
+    TIter nextd(d->GetListOfKeys());
+
     TKey* dkey;
-    while ((dkey = (TKey*)dnext())) {
+    while ((dkey = (TKey*)nextd())) {
       TClass* dcl = gROOT->GetClass(dkey->GetClassName());
       if (!dcl->InheritsFrom("TH1")) continue;
       TH1* h = (TH1*)dkey->ReadObj();
@@ -133,7 +135,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       }
       if (!hpass) continue;
 
-      h->SetName((dirname + "/" + hname).c_str());
+      if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);
 
       std::string name = dirname + "_" + hname;
@@ -154,6 +156,33 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_file->cd();
   }
 
+  // if no histograms are found in the sub-directories
+  // searc the top folder
+  if (hs.size() == 0) {
+    TIter nexth(m_file->GetListOfKeys());
+    TKey* keyh = NULL;
+    while ((keyh = (TKey*)nexth())) {
+      TClass* cl = gROOT->GetClass(keyh->GetClassName());
+      TH1* h;
+      if (cl->InheritsFrom("TH1")) { h = (TH1*)keyh->ReadObj(); hs.push_back(h); }
+      else continue;
+      std::string name = h->GetName();
+      name.replace(name.find("/"), 1, "/c_");
+      if (m_cs.find(name) == m_cs.end()) {
+        TCanvas* c = new TCanvas(name.c_str(), name.c_str());
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+      }
+      TCanvas* c = m_cs[name];
+      c->cd();
+      if (h->GetDimension() == 1) {
+        h->Draw("hist");
+      } else if (h->GetDimension() == 2) {
+        h->Draw("colz");
+      }
+      c->Update();
+    }
+  }
+
   resetHist();
   for (size_t i = 0; i < hs.size(); i++) {
     TH1* h = hs[i];
@@ -162,9 +191,12 @@ void DQMHistAnalysisInputRootFileModule::event()
   }
   m_count++;
   m_eventMetaDataPtr.create();
+
   m_eventMetaDataPtr->setExperiment(m_expno);
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
+  m_eventMetaDataPtr->setTime(ts * 1e9);
+
 }
 
 void DQMHistAnalysisInputRootFileModule::endRun()

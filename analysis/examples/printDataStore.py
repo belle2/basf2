@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+# Doxygen should skip this script
+# @cond
 
 """
 This script loads specified ROOT file and prints the content of the DataStore
@@ -17,3 +19,5 @@ path = basf2.Path()
 path.add_module('RootInput')
 printDataStore(path=path)
 basf2.process(path)
+
+# @endcond

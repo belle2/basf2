@@ -34,6 +34,7 @@ DelayDQMModule::DelayDQMModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("DAQ"));
   addParam("title", m_title, "Prefix for Title (ERECO, HLT, ...)", std::string("Processing "));
+  addParam("useMeta", m_useMeta, "Use time from EvtMetadata or FTSW", false);
 }
 
 void DelayDQMModule::BinLogX(TH1* h)
@@ -82,7 +83,11 @@ void DelayDQMModule::defineHisto()
 void DelayDQMModule::initialize()
 {
   // Required input
-  m_eventMetaData.isRequired();
+  if (m_useMeta) {
+    m_eventMetaData.isRequired();
+  } else {
+    m_rawFTSW.isOptional(); // actuall it would be Required(); but this prevents HLT/ERECO test from working
+  }
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -103,9 +108,23 @@ void DelayDQMModule::event()
   // This tells you how much delay we have summed up (it is NOT the processing time!)
   /** Time(Tag) from MetaInfo, ns since epoch */
   using namespace std::chrono;
-  nanoseconds meta_time = static_cast<nanoseconds>(m_eventMetaData->getTime());
   nanoseconds ns = duration_cast<nanoseconds> (system_clock::now().time_since_epoch());
-  auto deltaT = (duration_cast<milliseconds> (ns - meta_time)).count();
+  nanoseconds event_time{};
+  if (m_useMeta) {
+    // We get the time from EventMetaData, which gets the time from TTD (FTSW)
+    // BUT, this time is inaccurate for longer runs, the difference is larger than teh effect we
+    // monitor in the histograms!
+    event_time = static_cast<nanoseconds>(m_eventMetaData->getTime());
+  } else {
+    // get the trigger time from the NEW member function in TDD data
+    for (auto& it : m_rawFTSW) {
+      struct timeval tv;
+      it.GetPCTimeVal(0, &tv);
+      event_time = (static_cast<seconds>(tv.tv_sec)) + (static_cast<microseconds>(tv.tv_usec));
+      break;
+    }
+  }
+  auto deltaT = (duration_cast<milliseconds> (ns - event_time)).count();
   m_DelayMs->Fill(deltaT);
   m_DelayLog->Fill(1e-3 * deltaT);
   m_DelayS->Fill(1e-3 * deltaT);

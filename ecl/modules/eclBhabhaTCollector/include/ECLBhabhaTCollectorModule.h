@@ -15,6 +15,7 @@
 
 #include <framework/core/Module.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/utility/ECLTimingUtilities.h>
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
@@ -71,6 +72,11 @@ namespace Belle2 {
      * StoreObjPtr for T0. The event t0 class has an overall event t0
      */
     StoreObjPtr<EventT0> m_eventT0;
+
+    /** electronics amplitude calibration from database
+        Scale amplitudefor each crystal and for dead pre-amps*/
+    DBObjPtr<ECLCrystalCalib> m_ElectronicsDB; /**< database object */
+    std::vector<float> m_Electronics; /**< vector obtained from DB object */
 
     /** Time offset from electronics calibration from database */
     DBObjPtr<ECLCrystalCalib> m_ElectronicsTimeDB; /**< database object */
@@ -196,8 +202,9 @@ namespace Belle2 {
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
 
-    /* Function to calculate "energy dependence equation using Alex function" */
-    double energyDependentTimeOffsetElectronic(const double amplitude);
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > m_ECLTimeUtil =
+      std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
+
 
     double m_energyDependenceTimeOffsetFitParam_p1 = 0;                /**< p1 in "energy dependence equation" */
     double m_energyDependenceTimeOffsetFitParam_p2 = 88449.;           /**< p2 in "energy dependence equation" */

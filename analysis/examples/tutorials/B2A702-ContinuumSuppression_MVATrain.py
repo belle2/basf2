@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -20,7 +19,6 @@
 
 import basf2_mva
 import subprocess
-import sys
 
 if __name__ == "__main__":
 

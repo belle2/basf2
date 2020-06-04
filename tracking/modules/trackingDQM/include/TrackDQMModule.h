@@ -79,6 +79,61 @@ namespace Belle2 {
     TH1F* m_UBResidualsPXDV = nullptr;
     /** Unbiased residuals for SVD v */
     TH1F* m_UBResidualsSVDV = nullptr;
+
+    // half-shells
+    /** Unbiased residuals in X for PXD for Ying */
+    TH1F* m_UBResidualsPXDX_Ying = nullptr;
+    /** Unbiased residuals in X for PXD for Yang */
+    TH1F* m_UBResidualsPXDX_Yang = nullptr;
+    /** Unbiased residuals in X for SVD for Pat */
+    TH1F* m_UBResidualsSVDX_Pat = nullptr;
+    /** Unbiased residuals in X for SVD for Mat */
+    TH1F* m_UBResidualsSVDX_Mat = nullptr;
+
+    /** Unbiased residuals in Y for PXD for Ying */
+    TH1F* m_UBResidualsPXDY_Ying = nullptr;
+    /** Unbiased residuals in Y for PXD for Yang */
+    TH1F* m_UBResidualsPXDY_Yang = nullptr;
+    /** Unbiased residuals in Y for SVD for Pat */
+    TH1F* m_UBResidualsSVDY_Pat = nullptr;
+    /** Unbiased residuals in Y for SVD for Mat */
+    TH1F* m_UBResidualsSVDY_Mat = nullptr;
+
+    /** Unbiased residuals in Z for PXD for Ying */
+    TH1F* m_UBResidualsPXDZ_Ying = nullptr;
+    /** Unbiased residuals in Z for PXD for Yang */
+    TH1F* m_UBResidualsPXDZ_Yang = nullptr;
+    /** Unbiased residuals in Z for SVD for Pat */
+    TH1F* m_UBResidualsSVDZ_Pat = nullptr;
+    /** Unbiased residuals in Z for SVD for Mat */
+    TH1F* m_UBResidualsSVDZ_Mat = nullptr;
+
+    /**
+    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Yang half-shell, therefore it should be in the Ying half-shell if it's from PXD detector.
+    * Returns false if the sensor is in the Yang.
+    *
+    * Possible combinations of parameters for Yang:
+    *
+    * | layerNumber | ladderNumber        |
+    * | 1           | 5, 6, 7, 8          |
+    * | 2           | 7, 8, 9, 10, 11, 12 |
+    */
+    bool IsNotYang(int ladderNumber, int layerNumber);
+
+    /**
+    * Returns true if sensor with given ladderNumber and layerNumber isn't in the Mat half-shell, therefore it should be in the Pat half-shell if it's from SVD detector.
+    * Returns false if the sensor is in the Mat.
+    *
+    * Possible combinations of parameters for Mat:
+    *
+    * | layerNumber | ladderNumber               |
+    * | 3           | 3, 4, 5                    |
+    * | 4           | 4, 5, 6, 7, 8              |
+    * | 5           | 5, 6, 7, 8, 9, 10          |
+    * | 6           | 6, 7, 8, 9, 10, 11, 12, 13 |
+    */
+    bool IsNotMat(int ladderNumber, int layerNumber);
+
     /** Unbiased residuals for PXD and SVD v per sensor*/
     TH1F** m_UBResidualsSensorV = nullptr;
     /** Track related clusters - hitmap in IP angle range */

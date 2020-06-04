@@ -205,7 +205,7 @@ namespace Belle2 {
       module_occupancy->SetPoint(count_occ, PMTID , barID);
       count_occ++;
 
-      if (simHit) genergy->Fill(simHit->getEnergy());
+      genergy->Fill(simHit->getEnergy());
 
       const MCParticle* particle = DataStore::getRelated<MCParticle>(simHit);
 

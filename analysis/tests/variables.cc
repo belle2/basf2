@@ -1377,6 +1377,91 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, unmask)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for B -> (muon -> electron + muon_neutrino) + anti_muon_neutrino
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleGrandMother = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleAunt = mcGraph.addParticle();
+
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+
+    graphParticleGrandMother.setPDG(-521);
+    graphParticleMother.setPDG(13);
+    graphParticleAunt.setPDG(-14);
+    graphParticleDaughter1.setPDG(11);
+    graphParticleDaughter2.setPDG(14);
+
+    graphParticleMother.comesFrom(graphParticleGrandMother);
+    graphParticleAunt.comesFrom(graphParticleGrandMother);
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+    mcGraph.generateList();
+
+
+    // Get MC Particles from StoreArray
+    auto* mcGrandMother = mcParticles[0];
+    mcGrandMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcMother = mcParticles[1];
+    mcMother->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcAunt = mcParticles[2];
+    mcAunt->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter1 = mcParticles[3];
+    mcDaughter1->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* mcDaughter2 = mcParticles[4];
+    mcDaughter2->setStatus(MCParticle::c_PrimaryParticle);
+
+    auto* pGrandMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), -521);
+    pGrandMother->addRelationTo(mcGrandMother);
+
+    auto* pMother = particles.appendNew(TLorentzVector({ 0.0 , -0.4, 0.8, 1.0}), 13);
+    pMother->addRelationTo(mcMother);
+
+
+    pMother->writeExtraInfo("mcErrors", 8);
+    pGrandMother->writeExtraInfo("mcErrors", 8 | 16);
+    const Manager::Var* var1 = Manager::Instance().getVariable("unmask(mcErrors, 8)");
+    const Manager::Var* var2 = Manager::Instance().getVariable("unmask(mcErrors, 8, 16, 32, 64)");
+    ASSERT_NE(var1, nullptr);
+    EXPECT_FLOAT_EQ(var1->function(pMother), 0);
+    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16);
+    ASSERT_NE(var2, nullptr);
+    EXPECT_FLOAT_EQ(var2->function(pMother), 0);
+    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 0);
+
+
+    pMother->writeExtraInfo("mcErrors", 8 | 128);
+    pGrandMother->writeExtraInfo("mcErrors", 8 | 16 | 512);
+    ASSERT_NE(var1, nullptr);
+    EXPECT_FLOAT_EQ(var1->function(pMother), 128);
+    EXPECT_FLOAT_EQ(var1->function(pGrandMother), 16 | 512);
+    ASSERT_NE(var2, nullptr);
+    EXPECT_FLOAT_EQ(var2->function(pMother), 128);
+    EXPECT_FLOAT_EQ(var2->function(pGrandMother), 512);
+
+    // unmask variable needs at least two arguments
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors)"));
+
+    // all but the first argument have to be integers
+    EXPECT_B2FATAL(Manager::Instance().getVariable("unmask(mcErrors, NOTINT)"));
+  }
+
   TEST_F(MetaVariableTest, conditionalVariableSelector)
   {
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
@@ -3397,7 +3482,7 @@ namespace {
 
 
 
-  TEST_F(MetaVariableTest, daughterAngleInBetween)
+  TEST_F(MetaVariableTest, daughterAngle)
   {
     StoreArray<Particle> particles;
 
@@ -3443,20 +3528,20 @@ namespace {
 
 
     // Test the invariant mass of several combinations
-    const Manager::Var* var = Manager::Instance().getVariable("daughterAngleInBetween(0, 1)");
+    const Manager::Var* var = Manager::Instance().getVariable("daughterAngle(0, 1)");
     double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
     // this should be a generic combinations
-    var = Manager::Instance().getVariable("daughterAngleInBetween(0:0, 1:0)");
+    var = Manager::Instance().getVariable("daughterAngle(0:0, 1:0)");
     v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
     EXPECT_FLOAT_EQ(var->function(p), v_test);
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween( 1, -1)");
+    var = Manager::Instance().getVariable("daughterAngle( 1, -1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
-    var = Manager::Instance().getVariable("daughterAngleInBetween(1, 0:1:0:0:1)");
+    var = Manager::Instance().getVariable("daughterAngle(1, 0:1:0:0:1)");
     EXPECT_B2WARNING(var->function(p));
     EXPECT_TRUE(std::isnan(var->function(p)));
 
@@ -4318,7 +4403,7 @@ namespace {
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.5, 0.1, 0.1)")->function(particledEdx), 321);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0.1, 0.1, 0.1, 0.1, 0.5, 0.1)")->function(particledEdx), 2212);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG(0, 1., 0, 0, 0, 0)")->function(particledEdx), 13);
-    EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
+    EXPECT_EQ(Manager::Instance().getVariable("pidMostLikelyPDG()")->function(particleDeuteronAll), 1000010020);
     EXPECT_FLOAT_EQ(Manager::Instance().getVariable("pidIsMostLikely(0.5,0.1,0.1,0.1,0.1,0.1)")->function(particleDeuteronAll), 1.0);
   }
 

@@ -7,8 +7,8 @@ __author__ = 'Giacomo De Pietro'
 __copyright__ = '2019 - Belle II Collaboration'
 
 import basf2
-import sys
 import argparse
+import ROOT
 
 def arg_parser():
 
@@ -41,14 +41,25 @@ def arg_parser():
                         help='flag for raw input files; it must be used if data must be unpacked and reconstructed from scratch')
     return parser
 
+def check_file_content(file_name):
+
+    basf2.B2INFO('Checking the input file...')
+    file = ROOT.TFile.Open(file_name, 'READ')
+    if file.IsZombie():
+        basf2.B2FATAL('Cannot open the input file.')
+    klm_dataobjects = ['BKLMHit2ds', 'KLMDigits']
+    tree = file.Get('tree')
+    file_branches = [branch.GetName() for branch in tree.GetListOfBranches()]
+    file.Close()
+    basf2.B2INFO('... done!')
+    return set(klm_dataobjects) <= set(file_branches)
+
 if __name__ == "__main__":
 
+    # Argument parsing
     args = arg_parser().parse_args()
-
     raw_data = args.raw
-
     input_files = args.input
-
     max_events = args.events
 
     # Check if we are using .sroot files or not
@@ -65,13 +76,18 @@ if __name__ == "__main__":
             raw_data = True
             basf2.conditions.override_globaltags(['online'])
             basf2.B2INFO('No Global Tag is set in FileMetaData; base GT automatically set to "online"')
+        else:
+	    # Check if the input file contains the relevant branches
+            raw_data = not check_file_content(input_files[0])
     else:
         basf2.B2FATAL('Please provide a valid list of .sroot or .root input files.')
 
+    # Prepend the input GTs
     if not (args.prepend_gt == ''):
         for gt in reversed(args.prepend_gt):
             basf2.conditions.prepend_globaltag(gt)
 
+    # Append the input GTs
     if not (args.append_gt == ''):
         for gt in args.append_gt:
             basf2.conditions.append_globaltag(gt)
@@ -108,8 +124,8 @@ if __name__ == "__main__":
         # Unpacker
         main.add_module('KLMUnpacker')
 
-        # BKLM reconstruction
-        main.add_module('BKLMReconstructor')
+        # KLM reconstruction
+        main.add_module('KLMReconstructor')
 
     # DQM
     main.add_module('KLMDQM')

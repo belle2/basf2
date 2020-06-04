@@ -258,6 +258,9 @@ int UtrepsB::tpuser(TLorentzVector _pe, TLorentzVector _pp,
   // Return positive integer for the generation, otherwise, this event will
   // be canceled.
   // CAUTION!: The 4-momenta of particles are in e+e- cms
+  B2DEBUG(20, " _pe(" << _pe.Px() << "," << _pe.Py() << "," << _pe.Pz() << ") and "
+          << " _pp(" << _pp.Px() << "," << _pp.Py() << "," << _pp.Pz() << ") are given but not used");
+
 
   int iret = 1;
 

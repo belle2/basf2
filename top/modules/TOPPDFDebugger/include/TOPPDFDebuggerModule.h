@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPPDFCollection.h>
+#include <top/dataobjects/TOPAssociatedPDF.h>
 
 #include <string>
 #include <top/reconstruction/TOPreco.h>
@@ -77,6 +78,11 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Associate PDF peaks with photons using S-plot technique
+     */
+    void associatePDFPeaks(const TOP::TOPreco& reco, int moduleID, int pdg);
+
     // Module steering parameters
     double m_minBkgPerBar = 0; /**< minimal assumed background photons per bar */
     double m_scaleN0 = 0;      /**< scale factor for N0 */
@@ -99,6 +105,7 @@ namespace Belle2 {
     // collections
 
     StoreArray<TOPPDFCollection> m_pdfCollection; /**< collection of analytic PDF's */
+    StoreArray<TOPAssociatedPDF> m_associatedPDFs; /**< collection of associated PDF's */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreArray<Track> m_tracks;  /**< collection of tracks */
 

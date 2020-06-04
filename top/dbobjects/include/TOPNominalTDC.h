@@ -90,7 +90,7 @@ namespace Belle2 {
 
     /**
      * Sets the number of ADC bits
-     * @param acdBits number of adcBits
+     * @param adcBits number of adcBits
      */
     void setADCBits(unsigned adcBits) {m_adcBits = adcBits;}
 

@@ -41,6 +41,102 @@ namespace Belle2 {
     };
 
     /**
+     * Calibration results or supplementary results calculated from
+     * the input data.
+     */
+    class Results {
+
+      friend class KLMStripEfficiencyAlgorithm;
+
+    public:
+
+      /**
+       * Constructor.
+       */
+      Results();
+
+      /**
+       * Copy constructor.
+       */
+      Results(const Results& results);
+
+      /**
+       * Destructor,
+       */
+      ~Results();
+
+      /**
+       * Get achieved precision of efficiency measurement (the worst one).
+       */
+      float getAchievedPrecision() const
+      {
+        return m_AchievedPrecision;
+      }
+
+      /**
+       * Get number of matched digits.
+       */
+      int getMatchedDigits() const
+      {
+        return m_MatchedDigits;
+      }
+
+      /**
+       * Get efficiency.
+       */
+      float* getEfficiency() const
+      {
+        return m_Efficiency;
+      }
+
+      /**
+       * Get total number of ExtHits.
+       */
+      int getExtHits() const
+      {
+        return m_ExtHits;
+      }
+
+      /**
+       * Get number of ExtHits per plane.
+       */
+      int* getExtHitsPlane() const
+      {
+        return m_ExtHitsPlane;
+      }
+
+      /**
+       * Get number of new measured planes.
+       * @param[in] efficiency Efficiency for other measurement.
+       */
+      int newMeasuredPlanes(float* efficiency) const;
+
+      /**
+       * Get number of new measured planes with ExtHits.
+       * @param[in] extHitsPlane Number of ExtHits for other measurement.
+       */
+      int newExtHitsPlanes(int* extHitsPlane) const;
+
+    private:
+
+      /** Achieved precision of efficiency measurement. */
+      float m_AchievedPrecision = 0;
+
+      /** Number of matched digits. */
+      int m_MatchedDigits = 0;
+
+      /** Efficiency. */
+      float* m_Efficiency = nullptr;
+
+      /** Number of ExtHits (overall). */
+      int m_ExtHits = 0;
+
+      /** Number of ExtHits per plane. */
+      int* m_ExtHitsPlane = nullptr;
+
+    };
+
+    /**
      * Constructor.
      */
     KLMStripEfficiencyAlgorithm();
@@ -114,56 +210,12 @@ namespace Belle2 {
     }
 
     /**
-     * Get achieved precision of efficiency measurement (the worst one).
+     * Get results.
      */
-    float getAchievedPrecision() const
+    const Results* getResults() const
     {
-      return m_AchievedPrecision;
+      return &m_Results;
     }
-
-    /**
-     * Get number of matched digits.
-     */
-    int getMatchedDigits() const
-    {
-      return m_MatchedDigits;
-    }
-
-    /**
-     * Get efficiency.
-     */
-    float* getEfficiency() const
-    {
-      return m_Efficiency;
-    }
-
-    /**
-     * Get total number of ExtHits.
-     */
-    int getExtHits() const
-    {
-      return m_ExtHits;
-    }
-
-    /**
-     * Get number of ExtHits per plane.
-     */
-    int* getExtHitsPlane() const
-    {
-      return m_ExtHitsPlane;
-    }
-
-    /**
-     * Get number of new measured planes.
-     * @param[in] efficiency Other efficiency measurement.
-     */
-    int newMeasuredPlanes(float* efficiency) const;
-
-    /**
-     * Get number of new planes with ExhHits.
-     * @param[in] efficiency Number of ExtHits for other measurement.
-     */
-    int newExtHitsPlanes(int* extHitsPlane) const;
 
   private:
 
@@ -182,26 +234,14 @@ namespace Belle2 {
     /** Requested precision of efficiency measurement. */
     float m_RequestedPrecision = 0.02;
 
-    /** Achieved precision of efficiency measurement. */
-    float m_AchievedPrecision = 0;
-
-    /** Number of matched digits. */
-    int m_MatchedDigits = 0;
-
-    /** Efficiency. */
-    float* m_Efficiency;
-
-    /** Number of ExtHits (overall). */
-    int m_ExtHits = 0;
-
-    /** Number of ExtHits per plane. */
-    int* m_ExtHitsPlane;
-
     /** Element numbers */
     const KLMElementNumbers* m_ElementNumbers;
 
     /** Plane array index. */
     const KLMPlaneArrayIndex* m_PlaneArrayIndex;
+
+    /** Calibration results. */
+    Results m_Results;
 
     /** Efficiency data object */
     KLMStripEfficiency* m_StripEfficiency;

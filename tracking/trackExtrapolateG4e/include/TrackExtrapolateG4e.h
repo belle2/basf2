@@ -19,13 +19,13 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/MuidParameters.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
 
 /* Geant4 headers. */
@@ -436,8 +436,8 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
     //! ECL clusters
     StoreArray<ECLCluster> m_eclClusters;

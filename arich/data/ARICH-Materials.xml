@@ -421,9 +421,16 @@ It is also includes updated optical properties of HAPD quartz window.
     </Components>
   </Material>
 
+  <!-- Please note the density of the material higher than usual -->
+  <!-- in order to fit in a given volume. Do not use this material for anything else. -->
   <Material name="merger_pcb">
     <state>Solid</state>
-    <density unit="g/cm3">4.2</density>
+    <!-- Density at 2 mm thikness            -->
+    <!-- <density unit="g/cm3">4.2</density> -->
+    <!-- Density at 1 mm thikness            -->
+    <!-- <density unit="g/cm3">8.4</density> -->
+    <!-- Density at 0.5 mm thikness          -->
+    <density unit="g/cm3">16.8</density>
     <Components>
       <Element fraction="0.14">Cu</Element>
       <Element fraction="0.02">Fe</Element>
@@ -515,6 +522,18 @@ It is also includes updated optical properties of HAPD quartz window.
     <Components>
       <Element fraction="0.92257717">C</Element>
       <Element fraction="0.07742283">H</Element>
+    </Components>
+  </Material>
+
+  <!-- Please note the density of the material higher than usual -->
+  <!-- in order to fit in a given volume. Do not use this material for anything else. -->
+  <Material name="ARICH_merger_Cooling_Bodies_Al">
+    <!-- Maximum thickness of the merger cooling body is 17.0 mm we shrink it to 0.5 -->
+    <!-- Therefore effective density of aluminum have increased by factor 34 -->
+    <density unit="g/cm3">91.8</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="1.0">Al</Element>
     </Components>
   </Material>
 

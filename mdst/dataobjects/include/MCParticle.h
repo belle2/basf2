@@ -429,7 +429,7 @@ namespace Belle2 {
 
     /**
      * Sets the 4Vector of particle.
-     * @param 4Vector
+     * @param p4 4Vector
      */
     void set4Vector(const TLorentzVector& p4) { setMomentum(p4.Vect()); m_energy = p4.Energy(); }
 
@@ -456,13 +456,13 @@ namespace Belle2 {
 
     /**
      * Sets the physics process type of a secondary particle.
-     * @param physics process type as an integer number for a secondary particle.
+     * @param physicsProcess physics process type as an integer number for a secondary particle.
      */
     void setSecondaryPhysicsProcess(int physicsProcess) { m_secondaryPhysicsProcess = physicsProcess; }
 
     /**
      * Set the seen-in flags for the entire Belle II subdetectors for an Monte Carlo particle.
-     * @param seenInFlags The entire seen-in flags of the MC particle.
+     * @param set The ID for Belle II subdetector(s), in either Const::DetectorSet or Const::EDetector format
      */
     void setSeenInDetector(Const::DetectorSet set) { m_seenIn = set; }
 

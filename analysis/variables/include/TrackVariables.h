@@ -55,6 +55,11 @@ namespace Belle2 {
     double trackFirstPXDLayer(const Particle* part);
 
     /**
+     * returns the first activated CDC layer associated to the track
+     */
+    double trackFirstCDCLayer(const Particle* part);
+
+    /**
      * returns the last CDC layer associated to the track
      */
     double trackLastCDCLayer(const Particle* part);

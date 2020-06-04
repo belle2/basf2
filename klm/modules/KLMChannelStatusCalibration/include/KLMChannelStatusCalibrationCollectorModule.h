@@ -11,11 +11,10 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMChannelMapValue.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
 
 /* Belle 2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
@@ -71,11 +70,8 @@ namespace Belle2 {
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BKLMDigits;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EKLMDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_KLMDigits;
 
     /** Hit map. */
     StoreObjPtr< KLMChannelMapValue<unsigned int> > m_HitMap;

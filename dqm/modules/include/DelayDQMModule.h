@@ -13,7 +13,9 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include "TH1D.h"
 
 namespace Belle2 {
@@ -38,9 +40,13 @@ namespace Belle2 {
   private:
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     std::string m_title; /**< Prefix for title (NOT histo name) */
+    bool m_useMeta; /**< use time from Meta or FTSW */
 
     /** Input ptr for EventMetaData. */
     StoreObjPtr<EventMetaData> m_eventMetaData;
+
+    /** Input for FTSW */
+    StoreArray<RawFTSW> m_rawFTSW;
 
     TH1D* m_DelayS = nullptr;        /**< Delay between trigger and end of processing in s */
     TH1D* m_DelayMs = nullptr;        /**< Delay between trigger and end of processing in ms*/

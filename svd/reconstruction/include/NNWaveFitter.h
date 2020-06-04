@@ -29,7 +29,7 @@ namespace Belle2 {
 // ==============================================================================
 // The NNWaveFitter class - neural network fitter of APV25 waveforms
 // ------------------------------------------------------------------------------
-    /*
+    /**
     * The class uses a neural network to find a probability distribution
     * of arrival times for a sextet of APX25 signal samples.
     * The input to the network are sample S/N ratios, i.e., we expect
@@ -68,13 +68,13 @@ namespace Belle2 {
        */
       typedef std::pair<double, double> nnBoundsType;
 
-      /** Cnnstructor
+      /** Constructor
        * constructs the wavefitter from data in xml file.
        * @param xmlData string containing the network definition xml tree
        */
       NNWaveFitter(std::string xmlData = "");
 
-      /**Set proper network definition file.
+      /** Set proper network definition file.
        * @param xmlData string containing the network definition xml tree
        */
       void setNetwrok(const std::string& xmlData);

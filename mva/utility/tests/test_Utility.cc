@@ -10,6 +10,7 @@
 #include <mva/utility/Utility.h>
 #include <framework/utilities/TestHelpers.h>
 #include <framework/database/Configuration.h>
+#include <framework/database/Database.h>
 
 using namespace Belle2;
 
@@ -35,6 +36,7 @@ namespace {
     EXPECT_TRUE(MVA::available("MVAInterfaceTest.xml"));
     EXPECT_TRUE(MVA::available("MVAInterfaceTest"));
 
+    Database::reset();
   }
 
 }

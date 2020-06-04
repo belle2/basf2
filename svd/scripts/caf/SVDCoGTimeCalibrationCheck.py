@@ -23,8 +23,10 @@ import sys
 from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd import *
+from rawdata import *
 from svd.CoGCalibration_utils_checkCalibration import SVDCoGTimeCalibrationCheckModule
 from basf2 import conditions
+import rawdata as raw
 
 import matplotlib.pyplot as plt
 import simulation
@@ -41,17 +43,12 @@ localdb = sys.argv[1]
 filename = sys.argv[2]
 run = sys.argv[3]
 exp = sys.argv[4]
-branches = ['SVDShaperDigits', 'SVDShaperDigitsFromTracks', 'EventT0', 'SVDEventInfo']
+branches = ['RawSVDs', 'SVDShaperDigitsFromTracks', 'EventT0']
 
 trk_outputFile = "TrackFilterControlNtuples_" + localdb + ".root"
 nSVD = 6
 nCDC = 1
 pVal = 0.0  # 0001
-
-# inputFileList = [
-#    "/group/belle2/dataprod/Data/release-03-02-02/DB00000635/proc00000009/\
-# e0008/4S/r01309/skim/hlt_bhabha/cdst/sub00/cdst.physics.0008.01309.HLT*"
-# ]
 
 inputFileList = []
 
@@ -61,15 +58,13 @@ else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
 
-
-# reset_database()
-# use_database_chain()
-# use_local_database(str(localdb) + "/database.txt", str(localdb), invertLogging=True)
-
+conditions.override_globaltags()
 conditions.globaltags = [
-    # 'svd_NOCoGCorrections',
-    'klm_alignment_testing'
-]
+    "svd_NOCoGCorrections",
+    "staging_data_reprocessing_proc11",
+    "data_reprocessing_proc11_baseline",
+    "online_proc11"]
+
 conditions.testing_payloads = [
     str(localdb) + "/database.txt",
 ]
@@ -84,20 +79,10 @@ main.add_module(rootinput)
 main.add_module("Gearbox")
 main.add_module("Geometry", useDB=True)
 
-# Track selection - NOT APPLIED
-'''
-trkFlt = register_module('TrackFilter')
-trkFlt.param('outputFileName', trk_outputFile)
-trkFlt.param('outputINArrayName', 'SelectedTracks')
-trkFlt.param('outputOUTArrayName', 'ExcludedTracks')
-trkFlt.param('min_NumHitSVD', nSVD)
-trkFlt.param('min_NumHitCDC', nCDC)
-trkFlt.param('min_Pvalue', pVal)
-trkFlt.logging.log_level = LogLevel.DEBUG
-main.add_module(trkFlt)
-'''
-# re-reconstruct SVDShaperDigitsFromTracks using the localDB
+# unpack raw data to get SVDEventInfo
+add_unpackers(main, components=['SVD'])
 
+# re-reconstruct SVDShaperDigitsFromTracks using the localDB
 add_svd_reconstruction(main)
 
 for moda in main.modules():
@@ -107,6 +92,7 @@ for moda in main.modules():
     if moda.name() == 'SVDSimpleClusterizer':
         moda.param("Clusters", 'SVDClustersFromTracks')
         moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+        moda.param("timeAlgorithm", 0)
     if moda.name() == 'SVDSpacePointCreator':
         moda.param("SVDClusters", 'SVDClustersFromTracks')
 

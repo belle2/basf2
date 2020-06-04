@@ -28,6 +28,12 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
       REAL PIK_XD(MAX_PIK,0:NUM_CHA-1)    ! unfolded x pos. of channel
       REAL PIK_YD(MAX_PIK,0:NUM_CHA-1)    ! unfolded y pos. of channel
       INTEGER PIK_TYP(MAX_PIK,0:NUM_CHA-1) ! type: 0 direct 1 plane 2 cyl 3 spher mirr
+      REAL PIK_KXE(MAX_PIK,0:NUM_CHA-1) ! kx direction at emission
+      REAL PIK_KYE(MAX_PIK,0:NUM_CHA-1) ! ky direction at emission
+      REAL PIK_KZE(MAX_PIK,0:NUM_CHA-1) ! kz direction at emission
+      REAL PIK_KXD(MAX_PIK,0:NUM_CHA-1) ! kx direction at detection
+      REAL PIK_KYD(MAX_PIK,0:NUM_CHA-1) ! ky direction at detection
+      REAL PIK_KZD(MAX_PIK,0:NUM_CHA-1) ! kz direction at detection
 
       REAL STFS, STFB                   ! expected num. of signal, bkg. photons
       INTEGER LR_FLAG(0:1)              ! L/R flag
@@ -46,6 +52,7 @@ c--   TOP_PIK.fi: table of peak positions, widths, etc.
      &	   PIK_POZ, PIK_WID, PIK_NPH, PIK_FIC, PIK_E, PIK_SIGE,
      &     PIK_NX, PIK_NY, PIK_NXM, PIK_NYM, PIK_NXE, PIK_NYE,
      &     PIK_XD, PIK_YD, PIK_TYP,
+     &     PIK_KXE, PIK_KYE, PIK_KZE, PIK_KXD, PIK_KYD, PIK_KZD, 
      &     STFS, STFB, LR_FLAG,
      &     MASS_HYP, BETA, TOF, FOT0, PTOT, T_MIN, T_MAX, C_THC, S_THC,
      &	   TH0_SIP, D_THC, BETA_RQ, STORE_OPT, PDF_OPT

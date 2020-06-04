@@ -309,7 +309,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
     add_ecl_track_cluster_modules(path, components)
     add_ecl_cluster_properties_modules(path, components)
-    add_ecl_eip_module(path, components)
+    add_ecl_chargedpid_module(path, components)
     add_pid_module(path, components)
 
     if addClusterExpertModules:
@@ -410,6 +410,9 @@ def add_cdst_output(
         'CDCTriggerNNInput2DFinderTracks',
         'CDCTriggerNeuroTracks',
         'CDCTriggerNeuroTracksInput',
+        'CDCTriggerNNInputFinderTracks',
+        'CDCTriggerNNInputBits',
+        'CDCTriggerNNOutputBits',
         'TRGGDLUnpackerStores',
         'TRGTOPUnpackerStores',
         'TracksToBKLMHit2ds',
@@ -437,7 +440,7 @@ def add_cdst_output(
         'SVDShaperDigitsFromTracks',
         'TRGGDLUnpackerStores',
         'VXDDedxTracks',
-        'VXDDedxLikelihoods'
+        'VXDDedxLikelihoods',
     ]
 
     if rawFormat:
@@ -562,10 +565,8 @@ def add_klm_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'KLM' in components:
-        eklm_rec = register_module('EKLMReconstructor')
-        path.add_module(eklm_rec)
-        bklm_rec = register_module('BKLMReconstructor')
-        path.add_module(bklm_rec)
+        klm_rec = register_module('KLMReconstructor')
+        path.add_module(klm_rec)
         klm_clusters_rec = register_module('KLMClustersReconstructor')
         path.add_module(klm_clusters_rec)
 
@@ -704,7 +705,7 @@ def add_ecl_track_brem_finder(path, components=None):
         path.add_module(brem_finder)
 
 
-def add_ecl_eip_module(path, components=None):
+def add_ecl_chargedpid_module(path, components=None):
     """
     Add the ECL charged PID module to the path.
 
@@ -796,6 +797,6 @@ def prepare_cdst_analysis(path, components=None):
     add_muid_module(path, components=components)
     add_ecl_track_cluster_modules(path, components)
     add_ecl_cluster_properties_modules(path, components)
-    add_ecl_eip_module(path, components)
+    add_ecl_chargedpid_module(path, components)
     add_pid_module(path, components)
     add_ecl_track_brem_finder(path, components)

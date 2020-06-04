@@ -52,8 +52,7 @@ namespace Belle2 {
     label %= lit(":") >> lexeme[+(char_ - reserved)];
 
     // Arrow types
-    arrow %= string("->") | string("-->") | string("=>") | string("==>") | string("=direct=>") | string("=norad=>") |
-             string("=exact=>");
+    arrow %= string("->") | string("=direct=>") | string("=norad=>") | string("=exact=>");
 
     // Keyword for custom MC Matching
     keyword = string("...") | string("?nu") | string("!nu") | string("?gamma") | string("!gamma") | string("?addbrems");

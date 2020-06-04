@@ -59,7 +59,7 @@ void ZMQClient::initialize(const std::string& pubSocketAddress, const std::strin
   m_socket = std::make_unique<zmq::socket_t>(*m_context, AZMQType);
 
   if (AZMQType == ZMQ_DEALER) {
-    const std::string& uniqueID = std::to_string(getpid());
+    const std::string uniqueID = std::to_string(getpid());
     m_socket->setsockopt(ZMQ_IDENTITY, uniqueID.c_str(), uniqueID.length());
   }
 
@@ -108,7 +108,7 @@ void ZMQClient::subscribe(EMessageTypes filter)
 void ZMQClient::send(zmq::message_t& message) const
 {
   B2ASSERT("Can only run this on started clients", m_socket);
-  m_socket->send(message);
+  m_socket->send(message, zmq::send_flags::none);
 }
 
 #if defined(__GNUC__) && !defined(__clang__)

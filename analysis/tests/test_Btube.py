@@ -72,16 +72,16 @@ stdc.stdMu(listtype='good', path=my_path)
 ma.reconstructDecay('D0:kpi -> K-:good pi+:good', '', path=my_path)
 ma.matchMCTruth('D0:kpi', path=my_path)
 ma.applyCuts('D0:kpi', 'abs(mcPDG)==421', path=my_path)
-vx.vertexRave('D0:kpi', 0.0, path=my_path)
+vx.raveFit('D0:kpi', 0.0, path=my_path)
 
 ma.reconstructDecay('J/psi:mumu -> mu+:good mu-:good', '', path=my_path)
-vx.vertexRave('J/psi:mumu', 0.0, path=my_path)
+vx.raveFit('J/psi:mumu', 0.0, path=my_path)
 
 # TAGGING
 ma.reconstructDecay('B+:tag -> anti-D0:kpi pi+:all', '', path=my_path)
 ma.matchMCTruth('B+:tag', path=my_path)
 ma.applyCuts('B+:tag', 'isSignalAcceptMissingNeutrino>0.5', path=my_path)
-vx.vertexRave('B+:tag', 0.0, path=my_path)
+vx.raveFit('B+:tag', 0.0, path=my_path)
 
 # SIGNAL
 ma.reconstructDecay('B-:sigT -> J/psi:mumu K-:good pi+:good pi-:good', '', path=my_path)
@@ -95,7 +95,7 @@ mytestmodule2 = ma.register_module('BtubeCreator')
 # Order of daughters should be identical to decay string used in
 # reconstructDecay
 my_path.add_module(mytestmodule2, listName='Upsilon(4S):sig', decayString='Upsilon(4S):sig -> ^B+:tag B-:sigT')
-vx.vertexRave('B-:sigT', 0.0, '', 'btube', path=my_path)
+vx.raveFit('B-:sigT', 0.0, constraint='btube', path=my_path)
 # Saving variables to ntuple
 output_file = 'test.root'
 true_vars = ['truex', 'truey', 'truez']

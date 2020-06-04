@@ -41,7 +41,8 @@ namespace TreeFitter {
                 mass,
                 massEnergy,
                 merged,
-                ntypes
+                ntypes,
+                helix
               };
 
     /** operator used to sort the constraints */

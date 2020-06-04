@@ -12,6 +12,11 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-05
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-05-00.txt
+
 Changes since release-04
 ========================
 
@@ -19,6 +24,13 @@ Changes since release-04
       compatibility
 
 .. .. rubric:: Some important feature
+
+.. rubric:: Neutral hadrons from ECLClusters get momentum from the cluster energy
+
+Since ``release-04`` it has been possible to load ECLClusters under the neutral hadron hypothesis.
+Previously we assumed a mass when calculating the particle momentum, however this leads to problems when, for example, a :math:`K_L^0` deposits less than its mass energy in the ECL. This happens about 50% of the time.
+
+The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE`.
 
 
 .. Detailed changes for the analysis package first, that's
@@ -32,6 +44,14 @@ Changes since release-04
    move it directly in here
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
+
+.. Changes for decfiles package
+
+.. include:: decfiles/doc/whatsnew-since/release-04-02.txt
+
+.. Changes for b2bii here.
+
+.. include:: b2bii/doc/whatsnew-since/release-04-01.txt
 
 Changes since release-03
 ========================
@@ -136,11 +156,11 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.KFit`) for fast/simple fits, or TreeFitter (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
+Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 
-.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 
 
 .. rubric:: Tidy up and rename of Helicity variables.

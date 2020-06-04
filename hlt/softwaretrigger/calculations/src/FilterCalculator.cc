@@ -449,20 +449,20 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
         calculationResult["eemm"] = 1;
       }
     }
-    if (negativeP > 1. and positiveP > 1. and calculationResult["nTrkLoose"] == 2 and
+    if (1. < negativeP and 1. < positiveP and 2 == calculationResult["nTrkLoose"] and
         calculationResult["nTrkTight"] >= 1 and dphi < 170. and
-        pmissTheta > 10. and pmissTheta < 170. and pmissp > 1. and electronEP) {
+        10. < pmissTheta and pmissTheta < 170. and 1. < pmissp and electronEP) {
       calculationResult["radBhabha"] = 1;
     }
 
-    if (negativeP > 2. and positiveP > 2. and calculationResult["nTrkLoose"] == 2 and
-        calculationResult["nTrkTight"] >= 1 and dphi > 175. and
+    if (2. < negativeP and 2. < positiveP and 2 == calculationResult["nTrkLoose"] and
+        calculationResult["nTrkTight"] >= 1 and 175. < dphi and
         (pmissTheta < 5. or pmissTheta > 175.) and electronEP) {
       calculationResult["isrRadBhabha"] = 1;
     }
     if ((pmissTheta < 20. or pmissTheta > 160.) and
         ((calculationResult["maximumPCMS"] < 1.2 and dphi > 150.) or
-         (calculationResult["maximumPCMS"] < 2. and dphi > 175.))) {
+         (calculationResult["maximumPCMS"] < 2. and 175. < dphi))) {
       calculationResult["eexx"] = 1;
     }
     if (calculationResult["nTrkLoose"] == 2 and highp > 4.5 and notMuonPair and pmissp > 1. and
@@ -470,11 +470,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["eeBrem"] = 1;
     }
 
-    if (calculationResult["nTrkLoose"] == 2 and highp > 4.5 and lowEdep and dphi > 175. and thetaSum > 175. and
+    if (calculationResult["nTrkLoose"] == 2 and highp > 4.5 and lowEdep and dphi > 175. and 175. < thetaSum and
         thetaSum < 185.) {
       calculationResult["muonPairV"] = 1;
     }
-    if (highp > 3. and lowp > 2.5 and dphi > 165. and
+    if (3. < highp and 2.5 < lowp and 165. < dphi and
         ((negativeClusterSumLab > 0. and negativeClusterSumLab < 1.) or
          (positiveClusterSumLab > 0. and positiveClusterSumLab < 1.))) {
       calculationResult["selectmumu"] = 1;
@@ -519,8 +519,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const double thetaLab0 = firstCluster.p4Lab.Theta() * TMath::RadToDeg();
       const double thetaLab1 = secondCluster.p4Lab.Theta() * TMath::RadToDeg();
 
-      const bool barrel0 = thetaLab0 > 32. and thetaLab0 < 130.;
-      const bool barrel1 = thetaLab1 > 32. and thetaLab1 < 130.;
+      const bool barrel0 = 32. < thetaLab0 and thetaLab0 < 130.;
+      const bool barrel1 = 32. < thetaLab1 and thetaLab1 < 130.;
       const bool oneClustersAbove4 = firstEnergy > 4 or secondEnergy > 4;
       const bool oneIsNeutral = not firstCluster.isTrack or not secondCluster.isTrack;
       const bool bothAreNeutral = not firstCluster.isTrack and not secondCluster.isTrack;

@@ -137,7 +137,7 @@ void CDCDedxScanModule::event()
         if (!c.isValid()) continue;
 
         dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
-                          1.0);
+                          1.0, 0, 0.0, 0.0, 0.0);
       }
     }
     m_dedxArray.appendNew(*dedxTrack);

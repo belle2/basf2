@@ -23,6 +23,7 @@ extern "C" {
   void set_time_window_(float*, float*);
   void get_time_window_(float*, float*);
   void set_pdf_opt_(int*, int*, int*);
+  void set_store_opt_(int*);
   float get_logl_(float*, float*, float*, float*);
   void get_logl_ch_(float*, float*, float*, float*, float*);
   int data_getnum_();
@@ -33,6 +34,25 @@ extern "C" {
   void redo_pdf_(float*);
   int get_num_peaks_(int*);
   void get_peak_(int*, int*, float*, float*, float*);
+  float get_bgr_(int*);
+  int get_pik_typ_(int*, int*);
+  float get_pik_fic_(int*, int*);
+  float get_pik_e_(int*, int*);
+  float get_pik_sige_(int*, int*);
+  int get_pik_nx_(int*, int*);
+  int get_pik_ny_(int*, int*);
+  int get_pik_nxm_(int*, int*);
+  int get_pik_nym_(int*, int*);
+  int get_pik_nxe_(int*, int*);
+  int get_pik_nye_(int*, int*);
+  float get_pik_xd_(int*, int*);
+  float get_pik_yd_(int*, int*);
+  float get_pik_kxe_(int*, int*);
+  float get_pik_kye_(int*, int*);
+  float get_pik_kze_(int*, int*);
+  float get_pik_kxd_(int*, int*);
+  float get_pik_kyd_(int*, int*);
+  float get_pik_kzd_(int*, int*);
 }
 
 namespace Belle2 {
@@ -57,6 +77,13 @@ namespace Belle2 {
       enum PDFoption {c_Rough = 0, c_Fine, c_Optimal};
 
       /**
+       * Options for storing PDF parameters in Fortran common TOP_PIK
+       *    reduced: only position, width, nphot and fic (default)
+       *    full: also number of reflections etc.
+       */
+      enum StoreOption {c_Reduced, c_Full};
+
+      /**
        * Constructor
        * @param NumHyp number of mass hypotheses
        * @param Masses masses
@@ -68,6 +95,7 @@ namespace Belle2 {
       /**
        * Set channel mask
        * @param mask channel mask
+       * @param asicMask masked asics
        */
       static void setChannelMask(const DBObjPtr<TOPCalChannelMask>& mask,
                                  const TOPAsicMask& asicMask);
@@ -140,7 +168,7 @@ namespace Belle2 {
       }
 
       /**
-       * Set PDF option
+       * Sets PDF option
        * @param opt option - see definition of PDFoption
        * @param NP number of emission positions along track segment (equidistant)
        * @param NC number of Cerenkov angles (equdistant in photon energies)
@@ -149,6 +177,16 @@ namespace Belle2 {
       {
         int iopt = opt;
         set_pdf_opt_(&iopt, &NP, &NC);
+      }
+
+      /**
+       * Sets option for storing PDF parameters in Fortran common TOP_PIK
+       * @param opt option - see definition of StoreOption
+       */
+      void setStoreOption(StoreOption opt)
+      {
+        int iopt = opt;
+        set_store_opt_(&iopt);
       }
 
       /**
@@ -178,7 +216,7 @@ namespace Belle2 {
        * @param trk track
        * @param pdg PDG code for which to compute pulls. If 0 use MC true PDG.
        */
-      void reconstruct(TOPtrack& trk, int pdg = 0);
+      void reconstruct(const TOPtrack& trk, int pdg = 0);
 
       /**
        * Return status
@@ -356,6 +394,251 @@ namespace Belle2 {
         pixelID--; // 0-based is used in fortran
         k++; // counter starts with 1 in fortran
         get_peak_(&pixelID, &k, &position, &width, &numPhotons);
+      }
+
+      /**
+       * Returns estimated background level for given pixel
+       * @param pixelID pixel ID (1-based)
+       * @return number of background hits per nano second
+       */
+      float getBkgLevel(int pixelID) const
+      {
+        pixelID--; // 0-based is used in fortran
+        return get_bgr_(&pixelID);
+      }
+
+      /**
+       * Returns type of the k-th PDF peak for given pixel
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return 0 unknown, 1 direct, 2 reflected
+       */
+      int getPDFPeakType(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_typ_(&pixelID, &k);
+      }
+
+      /**
+       * Returns Cerenkov azimuthal angle of PDF peak
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return azimuthal angle
+       */
+      float getPDFPeakFic(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_fic_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon energy of PDF peak
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return photon energy [eV]
+       */
+      float getPDFPeakE(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_e_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon energy spread of PDF peak
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return photon energy sigma [eV]
+       */
+      float getPDFPeakSigE(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_sige_(&pixelID, &k);
+      }
+
+      /**
+       * Returns total number of reflections in x of PDF peak
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections
+       */
+      int getPDFPeakNx(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_nx_(&pixelID, &k));
+      }
+
+      /**
+       * Returns total number of reflections in y of PDF peak
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections
+       */
+      int getPDFPeakNy(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_ny_(&pixelID, &k));
+      }
+
+      /**
+       * Returns number of reflections in x before mirror
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections before mirror
+       */
+      int getPDFPeakNxm(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_nxm_(&pixelID, &k));
+      }
+
+      /**
+       * Returns number of reflections in y before mirror
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections before mirror
+       */
+      int getPDFPeakNym(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_nym_(&pixelID, &k));
+      }
+
+      /**
+       * Returns number of reflections in x in prism
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections before mirror
+       */
+      int getPDFPeakNxe(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_nxe_(&pixelID, &k));
+      }
+
+      /**
+       * Returns number of reflections in y in prism
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return total number of reflections before mirror
+       */
+      int getPDFPeakNye(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return abs(get_pik_nye_(&pixelID, &k));
+      }
+
+      /**
+       * Returns unfolded x position of pixel
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return unfolded x
+       */
+      float getPDFPeakXD(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_xd_(&pixelID, &k);
+      }
+
+      /**
+       * Returns unfolded y position of pixel
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return unfolded y
+       */
+      float getPDFPeakYD(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_yd_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in x at emission
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in x
+       */
+      float getPDFPeakKxe(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kxe_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in y at emission
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in y
+       */
+      float getPDFPeakKye(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kye_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in z at emission
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in z
+       */
+      float getPDFPeakKze(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kze_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in x at detection
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in x
+       */
+      float getPDFPeakKxd(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kxd_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in y at detection
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in y
+       */
+      float getPDFPeakKyd(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kyd_(&pixelID, &k);
+      }
+
+      /**
+       * Returns photon reconstructed direction in z at detection
+       * @param pixelID pixel ID (1-based)
+       * @param k peak counter (in C++ sense - starts with 0)
+       * @return direction in z
+       */
+      float getPDFPeakKzd(int pixelID, int k) const
+      {
+        pixelID--; // 0-based is used in fortran
+        k++; // counter starts with 1 in fortran
+        return get_pik_kzd_(&pixelID, &k);
       }
 
 

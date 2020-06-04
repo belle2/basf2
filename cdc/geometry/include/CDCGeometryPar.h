@@ -576,6 +576,29 @@ namespace Belle2 {
         return iret;
       }
 
+      //! Returns frontend channel id. corresponding to the wire id.
+      /*!
+      \param wireID   wire  id.
+      \return         channel id. (0-47)
+      */
+      unsigned short getChannelID(const WireID& wID) const
+      {
+        std::map<WireID, unsigned short>::const_iterator it = m_wireToChannel.find(wID);
+        unsigned short iret = (it != m_wireToChannel.end()) ? it->second : -999;
+        return iret;
+      }
+
+      //! Returns wire id. corresponding to the board-and-cannel ids.
+      /*!
+      \param bd board   id. (1-300)
+      \param ch channel id. (0-47)
+      \return   wire    id.
+      */
+      const WireID getWireID(unsigned short bd, unsigned short ch) const
+      {
+        return WireID(m_boardAndChannelToWire[bd][ch]);
+      }
+
       //! Returns time-walk
       /*!
       \param wireID   wire id
@@ -1121,6 +1144,8 @@ namespace Belle2 {
       double m_meanT0;  /*!< mean t0 over all wires; should be double. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
+      std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
+      unsigned short m_boardAndChannelToWire[nBoards][48]; /*!< array relating board-channel-id and wire-id. */
 
       //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 

@@ -33,7 +33,7 @@ namespace Belle2 {
     }
 
     //! A Useful Constructor
-    TRGTOPUnpackerStore(
+    explicit TRGTOPUnpackerStore(
       int eventIdL1
     )
     {

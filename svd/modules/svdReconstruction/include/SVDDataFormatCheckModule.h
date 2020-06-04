@@ -14,10 +14,8 @@
 
 
 #include <framework/core/Module.h>
-//#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-//#include <svd/geometry/SensorInfo.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -65,7 +63,7 @@ namespace Belle2 {
     /** event meta data store array */
     StoreObjPtr<EventMetaData> m_evtMetaData;
 
-    /**<storage for SVDEventInfo object */
+    /**storage for SVDEventInfo object */
     StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
 
     /** experiment number */

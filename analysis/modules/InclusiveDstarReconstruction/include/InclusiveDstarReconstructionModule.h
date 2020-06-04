@@ -3,7 +3,7 @@
  * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Maximilian Welsch                                        *
+ * Contributors: Maximilian Welsch, Pascal Schmolz                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -32,7 +32,17 @@ namespace Belle2 {
    * momentum is calculated using the D* PDG mass and the direction is collinear
    * to the slow pion direction.
    *
-   * The charge of the given pion list has to be consistent with the D* charge.
+   * The decay must be specified by a DecayString of the following forms
+   * - [D*+ -> pi+]
+   * - [D*+ -> pi0]
+   * - [D*0 -> pi0]
+   * The particle properties relevant for MC matching are set internally by the module.
+   * These are: ignore radiated photons, ignore intermediate resonances, ignore missing
+   * massive particles, ignore missing neutrino and ignore missing gamma.
+   *
+   * Note that the inclusive reconstruction of a D* by a pi0 is ambiguous as
+   * the flavor of the D* cannot be determined. Therefore there are two D*
+   * candidates for every pi0 with both flavors.
    */
   class InclusiveDstarReconstructionModule : public Module {
 
@@ -79,17 +89,32 @@ namespace Belle2 {
      * */
     bool pionCompatibleWithDstar(int pion_pdg_code);
 
-
-    std::string m_inputPionListName;  /**< Name of the input pion particle list */
-    std::string m_outputDstarListName;  /**< Name of the output D* particle list */
-    std::string m_slowPionCut;  /**< Cut used to identify slow pions */
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
+    /**
+     * Helper function to get the correct D* PDG code for the output list,
+     * depending on the input (DecayString) and the charge of the reconstructed
+     * pion. This allows to use both positive and negative decay strings.
+     *
+     * @param pion_charge - charge of the reconstructed pion
+     * @param input_dstar_pdg - PDG code of the input Dstar list
+     * */
+    int getDstarOutputPDG(int pion_charge, int input_dstar_pdg);
 
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor for parsing the user specifed DecayString */
 
+    std::unique_ptr<Variable::Cut> m_cut_pion; /**< cut object which performs the cuts */
+    std::unique_ptr<Variable::Cut> m_cut_dstar; /**< cut object which performs the cuts */
+
+    std::string m_pionListName;  /**< Name of the input pion particle list */
+    std::string m_decayString;  /**< Input DecayDescriptor string */
+    std::string m_outputListName;  /**< Name of the output D* particle list */
+    std::string m_outputAntiListName;  /**< Name of the output anti-D* particle list */
+    std::string m_slowPionCut;  /**< Cut to select slow pions. */
+    std::string m_DstarCut;  /**< Cut for Dstar */
+
     int m_dstar_pdg_code; /**< PDG code of the given D* particle list */
-    float m_dstar_pdg_mass; /**< PDG mass of the give D* particle list */
-    float m_d_pdg_mass; /**< PDG mass for the D daughter of the D* */
+
+    float m_dstar_pdg_mass; /**< PDG mass of the mother-D* */
+    float m_d_pdg_mass; /**< PDG mass of the daughter-D  */
   };
 
 }

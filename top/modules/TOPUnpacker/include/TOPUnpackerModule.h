@@ -264,6 +264,7 @@ namespace Belle2 {
      * Unpack raw data given in production debugging format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
+     * @param dataFormat data format
      * @param pedestalSubtracted true, if pedestal is subtracted in waveforms
      * @return number of words remaining in data buffer
      */

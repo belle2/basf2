@@ -70,22 +70,22 @@ void MuidBuilder::fillPDFs(MuidElementNumbers::Hypothesis hypothesis)
     for (int lastLayer = 0; lastLayer <= MuidElementNumbers::getMaximalBarrelLayer(); ++lastLayer) {
       if (!(MuidElementNumbers::checkExtrapolationOutcome(outcome, lastLayer)))
         break;
-      std::vector<double> layerPDF = m_MuidParameters->getProfile(hypothesis, outcome, lastLayer);
+      std::vector<double> layerPDF = m_LikelihoodParameters->getLongitudinalPDF(hypothesis, outcome, lastLayer);
       for (unsigned int layer = 0; layer < layerPDF.size(); ++layer) {
         m_LayerPDF[outcome][lastLayer][layer] = layerPDF[layer];
       }
     }
   }
-
   m_ReducedChiSquaredDx = MuidElementNumbers::getMaximalReducedChiSquared() /
                           MuidElementNumbers::getSizeReducedChiSquared(); // bin size
   for (int detector = 0; detector <= MuidElementNumbers::getMaximalDetector(); ++detector) {
 
     for (int halfNdof = 1; halfNdof <= MuidElementNumbers::getMaximalHalfNdof(); ++halfNdof) {
-      m_ReducedChiSquaredThreshold[detector][halfNdof] = m_MuidParameters->getThreshold(hypothesis, detector, halfNdof * 2);
-      m_ReducedChiSquaredScaleY[detector][halfNdof] = m_MuidParameters->getScaleY(hypothesis, detector, halfNdof * 2);
-      m_ReducedChiSquaredScaleX[detector][halfNdof] = m_MuidParameters->getScaleX(hypothesis, detector, halfNdof * 2);
-      std::vector<double> reducedChiSquaredPDF = m_MuidParameters->getPDF(hypothesis, detector, halfNdof * 2);
+      m_ReducedChiSquaredThreshold[detector][halfNdof] = m_LikelihoodParameters->getTransverseThreshold(hypothesis, detector,
+                                                         halfNdof * 2);
+      m_ReducedChiSquaredScaleY[detector][halfNdof] = m_LikelihoodParameters->getTransverseScaleY(hypothesis, detector, halfNdof * 2);
+      m_ReducedChiSquaredScaleX[detector][halfNdof] = m_LikelihoodParameters->getTransverseScaleX(hypothesis, detector, halfNdof * 2);
+      std::vector<double> reducedChiSquaredPDF = m_LikelihoodParameters->getTransversePDF(hypothesis, detector, halfNdof * 2);
       if (reducedChiSquaredPDF.size() != MuidElementNumbers::getSizeReducedChiSquared()) {
         B2ERROR("TransversePDF vector for hypothesis " << hypothesis << "  detector " << detector
                 << " has " << reducedChiSquaredPDF.size() << " entries; should be " << MuidElementNumbers::getSizeReducedChiSquared());
@@ -144,10 +144,10 @@ void MuidBuilder::spline(int n, double dx, double Y[], double B[], double C[], d
 
 double MuidBuilder::getPDF(const KLMMuidLikelihood* muid) const
 {
-  return getPDFLayer(muid) * getPDFRchisq(muid);
+  return getLongitudinalPDF(muid) * getTransversePDF(muid);
 }
 
-double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
+double MuidBuilder::getLongitudinalPDF(const KLMMuidLikelihood* muid) const
 {
   /* Setup the main ingredients for the calculation. */
   unsigned int outcome = muid->getOutcome();
@@ -199,7 +199,7 @@ double MuidBuilder::getPDFLayer(const KLMMuidLikelihood* muid) const
   return pdf;
 }
 
-double MuidBuilder::getPDFRchisq(const KLMMuidLikelihood* muid) const
+double MuidBuilder::getTransversePDF(const KLMMuidLikelihood* muid) const
 {
   /* Evaluate the transverse-coordinate PDF for this particleID hypothesis. */
   int ndof = muid->getDegreesOfFreedom();

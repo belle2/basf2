@@ -57,6 +57,11 @@ namespace Belle2 {
 
   private:
 
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = true;
+
+    /** parameter to change the range of the time histograms*/
+    bool m_isSVDTimeCalibrated = false;
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
 

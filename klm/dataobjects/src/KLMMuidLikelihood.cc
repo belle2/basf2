@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Leo Piilonen                                             *
+ * Contributors: Leo Piilonen, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,22 +16,21 @@ using namespace Belle2;
 
 KLMMuidLikelihood::KLMMuidLikelihood() :
   m_PDGCode(0),
-  m_JunkPDFValue(0.0),
-  m_Status(0),
+  m_JunkPDFValue(false),
   m_ChiSquared(0.0),
   m_DegreesOfFreedom(0),
   m_Outcome(0),
   m_IsForward(true),
   m_BarrelExtLayer(-1),
   m_EndcapExtLayer(-1),
+  m_ExtLayer(-1),
   m_BarrelHitLayer(-1),
   m_EndcapHitLayer(-1),
-  m_ExtLayer(-1),
   m_HitLayer(-1),
   m_ExtLayerPattern(0),
   m_HitLayerPattern(0)
 {
-  for (const Const::ChargedStable& particle : Const::chargedStableSet) {
+  for (const Const::ChargedStable particle : Const::chargedStableSet) {
     m_PDFValue[particle.getIndex()] = 0.0;
     m_LogL[particle.getIndex()] = -1.0E20;
   }

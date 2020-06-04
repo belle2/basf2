@@ -71,7 +71,7 @@ for VXDReq in VXDReqs:
 
     B0_DeltaT = ROOT.RooRealVar("DeltaT", "DeltaT", 0.)
     deltaTErr = ROOT.RooRealVar("DeltaTErr", "DeltaTErr", 0, limDeltaTErr, "ps")
-    B0_TruthDeltaT = ROOT.RooRealVar("MCDeltaT", "MCDeltaT", 0.)
+    B0_TruthDeltaT = ROOT.RooRealVar("mcDeltaT", "mcDeltaT", 0.)
 
     B0_qrMC = ROOT.RooRealVar("qrMC", "qrMC", 0., -100, 100)
     B0_isSignal = ROOT.RooRealVar("isSignal", "isSignal", 0., 0., 512.)
@@ -117,7 +117,7 @@ for VXDReq in VXDReqs:
     if VXDReq == 'SVD2':
         cut = cut + "&& Jpsi_mu_0_nSVDHits> 0 && Jpsi_mu_1_nSVDHits> 0 "
 
-    tdat.Draw("DeltaT - MCDeltaT >> B0_DeltaT_" + VXDReq, cut)
+    tdat.Draw("DeltaT - mcDeltaT >> B0_DeltaT_" + VXDReq, cut)
     tdat.Draw("DeltaTErr >> B0_DeltaTErr_" + VXDReq, cut)
     tdat.Draw("z - mcZ >> B0_DeltaZsig_" + VXDReq, cut)
     tdat.Draw("TagVz - mcTagVz >> B0_DeltaZtag_" + VXDReq, cut)
@@ -247,7 +247,7 @@ for VXDReq in VXDReqs:
 
         row = data.get(i)
 
-        tDT = row.getRealValue("DeltaT", 0, ROOT.kTRUE) - row.getRealValue("MCDeltaT", 0, ROOT.kTRUE)
+        tDT = row.getRealValue("DeltaT", 0, ROOT.kTRUE) - row.getRealValue("mcDeltaT", 0, ROOT.kTRUE)
         if abs(tDT) < limDeltaT:
             DT.setVal(tDT)
             fitDataDT.add(ROOT.RooArgSet(DT))

@@ -16,25 +16,25 @@ def arg_parser():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--exp',
-			required=True,
-			type=int,
-			help='experiment number',
-			metavar='EXP_NUMBER')
+                        required=True,
+                        type=int,
+                        help='experiment number',
+                        metavar='EXP_NUMBER')
     parser.add_argument('--run',
                         required=True,
-			type=int,
-			help='run number',
-			metavar='RUN_NUMBER')
+                        type=int,
+                        help='run number',
+                        metavar='RUN_NUMBER')
     parser.add_argument('-i', '--input',
-    			default='KLMDQM.root',
-			type=str,
-			help='input file name',
-			metavar='INPUT_FILE')
+                        default='KLMDQM.root',
+                        type=str,
+                        help='input file name',
+                        metavar='INPUT_FILE')
     parser.add_argument('-o', '--output',
-    			default='KLMDQM_Masked.root',
-			type=str,
-			help='output file name',
-			metavar='OUTPUT_FILE')
+                        default='KLMDQM_Masked.root',
+                        type=str,
+                        help='output file name',
+                        metavar='OUTPUT_FILE')
     parser.add_argument('--prepend_gt',
                         default='',
                         type=str,
@@ -52,89 +52,87 @@ def arg_parser():
 
 if __name__ == "__main__":
 
-   #####################################################
-   # Part 0: setup
+    #####################################################
+    # Part 0: setup
 
-   # Argument parsing
-   args = arg_parser().parse_args()
-   exp_number = args.exp
-   run_number = args.run
-   input_file = args.input
-   output_file = args.output
+    # Argument parsing
+    args = arg_parser().parse_args()
+    exp_number = args.exp
+    run_number = args.run
+    input_file = args.input
+    output_file = args.output
 
-   # Check that input and output file names are correct
-   if not os.path.exists(input_file):
-       basf2.B2FATAL('The input file does not exist.')
-   if not output_file.endswith('.root'):
-       basf2.B2FATAL('Please provide a valid .root output file name.')
-   if input_file == output_file:
-       basf2.B2FATAL('Input file name and output file name must differ.')
-   command = f'cp {input_file} {output_file}'  
-   basf2.B2INFO(f'The following command will be executed: {command}')
-   os.system(command)
+    # Check that input and output file names are correct
+    if not os.path.exists(input_file):
+        basf2.B2FATAL('The input file does not exist.')
+    if not output_file.endswith('.root'):
+        basf2.B2FATAL('Please provide a valid .root output file name.')
+    if input_file == output_file:
+        basf2.B2FATAL('Input file name and output file name must differ.')
+    command = f'cp {input_file} {output_file}'
+    basf2.B2INFO(f'The following command will be executed: {command}')
+    os.system(command)
 
-   # Set the Global Tags
-   basf2.conditions.override_globaltags(['online'])
-   if not (args.prepend_gt == ''):
-       for gt in reversed(args.prepend_gt):
-           basf2.conditions.prepend_globaltag(gt)
-   if not (args.append_gt == ''):
-       for gt in args.append_gt:
-           basf2.conditions.append_globaltag(gt)
+    # Set the Global Tags
+    basf2.conditions.override_globaltags(['online'])
+    if not (args.prepend_gt == ''):
+        for gt in reversed(args.prepend_gt):
+            basf2.conditions.prepend_globaltag(gt)
+    if not (args.append_gt == ''):
+        for gt in args.append_gt:
+            basf2.conditions.append_globaltag(gt)
 
-   # Set the logging options, including a temporary log file
-   log_file = 'log.tmp'
-   basf2.logging.log_level = basf2.LogLevel.INFO
-   basf2.logging.add_file(log_file)
+    # Set the logging options, including a temporary log file
+    log_file = 'log.tmp'
+    basf2.logging.log_level = basf2.LogLevel.INFO
+    basf2.logging.add_file(log_file)
 
+    #####################################################
+    # Part 1: run the KLM analysis module
 
-   #####################################################
-   # Part 1: run the KLM analysis module
+    # Create path
+    main = basf2.Path()
 
-   # Create path
-   main = basf2.Path()	
+    # Input
+    main.add_module('DQMHistAnalysisInputRootFile',
+                    Experiment=exp_number,
+                    RunNr=run_number,
+                    InputRootFile=output_file,
+                    SelectFolders=['KLM'])
 
-   # Input
-   main.add_module('DQMHistAnalysisInputRootFile',
-		   Experiment=exp_number,
-		   RunNr=run_number,
-		   InputRootFile=output_file,
-		   SelectFolders=['KLM'])
+    # Analysis module
+    analysis = basf2.register_module('DQMHistAnalysisKLM')
+    analysis.logging.log_level = basf2.LogLevel.DEBUG
+    analysis.logging.debug_level = 20
+    main.add_module(analysis)
 
-   # Analysis module
-   analysis = basf2.register_module('DQMHistAnalysisKLM')
-   analysis.logging.log_level = basf2.LogLevel.DEBUG
-   analysis.logging.debug_level = 20
-   main.add_module(analysis)
+    # Process events
+    basf2.process(path=main)
 
-   # Process events
-   basf2.process(path=main)
+    #####################################################
+    # Part 2: mask the channels with b2klm-executeMasking
 
+    print()
 
-   #####################################################
-   # Part 2: mask the channels with b2klm-executeMasking
+    # Open the log file to record the channels to be masked
+    line_marker = 'KLM@MaskMe'
+    channel_list = []
+    file = open(log_file)
+    for line in file:
+        if line_marker in line:
+            debug, marker, channel, *garbage = line.split()
+            channel_list.append(channel)
+    file.close()
 
-   print()
+    # Finally, launch the command to mask the channels
+    if not channel_list:
+        basf2.B2INFO('There are no channels to mask, nothing to do.')
+    else:
+        command = f'b2klm-executeMasking {output_file}'
+        for channel in channel_list:
+            command += f' {channel}'
+        basf2.B2INFO(f'The following command will be executed: {command}')
+        os.system(command)
+        basf2.B2INFO(f'Masking complete: the reference file {output_file} is now ready.')
 
-   # Open the log file to record the channels to be masked
-   line_marker = 'KLM@MaskMe'
-   channel_list = []
-   file = open(log_file)
-   for line in file:
-       if line_marker in line:
-          debug, marker, channel, *garbage = line.split()
-          channel_list.append(channel)
-   file.close()
-
-   # Finally, launch the command to mask the channels
-   if not channel_list:
-       basf2.B2INFO('There are no channels to mask, nothing to do.')
-   else:
-       command = f'b2klm-executeMasking {output_file}'
-       for channel in channel_list:
-       	   command += f' {channel}'
-       basf2.B2INFO(f'The following command will be executed: {command}')
-       os.system(command)
-       basf2.B2INFO(f'Masking complete: the reference file {output_file} is now ready.')
-
-   os.remove(log_file)
+    os.remove(log_file)

@@ -116,6 +116,7 @@ if __name__ == "__main__":
 
    print()
 
+   # Open the log file to record the channels to be masked
    line_marker = 'KLM@MaskMe'
    channel_list = []
    file = open(log_file)
@@ -125,6 +126,7 @@ if __name__ == "__main__":
           channel_list.append(channel)
    file.close()
 
+   # Finally, launch the command to mask the channels
    if not channel_list:
        basf2.B2INFO('There are no channels to mask, nothing to do.')
    else:

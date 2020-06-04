@@ -152,7 +152,7 @@ class CDCCalibration(Calibration):
                  name,
                  algorithms,
                  input_file_dict,
-                 max_iterations=5,
+                 max_iterations=1,
                  dependencies=None,
                  max_events=10000000):
         for algo in algorithms:

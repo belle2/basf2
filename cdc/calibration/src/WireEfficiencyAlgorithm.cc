@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Henrikas Svidras                                         *
+ * Contributors: Henrikas Svidras, Makoto Uchida                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,7 +40,7 @@ WireEfficiencyAlgorithm::WireEfficiencyAlgorithm(): CalibrationAlgorithm("CDCCal
   );
 }
 
-void WireEfficiencyAlgorithm::buildEfficiencies()
+bool WireEfficiencyAlgorithm::buildEfficiencies()
 {
   B2INFO("Creating efficiencies for every layer");
 
@@ -98,6 +98,9 @@ void WireEfficiencyAlgorithm::buildEfficiencies()
   B2INFO("TEfficiencies successfully filled.");
   outputCollection->Close();
   B2INFO("TEfficiencies successfully saved");
+  // setting 1000 entries as the minimum value to consider "enough data", but this might need to be tailored in the future.
+  if (nEntries > 1000) return true;
+  else return false;
 }
 
 void WireEfficiencyAlgorithm::detectBadWires()
@@ -190,9 +193,7 @@ void WireEfficiencyAlgorithm::detectBadWires()
     B2INFO("Bad wires for " << layerNo << " recorded");
   }
   m_badWireList->outputToFile("wireFile.txt");
-  TFile* wireList = new TFile("wireList.root", "RECREATE");
-  m_badWireList->Write();
-  wireList->Close();
+  saveCalibration(m_badWireList, "CDCBadWires");
   B2INFO("Bad wire list sucessfully saved.");
 }
 
@@ -236,9 +237,11 @@ CalibrationAlgorithm::EResult WireEfficiencyAlgorithm::calibrate()
   B2INFO("Creating CDCGeometryPar object");
   CDC::CDCGeometryPar::Instance(&(*m_cdcGeo));
 
-  buildEfficiencies();
+  bool enoughEventsInInput;
+  enoughEventsInInput = buildEfficiencies();
 
   detectBadWires();
 
-  return c_OK;
+  if (enoughEventsInInput) return c_OK;
+  else return c_NotEnoughData;
 }

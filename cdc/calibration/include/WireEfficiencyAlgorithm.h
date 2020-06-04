@@ -36,8 +36,8 @@ namespace Belle2 {
     protected:
       /// Run algo on data.
       EResult calibrate() override;
-      ///create 2D TEfficiency for each wire.
-      void buildEfficiencies();
+      ///create 2D TEfficiency for each wire and return True if more than 1000 entries
+      bool buildEfficiencies();
       /// detects bad wires.
       void detectBadWires();
       /// chitest

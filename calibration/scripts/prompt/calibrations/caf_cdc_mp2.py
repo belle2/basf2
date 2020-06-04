@@ -111,6 +111,7 @@ def get_calibrations(input_data, **kwargs):
                   'entries 100',
                   'scaleerrors 1. 1.'],
         params=dict(minPValue=0., externalIterations=0),
+        init_event=(0, output_iov.run_low, output_iov.exp_low),
         min_entries=10000)
 
     basf2.set_module_parameters(cal.collections['hlt_mumu'].pre_collector_path, 'RootInput', entrySequences=[f'0:{3000}'])

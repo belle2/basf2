@@ -160,7 +160,6 @@ void KLMDQMModule::defineHisto()
   /* Masked channels per sector:
    * it is defined here, but filled by the analysis module. */
   uint16_t totalSectors = m_SectorArrayIndex->getNElements();
-  B2INFO("Total sectors: " << totalSectors);
   m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
                                        totalSectors, -0.5, totalSectors - 0.5);
   for (KLMChannelIndex& klmSector : klmSectors) {

@@ -210,7 +210,7 @@ namespace Belle2 {
 
     }
 
-    void CsiCreator::BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, string side, int iEnclosure)
+    void CsiCreator::BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, const string side, int iEnclosure)
     {
 
       string gearPath = "Enclosures/Enclosure";

@@ -349,11 +349,15 @@ namespace Belle2 {
         for (int i = 0; i < dimz; i++) {
           int detID1 = 2 * i;
           int detID2 = 2 * i + 1;
-          if (phase == 1) {
+          /*if (phase == 1) {
             detID1 = ch_wAu[i];
             detID2 = ch_woAu[i];
-          }
+          }*/
           if (phase == 1) {
+
+            detID1 = ch_wAu[i];
+            detID2 = ch_woAu[i];
+
             transform = G4Translate3D(x_pos[i], y_pos[i],
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
@@ -365,8 +369,7 @@ namespace Belle2 {
             */
             new G4PVPlacement(transform, l_pin, TString::Format("p_pin_1_%d", i).Data(), &topVolume, false, detID1);
             B2INFO("With Au PIN-" << detID1 << " placed at: " << transform.getTranslation() << " mm");
-          }
-          if (phase == 1) {
+
             transform = G4Translate3D(x_pos[i], y_pos[i],
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
@@ -374,6 +377,14 @@ namespace Belle2 {
             new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
             B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
           }
+          /*if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
+            B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
+          }*/
           /*
             if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
             G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,

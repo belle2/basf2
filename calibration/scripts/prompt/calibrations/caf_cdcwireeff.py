@@ -29,7 +29,7 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_mumu = input_data["hlt_mumu"]
 
     max_files_per_run = 10
-    min_events_per_file = 1
+    min_events_per_file = 1000
 
     max_events_per_calibration = 10000000
     max_events_per_file = 10000
@@ -51,7 +51,7 @@ def get_calibrations(input_data, **kwargs):
     cal = CDCCalibration(name='wire_eff',
                          algorithms=[wire_algo()],
                          input_file_dict=input_file_dict,
-                         max_iterations=4
+                         max_iterations=1
                          )
 
     # Force the output payload IoV to be correct.

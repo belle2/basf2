@@ -116,10 +116,10 @@ namespace Belle2 {
       bool m_isCosmic = false;                 /**< true when we process cosmic events, else false (collision). */
       bool m_effStudy = false;                 /**< When true module collects info only necessary for wire eff study. */
 
-      unsigned short wireID;                   /** wireID for hit-level wire monitoring*/
-      unsigned short layerID;                  /** layerID for hit-level wire monitoring*/
-      float z;                                /** z of hit fot hit-level wire monitoring*/
-      bool isFound;
+      unsigned short wireID;                   /**< wireID for hit-level wire monitoring */
+      unsigned short layerID;                  /**< layerID for hit-level wire monitoring */
+      float z;                                 /**< z of hit fot hit-level wire monitoring */
+      bool isFound;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
     };
   }
 }

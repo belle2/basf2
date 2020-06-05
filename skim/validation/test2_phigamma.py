@@ -12,12 +12,11 @@ histoRootFile = 'phigamma_Validation.root'
 inputFileList = glob(inputFiles)
 
 phigamma_path = basf2.Path()
-eventinfosetter = register_module('EventInfoSetter')
-inputMdstList('default', inputFileList, path=phigamma_path)
+ma.inputMdstList('default', inputFileList, path=phigamma_path)
 
 stdKshorts(path=phigamma_path)
-ma.fillParticleList('K+:all', 'E > 0', writeOut=True, path=phigamma_path)
-ma.fillParticleList('K_L0:all', 'E > 0.', writeOut=True, path=phigamma_path)
+ma.fillParticleList('K+:all', "", writeOut=True, path=phigamma_path)
+ma.fillParticleList('K_L0:all', "", writeOut=True, path=phigamma_path)
 ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=phigamma_path)
 
 ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=phigamma_path)

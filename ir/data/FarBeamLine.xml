@@ -1548,6 +1548,64 @@
          <Material>G4_CONCRETE</Material>
          <Desc>Concrete shield</Desc>
       </ConcreteShieldL>
+
+      <!-- Collimators -->
+      <!-- for horizontal c. dy1=dy2, for vertical dx1=dx2 -->
+
+      <Collimator type="horizontal" name="D01H5">
+         <sec name="d1" unit="cm">-0.944</sec>
+         <sec name="d2" unit="cm">0.954</sec>
+         <sec name="dx1" unit="cm">19.31</sec>
+         <sec name="dx2" unit="cm">0.5</sec>
+         <sec name="dy1" unit="cm">0.6</sec>
+         <sec name="dy2" unit="cm">0.6</sec>
+         <sec name="dz" unit="cm">2.0</sec>
+         <sec name="Z" unit="m">9.322</sec>
+         <MotherVolume>LHL2</MotherVolume>
+         <Material>Cu</Material>
+         <Desc>Horizontal collimator D01H5</Desc>
+      </Collimator>
+
+      <Collimator type="horizontal" name="D02H4">
+         <sec name="d1" unit="cm">-0.862</sec>
+         <sec name="d2" unit="cm">0.935</sec>
+         <sec name="dx1" unit="cm">19.31</sec>
+         <sec name="dx2" unit="cm">0.5</sec>
+         <sec name="dy1" unit="cm">0.6</sec>
+         <sec name="dy2" unit="cm">0.6</sec>
+         <sec name="dz" unit="cm">2.0</sec>
+         <sec name="Z" unit="m">4.799</sec>
+         <MotherVolume>LLR4</MotherVolume>
+         <Material>Cu</Material>
+         <Desc>Horizontal collimator D02H4</Desc>
+      </Collimator>
+
+      <!-- Collimator Shields -->
+
+      <CollimatorShield name="FC29078.2">
+         <sec name="X0" unit="m">-1.064</sec>
+         <sec name="Z0" unit="m">-28.357</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <sec name="W" unit="mm">460</sec>
+         <sec name="H" unit="mm">330</sec>
+         <sec name="L" unit="mm">250</sec>
+         <sec name="d" unit="mm">50</sec>
+         <Material>Pb</Material>
+         <Desc>Shield for collimator D01H4 part 2</Desc>
+      </CollimatorShield>
+
+      <CollimatorShield name="FC29078.3">
+         <sec name="X0" unit="m">-0.928</sec>
+         <sec name="Z0" unit="m">-24.541</sec>
+         <sec name="PHI" unit="rad">-3.10601</sec>
+         <sec name="W" unit="mm">460</sec>
+         <sec name="H" unit="mm">330</sec>
+         <sec name="L" unit="mm">2620</sec>
+         <sec name="d" unit="mm">50</sec>
+         <Material>Pb</Material>
+         <Desc>Shield for collimator D01H4 part 3</Desc>
+      </CollimatorShield>
+
    </Content>
 </DetectorComponent>
 

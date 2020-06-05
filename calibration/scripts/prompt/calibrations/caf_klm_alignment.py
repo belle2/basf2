@@ -3,8 +3,12 @@
 """A simple example calibration that takes one input data list from raw data and performs
 a single calibration."""
 
+import collections
+
 import basf2
+from caf.utils import ExpRun, IoV
 from prompt import CalibrationSettings
+from prompt.utils import events_in_basf2_file
 
 ##############################
 # REQUIRED VARIABLE #
@@ -25,6 +29,64 @@ settings = CalibrationSettings(name="KLM alignmnent",
                                depends_on=[vxdcdc_alignment])
 
 ##############################
+
+
+def select_input_files(file_to_iov_physics, file_to_iov_cosmic,
+                       reduced_file_to_iov_physics, reduced_file_to_iov_cosmic,
+                       required_events):
+    """
+    Parameters:
+        files_to_iov_physics (dict): Dictionary {run : IOV} for physics data.
+        files_to_iov_cosmic (dict): Dictionary {run : IOV} for cosmic data.
+        reduced_file_to_iov_physics (dict): Selected physics data.
+        reduced_file_to_iov_cosmic (dict): Selected cosmic data.
+    """
+    run_to_files_physics = collections.defaultdict(list)
+    for input_file, file_iov in file_to_iov_physics.items():
+        run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
+        run_to_files_physics[run].append(input_file)
+    run_to_files_cosmic = collections.defaultdict(list)
+    for input_file, file_iov in file_to_iov_cosmic.items():
+        run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
+        run_to_files_cosmic[run].append(input_file)
+    max_files_per_run = 0
+    for files in run_to_files_physics.values():
+        files_per_run = len(files)
+        if files_per_run > max_files_per_run:
+            max_files_per_run = files_per_run
+    for files in run_to_files_cosmic.values():
+        files_per_run = len(files)
+        if files_per_run > max_files_per_run:
+            max_files_per_run = files_per_run
+    files_per_run = 0
+    collected_events = 0
+    while files_per_run < max_files_per_run:
+        for run, files in run_to_files_physics.items():
+            if files_per_run >= len(files):
+                continue
+            input_file = files[files_per_run]
+            events = events_in_basf2_file(input_file)
+            # Reject files without events.
+            if events == 0:
+                continue
+            collected_events = collected_events + events
+            reduced_file_to_iov_physics[input_file] = IoV(*run, *run)
+            basf2.B2INFO(f'File {input_file} with {events} events is selected.')
+        for run, files in run_to_files_cosmic.items():
+            if files_per_run >= len(files):
+                continue
+            input_file = files[files_per_run]
+            events = events_in_basf2_file(input_file)
+            # Reject files without events.
+            if events == 0:
+                continue
+            collected_events = collected_events + events
+            reduced_file_to_iov_cosmic[input_file] = IoV(*run, *run)
+            basf2.B2INFO(f'File {input_file} with {events} events is selected.')
+        files_per_run = files_per_run + 1
+        if collected_events >= required_events:
+            break
+    basf2.B2INFO(f'The total number of collected events is {collected_events}.')
 
 ##############################
 # REQUIRED FUNCTION #
@@ -61,25 +123,16 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_physics = input_data["raw_physics"]
     file_to_iov_cosmic = input_data["raw_cosmic"]
 
-    # We might have requested an enormous amount of data across a run range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 5
+    # Select input files.
+    reduced_file_to_iov_physics = collections.OrderedDict()
+    reduced_file_to_iov_cosmic = collections.OrderedDict()
+    select_input_files(file_to_iov_physics, file_to_iov_cosmic,
+                       reduced_file_to_iov_physics, reduced_file_to_iov_cosmic,
+                       5000000)
 
-    # If you are using Raw data there's a chance that input files could have zero events.
-    # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
-    # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 1
-
-    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
-    # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
-
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
     input_files_physics = sorted(list(reduced_file_to_iov_physics.keys()))
     basf2.B2INFO(f"Total number of 'physics' files actually used as input = {len(input_files_physics)}")
 
-    reduced_file_to_iov_cosmic = filter_by_max_files_per_run(file_to_iov_cosmic, max_files_per_run, min_events_per_file)
     input_files_cosmic = sorted(list(reduced_file_to_iov_cosmic.keys()))
     basf2.B2INFO(f"Total number of 'cosmic' files actually used as input = {len(input_files_cosmic)}")
 

@@ -42,7 +42,10 @@ namespace Belle2 {
      * Get momentum.
      * @return Momentum.
      */
-    TLorentzVector getMomentum() const;
+    TLorentzVector getMomentum() const
+    {
+      return TLorentzVector(m_pX, m_pY, m_pZ, m_e);
+    }
 
   protected:
 

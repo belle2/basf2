@@ -45,7 +45,5 @@ void VariableToReturnValueModule::initialize()
 
 void VariableToReturnValueModule::event()
 {
-  StoreObjPtr<EventExtraInfo> eventExtraInfo;
-  if (not eventExtraInfo.isValid()) eventExtraInfo.create();
   this->setReturnValue(static_cast<int>(std::lround(m_function(nullptr))));
 }

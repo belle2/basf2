@@ -242,6 +242,9 @@ namespace Belle2 {
     /** Delete dynamically allocated variables */
     virtual void terminate() override;
 
+    /** begin Run */
+    virtual void beginRun();
+
     /** convert raw data (in B2L buffer to bitstream) */
     virtual void event() override;
 
@@ -333,6 +336,11 @@ namespace Belle2 {
     int m_2DFinderCnttrg = 0;
     /** NN cnttrg */
     int m_NeuroCnttrg = 0;
+
+    /** exp number */
+    unsigned m_exp = 0;
+    /** run number */
+    unsigned m_run = 0;
 
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;

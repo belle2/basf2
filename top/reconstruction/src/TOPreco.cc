@@ -190,7 +190,7 @@ namespace Belle2 {
       top_reco_();
     }
 
-    void TOPreco::reconstruct(TOPtrack& trk, int pdg)
+    void TOPreco::reconstruct(const TOPtrack& trk, int pdg)
     {
       m_hypID = abs(trk.getPDGcode());
       if (pdg == 0) pdg = m_hypID;

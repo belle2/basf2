@@ -166,10 +166,10 @@ void TRGGRLMatchModule::initialize()
     int x3 = patterns_base2[p][2];
     int x4 = patterns_base2[p][3];
     int d = x2 - x0;
-    x1 -= d;
-    x2 -= d;
-    x3 -= d;
-    x4 -= d;
+    x1 += d;
+    x2 += d;
+    x3 += d;
+    x4 += d;
     patterns_base0.push_back({x1, x2, x3, x4});
   }
 
@@ -265,6 +265,7 @@ void TRGGRLMatchModule::event()
       matphi->set_dphi_d(dphi_d_tmp);
       matphi->addRelationTo(track2Dlist[i]);
       matphi->addRelationTo(clusterlist[cluster_ind_phi]);
+      matphi->set_e(clusterlist[cluster_ind_phi]->getEnergyDep());
       //   track2Dlist[i]->addRelationTo(clusterlist[cluster_ind]);
       clusterlist[cluster_ind_phi]->addRelationTo(track2Dlist[i]);
     }
@@ -403,6 +404,8 @@ void TRGGRLMatchModule::calculationphiangle(CDCTriggerTrack* _track, TRGECLClust
 
   if (phi_CDC > 2 * M_PI) {phi_CDC = phi_CDC - 2 * M_PI;}
   else if (phi_CDC < 0) {phi_CDC = phi_CDC + 2 * M_PI;}
+  if (_phi > 2 * M_PI) {_phi = _phi - 2 * M_PI;}
+  else if (_phi < 0) {_phi = _phi + 2 * M_PI;}
 
   //-- cluster/TRGECL information
   double    _cluster_x = _cluster->getPositionX();
@@ -693,43 +696,43 @@ void TRGGRLMatchModule::make_veto_map(StoreArray<CDCTriggerTrack> track2Dlist, s
     int L = _phi, R = _phi;
     if (_w >= 0 && _w <= 8) { L = _phi; }
     else if (_w >= 9 && _w <= 15) {
-      if (charge > 0) { L = _phi + 1; }
+      if (charge < 0) { L = _phi + 1; }
       else { L = _phi; }
     } else if (_w >= 16 && _w <= 24) {
-      if (charge > 0) { L = _phi + 2; }
+      if (charge < 0) { L = _phi + 2; }
       else { L = _phi; }
     } else if (_w >= 25 && _w <= 27) {
-      if (charge > 0) { L = _phi + 3; }
+      if (charge < 0) { L = _phi + 3; }
       else { L = _phi; }
     } else if (_w >= 28 && _w <= 30) {
-      if (charge > 0) { L = _phi + 3; }
+      if (charge < 0) { L = _phi + 3; }
       else { L = _phi + 1; }
     } else if (_w >= 31 && _w <= 32) {
-      if (charge > 0) { L = _phi + 4; }
+      if (charge < 0) { L = _phi + 4; }
       else { L = _phi + 1; }
     } else {
-      if (charge > 0) { L = _phi + 5; }
+      if (charge < 0) { L = _phi + 5; }
       else { L = _phi + 1; }
     }
 
     if (_w >= 0 && _w <= 8) { R = _phi; }
     else if (_w >= 9 && _w <= 15) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 1; }
     } else if (_w >= 16 && _w <= 24) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 2; }
     } else if (_w >= 25 && _w <= 27) {
-      if (charge > 0) { R = _phi; }
+      if (charge < 0) { R = _phi; }
       else { R = _phi - 3; }
     } else if (_w >= 28 && _w <= 30) {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 3; }
     } else if (_w >= 21 && _w <= 32) {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 4; }
     } else {
-      if (charge > 0) { R = _phi + 1; }
+      if (charge < 0) { R = _phi + 1; }
       else { R = _phi - 5; }
     }
 
@@ -820,6 +823,7 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
 
   std::vector< std::vector<int> > stlist_buf(0);
 
+  // -- ST finding with SL2
   for (int i = 0; i < 64; i++) {
 
     int ID0 = 0;
@@ -829,8 +833,7 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
     int ID4 = 0;
     stlist_buf.push_back({0, 0, 0, 0, 0, 0});
 
-    if (!SL0[i] || !SL2[i]) continue;
-    bool SL0_already_found = false;
+    if (!SL2[i]) continue;
     bool SL2_already_found = false;
 
     for (int p = 0; p < 137; p++) {
@@ -878,18 +881,8 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
         SL2_already_found = true; // if it has been found in previous pattern, no need to do it again.
       }
 
-      int y1 = pattern_base0[p][0];
-      int y2 = pattern_base0[p][1];
-      int y3 = pattern_base0[p][2];
-      int y4 = pattern_base0[p][3];
-
-      if (SL0[i] && SL1[N64(i + y1)] && SL2[N64(i + y2)] && SL3[N64(i + y3)] && SL4[N64(i + y4)] && !SL0_already_found) {
-        ST0[i] = true;
-        if (patt_ID[i] < 0) { patt_ID[i] = p; }
-        SL0_already_found = true; // if it has been found in previous pattern, no need to do it again.
-      }
-
-      if (SL2_already_found && SL0_already_found) break;
+      // if a pattern is found, no need to look for other pattern
+      if (SL2_already_found) break;
 
     }
 
@@ -902,7 +895,60 @@ void TRGGRLMatchModule::short_tracking(StoreArray<CDCTriggerSegmentHit> tslist, 
       stlist_buf[i][5] = ID4;
     }
   }
+/////////
+//-- ST finding with SL0
+  for (int i = 0; i < 64; i++) {
 
+    if (!SL0[i]) continue;
+    bool SL0_already_found = false;
+
+    for (int p = 0; p < 137; p++) {
+
+      // following patterns will not be used.
+      if (p == 4) continue;
+      if (p == 5) continue;
+      if (p == 17) continue;
+      if (p == 26) continue;
+      if (p == 38) continue;
+      if (p == 41) continue;
+      if (p == 42) continue;
+      if (p == 47) continue;
+      if (p == 50) continue;
+      if (p == 60) continue;
+      if (p == 63) continue;
+      if (p == 64) continue;
+      if (p == 74) continue;
+      if (p == 93) continue;
+      if (p == 94) continue;
+      if (p == 95) continue;
+      if (p == 96) continue;
+      if (p == 104) continue;
+      if (p == 113) continue;
+      if (p == 114) continue;
+      if (p == 115) continue;
+      if (p == 123) continue;
+      if (p == 134) continue;
+      if (p == 135) continue;
+      if (p == 136) continue;
+
+      int y1 = pattern_base0[p][0];
+      int y2 = pattern_base0[p][1];
+      int y3 = pattern_base0[p][2];
+      int y4 = pattern_base0[p][3];
+
+      if (SL0[i] && SL1[N64(i + y1)] && SL2[N64(i + y2)] && SL3[N64(i + y3)] && SL4[N64(i + y4)] && !SL0_already_found) {
+        ST0[i] = true;
+        if (patt_ID[i] < 0) { patt_ID[i] = p; }
+        SL0_already_found = true; // if it has been found in previous pattern, no need to do it again.
+      }
+
+      // if a pattern is found, no need to look for other pattern
+      if (SL0_already_found) break;
+
+    }
+
+  }
+/////////
 //-- extrapolation
   /*
     for (int i = 0; i < 64; i++) {

@@ -172,6 +172,7 @@ CDCTriggerNeuroModule::event()
     double z = (zIndex >= 0) ? target[zIndex] : 0.;
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
+    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
     const CDCTriggerTrack* NNtrack =
       m_tracksNN.appendNew(m_tracks2D[itrack]->getPhi0(),
                            m_tracks2D[itrack]->getOmega(),
@@ -179,7 +180,7 @@ CDCTriggerNeuroModule::event()
                            z, cot, 0.,
                            m_tracks2D[itrack]->getFoundOldTrack(),
                            m_tracks2D[itrack]->getDriftThreshold(),
-                           m_tracks2D[itrack]->getValidStereoBit(),
+                           valtrack,
                            m_tracks2D[itrack]->getExpert(),
                            m_tracks2D[itrack]->getTSVector(),
                            m_tracks2D[itrack]->getTime(),

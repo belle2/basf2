@@ -24,12 +24,8 @@
 using namespace Belle2;
 
 KLMElectronicsMapImporter::KLMElectronicsMapImporter() :
-  m_ExperimentLow(0),
-  m_RunLow(0),
-  m_ExperimentHigh(-1),
-  m_RunHigh(-1)
+  m_ElementNumbers(&(KLMElementNumbers::Instance()))
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMElectronicsMapImporter::~KLMElectronicsMapImporter()

@@ -13,6 +13,7 @@
 /* External headers. */
 #include <TMatrixDSym.h>
 #include <TMatrixD.h>
+#include <TVectorD.h>
 #include <TRotation.h>
 
 namespace Belle2 {
@@ -105,6 +106,16 @@ namespace Belle2 {
           mS(i, j) = (m(i, j) + m(j, i)) / 2;
         }
       return mS;
+    }
+
+
+    /**
+     * Convert TVector3 to TVectorD
+     *
+     */
+    inline TVectorD toVec(TVector3 v)
+    {
+      return TVectorD(0, 2, v.X(), v.Y(), v.Z(), "END");
     }
 
     /**

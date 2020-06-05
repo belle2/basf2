@@ -26,9 +26,19 @@ from pathlib import Path
 from collections import OrderedDict
 
 from caf.utils import IoV
+from caf import backends
 
 default_collection_heartbeat = 60
 default_max_files_per_collector_job = 1
+default_backend = "LSF"
+
+
+def get_local_backend():
+    return backends.Local(max_processes=4)
+
+backend_choices = {"Local": get_local_backend,
+                   "LSF"  : backends.LSF}
+
 
 from prompt import prompt_script_package
 
@@ -68,13 +78,13 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
                 file_to_iov[file_path] = IoV(exp_low=exp_run[0], run_low=exp_run[1], exp_high=exp_run[0], run_high=exp_run[1])
         B2INFO(f"Found {len(file_to_iov)} files in '{input_name}'")
         if not file_to_iov:
-            B2ERROR("'{input_name}' has no files associated with it!")
+            B2ERROR(f"'{input_name}' has no files associated with it!")
         input_data_files[input_name] = file_to_iov
     return input_data_files
 
 
 def setup_caf(args, input_data_files, prompt_caf):
-    """Path to config JSON file, used to set up the CAF and calibrations used 
+    """Path to config JSON file, used to set up the expert configuration, CAF and calibrations used 
 in this CAF process.
 
 Required format of JSON file:
@@ -85,7 +95,8 @@ Required format of JSON file:
      "caf_script": (str),
      "database_chain" array[str],
      "backend_args" dict,
-     "requested_iov" array[4](int)
+     "requested_iov" array[4](int),
+     "expert_config" dict     <- Optional as the prompt script default will be used if this is missing.
     }
 """
 
@@ -110,11 +121,20 @@ Required format of JSON file:
                          f"Required: {sorted(cal_module.input_data_names)}\n"
                          f"Input:    {sorted(input_data_files.keys())}")
         raise KeyError(error_message)
+    
+    B2INFO("Getting values for 'expert_config' from the prompt script.")
+    expert_config = cal_module.settings.expert_config   # set to be the default from the script
+    # If we have values in the caf_config we merge/overwrite with the default
+    if "expert_config" in caf_config:
+        # Overwrite/merge the default Calibration Settings with JSON
+        B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
+        expert_config = {**expert_config, **caf_config["expert_config"]}
 
-    calibrations = cal_module.get_calibrations(input_data_files, requested_iov=IoV(*caf_config["requested_iov"]))
+    calibrations = cal_module.get_calibrations(input_data_files,
+                                               requested_iov=IoV(*caf_config["requested_iov"]),
+                                               expert_config=expert_config)
 
-    from caf import backends
-    prompt_caf_backend = backends.LSF()
+    prompt_caf_backend = backend_choices[args.backend]()
 
     for cal in calibrations:
         B2INFO(f"Applying prompt settings to Calibration(name={cal.name})")
@@ -136,7 +156,7 @@ Required format of JSON file:
         for global_tag in caf_config["database_chain"]:
             cal.use_central_database(global_tag)
         # Heartbeat should be chosen by us, not the calibration setup function
-        cal.heartbeat = default_collection_heartbeat
+        cal.heartbeat = args.heartbeat
         # Backend should be chosen by us, not the calibration setup function
         cal.backend = prompt_caf_backend
         # Add the final Calibration object to the CAF
@@ -154,7 +174,7 @@ def run_caf(prompt_caf):
             raise RuntimeError(f"{calibration.name} failed!")
 
 
-def collect_outputdb(prompt_caf):
+def collect_outputdb(args, prompt_caf):
     """Some post processing to copy the final local DBs into one directory"""
     import shutil
     outputdb_name = "caf_outputdb_results"
@@ -162,9 +182,13 @@ def collect_outputdb(prompt_caf):
     try:
         outputdb_path.mkdir(parents=True)
     except FileExistsError as e:
-        B2ERROR(f"Final output payload directory '{outputdb_path.as_posix()}' exists! Will not overwrite. "
-                "Please remove and re-run.")
-        return 1
+        B2WARNING(f"Final output payload directory '{outputdb_path.as_posix()}' exists.")
+        if args.overwrite_db:
+            B2INFO(f"Overwrite DB set, removing '{outputdb_path.as_posix()}'...")
+            shutil.rmtree(outputdb_path)
+        else:
+            B2ERROR("Will not overwrite output db! Please move them and restart b2caf-prompt-run.")
+            return 1
     B2INFO(f"Will now copy the calibration final outputdb directories to '{outputdb_path.as_posix()}'")
     for calibration in prompt_caf.calibrations.values():
         if calibration.save_payloads:
@@ -182,9 +206,21 @@ def get_argparser():
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("caf_config", help=setup_caf.__doc__)
     parser.add_argument("input_data", help=get_input_data.__doc__)
+    parser.add_argument("--collector-backend", dest="backend",
+                        default=default_backend, nargs="?", const=default_backend, choices=backend_choices.keys(),
+                        help=("Sets the collector backend used to submit jobs. "
+                              "It can be useful to set to 'Local' during debugging with small amounts of input data."
+                             f"\n(default: {default_backend})")
+                       )
     parser.add_argument("--files-per-job", dest="files_per_job", metavar="",
                         type=int, default=default_max_files_per_collector_job,
-                        help="Sets the number of input files that wil be used per collector job for all calibrations."
+                        help=("Sets the number of input files that wil be used per collector job for all calibrations."
+                             f"\n(default: {default_max_files_per_collector_job})")
+                       )
+    parser.add_argument("--heartbeat", dest="heartbeat", metavar="",
+                        type=int, default=default_collection_heartbeat,
+                        help=("Sets the number of seconds between checking for new statuses e.g. collection job completion."
+                             f"\n(default: {default_collection_heartbeat})")
                        )
     parser.add_argument("--dry-run", dest="dry_run", action="store_true",
                         help="Flags if the CAF process should be set up but not run. "
@@ -192,6 +228,14 @@ def get_argparser():
                              "to submit any jobs."
                        )
     parser.set_defaults(dry_run=False)
+
+    parser.add_argument("--overwrite-output-db", dest="overwrite_db", action="store_true",
+                        help="Flags if the CAF process should be set up but not run. "
+                             "Good for testing if your prompt script and config files are well formed without attempting "
+                             "to submit any jobs."
+                       )
+    parser.set_defaults(overwrite_db=False)
+    parser.set_defaults(expert_config={})
 
     return parser
 
@@ -224,10 +268,10 @@ def main():
 
     if exit_code:
         return exit_code
-
+        
     if not args.dry_run:
         run_caf(cal_fw)
-        return collect_outputdb(cal_fw)
+        return collect_outputdb(args, cal_fw)
 
 
 if __name__ == "__main__":

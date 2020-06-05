@@ -71,7 +71,8 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     }
   }
   for (const int index : source) {
-    if (allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite && unpackComposite) {
+    if ((allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+         allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_V0) && unpackComposite) {
       auto fsdaughters = allParticles[index]->getFinalStateDaughters();
       for (auto* daughter : fsdaughters) {
         result.push_back(daughter);
@@ -203,7 +204,8 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
       maskedParticles.push_back(particle);
     }
     // don't lose a possible V0 particle
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+        particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
       maskedParticles.push_back(particle);
     }
   }
@@ -217,7 +219,7 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
   if (!mask) {
     B2FATAL("ROE Mask does not exist!");
   }
-  std::vector<const Particle*> allROEParticles = getParticles(name);
+  std::vector<const Particle*> allROEParticles = getParticles(name, false);
   std::vector<int> indicesToErase;
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* maskParticle : allROEParticles) {
@@ -253,7 +255,8 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
   if (!mask->isValid()) {
     return false; //We should have particles here!
   }
-  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite) {
+  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+      particleV0->getParticleSource() != Particle::EParticleSourceObject::c_V0) {
     return false;
   }
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();

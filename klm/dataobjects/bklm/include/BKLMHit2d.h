@@ -46,7 +46,9 @@ namespace Belle2 {
     BKLMHit2d& operator=(const BKLMHit2d&);
 
     //! Destructor
-    virtual ~BKLMHit2d() {}
+    virtual ~BKLMHit2d()
+    {
+    }
 
     //! Determine whether this 2D hit is in RPC or scintillator
     //! @return whether this 2D hit is in RPC (true) or scintillator (false)
@@ -121,43 +123,73 @@ namespace Belle2 {
     //! Get detector-module identifier
     //! @return detector-module identifier
     //! @sa BKLMStatus.h
-    int getModuleID() const { return m_ModuleID; }
+    int getModuleID() const
+    {
+      return m_ModuleID;
+    }
 
     //! Determine whether this 2D hit is outside the trigger-coincidence window
     //! @return whether this 2D hit is outside the trigger-coincidence window (true) or not (false)
-    bool isOutOfTime() { return (m_ModuleID & BKLM_OUTOFTIME_MASK) != 0; }
+    bool isOutOfTime()
+    {
+      return (m_ModuleID & BKLM_OUTOFTIME_MASK) != 0;
+    }
 
     //! Determine whether this 2D hit is associated with a muid-extrapolated track
     //! @return whether this 2D hit is associated with a muid-extrapolated track (true) or not (false)
-    bool isOnTrack() { return (m_ModuleID & BKLM_ONTRACK_MASK) != 0; }
+    bool isOnTrack()
+    {
+      return (m_ModuleID & BKLM_ONTRACK_MASK) != 0;
+    }
 
     //! Determine whether this 2D hit is associated with a BKLM-stand-alone track
     //! @return whether this 2D hit is associated with a BKLM-stand-alone track (true) or not (false)
-    bool isOnStaTrack() { return (m_ModuleID & BKLM_ONSTATRACK_MASK) != 0; }
+    bool isOnStaTrack()
+    {
+      return (m_ModuleID & BKLM_ONSTATRACK_MASK) != 0;
+    }
 
     //! Get 3D hit position's x coordinate in global coordinates
     //! @return 3D hit position's x coordinate in global coordinates (cm)
-    float getGlobalPositionX(void) const { return m_GlobalPosition[0]; }
+    float getGlobalPositionX(void) const
+    {
+      return m_GlobalPosition[0];
+    }
 
     //! Get 3D hit position's y coordinate in global coordinates
     //! @return 3D hit position's y coordinate in global coordinates (cm)
-    float getGlobalPositionY(void) const { return m_GlobalPosition[1]; }
+    float getGlobalPositionY(void) const
+    {
+      return m_GlobalPosition[1];
+    }
 
     //! Get 3D hit position's z coordinate in global coordinates
     //! @return 3D hit position's z coordinate in global coordinates (cm)
-    float getGlobalPositionZ(void) const { return m_GlobalPosition[2]; }
+    float getGlobalPositionZ(void) const
+    {
+      return m_GlobalPosition[2];
+    }
 
     //! Get 3D hit position in global coordinates
     //! @return 3D hit position in global coordinates (cm)
-    TVector3 getGlobalPosition(void) const { return TVector3(m_GlobalPosition[0], m_GlobalPosition[1], m_GlobalPosition[2]); }
+    TVector3 getGlobalPosition(void) const
+    {
+      return TVector3(m_GlobalPosition[0], m_GlobalPosition[1], m_GlobalPosition[2]);
+    }
 
     //! Get reconstructed hit time
     //! @return reconstructed hit time (ns), the average of the 2 projections
-    float getTime() const { return m_Time; }
+    float getTime() const
+    {
+      return m_Time;
+    }
 
     //! Get reconstructed energy deposition
     //! @return reconstructed energy deposition (MeV), the sum of the 2 projections
-    float getEnergyDeposit() const { return m_EnergyDeposit; }
+    float getEnergyDeposit() const
+    {
+      return m_EnergyDeposit;
+    }
 
     //! Determine whether the two BKLMHit2ds are in the same module
     //! @return whether the two BKLMHit2ds are in the same module (true) or not (false)
@@ -168,15 +200,24 @@ namespace Belle2 {
 
     //! Set or clear the OutOfTime flag
     //! @param flag whether this hit is outside the trigger-coincidence window (true) or not (false)
-    void isOutOfTime(bool flag) { if (flag) { m_ModuleID |= BKLM_OUTOFTIME_MASK; } else { m_ModuleID &= ~BKLM_OUTOFTIME_MASK; } }
+    void isOutOfTime(bool flag)
+    {
+      if (flag) { m_ModuleID |= BKLM_OUTOFTIME_MASK; } else { m_ModuleID &= ~BKLM_OUTOFTIME_MASK; }
+    }
 
     //! Set or clear the OnTrack flag
     //! @param flag whether this hit is associated with a muid-extrapolated track (true) or not (false)
-    void isOnTrack(bool flag) { if (flag) { m_ModuleID |= BKLM_ONTRACK_MASK; } else { m_ModuleID &= ~BKLM_ONTRACK_MASK; } }
+    void isOnTrack(bool flag)
+    {
+      if (flag) { m_ModuleID |= BKLM_ONTRACK_MASK; } else { m_ModuleID &= ~BKLM_ONTRACK_MASK; }
+    }
 
     //! Set or clear the On-BKLM-stand-alone-track flag
     //! @param flag whether this hit is associated with a stand-alone BKLM track (true) or not (false)
-    void isOnStaTrack(bool flag) { if (flag) { m_ModuleID |= BKLM_ONSTATRACK_MASK; } else { m_ModuleID &= ~BKLM_ONSTATRACK_MASK; } }
+    void isOnStaTrack(bool flag)
+    {
+      if (flag) { m_ModuleID |= BKLM_ONSTATRACK_MASK; } else { m_ModuleID &= ~BKLM_ONSTATRACK_MASK; }
+    }
 
   private:
 

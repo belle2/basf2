@@ -7096,14 +7096,14 @@ Decay D_s+
 0.023900 phi     e+      nu_e                            ISGW2; # [PDG2019]
 0.022900 eta     e+      nu_e                            ISGW2; # [PDG2019]
 0.007400 eta'    e+      nu_e                            ISGW2; # [PDG2019]
-0.001500 omega   e+      nu_e                            ISGW2; # [New mode added - PDG2019 says < 2.0x10^-3]
+0.001500 omega   e+      nu_e                            PHSP; # [New mode added - PDG2019 says < 2.0e-3] - ISGW2 not in EvtGen for this mode
 0.003900 K0      e+      nu_e                            ISGW2; # [PDG2019] - moved up from bottom of decay table 03/2020
 0.001800 K*0     e+      nu_e                            ISGW2; # [PDG2019] - moved up from bottom of decay table 03/2020
 
 0.019000 phi     mu+     nu_mu                           ISGW2; # [PDG2019]
 0.024000 eta     mu+     nu_mu                           ISGW2; # [PDG2019]
 0.011000 eta'    mu+     nu_mu                           ISGW2; # [PDG2019]
-0.001500 omega   mu+     nu_mu                           ISGW2; # [New mode added] - set equal to omega e+ nu_e, best estimate
+0.001500 omega   mu+     nu_mu                           PHSP; # [New mode added] - set equal to omega e+ nu_e, best estimate
 0.002058 K0      mu+     nu_mu                           ISGW2; # Fixed wrong-sign kaon 03/2020
 0.000762 K*0     mu+     nu_mu                           ISGW2; # Fixed wrong-sign kaon 03/2020
 
@@ -7251,14 +7251,14 @@ Decay D_s-
 0.023900 phi     e-      anti-nu_e                       ISGW2; # [PDG2019]
 0.022900 eta     e-      anti-nu_e                       ISGW2; # [PDG2019]
 0.007400 eta'    e-      anti-nu_e                       ISGW2; # [PDG2019]
-0.001500 omega   e-      anti-nu_e                       ISGW2; # [New mode added - PDG2019]
+0.001500 omega   e-      anti-nu_e                       PHSP; # [New mode added - PDG2019 says < 2.0e-3] - ISGW2 not in EvtGen for this mode
 0.003900 anti-K0 e-      anti-nu_e                       ISGW2; # [PDG2019] - moved up from bottom of decay table 03/2020
 0.001800 anti-K*0 e-     anti-nu_e                       ISGW2; # [PDG2019] - moved up from bottom of decay table 03/2020
 
 0.019000 phi     mu-     anti-nu_mu                      ISGW2; # [PDG2019]
 0.024000 eta     mu-     anti-nu_mu                      ISGW2; # [PDG2019]
 0.011000 eta'    mu-     anti-nu_mu                      ISGW2; # [PDG2019]
-0.001500 omega   mu-     anti-nu_mu                      ISGW2; # [New mode added - set equal to omega e- anti-nu_e (best guess)]
+0.001500 omega   mu-     anti-nu_mu                      PHSP; # [New mode added - set equal to omega e- anti-nu_e (best guess)]
 0.002058 anti-K0 mu-     anti-nu_mu                      ISGW2; # Fixed wrong-sign kaon 03/2020
 0.000762 anti-K*0 mu-    anti-nu_mu                      ISGW2; # Fixed wrong-sign kaon 03/2020
 

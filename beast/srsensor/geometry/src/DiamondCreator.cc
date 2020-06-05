@@ -41,7 +41,7 @@ namespace Belle2 {
 
     DiamondCreator::DiamondCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     DiamondCreator::~DiamondCreator()
@@ -51,6 +51,9 @@ namespace Belle2 {
 
     void DiamondCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 

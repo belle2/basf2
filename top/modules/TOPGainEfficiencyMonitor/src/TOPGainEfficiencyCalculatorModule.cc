@@ -278,7 +278,6 @@ namespace Belle2 {
     float threshold = m_threshold;
     int globalAsicId = 0;
     if (LoadHisto == c_LoadForFitIntegral || LoadHisto == c_LoadHitRateIntegral) threshold = m_thresholdForIntegral;
-    else threshold = m_threshold;
 
     for (int iHisto = 0 ; iHisto < c_NChannelPerPMT ; iHisto++) {
       if (m_targetPmtChId != -1 && iHisto + 1 != m_targetPmtChId) continue;

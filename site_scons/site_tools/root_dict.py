@@ -20,7 +20,7 @@ linkdef_class_re = \
 
 # link requests with '// implicit' comment (doesn't require header file)
 linkdef_implicit = \
-    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//\s*implicit\s*$', re.M)
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*;\s*//.*implicit.*$', re.M)
 
 
 def linkdef_emitter(target, source, env):

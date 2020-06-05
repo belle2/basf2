@@ -165,7 +165,7 @@ namespace Belle2 {
 
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)
-     * @param objName name of MonitoringObject to get
+     * @param histname name of MonitoringObject to get
      */
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 

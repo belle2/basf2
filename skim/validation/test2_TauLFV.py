@@ -30,8 +30,8 @@ loadStdAllKstar0(path=taulfvskim)
 loadStdAllPhi(path=taulfvskim)
 loadStdAllF_0(path=taulfvskim)
 
-from skim.taupair import TauLFVList
-tauList = TauLFVList(0, path=taulfvskim)
+from skim.taupair import TauLFV
+tauList = TauLFV().get_skim_list_names()
 ma.copyLists('tau+:LFV', tauList, path=taulfvskim)
 
 # the variables that are printed out are: M, deltaE

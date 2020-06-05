@@ -81,6 +81,13 @@ class TestSkimCodes(unittest.TestCase):
                 ),
             )
 
+    def test_clashing_skim_and_module_names(self):
+        """Check that there is no overlap between skim and module names."""
+        duplicates = set(Registry.modules).intersection(Registry.names)
+        self.assertEqual(
+            set(), duplicates, f"Name used for both a skim and a module: {', '.join(duplicates)}"
+        )
+
     def test_skims_exist(self):
         """Check that the registry is correct about the location of every skim.
 

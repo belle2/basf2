@@ -12,11 +12,12 @@
 
 #include <tracking/modules/trackingDQM/TrackDQMModule.h>
 #include <tracking/modules/trackingDQM/TrackDQMEventProcessor.h>
-#include <tracking/dqmUtils/THFFactory.h>
+#include <tracking/dqmUtils/HistogramFactory.h>
 
 #include <TDirectory.h>
 
 using namespace Belle2;
+using namespace Belle2::HistogramFactory;
 using namespace std;
 using boost::format;
 

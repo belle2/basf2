@@ -14,12 +14,12 @@
 
 using namespace std;
 
-namespace Belle2 {
+namespace Belle2::HistogramFactory {
   /**
    * This class represents a quantity which value can be set both permanently and temporarily.
    * Temporary value has priority but is invalidated when is read for the first time.
    * Quantity can be of any type.
-   * The class used in THFFactory to save some lines of code.
+   * The class used in Factory to save some lines of code.
    */
   template <typename AType>
   class Parameter {
@@ -112,18 +112,18 @@ namespace Belle2 {
   }
 
   /**
-  * This class unites some parameters for THFFactory which describe one axis of histogram. Those parameters are nbins, low, up and title. */
-  class THFAxis {
+  * This class unites some parameters for Factory which describe one axis of histogram. Those parameters are nbins, low, up and title. */
+  class Axis {
   public:
     /** Constructor. */
-    THFAxis() {}
+    Axis() {}
 
     /** Constructor.
     * @param nbins - number of bins along the axis
     * @param low - lower boundary of axis range
     * @param up - upper boundary of axis range
     * @param title - title of the axis */
-    THFAxis(int nbins, double low, double up, string title)
+    Axis(int nbins, double low, double up, string title)
     {
       m_nbins.Set(nbins);
       m_low.Set(low);
@@ -132,7 +132,7 @@ namespace Belle2 {
     }
 
     /** Copy constructor. */
-    THFAxis(THFAxis& axis)
+    Axis(Axis& axis)
     {
       m_nbins.Set(axis.m_nbins);
       m_low.Set(axis.m_low);
@@ -141,13 +141,13 @@ namespace Belle2 {
     }
 
     /** Set value of nbins */
-    THFAxis& nbins(int nbins) { m_nbins.Set(nbins); return *this; }
+    Axis& nbins(int nbins) { m_nbins.Set(nbins); return *this; }
     /** Set value of low */
-    THFAxis& low(double low) { m_low.Set(low); return *this; }
+    Axis& low(double low) { m_low.Set(low); return *this; }
     /** Set value of up */
-    THFAxis& up(double up) { m_up.Set(up); return *this; }
+    Axis& up(double up) { m_up.Set(up); return *this; }
     /** Set value of title */
-    THFAxis& title(string title) { m_title.Set(title); return *this; }
+    Axis& title(string title) { m_title.Set(title); return *this; }
 
   private:
     /** number of bins in the axis */
@@ -159,7 +159,7 @@ namespace Belle2 {
     /** title of axis */
     Parameter<string> m_title = Parameter(string());
 
-    friend class THFFactory;
+    friend class Factory;
   };
 
   /**
@@ -169,17 +169,17 @@ namespace Belle2 {
   * This class uses named parameters idiom via temporarily set values.
   *
   * Most of the methods return this object so they can be chained consecutively. */
-  class THFFactory {
+  class Factory {
   public:
     /** Constructor.
     * @param histoModule - pointer on histogram module is needed because this class actually doesn't create histograms by itself, but it calls functions on the module instead. */
-    THFFactory(DQMHistoModuleBase* histoModule)
+    Factory(DQMHistoModuleBase* histoModule)
     {
       m_histoModule = histoModule;
     }
 
-    /** Temporarily copies parameters for x axis from given THFAxis. */
-    THFFactory& xAxis(THFAxis& axis)
+    /** Temporarily copies parameters for x axis from given Axis. */
+    Factory& xAxis(Axis& axis)
     {
       m_nbinsx.SetTemporarily(axis.m_nbins);
       m_xlow.SetTemporarily(axis.m_low);
@@ -189,8 +189,8 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Temporarily copies parameters for y axis from given THFAxis. */
-    THFFactory& yAxis(THFAxis& axis)
+    /** Temporarily copies parameters for y axis from given Axis. */
+    Factory& yAxis(Axis& axis)
     {
       m_nbinsy.SetTemporarily(axis.m_nbins);
       m_ylow.SetTemporarily(axis.m_low);
@@ -200,8 +200,8 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Permanently copies parameters for x axis from given THFAxis. */
-    THFFactory& xAxisDefault(THFAxis& axis)
+    /** Permanently copies parameters for x axis from given Axis. */
+    Factory& xAxisDefault(Axis& axis)
     {
       m_nbinsx.Set(axis.m_nbins);
       m_xlow.Set(axis.m_low);
@@ -211,8 +211,8 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Permanently copies parameters for y axis from given THFAxis. */
-    THFFactory& yAxisDefault(THFAxis& axis)
+    /** Permanently copies parameters for y axis from given Axis. */
+    Factory& yAxisDefault(Axis& axis)
     {
       m_nbinsy.Set(axis.m_nbins);
       m_ylow.Set(axis.m_low);
@@ -241,30 +241,30 @@ namespace Belle2 {
      * All the following functions permanently set the value of given parameter.
      * They also return this instance so they can be chained. */
     /** @{ */
-    THFFactory& nbinsxDefault(int nbinsx) {    m_nbinsx.Set(nbinsx); return *this; } /**< Sets nbinsx permanently. */
-    THFFactory& xlowDefault(double xlow) {     m_xlow.Set(xlow);     return *this; } /**< Sets xlow permanently. */
-    THFFactory& xupDefault(double xup) {       m_xup.Set(xup);       return *this; } /**< Sets xup permanently. */
-    THFFactory& nbinsyDefault(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
-    THFFactory& ylowDefault(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
-    THFFactory& yupDefault(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
-    THFFactory& xTitleDefault(string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
-    THFFactory& yTitleDefault(string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
-    THFFactory& zTitleDefault(string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
+    Factory& nbinsxDefault(int nbinsx) {    m_nbinsx.Set(nbinsx); return *this; } /**< Sets nbinsx permanently. */
+    Factory& xlowDefault(double xlow) {     m_xlow.Set(xlow);     return *this; } /**< Sets xlow permanently. */
+    Factory& xupDefault(double xup) {       m_xup.Set(xup);       return *this; } /**< Sets xup permanently. */
+    Factory& nbinsyDefault(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
+    Factory& ylowDefault(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
+    Factory& yupDefault(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
+    Factory& xTitleDefault(string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
+    Factory& yTitleDefault(string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
+    Factory& zTitleDefault(string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
     /** @} */
 
     /** @name Named parameters
      * All the following functions temporarily set the value of given parameter. This means that its value is invalidated after its first use in the Create- functions.
      * They also return this instance so they can be chained. */
     /** @{ */
-    THFFactory& nbinsx(int nbinsx) {    m_nbinsx.SetTemporarily(nbinsx); return *this; } /**< Sets nbinsx temporarily */
-    THFFactory& xlow(double xlow) {     m_xlow.SetTemporarily(xlow);     return *this; } /**< Sets xlow temporarily */
-    THFFactory& xup(double xup) {       m_xup.SetTemporarily(xup);       return *this; } /**< Sets xup temporarily */
-    THFFactory& nbinsy(int nbinsy) {    m_nbinsy.SetTemporarily(nbinsy); return *this; } /**< Sets nbinsy temporarily */
-    THFFactory& ylow(double ylow) {     m_ylow.SetTemporarily(ylow);     return *this; } /**< Sets ylow temporarily */
-    THFFactory& yup(double yup) {       m_yup.SetTemporarily(yup);       return *this; } /**< Sets yup temporarily */
-    THFFactory& xTitle(string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
-    THFFactory& yTitle(string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
-    THFFactory& zTitle(string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
+    Factory& nbinsx(int nbinsx) {    m_nbinsx.SetTemporarily(nbinsx); return *this; } /**< Sets nbinsx temporarily */
+    Factory& xlow(double xlow) {     m_xlow.SetTemporarily(xlow);     return *this; } /**< Sets xlow temporarily */
+    Factory& xup(double xup) {       m_xup.SetTemporarily(xup);       return *this; } /**< Sets xup temporarily */
+    Factory& nbinsy(int nbinsy) {    m_nbinsy.SetTemporarily(nbinsy); return *this; } /**< Sets nbinsy temporarily */
+    Factory& ylow(double ylow) {     m_ylow.SetTemporarily(ylow);     return *this; } /**< Sets ylow temporarily */
+    Factory& yup(double yup) {       m_yup.SetTemporarily(yup);       return *this; } /**< Sets yup temporarily */
+    Factory& xTitle(string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
+    Factory& yTitle(string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
+    Factory& zTitle(string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
     /** @} */
 
   private:

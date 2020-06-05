@@ -12,11 +12,12 @@
 
 #include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 #include <alignment/modules/AlignmentDQM/AlignDQMEventProcessor.h>
-#include <tracking/dqmUtils/THFFactory.h>
+#include <tracking/dqmUtils/HistogramFactory.h>
 
 #include <TDirectory.h>
 
 using namespace Belle2;
+using namespace Belle2::HistogramFactory;
 using namespace std;
 using boost::format;
 
@@ -141,15 +142,15 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
   int iOmegaRange = 100;
   double fOmegaRange = 0.1;
 
-  auto phi = THFAxis(iPhiRange, -fPhiRange, fPhiRange, "#phi [deg]");
-  auto D0 = THFAxis(iD0Range, -fD0Range, fD0Range, "d0 [cm]");
-  auto Z0 = THFAxis(iZ0Range, -fZ0Range, fZ0Range, "z0 [cm]");
-  auto tanLambda = THFAxis(iLambdaRange, -fLambdaRange, fLambdaRange, "Tan Lambda");
-  auto omega = THFAxis(iOmegaRange, -fOmegaRange, fOmegaRange, "Omega");
-  auto momentumBig = THFAxis(2 * iMomRangeBig, 0.0, fMomRange, "Momentum");
-  auto momentumSmall = THFAxis(2 * iMomRangeSmall, 0.0, fMomRange, "Momentum");
+  auto phi = Axis(iPhiRange, -fPhiRange, fPhiRange, "#phi [deg]");
+  auto D0 = Axis(iD0Range, -fD0Range, fD0Range, "d0 [cm]");
+  auto Z0 = Axis(iZ0Range, -fZ0Range, fZ0Range, "z0 [cm]");
+  auto tanLambda = Axis(iLambdaRange, -fLambdaRange, fLambdaRange, "Tan Lambda");
+  auto omega = Axis(iOmegaRange, -fOmegaRange, fOmegaRange, "Omega");
+  auto momentumBig = Axis(2 * iMomRangeBig, 0.0, fMomRange, "Momentum");
+  auto momentumSmall = Axis(2 * iMomRangeSmall, 0.0, fMomRange, "Momentum");
 
-  auto factory = THFFactory(this);
+  auto factory = Factory(this);
 
   helixParameters->cd();
 
@@ -225,12 +226,12 @@ void AlignDQMModule::DefineSensors()
   double fSizeMax = -fSizeMin;
   double residualRange = 400;  // in um
 
-  auto positionU = THFAxis(iSizeBins, fSizeMin, fSizeMax, "position U [mm]");
-  auto positionV = THFAxis(positionU).title("position V [mm]");
-  auto residualU = THFAxis(200, -residualRange, residualRange, "residual U [#mum]");
-  auto residualV = THFAxis(residualU).title("residual V [#mum]");
+  auto positionU = Axis(iSizeBins, fSizeMin, fSizeMax, "position U [mm]");
+  auto positionV = Axis(positionU).title("position V [mm]");
+  auto residualU = Axis(200, -residualRange, residualRange, "residual U [#mum]");
+  auto residualV = Axis(residualU).title("residual V [#mum]");
 
-  auto factory = THFFactory(this);
+  auto factory = Factory(this);
 
   factory.xAxisDefault(positionU).yAxisDefault(positionV);
 
@@ -313,11 +314,11 @@ void AlignDQMModule::DefineLayers()
   int iYResGran = 200;
   double residualRange = 400;  // in um
 
-  auto phi = THFAxis(iPhiGran, -180, 180, "Phi [deg]");
-  auto theta = THFAxis(iThetGran, 0, 180, "Theta [deg]");
-  auto residual = THFAxis(iYResGran, -residualRange, residualRange, "residual [#mum]");
+  auto phi = Axis(iPhiGran, -180, 180, "Phi [deg]");
+  auto theta = Axis(iThetGran, 0, 180, "Theta [deg]");
+  auto residual = Axis(iYResGran, -residualRange, residualRange, "residual [#mum]");
 
-  auto factory = THFFactory(this);
+  auto factory = Factory(this);
   factory.xAxisDefault(phi).yAxisDefault(theta).zTitleDefault("counts");
 
   resMeanUPosUV->cd();

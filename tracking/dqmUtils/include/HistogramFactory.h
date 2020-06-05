@@ -131,15 +131,6 @@ namespace Belle2::HistogramFactory {
       m_title.Set(title);
     }
 
-    /** Copy constructor. */
-    Axis(Axis& axis)
-    {
-      m_nbins.Set(axis.m_nbins);
-      m_low.Set(axis.m_low);
-      m_up.Set(axis.m_up);
-      m_title.Set(axis.m_title);
-    }
-
     /** Set value of nbins */
     Axis& nbins(int nbins) { m_nbins.Set(nbins); return *this; }
     /** Set value of low */

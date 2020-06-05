@@ -330,13 +330,13 @@ namespace Belle2 {
       ich++; // convert to 1-based
     }
 
-    double TOPreco::getPDF(int pixelID, double T, double Mass, double Terr)
+    double TOPreco::getPDF(int pixelID, double T, double Mass, int PDG, double Terr)
     {
       pixelID--;  // 0-based ID used in fortran
       float t = (float) T;
       float terr = (float) Terr;
       float mass = (float) Mass;
-      return get_pdf_(&pixelID, &t, &terr, &mass);
+      return get_pdf_(&pixelID, &t, &terr, &mass, &PDG);
     }
 
   } // end top namespace

@@ -31,7 +31,7 @@ extern "C" {
   void set_channel_off_(int*, int*);
   void print_channel_mask_();
   void set_channel_effi_(int*, int*, float*);
-  void redo_pdf_(float*);
+  void redo_pdf_(float*, int*);
   int get_num_peaks_(int*);
   void get_peak_(int*, int*, float*, float*, float*);
   float get_bgr_(int*);
@@ -343,10 +343,11 @@ namespace Belle2 {
        * Return PDF for pixel pixelID at time t for mass hypothesis mass
        * @param pixelID pixel ID (e.g. software channel, 1-based)
        * @param t time
+       * @param mass particle mass
+       * @param PDG particle code
        * @param jitter additional time jitter, like electronic jitter
-       * @param mass mass
        */
-      double getPDF(int pixelID, double t, double mass, double jitter = 0);
+      double getPDF(int pixelID, double t, double mass, int PDG, double jitter = 0);
 
       /**
        * Set track beta (for beta resolution studies)
@@ -364,11 +365,12 @@ namespace Belle2 {
       /**
        * Re-calculate PDF for a given particle mass using option c_Fine
        * @param mass particle mass
+       * @param PDG particle code
        */
-      void redoPDF(double mass)
+      void redoPDF(double mass, int PDG)
       {
         float m = mass;
-        redo_pdf_(&m);
+        redo_pdf_(&m, &PDG);
       }
 
       /**

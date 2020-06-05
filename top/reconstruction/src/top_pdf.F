@@ -75,6 +75,7 @@
       ENDIF
       TOF=(TOF_C0+T0)/BETA
       CALL SET_REFIND_PAR(BETA)
+      CALL SET_DELTA(MODUL)
       RIND(-1)=PHASE_INDEX(E_MEAN-D_E)
       RIND(0)=PHASE_INDEX(E_MEAN) ! =REF_IND
       RIND(1)=PHASE_INDEX(E_MEAN+D_E) ! =REF_IND1
@@ -95,8 +96,6 @@
       D_THC=(S_THC(1)-S_THC(0))/C_THC(0)
       SIGE_SIP=D_E/D_THC*TH0_SIP
       CALL QE_SET_XQE(SIGE_SIP)
-
-      CALL SET_DELTA(MODUL)
       
 !     calculate pattern
       DO L=0,1
@@ -660,7 +659,7 @@ c--   calculate PDF parameters
       ELSE
          STFB=NUM_BGR
       ENDIF
-
+      
       NUMCH=NCH(0)+NCH(1)
       S=0.
       DO ICH=0,NUMCH-1
@@ -689,8 +688,10 @@ c--   calculate PDF parameters
       
       INTEGER ICH, NUMCH
       REAL S, EFFI
-      REAL NFOT_DELTA
+      REAL NFOT_DELTA, NORM_DELTA, N_D
 
+      CALL SET_TOP_DELTA
+      
       NUMCH=NCH(0)+NCH(1)
       S=0.
       EFFI=0.
@@ -704,11 +705,12 @@ c--   calculate PDF parameters
          ENDIF
       ENDDO
       EFFI=EFFI/NUMCH           ! average relative efficiency
-      STFD=NFOT_DELTA(BETA,PDG_HYP)*EFFI
+      STFD=NFOT_DELTA()*EFFI
       
       IF(S.EQ.0) RETURN
+      N_D=NORM_DELTA(T_MIN,T_MAX)
       DO ICH=0,NUMCH-1
-         PIK_DELTA(ICH)=PIK_DELTA(ICH)/S
+         PIK_DELTA(ICH)=PIK_DELTA(ICH)/S/N_D
       ENDDO
 
       END

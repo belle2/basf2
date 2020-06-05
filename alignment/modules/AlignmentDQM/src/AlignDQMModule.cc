@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <alignment/modules/AlignDQM/AlignDQMModule.h>
-#include <alignment/modules/AlignDQM/AlignDQMEventProcessor.h>
+#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
+#include <alignment/modules/AlignmentDQM/AlignDQMEventProcessor.h>
 #include <tracking/dqmUtils/THFFactory.h>
 
 #include <TDirectory.h>

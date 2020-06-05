@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/TrackDQM/TrackDQMEventProcessor.h>
-#include <tracking/modules/TrackDQM/TrackDQMModule.h>
+#include <tracking/modules/trackingDQM/TrackDQMEventProcessor.h>
+#include <tracking/modules/trackingDQM/TrackDQMModule.h>
 
 using namespace Belle2;
 

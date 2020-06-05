@@ -13,7 +13,7 @@
 #pragma once
 
 #include <tracking/dqmUtils/DQMEventProcessorBase.h>
-#include <tracking/modules/TrackDQM/TrackDQMModule.h>
+#include <tracking/modules/trackingDQM/TrackDQMModule.h>
 
 using namespace std;
 

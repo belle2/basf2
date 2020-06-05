@@ -13,7 +13,7 @@
 #pragma once
 
 #include <tracking/dqmUtils/DQMEventProcessorBase.h>
-#include <alignment/modules/AlignDQM/AlignDQMModule.h>
+#include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
 using namespace std;
 

@@ -26,7 +26,7 @@ namespace Belle2 {
   /**
    * KLM channel status calibration (data collection).
    */
-  class KLMChannelStatusCalibrationCollectorModule :
+  class KLMChannelStatusCollectorModule :
     public CalibrationCollectorModule {
 
   public:
@@ -34,12 +34,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    KLMChannelStatusCalibrationCollectorModule();
+    KLMChannelStatusCollectorModule();
 
     /**
      * Destructor.
      */
-    ~KLMChannelStatusCalibrationCollectorModule();
+    ~KLMChannelStatusCollectorModule();
 
     /**
      * Initializer.

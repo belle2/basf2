@@ -407,7 +407,7 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
       recoTrackMinus_forRefit = copyRecoTrackRemovingInnerHits(trackMinus, recoTrackMinus,
                                                                -1 * pdg_trackMinus, nRemoveHitsMinus);
       /// if the track refit fails, break out of this loop and
-      /// adopt the original vertex fit with the original tracks.
+      /// revert back to the original vertex fit with the original tracks.
       if (recoTrackMinus_forRefit == nullptr) {
         failflag = true;
         break;
@@ -514,10 +514,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   stPlus  = gfTrackPlus.getFittedState();
   stMinus = gfTrackMinus.getFittedState();
 
-  /// TO DO(?): these two lines can be moved to inside the "if(m_validation){..." parenthesis ?
-  const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
-  const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-
   const TVector3& posVert(vert.getPos());
   vertexPos = posVert;
 
@@ -555,6 +551,8 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
     if (m_validation) {
       B2DEBUG(300, "Create StoreArray and Output for validation.");
+      const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+      const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
       TLorentzVector lv0, lv1;
       /// Reconstruct invariant mass.
       lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());

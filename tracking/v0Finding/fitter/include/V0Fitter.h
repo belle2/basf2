@@ -74,7 +74,7 @@ namespace Belle2 {
 
     /** fit V0 vertex using RecoTrack's as inputs.
      * Return true (false) if the vertex fit has done well (failed).
-     * If RecoTracks have hits inside the fitted V0 vertex position, bits in hasInnerHitStatus is set.
+     * If RecoTracks have hits inside the fitted V0 vertex position, bits in hasInnerHitStatus are set.
      * If there are no inside hits, store the V0 to the DataStore.
      * @param trackPlus
      * @param trackMinus
@@ -82,8 +82,8 @@ namespace Belle2 {
      * @param recoTrackMinus
      * @param v0Hypothesis
      * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the V0 vertex position, 0x1(0x2) bit is set.
-     * @param forceStore if true, store the fitted V0 to the DataStore even if there are some inside hits.
      * @param vertexPos store a result of this function. the fitted vertex position is stored.
+     * @param forceStore if true, store the fitted V0 to the DataStore even if there are some inside hits.
      * @return
      */
     bool vertexFitWithRecoTracks(const Track* trackPlus, const Track* trackMinus,
@@ -135,6 +135,8 @@ namespace Belle2 {
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const TVector3& vertexPosition);
 
+    /// Extrapolate the fit results to the perigee to the vertex.
+    /// If the daughter tracks have hits inside the V0 vertex, bits in the hasInnerHiStatus variable are set.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const TVector3& vertexPosition, unsigned int& hasInnerHitStatus);
 

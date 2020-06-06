@@ -28,6 +28,18 @@ def make_collection(name, path, **argk):
 
 
 def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False):
+    """
+    Standard collection of all RecoTracks with standard reconstruction
+
+    Parameters
+    ----------
+    name : str
+      Collection name
+    add_unpackers : bool
+      Whether to add unpacking (set to False for MC)
+    klm : bool
+      Whether to add muid hits to the track fit
+    """
     path = basf2.create_path()
 
     path.add_module('Progress')
@@ -59,6 +71,23 @@ def cosmicTracks(name="cosmicTracks",
                  skim_hlt_cosmic=False,
                  cut='[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
                  klm=False):
+    """
+    Standard collection of all RecoTracks with cosmic reconstruction
+
+    Parameters
+    ----------
+    name : str
+      Collection name
+    add_unpackers : bool
+      Whether to add unpacking (set to False for MC)
+    skim_hlt_cosmic : bool
+      Whether to add TriggerSkim module and process only events with cosmic TRG
+    cut : str
+      Cut string to select GOOD events. By default set to avoid region of poorly described magnetic
+      field around QCS magnets + remove the 'background' from physics around IP
+    klm : bool
+      Whether to add muid hits to the track fit
+    """
     path = basf2.create_path()
 
     path.add_module('Progress')
@@ -116,6 +145,24 @@ def diMuonsIP(
         muon_cut='p > 1.0 and abs(dz) < 2.0 and dr < 0.5',
         dimuon_cut='',
         klm=False):
+    """
+    Di-muons with vertex+beam constraint collection
+
+    Parameters
+    ----------
+    name : str
+      Collection name
+    add_unpackers : bool
+      Whether to add unpacking (set to False for MC)
+    skim_hlt_cosmic : bool
+      Whether to add TriggerSkim module and process only events with accept_mumu_2trk TRG
+    muon_cut : str
+      Cut string to select daughter muons
+    dimuon_cut : str
+      Cut string to apply for reconstructed di-muon decay
+    klm : bool
+      Whether to add muid hits to the track fit
+    """
     path = basf2.create_path()
     path.add_module('Progress')
     path.add_module('RootInput')

@@ -6,6 +6,7 @@
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <genfit/Track.h>
 
 #include <TVector3.h>
 
@@ -146,6 +147,10 @@ namespace Belle2 {
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                         const Const::ParticleType& trackHypothesis);
+
+    /// Get the HitPattern in the VXD. copied from TrackBuilder and modified
+    uint32_t getHitPatternVXDInitializer(const genfit::Track& track) const;
+    uint64_t getHitPatternCDCInitializer(const genfit::Track& track) const;
 
 
   private:

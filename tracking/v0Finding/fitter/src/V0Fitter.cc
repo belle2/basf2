@@ -6,11 +6,25 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
+#include <mdst/dataobjects/HitPatternVXD.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
+#include <pxd/reconstruction/PXDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+
+#include <genfit/Track.h>
+#include <genfit/TrackPoint.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertexFactory.h>
 #include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>
-#include "genfit/MaterialEffects.h"
+#include <genfit/MaterialEffects.h>
+#include <genfit/FitStatus.h>
+#include <genfit/KalmanFitStatus.h>
+#include <genfit/KalmanFitterInfo.h>
 
 #include <framework/utilities/IOIntercept.h>
 
@@ -172,13 +186,26 @@ double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                               const Const::ParticleType& trackHypothesis)
 {
-  TrackFitResult* v0TrackFitResult
-    = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
-                                  msop.get6DCov(), msop.getCharge(),
-                                  trackHypothesis,
-                                  track.getFitStatus()->getPVal(),
-                                  Bz, 0, 0);
-  return v0TrackFitResult;
+  if (m_v0FitterMode == 1 || m_v0FitterMode == 2) {
+    const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(track);
+    const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(track);
+
+    TrackFitResult* v0TrackFitResult
+      = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
+                                    msop.get6DCov(), msop.getCharge(),
+                                    trackHypothesis,
+                                    track.getFitStatus()->getPVal(),
+                                    Bz, hitPatternCDCInitializer, hitPatternVXDInitializer);
+    return v0TrackFitResult;
+  } else {
+    TrackFitResult* v0TrackFitResult
+      = m_trackFitResults.appendNew(msop.getPos(), msop.getMom(),
+                                    msop.get6DCov(), msop.getCharge(),
+                                    trackHypothesis,
+                                    track.getFitStatus()->getPVal(),
+                                    Bz, 0, 0);
+    return v0TrackFitResult;
+  }
 }
 
 std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const
@@ -622,4 +649,107 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, Reco
   }
 
   return newRecoTrack;
+}
+
+///// copy from TrackBuilder::getHitPatternVXDInitializer
+uint32_t V0Fitter::getHitPatternVXDInitializer(const genfit::Track& track) const
+{
+  HitPatternVXD hitPatternVXD;
+
+  const auto& hitPointsWithMeasurements = track.getPointsWithMeasurement();
+  int nNotFittedVXDhits = 0;
+
+  for (const auto& trackPoint : hitPointsWithMeasurements) {
+
+    for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
+
+      genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+
+      if (kalmanInfo) {
+        const double weight = kalmanInfo->getWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else {
+        ++nNotFittedVXDhits;
+        continue;
+      }
+
+      PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
+      if (pxdHit) {
+        const int layerNumber = pxdHit->getSensorID().getLayerNumber();
+        const int currentHits = hitPatternVXD.getPXDLayer(layerNumber, HitPatternVXD::PXDMode::normal);
+        hitPatternVXD.setPXDLayer(layerNumber, currentHits + 1, HitPatternVXD::PXDMode::normal);
+      }
+
+      SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
+      SVDRecoHit2D* svdHit2D = dynamic_cast<SVDRecoHit2D*>(absMeas);
+      if (svdHit2D) {
+        const int layerNumber = svdHit2D->getSensorID().getLayerNumber();
+        const auto& currentHits = hitPatternVXD.getSVDLayer(layerNumber);
+        hitPatternVXD.setSVDLayer(layerNumber, currentHits.first + 1, currentHits.second + 1);
+      } else if (svdHit) {
+        const int layerNumber = svdHit->getSensorID().getLayerNumber();
+        const auto& currentHits = hitPatternVXD.getSVDLayer(layerNumber);
+
+        if (svdHit->isU())
+          hitPatternVXD.setSVDLayer(layerNumber, currentHits.first + 1, currentHits.second);
+        else
+          hitPatternVXD.setSVDLayer(layerNumber, currentHits.first , currentHits.second + 1);
+      }
+
+    }
+  }
+
+  if (nNotFittedVXDhits > 0) {
+    B2DEBUG(100, " No KalmanFitterInfo associated to some TrackPoints with VXD hits, not filling the HitPatternVXD");
+    B2DEBUG(100, nNotFittedVXDhits << " had no FitterInfo");
+  }
+  return hitPatternVXD.getInteger();
+}
+
+///// copy from TrackBuilder::getHitPatternCDCInitializer
+uint64_t V0Fitter::getHitPatternCDCInitializer(const genfit::Track& track) const
+{
+  HitPatternCDC hitPatternCDC;
+
+  int nCDChits = 0;
+  int nNotFittedCDChits = 0;
+
+  const auto& hitPointsWithMeasurements = track.getPointsWithMeasurement();
+
+  for (const auto& trackPoint : hitPointsWithMeasurements) {
+
+    for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {
+
+      genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo();
+
+      if (kalmanInfo) {
+        const double weight = kalmanInfo->getWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else {
+        ++nNotFittedCDChits;
+        continue;
+      }
+
+      CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
+
+      if (cdcHit) {
+        WireID wire = cdcHit->getWireID();
+        hitPatternCDC.setLayer(wire.getICLayer());
+        nCDChits++;
+      }
+    }
+
+  }
+  if (nNotFittedCDChits > 0) {
+    B2DEBUG(100, " No KalmanFitterInfo associated to some TrackPoints with CDC hits, not filling the HitPatternCDC");
+    B2DEBUG(100, nNotFittedCDChits << " out of " << nCDChits << " had no FitterInfo");
+  }
+  hitPatternCDC.setNHits(nCDChits);
+
+  return hitPatternCDC.getInteger();
+
 }

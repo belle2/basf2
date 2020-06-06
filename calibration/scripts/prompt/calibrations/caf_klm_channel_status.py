@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""Calibration of KLM channel status."""
+
+import collections
 
 import basf2
+from caf.utils import ExpRun, IoV
 from prompt import CalibrationSettings
+from prompt.utils import events_in_basf2_file
 
 ##############################
 # REQUIRED VARIABLE #
@@ -24,6 +27,25 @@ settings = CalibrationSettings(
     depends_on=[])
 
 ##############################
+
+
+def select_input_files(file_to_iov):
+    """
+    Parameters:
+        files_to_iov (dict): Dictionary {run : IOV}.
+        reduced_file_to_iov (dict): Selected data.
+    """
+    run_to_files = collections.defaultdict(list)
+    for input_file, file_iov in file_to_iov.items():
+        run = ExpRun(exp=file_iov.exp_low, run=file_iov.run_low)
+        # Reject files without events.
+        if events_in_basf2_file(input_file) > 0:
+            run_to_files[run].append(input_file)
+    reduced_file_to_iov = collections.OrderedDict()
+    for run, files in run_to_files.items():
+        for input_file in files:
+            reduced_file_to_iov[input_file] = IoV(*run, *run)
+    return reduced_file_to_iov
 
 ##############################
 # REQUIRED FUNCTION #
@@ -61,24 +83,15 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_raw_cosmic = input_data['raw_cosmic']
     file_to_iov_raw_physics = input_data['raw_physics']
 
-    # We might have requested an enormous amount of data across a run range.
-    # There's a LOT more files than runs!
-    # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 2
-
-    # If you are using Raw data there's a chance that input files could have zero events.
-    # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
-    # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 1
-
-    # We filter out any more than 2 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
-    # already. This procedure respects that ordering
-    from prompt.utils import filter_by_max_files_per_run
+    # Select input files (all data are necessary, only removes empty files).
+    reduced_file_to_iov_raw_beam = select_input_files(file_to_iov_raw_beam)
+    reduced_file_to_iov_raw_cosmic = select_input_files(file_to_iov_raw_cosmic)
+    reduced_file_to_iov_raw_physics = select_input_files(file_to_iov_raw_physics)
 
     # Merge all input data.
-    input_files_raw = list(file_to_iov_raw_beam.keys())
-    input_files_raw.extend(list(file_to_iov_raw_cosmic.keys()))
-    input_files_raw.extend(list(file_to_iov_raw_physics.keys()))
+    input_files_raw = list(reduced_file_to_iov_raw_beam.keys())
+    input_files_raw.extend(list(reduced_file_to_iov_raw_cosmic.keys()))
+    input_files_raw.extend(list(reduced_file_to_iov_raw_physics.keys()))
     input_files_raw.sort()
     basf2.B2INFO(f'Total number of raw-data files used as input = {len(input_files_raw)}')
 

@@ -15,12 +15,13 @@ from prompt import CalibrationSettings
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name='KLM channel status',
-                               expert_username='zhai',
-                               description=__doc__,
-                               input_data_formats=['raw'],
-                               input_data_names=['raw'],
-                               depends_on=[])
+settings = CalibrationSettings(
+    name='KLM channel status',
+    expert_username='zhai',
+    description=__doc__,
+    input_data_formats=['raw'],
+    input_data_names=['raw_beam', 'raw_cosmic', 'raw_physics'],
+    depends_on=[])
 
 ##############################
 
@@ -56,7 +57,9 @@ def get_calibrations(input_data, **kwargs):
 
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
-    file_to_iov_raw = input_data['raw']
+    file_to_iov_raw_beam = input_data['raw_beam']
+    file_to_iov_raw_cosmic = input_data['raw_cosmic']
+    file_to_iov_raw_physics = input_data['raw_physics']
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -72,11 +75,12 @@ def get_calibrations(input_data, **kwargs):
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
-    # For testing
-    # reduced_file_to_iov_raw = filter_by_max_files_per_run(file_to_iov_raw, max_files_per_run, min_events_per_file)
-    # input_files_raw = sorted(list(reduced_file_to_iov_raw.keys()))
-    input_files_raw = sorted(list(file_to_iov_raw.keys()))
-    basf2.B2INFO(f'Total number of \'raw\' files actually used as input = {len(input_files_raw)}')
+    # Merge all input data.
+    input_files_raw = list(file_to_iov_raw_beam.keys())
+    input_files_raw.extend(list(file_to_iov_raw_cosmic.keys()))
+    input_files_raw.extend(list(file_to_iov_raw_physics.keys()))
+    input_files_raw.sort()
+    basf2.B2INFO(f'Total number of raw-data files used as input = {len(input_files_raw)}')
 
     if not input_files_raw:
         raise Exception('No valid input files found!')

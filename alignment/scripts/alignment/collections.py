@@ -27,7 +27,7 @@ def make_collection(name, path, **argk):
     return (name, path, argk)
 
 
-def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False):
+def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False, prescale=1.):
     """
     Standard collection of all RecoTracks with standard reconstruction
 
@@ -39,11 +39,14 @@ def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False):
       Whether to add unpacking (set to False for MC)
     klm : bool
       Whether to add muid hits to the track fit
+    prescale : float
+      Process only 'prescale' fraction of events
     """
     path = basf2.create_path()
 
     path.add_module('Progress')
     path.add_module('RootInput')
+    path.add_module('Prescale', prescale=prescale)
     path.add_module('Gearbox')
     path.add_module('Geometry')
 
@@ -70,7 +73,8 @@ def cosmicTracks(name="cosmicTracks",
                  add_unpackers=True,
                  skim_hlt_cosmic=False,
                  cut='[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
-                 klm=False):
+                 klm=False,
+                 prescale=1.):
     """
     Standard collection of all RecoTracks with cosmic reconstruction
 
@@ -87,11 +91,14 @@ def cosmicTracks(name="cosmicTracks",
       field around QCS magnets + remove the 'background' from physics around IP
     klm : bool
       Whether to add muid hits to the track fit
+    prescale : float
+      Process only 'prescale' fraction of events
     """
     path = basf2.create_path()
 
     path.add_module('Progress')
     path.add_module('RootInput')
+    path.add_module('Prescale', prescale=prescale)
 
     if skim_hlt_cosmic:
         path.add_module(
@@ -144,7 +151,8 @@ def diMuonsIP(
         skim_mumu_2trk=False,
         muon_cut='p > 1.0 and abs(dz) < 2.0 and dr < 0.5',
         dimuon_cut='',
-        klm=False):
+        klm=False,
+        prescale=1.):
     """
     Di-muons with vertex+beam constraint collection
 
@@ -162,10 +170,14 @@ def diMuonsIP(
       Cut string to apply for reconstructed di-muon decay
     klm : bool
       Whether to add muid hits to the track fit
+    prescale : float
+      Process only 'prescale' fraction of events
     """
     path = basf2.create_path()
     path.add_module('Progress')
     path.add_module('RootInput')
+    path.add_module('Prescale', prescale=prescale)
+
     path.add_module('Gearbox')
     path.add_module('Geometry')
 

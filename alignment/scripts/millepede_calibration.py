@@ -254,9 +254,10 @@ def create(name,
     fixed : list(int)
         List of fixed parameters (use alignment.parameters to get them)
 
-    params : common parameters to set for collectors of all collections.
+    params : dict
+        Dictionary of common parameters to set for collectors of all collections.
     min_entries : int
-        Minimum entries to require by the algorithm. Returns NotEnoughData if less entries is collected.
+        Minimum entries to required by the algorithm. Returns NotEnoughData if less entries is collected.
 
     Returns
     ----------

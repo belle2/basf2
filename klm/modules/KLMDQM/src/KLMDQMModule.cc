@@ -16,7 +16,6 @@
 
 /* ROOT headers. */
 #include <TDirectory.h>
-#include <TLatex.h>
 
 using namespace Belle2;
 

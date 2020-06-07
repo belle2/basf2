@@ -46,7 +46,8 @@ def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False, prescale=
 
     path.add_module('Progress')
     path.add_module('RootInput')
-    path.add_module('Prescale', prescale=prescale)
+    if prescale != 1.:
+        path.add_module('Prescale', prescale=prescale).if_false(basf2.Path(), basf2.AfterConditionPath.END)
     path.add_module('Gearbox')
     path.add_module('Geometry')
 
@@ -98,7 +99,8 @@ def cosmicTracks(name="cosmicTracks",
 
     path.add_module('Progress')
     path.add_module('RootInput')
-    path.add_module('Prescale', prescale=prescale)
+    if prescale != 1.:
+        path.add_module('Prescale', prescale=prescale).if_false(basf2.Path(), basf2.AfterConditionPath.END)
 
     if skim_hlt_cosmic:
         path.add_module(
@@ -176,7 +178,8 @@ def diMuonsIP(
     path = basf2.create_path()
     path.add_module('Progress')
     path.add_module('RootInput')
-    path.add_module('Prescale', prescale=prescale)
+    if prescale != 1.:
+        path.add_module('Prescale', prescale=prescale).if_false(basf2.Path(), basf2.AfterConditionPath.END)
 
     path.add_module('Gearbox')
     path.add_module('Geometry')

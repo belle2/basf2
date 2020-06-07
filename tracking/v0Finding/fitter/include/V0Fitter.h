@@ -47,6 +47,7 @@ namespace Belle2 {
     ///   0: original (default)
     ///   1: original with vertexFitWithRecoTracks function
     ///   2: remove hits inside the V0 vertex position
+    ///   3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair
     void setFitterMode(int fitterMode);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
@@ -55,6 +56,7 @@ namespace Belle2 {
       if (m_v0FitterMode == 0)      return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
       else if (m_v0FitterMode == 1) return fitAndStore1(trackPlus, trackMinus, v0Hypothesis);
       else if (m_v0FitterMode == 2) return fitAndStore2(trackPlus, trackMinus, v0Hypothesis);
+      else if (m_v0FitterMode == 3) return fitAndStore2(trackPlus, trackMinus, v0Hypothesis);
       else                          return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
     }
 
@@ -164,7 +166,8 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
-    int    m_v0FitterMode;  /// 0: original, 1: original with new function, 2: remove hits inside the V0 vertex position
+    int    m_v0FitterMode;  /// 0: original, 1: original with new function, 2: remove hits inside the V0 vertex position, 3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair
+    bool   m_useOnlyOneSVDHitPair;/// false only if the V0Fitter mode is 3
   };
 
 }

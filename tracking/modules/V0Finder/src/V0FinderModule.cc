@@ -59,7 +59,8 @@ V0FinderModule::V0FinderModule() : Module()
            "designate which fitAndStore function is called in V0Fitter.\n"
            "    0: original\n"
            "    1: original with vertexFitWithRecoTracks function\n"
-           "    2: remove hits inside the V0 vertex position",
+           "    2: remove hits inside the V0 vertex position\n"
+           "    3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair",
            0);
 
   addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"

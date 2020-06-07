@@ -55,7 +55,7 @@ namespace Belle2 {
 
     double m_beamPipeRadius;          ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;    ///< Chi2 cut for V0s outside of the beampipe. Applies to all.
-    int    m_v0FitterMode;            ///< fitter mode (0: original, 1: original with vertexFitWithRecoTracks function, 2: remove hits inside the V0 vertex position)
+    int    m_v0FitterMode;            ///< fitter mode (0: original, 1: original with vertexFitWithRecoTracks function, 2: remove hits inside the V0 vertex position), 3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair
 
     bool m_validation;                         ///< Flag if use validation.
     std::string m_arrayNameV0ValidationVertex; ///< StoreArray name of the V0ValidationVertex.

@@ -33,7 +33,7 @@ using namespace Belle2;
 V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
                    const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
                    const std::string& copiedRecoTracksName, bool enableValidation)
-  : m_validation(enableValidation), m_recoTracksName(recoTracksName), m_v0FitterMode(0)
+  : m_validation(enableValidation), m_recoTracksName(recoTracksName), m_v0FitterMode(0), m_useOnlyOneSVDHitPair(true)
 {
   m_trackFitResults.isRequired(trackFitResultsName);
   m_v0s.registerInDataStore(v0sName, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
@@ -65,10 +65,14 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
 
 void V0Fitter::setFitterMode(int fitterMode)
 {
-  if (not(0 <= fitterMode && fitterMode <= 2)) {
+  if (not(0 <= fitterMode && fitterMode <= 3)) {
     B2WARNING("invarid fitter mode! set as the default fitter");
   } else {
     m_v0FitterMode = fitterMode;
+    if (fitterMode == 3)
+      m_useOnlyOneSVDHitPair = false;
+    else
+      m_useOnlyOneSVDHitPair = true;
   }
 }
 
@@ -186,7 +190,7 @@ double V0Fitter::getBzAtVertex(const TVector3& vertexPosition)
 TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                               const Const::ParticleType& trackHypothesis)
 {
-  if (m_v0FitterMode == 1 || m_v0FitterMode == 2) {
+  if (m_v0FitterMode == 1 || m_v0FitterMode == 2 || m_v0FitterMode == 3) {
     const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(track);
     const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(track);
 
@@ -635,6 +639,18 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, Reco
         recoHitInformations[nRemoveHits]->setUseInFit(false);
         ++nRemoveHits;
       }
+    }
+  }
+
+  /// if N of remaining SVD hit-pair is only one, don't use the SVD hits
+  if (!m_useOnlyOneSVDHitPair &&
+      recoHitInformations[nRemoveHits - 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD &&
+      recoHitInformations.size() > nRemoveHits + 2) {
+    if (recoHitInformations[nRemoveHits  ]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD && /// SVD U-hit
+        recoHitInformations[nRemoveHits + 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD && /// SVD V-hit
+        recoHitInformations[nRemoveHits + 2]->getTrackingDetector() != RecoHitInformation::RecoHitDetector::c_SVD) { /// not SVD hit (CDC)
+      recoHitInformations[nRemoveHits  ]->setUseInFit(false);
+      recoHitInformations[nRemoveHits + 1]->setUseInFit(false);
     }
   }
 

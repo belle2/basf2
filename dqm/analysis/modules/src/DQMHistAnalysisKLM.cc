@@ -293,7 +293,10 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     }
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
-    if (m_DeadBarrelModules.size() > 0) {
+    if (m_DeadBarrelModules.size() == 0) {
+      canvas->SetFillColor(kWhite);
+      canvas->Update();
+    } else {
       canvas->SetFillColor(kRed);
       for (uint16_t module : m_DeadBarrelModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
@@ -328,7 +331,10 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     }
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
-    if (m_DeadEndcapModules.size() > 0) {
+    if (m_DeadEndcapModules.size() == 0) {
+      canvas->SetFillColor(kWhite);
+      canvas->Update();
+    } else {
       canvas->SetFillColor(kRed);
       for (uint16_t module : m_DeadEndcapModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(

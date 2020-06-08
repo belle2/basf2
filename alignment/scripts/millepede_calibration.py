@@ -199,7 +199,7 @@ def create_collector(dbobjects, **argk):
 def create(name,
            dbobjects,
            collections,
-           files,
+           files=None,
            tags=None,
            timedep=None,
            commands=None,
@@ -234,7 +234,8 @@ def create(name,
           For standard collections to use, see alignment.collections
 
     files : dict( str -> list(str) )
-        Dictionary of lists of input file paths, key is collection name, value is list of input files
+        Dictionary of lists of input file paths, key is collection name, value is list of input files.
+        NOTE: This overrides possible list of files assigned during creation of collections (if set)
     tags : list(str)
         List of input global tags. Can include absolute file paths to local databases (added to the chain).
 
@@ -398,10 +399,16 @@ def create(name,
         files = dict()
 
     print("- Collections:")
-    for colname, path, args in collections:
-        filelist = []
+    for col in collections:
+        colname = col.name
+        colfiles = col.files
+        path = col.path
+        args = col.argk
+
+        filelist = colfiles
         if colname in files:
-            filelist = files[colname]
+            if colname in files:
+                filelist = files[colname]
 
         print(f"  - {colname} ({len(filelist)} files)")
 

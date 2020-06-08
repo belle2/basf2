@@ -4,8 +4,12 @@ import reconstruction as reco
 import modularAnalysis as ana
 import vertex as vtx
 
+from collections import namedtuple
 
-def make_collection(name, path, **argk):
+MillepedeCollection = namedtuple('MillepedeCollection', ['name', 'files', 'path', 'argk'])
+
+
+def make_collection(name, files=None, path=None, **argk):
     """
     Handy function to make a collection configuration
     to be passed in 'collections' argument of the create(...) function
@@ -14,6 +18,8 @@ def make_collection(name, path, **argk):
     ----------
     name : str
       Collection name
+    files : list(str)
+      List of input data files
     path : basf2.Path
       pre-collector path
     argk : dict
@@ -21,13 +27,18 @@ def make_collection(name, path, **argk):
 
     Returns
     -------
-    tuple(str, basf2.Path, dict)
+    namedtuple('MillepedeCollection', ['name', 'files', 'path', 'argk'])
 
     """
-    return (name, path, argk)
+    if files is None:
+        files = []
+    if path is None:
+        path = basf2.Path()
+
+    return MillepedeCollection(name=name, path=path, files=files, argk=argk)
 
 
-def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False, prescale=1.):
+def physicsTracks(name="physicsTracks", files=None, add_unpackers=True, klm=False, prescale=1.):
     """
     Standard collection of all RecoTracks with standard reconstruction
 
@@ -35,6 +46,8 @@ def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False, prescale=
     ----------
     name : str
       Collection name
+    files : list(str)
+      List of input data files
     add_unpackers : bool
       Whether to add unpacking (set to False for MC)
     klm : bool
@@ -67,10 +80,11 @@ def physicsTracks(name="physicsTracks", add_unpackers=True, klm=False, prescale=
     path = tmp
     path.add_module('DAFRecoFitter')
 
-    return make_collection(name, path=path, tracks=['RecoTracks'])
+    return make_collection(name, files=files, path=path, tracks=['RecoTracks'])
 
 
 def cosmicTracks(name="cosmicTracks",
+                 files=None,
                  add_unpackers=True,
                  skim_hlt_cosmic=False,
                  cut='[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
@@ -83,6 +97,8 @@ def cosmicTracks(name="cosmicTracks",
     ----------
     name : str
       Collection name
+    files : list(str)
+      List of input data files
     add_unpackers : bool
       Whether to add unpacking (set to False for MC)
     skim_hlt_cosmic : bool
@@ -144,11 +160,12 @@ def cosmicTracks(name="cosmicTracks",
         # ana.variablesToNtuple('mu+:good_cosmics', variables=track_variables, filename='analysis_cosmics.root', path=path)
         path.add_module('SkimFilter', particleLists=['mu+:good_cosmics']).if_false(basf2.create_path())
 
-    return make_collection(name, path=path, tracks=['RecoTracks'])
+    return make_collection(name, files=files, path=path, tracks=['RecoTracks'])
 
 
 def diMuonsIP(
         name="diMuonsIP",
+        files=None,
         add_unpackers=True,
         skim_mumu_2trk=False,
         muon_cut='p > 1.0 and abs(dz) < 2.0 and dr < 0.5',
@@ -162,6 +179,8 @@ def diMuonsIP(
     ----------
     name : str
       Collection name
+    files : list(str)
+      List of input data files
     add_unpackers : bool
       Whether to add unpacking (set to False for MC)
     skim_hlt_cosmic : bool
@@ -214,4 +233,4 @@ def diMuonsIP(
 
     vtx.raveFit(f"Upsilon(4S):{name}", 0.001, daughtersUpdate=True, silence_warning=True, path=path)
 
-    return make_collection(name, path, primaryVertices=[f"Upsilon(4S):{name}"])
+    return make_collection(name, files=files, path=path, primaryVertices=[f"Upsilon(4S):{name}"])

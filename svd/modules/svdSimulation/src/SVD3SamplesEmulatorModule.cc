@@ -29,10 +29,10 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_shaperDigitInputName, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "input SVDEventInfo name", std::string(""));
   addParam("StartingSample", m_startingSample, "Starting sample of the three samples (between 0 and 3, the default is 0)", int(0));
   addParam("outputSVDShaperDigits", m_outputArrayName, "StoreArray with the output shaperdigits with 3 samples",
            std::string("SVDShaperDigit3Samples"));
-  addParam("SVDEventInfo", m_svdEventInfoName, "input SVDEventInfo name", std::string(""));
   addParam("outputSVDEventInfo", m_svdEventInfoOutName, "output SVDEventInfo name", std::string("SVDEventInfo3Samples"));
 }
 

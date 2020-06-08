@@ -160,8 +160,12 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       std::vector<uint16_t>::iterator ite = std::find(m_DeadEndcapModules.begin(),
                                                       m_DeadEndcapModules.end(),
                                                       moduleNumber);
-      if (ite == m_DeadEndcapModules.end())
-        m_DeadEndcapModules.push_back(moduleNumber);
+      if (ite == m_DeadEndcapModules.end()) {
+        /* FIXME: remove this hard-coded selection for EB3, layer 6. */
+        if (moduleNumber != 24) {
+          m_DeadEndcapModules.push_back(moduleNumber);
+        }
+      }
     }
   }
   if (activeModuleChannels == 0)

@@ -12,7 +12,7 @@
 # The analysers has to specify systematic "test" from the list of tests. The output
 # file contains reconstructed J/psi inv. mass and momentum with corresponding modification.
 #
-# The latest recommendations for tracking systeamtic uncertainties can be found here:
+# The latest recommendations for tracking systematic uncertainties can be found here:
 # https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance
 #
 ###############################################################################

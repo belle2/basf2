@@ -11,10 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <analysis/dataobjects/Particle.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <TRandom.h>
 
 namespace Belle2 {
   /**
@@ -65,7 +61,7 @@ namespace Belle2 {
   private:
     /** input particle lists */
     std::vector<std::string> m_ParticleLists;
-    /** imput momentum scale modifier */
+    /** input momentum scale modifier */
     double m_scale;
 
   }; // TrackingMomentumModule

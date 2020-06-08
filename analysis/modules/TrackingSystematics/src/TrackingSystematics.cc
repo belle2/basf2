@@ -1,26 +1,44 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Sasha Glazov                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// Own include
 #include <analysis/modules/TrackingSystematics/TrackingSystematics.h>
+
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
+#include <TRandom.h>
 
 using namespace Belle2;
 
 REG_MODULE(TrackingEfficiency);
 REG_MODULE(TrackingMomentum);
 
-TrackingEfficiencyModule::TrackingEfficiencyModule():
-  m_frac(0)
+TrackingEfficiencyModule::TrackingEfficiencyModule() : Module()
 {
   setDescription(
     R"DOC(Module to remove tracks from the lists at random. Include in your code as
-		     
-.. code:: python
 
-mypath.add_module("TrackingEfficiency",particleLists=['pi+:cut'],frac=0.01)
+    .. code:: python
+
+        mypath.add_module("TrackingEfficiency", particleLists=['pi+:cut'], frac=0.01)
 
 The module modifies the input particleLists by randomly removing tracks with the probability frac.
 		     
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("frac", m_frac, "probability to remove the particle");
+  addParam("frac", m_frac, "probability to remove the particle", 0.0);
 }
 
 void TrackingEfficiencyModule::event()
@@ -49,21 +67,21 @@ void TrackingEfficiencyModule::event()
   }
 }
 
-TrackingMomentumModule::TrackingMomentumModule()
+TrackingMomentumModule::TrackingMomentumModule() : Module()
 {
   setDescription(
     R"DOC(Module to modify momentum of tracks from the lists. Include in your code as
-		     
-.. code:: python
 
-mypath.add_module("TrackingMomentum",particleLists=['pi+:cut'],scale=0.999)
+    .. code:: python
+
+        mypath.add_module("TrackingMomentum", particleLists=['pi+:cut'], scale=0.999)
 
 The module modifies the input particleLists by scaling track momenta as given by the parameter scale
 		     
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("scale", m_scale, "scale factor to be applied to 3-momentum");
+  addParam("scale", m_scale, "scale factor to be applied to 3-momentum", 0.999);
 }
 
 void TrackingMomentumModule::event()

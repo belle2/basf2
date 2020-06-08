@@ -38,7 +38,8 @@ namespace Belle2 {
        * @return true if a Hit has been created, false if the hit was ignored
        */
       bool step(G4Step* step, G4TouchableHistory*) override;
-      int m_trackID;                    /** track id */
+      /** track id */
+      int m_trackID;
     };
 
   } //he3tube namespace

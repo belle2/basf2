@@ -12,13 +12,16 @@
 # The analysers has to specify systematic "test" from the list of tests. The output
 # file contains reconstructed J/psi inv. mass and momentum with corresponding modification.
 #
+# The latest recommendations for tracking systeamtic uncertainties can be found here:
+# https://confluence.desy.de/display/BI/Tracking+and+Vertexing+Performance
+#
 ###############################################################################
 
 import basf2 as b2
 import modularAnalysis as ma
 
 # defile systematic tests
-sys_tests = ['def', 'scaleUp', 'scaleDown', 'Efficiency']
+sys_tests = ['def', 'scale', 'scaleUp', 'scaleDown', 'Efficiency']
 
 # Select the systematic variation from the list
 test = 'Efficiency'
@@ -43,6 +46,8 @@ ma.fillParticleList(decayString='e+:sel',
 
 if test == 'def':
     pass
+elif test == 'scale':
+    my_path.add_module('TrackingMomentum', particleLists=['e+:sel'], scale=1.00056)
 elif test == 'scaleUp':
     my_path.add_module('TrackingMomentum', particleLists=['e+:sel'], scale=1.001)
 elif test == 'scaleDown':

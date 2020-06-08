@@ -100,6 +100,7 @@ namespace Belle2 {
     float getglobalTime()       const { return m_globalTime; }
     /** event number */
     int geteventnumber() const {return m_evtNum;}
+    /** set an event number */
     void seteventnumber(const int evtn) {m_evtNum = (unsigned)evtn;}
 
 

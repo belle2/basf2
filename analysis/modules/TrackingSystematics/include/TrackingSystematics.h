@@ -35,11 +35,6 @@ namespace Belle2 {
     TrackingEfficiencyModule();
 
     /**
-     * Check particle lists at initialization
-    */
-    virtual void initialize() override;
-
-    /**
     * Function to be executed at each event
     */
     virtual void event() override;
@@ -61,11 +56,6 @@ namespace Belle2 {
     * Constructor: Sets the description, the properties and the parameters of the module.
     */
     TrackingMomentumModule();
-
-    /**
-     * Check particle lists at initialization
-    */
-    virtual void initialize() override;
 
     /**
     * Function to be executed at each event

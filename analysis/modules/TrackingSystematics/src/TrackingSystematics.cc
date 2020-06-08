@@ -23,11 +23,10 @@ The module modifies the input particleLists by randomly removing tracks with the
   addParam("frac", m_frac, "probability to remove the particle");
 }
 
-void TrackingEfficiencyModule::initialize()
+void TrackingEfficiencyModule::event()
 {
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
-
     //check particle List exists and has particles
     if (!particleList) {
       B2ERROR("ParticleList " << iList << " not found");
@@ -37,13 +36,6 @@ void TrackingEfficiencyModule::initialize()
     if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particleList->getPDGCode())))) {
       B2ERROR("The provided particlelist " << iList << " does not contain track-based particles.");
     }
-  }
-}
-
-void TrackingEfficiencyModule::event()
-{
-  for (auto& iList : m_ParticleLists) {
-    StoreObjPtr<ParticleList> particleList(iList);
 
     std::vector<unsigned int> toRemove;
     size_t nPart = particleList->getListSize();
@@ -74,8 +66,7 @@ The module modifies the input particleLists by scaling track momenta as given by
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum");
 }
 
-
-void TrackingMomentumModule::initialize()
+void TrackingMomentumModule::event()
 {
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
@@ -89,14 +80,6 @@ void TrackingMomentumModule::initialize()
     if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particleList->getPDGCode())))) {
       B2ERROR("The provided particlelist " << iList << " does not contain track-based particles.");
     }
-
-  }
-}
-
-void TrackingMomentumModule::event()
-{
-  for (auto& iList : m_ParticleLists) {
-    StoreObjPtr<ParticleList> particleList(iList);
 
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {

@@ -254,11 +254,11 @@ void SVDSimpleClusterizerModule::writeClusters(SimpleClusterCandidate cluster)
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-  //depending on the algorithm time contains different information:
-  //6-sample CoG (0): this is the calibrated already
+  //depending on the algorithm, time contains different information:
+  //6-sample CoG (0): this is the calibrated time already
   //3-sample CoG (1) or ELS (2) this is the raw time, you need to calibrate:
   float caltime = time;
-  if ((m_timeAlgorithm == 1) || eventinfo->getModeByte().getDAQMode() == 1)
+  if (m_timeAlgorithm == 1)
     caltime = m_3CoGTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);
   else if (m_timeAlgorithm == 2)
     caltime = m_3ELSTimeCal.getCorrectedTime(sensorID, isU, -1, time, -1);

@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for the given bin
-     * @param bin number
+     * @param bin for const with cosine bin
      */
     double getMean(unsigned int bin) const
     {
@@ -82,7 +82,7 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for given cos(theta)
-     * @param cos(theta)
+     * @param costh for const with costh theta value
      */
     double getMean(double costh) const
     {

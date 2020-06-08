@@ -95,7 +95,8 @@ namespace Belle2 {
     };
 
     /** Return dE/dx mean value for the given bin
-     * @param bin number
+     * @param layer is layer number between 0-55
+     * @param bin is enta bin number
      */
     double getMean(unsigned int layer, unsigned int bin) const
     {
@@ -106,11 +107,13 @@ namespace Belle2 {
       if (bin < m_onedgains[mylayer].size())
         return m_onedgains[mylayer][bin];
       else return 1.0;
-    }
+    };
 
     /** Reset dE/dx mean value for the given bin
-     * @param bin number
-     */
+     * @param layer is layer number between 0-55
+     * @param bin is enta bin number
+     * @param value is constant for requested entabin and layer
+    */
     void setMean(unsigned int layer, unsigned int bin, double value)
     {
       int mylayer = 0;
@@ -119,7 +122,7 @@ namespace Belle2 {
 
       if (bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
       else m_onedgains[mylayer][bin] = 1.0;
-    }
+    };
 
     /** Return dE/dx mean value for given entrance angle
      * @param continuous layer number

@@ -586,6 +586,23 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
+def trackingEfficiency(inputListName, fraction, path=None):
+    """
+    Randomly remove tracks from the provided particle list to estimate the tracking efficiency.
+
+    Parameters:
+        inputListName (str): input particle list name
+        fraction (float): fraction of particles to be removed randomly
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingefficiency = register_module('ParticleSelector')
+    trackingefficiency.set_name('ParticleSelector_' + inputListName)
+    trackingefficiency.param('decayString', inputListName)
+    trackingefficiency.param('cut', f'random>{fraction}')
+    path.add_module(trackingefficiency)
+
+
 def mergeListsWithBestDuplicate(outputListName,
                                 inputListNames,
                                 variable,

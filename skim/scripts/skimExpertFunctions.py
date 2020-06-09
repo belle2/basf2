@@ -508,6 +508,7 @@ class BaseSkim(ABC):
             `BaseSkim.skim_event_cuts`, *e.g.*
 
             .. code-block:: python
+
                 def build_lists(self, path):
                     path = self.skim_event_cuts("nTracks>4", path=path)
                     # rest of skim list building...

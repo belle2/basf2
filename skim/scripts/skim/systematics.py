@@ -621,13 +621,16 @@ class SystematicsPhiGamma(BaseSkim):
     TestFiles = [get_test_file("phigamma_neutral")]
 
     def build_lists(self, path):
-        ma.applyEventCuts("[nTracks>=2] and [nTracks<=4]", path=path)
+        EventCuts = [
+            "[nTracks>=2] and [nTracks<=4]",
+            "[nParticlesInList(gamma:PhiSystematics) > 0]",
+            "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
+        ]
+        path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
+
         ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
-        ma.applyEventCuts("[nParticlesInList(gamma:PhiSystematics) > 0]", path=path)
 
         ma.reconstructDecay('phi:charged -> K+:all K-:all', '0.9 < M < 1.2', path=path)
         ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
-        ma.applyEventCuts("[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]",
-                          path=path)
 
         self.SkimLists = ["gamma:PhiSystematics"]

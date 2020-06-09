@@ -729,6 +729,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -808,6 +810,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();

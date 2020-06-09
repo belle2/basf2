@@ -17,6 +17,7 @@
 /* Element numbers and indices. */
 #pragma link C++ class Belle2::KLMChannelArrayIndex-;
 #pragma link C++ class Belle2::KLMChannelIndex-;
+#pragma link C++ class Belle2::KLMElementArrayIndex-;
 #pragma link C++ class Belle2::KLMElementNumbers-;
 #pragma link C++ class Belle2::KLMModuleArrayIndex-;
 #pragma link C++ class Belle2::KLMPlaneArrayIndex-;

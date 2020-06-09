@@ -24,7 +24,7 @@ import modularAnalysis as ma
 sys_tests = ['def', 'scale', 'scaleUp', 'scaleDown', 'Efficiency']
 
 # Select the systematic variation from the list
-test = 'Efficiency'
+test = 'scaleDown'
 
 if test not in sys_tests:
     print("Unknown systematic test {}".format(test))
@@ -47,13 +47,13 @@ ma.fillParticleList(decayString='e+:sel',
 if test == 'def':
     pass
 elif test == 'scale':
-    my_path.add_module('TrackingMomentum', particleLists=['e+:sel'], scale=1.00056)
+    ma.trackingMomentum(inputListNames=['e+:sel'], scale=1.00056, path=my_path)
 elif test == 'scaleUp':
-    my_path.add_module('TrackingMomentum', particleLists=['e+:sel'], scale=1.001)
+    ma.trackingMomentum(inputListNames=['e+:sel'], scale=1.001, path=my_path)
 elif test == 'scaleDown':
-    my_path.add_module('TrackingMomentum', particleLists=['e+:sel'], scale=0.999)
+    ma.trackingMomentum(inputListNames=['e+:sel'], scale=0.999, path=my_path)
 elif test == 'Efficiency':
-    my_path.add_module('TrackingEfficiency', particleLists=['e+:sel'], frac=0.01)
+    ma.trackingEfficiency(inputListNames=['e+:sel'], fraction=0.01, path=my_path)
 
 # J/psi
 ma.reconstructDecay(decayString='J/psi:out -> e+:sel e-:sel',

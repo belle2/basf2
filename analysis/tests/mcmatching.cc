@@ -1252,5 +1252,47 @@ namespace {
   }
 
 
+  TEST_F(MCMatchingTest, MissingFlagsOfDaughters)
+  {
+    {
+      /** Y(4S) -> [B0 -> mu+ mu- K+, pi-, pi0(->gamma gamma)] [B0 -> [anti-D0 -> K+ pi-] pi+] */
+      Decay d(300553, { {511, { -13, 13, 321, -211, {111, {22, 22}}}}, {511, {{421, {321, -211}}, 211}} });
+      Decay* ep = &(d[1][0]);
+      Decay* em = &(d[1][1]);
+
+      /** Reconstructed as Y(4S) -> [B0 -> mu+ mu-] [B0 -> [anti-D0 -> K+ pi-] pi+] */
+      d.reconstruct({300553, { {511, { -13, 13, 0, 0, {0, {0, 0}}}}, {511, {{421, {321, -211}}, 211}} } });
+
+      Particle* Y4S = d.m_particle;
+      Particle* B1 = d.m_particle->getDaughters()[0];
+      Particle* B2 = d.m_particle->getDaughters()[1];
+
+      int isIgnoreMissing = Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons |
+                            Particle::PropertyFlags::c_IsIgnoreIntermediate |
+                            Particle::PropertyFlags::c_IsIgnoreMassive |
+                            Particle::PropertyFlags::c_IsIgnoreNeutrino |
+                            Particle::PropertyFlags::c_IsIgnoreGamma;
+
+      // set missing particle flags on B1
+      B1->setProperty(isIgnoreMissing);
+      ASSERT_TRUE(MCMatching::setMCTruth(B1)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(B1)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B1), 1.0) << d.getString();
+
+
+      ASSERT_TRUE(MCMatching::setMCTruth(B2)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(B2)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B2), 1.0) << d.getString();
+
+
+      ASSERT_TRUE(MCMatching::setMCTruth(Y4S)) << d.getString();
+      EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(Y4S)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(Y4S), 1.0) << d.getString();
+
+    }
+  }
+
+
 }  // namespace
 #endif
+

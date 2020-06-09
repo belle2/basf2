@@ -33,13 +33,14 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
   addParam("SVDClustersFromTracksName", m_svdClusters, "Name of the SVDClusters list", m_svdClusters);
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
   addParam("SVDEventInfoName", m_svdEventInfo, "Name of the SVDEventInfo list", m_svdEventInfo);
+  addParam("RawCoGBinWidth", m_rawCoGBinWidth, "Bin Width [ns] for raw CoG time", m_rawCoGBinWidth);
 }
 
 void SVDCoGTimeCalibrationCollectorModule::prepare()
 {
   TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
                      "EventT0Sync vs rawCoG in @layer.@ladder.@sensor @view/@side",
-                     100, -100, 100, 100, -100, 100);
+                     int(200 / m_rawCoGBinWidth), -100, 100, 100, -100, 100);
   hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
   hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);

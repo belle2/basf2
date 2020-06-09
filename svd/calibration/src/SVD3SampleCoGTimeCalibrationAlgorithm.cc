@@ -40,11 +40,12 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVD3SampleCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10, 80));
-  pol3->SetParLimits(0, -200, 0);
-  pol3->SetParLimits(1, 0, 10);
-  pol3->SetParLimits(2, -1, 0);
-  pol3->SetParLimits(3, 0, 1);
+  std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10,
+                                    80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
+  // pol3->SetParLimits(0, -200, 0);
+  // pol3->SetParLimits(1, 0, 10);
+  // pol3->SetParLimits(2, -1, 0);
+  // pol3->SetParLimits(3, 0, 1);
 
   std::unique_ptr<TFile> f(new TFile("algorithm_3SampleCoG_output.root", "RECREATE"));
 
@@ -80,7 +81,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
-          pfx->SetErrorOption("S");
+          // pfx->SetErrorOption("S");
           pfx->Fit("pol3", "RQ");
           double par[4];
           pol3->GetParameters(par);

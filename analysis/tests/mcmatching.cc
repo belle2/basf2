@@ -1257,8 +1257,6 @@ namespace {
     {
       /** Y(4S) -> [B0 -> mu+ mu- K+, pi-, pi0(->gamma gamma)] [B0 -> [anti-D0 -> K+ pi-] pi+] */
       Decay d(300553, { {511, { -13, 13, 321, -211, {111, {22, 22}}}}, {511, {{421, {321, -211}}, 211}} });
-      Decay* ep = &(d[1][0]);
-      Decay* em = &(d[1][1]);
 
       /** Reconstructed as Y(4S) -> [B0 -> mu+ mu-] [B0 -> [anti-D0 -> K+ pi-] pi+] */
       d.reconstruct({300553, { {511, { -13, 13, 0, 0, {0, {0, 0}}}}, {511, {{421, {321, -211}}, 211}} } });
@@ -1295,4 +1293,3 @@ namespace {
 
 }  // namespace
 #endif
-

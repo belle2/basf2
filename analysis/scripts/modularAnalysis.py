@@ -586,21 +586,37 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
-def trackingEfficiency(inputListName, fraction, path=None):
+def trackingEfficiency(inputListNames, fraction, path=None):
     """
-    Randomly remove tracks from the provided particle list to estimate the tracking efficiency.
+    Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
+    Takes care of the duplicates, if any.
 
     Parameters:
-        inputListName (str): input particle list name
+        inputListNames list(str): input particle list names
         fraction (float): fraction of particles to be removed randomly
         path (basf2.Path): module is added to this path
     """
 
-    trackingefficiency = register_module('ParticleSelector')
-    trackingefficiency.set_name('ParticleSelector_' + inputListName)
-    trackingefficiency.param('decayString', inputListName)
-    trackingefficiency.param('cut', f'random>{fraction}')
+    trackingefficiency = register_module('TrackingEfficiency')
+    trackingefficiency.param('particleLists', inputListNames)
+    trackingefficiency.param('frac', fraction)
     path.add_module(trackingefficiency)
+
+
+def trackingMomentum(inputListNames, scale, path=None):
+    """
+    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Parameters:
+        inputListNames list(str): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('scale', scale)
+    path.add_module(trackingmomentum)
 
 
 def mergeListsWithBestDuplicate(outputListName,

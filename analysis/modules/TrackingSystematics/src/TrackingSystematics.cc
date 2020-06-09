@@ -17,6 +17,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
+#include <map>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -43,6 +44,10 @@ The module modifies the input particleLists by randomly removing tracks with the
 
 void TrackingEfficiencyModule::event()
 {
+  // map from mdstIndex to decision
+  std::map <unsigned, bool> indexToRemove;
+
+  // determine list of mdst tracks:
   for (auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
     //check particle List exists and has particles
@@ -59,9 +64,18 @@ void TrackingEfficiencyModule::event()
     size_t nPart = particleList->getListSize();
     for (size_t iPart = 0; iPart < nPart; iPart++) {
       auto particle = particleList->getParticle(iPart);
-      auto prob = gRandom->Uniform();
-      if (prob < m_frac)
-        toRemove.push_back(particle->getArrayIndex());
+      unsigned mdstIndex = particle->getMdstArrayIndex();
+      bool remove;
+      if (indexToRemove.find(mdstIndex) !=  indexToRemove.end()) {
+        // found, use entry
+        remove = indexToRemove.at(mdstIndex);
+      } else {
+        // not found, generate and store it
+        auto prob = gRandom->Uniform();
+        remove = prob < m_frac;
+        indexToRemove.insert(std::pair{mdstIndex, remove});
+      }
+      if (remove) toRemove.push_back(particle->getArrayIndex());
     }
     particleList->removeParticles(toRemove);
   }

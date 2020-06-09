@@ -190,20 +190,21 @@ namespace {
         continue;
       }
 
-      if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
-        //now daug does not have any daughters.
-        //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
-        //so we'll also add all mother MCParticles until the first primary mother
-        mcParticle = mcParticle->getMother();
-        while (mcParticle) {
-          mcMatchedParticles.insert(mcParticle);
-          if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
-            break;
-
+      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+        if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
+          //now daug does not have any daughters.
+          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
+          //so we'll also add all mother MCParticles until the first primary mother
           mcParticle = mcParticle->getMother();
+          while (mcParticle) {
+            mcMatchedParticles.insert(mcParticle);
+            if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
+              break;
+
+            mcParticle = mcParticle->getMother();
+          }
         }
       }
-
     }
   }
 
@@ -219,6 +220,58 @@ namespace {
       appendParticles(daug, children);
     }
   }
+
+  /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
+  /** If a daughter has e_extraInfoMCErrors already, gather daughters of matched MCParticles as well. */
+  void appendDaughtersOfMatched(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
+  {
+    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
+      const Particle* daug = p->getDaughter(i);
+
+      //add matched MCParticle for 'daug'
+      const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
+      if (mcParticle)
+        mcMatchedParticles.insert(mcParticle);
+
+      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+        vector<const MCParticle*> children;
+
+        const vector<MCParticle*>& genDaughters = mcParticle->getDaughters();
+        for (auto mcDaug : genDaughters) {
+          children.push_back(mcDaug);
+          appendParticles(mcDaug, children);
+        }
+
+        for (auto child : children) {
+          mcMatchedParticles.insert(child);
+        }
+      }
+
+      if (daug->getNDaughters() != 0) {
+        // if daug has daughters, call appendParticles recursively.
+        appendDaughtersOfMatched(daug, mcMatchedParticles);
+        continue;
+      }
+
+      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+        if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
+          //now daug does not have any daughters.
+          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
+          //so we'll also add all mother MCParticles until the first primary mother
+          mcParticle = mcParticle->getMother();
+          while (mcParticle) {
+            mcMatchedParticles.insert(mcParticle);
+            if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
+              break;
+
+            mcParticle = mcParticle->getMother();
+          }
+        }
+      }
+    }
+  }
+
+
 }
 
 int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle, const bool honorProperty)
@@ -347,10 +400,7 @@ int MCMatching::getFlagsOfDaughters(const Particle* particle, const MCParticle* 
     daughterStatuses |= (daughterStatus & daughterStatusAcceptMask);
   }
 
-  //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusesAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
-  return (daughterStatuses & daughterStatusesAcceptMask);
-
+  return daughterStatuses;
 }
 
 
@@ -452,13 +502,15 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   int flags = 0;
 
   unordered_set<const MCParticle*> mcMatchedParticles;
-  appendParticles(particle, mcMatchedParticles);
+  // appendParticles(particle, mcMatchedParticles);
+  appendDaughtersOfMatched(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
 
+
   for (const MCParticle* genPart : genParts) {
 
-    // if genPart exists in mcMatchedParticles, continue
+    // if genPart exists in mcMatchedParticles, continue.
     if (mcMatchedParticles.find(genPart) != mcMatchedParticles.end())
       continue;
 

@@ -1284,8 +1284,8 @@ namespace {
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(B2)) << d.getString();
       EXPECT_EQ(Variable::isSignal(B2), 1.0) << d.getString();
 
-
       ASSERT_TRUE(MCMatching::setMCTruth(Y4S)) << d.getString();
+      EXPECT_EQ(Y4S->getProperty(), Particle::PropertyFlags::c_Ordinary) << d.getString();
       EXPECT_EQ(MCMatching::c_Correct, MCMatching::getMCErrors(Y4S)) << d.getString();
       EXPECT_EQ(Variable::isSignal(Y4S), 1.0) << d.getString();
 

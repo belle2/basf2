@@ -83,8 +83,8 @@ void PXDTrackClusterDQMModule::defineHisto()
       if (avxdid == VxdID("1.5.1")) {
         for (int s = 0; s < 6; s++) {
           for (int d = 0; d < 4; d++) {
-            m_trackASICClusterCharge[avxdid][s][d] = new TH1F("PXD_Track_Cluster_Charge_" + buff + Form("_sw%d_dcd%d", s, d),
-                                                              "PXD Track Cluster Charge " + buff + Form(" sw%d dcd%d ", s, d) + ";Charge/ADU;", 100, 0, 100);
+            m_trackASICClusterCharge[avxdid][s][d] = new TH1F("PXD_Track_Cluster_Charge_" + buff + Form("_sw%d_dcd%d", s + 1, d + 1),
+                                                              "PXD Track Cluster Charge " + buff + Form(" sw%d dcd%d ", s + 1, d + 1) + ";Charge/ADU;", 100, 0, 100);
           }
         }
       }

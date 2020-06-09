@@ -156,7 +156,7 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
 def add_svd_simulation(path, daqMode=2):
 
     svdevtinfoset = register_module("SVDEventInfoSetter")
-    svdevtinforset.param("daqMode", daqMode)
+    svdevtinfoset.param("daqMode", daqMode)
     path.add_module(svdevtinfoset)
 
     digitizer = register_module('SVDDigitizer')

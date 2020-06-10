@@ -755,8 +755,6 @@ void ECLBhabhaTCollectorModule::collect()
               crysE2Max[icharge] = tempE;
             }
 
-
-
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // If we drop the information about the second highest energy crystal we could use
             //    m_eclClusterArray[ic]->getMaxECellId()

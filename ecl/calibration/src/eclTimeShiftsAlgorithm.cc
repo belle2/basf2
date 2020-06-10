@@ -27,7 +27,8 @@ eclTimeShiftsAlgorithm::eclTimeShiftsAlgorithm(): CalibrationAlgorithm("DummyCol
   crysCrateShift_max(20),
   m_ECLCrystalTimeOffset("ECLCrystalTimeOffset"),
   m_ECLCrateTimeOffset("ECLCrateTimeOffset"),
-  m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib")//,
+  m_refCrysIDzeroingCrate("ECLReferenceCrystalPerCrateCalib"),
+  forcePayloadIOVnotOpenEnded(false)//,
 {
   setDescription(
     "Perform time calibration of ecl crystals by combining previous values from the DB for different calibrations."
@@ -41,6 +42,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
 
   B2INFO("eclTimeShiftsAlgorithm parameters:");
   B2INFO("debugFilenameBase = " << debugFilenameBase);
+  B2INFO("forcePayloadIOVnotOpenEnded = " << forcePayloadIOVnotOpenEnded);
   B2INFO("timeShiftForPlotStyle = {");
   for (int crateTest = 0; crateTest < 51; crateTest++) {
     B2INFO(timeShiftForPlotStyle[crateTest] << ",");
@@ -204,6 +206,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   }
   // This results in : allCrates_crate_time[index for crate number][index for run number]
 
+  //int previousRevNum = -1 ;
 
   //------------------------------------------------------------------------
   /** Loop over all the experiments and runs and extract the crate times*/
@@ -241,6 +244,21 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     B2INFO("eclTimeShiftsAlgorithm:: loaded ECLCrateTimeOffset from the database"
            << LogVar("IoV", m_ECLCrateTimeOffset.getIoV())
            << LogVar("Revision", m_ECLCrateTimeOffset.getRevision()));
+
+
+    //------------------------------------------------------------------------
+    /** If requested by the user, check that the payload revision is
+        increasing by +1 and that the payload iov does not have a -1 as
+        the high run number.  This should hopefully skip the runs that*/
+    if (forcePayloadIOVnotOpenEnded) {
+      if (m_ECLCrateTimeOffset.getIoV().getExperimentHigh() == -1 &&
+          m_ECLCrateTimeOffset.getIoV().getRunHigh() == -1) {
+        // skip this run because it is using an older payload - probably an iov hole
+        B2INFO("Skipping run since payload has (*,*,-1,-1).");
+        continue;
+      }
+    }
+
 
     //------------------------------------------------------------------------
     /** Get the vectors from the input payload */
@@ -321,8 +339,10 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     B2INFO("IOV_exp_high = " << IOV_exp_high);
     B2INFO("IOV_run_high = " << IOV_run_high);
     if (IOV_run_high == -1) {
+      B2INFO("IOV_run_high is -1 so stop looping over all runs");
       break;
     } else {
+      B2INFO("Set run number to higher iov run number");
       run = IOV_run_high;
     }
     B2INFO("now set run = " << run);

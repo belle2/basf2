@@ -15,5 +15,6 @@
 #pragma link C++ class Belle2::ECL::eclEdgeAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclLeakageAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclMergingCrystalTimingAlgorithm-;
+#pragma link C++ class Belle2::ECL::eclTimeShiftsAlgorithm-;
 
 #endif

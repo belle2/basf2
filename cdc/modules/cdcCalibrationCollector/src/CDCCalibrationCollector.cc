@@ -17,10 +17,16 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
+
 #include <Math/ProbFuncMathCore.h>
 
 #include <cdc/dataobjects/WireID.h>
@@ -28,10 +34,12 @@
 
 #include <TH1F.h>
 
-using namespace std;
+//using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace genfit;
+using namespace TrackFindingCDC;
+
 
 REG_MODULE(CDCCalibrationCollector)
 
@@ -48,6 +56,7 @@ CDCCalibrationCollectorModule::CDCCalibrationCollectorModule() : CalibrationColl
   addParam("eventT0Extraction", m_eventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("minimumPt", m_minimumPt, "Tracks with tranverse momentum smaller than this value will not used", 0.15);
   addParam("isCosmic", m_isCosmic, "True when we process cosmic events, else False (collision)", m_isCosmic);
+  addParam("effStudy", m_effStudy, "When true module collects info only  necessary for wire eff study", false);
 }
 
 CDCCalibrationCollectorModule::~CDCCalibrationCollectorModule()
@@ -60,37 +69,50 @@ void CDCCalibrationCollectorModule::prepare()
   StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
   StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
   StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
+  StoreWrappedObjPtr<std::vector<CDCTrack>> cdcTracks(m_cdcTrackVectorName);
   RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
   //Store names to speed up creation later
   m_recoTrackArrayName = recoTracks.getName();
   m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
+  if (!m_effStudy) { // by default collects calibration data
+    auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
+    m_tree->Branch<Float_t>("x_mea", &x_mea);
+    m_tree->Branch<Float_t>("x_u", &x_u);
+    m_tree->Branch<Float_t>("x_b", &x_b);
+    m_tree->Branch<Float_t>("alpha", &alpha);
+    m_tree->Branch<Float_t>("theta", &theta);
+    m_tree->Branch<Float_t>("t", &t);
+    m_tree->Branch<UShort_t>("adc", &adc);
+    //  m_tree->Branch<int>("boardID", &boardID);
+    m_tree->Branch<UChar_t>("lay", &lay);
+    m_tree->Branch<Float_t>("weight", &weight);
+    m_tree->Branch<UShort_t>("IWire", &IWire);
+    m_tree->Branch<Float_t>("Pval", &Pval);
+    m_tree->Branch<Float_t>("ndf", &ndf);
+    if (m_storeTrackParams) {
+      m_tree->Branch<Float_t>("d0", &d0);
+      m_tree->Branch<Float_t>("z0", &z0);
+      m_tree->Branch<Float_t>("phi0", &phi0);
+      m_tree->Branch<Float_t>("tanL", &tanL);
+      m_tree->Branch<Float_t>("omega", &omega);
+    }
 
-  auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-  m_tree->Branch<Float_t>("x_mea", &x_mea);
-  m_tree->Branch<Float_t>("x_u", &x_u);
-  m_tree->Branch<Float_t>("x_b", &x_b);
-  m_tree->Branch<Float_t>("alpha", &alpha);
-  m_tree->Branch<Float_t>("theta", &theta);
-  m_tree->Branch<Float_t>("t", &t);
-  m_tree->Branch<UShort_t>("adc", &adc);
-  //  m_tree->Branch<int>("boardID", &boardID);
-  m_tree->Branch<UChar_t>("lay", &lay);
-  m_tree->Branch<Float_t>("weight", &weight);
-  m_tree->Branch<UShort_t>("IWire", &IWire);
-  m_tree->Branch<Float_t>("Pval", &Pval);
-  m_tree->Branch<Float_t>("ndf", &ndf);
-  if (m_storeTrackParams) {
-    m_tree->Branch<Float_t>("d0", &d0);
-    m_tree->Branch<Float_t>("z0", &z0);
-    m_tree->Branch<Float_t>("phi0", &phi0);
-    m_tree->Branch<Float_t>("tanL", &tanL);
-    m_tree->Branch<Float_t>("omega", &omega);
+    if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
+      m_tree->Branch<Float_t>("t_fit", &t_fit);
+    }
+
+    registerObject<TTree>("tree", m_tree);
   }
+  if (m_effStudy) { //if m_effStudy is changed to true prepares to only run wire efficiency study
+    auto m_efftree  = new TTree(m_effTreeName.c_str(), "tree for wire efficiency");
+    m_efftree->Branch<unsigned short>("layerID", &layerID);
+    m_efftree->Branch<unsigned short>("wireID", &wireID);
+    m_efftree->Branch<float>("z", &z);
+    m_efftree->Branch<bool>("isFound", &isFound);
 
-  if (m_calExpectedDriftTime) { // expected drift time, calculated form xfit
-    m_tree->Branch<Float_t>("t_fit", &t_fit);
+    registerObject<TTree>("efftree", m_efftree);
   }
 
   auto m_hNDF = new TH1F("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
@@ -99,7 +121,6 @@ void CDCCalibrationCollectorModule::prepare()
   auto m_hNTracks = new TH1F("hNTracks", "Number of tracks", 50, 0, 10);
   auto m_hOccupancy = new TH1F("hOccupancy", "occupancy", 100, 0, 1.0);
 
-  registerObject<TTree>("tree", m_tree);
   registerObject<TH1F>("hNDF", m_hNDF);
   registerObject<TH1F>("hPval", m_hPval);
   registerObject<TH1F>("hEventT0", m_hEventT0);
@@ -112,6 +133,7 @@ void CDCCalibrationCollectorModule::collect()
   const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
   const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
   const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
+  const StoreWrappedObjPtr<std::vector<CDCTrack>> cdcTracks(m_cdcTrackVectorName);
   const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
   const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
 
@@ -129,7 +151,17 @@ void CDCCalibrationCollectorModule::collect()
       return;
     }
   }
+  // Collects the WireID and Layer of every hit in this event
+  // Used in wire efficiency building
+  std::vector<unsigned short> wiresInCDCTrack;
 
+  for (CDCTrack& cdcTrack : *cdcTracks) {
+    for (CDCRecoHit3D& cdcHit : cdcTrack) {
+      unsigned short eWireID = cdcHit.getWire().getEWire();
+      wiresInCDCTrack.push_back(eWireID);
+    }
+  }
+  // WireID collection finished
 
   const int nTr = recoTracks.getEntries();
 
@@ -170,9 +202,9 @@ void CDCCalibrationCollectorModule::collect()
   for (int i = 0; i < nTr; ++i) {
     RecoTrack* track = recoTracks[i];
     if (track->getDirtyFlag()) continue;
-    if (!track->getTrackFitStatus()->isFitted()) continue;
     const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs || !fs->isFitConverged()) continue; //not fully convergence
+    if (!fs || !fs->isFitted()) continue;
+    if (!fs->isFitConverged()) continue; //not fully convergence
 
     const Belle2::Track* b2track = track->getRelatedFrom<Belle2::Track>();
     if (!b2track) {B2DEBUG(99, "No relation found"); continue;}
@@ -208,10 +240,18 @@ void CDCCalibrationCollectorModule::collect()
     if (m_isCosmic == true && phi0 > 0.0) continue;
 
     //cut at Pt
-    if (fitresult->getMomentum().Perp() < m_minimumPt) continue;
-    try {
-      harvest(track);
-    } catch (...) {
+    if (fitresult->getTransverseMomentum() < m_minimumPt) continue;
+    if (!m_effStudy) { // all harvest to fill the tree if collecting calibration info
+      try {
+        harvest(track);
+      } catch (...) {
+      }
+    }
+    if (m_effStudy) { // call buildEfficiencies for efficiency study
+      // Request tracks coming from IP
+      if (fitresult->getD0() > 2 || fitresult->getZ0() > 5) continue;
+      const Helix helixFit = fitresult->getHelix();
+      buildEfficiencies(wiresInCDCTrack, helixFit);
     }
   }
 
@@ -266,7 +306,7 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
         alpha = cdcgeo.getOutgoingAlpha(alpha);
 
         B2DEBUG(99, "x_unbiased " << x_u << " |left_right " << lr);
-        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(std::abs(x_u), lay, lr, alpha , theta);}
+        if (m_calExpectedDriftTime) { t_fit = cdcgeo.getDriftTime(abs(x_u), lay, lr, alpha , theta);}
         alpha *= 180 / M_PI;
         theta *= 180 / M_PI;
         //estimate drift time
@@ -277,6 +317,53 @@ void CDCCalibrationCollectorModule::harvest(Belle2::RecoTrack* track)
     }//end of for
   }//end of for tp
 }//end of func
+
+const CDCWire& CDCCalibrationCollectorModule::getIntersectingWire(const TVector3& xyz, const CDCWireLayer& layer,
+    const Helix& helixFit) const
+{
+  Vector3D crosspoint;
+  if (layer.isAxial())
+    crosspoint = Vector3D(xyz);
+  else {
+    const CDCWire& oneWire = layer.getWire(1);
+    double newR = oneWire.getWirePos2DAtZ(xyz.z()).norm();
+    double arcLength = helixFit.getArcLength2DAtCylindricalR(newR);
+    TVector3 xyzOnWire = helixFit.getPositionAtArcLength2D(arcLength);
+    crosspoint = Vector3D(xyzOnWire);
+  }
+
+  const CDCWire& wire = layer.getClosestWire(crosspoint);
+
+  return wire;
+}
+
+void CDCCalibrationCollectorModule::buildEfficiencies(std::vector<unsigned short> wireHits, const Helix helixFit)
+{
+  static const TrackFindingCDC::CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  for (const CDCWireLayer& wireLayer : wireTopology.getWireLayers()) {
+    const double radiusofLayer = wireLayer.getRefCylindricalR();
+    //simple extrapolation of fit
+    const double arcLength = helixFit.getArcLength2DAtCylindricalR(radiusofLayer);
+    const TVector3 xyz = helixFit.getPositionAtArcLength2D(arcLength);
+    if (!xyz.x()) continue;
+    const CDCWire& wireIntersected = getIntersectingWire(xyz, wireLayer, helixFit);
+    unsigned short crossedWire = wireIntersected.getEWire();
+    unsigned short crossedCWire = wireIntersected.getNeighborCW()->getEWire();
+    unsigned short crossedCCWire = wireIntersected.getNeighborCCW()->getEWire();
+
+    if (find(wireHits.begin(), wireHits.end(), crossedWire) != wireHits.end()
+        || find(wireHits.begin(), wireHits.end(), crossedCWire) != wireHits.end()
+        || find(wireHits.begin(), wireHits.end(), crossedCCWire) != wireHits.end())
+      isFound = true;
+    else
+      isFound = false;
+
+    wireID = wireIntersected.getIWire();
+    layerID = wireIntersected.getICLayer();
+    z = xyz.z();
+    getObjectPtr<TTree>("efftree")->Fill();
+  }
+}
 
 
 

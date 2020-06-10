@@ -592,7 +592,7 @@ def trackingEfficiency(inputListNames, fraction, path=None):
     Takes care of the duplicates, if any.
 
     Parameters:
-        inputListNames list(str): input particle list names
+        inputListNames (list(str)): input particle list names
         fraction (float): fraction of particles to be removed randomly
         path (basf2.Path): module is added to this path
     """
@@ -608,7 +608,7 @@ def trackingMomentum(inputListNames, scale, path=None):
     Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
 
     Parameters:
-        inputListNames list(str): input particle list names
+        inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
         path (basf2.Path): module is added to this path
     """

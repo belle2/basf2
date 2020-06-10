@@ -126,7 +126,7 @@ def get_calibrations(input_data, **kwargs):
     prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
 
     # ====================================================
-    t0BiasCorretion = -0.9  # Correct for the CDC t0 bias
+    t0BiasCorrection = -0.9  # Correct for the CDC t0 bias
     # ====================================================
 
     col_bhabha = register_module('ECLBhabhaTCollector')
@@ -134,7 +134,7 @@ def get_calibrations(input_data, **kwargs):
     col_bhabha.param('minCrystal', 1)
     col_bhabha.param('maxCrystal', 8736)
     col_bhabha.param('saveTree', False)
-    col_bhabha.param('hadronEventT0_TO_bhabhaEventT0_correction', t0BiasCorretion)
+    col_bhabha.param('hadronEventT0_TO_bhabhaEventT0_correction', t0BiasCorrection)
 
     eclTCol = Collection(collector=col_bhabha,
                          input_files=input_files_bhabha,

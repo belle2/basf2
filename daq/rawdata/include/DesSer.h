@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <sys/time.h>
-
+#include <unistd.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>

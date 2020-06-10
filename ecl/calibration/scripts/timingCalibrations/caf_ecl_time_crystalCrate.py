@@ -71,11 +71,16 @@ def get_calibrations(input_data, **kwargs):
     # crates calibration code.
     max_files_per_run_calibration = 26
     max_files_per_run_validation = 2
+    max_events_per_run_plotting = 1
 
     # We filter addition files if there are more than [max_files_per_run] files per run.
     # The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
+
+    # We filter addition files if there are more than [max_events_per_run] events per run.
+    # For plotting after the calibrations
+    from prompt.utils import filter_by_max_events_per_run
 
     reduced_file_to_iov_bhabha = filter_by_max_files_per_run(file_to_iov_bhabha, max_files_per_run_calibration)
     input_files_bhabha = list(reduced_file_to_iov_bhabha.keys())
@@ -84,6 +89,21 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run_validation)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     basf2.B2INFO(f"Total number of hadron files actually used as input = {len(input_files_hadron)}")
+
+    # For plotting after the calibrations are made
+    reduced_file_to_iov_plotting = filter_by_max_events_per_run(file_to_iov_bhabha, max_events_per_run_plotting)
+    input_files_plotting = list(reduced_file_to_iov_plotting.keys())
+
+    basf2.B2INFO("First/last files before sort:")
+    basf2.B2INFO(input_files_plotting[0])
+    basf2.B2INFO(input_files_plotting[-1])
+
+    intput_files_plotting_sort = sorted(input_files_plotting)
+
+    input_files_first_last = [intput_files_plotting_sort[0], intput_files_plotting_sort[-1]]
+
+    basf2.B2INFO("List of files with only the lowest and highest run numbers for plotting:")
+    basf2.B2INFO(input_files_first_last)
 
     ###################################################
     from basf2 import register_module, create_path
@@ -334,6 +354,23 @@ def get_calibrations(input_data, **kwargs):
 
     #######################################################################
     #######################################################################
+    # Set up the plotting.  Use the two files with the collector to
+    # determine the run range to plot.  The plotting is done in the
+    # algorithm
+
+    tShifts_alg = Belle2.ECL.eclTimeShiftsAlgorithm()
+    tShifts_alg.debugFilenameBase = "eclTimeShiftsAlgorithm"
+
+    # +-12ns range allows for three 8ns crate time jumps in one direction
+    tShifts_alg.crysCrateShift_min = -12   # in ns
+    tShifts_alg.crysCrateShift_max = 12    # in ns
+    tShifts_alg.forcePayloadIOVnotOpenEnded = True
+
+    cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", collector="DummyCollector",
+                                     algorithms=[tShifts_alg], input_files=input_files_first_last)
+
+    #######################################################################
+    #######################################################################
     # Set up calibrations for crystals and crates to be executed in order
     # to converge the calibrations.  Instead of a loop, just create the
     # calibration instances manually with dependencies.  Once these are
@@ -349,11 +386,15 @@ def get_calibrations(input_data, **kwargs):
     valid_cal_bhabha.depends_on(cal_crates_2)
     valid_cal_hadron.depends_on(cal_crates_2)
 
+    # Plotting
+    cal_ecl_timeShifts.depends_on(cal_crates_2)
+
     ###################################################
     # Finalize all calibrations
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     # Calibrations will be executed in this order as a result of the dependencies defined by the "dependes_on(...)".
-    return [cal_crates_1, cal_crystals_1, cal_ecl_merge, cal_crates_2, valid_cal_bhabha, valid_cal_hadron]
+    return [cal_crates_1, cal_crystals_1, cal_ecl_merge, cal_crates_2,
+            valid_cal_bhabha, valid_cal_hadron, cal_ecl_timeShifts]
 
 ##############################

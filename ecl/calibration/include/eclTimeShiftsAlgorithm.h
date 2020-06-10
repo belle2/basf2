@@ -45,6 +45,11 @@ namespace Belle2 {
       double crysCrateShift_min;
       double crysCrateShift_max;
 
+      /** Whether or not to veto runs where an older payload is used.
+          Force the payload revision number to increase as the
+          run number increases. */
+      bool forcePayloadIOVnotOpenEnded;
+
     protected:
 
       /**..Run algorithm */

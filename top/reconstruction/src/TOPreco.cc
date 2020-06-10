@@ -18,21 +18,63 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
+extern "C" {
+  void set_beta_rq_(float*);
+  void set_time_window_(float*, float*);
+  void get_time_window_(float*, float*);
+  void set_pdf_opt_(int*, int*, int*);
+  void set_store_opt_(int*);
+  float get_logl_(float*, float*, float*, float*);
+  void get_logl_ch_(float*, float*, float*, float*, float*);
+  int data_getnum_();
+  void set_channel_mask_(int*, int*, int*);
+  void set_channel_off_(int*, int*);
+  void print_channel_mask_();
+  void set_channel_effi_(int*, int*, float*);
+  void redo_pdf_(float*, int*);
+  int get_num_peaks_(int*);
+  void get_peak_(int*, int*, float*, float*, float*);
+  float get_bgr_(int*);
+  int get_pik_typ_(int*, int*);
+  float get_pik_fic_(int*, int*);
+  float get_pik_e_(int*, int*);
+  float get_pik_sige_(int*, int*);
+  int get_pik_nx_(int*, int*);
+  int get_pik_ny_(int*, int*);
+  int get_pik_nxm_(int*, int*);
+  int get_pik_nym_(int*, int*);
+  int get_pik_nxe_(int*, int*);
+  int get_pik_nye_(int*, int*);
+  float get_pik_xd_(int*, int*);
+  float get_pik_yd_(int*, int*);
+  float get_pik_kxe_(int*, int*);
+  float get_pik_kye_(int*, int*);
+  float get_pik_kze_(int*, int*);
+  float get_pik_kxd_(int*, int*);
+  float get_pik_kyd_(int*, int*);
+  float get_pik_kzd_(int*, int*);
+}
+
 namespace Belle2 {
   namespace TOP {
 
-    TOPreco::TOPreco(int Num, double Masses[], double BkgPerModule, double ScaleN0):
-      m_hypID(0), m_beta(0.0)
+    TOPreco::TOPreco(int Num, double Masses[], int pdgCodes[],
+                     double BkgPerModule, double ScaleN0)
     {
       data_clear_();
       rtra_clear_();
+
       std::vector<float> masses;
       for (int i = 0; i < Num; i++) {
         masses.push_back((float) Masses[i]);
       }
       rtra_set_hypo_(&Num, masses.data());
-      float b = (float) BkgPerModule; float s = (float) ScaleN0;
+      rtra_set_hypid_(&Num, pdgCodes);
+
+      float b = (float) BkgPerModule;
+      float s = (float) ScaleN0;
       set_top_par_(&b, &s);
+
       setPDFoption(c_Optimal); // default option
       setTimeWindow(0.0, 0.0); // use default (TDC range)
       setBeta(0); // use default: beta from momentum and mass
@@ -101,6 +143,10 @@ namespace Belle2 {
       B2INFO("TOPreco: timebase-uncalibrated channels have been masked off");
     }
 
+    void TOPreco::printChannelMask()
+    {
+      print_channel_mask_();
+    }
 
     void TOPreco::setChannelEffi()
     {
@@ -119,19 +165,40 @@ namespace Belle2 {
       B2INFO("TOPreco: new relative pixel efficiencies have been passed to reconstruction");
     }
 
-
-    void TOPreco::setHypID(int NumHyp, int HypID[])
-    {
-      rtra_set_hypid_(&NumHyp, HypID);
-    }
-
-    void TOPreco::setMass(double Mass)
+    void TOPreco::setMass(double Mass, int pdg)
     {
       int Num = 1;
       float mass = (float) Mass;
       rtra_set_hypo_(&Num, &mass);
-      int HypID = 0;
-      rtra_set_hypid_(&Num, &HypID);
+      rtra_set_hypid_(&Num, &pdg);
+    }
+
+    void TOPreco::setTimeWindow(double Tmin, double Tmax)
+    {
+      float tmin = (float) Tmin;
+      float tmax = (float) Tmax;
+      set_time_window_(&tmin, &tmax);
+    }
+
+    void TOPreco::getTimeWindow(double& Tmin, double& Tmax)
+    {
+      float tmin = 0;
+      float tmax = 0;
+      get_time_window_(&tmin, &tmax);
+      Tmin = tmin;
+      Tmax = tmax;
+    }
+
+    void TOPreco::setPDFoption(PDFoption opt, int NP, int NC)
+    {
+      int iopt = opt;
+      set_pdf_opt_(&iopt, &NP, &NC);
+    }
+
+    void TOPreco::setStoreOption(StoreOption opt)
+    {
+      int iopt = opt;
+      set_store_opt_(&iopt);
     }
 
     void TOPreco::clearData()
@@ -171,6 +238,10 @@ namespace Belle2 {
       }
     }
 
+    int TOPreco::getDataSize()
+    {
+      return data_getnum_();
+    }
 
     void TOPreco::reconstruct(double X, double Y, double Z, double Tlen,
                               double Px, double Py, double Pz, int Q,
@@ -190,7 +261,7 @@ namespace Belle2 {
       top_reco_();
     }
 
-    void TOPreco::reconstruct(TOPtrack& trk, int pdg)
+    void TOPreco::reconstruct(const TOPtrack& trk, int pdg)
     {
       m_hypID = abs(trk.getPDGcode());
       if (pdg == 0) pdg = m_hypID;
@@ -242,6 +313,26 @@ namespace Belle2 {
         LogL[i] = logl[i];
         ExpNphot[i] = sfot[i];
       }
+    }
+
+    double TOPreco::getLogL(double timeShift, double timeMin, double timeMax,
+                            double sigma)
+    {
+      float t0 = (float) timeShift;
+      float tmin = (float) timeMin;
+      float tmax = (float) timeMax;
+      float sigt = (float) sigma;
+      return get_logl_(&t0, &tmin, &tmax, &sigt);
+    }
+
+    void TOPreco::getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                          float* logL)
+    {
+      float t0 = (float) timeShift;
+      float tmin = (float) timeMin;
+      float tmax = (float) timeMax;
+      float sigt = (float) sigma;
+      get_logl_ch_(&t0, &tmin, &tmax, &sigt, logL);
     }
 
     void TOPreco::getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,
@@ -337,6 +428,165 @@ namespace Belle2 {
       float terr = (float) Terr;
       float mass = (float) Mass;
       return get_pdf_(&pixelID, &t, &terr, &mass, &PDG);
+    }
+
+    void TOPreco::setBeta(double beta)
+    {
+      m_beta = beta;
+      float bt = beta;
+      set_beta_rq_(&bt);
+    }
+
+    void TOPreco::redoPDF(double mass, int PDG)
+    {
+      float m = mass;
+      redo_pdf_(&m, &PDG);
+    }
+
+    int TOPreco::getNumofPDFPeaks(int pixelID) const
+    {
+      pixelID--; // 0-based is used in fortran
+      return get_num_peaks_(&pixelID);
+    }
+
+    void TOPreco::getPDFPeak(int pixelID, int k,
+                             float& position, float& width, float& numPhotons) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      get_peak_(&pixelID, &k, &position, &width, &numPhotons);
+    }
+
+    float TOPreco::getBkgLevel(int pixelID) const
+    {
+      pixelID--; // 0-based is used in fortran
+      return get_bgr_(&pixelID);
+    }
+
+    int TOPreco::getPDFPeakType(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_typ_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakFic(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_fic_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakE(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_e_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakSigE(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_sige_(&pixelID, &k);
+    }
+
+    int TOPreco::getPDFPeakNx(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_nx_(&pixelID, &k));
+    }
+
+    int TOPreco::getPDFPeakNy(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_ny_(&pixelID, &k));
+    }
+
+    int TOPreco::getPDFPeakNxm(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_nxm_(&pixelID, &k));
+    }
+
+    int TOPreco::getPDFPeakNym(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_nym_(&pixelID, &k));
+    }
+
+    int TOPreco::getPDFPeakNxe(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_nxe_(&pixelID, &k));
+    }
+
+    int TOPreco::getPDFPeakNye(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return abs(get_pik_nye_(&pixelID, &k));
+    }
+
+    float TOPreco::getPDFPeakXD(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_xd_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakYD(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_yd_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKxe(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kxe_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKye(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kye_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKze(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kze_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKxd(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kxd_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKyd(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kyd_(&pixelID, &k);
+    }
+
+    float TOPreco::getPDFPeakKzd(int pixelID, int k) const
+    {
+      pixelID--; // 0-based is used in fortran
+      k++; // counter starts with 1 in fortran
+      return get_pik_kzd_(&pixelID, &k);
     }
 
   } // end top namespace

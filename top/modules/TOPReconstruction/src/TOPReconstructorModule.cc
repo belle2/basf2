@@ -109,7 +109,7 @@ namespace Belle2 {
 
     for (const auto& part : Const::chargedStableSet) {
       m_masses[part.getIndex()] = part.getMass();
-      m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
+      m_pdgCodes[part.getIndex()] = part.getPDGCode();
     }
 
     // set track smearing flag
@@ -145,8 +145,8 @@ namespace Belle2 {
 
     // create reconstruction object
 
-    TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
-    reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
+    TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_pdgCodes,
+                 m_minBkgPerBar, m_scaleN0);
 
     // set time window if given, otherwise use the default one from TOPNominalTDC
     if (m_maxTime > m_minTime) {

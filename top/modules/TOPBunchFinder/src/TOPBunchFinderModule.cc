@@ -244,7 +244,8 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double pionMass = Const::pion.getMass();
-    TOPreco reco(Nhyp, &pionMass);
+    int pionPDG = Const::pion.getPDGCode();
+    TOPreco reco(Nhyp, &pionMass, &pionPDG);
     reco.setPDFoption(TOPreco::c_Rough);
 
     // add photon hits to reconstruction object
@@ -261,6 +262,7 @@ namespace Belle2 {
     m_nodEdxCount = 0;
     std::vector<TOPtrack> topTracks;
     std::vector<double> masses;
+    std::vector<int> pdgCodes;
     std::vector<TOP1Dpdf> top1Dpdfs;
     std::vector<int> numPhotons;
     std::vector<Chi2MinimumFinder1D> finders;
@@ -285,16 +287,20 @@ namespace Belle2 {
 
       // determine most probable particle mass
       double mass = 0;
+      int pdg = 0;
       if (m_useMCTruth) {
         if (!trk.getMCParticle()) continue;
         if (!trk.getBarHit()) continue;
         mass = trk.getMCParticle()->getMass();
+        pdg = trk.getMCParticle()->getPDG();
       } else {
-        mass = getMostProbableMass(track);
+        auto chargedStable = getMostProbable(track);
+        mass = chargedStable.getMass();
+        pdg = chargedStable.getPDGCode();
       }
 
       // reconstruct (e.g. set PDF internally)
-      reco.setMass(mass);
+      reco.setMass(mass, pdg);
       reco.reconstruct(trk);
       if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
       numTrk++;
@@ -314,6 +320,7 @@ namespace Belle2 {
 
       topTracks.push_back(trk);
       masses.push_back(mass);
+      pdgCodes.push_back(pdg);
       top1Dpdfs.push_back(pdf1d);
       numPhotons.push_back(reco.getNumOfPhotons());
     }
@@ -376,7 +383,8 @@ namespace Belle2 {
         finders.push_back(Chi2MinimumFinder1D(m_numBins, t0min, t0max));
         auto& trk = topTracks[itrk];
         auto mass = masses[itrk];
-        reco.setMass(mass);
+        auto pdg = pdgCodes[itrk];
+        reco.setMass(mass, pdg);
         reco.reconstruct(trk);
         numPhotons.push_back(reco.getNumOfPhotons());
         if (reco.getFlag() != 1) {
@@ -503,24 +511,22 @@ namespace Belle2 {
   }
 
 
-  double TOPBunchFinderModule::getMostProbableMass(const Track& track)
+  Const::ChargedStable TOPBunchFinderModule::getMostProbable(const Track& track)
   {
 
     std::vector<double> logL;
-    std::vector<double> masses;
     std::vector<double> priors;
 
     if (m_usePIDLikelihoods) {
       const auto* pid = track.getRelated<PIDLikelihood>();
       if (!pid) {
         m_nodEdxCount++;
-        return Const::pion.getMass();
+        return Const::pion;
       }
       auto subset = Const::PIDDetectorSet(Const::SVD);
       subset += Const::PIDDetectorSet(Const::CDC);
       for (const auto& type : Const::chargedStableSet) {
         logL.push_back(pid->getLogL(type, subset));
-        masses.push_back(type.getMass());
         priors.push_back(m_priors[abs(type.getPDGCode())]);
       }
     } else {
@@ -528,7 +534,7 @@ namespace Belle2 {
       const auto* vxddedx = track.getRelated<VXDDedxLikelihood>();
       if (!cdcdedx and !vxddedx) {
         m_nodEdxCount++;
-        return Const::pion.getMass();
+        return Const::pion;
       }
       for (const auto& type : Const::chargedStableSet) {
         if (cdcdedx and vxddedx) {
@@ -538,7 +544,6 @@ namespace Belle2 {
         } else {
           logL.push_back(vxddedx->getLogL(type));
         }
-        masses.push_back(type.getMass());
         priors.push_back(m_priors[abs(type.getPDGCode())]);
       }
     }
@@ -555,12 +560,12 @@ namespace Belle2 {
       probability[i] = exp(logL[i] - logL_max) * priors[i];
     }
 
-    // find most probable mass
+    // find most probable
     unsigned i0 = 0;
     for (unsigned i = 0; i < probability.size(); ++i) {
       if (probability[i] > probability[i0]) i0 = i;
     }
-    return masses[i0];
+    return Const::chargedStableSet.at(i0);
 
   }
 

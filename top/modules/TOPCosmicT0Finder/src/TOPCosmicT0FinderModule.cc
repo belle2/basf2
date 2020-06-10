@@ -172,7 +172,8 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double mass = Const::muon.getMass();
-    TOPreco reco(Nhyp, &mass);
+    int pdg = Const::muon.getPDGCode();
+    TOPreco reco(Nhyp, &mass, &pdg);
     reco.setPDFoption(TOPreco::c_Rough);
 
     // add photon hits to reconstruction object

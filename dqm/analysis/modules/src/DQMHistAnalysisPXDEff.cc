@@ -125,6 +125,16 @@ void DQMHistAnalysisPXDEffModule::initialize()
     }
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
+  m_line_warn = new TLine(0, m_warnlevel, m_PXDModules.size(), m_warnlevel);
+  m_line_error = new TLine(0, m_errorlevel, m_PXDModules.size(), m_errorlevel);
+  m_line_warn->SetHorizontal(true);
+  m_line_warn->SetLineColor(kOrange - 3);
+  m_line_warn->SetLineWidth(3);
+  m_line_warn->SetLineStyle(4);
+  m_line_error->SetHorizontal(true);
+  m_line_error->SetLineColor(kRed + 3);
+  m_line_error->SetLineWidth(3);
+  m_line_error->SetLineStyle(7);
 
 #ifdef _BELLE2_EPICS
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
@@ -301,6 +311,8 @@ void DQMHistAnalysisPXDEffModule::event()
         //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
       }
     }
+    m_line_warn->Draw();
+    m_line_error->Draw();
   }
 
   m_cEffAll->Modified();

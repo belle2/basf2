@@ -39,10 +39,10 @@ SVDCoGTimeCalibrationCollectorModule::SVDCoGTimeCalibrationCollectorModule() : C
 void SVDCoGTimeCalibrationCollectorModule::prepare()
 {
   TH2F hEventT0vsCoG("eventT0vsCoG__L@layerL@ladderS@sensor@view",
-                     "EventT0Sync vs rawCoG in @layer.@ladder.@sensor @view/@side",
+                     "EventT0Sync vs rawTime in @layer.@ladder.@sensor @view/@side",
                      int(200 / m_rawCoGBinWidth), -100, 100, 100, -100, 100);
   hEventT0vsCoG.GetYaxis()->SetTitle("EventT0Sync (ns)");
-  hEventT0vsCoG.GetXaxis()->SetTitle("raw_cog (ns)");
+  hEventT0vsCoG.GetXaxis()->SetTitle("raw_time (ns)");
   m_hEventT0vsCoG = new SVDHistograms<TH2F>(hEventT0vsCoG);
 
   TH1F hEventT0("eventT0__L@layerL@ladderS@sensor@view",

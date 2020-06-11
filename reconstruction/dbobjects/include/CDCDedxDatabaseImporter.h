@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <TFile.h>
 #include <TObject.h>
 
 namespace Belle2 {

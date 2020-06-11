@@ -11,12 +11,10 @@
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
 
 #include <TF1.h>
-#include <TH1D.h>
 #include <TCanvas.h>
 #include <TLine.h>
-#include <TPaveText.h>
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 
 using namespace Belle2;
 

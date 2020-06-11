@@ -10,11 +10,7 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-
 #include <cmath>
-#include <iostream>
 #include <vector>
 
 #define PI 3.14159265

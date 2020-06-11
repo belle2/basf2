@@ -11,12 +11,8 @@
 #ifndef CDCDEDXTRACK_H
 #define CDCDEDXTRACK_H
 
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
-
-#include <TVector3.h>
 
 #include <vector>
 

@@ -9,15 +9,12 @@
  **************************************************************************/
 
 #include <framework/gearbox/Const.h>
-#include <framework/io/RootIOUtilities.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <TFile.h>
-#include <TMath.h>
 #include <TTree.h>
 #include <TCanvas.h>
 #include <TH2F.h>
-#include <TGraph.h>
 #include <TApplication.h>
 #include <TROOT.h>
 #include <TStyle.h>

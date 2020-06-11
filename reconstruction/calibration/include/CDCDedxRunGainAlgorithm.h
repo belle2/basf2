@@ -13,10 +13,6 @@
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <TH1D.h>
 
 namespace Belle2 {

@@ -43,11 +43,11 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
-  m_PlaneLine.SetLineColor(8); // dark green
+  m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
-  m_PlaneText.SetTextAlign(22); // centred, middle
-  m_PlaneText.SetTextColor(8); // dark green
+  m_PlaneText.SetTextAlign(22); // centered, middle
+  m_PlaneText.SetTextColor(kMagenta);
   m_PlaneText.SetTextFont(42); // Helvetica regular
   m_PlaneText.SetTextSize(0.02); // 2% of TPad's full height
 }

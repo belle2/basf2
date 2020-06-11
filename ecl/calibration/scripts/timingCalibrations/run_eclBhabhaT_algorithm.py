@@ -65,11 +65,13 @@ algo.meanCleanCutMinFactor = 0.3
 # algo.crateIDLo = 10
 # algo.crateIDHi = 9
 algo.debugFilenameBase = "eclBhabhaTAlgorithm"
+
+# Don't need to use this unless I want to change the reference crystals
 # algo.refCrysPerCrate = arr.array('i', [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 #                                        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
 #                                        -1,-1,-1])   # 'i' is a signed integer
-
-# 'i' is a signed integer - old cid ref values.  some are not very good.
+# 'i' is a signed integer - old cid ref values.  some are not very good but also give a good reference
+# for which crystals to use for testing
 # algo.refCrysPerCrate = arr.array('i', [2305, 2309, 2313, 2317, 2321, 2325, 2329, 2333, 2337, 2341, 2345, 2349,
 #                                        2353, 2357, 2361, 2365, 2369, 2373, 2377, 2381, 2385, 2389, 2393, 2397,
 #                                        2401, 2405, 2409, 2413, 2417, 2421, 2425, 2429, 2433, 2437, 2441, 2445,

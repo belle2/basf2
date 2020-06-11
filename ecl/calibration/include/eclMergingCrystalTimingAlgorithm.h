@@ -1,11 +1,13 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Take the previously created DBObjects for ECL crystal timing from      *
  * bhabha events for crystals inside the CDC acceptance and radiative     *
  * bhabha and/or cosmic muons for crystal near and outside the CDC        *
- * acceptance.                                                            *
+ * acceptance and merge them.  Does not not explicitly check the          *
+ * regions where the crystals are, it just prioritises certain            *
+ * payloads over others.                                                  *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors:                                                          *

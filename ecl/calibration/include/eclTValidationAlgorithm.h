@@ -13,7 +13,6 @@
  **************************************************************************/
 
 #pragma once
-#include <ecl/calibration/eclTValidationAlgorithm.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <string>
 

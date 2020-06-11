@@ -8,7 +8,6 @@
 #include <rawdata/modules/PrintDataTemplate.h>
 //#include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/RawPXD.h>
-#include <framework/core/InputController.h>
 
 
 using namespace std;

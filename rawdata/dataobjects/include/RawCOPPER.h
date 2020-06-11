@@ -11,9 +11,6 @@
 
 // Includes
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
@@ -24,7 +21,6 @@
 #include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
-#include <TObject.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 

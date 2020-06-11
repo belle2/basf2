@@ -11,8 +11,6 @@
 
 // Includes
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 #include <rawdata/dataobjects/RawHeader_v0.h>

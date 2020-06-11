@@ -11,13 +11,9 @@
 
 #include <framework/core/Module.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-//#include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
 #include <rawdata/dataobjects/RawCDC.h>
 #include <rawdata/dataobjects/RawSVD.h>
 #include <rawdata/dataobjects/RawECL.h>
@@ -26,9 +22,6 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawTRG.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
-
-
-#include <framework/dataobjects/EventMetaData.h>
 
 
 namespace Belle2 {

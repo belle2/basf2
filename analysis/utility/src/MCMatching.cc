@@ -222,12 +222,12 @@ namespace {
     }
   }
 
-  // Check if mcDaug is accepted to be missed in the property of part.
+  // Check if mcDaug is accepted to be missed by the property of part.
   bool isDaughterAccepted(const MCParticle* mcDaug, const Particle* part)
   {
     const int property = part->getProperty();
 
-    int absPDG = abs(mcDaug->getPDG());
+    const int absPDG = abs(mcDaug->getPDG());
 
     // if mcDaug is not FSP, check c_IsIgnoreIntermediate property
     if (!MCMatching::isFSP(absPDG)) {
@@ -254,7 +254,7 @@ namespace {
 
   /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
   /** If a daughter has e_extraInfoMCErrors already and missing particles are accepted,
-      accepted daughters of the daughter are also stored. */
+      accepted mc-daughters of the daughter are also stored. */
   void appendDaughtersOfMatched(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
   {
     for (unsigned i = 0; i < p->getNDaughters(); ++i) {

@@ -40,9 +40,10 @@ eclBhabhaTAlgorithm::eclBhabhaTAlgorithm():
   debugOutput(true),
   debugFilenameBase("eclBhabhaTAlgorithm"),   // base of filename (without ".root")
   collectorName("ECLBhabhaTCollector"),
-  refCrysPerCrate{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1} //,
-  // Private members
-  //m_runCount(0)
+  refCrysPerCrate{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1, -1, -1} //,
 {
   setDescription("Calculate time offsets from bhabha events by fitting gaussian function to the (t - T0) difference.");
 }
@@ -64,10 +65,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("crateIDLo = " << crateIDLo);
   B2INFO("crateIDHi = " << crateIDHi);
   B2INFO("refCrysPerCrate = {");
-  for (int crateTest = 0; crateTest < 51; crateTest++) {
+  for (int crateTest = 0; crateTest < 52 - 1; crateTest++) {
     B2INFO(refCrysPerCrate[crateTest] << ",");
   }
-  B2INFO(refCrysPerCrate[51] << "}");
+  B2INFO(refCrysPerCrate[52 - 1] << "}");
 
 
   /* Histogram with the data collected by eclBhabhaTCollectorModule */
@@ -204,8 +205,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   // crystal index for the crystals (one per crate) that is used as the reference crystal.  This one has
   //    ts defined as zero.  The crystal id runs 1...8636, not starting at 0.
   B2INFO("Extract reference crystals from collector histogram.");
-  // Extract from the histogram the list of crystals to be used as reference crystals.
-  //    The crystal id runs 1...8636, not starting at 0.
   vector <short> crystalIDreferenceUntested;
   for (int bin = 1; bin <= 8736; bin++) {
     if (refCrysIDzeroingCrate->GetBinContent(bin) > 0.5) {
@@ -237,7 +236,7 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   }
 
   // Count the number of reference crystals for each crate to make sure that there is exactly
-  //    one reference crystal for each crate.
+  //    one reference crystal for each crate as defined by the payload/database.
   //    also fill the final vector that maps the crate id to the reference crystal id
   vector <short> crateIDsNumRefCrystalsUntested(52, 0);
   vector <short> crystalIDReferenceForZeroTs(52, 0);
@@ -248,6 +247,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     crateIDsNumRefCrystalsUntested[crate_id_from_crystal - 1]++;
     crystalIDReferenceForZeroTs[crate_id_from_crystal - 1] = crys_id;
   }
+
+  // Make sure that there is only one reference crystal per crate as defined by the payload/database
   for (int crateTest = 0; crateTest < 52; crateTest++) {
     if (crateIDsNumRefCrystalsUntested[crateTest] != 1) {
       B2FATAL("Crate " << crateTest + 1 << " (base 1) has " << crateIDsNumRefCrystalsUntested[crateTest] << " reference crystals");
@@ -260,14 +261,10 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
   B2INFO("Extract reference crystals from algorithm steering script if provided.  If user inputs custom values via steering script for this algorithm, they are only applied after all the tests are performed on the values from the histogram and override the histogram valuees.  User can adjust just a single crystal if desired.  Use -1 to indicate that a crystal is not to be modified.  Position of crystal in list determines the crate to which the crystal is meant to be associated.");
 
-  /*
-    if (refCrysPerCrate.size()!=52)
-    {
-      B2FATAL("There are not 52 reference crystals per crate in the list set by the steering script.");
-      return c_Failure;
-    }
-  */
-
+  /* Test if the user wants to modify the reference crystals.  This will probably be done very rarely,
+     perhaps less than once per year.  If the user does want to change one or more reference
+     crystals then perform the checks again to make sure that there is still just one reference crystal
+     per crate after the modifications to the payload values with the user values.*/
   bool userSetRefCrysPerCrate = false ;
   for (int crateTest = 0; crateTest < 52; crateTest++) {
     if (refCrysPerCrate[crateTest] != -1) {
@@ -342,9 +339,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   B2INFO("hist_tmin = " << hist_tmin);
   B2INFO("hist_tmax = " << hist_tmax);
 
-
-  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) *
-                             1e3;  // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz. Same for all crystals.  Proper accurate value
+  /* 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency, fRF=508.889 MHz.
+     Same for all crystals.  Proper accurate value*/
+  const double TICKS_TO_NS = 1.0 / (4.0 * EclConfiguration::m_rf) * 1e3;
 
   // The ts and tcrate database values are filled once per tcol instance so count the number of times that the database values
   //    were summed together by the histogram merging process and extract out the original values again.
@@ -526,8 +523,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
     int numEntries = h_time->GetEntries();
-    // If number of entries in histogram is greater than X then use the statistical information from the data otherwise leave crystal uncalibrated.  Histograms are still shown though.
-    //  ALSO require the that fits are good.
+    /* If number of entries in histogram is greater than X then use the statistical information from the data otherwise
+       leave crystal uncalibrated.  Histograms are still shown though.  ALSO require the that fits are good.*/
     if ((numEntries >= minNumEntries)  &&  good_fit) {
       crystalCalibSaved = 1;
       database_mean = fit_mean;

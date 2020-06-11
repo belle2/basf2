@@ -15,7 +15,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 

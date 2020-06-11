@@ -13,12 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 namespace Belle2 {

@@ -1,5 +1,4 @@
 #include<svd/dbobjects/SVDHitTimeSelectionFunction.h>
-#include<framework/logging/Logger.h>
 
 using namespace Belle2;
 

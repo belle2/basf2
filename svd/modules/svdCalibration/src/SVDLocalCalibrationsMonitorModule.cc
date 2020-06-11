@@ -11,7 +11,6 @@
 #include <svd/modules/svdCalibration/SVDLocalCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 

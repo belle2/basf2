@@ -11,9 +11,10 @@
 #pragma once
 
 #include <TObject.h>
-#include <functional>
+
+#include <cmath>
 #include <vector>
-#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
   /** class to contain the cut on svd hit time at SP creation step*/

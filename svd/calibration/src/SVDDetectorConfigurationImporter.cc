@@ -18,14 +18,10 @@
 
 // framework - Database
 #include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/FileSystem.h>
@@ -34,16 +30,12 @@
 #include <svd/calibration/SVDDetectorConfiguration.h>
 //#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
-#include <vxd/dataobjects/VxdID.h>
-
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <TFile.h>
-#include <TVectorF.h>
 
 using namespace std;
 using namespace Belle2;

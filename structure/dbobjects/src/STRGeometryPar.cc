@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <structure/dbobjects/STRGeometryPar.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

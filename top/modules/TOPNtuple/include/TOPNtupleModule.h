@@ -13,8 +13,9 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <top/modules/TOPNtuple/NtupleStructure.h>
-#include <top/geometry/TOPGeometryPar.h>
-#include "TFile.h"
+
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
 

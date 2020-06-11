@@ -12,23 +12,14 @@
 #include <top/calibration/TOPDatabaseImporter.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-// framework - core
-#include <framework/core/RandomGenerator.h> // gRandom
-
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 
-// framework - xml
-#include <framework/gearbox/GearDir.h>
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DB objects

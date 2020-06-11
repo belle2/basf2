@@ -24,17 +24,12 @@
 #include <top/dataobjects/TOPBarHit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
 #include <cmath>
 
 using namespace std;

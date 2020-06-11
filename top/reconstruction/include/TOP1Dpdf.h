@@ -12,8 +12,6 @@
 
 #include <vector>
 #include <string>
-#include <framework/logging/Logger.h>
-#include <TH1F.h>
 #include <top/reconstruction/TOPreco.h>
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPDigit.h>

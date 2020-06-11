@@ -125,16 +125,16 @@ namespace Belle2 {
       bool displacement = false);
 
     /** Low experiment. */
-    int m_ExperimentLow;
+    int m_ExperimentLow = 0;
 
     /** Low run. */
-    int m_RunLow;
+    int m_RunLow = 0;
 
     /** High experiment. */
-    int m_ExperimentHigh;
+    int m_ExperimentHigh = -1;
 
     /** High run. */
-    int m_RunHigh;
+    int m_RunHigh = -1;
 
   };
 

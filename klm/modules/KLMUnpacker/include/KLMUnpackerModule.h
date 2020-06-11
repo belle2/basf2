@@ -77,6 +77,24 @@ namespace Belle2 {
   private:
 
     /**
+     * Create KLM digit.
+     * @param[in] raw               Raw data.
+     * @param[in] klmDigitRaw       Raw digit.
+     * @param[in] klmDigitEventInfo Event information.
+     * @param[in] subdetector       Subdetector.
+     * @param[in] section           Section.
+     * @param[in] sector            Sector.
+     * @param[in] layer             Layer.
+     * @param[in] plane             Plane.
+     * @param[in] strip             Strip.
+     * @param[in] lastStrip         Last strip (for multiple-strip hits).
+     */
+    void createDigit(
+      const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
+      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+      int sector, int layer, int plane, int strip, int lastStrip);
+
+    /**
      * Unpack KLM digit.
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.

@@ -49,23 +49,35 @@ namespace Belle2 {
     /**
      * Set testing payload name.
      */
-    void setTestingPayload(const std::string& testingPayloadName);
+    void setTestingPayload(const std::string& testingPayloadName)
+    {
+      m_testingPayloadName = testingPayloadName;
+    }
 
     /**
      * Set Global Tag name.
      */
-    void setGlobalTag(const std::string& globalTagName);
+    void setGlobalTag(const std::string& globalTagName)
+    {
+      m_GlobalTagName = globalTagName;
+    }
 
     /**
      * Set alignment results file.
      */
-    void setAlignmentResultsFile(const std::string& alignmentResultsFile);
+    void setAlignmentResultsFile(const std::string& alignmentResultsFile)
+    {
+      m_AlignmentResultsFile = alignmentResultsFile;
+    }
 
     /**
      * Set strip efficiency results file.
      */
     void setStripEfficiencyResultsFile(
-      const std::string& stripEfficiencyResultsFile);
+      const std::string& stripEfficiencyResultsFile)
+    {
+      m_StripEfficiencyResultsFile = stripEfficiencyResultsFile;
+    }
 
     /**
      * Check alignment.

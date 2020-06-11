@@ -32,7 +32,7 @@ namespace Belle2 {
     }
 
     /** Constructor. needs the first parameter is outer hit, second is inner hit. Parameters in TVector3-format*/
-    TwoHitFilters(TVector3& outerHit, TVector3& innerHit):
+    TwoHitFilters(const TVector3& outerHit, const TVector3& innerHit):
       m_hitA(outerHit),
       m_hitB(innerHit) { initializeMe(outerHit, innerHit); }
 
@@ -41,7 +41,7 @@ namespace Belle2 {
     ~TwoHitFilters() {}
 
     /** Overrides Constructor-Setup. Needed if you want to reuse the instance instead of recreating one */
-    void resetValues(TVector3& outerHit, TVector3& innerHit)
+    void resetValues(const TVector3& outerHit, const TVector3& innerHit)
     {
       m_hitA = outerHit;
       m_hitB = innerHit;
@@ -88,7 +88,7 @@ namespace Belle2 {
   protected:
 
     /** initializer function, sets values */
-    void initializeMe(TVector3& outerHit, TVector3& innerHit)
+    void initializeMe(const TVector3& outerHit, const TVector3& innerHit)
     {
       m_x2 = outerHit[0] - innerHit[0]; // not x2 yet, reusing member
       m_y2 = outerHit[1] - innerHit[1];

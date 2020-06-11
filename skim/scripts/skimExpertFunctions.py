@@ -14,28 +14,6 @@ from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOf
 from skim.registry import Registry
 
 
-def encodeSkimName(SkimName):
-    """
-    Returns the appropriate 8 digit skim code that will be used as the output uDST
-    file name for any give name of a skimming script.
-
-    :param str SkimName: Name of the skim.
-    """
-    # TODO: delete `encodeSkimName` and use `Registry.encode_skim_name` in its place
-    return Registry.encode_skim_name(SkimName)
-
-
-def decodeSkimName(SkimCode):
-    """
-    Returns the appropriate name of the skim given a specific skim code. This is useful to determine the skim script used
-    to produce a specific uDST file, given the 8-digit code  name of the file itself.
-
-    :param str code:
-    """
-    # TODO: delete `decodeSkimName` and use `Registry.decode_skim_code` in its place
-    return Registry.decode_skim_code(SkimCode)
-
-
 def _get_test_sample_info(sampleName):
     """Read in the YAML file of test samples (``skim/scripts/TestFiles.yaml``) and
     return the info for a sample as a dict.
@@ -86,7 +64,7 @@ def get_total_infiles(sampleName):
         return sampleInfo["total_input_files"]
     else:
         msg = f"'total_input_files' not listed for {sampleName} sample."
-        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def get_events_per_file(sampleName):
@@ -104,7 +82,7 @@ def get_events_per_file(sampleName):
         return sampleInfo["average_events_per_file"]
     else:
         msg = f"'average_events_per_file' not listed for {sampleName} sample."
-        b2.B2ERROR(msg)
+        raise KeyError(msg)
 
 
 def add_skim(label, lists, path):
@@ -562,6 +540,20 @@ class BaseSkim(ABC):
 
         return ConditionalPath
 
+    def get_skim_list_names(self):
+        """
+        Get the list of skim particle list names, without creating the particle lists on
+        the current path.
+        """
+        DummyPath = b2.Path()
+
+        OriginalSkimListsValue = self.SkimLists
+        self.build_lists(DummyPath)
+        SkimLists = self.SkimLists
+        self.SkimLists = OriginalSkimListsValue
+
+        return SkimLists
+
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has
         been overriden.
@@ -654,6 +646,13 @@ class BaseSkim(ABC):
             k: v for (k, v) in self.RequiredStandardLists.items()
             if k.startswith("skim.standardlists.")
         }
+        try:
+            # The lightmesons module creates particle lists required by other skim
+            # lists, so make sure they are run before any other skim list functions.
+            lightmesons = StandardSkimLists.pop("skim.standardlists.lightmesons")
+            StandardSkimLists = {"skim.standardlists.lightmesons": lightmesons, **StandardSkimLists}
+        except KeyError:
+            pass
 
         self.RequiredStandardLists = {**StandardLists, **StandardSkimLists}
 

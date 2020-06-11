@@ -31,6 +31,9 @@ namespace Belle2 {
        * claws::SensitiveDetector instance will be created.
        */
       CLAWSCreator(Simulation::SensitiveDetectorBase* sensitive = nullptr);
+      /**
+       * Destructor
+       */
       virtual ~CLAWSCreator();
       /** create a shape (box or cylinder) from XML description and place all
        * child shapes in it by recursively calling this function for all
@@ -44,6 +47,12 @@ namespace Belle2 {
       void createShape(const std::string& prefix, const GearDir& params,
                        G4LogicalVolume* parent, double roffset, bool check);
 
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
     protected:

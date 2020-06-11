@@ -25,11 +25,11 @@
 
 using namespace Belle2;
 
-KLMDisplacementGenerator::KLMDisplacementGenerator()
+KLMDisplacementGenerator::KLMDisplacementGenerator() :
+  m_GeoDat(&(EKLM::GeometryData::Instance())),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMDisplacementGenerator::~KLMDisplacementGenerator()

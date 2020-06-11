@@ -80,37 +80,14 @@ namespace Belle2 {
 
 
   protected:
-    Long64_t m_nEvents = 0;     /**< Number of events processed */
-    TH1F* m_hNEvents = nullptr; /**< Histogram of num. events */
-    TH1F* m_hADC[300] = {};     /**< Histogram of TDC for all boards (0-299) */
-    TH1F* m_hTDC[300] = {};     /**< Histogram of TDC for all boards (0-299) */
-    TH1F* m_hTDCbig[300] = {};  /**< Histogram of TDC with coarse bin for all boards (0-299) */
-    TH2F* m_hADCTDC[300] = {};  /**< Histogram of ADC vs. TDC for all boards (0-299) */
-    TH2F* m_hADCTOT[300] = {};  /**< Histogram of ADC vs. TOT for all boards (0-299) */
-    TH1F* m_hHit[56]  = {};     /**< Histogram of hits for all layers (0-55) */
-    TH1F* m_hOcc = nullptr;     /**< Histogram of occupancy */
-
-    StoreArray<CDCHit> m_cdcHits;         /**< CDCHit data object */
-    StoreArray<CDCRawHit> m_cdcRawHits;   /**< CDCRawHit data object */
-    StoreObjPtr<TRGSummary> m_trgSummary; /**< TRG summary data object */
-
-    /**
-     * Number of sense wires for each layer.
-     */
-    int m_nSenseWires[56] = {160, 160, 160, 160, 160, 160, 160, 160,
-                             160, 160, 160, 160, 160, 160,
-                             192, 192, 192, 192, 192, 192,
-                             224, 224, 224, 224, 224, 224,
-                             256, 256, 256, 256, 256, 256,
-                             288, 288, 288, 288, 288, 288,
-                             320, 320, 320, 320, 320, 320,
-                             352, 352, 352, 352, 352, 352,
-                             384, 384, 384, 384, 384, 384
-                            };
-
-    std::string m_cdcHitName;     /**< Name of CDCHit data object */
-    std::string m_cdcRawHitName;  /**< Name of CDCRawHit data object */
-
+    Long64_t m_nEvents = 0;          /**< Number of events processed */
+    TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
+    TH2F* m_hADC  = nullptr;              /**< Histogram of ADC for all boards (0-299) */
+    TH2F* m_hADCTOTCut = nullptr;    /**< Histogram of ADC with tot cut for all boards (0-299) */
+    TH2F* m_hTDC = nullptr;          /**< Histogram of TDC for all boards (0-299) */
+    TH2F* m_hHit  = nullptr;          /**< Histogram of hits for all layers (0-55) */
+    TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
+    int m_minHits;         /**< Minimum hits for processing. */
   };
 
 } // Belle2 namespace

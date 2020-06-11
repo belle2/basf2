@@ -44,11 +44,12 @@ KLMStripEfficiencyAlgorithm::Results::~Results()
     delete m_ExtHitsPlane;
 }
 
-KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() : CalibrationAlgorithm("KLMStripEfficiencyCollector")
+KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() :
+  CalibrationAlgorithm("KLMStripEfficiencyCollector"),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
+  m_StripEfficiency(nullptr)
 {
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
-  m_StripEfficiency = nullptr;
   int nPlanes = m_PlaneArrayIndex->getNElements();
   m_Results.m_Efficiency = new float[nPlanes];
   m_Results.m_ExtHitsPlane = new int[nPlanes];

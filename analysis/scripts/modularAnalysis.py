@@ -586,6 +586,39 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
+def trackingEfficiency(inputListNames, fraction, path=None):
+    """
+    Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
+    Takes care of the duplicates, if any.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        fraction (float): fraction of particles to be removed randomly
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingefficiency = register_module('TrackingEfficiency')
+    trackingefficiency.param('particleLists', inputListNames)
+    trackingefficiency.param('frac', fraction)
+    path.add_module(trackingefficiency)
+
+
+def trackingMomentum(inputListNames, scale, path=None):
+    """
+    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('scale', scale)
+    path.add_module(trackingmomentum)
+
+
 def mergeListsWithBestDuplicate(outputListName,
                                 inputListNames,
                                 variable,
@@ -2838,7 +2871,7 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     path.add_module(dist_mod)
 
 
-def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut, path):
+def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     """
     Adds the InclusiveDstarReconstruction module to the given path.
     This module creates a D* particle list by estimating the D* four momenta
@@ -2848,15 +2881,15 @@ def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut,
     to the slow pion direction. The charge of the given pion list has to be consistent
     with the D* charge
 
-    @param inputPionList Name of the input pion particle list
-    @param outputDstarList Name of the output D* particle list
-    @param slowPionCut Cut applied to the pion list to identify slow pions
+    @param decayString Decay string, must be of form `D* -> pi`
+    @param slowPionCut Cut applied to the input pion list to identify slow pions
+    @param DstarCut Cut applied to the output D* list
     @param path the module is added to this path
     """
     incl_dstar = register_module("InclusiveDstarReconstruction")
-    incl_dstar.param("pionListName", inputPionList)
-    incl_dstar.param("DstarListName", outputDstarList)
+    incl_dstar.param("decayString", decayString)
     incl_dstar.param("slowPionCut", slowPionCut)
+    incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
 
 if __name__ == '__main__':

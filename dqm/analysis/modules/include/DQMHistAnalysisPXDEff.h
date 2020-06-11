@@ -19,6 +19,7 @@
 
 #include <TEfficiency.h>
 #include <TCanvas.h>
+#include <TLine.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Efficiency */
@@ -53,6 +54,12 @@ namespace Belle2 {
     int m_u_bins;
     //! v binning for 2d plots
     int m_v_bins;
+    //! confidence level for error bars
+    double m_confidence;
+    //! warn level for alarm
+    double m_warnlevel;
+    //! error level for alarm
+    double m_errorlevel;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -67,6 +74,10 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
 
+    /** TLine object for warning limit */
+    TLine* m_line_warn{};
+    /** TLine object for error error */
+    TLine* m_line_error{};
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

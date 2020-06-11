@@ -3,7 +3,8 @@
  * Copyright(C) 2018  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kirill Chilikin, Leo Piilonen                            *
+ * Contributors: Kirill Chilikin, Leo Piilonen, Vipin Gaur,               *
+ *               Giacomo De Pietro                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -26,6 +27,9 @@
 #include <TLatex.h>
 #include <TText.h>
 #include <TLine.h>
+
+/* C++ headers. */
+#include <vector>
 
 namespace Belle2 {
 
@@ -75,12 +79,12 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector    Subdetector.
-     * @param[in]  section        Section.
-     * @param[in]  sector         Sector.
-     * @param[in]  histogram      Histogram.
-     * @param[in]  canvas         Canvas.
-     * @param[out] latex          TLatex to draw messages.
+     * @param[in]  subdetector  Subdetector.
+     * @param[in]  section      Section.
+     * @param[in]  sector       Sector.
+     * @param[in]  histogram    Histogram.
+     * @param[in]  canvas       Canvas.
+     * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
       int subdetector, int section, int sector,
@@ -88,19 +92,46 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the number of hits in plane.
-     * @param[in]  histName  Histogram name.
+     * @param[in] histName  Histogram name.
      */
-    void processPlaneHistogram(const std::string& histName);
+    void processPlaneHistogram(const std::string& histName, TLatex& latex);
+
+    /**
+     * Fill histogram containing masked channels per sector.
+     * @param[in] histName  Histogram name.
+     */
+    void fillMaskedChannelsHistogram(const std::string& histName);
 
     /**
      * Find TCanvas that matches a given name.
-     * @param[in]  canvasName   name of the desired TCanvas.
-     * @param[out] TCanvas*     matching TCanvas.
+     * @param[in]  canvasName  Name of the desired TCanvas.
+     * @param[out] TCanvas*    Matching TCanvas.
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Threshold for masked channels. */
+    int m_ThresholdForMasked;
+
+    /** Threshold for hot channels. */
+    int m_ThresholdForHot;
+
+    /** Minimal number of hits for flagging. */
+    int m_MinHitsForFlagging;
+
+    /** Vector of dead barrel modules. */
+    std::vector<uint16_t> m_DeadBarrelModules;
+
+    /** Vector of dead endcap modules. */
+    std::vector<uint16_t> m_DeadEndcapModules;
+
+    /** Vector of new channels to be masked. */
+    std::vector<uint16_t> m_NewMaskedChannels;
+
+    /** Vector of channels already masked. */
+    std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

@@ -67,7 +67,7 @@ namespace Belle2 {
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
       if (mcpart == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       if (daughterIDs.empty())
         B2FATAL("Wrong number of arguments for parameter function isAncestorOf. At least one needed!");
@@ -92,7 +92,7 @@ namespace Belle2 {
       // Daughter obtained, get MC particle of daughter
       const MCParticle* finalMCDaughter = curParticle->getRelatedTo<MCParticle>();
       if (finalMCDaughter == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       // Go up the MC chain, check for ancestor
       const MCParticle* curMCParticle = finalMCDaughter;
@@ -122,7 +122,7 @@ namespace Belle2 {
       // If particle has no MC relation, MC chain doesn't exist
       const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
       if (mcpart == nullptr)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       int m_PDG, m_sign = 0;
 

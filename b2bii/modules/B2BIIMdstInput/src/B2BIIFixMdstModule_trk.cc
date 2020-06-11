@@ -3327,9 +3327,9 @@ namespace Belle2 {
 //from the module smear_trk originally coded by Marko Staric.
 //=======================================================================
 
-  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]); /** Scale error */
-  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]); /** Smear MC tracks */
-  static void smear_charged(); /** Smear tracks in Mdst_Charged */
+  static void scale_err_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Scale error */
+  static void smear_trk_ms(Belle::Mdst_trk_fit& fit, double scale[]); /**< Smear MC tracks */
+  static void smear_charged(); /**< Smear tracks in Mdst_Charged */
 
 //==========================
   void B2BIIFixMdstModule::smear_trk()

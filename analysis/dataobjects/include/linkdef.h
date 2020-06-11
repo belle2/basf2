@@ -5,30 +5,40 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Particle+;
-#pragma link C++ class Belle2::EventExtraInfo+;
-#pragma link C++ class Belle2::ParticleList+;
-#pragma link C++ class Belle2::RestOfEvent+;
-#pragma link C++ class Belle2::TagVertex+;
-#pragma link C++ class Belle2::ContinuumSuppression+;
-#pragma link C++ class Belle2::FlavorTaggerInfo+;
-#pragma link C++ class Belle2::FlavorTaggerInfoMap+;
-#pragma link C++ class Belle2::StringWrapper+;
-#pragma link C++ class Belle2::EventShapeContainer+;
-#pragma link C++ class Belle2::EventKinematics+;
-#pragma link C++ class Belle2::TauPairDecay+;
-#pragma link C++ class Belle2::ECLEnergyCloseToTrack+;
-#pragma link C++ class Belle2::ECLTRGInformation+;
-#pragma link C++ class Belle2::ECLTriggerCell+;
+#pragma link C++ class Belle2::Particle+; // checksum=0xf385aee8, version=12
+#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
+#pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
+#pragma link C++ class Belle2::RestOfEvent+; // checksum=0xa87084c6, version=5
+#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=4
+#pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
+#pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0x2e59c562, version=3
+#pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
+#pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
+#pragma link C++ class Belle2::EventShapeContainer+; // checksum=0x57e119da, version=1
+#pragma link C++ class Belle2::EventKinematics+; // checksum=0x2ede9ce0, version=1
+#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
+#pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
+#pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
+#pragma link C++ class Belle2::ECLTriggerCell+; // checksum=0xfcbe0110, version=2
 //these two are needed when using these types (returned by Particle) in PyROOT
 #pragma link C++ class vector<Belle2::Particle*>-;
 #pragma link C++ class vector<const Belle2::Particle*>-;
 
-#pragma link C++ class Belle2::ParticleExtraInfoMap+;
-#pragma link C++ class Belle2::ParticleExtraInfoMap::IndexMap+;
-#pragma link C++ class map<string, unsigned int>+;
-#pragma link C++ class vector<map<string, unsigned int> >+;
-#pragma link C++ class Belle2::Btube+;
+#pragma link C++ class Belle2::ParticleExtraInfoMap+; // checksum=0x82838333, version=1
+#pragma link C++ class Belle2::ParticleExtraInfoMap::IndexMap+; // checksum=0xf9eb593, version=6
+#pragma link C++ class map<string, unsigned int>+; // checksum=0xf9eb593, version=6
+#pragma link C++ class vector<map<string, unsigned int> >+; // checksum=0x267ce51a, version=6
+#pragma link C++ class Belle2::Btube+; // checksum=0x772238ab, version=1
+#pragma link C++ class Eigen::Matrix<double,3,1,0,3,1>+; // checksum=0x43805c43, version=-1
+#pragma link C++ class Eigen::PlainObjectBase<Eigen::Matrix<double,3,1,0,3,1> >+; // checksum=0x6464cd47, version=-1
+#pragma link C++ class Eigen::EigenBase<Eigen::Matrix<double,3,1,0,3,1> >+; // checksum=0x76f10151, version=-1
+#pragma link C++ class Eigen::MatrixBase<Eigen::Matrix<double,3,1,0,3,1> >+; // checksum=0x3988eec2, version=-1
+#pragma link C++ class Eigen::DenseStorage<double,3,3,1,0>+; // checksum=0xe13ab357, version=-1
+#pragma link C++ class Eigen::DenseBase<Eigen::Matrix<double,3,1,0,3,1> >+; // checksum=0xddba3f8c, version=-1
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,0>+; // checksum=0x3b876532, version=-1
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,1>+; // checksum=0x2bf33e25, version=-1
+#pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,3>+; // checksum=0xd3a06597, version=-1
+#pragma link C++ class Eigen::internal::plain_array<double,3,0,0>+; // checksum=0xa73f796a, version=-1
 
 #pragma read                                    \
   sourceClass="Belle2::Particle"                \

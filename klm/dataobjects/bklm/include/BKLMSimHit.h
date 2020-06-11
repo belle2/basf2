@@ -36,7 +36,9 @@ namespace Belle2 {
     BKLMSimHit(int moduleID, double x, double t, double dE);
 
     //! Destructor
-    virtual ~BKLMSimHit() {}
+    virtual ~BKLMSimHit()
+    {
+    }
 
     //! Copy constructor
     BKLMSimHit(const BKLMSimHit&);
@@ -110,27 +112,45 @@ namespace Belle2 {
 
     //! Get detector-module identifier
     //! @return detector-module identifier
-    int getModuleID() const { return m_ModuleID; }
+    int getModuleID() const
+    {
+      return m_ModuleID;
+    }
 
     //! Get signal propagation time alont strip
     //! @return time-of-propagation (ns) from hit to sensor
-    float getPropagationTime() const { return m_PropagationTime; }
+    float getPropagationTime() const
+    {
+      return m_PropagationTime;
+    }
 
     //! Get the hit time (implementation of base class function
     //! @return the hit time (ns) since start of the event
-    float getGlobalTime() const override { return m_Time; }
+    float getGlobalTime() const override
+    {
+      return m_Time;
+    }
 
     //! Get the hit time
     //! @return the hit time (ns) since start of the event
-    double getTime() const { return (double)m_Time; }
+    double getTime() const
+    {
+      return (double)m_Time;
+    }
 
     //! Get energy deposition
     //! @return energy deposition (MeV)
-    double getEnergyDeposit() const { return (double)m_EDep; }
+    double getEnergyDeposit() const
+    {
+      return (double)m_EDep;
+    }
 
     //! Adjust time (for background-overlay hit)
     //! @param delta time shift (ns)
-    void shiftInTime(float delta) override { m_Time += delta; }
+    void shiftInTime(float delta) override
+    {
+      m_Time += delta;
+    }
 
   private:
 

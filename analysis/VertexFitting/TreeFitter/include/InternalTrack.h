@@ -92,10 +92,6 @@ namespace TreeFitter {
     /** Energy is not conserved at the decay (happens in Bremsstrahlung) */
     bool m_noEnergySum;
 
-    /** automatically figure out if mother and particle vertex should be the same
-     * and also add geometric constraints */
-    bool m_automatic_vertex_constraining;
-
     /** is conversion */
     bool m_isconversion;
 

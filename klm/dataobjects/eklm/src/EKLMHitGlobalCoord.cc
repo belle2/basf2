@@ -13,11 +13,11 @@
 
 using namespace Belle2;
 
-EKLMHitGlobalCoord::EKLMHitGlobalCoord()
+EKLMHitGlobalCoord::EKLMHitGlobalCoord() :
+  m_globalX(-1),
+  m_globalY(-1),
+  m_globalZ(-1)
 {
-  m_globalX = -1;
-  m_globalY = -1;
-  m_globalZ = -1;
 }
 
 EKLMHitGlobalCoord::~EKLMHitGlobalCoord()
@@ -37,24 +37,3 @@ void EKLMHitGlobalCoord::setPosition(const TVector3& pos)
   m_globalY = pos.Y();
   m_globalZ = pos.Z();
 }
-
-float EKLMHitGlobalCoord::getPositionX() const
-{
-  return m_globalX;
-}
-
-float EKLMHitGlobalCoord::getPositionY() const
-{
-  return m_globalY;
-}
-
-float EKLMHitGlobalCoord::getPositionZ() const
-{
-  return m_globalZ;
-}
-
-TVector3 EKLMHitGlobalCoord::getPosition() const
-{
-  return TVector3(m_globalX, m_globalY, m_globalZ);
-}
-

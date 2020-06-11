@@ -235,7 +235,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
            nSectorsInV = config.vSectorDivider.size();
 
   // retrieve the full list of sensors from the geometry
-  VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> listOfSensors = geometry.getListOfSensors();
   for (VxdID aSensorId : listOfSensors) {
 

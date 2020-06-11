@@ -22,17 +22,17 @@ namespace Belle2 {
     using Point = std::pair<double, double>;
 
     /**
-     *@brief Class to perform template fit on TOP waveform data
-     *Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
-     *@author Tobias Weber
+     * @brief Class to perform template fit on TOP waveform data
+     * Minimzation method is described here http://wwwa1.kph.uni-mainz.de/Vorlesungen/SS11/Statistik/
+     * @author Tobias Weber
      */
     class TOPTemplateFitter {
 
     public:
 
       /**
-       *@brief Parameters of the template function.
-       *We use a crystal ball function
+       * @brief Parameters of the template function.
+       * We use a crystal ball function
        */
       struct TemplateParameters {
         double amplitude = 100.;/**< amplitude of template function */
@@ -40,7 +40,7 @@ namespace Belle2 {
       };
 
       /**
-       *@brief structure holding values from template fit
+       * @brief structure holding values from template fit
        */
       struct FitResult {
         double amplitude = 0; /**< fitted amplitude */
@@ -50,7 +50,7 @@ namespace Belle2 {
         double risingEdge = 0;/**< fitted rising edge*/
 
         /**
-         *@brief set the fit result variables to zero
+         * @brief set the fit result variables to zero
          */
         void clear()
         {
@@ -63,8 +63,8 @@ namespace Belle2 {
       };
 
       /**
-      *@brief Variables used during template fit minimization
-      */
+       * @brief Variables used during template fit minimization
+       */
       struct MinimizationSums {
         double S1 = 0; /**< sum of sample weights */
         double Sx = 0; /**< sum of template*weight */
@@ -74,7 +74,7 @@ namespace Belle2 {
         double Syy = 0;/**< sum of signal sample * signal sample * weight */
 
         /**
-         *@brief set sums used during template fit to initial values
+         * @brief set sums used during template fit to initial values
          */
         void clear()
         {
@@ -88,123 +88,126 @@ namespace Belle2 {
       };
 
       /**
-      @brief full constructor
-      @param TOP raw waveform samples
-      @param database object holding time correction
-      @param average sample RMS
+       * @brief full constructor
+       * @param wf TOP raw waveform samples
+       * @param sampleTimes database object holding time correction
+       * @param averageRMS average sample RMS
       */
       TOPTemplateFitter(const TOPRawWaveform& wf,
                         const TOPSampleTimes& sampleTimes,
                         const double averageRMS);
       /**
-      @brief default destructor
-      */
+       * @brief default destructor
+       */
       ~TOPTemplateFitter() {};
 
       /**
-      @brief Returns fit chi square
-      @return fit chi square
-      */
+       * @brief Returns fit chi square
+       * @return fit chi square
+       */
       double getChisq() const {return m_chisq;}
 
       /**
-      @brief Returns calculated chisq values
-      @return chisq vector
-      */
+       * @brief Returns calculated chisq values
+       * @return chisq vector
+       */
       const std::vector<double>& getChisqVector() const {return m_chisq_vec;}
 
       /**
-      @brief Returns fitted values with errors
-      @return fitted values with errors
-      */
+       * @brief Returns fitted values with errors
+       * @return fitted values with errors
+       */
       const FitResult& getFitResult() const {return m_result;}
 
       /**
-      @brief Returns the template parameters
-      @return template parameters
-      */
+       * @brief Returns the template parameters
+       * @return template parameters
+       */
       static TemplateParameters& getTemplateParameters() {return s_templateParameters;}
 
       /**
-      @brief Returns the total number of template samples
-      @return total number of template samples
-      */
+       * @brief Returns the total number of template samples
+       * @return total number of template samples
+       */
       static int getTemplateSamples() {return s_totalTemplateSamples;}
 
       /**
-      @brief Returns the template resolution
-      @return template resolution
-      */
+       * @brief Returns the template resolution
+       * @return template resolution
+       */
       static int getTemplateResolution() {return s_templateResolution;}
 
       /**
-       @brief Returns useParabola
-       @return useParabola
+       * @brief Returns useParabola
+       * @return useParabola
        */
       static bool getUseParabola() {return s_useParabola;}
 
       /**
-      @brief Sets the template parameters
-      @param template Parameters
-      */
+       * @brief Sets the template parameters
+       * @param params template Parameters
+       */
       static void setTemplateParameters(const TemplateParameters& params);
 
       /**
-      @brief Set the total number of template samples
-      @param total number of template samples
-      */
+       * @brief Set the total number of template samples
+       * @param nSamples total number of template samples
+       */
       static void setTemplateSamples(int nSamples);
 
       /**
-      @brief Set the template resolution
-      @param template resolution
-      */
+       * @brief Set the template resolution
+       * @param resolution template resolution
+       */
       static void setTemplateResolution(int resolution);
 
       /**
-      @brief Enable Usage of parabola improvement
-      @param enable/disable usage
+       * @brief Enable Usage of parabola improvement
+       * @param use enable/disable usage
       */
       static void setUseParabola(bool use) {s_useParabola = use;}
 
       /**
-      @brief Intializes the template fit using default values
-      */
+       * @brief Intializes the template fit using default values
+       */
       static void InitializeTemplateFit();
 
       /**
-      @brief Prepares data and performs the template fit in sample space
-      @param initial guess for rising edge position from CFD
-      @param range of template fit*/
+       * @brief Prepares data and performs the template fit in sample space
+       * @param risingEdgeStart initial guess for rising edge position from CFD
+       * @param fitRange range of template fit
+       */
       void performTemplateFit(const double risingEdgeStart,
                               const double fitRange);
 
     private:
 
       /**
-       *@brief performs the template fit
-       *@param sample vector
-       *@param pedestal vector
-       *@param timing correction for samples
-       *@param rising edge from constant fraction discrimination
+       * @brief performs the template fit
+       * @param samples sample vector
+       * @param pedestals pedestal vector
+       * @param timingCorrection timing correction for samples
+       * @param risingEdgeCFD rising edge from constant fraction discrimination
+       * @param fitRange fit range
        */
       void PerformTemplateFitMinimize(const std::vector<short>& samples, const std::vector<short>& pedestals,
-                                      const std::vector<float>& timingCorrection, const double risingEdgeCFD, const double fitRange);
+                                      const std::vector<float>& timingCorrection, const double risingEdgeCFD,
+                                      const double fitRange);
 
       /**
-       *@brief  Compute the minimized parameters and chi square value
-       *@param minimization sums for chisq calculation
-       *@param minimized parameters
-       *@return chi square
+       * @brief  Compute the minimized parameters and chi square value
+       * @param sums minimization sums for chisq calculation
+       * @param result minimized parameters
+       * @return chi square
        */
       double ComputeMinimizedParametersAndChisq(const MinimizationSums& sums, FitResult& result);
 
       /**
-       *@brief Calculate vertex coordinates of parabola given three data points
-       *@param data point 1
-       *@param data point 2
-       *@param data point 3
-       *@param vertex position
+       * @brief Calculate vertex coordinates of parabola given three data points
+       * @param p1 data point 1
+       * @param p2 data point 2
+       * @param p3 data point 3
+       * @param vertex vertex position
        */
       void CalculateParabolaVertex(const Point& p1, const Point& p2, const Point& p3,
                                    Point& vertex);

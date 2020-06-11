@@ -62,5 +62,6 @@ Enddecay
 
 Decay pi0sig
 1.0000 gamma   gamma   PHSP;
+Enddecay
 
 End

@@ -46,12 +46,18 @@ namespace Belle2 {
       /**
        * Get initial point.
        */
-      const HepGeom::Point3D<double>& getInitialPoint() const;
+      const HepGeom::Point3D<double>& getInitialPoint() const
+      {
+        return m_Point;
+      }
 
       /**
        * Get vector.
        */
-      const HepGeom::Vector3D<double>& getVector() const;
+      const HepGeom::Vector3D<double>& getVector() const
+      {
+        return m_Vector;
+      }
 
       /**
        * Find intersection with a line.

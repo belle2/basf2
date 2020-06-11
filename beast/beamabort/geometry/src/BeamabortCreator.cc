@@ -45,9 +45,9 @@ namespace Belle2 {
     /** Creator creates the BEAMABORT geometry */
     geometry::CreatorFactory <BeamabortCreator> BeamabortFactory("BEAMABORTCreator");
 
-    BeamabortCreator::BeamabortCreator() : m_sensitive(0)
+    BeamabortCreator::BeamabortCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     BeamabortCreator::~BeamabortCreator()
@@ -58,6 +58,8 @@ namespace Belle2 {
     void BeamabortCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
                                   geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       B2INFO("BeamabortCreator phase2");
       //Visualization Attributes

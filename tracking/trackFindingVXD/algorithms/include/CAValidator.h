@@ -19,7 +19,7 @@ namespace Belle2 {
     bool isValidRound(int caRound) { return !(caRound > nMaxIterations) and !(caRound < 0); }
 
     /** function to check the cell if seed-conditions are met. */
-    bool checkSeed(CellType& aCell) { return !(aCell.getState() < seedThreshold); }
+    bool checkSeed(const CellType& aCell) { return !(aCell.getState() < seedThreshold); }
 
     /** determines max number of iterations allowed by user, standard value is (number of VXD layers x 4) + 1. */
     int nMaxIterations = 25;

@@ -9,8 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
@@ -54,29 +55,35 @@ namespace Belle2 {
       /// Equality comparision based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const
       {
-        return
-          std::tie(m_startSegment, m_middleSegment, m_endSegment) ==
-          std::tie(rhs.m_startSegment, rhs.m_middleSegment, rhs.m_endSegment);
+        return (*m_startSegment == *rhs.m_startSegment) &&
+               (*m_middleSegment == *rhs.m_middleSegment) &&
+               (*m_endSegment == *rhs.m_endSegment);
       }
 
       /// Total ordering sheme based on the two axial segments first and the stereo segments second
       bool operator<(CDCSegmentTriple const& rhs) const
       {
-        return
-          std::tie(m_startSegment, m_middleSegment, m_endSegment) <
-          std::tie(rhs.m_startSegment, rhs.m_middleSegment, rhs.m_endSegment);
+        if (*m_startSegment < *rhs.m_startSegment)
+          return true;
+        if (*m_startSegment > *rhs.m_startSegment)
+          return false;
+        if (*m_middleSegment < *rhs.m_middleSegment)
+          return true;
+        if (*m_middleSegment > *rhs.m_middleSegment)
+          return false;
+        return *m_endSegment < *rhs.m_endSegment;
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
       friend bool operator<(CDCSegmentTriple const& segmentTriple, const CDCAxialSegment2D* axialSegment)
       {
-        return segmentTriple.getStartSegment() < axialSegment;
+        return *segmentTriple.getStartSegment() < *axialSegment;
       }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
       friend bool operator<(const CDCAxialSegment2D* axialSegment, CDCSegmentTriple const& segmentTriple)
       {
-        return axialSegment < segmentTriple.getStartSegment();
+        return *axialSegment < *segmentTriple.getStartSegment();
       }
 
       /// Checks the references to the contained three segment for nullptrs

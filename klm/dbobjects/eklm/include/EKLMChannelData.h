@@ -25,108 +25,154 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMChannelData();
+    EKLMChannelData()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMChannelData();
+    ~EKLMChannelData()
+    {
+    }
 
     /**
      * Get pedestal.
      */
-    float getPedestal() const;
+    float getPedestal() const
+    {
+      return m_Pedestal;
+    }
 
     /**
      * Set pedestal.
      */
-    void setPedestal(float pedestal);
+    void setPedestal(float pedestal)
+    {
+      m_Pedestal = pedestal;
+    }
 
     /**
      * Get photoelectron amplitude.
      */
-    float getPhotoelectronAmplitude() const;
+    float getPhotoelectronAmplitude() const
+    {
+      return m_PhotoelectronAmplitude;
+    }
 
     /**
      * Set photoelectron amplitude.
      */
-    void setPhotoelectronAmplitude(float photoelectronAmplitude);
+    void setPhotoelectronAmplitude(float photoelectronAmplitude)
+    {
+      m_PhotoelectronAmplitude = photoelectronAmplitude;
+    }
 
     /**
      * Get threshold.
      */
-    int getThreshold() const;
+    int getThreshold() const
+    {
+      return m_Threshold;
+    }
 
     /**
      * Set threshold.
      */
-    void setThreshold(int threshold);
+    void setThreshold(int threshold)
+    {
+      m_Threshold = threshold;
+    }
 
     /**
      * Get voltage.
      */
-    float getVoltage() const;
+    float getVoltage() const
+    {
+      return m_Voltage;
+    }
 
     /**
      * Set voltage.
      */
-    void setVoltage(float voltage);
+    void setVoltage(float voltage)
+    {
+      m_Voltage = voltage;
+    }
 
     /**
      * Get adjustment voltage.
      */
-    int getAdjustmentVoltage() const;
+    int getAdjustmentVoltage() const
+    {
+      return m_AdjustmentVoltage;
+    }
 
     /**
      * Set adjustment voltage.
      */
-    void setAdjustmentVoltage(int adjustmentVoltage);
+    void setAdjustmentVoltage(int adjustmentVoltage)
+    {
+      m_AdjustmentVoltage = adjustmentVoltage;
+    }
 
     /**
      * Get lookback time (unit is 32 TDC counts).
      */
-    int getLookbackTime() const;
+    int getLookbackTime() const
+    {
+      return m_LookbackTime;
+    }
 
     /**
      * Set lookback time (unit is 32 TDC counts).
      */
-    void setLookbackTime(int lookbackTime);
+    void setLookbackTime(int lookbackTime)
+    {
+      m_LookbackTime = lookbackTime;
+    }
 
     /**
      * Get lookback window width (unit is 32 TDC counts).
      */
-    int getLookbackWindowWidth() const;
+    int getLookbackWindowWidth() const
+    {
+      return m_LookbackWindowWidth;
+    }
 
     /**
      * Set lookback window width (unit is 32 TDC counts).
      */
-    void setLookbackWindowWidth(int lookbackWindowWidth);
+    void setLookbackWindowWidth(int lookbackWindowWidth)
+    {
+      m_LookbackWindowWidth = lookbackWindowWidth;
+    }
 
   private:
 
     /** True if channel is active. */
-    bool m_Active;
+    bool m_Active = false;
 
     /** Pedestal. */
-    float m_Pedestal;
+    float m_Pedestal = 0;
 
     /** Photoelectron amplitude. */
-    float m_PhotoelectronAmplitude;
+    float m_PhotoelectronAmplitude = 0;
 
     /** Threshold (maximal EKLMDigit.m_Charge). */
-    int m_Threshold;
+    int m_Threshold = 0;
 
     /** Voltage. */
-    float m_Voltage;
+    float m_Voltage = 0;
 
     /** Adjustment voltage. */
-    int m_AdjustmentVoltage;
+    int m_AdjustmentVoltage = 0;
 
     /** Lookback time (unit is 32 TDC counts). */
-    int m_LookbackTime;
+    int m_LookbackTime = 0;
 
     /** Lookback window width (unit is 32 TDC counts). */
-    int m_LookbackWindowWidth;
+    int m_LookbackWindowWidth = 0;
 
     /** Class version. */
     ClassDef(Belle2::EKLMChannelData, 4);

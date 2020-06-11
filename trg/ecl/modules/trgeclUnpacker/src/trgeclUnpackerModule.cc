@@ -42,7 +42,7 @@ TRGECLUnpackerModule::TRGECLUnpackerModule()
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  B2INFO("trgeclunpacker: Constructor done.");
+  B2DEBUG(20, "trgeclunpacker: Constructor done.");
 }
 
 TRGECLUnpackerModule::~TRGECLUnpackerModule() {}

@@ -314,12 +314,6 @@ WeightedRelation<const CDCSegment2D> CDCSegment2D::makeWeightedRelation(double w
   return {this, weight, segment};
 }
 
-bool CDCSegment2D::operator==(const CDCSegment2D& segment2D) const
-{
-  return (this->getISuperLayer() == segment2D.getISuperLayer()) and
-         (this->getISuperCluster() == segment2D.getISuperCluster());
-}
-
 bool CDCSegment2D::operator<(const CDCSegment2D& segment2D) const
 {
   return (this->getISuperLayer() < segment2D.getISuperLayer()) or

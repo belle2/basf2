@@ -289,7 +289,7 @@ namespace {
       }
 
       if (daug->getNDaughters() != 0) {
-        // if daug has daughters, call appendParticles recursively.
+        // if daug has daughters, call appendDaughtersOfMatched recursively.
         appendDaughtersOfMatched(daug, mcMatchedParticles);
         continue;
       }
@@ -546,6 +546,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   int flags = 0;
 
   unordered_set<const MCParticle*> mcMatchedParticles;
+  // Missing particles which are accepted by the property are also stored.
   appendDaughtersOfMatched(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
@@ -597,6 +598,8 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
 {
   unordered_set<const MCParticle*> mcMatchedParticles;
+  // Missing particles which are accepted by the property flags are NOT stored.
+  // --> Such particles are also counted in nMissingDaughter.
   appendParticles(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);

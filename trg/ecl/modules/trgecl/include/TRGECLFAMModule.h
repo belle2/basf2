@@ -18,7 +18,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
 
 #include "trg/ecl/dataobjects/TRGECLFAMAna.h"
 #include "trg/ecl/dataobjects/TRGECLDigi0.h"

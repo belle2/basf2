@@ -14,11 +14,9 @@
 #define TRG_SHORT_NAMES
 
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 #include <map>
 #include <string.h>
 #include "trg/trg/Utilities.h"

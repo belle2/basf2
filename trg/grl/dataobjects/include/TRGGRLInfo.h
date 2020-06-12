@@ -13,8 +13,7 @@
 //-----------------------------------------------------------
 #pragma once
 #include <TObject.h>
-#include <TVector3.h>
-#include <string>
+
 namespace Belle2 {
 
   /// a class to store TRGGRL TSIM info

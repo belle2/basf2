@@ -14,12 +14,9 @@
 #ifndef TRGECLBeamBKG_FLAG_
 #define TRGECLBeamBKG_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 #include "trg/ecl/TrgEclMapping.h"
-#include "TVector3.h"
 //
 //
 //

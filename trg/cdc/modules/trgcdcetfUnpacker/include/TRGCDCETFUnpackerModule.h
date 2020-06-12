@@ -14,18 +14,13 @@
 #ifndef TRGCDCETFUNPACKER_H
 #define TRGCDCETFUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/cdc/dataobjects/TRGCDCETFUnpackerStore.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 

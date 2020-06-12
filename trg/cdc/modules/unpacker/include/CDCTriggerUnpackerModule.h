@@ -22,7 +22,6 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
@@ -31,10 +30,7 @@
 #include <bitset>
 #include <vector>
 #include <string>
-#include <iostream>
 #include <iomanip>
-#include <utility>
-#include <typeinfo>
 
 namespace Belle2 {
 

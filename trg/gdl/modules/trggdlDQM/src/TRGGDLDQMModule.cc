@@ -16,15 +16,11 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dbobjects/RunInfo.h>
-#include <framework/datastore/DataStore.h>
 
 #include <TDirectory.h>
-#include <TRandom3.h>
 #include <TPostScript.h>
 #include <TCanvas.h>
 #include <TStyle.h>
-#include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <framework/logging/Logger.h>

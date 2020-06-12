@@ -17,8 +17,6 @@
 
 #include <algorithm>
 
-#include <numeric>
-
 /* defines */
 #define CDC_SUPER_LAYERS 9
 

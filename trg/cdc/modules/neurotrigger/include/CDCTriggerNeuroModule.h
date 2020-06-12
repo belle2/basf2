@@ -12,8 +12,6 @@
 
 namespace Belle2 {
 
-  class CDCTriggerMLP;
-
   /** The neural network module of the CDC trigger.
    * Select one of several trained neural networks
    * and run it to estimate the z-vertex of a track

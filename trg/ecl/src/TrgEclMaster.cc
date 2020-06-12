@@ -57,14 +57,7 @@
 #define TRG_SHORT_NAMES
 #define TRGECL_SHORT_NAMES
 
-//#include <cstdlib>
 #include "framework/datastore/StoreArray.h"
-//#include "trg/trg/Debug.h"
-//#include "trg/trg/Time.h"
-//#include "trg/trg/Signal.h"
-//#include "trg/trg/Link.h"
-//#include "trg/trg/Utilities.h"
-#include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclMaster.h"
 #include "trg/ecl/TrgEclCluster.h"
 

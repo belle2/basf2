@@ -34,13 +34,11 @@
 
 #define TRG_SHORT_NAMES
 #define TRGECLCLUSTER_SHORT_NAMES
-#include <framework/datastore/StoreObjPtr.h>
+
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 
 
 #include <trg/ecl/TrgEclCluster.h>
-#include <framework/logging/Logger.h>
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 

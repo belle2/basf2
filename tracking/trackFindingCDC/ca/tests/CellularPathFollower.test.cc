@@ -37,7 +37,7 @@ TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
   secondElement.getAutomatonCell().setCellState(1);
   secondElement.getAutomatonCell().setAssignedFlag();
 
-  CellularPathFollower<Element, WeightedRelation> cellularPathFollower;
+  CellularPathFollower<Element> cellularPathFollower;
   const std::vector<Element*> elementPath =
     cellularPathFollower.followSingle(&startElement, relations, -INFINITY);
   EXPECT_EQ(2, elementPath.size());

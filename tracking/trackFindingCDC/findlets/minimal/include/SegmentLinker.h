@@ -59,10 +59,10 @@ namespace Belle2 {
 
     private:
       /// Creator of the segment relations for linking
-      WeightedRelationCreator<const CDCSegment2D, ChooseableSegmentRelationFilter, WeightedRelation> m_segment2DRelationCreator;
+      WeightedRelationCreator<const CDCSegment2D, ChooseableSegmentRelationFilter> m_segment2DRelationCreator;
 
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCSegment2D, WeightedRelation> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegment2D> m_cellularPathFinder;
 
       /// Memory for the relations between segments to be followed on linking
       std::vector<WeightedRelation<const CDCSegment2D>> m_segment2DRelations;

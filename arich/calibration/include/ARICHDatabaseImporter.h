@@ -608,8 +608,6 @@ namespace Belle2 {
       rStream << '\n';
     }
 
-    ClassDef(ARICHDatabaseImporter, 4);                 /**< ClassDef */
-
   };
 
 } // Belle2 namespace

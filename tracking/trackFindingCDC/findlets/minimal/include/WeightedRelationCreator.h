@@ -42,7 +42,7 @@ namespace Belle2 {
      *  In addition a parameter is exposed to only keep a fixed number of highest weighted relations
      *  from each segment.
      */
-    template <class AObject, class ARelationFilter, template<class ...> class WeightedRelationClass>
+    template <class AObject, class ARelationFilter, template<class> class WeightedRelationClass>
     class WeightedRelationCreator : public Findlet<AObject* const, WeightedRelationClass<AObject>> {
 
     private:

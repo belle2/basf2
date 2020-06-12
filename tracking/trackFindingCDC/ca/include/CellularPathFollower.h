@@ -32,7 +32,7 @@ namespace Belle2 {
      *  certainly pick up a lot of elements twice if there are many start culminating into a common long
      *  path. This is carried out recursively by followAll over the start cells marked with start flag.
      */
-    template<class ACellHolder, template<class ...> class WeightedRelationClass>
+    template<class ACellHolder, template<class> class WeightedRelationClass>
     class CellularPathFollower {
 
     public:

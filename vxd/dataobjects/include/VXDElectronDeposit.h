@@ -12,8 +12,8 @@
 #ifndef VXD_SIMULATION_ELECTRONDEPOSIT_H
 #define VXD_SIMULATION_ELECTRONDEPOSIT_H
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 namespace Belle2 {
   /** Packed class to represent energy deposit along a path in electrons.

@@ -364,7 +364,7 @@ def get_calibrations(input_data, **kwargs):
     # +-12ns range allows for three 8ns crate time jumps in one direction
     tShifts_alg.crysCrateShift_min = -12   # in ns
     tShifts_alg.crysCrateShift_max = 12    # in ns
-    tShifts_alg.forcePayloadIOVnotOpenEnded = True
+    tShifts_alg.forcePayloadIOVnotOpenEndedAndSequentialRevision = True
 
     cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", collector="DummyCollector",
                                      algorithms=[tShifts_alg], input_files=input_files_first_last)

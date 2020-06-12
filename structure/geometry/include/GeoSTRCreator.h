@@ -22,14 +22,10 @@
 #include <structure/dbobjects/STRGeometryPar.h>
 
 #include <string>
-#include <vector>
 
 class G4LogicalVolume;
-//class G4Polycone
 
 namespace Belle2 {
-
-  class GearDir;
 
   namespace structure {
 

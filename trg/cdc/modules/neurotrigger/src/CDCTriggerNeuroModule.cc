@@ -1,9 +1,5 @@
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/gearbox/Const.h>
-
 #include <cmath>
 
 using namespace Belle2;

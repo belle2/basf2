@@ -4,8 +4,6 @@
 
 #include <framework/gearbox/Const.h>
 
-#include <Eigen/Dense>
-
 namespace {
   //small anonymous helper construct making converting a pair of iterators usable
   //with range based for

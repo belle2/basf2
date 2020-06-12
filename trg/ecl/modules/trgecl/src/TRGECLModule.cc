@@ -13,22 +13,15 @@
 
 #define TRGECL_SHORT_NAMES
 
-//framework headers
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-
-#include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/core/ModuleParamList.h>
 
-#include <G4RunManager.hh>
 #include "trg/ecl/TrgEclMaster.h"
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLModule.h"
 #include "trg/ecl/dbobjects/TRGECLETMPara.h"
 
-#include <stdlib.h>
 #include <iostream>
 
 using namespace std;

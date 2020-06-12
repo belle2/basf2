@@ -14,12 +14,8 @@
 
 #include <array>
 #include <bitset>
-#include <queue>
 #include <string>
-#include <sstream>
-#include <utility>
 #include <numeric>
-#include <iomanip>
 #include <algorithm>
 
 using namespace Belle2;

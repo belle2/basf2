@@ -16,10 +16,7 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <algorithm>
-#include <limits>
 #include <iostream>
-#include <iomanip>
-#include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/State.h"
 #include "trg/trg/Channel.h"

@@ -48,7 +48,7 @@ namespace Belle2 {
       /** Whether or not to veto runs where an older payload is used.
           Force the payload revision number to increase as the
           run number increases. */
-      bool forcePayloadIOVnotOpenEnded;
+      bool forcePayloadIOVnotOpenEndedAndSequentialRevision;
 
     protected:
 

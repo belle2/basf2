@@ -17,18 +17,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
-
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <svd/online/SVDStripNoiseMap.h>
 
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
-//
 
 
 namespace Belle2 {

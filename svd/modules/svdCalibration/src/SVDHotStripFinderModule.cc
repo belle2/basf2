@@ -1,19 +1,15 @@
 #include <geometry/GeometryManager.h>
 #include <time.h>
-#include <list>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 // framework - Database
-#include <framework/database/Database.h>
-#include <framework/database/PayloadFile.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
+
+#include <svd/calibration/SVDHotStripsCalibrations.h>
 #include <svd/calibration/SVDOccupancyCalibrations.h>
 #include <svd/modules/svdCalibration/SVDHotStripFinderModule.h>
 
-
-#include <boost/foreach.hpp>
 
 using namespace std;
 

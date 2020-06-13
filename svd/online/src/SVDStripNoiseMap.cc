@@ -11,7 +11,6 @@
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/logging/Logger.h>
 
-#include <iostream>
 #include <cstdlib>
 #include <fstream>
 

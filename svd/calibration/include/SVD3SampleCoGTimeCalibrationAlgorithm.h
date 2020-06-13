@@ -12,11 +12,6 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
-#include <svd/dataobjects/SVDHistograms.h>
-#include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
 #include <optional>
 
 namespace Belle2 {

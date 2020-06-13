@@ -13,10 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <svd/geometry/SensorInfo.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
 #include <string>

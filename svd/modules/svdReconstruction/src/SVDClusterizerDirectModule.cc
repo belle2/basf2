@@ -10,7 +10,6 @@
 
 #include <svd/modules/svdReconstruction/SVDClusterizerDirectModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 

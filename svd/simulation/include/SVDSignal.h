@@ -16,8 +16,6 @@
 #include <sstream>
 #include <deque>
 #include <map>
-#include <algorithm>
-#include <math.h>
 #include <svd/simulation/SVDSimulationTools.h>
 
 namespace Belle2 {

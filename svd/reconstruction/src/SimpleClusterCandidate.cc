@@ -16,7 +16,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 

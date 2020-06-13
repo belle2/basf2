@@ -9,7 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <svd/modules/svdCoGTimeCalibrationCollector/SVDCoGTimeCalibrationCollectorModule.h>
-#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

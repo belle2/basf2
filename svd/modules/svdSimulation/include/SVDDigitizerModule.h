@@ -14,21 +14,16 @@
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/simulation/SVDSignal.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/dataobjects/RelationElement.h>
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 #include <string>
-#include <set>
-#include <vector>
 
 #include <root/TVector3.h>
 #include <root/TFile.h>
 #include <root/TTree.h>
 #include <root/TH1D.h>
-#include <root/TH2D.h>
 
 namespace Belle2 {
   namespace SVD {

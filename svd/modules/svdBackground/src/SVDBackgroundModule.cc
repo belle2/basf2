@@ -4,10 +4,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <simulation/background/BkgNeutronWeight.h>
-
-#include <framework/core/InputController.h>
 
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/dataobjects/BackgroundMetaData.h>
@@ -23,13 +19,9 @@
 #include <fstream>
 #include <set>
 #include <algorithm>
-#include <numeric>
 #include <boost/format.hpp>
 
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TVector3.h"
-#include "TDirectory.h"
 
 using namespace std;
 using boost::format;

@@ -13,8 +13,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/SimpleClusterCandidate.h>
 
 #include <mdst/dataobjects/MCParticle.h>

@@ -10,7 +10,6 @@
 
 #include <svd/modules/svdReconstruction/SVDShaperDigitSorterModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
